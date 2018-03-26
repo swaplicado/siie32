@@ -14,11 +14,16 @@ import erp.mod.trn.db.SDbInventoryMfgCost;
 import erp.mod.trn.db.SDbInventoryValuation;
 import erp.mod.trn.db.SDbItemRequiredDpsConfig;
 import erp.mod.trn.db.SDbMaintArea;
+import erp.mod.trn.db.SDbMaintConfig;
+import erp.mod.trn.db.SDbMaintUser;
+import erp.mod.trn.db.SDbMaintUserSupervisor;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.form.SFormDelivery;
 import erp.mod.trn.form.SFormInventoryValuation;
 import erp.mod.trn.form.SFormItemRequiredDpsConfig;
 import erp.mod.trn.form.SFormMaintArea;
+import erp.mod.trn.form.SFormMaintUser;
+import erp.mod.trn.form.SFormMaintUserSupervisor;
 import erp.mod.trn.form.SFormMmsConfig;
 import erp.mod.trn.view.SViewAccountsPending;
 import erp.mod.trn.view.SViewCurrencyBalance;
@@ -31,6 +36,8 @@ import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
 import erp.mod.trn.view.SViewItemRequiredDpsConfig;
 import erp.mod.trn.view.SViewMaintArea;
+import erp.mod.trn.view.SViewMaintUser;
+import erp.mod.trn.view.SViewMaintUserSupervisor;
 import erp.mod.trn.view.SViewMmsConfig;
 import erp.mod.trn.view.SViewOrderLimitMonth;
 import erp.mod.trn.view.SViewValCost;
@@ -52,7 +59,7 @@ import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Cesar Orozco
+ * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Gil De Jesús
  */
 public class SModuleTrn extends SGuiModule {
 
@@ -61,6 +68,10 @@ public class SModuleTrn extends SGuiModule {
     private SFormMmsConfig moFormMmsConfiguration;
     private SFormDelivery moFormDelivery;
     private SFormMaintArea moFormMaintArea;
+    private SFormMaintUser moFormMaintUserEmployee;
+    private SFormMaintUser moFormMaintUserContractor;
+    private SFormMaintUser moFormMaintUserToolMaintProv;
+    private SFormMaintUserSupervisor moFormMaintUserSupv;
 
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
@@ -126,8 +137,17 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_DVY_ETY:
                 registry = new SDbDeliveryEntry();
                 break;
+            case SModConsts.TRN_MAINT_CFG:
+                registry = new SDbMaintConfig();
+                break;
             case SModConsts.TRN_MAINT_AREA:
                 registry = new SDbMaintArea();
+                break;
+            case SModConsts.TRN_MAINT_USER:
+                registry = new SDbMaintUser();
+                break;
+            case SModConsts.TRN_MAINT_USER_SUPV:
+                registry = new SDbMaintUserSupervisor();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -139,6 +159,8 @@ public class SModuleTrn extends SGuiModule {
     @Override
     public SGuiCatalogueSettings getCatalogueSettings(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
+        String sqlWhere = "";
+        String name = "";
         SGuiCatalogueSettings settings = null;
 
         switch (type) {
@@ -146,15 +168,53 @@ public class SModuleTrn extends SGuiModule {
                 settings = new SGuiCatalogueSettings("Tipo de documento", 3);
                 sql = "SELECT id_ct_dps AS " + SDbConsts.FIELD_ID + "1, id_cl_dps AS " + SDbConsts.FIELD_ID + "2, id_tp_dps AS " + SDbConsts.FIELD_ID + "3, "
                         + "tp_dps AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = FALSE "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
                         + "ORDER BY tp_dps, id_ct_dps, id_cl_dps, id_tp_dps ";
                 break;
             case SModConsts.TRNU_TP_DPS_ANN:
                 settings = new SGuiCatalogueSettings("Cancelación", 1);
                 sql = "SELECT id_tp_dps_ann AS " + SDbConsts.FIELD_ID + "1, tp_dps_ann AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " "
-                        + "WHERE b_del = 0 "
+                        + "WHERE NOT b_del "
                         + "ORDER BY id_tp_dps_ann ";
+                break;
+            case SModConsts.TRN_MAINT_AREA:
+                settings = new SGuiCatalogueSettings("Área de mantenimiento", 1);
+                sql = "SELECT id_maint_area AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del "
+                        + "ORDER BY name, id_maint_area ";
+                break;
+            case SModConsts.TRN_MAINT_USER:
+                switch (subtype) {
+                    case SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE:
+                        sqlWhere = "mu.b_employee ";
+                        name = SModSysConsts.TXT_TRNX_TP_MAINT_USER_EMPLOYEE;
+                        break;
+                    case SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR:
+                        sqlWhere = "mu.b_contractor ";
+                        name = SModSysConsts.TXT_TRNX_TP_MAINT_USER_CONTRACTOR;
+                        break;
+                    case SModSysConsts.TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV:
+                        sqlWhere = "mu.b_tool_maint_prov ";
+                        name = SModSysConsts.TXT_TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV;
+                        break;
+                    default:
+                }
+                settings = new SGuiCatalogueSettings(name, 1);
+                sql = "SELECT mu.id_maint_user AS " + SDbConsts.FIELD_ID + "1, b.bp AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " AS mu "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = mu.id_maint_user "
+                        + "WHERE NOT mu.b_del " + (sqlWhere.isEmpty() ? "" : "AND " + sqlWhere)
+                        + "ORDER BY b.bp, mu.id_maint_user ";
+                break;
+            case SModConsts.TRN_MAINT_USER_SUPV:
+                settings = new SGuiCatalogueSettings("Residente de contratista", 1);
+                sql = "SELECT id_maint_user_supv AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " "
+                        + "WHERE NOT b_del AND fk_maint_user_n = " + params.getKey()[0] + " "
+                        + "ORDER BY name, id_maint_user_supv ";
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -235,6 +295,23 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAINT_AREA:
                 view = new SViewMaintArea(miClient, "Áreas mantenimiento");
                 break;
+            case SModConsts.TRN_MAINT_USER:
+                switch(subtype){
+                    case SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE:
+                        view = new SViewMaintUser(miClient, subtype, "Mantto. - Empleados");
+                        break;
+                    case SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR:
+                        view = new SViewMaintUser(miClient, subtype, "Mantto. - Contratistas");
+                        break;
+                    case SModSysConsts.TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV:
+                        view = new SViewMaintUser(miClient, subtype, "Mantto. - Proveedores mantto. herramientas");
+                        break;
+                    default:
+                }
+                break;
+            case SModConsts.TRN_MAINT_USER_SUPV:
+                view = new SViewMaintUserSupervisor(miClient, "Mantto. - Residentes contratistas");
+                break;
             case SModConsts.TRNX_BP_BAL_CUR:
                 title = (subtype == SDataConstantsSys.TRNS_CT_DPS_SAL ? "CXC" : "CXP") + " x moneda";
                 if (params == null) {
@@ -274,16 +351,37 @@ public class SModuleTrn extends SGuiModule {
                 form = moFormInventoryValuation;
                 break;
             case SModConsts.TRN_MMS_CFG:
-                if(moFormMmsConfiguration == null) moFormMmsConfiguration = new SFormMmsConfig(miClient, "Configuración de ítems para envío por correo-e");
+                if (moFormMmsConfiguration == null) moFormMmsConfiguration = new SFormMmsConfig(miClient, "Configuración de ítems para envío por correo-e");
                 form = moFormMmsConfiguration;
                 break;
             case SModConsts.TRN_DVY:
-                if(moFormDelivery == null) moFormDelivery = new SFormDelivery(miClient, "Entrega");
+                if (moFormDelivery == null) moFormDelivery = new SFormDelivery(miClient, "Entrega");
                 form = moFormDelivery;
                 break;
             case SModConsts.TRN_MAINT_AREA:
-                if(moFormMaintArea == null) moFormMaintArea = new SFormMaintArea(miClient, "Área de mantenimiento");
+                if (moFormMaintArea == null) moFormMaintArea = new SFormMaintArea(miClient, "Área de mantenimiento");
                 form = moFormMaintArea;
+                break;
+            case SModConsts.TRN_MAINT_USER:
+                switch (subtype){
+                    case SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE:
+                        if (moFormMaintUserEmployee == null) moFormMaintUserEmployee = new SFormMaintUser(miClient, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE, SModSysConsts.TXT_TRNX_TP_MAINT_USER_EMPLOYEE);
+                        form = moFormMaintUserEmployee;
+                        break;
+                    case SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR:
+                        if (moFormMaintUserContractor == null) moFormMaintUserContractor = new SFormMaintUser(miClient, SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR, SModSysConsts.TXT_TRNX_TP_MAINT_USER_CONTRACTOR);
+                        form = moFormMaintUserContractor;
+                        break;
+                    case SModSysConsts.TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV:
+                        if (moFormMaintUserToolMaintProv == null) moFormMaintUserToolMaintProv = new SFormMaintUser(miClient, SModSysConsts.TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV, SModSysConsts.TXT_TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV);
+                        form = moFormMaintUserToolMaintProv;
+                        break;
+                    default:
+                }
+                break;
+            case SModConsts.TRN_MAINT_USER_SUPV:
+                if (moFormMaintUserSupv == null) moFormMaintUserSupv = new SFormMaintUserSupervisor(miClient, "Residente de contratista");
+                form = moFormMaintUserSupv;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

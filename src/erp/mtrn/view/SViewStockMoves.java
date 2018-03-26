@@ -24,7 +24,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewStockMoves extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -102,6 +102,7 @@ public class SViewStockMoves extends erp.lib.table.STableTab implements java.awt
 
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.TRN_DIOG);
+        mvSuscriptors.add(SDataConstants.TRNX_DIOG_MAINT);
 
         populateTable();
     }

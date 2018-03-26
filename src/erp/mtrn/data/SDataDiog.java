@@ -81,6 +81,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
 
+    protected int mnLastDiogSignatureId;
     protected java.lang.String msDbmsDiogCategory;
     protected java.lang.String msDbmsDiogClass;
     protected java.lang.String msDbmsDiogType;
@@ -469,6 +470,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
+    public void setLastDiogSignatureId(int n) { mnLastDiogSignatureId = n; }
     public void setDbmsDiogCategory(java.lang.String s) { msDbmsDiogCategory = s; }
     public void setDbmsDiogClass(java.lang.String s) { msDbmsDiogClass = s; }
     public void setDbmsDiogType(java.lang.String s) { msDbmsDiogType = s; }
@@ -481,6 +483,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
 
     public void setDbmsDataCounterpartDiog(erp.mtrn.data.SDataDiog o) { moDbmsDataCounterpartDiog = o; }
 
+    public int getLastDiogSignatureId() { return mnLastDiogSignatureId; }
     public java.lang.String getDbmsDiogCategory() { return msDbmsDiogCategory; }
     public java.lang.String getDbmsDiogClass() { return msDbmsDiogClass; }
     public java.lang.String getDbmsDiogType() { return msDbmsDiogType; }
@@ -510,6 +513,54 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public int[] getLinkedDpsKey_n() { return mnFkDpsYearId_n == SLibConstants.UNDEFINED || mnFkDpsDocId_n == SLibConstants.UNDEFINED ? null : new int[] { mnFkDpsYearId_n, mnFkDpsDocId_n }; }
     public int[] getLinkedDiogKey_n() { return mnFkDiogYearId_n == SLibConstants.UNDEFINED || mnFkDiogDocId_n == SLibConstants.UNDEFINED ? null : new int[] { mnFkDiogYearId_n, mnFkDiogDocId_n }; }
     public int[] getProdOrderKey_n() { return mnFkMfgYearId_n == SLibConstants.UNDEFINED || mnFkMfgOrderId_n == SLibConstants.UNDEFINED ? null : new int[] { mnFkMfgYearId_n, mnFkMfgOrderId_n }; }
+
+    public boolean isRegistryEditable() {
+        boolean editable = true;
+
+        if (this.getIsShipped()) {
+            editable = false;
+        }
+        else if (this.getIsAudited()) {
+            editable = false;
+        }
+        else if (this.getIsAuthorized()) {
+            editable = false;
+        }
+        else if (this.getIsSystem()) {
+            editable = false;
+        }
+        else if (this.getIsDeleted()) {
+            editable = false;
+        }
+
+        return editable;
+    }
+
+    public String getNonEditableHelp() {
+        String help = "";
+
+        if (this.getIsShipped()) {
+            help += "\n- El documento está embarcado.";
+        }
+        else if (this.getIsAudited()) {
+            help += "\n- El documento está auditado.";
+        }
+        else if (this.getIsAuthorized()) {
+            help += "\n- El documento está autorizado.";
+        }
+        else if (this.getIsSystem()) {
+            help += "\n- El documento es de sistema.";
+        }
+        else if (this.getIsDeleted()) {
+            help += "\n- El documento está eliminado.";
+        }
+
+        if (help.length() > 0) {
+            help = "No se puede modificar el documento porque:" + help;
+        }
+
+        return help;
+    }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -574,6 +625,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         mtUserEditTs = null;
         mtUserDeleteTs = null;
 
+        mnLastDiogSignatureId = 0;
         msDbmsDiogCategory = "";
         msDbmsDiogClass = "";
         msDbmsDiogType = "";
@@ -727,6 +779,10 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                     moDbmsRecordKey = new Object[] {resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getString(4), resultSet.getInt(5) };
                     mtDbmsRecordDate = resultSet.getDate("r.dt");
                 }
+                
+                // Read aswell, if any, last maintenance stock-movement's ID:
+                
+                mnLastDiogSignatureId = STrnMaintUtilities.getLastMaintDiogSignature(statement, (int[]) getPrimaryKey());
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;

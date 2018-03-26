@@ -1929,12 +1929,61 @@
                         <Component class="javax.swing.JLabel" name="jlTariff">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Fracc. arancelaria:"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Fracci&#xf3;n arancelaria"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                               <Dimension value="[100, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
-                        <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextTariff">
+                        <Component class="javax.swing.JTextField" name="moTextTariff">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Fracci&#xf3;n arancelaria"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[75, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="jlCustomsUnit">
+                          <Properties>
+                            <Property name="horizontalAlignment" type="int" value="0"/>
+                            <Property name="text" type="java.lang.String" value="Unidad aduana:"/>
+                            <Property name="toolTipText" type="java.lang.String" value="C&#xf3;digo de unidad aduana"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[85, 23]"/>
+                            </Property>
+                            <Property name="requestFocusEnabled" type="boolean" value="false"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JTextField" name="jtfCustomsUnit">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="TEXT"/>
+                            <Property name="toolTipText" type="java.lang.String" value="C&#xf3;digo de unidad aduana"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[50, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="jlCustomsEquivalence">
+                          <Properties>
+                            <Property name="horizontalAlignment" type="int" value="0"/>
+                            <Property name="text" type="java.lang.String" value="Equiv. aduana:"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Equivalencia respecto a la unidad f&#xed;sica"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[85, 23]"/>
+                            </Property>
+                            <Property name="requestFocusEnabled" type="boolean" value="false"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JTextField" name="jtfCustomsEquivalence">
+                          <Properties>
+                            <Property name="horizontalAlignment" type="int" value="11"/>
+                            <Property name="text" type="java.lang.String" value="0.000"/>
+                            <Property name="toolTipText" type="java.lang.String" value="Equivalencia respecto a la unidad f&#xed;sica"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[100, 23]"/>
+                            </Property>
+                          </Properties>
                         </Component>
                       </SubComponents>
                     </Container>

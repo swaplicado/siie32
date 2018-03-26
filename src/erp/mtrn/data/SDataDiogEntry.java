@@ -62,6 +62,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     protected java.lang.String msDbmsUnitSymbol;
     protected java.lang.String msDbmsOriginalUnit;
     protected java.lang.String msDbmsOriginalUnitSymbol;
+    protected java.lang.String msDbmsMaintArea;
     protected java.lang.String msDbmsUserNew;
     protected java.lang.String msDbmsUserEdit;
     protected java.lang.String msDbmsUserDelete;
@@ -150,6 +151,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public void setDbmsUnitSymbol(java.lang.String s) { msDbmsUnitSymbol = s; }
     public void setDbmsOriginalUnit(java.lang.String s) { msDbmsOriginalUnit = s; }
     public void setDbmsOriginalUnitSymbol(java.lang.String s) { msDbmsOriginalUnitSymbol = s; }
+    public void setDbmsMaintArea(java.lang.String s) { msDbmsMaintArea = s; }
     public void setDbmsUserNew(java.lang.String s) { msDbmsUserNew = s; }
     public void setDbmsUserEdit(java.lang.String s) { msDbmsUserEdit = s; }
     public void setDbmsUserDelete(java.lang.String s) { msDbmsUserDelete = s; }
@@ -162,6 +164,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
     public java.lang.String getDbmsUnitSymbol() { return msDbmsUnitSymbol; }
     public java.lang.String getDbmsOriginalUnit() { return msDbmsOriginalUnit; }
     public java.lang.String getDbmsOriginalUnitSymbol() { return msDbmsOriginalUnitSymbol; }
+    public java.lang.String getDbmsMaintArea() { return msDbmsMaintArea; }
     public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
@@ -249,6 +252,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         msDbmsUnitSymbol = "";
         msDbmsOriginalUnit = "";
         msDbmsOriginalUnitSymbol = "";
+        msDbmsMaintArea = "";
         msDbmsUserNew = "";
         msDbmsUserEdit = "";
         msDbmsUserDelete = "";
@@ -273,12 +277,13 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
 
         try {
             sql = "SELECT de.*, d.fid_bkk_year_n, d.fid_bkk_num_n, " +
-                    "i.item, i.item_key, u.unit, u.symbol, uo.unit, uo.symbol, un.usr, ue.usr, ud.usr " +
+                    "i.item, i.item_key, u.unit, u.symbol, uo.unit, uo.symbol, ma.name, un.usr, ue.usr, ud.usr " +
                     "FROM trn_diog_ety AS de " +
                     "INNER JOIN trn_diog AS d ON de.id_year = d.id_year AND de.id_doc = d.id_doc " +
                     "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
                     "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
                     "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit " +
+                    "INNER JOIN trn_maint_area AS ma ON de.fid_maint_area = ma.id_maint_area " +
                     "INNER JOIN erp.usru_usr AS un ON de.fid_usr_new = un.id_usr " +
                     "INNER JOIN erp.usru_usr AS ue ON de.fid_usr_edit = ue.id_usr " +
                     "INNER JOIN erp.usru_usr AS ud ON de.fid_usr_del = ud.id_usr " +
@@ -328,6 +333,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 msDbmsUnitSymbol = resultSet.getString("u.symbol");
                 msDbmsOriginalUnit = resultSet.getString("uo.unit");
                 msDbmsOriginalUnitSymbol = resultSet.getString("uo.symbol");
+                msDbmsMaintArea = resultSet.getString("ma.name");
                 msDbmsUserNew = resultSet.getString("un.usr");
                 msDbmsUserEdit = resultSet.getString("ue.usr");
                 msDbmsUserDelete = resultSet.getString("ud.usr");
@@ -593,6 +599,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
         registry.setDbmsItemKey(this.getDbmsItemKey());
         registry.setDbmsUnit(this.getDbmsUnit());
         registry.setDbmsUnitSymbol(this.getDbmsUnitSymbol());
+        registry.setDbmsMaintArea(this.getDbmsMaintArea());
         registry.setDbmsUserNew(this.getDbmsUserNew());
         registry.setDbmsUserEdit(this.getDbmsUserEdit());
         registry.setDbmsUserDelete(this.getDbmsUserDelete());

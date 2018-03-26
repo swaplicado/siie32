@@ -694,11 +694,13 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel10.add(jtfEntryValue);
 
         jbEntryAdd.setText("Agregar");
+        jbEntryAdd.setToolTipText("Agregar partida (Ctrl + A)");
         jbEntryAdd.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbEntryAdd.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jbEntryAdd);
 
         jbEntryClear.setText("Limpiar");
+        jbEntryClear.setToolTipText("Limpiar partida (Ctrl + L)");
         jbEntryClear.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbEntryClear.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jbEntryClear);
@@ -713,6 +715,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbEntryDelete.setText("Eliminar");
+        jbEntryDelete.setToolTipText("Eliminar partida (Ctrl + E)");
         jbEntryDelete.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbEntryDelete.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel13.add(jbEntryDelete);
@@ -956,8 +959,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         SFormUtilities.createActionMap(rootPane, this, "actionOk", "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
         SFormUtilities.createActionMap(rootPane, this, "actionRowAdd", "rowAdd", KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK);
-        SFormUtilities.createActionMap(rootPane, this, "actionRowDelete", "rowDelete", KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionRowClear", "rowClear", KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK);
+        SFormUtilities.createActionMap(rootPane, this, "actionRowDelete", "rowDelete", KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK);
     }
 
     private void windowActivated() {
@@ -1141,54 +1144,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         }
 
         return open;
-    }
-
-    private boolean isRegistryEditable() {
-        boolean editable = true;
-
-        if (moDiog.getIsShipped()) {
-            editable = false;
-        }
-        else if (moDiog.getIsAudited()) {
-            editable = false;
-        }
-        else if (moDiog.getIsAuthorized()) {
-            editable = false;
-        }
-        else if (moDiog.getIsSystem()) {
-            editable = false;
-        }
-        else if (moDiog.getIsDeleted()) {
-            editable = false;
-        }
-
-        return editable;
-    }
-
-    private String getNonEditableHelp() {
-        String help = "";
-
-        if (moDiog.getIsShipped()) {
-            help += "\n- El documento está embarcado.";
-        }
-        else if (moDiog.getIsAudited()) {
-            help += "\n- El documento está auditado.";
-        }
-        else if (moDiog.getIsAuthorized()) {
-            help += "\n- El documento está autorizado.";
-        }
-        else if (moDiog.getIsSystem()) {
-            help += "\n- El documento es de sistema.";
-        }
-        else if (moDiog.getIsDeleted()) {
-            help += "\n- El documento está eliminado.";
-        }
-
-        if (help.length() > 0) {
-            help = "No se puede modificar el documento porque:" + help;
-        }
-
-        return help;
     }
 
     private boolean canEditEntry(erp.mtrn.data.SDataDiogEntry entry) {
@@ -2467,7 +2422,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         }
     }
 
-    public void actionDecimals() {
+    private void actionDecimals() {
         String toolTipText = !jtbDecimals.isSelected() ? TXT_DEC_INC : TXT_DEC_DEC;
         DefaultTableCellRenderer tcr = !jtbDecimals.isSelected() ?
             miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity() :
@@ -2487,7 +2442,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         computeDocValue();
     }
 
-    private void actionEntryAdd() {
+    public void actionEntryAdd() {
         int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
         int mode = STrnUtilities.isIogTypeForProdOrder(manParamIogTypeKey) ? SLibConstants.MODE_QTY_EXT : jtbDecimals.isSelected() ? SLibConstants.MODE_QTY_EXT : SLibConstants.MODE_QTY;
         boolean add = true;
@@ -2532,7 +2487,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryQuantity.getText() + "'.");
                 jtfEntryQuantity.requestFocus();
             }
-            else if (moFieldEntryValue.getDouble() == 0d && miClient.showMsgBoxConfirm("¿Está seguro que desea agregar al documento una partida sin valor?") != JOptionPane.YES_OPTION) {
+            else if (moFieldEntryValue.getDouble() == 0d && mnParamIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN && miClient.showMsgBoxConfirm("¿Está seguro que desea agregar al documento una partida sin valor?") != JOptionPane.YES_OPTION) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryValueUnitary.getText() + "'.");
                 jtfEntryValueUnitary.requestFocus();
             }
@@ -2569,7 +2524,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             iogEntry.setOriginalQuantity(moFieldEntryQuantity.getDouble());
                             iogEntry.setOriginalValueUnitary(moFieldEntryValueUnitary.getDouble());
                             iogEntry.setSortingPosition(0);
-                            iogEntry.setIsInventoriable(moEntryItem.getIsInventoriable());
+                            iogEntry.setIsInventoriable(true);
                             iogEntry.setIsDeleted(false);
                             iogEntry.setFkItemId(moEntryItem.getPkItemId());
                             iogEntry.setFkUnitId(moEntryItem.getFkUnitId());
@@ -2631,7 +2586,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         }
     }
 
-    private void actionEntryClear() {
+    public void actionEntryClear() {
         moEntryItem = null;
         moStockMoveEntry = null;
         jtfEntryTextToFind.setText("");
@@ -2676,7 +2631,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         }
     }
 
-    private void actionEntryDelete() {
+    public void actionEntryDelete() {
         int index = 0;
         SDataDiogEntry iogEntry = null;
 
@@ -2928,7 +2883,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         }
     }
 
-    public void actionEdit() {
+    private void actionEdit() {
         mnFormStatus = SLibConstants.FORM_STATUS_EDIT;
 
         jbEdit.setEnabled(false);
@@ -2941,8 +2896,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jftDate.requestFocus();
     }
 
-    public void actionEditHelp() {
-        String help = getNonEditableHelp();
+    private void actionEditHelp() {
+        String help = moDiog.getNonEditableHelp();
 
         miClient.showMsgBoxInformation(help.length() == 0 ? "No fué posible determinar por qué el documento es de sólo lectura." : help);
     }
@@ -3355,7 +3310,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jbOk.setEnabled(false);
         jbCancel.setEnabled(true);
 
-        if (isRegistryEditable()) {
+        if (moDiog.isRegistryEditable()) {
             jbEdit.setEnabled(true);
             jbEditHelp.setEnabled(false);
         }
@@ -3411,7 +3366,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         // Document notes:
 
-        if (moDiog.getDbmsNotes().size() > 0) {
+        if (!moDiog.getDbmsNotes().isEmpty()) {
             moFieldNotes.setString(moDiog.getDbmsNotes().get(0).getNotes());
         }
     }
@@ -3421,7 +3376,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         int year = SLibTimeUtilities.digestYear(moFieldDate.getDate())[0];
         int[] iogTypeKey = null;
         SDataDiog iogCounterpart = null;
-        SDataDiogNotes iogNote = null;
         Vector<SFormComponentItem> items = null;
 
         if (moDiog == null) {
@@ -3515,33 +3469,35 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         // Document notes:
 
+        SDataDiogNotes diogNotes = null;
+        
         if (moDiog.getDbmsNotes().size() > 0) {
-            iogNote = moDiog.getDbmsNotes().get(0);
+            diogNotes = moDiog.getDbmsNotes().get(0);
         }
 
-        moDiog.getDbmsNotes().clear();
-        if (moFieldNotes.getString().length() == 0) {
-            if (iogNote != null) {
-                iogNote.setIsDeleted(true);
-                iogNote.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+        if (moFieldNotes.getString().isEmpty()) {
+            if (diogNotes != null) {
+                diogNotes.setIsDeleted(true);
+                diogNotes.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
             }
         }
         else {
-            if (iogNote == null) {
-                iogNote = new SDataDiogNotes();
-                iogNote.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+            if (diogNotes == null) {
+                diogNotes = new SDataDiogNotes();
+                diogNotes.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
             }
             else {
-                iogNote.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                diogNotes.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
             }
 
-            iogNote.setNotes(moFieldNotes.getString());
-            iogNote.setIsPrintable(true);
+            diogNotes.setNotes(moFieldNotes.getString());
+            diogNotes.setIsPrintable(true);
         }
 
-        if (iogNote != null) {
-            iogNote.setIsRegistryEdited(true);
-            moDiog.getDbmsNotes().add(iogNote);
+        moDiog.getDbmsNotes().clear();
+        if (diogNotes != null) {
+            diogNotes.setIsRegistryEdited(true);
+            moDiog.getDbmsNotes().add(diogNotes);
         }
 
         if (mbWarehouseDestinyNeeded) {
@@ -3590,7 +3546,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                     iogCounterpart.setNumberSeries(moDiog.getDbmsDataCounterpartDiog().getNumberSeries());
                     iogCounterpart.setNumber(moDiog.getDbmsDataCounterpartDiog().getNumber());
                     iogCounterpart.setReference(moFieldReference.getString());
-                    
 
                     for (SDataDiogEntry entry : iogCounterpart.getDbmsEntries()) {
                         entry.setPkYearId(moDiog.getDbmsDataCounterpartDiog().getPkYearId());

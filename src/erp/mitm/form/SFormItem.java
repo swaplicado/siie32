@@ -138,6 +138,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldFkFiscalAccountExpId;
     private erp.lib.form.SFormField moFieldFkCfdProdServId_n;
     private erp.lib.form.SFormField moFieldTariff;
+    private erp.lib.form.SFormField moFieldCustomsUnit;
+    private erp.lib.form.SFormField moFieldCustomsEquivalence;
 
     private erp.lib.table.STablePane moItemForeignLanguagePane;
     private erp.lib.table.STablePane moItemBarcodePane;
@@ -360,7 +362,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moKeyCfdProdServId_n = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel7 = new javax.swing.JPanel();
         jlTariff = new javax.swing.JLabel();
-        moTextTariff = new sa.lib.gui.bean.SBeanFieldText();
+        moTextTariff = new javax.swing.JTextField();
+        jlCustomsUnit = new javax.swing.JLabel();
+        jtfCustomsUnit = new javax.swing.JTextField();
+        jlCustomsEquivalence = new javax.swing.JLabel();
+        jtfCustomsEquivalence = new javax.swing.JTextField();
         jpConfig2 = new javax.swing.JPanel();
         jpConfig2Language = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
@@ -1196,9 +1202,39 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlTariff.setText("Fracc. arancelaria:");
+        jlTariff.setToolTipText("Fracción arancelaria");
         jlTariff.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlTariff);
+
+        moTextTariff.setText("TEXT");
+        moTextTariff.setToolTipText("Fracción arancelaria");
+        moTextTariff.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel7.add(moTextTariff);
+
+        jlCustomsUnit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlCustomsUnit.setText("Unidad aduana:");
+        jlCustomsUnit.setToolTipText("Código de unidad aduana");
+        jlCustomsUnit.setPreferredSize(new java.awt.Dimension(85, 23));
+        jlCustomsUnit.setRequestFocusEnabled(false);
+        jPanel7.add(jlCustomsUnit);
+
+        jtfCustomsUnit.setText("TEXT");
+        jtfCustomsUnit.setToolTipText("Código de unidad aduana");
+        jtfCustomsUnit.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel7.add(jtfCustomsUnit);
+
+        jlCustomsEquivalence.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlCustomsEquivalence.setText("Equiv. aduana:");
+        jlCustomsEquivalence.setToolTipText("Equivalencia respecto a la unidad física");
+        jlCustomsEquivalence.setPreferredSize(new java.awt.Dimension(85, 23));
+        jlCustomsEquivalence.setRequestFocusEnabled(false);
+        jPanel7.add(jlCustomsEquivalence);
+
+        jtfCustomsEquivalence.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfCustomsEquivalence.setText("0.000");
+        jtfCustomsEquivalence.setToolTipText("Equivalencia respecto a la unidad física");
+        jtfCustomsEquivalence.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jtfCustomsEquivalence);
 
         jPanel2.add(jPanel7);
 
@@ -1483,9 +1519,14 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldFkCfdProdServId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, moKeyCfdProdServId_n.getComponent(), jlFkCfdProdServId_n);
         moFieldFkCfdProdServId_n.setTabbedPaneIndex(1, jTabbedPane);
         moKeyCfdProdServId_n.setKeySettings((SGuiClient) miClient, SGuiUtils.getLabelName(jlFkCfdProdServId_n.getText()), true);
-        moFieldTariff = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, moTextTariff.getComponent(), jlTariff);
+        moFieldTariff = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, moTextTariff, jlTariff);
         moFieldTariff.setLengthMax(10);
-        moTextTariff.setTextSettings(SGuiUtils.getLabelName(jlTariff.getText()), 10);
+        moFieldCustomsUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCustomsUnit, jlCustomsUnit);
+        moFieldCustomsUnit.setLengthMax(2);
+        moFieldCustomsUnit.setTabbedPaneIndex(1, jTabbedPane);
+        moFieldCustomsEquivalence = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCustomsEquivalence, jlCustomsEquivalence);
+        moFieldCustomsEquivalence.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
+        moFieldCustomsEquivalence.setTabbedPaneIndex(1, jTabbedPane);
         
         mvFields.add(moFieldFkItemGenericId);
         mvFields.add(moFieldFkItemLineId_n);
@@ -1553,6 +1594,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldFkFiscalAccountExpId);
         mvFields.add(moFieldFkCfdProdServId_n);
         mvFields.add(moFieldTariff);
+        mvFields.add(moFieldCustomsUnit);
+        mvFields.add(moFieldCustomsEquivalence);
 
         moFormItemBarcode = new SFormItemBarcode(miClient);
         moFormItemForeignLanguage = new SFormItemForeignLanguage(miClient);
@@ -2815,6 +2858,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JCheckBox jckIsSurfaceVariable;
     private javax.swing.JCheckBox jckIsVolumeVariable;
     private javax.swing.JLabel jlCode;
+    private javax.swing.JLabel jlCustomsEquivalence;
+    private javax.swing.JLabel jlCustomsUnit;
     private javax.swing.JLabel jlFkAccountEbitdaTypeId;
     private javax.swing.JLabel jlFkAdministrativeConceptTypeId;
     private javax.swing.JLabel jlFkBrandId;
@@ -2873,6 +2918,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JRadioButton jrbStatusInactive;
     private javax.swing.JRadioButton jrbStatusRestricted;
     private javax.swing.JTextField jtfCode;
+    private javax.swing.JTextField jtfCustomsEquivalence;
+    private javax.swing.JTextField jtfCustomsUnit;
     private javax.swing.JTextField jtfItemKey;
     private javax.swing.JTextField jtfItemNameRo;
     private javax.swing.JTextField jtfItemNameShortRo;
@@ -2904,7 +2951,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JTextField jtfWeightDelivery;
     private javax.swing.JTextField jtfWeightGross;
     private sa.lib.gui.bean.SBeanFieldKey moKeyCfdProdServId_n;
-    private sa.lib.gui.bean.SBeanFieldText moTextTariff;
+    private javax.swing.JTextField moTextTariff;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -2990,8 +3037,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                 params = new Object[] { moItem == null ? 0 : moItem.getPkItemId(), jtfItemNameRo.getText() };
                 if (SDataUtilities.callProcedureVal(miClient, SProcConstants.ITMU_ITEM_VAL, params, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
                     if (miClient.showMsgBoxConfirm("El valor del campo '" + jlItem.getText() + "' ya existe, ¿desea conservalo? ") == JOptionPane.NO_OPTION) {
-                        validation.setTabbedPaneIndex(0);
                         validation.setComponent(jtfItemNameRo);
+                        validation.setTabbedPaneIndex(0);
                         validation.setIsError(true);
                     }
                 }
@@ -3000,8 +3047,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                     params = new Object[] { moItem == null ? 0 : moItem.getPkItemId(), moFieldItemKey.getString() };
                     if (!moFieldItemKey.getString().isEmpty() && SDataUtilities.callProcedureVal(miClient, SProcConstants.ITMU_ITEM_KEY_VAL, params, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
                         if (miClient.showMsgBoxConfirm("El valor del campo '" + jlItemKey.getText() + "' ya existe, ¿desea conservalo? ") == JOptionPane.NO_OPTION) {
-                            validation.setTabbedPaneIndex(0);
                             validation.setComponent(jtfItemKey);
+                            validation.setTabbedPaneIndex(0);
                             validation.setIsError(true);
                         }
                     }
@@ -3010,24 +3057,29 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                         if (moFieldUnitsPackage.getDouble() != 0d && jcbFkItemPackageId_n.getSelectedIndex() <= 0) {
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemPackageId_n.getText() + "'.");
                             validation.setComponent(jcbFkItemPackageId_n);
+                            validation.setTabbedPaneIndex(0);
                         }
                         else if (moFieldUnitsPackage.getDouble() == 0d && jcbFkItemPackageId_n.getSelectedIndex() > 0) {
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemPackageId_n.getText() + "'.");
                             validation.setComponent(jtfUnitsPackage);
+                            validation.setTabbedPaneIndex(0);
                         }
                         else if (moItem != null && moItem.getPkItemId() == moFieldFkItemPackageId_n.getKeyAsIntArray()[0]) {
                             validation.setMessage("El valor del campo '" + jlFkItemPackageId_n.getText() + "' debe ser distinto.");
                             validation.setComponent(jcbFkItemPackageId_n);
+                            validation.setTabbedPaneIndex(0);
                         }
                         else if (moFieldFkUnitId.getKeyAsIntArray()[0] == SDataConstants.UNDEFINED) {
                             validation.setMessage("Se debe seleccionar una opción para el campo '" + jlFkUnitId.getText() + "'.");
                             jcbFkUnitId.setEnabled(true);
                             jbEditUnit.setEnabled(false);
                             validation.setComponent(jcbFkUnitId);
+                            validation.setTabbedPaneIndex(0);
                         }
                         else if (moFieldFkUnitId.getKeyAsIntArray()[0] == moFieldFkUnitAlternativeTypeId.getKeyAsIntArray()[0]) {
                             validation.setMessage("El valor de los campos '" + jlFkUnitId.getText() + "' y '" + jlFkUnitAlternativeTypeId.getText() + "' debe ser distinto.");
                             validation.setComponent(jcbFkUnitAlternativeTypeId);
+                            validation.setTabbedPaneIndex(0);
                         }
                     }
 
@@ -3035,14 +3087,27 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                         if (moFieldIsDeleted.getBoolean() && hasStock()) {
                             validation.setMessage("El ítem '" + jtfName.getText() + "' no puede ser eliminado\n debido a que tiene existencias en los inventarios.");
                             validation.setComponent(jckIsDeleted);
+                            validation.setTabbedPaneIndex(0);
                         }
                         else if (mbWasInventoriable && !moFieldIsInventoriable.getBoolean() && hasStock()) {
                             validation.setMessage("Debe seleccionar el campo '" + jckIsInventoriable.getText() + "' para el ítem '" + jtfName.getText() + "'\n debido a que tiene existencias en los inventarios.");
                             validation.setComponent(jckIsInventoriable);
+                            validation.setTabbedPaneIndex(0);
                         }
                         else if (mbWasLotApplying && !moFieldIsLotApplying.getBoolean() && hasStock()) {
                             validation.setMessage("Debe seleccionar el campo '" + jckIsLotApplying.getText() + "' para el ítem '" + jtfName.getText() + "'\n debido a que tiene existencias en los inventarios.");
                             validation.setComponent(jckIsLotApplying);
+                            validation.setTabbedPaneIndex(0);
+                        }
+                        else if (!moFieldCustomsUnit.getString().isEmpty() && moFieldCustomsEquivalence.getDouble() == 0) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCustomsEquivalence.getText() + "'.");
+                            validation.setComponent(jtfCustomsEquivalence);
+                            validation.setTabbedPaneIndex(1);
+                        }
+                        else if (moFieldCustomsUnit.getString().isEmpty() && moFieldCustomsEquivalence.getDouble() != 0) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCustomsUnit.getText() + "'.");
+                            validation.setComponent(jtfCustomsUnit);
+                            validation.setTabbedPaneIndex(1);
                         }
                     }
                 }
@@ -3157,7 +3222,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldFkFiscalAccountIncId.setFieldValue(new int[] { moItem.getFkFiscalAccountIncId() });
         moFieldFkFiscalAccountExpId.setFieldValue(new int[] { moItem.getFkFiscalAccountExpId() });
         moKeyCfdProdServId_n.setValue(new int[] { moItem.getFkCfdProdServId_n() });
-        moTextTariff.setValue(moItem.getTariff());
+        moFieldTariff.setFieldValue(moItem.getTariff());
+        moFieldCustomsUnit.setFieldValue(moItem.getCustomsUnit());
+        moFieldCustomsEquivalence.setFieldValue(moItem.getCustomsEquivalence());
         jtfPkItemId_Ro.setText("" + moItem.getPkItemId());
 
         jckIsDeleted.setEnabled(true);
@@ -3271,16 +3338,20 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setFkUnitAlternativeTypeId(moFieldFkUnitAlternativeTypeId.getKeyAsIntArray()[0]);
         moItem.setFkLevelTypeId(moFieldFkLevelTypeId.getKeyAsIntArray()[0]);
         moItem.setUnitAlternativeBaseEquivalence(moFieldUnitAlternativeBaseEquivalence.getDouble());
-
+        moItem.setSurplusPercentage(moFieldSurplusPercentage.getDouble());
+        
+        moItem.setTariff(moFieldTariff.getString());
+        moItem.setCustomsUnit(moFieldCustomsUnit.getString());
+        moItem.setCustomsEquivalence(moFieldCustomsEquivalence.getDouble());
+        moItem.setIsReference(moFieldIsReference.getBoolean());
+        moItem.setIsPrepayment(moFieldIsPrepayment.getBoolean());
+        moItem.setIsFreePrice(moFieldIsFreePrice.getBoolean());
+        moItem.setIsFreeDiscount(moFieldIsFreeDiscount.getBoolean());
         moItem.setIsFreeDiscountUnitary(moFieldIsFreeDiscountUnitary.getBoolean());
         moItem.setIsFreeDiscountEntry(moFieldIsFreeDiscountEntry.getBoolean());
         moItem.setIsFreeDiscountDoc(moFieldIsFreeDiscountDoc.getBoolean());
-        moItem.setIsFreePrice(moFieldIsFreePrice.getBoolean());
-        moItem.setIsFreeDiscount(moFieldIsFreeDiscount.getBoolean());
         moItem.setIsFreeCommissions(moFieldIsFreeCommissions.getBoolean());
-        moItem.setSurplusPercentage(moFieldSurplusPercentage.getDouble());
-        moItem.setIsReference(moFieldIsReference.getBoolean());
-        moItem.setIsPrepayment(moFieldIsPrepayment.getBoolean());
+        
         moItem.setFkDefaultItemRefId_n(jcbFkDefaultItemRefId_n.getSelectedIndex() <= 0 ? 0 : moFieldFkDefaultItemRefId_n.getKeyAsIntArray()[0]);
         moItem.setFkAdministrativeConceptTypeId(moFieldFkAdministrativeConceptTypeId.getKeyAsIntArray()[0]);
         moItem.setFkTaxableConceptTypeId(moFieldFkTaxableConceptTypeId.getKeyAsIntArray()[0]);
@@ -3288,7 +3359,6 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setFkFiscalAccountIncId(moFieldFkFiscalAccountIncId.getKeyAsIntArray()[0]);
         moItem.setFkFiscalAccountExpId(moFieldFkFiscalAccountExpId.getKeyAsIntArray()[0]);
         moItem.setFkCfdProdServId_n(moKeyCfdProdServId_n.getSelectedIndex() <= 0 ? 0 : moKeyCfdProdServId_n.getValue()[0]);
-        moItem.setTariff(moTextTariff.getValue());
         
         if (jrbStatusActive.isSelected()) {
             moItem.setFkItemStatusId(SModSysConsts.ITMS_ST_ITEM_ACT);

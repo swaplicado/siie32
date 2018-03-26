@@ -5,7 +5,8 @@
 package erp.mod.trn.form;
 
 import erp.mod.SModConsts;
-import erp.mod.trn.db.SDbMaintArea;
+import erp.mod.SModSysConsts;
+import erp.mod.trn.db.SDbMaintUserSupervisor;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -19,15 +20,15 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Gil De Jesús, Sergio Flores
  */
-public class SFormMaintArea extends SBeanForm {
+public class SFormMaintUserSupervisor extends SBeanForm {
 
-    private SDbMaintArea moRegistry;
+    private SDbMaintUserSupervisor moRegistry;
 
     /**
-     * Creates new form SFormMaintArea
+     * Creates new form SFormMaintUserSupv
      */
-    public SFormMaintArea(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAINT_AREA, SLibConsts.UNDEFINED, title);
+    public SFormMaintUserSupervisor(SGuiClient client, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_MAINT_USER_SUPV, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }
@@ -45,8 +46,8 @@ public class SFormMaintArea extends SBeanForm {
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jlCode = new javax.swing.JLabel();
-        moTextCode = new sa.lib.gui.bean.SBeanFieldText();
+        jlMaintUserContractor = new javax.swing.JLabel();
+        moKeyMaintUserContractor = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel5 = new javax.swing.JPanel();
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
@@ -58,23 +59,22 @@ public class SFormMaintArea extends SBeanForm {
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCode.setText("Código:*");
-        jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel4.add(jlCode);
+        jlMaintUserContractor.setText("Contratista:*");
+        jlMaintUserContractor.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlMaintUserContractor);
 
-        moTextCode.setText("sBeanFieldText1");
-        jPanel4.add(moTextCode);
+        moKeyMaintUserContractor.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel4.add(moKeyMaintUserContractor);
 
         jPanel2.add(jPanel4);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlName.setText("Nombre:*");
+        jlName.setText("Residente:*");
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlName);
 
-        moTextName.setText("sBeanFieldText1");
-        moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel5.add(moTextName);
 
         jPanel2.add(jPanel5);
@@ -83,25 +83,26 @@ public class SFormMaintArea extends SBeanForm {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JLabel jlCode;
+    private javax.swing.JLabel jlMaintUserContractor;
     private javax.swing.JLabel jlName;
-    private sa.lib.gui.bean.SBeanFieldText moTextCode;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyMaintUserContractor;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 480, 300);
         
-        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 5);
-        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
+        moKeyMaintUserContractor.setKeySettings(miClient, SGuiUtils.getLabelName(jlMaintUserContractor), true);
+        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 100);
 
-        moFields.addField(moTextCode);
+        moFields.addField(moKeyMaintUserContractor);
         moFields.addField(moTextName);
 
         moFields.setFormButton(jbSave);
@@ -119,17 +120,18 @@ public class SFormMaintArea extends SBeanForm {
 
     @Override
     public void reloadCatalogues() {
-
+        miClient.getSession().populateCatalogue(moKeyMaintUserContractor, SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR, null);
     }
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        moRegistry = (SDbMaintArea) registry;
-
+        moRegistry = (SDbMaintUserSupervisor) registry;
+        
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
 
         removeAllListeners();
+        
         reloadCatalogues();
 
         if (moRegistry.isRegistryNew()) {
@@ -139,30 +141,31 @@ public class SFormMaintArea extends SBeanForm {
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
-
+        
+        moKeyMaintUserContractor.setValue(new int[] { moRegistry.getFkMaintUserId_n() });
         moTextName.setValue(moRegistry.getName());
-        moTextCode.setValue(moRegistry.getCode());
 
         setFormEditable(true);
-
+        
         if (moRegistry.isRegistryNew()) {
             
         }
         else {
             
         }
-        
+
         addAllListeners();
     }
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbMaintArea registry = moRegistry.clone();
+        SDbMaintUserSupervisor registry = moRegistry.clone();
 
         if (registry.isRegistryNew()) { }
 
-        registry.setCode(moTextCode.getValue());
         registry.setName(moTextName.getValue());
+        //registry.setFingerprint_n(...);
+        registry.setFkMaintUserId_n(moKeyMaintUserContractor.getValue()[0]);
 
         return registry;
     }

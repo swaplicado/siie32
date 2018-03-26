@@ -509,7 +509,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_SEND_PEND = 207573;
     public static final int TRNX_DPS_SENT = 207574;
     public static final int TRNX_DOC_REMISSION = 207575;
-
+ 
     public static final int TRNX_STK_STK = 207581;
     public static final int TRNX_STK_STK_WH = 207582;
     public static final int TRNX_STK_LOT = 207583;
@@ -531,7 +531,8 @@ public abstract class SDataConstants {
 
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;
-
+    public static final int TRNX_DIOG_MAINT = 207651;
+    
     // XXX
     public static final int TRNX_DSM_ETY_SOURCE = 207601;
     public static final int TRNX_DSM_ETY_DESTINY = 207602;
@@ -676,8 +677,7 @@ public abstract class SDataConstants {
 
     public static final java.lang.String MSG_ERR_DATA_NOT_FOUND = "El tipo de registro no existe.";
     
-    public static final HashMap<Integer, String> TablesMap = new HashMap<Integer, String>();
-    
+    public static final HashMap<Integer, String> TablesMap = new HashMap<>();
 
     static {
         TablesMap.put(CFGS_CT_ENT, "erp.cfgs_ct_ent");

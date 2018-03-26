@@ -28,7 +28,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Alfredo Perez.
+ * @author Sergio Flores, Edwin Carmona, Alfredo Perez
  */
 public class SViewStock extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -208,6 +208,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         mvSuscriptors.add(SDataConstants.ITMU_UNIT);
         mvSuscriptors.add(SDataConstants.TRN_LOT);
         mvSuscriptors.add(SDataConstants.TRN_DIOG);
+        mvSuscriptors.add(SDataConstants.TRNX_DIOG_MAINT);
         mvSuscriptors.add(SDataConstants.TRN_STK_CFG);
         mvSuscriptors.add(SDataConstants.TRNX_DPS_SUPPLY_PEND);
         mvSuscriptors.add(SDataConstants.TRNX_DPS_SUPPLY_PEND_ETY);

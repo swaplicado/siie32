@@ -200,6 +200,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel9.add(jlSymbolCustoms);
 
         moTextSymbolCustoms.setText("TEXT");
+        moTextSymbolCustoms.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(moTextSymbolCustoms);
 
         jPanel2.add(jPanel9);
@@ -295,7 +296,7 @@ public class SFormUnit extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldUnitCustoms.setLengthMax(25);
         moTextUnitCustoms.setTextSettings(SGuiUtils.getLabelName(jlUnitCustoms.getText()), 25);
         moFieldSymbolCustoms = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, moTextSymbolCustoms.getComponent(), jlSymbolCustoms);
-        moFieldSymbolCustoms.setLengthMax(5);
+        moFieldSymbolCustoms.setLengthMax(2);
         moTextSymbolCustoms.setTextSettings(SGuiUtils.getLabelName(jlSymbolCustoms.getText()), 5);
         moFieldUnitBaseEquivalence = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfUnitBaseEquivalence, jlUnitBaseEquivalence);
         moFieldUnitBaseEquivalence.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsBaseEquivalenceFormat());
