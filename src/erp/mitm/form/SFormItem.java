@@ -1521,10 +1521,10 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moKeyCfdProdServId_n.setKeySettings((SGuiClient) miClient, SGuiUtils.getLabelName(jlFkCfdProdServId_n.getText()), true);
         moFieldTariff = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, moTextTariff, jlTariff);
         moFieldTariff.setLengthMax(10);
-        moFieldCustomsUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfCustomsUnit, jlCustomsUnit);
+        moFieldCustomsUnit = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCustomsUnit, jlCustomsUnit);
         moFieldCustomsUnit.setLengthMax(2);
         moFieldCustomsUnit.setTabbedPaneIndex(1, jTabbedPane);
-        moFieldCustomsEquivalence = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfCustomsEquivalence, jlCustomsEquivalence);
+        moFieldCustomsEquivalence = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfCustomsEquivalence, jlCustomsEquivalence);
         moFieldCustomsEquivalence.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
         moFieldCustomsEquivalence.setTabbedPaneIndex(1, jTabbedPane);
         
