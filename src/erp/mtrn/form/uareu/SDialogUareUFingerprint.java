@@ -6,16 +6,33 @@
 /*
  * SDialogFilterDocumentType.java
  *
- * Created on 11/03/2010, 10:01:40 AM
  */
 
 package erp.mtrn.form.uareu;
 
+import com.digitalpersona.onetouch.DPFPDataPurpose;
+import com.digitalpersona.onetouch.DPFPFeatureSet;
+import com.digitalpersona.onetouch.DPFPGlobal;
+import com.digitalpersona.onetouch.DPFPSample;
+import com.digitalpersona.onetouch.DPFPTemplate;
+import com.digitalpersona.onetouch.capture.DPFPCapture;
+import com.digitalpersona.onetouch.capture.event.DPFPDataAdapter;
+import com.digitalpersona.onetouch.capture.event.DPFPDataEvent;
+import com.digitalpersona.onetouch.capture.event.DPFPErrorAdapter;
+import com.digitalpersona.onetouch.capture.event.DPFPErrorEvent;
+import com.digitalpersona.onetouch.capture.event.DPFPReaderStatusAdapter;
+import com.digitalpersona.onetouch.capture.event.DPFPReaderStatusEvent;
+import com.digitalpersona.onetouch.processing.DPFPEnrollment;
+import com.digitalpersona.onetouch.processing.DPFPFeatureExtraction;
+import com.digitalpersona.onetouch.processing.DPFPImageQualityException;
+import com.digitalpersona.onetouch.verification.DPFPVerification;
+import com.digitalpersona.onetouch.verification.DPFPVerificationResult;
 import erp.lib.SLibConstants;
-import erp.lib.form.SFormField;
+import erp.lib.SLibUtilities;
 import erp.lib.form.SFormUtilities;
 import java.awt.event.KeyEvent;
-import java.util.Vector;
+import javax.swing.SwingUtilities;
+import sa.lib.SLibConsts;
 
 /**
  *
@@ -23,34 +40,32 @@ import java.util.Vector;
  */
 public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
     
-    public static final int MODE_CREATE = 1;
-    public static final int MODE_VALIDATE = 2;
+    public static final int VALUE_FINGERPRINT = 1;
+    public static final int MODE_ENROLLMENT = 1;
+    public static final int MODE_VERIFICATION = 2;
+    public static final String TEMPLATE_PROPERTY = "template";
 
-    private int mnFormType;
     private int mnFormResult;
-    private int mnFormStatus;
     private boolean mbFirstTime;
-    private boolean mbResetingForm;
-    private java.util.Vector<erp.lib.form.SFormField> mvFields;
+    private int mnMode;
     private erp.client.SClientInterface miClient;
 
-    private int mnDataType;
-    private int[] manDataFilterKey;
-    private int[] manDocumentTypeKey;
-    private erp.lib.form.SFormField moFieldDocumentType;
-
-    /** Creates new form SDialogFilterDocumentType
+    private DPFPTemplate moFpTemplate;          // to handle fingerprints
+    private DPFPCapture moFpCapture;            // to handle DigitalPersona device
+    private DPFPEnrollment moFpEnrollment;      // to create fingerprint templates
+    private DPFPVerification moFPVerification;  // to verify fingerprint templates
+    
+    /** Creates new form SDialogUareUFingerprint
      * @param client GUI client.
-     * @param modeType MODE_CREATE or MODE_VALIDATE.
+     * @param mode Dialog mode: MODE_ENROLLMENT or MODE_VERIFICATION.
      */
-    public SDialogUareUFingerprint(erp.client.SClientInterface client, int modeType) {
+    public SDialogUareUFingerprint(erp.client.SClientInterface client, int mode) {
         super(client.getFrame(), true);
-        miClient =  client;
-        mnDataType = 0;
-        manDataFilterKey = null;
-
+        miClient = client;
+        mnMode = mode;
+                 
         initComponents();
-        initComponentsExtra();
+        initComponentsExtra();    
     }
 
     /** This method is called from within the constructor to
@@ -62,20 +77,19 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jpFingerprint = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jtfMode = new javax.swing.JTextField();
+        jspMessages = new javax.swing.JScrollPane();
+        jtaMessages = new javax.swing.JTextArea();
+        jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jckSelectedAll = new javax.swing.JCheckBox();
-        jPanel4 = new javax.swing.JPanel();
-        jlDocumentType = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
-        jcbDocumentType = new javax.swing.JComboBox();
-        jbDocumentType = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Tipos de documentos");
+        setTitle("Huellas digitales");
+        setModal(true);
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -83,131 +97,239 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(492, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpFingerprint.setLayout(new java.awt.BorderLayout());
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jtfMode.setEditable(false);
+        jtfMode.setFocusable(false);
+        jtfMode.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel2.add(jtfMode);
+
+        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+        jtaMessages.setColumns(20);
+        jtaMessages.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
+        jtaMessages.setRows(5);
+        jspMessages.setViewportView(jtaMessages);
+
+        jPanel1.add(jspMessages, java.awt.BorderLayout.CENTER);
+
+        jpFingerprint.add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jpFingerprint, java.awt.BorderLayout.CENTER);
+
+        jpControls.setPreferredSize(new java.awt.Dimension(492, 33));
+        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
-        jbOk.setToolTipText("[Ctrl + Enter]");
+        jbOk.setEnabled(false);
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbOk);
+        jpControls.add(jbOk);
 
         jbCancel.setText("Cancelar");
-        jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
+        jpControls.add(jbCancel);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+        getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones disponibles:"));
-        jPanel2.setLayout(new java.awt.BorderLayout());
-
-        jPanel3.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
-
-        jckSelectedAll.setText("Todos los tipos de documento");
-        jckSelectedAll.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jckSelectedAllItemStateChanged(evt);
-            }
-        });
-        jPanel3.add(jckSelectedAll);
-
-        jPanel4.setLayout(new java.awt.BorderLayout(5, 0));
-
-        jlDocumentType.setText("Tipo de documento:");
-        jlDocumentType.setPreferredSize(new java.awt.Dimension(125, 14));
-        jPanel4.add(jlDocumentType, java.awt.BorderLayout.LINE_START);
-
-        jPanel5.setLayout(new java.awt.BorderLayout(5, 0));
-
-        jcbDocumentType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jPanel5.add(jcbDocumentType, java.awt.BorderLayout.CENTER);
-
-        jbDocumentType.setText("jButton1");
-        jbDocumentType.setToolTipText("Seleccionar tipo de documento");
-        jbDocumentType.setFocusable(false);
-        jbDocumentType.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel5.add(jbDocumentType, java.awt.BorderLayout.EAST);
-
-        jPanel4.add(jPanel5, java.awt.BorderLayout.CENTER);
-
-        jPanel3.add(jPanel4);
-
-        jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
-
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
-
-        setSize(new java.awt.Dimension(488, 334));
+        setSize(new java.awt.Dimension(496, 339));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jckSelectedAllItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckSelectedAllItemStateChanged
-        if (!mbResetingForm) {
-            itemStateChangedSelectedAll();
-        }
-    }//GEN-LAST:event_jckSelectedAllItemStateChanged
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        switch (mnMode) {
+            case MODE_ENROLLMENT:
+                jtfMode.setText("CREAR HUELLA DIGITAL");
+                break;
+            case MODE_VERIFICATION:
+                jtfMode.setText("VERIFICAR HUELLA DIGITAL");
+                break;
+            default:
+        }
+        
+        moFpCapture = DPFPGlobal.getCaptureFactory().createCapture();
+        
+        moFpCapture.addDataListener(new DPFPDataAdapter() {
+            @Override
+            public void dataAcquired(final DPFPDataEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        appendMessage("Huella digital leída.");
+                        processCapture(e.getSample());
+                    }
+                });
+            }
+        });
 
-        moFieldDocumentType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbDocumentType, jlDocumentType);
-        moFieldDocumentType.setPickerButton(jbDocumentType);
+        moFpCapture.addReaderStatusListener(new DPFPReaderStatusAdapter() {
+            @Override
+            public void readerConnected(final DPFPReaderStatusEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        appendMessage("Lector de huella digital conectado.");
+                    }
+                });
+            }
 
-        mvFields.add(moFieldDocumentType);
+           @Override 
+           public void readerDisconnected(final DPFPReaderStatusEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        appendMessage("Lector de huella digital desconectado.");
+                    }
+                });
+            }
+        });
 
+        moFpCapture.addErrorListener(new DPFPErrorAdapter() {
+            public void errorReader(final DPFPErrorEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        appendMessage("Error en lector de huella digital: " + e.getError());
+                    }
+                });
+            }
+        });
+        
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
-        jbDocumentType.addActionListener(this);
-
-        SFormUtilities.createActionMap(rootPane, this, "actionOk", "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
-        SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, SLibConstants.UNDEFINED);
+        
+        SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
     }
-
+    
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
+            startFpReader();
+        }
+    }
+    
+    private void startFpReader() {
+        switch (mnMode) {
+            case MODE_ENROLLMENT:
+                moFpEnrollment = DPFPGlobal.getEnrollmentFactory().createEnrollment();
+                break;
+            case MODE_VERIFICATION:
+                moFPVerification = DPFPGlobal.getVerificationFactory().createVerification();
+                break;
+            default:
+        }
+        
+        moFpCapture.startCapture();
+        jtaMessages.setText("Lector de huella digital encendido.\n");
+    }
 
-            if (jcbDocumentType.isEnabled()) {
-                jcbDocumentType.requestFocus();
-            }
-            else {
-                jckSelectedAll.requestFocus();
-            }
+    private void stopFpReader() {
+        moFpCapture.stopCapture();
+        appendMessage("Lector de huella digital apagado.");
+    }
+
+    private void appendMessage(String message) {
+        jtaMessages.append(message + "\n");
+    }
+
+    private DPFPFeatureSet extractFeatures(DPFPSample sample, DPFPDataPurpose purpose) {
+        DPFPFeatureSet featureSet = null;
+        
+        try {
+            DPFPFeatureExtraction extractor = DPFPGlobal.getFeatureExtractionFactory().createFeatureExtraction();
+            featureSet = extractor.createFeatureSet(sample, purpose);
+        } 
+        catch (DPFPImageQualityException e) {
+            SLibUtilities.renderException(this, e);
+        }
+        
+        return featureSet;
+    }
+    
+    public void processCapture(final DPFPSample sample) {
+        switch (mnMode) {
+            case MODE_ENROLLMENT:
+                try {
+                    DPFPFeatureSet featureSet = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
+                    
+                    if (featureSet == null) {
+                        throw new Exception("No fue posible obtener los atributos de la muestra de huella digital.");
+                    }
+
+                    moFpEnrollment.addFeatures(featureSet);
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+                finally {
+                    switch(moFpEnrollment.getTemplateStatus()) {
+                        case TEMPLATE_STATUS_READY:
+                            moFpTemplate = moFpEnrollment.getTemplate();
+                            miClient.showMsgBoxInformation("Plantilla de huella digital creada exitosamente.");
+                            actionOk();
+                            break;
+
+                        case TEMPLATE_STATUS_FAILED:
+                            miClient.showMsgBoxInformation("No fue posible crear la plantilla de huella digital.");
+                            actionCancel();
+                            break;
+
+                        case TEMPLATE_STATUS_INSUFFICIENT:
+                            if (moFpEnrollment.getFeaturesNeeded() != 0) {
+                                appendMessage("Restan " + moFpEnrollment.getFeaturesNeeded() + " intentos de captura de huella digital para crear la plantilla.");
+                            } 
+                            break;
+
+                        case TEMPLATE_STATUS_UNKNOWN:
+                            appendMessage("Estatus desconocido del lector de huella digital.");
+                            break;
+
+                        default:
+                            appendMessage(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                    }
+                }
+                break;
+                
+            case MODE_VERIFICATION:
+                try {
+                    DPFPFeatureSet featureSet = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_VERIFICATION);
+                    
+                    if (featureSet == null) {
+                        throw new Exception("No fue posible obtener los atributos de la muestra de huella digital.");
+                    }
+
+                    DPFPVerificationResult result = moFPVerification.verify(featureSet, moFpTemplate);
+
+                    if (result.isVerified()) {
+                        actionOk();
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("No fue posible verificar la huella digital.\nIntenta de nuevo.");
+                    }
+                } 
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+                break;
+                
+            default:
         }
     }
 
-    private void itemStateChangedSelectedAll() {
-        if (jckSelectedAll.isSelected()) {
-            jcbDocumentType.setEnabled(false);
-            jbDocumentType.setEnabled(false);
-            moFieldDocumentType.resetField();
-        }
-        else {
-            jcbDocumentType.setEnabled(true);
-            jbDocumentType.setEnabled(true);
-        }
-    }
-
-    private void actionDocumentType() {
-        miClient.pickOption(mnDataType, moFieldDocumentType, manDataFilterKey);
-    }
+    /*
+    * @param args the command line arguments
+    */
 
     public void actionOk() {
-        if (!jckSelectedAll.isSelected() && moFieldDocumentType.getKeyAsIntArray()[0] == 0) {
-            jcbDocumentType.requestFocus();
-            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDocumentType.getText() + "'.");
-        }
-        else {
-            manDocumentTypeKey = jckSelectedAll.isSelected() ? null : moFieldDocumentType.getKeyAsIntArray();
-
-            mnFormResult = SLibConstants.FORM_RESULT_OK;
-            setVisible(false);
-        }
+        stopFpReader();
+        mnFormResult = SLibConstants.FORM_RESULT_OK;
+        setVisible(false);
     }
 
     public void actionCancel() {
+        stopFpReader();
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
@@ -215,35 +337,14 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbDocumentType;
     private javax.swing.JButton jbOk;
-    private javax.swing.JComboBox jcbDocumentType;
-    private javax.swing.JCheckBox jckSelectedAll;
-    private javax.swing.JLabel jlDocumentType;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpFingerprint;
+    private javax.swing.JScrollPane jspMessages;
+    private javax.swing.JTextArea jtaMessages;
+    private javax.swing.JTextField jtfMode;
     // End of variables declaration//GEN-END:variables
-
-    public void setDataFilterKey(final int[] key) {
-        manDataFilterKey = key;
-    }
-
-    public void setDocumentTypeKey(final int[] key) {
-        mbResetingForm = true;
-
-        manDocumentTypeKey = key;
-        jckSelectedAll.setSelected(manDocumentTypeKey == null);
-        moFieldDocumentType.setKey(manDocumentTypeKey);
-        itemStateChangedSelectedAll();
-
-        mbResetingForm = false;
-    }
-
-    public int[] getDocumentTypeKey() {
-        return manDocumentTypeKey;
-    }
 
     @Override
     public void formClearRegistry() {
@@ -253,19 +354,16 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
     @Override
     public void formReset() {
         mnFormResult = SLibConstants.UNDEFINED;
-        mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
-
-        for (int i = 0; i < mvFields.size(); i++) {
-            ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
-        }
-
-        setDocumentTypeKey(null);
+        
+        moFpTemplate = null;
+        moFpEnrollment = null;
+        moFPVerification = null;
     }
 
     @Override
     public void formRefreshCatalogues() {
-        SFormUtilities.populateComboBox(miClient, jcbDocumentType, mnDataType, manDataFilterKey);
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -275,7 +373,7 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
 
     @Override
     public void setFormStatus(int status) {
-        mnFormStatus = status;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -285,7 +383,7 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
 
     @Override
     public int getFormStatus() {
-        return mnFormStatus;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -305,19 +403,35 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
 
     @Override
     public void setValue(int type, java.lang.Object value) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        switch (type) {
+            case VALUE_FINGERPRINT:
+                moFpTemplate = DPFPGlobal.getTemplateFactory().createTemplate((byte[]) value);
+                break;
+            default:
+                miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
     }
 
     @Override
     public java.lang.Object getValue(int type) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Object value = null;
+        
+        switch (type) {
+            case VALUE_FINGERPRINT:
+                value = moFpTemplate.serialize();
+                break;
+            default:
+                miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
+        return value;
     }
 
     @Override
     public javax.swing.JLabel getTimeoutLabel() {
         return null;
     }
-
+ 
     @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
         if (e.getSource() instanceof javax.swing.JButton) {
@@ -328,10 +442,7 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
             }
             else if (button == jbCancel) {
                 actionCancel();
-            }
-            else if (button == jbDocumentType) {
-                actionDocumentType();
-            }
+            }           
         }
     }
 }

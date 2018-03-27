@@ -5,8 +5,11 @@
 package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
+import java.io.ByteArrayInputStream;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -34,6 +37,8 @@ public class SDbMaintUserSupervisor extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
 
+    protected byte[] maAuxFingerprintBytes;
+
     public SDbMaintUserSupervisor() {
         super(SModConsts.TRN_MAINT_USER_SUPV);
     }
@@ -58,6 +63,8 @@ public class SDbMaintUserSupervisor extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
+    public void setAuxFingerprintBytes(byte[] bytes) { maAuxFingerprintBytes = bytes; }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkMaintUserSupervisorId = pk[0];
@@ -82,6 +89,7 @@ public class SDbMaintUserSupervisor extends SDbRegistryUser {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
+        maAuxFingerprintBytes = null;
     }
 
     @Override
@@ -182,6 +190,17 @@ public class SDbMaintUserSupervisor extends SDbRegistryUser {
         }
 
         session.getStatement().execute(msSql);
+        
+        // save fingerprint:
+        PreparedStatement preparedStatement = session.getStatement().getConnection().prepareStatement("UPDATE " + getSqlTable() + " SET fingerprint_n = ? " + getSqlWhere());
+        if (maAuxFingerprintBytes == null) {
+            preparedStatement.setNull(1, Types.BLOB);
+        }
+        else {
+            preparedStatement.setBlob(1, new ByteArrayInputStream(maAuxFingerprintBytes));
+        }
+        preparedStatement.execute();
+        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -199,6 +218,8 @@ public class SDbMaintUserSupervisor extends SDbRegistryUser {
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
+
+        registry.setAuxFingerprintBytes(maAuxFingerprintBytes == null ? null : maAuxFingerprintBytes.clone());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

@@ -5,7 +5,9 @@
  */
 package erp.mtrn.data;
 
+import erp.client.SClientInterface;
 import erp.lib.SLibConstants;
+import erp.mtrn.form.uareu.SDialogUareUFingerprint;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -27,5 +29,32 @@ public abstract class STrnMaintUtilities {
         }
                 
         return id;
+    }
+    
+    public static byte[] enrollFingerprint(final SClientInterface client) {
+        byte[] fingerprint = null;
+        SDialogUareUFingerprint dialog = new SDialogUareUFingerprint(client, SDialogUareUFingerprint.MODE_ENROLLMENT);
+        
+        dialog.formReset();
+        dialog.setVisible(true);
+        if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            fingerprint = (byte[]) dialog.getValue(SDialogUareUFingerprint.VALUE_FINGERPRINT);
+        }
+        
+        return fingerprint;
+    }
+    
+    public static boolean verifyFingerprint(final SClientInterface client, final byte[] fingerprint) {
+        boolean verified = false;
+        SDialogUareUFingerprint dialog = new SDialogUareUFingerprint(client, SDialogUareUFingerprint.MODE_VERIFICATION);
+        
+        dialog.formReset();
+        dialog.setValue(SDialogUareUFingerprint.VALUE_FINGERPRINT, fingerprint);
+        dialog.setVisible(true);
+        if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            verified = true;
+        }
+        
+        return verified;
     }
 }
