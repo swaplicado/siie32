@@ -12,7 +12,7 @@ package erp.mtrn.data;
 public class STrnMaintConstants {
     
     public static final String SIGNED = "Firmado";
-    public static final String UNSIGNED = "¡No firmado!";
+    public static final String NONSIGNED = "¡No firmado!";
     
     public static final String VERIFIED = "Verificado";
     public static final String NONVERIFIED = "¡No verificado!";

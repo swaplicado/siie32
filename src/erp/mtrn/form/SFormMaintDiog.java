@@ -38,6 +38,7 @@ import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogMaintMovementEntryRow;
 import erp.mtrn.data.SDataDiogNotes;
 import erp.mtrn.data.STrnItemFound;
+import erp.mtrn.data.STrnMaintConstants;
 import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnStockValidator;
 import erp.mtrn.data.STrnUtilities;
@@ -72,9 +73,6 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     public static final String SERIES_TRA_IN = "MTE";
     public static final String SERIES_TRA_OUT = "MTS";
     
-    public static final String SIGNED = "Firmado";
-    public static final String UNSIGNED = "¡Sin firmar!";
-
     private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
@@ -1402,7 +1400,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         mvDeletedDiogEntries.clear();
         moPaneDiogEntries.clearTableRows();
         
-        jtfSignatureStatus.setText(UNSIGNED);
+        jtfSignatureStatus.setText(STrnMaintConstants.NONSIGNED);
         jtfSignatureStatus.setCaretPosition(0);
 
         setUpControls();
@@ -1602,7 +1600,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             moFieldNotes.setString(moDiog.getDbmsNotes().get(0).getNotes());
         }
         
-        jtfSignatureStatus.setText(UNSIGNED);
+        jtfSignatureStatus.setText(STrnMaintConstants.NONSIGNED);
         jtfSignatureStatus.setCaretPosition(0);
         
         setUpControls();
