@@ -31,20 +31,19 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 
 /**
  *
  * @author Sergio Flores
  */
-public class SViewDiogMaintMovement extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private javax.swing.JButton jbAdjIn1;
     private javax.swing.JButton jbAdjIn2;
-    private javax.swing.JButton jbIntInTra;
     private javax.swing.JButton jbAdjOut1;
     private javax.swing.JButton jbAdjOut2;
-    private javax.swing.JButton jbIntOutTra;
-    private javax.swing.JButton mjbViewNotes;
+    private javax.swing.JButton jbViewNotes;
     private javax.swing.JButton jbPrint;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
@@ -57,8 +56,8 @@ public class SViewDiogMaintMovement extends erp.lib.table.STableTab implements j
      * @param tabTitle GUI-tab title.
      * @param auxType01 Use case of view: SModSysConsts.TRNX_MAINT_...
      */
-    public SViewDiogMaintMovement(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
-        super(client, tabTitle, SDataConstants.TRNX_DIOG_MAINT, auxType01);
+    public SViewMaintDiog(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
+        super(client, tabTitle, SDataConstants.TRNX_MAINT_DIOG, auxType01);
         initComponents();
     }
 
@@ -90,80 +89,157 @@ public class SViewDiogMaintMovement extends erp.lib.table.STableTab implements j
         addTaskBarUpperSeparator();
         
         String[][] toolTipTexts = null;
+        String[][] icons = null;
         
         switch (mnTabTypeAux01) {
             case SModSysConsts.TRNX_MAINT_PART:
                 toolTipTexts = new String[][] {
                     new String[] {
-                        "Consumo refacción c/empleado",
-                        "Consumo refacción c/contratista"
+                        "Consumo refacción empleado",
+                        "Consumo refacción contratista"
                     },
                     new String[] {
-                        "Recuperación refacción c/empleado",
-                        "Recuperación refacción c/contratista"
+                        "Recuperación refacción empleado",
+                        "Recuperación refacción contratista"
+                    },
+                };
+                icons = new String[][] {
+                    new String[] {
+                        "icon_std_stk_adj_out",
+                        "icon_std_stk_inv_out"
+                    },
+                    new String[] {
+                        "icon_std_stk_adj_in",
+                        "icon_std_stk_inv_in"
                     },
                 };
                 break;
-            case SModSysConsts.TRNX_MAINT_TOOL_AV:
+                
+            case SModSysConsts.TRNX_MAINT_TOOL:
+                toolTipTexts = new String[][] {
+                    new String[] {
+                        "Consumo herramienta empleado",
+                        "Consumo herramienta contratista"
+                    },
+                    new String[] {
+                        "Recuperación herramienta empleado",
+                        "Recuperación herramienta contratista"
+                    },
+                };
+                icons = new String[][] {
+                    new String[] {
+                        "icon_std_stk_adj_out",
+                        "icon_std_stk_inv_out"
+                    },
+                    new String[] {
+                        "icon_std_stk_adj_in",
+                        "icon_std_stk_inv_in"
+                    },
+                };
                 break;
+                
             case SModSysConsts.TRNX_MAINT_TOOL_LENT:
+                toolTipTexts = new String[][] {
+                    new String[] {
+                        "Préstamo herramienta empleado",
+                        "Préstamo herramienta contratista"
+                    },
+                    new String[] {
+                        "Devolución herramienta empleado",
+                        "Devolución herramienta contratista"
+                    },
+                };
+                icons = new String[][] {
+                    new String[] {
+                        "icon_std_stk_maint_lent_emp_out",
+                        "icon_std_stk_maint_lent_cont_out"
+                    },
+                    new String[] {
+                        "icon_std_stk_maint_lent_emp_in",
+                        "icon_std_stk_maint_lent_cont_in"
+                    },
+                };
                 break;
+                
             case SModSysConsts.TRNX_MAINT_TOOL_MAINT:
+                toolTipTexts = new String[][] {
+                    new String[] {
+                        "Mantenimiento herramienta"
+                    },
+                    new String[] {
+                        "Devolución herramienta mantenimiento"
+                    },
+                };
+                icons = new String[][] {
+                    new String[] {
+                        "icon_std_stk_maint_maint_out"
+                    },
+                    new String[] {
+                        "icon_std_stk_maint_maint_in"
+                    },
+                };
                 break;
+                
             case SModSysConsts.TRNX_MAINT_TOOL_LOST:
+                toolTipTexts = new String[][] {
+                    new String[] {
+                        "Extravío herramienta"
+                    },
+                    new String[] {
+                        "Devolución herramienta extraviada"
+                    },
+                };
+                icons = new String[][] {
+                    new String[] {
+                        "icon_std_stk_maint_lost_out"
+                    },
+                    new String[] {
+                        "icon_std_stk_maint_lost_in"
+                    },
+                };
                 break;
+                
             default:
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
 
-        jbAdjOut1 = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_adj_out.gif")));    // XXX change button icon!
+        jbAdjOut1 = new JButton(new ImageIcon(getClass().getResource("/erp/img/" + icons[0][0] + ".gif")));
         jbAdjOut1.setPreferredSize(new Dimension(23, 23));
         jbAdjOut1.setToolTipText(toolTipTexts[0][0]);
         jbAdjOut1.addActionListener(this);
         addTaskBarUpperComponent(jbAdjOut1);
 
-        jbAdjOut2 = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_inv_out.gif")));    // XXX change button icon!
-        jbAdjOut2.setPreferredSize(new Dimension(23, 23));
-        jbAdjOut2.setToolTipText(toolTipTexts[0][1]);
-        jbAdjOut2.addActionListener(this);
-        addTaskBarUpperComponent(jbAdjOut2);
+        if (isButton2Needed()) {
+            jbAdjOut2 = new JButton(new ImageIcon(getClass().getResource("/erp/img/" + icons[0][1] + ".gif")));
+            jbAdjOut2.setPreferredSize(new Dimension(23, 23));
+            jbAdjOut2.setToolTipText(toolTipTexts[0][1]);
+            jbAdjOut2.addActionListener(this);
+            addTaskBarUpperComponent(jbAdjOut2);
+        }
 
-        /* XXX
-        jbIntOutTra = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_tra_out.gif")));
-        jbIntOutTra.setPreferredSize(new Dimension(23, 23));
-        jbIntOutTra.setToolTipText("Salida traspaso");
-        jbIntOutTra.addActionListener(this);
-        addTaskBarUpperComponent(jbIntOutTra);
-        */
-        
         addTaskBarUpperSeparator();
 
-        jbAdjIn1 = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_adj_in.gif")));  // XXX change button icon!
+        jbAdjIn1 = new JButton(new ImageIcon(getClass().getResource("/erp/img/" + icons[1][0] + ".gif")));
         jbAdjIn1.setPreferredSize(new Dimension(23, 23));
         jbAdjIn1.setToolTipText(toolTipTexts[1][0]);
         jbAdjIn1.addActionListener(this);
         addTaskBarUpperComponent(jbAdjIn1);
 
-        jbAdjIn2 = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_inv_in.gif")));  // XXX change button icon!
-        jbAdjIn2.setPreferredSize(new Dimension(23, 23));
-        jbAdjIn2.setToolTipText(toolTipTexts[1][1]);
-        jbAdjIn2.addActionListener(this);
-        addTaskBarUpperComponent(jbAdjIn2);
+        if (isButton2Needed()) {
+            jbAdjIn2 = new JButton(new ImageIcon(getClass().getResource("/erp/img/" + icons[1][1] + ".gif")));
+            jbAdjIn2.setPreferredSize(new Dimension(23, 23));
+            jbAdjIn2.setToolTipText(toolTipTexts[1][1]);
+            jbAdjIn2.addActionListener(this);
+            addTaskBarUpperComponent(jbAdjIn2);
+        }
 
-        /* XXX
-        jbIntInTra = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_tra_in.gif")));
-        jbIntInTra.setPreferredSize(new Dimension(23, 23));
-        jbIntInTra.setToolTipText("Entrada traspaso");
-        jbIntInTra.addActionListener(this);
-        addTaskBarUpperComponent(jbIntInTra);
-        */
-        
         addTaskBarUpperSeparator();
 
-        mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
-        mjbViewNotes.setPreferredSize(new Dimension(23, 23));
-        mjbViewNotes.addActionListener(this);
-        mjbViewNotes.setToolTipText("Ver notas del documento");
-        addTaskBarUpperComponent(mjbViewNotes);
+        jbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
+        jbViewNotes.setPreferredSize(new Dimension(23, 23));
+        jbViewNotes.addActionListener(this);
+        jbViewNotes.setToolTipText("Ver notas del documento");
+        addTaskBarUpperComponent(jbViewNotes);
 
         jbPrint = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
         jbPrint.setPreferredSize(new Dimension(23, 23));
@@ -177,13 +253,16 @@ public class SViewDiogMaintMovement extends erp.lib.table.STableTab implements j
         jbNew.setEnabled(false);
         jbEdit.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR || levelRightOutOtherInt >=  SUtilConsts.LEV_AUTHOR);
         jbDelete.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR || levelRightOutOtherInt >=  SUtilConsts.LEV_AUTHOR);
+        
         jbAdjIn1.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR);
-        jbAdjIn2.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR);
-        // XXX jbIntInTra.setEnabled(false);   // this stock move is only a consequence of its counterpart
+        if (isButton2Needed()) {
+            jbAdjIn2.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR);
+        }
         jbAdjOut1.setEnabled(levelRightOutOtherInt >= SUtilConsts.LEV_AUTHOR);
-        jbAdjOut2.setEnabled(levelRightOutOtherInt >= SUtilConsts.LEV_AUTHOR);
-        // XXX jbIntOutTra.setEnabled(levelRightOutOtherInt >= SUtilConsts.LEV_AUTHOR);
-        mjbViewNotes.setEnabled(true);
+        if (isButton2Needed()) {
+            jbAdjOut2.setEnabled(levelRightOutOtherInt >= SUtilConsts.LEV_AUTHOR);
+        }
+        jbViewNotes.setEnabled(true);
         jbPrint.setEnabled(true);
 
         STableField[] aoKeyFields = new STableField[2];
@@ -237,6 +316,10 @@ public class SViewDiogMaintMovement extends erp.lib.table.STableTab implements j
 
         populateTable();
     }
+    
+    private boolean isButton2Needed() {
+        return !SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SModSysConsts.TRNX_MAINT_TOOL_MAINT, SModSysConsts.TRNX_MAINT_TOOL_LOST });
+    }
 
     private void actionMove(final int maintMovementType, final int maintUserType) {
         STrnDiogComplement complement = new STrnDiogComplement();
@@ -250,7 +333,7 @@ public class SViewDiogMaintMovement extends erp.lib.table.STableTab implements j
     }
 
     private void actionViewNotes() {
-        if (mjbViewNotes.isEnabled()) {
+        if (jbViewNotes.isEnabled()) {
             SModuleUtilities.showDocumentNotes(miClient, SDataConstants.TRN_DIOG, moTablePane.getSelectedTableRow());
         }
     }
@@ -337,13 +420,17 @@ public class SViewDiogMaintMovement extends erp.lib.table.STableTab implements j
             case SModSysConsts.TRNX_MAINT_PART:
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "iog.fid_maint_mov_tp IN (" + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART + ") ";
                 break;
-            case SModSysConsts.TRNX_MAINT_TOOL_AV:
+            case SModSysConsts.TRNX_MAINT_TOOL:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "iog.fid_maint_mov_tp IN (" + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL + ") ";
                 break;
             case SModSysConsts.TRNX_MAINT_TOOL_LENT:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "iog.fid_maint_mov_tp IN (" + SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT + ") ";
                 break;
             case SModSysConsts.TRNX_MAINT_TOOL_MAINT:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "iog.fid_maint_mov_tp IN (" + SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT + ") ";
                 break;
             case SModSysConsts.TRNX_MAINT_TOOL_LOST:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "iog.fid_maint_mov_tp IN (" + SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST + ") ";
                 break;
             default:
         }
@@ -381,30 +468,79 @@ public class SViewDiogMaintMovement extends erp.lib.table.STableTab implements j
 
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (javax.swing.JButton) e.getSource();
+            int[] movements = null;
+            int[] users = null;
 
+            switch (mnTabTypeAux01) {
+                case SModSysConsts.TRNX_MAINT_PART:
+                    movements = new int[] {
+                        SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART,
+                        SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART
+                    };
+                    users = new int[] {
+                        SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE,
+                        SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR
+                    };
+                    break;
+                    
+                case SModSysConsts.TRNX_MAINT_TOOL:
+                    movements = new int[] {
+                        SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL,
+                        SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL
+                    };
+                    users = new int[] {
+                        SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE,
+                        SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR
+                    };
+                    break;
+                    
+                case SModSysConsts.TRNX_MAINT_TOOL_LENT:
+                    movements = new int[] {
+                        SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT,
+                        SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT
+                    };
+                    users = new int[] {
+                        SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE,
+                        SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR
+                    };
+                    break;
+                    
+                case SModSysConsts.TRNX_MAINT_TOOL_MAINT:
+                    movements = new int[] {
+                        SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT,
+                        SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT
+                    };
+                    users = new int[] {
+                        SModSysConsts.TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV
+                    };
+                    break;
+                    
+                case SModSysConsts.TRNX_MAINT_TOOL_LOST:
+                    movements = new int[] {
+                        SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST,
+                        SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST
+                    };
+                    users = new int[] {
+                        SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE
+                    };
+                    break;
+                    
+                default:
+            }
+            
             if (button == jbAdjOut1) {
-                actionMove(SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE);   // XXX
+                actionMove(movements[0], users[0]);
             }
             else if (button == jbAdjOut2) {
-                actionMove(SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART, SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR); // XXX
+                actionMove(movements[0], users[1]);
             }
-            /* XXX
-            else if (button == jbIntInTra) {
-                actionMove(SDataConstantsSys.TRNS_TP_IOG_IN_INT_TRA);
-            }
-            */
             else if (button == jbAdjIn1) {
-                actionMove(SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE);    // XXX
+                actionMove(movements[1], users[0]);
             }
             else if (button == jbAdjIn2) {
-                actionMove(SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART, SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR);  // XXX
+                actionMove(movements[1], users[1]);
             }
-            /* XXX
-            else if (button == jbIntOutTra) {
-                actionMove(SDataConstantsSys.TRNS_TP_IOG_OUT_INT_TRA);
-            }
-            */
-            else if (button == mjbViewNotes) {
+            else if (button == jbViewNotes) {
                 actionViewNotes();
             }
             else if (button == jbPrint) {

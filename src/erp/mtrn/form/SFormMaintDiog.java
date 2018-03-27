@@ -4,7 +4,7 @@
  */
 
 /*
- * SFormDiogMaintMovement.java
+ * SFormMaintDiog.java
  *
  * Created on 23/10/2009, 08:48:14 AM
  */
@@ -65,7 +65,7 @@ import sa.lib.gui.SGuiUtils;
  *
  * @author Gil De Jesús, Sergio Flores
  */
-public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
+public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
     
     public static final String SERIES_ADJ_IN  = "MAE";
     public static final String SERIES_ADJ_OUT = "MAS";
@@ -112,13 +112,13 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
     private erp.mitm.data.SDataItem moEntryItem;
 
     /**
-     * Creates new form SFormDiogMaintMovement.
+     * Creates new form SFormMaintDiog.
      * @param client GUI client.
      */
-    public SFormDiogMaintMovement(erp.client.SClientInterface client) {
+    public SFormMaintDiog(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient =  client;
-        mnFormType = SDataConstants.TRNX_DIOG_MAINT;
+        mnFormType = SDataConstants.TRNX_MAINT_DIOG;
 
         initComponents();
         initComponentsExtra();
@@ -165,6 +165,7 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
         jPanel24 = new javax.swing.JPanel();
         jlMaintReturnUser = new javax.swing.JLabel();
         jcbMaintReturnUser = new javax.swing.JComboBox<SFormComponentItem>();
+        jbCopyMaintUser = new javax.swing.JButton();
         jPanel25 = new javax.swing.JPanel();
         jlMaintReturnUserSupervisor = new javax.swing.JLabel();
         jcbMaintReturnUserSupervisor = new javax.swing.JComboBox<SFormComponentItem>();
@@ -350,6 +351,12 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
         jcbMaintReturnUser.setMaximumRowCount(16);
         jcbMaintReturnUser.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel24.add(jcbMaintReturnUser);
+
+        jbCopyMaintUser.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_copy.gif"))); // NOI18N
+        jbCopyMaintUser.setToolTipText("Copiar responsable");
+        jbCopyMaintUser.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        jbCopyMaintUser.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel24.add(jbCopyMaintUser);
 
         jPanel22.add(jPanel24);
 
@@ -614,6 +621,7 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
         jbEdit.addActionListener(this);
         jbEditHelp.addActionListener(this);
         jbDate.addActionListener(this);
+        jbCopyMaintUser.addActionListener(this);
         jbEntryFind.addActionListener(this);
         jbEntryAdd.addActionListener(this);
         jbEntryClear.addActionListener(this);
@@ -729,6 +737,7 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
             jtfNotes.setFocusable(false);
             jcbMaintReturnUser.setEnabled(false);
             jcbMaintReturnUserSupervisor.setEnabled(false);
+            jbCopyMaintUser.setEnabled(false);
 
             jtfEntryTextToFind.setEditable(false);
             jtfEntryTextToFind.setFocusable(false);
@@ -758,18 +767,19 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
             jcbMaintUserSupervisor.setEnabled(enable && shouldEnableMaintUserSupervisor());
             jtfNotes.setEditable(true);
             jtfNotes.setFocusable(true);
-            jcbMaintReturnUser.setEnabled(enable && mnMaintMovementIogCategory == SModSysConsts.TRNS_CT_IOG_IN);
-            jcbMaintReturnUserSupervisor.setEnabled(enable && shouldEnableMaintReturnUserSupervisor());
+            jcbMaintReturnUser.setEnabled(mnMaintMovementIogCategory == SModSysConsts.TRNS_CT_IOG_IN);
+            jcbMaintReturnUserSupervisor.setEnabled(shouldEnableMaintReturnUserSupervisor());
+            jbCopyMaintUser.setEnabled(shouldEnableMaintReturnUserSupervisor());
 
             jtfEntryTextToFind.setEditable(true);
             jtfEntryTextToFind.setFocusable(true);
             jcbEntryMaintArea.setEnabled(mbMaintAreaNeeded);
             jtfEntryQuantity.setEditable(true);
             jtfEntryQuantity.setFocusable(true);
-            jtfEntryValueUnit.setEditable(mnMaintMovementIogCategory == SModSysConsts.TRNS_CT_IOG_IN);
-            jtfEntryValueUnit.setFocusable(mnMaintMovementIogCategory == SModSysConsts.TRNS_CT_IOG_IN);
-            jtfEntryValue.setEditable(mnMaintMovementIogCategory == SModSysConsts.TRNS_CT_IOG_IN);
-            jtfEntryValue.setFocusable(mnMaintMovementIogCategory == SModSysConsts.TRNS_CT_IOG_IN);
+            jtfEntryValueUnit.setEditable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
+            jtfEntryValueUnit.setFocusable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
+            jtfEntryValue.setEditable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
+            jtfEntryValue.setFocusable(mnIogCategoryId == SModSysConsts.TRNS_CT_IOG_IN);
 
             jbEntryFind.setEnabled(true);
             jbEntryAdd.setEnabled(true);
@@ -861,6 +871,18 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
         return bIsAppropriate;
     }
 
+    private void actionCopyMaintUser() {
+        if (jcbMaintUser.getSelectedIndex() > 0 && jcbMaintReturnUser.isEnabled()) {
+            SGuiUtils.locateItem(jcbMaintReturnUser, ((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey());
+            
+            if (jcbMaintUserSupervisor.getSelectedIndex() > 0 && jcbMaintReturnUserSupervisor.isEnabled()) {
+                SGuiUtils.locateItem(jcbMaintReturnUserSupervisor, ((SGuiItem) jcbMaintUserSupervisor.getSelectedItem()).getPrimaryKey());
+            }
+            
+            jcbMaintReturnUser.requestFocus();
+        }
+    }
+
     private void actionDate() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDate.getDate(), moFieldDate);
     }
@@ -939,7 +961,7 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
                     miClient.showMsgBoxWarning(SItmConsts.MSG_ERR_ST_ITEM_RES);
                     jtfEntryTextToFind.requestFocus();
                 }
-                else if (jcbEntryMaintArea.getSelectedIndex() <= 0) {
+                else if (mbMaintAreaNeeded && jcbEntryMaintArea.getSelectedIndex() <= 0) {
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryMaintArea.getText() + "'.");
                     jcbEntryMaintArea.requestFocus();
                 }
@@ -977,7 +999,7 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
                     iogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
                     iogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
                     iogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
-                    iogEntry.setFkMaintAreaId(((SGuiItem) jcbEntryMaintArea.getSelectedItem()).getPrimaryKey()[0]);
+                    iogEntry.setFkMaintAreaId(jcbEntryMaintArea.getSelectedIndex() <= 0 ? SModSysConsts.TRN_MAINT_AREA_NA : ((SGuiItem) jcbEntryMaintArea.getSelectedItem()).getPrimaryKey()[0]);
 
                     iogEntry.setFkUserNewId(SUtilConsts.USR_NA_ID);
                     iogEntry.setFkUserEditId(SUtilConsts.USR_NA_ID);
@@ -989,7 +1011,7 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
                     iogEntry.setDbmsUnitSymbol(moEntryItem.getDbmsDataUnit().getSymbol());
                     iogEntry.setDbmsOriginalUnit(moEntryItem.getDbmsDataUnit().getUnit());
                     iogEntry.setDbmsOriginalUnitSymbol(moEntryItem.getDbmsDataUnit().getSymbol());
-                    iogEntry.setDbmsMaintArea(((SGuiItem) jcbEntryMaintArea.getSelectedItem()).getItem());
+                    iogEntry.setDbmsMaintArea(jcbEntryMaintArea.getSelectedIndex() <= 0 ? "" : ((SGuiItem) jcbEntryMaintArea.getSelectedItem()).getItem());
 
                     int year = (moFieldDate.getDate() != null ? SLibTimeUtilities.digestYear(moFieldDate.getDate())[0] : 0);
                     iogEntry.getAuxStockMoves().add(new STrnStockMove(new int[] { year, iogEntry.getFkItemId(), iogEntry.getFkUnitId(), SDataConstantsSys.TRNX_STK_LOT_DEF_ID, moWarehouseSource.getPkCompanyBranchId(), moWarehouseSource.getPkEntityId() }, iogEntry.getQuantity()));
@@ -1125,6 +1147,7 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbCopyMaintUser;
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbEdit;
     private javax.swing.JButton jbEditHelp;
@@ -1762,6 +1785,9 @@ public class SFormDiogMaintMovement extends javax.swing.JDialog implements erp.l
             }
             else if (button == jbDate) {
                 actionDate();
+            }
+            else if (button == jbCopyMaintUser) {
+                actionCopyMaintUser();
             }
             else if (button == jbEntryFind) {
                 actionEntryFind();

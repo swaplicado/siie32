@@ -102,7 +102,7 @@ public class SViewStockMoves extends erp.lib.table.STableTab implements java.awt
 
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.TRN_DIOG);
-        mvSuscriptors.add(SDataConstants.TRNX_DIOG_MAINT);
+        mvSuscriptors.add(SDataConstants.TRNX_MAINT_DIOG);
 
         populateTable();
     }

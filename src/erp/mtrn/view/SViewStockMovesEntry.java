@@ -143,7 +143,7 @@ public class SViewStockMovesEntry extends erp.lib.table.STableTab implements jav
 
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.TRN_DIOG);
-        mvSuscriptors.add(SDataConstants.TRNX_DIOG_MAINT);
+        mvSuscriptors.add(SDataConstants.TRNX_MAINT_DIOG);
 
         populateTable();
     }

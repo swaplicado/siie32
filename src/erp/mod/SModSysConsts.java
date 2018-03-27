@@ -700,13 +700,15 @@ public abstract class SModSysConsts {
     public static final int TRNX_DIOG_CST_TRAN_YES = 2;
     
     public static final int TRNX_MAINT_PART = 11;
-    public static final int TRNX_MAINT_TOOL_AV = 21;
+    public static final int TRNX_MAINT_TOOL = 12;
+    public static final int TRNX_MAINT_TOOL_AVL = 21;
     public static final int TRNX_MAINT_TOOL_LENT = 22;
     public static final int TRNX_MAINT_TOOL_MAINT = 23;
     public static final int TRNX_MAINT_TOOL_LOST = 24;
     
     public static final String TXT_TRNX_MAINT_PART = "Refacciones";
-    public static final String TXT_TRNX_MAINT_TOOL_AV = "Herramientas disponibles";
+    public static final String TXT_TRNX_MAINT_TOOL = "Herramientas";
+    public static final String TXT_TRNX_MAINT_TOOL_AVL = "Herramientas disponibles";
     public static final String TXT_TRNX_MAINT_TOOL_LENT = "Herramientas en préstamo";
     public static final String TXT_TRNX_MAINT_TOOL_MAINT = "Herramientas en mantto.";
     public static final String TXT_TRNX_MAINT_TOOL_LOST = "Herramientas extraviadas";

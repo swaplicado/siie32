@@ -531,7 +531,8 @@ public abstract class SDataConstants {
 
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;
-    public static final int TRNX_DIOG_MAINT = 207651;
+    public static final int TRNX_MAINT_DIOG = 207651;
+    public static final int TRNX_MAINT_STK = 207652;
     
     // XXX
     public static final int TRNX_DSM_ETY_SOURCE = 207601;

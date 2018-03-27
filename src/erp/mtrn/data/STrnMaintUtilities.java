@@ -20,7 +20,7 @@ public abstract class STrnMaintUtilities {
         
         String sql = "SELECT MAX(id_maint_diog_sig) "
                 + "FROM trn_maint_diog_sig "
-                + "WHERE fid_diog_year = " + diogKey[0] + " AND fid_diog_doc = " + diogKey[1] + " ";
+                + "WHERE fk_diog_year = " + diogKey[0] + " AND fk_diog_doc = " + diogKey[1] + " ";
         ResultSet resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
             id = resultSet.getInt(1);

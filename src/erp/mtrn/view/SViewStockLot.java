@@ -103,7 +103,7 @@ public class SViewStockLot extends erp.lib.table.STableTab implements java.awt.e
         }
 
         mvSuscriptors.add(mnTabType);
-        mvSuscriptors.add(SDataConstants.TRNX_DIOG_MAINT);
+        mvSuscriptors.add(SDataConstants.TRNX_MAINT_DIOG);
         mvSuscriptors.add(SDataConstants.ITMU_ITEM);
         mvSuscriptors.add(SDataConstants.ITMU_UNIT);
         mvSuscriptors.add(SDataConstants.ITMU_IGEN);
