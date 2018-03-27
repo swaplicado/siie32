@@ -28,21 +28,11 @@ import com.digitalpersona.onetouch.processing.DPFPImageQualityException;
 import com.digitalpersona.onetouch.verification.DPFPVerification;
 import com.digitalpersona.onetouch.verification.DPFPVerificationResult;
 import erp.lib.SLibConstants;
-import java.awt.Image;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
+import erp.lib.SLibUtilities;
+import erp.lib.form.SFormUtilities;
+import java.awt.event.KeyEvent;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import sa.lib.SLibConsts;
 
 /**
  *
@@ -50,50 +40,32 @@ import javax.swing.UIManager;
  */
 public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
     
-    public static final int MODE_CREATE = 1;
-    public static final int MODE_VALIDATE = 2;
+    public static final int VALUE_FINGERPRINT = 1;
+    public static final int MODE_ENROLLMENT = 1;
+    public static final int MODE_VERIFICATION = 2;
+    public static final String TEMPLATE_PROPERTY = "template";
 
-    private int modeType = 1;
     private int mnFormResult;
-    private int mnFormStatus;
     private boolean mbFirstTime;
-    private java.util.Vector<erp.lib.form.SFormField> mvFields;
+    private int mnMode;
     private erp.client.SClientInterface miClient;
-    private final int typeRegisterFinger = 1;
 
-    private int[] manDataFilterKey;
-    private int[] manDocumentTypeKey;
-    private erp.lib.form.SFormField moFieldDocumentType;
-
-    /** Creates new form SDialogFilterDocumentType
+    private DPFPTemplate moFpTemplate;          // to handle fingerprints
+    private DPFPCapture moFpCapture;            // to handle DigitalPersona device
+    private DPFPEnrollment moFpEnrollment;      // to create fingerprint templates
+    private DPFPVerification moFPVerification;  // to verify fingerprint templates
+    
+    /** Creates new form SDialogUareUFingerprint
      * @param client GUI client.
-     * @param modeType MODE_CREATE or MODE_VALIDATE.
+     * @param mode Dialog mode: MODE_ENROLLMENT or MODE_VERIFICATION.
      */
-    public SDialogUareUFingerprint(erp.client.SClientInterface client, int modeType) {
+    public SDialogUareUFingerprint(erp.client.SClientInterface client, int mode) {
         super(client.getFrame(), true);
         miClient = client;
-        modeType = 1;
-        manDataFilterKey = null;
+        mnMode = mode;
                  
         initComponents();
         initComponentsExtra();    
-    }
-  
-     public SDialogUareUFingerprint() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } 
-        catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Imposible modificar el tema visual", "Look and feel inválido.",
-            JOptionPane.ERROR_MESSAGE);
-        }
-        
-        initComponents();
-        txtArea.setEditable(false);
-        jComboBox1.removeAllItems();
-        jbOk.setEnabled(false);
-        Employee employee = new Employee();
-        employee.showEmployees(jComboBox1);
     }
 
     /** This method is called from within the constructor to
@@ -105,97 +77,64 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jpFingerprint = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jtfMode = new javax.swing.JTextField();
+        jspMessages = new javax.swing.JScrollPane();
+        jtaMessages = new javax.swing.JTextArea();
+        jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        jFingerPrints = new javax.swing.JPanel();
-        jPanel8 = new javax.swing.JPanel();
-        jlFingerprintImage = new javax.swing.JLabel();
-        jPanel9 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jConsole = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Huellas digitales");
+        setModal(true);
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
             }
-            public void windowOpened(java.awt.event.WindowEvent evt) {
-                formWindowOpened(evt);
-            }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(492, 33));
+        jpFingerprint.setLayout(new java.awt.BorderLayout());
 
-        jbOk.setText("Guardar");
-        jbOk.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbOkActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jbOk);
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jtfMode.setEditable(false);
+        jtfMode.setFocusable(false);
+        jtfMode.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel2.add(jtfMode);
+
+        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+        jtaMessages.setColumns(20);
+        jtaMessages.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
+        jtaMessages.setRows(5);
+        jspMessages.setViewportView(jtaMessages);
+
+        jPanel1.add(jspMessages, java.awt.BorderLayout.CENTER);
+
+        jpFingerprint.add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jpFingerprint, java.awt.BorderLayout.CENTER);
+
+        jpControls.setPreferredSize(new java.awt.Dimension(492, 33));
+        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbOk.setText("Aceptar");
+        jbOk.setEnabled(false);
+        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpControls.add(jbOk);
 
         jbCancel.setText("Cancelar");
-        jbCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbCancelActionPerformed(evt);
-            }
-        });
-        jPanel1.add(jbCancel);
+        jpControls.add(jbCancel);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+        getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Lector huella digital:", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
-        jPanel2.setLayout(new java.awt.BorderLayout());
-
-        jFingerPrints.setPreferredSize(new java.awt.Dimension(400, 270));
-        jFingerPrints.setLayout(new java.awt.BorderLayout());
-
-        jPanel8.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
-        jPanel8.setLayout(new java.awt.BorderLayout());
-        jPanel8.add(jlFingerprintImage, java.awt.BorderLayout.CENTER);
-
-        jFingerPrints.add(jPanel8, java.awt.BorderLayout.CENTER);
-
-        jLabel1.setText("Elegir");
-        jPanel9.add(jLabel1);
-        jLabel1.getAccessibleContext().setAccessibleName("Elegir ");
-
-        jComboBox1.setPreferredSize(new java.awt.Dimension(180, 20));
-        jPanel9.add(jComboBox1);
-
-        jFingerPrints.add(jPanel9, java.awt.BorderLayout.PAGE_START);
-
-        jPanel2.add(jFingerPrints, java.awt.BorderLayout.NORTH);
-        jFingerPrints.getAccessibleContext().setAccessibleName("");
-
-        jConsole.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Consola", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION));
-        jConsole.setPreferredSize(new java.awt.Dimension(400, 190));
-        jConsole.setLayout(new java.awt.BorderLayout());
-
-        jPanel6.setLayout(new java.awt.BorderLayout());
-
-        txtArea.setColumns(20);
-        txtArea.setFont(new java.awt.Font("Lucida Sans", 1, 10)); // NOI18N
-        txtArea.setRows(5);
-        jScrollPane1.setViewportView(txtArea);
-
-        jPanel6.add(jScrollPane1, java.awt.BorderLayout.CENTER);
-
-        jConsole.add(jPanel6, java.awt.BorderLayout.CENTER);
-
-        jPanel2.add(jConsole, java.awt.BorderLayout.SOUTH);
-
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
-
-        setSize(new java.awt.Dimension(488, 553));
+        setSize(new java.awt.Dimension(496, 339));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -203,436 +142,209 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void jbOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbOkActionPerformed
-        saveFingerprints();
-        recruiter.clear();
-        stop();
-        jlFingerprintImage.setIcon(null);
-        jComboBox1.setEnabled(true);
-        jbOk.setEnabled(false);
-        txtArea.setText("");
-        start();
-    }//GEN-LAST:event_jbOkActionPerformed
-
-    private void jbCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbCancelActionPerformed
-        recruiter.clear();
-        stop();
-        jlFingerprintImage.setIcon(null);
-        jComboBox1.setEnabled(true);
-        jbOk.setEnabled(false);
-        txtArea.setText("");
-        start();
-
-    }//GEN-LAST:event_jbCancelActionPerformed
-
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        
-        initComponentsExtra();
-	start();
-    }//GEN-LAST:event_formWindowOpened
-
-    //Varible que permite iniciar el dispositivo de lector de huella conectado con sus distintos metodos.
-    private DPFPCapture footprintReader = DPFPGlobal.getCaptureFactory().createCapture();    
-    //Varible que permite establecer las capturas de la huellas, para determina sus caracteristicas y poder estimar la creacion de un template de la huella para luego poder guardarla
-    private DPFPEnrollment recruiter = DPFPGlobal.getEnrollmentFactory().createEnrollment();
-    //Variable que para crear el template de la huella luego de que se hallan creado las caracteriticas necesarias de la huella si no ha ocurrido ningun problema
-    private DPFPTemplate template;
-    //Esta variable tambien captura una huella del lector y crea sus caracteristcas para auntetificarla o verificarla con alguna guarda en la BD
-    private DPFPVerification checker = DPFPGlobal.getVerificationFactory().createVerification();
-    
-    public static String TEMPLATE_PROPERTY = "template";
-        
     private void initComponentsExtra() {
-        footprintReader.addDataListener(new DPFPDataAdapter() {
+        switch (mnMode) {
+            case MODE_ENROLLMENT:
+                jtfMode.setText("CREAR HUELLA DIGITAL");
+                break;
+            case MODE_VERIFICATION:
+                jtfMode.setText("VERIFICAR HUELLA DIGITAL");
+                break;
+            default:
+        }
         
-            @Override 
+        moFpCapture = DPFPGlobal.getCaptureFactory().createCapture();
+        
+        moFpCapture.addDataListener(new DPFPDataAdapter() {
+            @Override
             public void dataAcquired(final DPFPDataEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        sendText("La huella digital ha sido leída");
-                            ProcessCapture(e.getSample());       
+                        appendMessage("Huella digital leída.");
+                        processCapture(e.getSample());
                     }
                 });
             }
         });
 
-        footprintReader.addReaderStatusListener(new DPFPReaderStatusAdapter() {
-
-            @Override 
+        moFpCapture.addReaderStatusListener(new DPFPReaderStatusAdapter() {
+            @Override
             public void readerConnected(final DPFPReaderStatusEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {	
+                SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
+                        appendMessage("Lector de huella digital conectado.");
                     }
                 });
             }
 
            @Override 
            public void readerDisconnected(final DPFPReaderStatusEvent e) {
-                    SwingUtilities.invokeLater(new Runnable() {	
-                        public void run() {
-                            sendText("El sensor de huella digital esta desactivado o no conectado");
-                        }
-                    });
-                }
-            });
-
-        footprintReader.addErrorListener(new DPFPErrorAdapter(){
-            public void errorReader(final DPFPErrorEvent e){
-                SwingUtilities.invokeLater(new Runnable() {  
+                SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
-                        sendText("Error: " + e.getError());
+                        appendMessage("Lector de huella digital desconectado.");
                     }
                 });
             }
         });
-    }
 
-    
-    public DPFPFeatureSet featuresinscripcion;
-    
-    public DPFPFeatureSet featuresverificacion;
-    
-    public void ProcessCapture(DPFPSample sample) {
-        
-    if (modeType == MODE_CREATE) {
-        // Procesar la muestra de la huella y crear un conjunto de características con el propósito de inscripción.
-        featuresinscripcion = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
-
-        // Comprobar la calidad de la muestra de la huella y lo añade a su reclutador si es bueno
-        if (featuresinscripcion != null)
-            try {
-                jComboBox1.setEnabled(false);
-                System.out.println("Las caracteristicas de la huella han sido creadas");
-                recruiter.addFeatures(featuresinscripcion); // Agregar las caracteristicas de la huella a la plantilla a crear
-
-                // Dibuja la huella dactilar capturada.
-                Image image = createFingerprintImage(sample);
-                drawFingerprints(image);
-
-                }
-            catch (DPFPImageQualityException ex) {
-                System.err.println("Error: " + ex.getMessage());
-            }
-
-            finally {
-                    stateFingerprints();
-                    // Comprueba si la plantilla se ha creado.
-                switch(recruiter.getTemplateStatus())
-                {
-                    case TEMPLATE_STATUS_READY:	// informe de éxito y detiene  la captura de huellas
-                        stop();
-                        setTemplate(recruiter.getTemplate());
-                        sendText("La plantilla de la huella ha sido creada, ya puede ser guardada");
-                        jbOk.setEnabled(true);
-                        jbOk.grabFocus();
-                        break;
-
-                    case TEMPLATE_STATUS_FAILED: // informe de fallas y reiniciar la captura de huellas
-                        recruiter.clear();
-                        stop();
-                        stateFingerprints();
-                        setTemplate(null);
-                        JOptionPane.showMessageDialog(SDialogUareUFingerprint.this, "La plantilla de la huella no pudo ser creada, repita el proceso", "Inscripción de huellas dactilares", JOptionPane.ERROR_MESSAGE);
-                        start();
-                        break;
-                }
-            }
-        }
-        else  {
-            featuresverificacion = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_VERIFICATION);
-            try {
-                identifyFingerprints();
-            } 
-            catch (IOException ex) {
-                Logger.getLogger(SDialogUareUFingerprint.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-    
-    public DPFPFeatureSet extractFeatures(DPFPSample sample, DPFPDataPurpose purpose){
-        DPFPFeatureExtraction extractor = DPFPGlobal.getFeatureExtractionFactory().createFeatureExtraction();
-        try {
-           return extractor.createFeatureSet(sample, purpose);
-        } 
-        catch (DPFPImageQualityException e) {
-           return null;
-        }
-    }
-
-    public  Image createFingerprintImage(DPFPSample sample) {
-        return DPFPGlobal.getSampleConversionFactory().createImage(sample);
-    }
-
-    public void drawFingerprints(Image image) {
-        jlFingerprintImage.setIcon(new ImageIcon(image.getScaledInstance(jlFingerprintImage.getWidth(), jlFingerprintImage.getHeight(), Image.SCALE_DEFAULT)));
-        repaint();
-    }
-    
-    public void stateFingerprints(){
-        if (recruiter.getFeaturesNeeded() != 0) {
-            sendText("Restan " + recruiter.getFeaturesNeeded() + " intentos de huellas dactilares necesarias para la creción de la plantilla ");
-        } 
-        else {
-            sendText("Huellas dactilares listas para su captura ");
-        }
-    }
-
-    public void sendText(String string) {
-            txtArea.append(string + "\n");
-    }
-
-    public void start(){
-            footprintReader.startCapture();
-            sendText("Lector de huella dactilar listo para usar");
-    }
-
-    public void stop(){
-            footprintReader.stopCapture();
-            sendText("No se está usando el lector de huella dactilar");
-    }
-
-    public DPFPTemplate getTemplate() {
-        return template;
-    }
-    
-    Conexion conn = new Conexion();
-    
-    public void setTemplate(DPFPTemplate template) {
-        DPFPTemplate old = this.template;
-        this.template = template;
-        firePropertyChange(TEMPLATE_PROPERTY, old, template);
-    }
-    
-    
-   // Identifica a una persona registrada por medio de su huella digital   
-   public void saveFingerprints() {
-       // Obtener los datos del template de la huella actual
-       ByteArrayInputStream dataFingerprints = new ByteArrayInputStream(template.serialize());
-       Integer sizeFingerprints  = template.serialize().length;
-       
-       Employee employee = jComboBox1.getItemAt(jComboBox1.getSelectedIndex());
-       
-       try {
-           //Establece los valores para la sentencia SQL
-           Connection c = conn.conectar();
-           
-           PreparedStatement guardarStmt = c.prepareStatement("INSERT INTO fingerprints(print,code,employee_id,typeregister_id) values(?,?,?,?)");
-           guardarStmt.setBinaryStream(1,dataFingerprints,sizeFingerprints);
-           guardarStmt.setNull(2, java.sql.Types.INTEGER);
-           guardarStmt.setInt(3,employee.getId());
-           guardarStmt.setInt(4, typeRegisterFinger);
-           
-           //Ejecuta la sentencia
-           guardarStmt.execute();
-           guardarStmt.close();
-           JOptionPane.showMessageDialog(null, "Huella guardada correctamente");
-           conn.desconectar();
-           jbOk.setEnabled(false);
-       }
-       catch (SQLException ex) {
-           //Si ocurre un error lo indica en la consola
-           JOptionPane.showMessageDialog(null, "Ocurrio un error al guardar la huella, intente de nuevo.");
-           System.err.println("Error al guardar los datos de la huella.");
-       }
-       finally {
-           conn.desconectar();
-       }
-   }
-   
-    /*
-    * @param args the command line arguments
-    */
-
-   public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new SDialogUareUFingerprint().setVisible(true);
+        moFpCapture.addErrorListener(new DPFPErrorAdapter() {
+            public void errorReader(final DPFPErrorEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        appendMessage("Error en lector de huella digital: " + e.getError());
+                    }
+                });
             }
         });
+        
+        jbOk.addActionListener(this);
+        jbCancel.addActionListener(this);
+        
+        SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
     }
     
     private void windowActivated() {
         if (mbFirstTime) {
-            mbFirstTime = false;         
+            mbFirstTime = false;
+            startFpReader();
+        }
+    }
+    
+    private void startFpReader() {
+        switch (mnMode) {
+            case MODE_ENROLLMENT:
+                moFpEnrollment = DPFPGlobal.getEnrollmentFactory().createEnrollment();
+                break;
+            case MODE_VERIFICATION:
+                moFPVerification = DPFPGlobal.getVerificationFactory().createVerification();
+                break;
+            default:
+        }
+        
+        moFpCapture.startCapture();
+        jtaMessages.setText("Lector de huella digital encendido.\n");
+    }
 
-            conn.conectar();
-        }
+    private void stopFpReader() {
+        moFpCapture.stopCapture();
+        appendMessage("Lector de huella digital apagado.");
     }
-    
-    //verificar huella
-    private void cleanImage() {
 
-        javax.swing.Timer clean = new javax.swing.Timer(4000, new java.awt.event.ActionListener() { 
-            
-            @Override         
-            public void actionPerformed(java.awt.event.ActionEvent ae) {                              
-                txtArea.setText("");
-            } 
-        });
-        clean.start();
-        clean.setRepeats(false);
+    private void appendMessage(String message) {
+        jtaMessages.append(message + "\n");
     }
-    
-    public void insertEntry(final int id_fingerprint, final int employee_id) {
-       try {
-            Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-            SimpleDateFormat hourFormat = new SimpleDateFormat("HH:mm:ss");
-            Connection c = conn.conectar();            
-            PreparedStatement guardarStmt = c.prepareStatement("INSERT INTO registry(employee_id, date, time, fingerprint_id) values(?, ?, ?, ?)");
-            guardarStmt.setInt(1, employee_id);   
-            guardarStmt.setString(2, dateFormat.format(date));
-            guardarStmt.setString(3, hourFormat.format(date));
-            guardarStmt.setInt(4, id_fingerprint);
-            
-            guardarStmt.execute();
-            guardarStmt.close();
-            
-            correctImage(employee_id, c, date, hourFormat);
-            
-            cleanImage();
-            
-        }
-        catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Ocurrio un error al guardar la huella, intente de nuevo.");
-            System.err.println("Error al guardar los datos de la huella.");
-        }
-        finally {
-            conn.desconectar();
-        }
-   }
-       
-    
-    private void incorrectImage() {
-        txtArea.setText("No existe ningún registro que coincida con el codigo, Intente de nuevo"); 
-        setTemplate(null);
-    }
-    
-    private void correctImage(final int id_employee, final Connection c, Date date, SimpleDateFormat hourFormat) throws SQLException {
-        PreparedStatement employee = c.prepareStatement("SELECT * FROM empleados WHERE id = ? ");
-        employee.setInt(1, id_employee);
-        ResultSet empleado = employee.executeQuery();
-        String aux = "";
+
+    private DPFPFeatureSet extractFeatures(DPFPSample sample, DPFPDataPurpose purpose) {
+        DPFPFeatureSet featureSet = null;
         
-        while(empleado.next()) {
-            aux = empleado.getString("name");
+        try {
+            DPFPFeatureExtraction extractor = DPFPGlobal.getFeatureExtractionFactory().createFeatureExtraction();
+            featureSet = extractor.createFeatureSet(sample, purpose);
+        } 
+        catch (DPFPImageQualityException e) {
+            SLibUtilities.renderException(this, e);
         }
         
-        System.out.println("Verificación correcta de  " + aux + " a las " + hourFormat.format(date) + " horas.");
-        txtArea.setText("Verificación correcta de  " + aux + " a las " + hourFormat.format(date) + " horas.");
+        return featureSet;
     }
     
-   // Identifica a una persona registrada por medio de su huella digital
-   public void identifyFingerprints() throws IOException {
-        
-       try{
-           //Establece los valores para la sentencia SQL
-           Connection c = conn.conectar();
-           
-           //Obtiene todas las huella de la bd
-           PreparedStatement identifyStmt = c.prepareStatement("SELECT id, employee_id, print FROM fingerprints WHERE typeregister_id = 1");
-           ResultSet rs = identifyStmt.executeQuery();
-           
-           //Si se encuentra el nombre en la base de datos
-           while (rs.next()) {
-               //Lee la plantilla de la base de datos
-               int id_fingerprint = rs.getInt("id");
-               byte templateBuffer[] = rs.getBytes("print");
-               int employee_id = rs.getInt("employee_id");
-               //Crea una nueva plantilla a partir de la guardada en la base de datos
-               DPFPTemplate referenceTemplate = DPFPGlobal.getTemplateFactory().createTemplate(templateBuffer);
-               //Envia la plantilla creada al objeto contenedor de Template del componente de huella digital
-               setTemplate(referenceTemplate);
-               
-               
-                //prro aqui poner la verificacion de usuario y pintar la huella
+    public void processCapture(final DPFPSample sample) {
+        switch (mnMode) {
+            case MODE_ENROLLMENT:
+                try {
+                    DPFPFeatureSet featureSet = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
+                    
+                    if (featureSet == null) {
+                        throw new Exception("No fue posible obtener los atributos de la muestra de huella digital.");
+                    }
+
+                    moFpEnrollment.addFeatures(featureSet);
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+                finally {
+                    switch(moFpEnrollment.getTemplateStatus()) {
+                        case TEMPLATE_STATUS_READY:
+                            moFpTemplate = moFpEnrollment.getTemplate();
+                            miClient.showMsgBoxInformation("Plantilla de huella digital creada exitosamente.");
+                            actionOk();
+                            break;
+
+                        case TEMPLATE_STATUS_FAILED:
+                            miClient.showMsgBoxInformation("No fue posible crear la plantilla de huella digital.");
+                            actionCancel();
+                            break;
+
+                        case TEMPLATE_STATUS_INSUFFICIENT:
+                            if (moFpEnrollment.getFeaturesNeeded() != 0) {
+                                appendMessage("Restan " + moFpEnrollment.getFeaturesNeeded() + " intentos de captura de huella digital para crear la plantilla.");
+                            } 
+                            break;
+
+                        case TEMPLATE_STATUS_UNKNOWN:
+                            appendMessage("Estatus desconocido del lector de huella digital.");
+                            break;
+
+                        default:
+                            appendMessage(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                    }
+                }
+                break;
                 
-            
-//            DPFPSample sample = null; // quitar este null- null pointer 
-//            featuresinscripcion = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_ENROLLMENT);
-//            Image image = createFingerprintImage(sample);
-//            drawFingerprints(image);
-//            
-//            Employee em = (Employee) jComboBox1.getSelectedItem();
-//            int pk [] = {em.getId()}; 
-//            moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, pk, SLibConstants.EXEC_MODE_SILENT);
-               
-               //Compara las caracteristicas de la huella recientemente capturada con alguna plantilla guardada en la base de datos que concide con ese tipo
-               DPFPVerificationResult result = checker.verify(featuresverificacion, getTemplate());
-               
-               //Compara las plantillas, si encuentra correspondenica dibuja el mapa que indica el nombre de la persona que coincidio
-               if (result.isVerified()) {
-                   insertEntry(id_fingerprint, employee_id);                   
-                   return;
-               }
-           }
-           //Si no encuentra alguna huella correspondiente al nombre lo indica con un mensaje 
-           //aparecer incorrecto
-           incorrectImage();
-           cleanImage();
-           
-       }
-       catch (SQLException e) {
-           //Si ocurre un error lo indica en consola
-           System.err.println("Error al identificar huella dactilar.");
-       }
-       finally {
-           conn.desconectar();
-       }
+            case MODE_VERIFICATION:
+                try {
+                    DPFPFeatureSet featureSet = extractFeatures(sample, DPFPDataPurpose.DATA_PURPOSE_VERIFICATION);
+                    
+                    if (featureSet == null) {
+                        throw new Exception("No fue posible obtener los atributos de la muestra de huella digital.");
+                    }
+
+                    DPFPVerificationResult result = moFPVerification.verify(featureSet, moFpTemplate);
+
+                    if (result.isVerified()) {
+                        actionOk();
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("No fue posible verificar la huella digital.\nIntenta de nuevo.");
+                    }
+                } 
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+                break;
+                
+            default:
+        }
     }
-     
-    private void actionDocumentType() {
-        miClient.pickOption(modeType, moFieldDocumentType, manDataFilterKey);
-    }
-//    
-//    public void itemStateChanged(ItemEvent e) throws IOException {
-//        if (e.getSource() instanceof JComboBox) {
-//            if (e.getStateChange() == ItemEvent.SELECTED) {
-//                JComboBox comboBox = (JComboBox) e.getSource();
-//                if (comboBox == jComboBox1) {
-//                    identifyFingerprints();
-//                }
-//            }
-//        }
-//    }
+
+    /*
+    * @param args the command line arguments
+    */
 
     public void actionOk() {
-        
+        stopFpReader();
+        mnFormResult = SLibConstants.FORM_RESULT_OK;
+        setVisible(false);
     }
 
     public void actionCancel() {
+        stopFpReader();
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<erp.mtrn.form.uareu.Employee> jComboBox1;
-    private javax.swing.JPanel jConsole;
-    private javax.swing.JPanel jFingerPrints;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
-    private javax.swing.JLabel jlFingerprintImage;
-    private javax.swing.JTextArea txtArea;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpFingerprint;
+    private javax.swing.JScrollPane jspMessages;
+    private javax.swing.JTextArea jtaMessages;
+    private javax.swing.JTextField jtfMode;
     // End of variables declaration//GEN-END:variables
-
-    public void setDataFilterKey(final int[] key) {
-        manDataFilterKey = key;
-    }
-
-    public void setDocumentTypeKey(final int[] key) {
-      
-    }
-
-    public int[] getDocumentTypeKey() {
-        return manDocumentTypeKey;
-    }
 
     @Override
     public void formClearRegistry() {
@@ -642,18 +354,16 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
     @Override
     public void formReset() {
         mnFormResult = SLibConstants.UNDEFINED;
-        mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
-
-        for (int i = 0; i < mvFields.size(); i++) {
-            ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
-        }
-
-        setDocumentTypeKey(null);
+        
+        moFpTemplate = null;
+        moFpEnrollment = null;
+        moFPVerification = null;
     }
 
     @Override
     public void formRefreshCatalogues() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -663,7 +373,7 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
 
     @Override
     public void setFormStatus(int status) {
-        mnFormStatus = status;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -673,7 +383,7 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
 
     @Override
     public int getFormStatus() {
-        return mnFormStatus;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -693,12 +403,28 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
 
     @Override
     public void setValue(int type, java.lang.Object value) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        switch (type) {
+            case VALUE_FINGERPRINT:
+                moFpTemplate = DPFPGlobal.getTemplateFactory().createTemplate((byte[]) value);
+                break;
+            default:
+                miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
     }
 
     @Override
     public java.lang.Object getValue(int type) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        Object value = null;
+        
+        switch (type) {
+            case VALUE_FINGERPRINT:
+                value = moFpTemplate.serialize();
+                break;
+            default:
+                miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
+        return value;
     }
 
     @Override
