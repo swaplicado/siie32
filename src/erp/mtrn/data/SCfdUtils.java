@@ -3977,13 +3977,8 @@ public abstract class SCfdUtils implements Serializable {
 
     public static boolean signCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
         boolean signed = false;
-        boolean signNeeded = false;
-        ArrayList<SDataCfd> cfdsValidate = null;
-        ArrayList<SDataCfd> cfdsAux = null;
-        SDialogResult dialogResult = null;
-
-        cfdsValidate = new ArrayList<SDataCfd>();
-        cfdsAux = new ArrayList<SDataCfd>();
+        ArrayList<SDataCfd> cfdsValidate = new ArrayList<>();
+        ArrayList<SDataCfd> cfdsAux = new ArrayList<>();
 
         for(SDataCfd cfd : cfds) {
             if (cfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
@@ -4000,8 +3995,9 @@ public abstract class SCfdUtils implements Serializable {
         }
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea timbrar " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
+                signed = true;
+                boolean signNeeded = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
                 int stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
-                signNeeded = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
 
                 if (signNeeded && stampsAvailable == 0) {
                     client.showMsgBoxWarning("No existen timbres disponibles.");
@@ -4013,7 +4009,7 @@ public abstract class SCfdUtils implements Serializable {
 
                     if (existsCfdiEmitInconsist(client, cfdsValidate)) {
                         if (signed) {
-                            dialogResult = new SDialogResult((SClient) client, "Resultados de timbrado", SCfdConsts.PROC_REQ_STAMP);
+                            SDialogResult dialogResult = new SDialogResult((SClient) client, "Resultados de timbrado", SCfdConsts.PROC_REQ_STAMP);
                             dialogResult.setFormParams(client, cfdsAux, null, stampsAvailable, null, signNeeded, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialogResult.setVisible(true);
                         }
@@ -4027,14 +4023,8 @@ public abstract class SCfdUtils implements Serializable {
     
     public static boolean signAndSendCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
         boolean signedSent = false;
-        int stampsAvailable = 0;
-        ArrayList<SDataCfd> cfdsValidate = null;
-        ArrayList<SDataCfd> cfdsAux = null;
-        SDialogResult dialogResult = null;
-        boolean needSign = false;
-
-        cfdsValidate = new ArrayList<SDataCfd>();
-        cfdsAux = new ArrayList<SDataCfd>();
+        ArrayList<SDataCfd> cfdsValidate = new ArrayList<>();
+        ArrayList<SDataCfd> cfdsAux = new ArrayList<>();
 
         for(SDataCfd cfd : cfds) {
             if (cfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
@@ -4047,27 +4037,26 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfdsAux.isEmpty()) {
-            client.showMsgBoxInformation("No existen documentos para timbrar.");
+            client.showMsgBoxInformation("No existen documentos para timbrar y enviar.");
         }
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea timbrar y enviar " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
                 signedSent = true;
-                stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
-                needSign = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
+                boolean signNeeded = isNeedStamps(client, cfdsAux.get(0), SDbConsts.ACTION_SAVE, 0);
+                int stampsAvailable = getStampsAvailable(client, cfdsAux.get(0).getFkCfdTypeId(), cfdsAux.get(0).getTimestamp(), 0);
 
-                if (needSign && stampsAvailable == 0) {
+                if (signNeeded && stampsAvailable == 0) {
                     client.showMsgBoxWarning("No existen timbres disponibles.");
                 }
                 else {
-                    if (needSign && cfdsAux.size() > stampsAvailable) {
+                    if (signNeeded && cfdsAux.size() > stampsAvailable) {
                         signedSent = client.showMsgBoxConfirm("Timbres insuficientes:\n -Solo existen '" + stampsAvailable + "' timbres disponibles.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION;
                     }
 
                     if (existsCfdiEmitInconsist(client, cfdsValidate)) {
                         if (signedSent) {
-                            dialogResult = new SDialogResult((SClient) client, "Resultados de timbrado y enviado", SCfdConsts.PROC_REQ_STAMP_AND_SND);
-
-                            dialogResult.setFormParams(client, cfdsAux, null, stampsAvailable, null, needSign, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                            SDialogResult dialogResult = new SDialogResult((SClient) client, "Resultados de timbrado y enviado", SCfdConsts.PROC_REQ_STAMP_AND_SND);
+                            dialogResult.setFormParams(client, cfdsAux, null, stampsAvailable, null, signNeeded, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialogResult.setVisible(true);
                         }
                     }
