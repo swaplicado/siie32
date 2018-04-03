@@ -18,7 +18,7 @@ import erp.mhrs.form.SDialogFormerPayrollImport;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
-import erp.mod.hrs.form.SDialogCalculateEstimateIncomeTax;
+import erp.mod.hrs.form.SDialogCalculateIncomeTax;
 import erp.mod.hrs.form.SDialogPayrollEmployeeSsContributionUpdate;
 import erp.mod.hrs.form.SDialogRepHrsActiveEmployees;
 import erp.mod.hrs.form.SDialogRepHrsAuxPayroll;
@@ -909,7 +909,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SFormCalculateNetGrossAmount((SGuiClient) miClient, SHrsConsts.CAL_NET_AMT_TYPE, "Calcular ingreso mensual").setFormVisible(true);
             }
             else if (item == jmiPayCalculatedEstimateIncomeTax) {
-                new SDialogCalculateEstimateIncomeTax((SGuiClient) miClient, "Calcular impuesto acumulado").setFormVisible(true);
+                new SDialogCalculateIncomeTax((SGuiClient) miClient, "Calcular impuesto acumulado").setFormVisible(true);
             }
             else if (item == jmiBenefitBenefitVac) {
                 miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_VAC, null);
