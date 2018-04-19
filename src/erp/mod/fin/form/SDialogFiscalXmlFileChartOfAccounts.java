@@ -191,7 +191,7 @@ public class SDialogFiscalXmlFileChartOfAccounts extends SBeanFormDialog {
         ArrayList<SRowFiscalChartOfAccounts> accounts = new ArrayList<>();
 
         try {
-            sql = SFiscalUtils.createQueryCatalogo11(miClient.getSession(), mnYear, mnMonth);
+            sql = SFiscalUtils.createQueryCatalogo13(miClient.getSession(), mnYear, mnMonth);
             resultSet = miClient.getSession().getStatement().executeQuery(sql);
             while (resultSet.next()) {
                 account = new SRowFiscalChartOfAccounts();

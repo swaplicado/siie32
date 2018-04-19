@@ -487,7 +487,7 @@
                                 <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                                   <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
                                 </Property>
-                                <Property name="text" type="java.lang.String" value="0000000000"/>
+                                <Property name="text" type="java.lang.String" value="AA00000000000"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[85, 23]"/>
                                 </Property>
