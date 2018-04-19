@@ -34,7 +34,7 @@ import sa.lib.xml.SXmlUtils;
  * Every single change made to the definition of this class' table must be updated also in the following classes:
  * - erp.mod.hrs.db.SDbFormerPayrollImport
  * - erp.mtrn.data.SCfdUtils
- * All of them also make raw SQL insertions.
+ * All of them execute raw SQL insertions.
  */
 
 /**
@@ -59,6 +59,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     private final static int DATA_TYPE_DATE = 3;
     
     protected int mnPkCfdId;
+    protected java.lang.String msSeries;
+    protected int mnNumber;
     protected java.util.Date mtTimestamp;
     protected java.lang.String msCertNumber;
     protected java.lang.String msStringSigned;
@@ -86,6 +88,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkXmlStatusId;
     protected int mnFkXmlDeliveryTypeId;
     protected int mnFkXmlDeliveryStatusId;
+    protected int mnFkCompanyBranchId_n;
     protected int mnFkDpsYearId_n;
     protected int mnFkDpsDocId_n;
     protected int mnFkRecordYearId_n;
@@ -248,6 +251,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     public void setPkCfdId(int n) { mnPkCfdId = n; }
+    public void setSeries(java.lang.String s) { msSeries = s; }
+    public void setNumber(int n) { mnNumber = n; }
     public void setTimestamp(java.util.Date t) { mtTimestamp = t; }
     public void setCertNumber(java.lang.String s) { msCertNumber = s; }
     public void setStringSigned(java.lang.String s) { msStringSigned = s; }
@@ -275,6 +280,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkXmlStatusId(int n) { mnFkXmlStatusId = n; }
     public void setFkXmlDeliveryTypeId(int n) { mnFkXmlDeliveryTypeId = n; }
     public void setFkXmlDeliveryStatusId(int n) { mnFkXmlDeliveryStatusId = n; }
+    public void setFkCompanyBranchId_n(int n) { mnFkCompanyBranchId_n = n; }
     public void setFkDpsYearId_n(int n) { mnFkDpsYearId_n = n; }
     public void setFkDpsDocId_n(int n) { mnFkDpsDocId_n = n; }
     public void setFkRecordYearId_n(int n) { mnFkRecordYearId_n = n; }
@@ -302,6 +308,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxIsValidate(boolean b) { mbAuxIsValidate = b; }    
 
     public int getPkCfdId() { return mnPkCfdId; }
+    public java.lang.String getSeries() { return msSeries; }
+    public int getNumber() { return mnNumber; }
     public java.util.Date getTimestamp() { return mtTimestamp; }
     public java.lang.String getCertNumber() { return msCertNumber; }
     public java.lang.String getStringSigned() { return msStringSigned; }
@@ -329,6 +337,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkXmlStatusId() { return mnFkXmlStatusId; }
     public int getFkXmlDeliveryTypeId() { return mnFkXmlDeliveryTypeId; }
     public int getFkXmlDeliveryStatusId() { return mnFkXmlDeliveryStatusId; }
+    public int getFkCompanyBranchId_n() { return mnFkCompanyBranchId_n; }
     public int getFkDpsYearId_n() { return mnFkDpsYearId_n; }
     public int getFkDpsDocId_n() { return mnFkDpsDocId_n; }
     public int getFkRecordYearId_n() { return mnFkRecordYearId_n; }
@@ -370,6 +379,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         super.resetRegistry();
 
         mnPkCfdId = 0;
+        msSeries = "";
+        mnNumber = 0;
         mtTimestamp = null;
         msCertNumber = "";
         msStringSigned = "";
@@ -397,6 +408,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkXmlStatusId = 0;
         mnFkXmlDeliveryTypeId = 0;
         mnFkXmlDeliveryStatusId = 0;
+        mnFkCompanyBranchId_n = 0;
         mnFkDpsYearId_n = 0;
         mnFkDpsDocId_n = 0;
         mnFkRecordYearId_n = 0;
@@ -443,6 +455,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
             else {
                 mnPkCfdId = resultSet.getInt("id_cfd");
+                msSeries = resultSet.getString("ser");
+                mnNumber = resultSet.getInt("num");
                 mtTimestamp = resultSet.getTimestamp("ts");
                 msCertNumber = resultSet.getString("cert_num");
                 msStringSigned = resultSet.getString("str_signed");
@@ -470,6 +484,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkXmlStatusId = resultSet.getInt("fid_st_xml");
                 mnFkXmlDeliveryTypeId = resultSet.getInt("fid_tp_xml_dvy");
                 mnFkXmlDeliveryStatusId = resultSet.getInt("fid_st_xml_dvy");
+                mnFkCompanyBranchId_n = resultSet.getInt("fid_cob_n");
                 mnFkDpsYearId_n = resultSet.getInt("fid_dps_year_n");
                 mnFkDpsDocId_n = resultSet.getInt("fid_dps_doc_n");
                 mnFkRecordYearId_n = resultSet.getInt("fid_rec_year_n");
@@ -522,36 +537,45 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             statement = connection.createStatement();
             
             if (mnPkCfdId == SLibConsts.UNDEFINED) {
-                sql = "SELECT COALESCE(MAX(id_cfd), 0) + 1 AS f_cfd_id FROM trn_cfd ";
+                // obtain new ID for CFD:
+                sql = "SELECT COALESCE(MAX(id_cfd), 0) + 1 FROM trn_cfd ";
                 resultSet = statement.executeQuery(sql);
-                
                 if (!resultSet.next()) {
                     throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
                 }
                 else {
-                    mnPkCfdId = resultSet.getInt("f_cfd_id");
+                    mnPkCfdId = resultSet.getInt(1);
                 }
 
-                sql = "DELETE FROM trn_cfd WHERE id_cfd = " + mnPkCfdId + " ";
-                statement.execute(sql);
+                if (!msSeries.isEmpty() && mnNumber == 0) {
+                    // obtain new Number for actual Series of CFD:
+                    sql = "SELECT COALESCE(MAX(num), 0) + 1 FROM trn_cfd WHERE ser = '" + msSeries + "' ";
+                    resultSet = statement.executeQuery(sql);
+                    if (!resultSet.next()) {
+                        throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+                    }
+                    else {
+                        mnNumber = resultSet.getInt(1);
+                    }
+                }
 
-                sql = "INSERT INTO trn_cfd (id_cfd, " +
+                sql = "INSERT INTO trn_cfd (id_cfd, ser, num, " +
                         "ts, cert_num, str_signed, signature, doc_xml, doc_xml_name, xml_rfc_emi, xml_rfc_rec, xml_tot, xml_mon, " +
                         "xml_tc, xml_sign_n, uuid, qrc_n, ack_can_xml, ack_can_pdf_n, ack_dvy, msg_dvy, b_prc_ws, b_prc_sto_xml, " +
-                        "b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, fid_dps_year_n, fid_dps_doc_n, fid_rec_year_n, " +
-                        "fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, " +
+                        "b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, fid_cob_n, fid_dps_year_n, fid_dps_doc_n, " +
+                        "fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, " +
                         "fid_pay_rcp_iss_n, fid_usr_prc, fid_usr_dvy, ts_prc, ts_dvy) " +
-                        "VALUES (" + mnPkCfdId + ", " +
+                        "VALUES (" + mnPkCfdId + ", ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, NOW(), NOW())";
             }
             else {
                 bIsUpd = true;
                 
-                sql = "UPDATE trn_cfd SET ts = ?, cert_num = ?, str_signed = ?, signature = ?, " +
+                sql = "UPDATE trn_cfd SET ser = ?, num = ?, ts = ?, cert_num = ?, str_signed = ?, signature = ?, " +
                         "doc_xml = ?, doc_xml_name = ?, xml_rfc_emi = ?, xml_rfc_rec = ?, xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, " +
                         "uuid = ?, " + (mnFkXmlStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED ? "qrc_n = ?," : "") + " ack_can_xml = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, fid_tp_cfd = ?, " +
                         "fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
@@ -568,6 +592,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement = connection.prepareStatement(sql);
             
             preparedStatement.setTimestamp(index++, new java.sql.Timestamp(mtTimestamp.getTime()));
+            preparedStatement.setString(index++, msSeries);
+            preparedStatement.setInt(index++, mnNumber);
             preparedStatement.setString(index++, msCertNumber);
             preparedStatement.setString(index++, msStringSigned);
             preparedStatement.setString(index++, msSignature);
@@ -628,6 +654,13 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement.setInt(index++, mnFkXmlStatusId);
             preparedStatement.setInt(index++, mnFkXmlDeliveryTypeId);
             preparedStatement.setInt(index++, mnFkXmlDeliveryStatusId);
+            
+            if (mnFkCompanyBranchId_n == SLibConsts.UNDEFINED) {
+                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
+            }
+            else {
+                preparedStatement.setInt(index++, mnFkCompanyBranchId_n);
+            }
             
             if (mnFkDpsYearId_n == SLibConsts.UNDEFINED) {
                 preparedStatement.setNull(index++, java.sql.Types.SMALLINT);
