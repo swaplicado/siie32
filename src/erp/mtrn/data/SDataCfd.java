@@ -548,7 +548,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
 
                 if (!msSeries.isEmpty() && mnNumber == 0) {
-                    // obtain new Number for actual Series of CFD:
+                    // obtain new Number for actual Series of CFD, only CFD with own number series will be numbered:
                     sql = "SELECT COALESCE(MAX(num), 0) + 1 FROM trn_cfd WHERE ser = '" + msSeries + "' ";
                     resultSet = statement.executeQuery(sql);
                     if (!resultSet.next()) {
@@ -577,8 +577,10 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 sql = "UPDATE trn_cfd SET ser = ?, num = ?, ts = ?, cert_num = ?, str_signed = ?, signature = ?, " +
                         "doc_xml = ?, doc_xml_name = ?, xml_rfc_emi = ?, xml_rfc_rec = ?, xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, " +
-                        "uuid = ?, " + (mnFkXmlStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED ? "qrc_n = ?," : "") + " ack_can_xml = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, fid_tp_cfd = ?, " +
-                        "fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
+                        "uuid = ?, " + (mnFkXmlStatusId != SDataConstantsSys.TRNS_ST_DPS_ANNULED ? "qrc_n = ?," : "") + " ack_can_xml = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, " +
+                        "fid_tp_cfd = ?, fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_cob_n = ?, " +
+                        "fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, " +
+                        "fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
                         "WHERE id_cfd = " + mnPkCfdId + " ";
             }
             
@@ -591,9 +593,9 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             
             preparedStatement = connection.prepareStatement(sql);
             
-            preparedStatement.setTimestamp(index++, new java.sql.Timestamp(mtTimestamp.getTime()));
             preparedStatement.setString(index++, msSeries);
             preparedStatement.setInt(index++, mnNumber);
+            preparedStatement.setTimestamp(index++, new java.sql.Timestamp(mtTimestamp.getTime()));
             preparedStatement.setString(index++, msCertNumber);
             preparedStatement.setString(index++, msStringSigned);
             preparedStatement.setString(index++, msSignature);
