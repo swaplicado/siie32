@@ -500,6 +500,7 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
                 moDpsEntry.setWeightGross(moItem.getWeightGross());
                 moDpsEntry.setWeightDelivery(moItem.getWeightDelivery());
                 moDpsEntry.setSurplusPercentage(0);
+                moDpsEntry.setOperationsType(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
                 moDpsEntry.setFkItemRefId_n(moRequisitionEntry.getFkItemId());
                 moDpsEntry.setFkCostCenterId_n("");
                 moDpsEntry.setIsInventoriable(moItem.getIsInventoriable());

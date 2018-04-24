@@ -7,7 +7,7 @@ package erp.mfin.data;
  *
  * @author Sergio Flores
  */
-public enum SFinMovement {
-    INCREMENT,
-    DECREMENT
+public enum SFinMovementType {
+    MOVT_INCREMENT,
+    MOVT_DECREMENT
 }

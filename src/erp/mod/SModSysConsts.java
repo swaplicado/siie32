@@ -666,6 +666,18 @@ public abstract class SModSysConsts {
     public static final int TRNS_TP_LINK_MFR = 10;
     public static final int TRNS_TP_LINK_ITEM = 11;
     
+    public static final int TRNS_TP_MAINT_MOV_NA = 1;   // non applicable
+    public static final int TRNS_TP_MAINT_MOV_IN_CONS_PART = 111;   // in consumption of parts
+    public static final int TRNS_TP_MAINT_MOV_IN_CONS_TOOL = 121;   // in consumption of tools
+    public static final int TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT = 151;      // in status of tools lent
+    public static final int TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT = 152;     // in status of tools maintenance
+    public static final int TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST = 153;      // in status of tools lost
+    public static final int TRNS_TP_MAINT_MOV_OUT_CONS_PART = 211;  // out consumption of parts
+    public static final int TRNS_TP_MAINT_MOV_OUT_CONS_TOOL = 221;  // out consumption of tools
+    public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT = 251;     // out status of tools lent
+    public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT = 252;    // out status of tools maintenance
+    public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST = 253;     // out status of tools lost
+
     public static final int TRNU_TP_IOG_ADJ_NA = 1;
 
     public static final int TRNU_TP_DPS_ANN_NA = 1;
@@ -673,6 +685,12 @@ public abstract class SModSysConsts {
     public static final int TRN_PAC_FCG = 1;    // Formas Contínuas de Guadalajara SA de CV
     public static final int TRN_PAC_FNK = 2;    // Finkok SA de CV
 
+    public static final int TRN_MAINT_CFG_COM = 1; // company's maintenance configuration
+
+    public static final int TRN_MAINT_AREA_NA = 1; // non applicable
+    
+    public static final int TRN_MAINT_USER_SUPV_NA = 1; // non applicable
+    
     public static final int TRNX_DIOG_CST_ASIG_NA = 0;
     public static final int TRNX_DIOG_CST_ASIG_NO = 1;
     public static final int TRNX_DIOG_CST_ASIG_YES = 2;
@@ -680,6 +698,24 @@ public abstract class SModSysConsts {
     public static final int TRNX_DIOG_CST_TRAN_NA = 0;
     public static final int TRNX_DIOG_CST_TRAN_NO = 1;
     public static final int TRNX_DIOG_CST_TRAN_YES = 2;
+    
+    public static final int TRNX_ST_MAINT_AV = 1;
+    public static final int TRNX_ST_MAINT_LENT = 2;
+    public static final int TRNX_ST_MAINT_MAINT = 3;
+    public static final int TRNX_ST_MAINT_LOST = 4;
+    
+    public static final String TXT_TRNX_ST_MAINT_AV = "Herramientas disponibles";
+    public static final String TXT_TRNX_ST_MAINT_LENT = "Herramientas en préstamo";
+    public static final String TXT_TRNX_ST_MAINT_MAINT = "Herramientas en mantenimiento";
+    public static final String TXT_TRNX_ST_MAINT_LOST = "Herramientas extraviadas";
+    
+    public static final int TRNX_TP_MAINT_USER_EMPLOYEE = 1;
+    public static final int TRNX_TP_MAINT_USER_CONTRACTOR = 2;
+    public static final int TRNX_TP_MAINT_USER_TOOL_MAINT_PROV = 3;
+    
+    public static final String TXT_TRNX_TP_MAINT_USER_EMPLOYEE = "Empleado";
+    public static final String TXT_TRNX_TP_MAINT_USER_CONTRACTOR = "Contratista";
+    public static final String TXT_TRNX_TP_MAINT_USER_TOOL_MAINT_PROV = "Proveedor mantto. herramientas";
     
     /*
      * Marketing

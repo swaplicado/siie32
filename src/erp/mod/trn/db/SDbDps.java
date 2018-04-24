@@ -107,6 +107,9 @@ public class SDbDps extends SDbRegistryUser {
     protected int mnFkBizPartnerAltId_r;
     protected int mnFkBizPartnerBranchAltId;
     protected int mnFkBizPartnerBranchAddressAltId;
+    protected int mnFkAddresseeBizPartnerId_nr;
+    protected int mnFkAddresseeBizPartnerBranchId_n;
+    protected int mnFkAddresseeBizPartnerBranchAddressId_n;
     protected int mnFkContactBizPartnerBranchId_n;
     protected int mnFkContactContactId_n;
     protected int mnFkTaxIdentityEmisorTypeId;
@@ -235,6 +238,9 @@ public class SDbDps extends SDbRegistryUser {
     public void setFkBizPartnerAltId_r(int n) { mnFkBizPartnerAltId_r = n; }
     public void setFkBizPartnerBranchAltId(int n) { mnFkBizPartnerBranchAltId = n; }
     public void setFkBizPartnerBranchAddressAltId(int n) { mnFkBizPartnerBranchAddressAltId = n; }
+    public void setFkAddresseeBizPartnerId_nr(int n) { mnFkAddresseeBizPartnerId_nr = n; }
+    public void setFkAddresseeBizPartnerBranchId_n(int n) { mnFkAddresseeBizPartnerBranchId_n = n; }
+    public void setFkAddresseeBizPartnerBranchAddressId_n(int n) { mnFkAddresseeBizPartnerBranchAddressId_n = n; }
     public void setFkContactBizPartnerBranchId_n(int n) { mnFkContactBizPartnerBranchId_n = n; }
     public void setFkContactContactId_n(int n) { mnFkContactContactId_n = n; }
     public void setFkTaxIdentityEmisorTypeId(int n) { mnFkTaxIdentityEmisorTypeId = n; }
@@ -353,6 +359,9 @@ public class SDbDps extends SDbRegistryUser {
     public int getFkBizPartnerAltId_r() { return mnFkBizPartnerAltId_r; }
     public int getFkBizPartnerBranchAltId() { return mnFkBizPartnerBranchAltId; }
     public int getFkBizPartnerBranchAddressAltId() { return mnFkBizPartnerBranchAddressAltId; }
+    public int getFkAddresseeBizPartnerId_nr() { return mnFkAddresseeBizPartnerId_nr; }
+    public int getFkAddresseeBizPartnerBranchId_n() { return mnFkAddresseeBizPartnerBranchId_n; }
+    public int getFkAddresseeBizPartnerBranchAddressId_n() { return mnFkAddresseeBizPartnerBranchAddressId_n; }
     public int getFkContactBizPartnerBranchId_n() { return mnFkContactBizPartnerBranchId_n; }
     public int getFkContactContactId_n() { return mnFkContactContactId_n; }
     public int getFkTaxIdentityEmisorTypeId() { return mnFkTaxIdentityEmisorTypeId; }
@@ -497,6 +506,9 @@ public class SDbDps extends SDbRegistryUser {
         mnFkBizPartnerAltId_r = 0;
         mnFkBizPartnerBranchAltId = 0;
         mnFkBizPartnerBranchAddressAltId = 0;
+        mnFkAddresseeBizPartnerId_nr = 0;
+        mnFkAddresseeBizPartnerBranchId_n = 0;
+        mnFkAddresseeBizPartnerBranchAddressId_n = 0;
         mnFkContactBizPartnerBranchId_n = 0;
         mnFkContactContactId_n = 0;
         mnFkTaxIdentityEmisorTypeId = 0;
@@ -656,6 +668,9 @@ public class SDbDps extends SDbRegistryUser {
             mnFkBizPartnerAltId_r = resultSet.getInt("fid_bp_alt_r");
             mnFkBizPartnerBranchAltId = resultSet.getInt("fid_bpb_alt");
             mnFkBizPartnerBranchAddressAltId = resultSet.getInt("fid_add_alt");
+            mnFkAddresseeBizPartnerId_nr = resultSet.getInt("fid_add_bp_nr");
+            mnFkAddresseeBizPartnerBranchId_n = resultSet.getInt("fid_add_bpb_n");
+            mnFkAddresseeBizPartnerBranchAddressId_n = resultSet.getInt("fid_add_add_n");
             mnFkContactBizPartnerBranchId_n = resultSet.getInt("fid_con_bpb_n");
             mnFkContactContactId_n = resultSet.getInt("fid_con_con_n");
             mnFkTaxIdentityEmisorTypeId = resultSet.getInt("fid_tp_tax_idy_emir");

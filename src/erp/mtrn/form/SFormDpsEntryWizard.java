@@ -700,6 +700,9 @@ public class SFormDpsEntryWizard extends javax.swing.JDialog implements erp.lib.
         entry.setWeightGross(0);
         entry.setWeightDelivery(0);
         entry.setSurplusPercentage(0);
+        entry.setOperationsType(SDataConstantsSys.TRNX_OPS_TYPE_OPS_OPS);
+        entry.setUserId(SLibConstants.UNDEFINED);
+        entry.setSortingPosition(0);
 
         entry.setFkItemRefId_n(!jcbFkItemReferenceId_n.isEnabled() ? 0 : moFieldFkItemReferenceId_n.getKeyAsIntArray()[0]);
         entry.setFkCostCenterId_n(!moPanelFkCostCenterId_n.getFieldAccount().getComponent().isEnabled() ? "" : (moPanelFkCostCenterId_n.isEmptyAccountId() ? "" : moPanelFkCostCenterId_n.getFieldAccount().getString()));

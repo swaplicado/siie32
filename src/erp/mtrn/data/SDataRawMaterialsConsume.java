@@ -12,11 +12,13 @@ import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.mcfg.data.SDataCompanyBranchEntity;
+import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Vector;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 
 /**
  *
@@ -259,6 +261,10 @@ public class SDataRawMaterialsConsume extends erp.lib.data.SDataRegistry impleme
                             iog.setFkMfgOrderId_n(mnPkOrderId);
                             iog.setFkBookkeepingYearId_n(SLibConstants.UNDEFINED);
                             iog.setFkBookkeepingNumberId_n(SLibConstants.UNDEFINED);
+                            iog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_NA);
+                            iog.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
+                            iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
+                            iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
                             iog.setFkUserShippedId(SUtilConsts.USR_NA_ID);
                             iog.setFkUserAuditedId(SUtilConsts.USR_NA_ID);
                             iog.setFkUserAuthorizedId(SUtilConsts.USR_NA_ID);

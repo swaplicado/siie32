@@ -336,6 +336,7 @@ public abstract class SModConsts {
     public static final int TRNS_TP_STK_SEG = 2021031;
     public static final int TRNS_TP_STK_SEG_MOV = 2021032;
     public static final int TRNS_CFD_CAT = 2021201;
+    public static final int TRNS_TP_MAINT_MOV = 2021301;
 
     public static final int TRNU_DPS_NAT = 2022001;
     public static final int TRNU_TP_DPS = 2022002;
@@ -411,6 +412,10 @@ public abstract class SModConsts {
     public static final int TRN_MMS_CFG = 2023102;
     public static final int TRN_DVY = 2023121;
     public static final int TRN_DVY_ETY = 2023122;
+    public static final int TRN_MAINT_CFG = 2023300;
+    public static final int TRN_MAINT_AREA = 2023301;
+    public static final int TRN_MAINT_USER = 2023311;
+    public static final int TRN_MAINT_USER_SUPV = 2023316;
 
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
@@ -936,6 +941,7 @@ public abstract class SModConsts {
         TablesMap.put(TRNS_TP_STK_SEG, "erp.trns_tp_stk_seg");
         TablesMap.put(TRNS_TP_STK_SEG_MOV, "erp.trns_tp_stk_seg_mov");
         TablesMap.put(TRNS_CFD_CAT, "erp.trns_cfd_cat");
+        TablesMap.put(TRNS_TP_MAINT_MOV, "erp.trns_tp_maint_mov");
 
         TablesMap.put(TRNU_DPS_NAT, "erp.trnu_dps_nat");
         TablesMap.put(TRNU_TP_DPS, "erp.trnu_tp_dps");
@@ -1010,6 +1016,10 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MMS_CFG, "trn_mms_cfg");
         TablesMap.put(TRN_DVY, "trn_dvy");
         TablesMap.put(TRN_DVY_ETY, "trn_dvy_ety");
+        TablesMap.put(TRN_MAINT_CFG, "trn_maint_cfg");
+        TablesMap.put(TRN_MAINT_AREA, "trn_maint_area");
+        TablesMap.put(TRN_MAINT_USER, "trn_maint_user");
+        TablesMap.put(TRN_MAINT_USER_SUPV, "trn_maint_user_supv");
 
         TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");
         TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");

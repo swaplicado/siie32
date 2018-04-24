@@ -24,6 +24,7 @@ import erp.cfd.SCfdXmlCfdi32;
 import erp.cfd.SCfdXmlCfdi33;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.util.ArrayList;
@@ -859,6 +860,21 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         return SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01;
     }
 
+    @Override
+    public int getDestinatarioId() {
+        return SLibConstants.UNDEFINED;
+    }
+
+    @Override
+    public int getDestinatarioSucursalId() {
+        return SLibConstants.UNDEFINED;
+    }
+
+    @Override
+    public int getDestinatarioDomicilioId() {
+        return SLibConstants.UNDEFINED;
+    }
+    
     @Override
     public ArrayList<SCfdDataConcepto> getElementsConcepto() {
         SCfdDataConcepto conceptoXml = new SCfdDataConcepto();

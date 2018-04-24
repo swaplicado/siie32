@@ -48,7 +48,7 @@ public class SViewAccountsPending extends SGridPaneView {
         setRowButtonsEnabled(false, false, false, false, false);
         
         moFilterDateCutOff = new SGridFilterDateCutOff(miClient, this);
-        moFilterDateCutOff.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_DATE, SLibTimeUtils.getEndOfMonth(miClient.getSession().getCurrentDate()).getTime()));
+        moFilterDateCutOff.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_DATE, miClient.getSession().getCurrentDate().getTime()));
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
     }
@@ -66,6 +66,9 @@ public class SViewAccountsPending extends SGridPaneView {
         filter = moFiltersMap.get(SGridConsts.FILTER_DATE).getValue();
         if (filter instanceof SGuiDate) {
             date = (Date) filter;
+            if (date == null) {
+                date = SLibTimeUtils.getEndOfYear(miClient.getSession().getSystemDate());
+            }
             year = SLibTimeUtils.digestYear(date)[0];
         }
         

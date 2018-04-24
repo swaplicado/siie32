@@ -22,7 +22,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -42,7 +41,7 @@ public class SFormOptionPickerBizPartner extends javax.swing.JDialog implements 
     /**
      * Creates new form SFormOptionPickerBizPartner
      * @param client ERP Client interface.
-     * @param type Constants defined in erp.data.SDataConstants.
+     * @param type Constants defined in erp.data.SDataConstants: BPSX_BP_SUP, BPSX_BP_CUS.
      */
     public SFormOptionPickerBizPartner(erp.client.SClientInterface client, int type) {
         super(client.getFrame(), true);

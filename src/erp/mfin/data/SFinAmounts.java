@@ -29,7 +29,7 @@ public class SFinAmounts {
         SFinAmount amount = null;
         
         for (SFinAmount a : maAmounts) {
-            if (SLibUtils.compareKeys(key, a.KeyRefDocument) && a.AmountType == SFinAmountType.DOCUMENT) {
+            if (a.AccountType == SFinAccountType.ACC_BIZ_PARTNER_DOC && SLibUtils.compareKeys(key, a.KeyRefDocument)) {
                 amount = a;
                 break;
             }
@@ -47,7 +47,7 @@ public class SFinAmounts {
         SFinAmount amount = null;
         
         for (SFinAmount a : maAmounts) {
-            if (SLibUtils.compareKeys(key, a.KeyRefCashAccount) && a.AmountType == SFinAmountType.CASH_ACCOUNT) {
+            if (a.AccountType == SFinAccountType.ACC_CASH_ACCOUNT && SLibUtils.compareKeys(key, a.KeyRefCashAccount)) {
                 amount = a;
                 break;
             }
@@ -57,14 +57,14 @@ public class SFinAmounts {
     }
     
     /**
-     * Gets amount for advance billed if any, otherwise null.
+     * Gets amount for prepayments to invoice if any, otherwise null.
      * @return Found amount.
      */
-    public SFinAmount getAmountForAdvanceBilled() {
+    public SFinAmount getAmountForPrepaymentsToInvoice() {
         SFinAmount amount = null;
         
         for (SFinAmount a : maAmounts) {
-            if (a.AmountType == SFinAmountType.ADVANCE_BILLED) {
+            if (a.AccountType == SFinAccountType.ACC_PREPAY_TO_INVOICE) {
                 amount = a;
                 break;
             }
@@ -83,7 +83,7 @@ public class SFinAmounts {
         
         if (a == null) {
             a = new SFinAmount(amount);
-            a.AmountType = SFinAmountType.DOCUMENT;
+            a.AccountType = SFinAccountType.ACC_BIZ_PARTNER_DOC;
             a.KeyRefDocument = key;
             maAmounts.add(a);
         }
@@ -102,7 +102,7 @@ public class SFinAmounts {
         
         if (a == null) {
             a = new SFinAmount(amount);
-            a.AmountType = SFinAmountType.CASH_ACCOUNT;
+            a.AccountType = SFinAccountType.ACC_CASH_ACCOUNT;
             a.KeyRefCashAccount = key;
             maAmounts.add(a);
         }
@@ -112,15 +112,15 @@ public class SFinAmounts {
     }
     
     /**
-     * Adds amount for advance billed.
+     * Adds amount for prepayments to invoice.
      * @param amount Amount to be added.
      */
-    public void addAmountForAdvanceBilled(final SFinAmount amount) {
-        SFinAmount a = getAmountForAdvanceBilled();
+    public void addAmountForPrepaymentsToInvoice(final SFinAmount amount) {
+        SFinAmount a = getAmountForPrepaymentsToInvoice();
         
         if (a == null) {
             a = new SFinAmount(amount);
-            a.AmountType = SFinAmountType.ADVANCE_BILLED;
+            a.AccountType = SFinAccountType.ACC_PREPAY_TO_INVOICE;
             maAmounts.add(a);
         }
         else {
@@ -132,27 +132,22 @@ public class SFinAmounts {
      * Checks sum of all amounts against provided total amount, and adjust difference (if any) on greatest member amount.
      * @param total Total amount.
      */
-    public void checkAmount(double total) {
+    public void checkAmounts(double total) {
         double sum = 0;
         SFinAmount greatest = null;
         
         for (SFinAmount a : maAmounts) {
-            if (a.Movement == SFinMovement.INCREMENT) {
-                sum += a.Amount;
-            }
-            else {
-                sum -= a.Amount;
-            }
-            
-            if (greatest == null || a.Amount > greatest.Amount) {
-                greatest = a;
+            if (!a.OmitWhenAmountsChecked) {
+                sum = SLibUtils.round(sum + a.Amount, 2);
+
+                if (greatest == null || a.Amount > greatest.Amount) {
+                    greatest = a;
+                }
             }
         }
         
-        sum = SLibUtils.round(sum, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-        
         if (total != sum && greatest != null) {
-            greatest.Amount = SLibUtils.round(greatest.Amount + (total - sum), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+            greatest.Amount = SLibUtils.round(greatest.Amount + (total - sum), 2);
         }
     }
 }

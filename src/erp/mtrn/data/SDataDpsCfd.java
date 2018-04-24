@@ -6,6 +6,7 @@
 package erp.mtrn.data;
 
 import cfd.DElement;
+import cfd.ver3.DCfdVer3Consts;
 import cfd.ver33.DElementCfdiRelacionado;
 import cfd.ver33.DElementCfdiRelacionados;
 import erp.cfd.SXmlDpsCfd;
@@ -27,15 +28,15 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
 
     protected int mnPkYearId;
     protected int mnPkDocId;
-    protected java.lang.String msVersion;
-    protected java.lang.String msCfdiType;
-    protected java.lang.String msPaymentWay;
-    protected java.lang.String msPaymentMethod;
-    protected java.lang.String msPaymentConditions;
-    protected java.lang.String msZipIssue;
-    protected java.lang.String msConfirmation;
-    protected java.lang.String msTaxRegime;
-    protected java.lang.String msCfdiUsage;
+    protected String msVersion;
+    protected String msCfdiType;
+    protected String msPaymentWay;
+    protected String msPaymentMethod;
+    protected String msPaymentConditions;
+    protected String msZipIssue;
+    protected String msConfirmation;
+    protected String msTaxRegime;
+    protected String msCfdiUsage;
     protected String msXml;
     
     protected String msCfdiRelacionadosTipoRelacion;
@@ -60,17 +61,17 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
 
     public void setPkYearId(int n) { mnPkYearId = n; }
     public void setPkDocId(int n) { mnPkDocId = n; }
-    public void setVersion(java.lang.String s) { msVersion = s; }
-    public void setCfdiType(java.lang.String s) { msCfdiType = s; }
-    public void setPaymentWay(java.lang.String s) { msPaymentWay = s; }
-    public void setPaymentMethod(java.lang.String s) { msPaymentMethod = s; }
-    public void setPaymentConditions(java.lang.String s) { msPaymentConditions = s; }
-    public void setZipIssue(java.lang.String s) { msZipIssue = s; }
-    public void setConfirmation(java.lang.String s) { msConfirmation = s; }
-    public void setTaxRegime(java.lang.String s) { msTaxRegime = s; }
-    public void setCfdiUsage(java.lang.String s) { msCfdiUsage = s; }
+    public void setVersion(String s) { msVersion = s; }
+    public void setCfdiType(String s) { msCfdiType = s; }
+    public void setPaymentWay(String s) { msPaymentWay = s; }
+    public void setPaymentMethod(String s) { msPaymentMethod = s; }
+    public void setPaymentConditions(String s) { msPaymentConditions = s; }
+    public void setZipIssue(String s) { msZipIssue = s; }
+    public void setConfirmation(String s) { msConfirmation = s; }
+    public void setTaxRegime(String s) { msTaxRegime = s; }
+    public void setCfdiUsage(String s) { msCfdiUsage = s; }
     
-    public void setCfdiRelacionadosTipoRelacion(java.lang.String s) { msCfdiRelacionadosTipoRelacion = s; }
+    public void setCfdiRelacionadosTipoRelacion(String s) { msCfdiRelacionadosTipoRelacion = s; }
     
     public void setCfdCceMotivoTraslado(String s) { msCfdCceMotivoTraslado = s; }
     public void setCfdCceTipoOperacion(String s) { msCfdCceTipoOperacion = s; }
@@ -85,15 +86,15 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
 
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
-    public java.lang.String getVersion() { return msVersion; }
-    public java.lang.String getCfdiType() { return msCfdiType; }
-    public java.lang.String getPaymentWay() { return msPaymentWay; }
-    public java.lang.String getPaymentMethod() { return msPaymentMethod; }
-    public java.lang.String getPaymentConditions() { return msPaymentConditions; }
-    public java.lang.String getZipIssue() { return msZipIssue; }
-    public java.lang.String getConfirmation() { return msConfirmation; }
-    public java.lang.String getTaxRegime() { return msTaxRegime; }
-    public java.lang.String getCfdiUsage() { return msCfdiUsage; }
+    public String getVersion() { return msVersion; }
+    public String getCfdiType() { return msCfdiType; }
+    public String getPaymentWay() { return msPaymentWay; }
+    public String getPaymentMethod() { return msPaymentMethod; }
+    public String getPaymentConditions() { return msPaymentConditions; }
+    public String getZipIssue() { return msZipIssue; }
+    public String getConfirmation() { return msConfirmation; }
+    public String getTaxRegime() { return msTaxRegime; }
+    public String getCfdiUsage() { return msCfdiUsage; }
     public String getXml() { return msXml; }
     
     public String getCfdiRelacionadosTipoRelacion() { return msCfdiRelacionadosTipoRelacion; }
@@ -111,6 +112,32 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public String getCfdCceIncoterm() { return msCfdCceIncoterm; }
     
     public boolean hasInternationalCommerce() { return !msCfdCceTipoOperacion.isEmpty(); }
+    
+    /**
+     * Adds UUID to array of CFDI Relacionados only if it has not been added yet previously.
+     * @param uuid UUID of CFDI to add.
+     * @return <code>true</code> if UUID was added, otherwise <code>false</code>.
+     */
+    public boolean addCfdiRelacionado(String uuid) throws Exception {
+        if (uuid == null || uuid.length() != DCfdVer3Consts.LEN_UUID) {
+            throw new Exception("La longitud del UUID " + (uuid == null ? "" : "'" + uuid + "'") + " debe ser de " + DCfdVer3Consts.LEN_UUID + " caracteres.");
+        }
+        
+        boolean add = true;
+        
+        for (String cfdi : maCfdiRelacionados) {
+            if (cfdi.equals(uuid)) {
+                add = false;
+                break;
+            }
+        }
+        
+        if (add) {
+            maCfdiRelacionados.add(uuid);
+        }
+        
+        return add;
+    }
 
     /**
      * Generate the XML with infromation aditional for CFDI.

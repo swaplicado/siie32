@@ -5,6 +5,8 @@
 
 package erp.data;
 
+import java.util.HashMap;
+
 /**
  *
  * @author Sergio Flores, Claudio Peña
@@ -12,6 +14,7 @@ package erp.data;
  * Maintenance Log:
  * 
  * 2016-07-14, Sergio Flores: implementation of new payment method catalogue (erp.TRNU_TP_PAY_SYS DB table).
+ * 2018-02-28, Sergio Flores: implementation of constants of operations types.
  * 
  */
 public abstract class SDataConstantsSys {
@@ -1283,6 +1286,29 @@ public abstract class SDataConstantsSys {
     public static final int TRNX_DIOG_CST_TRAN_NA = 0;
     public static final int TRNX_DIOG_CST_TRAN_NO = 1;
     public static final int TRNX_DIOG_CST_TRAN_YES = 2;
+    
+    public static final int TRNX_OPS_TYPE_OPS_OPS = 11;             // operations
+    public static final int TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY = 12;  // operations - application of prepayment invoiced as discount
+    public static final int TRNX_OPS_TYPE_OPS_PREPAY = 13;          // prepayment invoiced
+
+    public static final int TRNX_OPS_TYPE_ADJ_OPS = 21;             // adjustment of operations
+    public static final int TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY = 22;  // adjustment of operations - application of prepayment invoiced as discount
+    public static final int TRNX_OPS_TYPE_ADJ_PREPAY = 23;          // adjustment of prepayment invoiced
+    public static final int TRNX_OPS_TYPE_ADJ_APP_PREPAY = 26;      // application of prepayment invoiced
+    
+    public static final HashMap<Integer, String> OperationsTypesOpsMap = new HashMap<>();
+    public static final HashMap<Integer, String> OperationsTypesAdjMap = new HashMap<>();
+    
+    static {
+        OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_OPS, "Operación");
+        OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_OPS_APP_PREPAY, "Operación con aplicación anticipo facturado");
+        OperationsTypesOpsMap.put(TRNX_OPS_TYPE_OPS_PREPAY, "Facturación de anticipo");
+        
+        OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_OPS, "Ajuste operación");
+        OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_OPS_APP_PREPAY, "Ajuste operación con aplicación anticipo facturado");
+        OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_PREPAY, "Ajuste facturación de anticipo");
+        OperationsTypesAdjMap.put(TRNX_OPS_TYPE_ADJ_APP_PREPAY, "Aplicación anticipo facturado");
+    }
 
     /*
     public static final int TRN_DPS_PUR_LINK_EST_PEND = 27;

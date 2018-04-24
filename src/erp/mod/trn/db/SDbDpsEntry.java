@@ -92,6 +92,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected String msTicket;
     protected String msContainerTank;
     protected String msVgm;
+    protected int mnOperationsType;
     protected int mnUserId;
     protected int mnSortingPosition;
     protected boolean mbIsPrepayment;
@@ -192,6 +193,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public void setTicket(String s) { msTicket = s; }
     public void setContainerTank(String s) { msContainerTank = s; }
     public void setVgm(String s) { msVgm = s; }
+    public void setOperationsType(int n) { mnOperationsType = n; }
     public void setUserId(int n) { mnUserId = n; }
     public void setSortingPosition(int n) { mnSortingPosition = n; }
     public void setIsPrepayment(boolean b) { mbIsPrepayment = b; }
@@ -282,6 +284,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public String getTicket() { return msTicket; }
     public String getContainerTank() { return msContainerTank; }
     public String getVgm() { return msVgm; }
+    public int getOperationsType() { return mnOperationsType; }
     public int getUserId() { return mnUserId; }
     public int getSortingPosition() { return mnSortingPosition; }
     public boolean getIsPrepayment() { return mbIsPrepayment; }
@@ -392,6 +395,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
         msTicket = "";
         msContainerTank = ""; 
         msVgm = "";
+        mnOperationsType = 0;
         mnUserId = 0;
         mnSortingPosition = 0;
         mbIsPrepayment = false;
@@ -525,7 +529,8 @@ public class SDbDpsEntry extends SDbRegistryUser {
             msPlate = resultSet.getString("plate");
             msTicket = resultSet.getString("ticket");
             msContainerTank = resultSet.getString("cont_tank"); 
-            msVgm = resultSet.getString("Vgm");
+            msVgm = resultSet.getString("vgm");
+            mnOperationsType = resultSet.getInt("ops_type");
             mnUserId = resultSet.getInt("usr_id");
             mnSortingPosition = resultSet.getInt("sort_pos");
             mbIsPrepayment = resultSet.getBoolean("b_pre_pay");
