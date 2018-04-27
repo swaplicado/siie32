@@ -161,10 +161,12 @@ public class SDialogRepFinStatements extends SBeanDialogReport implements Action
             userParams.put("tFechaIni", new SUserParam("tFechaIni", SEnumDataType.DATE, moDateStart.getValue()));
             userParams.put("tFechaFin", new SUserParam("tFechaFin", SEnumDataType.DATE, moDateEnd.getValue()));
             userParams.put("sMes", new SUserParam("sMes", SEnumDataType.STRING, months[SLibTimeUtils.digestMonth(moDateEnd.getValue())[1] - 1]));
+            userParams.put("tMesIni", new SUserParam("tMesIni", SEnumDataType.STRING, SLibTimeUtils.getBeginOfMonth(moDateEnd.getValue())));
             userParams.put("sCuentaTraspasoCompras", new SUserParam("sCuentaTraspasoCompras", SEnumDataType.STRING, "5100-9999-0000"));
             userParams.put("sCuentaGastosProd", new SUserParam("sCuentaGastosProd", SEnumDataType.STRING, "6000-0003-0000"));
             userParams.put("sCentroCostoRefacturacion", new SUserParam("sCentroCostoRefacturacion", SEnumDataType.STRING, "900-00-00-000"));
             userParams.put("sItemTraspasoGastosProd", new SUserParam("sItemTraspasoGastosProd", SEnumDataType.STRING, "GP9998"));
+            userParams.put("sCentroCostoRefacturacion", new SUserParam("sCentroCostoRefacturacion", SEnumDataType.STRING, "900-00-00-000"));
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
