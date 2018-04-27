@@ -224,6 +224,7 @@
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="jbgXmlFile"/>
                 </Property>
+                <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="Cat&#xe1;logo de cuentas utilizado en el per&#xed;odo"/>
               </Properties>
             </Component>

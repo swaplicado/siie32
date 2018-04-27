@@ -119,8 +119,8 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_ref", "Referencia", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "i.b_pre_pay", "Anticipo", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ae.tp_acc_ebitda", "Cuenta EBITDA", 100);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_inc", "Código agrupador SAT (ingresos)", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_exp", "Código agrupador SAT (egresos)", 200);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_inc", "Código agrup SAT (ingresos)", 200);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fiscal_acc_exp", "Código agrup SAT (egresos)", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfdps_code", "ClaveProdServ SAT", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cfdps_name", "ProdServ SAT", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.tariff", "Fracc. arancelaria", 55);

@@ -201,6 +201,7 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         jPanel5.setLayout(new java.awt.GridLayout(5, 1));
 
         jbgXmlFile.add(moRadXmlFileChartOfAccounts);
+        moRadXmlFileChartOfAccounts.setSelected(true);
         moRadXmlFileChartOfAccounts.setText("Catálogo de cuentas utilizado en el período");
         jPanel5.add(moRadXmlFileChartOfAccounts);
 
@@ -686,7 +687,7 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
             default:
         }
 
-        moRadXmlFileTrialSheet.setSelected(true);
+        moRadXmlFileChartOfAccounts.setSelected(true);
 
         itemStateXmlFile();
         itemStateTrialSheet();

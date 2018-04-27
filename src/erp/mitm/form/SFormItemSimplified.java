@@ -316,7 +316,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel47.add(jlFkAccountEbitdaTypeId);
 
         jcbFkAccountEbitdaTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkAccountEbitdaTypeId.setPreferredSize(new java.awt.Dimension(400, 23));
+        jcbFkAccountEbitdaTypeId.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel47.add(jcbFkAccountEbitdaTypeId);
 
         jbFkAccountEbitdaTypeId.setText("...");
@@ -335,7 +335,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel45.add(jlFkFiscalAccountIncId);
 
         jcbFkFiscalAccountIncId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkFiscalAccountIncId.setPreferredSize(new java.awt.Dimension(400, 23));
+        jcbFkFiscalAccountIncId.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel45.add(jcbFkFiscalAccountIncId);
 
         jbFkFiscalAccountIncId.setText("jButton1");
@@ -359,7 +359,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel46.add(jlFkFiscalAccountExpId);
 
         jcbFkFiscalAccountExpId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkFiscalAccountExpId.setPreferredSize(new java.awt.Dimension(400, 23));
+        jcbFkFiscalAccountExpId.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel46.add(jcbFkFiscalAccountExpId);
 
         jbFkFiscalAccountExpId.setText("jButton1");
@@ -383,7 +383,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         jPanel48.add(jlFkCfdProdServId_n);
 
         moKeyCfdProdServId_n.setMaximumRowCount(20);
-        moKeyCfdProdServId_n.setPreferredSize(new java.awt.Dimension(400, 23));
+        moKeyCfdProdServId_n.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel48.add(moKeyCfdProdServId_n);
 
         jPanel4.add(jPanel48);
