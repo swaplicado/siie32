@@ -1646,7 +1646,35 @@ public abstract class SFiscalUtils {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS a ON a.id_acc = re.fid_acc "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS al ON al.code = CONCAT(LEFT(a.code, 6), REPEAT('0', 42)) AND al.fid_tp_acc_r = " + SModSysConsts.FINS_TP_ACC_RES + " "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK_DET) + " AS fad ON fad.id_year = " + coaYear + " AND fad.id_per = " + coaMonth + " AND "
-                + "fad.id_tp_fiscal_acc_link BETWEEN " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_INC + " AND " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_EXP + " AND fad.id_ref_1 = re.fid_item_n AND fad.id_ref_2 = " + SLibConsts.UNDEFINED + " AND fad.id_acc = a.pk_acc "
+                + "fad.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_INC + " AND fad.id_ref_1 = re.fid_item_n AND fad.id_ref_2 = " + SLibConsts.UNDEFINED + " AND fad.id_acc = a.pk_acc "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON i.id_item = re.fid_item_n "
+                + "WHERE "
+                + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + " "
+                + "GROUP BY f_acc_id, f_acc_tp_id, f_acc_cl_id, f_acc_spe_id, f_ref_1, f_ref_2, f_acc_code, f_acc_name, f_acc_nat "
+                + ""
+                + "UNION "
+                + ""
+                + "SELECT "
+                + "a.id_acc AS f_acc_id, "
+                + "al.fid_tp_acc_r AS f_acc_tp_id, "
+                + "al.fid_cl_acc_r AS f_acc_cl_id, "
+                + "al.fid_tp_acc_spe AS f_acc_spe_id, "
+                + "re.fid_item_n AS f_ref_1, "
+                + "" + SLibConsts.UNDEFINED + " AS f_ref_2, "
+                + "fad.acc_code AS f_acc_code, "
+                + "i.item AS f_acc_name, "
+                + "fad.nat AS f_acc_nat, "
+                + "SUM(IF(r.dt < '" + balDate + "', re.debit - re.credit, 0.0)) AS f_bal_ope, "
+                + "SUM(IF(r.dt >= '" + balDate + "', re.debit, 0.0)) AS f_dbt, "
+                + "SUM(IF(r.dt >= '" + balDate + "', re.credit, 0.0)) AS f_cdt, "
+                + "SUM(re.debit - re.credit) AS f_bal_clo "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON "
+                + "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS a ON a.id_acc = re.fid_acc "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS al ON al.code = CONCAT(LEFT(a.code, 6), REPEAT('0', 42)) AND al.fid_tp_acc_r = " + SModSysConsts.FINS_TP_ACC_RES + " "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK_DET) + " AS fad ON fad.id_year = " + coaYear + " AND fad.id_per = " + coaMonth + " AND "
+                + "fad.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_EXP + " AND fad.id_ref_1 = re.fid_item_n AND fad.id_ref_2 = " + SLibConsts.UNDEFINED + " AND fad.id_acc = a.pk_acc "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON i.id_item = re.fid_item_n "
                 + "WHERE "
                 + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + " "
@@ -1682,7 +1710,7 @@ public abstract class SFiscalUtils {
                 + ""
                 + "ORDER BY f_acc_id, f_acc_name, f_acc_code, f_acc_spe_id, f_ref_1, f_ref_2; ";
 
-        return sql;
+         return sql;
     }
 
     /**
