@@ -390,7 +390,7 @@ public abstract class SFiscalUtils {
             "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BANK_ACC) + " AS bka ON bka.id_bpb = ac.fid_bpb_n AND bka.id_bank_acc = ac.fid_bank_acc_n " +
             "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bk ON bk.id_bp = bka.fid_bank " +
             "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = re.fid_bp_nr " +
-            "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON i.id_item = re.fid_item_n " +
+            "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON i.id_item = re.fid_item_n AND al.fid_tp_acc_r = " + SModSysConsts.FINS_TP_ACC_RES + " " +
             "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FINS_FISCAL_ACC) + " AS faii ON faii.id_fiscal_acc = i.fid_fiscal_acc_inc " +
             "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FINS_FISCAL_ACC) + " AS faie ON faie.id_fiscal_acc = i.fid_fiscal_acc_exp " +
             "WHERE r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + " " +
