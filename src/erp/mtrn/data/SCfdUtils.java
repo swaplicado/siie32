@@ -2226,6 +2226,26 @@ public abstract class SCfdUtils implements Serializable {
         return valid;
     }
     
+    /*
+     * Public static methods:
+     */
+    
+    public static float getCfdVersion(final int xmlType) {
+        float version = 0;
+        
+        switch (xmlType) {
+            case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                version = DCfdConsts.CFDI_VER_32;
+                break;
+            case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                version = DCfdConsts.CFDI_VER_33;
+                break;
+            default:
+        }
+        
+        return version;
+    }
+
     public static boolean validateEmisorXmlExpenses(final SClientInterface client, final String fileXml) throws Exception {
         DocumentBuilder docBuilder = null;
         Document doc = null;
@@ -2277,10 +2297,6 @@ public abstract class SCfdUtils implements Serializable {
         
         return true;
     }
-
-    /*
-     * Public static methods:
-     */
 
     public static boolean existsCfdiPending(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
         if (cfds != null) {

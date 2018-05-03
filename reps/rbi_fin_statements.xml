@@ -7,11 +7,12 @@
 		<Param name="dExchangeRate" 					dataType="DOUBLE" 	defaultValue="1.0" />
 		<Param name="nLenAccountMajor" 					dataType="LONG" 	defaultValue="4" />
 		<Param name="sCompAccountMajor" 				dataType="STRING" 	defaultValue="-0000-0000" />
-		<Param name="nAño"								dataType="LONG" 	defaultValue="2017" />
+		<Param name="nAño"								dataType="LONG" 	defaultValue="2018" />
 		<Param name="sMes"								dataType="STRING" 	defaultValue="" />
+		<Param name="tMesIni"							dataType="STRING" 	defaultValue="2018-03-01" />
 		<Param name="tFechaIni"							dataType="STRING" 	defaultValue="" />
 		<Param name="tFechaFin"							dataType="STRING" 	defaultValue="" />
-		<Param name="tFechaIniYear"						dataType="STRING" 	defaultValue="2017-01-01" />
+		<Param name="tFechaIniYear"						dataType="STRING" 	defaultValue="2018-01-01" />
 		<Param name="sCuentaTraspasoCompras"			dataType="STRING" 	defaultValue="5100-9999-0000" />
 		<Param name="sCuentaGastosProd"					dataType="STRING" 	defaultValue="6000-0003-0000" />
 		<Param name="sCentroCostoRefacturacion"			dataType="STRING" 	defaultValue="900-00-00-000" />
@@ -23,8 +24,8 @@
 	<DataSources>
 		<DataSource name="Ventas" type="MYSQL" host="192.168.1.233" port="3306" database="erp_aeth" user="query" password="msquery" query="
 			SELECT al.id_acc, al.acc, bba.fid_cty_n IS NULL AS _dom,
-				SUM(IF(r.dt BETWEEN $P{tFechaIni} AND $P{tFechaFin}, re.credit - re.debit, 0.0)) AS _bal_per_mes,
-				SUM(IF(r.dt &lt; $P{tFechaFin}, re.credit-re.debit, 0.0)) AS _bal_per_acumulado
+				SUM(IF(r.dt BETWEEN $P{tMesIni} AND $P{tFechaFin}, re.credit - re.debit, 0.0)) AS _bal_per,
+				SUM(IF(r.dt &lt; $P{tFechaFin}, re.credit-re.debit, 0.0)) AS _bal_year
 			FROM fin_rec AS r
 				INNER JOIN fin_rec_ety AS re ON r.id_year=re.id_year AND r.id_per=re.id_per AND r.id_bkc=re.id_bkc AND r.id_tp_rec=re.id_tp_rec AND r.id_num=re.id_num
 				INNER JOIN fin_acc AS a ON re.fid_acc=a.id_acc
@@ -49,10 +50,10 @@
 		<DataSource name="CuentasMayor" type="MYSQL" host="192.168.1.233" port="3306" database="erp_aeth" user="query" password="msquery" query="
 			SELECT
 				al.id_acc, al.acc,
-				SUM(IF(r.dt &lt;$P{tFechaIni},re.debit-re.credit, 0.0)) AS _open_bal,
+				SUM(IF(r.dt &lt;$P{tMesIni},re.debit-re.credit, 0.0)) AS _open_bal,
 				SUM(IF(r.dt &gt;=$P{tFechaIni},re.debit, 0.0)) AS _debit,
 				SUM(IF(r.dt &gt;=$P{tFechaIni},re.credit, 0.0)) AS _credit,
-				SUM(IF(r.dt &gt;=$P{tFechaIni},re.debit-re.credit, 0.0)) AS _bal,
+				SUM(IF(r.dt &gt;=$P{tMesIni},re.debit-re.credit, 0.0)) AS _bal,
 				SUM(IF(r.dt &lt; $P{tFechaIniYear},re.debit-re.credit, 0.0)) AS _open_bal_acumulado,
 				SUM(IF(r.dt &gt;=$P{tFechaIniYear},re.debit, 0.0)) AS _debit_acumulado,
 				SUM(IF(r.dt &gt;=$P{tFechaIniYear},re.credit, 0.0)) AS _credit_acumulado,
@@ -80,7 +81,7 @@
 		
 		<DataSource name="Compras" type="MYSQL" host="192.168.1.233" port="3306" database="erp_aeth" user="query" password="msquery" query="
 			SELECT
-				SUM(IF(r.dt BETWEEN $P{tFechaIni} AND $P{tFechaFin}, re.credit - re.debit, 0.0)) AS _bal_mes,
+				SUM(IF(r.dt BETWEEN $P{tMesIni} AND $P{tFechaFin}, re.credit - re.debit, 0.0)) AS _bal_mes,
 				SUM(IF(r.dt BETWEEN $P{tFechaIniYear} AND $P{tFechaFin}, re.credit - re.debit, 0.0)) AS _bal_acumulado
 			FROM fin_rec AS r
 				INNER JOIN fin_rec_ety AS re ON r.id_year=re.id_year AND r.id_per=re.id_per AND r.id_bkc=re.id_bkc AND r.id_tp_rec=re.id_tp_rec AND r.id_num=re.id_num
@@ -104,7 +105,7 @@
 				SUM(re.debit-re.credit) AS _bal_year,
 				SUM(IF(r.dt &lt; $P{tFechaFin}, re.debit, 0.0)) AS _debit_per,
 				SUM(IF(r.dt BETWEEN $P{tFechaIni} AND $P{tFechaFin}, re.credit, 0.0)) AS _credit_per,
-    SUM(IF(r.dt BETWEEN $P{tFechaIni} AND $P{tFechaFin}, re.debit - re.credit, 0.0)) AS _bal_per
+    SUM(IF(r.dt BETWEEN $P{tMesIni} AND $P{tFechaFin}, re.debit - re.credit, 0.0)) AS _bal_per
 			FROM fin_rec AS r
 				INNER JOIN fin_rec_ety AS re ON
 				r.id_year=re.id_year AND r.id_per=re.id_per AND r.id_bkc=re.id_bkc AND r.id_tp_rec=re.id_tp_rec AND r.id_num=re.id_num
@@ -135,7 +136,7 @@
 		<DataSource name="CentrosCostoItems" type="MYSQL" host="192.168.1.233" port="3306" database="erp_aeth" user="query" password="msquery" query="
 			SELECT
 				a.id_acc, a.acc, cc.id_cc, cc.cc,
-				SUM(IF(r.dt BETWEEN $P{tFechaIni} AND $P{tFechaFin},        re.debit - re.credit,        0.0)) AS sum_mes,
+				SUM(IF(r.dt BETWEEN $P{tMesIni} AND $P{tFechaFin},        re.debit - re.credit,        0.0)) AS sum_mes,
 				SUM(IF(r.dt BETWEEN $P{tFechaIniYear} AND $P{tFechaFin},        re.debit - re.credit,        0.0)) AS sum_acumulado
 			FROM 
 				fin_rec AS r
@@ -418,142 +419,142 @@
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="32" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="40" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="TERRENOS">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="33" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="32" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="INVERSIONES EN ACCIONES">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="34" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="33" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="DEPOSITOS EN GARANTIA">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="35" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="34" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="SEGUROS Y GTOS PAG POR ANTICIPADO">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="36" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="35" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="IMPUESTOS PAG POR ANTICIPADO">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="38" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="37" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="SUMA OTROS ACTIVOS">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="41" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="39" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="FIJO">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="42" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="41" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="MUEBLES Y ENSERES">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="43" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="42" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="DEPRECIACION">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="44" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="43" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="MUEBLES Y MAQ. ELECTRONICA">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="45" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="44" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="DEPRECIACION">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="46" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="45" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="MAQUINARIA Y EQUIPO">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="47" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="46" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="DEPRECIACION">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="48" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="47" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="EDIFICIOS ">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="49" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="48" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="DEPRECIACION">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="50" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="49" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="EQUIPO DE TRANSPORTE">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="51" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="50" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="DEPRECIACION">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="53" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="52" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="SUMA ACTIVO FIJO">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="56" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="TRUE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="55" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="TRUE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="SUMA ACTIVO ">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="59" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="TRUE" fontCursive="FALSE" fontUnderline="TRUE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="58" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="TRUE" fontCursive="FALSE" fontUnderline="TRUE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="Cuentas de Orden deudoras:">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="60" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="59" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="ARRENDAMIENTO DE ACTIVOS ">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="61" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="60" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="Tanque Cilindrico Vertical">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="62" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="61" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="Camioneta Nissan Roja 2016">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="63" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="62" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="Camioneta Nissan Gris 2017">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="64" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="63" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="Camion Freightliner ">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="65" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="0" rowNumber="64" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="9" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="Iva por Acreeditar ">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="69" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="11" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="0" rowNumber="68" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="11" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="C.P. ABRAHAM JUÁREZ TINOCO ">
 				</Expression>
 			</Element>
 
-			<Element columnNumber="0" rowNumber="70" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="11" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="0" rowNumber="69" name="" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="11" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="CONTADOR ">
 				</Expression>
 			</Element>
@@ -566,14 +567,14 @@
 			<!-- 888    888 888  888 888 888  888 888  888  888 888  888       888    -->
 			<!-- Y88b  d88P Y88..88P 888 Y88b 888 888  888  888 888  888       888    -->
 			<!--  "Y8888P"   "Y88P"  888  "Y88888 888  888  888 888  888     8888888  -->
-			
-			
+
+
 			<Element columnNumber="1" rowNumber="24" name="B25" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1130-0001-0000" operator=""/>
 				</Expression>
 			</Element>
-			
+
 			<Element columnNumber="1" rowNumber="25" name="B26" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1130-0002-0000" operator=""/>
@@ -583,59 +584,75 @@
 					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
 				</Expression>
 			</Element>
-			
-			<Element columnNumber="1" rowNumber="42" name="B43" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+
+			<Element columnNumber="1" rowNumber="41" name="B43" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1220-0001-0000" operator=""/>
 				</Expression>
 			</Element>
-			
-			<Element columnNumber="1" rowNumber="43" name="B44" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+
+			<Element columnNumber="1" rowNumber="42" name="B44" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1220-2001-0000" operator=""/>
 				</Expression>
 			</Element>
-			
-			<Element columnNumber="1" rowNumber="44" name="B45" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+
+			<Element columnNumber="1" rowNumber="43" name="B45" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1225-0001-0000" operator=""/>
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1225-0002-0000" operator=""/>
 					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="STRING" term2Value="" operator="OR"/>
 				</Expression>
 			</Element>
-			
-			<Element columnNumber="1" rowNumber="45" name="B46" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+
+			<Element columnNumber="1" rowNumber="44" name="B46" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1225-2001-0000" operator=""/>
 				</Expression>
 			</Element>
-			
-			<Element columnNumber="1" rowNumber="46" name="B47" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="GREATER_EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0000-0000" operator=""/>
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="LESS" term2Type="CONST" term2DataType="STRING" term2Value="1215-0010-0000" operator=""/>
-					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
-				</Expression>
+
+			<Element columnNumber="1" rowNumber="45" name="B47" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
 				<Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="EDIFICIOS" operator=""/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0001-0001" operator=""/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0002-0002" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0003-0003" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0003-0004" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0005-0001" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0005-0002" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0006-0001" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0007-0001" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0008-0002" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0009-0001" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0009-0002" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0009-0003" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0010-0001" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0010-0002" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0001-0099" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
 				</Expression>
-				<Expression type="OPERATOR" dataType="" value="SUBTRACTION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-				<Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="GREATER_EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0004-0000" operator=""/>
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="LESS" term2Type="CONST" term2DataType="STRING" term2Value="1215-0004-0005" operator=""/>
-					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
-				</Expression>
-				<Expression type="OPERATOR" dataType="" value="SUBTRACTION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
-			<!-- xxx^1215-0004 -->
-			
-			<Element columnNumber="1" rowNumber="47" name="B48" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+
+			<Element columnNumber="1" rowNumber="46" name="B48" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-2001-0001" operator=""/>
 				</Expression>
 			</Element>
 			
-			<Element columnNumber="1" rowNumber="48" name="B49" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="1" rowNumber="47" name="B49" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<!--OLD VALUE
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="EDIFICIOS" operator=""/>
 				</Expression>
@@ -645,15 +662,37 @@
 					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
 				</Expression>
 				<Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			-->
+			    <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0001-0100" operator=""/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0002-0100" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0003-0100" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0005-0100" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0006-0100" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0007-0100" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="OR"/>
+				</Expression>
+				
+				<Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="GREATER_EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-0004-0001" operator=""/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="LESS" term2Type="CONST" term2DataType="STRING" term2Value="1215-0004-0009" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
+				</Expression>
+				
+				<Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
 			
-			<Element columnNumber="1" rowNumber="49" name="B50" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="1" rowNumber="48" name="B50" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1215-3001-0001" operator=""/>
 				</Expression>
 			</Element>
 			
-			<Element columnNumber="1" rowNumber="50" name="B51" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="1" rowNumber="49" name="B51" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1230-0001-0000" operator=""/>
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1230-0003-0000" operator=""/>
@@ -661,7 +700,7 @@
 				</Expression>
 			</Element>
 			
-			<Element columnNumber="1" rowNumber="51" name="B52" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="1" rowNumber="50" name="B52" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1230-2001-0000" operator=""/>
 				</Expression>
@@ -771,25 +810,25 @@
 				</Expression>
 			</Element>
 
-			<Element columnNumber="2" rowNumber="32" name="C33" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="40" name="C33" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasMayorSaldos" dataSourceColumnName="sum" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1205-0000-0000" operator=""/>
 				</Expression>
 			</Element>
 
-			<Element columnNumber="2" rowNumber="33" name="C34" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="32" name="C34" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasMayorSaldos" dataSourceColumnName="sum" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1170-0000-0000" operator=""/>
 				</Expression>
 			</Element>
 
-			<Element columnNumber="2" rowNumber="34" name="C35" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="33" name="C35" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasMayorSaldos" dataSourceColumnName="sum" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1345-0000-0000" operator=""/>
 				</Expression>
 			</Element>
 
-			<Element columnNumber="2" rowNumber="35" name="C36" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="34" name="C36" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasNivel2" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1315-0000-0000" operator=""/>
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1320-0000-0000" operator=""/>
@@ -801,16 +840,14 @@
 				</Expression>
 			</Element>
 
-			<Element columnNumber="2" rowNumber="36" name="C37" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="35" name="C37" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasMayorSaldos" dataSourceColumnName="sum" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1150-0000-0000" operator=""/>
 				</Expression>
 			</Element>
 
-			<Element columnNumber="2" rowNumber="38" name="C39" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="37" name="C39" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_ELEMENT" dataType="" value="C32" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="C33" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 				<Expression type="OPERAND_ELEMENT" dataType="" value="C34" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 				<Expression type="OPERAND_ELEMENT" dataType="" value="C35" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
@@ -821,37 +858,37 @@
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
 
-			<Element columnNumber="2" rowNumber="43" name="C44" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="42" name="C44" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasMayorSaldos" dataSourceColumnName="sum" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1220-0000-0000" operator=""/>
 				</Expression>
 			</Element>
 
-			<Element columnNumber="2" rowNumber="45" name="C46" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="44" name="C46" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasMayorSaldos" dataSourceColumnName="sum" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1225-0000-0000" operator=""/>
 				</Expression>
 			</Element>
 			
-			<Element columnNumber="2" rowNumber="47" name="C48" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="46" name="C48" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
 				<Expression type="OPERAND_ELEMENT" dataType="" value="B47" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERAND_ELEMENT" dataType="" value="B48" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
 <!--XXX-->
-			<Element columnNumber="2" rowNumber="49" name="C50" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+			<Element columnNumber="2" rowNumber="48" name="C50" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
 				<Expression type="OPERAND_ELEMENT" dataType="" value="B49" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERAND_ELEMENT" dataType="" value="B50" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
 
-			<Element columnNumber="2" rowNumber="51" name="C52" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="50" name="C52" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CuentasMayorSaldos" dataSourceColumnName="sum" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="1230-0000-0000" operator=""/>
 				</Expression>
 			</Element>
 
-			<Element columnNumber="2" rowNumber="53" name="C54" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="52" name="C54" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_ELEMENT" dataType="" value="C44" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERAND_ELEMENT" dataType="" value="C46" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
@@ -861,9 +898,11 @@
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 				<Expression type="OPERAND_ELEMENT" dataType="" value="C52" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+				<Expression type="OPERAND_ELEMENT" dataType="" value="C33" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
 
-			<Element columnNumber="2" rowNumber="56" name="C57" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="2" rowNumber="55" name="C57" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_ELEMENT" dataType="" value="C29" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERAND_ELEMENT" dataType="" value="C39" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
@@ -872,159 +911,6 @@
 			</Element>
 
 
-			<!--  .d8888b.           888                                      .d8888b.   -->
-			<!-- d88P  Y88b          888                                     d88P  Y88b  -->
-			<!-- 888    888          888                                          .d88P  -->
-			<!-- 888         .d88b.  888 888  888 88888b.d88b.  88888b.          8888"   -->
-			<!-- 888        d88""88b 888 888  888 888 "888 "88b 888 "88b          "Y8b.  -->
-			<!-- 888    888 888  888 888 888  888 888  888  888 888  888     888    888  -->
-			<!-- Y88b  d88P Y88..88P 888 Y88b 888 888  888  888 888  888     Y88b  d88P  -->
-			<!--  "Y8888P"   "Y88P"  888  "Y88888 888  888  888 888  888      "Y8888P"   -->
-			
-			
-			<Element columnNumber="3" rowNumber="13" name="D14" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="EFECTIVOCAJAYBANCOS"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="14" name="D15" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="INVERSIONESCORTOPLAZO"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="15" name="D16" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="CUENTASXCOBRARCLIENTES"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="16" name="D17" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="ANTICIPOPROVEEDORES"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="17" name="D18" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="DEUDORESDIVERSOS"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="18" name="D19" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="IMPCOBRAR"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="19" name="D20" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="IMPACREDITAR"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="20" name="D21" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="INSTRUMENTOSFINANCIEROS"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-
-			<Element columnNumber="3" rowNumber="25" name="D26" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C26"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="28" name="D29" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C29"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="31" name="D32" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C32"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="32" name="D33" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C33"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="33" name="D34" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C34"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="34" name="D35" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C35"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="35" name="D36" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C36"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="36" name="D37" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C37"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-				
-			<Element columnNumber="3" rowNumber="38" name="D39" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C39"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="43" name="D44" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C44"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="45" name="D46" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C46"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="47" name="D48" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C48"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="49" name="D50" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C50"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="51" name="D52" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C52"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="53" name="D54" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C54"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-		
-			<Element columnNumber="3" rowNumber="56" name="D57" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="TRUE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
 			
 			<!--  .d8888b.           888                                     888888888   -->
 			<!-- d88P  Y88b          888                                     888         -->
@@ -1333,106 +1219,9 @@
 				<Expression type="OPERATOR" dataType="" value="MULTIPLICATION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
 			
-			<Element columnNumber="7" rowNumber="44" name="H45" type="CONST" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
-				<Expression type="OPERAND_ELEMENT" dataType="" value="H36" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H37" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-				<Expression type="OPERAND_ELEMENT" dataType="" value="H38" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
+			
 
-			<Element columnNumber="7" rowNumber="56" name="H57" type="CONST" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="TRUE" fontAlign="LEFT">
-				<Expression type="OPERAND_ELEMENT" dataType="" value="H30" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H45" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-
-			 <!-- .d8888b.           888                                      .d8888b.   -->
-			<!-- d88P  Y88b          888                                     d88P  Y88b  -->
-			<!-- 888    888          888                                     Y88b. d88P  -->
-			<!-- 888         .d88b.  888 888  888 88888b.d88b.  88888b.       "Y88888"   -->
-			<!-- 888        d88""88b 888 888  888 888 "888 "88b 888 "88b     .d8P""Y8b.  -->
-			<!-- 888    888 888  888 888 888  888 888  888  888 888  888     888    888  -->
-			<!-- Y88b  d88P Y88..88P 888 Y88b 888 888  888  888 888  888     Y88b  d88P  -->
-			 <!-- "Y8888P"   "Y88P"  888  "Y88888 888  888  888 888  888      "Y8888P"   -->
-			 
-			<Element columnNumber="8" rowNumber="13" name="I14" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H14" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
 			
-			<Element columnNumber="8" rowNumber="14" name="I15" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H15" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="8" rowNumber="15" name="I16" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H16" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="8" rowNumber="16" name="I17" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H17" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="8" rowNumber="18" name="I19" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H19" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="8" rowNumber="23" name="I24" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H24" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="8" rowNumber="24" name="I25" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H25" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="8" rowNumber="26" name="I27" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H27" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="8" rowNumber="29" name="I30" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H30" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="8" rowNumber="35" name="I36" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H36" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="8" rowNumber="36" name="I37" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H37" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="8" rowNumber="44" name="I45" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H45" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="8" rowNumber="56" name="I57" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
 			 
 
 			<!--  .d8888b.           888                                      .d8888b.   -->
@@ -1620,9 +1409,11 @@
 				</Expression>
 			</Element>
 
-			 <Element columnNumber="12" rowNumber="11" name="VENTASEXPORTACION" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+			<Element columnNumber="12" rowNumber="11" name="VENTASEXPORTACION" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="Ventas" dataSourceColumnName="_bal_per" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="_dom" comparison="EQUAL" term2Type="CONST" term2DataType="BOOLEAN" term2Value="0" operator=""/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="VENTAS" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
 				</Expression>
 			</Element>
 
@@ -1639,9 +1430,9 @@
  			<Element columnNumber="12" rowNumber="12" name="VENTASNACIONALES" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="Ventas" dataSourceColumnName="_bal_per" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="_dom" comparison="EQUAL" term2Type="CONST" term2DataType="BOOLEAN" term2Value="1" operator=""/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="VENTAS" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
 				</Expression>
-					<Expression type="OPERAND_ELEMENT" dataType="DOUBLE" value="DEVyDESCsVENTAS" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-					<Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
 
 			<Element columnNumber="12" rowNumber="14" name="VENTASTOTALES" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
@@ -1649,7 +1440,6 @@
                 <Expression type="OPERAND_ELEMENT" dataType="" value="VENTASNACIONALES" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
-
 
 			<Element columnNumber="12" rowNumber="18" name="VNET" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_ELEMENT" dataType="" value="VENTASTOTALES" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
@@ -1715,16 +1505,12 @@
 
 			<Element columnNumber="12" rowNumber="33" name="GASTOSPRODREF" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CentrosCosto" dataSourceColumnName="_bal_per" dataSourceOperation="SUM">
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_cc" comparison="GREATER_EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="200-01-00-000" operator=""/>
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_cc" comparison="LESS" term2Type="CONST" term2DataType="STRING" term2Value="200-01-11-999" operator=""/>
-					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="GASTOS PRODUCCIÓN" operator=""/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="6000-0003-0000" operator=""/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_cc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="900-01-07-000" operator=""/>
 					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
 				</Expression>
-				<Expression type="OPERAND_CONST" dataType="DOUBLE" value="-1" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-				<Expression type="OPERATOR" dataType="" value="MULTIPLICATION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
-			
+
 			<Element columnNumber="12" rowNumber="34" name="GASTOSVENTAREF" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CentrosCosto" dataSourceColumnName="_bal_per" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_cc" comparison="GREATER_EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="900-02-00-00" operator=""/>
@@ -1736,10 +1522,12 @@
 			</Element>
 
 			<Element columnNumber="12" rowNumber="35" name="HARINASREF" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CentrosCosto" dataSourceColumnName="_bal_per" dataSourceOperation="SUM">
+                <!--<Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CentrosCosto" dataSourceColumnName="_bal_per" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="cc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="HARINAS" operator=""/>
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="6000-0002-0000" operator=""/>
 					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
+				</Expression>-->
+				<Expression type="OPERAND_CONST" dataType="DOUBLE" value="0.0">
 				</Expression>
 			</Element>
 
@@ -1843,6 +1631,10 @@
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 				<Expression type="OPERAND_ELEMENT" dataType="" value="GASTOSPROD" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+				<Expression type="OPERAND_ELEMENT" dataType="" value="GASTOSDEFINANCIEROSREF" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+				<Expression type="OPERAND_ELEMENT" dataType="" value="GASTOSVENTAREF" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
 
 			<Element columnNumber="12" rowNumber="47" name="RESOPERATION" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
@@ -1877,142 +1669,8 @@
 				</Expression>
 			</Element>
 
-			<!--  .d8888b.           888                                      d888    .d8888b.   -->
-			<!-- d88P  Y88b          888                                     d8888   d88P  Y88b  -->
-			<!-- 888    888          888                                       888        .d88P  -->
-			<!-- 888         .d88b.  888 888  888 88888b.d88b.  88888b.        888       8888"   -->
-			<!-- 888        d88""88b 888 888  888 888 "888 "88b 888 "88b       888        "Y8b.  -->
-			<!-- 888    888 888  888 888 888  888 888  888  888 888  888       888   888    888  -->
-			<!-- Y88b  d88P Y88..88P 888 Y88b 888 888  888  888 888  888       888   Y88b  d88P  -->
-			 <!-- "Y8888P"   "Y88P"  888  "Y88888 888  888  888 888  888     8888888  "Y8888P"   -->
-			 
-			 <Element columnNumber="13" rowNumber="9" name="L72" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-				<Expression type="OPERAND_CONST" dataType="STRING" value="%">
-				</Expression>
-			</Element>
-			 
-			 <Element columnNumber="13" rowNumber="11" name="PERCENTEXP" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="VENTASEXPORTACION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="VENTASTOTALES" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="12" name="PERCENTNAC" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="VENTASNACIONALES" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="VENTASTOTALES" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="14" name="PERCENTNAC" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" dataType="" value="PERCENTEXP" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" dataType="" value="PERCENTNAC" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="26" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_ELEMENT" 	dataType="" 	value="COSTOSVENTAS" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" 	dataType="" 	value="VENTASTOTALES" 		dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERAND_ELEMENT" 	dataType="" 	value="DEVyDESCsVENTAS" 		dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" 		dataType=""		value="SUBTRACTION"	dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-                <Expression type="OPERATOR" 		dataType=""		value="DIVISION"	dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="32" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="GASTOSCORPOREF"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="33" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="GASTOSPRODREF"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="34" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="GASTOSVENTAREF"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="35" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="HARINASREF"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="36" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="GASTOSADMONREF"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="37" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="GASTOSEGURIDADREF"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="38" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="GASTOSDEFINANCIEROSREF"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="39" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="GASTOSPROD"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="40" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="GASTOSVENTA"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="41" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="HARINAS"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="42" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="GASTOSADMON"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="43" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="GASTOSOPRODFIN"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="45" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="GASTOSTOTALES"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="47" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="RESOPERATION"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="49" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="OTROSGASTOSYPRODUCTOS"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			
-			<Element columnNumber="13" rowNumber="51" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
-				<Expression type="OPERAND_ELEMENT" value="RESULTADOFINAL"></Expression>
-				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
-				<Expression type="OPERATOR" value="DIVISION"></Expression>
-			</Element>
-			 
+
+
 			 <!-- .d8888b.           888                                      d888       d8888   -->
 			<!-- d88P  Y88b          888                                     d8888      d8P888   -->
 			<!-- 888    888          888                                       888     d8P 888   -->
@@ -2021,7 +1679,7 @@
 			<!-- 888    888 888  888 888 888  888 888  888  888 888  888       888   8888888888  -->
 			<!-- Y88b  d88P Y88..88P 888 Y88b 888 888  888  888 888  888       888         888   -->
 			 <!-- "Y8888P"   "Y88P"  888  "Y88888 888  888  888 888  888     8888888       888   -->
-			 
+
 			 <!-- .d8888b.           888                                      d888   888888888   -->
 			<!-- d88P  Y88b          888                                     d8888   888         -->
 			<!-- 888    888          888                                       888   888         -->
@@ -2030,9 +1688,9 @@
 			<!-- 888    888 888  888 888 888  888 888  888  888 888  888       888          888  -->
 			<!-- Y88b  d88P Y88..88P 888 Y88b 888 888  888  888 888  888       888   Y88b  d88P  -->
 			 <!-- "Y8888P"   "Y88P"  888  "Y88888 888  888  888 888  888     8888888  "Y8888P"   -->
-																						   
-			 
-			<Element columnNumber="15" rowNumber="9" name="L72A" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+
+
+			<Element columnNumber="15" rowNumber="9" name="P9" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="ACUMULADO">
 				</Expression>
 			</Element>
@@ -2040,24 +1698,15 @@
 			 <Element columnNumber="15" rowNumber="11" name="VENTASEXPORTACIONA" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
 				<Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="Ventas" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="_dom" comparison="EQUAL" term2Type="CONST" term2DataType="BOOLEAN" term2Value="0" operator=""/>
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="4100-0000-0000" operator=""/>
-					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="0" operator="AND"/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="VENTAS" operator=""/>
+					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
 				</Expression>
-				<Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="Ventas" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="4300-0000-0000" operator=""/>
-				</Expression>
-				<Expression type="OPERATOR" dataType="" value="SUBTRACTION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-				<Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CentrosCosto" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="2125-0000-0000" operator=""/>
-				</Expression>
-				<Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-				
 			</Element>
 
  			<Element columnNumber="15" rowNumber="12" name="VENTASNACIONALESA" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
                 <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="Ventas" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="_dom" comparison="EQUAL" term2Type="CONST" term2DataType="BOOLEAN" term2Value="1" operator=""/>
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="4100-0000-0000" operator=""/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="VENTAS" operator=""/>
 					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
 				</Expression>
 			</Element>
@@ -2143,15 +1792,20 @@
 			</Element>
 
 			<Element columnNumber="15" rowNumber="33" name="GASTOSPRODREFA" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CentrosCosto" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_cc" comparison="GREATER_EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="200-01-00-000" operator=""/>
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_cc" comparison="LESS" term2Type="CONST" term2DataType="STRING" term2Value="200-01-11-999" operator=""/>
-					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
-					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="GASTOS PRODUCCIÓN" operator=""/>
+                <!-- <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CentrosCosto" dataSourceColumnName="_bal_year" dataSourceOperation="SUM"> -->
+					<!-- <DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_cc" comparison="GREATER_EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="200-01-00-000" operator=""/> -->
+					<!-- <DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_cc" comparison="LESS" term2Type="CONST" term2DataType="STRING" term2Value="200-01-11-999" operator=""/> -->
+					<!-- <DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/> -->
+					<!-- <DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="GASTOS PRODUCCIÓN" operator=""/> -->
+					<!-- <DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/> -->
+				<!-- </Expression> -->
+				<!-- <Expression type="OPERAND_CONST" dataType="DOUBLE" value="-1" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression> -->
+				<!-- <Expression type="OPERATOR" dataType="" value="MULTIPLICATION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression> -->
+				<Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CentrosCosto" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="6000-0003-0000" operator=""/>
+					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_cc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="900-01-07-000" operator=""/>
 					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
 				</Expression>
-				<Expression type="OPERAND_CONST" dataType="DOUBLE" value="-1" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
-				<Expression type="OPERATOR" dataType="" value="MULTIPLICATION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
 
 			<Element columnNumber="15" rowNumber="34" name="GASTOSVENTAREFA" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
@@ -2163,13 +1817,14 @@
 					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
 				</Expression>
 			</Element>
-
-			
+			<!-- XXX PENDIENTE DE VALIDAR DE MANERA CORRECTA -->
 			<Element columnNumber="15" rowNumber="35" name="HARINASREFA" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
-                <Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CentrosCosto" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
+                <!--<Expression type="OPERAND_DATA" dataType="" value="" dataSourceName="CentrosCosto" dataSourceColumnName="_bal_year" dataSourceOperation="SUM">
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="cc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="HARINAS" operator=""/>
 					<DataSourceFilter type="OPERAND" term1Type="DATA" term1DataType="" term1Value="id_acc" comparison="EQUAL" term2Type="CONST" term2DataType="STRING" term2Value="6000-0002-0000" operator=""/>
 					<DataSourceFilter type="OPERATOR" term1Type="" term1DataType="" term1Value="" comparison="" term2Type="" term2DataType="" term2Value="" operator="AND"/>
+				</Expression>-->
+				<Expression type="OPERAND_CONST" dataType="DOUBLE" value="0.0">
 				</Expression>
 			</Element>
 
@@ -2273,6 +1928,10 @@
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 				<Expression type="OPERAND_ELEMENT" dataType="" value="GASTOSPRODA" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
                 <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+				<Expression type="OPERAND_ELEMENT" dataType="" value="GASTOSDEFINANCIEROSREFA" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+				<Expression type="OPERAND_ELEMENT" dataType="" value="GASTOSVENTAREFA" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
 			</Element>
 
 			<Element columnNumber="15" rowNumber="47" name="RESOPERATIONA" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
@@ -2307,7 +1966,416 @@
 				</Expression>
 			</Element>
 
-		 <!-- .d8888b.           888                                      d888    .d8888b.   -->
+
+		
+			<!-- 8888888888          888                                   .d8888b.   .d8888b.   .d8888b.   -->
+			<!-- 888                 888                                  d88P  Y88b d88P  Y88b d88P  Y88b  -->
+			<!-- 888                 888                                  888    888 888    888 888    888  -->
+			<!-- 8888888    888  888 888888 888d888  8888b.  .d8888b      Y88b. d888 Y88b. d888 Y88b. d888  -->
+			<!-- 888        `Y8bd8P' 888    888P"       "88b 88K           "Y888P888  "Y888P888  "Y888P888  -->
+			<!-- 888          X88K   888    888     .d888888 "Y8888b.            888        888        888  -->
+			<!-- 888        .d8""8b. Y88b.  888     888  888      X88     Y88b  d88P Y88b  d88P Y88b  d88P  -->
+			<!-- 8888888888 888  888  "Y888 888     "Y888888  88888P'      "Y8888P"   "Y8888P"   "Y8888P"   -->
+			
+			<Element columnNumber="7" rowNumber="37" name="H38" type="CONST" dataType="DOUBLE" dataFormat="" fontType="" fontSize="11" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+				<Expression type="OPERAND_ELEMENT" dataType="DOUBLE" value="RESULTADOFINALA">
+				</Expression>
+			</Element>
+			
+			<Element columnNumber="7" rowNumber="44" name="H45" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
+				<Expression type="OPERAND_ELEMENT" dataType="" value="H36" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H37" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+				<Expression type="OPERAND_ELEMENT" dataType="" value="H38" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+
+			<Element columnNumber="7" rowNumber="56" name="H57" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="TRUE" fontAlign="LEFT">
+				<Expression type="OPERAND_ELEMENT" dataType="" value="H30" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H45" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+
+
+			<!--  .d8888b.           888                                      .d8888b.   -->
+			<!-- d88P  Y88b          888                                     d88P  Y88b  -->
+			<!-- 888    888          888                                          .d88P  -->
+			<!-- 888         .d88b.  888 888  888 88888b.d88b.  88888b.          8888"   -->
+			<!-- 888        d88""88b 888 888  888 888 "888 "88b 888 "88b          "Y8b.  -->
+			<!-- 888    888 888  888 888 888  888 888  888  888 888  888     888    888  -->
+			<!-- Y88b  d88P Y88..88P 888 Y88b 888 888  888  888 888  888     Y88b  d88P  -->
+			<!--  "Y8888P"   "Y88P"  888  "Y88888 888  888  888 888  888      "Y8888P"   -->
+				<!-- # PERCENT DIVISION -->
+			
+			<Element columnNumber="3" rowNumber="13" name="D14" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="EFECTIVOCAJAYBANCOS"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="14" name="D15" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="INVERSIONESCORTOPLAZO"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="15" name="D16" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="CUENTASXCOBRARCLIENTES"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="16" name="D17" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="ANTICIPOPROVEEDORES"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="17" name="D18" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="DEUDORESDIVERSOS"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="18" name="D19" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="IMPCOBRAR"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="19" name="D20" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="IMPACREDITAR"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="20" name="D21" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="INSTRUMENTOSFINANCIEROS"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="3" rowNumber="25" name="D26" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C26"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="28" name="D29" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C29"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="31" name="D32" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C32"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="40" name="D33" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C33"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="32" name="D34" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C34"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="33" name="D35" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C35"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="34" name="D36" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C36"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="35" name="D37" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C37"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+				
+			<Element columnNumber="3" rowNumber="37" name="D39" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C39"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="42" name="D44" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C44"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="44" name="D46" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C46"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="46" name="D48" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C48"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="48" name="D50" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C50"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="50" name="D52" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C52"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="52" name="D54" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C54"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+		
+			<Element columnNumber="3" rowNumber="55" name="D57" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="TRUE" fontCursive="FALSE" fontUnderline="TRUE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="C57"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+			
+			<!--  .d8888b.           888                                      .d8888b.   -->
+			<!-- d88P  Y88b          888                                     d88P  Y88b  -->
+			<!-- 888    888          888                                     Y88b. d88P  -->
+			<!-- 888         .d88b.  888 888  888 88888b.d88b.  88888b.       "Y88888"   -->
+			<!-- 888        d88""88b 888 888  888 888 "888 "88b 888 "88b     .d8P""Y8b.  -->
+			<!-- 888    888 888  888 888 888  888 888  888  888 888  888     888    888  -->
+			<!-- Y88b  d88P Y88..88P 888 Y88b 888 888  888  888 888  888     Y88b  d88P  -->
+			 <!-- "Y8888P"   "Y88P"  888  "Y88888 888  888  888 888  888      "Y8888P"   -->
+			 <!-- # PERCENT DIVISION -->
+			<Element columnNumber="8" rowNumber="13" name="I14" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H14" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="14" name="I15" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H15" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="15" name="I16" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H16" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="16" name="I17" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H17" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="18" name="I19" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H19" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="23" name="I24" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H24" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="24" name="I25" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H25" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="26" name="I27" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H27" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="29" name="I30" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H30" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="35" name="I36" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H36" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="36" name="I37" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H37" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="44" name="I45" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H45" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<Element columnNumber="8" rowNumber="56" name="I57" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="H57" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+			
+			<!--  .d8888b.           888                                      d888    .d8888b.   -->
+			<!-- d88P  Y88b          888                                     d8888   d88P  Y88b  -->
+			<!-- 888    888          888                                       888        .d88P  -->
+			<!-- 888         .d88b.  888 888  888 88888b.d88b.  88888b.        888       8888"   -->
+			<!-- 888        d88""88b 888 888  888 888 "888 "88b 888 "88b       888        "Y8b.  -->
+			<!-- 888    888 888  888 888 888  888 888  888  888 888  888       888   888    888  -->
+			<!-- Y88b  d88P Y88..88P 888 Y88b 888 888  888  888 888  888       888   Y88b  d88P  -->
+			<!--  "Y8888P"   "Y88P"  888  "Y88888 888  888  888 888  888     8888888  "Y8888P"   -->
+			 <!-- # PERCENT DIVISION -->
+
+			 <Element columnNumber="13" rowNumber="9" name="L72" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+				<Expression type="OPERAND_CONST" dataType="STRING" value="%">
+				</Expression>
+			</Element>
+
+			 <Element columnNumber="13" rowNumber="11" name="PERCENTEXP" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="VENTASEXPORTACION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="VENTASTOTALES" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="12" name="PERCENTNAC" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="VENTASNACIONALES" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="VENTASTOTALES" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="DIVISION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="14" name="PERCENTNAC" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" dataType="" value="PERCENTEXP" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" dataType="" value="PERCENTNAC" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" dataType="" value="ADDITION" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="26" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
+                <Expression type="OPERAND_ELEMENT" 	dataType="" 	value="COSTOSVENTAS" dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" 	dataType="" 	value="VENTASTOTALES" 		dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERAND_ELEMENT" 	dataType="" 	value="DEVyDESCsVENTAS" 		dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" 		dataType=""		value="SUBTRACTION"	dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+                <Expression type="OPERATOR" 		dataType=""		value="DIVISION"	dataSourceName="" dataSourceColumnName="" dataSourceOperation=""></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="32" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="GASTOSCORPOREF"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="33" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="GASTOSPRODREF"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="34" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="GASTOSVENTAREF"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="35" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="HARINASREF"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="36" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="GASTOSADMONREF"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="37" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="GASTOSEGURIDADREF"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="38" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="GASTOSDEFINANCIEROSREF"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="39" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="GASTOSPROD"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="40" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="GASTOSVENTA"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="41" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="HARINAS"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="42" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="GASTOSADMON"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="43" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="GASTOSOPRODFIN"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="45" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="GASTOSTOTALES"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="47" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="RESOPERATION"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="49" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="OTROSGASTOSYPRODUCTOS"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+
+			<Element columnNumber="13" rowNumber="51" name="" type="FORMULA" dataType="DOUBLE" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="RIGHT">
+				<Expression type="OPERAND_ELEMENT" value="RESULTADOFINAL"></Expression>
+				<Expression type="OPERAND_ELEMENT" value="VNET"></Expression>
+				<Expression type="OPERATOR" value="DIVISION"></Expression>
+			</Element>
+			
+		<!--  .d8888b.           888                                      d888    .d8888b.   -->
 		<!-- d88P  Y88b          888                                     d8888   d88P  Y88b  -->
 		<!-- 888    888          888                                       888   888         -->
 		<!-- 888         .d88b.  888 888  888 88888b.d88b.  88888b.        888   888d888b.   -->
@@ -2315,7 +2383,7 @@
 		<!-- 888    888 888  888 888 888  888 888  888  888 888  888       888   888    888  -->
 		<!-- Y88b  d88P Y88..88P 888 Y88b 888 888  888  888 888  888       888   Y88b  d88P  -->
 		 <!-- "Y8888P"   "Y88P"  888  "Y88888 888  888  888 888  888     8888888  "Y8888P"   -->
-
+<!-- # PERCENT DIVISION -->
 			<Element columnNumber="16" rowNumber="9" name="O72A" type="CONST" dataType="STRING" dataFormat="" fontType="" fontSize="10" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="CENTER">
 				<Expression type="OPERAND_CONST" dataType="STRING" value="%">
 				</Expression>
@@ -2442,21 +2510,7 @@
 				<Expression type="OPERAND_ELEMENT" value="VNETA"></Expression>
 				<Expression type="OPERATOR" value="DIVISION"></Expression>
 			</Element>
-		
-			<!-- 8888888888          888                                   .d8888b.   .d8888b.   .d8888b.   -->
-			<!-- 888                 888                                  d88P  Y88b d88P  Y88b d88P  Y88b  -->
-			<!-- 888                 888                                  888    888 888    888 888    888  -->
-			<!-- 8888888    888  888 888888 888d888  8888b.  .d8888b      Y88b. d888 Y88b. d888 Y88b. d888  -->
-			<!-- 888        `Y8bd8P' 888    888P"       "88b 88K           "Y888P888  "Y888P888  "Y888P888  -->
-			<!-- 888          X88K   888    888     .d888888 "Y8888b.            888        888        888  -->
-			<!-- 888        .d8""8b. Y88b.  888     888  888      X88     Y88b  d88P Y88b  d88P Y88b  d88P  -->
-			<!-- 8888888888 888  888  "Y888 888     "Y888888  88888P'      "Y8888P"   "Y8888P"   "Y8888P"   -->
-		
-			<Element columnNumber="7" rowNumber="37" name="H38" type="CONST" dataType="DOUBLE" dataFormat="" fontType="" fontSize="21" fontBold="FALSE" fontCursive="FALSE" fontUnderline="FALSE" fontAlign="LEFT">
-				<Expression type="OPERAND_ELEMENT" dataType="DOUBLE" value="RESULTADOFINALA">
-				</Expression>
-			</Element>
-
+			
 			</Elements>
 	</Report>
 </Template>

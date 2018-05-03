@@ -481,6 +481,7 @@ public abstract class SModSysConsts {
     public static final int FINS_FISCAL_BANK_NA = 999;
     public static final int FINS_FISCAL_PAY_MET_NA = 98;
 
+    // constants for generation of e-accounting files:
     public static final int FINS_TP_FISCAL_ACC_LINK_ACC = 1;
     public static final int FINS_TP_FISCAL_ACC_LINK_CSH_CSH = 11;
     public static final int FINS_TP_FISCAL_ACC_LINK_CSH_BNK = 12;

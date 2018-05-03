@@ -21,7 +21,7 @@ public class SCfdPayment extends erp.lib.table.STableRow {
     public String PaymentWay;
     public int CurrencyId;
     public String CurrencyKey;
-    public double AmountCurrency;
+    public double Amount;
     public double ExchangeRate;
     public double AmountLocal;
     public String Operation;
@@ -31,17 +31,17 @@ public class SCfdPayment extends erp.lib.table.STableRow {
     public String AccountDesFiscalId;
     public String AccountDesNumber;
     public SDataRecord DataRecord;
-    ArrayList<SCfdPaymentDocument> Documents;
+    ArrayList<SCfdPaymentDoc> Documents;
     
-    public SCfdPayment(int number, Date date, String paymentWay, int currencyId, String currencyKey, double amountCurrency, double exchangeRate, SDataRecord dataRecord) {
+    public SCfdPayment(int number, Date date, String paymentWay, int currencyId, String currencyKey, double amount, double exchangeRate, SDataRecord dataRecord) {
         Number = number;
         Date = date;
         PaymentWay = paymentWay;
         CurrencyId = currencyId;
         CurrencyKey = currencyKey;
-        AmountCurrency = amountCurrency;
+        Amount = amount;
         ExchangeRate = exchangeRate;
-        AmountLocal = SLibUtils.round(amountCurrency * exchangeRate, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+        AmountLocal = SLibUtils.round(amount * exchangeRate, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
         Operation = "";
         AccountSrcFiscalId = "";
         AccountSrcNumber = "";
@@ -56,10 +56,10 @@ public class SCfdPayment extends erp.lib.table.STableRow {
      * Computes payments of documents in CurrencyId.
      * @return 
      */
-    public double computePaymentCurrency() {
+    public double computePayment() {
         double payment = 0;
         
-        for (SCfdPaymentDocument document : Documents) {
+        for (SCfdPaymentDoc document : Documents) {
             payment = SLibUtils.round(
                     payment + SLibUtils.round(
                             document.Payment * document.ExchangeRate, 
@@ -76,7 +76,7 @@ public class SCfdPayment extends erp.lib.table.STableRow {
         mvValues.add(Number);
         mvValues.add(Date);
         mvValues.add(PaymentWay);
-        mvValues.add(AmountCurrency);
+        mvValues.add(Amount);
         mvValues.add(CurrencyKey);
         mvValues.add(ExchangeRate);
         mvValues.add(DataRecord.getRecordPrimaryKey());

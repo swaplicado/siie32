@@ -11,24 +11,30 @@ import erp.mtrn.data.SDataDps;
  *
  * @author Sergio Flores
  */
-public class SCfdPaymentDocument extends erp.lib.table.STableRow {
+public class SCfdPaymentDoc extends erp.lib.table.STableRow {
     
     public int Number;
     public SDataDps DataDps;
     public int Installment;
-    public double ExchangeRate;
-    public double BalancePrevious;
+    public double BalancePrev;
     public double Payment;
-    public double Balance;
+    public double BalancePend;
+    public double ExchangeRate;
+    public double BalancePrevPay;
+    public double PaymentPay;
+    public double BalancePendPay;
     
-    public SCfdPaymentDocument(int number, SDataDps dataDps, int installment, double exchangeRate, double balancePrevious, double payment, double balance) {
+    public SCfdPaymentDoc(int number, SDataDps dataDps, int installment, double balancePrev, double payment, double balancePend, double exchangeRate, double balancePrevPay, double paymentPay, double balancePendPay) {
         Number = number;
         DataDps = dataDps;
         Installment = installment;
-        ExchangeRate = exchangeRate;
-        BalancePrevious = balancePrevious;
+        BalancePrev = balancePrev;
         Payment = payment;
-        Balance = balance;
+        BalancePend = balancePend;
+        ExchangeRate = exchangeRate;
+        BalancePrevPay = balancePrevPay;
+        PaymentPay = paymentPay;
+        BalancePendPay = balancePendPay;
     }
 
     @Override
@@ -38,9 +44,9 @@ public class SCfdPaymentDocument extends erp.lib.table.STableRow {
         mvValues.add(DataDps.getDpsNumber());
         mvValues.add(DataDps.getDbmsDataCfd().getUuid());
         mvValues.add(Installment);
-        mvValues.add(BalancePrevious);
+        mvValues.add(BalancePrev);
         mvValues.add(Payment);
-        mvValues.add(Balance);
+        mvValues.add(BalancePend);
         mvValues.add(DataDps.getDbmsCurrencyKey());
         mvValues.add(ExchangeRate);
     }
