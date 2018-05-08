@@ -795,17 +795,13 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
     @Override
     public void actionSave() {
-        boolean computeXml = true;
-        String name = "";
-        SDbBizPartner company = null;
-        SXmlDocument doc = null;
-        SDialogFiscalXmlFileChartOfAccounts dialogChartOfAccounts = null;
-
         if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
                 try {
+                    boolean computeXml = true;
+                    
                     if (moRadXmlFileChartOfAccounts.isSelected()) {
-                        dialogChartOfAccounts = new SDialogFiscalXmlFileChartOfAccounts(miClient, "Configuración del catálogo de cuentas utilizado en el período");
+                        SDialogFiscalXmlFileChartOfAccounts dialogChartOfAccounts = new SDialogFiscalXmlFileChartOfAccounts(miClient, "Configuración del catálogo de cuentas utilizado en el período");
                         dialogChartOfAccounts.setValue(SGuiConsts.PARAM_DATE, new int[] { (int) jsYear.getValue(), mnMonth });
                         dialogChartOfAccounts.initForm();
                         dialogChartOfAccounts.setVisible(true);
@@ -813,6 +809,9 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
                     }
 
                     if (computeXml) {
+                        String name = "";
+                        SDbBizPartner company = null;
+                        
                         if (moRadXmlFileChartOfAccounts.isSelected()) {
                             name = SFiscalConsts.XML_COA;
                         }
@@ -834,6 +833,8 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
                         miClient.getFileChooser().setSelectedFile(new File(name));
                         if (miClient.getFileChooser().showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                            SXmlDocument doc = null;
+                            
                             if (moRadXmlFileChartOfAccounts.isSelected()) {
                                 doc = SFiscalUtils.createDocCatalogo13(miClient.getSession(), (int) jsYear.getValue(), mnMonth);
                             }
