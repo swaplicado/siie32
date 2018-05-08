@@ -36,7 +36,7 @@ public abstract class SFiscalAccountUtils {
         SetFiscalAccountCodeSal.add("401.07");
         SetFiscalAccountCodeSal.add("401.08");
         SetFiscalAccountCodeSal.add("401.09");
-        SetFiscalAccountCodeSal.add("401.1");
+        SetFiscalAccountCodeSal.add("401.10");
         SetFiscalAccountCodeSal.add("401.11");
         SetFiscalAccountCodeSal.add("401.12");
         SetFiscalAccountCodeSal.add("401.13");
@@ -46,7 +46,7 @@ public abstract class SFiscalAccountUtils {
         SetFiscalAccountCodeSal.add("401.17");
         SetFiscalAccountCodeSal.add("401.18");
         SetFiscalAccountCodeSal.add("401.19");
-        SetFiscalAccountCodeSal.add("401.2");
+        SetFiscalAccountCodeSal.add("401.20");
         SetFiscalAccountCodeSal.add("401.21");
         SetFiscalAccountCodeSal.add("401.22");
         SetFiscalAccountCodeSal.add("401.23");
@@ -56,7 +56,7 @@ public abstract class SFiscalAccountUtils {
         SetFiscalAccountCodeSal.add("401.27");
         SetFiscalAccountCodeSal.add("401.28");
         SetFiscalAccountCodeSal.add("401.29");
-        SetFiscalAccountCodeSal.add("401.3");
+        SetFiscalAccountCodeSal.add("401.30");
         SetFiscalAccountCodeSal.add("401.31");
         SetFiscalAccountCodeSal.add("401.32");
         SetFiscalAccountCodeSal.add("401.33");
@@ -66,18 +66,22 @@ public abstract class SFiscalAccountUtils {
         SetFiscalAccountCodeSal.add("401.37");
         SetFiscalAccountCodeSal.add("401.38");
 
+        SetFiscalAccountCodeSalAdj.add("402");
         SetFiscalAccountCodeSalAdj.add("402.01");
         SetFiscalAccountCodeSalAdj.add("402.02");
         SetFiscalAccountCodeSalAdj.add("402.03");
         SetFiscalAccountCodeSalAdj.add("402.04");
 
+        SetFiscalAccountCodePur.add("502");
         SetFiscalAccountCodePur.add("502.01");
         SetFiscalAccountCodePur.add("502.02");
         SetFiscalAccountCodePur.add("502.03");
         SetFiscalAccountCodePur.add("502.04");
 
+        SetFiscalAccountCodePurAdj.add("503");
         SetFiscalAccountCodePurAdj.add("503.01");
         
+        SetFiscalAccountCodeCogs.add("501");
         SetFiscalAccountCodeCogs.add("501.01");
         SetFiscalAccountCodeCogs.add("501.02");
         SetFiscalAccountCodeCogs.add("501.03");
