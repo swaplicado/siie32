@@ -9,11 +9,11 @@ import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbTaxSubsidyTable;
 import erp.mod.hrs.db.SDbTaxTable;
 import erp.mod.hrs.db.SHrsAmountEarning;
-import erp.mod.hrs.db.SHrsCalculateEstimateISR;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import static erp.mod.hrs.db.SHrsUtils.getRecentTaxSubsidyTable;
 import static erp.mod.hrs.db.SHrsUtils.getRecentTaxTable;
+import erp.mod.hrs.db.SRowCalculateIncomeTax;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,9 +45,9 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
-public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implements ActionListener, ChangeListener  {
+public class SDialogCalculateIncomeTax extends SBeanFormDialog implements ActionListener, ChangeListener  {
 
     protected SGridPaneForm moGridEmployeesRow;
     protected int mnDaysPeriod;
@@ -57,7 +57,7 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
      * @param client
      * @param title
      */
-    public SDialogCalculateEstimateIncomeTax(SGuiClient client, String title) {
+    public SDialogCalculateIncomeTax(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_SSC_UPD, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -108,8 +108,8 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentType.setText("Periodo pago:");
-        jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlPaymentType.setText("Periodo pago nómina:");
+        jlPaymentType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel29.add(jlPaymentType);
 
         moKeyPaymentType.setPreferredSize(new java.awt.Dimension(250, 23));
@@ -161,6 +161,7 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
         jPanel27.add(jlYear);
         jPanel27.add(moCalYear);
 
+        jlDateCut.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlDateCut.setText("Fecha corte:");
         jlDateCut.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel27.add(jlDateCut);
@@ -228,7 +229,9 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
         moRadFilterTypeDateCut.setEnabled(enable);
         moRadFilterTypeYear.setEnabled(enable);
         moDateDateCut.setEditable(enable);
+        moDateDateCut.setFocusable(enable);
         moCalYear.setEditable(enable);
+        moCalYear.setFocusable(enable);
         jbCalculate.setEnabled(enable);
         jbClean.setEnabled(!enable);
     }
@@ -236,11 +239,15 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
     private void actionEnableFieldsTypeCal() {
         if (moRadFilterTypeDateCut.isSelected()) {
             moDateDateCut.setEditable(true);
+            moDateDateCut.setFocusable(true);
             moCalYear.setEditable(true);
+            moCalYear.setFocusable(true);
         }
         else if (moRadFilterTypeYear.isSelected()) {
             moDateDateCut.setEditable(false);
+            moDateDateCut.setFocusable(false);
             moCalYear.setEditable(true);
+            moCalYear.setFocusable(true);
             actionStateChangeYear();
         }
     }
@@ -252,7 +259,9 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 960, 600);
         
-        jbSave.setText("Aceptar");
+        jbCancel.setText(SGuiConsts.TXT_BTN_CLOSE);
+        jbSave.setText(SGuiConsts.TXT_BTN_OK);
+        jbSave.setEnabled(false);   // button not needed
 
         moDateDateCut.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCut.getText()), true);
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
@@ -274,7 +283,6 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave empleado"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Status actual"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto ingresos $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto gravado $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días activo"));
@@ -288,6 +296,9 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio entregado $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio diferencia $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Diferencia neta $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Status actual"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Últ. alta"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Últ. baja"));
                 
                 return gridColumnsForm;
             }
@@ -309,11 +320,13 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
         
         moCalYear.setValue(SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0]);
         moDateDateCut.setValue(miClient.getSession().getCurrentDate());
+        moRadFilterTypeYear.setSelected(true);
         
         moKeyTax.setEnabled(false);
         moKeyTaxSubsidy.setEnabled(false);
         
         enableFields(true);
+        actionEnableFieldsTypeCal();
     }
     
     private void setTablesTax() throws Exception {
@@ -362,7 +375,6 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
         Date mtDateEnd = null;
         String sql = "";
         Vector<SGridRow> rows = new Vector<SGridRow>();
-        SHrsCalculateEstimateISR calculateEstimateISR = null;
         SHrsAmountEarning amountEarningSubsidy = null;
         SHrsAmountEarning amountEarnings = null;
         ResultSet resultSet = null;
@@ -378,20 +390,21 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
             dbTaxTable = (SDbTaxTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(miClient.getSession(), mtDateEnd) });
             dbSubsidyTable = (SDbTaxSubsidyTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX_SUB, new int[] { getRecentTaxSubsidyTable(miClient.getSession(), mtDateEnd) });
             
-            sql = "SELECT e.num, e.id_emp, bp.bp, e.b_act "
+            sql = "SELECT e.num, e.id_emp, b.bp, e.b_act, e.dt_hire, e.dt_dis_n "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
-                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = e.id_emp "
-                    + "WHERE e.b_act = 1 AND e.id_emp IN(SELECT DISTINCT id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = e.id_emp "
+                    + "WHERE e.id_emp IN ("
+                    + "SELECT DISTINCT id_emp "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
-                    + "WHERE " + (moRadFilterTypeDateCut.isSelected() ? " dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateCut.getValue()) + "' AND " : "")
-                    + "per_year = " + moCalYear.getValue() + " " 
-                    + (moKeyPaymentType.getSelectedIndex() > 0 ? " AND pr.fk_tp_pay = " +  moKeyPaymentType.getValue()[0] : "") + " "
+                    + "WHERE p.fis_year = " + moCalYear.getValue() + " " + (!moRadFilterTypeDateCut.isSelected() ? "" : "AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateCut.getValue()) + "'") + " "
+                    + (moKeyPaymentType.getSelectedIndex() <= 0 ? "" : "AND p.fk_tp_pay = " +  moKeyPaymentType.getValue()[0]) + " "
                     + "ORDER BY id_emp)"
-                    + "ORDER BY bp, id_bp ";
+                    + "ORDER BY b.bp, b.id_bp ";
 
             resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
-                calculateEstimateISR = new SHrsCalculateEstimateISR();
+                SRowCalculateIncomeTax row = new SRowCalculateIncomeTax();
                 employeeId = resultSet.getInt("e.id_emp");
                 
                 dDaysHired = SHrsUtils.getEmployeeHireDays(SHrsUtils.getEmployeeHireLogs(miClient.getSession(), employeeId, mtDateStart, mtDateEnd), mtDateStart, mtDateEnd);
@@ -402,26 +415,28 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
                 amountEarningSubsidy = SHrsUtils.getAmountEarningByEmployee(miClient.getSession(), employeeId, SModSysConsts.HRSS_TP_EAR_TAX_SUB, periodYear, mtDateEnd);
                 dTableFactor = ((double) SHrsConsts.YEAR_MONTHS / (SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(periodYear) ? 1d : 0d))) * dDaysTaxable;
 
-                calculateEstimateISR.setEmployeeId(employeeId);
-                calculateEstimateISR.setCodeEmployee(resultSet.getString("e.num"));
-                calculateEstimateISR.setNameEmployee(resultSet.getString("bp.bp"));
-                calculateEstimateISR.setDaysHire(dDaysHired);
-                calculateEstimateISR.setDaysIncapacity(dDaysIncapacityNotPay);
-                calculateEstimateISR.setDaysTaxable(dDaysTaxable);
-                calculateEstimateISR.setAmountTaxable(amountEarnings.getAmountTaxable());
-                calculateEstimateISR.setAmountIncome(amountEarnings.getAmount());
-                calculateEstimateISR.setFactor(dTableFactor);
-                calculateEstimateISR.setIsStatus(resultSet.getBoolean("e.b_act"));
-                calculateEstimateISR.setCalculatedTax(SHrsUtils.computeAmoutTax(dbTaxTable, amountEarnings.getAmountTaxable(), dTableFactor));
-                calculateEstimateISR.setRetainedTax(SHrsUtils.getAmountDeductionByEmployee(miClient.getSession(), employeeId, SModSysConsts.HRSS_TP_DED_TAX, periodYear, mtDateEnd));
-                calculateEstimateISR.setCalculatedSubsidy(SHrsUtils.computeAmoutTaxSubsidy(dbSubsidyTable, amountEarnings.getAmountTaxable(), dTableFactor));
-                calculateEstimateISR.setGivenSubsidy(amountEarningSubsidy.getAmount());
+                row.setEmployeeId(employeeId);
+                row.setNameEmployee(resultSet.getString("b.bp"));
+                row.setCodeEmployee(resultSet.getString("e.num"));
+                row.setAmountTaxable(amountEarnings.getAmountTaxable());
+                row.setAmountIncome(amountEarnings.getAmount());
+                row.setDaysHire(dDaysHired);
+                row.setDaysIncapacity(dDaysIncapacityNotPay);
+                row.setDaysTaxable(dDaysTaxable);
+                row.setFactor(dTableFactor);
+                row.setCalculatedTax(SHrsUtils.computeAmoutTax(dbTaxTable, amountEarnings.getAmountTaxable(), dTableFactor));
+                row.setRetainedTax(SHrsUtils.getAmountDeductionByEmployee(miClient.getSession(), employeeId, SModSysConsts.HRSS_TP_DED_TAX, periodYear, mtDateEnd));
+                row.setCalculatedSubsidy(SHrsUtils.computeAmoutTaxSubsidy(dbSubsidyTable, amountEarnings.getAmountTaxable(), dTableFactor));
+                row.setGivenSubsidy(amountEarningSubsidy.getAmount());
+                row.setIsStatus(resultSet.getBoolean("e.b_act"));
+                row.setDateHire(resultSet.getDate("e.dt_hire"));
+                row.setDateDismisss_n(resultSet.getDate("e.dt_dis_n"));
                 
-                rows.add(calculateEstimateISR);
+                rows.add(row);
             }
         }
         catch (Exception e) {
-           SLibUtils.printException(this, e);
+           SLibUtils.showException(this, e);
         }
         
         moGridEmployeesRow.populateGrid(rows);
@@ -524,11 +539,9 @@ public class SDialogCalculateEstimateIncomeTax extends SBeanFormDialog implement
     @Override
     public void stateChanged(ChangeEvent e) {
         if (e.getSource() instanceof SBeanFieldRadio) {
-            if ((SBeanFieldRadio) e.getSource() == moRadFilterTypeDateCut ||
-                    (SBeanFieldRadio) e.getSource() == moRadFilterTypeYear) {
+            if ((SBeanFieldRadio) e.getSource() == moRadFilterTypeDateCut || (SBeanFieldRadio) e.getSource() == moRadFilterTypeYear) {
                 actionEnableFieldsTypeCal();
             }
-            
         }
         else if (e.getSource() instanceof JSpinner) {
             SBeanFieldCalendarYear spinner = (SBeanFieldCalendarYear) e.getSource();

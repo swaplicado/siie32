@@ -24,7 +24,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDataFiscalYearClosing extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -115,7 +115,7 @@ public class SDataFiscalYearClosing extends erp.lib.data.SDataRegistry implement
                     "" + (rs.getString("fid_cc_n") == null ? "NULL" : "'" + rs.getString("fid_cc_n") + "'") + ", " +
                     "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, " +
                     "NULL, NULL, NULL, NULL, NULL, " +
-                    "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, " +
+                    "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, " +
                     "" + (rs.getInt("fid_item_n") == 0 ? "NULL" : rs.getInt("fid_item_n")) + ", NULL, " +
                     "" + (rs.getInt("fid_unit_n") == 0 ? "NULL" : rs.getInt("fid_unit_n")) + ", " +
                     "NULL, NULL, " +
@@ -148,7 +148,7 @@ public class SDataFiscalYearClosing extends erp.lib.data.SDataRegistry implement
                     "NULL, " +  // no cost center needed
                     "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, " +
                     "NULL, NULL, " + mnPkYearId + ", NULL, NULL, " +
-                    "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, " +
+                    "NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, " +
                     "" + (rs.getInt("fid_item_n") == 0 ? "NULL" : rs.getInt("fid_item_n")) + ", NULL, " +
                     "" + (rs.getInt("fid_unit_n") == 0 ? "NULL" : rs.getInt("fid_unit_n")) + ", " +
                     "NULL, NULL, " +

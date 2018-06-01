@@ -20,9 +20,11 @@ import sa.lib.SLibConsts;
  * Every single change made to the definition of this class' table must be updated also in the following classes:
  * - erp.mfin.data.SDataFiscalYearClosing
  * - erp.mfin.data.SDataFiscalYearOpening
- * - erp.mfin.data.SDataRecord
+ * - erp.util.imp.ImportAccountingRecords
+ * - erp.util.imp.ImportAccountingRecordsMicroSip
  * - erp.mod.hrs.db.SHrsFinUtils
- * All of them also make raw SQL insertions.
+ * - erp.mfin.data.SDataRecord
+ * All of them execute raw SQL queries and insertions.
  */
 
 /**
@@ -88,6 +90,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     protected int mnFkDiogDocId_n;
     protected int mnFkMfgYearId_n;
     protected int mnFkMfgOrdId_n;
+    protected int mnFkCfdId_n;
     protected int mnFkCostGicId_n;
     protected int mnFkPayrollFormerId_n;
     protected int mnFkPayrollId_n;
@@ -191,6 +194,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public void setFkDiogDocId_n(int n) { mnFkDiogDocId_n = n; }
     public void setFkMfgYearId_n(int n) { mnFkMfgYearId_n = n; }
     public void setFkMfgOrdId_n(int n) { mnFkMfgOrdId_n = n; }
+    public void setFkCfdId_n(int n) { mnFkCfdId_n = n; }
     public void setFkCostGicId_n(int n) { mnFkCostGicId_n = n; }
     public void setFkPayrollFormerId_n(int n) { mnFkPayrollFormerId_n = n; }
     public void setFkPayrollId_n(int n) { mnFkPayrollId_n = n; }
@@ -261,6 +265,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public int getFkDiogDocId_n() { return mnFkDiogDocId_n; }
     public int getFkMfgYearId_n() { return mnFkMfgYearId_n; }
     public int getFkMfgOrdId_n() { return mnFkMfgOrdId_n; }
+    public int getFkCfdId_n() { return mnFkCfdId_n; }
     public int getFkCostGicId_n() { return mnFkCostGicId_n; }
     public int getFkPayrollFormerId_n() { return mnFkPayrollFormerId_n; }
     public int getFkPayrollId_n() { return mnFkPayrollId_n; }
@@ -407,6 +412,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         mnFkDiogDocId_n = 0;
         mnFkMfgYearId_n = 0;
         mnFkMfgOrdId_n = 0;
+        mnFkCfdId_n = 0;
         mnFkCostGicId_n = 0;
         mnFkPayrollFormerId_n = 0;
         mnFkPayrollId_n = 0;
@@ -544,6 +550,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 mnFkDiogDocId_n = resultSet.getInt("re.fid_diog_doc_n");
                 mnFkMfgYearId_n = resultSet.getInt("re.fid_mfg_year_n");
                 mnFkMfgOrdId_n = resultSet.getInt("re.fid_mfg_ord_n");
+                mnFkCfdId_n = resultSet.getInt("re.fid_cfd_n");
                 mnFkCostGicId_n = resultSet.getInt("re.fid_cost_gic_n");
                 mnFkPayrollFormerId_n = resultSet.getInt("re.fid_payroll_n");
                 mnFkPayrollId_n = resultSet.getInt("re.fid_pay_n");
@@ -731,7 +738,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkPeriodId);
             callableStatement.setInt(nParam++, mnPkBookkeepingCenterId);
@@ -787,6 +794,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
             if (mnFkDiogDocId_n > 0) callableStatement.setInt(nParam++, mnFkDiogDocId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkMfgYearId_n > 0) callableStatement.setInt(nParam++, mnFkMfgYearId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             if (mnFkMfgOrdId_n > 0) callableStatement.setInt(nParam++, mnFkMfgOrdId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkCfdId_n > 0) callableStatement.setInt(nParam++, mnFkCfdId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkCostGicId_n > 0) callableStatement.setInt(nParam++, mnFkCostGicId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
             if (mnFkPayrollFormerId_n > 0) callableStatement.setInt(nParam++, mnFkPayrollFormerId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkPayrollId_n > 0) callableStatement.setInt(nParam++, mnFkPayrollId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
@@ -907,6 +915,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         clone.setFkDiogDocId_n(mnFkDiogDocId_n);
         clone.setFkMfgYearId_n(mnFkMfgYearId_n);
         clone.setFkMfgOrdId_n(mnFkMfgOrdId_n);
+        clone.setFkCfdId_n(mnFkCfdId_n);
         clone.setFkCostGicId_n(mnFkCostGicId_n);
         clone.setFkPayrollFormerId_n(mnFkPayrollFormerId_n);
         clone.setFkPayrollId_n(mnFkPayrollId_n);

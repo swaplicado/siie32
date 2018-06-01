@@ -1075,12 +1075,12 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel49.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkDefaultItemRefId_n.setText("Ítem de referencia predeterminado:");
-        jlFkDefaultItemRefId_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlFkDefaultItemRefId_n.setText("Ítem referencia predeterminado:");
+        jlFkDefaultItemRefId_n.setPreferredSize(new java.awt.Dimension(165, 23));
         jPanel49.add(jlFkDefaultItemRefId_n);
 
         jcbFkDefaultItemRefId_n.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkDefaultItemRefId_n.setPreferredSize(new java.awt.Dimension(250, 23));
+        jcbFkDefaultItemRefId_n.setPreferredSize(new java.awt.Dimension(325, 23));
         jPanel49.add(jcbFkDefaultItemRefId_n);
 
         jbFkDefaultItemRefId_n.setText("...");
@@ -1094,8 +1094,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel44.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkAdministrativeConceptTypeId.setText("Tipo de concepto administrativo: *");
-        jlFkAdministrativeConceptTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlFkAdministrativeConceptTypeId.setText("Tipo concepto administrativo: *");
+        jlFkAdministrativeConceptTypeId.setPreferredSize(new java.awt.Dimension(165, 23));
         jPanel44.add(jlFkAdministrativeConceptTypeId);
 
         jcbFkAdministrativeConceptTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -1113,8 +1113,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel43.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel43.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkTaxableConceptTypeId.setText("Tipo de concepto impuestos: *");
-        jlFkTaxableConceptTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlFkTaxableConceptTypeId.setText("Tipo concepto impuestos: *");
+        jlFkTaxableConceptTypeId.setPreferredSize(new java.awt.Dimension(165, 23));
         jPanel43.add(jlFkTaxableConceptTypeId);
 
         jcbFkTaxableConceptTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -1133,7 +1133,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel47.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkAccountEbitdaTypeId.setText("Tipo cuenta EBITDA: *");
-        jlFkAccountEbitdaTypeId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlFkAccountEbitdaTypeId.setPreferredSize(new java.awt.Dimension(165, 23));
         jPanel47.add(jlFkAccountEbitdaTypeId);
 
         jcbFkAccountEbitdaTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -1151,12 +1151,12 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel45.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkFiscalAccountIncId.setText("Código agrupador SAT (ingresos): *");
-        jlFkFiscalAccountIncId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlFkFiscalAccountIncId.setText("Código agrup. SAT (ingresos): *");
+        jlFkFiscalAccountIncId.setPreferredSize(new java.awt.Dimension(165, 23));
         jPanel45.add(jlFkFiscalAccountIncId);
 
         jcbFkFiscalAccountIncId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkFiscalAccountIncId.setPreferredSize(new java.awt.Dimension(250, 23));
+        jcbFkFiscalAccountIncId.setPreferredSize(new java.awt.Dimension(325, 23));
         jPanel45.add(jcbFkFiscalAccountIncId);
 
         jbFkFiscalAccountIncId.setText("...");
@@ -1170,12 +1170,12 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel46.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkFiscalAccountExpId.setText("Código agrupador SAT (egresos): *");
-        jlFkFiscalAccountExpId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlFkFiscalAccountExpId.setText("Código agrup. SAT (egresos): *");
+        jlFkFiscalAccountExpId.setPreferredSize(new java.awt.Dimension(165, 23));
         jPanel46.add(jlFkFiscalAccountExpId);
 
         jcbFkFiscalAccountExpId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkFiscalAccountExpId.setPreferredSize(new java.awt.Dimension(250, 23));
+        jcbFkFiscalAccountExpId.setPreferredSize(new java.awt.Dimension(325, 23));
         jPanel46.add(jcbFkFiscalAccountExpId);
 
         jbFkFiscalAccountExpId.setText("...");
@@ -1194,7 +1194,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel48.add(jlFkCfdProdServId_n);
 
         moKeyCfdProdServId_n.setMaximumRowCount(20);
-        moKeyCfdProdServId_n.setPreferredSize(new java.awt.Dimension(400, 23));
+        moKeyCfdProdServId_n.setPreferredSize(new java.awt.Dimension(418, 23));
         jPanel48.add(moKeyCfdProdServId_n);
 
         jPanel2.add(jPanel48);

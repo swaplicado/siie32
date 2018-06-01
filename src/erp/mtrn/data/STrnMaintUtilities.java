@@ -20,9 +20,10 @@ public abstract class STrnMaintUtilities {
     public static int getLastMaintDiogSignature(final Statement statement, final int[] diogKey) throws Exception {
         int id = SLibConstants.UNDEFINED;
         
-        String sql = "SELECT MAX(id_maint_diog_sig) "
-                + "FROM trn_maint_diog_sig "
-                + "WHERE fk_diog_year = " + diogKey[0] + " AND fk_diog_doc = " + diogKey[1] + " ";
+        String sql = "SELECT MAX(mds.id_maint_diog_sig) "
+                + "FROM trn_maint_diog_sig AS mds "
+                + "INNER JOIN trn_diog AS d ON mds.fk_diog_year = d.id_year AND mds.fk_diog_doc = d.id_doc AND mds.ts_usr_ins >= d.ts_edit "
+                + "WHERE mds.fk_diog_year = " + diogKey[0] + " AND mds.fk_diog_doc = " + diogKey[1] + " ";
         ResultSet resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
             id = resultSet.getInt(1);

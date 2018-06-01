@@ -125,6 +125,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msDbmsItem;
     protected java.lang.String msDbmsUnitSymbol;
     protected java.lang.String msDbmsOriginalUnitSymbol;
+    protected double mdDbmsOriginalUnitBaseEquivalence;
     protected java.lang.String msDbmsTaxRegion;
     protected java.lang.String msDbmsDpsAdjustmentType;
     protected java.lang.String msDbmsDpsEntryType;
@@ -134,9 +135,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msDbmsItemClaveProdServ;
     protected java.lang.String msDbmsUnidadClave;
     protected java.lang.String msDbmsOriginalUnidadClave;
-    protected java.lang.String msDbmsTariffFraction;
+    protected java.lang.String msDbmsTariff;
     protected java.lang.String msDbmsCustomsUnit;
     protected java.lang.String msDbmsCustomsUnitSymbol;
+    protected java.lang.String msDbmsItemCustomsUnitSymbol;
+    protected double mdDbmsItemCustomsUnitEquivalence;
     protected int mnDbmsDpsAddBachocoNumberPosition;
     protected java.lang.String msDbmsDpsAddBachocoCenter;
     protected int mnDbmsDpsAddLorealEntryNumber;
@@ -385,6 +388,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsItem(java.lang.String s) { msDbmsItem = s; }
     public void setDbmsUnitSymbol(java.lang.String s) { msDbmsUnitSymbol = s; }
     public void setDbmsOriginalUnitSymbol(java.lang.String s) { msDbmsOriginalUnitSymbol = s; }
+    public void setDbmsOriginalUnitBaseEquivalence(double d) { mdDbmsOriginalUnitBaseEquivalence = d; }
     public void setDbmsTaxRegion(java.lang.String s) { msDbmsTaxRegion = s; }
     public void setDbmsDpsAdjustmentType(java.lang.String s) { msDbmsDpsAdjustmentType = s; }
     public void setDbmsDpsEntryType(java.lang.String s) { msDbmsDpsEntryType = s; }
@@ -394,9 +398,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsItemClaveProdServ (java.lang.String s) { msDbmsItemClaveProdServ = s; }
     public void setDbmsUnidadClave(java.lang.String s) { msDbmsUnidadClave = s; }
     public void setDbmsOriginalUnidadClave(java.lang.String s) { msDbmsOriginalUnidadClave = s; }
-    public void setDbmsTariffFraction(java.lang.String s) { msDbmsTariffFraction = s; }
+    public void setDbmsTariff(java.lang.String s) { msDbmsTariff = s; }
     public void setDbmsCustomsUnit(java.lang.String s) { msDbmsCustomsUnit = s; }
     public void setDbmsCustomsUnitSymbol(java.lang.String s) { msDbmsCustomsUnitSymbol = s; }
+    public void setDbmsItemCustomsUnitSymbol(java.lang.String s) { msDbmsItemCustomsUnitSymbol = s; }
+    public void setDbmsItemCustomsUnitEquivalence(double d) { mdDbmsItemCustomsUnitEquivalence = d; }
     public void setDbmsDpsAddBachocoNumberPosition(int n) { mnDbmsDpsAddBachocoNumberPosition = n; }
     public void setDbmsDpsAddBachocoCenter(java.lang.String s) { msDbmsDpsAddBachocoCenter = s; }
     public void setDbmsDpsAddLorealEntryNumber(int n) { mnDbmsDpsAddLorealEntryNumber = n; }
@@ -415,6 +421,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getDbmsItem() { return msDbmsItem; }
     public java.lang.String getDbmsUnitSymbol() { return msDbmsUnitSymbol; }
     public java.lang.String getDbmsOriginalUnitSymbol() { return msDbmsOriginalUnitSymbol; }
+    public double getDbmsOriginalUnitBaseEquivalence() { return mdDbmsOriginalUnitBaseEquivalence; }
     public java.lang.String getDbmsTaxRegion() { return msDbmsTaxRegion; }
     public java.lang.String getDbmsDpsAdjustmentType() { return msDbmsDpsAdjustmentType; }
     public java.lang.String getDbmsDpsEntryType() { return msDbmsDpsEntryType; }
@@ -424,9 +431,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getDbmsItemClaveProdServ() { return msDbmsItemClaveProdServ; }
     public java.lang.String getDbmsUnidadClave() { return msDbmsUnidadClave; }
     public java.lang.String getDbmsOriginalUnidadClave() { return msDbmsOriginalUnidadClave; }
-    public java.lang.String getDbmsTariffFraction() { return msDbmsTariffFraction; }
+    public java.lang.String getDbmsTariff() { return msDbmsTariff; }
     public java.lang.String getDbmsCustomsUnit() { return msDbmsCustomsUnit; }
     public java.lang.String getDbmsCustomsUnitSymbol() { return msDbmsCustomsUnitSymbol; }
+    public java.lang.String getDbmsItemCustomsUnitSymbol() { return msDbmsItemCustomsUnitSymbol; }
+    public double getDbmsItemCustomsUnitEquivalence() { return mdDbmsItemCustomsUnitEquivalence; }
     public int getDbmsDpsAddBachocoNumberPosition() { return mnDbmsDpsAddBachocoNumberPosition; }
     public java.lang.String getDbmsDpsAddBachocoCenter() { return msDbmsDpsAddBachocoCenter; }
     public int getDbmsDpsAddLorealEntryNumber() { return mnDbmsDpsAddLorealEntryNumber; }
@@ -587,6 +596,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         msDbmsItem = "";
         msDbmsUnitSymbol = "";
         msDbmsOriginalUnitSymbol = "";
+        mdDbmsOriginalUnitBaseEquivalence = 0;
         msDbmsTaxRegion = "";
         msDbmsDpsAdjustmentType = "";
         msDbmsDpsEntryType = "";
@@ -596,9 +606,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         msDbmsItemClaveProdServ = "";
         msDbmsUnidadClave = "";
         msDbmsOriginalUnidadClave = "";
-        msDbmsTariffFraction = "";
+        msDbmsTariff = "";
         msDbmsCustomsUnit = "";
         msDbmsCustomsUnitSymbol = "";
+        msDbmsItemCustomsUnitSymbol = "";
+        mdDbmsItemCustomsUnitEquivalence = 0;
         mnDbmsDpsAddBachocoNumberPosition = 0;
         msDbmsDpsAddBachocoCenter = "";
         mnDbmsDpsAddLorealEntryNumber = 0;
@@ -646,9 +658,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
         try {
             sql = "SELECT de.*, " +
-                    "i.item, i.fid_cfd_prod_serv_n, i.tariff, i.fid_igen, " +
+                    "i.item, i.fid_cfd_prod_serv_n, i.tariff, i.custs_unit, i.custs_equiv, i.fid_igen, " +
                     "igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, igen.fid_cfd_prod_serv, " +
-                    "u.symbol, ou.symbol, ou.symbol_custs, ou.unit_custs, cu.code, ocu.code, " +
+                    "u.symbol, ou.symbol, ou.unit_base_equiv, ou.symbol_custs, ou.unit_custs, cu.code, ocu.code, " +
                     "tr.tax_reg, tda.stp_dps_adj, tde.tp_dps_ety, cc.code, cc.cc, ir.item, ade.bac_num_pos, ade.bac_cen, ade.lor_num_ety, ade.sor_cod, " +
                     "ade.ele_ord, ade.ele_barc, ade.ele_cag, ade.ele_cag_price_u, ade.ele_par, ade.ele_par_price_u " +
                     "FROM trn_dps_ety AS de " +
@@ -777,6 +789,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 msDbmsItem = resultSet.getString("i.item");
                 msDbmsUnitSymbol = resultSet.getString("u.symbol");
                 msDbmsOriginalUnitSymbol = resultSet.getString("ou.symbol");
+                mdDbmsOriginalUnitBaseEquivalence = resultSet.getDouble("ou.unit_base_equiv");
                 msDbmsTaxRegion = resultSet.getString("tr.tax_reg");
                 msDbmsDpsAdjustmentType = resultSet.getString("tda.stp_dps_adj");
                 msDbmsDpsEntryType = resultSet.getString("tde.tp_dps_ety");
@@ -835,9 +848,11 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
                 msDbmsUnidadClave = resultSet.getString("cu.code");
                 msDbmsOriginalUnidadClave = resultSet.getString("ocu.code");
-                msDbmsTariffFraction = resultSet.getString("i.tariff");
+                msDbmsTariff = resultSet.getString("i.tariff");
                 msDbmsCustomsUnit = resultSet.getString("ou.unit_custs");
                 msDbmsCustomsUnitSymbol = resultSet.getString("ou.symbol_custs");
+                msDbmsItemCustomsUnitSymbol = resultSet.getString("i.custs_unit");
+                mdDbmsItemCustomsUnitEquivalence = resultSet.getDouble("i.custs_equiv");
                 
                 statementAux = statement.getConnection().createStatement();
                 
@@ -1695,6 +1710,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setDbmsItem(msDbmsItem);
         clone.setDbmsUnitSymbol(msDbmsUnitSymbol);
         clone.setDbmsOriginalUnitSymbol(msDbmsOriginalUnitSymbol);
+        clone.setDbmsOriginalUnitBaseEquivalence(mdDbmsOriginalUnitBaseEquivalence);
         clone.setDbmsTaxRegion(msDbmsTaxRegion);
         clone.setDbmsDpsAdjustmentType(msDbmsDpsAdjustmentType);
         clone.setDbmsDpsEntryType(msDbmsDpsEntryType);
@@ -1705,6 +1721,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setDbmsOriginalUnidadClave(msDbmsOriginalUnidadClave);
         clone.setDbmsCustomsUnit(msDbmsCustomsUnit);
         clone.setDbmsCustomsUnitSymbol(msDbmsCustomsUnitSymbol);
+        clone.setDbmsItemCustomsUnitSymbol(msDbmsItemCustomsUnitSymbol);
+        clone.setDbmsItemCustomsUnitEquivalence(mdDbmsItemCustomsUnitEquivalence);
         clone.setDbmsDpsAddBachocoNumberPosition(mnDbmsDpsAddBachocoNumberPosition);
         clone.setDbmsDpsAddBachocoCenter(msDbmsDpsAddBachocoCenter);
         clone.setDbmsDpsAddLorealEntryNumber(mnDbmsDpsAddLorealEntryNumber);

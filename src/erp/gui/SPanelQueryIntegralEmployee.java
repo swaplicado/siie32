@@ -1348,7 +1348,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             paymentDaily = (employee.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? employee.getSalary() :
                 (config.isFornightStandard() ? ((employee.getWage() * SHrsConsts.YEAR_MONTHS) / (SHrsConsts.FORNIGHT_FIXED_DAYS * SHrsConsts.YEAR_FORNIGHTS)) :
                 ((employee.getWage() * SHrsConsts.YEAR_MONTHS) / SHrsConsts.YEAR_DAYS)));
-            settlementPaymentDaily = (employee.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? employee.getSalary() : (employee.getWage() / 30.04));
+            //settlementPaymentDaily = (employee.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? employee.getSalary() : (employee.getWage() / 30.04));
+            settlementPaymentDaily = (employee.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? employee.getSalary() : (employee.getWage() / SHrsConsts.MONTH_DAYS_FIXED));
             
             if (employee.getDateBenefits().compareTo(SLibTimeUtils.getBeginOfYear(mtDateCut)) >= 0) {
                 mtDateBaseAnn = employee.getDateBenefits();
@@ -1410,40 +1411,41 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         }   
     }
     
+    /**
+     * Render settlement amounts.
+     * @param seniority Worked years.
+     * @param seniorityDays Worked days in last year.
+     * @param settlementPaymentDaily Daily payment for settlement.
+     * @param mwzReferenceId ID of Reference Minimum-Wage-Zone.
+     * @throws Exception 
+     */
     private void renderSettlement(int seniority, int seniorityDays, double settlementPaymentDaily, int mwzReferenceId) throws Exception {
         double settlement = 0;
         double rjdj = 0;
         double disl = 0;
         double dicl = 0;
-        double MwzReferenceWage = 0;
+        double mwzReferenceWage = SHrsUtils.getRecentMwz(miClient.getSession(), mwzReferenceId, miClient.getSession().getCurrentDate());
         
-        MwzReferenceWage = SHrsUtils.getRecentMwz(miClient.getSession(), mwzReferenceId, miClient.getSession().getCurrentDate());
+        settlement = 
+                Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) +
+                Double.parseDouble(jtfVacationsPayProp.getText().replaceAll(",", "")) +
+                Double.parseDouble(jtfVacationsBonusPayProp.getText().replaceAll(",", ""));
         
-        settlement = Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsBonusPayProp.getText().replaceAll(",", ""));;
-        
-        /*
-        rjdj = Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsBonusPayProp.getText().replaceAll(",", ""));
-        disl = Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsBonusPayProp.getText().replaceAll(",", ""));
-        dicl = Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsPayProp.getText().replaceAll(",", "")) + Double.parseDouble(jtfVacationsBonusPayProp.getText().replaceAll(",", ""));
-        */
         rjdj = settlement;
         disl = settlement;
         dicl = settlement;
         
-        if (seniority >= SHrsConsts.RET_BONUS_YEARS_MIN) {
-            rjdj += SHrsConsts.RET_BONUS_DAYS_PER_YEAR *
-                    (settlementPaymentDaily > (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) ? (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) : settlementPaymentDaily) *
-                    ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS));
-        }
-        disl += SHrsConsts.RET_BONUS_DAYS_PER_YEAR *
-                (settlementPaymentDaily > (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) ? (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) : settlementPaymentDaily) *
-                ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS));
-        dicl += SHrsConsts.RET_BONUS_DAYS_PER_YEAR *
-                (settlementPaymentDaily > (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) ? (SHrsConsts.RET_BONUS_DMW_LIMIT * MwzReferenceWage) : settlementPaymentDaily) *
+        double bonus = SHrsConsts.RET_BONUS_DAYS_PER_YEAR *
+                (settlementPaymentDaily > (SHrsConsts.RET_BONUS_DMW_LIMIT * mwzReferenceWage) ? (SHrsConsts.RET_BONUS_DMW_LIMIT * mwzReferenceWage) : settlementPaymentDaily) *
                 ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS));
         
-        disl += (SHrsConsts.DIS_COMP_MONTHS * SHrsConsts.MONTH_DAYS_FIXED) * settlementPaymentDaily;
-        dicl += ((SHrsConsts.DIS_COMP_MONTHS * SHrsConsts.MONTH_DAYS_FIXED) * settlementPaymentDaily) +
+        if (seniority >= SHrsConsts.RET_BONUS_YEARS_MIN) {
+            rjdj += bonus;
+        }
+        
+        disl += bonus + ((SHrsConsts.DIS_COMP_MONTHS * SHrsConsts.MONTH_DAYS_FIXED) * settlementPaymentDaily);
+        
+        dicl += bonus + ((SHrsConsts.DIS_COMP_MONTHS * SHrsConsts.MONTH_DAYS_FIXED) * settlementPaymentDaily) +
                 (SHrsConsts.DIS_COMP_DAYS_PER_YEAR * ((double) seniority + ((double) seniorityDays / SHrsConsts.YEAR_DAYS)) * settlementPaymentDaily);
         
         jtfSettlement.setText(SLibUtils.DecimalFormatValue2D.format(settlement) + "");

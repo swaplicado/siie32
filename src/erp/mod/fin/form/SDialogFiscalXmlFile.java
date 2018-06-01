@@ -32,7 +32,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores
+// * @author Sergio Flores, Claudio Peña
  */
 public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListener {
 
@@ -201,6 +201,7 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         jPanel5.setLayout(new java.awt.GridLayout(5, 1));
 
         jbgXmlFile.add(moRadXmlFileChartOfAccounts);
+        moRadXmlFileChartOfAccounts.setSelected(true);
         moRadXmlFileChartOfAccounts.setText("Catálogo de cuentas utilizado en el período");
         jPanel5.add(moRadXmlFileChartOfAccounts);
 
@@ -314,7 +315,7 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         jPanel17.add(moTextRequestTransaction);
 
         jLabel6.setForeground(java.awt.SystemColor.textInactiveText);
-        jLabel6.setText("0000000000");
+        jLabel6.setText("AA00000000000");
         jLabel6.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel17.add(jLabel6);
 
@@ -458,7 +459,7 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         moRadRequestDe.setBooleanSettings(moRadRequestDe.getText(), false);
         moRadRequestCo.setBooleanSettings(moRadRequestCo.getText(), false);
         moTextRequestOrder.setTextSettings(SGuiUtils.getLabelName(jlRequestOrder), 13, 13);
-        moTextRequestTransaction.setTextSettings(SGuiUtils.getLabelName(jlRequestTransaction), 10, 10);
+        moTextRequestTransaction.setTextSettings(SGuiUtils.getLabelName(jlRequestTransaction), 14, 14);
 
         moPanelAccountStart.setPanelSettings(miClient, SAccountConsts.TYPE_ACCOUNT, false, true, false);
         moPanelAccountStart.setAccountNameWidth(300);
@@ -686,7 +687,7 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
             default:
         }
 
-        moRadXmlFileTrialSheet.setSelected(true);
+        moRadXmlFileChartOfAccounts.setSelected(true);
 
         itemStateXmlFile();
         itemStateTrialSheet();
@@ -794,17 +795,13 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
     @Override
     public void actionSave() {
-        boolean computeXml = true;
-        String name = "";
-        SDbBizPartner company = null;
-        SXmlDocument doc = null;
-        SDialogFiscalXmlFileChartOfAccounts dialogChartOfAccounts = null;
-
         if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
                 try {
+                    boolean computeXml = true;
+                    
                     if (moRadXmlFileChartOfAccounts.isSelected()) {
-                        dialogChartOfAccounts = new SDialogFiscalXmlFileChartOfAccounts(miClient, "Configuración del catálogo de cuentas utilizado en el período");
+                        SDialogFiscalXmlFileChartOfAccounts dialogChartOfAccounts = new SDialogFiscalXmlFileChartOfAccounts(miClient, "Configuración del catálogo de cuentas utilizado en el período");
                         dialogChartOfAccounts.setValue(SGuiConsts.PARAM_DATE, new int[] { (int) jsYear.getValue(), mnMonth });
                         dialogChartOfAccounts.initForm();
                         dialogChartOfAccounts.setVisible(true);
@@ -812,6 +809,9 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
                     }
 
                     if (computeXml) {
+                        String name = "";
+                        SDbBizPartner company = null;
+                        
                         if (moRadXmlFileChartOfAccounts.isSelected()) {
                             name = SFiscalConsts.XML_COA;
                         }
@@ -833,22 +833,24 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
                         miClient.getFileChooser().setSelectedFile(new File(name));
                         if (miClient.getFileChooser().showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                            SXmlDocument doc = null;
+                            
                             if (moRadXmlFileChartOfAccounts.isSelected()) {
-                                doc = SFiscalUtils.createDocCatalogo11(miClient.getSession(), (int) jsYear.getValue(), mnMonth);
+                                doc = SFiscalUtils.createDocCatalogo13(miClient.getSession(), (int) jsYear.getValue(), mnMonth);
                             }
                             else if (moRadXmlFileTrialSheet.isSelected()) {
-                                doc = SFiscalUtils.createDocBalanza11(miClient.getSession(), (int) jsYear.getValue(), mnMonth,
+                                doc = SFiscalUtils.createDocBalanza13(miClient.getSession(), (int) jsYear.getValue(), mnMonth,
                                         moRadTrialSheetNormal.isSelected() ? SFiscalConsts.TRS_NOR : SFiscalConsts.TRS_CMP, moRadTrialSheetNormal.isSelected() ? null : moDateTrialSheetLastModification.getValue());
                             }
                             else if (moRadXmlFileJournalVouchers.isSelected()) {
-                                doc = SFiscalUtils.createDocPolizas11(miClient.getSession(), (int) jsYear.getValue(), mnMonth,
+                                doc = SFiscalUtils.createDocPolizas13(miClient.getSession(), (int) jsYear.getValue(), mnMonth,
                                         moRadRequestAf.isSelected() ? SFiscalConsts.JOV_REQ_TP_AF : SFiscalConsts.JOV_REQ_TP_FC, moTextRequestOrder.getValue(), moTextRequestTransaction.getValue());
                             }
                             else if (moRadXmlFileDetailedCfdi.isSelected()) {
-
+                                // do not needed actually
                             }
                             else if (moRadXmlFileDetailedLedger.isSelected()) {
-                                doc = SFiscalUtils.createDocAuxiliarCtas11(miClient.getSession(), (int) jsYear.getValue(), mnMonth,
+                                doc = SFiscalUtils.createDocAuxiliarCtas13(miClient.getSession(), (int) jsYear.getValue(), mnMonth,
                                         moRadRequestAf.isSelected() ? SFiscalConsts.JOV_REQ_TP_AF : SFiscalConsts.JOV_REQ_TP_FC, moTextRequestOrder.getValue(), moTextRequestTransaction.getValue(),
                                         moPanelAccountStart.getSelectedAccount() == null ? "" : moPanelAccountStart.getSelectedAccount().getCodeStd(),
                                         moPanelAccountEnd.getSelectedAccount() == null ? "" : moPanelAccountEnd.getSelectedAccount().getCodeStd());
@@ -869,7 +871,7 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
     @Override
     public void itemStateChanged(ItemEvent e) {
         if (e.getSource() instanceof SBeanFieldRadio) {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {            
                 SBeanFieldRadio field = (SBeanFieldRadio) e.getSource();
 
                 if (field == moRadMonth01) {

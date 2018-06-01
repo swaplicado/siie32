@@ -20,7 +20,8 @@ import sa.lib.SLibUtils;
  * - erp.mfin.data.SDataFiscalYearOpening
  * - erp.util.imp.ImportAccountingRecords
  * - erp.util.imp.ImportAccountingRecordsMicroSip
- * All of them also make raw SQL insertions.
+ * - erp.mod.hrs.db.SHrsFinUtils
+ * All of them also make raw SQL queries and insertions.
  */
 
 /**
@@ -154,12 +155,28 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     public erp.mfin.data.SDataAccountCash getDbmsDataAccountCash() { return moDbmsDataAccountCash; }
     public java.util.Vector<SDataRecordEntry> getDbmsRecordEntries() { return mvDbmsRecordEntries; }
 
+    /**
+     * Composes record period in format yyyy-mm (i.e., year-month).
+     * @return 
+     */
     public java.lang.String getRecordPeriod() {
         return SLibUtils.DecimalFormatCalendarYear.format(mnPkYearId) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(mnPkPeriodId);
     }
 
+    /**
+     * Composes record number in format tp-000000 (i.e., type-number).
+     * @return 
+     */
     public java.lang.String getRecordNumber() {
         return msPkRecordTypeId + "-" + SLibUtils.DecimalNumberFormat.format(mnPkNumberId);
+    }
+
+    /**
+     * Composes record primary key in format yyyy-mm-0-tp-000000 (i.e., year-month-BKC-type-number).
+     * @return 
+     */
+    public String getRecordPrimaryKey() {
+        return getRecordPeriod() + "-" + mnPkBookkeepingCenterId + "-" + getRecordNumber();
     }
 
     @Override

@@ -117,6 +117,7 @@ public class SDataFiscalYearOpening extends erp.lib.data.SDataRegistry implement
                     "NULL, NULL, " +    // DPS adjustment
                     "NULL, NULL, " +    // DIOG
                     "NULL, NULL, " +    // manufacturing order
+                    "NULL, " +          // CFD
                     "NULL, " +          // group of indirect costs
                     "NULL, " +          // payroll (former)
                     "NULL, " +          // payroll

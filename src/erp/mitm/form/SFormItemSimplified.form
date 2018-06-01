@@ -399,7 +399,7 @@
                       </StringArray>
                     </Property>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[400, 23]"/>
+                      <Dimension value="[300, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -446,7 +446,7 @@
                       </StringArray>
                     </Property>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[400, 23]"/>
+                      <Dimension value="[500, 23]"/>
                     </Property>
                   </Properties>
                   <AuxValues>
@@ -507,7 +507,7 @@
                       </StringArray>
                     </Property>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[400, 23]"/>
+                      <Dimension value="[500, 23]"/>
                     </Property>
                   </Properties>
                   <AuxValues>
@@ -561,7 +561,7 @@
                   <Properties>
                     <Property name="maximumRowCount" type="int" value="20"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[400, 23]"/>
+                      <Dimension value="[500, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
