@@ -582,7 +582,7 @@ public class SFormItemSimplified extends javax.swing.JDialog implements erp.lib.
         nYear = miClient.getSessionXXX().getSystemYear();
 
         try {
-            stock = STrnUtilities.obtainStock(miClient, nYear, moItem.getPkItemId(), moItem.getFkUnitId(), SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getSystemDate()));
+            stock = STrnUtilities.obtainStock(miClient, nYear, moItem.getPkItemId(), moItem.getFkUnitId(), SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getSystemDate()), null);
         }
         catch (Exception e) {
             SLibUtilities.printOutException(this, e);

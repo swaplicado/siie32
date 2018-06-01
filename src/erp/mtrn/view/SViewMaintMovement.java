@@ -1,4 +1,4 @@
-/*
+/*{
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -27,22 +27,21 @@ import erp.table.STabFilterCompanyBranchEntity;
 import erp.table.STabFilterDocumentType;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
-import sa.lib.SLibUtils;
 
 /**
  *
  * @author Sergio Flores
  */
-public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
+public class SViewMaintMovement extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private javax.swing.JButton jbAdjIn1;
     private javax.swing.JButton jbAdjIn2;
     private javax.swing.JButton jbAdjOut1;
     private javax.swing.JButton jbAdjOut2;
+    private javax.swing.JButton mjbViewDps;
     private javax.swing.JButton jbViewNotes;
     private javax.swing.JButton jbPrint;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
@@ -56,8 +55,8 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
      * @param tabTitle GUI-tab title.
      * @param auxType01 Use case of view: SModSysConsts.TRNX_MAINT_...
      */
-    public SViewMaintDiog(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
-        super(client, tabTitle, SDataConstants.TRNX_MAINT_DIOG, auxType01);
+    public SViewMaintMovement(erp.client.SClientInterface client, java.lang.String tabTitle) {
+        super(client, tabTitle, SDataConstants.TRNX_MAINT_MOV);
         initComponents();
     }
 
@@ -88,7 +87,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
 
         addTaskBarUpperSeparator();
         
-        String[][] toolTipTexts = null;
+        /*String[][] toolTipTexts = null;
         String[][] icons = null;
         
         switch (mnTabTypeAux01) {
@@ -201,9 +200,9 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-        }
+        }*/
 
-        jbAdjOut1 = new JButton(new ImageIcon(getClass().getResource("/erp/img/" + icons[0][0] + ".gif")));
+       /* jbAdjOut1 = new JButton(new ImageIcon(getClass().getResource("/erp/img/" + icons[0][0] + ".gif")));
         jbAdjOut1.setPreferredSize(new Dimension(23, 23));
         jbAdjOut1.setToolTipText(toolTipTexts[0][0]);
         jbAdjOut1.addActionListener(this);
@@ -233,7 +232,13 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
             addTaskBarUpperComponent(jbAdjIn2);
         }
 
-        addTaskBarUpperSeparator();
+        addTaskBarUpperSeparator();*/
+
+        mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_LOOK));
+        mjbViewDps.setPreferredSize(new Dimension(23, 23));
+        mjbViewDps.addActionListener(this);
+        mjbViewDps.setToolTipText("Ver documento");
+        addTaskBarUpperComponent(mjbViewDps);
 
         jbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
         jbViewNotes.setPreferredSize(new Dimension(23, 23));
@@ -252,21 +257,23 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
 
         jbNew.setEnabled(false);
         jbEdit.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR || levelRightOutOtherInt >=  SUtilConsts.LEV_AUTHOR);
-        jbDelete.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR || levelRightOutOtherInt >=  SUtilConsts.LEV_AUTHOR);
+        jbDelete.setEnabled(false);
+        //jbDelete.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR || levelRightOutOtherInt >=  SUtilConsts.LEV_AUTHOR);
         
-        jbAdjIn1.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR);
+       /* jbAdjIn1.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR);
         if (isButton2Needed()) {
             jbAdjIn2.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR);
         }
         jbAdjOut1.setEnabled(levelRightOutOtherInt >= SUtilConsts.LEV_AUTHOR);
         if (isButton2Needed()) {
             jbAdjOut2.setEnabled(levelRightOutOtherInt >= SUtilConsts.LEV_AUTHOR);
-        }
+        }*/
+        mjbViewDps.setEnabled(true);
         jbViewNotes.setEnabled(true);
         jbPrint.setEnabled(true);
 
         STableField[] aoKeyFields = new STableField[2];
-        STableColumn[] aoTableColumns = new STableColumn[31];
+        STableColumn[] aoTableColumns = new STableColumn[22];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "iog.id_year");
@@ -279,26 +286,24 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "iog.dt", "Fecha doc.", STableConstants.WIDTH_DATE);       
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.code", "Código tipo doc.", STableConstants.WIDTH_CODE_DOC);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.tp_iog", "Tipo doc.", 125);
+        //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "iog.id_doc", "documento",200);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.tp_iog", "Tipo mov.", 125);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ent.code", "Almacén", STableConstants.WIDTH_CODE_COB_ENT);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "iog.val_r", "Valor $", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num_cp", "Folio doc. complemento", STableConstants.WIDTH_DOC_NUM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog_cp.code", "Código tipo doc. complemento", STableConstants.WIDTH_CODE_DOC);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog_cp.tp_iog", "Tipo doc. complemento", 125);        
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb_cp.code", "Sucursal empresa complemento", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ent_cp.code", "Almacén complemento", STableConstants.WIDTH_CODE_COB_ENT);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rec", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "iog.ref", "Referencia", STableConstants.WIDTH_RECORD_NUM);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "mov.name", "Descripción mov.", 125);
+        //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ent.ent", "Almacén origen", 125);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "it.item", "Ítem", 200);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "diog.qty", "Cantidad", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "unid.symbol", "Unidad", 35);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "area.name", "Área", 130);      
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Responsable", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "supv.name", "Residente", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_signed", "Firmado", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_audit", "Auditado", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaud.usr", "Usr. auditoría", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_audit", "Auditoría", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_authorn", "Autorizado", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaut.usr", "Usr. autorización", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_authorn", "Autorización", STableConstants.WIDTH_DATE_TIME);
+        //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaud.usr", "Usr. auditoría", STableConstants.WIDTH_USER);
+        //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_audit", "Auditoría", STableConstants.WIDTH_DATE_TIME);
+        //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_authorn", "Autorizado", STableConstants.WIDTH_BOOLEAN);
+        //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaut.usr", "Usr. autorización", STableConstants.WIDTH_USER);
+        //aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_authorn", "Autorización", STableConstants.WIDTH_DATE_TIME);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_sys", "Sistema", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
@@ -320,9 +325,9 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
         populateTable();
     }
     
-    private boolean isButton2Needed() {
-        return !SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SModSysConsts.TRNX_MAINT_TOOL_MAINT, SModSysConsts.TRNX_MAINT_TOOL_LOST });
-    }
+//    private boolean isButton2Needed() {
+//        return !SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SModSysConsts.TRNX_MAINT_TOOL_MAINT, SModSysConsts.TRNX_MAINT_TOOL_LOST });
+//    }
 
     private void actionMove(final int maintMovementType, final int maintUserType) {
         STrnDiogComplement complement = new STrnDiogComplement();
@@ -333,6 +338,45 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
         if (miClient.getGuiModule(SDataConstants.MOD_INV).showForm(mnTabType, null) == SLibConstants.DB_ACTION_SAVE_OK) {
             miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
         }
+    }
+    private boolean isViewForCategoryPur() {
+        return mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR;
+    }
+    private void actionViewDps() {
+        int gui = isViewForCategoryPur() ? SDataConstants.MOD_MKT : SDataConstants.MOD_INV;    // GUI module
+        int[] dpsTypeKey = getDpsTypeKey();
+
+        miClient.getGuiModule(gui).setFormComplement(dpsTypeKey);
+        miClient.getGuiModule(gui).showForm(SDataConstants.TRNX_MAINT_DIOG, moTablePane.getSelectedTableRow().getPrimaryKey());
+    }
+    
+     private int[] getDpsTypeKey() {
+        int[] dpsTypeKey = null;
+
+        /*if (isViewForCategoryPur()) {
+            if (isViewForEstimateEst()) {
+                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_PUR_EST;
+            }
+            else if (isViewForEstimateCon()) {
+                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_PUR_CON;
+            }
+            else if (isViewForOrder()) {
+                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_PUR_ORD;
+            }
+        }
+        else {
+            if (isViewForEstimateEst()) {
+                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_SAL_EST;
+            }
+            else if (isViewForEstimateCon()) {
+                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_SAL_CON;
+            }
+            else if (isViewForOrder()) {
+                dpsTypeKey = SDataConstantsSys.TRNU_TP_DPS_SAL_ORD;
+            }
+        }*/
+
+        return dpsTypeKey;
     }
 
     private void actionViewNotes() {
@@ -358,8 +402,10 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
     public void actionEdit() {
         if (jbEdit.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-                if (miClient.getGuiModule(SDataConstants.MOD_INV).showForm(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
-                    miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
+                 if (miClient.getGuiModule(SDataConstants.MOD_INV).showForm(SDataConstants.TRNX_MAINT_DIOG, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
+                   //if (miClient.getGuiModule(SDataConstants.MOD_INV).showForm(mnTabType, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
+                     miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(mnTabType);
+                    
                 }
             }
         }
@@ -438,13 +484,11 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
             default:
         }
         
-        msSql = "SELECT iog.id_year, iog.id_doc, iog.dt, iog.val_r, iog.ref, iog.b_audit, iog.b_authorn, iog.b_sys, iog.b_del,  " +
+        msSql = "SELECT " +                            
+                "iog.id_year, iog.id_doc, iog.dt, iog.b_authorn, iog.b_sys, iog.b_del, " +
                 "CONCAT(iog.num_ser, IF(LENGTH(iog.num_ser) = 0, '', '-'), erp.lib_fix_int(iog.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS f_num, " +
                 "tp_iog.tp_iog, tp_iog.code, bpb.code, ent.code, " +
-                "CONCAT(iog_cp.num_ser, IF(LENGTH(iog_cp.num_ser) = 0, '', '-'), erp.lib_fix_int(iog_cp.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS f_num_cp, " +
-                "tp_iog_cp.tp_iog, tp_iog_cp.code, bpb_cp.code, ent_cp.code, " +
-                "CONCAT(r.fid_rec_tp_rec, '-', erp.lib_fix_int(r.fid_rec_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_rec, " +
-                "iog.ts_audit, iog.ts_authorn, iog.ts_new, iog.ts_edit, iog.ts_del, uaud.usr, uaut.usr, un.usr, ue.usr, ud.usr, bp.bp, supv.name, " +
+                "iog.ts_audit, iog.ts_authorn, iog.ts_new, iog.ts_edit, iog.ts_del, uaud.usr, uaut.usr, un.usr, ue.usr, ud.usr, bp.bp, supv.name, ent.ent, it.item, diog.qty, unid.symbol, area.name, mov.name, " +
                 "(SELECT COUNT(*) FROM trn_maint_diog_sig AS sig WHERE sig.fk_diog_year = iog.id_year AND sig.fk_diog_doc = iog.id_doc AND sig.ts_usr_ins >= iog.ts_edit) > 0 AS _signed " +
                 "FROM trn_diog AS iog " +
                 "INNER JOIN erp.trns_ct_iog AS ct_iog ON iog.fid_ct_iog = ct_iog.id_ct_iog " +
@@ -452,6 +496,14 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 "INNER JOIN erp.trns_tp_iog AS tp_iog ON iog.fid_tp_iog = tp_iog.id_tp_iog AND iog.fid_ct_iog = tp_iog.id_ct_iog AND iog.fid_cl_iog = tp_iog.id_cl_iog " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON iog.fid_cob = bpb.id_bpb " +
                 "INNER JOIN erp.cfgu_cob_ent AS ent ON iog.fid_cob = ent.id_cob AND iog.fid_wh = ent.id_ent " +
+                
+                "INNER JOIN erp.cfgs_tp_ent AS al ON ent.fid_ct_ent = al.id_ct_ent AND ent.fid_tp_ent = al.id_tp_ent " +
+                "INNER JOIN erp.trns_tp_maint_mov AS mov ON iog.fid_maint_mov_tp = mov.id_tp_maint_mov " +
+                "INNER JOIN trn_diog_ety AS diog ON iog.id_year = diog.id_year AND iog.id_doc = diog.id_doc " +
+                "INNER JOIN trn_maint_area AS area ON diog.fid_maint_area = area.id_maint_area " +
+                "INNER JOIN erp.itmu_item AS it ON diog.fid_item = it.id_item " +
+                "INNER JOIN erp.itmu_unit AS unid ON diog.fid_unit = unid.id_unit AND diog.fid_orig_unit = unid.id_unit " +
+                
                 "INNER JOIN erp.usru_usr AS uaud ON iog.fid_usr_audit = uaud.id_usr " +
                 "INNER JOIN erp.usru_usr AS uaut ON iog.fid_usr_authorn = uaut.id_usr " +
                 "INNER JOIN erp.usru_usr AS un ON iog.fid_usr_new = un.id_usr " +
@@ -459,14 +511,14 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 "INNER JOIN erp.usru_usr AS ud ON iog.fid_usr_del = ud.id_usr " +
                 "INNER JOIN trn_maint_user_supv AS supv ON iog.fid_maint_user_supv = supv.id_maint_user_supv " +
                 "LEFT OUTER JOIN trn_diog AS iog_cp ON iog.fid_diog_year_n = iog_cp.id_year AND iog.fid_diog_doc_n = iog_cp.id_doc " +
-                "LEFT OUTER JOIN erp.trns_tp_iog AS tp_iog_cp ON iog_cp.fid_tp_iog = tp_iog_cp.id_tp_iog AND iog_cp.fid_ct_iog = tp_iog_cp.id_ct_iog AND iog_cp.fid_cl_iog = tp_iog_cp.id_cl_iog " +
-                "LEFT OUTER JOIN erp.bpsu_bpb AS bpb_cp ON iog_cp.fid_cob = bpb_cp.id_bpb " +
-                "LEFT OUTER JOIN erp.cfgu_cob_ent AS ent_cp ON iog_cp.fid_cob = ent_cp.id_cob AND iog_cp.fid_wh = ent_cp.id_ent " +
                 "LEFT OUTER JOIN trn_diog_rec AS r ON iog.id_year = r.id_iog_year AND iog.id_doc = r.id_iog_doc " +
                 "LEFT OUTER JOIN erp.bpsu_bp AS bp ON iog.fid_maint_user_n = bp.id_bp " +
-                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
-                "ORDER BY iog.dt, f_num, iog.id_year, iog.id_doc ";
-    }
+                //(sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
+                "WHERE iog.num_ser <> '' " +
+                //"ORDER BY iog.dt, f_num, iog.id_year, iog.id_doc " + 
+                //"ORDER BY iog.dt, f_num, iog.id_year, iog.id_doc " +
+                "GROUP BY diog.id_year, diog.id_doc, diog.id_ety " ;
+        }
 
     @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -535,7 +587,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
             }
             
             if (button == jbAdjOut1) {
-                    actionMove(movements[0], users[0]);
+                actionMove(movements[0], users[0]);
             }
             else if (button == jbAdjOut2) {
                 actionMove(movements[0], users[1]);
@@ -545,6 +597,9 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
             }
             else if (button == jbAdjIn2) {
                 actionMove(movements[1], users[1]);
+            }
+            else if (button == mjbViewDps) {
+                actionViewDps();
             }
             else if (button == jbViewNotes) {
                 actionViewNotes();

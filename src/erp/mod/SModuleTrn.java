@@ -15,6 +15,7 @@ import erp.mod.trn.db.SDbInventoryValuation;
 import erp.mod.trn.db.SDbItemRequiredDpsConfig;
 import erp.mod.trn.db.SDbMaintArea;
 import erp.mod.trn.db.SDbMaintConfig;
+import erp.mod.trn.db.SDbMaintDiogSignature;
 import erp.mod.trn.db.SDbMaintUser;
 import erp.mod.trn.db.SDbMaintUserSupervisor;
 import erp.mod.trn.db.SDbMmsConfig;
@@ -148,6 +149,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_MAINT_USER_SUPV:
                 registry = new SDbMaintUserSupervisor();
+                break;
+            case SModConsts.TRN_MAINT_DIOG_SIG:
+                registry = new SDbMaintDiogSignature();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

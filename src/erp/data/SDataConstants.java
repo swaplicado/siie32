@@ -535,6 +535,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_ACT_VIEW_LINKS = 207614;
     public static final int TRNX_MAINT_DIOG = 207651;
     public static final int TRNX_MAINT_STK = 207652;
+    public static final int TRNX_MAINT_MOV = 207653;
     
     // XXX
     public static final int TRNX_DSM_ETY_SOURCE = 207601;

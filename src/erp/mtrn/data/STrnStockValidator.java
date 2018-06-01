@@ -32,16 +32,18 @@ public class STrnStockValidator {
     protected int[] manDiogKey;
     protected int mnSegregationType;
     protected int[] manSegregationReferenceKey;
+    protected int mnMaintUserId;    // business partner ID acting as maintenance user
     protected Vector<STrnStockMove> mvStockMoves;
 
-    public STrnStockValidator(erp.client.SClientInterface client, int year, int[] warehouseKey, int[] iogKey, int segregationType, final int[] segregationReferenceKey) {
+    public STrnStockValidator(erp.client.SClientInterface client, int year, int[] warehouseKey, int[] iogKey, int segregationType, final int[] segregationReferenceKey, final int maintUserId) {
         miClient = client;
         mnYear = year;
         manWarehouseKey = warehouseKey;
         manDiogKey = iogKey;
         mnSegregationType = segregationType;
 	manSegregationReferenceKey = segregationReferenceKey;
-        mvStockMoves = new Vector<STrnStockMove>();
+        mnMaintUserId = maintUserId;
+        mvStockMoves = new Vector<>();
     }
 
     public void addStockMove(final int[] lotKey, final double quantity, final boolean isMoveBeingDeleted) {
@@ -93,7 +95,7 @@ public class STrnStockValidator {
                     
                     stock = STrnUtilities.obtainStock(miClient, stockMove.getPkYearId(),
                             stockMove.getPkItemId(), stockMove.getPkUnitId(), stockMove.getPkLotId(),
-                            stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(), dateCutOff,
+                            stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(), mnMaintUserId, dateCutOff,
                             isDocBeingDeleted || stockMove.getAuxIsMoveBeingDeleted() ? null : manDiogKey);
                     
                     if (stock < stockMove.getQuantity()) {
@@ -105,7 +107,7 @@ public class STrnStockValidator {
                         
                         stock = STrnUtilities.obtainStock(miClient, stockMove.getPkYearId(),
                                 stockMove.getPkItemId(), stockMove.getPkUnitId(), stockMove.getPkLotId(),
-                                stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(),
+                                stockMove.getPkCompanyBranchId(), stockMove.getPkWarehouseId(), mnMaintUserId, null,
                                 isDocBeingDeleted || stockMove.getAuxIsMoveBeingDeleted() ? null : manDiogKey);
 
                         if (stock < stockMove.getQuantity()) {
@@ -116,6 +118,7 @@ public class STrnStockValidator {
                             // 3. Check available stock omitting segregated stock:
 
                             if (mnSegregationType != SLibConstants.UNDEFINED && manSegregationReferenceKey != null) {
+                                // set current segregation in stock-movement to exclude it when validating available stock:
                                 stockMove.setSegregationReference(new int[] { manSegregationReferenceKey[0], manSegregationReferenceKey[1] });
                                 stockMove.setSegregationType(mnSegregationType);
                                 stockMove.setIsCurrentSegregationExcluded(true);
@@ -225,9 +228,9 @@ public class STrnStockValidator {
     public static java.lang.String validateStockMoves(final erp.client.SClientInterface client,
             final java.util.Vector<erp.mtrn.data.SDataDiogEntry> iogEntries, final int iogCategoryId,
             final int[] iogKey, final int[] warehouseKey, final boolean isDocBeingDeleted, final Date dateCutOff,
-            final int segregationType, final int[] segregationReferenceKey) throws Exception {
+            final int segregationType, final int[] segregationReferenceKey, final int maintUserId) throws Exception {
         
-        STrnStockValidator validator = new STrnStockValidator(client, iogKey[0], warehouseKey, iogKey, segregationType, segregationReferenceKey);
+        STrnStockValidator validator = new STrnStockValidator(client, iogKey[0], warehouseKey, iogKey, segregationType, segregationReferenceKey, maintUserId);
 
         for (SDataDiogEntry entry : iogEntries) {
             if (entry.shouldValidateStockLots() && entry.shouldValidateOutgoingItems(iogCategoryId, isDocBeingDeleted)) {

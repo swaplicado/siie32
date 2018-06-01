@@ -6,25 +6,24 @@
 
 package erp.mmfg.form;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.util.Vector;
-import javax.swing.AbstractAction;
-import javax.swing.JOptionPane;
-
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
-import erp.lib.form.SFormComponentItem;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormValidation;
-import erp.lib.form.SFormUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import erp.mitm.data.SDataItem;
 import erp.mmfg.data.SDataBomSubstitute;
 import erp.mmfg.data.SDataProductionOrder;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.form.SDialogPickerStockLots;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.util.Vector;
+import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -527,7 +526,7 @@ public class SDialogMfgRawMaterialSubstitute extends javax.swing.JDialog impleme
             // Available stock is processed in inventory units:
 
             try {
-                stock = STrnUtilities.obtainStock(miClient, miClient.getSessionXXX().getWorkingYear(), moItem.getPkItemId(), moItem.getFkUnitId(), SLibConstants.UNDEFINED, moProductionOrder.getDbmsFkCompanyBranchId(), moProductionOrder.getDbmsFkWarehouseId(), null, null);
+                stock = STrnUtilities.obtainStock(miClient, miClient.getSessionXXX().getWorkingYear(), moItem.getPkItemId(), moItem.getFkUnitId(), SLibConstants.UNDEFINED, moProductionOrder.getDbmsFkCompanyBranchId(), moProductionOrder.getDbmsFkWarehouseId(), SLibConstants.UNDEFINED, null, null);
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);

@@ -868,6 +868,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                     vParams2.add(null); // Lot
                     vParams2.add(mnFkCompanyBranchId); // Company branch
                     vParams2.add(null); // Warehouse
+                    vParams2.add(null); // maintenance user
                     vParams2.add("'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDate.getDate()) + "'"); // Date
                     vParams2 = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_STK_GET, vParams2, SLibConstants.EXEC_MODE_SILENT);
 
@@ -896,6 +897,7 @@ public class SDialogExplotionMaterialsRawMaterial extends javax.swing.JDialog im
                         vParams2.add(null); // Lot
                         vParams2.add(fkEntityId[0]); // Company branch
                         vParams2.add(fkEntityId[1]); // Warehouse
+                        vParams2.add(null); // maintenance user
                         vParams2.add("'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDate.getDate()) + "'"); // Date
                         vParams2 = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_STK_GET, vParams2, SLibConstants.EXEC_MODE_SILENT);
 

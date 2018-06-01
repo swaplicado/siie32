@@ -551,7 +551,7 @@ public abstract class SDataReadTableRows {
         ArrayList<STableField> aQueryAdditionalFields = new ArrayList<STableField>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
-        java.sql.Date oDate = null;
+        java.util.Date tDate = null;
         boolean bInventoriableNot = false;
         boolean bInventoriableOnly = false;
 
@@ -956,8 +956,15 @@ public abstract class SDataReadTableRows {
             case SDataConstants.ITMX_ITEM_IOG:
                 aoPkFields = new STableField[1];
                 aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
+                
+                /*
+                filterKey is parameter that can be either of type int[] or Object[]:
+                a) when int[] only 8 columns are defined, and stock column is excluded, and... that's it!
+                    It does not have any other use! Apparently its intented porpuse is to provide an Item Class filter in query.
+                b) when Object[] 9 columns are defined, stock column included, and database stored function trn_stk_get is invoked.
+                    But there is not any case in whole project that uses it!
+                */
 
-                i = 0;
                 if (filterKey == null || filterKey instanceof int[]) {
                     aoQueryFields = new STableField[8];
                 }
@@ -965,6 +972,7 @@ public abstract class SDataReadTableRows {
                     aoQueryFields = new STableField[9];
                 }
 
+                i = 0;
                 if (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                     aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
                     aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
@@ -974,28 +982,41 @@ public abstract class SDataReadTableRows {
                     aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
                 }
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "u.symbol");
-                if (filterKey != null && filterKey instanceof Object[]) {
+                
+                if (!(filterKey == null || filterKey instanceof int[])) {
                     aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "stock");
                 }
+                
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "b.brd");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "m.mfr");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "icl.id_ct_item");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "icl.id_cl_item");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "icl.cl_item");
+                
+                /*
+                filterKey as Object[] indexes:
+                0 = year
+                1 = cutoff date
+                2 = unit ID (WRONG!, this has no sense!)
+                3 = warehouse PK (company branch ID)
+                4 = warehouse PK (warehouse (entity) ID)
+                */
 
                 if (filterKey != null && filterKey instanceof Object[] && ((Object[]) filterKey)[1] != null) {
-                    oDate = new java.sql.Date(((java.util.Date)((Object[]) filterKey)[1]).getTime());
+                    tDate = (Date) ((Object[]) filterKey)[1];
                 }
-                sSql = "SELECT i.id_item, i.item, i.item_key, u.symbol, b.brd, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item " +
-                        ((filterKey == null || filterKey instanceof int[]) ? "" : (", trn_stk_get(" +
-                        ((filterKey == null || filterKey instanceof int[]) ? piClient.getSessionXXX().getWorkingYear() : (Integer)((Object[]) filterKey)[0]) + ", " +
+                
+                sSql = "SELECT i.id_item, i.item, i.item_key, u.symbol, b.brd, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item, " +
+                        ((filterKey == null || filterKey instanceof int[]) ? "0.0" : 
+                        ("trn_stk_get(" +
+                        ((Integer) ((Object[]) filterKey)[0]) + ", " +
                         "i.id_item, " +
-                        ((filterKey == null || filterKey instanceof int[]) ? (Integer)((Object[]) filterKey)[2] == 0 ? " i.fid_unit" : (Integer)((Object[]) filterKey)[2] : " i.fid_unit") + ", " +
-                        "NULL, " +  // lot
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : (Integer)((Object[]) filterKey)[3]) + ", " +
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : (Integer)((Object[]) filterKey)[4]) + ", " +
-                        ((filterKey == null || filterKey instanceof int[]) ? " null" : "'" + oDate + "'") +  " " +
-                        ") AS stock ")) +
+                        "i.fid_unit, " +
+                        "NULL, " +  // all lots of current item-unit
+                        ((Integer) ((Object[]) filterKey)[3]) + ", " +
+                        ((Integer) ((Object[]) filterKey)[4]) + ", " +
+                        "NULL, " +  // maintenance user ommited
+                        ("'" + SLibUtils.DbmsDateFormatDate.format(tDate) + "')"))) + " AS stock " +
                         "FROM erp.itmu_item AS i " +
                         "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
                         (!bInventoriableNot ? "" : "AND i.b_inv = 0 ") +
@@ -1090,12 +1111,12 @@ public abstract class SDataReadTableRows {
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "si.name");
 
                 if (filterKey != null && filterKey instanceof Object[] && ((Object[]) filterKey)[1] != null) {
-                    oDate = new java.sql.Date(((java.util.Date)((Object[]) filterKey)[1]).getTime());
+                    tDate = new java.sql.Date(((java.util.Date) ((Object[]) filterKey)[1]).getTime());
                 }
                 
                 sSql = "SELECT i.id_item, i.item, i.item_key, u.id_unit, u.symbol, b.id_brd, b.brd, m.id_mfr, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item, si.id_st_item, si.name " +
                         (filterKey == null || filterKey instanceof int[] ? "" : ", trn_stk_get(" +
-                        (Integer) ((Object[]) filterKey)[0] + ", i.id_item, i.fid_unit, NULL, " + (Integer) ((Object[]) filterKey)[3] + ", " + (Integer) ((Object[]) filterKey)[4] + ", '" + SLibUtils.DbmsDateFormatDate.format(oDate) + "') AS f_stock ") +
+                        (Integer) ((Object[]) filterKey)[0] + ", i.id_item, i.fid_unit, NULL, " + (Integer) ((Object[]) filterKey)[3] + ", " + (Integer) ((Object[]) filterKey)[4] + ", NULL, '" + SLibUtils.DbmsDateFormatDate.format(tDate) + "') AS f_stock ") +
                         "FROM erp.itmu_item AS i " +
                         "INNER JOIN erp.itmu_unit AS u ON i.fid_unit = u.id_unit " +
                         (!bInventoriableNot ? "" : "AND i.b_inv = 0 ") +

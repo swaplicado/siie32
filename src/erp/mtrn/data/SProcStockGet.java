@@ -5,11 +5,10 @@
 
 package erp.mtrn.data;
 
-import java.sql.Statement;
-import java.sql.ResultSet;
-
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 /**
  *
@@ -40,7 +39,8 @@ public class SProcStockGet extends erp.lib.data.SDataProcedure implements java.i
             sSql += (mvParamsIn.size() <= 5 || mvParamsIn.get(5) == null ? "NULL" : mvParamsIn.get(5)) + ", ";
             sSql += (mvParamsIn.size() <= 6 || mvParamsIn.get(6) == null ? "NULL" : mvParamsIn.get(6)) + ", ";
             sSql += (mvParamsIn.size() <= 7 || mvParamsIn.get(7) == null ? "NULL" : mvParamsIn.get(7)) + ", ";
-            sSql += (mvParamsIn.size() <= 8 || mvParamsIn.get(8) == null ? "NULL" : mvParamsIn.get(8)) + ") AS f_stk ";
+            sSql += (mvParamsIn.size() <= 8 || mvParamsIn.get(8) == null ? "NULL" : mvParamsIn.get(8)) + ", ";
+            sSql += (mvParamsIn.size() <= 9 || mvParamsIn.get(9) == null ? "NULL" : mvParamsIn.get(9)) + ") AS f_stk ";
 
             statement = connection.createStatement();
             statement.execute(sSql);
@@ -54,63 +54,6 @@ public class SProcStockGet extends erp.lib.data.SDataProcedure implements java.i
             else {
                 mnLastDbActionResult = SLibConstants.DB_PROCEDURE_ERROR;
             }
-
-            /*
-            callableStatement = connection.prepareCall("{ " +
-                    "CALL trn_stk_get(" +
-                    "?, ?, ?, ?, ?, " +
-                    "?, ?) }");
-
-            //System.out.println(nParam + " - " + mvParamsIn.get(nParam - 1));
-            callableStatement.setInt(nParam, (java.lang.Integer) mvParamsIn.get(nParam - 1)); nParam++;
-
-            //System.out.println(nParam + " - " + mvParamsIn.get(nParam - 1));
-            callableStatement.setInt(nParam, (java.lang.Integer) mvParamsIn.get(nParam - 1)); nParam++;
-
-            //System.out.println(nParam + " - " + mvParamsIn.get(nParam - 1));
-            callableStatement.setInt(nParam, (java.lang.Integer) mvParamsIn.get(nParam - 1)); nParam++;
-
-            //System.out.println(nParam + " - " + mvParamsIn.get(nParam - 1));
-            if (mvParamsIn.get(nParam - 1)!= null) {
-                callableStatement.setInt(nParam, (java.lang.Integer) mvParamsIn.get(nParam - 1));
-                nParam++;
-            }
-            else {
-                callableStatement.setNull(nParam, java.sql.Types.INTEGER);
-                nParam++;
-            }
-
-            //System.out.println(nParam + " - " + mvParamsIn.get(nParam - 1));
-            if (mvParamsIn.get(nParam - 1)!= null) {
-                callableStatement.setInt(nParam, (java.lang.Integer) mvParamsIn.get(nParam - 1));
-                nParam++;
-            }
-            else {
-                callableStatement.setNull(nParam, java.sql.Types.INTEGER);
-                nParam++;
-            }
-
-            //System.out.println(nParam + " - " + mvParamsIn.get(nParam - 1));
-            if (mvParamsIn.get(nParam - 1)!= null) {
-                callableStatement.setInt(nParam, (java.lang.Integer) mvParamsIn.get(nParam - 1));
-                nParam++;
-            }
-            else {
-                callableStatement.setNull(nParam, java.sql.Types.INTEGER);
-                nParam++;
-            }
-
-            //System.out.println(nParam + " - " + mvParamsIn.get(nParam - 1));
-            if (mvParamsIn.get(nParam - 1)!= null) {
-                callableStatement.setDate(nParam, new java.sql.Date(((java.util.Date) mvParamsIn.get(nParam - 1)).getTime()));
-                nParam++; }
-            else {
-                callableStatement.setNull(nParam, java.sql.Types.DATE);
-                nParam++;
-            }
-            callableStatement.execute();
-            */
-
         }
         catch (java.sql.SQLException e) {
             mnLastDbActionResult = SLibConstants.DB_PROCEDURE_ERROR;

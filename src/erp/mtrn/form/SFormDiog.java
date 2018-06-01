@@ -3150,8 +3150,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     public erp.lib.form.SFormValidation formValidate() {
         int year = SLibTimeUtilities.digestYear(moFieldDate.getDate())[0];
         String msg = "";
-        Vector<Object> params = new Vector<Object>();
-        Vector<SDataDiogEntry> entries = new Vector<SDataDiogEntry>();
+        Vector<Object> params = new Vector<>();
+        Vector<SDataDiogEntry> entries = new Vector<>();
         SDataItem item = null;
         SFormValidation validation = new SFormValidation();
 
@@ -3245,7 +3245,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                             }
                         }
                         
-                        // Validate item lots:
+                        // Validate item lots and segregations:
 
                         msg = STrnStockValidator.validateStockLots(miClient, entries, mnParamIogCategoryId, false);
                         if (msg.length() > 0) {
@@ -3261,7 +3261,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                                 segregationReferenceKey = new int[] { moProdOrderSource.getPkYearId(), moProdOrderSource.getPkOrdId() };
                             }
                             
-                            msg = STrnStockValidator.validateStockMoves(miClient, entries, mnParamIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate(), segregationType, segregationReferenceKey);
+                            msg = STrnStockValidator.validateStockMoves(miClient, entries, mnParamIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate(), segregationType, segregationReferenceKey, SLibConstants.UNDEFINED);
                             if (msg.length() > 0) {
                                 throw new Exception(msg);
                             }
