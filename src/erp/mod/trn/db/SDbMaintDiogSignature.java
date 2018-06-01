@@ -13,7 +13,7 @@ import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
- *
+ * WARNING: Every change made to structure of table trn_maint_diog_sig must be updated aswell in method save() of class SDataDiog!
  * @author Sergio Flores
  */
 public class SDbMaintDiogSignature extends SDbRegistryUser {
@@ -134,7 +134,6 @@ public class SDbMaintDiogSignature extends SDbRegistryUser {
 
         if (mbRegistryNew) {
             computePrimaryKey(session);
-            mbDeleted = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +

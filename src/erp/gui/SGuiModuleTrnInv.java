@@ -119,6 +119,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiIogMaintMovementToolLent;
     private javax.swing.JMenuItem jmiIogMaintMovementToolMaint;
     private javax.swing.JMenuItem jmiIogMaintMovementToolLost;
+    private javax.swing.JMenuItem jmiIogMaintMovement;
     private javax.swing.JMenuItem jmiIogMaintUserEmployee;
     private javax.swing.JMenuItem jmiIogMaintUserContractor;
     private javax.swing.JMenuItem jmiIogMaintUserContractorSupv;
@@ -352,6 +353,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMaintMovementToolLent = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LENT.toLowerCase());
         jmiIogMaintMovementToolMaint = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_MAINT.toLowerCase());
         jmiIogMaintMovementToolLost = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase());
+        jmiIogMaintMovement = new JMenuItem("Movs. mantenimiento");
         jmiIogMaintUserEmployee = new JMenuItem("Empleados");
         jmiIogMaintUserContractor = new JMenuItem("Contratistas");
         jmiIogMaintUserContractorSupv = new JMenuItem("Residentes de contratistas");
@@ -396,6 +398,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmIogMaint.add(jmiIogMaintMovementToolMaint);
         jmIogMaint.add(jmiIogMaintMovementToolLost);
         jmIogMaint.addSeparator();
+        jmIogMaint.add(jmiIogMaintMovement);
+        jmIogMaint.addSeparator();
         jmIogMaint.add(jmiIogMaintUserEmployee);
         jmIogMaint.add(jmiIogMaintUserContractor);
         jmIogMaint.add(jmiIogMaintUserContractorSupv);
@@ -436,6 +440,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMaintMovementToolLent.addActionListener(this);
         jmiIogMaintMovementToolMaint.addActionListener(this);
         jmiIogMaintMovementToolLost.addActionListener(this);
+        jmiIogMaintMovement.addActionListener(this);
         jmiIogMaintUserEmployee.addActionListener(this);
         jmiIogMaintUserContractor.addActionListener(this);
         jmiIogMaintUserContractorSupv.addActionListener(this);
@@ -960,6 +965,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
                     break;
+                case SDataConstants.TRNX_MAINT_MOV:
+                    viewClass = erp.mtrn.view.SViewMaintMovement.class;
+                    title = "Movs. mantenimiento";
+                    break;  
                 case SDataConstants.TRNX_DIOG_MFG:
                     viewClass = erp.mtrn.view.SViewDiogProdOrder.class;
                     switch (auxType01) {
@@ -1341,6 +1350,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiIogMaintMovementToolLost) {
                 showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL_LOST);
+            }
+            else if (item == jmiIogMaintMovement) {
+                showView(SDataConstants.TRNX_MAINT_MOV);
             }
             else if (item == jmiIogMaintUserEmployee) {
                 miClient.getSession().showView(SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE, null);

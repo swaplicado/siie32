@@ -3630,5 +3630,5 @@ public abstract class SDataUtilities {
         }
 
         return costCenter;
-    }
+    }   
 }

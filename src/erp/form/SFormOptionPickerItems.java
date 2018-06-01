@@ -412,7 +412,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             jtfCompanyBranch.setText("");
         }
         else {
-            mnCompanyBranchId = (Integer)((Object[]) moFilterKey)[3];
+            mnCompanyBranchId = (Integer) ((Object[]) moFilterKey)[3];
             companyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { mnCompanyBranchId }, SLibConstants.EXEC_MODE_SILENT);
 
             jtfCompanyBranch.setText(companyBranch.getBizPartnerBranch());
@@ -427,8 +427,8 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             jtfWarehouse.setText("");
         }
         else {
-            mnCompanyBranchId = (Integer)((Object[]) moFilterKey)[3];
-            mnCompanyBranchEntityId = (Integer)((Object[]) moFilterKey)[4];
+            mnCompanyBranchId = (Integer) ((Object[]) moFilterKey)[3];
+            mnCompanyBranchEntityId = (Integer) ((Object[]) moFilterKey)[4];
             warehouse = (SDataCompanyBranchEntity) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_COB_ENT, new int[] { mnCompanyBranchId, mnCompanyBranchEntityId }, SLibConstants.EXEC_MODE_SILENT);
 
             jtfWarehouse.setText(warehouse.getCode());

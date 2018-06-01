@@ -141,53 +141,6 @@ public abstract class STrnUtilities {
     }
 
     /**
-     * Obtains available stock on a certain year.
-     * @param client ERP Client interface.
-     * @param itemId Lot item ID (primary key).
-     * @param unitId Lot unit ID (primary key).
-     * @param lotId_n Lot ID (primary key), can be 0 meaning undefined.
-     * @param cobId_n Company branch ID (primary key), can be 0 meaning undefined.
-     * @param whId_n Warehouse ID (primary key), can be 0 meaning undefined.
-     * @returns Available stock for provided params.
-     */
-    @SuppressWarnings("unchecked")
-    public static double obtainStock(final SClientInterface client, final int year, final int itemId, final int unitId, final int lotId_n, final int companyBranchId_n, final int warehouseId_n) throws Exception {
-        return obtainStock(client, year, itemId, unitId, lotId_n, companyBranchId_n, warehouseId_n, null, null);
-    }
-
-    /**
-     * Obtains available stock on a certain year.
-     * @param client ERP Client interface.
-     * @param itemId Lot item ID (primary key).
-     * @param unitId Lot unit ID (primary key).
-     * @param lotId_n Lot ID (primary key), can be 0 meaning undefined.
-     * @param cobId_n Company branch ID (primary key), can be 0 meaning undefined.
-     * @param whId_n Warehouse ID (primary key), can be 0 meaning undefined.
-     * @param iogKey_n Primary key of IOG being edited.
-     * @returns Available stock for provided params.
-     */
-    @SuppressWarnings("unchecked")
-    public static double obtainStock(final SClientInterface client, final int year, final int itemId, final int unitId, final int lotId_n, final int companyBranchId_n, final int warehouseId_n, final int[] iogKey_n) throws Exception {
-        return obtainStock(client, year, itemId, unitId, lotId_n, companyBranchId_n, warehouseId_n, null, iogKey_n);
-    }
-
-    /**
-     * Obtains available stock on a certain year up to cut off date.
-     * @param client ERP Client interface.
-     * @param itemId Lot item ID (primary key).
-     * @param unitId Lot unit ID (primary key).
-     * @param lotId_n Lot ID (primary key), can be 0 meaning undefined.
-     * @param cobId_n Company branch ID (primary key), can be 0 meaning undefined.
-     * @param whId_n Warehouse ID (primary key), can be 0 meaning undefined.
-     * @param dateCutOff_n Cut off date.
-     * @returns Available stock for provided params.
-     */
-    @SuppressWarnings("unchecked")
-    public static double obtainStock(final SClientInterface client, final int year, final int itemId, final int unitId, final int lotId_n, final int companyBranchId_n, final int warehouseId_n, final Date dateCutOff_n) throws Exception {
-        return obtainStock(client, year, itemId, unitId, lotId_n, companyBranchId_n, warehouseId_n, dateCutOff_n, null);
-    }
-
-    /**
      * Obtains available stock on a certain year up to cut off date.
      * @param client ERP Client interface.
      * @param itemId Lot item ID (primary key).
@@ -200,7 +153,7 @@ public abstract class STrnUtilities {
      * @returns Available stock for provided params.
      */
     @SuppressWarnings("unchecked")
-    public static double obtainStock(final SClientInterface client, final int year, final int itemId, final int unitId, final int lotId_n, final int companyBranchId_n, final int warehouseId_n, final Date dateCutOff_n, final int[] iogKey_n) throws Exception {
+    public static double obtainStock(final SClientInterface client, final int year, final int itemId, final int unitId, final int lotId_n, final int companyBranchId_n, final int warehouseId_n, final int maintUserId_n, final Date dateCutOff_n, final int[] iogKey_n) throws Exception {
         double stock = 0;
         String sql = "";
         ResultSet resulSet = null;
@@ -209,6 +162,7 @@ public abstract class STrnUtilities {
                 (lotId_n == SLibConstants.UNDEFINED ? "NULL" : "" + lotId_n) + ", " +
                 (companyBranchId_n == SLibConstants.UNDEFINED ? "NULL" : "" + companyBranchId_n) + ", " +
                 (warehouseId_n == SLibConstants.UNDEFINED ? "NULL" : "" + warehouseId_n) + ", " +
+                (maintUserId_n == SLibConstants.UNDEFINED ? "NULL" : "" + maintUserId_n) + ", " +
                 (dateCutOff_n == null ? "NULL" : "'" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(dateCutOff_n) + "'") + ", " +
                 (iogKey_n == null || (iogKey_n[0] == SLibConstants.UNDEFINED || iogKey_n[1] == SLibConstants.UNDEFINED) ? "NULL, NULL" : "" + iogKey_n[0] + ", " + iogKey_n[1]) + ") ";
 

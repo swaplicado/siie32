@@ -29,7 +29,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Gil De Jesús
  */
 public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -81,7 +81,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
 
-    protected int mnLastDiogSignatureId;
+    protected int mnDbmsLastDiogSignatureId;
     protected java.lang.String msDbmsDiogCategory;
     protected java.lang.String msDbmsDiogClass;
     protected java.lang.String msDbmsDiogType;
@@ -98,12 +98,13 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected java.util.Vector<erp.mtrn.data.SDataDiogNotes> mvDbmsDiogNotes;
 
     protected boolean mbAuxIsDbmsDataCounterpartDiog;
+    protected boolean mbAuxSignDiog;
     protected int moAuxSegregationStockId;
 
     public SDataDiog() {
         super(SDataConstants.TRN_DIOG);
-        mvDbmsDiogEntries = new Vector<erp.mtrn.data.SDataDiogEntry>();
-        mvDbmsDiogNotes = new Vector<erp.mtrn.data.SDataDiogNotes>();
+        mvDbmsDiogEntries = new Vector<>();
+        mvDbmsDiogNotes = new Vector<>();
         reset();
     }
 
@@ -242,7 +243,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         String sql = "";
         Statement statement = connection.createStatement();
         SDataStockMove stockMove = null;
-        Vector<SDataStockMove> stockMoves = new Vector<SDataStockMove>();
+        Vector<SDataStockMove> stockMoves = new Vector<>();
 
         // Delete previous stock moves, if any:
 
@@ -470,7 +471,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
-    public void setLastDiogSignatureId(int n) { mnLastDiogSignatureId = n; }
+    public void setDbmsLastDiogSignatureId(int n) { mnDbmsLastDiogSignatureId = n; }
     public void setDbmsDiogCategory(java.lang.String s) { msDbmsDiogCategory = s; }
     public void setDbmsDiogClass(java.lang.String s) { msDbmsDiogClass = s; }
     public void setDbmsDiogType(java.lang.String s) { msDbmsDiogType = s; }
@@ -483,7 +484,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
 
     public void setDbmsDataCounterpartDiog(erp.mtrn.data.SDataDiog o) { moDbmsDataCounterpartDiog = o; }
 
-    public int getLastDiogSignatureId() { return mnLastDiogSignatureId; }
+    public int getDbmsLastDiogSignatureId() { return mnDbmsLastDiogSignatureId; }
     public java.lang.String getDbmsDiogCategory() { return msDbmsDiogCategory; }
     public java.lang.String getDbmsDiogClass() { return msDbmsDiogClass; }
     public java.lang.String getDbmsDiogType() { return msDbmsDiogType; }
@@ -500,9 +501,11 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.util.Vector<erp.mtrn.data.SDataDiogNotes> getDbmsNotes() { return mvDbmsDiogNotes; }
 
     public void setAuxIsDbmsDataCounterpartDiog(boolean b) { mbAuxIsDbmsDataCounterpartDiog = b; }
+    public void setAuxSignDiog(boolean b) { mbAuxSignDiog = b; }
     public void setAuxSegregationStockId(int n) { moAuxSegregationStockId = n; }
 
     public boolean getAuxIsDbmsDataCounterpartDiog() { return mbAuxIsDbmsDataCounterpartDiog; }
+    public boolean getAuxSignDiog() { return mbAuxSignDiog; }
     public int getAuxSegregationStockId() { return moAuxSegregationStockId; }
 
     public int[] getDiogCategoryKey() { return new int[] { mnFkDiogCategoryId }; }
@@ -625,7 +628,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         mtUserEditTs = null;
         mtUserDeleteTs = null;
 
-        mnLastDiogSignatureId = 0;
+        mnDbmsLastDiogSignatureId = 0;
         msDbmsDiogCategory = "";
         msDbmsDiogClass = "";
         msDbmsDiogType = "";
@@ -642,6 +645,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         mvDbmsDiogNotes.clear();
 
         mbAuxIsDbmsDataCounterpartDiog = false;
+        mbAuxSignDiog = false;
         moAuxSegregationStockId = 0;
     }
 
@@ -782,7 +786,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 
                 // Read aswell, if any, last maintenance stock-movement's ID:
                 
-                mnLastDiogSignatureId = STrnMaintUtilities.getLastMaintDiogSignature(statement, (int[]) getPrimaryKey());
+                mnDbmsLastDiogSignatureId = STrnMaintUtilities.getLastMaintDiogSignature(statement, (int[]) getPrimaryKey());
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -972,11 +976,46 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 computeStock(connection);
                 //System.out.println("SDataDiog: 3.5");
                 
-                // release the stock in segregations
+                // sign DIOG:
+                if (mbAuxSignDiog) {
+                    int user = SLibConstants.UNDEFINED;
+                    int userSupv = SLibConstants.UNDEFINED;
+                    
+                    switch (mnFkMaintMovementTypeId) {
+                        case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART:
+                        case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL:
+                        case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT:
+                        case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT:
+                        case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST:
+                            user = mnFkMaintReturnUserId_n;
+                            userSupv = mnFkMaintReturnUserSupervisorId;
+                            break;
+                        case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART:
+                        case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL:
+                        case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT:
+                        case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT:
+                        case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST:
+                            user = mnFkMaintUserId_n;
+                            userSupv = mnFkMaintUserSupervisorId;
+                            break;
+                        default:
+                    }
+                    
+                    String sql;
+                    
+                    sql = "SET @id = (SELECT COALESCE(MAX(id_maint_diog_sig), 0) + 1 FROM trn_maint_diog_sig);";
+                    connection.createStatement().execute(sql);
+                    
+                    sql = "INSERT INTO trn_maint_diog_sig "
+                            + "VALUES (@id, " + mnPkYearId + ", " + mnPkDocId + ", " + user + ", " + userSupv + ", " + (mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId) + ", NOW());";
+                    connection.createStatement().execute(sql);
+                }
+                
+                // release the stock in segregations:
                 if (moAuxSegregationStockId != SLibConstants.UNDEFINED && mnFkDiogCategoryId == SDataConstantsSys.TRNS_CT_IOG_OUT) {
                     releaseSegregations(connection, moAuxSegregationStockId, mvDbmsDiogEntries, mnFkCompanyBranchId, mnFkWarehouseId);
                 }
-
+                
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
             }
@@ -1132,7 +1171,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
     }
 
     public java.lang.String validateStockMoves(final erp.client.SClientInterface client, final boolean isDocBeingDeleted) throws Exception {
-        return STrnStockValidator.validateStockMoves(client, mvDbmsDiogEntries, mnFkDiogCategoryId, (int[]) getPrimaryKey(), getWarehouseKey(), isDocBeingDeleted, mtDate, SLibConstants.UNDEFINED, null);
+        return STrnStockValidator.validateStockMoves(client, mvDbmsDiogEntries, mnFkDiogCategoryId, (int[]) getPrimaryKey(), getWarehouseKey(), isDocBeingDeleted, mtDate, SLibConstants.UNDEFINED, null, mnFkMaintUserId_n);
     }
 
     @Override
@@ -1187,6 +1226,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         registry.setUserEditTs(this.getUserEditTs());
         registry.setUserDeleteTs(this.getUserDeleteTs());
 
+        registry.setDbmsLastDiogSignatureId(this.getDbmsLastDiogSignatureId());
         registry.setDbmsDiogCategory(this.getDbmsDiogCategory());
         registry.setDbmsDiogClass(this.getDbmsDiogClass());
         registry.setDbmsDiogType(this.getDbmsDiogType());
@@ -1203,6 +1243,10 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
             registry.getDbmsNotes().add(notes.clone());
         }
 
+        registry.setAuxIsDbmsDataCounterpartDiog(this.getAuxIsDbmsDataCounterpartDiog());
+        registry.setAuxSignDiog(this.getAuxSignDiog());
+        registry.setAuxSegregationStockId(this.getAuxSegregationStockId());
+    
         return registry;
     }
 }
