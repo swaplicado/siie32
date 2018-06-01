@@ -531,6 +531,8 @@ public abstract class SDataConstants {
 
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;
+    public static final int TRNX_CFD_PAY = 207611;
+    public static final int TRNX_DPS_ACT_VIEW_LINKS = 207614;
     public static final int TRNX_MAINT_DIOG = 207651;
     public static final int TRNX_MAINT_STK = 207652;
     
@@ -543,11 +545,6 @@ public abstract class SDataConstants {
     public static final int TRNX_TP_DPS = 207606;
     public static final int TRNX_SAL_PUR_TOT = 207607;
     public static final int TRNX_SAL_PUR_GLB = 207608;
-
-    public static final int TRNX_DPS_ACT_ANNUL = 207611;
-    public static final int TRNX_DPS_ACT_RISS = 207612;
-    public static final int TRNX_DPS_ACT_REPL = 207613;
-    public static final int TRNX_DPS_ACT_VIEW_LINKS = 207614;   
     // XXX
 
     public static final int TRNX_MFG_ORD = 207620;
