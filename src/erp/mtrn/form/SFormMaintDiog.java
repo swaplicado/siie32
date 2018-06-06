@@ -644,7 +644,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
 
         int i = 0;
         STableColumnForm tableColumnsEntry[] = new STableColumnForm[14];
-        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
+        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Área mantenimiento", 150);
         tableColumnsEntry[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad", STableConstants.WIDTH_QUANTITY);
