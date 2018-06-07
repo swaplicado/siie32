@@ -6,17 +6,17 @@
 
 package erp.lib.gui;
 
+import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import javax.swing.AbstractAction;
-
-import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.lib.form.SFormUtilities;
-import erp.lib.form.SFormValidation;
+import sa.lib.SLibTimeUtils;
 
 /**
  *
@@ -467,7 +467,7 @@ public class SGuiDatePicker extends javax.swing.JDialog implements erp.lib.form.
 
     public void actionSelectedMonth() {
         if (jbSelectedMonth.isEnabled()) {
-            moGuiDate = new SGuiDate(catchSelectedDate().getTime().getTime(), SLibConstants.GUI_DATE_AS_YEAR_MONTH);
+            moGuiDate = new SGuiDate(SLibTimeUtils.getEndOfMonth(catchSelectedDate().getTime()).getTime(), SLibConstants.GUI_DATE_AS_YEAR_MONTH);
             mnFormResult = SLibConstants.FORM_RESULT_OK;
             setVisible(false);
         }
@@ -475,7 +475,7 @@ public class SGuiDatePicker extends javax.swing.JDialog implements erp.lib.form.
 
     public void actionSelectedYear() {
         if (jbSelectedYear.isEnabled()) {
-            moGuiDate = new SGuiDate(catchSelectedDate().getTime().getTime(), SLibConstants.GUI_DATE_AS_YEAR);
+            moGuiDate = new SGuiDate(SLibTimeUtils.getEndOfYear(catchSelectedDate().getTime()).getTime(), SLibConstants.GUI_DATE_AS_YEAR);
             mnFormResult = SLibConstants.FORM_RESULT_OK;
             setVisible(false);
         }
