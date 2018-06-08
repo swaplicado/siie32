@@ -703,9 +703,12 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     private boolean shouldCheckMaintUserStock() {
         return SLibUtils.belongsTo(mnParamMaintMovementType, 
                 new int[] {
-                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT,
-                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT,
-                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST });
+                    SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT,
+                    SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT,
+                    SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST });
+//                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT,
+//                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT,
+//                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST });
     }
 
     private void populateMaintUserSupervisor() {
