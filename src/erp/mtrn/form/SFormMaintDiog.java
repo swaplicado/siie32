@@ -699,6 +699,14 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 mnMaintMovementIogCategory == SModSysConsts.TRNS_CT_IOG_IN &&
                 jcbMaintReturnUser.getSelectedIndex() > 0;
     }
+    
+    private boolean shouldCheckMaintUserStock() {
+        return SLibUtils.belongsTo(mnParamMaintMovementType, 
+                new int[] {
+                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT,
+                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT,
+                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST });
+    }
 
     private void populateMaintUserSupervisor() {
         jcbMaintUserSupervisor.setEnabled(false);
@@ -1603,14 +1611,16 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                     }
 
                     // Validate item lots:
-                    
+                   
                     String validationMsg = STrnStockValidator.validateStockLots(miClient, entries, mnIogCategoryId, false);
 
                     if (!validationMsg.isEmpty()) {
                         throw new Exception(validationMsg);
                     }
 
-                    validationMsg = STrnStockValidator.validateStockMoves(miClient, entries, mnIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate(), SLibConstants.UNDEFINED, null, ((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey()[0]);
+                    validationMsg = STrnStockValidator.validateStockMoves(miClient, entries, mnIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), 
+                            (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate(), 
+                            SLibConstants.UNDEFINED, null, !shouldCheckMaintUserStock() ? SLibConstants.UNDEFINED : ((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey()[0]);
                     if (validationMsg.length() > 0) {
                         throw new Exception(validationMsg);
                     }
