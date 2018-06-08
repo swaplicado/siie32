@@ -161,7 +161,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
 
-                aoTableColumns = new STableColumn[10];
+                aoTableColumns = new STableColumn[11];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL:
