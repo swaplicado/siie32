@@ -160,7 +160,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jpDocType = new javax.swing.JPanel();
         jlDiogType = new javax.swing.JLabel();
         jtfDiogType = new javax.swing.JTextField();
-        jcbDiogAdjustmentType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbDiogAdjustmentType = new javax.swing.JComboBox<>();
         jpDocDate = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
         jftDate = new javax.swing.JFormattedTextField();
@@ -170,7 +170,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsDeleted = new javax.swing.JCheckBox();
         jpDocNumber = new javax.swing.JPanel();
         jlSeries = new javax.swing.JLabel();
-        jcbSeries = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbSeries = new javax.swing.JComboBox<>();
         jtfNumber = new javax.swing.JTextField();
         jlDummy01 = new javax.swing.JLabel();
         jbWarehouseExchange = new javax.swing.JButton();
@@ -192,7 +192,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel22 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jlProdOrderSource = new javax.swing.JLabel();
-        jcbProdOrderSource = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbProdOrderSource = new javax.swing.JComboBox<>();
         jbProdOrderSource = new javax.swing.JButton();
         jPanel25 = new javax.swing.JPanel();
         jlItemSource = new javax.swing.JLabel();
@@ -202,7 +202,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfUnitSymbolSource = new javax.swing.JTextField();
         jpProductionOrderDestiny = new javax.swing.JPanel();
         jlProdOrderDestiny = new javax.swing.JLabel();
-        jcbProdOrderDestiny = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbProdOrderDestiny = new javax.swing.JComboBox<>();
         jbProdOrderDestiny = new javax.swing.JButton();
         jtbSwitchProdOrderDestiny = new javax.swing.JToggleButton();
         jpProductionOrderDestinyItem = new javax.swing.JPanel();
@@ -578,11 +578,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfReference.setText("TEXT");
         jtfReference.setPreferredSize(new java.awt.Dimension(135, 23));
-        jtfReference.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfReferenceActionPerformed(evt);
-            }
-        });
         jPanel27.add(jtfReference);
 
         jPanel22.add(jPanel27);
@@ -595,11 +590,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jtfNotes.setText("TEXT");
         jtfNotes.setPreferredSize(new java.awt.Dimension(400, 23));
-        jtfNotes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfNotesActionPerformed(evt);
-            }
-        });
         jPanel28.add(jtfNotes);
 
         jPanel22.add(jPanel28);
@@ -832,14 +822,6 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         actionCancel();
     }//GEN-LAST:event_formWindowClosing
-
-    private void jtfNotesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfNotesActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfNotesActionPerformed
-
-    private void jtfReferenceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfReferenceActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfReferenceActionPerformed
 
     private void initComponentsExtra() {
         int i = 0;
@@ -3513,8 +3495,8 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                 iogCounterpart.setFkWarehouseId(moWarehouseDestiny.getPkEntityId());
                 iogCounterpart.setFkDpsYearId_n(SLibConstants.UNDEFINED);
                 iogCounterpart.setFkDpsDocId_n(SLibConstants.UNDEFINED);
-                iogCounterpart.setFkDiogYearId_n(SLibConstants.UNDEFINED);
-                iogCounterpart.setFkDiogDocId_n(SLibConstants.UNDEFINED);
+                iogCounterpart.setFkDiogYearId_n(SLibConstants.UNDEFINED);  // necesary to break link to himself
+                iogCounterpart.setFkDiogDocId_n(SLibConstants.UNDEFINED);   // necesary to break link to himself
 
                 if (STrnUtilities.needsIogTypeProdOrderDestiny(manParamIogTypeKey)) {
                     if (SLibUtilities.compareKeys(manParamIogTypeKey, SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_WP_RET)) {
@@ -3538,14 +3520,12 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
                     iogCounterpart.setPkDocId(0);
                     iogCounterpart.setNumberSeries(items.size() == 0 ? moDiog.getNumberSeries() : items.get(0).getItem());
                     iogCounterpart.setNumber("");   // number will be set in store procedure
-                    iogCounterpart.setReference(moFieldReference.getString());
                 }
                 else {
                     iogCounterpart.setPkYearId(moDiog.getDbmsDataCounterpartDiog().getPkYearId());
                     iogCounterpart.setPkDocId(moDiog.getDbmsDataCounterpartDiog().getPkDocId());
                     iogCounterpart.setNumberSeries(moDiog.getDbmsDataCounterpartDiog().getNumberSeries());
                     iogCounterpart.setNumber(moDiog.getDbmsDataCounterpartDiog().getNumber());
-                    iogCounterpart.setReference(moFieldReference.getString());
 
                     for (SDataDiogEntry entry : iogCounterpart.getDbmsEntries()) {
                         entry.setPkYearId(moDiog.getDbmsDataCounterpartDiog().getPkYearId());

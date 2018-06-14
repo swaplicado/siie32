@@ -836,7 +836,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
 
             if (moDbmsDataCounterpartDiog != null) {
                 moDbmsDataCounterpartDiog.setIsDeleted(mbIsDeleted);
-                moDbmsDataCounterpartDiog.setReference(msNumber);
                 moDbmsDataCounterpartDiog.setIsShipmentRequired(mbIsShipmentRequired);
                 moDbmsDataCounterpartDiog.setIsShipped(mbIsShipped);
                 moDbmsDataCounterpartDiog.setIsAudited(mbIsAudited);

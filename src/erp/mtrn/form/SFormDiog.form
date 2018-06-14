@@ -663,9 +663,6 @@
                           <Dimension value="[135, 23]"/>
                         </Property>
                       </Properties>
-                      <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jtfReferenceActionPerformed"/>
-                      </Events>
                     </Component>
                   </SubComponents>
                 </Container>
@@ -691,9 +688,6 @@
                           <Dimension value="[400, 23]"/>
                         </Property>
                       </Properties>
-                      <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jtfNotesActionPerformed"/>
-                      </Events>
                     </Component>
                   </SubComponents>
                 </Container>

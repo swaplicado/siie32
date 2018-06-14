@@ -999,7 +999,7 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
                 stockMoveParams.setPkUnitId(stockAssignRow.getFkUnitId());
                 stockMoveParams.setWarehouseType(SDataConstantsSys.CFGS_TP_ENT_WH_MFG_MS[1]);
                 
-                objStock = STrnStockSegregationUtils.getStock(miClient, stockMoveParams);
+                objStock = STrnStockSegregationUtils.getStock(miClient, stockMoveParams, null);
                 surplus = objStock.getAvailableStock();
             }
             catch (Exception e) {

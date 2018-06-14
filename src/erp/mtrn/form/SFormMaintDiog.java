@@ -1624,7 +1624,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                     validationMsg = STrnStockValidator.validateStockMoves(miClient, entries, mnIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), 
                             (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate(), 
                             SLibConstants.UNDEFINED, null, !shouldCheckMaintUserStock() ? SLibConstants.UNDEFINED : ((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey()[0]);
-                    if (validationMsg.length() > 0) {
+                    if (!validationMsg.isEmpty()) {
                         throw new Exception(validationMsg);
                     }
             
@@ -1871,12 +1871,16 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 diogCounterpart.setFkDiogTypeId(diogTypeCounterpartKey[2]);
                 diogCounterpart.setFkCompanyBranchId(moWarehouseDestiny.getPkCompanyBranchId());
                 diogCounterpart.setFkWarehouseId(moWarehouseDestiny.getPkEntityId());
+                diogCounterpart.setFkDpsYearId_n(SLibConstants.UNDEFINED);
+                diogCounterpart.setFkDpsDocId_n(SLibConstants.UNDEFINED);
+                diogCounterpart.setFkDiogYearId_n(SLibConstants.UNDEFINED); // necesary to break link to himself
+                diogCounterpart.setFkDiogDocId_n(SLibConstants.UNDEFINED);  // necesary to break link to himself
 
                 if (moDiog.getDbmsDataCounterpartDiog() == null) {
                     diogCounterpart.setPkYearId(moDiog.getPkYearId());                    
-                    //diogCounterpart.setPkDocId(...);
+                    diogCounterpart.setPkDocId(0);
                     diogCounterpart.setNumberSeries(msSeriesIogCounterpart);
-                    //diogCounterpart.setNumber(...);
+                    diogCounterpart.setNumber("");
                 }
                 else {
                     diogCounterpart.setPkYearId(moDiog.getDbmsDataCounterpartDiog().getPkYearId());

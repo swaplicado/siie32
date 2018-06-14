@@ -128,7 +128,7 @@ public class STrnStockValidator {
                             
                             stockMoveSegregation = stockMove.clone();
                             stockMoveSegregation.setPkLotId(0);
-                            stockTotal = STrnStockSegregationUtils.getStock(miClient, stockMoveSegregation).getStock();
+                            stockTotal = STrnStockSegregationUtils.getStock(miClient, stockMoveSegregation, isDocBeingDeleted || stockMove.getAuxIsMoveBeingDeleted() ? null : manDiogKey).getStock();
                             
                             stockAvailable = stockTotal - stockSegregated;
                             
