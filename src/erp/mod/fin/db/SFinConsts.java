@@ -2,6 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mod.fin.db;
 
 /**
@@ -24,8 +25,10 @@ public class SFinConsts {
     
     public static final java.lang.String TXT_VAL = "VALUACIÓN";
     
-    public static final int LAY_BANK_TYPE_DPS = 1;
-    public static final int LAY_BANK_TYPE_ADV = 2;
+    /** Bank layout for payments */
+    public static final int LAY_BANK_TYPE_PAY = 2;
+    /** Bank layout for prepayments */
+    public static final int LAY_BANK_TYPE_ADV = 3;
     
     public static final int LAY_BANK_NEW_ST = 0;
     public static final int LAY_BANK_APPROVED_ST = 1;
@@ -41,9 +44,6 @@ public class SFinConsts {
     public static final String TXT_CHECK = "CHQ";
     public static final String TXT_INVOICE = "FAC";
 
-    public static final String RFC_DOM = "XAXX010101000";
-    public static final String RFC_INT = "XEXX010101000";
-    
     public static final int RFC_PER_LEN = 13;
     public static final int RFC_COM_LEN = 12;
     public static final int CURP_LEN = 18;

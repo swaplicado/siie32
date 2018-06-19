@@ -2,6 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mod.hrs.db;
 
 import cfd.DAttributeOptionCondicionesPago;
@@ -877,22 +878,22 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     
     @Override
     public ArrayList<SCfdDataConcepto> getElementsConcepto() {
-        SCfdDataConcepto conceptoXml = new SCfdDataConcepto();
-        conceptoXml.setClaveProdServ("84111505");
-        conceptoXml.setNoIdentificacion("");
-        conceptoXml.setCantidad(1);
-        conceptoXml.setClaveUnidad("ACT");
-        conceptoXml.setUnidad("");
-        conceptoXml.setDescripcion("Pago de nómina");
-        conceptoXml.setValorUnitario(mdTotalPercepciones);
-        conceptoXml.setImporte(mdTotalPercepciones);
-        conceptoXml.setDescuento(mdTotalDeducciones);
-        conceptoXml.setCfdiType(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
+        SCfdDataConcepto concepto = new SCfdDataConcepto();
+        concepto.setClaveProdServ(DCfdi33Catalogs.ClaveProdServServsSueldosSalarios);
+        concepto.setNoIdentificacion("");
+        concepto.setCantidad(1);
+        concepto.setClaveUnidad(DCfdi33Catalogs.ClaveUnidadAct);
+        concepto.setUnidad("");
+        concepto.setDescripcion(DCfdi33Catalogs.ConceptoServsSueldosSalarios);
+        concepto.setValorUnitario(mdTotalPercepciones);
+        concepto.setImporte(mdTotalPercepciones);
+        concepto.setDescuento(mdTotalDeducciones);
+        concepto.setCfdiType(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
 
-        ArrayList<SCfdDataConcepto> concepts = new ArrayList<SCfdDataConcepto>();
-        concepts.add(conceptoXml);
+        ArrayList<SCfdDataConcepto> conceptos = new ArrayList<>();
+        conceptos.add(concepto);
 
-        return concepts;
+        return conceptos;
     }
 
     @Override

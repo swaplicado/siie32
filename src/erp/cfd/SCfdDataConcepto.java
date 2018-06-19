@@ -44,7 +44,7 @@ public class SCfdDataConcepto {
         mdImporte = 0;
         mdDescuento = 0;
         mnCfdiType = 0;
-        maImpuestosXml = new ArrayList<SCfdDataImpuesto>();
+        maImpuestosXml = new ArrayList<>();
     }
     
     public void setClaveProdServ(String s) { msClaveProdServ = s; }
@@ -56,6 +56,10 @@ public class SCfdDataConcepto {
     public void setValorUnitario(double d) { mdValorUnitario = d; }
     public void setImporte(double d) { mdImporte = d; }
     public void setDescuento(double d) { mdDescuento = d; }
+    /**
+     * Helps in formatting some of the attributes of XML node, according of the type of CFDI provided.
+     * @param n Valid values limited to constants defined in SDataConstantsSys.TRNS_TP_CFD_...
+     */
     public void setCfdiType(int n) { mnCfdiType = n; }
     
     public String getClaveProdServ() { return msClaveProdServ; }
@@ -138,7 +142,7 @@ public class SCfdDataConcepto {
     
     /**
      * Create node for concept version 3.3.
-     * @return Node
+     * @return XML node of class cfd.ver33.DElementConcepto.
      * @throws Exception 
      */
     public cfd.ver33.DElementConcepto createRootElementConcept33() throws Exception {
@@ -150,17 +154,23 @@ public class SCfdDataConcepto {
         concepto.getAttClaveUnidad().setString(msClaveUnidad);
         
         concepto.getAttCantidad().setDouble(mdCantidad);
-        if (mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+        if (SLibUtils.belongsTo(mnCfdiType, new int[] { SDataConstantsSys.TRNS_TP_CFD_PAY_REC, SDataConstantsSys.TRNS_TP_CFD_PAYROLL })) {
             concepto.getAttCantidad().setDecimals(0);
         }
         
         concepto.getAttDescripcion().setString(msDescripcion);
-        concepto.getAttValorUnitario().setDouble(mdValorUnitario);
-        concepto.getAttImporte().setDouble(mdImporte);
         
-        if (mdDescuento > 0) {
-            concepto.getAttDescuento().setDouble(mdDescuento);
+        concepto.getAttValorUnitario().setDouble(mdValorUnitario);
+        if (mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_PAY_REC) {
+            concepto.getAttValorUnitario().setDecimals(0);
         }
+        
+        concepto.getAttImporte().setDouble(mdImporte);
+        if (mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_PAY_REC) {
+            concepto.getAttImporte().setDecimals(0);
+        }
+        
+        concepto.getAttDescuento().setDouble(mdDescuento);
         
         // Taxes:
             

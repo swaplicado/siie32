@@ -140,6 +140,7 @@ import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataCfdPacType;
+import erp.mtrn.data.SDataCfdPayment;
 import erp.mtrn.data.SDataCfdSignLog;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogDocumentNumberSeries;
@@ -708,6 +709,9 @@ public abstract class SDataUtilities {
                 break;
             case SDataConstants.TRN_CFD:
                 registry = new SDataCfd();
+                break;
+            case SDataConstants.TRNX_CFD_PAY:
+                registry = new SDataCfdPayment();
                 break;
             case SDataConstants.TRN_CFD_SIGN_LOG:
                 registry = new SDataCfdSignLog();
@@ -1518,7 +1522,7 @@ public abstract class SDataUtilities {
 
     /**
      * @param client ERP Client interface.
-     * @param keyDps Purchases-Sales Document key.
+     * @param dpsKey Purchases-Sales Document key.
      * @param year Fiscal year.
      * @param dateCutOff_n If needed, cut-off date.
      * @returns Returns an array of double, where:

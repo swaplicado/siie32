@@ -2,17 +2,17 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mod.fin.view;
 
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
-import erp.mfin.data.SDataBankLayoutType;
 import erp.mfin.data.SFinUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbBankLayout;
 import erp.mod.fin.db.SFinConsts;
-import erp.mod.fin.form.SDialogLayoutsBankCardex;
+import erp.mod.fin.form.SDialogBankLayoutCardex;
 import erp.mod.fin.util.SFinUtils;
 import erp.mod.fin.util.STreasuryBankLayoutRequest;
 import java.awt.event.ActionEvent;
@@ -39,7 +39,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez
+ * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Sergio Flores
  */
 public class SViewBankLayout extends SGridPaneView implements ActionListener {
 
@@ -48,7 +48,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
     private JButton jbSend;
     private JButton jbBackToNew;
     private JButton jbCardex;
-    private SDialogLayoutsBankCardex moDialogLayoutsCardex;
+    private SDialogBankLayoutCardex moDialogBankLayoutCardex;
     
     public SViewBankLayout(SGuiClient client, int gridSubtype, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FIN_LAY_BANK, gridSubtype, title);
@@ -64,14 +64,14 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         jbSend = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar solicitud de autorización", this);
         jbBackToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a estatus anterior", this);
 	jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver detalles de pago", this);
-        moDialogLayoutsCardex = new SDialogLayoutsBankCardex(miClient, mnGridSubtype, "Detalle del layout");
+        moDialogBankLayoutCardex = new SDialogBankLayoutCardex(miClient, mnGridSubtype, "Detalle del layout");
     
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetLayout);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSend);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbBackToNew);
 	
-        if (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_DPS) {
+        if (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_PAY) {
            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
         }
     }
@@ -203,11 +203,10 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         boolean done = false;
         SDbBankLayout bankLayout = null;
         STreasuryBankLayoutRequest treasuryBankLayoutRequest = null;
-        SDataBankLayoutType typeLayout = null;
         bankLayout = readLayout();
         
         if (bankLayout != null) {
-            bankLayout.setAuxLayoutType(mnGridSubtype == SModSysConsts.FIN_LAY_BANK_DPS ? "TRANSFERENCIAS" : "ANTICIPOS");
+            bankLayout.setAuxLayoutType(mnGridSubtype == SModSysConsts.FIN_LAY_BANK_PAY ? "TRANSFERENCIAS" : "ANTICIPOS");
             treasuryBankLayoutRequest = new STreasuryBankLayoutRequest(miClient, bankLayout);
             done = treasuryBankLayoutRequest.makeRequestToTreasury();
             
@@ -253,8 +252,8 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                     miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
                 }
                 else {
-                    moDialogLayoutsCardex.setFormParams(gridRow.getRowPrimaryKey());
-                    moDialogLayoutsCardex.setVisible(true);
+                    moDialogBankLayoutCardex.setFormParams(gridRow.getRowPrimaryKey());
+                    moDialogBankLayoutCardex.setVisible(true);
                 }
             }
         }
@@ -313,7 +312,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                 + "l.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "l.fk_usr_upd = uu.id_usr "
-                + "WHERE l.trn_tp = " + (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_DPS ? SFinConsts.LAY_BANK_TYPE_DPS : SFinConsts.LAY_BANK_TYPE_ADV) + (sql.length() == 0 ? "" : " AND " + sql) + " "
+                + "WHERE l.trn_tp = " + mnGridSubtype + (sql.length() == 0 ? "" : " AND " + sql) + " "
                 + "ORDER BY l.dt_lay, l.dt_due, l.id_lay_bank ";
     }
 
@@ -335,7 +334,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.tra", "Transferencias", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.tra_pay", "Transferencias pagadas", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "f_tra_x_pay", "Transferencias x pagar", 100));
-        if (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_DPS) {
+        if (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_PAY) {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.dps", "Documentos", 100));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.dps_pay", "Documentos pagados", 100));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "f_doc_x_pay", "Documentos x pagar", 100));            

@@ -72,14 +72,17 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         moRadMonth04 = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadMonth07 = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadMonth10 = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadMonth13 = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadMonth02 = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadMonth05 = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadMonth08 = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadMonth11 = new sa.lib.gui.bean.SBeanFieldRadio();
+        jlMonthDummy01 = new javax.swing.JLabel();
         moRadMonth03 = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadMonth06 = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadMonth09 = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadMonth12 = new sa.lib.gui.bean.SBeanFieldRadio();
+        jtfMonthNotes = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         moRadXmlFileChartOfAccounts = new sa.lib.gui.bean.SBeanFieldRadio();
@@ -94,7 +97,7 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         moRadTrialSheetNormal = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel9 = new javax.swing.JPanel();
         jlTrialSheetLastModification = new javax.swing.JLabel();
-        moRadTrialSheetSubsequent = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadTrialSheetComplem = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel10 = new javax.swing.JPanel();
         moDateTrialSheetLastModification = new sa.lib.gui.bean.SBeanFieldDate();
         jLabel1 = new javax.swing.JLabel();
@@ -103,17 +106,17 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         jLabel5 = new javax.swing.JLabel();
         jPanel12 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
-        moRadRequestAf = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadRequestInspect = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel14 = new javax.swing.JPanel();
         jlRequestOrder = new javax.swing.JLabel();
-        moRadRequestFc = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadRequestCertif = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel15 = new javax.swing.JPanel();
         moTextRequestOrder = new sa.lib.gui.bean.SBeanFieldText();
         jLabel3 = new javax.swing.JLabel();
-        moRadRequestDe = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadRequestRefund = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel16 = new javax.swing.JPanel();
         jlRequestTransaction = new javax.swing.JLabel();
-        moRadRequestCo = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadRequestCompen = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel17 = new javax.swing.JPanel();
         moTextRequestTransaction = new sa.lib.gui.bean.SBeanFieldText();
         jLabel6 = new javax.swing.JLabel();
@@ -141,7 +144,7 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel3.setLayout(new java.awt.GridLayout(3, 4));
+        jPanel3.setLayout(new java.awt.GridLayout(3, 5));
 
         jbgPeriod.add(moRadMonth01);
         moRadMonth01.setText("Enero");
@@ -159,6 +162,10 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         moRadMonth10.setText("Octubre");
         jPanel3.add(moRadMonth10);
 
+        jbgPeriod.add(moRadMonth13);
+        moRadMonth13.setText("Mes 13");
+        jPanel3.add(moRadMonth13);
+
         jbgPeriod.add(moRadMonth02);
         moRadMonth02.setText("Febrero");
         jPanel3.add(moRadMonth02);
@@ -174,6 +181,7 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         jbgPeriod.add(moRadMonth11);
         moRadMonth11.setText("Noviembre");
         jPanel3.add(moRadMonth11);
+        jPanel3.add(jlMonthDummy01);
 
         jbgPeriod.add(moRadMonth03);
         moRadMonth03.setText("Marzo");
@@ -190,6 +198,10 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         jbgPeriod.add(moRadMonth12);
         moRadMonth12.setText("Diciembre");
         jPanel3.add(moRadMonth12);
+
+        jtfMonthNotes.setEditable(false);
+        jtfMonthNotes.setFocusable(false);
+        jPanel3.add(jtfMonthNotes);
 
         jPanel1.add(jPanel3, java.awt.BorderLayout.CENTER);
 
@@ -246,9 +258,9 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
         jPanel7.add(jPanel9);
 
-        jbgTrialSheet.add(moRadTrialSheetSubsequent);
-        moRadTrialSheetSubsequent.setText("Complementaria");
-        jPanel7.add(moRadTrialSheetSubsequent);
+        jbgTrialSheet.add(moRadTrialSheetComplem);
+        moRadTrialSheetComplem.setText("Complementaria");
+        jPanel7.add(moRadTrialSheetComplem);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
         jPanel10.add(moDateTrialSheetLastModification);
@@ -268,10 +280,10 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
         jPanel13.setLayout(new java.awt.GridLayout(4, 2));
 
-        jbgRequest.add(moRadRequestAf);
-        moRadRequestAf.setSelected(true);
-        moRadRequestAf.setText("Acto de fiscalización");
-        jPanel13.add(moRadRequestAf);
+        jbgRequest.add(moRadRequestInspect);
+        moRadRequestInspect.setSelected(true);
+        moRadRequestInspect.setText("Acto de fiscalización");
+        jPanel13.add(moRadRequestInspect);
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
@@ -281,9 +293,9 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
         jPanel13.add(jPanel14);
 
-        jbgRequest.add(moRadRequestFc);
-        moRadRequestFc.setText("Fiscalización compulsa");
-        jPanel13.add(moRadRequestFc);
+        jbgRequest.add(moRadRequestCertif);
+        moRadRequestCertif.setText("Fiscalización compulsa");
+        jPanel13.add(moRadRequestCertif);
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
         jPanel15.add(moTextRequestOrder);
@@ -295,9 +307,9 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
         jPanel13.add(jPanel15);
 
-        jbgRequest.add(moRadRequestDe);
-        moRadRequestDe.setText("Devolución");
-        jPanel13.add(moRadRequestDe);
+        jbgRequest.add(moRadRequestRefund);
+        moRadRequestRefund.setText("Devolución");
+        jPanel13.add(moRadRequestRefund);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
@@ -307,9 +319,9 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
         jPanel13.add(jPanel16);
 
-        jbgRequest.add(moRadRequestCo);
-        moRadRequestCo.setText("Compensación");
-        jPanel13.add(moRadRequestCo);
+        jbgRequest.add(moRadRequestCompen);
+        moRadRequestCompen.setText("Compensación");
+        jPanel13.add(moRadRequestCompen);
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
         jPanel17.add(moTextRequestTransaction);
@@ -392,11 +404,13 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
     private javax.swing.ButtonGroup jbgXmlFile;
     private javax.swing.JLabel jlAccountEnd;
     private javax.swing.JLabel jlAccountStart;
+    private javax.swing.JLabel jlMonthDummy01;
     private javax.swing.JLabel jlRequestOrder;
     private javax.swing.JLabel jlRequestTransaction;
     private javax.swing.JLabel jlTrialSheetLastModification;
     private javax.swing.JLabel jlYear;
     private javax.swing.JSpinner jsYear;
+    private javax.swing.JTextField jtfMonthNotes;
     private sa.lib.gui.bean.SBeanFieldDate moDateTrialSheetLastModification;
     private erp.gui.account.SBeanPanelAccount moPanelAccountEnd;
     private erp.gui.account.SBeanPanelAccount moPanelAccountStart;
@@ -412,12 +426,13 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
     private sa.lib.gui.bean.SBeanFieldRadio moRadMonth10;
     private sa.lib.gui.bean.SBeanFieldRadio moRadMonth11;
     private sa.lib.gui.bean.SBeanFieldRadio moRadMonth12;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadRequestAf;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadRequestCo;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadRequestDe;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadRequestFc;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadMonth13;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadRequestCertif;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadRequestCompen;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadRequestInspect;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadRequestRefund;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadTrialSheetComplem;
     private sa.lib.gui.bean.SBeanFieldRadio moRadTrialSheetNormal;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadTrialSheetSubsequent;
     private sa.lib.gui.bean.SBeanFieldRadio moRadXmlFileChartOfAccounts;
     private sa.lib.gui.bean.SBeanFieldRadio moRadXmlFileDetailedCfdi;
     private sa.lib.gui.bean.SBeanFieldRadio moRadXmlFileDetailedLedger;
@@ -446,18 +461,19 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         moRadMonth10.setBooleanSettings(moRadMonth10.getText(), false);
         moRadMonth11.setBooleanSettings(moRadMonth11.getText(), false);
         moRadMonth12.setBooleanSettings(moRadMonth12.getText(), false);
+        moRadMonth13.setBooleanSettings(moRadMonth13.getText(), false);
         moRadXmlFileChartOfAccounts.setBooleanSettings(moRadXmlFileChartOfAccounts.getText(), false);
         moRadXmlFileTrialSheet.setBooleanSettings(moRadXmlFileTrialSheet.getText(), false);
         moRadXmlFileJournalVouchers.setBooleanSettings(moRadXmlFileJournalVouchers.getText(), false);
         moRadXmlFileDetailedCfdi.setBooleanSettings(moRadXmlFileDetailedCfdi.getText(), false);
         moRadXmlFileDetailedLedger.setBooleanSettings(moRadXmlFileDetailedLedger.getText(), false);
         moRadTrialSheetNormal.setBooleanSettings(moRadTrialSheetNormal.getText(), false);
-        moRadTrialSheetSubsequent.setBooleanSettings(moRadTrialSheetSubsequent.getText(), false);
+        moRadTrialSheetComplem.setBooleanSettings(moRadTrialSheetComplem.getText(), false);
         moDateTrialSheetLastModification.setDateSettings(miClient, SGuiUtils.getLabelName(jlTrialSheetLastModification), true);
-        moRadRequestAf.setBooleanSettings(moRadRequestAf.getText(), false);
-        moRadRequestFc.setBooleanSettings(moRadRequestFc.getText(), false);
-        moRadRequestDe.setBooleanSettings(moRadRequestDe.getText(), false);
-        moRadRequestCo.setBooleanSettings(moRadRequestCo.getText(), false);
+        moRadRequestInspect.setBooleanSettings(moRadRequestInspect.getText(), false);
+        moRadRequestCertif.setBooleanSettings(moRadRequestCertif.getText(), false);
+        moRadRequestRefund.setBooleanSettings(moRadRequestRefund.getText(), false);
+        moRadRequestCompen.setBooleanSettings(moRadRequestCompen.getText(), false);
         moTextRequestOrder.setTextSettings(SGuiUtils.getLabelName(jlRequestOrder), 13, 13);
         moTextRequestTransaction.setTextSettings(SGuiUtils.getLabelName(jlRequestTransaction), 14, 14);
 
@@ -483,13 +499,14 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         moFields.addField(moRadMonth10);
         moFields.addField(moRadMonth11);
         moFields.addField(moRadMonth12);
+        moFields.addField(moRadMonth13);
         moFields.addField(moRadXmlFileChartOfAccounts);
         moFields.addField(moRadXmlFileTrialSheet);
         moFields.addField(moRadXmlFileJournalVouchers);
         moFields.addField(moRadXmlFileDetailedCfdi);
         moFields.addField(moRadXmlFileDetailedLedger);
         moFields.addField(moRadTrialSheetNormal);
-        moFields.addField(moRadTrialSheetSubsequent);
+        moFields.addField(moRadTrialSheetComplem);
         moFields.addField(moDateTrialSheetLastModification);
         moFields.addField(moTextRequestOrder);
         moFields.addField(moTextRequestTransaction);
@@ -504,25 +521,45 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         ((SpinnerNumberModel) jsYear.getModel()).setMaximum(SFiscalConsts.YEAR_MAX);
     }
 
-    private void itemStateXmlFile() {
-        boolean enableTrialSheet = false;
-        boolean enableRequest = false;
-        boolean enableAccounts = false;
+    private void itemStateChangedMonth() {
+        if (!moRadXmlFileTrialSheet.isSelected()) {
+            jtfMonthNotes.setText("");
+        }
+        else {
+            if (moRadMonth12.isSelected()) {
+                jtfMonthNotes.setText("SIN ajustes de cierre y auditoría");
+            }
+            else if (moRadMonth13.isSelected()) {
+                jtfMonthNotes.setText("CON ajustes de cierre y auditoría");
+            }
+            else {
+                jtfMonthNotes.setText("TODAS las pólizas contables");
+            }
+        }
+    }
 
+    private void itemStateChangedXmlFile() {
+        boolean enableMonth13 = false;
+        boolean enablePanelTrialSheet = false;
+        boolean enablePanelRequest = false;
+        boolean enablePanelAccounts = false;
+
+        moRadMonth13.setEnabled(false);
+        
         moDateTrialSheetLastModification.setValue(null);
         moDateTrialSheetLastModification.setEditable(false);
         moRadTrialSheetNormal.setEnabled(false);
-        moRadTrialSheetSubsequent.setEnabled(false);
+        moRadTrialSheetComplem.setEnabled(false);
         jbgTrialSheet.clearSelection();
 
         moTextRequestOrder.setValue("");
         moTextRequestOrder.setEditable(false);
         moTextRequestTransaction.setValue("");
         moTextRequestTransaction.setEditable(false);
-        moRadRequestAf.setEnabled(false);
-        moRadRequestFc.setEnabled(false);
-        moRadRequestDe.setEnabled(false);
-        moRadRequestCo.setEnabled(false);
+        moRadRequestInspect.setEnabled(false);
+        moRadRequestCertif.setEnabled(false);
+        moRadRequestRefund.setEnabled(false);
+        moRadRequestCompen.setEnabled(false);
         jbgRequest.clearSelection();
 
         moPanelAccountStart.resetPanel();
@@ -534,45 +571,56 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
         }
         else if (moRadXmlFileTrialSheet.isSelected()) {
-            enableTrialSheet = true;
+            enableMonth13 = true;
+            enablePanelTrialSheet = true;
         }
         else if (moRadXmlFileJournalVouchers.isSelected()) {
-            enableRequest = true;
+            enablePanelRequest = true;
         }
         else if (moRadXmlFileDetailedCfdi.isSelected()) {
-            enableRequest = true;
+            enablePanelRequest = true;
         }
         else if (moRadXmlFileDetailedLedger.isSelected()) {
-            enableRequest = true;
-            enableAccounts = true;
+            enablePanelRequest = true;
+            enablePanelAccounts = true;
         }
+        
+        if (enableMonth13) {
+            moRadMonth13.setEnabled(true);
+        }
+        
+        if (moRadMonth13.isSelected() && !moRadMonth13.isEnabled()) {
+            moRadMonth12.setSelected(true);
+        }
+        
+        itemStateChangedMonth();
 
-        if (enableTrialSheet) {
+        if (enablePanelTrialSheet) {
             moDateTrialSheetLastModification.setEditable(true);
             moRadTrialSheetNormal.setEnabled(true);
-            moRadTrialSheetSubsequent.setEnabled(true);
+            moRadTrialSheetComplem.setEnabled(true);
 
             moRadTrialSheetNormal.setSelected(true);    // triggers item state changed event
         }
 
-        if (enableRequest) {
+        if (enablePanelRequest) {
             moTextRequestOrder.setEditable(true);
             moTextRequestTransaction.setEditable(true);
-            moRadRequestAf.setEnabled(true);
-            moRadRequestFc.setEnabled(true);
-            moRadRequestDe.setEnabled(true);
-            moRadRequestCo.setEnabled(true);
+            moRadRequestInspect.setEnabled(true);
+            moRadRequestCertif.setEnabled(true);
+            moRadRequestRefund.setEnabled(true);
+            moRadRequestCompen.setEnabled(true);
 
-            moRadRequestAf.setSelected(true);           // triggers item state changed event
+            moRadRequestInspect.setSelected(true);           // triggers item state changed event
         }
 
-        if (enableAccounts) {
+        if (enablePanelAccounts) {
             moPanelAccountStart.setPanelEditable(true);
             moPanelAccountEnd.setPanelEditable(true);
         }
     }
 
-    private void itemStateTrialSheet() {
+    private void itemStateChangedTrialSheet() {
         boolean enableLastModification = false;
 
         moDateTrialSheetLastModification.setEditable(false);
@@ -580,7 +628,7 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         if (moRadTrialSheetNormal.isSelected()) {
 
         }
-        else if (moRadTrialSheetSubsequent.isSelected()) {
+        else if (moRadTrialSheetComplem.isSelected()) {
             enableLastModification = true;
         }
 
@@ -589,23 +637,23 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         }
     }
 
-    private void itemStateRequest() {
+    private void itemStateChangedRequest() {
         boolean enableOrder = false;
         boolean enableTransaction = false;
 
         moTextRequestOrder.setEditable(false);
         moTextRequestTransaction.setEditable(false);
 
-        if (moRadRequestAf.isSelected()) {
+        if (moRadRequestInspect.isSelected()) {
             enableOrder = true;
         }
-        else if (moRadRequestFc.isSelected()) {
+        else if (moRadRequestCertif.isSelected()) {
             enableOrder = true;
         }
-        else if (moRadRequestDe.isSelected()) {
+        else if (moRadRequestRefund.isSelected()) {
             enableTransaction = true;
         }
-        else if (moRadRequestCo.isSelected()) {
+        else if (moRadRequestCompen.isSelected()) {
             enableTransaction = true;
         }
 
@@ -689,9 +737,9 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
         moRadXmlFileChartOfAccounts.setSelected(true);
 
-        itemStateXmlFile();
-        itemStateTrialSheet();
-        itemStateRequest();
+        itemStateChangedXmlFile();
+        itemStateChangedTrialSheet();
+        itemStateChangedRequest();
 
         addAllListeners();
     }
@@ -710,17 +758,18 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         moRadMonth10.addItemListener(this);
         moRadMonth11.addItemListener(this);
         moRadMonth12.addItemListener(this);
+        moRadMonth13.addItemListener(this);
         moRadXmlFileChartOfAccounts.addItemListener(this);
         moRadXmlFileTrialSheet.addItemListener(this);
         moRadXmlFileJournalVouchers.addItemListener(this);
         moRadXmlFileDetailedCfdi.addItemListener(this);
         moRadXmlFileDetailedLedger.addItemListener(this);
         moRadTrialSheetNormal.addItemListener(this);
-        moRadTrialSheetSubsequent.addItemListener(this);
-        moRadRequestAf.addItemListener(this);
-        moRadRequestFc.addItemListener(this);
-        moRadRequestDe.addItemListener(this);
-        moRadRequestCo.addItemListener(this);
+        moRadTrialSheetComplem.addItemListener(this);
+        moRadRequestInspect.addItemListener(this);
+        moRadRequestCertif.addItemListener(this);
+        moRadRequestRefund.addItemListener(this);
+        moRadRequestCompen.addItemListener(this);
     }
 
     @Override
@@ -737,17 +786,18 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
         moRadMonth10.removeItemListener(this);
         moRadMonth11.removeItemListener(this);
         moRadMonth12.removeItemListener(this);
+        moRadMonth13.removeItemListener(this);
         moRadXmlFileChartOfAccounts.removeItemListener(this);
         moRadXmlFileTrialSheet.removeItemListener(this);
         moRadXmlFileJournalVouchers.removeItemListener(this);
         moRadXmlFileDetailedCfdi.removeItemListener(this);
         moRadXmlFileDetailedLedger.removeItemListener(this);
         moRadTrialSheetNormal.removeItemListener(this);
-        moRadTrialSheetSubsequent.removeItemListener(this);
-        moRadRequestAf.removeItemListener(this);
-        moRadRequestFc.removeItemListener(this);
-        moRadRequestDe.removeItemListener(this);
-        moRadRequestCo.removeItemListener(this);
+        moRadTrialSheetComplem.removeItemListener(this);
+        moRadRequestInspect.removeItemListener(this);
+        moRadRequestCertif.removeItemListener(this);
+        moRadRequestRefund.removeItemListener(this);
+        moRadRequestCompen.removeItemListener(this);
     }
 
     @Override
@@ -844,14 +894,14 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
                             }
                             else if (moRadXmlFileJournalVouchers.isSelected()) {
                                 doc = SFiscalUtils.createDocPolizas13(miClient.getSession(), (int) jsYear.getValue(), mnMonth,
-                                        moRadRequestAf.isSelected() ? SFiscalConsts.JOV_REQ_TP_AF : SFiscalConsts.JOV_REQ_TP_FC, moTextRequestOrder.getValue(), moTextRequestTransaction.getValue());
+                                        moRadRequestInspect.isSelected() ? SFiscalConsts.JOV_REQ_TP_AF : SFiscalConsts.JOV_REQ_TP_FC, moTextRequestOrder.getValue(), moTextRequestTransaction.getValue());
                             }
                             else if (moRadXmlFileDetailedCfdi.isSelected()) {
                                 // do not needed actually
                             }
                             else if (moRadXmlFileDetailedLedger.isSelected()) {
                                 doc = SFiscalUtils.createDocAuxiliarCtas13(miClient.getSession(), (int) jsYear.getValue(), mnMonth,
-                                        moRadRequestAf.isSelected() ? SFiscalConsts.JOV_REQ_TP_AF : SFiscalConsts.JOV_REQ_TP_FC, moTextRequestOrder.getValue(), moTextRequestTransaction.getValue(),
+                                        moRadRequestInspect.isSelected() ? SFiscalConsts.JOV_REQ_TP_AF : SFiscalConsts.JOV_REQ_TP_FC, moTextRequestOrder.getValue(), moTextRequestTransaction.getValue(),
                                         moPanelAccountStart.getSelectedAccount() == null ? "" : moPanelAccountStart.getSelectedAccount().getCodeStd(),
                                         moPanelAccountEnd.getSelectedAccount() == null ? "" : moPanelAccountEnd.getSelectedAccount().getCodeStd());
                             }
@@ -876,72 +926,88 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
 
                 if (field == moRadMonth01) {
                     mnMonth = 1;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadMonth02) {
                     mnMonth = 2;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadMonth03) {
                     mnMonth = 3;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadMonth04) {
                     mnMonth = 4;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadMonth05) {
                     mnMonth = 5;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadMonth06) {
                     mnMonth = 6;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadMonth07) {
                     mnMonth = 7;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadMonth08) {
                     mnMonth = 8;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadMonth09) {
                     mnMonth = 9;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadMonth10) {
                     mnMonth = 10;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadMonth11) {
                     mnMonth = 11;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadMonth12) {
                     mnMonth = 12;
+                    itemStateChangedMonth();
+                }
+                else if (field == moRadMonth13) {
+                    mnMonth = 13;
+                    itemStateChangedMonth();
                 }
                 else if (field == moRadXmlFileChartOfAccounts) {
-                    itemStateXmlFile();
+                    itemStateChangedXmlFile();
                 }
                 else if (field == moRadXmlFileTrialSheet) {
-                    itemStateXmlFile();
+                    itemStateChangedXmlFile();
                 }
                 else if (field == moRadXmlFileJournalVouchers) {
-                    itemStateXmlFile();
+                    itemStateChangedXmlFile();
                 }
                 else if (field == moRadXmlFileDetailedCfdi) {
-                    itemStateXmlFile();
+                    itemStateChangedXmlFile();
                 }
                 else if (field == moRadXmlFileDetailedLedger) {
-                    itemStateXmlFile();
+                    itemStateChangedXmlFile();
                 }
                 else if (field == moRadTrialSheetNormal) {
-                    itemStateTrialSheet();
+                    itemStateChangedTrialSheet();
                 }
-                else if (field == moRadTrialSheetSubsequent) {
-                    itemStateTrialSheet();
+                else if (field == moRadTrialSheetComplem) {
+                    itemStateChangedTrialSheet();
                 }
-                else if (field == moRadRequestAf) {
-                    itemStateRequest();
+                else if (field == moRadRequestInspect) {
+                    itemStateChangedRequest();
                 }
-                else if (field == moRadRequestFc) {
-                    itemStateRequest();
+                else if (field == moRadRequestCertif) {
+                    itemStateChangedRequest();
                 }
-                else if (field == moRadRequestDe) {
-                    itemStateRequest();
+                else if (field == moRadRequestRefund) {
+                    itemStateChangedRequest();
                 }
-                else if (field == moRadRequestCo) {
-                    itemStateRequest();
+                else if (field == moRadRequestCompen) {
+                    itemStateChangedRequest();
                 }
             }
         }

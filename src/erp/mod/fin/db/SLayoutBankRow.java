@@ -310,10 +310,10 @@ public class SLayoutBankRow implements SGridRow {
         int[] key = new int[] { SLibConsts.UNDEFINED };
         
         switch (mnLayoutRowType) {
-            case SModSysConsts.FIN_LAY_BANK_DPS:
+            case SModSysConsts.FIN_LAY_BANK_PAY:
                 key = new int[] { mnPkYearId, mnPkDocId };
                 break;
-            case SModSysConsts.FIN_LAY_BANK_ADV:
+            case SModSysConsts.FIN_LAY_BANK_PREPAY:
                 key = new int[] { mnBizPartnerId };
                 break;
             default:
@@ -357,7 +357,7 @@ public class SLayoutBankRow implements SGridRow {
         Object value = null;
         
         switch (mnLayoutRowType) {
-            case SModSysConsts.FIN_LAY_BANK_DPS:
+            case SModSysConsts.FIN_LAY_BANK_PAY:
                 switch (col) {
                     case 0:
                         value = msBizPartner;
@@ -442,7 +442,7 @@ public class SLayoutBankRow implements SGridRow {
                 }
                 break;
                 
-            case SModSysConsts.FIN_LAY_BANK_ADV:
+            case SModSysConsts.FIN_LAY_BANK_PREPAY:
                 switch (col) {
                     case 0:
                         value = msBizPartner;
@@ -499,7 +499,7 @@ public class SLayoutBankRow implements SGridRow {
     @Override
     public void setRowValueAt(Object value, int row) {
         switch (mnLayoutRowType) {
-            case SModSysConsts.FIN_LAY_BANK_DPS:
+            case SModSysConsts.FIN_LAY_BANK_PAY:
                 switch (row) {
                     case 0:
                     case 1:
@@ -588,7 +588,7 @@ public class SLayoutBankRow implements SGridRow {
                         break;
                     }
                     break;
-            case SModSysConsts.FIN_LAY_BANK_ADV:
+            case SModSysConsts.FIN_LAY_BANK_PREPAY:
                 switch (row) {
                     case 0:
                     case 1:

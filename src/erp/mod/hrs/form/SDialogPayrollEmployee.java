@@ -1055,75 +1055,6 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         }
     }
 
-    /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
-    private SDbPayrollReceiptEarning createReceipEarning(SHrsPayrollReceipt payrollReceipt, SHrsPayrollReceiptEarning row) {
-        double amount = 0;
-        SDbPayrollReceiptEarning receiptEarning = null;
-
-        receiptEarning = new SDbPayrollReceiptEarning();
-
-        receiptEarning.setPkPayrollId(payrollReceipt.getReceipt().getPkPayrollId());
-        receiptEarning.setPkEmployeeId(payrollReceipt.getHrsEmployee().getEmployee().getPkEmployeeId());
-        receiptEarning.setPkMoveId(row.getPkMoveId());
-        
-        if (moHrsBenefit == null) {
-            // Unit:
-
-            if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
-                receiptEarning.setUnitsAlleged(row.getXtaValueAlleged() == 0 ? 0d : 1d);
-                receiptEarning.setUnits(row.getXtaValueAlleged() == 0 ? 0d : 1d);
-            }
-            else {
-                receiptEarning.setUnitsAlleged(row.getXtaValueAlleged());
-                receiptEarning.setUnits(row.getXtaValue());
-            }
-            receiptEarning.setFactorAmount(1);
-
-            // Amount unitary:
-
-            if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
-                receiptEarning.setAmountUnitary(row.getXtaValue());
-            }
-            else if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
-                receiptEarning.setAmountUnitary(moReceipt.getReceipt().getPaymentDaily());
-            }
-            else if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
-                receiptEarning.setAmountUnitary(moReceipt.getReceipt().getPaymentHourly());
-            }
-            else if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY) {
-                receiptEarning.setAmountUnitary(moReceipt.getReceipt().getPaymentDaily() * moEarning.getPayPercentage());
-            }
-            else if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
-                receiptEarning.setAmountUnitary(moReceipt.getReceipt().getPaymentHourly() * moEarning.getPayPercentage());
-            }
-
-            amount = SLibUtils.round((receiptEarning.getUnits() * receiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-            
-            receiptEarning.setAmountSystem_r(amount);
-            receiptEarning.setAmount_r(amount);
-            receiptEarning.setAutomatic(false);
-            receiptEarning.setFkBenefitTypeId(row.getEarning().getFkBenefitTypeId());
-        }
-        else {
-            receiptEarning.setUnitsAlleged(row.getXtaValueAlleged());
-            receiptEarning.setUnits(row.getXtaValue());
-            receiptEarning.setFactorAmount(moHrsBenefit.getFactorAmount());
-            receiptEarning.setAmountUnitary(moReceipt.getReceipt().getPaymentDaily());
-            receiptEarning.setAmountSystem_r(moHrsBenefit.getAmountPayedReceiptSys());
-            receiptEarning.setAmount_r(moHrsBenefit.getAmountPayedReceipt());
-            receiptEarning.setFkBenefitTypeId(moHrsBenefit.getBenefitTypeId());
-            receiptEarning.setBenefitAniversary(moHrsBenefit.getBenefitAnn());
-            receiptEarning.setBenefitYear(moHrsBenefit.getBenefitYear());
-            receiptEarning.setAutomatic(true);
-        }
-        receiptEarning.setAlternativeTaxCalculation(row.getEarning().isAlternativeTaxCalculation());// XXX (jbarajas, 2016-04-06) articule 174 RLISR
-        receiptEarning.setFkEarningTypeId(row.getEarning().getFkEarningTypeId());
-        receiptEarning.setFkEarningId(row.getEarning().getPkEarningId());
-
-        return receiptEarning;
-    }
-    */
-    
     private SDbPayrollReceiptEarning createReceipEarning(SHrsPayrollReceipt payrollReceipt, SHrsPayrollReceiptEarning row) {
         double amount_unt = 0;
         double unit = 0;
@@ -1619,7 +1550,6 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             hrsReceiptDeductionRow.setPkMoveId(moReceipt.getHrsDeductions().size() + 1);
             hrsReceiptDeductionRow.setXtaEmployee(moReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
             hrsReceiptDeductionRow.setXtaValue(moComDeductionValue.getField().getValue());
-            //hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE)); XXX (jbarajas, 2016-04-20) new field for computation type
             hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
             hrsReceiptDeductionRow.setReceiptDeduction(createReceipDeduction(moReceipt, hrsReceiptDeductionRow));
 
@@ -1969,6 +1899,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
 
     @Override
     public void keyTyped(KeyEvent e) {
+        
     }
 
     @Override

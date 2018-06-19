@@ -140,9 +140,15 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel20 = new javax.swing.JPanel();
         jlAbsenceType = new javax.swing.JLabel();
         moKeyAbsenceType = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel30 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         moBoolWithholding = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel31 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         moBoolPayrollTax = new sa.lib.gui.bean.SBeanFieldBoolean();
-        moBoolTaxCalculationOptional = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel32 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        moBoolAlternativeTaxCalculation = new sa.lib.gui.bean.SBeanFieldBoolean();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
@@ -458,7 +464,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAbsenceClass.setText("Clase incidencia:");
-        jlAbsenceClass.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlAbsenceClass.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel21.add(jlAbsenceClass);
 
         moKeyAbsenceClass.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -469,7 +475,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAbsenceType.setText("Tipo incidencia:");
-        jlAbsenceType.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlAbsenceType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel20.add(jlAbsenceType);
 
         moKeyAbsenceType.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -477,17 +483,38 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel28.add(jPanel20);
 
+        jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel30.add(jLabel1);
+
         moBoolWithholding.setText("Es retención de ley");
-        moBoolWithholding.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel28.add(moBoolWithholding);
+        moBoolWithholding.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel30.add(moBoolWithholding);
 
-        moBoolPayrollTax.setText("Aplica imp. sobre nómina");
-        moBoolPayrollTax.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel28.add(moBoolPayrollTax);
+        jPanel28.add(jPanel30);
 
-        moBoolTaxCalculationOptional.setText("Aplica cálculo imp. opcional");
-        moBoolTaxCalculationOptional.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel28.add(moBoolTaxCalculationOptional);
+        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel2.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel31.add(jLabel2);
+
+        moBoolPayrollTax.setText("Aplica para impto. sobre nóminas");
+        moBoolPayrollTax.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel31.add(moBoolPayrollTax);
+
+        jPanel28.add(jPanel31);
+
+        jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel3.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel32.add(jLabel3);
+
+        moBoolAlternativeTaxCalculation.setText("Cálculo alterno impto. (Art. 174 RLISR)");
+        moBoolAlternativeTaxCalculation.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel32.add(moBoolAlternativeTaxCalculation);
+
+        jPanel28.add(jPanel32);
 
         jPanel26.add(jPanel28, java.awt.BorderLayout.CENTER);
 
@@ -499,6 +526,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -522,6 +552,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel30;
+    private javax.swing.JPanel jPanel31;
+    private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -560,13 +593,13 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlUnitsFactor;
     private javax.swing.JLabel jlUnitsMaximumWeek;
     private javax.swing.JLabel jlUnitsMaximumWeekHelp;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolAlternativeTaxCalculation;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolDaysAbsence;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolDaysAdjustment;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolDaysWorked;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolDaysWorkedBased;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolLoan;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolPayrollTax;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBoolTaxCalculationOptional;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolWelfare;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolWithholding;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecExemptionMwz;
@@ -630,7 +663,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moKeyAbsenceType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAbsenceType.getText()), false);
         moBoolWithholding.setBooleanSettings(SGuiUtils.getLabelName(moBoolWithholding.getText()), false);
         moBoolPayrollTax.setBooleanSettings(SGuiUtils.getLabelName(moBoolPayrollTax.getText()), false);
-        moBoolTaxCalculationOptional.setBooleanSettings(SGuiUtils.getLabelName(moBoolTaxCalculationOptional.getText()), false);
+        moBoolAlternativeTaxCalculation.setBooleanSettings(SGuiUtils.getLabelName(moBoolAlternativeTaxCalculation.getText()), false);
 
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
@@ -662,7 +695,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moKeyAbsenceType);
         moFields.addField(moBoolWithholding);
         moFields.addField(moBoolPayrollTax);
-        moFields.addField(moBoolTaxCalculationOptional);
+        moFields.addField(moBoolAlternativeTaxCalculation);
 
         moFields.setFormButton(jbSave);
     }
@@ -818,7 +851,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolDaysWorkedBased.setValue(moRegistry.isDaysWorkedBased());
         moBoolWithholding.setValue(moRegistry.isWithholding());
         moBoolPayrollTax.setValue(moRegistry.isPayrollTax());
-        moBoolTaxCalculationOptional.setValue(moRegistry.isAlternativeTaxCalculation());
+        moBoolAlternativeTaxCalculation.setValue(moRegistry.isAlternativeTaxCalculation());
         moKeyEarningType.setValue(new int[] { moRegistry.getFkEarningTypeId() });
         moKeyEarningComputationType.setValue(new int[] { moRegistry.getFkEarningComputationTypeId() });
         moKeyEarningExemptionType.setValue(new int[] { moRegistry.getFkEarningExemptionTypeId() });
@@ -865,7 +898,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         registry.setDaysWorkedBased(moBoolDaysWorkedBased.getValue());
         registry.setWithholding(moBoolWithholding.getValue());
         registry.setPayrollTax(moBoolPayrollTax.getValue());
-        registry.setAlternativeTaxCalculation(moBoolTaxCalculationOptional.getValue());
+        registry.setAlternativeTaxCalculation(moBoolAlternativeTaxCalculation.getValue());
         registry.setFkEarningTypeId(moKeyEarningType.getValue()[0]);
         registry.setFkEarningComputationTypeId(moKeyEarningComputationType.getValue()[0]);
         registry.setFkEarningExemptionTypeId(moKeyEarningExemptionType.getValue()[0]);

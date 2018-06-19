@@ -10,7 +10,7 @@ import sa.lib.SLibConsts;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
 public class SLayoutBankXmlRow {
     
@@ -132,10 +132,10 @@ public class SLayoutBankXmlRow {
     public int[] getPrimaryKey() {
         int[] key = new int[] { SLibConsts.UNDEFINED };
         
-        if (mnLayoutXmlRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
+        if (mnLayoutXmlRowType == SModSysConsts.FIN_LAY_BANK_PAY) {
             key = new int[] { mnDpsYear, mnDpsDoc };
         }
-        else if (mnLayoutXmlRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
+        else if (mnLayoutXmlRowType == SModSysConsts.FIN_LAY_BANK_PREPAY) {
             key = new int[] { mnBizPartner };
         }
         

@@ -1927,28 +1927,32 @@ public abstract class SDataReadTableRows {
                 aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "cfd.id_cfd");
 
                 i = 0;
-                aoQueryFields = new STableField[9];
+                aoQueryFields = new STableField[8];
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DATE, "cfd.ts");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cfdtp.code");
-                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "xmltp.code");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cfdtp.tp_cfd");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "xmltp.tp_xml");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "_cfd_num");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cfd.uuid");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cfd.xml_rfc_rec");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "cfd.xml_tot");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cfd.xml_mon");
 
-                sSql = "SELECT cfd.id_cfd, cfd.uuid, cfd.xml_rfc_rec, cfd.xml_tot, cfd.xml_mon, cfdtp.tp_cfd, xmltp.tp_xml, " +
-                        "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, dt.code, b.bp, b.id_bp, c.cur_key, cob.code " +
+                int typeCfd = SLibConstants.UNDEFINED;
+                String rfcRec = "";
+                if (filterKey instanceof Object[]) {
+                    typeCfd = (int) ((Object[]) filterKey)[0];
+                    rfcRec = (String) ((Object[]) filterKey)[1];
+                }
+
+                sSql = "SELECT cfd.id_cfd, cfd.ts, cfd.uuid, cfd.xml_rfc_rec, cfd.xml_tot, cfd.xml_mon, cfdtp.tp_cfd, xmltp.tp_xml, " +
+                        "COALESCE(CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num), CONCAT(cfd.ser, IF(length(cfd.ser) = 0, '', '-'), cfd.num)) AS _cfd_num " +
                         "FROM trn_cfd AS cfd " +
-                        "INNER JOIN trns_tp_cfd AS cfdtp ON cfd.fid_tp_cfd = cfdtp.id_tp_cfd " +
-                        "INNER JOIN trns_tp_xml AS xmltp ON cfd.fid_tp_xml = xmltp.id_tp_xml " +
+                        "INNER JOIN erp.trns_tp_cfd AS cfdtp ON cfd.fid_tp_cfd = cfdtp.id_tp_cfd " +
+                        "INNER JOIN erp.trns_tp_xml AS xmltp ON cfd.fid_tp_xml = xmltp.id_tp_xml " +
                         "LEFT OUTER JOIN trn_dps AS d ON cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc " +
-                        "WHERE cfd.fid_tp_cfd = " + ((Object[]) filterKey)[0] + " AND cfd.xml_rfc_rec = '" + ((Object[]) filterKey)[1] + "' AND " +
-                        "cfd.fid_st_cfd = " + 1 + " " +
-                        (filterKey == null ? "" : "d.fid_ct_dps = " + ((int[])((Object[]) filterKey)[0])[0] + " AND d.fid_cl_dps = " + ((int[])((Object[]) filterKey)[0])[1] + " AND ") +
-                        (((Object[]) filterKey).length == 1 ? "" : "d.fid_bp_r = " + ((int[]) ((Object[]) filterKey)[1])[0] + " AND ") +
-                        "d.b_del = 0 AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
-                        "ORDER BY d.dt, dt.code, d.num_ser, d.num, b.bp, b.id_bp ";
+                        "WHERE cfd.fid_tp_cfd = " + typeCfd + " AND cfd.xml_rfc_rec = '" + rfcRec + "' AND " +
+                        "cfd.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
+                        "ORDER BY cfd.ts ";
                 break;
 
             case SDataConstants.TRN_DPS_IOG_CHG:

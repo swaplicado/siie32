@@ -457,6 +457,7 @@ public abstract class SDataConstants {
     public static final int TRN_TP_CFD_PAC = 207098;    // out of place! (sflores, 2014-02-17)
     public static final int TRN_MMS_LOG = 207099;       // out of place! (sflores, 2014-01-28)
     public static final int TRN_CFD_SIGN_LOG = 207100;  // out of place! (sflores, 2014-09-01)
+    public static final int TRN_CFD_FIN_REC = 207104;
     public static final int TRN_DVY = 207111;
     public static final int TRN_DVY_ETY = 207112;
 
@@ -942,6 +943,7 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_CFD, "trn_cfd");
         TablesMap.put(TRN_CFD_SIGN_LOG, "trn_cfd_sign_log");
         TablesMap.put(TRN_CFD_SND_LOG, "trn_cfd_snd_log");
+        TablesMap.put(TRN_CFD_FIN_REC, "trn_cfd_fin_rec");
         TablesMap.put(TRN_PAC, "trn_pac");
         TablesMap.put(TRN_TP_CFD_PAC, "trn_tp_cfd_pac");
         TablesMap.put(TRN_SIGN, "trn_sign");

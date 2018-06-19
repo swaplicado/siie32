@@ -2,13 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mod.fin.db;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
-public class SFinRecordLayout {
+public class SLayoutBankRecordKey {
 
     protected int mnPkYearId;
     protected int mnPkPeriodId;
@@ -16,19 +17,13 @@ public class SFinRecordLayout {
     protected java.lang.String msPkRecordTypeId;
     protected int mnPkNumberId;
 
-    public SFinRecordLayout(int year, int period, int bookkeepingCenter, String recordType, int number) {
+    public SLayoutBankRecordKey(int year, int period, int bookkeepingCenter, String recordType, int number) {
         mnPkYearId = year;
         mnPkPeriodId = period;
         mnPkBookkeepingCenterId = bookkeepingCenter;
         msPkRecordTypeId = recordType;
         mnPkNumberId = number;
     }
-
-    public void setPkYearId(int n) { mnPkYearId = n; }
-    public void setPkPeriodId(int n) { mnPkPeriodId = n; }
-    public void setPkBookkeepingCenterId(int n) { mnPkBookkeepingCenterId = n; }
-    public void setPkRecordTypeId(java.lang.String s) { msPkRecordTypeId = s; }
-    public void setPkNumberId(int n) { mnPkNumberId = n; }
 
     public Object[] getPrimaryKey() {
         return new Object[] { mnPkYearId, mnPkPeriodId, mnPkBookkeepingCenterId, msPkRecordTypeId, mnPkNumberId };
@@ -40,7 +35,8 @@ public class SFinRecordLayout {
     public java.lang.String getPkRecordTypeId() { return msPkRecordTypeId; }
     public int getPkNumberId() { return mnPkNumberId; }
     
-    public SFinRecordLayout clone() {
-        return new SFinRecordLayout(mnPkYearId, mnPkPeriodId, mnPkBookkeepingCenterId, msPkRecordTypeId, mnPkNumberId);
+    @Override
+    public SLayoutBankRecordKey clone() {
+        return new SLayoutBankRecordKey(mnPkYearId, mnPkPeriodId, mnPkBookkeepingCenterId, msPkRecordTypeId, mnPkNumberId);
     }
 }

@@ -4,6 +4,7 @@
  */
 package erp.mod.fin.db;
 
+import cfd.DCfdConsts;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
@@ -264,7 +265,7 @@ public abstract class SFiscalUtils {
             "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS a " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FINS_FISCAL_ACC) + " AS fa ON fa.id_fiscal_acc = a.fid_fiscal_acc " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FINS_TP_ACC_SPE) + " AS spe ON spe.id_tp_acc_spe = a.fid_tp_acc_spe " +
-            "WHERE a.lev = 1 AND a.code IN ( " +
+            "WHERE a.lev = 1 AND a.code IN (" +
             "SELECT DISTINCT CONCAT(LEFT(a.code, 6), REPEAT('0', 42)) AS f_acc_ldg_id " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num AND r.b_del = 0 AND re.b_del = 0 " +
@@ -664,7 +665,7 @@ public abstract class SFiscalUtils {
 
                     case SFiscalConsts.ACC_CSH_BNK:
                         accountNature = SFiscalConsts.COA_DBT;
-                        fiscalAccountCodeSpecial = fiscalIdBank.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_CSH_BNK_INT : SFiscalConsts.ACC_CSH_BNK_DOM;
+                        fiscalAccountCodeSpecial = fiscalIdBank.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_CSH_BNK_INT : SFiscalConsts.ACC_CSH_BNK_DOM;
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_CSH_BNK;
                         referenceKey = new int[] { resultSet.getInt("f_bnk_cob_id"), resultSet.getInt("f_bnk_ent_id") };
@@ -673,10 +674,10 @@ public abstract class SFiscalUtils {
                     case SFiscalConsts.ACC_BPR_CUS:
                         accountNature = SFiscalConsts.COA_DBT;
                         if (attRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_REL_INT : SFiscalConsts.ACC_BPR_CUS_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_REL_INT : SFiscalConsts.ACC_BPR_CUS_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_INT : SFiscalConsts.ACC_BPR_CUS_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_INT : SFiscalConsts.ACC_BPR_CUS_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_CUS;
@@ -694,7 +695,7 @@ public abstract class SFiscalUtils {
                             fiscalAccountCodeSpecial = SFiscalConsts.ACC_BPR_DBR_SHH;
                         }
                         else if (attRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_DBR_REL_INT : SFiscalConsts.ACC_BPR_DBR_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_DBR_REL_INT : SFiscalConsts.ACC_BPR_DBR_REL_DOM;
                         }
                         else {
                             fiscalAccountCodeSpecial = SFiscalConsts.ACC_BPR_DBR_OTH;
@@ -709,10 +710,10 @@ public abstract class SFiscalUtils {
                     case SFiscalConsts.ACC_BPR_SUP_ADV:
                         accountNature = SFiscalConsts.COA_DBT;
                         if (attRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_ADV_REL_INT : SFiscalConsts.ACC_BPR_SUP_ADV_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_ADV_REL_INT : SFiscalConsts.ACC_BPR_SUP_ADV_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_ADV_INT : SFiscalConsts.ACC_BPR_SUP_ADV_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_ADV_INT : SFiscalConsts.ACC_BPR_SUP_ADV_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_SUP_ADV;
@@ -724,10 +725,10 @@ public abstract class SFiscalUtils {
                     case SFiscalConsts.ACC_BPR_SUP:
                         accountNature = SFiscalConsts.COA_CDT;
                         if (attRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_REL_INT : SFiscalConsts.ACC_BPR_SUP_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_REL_INT : SFiscalConsts.ACC_BPR_SUP_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_INT : SFiscalConsts.ACC_BPR_SUP_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_INT : SFiscalConsts.ACC_BPR_SUP_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_SUP;
@@ -742,10 +743,10 @@ public abstract class SFiscalUtils {
                             fiscalAccountCodeSpecial = SFiscalConsts.ACC_BPR_CDR_ST_SHH;
                         }
                         else if (attRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_ST_REL_INT : SFiscalConsts.ACC_BPR_CDR_ST_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_ST_REL_INT : SFiscalConsts.ACC_BPR_CDR_ST_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_ST_INT : SFiscalConsts.ACC_BPR_CDR_ST_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_ST_INT : SFiscalConsts.ACC_BPR_CDR_ST_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_CDR;
@@ -757,10 +758,10 @@ public abstract class SFiscalUtils {
                     case SFiscalConsts.ACC_BPR_CUS_ADV:
                         accountNature = SFiscalConsts.COA_CDT;
                         if (attRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_ADV_REL_INT : SFiscalConsts.ACC_BPR_CUS_ADV_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_ADV_REL_INT : SFiscalConsts.ACC_BPR_CUS_ADV_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_ADV_INT : SFiscalConsts.ACC_BPR_CUS_ADV_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_ADV_INT : SFiscalConsts.ACC_BPR_CUS_ADV_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_CUS_ADV;
@@ -775,10 +776,10 @@ public abstract class SFiscalUtils {
                             fiscalAccountCodeSpecial = SFiscalConsts.ACC_BPR_CDR_LT_SHH;
                         }
                         else if (attRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_LT_REL_INT : SFiscalConsts.ACC_BPR_CDR_LT_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_LT_REL_INT : SFiscalConsts.ACC_BPR_CDR_LT_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_LT_INT : SFiscalConsts.ACC_BPR_CDR_LT_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_LT_INT : SFiscalConsts.ACC_BPR_CDR_LT_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_CDR;
@@ -1043,7 +1044,7 @@ public abstract class SFiscalUtils {
 
                     case SFiscalConsts.ACC_CSH_BNK:
                         accountNature = SFiscalConsts.COA_DBT;
-                        fiscalAccountCodeSpecial = fiscalIdBank.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_CSH_BNK_INT : SFiscalConsts.ACC_CSH_BNK_DOM;
+                        fiscalAccountCodeSpecial = fiscalIdBank.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_CSH_BNK_INT : SFiscalConsts.ACC_CSH_BNK_DOM;
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_CSH_BNK;
                         referenceKey = new int[] { resultSet.getInt("f_bnk_cob_id"), resultSet.getInt("f_bnk_ent_id") };
@@ -1052,10 +1053,10 @@ public abstract class SFiscalUtils {
                     case SFiscalConsts.ACC_BPR_CUS:
                         accountNature = SFiscalConsts.COA_DBT;
                         if (isAttRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_REL_INT : SFiscalConsts.ACC_BPR_CUS_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_REL_INT : SFiscalConsts.ACC_BPR_CUS_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_INT : SFiscalConsts.ACC_BPR_CUS_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_INT : SFiscalConsts.ACC_BPR_CUS_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_CUS;
@@ -1073,7 +1074,7 @@ public abstract class SFiscalUtils {
                             fiscalAccountCodeSpecial = SFiscalConsts.ACC_BPR_DBR_SHH;
                         }
                         else if (isAttRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_DBR_REL_INT : SFiscalConsts.ACC_BPR_DBR_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_DBR_REL_INT : SFiscalConsts.ACC_BPR_DBR_REL_DOM;
                         }
                         else {
                             fiscalAccountCodeSpecial = SFiscalConsts.ACC_BPR_DBR_OTH;
@@ -1088,10 +1089,10 @@ public abstract class SFiscalUtils {
                     case SFiscalConsts.ACC_BPR_SUP_ADV:
                         accountNature = SFiscalConsts.COA_DBT;
                         if (isAttRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_ADV_REL_INT : SFiscalConsts.ACC_BPR_SUP_ADV_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_ADV_REL_INT : SFiscalConsts.ACC_BPR_SUP_ADV_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_ADV_INT : SFiscalConsts.ACC_BPR_SUP_ADV_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_ADV_INT : SFiscalConsts.ACC_BPR_SUP_ADV_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_SUP_ADV;
@@ -1103,10 +1104,10 @@ public abstract class SFiscalUtils {
                     case SFiscalConsts.ACC_BPR_SUP:
                         accountNature = SFiscalConsts.COA_CDT;
                         if (isAttRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_REL_INT : SFiscalConsts.ACC_BPR_SUP_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_REL_INT : SFiscalConsts.ACC_BPR_SUP_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_INT : SFiscalConsts.ACC_BPR_SUP_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_SUP_INT : SFiscalConsts.ACC_BPR_SUP_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_SUP;
@@ -1121,10 +1122,10 @@ public abstract class SFiscalUtils {
                             fiscalAccountCodeSpecial = SFiscalConsts.ACC_BPR_CDR_ST_SHH;
                         }
                         else if (isAttRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_ST_REL_INT : SFiscalConsts.ACC_BPR_CDR_ST_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_ST_REL_INT : SFiscalConsts.ACC_BPR_CDR_ST_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_ST_INT : SFiscalConsts.ACC_BPR_CDR_ST_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_ST_INT : SFiscalConsts.ACC_BPR_CDR_ST_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_CDR;
@@ -1136,10 +1137,10 @@ public abstract class SFiscalUtils {
                     case SFiscalConsts.ACC_BPR_CUS_ADV:
                         accountNature = SFiscalConsts.COA_CDT;
                         if (isAttRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_ADV_REL_INT : SFiscalConsts.ACC_BPR_CUS_ADV_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_ADV_REL_INT : SFiscalConsts.ACC_BPR_CUS_ADV_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_ADV_INT : SFiscalConsts.ACC_BPR_CUS_ADV_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CUS_ADV_INT : SFiscalConsts.ACC_BPR_CUS_ADV_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_CUS_ADV;
@@ -1154,10 +1155,10 @@ public abstract class SFiscalUtils {
                             fiscalAccountCodeSpecial = SFiscalConsts.ACC_BPR_CDR_LT_SHH;
                         }
                         else if (isAttRelatedParty) {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_LT_REL_INT : SFiscalConsts.ACC_BPR_CDR_LT_REL_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_LT_REL_INT : SFiscalConsts.ACC_BPR_CDR_LT_REL_DOM;
                         }
                         else {
-                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(SFinConsts.RFC_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_LT_INT : SFiscalConsts.ACC_BPR_CDR_LT_DOM;
+                            fiscalAccountCodeSpecial = fiscalIdBizPartner.compareTo(DCfdConsts.RFC_GEN_INT) == 0 ? SFiscalConsts.ACC_BPR_CDR_LT_INT : SFiscalConsts.ACC_BPR_CDR_LT_DOM;
                         }
 
                         linkType = SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_CDR;
@@ -1576,18 +1577,37 @@ public abstract class SFiscalUtils {
     }
     
     public static String createQueryBalanza13(final SGuiSession session, final int periodYear, final int periodMonth, final int coaYear, final int coaMonth) throws Exception {
+        int month = 0;
         String sql = "";
         String balDate = "";
+        String whereDec = "";
+        
+        // adjust calendar month if necesary:
 
+        if (periodMonth <= SLibTimeConsts.MONTH_MAX) {
+            month = periodMonth;
+        }
+        else if (periodMonth == (SLibTimeConsts.MONTH_MAX + 1)) {
+            month = SLibTimeConsts.MONTH_MAX;
+        }
+        
+        // exclude journal vouchers of closing and audit adjustments only in december:
+        
+        if (periodMonth == SLibTimeConsts.MONTH_MAX) {
+            whereDec = "AND NOT b_adj_year AND NOT b_adj_audit ";
+        }
+        
+        // validate year and month:
+        
         if (periodYear < SFiscalConsts.YEAR_MIN || periodYear > SLibTimeConsts.YEAR_MAX) {
             throw new Exception("El atributo 'Anio' debe ser mínimo " + SFiscalConsts.YEAR_MIN + " y máximo " + SLibTimeConsts.YEAR_MAX + ".");
         }
 
-        if (periodMonth < SLibTimeConsts.MONTH_MIN || periodMonth > SLibTimeConsts.MONTH_MAX) {
+        if (month < SLibTimeConsts.MONTH_MIN || month > SLibTimeConsts.MONTH_MAX) {
             throw new Exception("El atributo 'Mes' debe ser mínimo " + SLibTimeConsts.MONTH_MIN + " y máximo " + SLibTimeConsts.MONTH_MAX + ".");
         }
 
-        balDate = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.createDate(periodYear, periodMonth));
+        balDate = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.createDate(periodYear, month));
 
         /*
          * Obtain trial balance as follows:
@@ -1622,7 +1642,7 @@ public abstract class SFiscalUtils {
                 + "fad.id_tp_fiscal_acc_link BETWEEN " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_CSH_CSH + " AND " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_CSH_BNK + " AND fad.id_ref_1 = re.fid_cob_n AND fad.id_ref_2 = re.fid_ent_n "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_COB_ENT) + " AS ce ON ce.id_cob = re.fid_cob_n AND ce.id_ent = re.fid_ent_n "
                 + "WHERE "
-                + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + " "
+                + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + month + " " + whereDec
                 + "GROUP BY f_acc_id, f_acc_tp_id, f_acc_cl_id, f_acc_spe_id, f_ref_1, f_ref_2, f_acc_code, f_acc_name, f_acc_nat "
                 + "HAVING f_bal_ope <> 0 OR f_dbt <> 0 OR f_cdt <> 0 OR f_bal_clo <> 0 "
                 + ""
@@ -1652,7 +1672,7 @@ public abstract class SFiscalUtils {
                 + "fad.id_tp_fiscal_acc_link BETWEEN " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_SUP + " AND " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_CUS_ADV + " AND fad.id_ref_1 = re.fid_bp_nr AND fad.id_ref_2 = " + SLibConsts.UNDEFINED + " AND fad.id_acc = a.pk_acc "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = re.fid_bp_nr "
                 + "WHERE "
-                + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + " "
+                + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + month + " " + whereDec
                 + "GROUP BY f_acc_id, f_acc_tp_id, f_acc_cl_id, f_acc_spe_id, f_ref_1, f_ref_2, f_acc_code, f_acc_name, f_acc_nat "
                 + "HAVING f_bal_ope <> 0 OR f_dbt <> 0 OR f_cdt <> 0 OR f_bal_clo <> 0 "
                 + ""
@@ -1681,7 +1701,7 @@ public abstract class SFiscalUtils {
                 + "fad.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_INC + " AND fad.id_ref_1 = re.fid_item_n AND fad.id_ref_2 = " + SLibConsts.UNDEFINED + " AND fad.id_acc = a.pk_acc "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON i.id_item = re.fid_item_n "
                 + "WHERE "
-                + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + " "
+                + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + month + " " + whereDec
                 + "GROUP BY f_acc_id, f_acc_tp_id, f_acc_cl_id, f_acc_spe_id, f_ref_1, f_ref_2, f_acc_code, f_acc_name, f_acc_nat "
                 + "HAVING f_bal_ope <> 0 OR f_dbt <> 0 OR f_cdt <> 0 OR f_bal_clo <> 0 "
                 + ""
@@ -1710,7 +1730,7 @@ public abstract class SFiscalUtils {
                 + "fad.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_EXP + " AND fad.id_ref_1 = re.fid_item_n AND fad.id_ref_2 = " + SLibConsts.UNDEFINED + " AND fad.id_acc = a.pk_acc "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.ITMU_ITEM) + " AS i ON i.id_item = re.fid_item_n "
                 + "WHERE "
-                + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + " "
+                + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + month + " " + whereDec
                 + "GROUP BY f_acc_id, f_acc_tp_id, f_acc_cl_id, f_acc_spe_id, f_ref_1, f_ref_2, f_acc_code, f_acc_name, f_acc_nat "
                 + "HAVING f_bal_ope <> 0 OR f_dbt <> 0 OR f_cdt <> 0 OR f_bal_clo <> 0 "
                 + ""
@@ -1739,7 +1759,7 @@ public abstract class SFiscalUtils {
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK_DET) + " AS fad ON fad.id_year = " + coaYear + " AND fad.id_per = " + coaMonth + " AND "
                 + "fad.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_ACC + " AND fad.id_ref_1 = a.pk_acc AND fad.id_ref_2 = " + SLibConsts.UNDEFINED + " "
                 + "WHERE "
-                + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + " "
+                + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + month + " " + whereDec
                 + "GROUP BY f_acc_id, f_acc_tp_id, f_acc_cl_id, f_acc_spe_id, f_ref_1, f_ref_2, f_acc_code, f_acc_name, f_acc_nat "
                 + "HAVING f_bal_ope <> 0 OR f_dbt <> 0 OR f_cdt <> 0 OR f_bal_clo <> 0 "
                 + ""
@@ -1862,6 +1882,7 @@ public abstract class SFiscalUtils {
      * @param lastModification Last accounting modification, when trial balance type is "complement", i.e., <code>SFiscalConsts.TRS_CMP</code>). Otherwise <code>null</code> must be provided.
      */
     public static SXmlDocument createDocBalanza13(final SGuiSession session, final int periodYear, final int periodMonth, final String balanceType, final Date lastModification) throws Exception {
+        int month = 0;
         double sign = 0d;
         int[] coaPeriod = null;
         int[] accountClassKey = null;
@@ -1873,12 +1894,19 @@ public abstract class SFiscalUtils {
         SDbBizPartner company = null;
         SXmlDocument xmlDoc = null;
         SXmlElement xmlCtas = null;
+        
+        if (periodMonth <= SLibTimeConsts.MONTH_MAX) {
+            month = periodMonth;
+        }
+        else if (periodMonth == (SLibTimeConsts.MONTH_MAX + 1)) {
+            month = SLibTimeConsts.MONTH_MAX;
+        }
 
         if (periodYear < SFiscalConsts.YEAR_MIN || periodYear > SLibTimeConsts.YEAR_MAX) {
             throw new Exception("El atributo 'Anio' debe ser mínimo " + SFiscalConsts.YEAR_MIN + " y máximo " + SLibTimeConsts.YEAR_MAX + ".");
         }
 
-        if (periodMonth < SLibTimeConsts.MONTH_MIN || periodMonth > SLibTimeConsts.MONTH_MAX) {
+        if (month < SLibTimeConsts.MONTH_MIN || month > SLibTimeConsts.MONTH_MAX) {
             throw new Exception("El atributo 'Mes' debe ser mínimo " + SLibTimeConsts.MONTH_MIN + " y máximo " + SLibTimeConsts.MONTH_MAX + ".");
         }
 
@@ -1906,7 +1934,7 @@ public abstract class SFiscalUtils {
             xmlDoc.getXmlAttributes().add(new SXmlAttribute("FechaModBal", DateFormatFecha.format(lastModification)));
         }
 
-        coaPeriod = getSuitableChartOfAccounts(session, periodYear, periodMonth);
+        coaPeriod = getSuitableChartOfAccounts(session, periodYear, month);
 
         sql = createQueryBalanza13(session, periodYear, periodMonth, coaPeriod[0], coaPeriod[1]);
 
@@ -2427,7 +2455,7 @@ public abstract class SFiscalUtils {
 
                     xmlComp = null;
 
-                    if (resultSetRecEty.getString("doc_bp.fiscal_id").compareTo(SFinConsts.RFC_INT) == 0) {
+                    if (resultSetRecEty.getString("doc_bp.fiscal_id").compareTo(DCfdConsts.RFC_GEN_INT) == 0) {
                         // International document:
                         xmlComp = createElementPolizas11CompExt(
                                 (resultSetRecEty.getString("doc.num_ser").isEmpty() ? "" : resultSetRecEty.getString("doc.num_ser") + "-") + resultSetRecEty.getString("doc.num"),
@@ -2576,7 +2604,7 @@ public abstract class SFiscalUtils {
                     if (resultSetRecEty.getInt("re.fid_check_wal_n") != SLibConsts.UNDEFINED) {
 //                        xmlPago = createElementPolizas11Cheque(resultSetRecEty.getString("chk.num"), resultSetRecEty.getString("fbnk.code"), resultSetRecEty.getString("bnk_fcur.code"), resultSetRecEty.getString("acsh_bnk.acc_num"),
                         xmlPago = createElementPolizas11Cheque(resultSetRecEty.getString("chk.num"), resultSetRecEty.getString("fbnk.code"), resultSetRecEty.getString("doc_fcur.code"), resultSetRecEty.getString("acsh_bnk.acc_num"),
-                                resultSetRecEty.getDate("chk.dt"), resultSetRecEty.getString("chk.benef"), resultSetRecEty.getString("chk_bp.fiscal_id") == null ? SFinConsts.RFC_DOM : resultSetRecEty.getString("chk_bp.fiscal_id"),
+                                resultSetRecEty.getDate("chk.dt"), resultSetRecEty.getString("chk.benef"), resultSetRecEty.getString("chk_bp.fiscal_id") == null ? DCfdConsts.RFC_GEN_NAC : resultSetRecEty.getString("chk_bp.fiscal_id"),
                                 resultSetRecEty.getDouble("chk.val"), resultSetRecEty.getString("bnk_fcur.code"), resultSetRecEty.getDouble("re.exc_rate"));
                     }
 
@@ -2772,7 +2800,7 @@ public abstract class SFiscalUtils {
 
                     xmlComp = null;
 
-                    if (resultSetRecEty.getString("doc_bp.fiscal_id").compareTo(SFinConsts.RFC_INT) == 0) {
+                    if (resultSetRecEty.getString("doc_bp.fiscal_id").compareTo(DCfdConsts.RFC_GEN_INT) == 0) {
                         // International document:
                         xmlComp = createElementPolizas13CompExt(
                                 (resultSetRecEty.getString("doc.num_ser").isEmpty() ? "" : resultSetRecEty.getString("doc.num_ser") + "-") + resultSetRecEty.getString("doc.num"),
@@ -2919,7 +2947,7 @@ public abstract class SFiscalUtils {
                     if (resultSetRecEty.getInt("re.fid_check_wal_n") != SLibConsts.UNDEFINED) {
 //                        xmlPago = createElementPolizas11Cheque(resultSetRecEty.getString("chk.num"), resultSetRecEty.getString("fbnk.code"), resultSetRecEty.getString("bnk_fcur.code"), resultSetRecEty.getString("acsh_bnk.acc_num"),
                         xmlPago = createElementPolizas13Cheque(resultSetRecEty.getString("chk.num"), resultSetRecEty.getString("fbnk.code"),resultSetRecEty.getString("bnk_fcur.code"), resultSetRecEty.getString("acsh_bnk.acc_num"),
-                                resultSetRecEty.getDate("chk.dt"), resultSetRecEty.getString("chk.benef"), resultSetRecEty.getString("chk_bp.fiscal_id") == null ? SFinConsts.RFC_DOM : resultSetRecEty.getString("chk_bp.fiscal_id"),
+                                resultSetRecEty.getDate("chk.dt"), resultSetRecEty.getString("chk.benef"), resultSetRecEty.getString("chk_bp.fiscal_id") == null ? DCfdConsts.RFC_GEN_NAC : resultSetRecEty.getString("chk_bp.fiscal_id"),
                                 resultSetRecEty.getDouble("chk.val"), resultSetRecEty.getString("bnk_fcur.code"), resultSetRecEty.getDouble("re.exc_rate"));
                     }
 

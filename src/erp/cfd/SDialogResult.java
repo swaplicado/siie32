@@ -543,7 +543,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             break;
                             
                         case SCfdConsts.PROC_REQ_VERIFY:
-                            SCfdUtils.verifyCfdi(miClient, cfd, mnSubtypeCfd, false);
+                            SCfdUtils.validateCfdi(miClient, cfd, mnSubtypeCfd, false);
                             detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Verificado.\n";
                             break;
                             

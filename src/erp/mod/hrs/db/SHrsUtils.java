@@ -2374,8 +2374,7 @@ public abstract class SHrsUtils {
             case SModSysConsts.HRSS_TP_LOAN_PAY_AMT:
                 amoutMonth = loan.getPaymentAmount() + amoutAdjustment;
                 
-                if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_COM || loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_UNI ||
-                        loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_TPS) {
+                if (SLibUtils.belongsTo(loan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOA_COM, SModSysConsts.HRSS_TP_LOAN_LOA_UNI, SModSysConsts.HRSS_TP_LOAN_LOA_TPS })) {
                     amoutAux = amoutMonth;
                 
                     balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsReceipt.getHrsEmployee());
@@ -2383,18 +2382,18 @@ public abstract class SHrsUtils {
                     amoutAux = (amoutAux > balanceLoan ? balanceLoan : amoutAux);
                 }
                 else {
-                    amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getPeriodDays() * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
-                    amoutAux += amoutMonth / hrsDaysCurr.getPeriodDays() * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
-                    amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getPeriodDays() * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
+                    amoutAux += hrsDaysPrev == null ? 0 : ((amoutMonth / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
+                    amoutAux += (amoutMonth / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
+                    amoutAux += hrsDaysNext == null ? 0 : ((amoutMonth / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
                 }
                 break;
                 
             case SModSysConsts.HRSS_TP_LOAN_PAY_FIX:
                 amoutMonth = loan.getPaymentFixed() * hrsReceipt.getHrsPayroll().getPayroll().getMwzReferenceWage() + amoutAdjustment;
                 
-                amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getPeriodDays() * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
-                amoutAux += amoutMonth / hrsDaysCurr.getPeriodDays() * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
-                amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getPeriodDays() * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
+                amoutAux += hrsDaysPrev == null ? 0 : ((amoutMonth / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
+                amoutAux += (amoutMonth / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
+                amoutAux += hrsDaysNext == null ? 0 : ((amoutMonth / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
                 break;
                 
             case SModSysConsts.HRSS_TP_LOAN_PAY_UMA:
@@ -2439,7 +2438,6 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax.
      * @throws Exception 
      */
-    
     public static double computeAmoutTax(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
         double dTaxComputed = 0;
         SDbTaxTableRow dbTaxTableRow = null;
@@ -2463,7 +2461,6 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax subsidy.
      * @throws Exception 
      */
-    
     public static double computeAmoutTaxSubsidy(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
         double dSubsidyComputed = 0;
         SDbTaxSubsidyTableRow dbSubsidyTableRow = null;
@@ -2490,7 +2487,6 @@ public abstract class SHrsUtils {
      * @return double amount calculated of security social contribution.
      * @throws Exception 
      */
-    
     public static double computeSSContribution(final SDbSsContributionTable dbSscTable, final double dSalarySsc, final double dMwzReferenceWage, final SHrsDaysByPeriod hrsDaysPrev,
                                                     final SHrsDaysByPeriod hrsDaysCurr, final SHrsDaysByPeriod hrsDaysNext) throws Exception {
         SDbSsContributionTableRow dbSscTableRow = null;
@@ -2542,7 +2538,6 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax.
      * @throws Exception 
      */
-    
     public static double computeAmoutTaxAlt(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
         double amountFractionI = 0;
         double amountFractionII = 0;
@@ -2584,7 +2579,6 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax subsidy.
      * @throws Exception 
      */
-    
     public static double computeAmoutTaxSubsidyAlt(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
         double amountFractionI = 0;
         double amountFractionII = 0;
@@ -2627,7 +2621,6 @@ public abstract class SHrsUtils {
      * @return
      * @throws Exception 
      */
-    
     public static SHrsCalculatedNetGrossAmount computeNetAmountPayment(final SGuiSession session, final double grossAmount, final Date dateCut, final Date dateBenefit) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;
@@ -2684,7 +2677,6 @@ public abstract class SHrsUtils {
      * @return
      * @throws Exception 
      */
-    
     public static SHrsCalculatedNetGrossAmount computeGrossAmountPayment(final SGuiSession session, final double dNetAmount, final Date dateCut, final double tolerance, final Date dateBenefit) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;

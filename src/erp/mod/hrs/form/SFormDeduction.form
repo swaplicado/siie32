@@ -197,12 +197,21 @@
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolPayrollTax">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Aplica imp. sobre n&#xf3;mina"/>
+                    <Property name="text" type="java.lang.String" value="Aplica para impto. sobre n&#xf3;minas"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[150, 23]"/>
+                      <Dimension value="[200, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
+              </SubComponents>
+            </Container>
+            <Container class="javax.swing.JPanel" name="jPanel9">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
+                <Property name="verticalGap" type="int" value="0"/>
+              </Layout>
+              <SubComponents>
                 <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolLoan">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Es cr&#xe9;dito/pr&#xe9;stamo"/>

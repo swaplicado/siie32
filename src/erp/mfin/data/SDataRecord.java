@@ -8,6 +8,8 @@ package erp.mfin.data;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Vector;
@@ -69,6 +71,10 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         reset();
     }
 
+    /*
+     * Private methods
+     */
+    
     private void updateChecksLinks(java.sql.Connection connection) throws java.sql.SQLException, java.lang.Exception{
         String sql = "";
         Statement statement = connection.createStatement();
@@ -96,6 +102,10 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         }
     }
 
+    /*
+     * Public methods
+     */
+    
     public void setPkYearId(int n) { mnPkYearId = n; }
     public void setPkPeriodId(int n) { mnPkPeriodId = n; }
     public void setPkBookkeepingCenterId(int n) { mnPkBookkeepingCenterId = n; }
@@ -179,6 +189,43 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         return getRecordPeriod() + "-" + mnPkBookkeepingCenterId + "-" + getRecordNumber();
     }
 
+    public int getLastSortingPosition() {
+        int position = 0;
+                
+        for (SDataRecordEntry entry : mvDbmsRecordEntries) {
+            if (!entry.getIsDeleted()) {
+                position = entry.getSortingPosition();
+            }
+        }
+        
+        return position;
+    }
+
+    public void checkIsEditable(final Connection connection) throws Exception {
+        if (mbIsSystem) {
+            throw new Exception("¡La póliza contable '" + getRecordNumber() + "' es de sistema!");
+        }
+        
+        if (mbIsDeleted) {
+            throw new Exception("¡La póliza contable '" + getRecordNumber() + "' está eliminada!");
+        }
+        
+        int index = 1;
+        CallableStatement oCallableStatement = connection.prepareCall("{ CALL fin_year_per_st(?, ?, ?) }");
+        oCallableStatement.setInt(index++, mnPkYearId);
+        oCallableStatement.setInt(index++, mnPkPeriodId);
+        oCallableStatement.registerOutParameter(index++, java.sql.Types.INTEGER);
+        oCallableStatement.execute();
+
+        if (oCallableStatement.getBoolean(index - 1)) {
+            throw new Exception("¡El período contable '" + getRecordPeriod() + "' de la póliza contable '" + getRecordNumber() + "' está cerrado!");
+        }
+    }
+    
+    /*
+     * Public overriden methods
+     */
+    
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkYearId = (Integer) ((Object[]) pk)[0];

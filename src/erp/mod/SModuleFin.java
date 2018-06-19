@@ -29,8 +29,8 @@ import erp.mod.fin.form.SFormAbpItem;
 import erp.mod.fin.form.SFormAbpItemLink;
 import erp.mod.fin.form.SFormAbpTax;
 import erp.mod.fin.form.SFormAccountItemLink;
+import erp.mod.fin.form.SFormBankLayout;
 import erp.mod.fin.form.SFormImportPayments;
-import erp.mod.fin.form.SFormLayoutBank;
 import erp.mod.fin.form.SFormTaxItemLink;
 import erp.mod.fin.view.SViewAbpBizPartner;
 import erp.mod.fin.view.SViewAbpBizPartnerLink;
@@ -70,7 +70,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Alfredo Pérez
+ * @author Sergio Flores, Juan Barajas, Edwin Carmona, Alfredo Pérez
  */
 public class SModuleFin extends SGuiModule {
 
@@ -87,9 +87,9 @@ public class SModuleFin extends SGuiModule {
     private SFormAbpItem moFormAbpItem;
     private SFormAbpItemLink moFormAbpItemLink;
     private SFormAbpTax moFormAbpTax;
-    private SFormLayoutBank moFormBankLayoutAccounting;
-    private SFormLayoutBank moFormBankLayoutDps;
-    private SFormLayoutBank moFormBankLayoutAdvance;
+    private SFormBankLayout moFormBankLayoutAccounting;
+    private SFormBankLayout moFormBankLayoutPayments;
+    private SFormBankLayout moFormBankLayoutPrepayments;
     private SFormImportPayments moFormImportPayments;
 
     private SBeanOptionPicker moPickerExchangeRateMxn;
@@ -145,7 +145,7 @@ public class SModuleFin extends SGuiModule {
                         }
                         else {
                             switch (field) {
-                                case SDbRegistry.FIELD_CODE:
+                                case SDbRegistry.FIELD_NAME:
                                     value = resultSet.getString(1);
                                     break;
                                 default:
@@ -452,7 +452,7 @@ public class SModuleFin extends SGuiModule {
                 view = new SViewAbpTax(miClient, "Paq. contab. aut. impuestos");
                 break;
             case SModConsts.FIN_LAY_BANK:
-                if (subtype == SModSysConsts.FIN_LAY_BANK_DPS) {
+                if (subtype == SModSysConsts.FIN_LAY_BANK_PAY) {
                     if (params == null) {
                         view = new SViewBankLayout(miClient, subtype, "Layouts transferencias");
                     }
@@ -469,7 +469,7 @@ public class SModuleFin extends SGuiModule {
                         }
                     }
                 }
-                else if (subtype == SModSysConsts.FIN_LAY_BANK_ADV) {
+                else if (subtype == SModSysConsts.FIN_LAY_BANK_PREPAY) {
                     if (params == null) {
                         view = new SViewBankLayout(miClient, subtype, "Layouts anticipos");
                     }
@@ -637,16 +637,16 @@ public class SModuleFin extends SGuiModule {
             case SModConsts.FIN_LAY_BANK:
                 switch (subtype) {
                     case SModSysConsts.FIN_LAY_BANK_ACC:
-                        if (moFormBankLayoutAccounting == null) moFormBankLayoutAccounting = new SFormLayoutBank(miClient, subtype, "Aplicación de pagos de layout bancario");
+                        if (moFormBankLayoutAccounting == null) moFormBankLayoutAccounting = new SFormBankLayout(miClient, subtype, "Contabilización de pagos bancarios");
                         form = moFormBankLayoutAccounting;
                         break;
-                    case SModSysConsts.FIN_LAY_BANK_DPS:
-                        if (moFormBankLayoutDps == null) moFormBankLayoutDps = new SFormLayoutBank(miClient, subtype, "Layout de transferencias");
-                        form = moFormBankLayoutDps;
+                    case SModSysConsts.FIN_LAY_BANK_PAY:
+                        if (moFormBankLayoutPayments == null) moFormBankLayoutPayments = new SFormBankLayout(miClient, subtype, "Layout de transferencias");
+                        form = moFormBankLayoutPayments;
                         break;
-                    case SModSysConsts.FIN_LAY_BANK_ADV:
-                        if (moFormBankLayoutAdvance == null) moFormBankLayoutAdvance = new SFormLayoutBank(miClient, subtype, "Layout de anticipos");
-                        form = moFormBankLayoutAdvance;
+                    case SModSysConsts.FIN_LAY_BANK_PREPAY:
+                        if (moFormBankLayoutPrepayments == null) moFormBankLayoutPrepayments = new SFormBankLayout(miClient, subtype, "Layout de anticipos");
+                        form = moFormBankLayoutPrepayments;
                         break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

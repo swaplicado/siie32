@@ -87,7 +87,7 @@
           </Constraints>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-            <Property name="columns" type="int" value="4"/>
+            <Property name="columns" type="int" value="5"/>
             <Property name="rows" type="int" value="3"/>
           </Layout>
           <SubComponents>
@@ -123,6 +123,14 @@
                 <Property name="text" type="java.lang.String" value="Octubre"/>
               </Properties>
             </Component>
+            <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadMonth13">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="jbgPeriod"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Mes 13"/>
+              </Properties>
+            </Component>
             <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadMonth02">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
@@ -155,6 +163,8 @@
                 <Property name="text" type="java.lang.String" value="Noviembre"/>
               </Properties>
             </Component>
+            <Component class="javax.swing.JLabel" name="jlMonthDummy01">
+            </Component>
             <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadMonth03">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
@@ -185,6 +195,12 @@
                   <ComponentRef name="jbgPeriod"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Diciembre"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="jtfMonthNotes">
+              <Properties>
+                <Property name="editable" type="boolean" value="false"/>
+                <Property name="focusable" type="boolean" value="false"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -331,7 +347,7 @@
                             </Component>
                           </SubComponents>
                         </Container>
-                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadTrialSheetSubsequent">
+                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadTrialSheetComplem">
                           <Properties>
                             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                               <ComponentRef name="jbgTrialSheet"/>
@@ -385,7 +401,7 @@
                         <Property name="rows" type="int" value="4"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadRequestAf">
+                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadRequestInspect">
                           <Properties>
                             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                               <ComponentRef name="jbgRequest"/>
@@ -411,7 +427,7 @@
                             </Component>
                           </SubComponents>
                         </Container>
-                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadRequestFc">
+                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadRequestCertif">
                           <Properties>
                             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                               <ComponentRef name="jbgRequest"/>
@@ -441,7 +457,7 @@
                             </Component>
                           </SubComponents>
                         </Container>
-                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadRequestDe">
+                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadRequestRefund">
                           <Properties>
                             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                               <ComponentRef name="jbgRequest"/>
@@ -466,7 +482,7 @@
                             </Component>
                           </SubComponents>
                         </Container>
-                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadRequestCo">
+                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadRequestCompen">
                           <Properties>
                             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                               <ComponentRef name="jbgRequest"/>

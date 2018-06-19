@@ -815,6 +815,19 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
                 setTitle("Seleccionar documento de compras-ventas");
                 break;
 
+            case SDataConstants.TRN_CFD:
+                aoTableColumns = new STableColumnForm[8];
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Fecha-hora CFD", STableConstants.WIDTH_DATE_TIME);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo CFD", 100);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Versión CFD", 50);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio CFD", STableConstants.WIDTH_DOC_NUM);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "UUID", 100);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "RFC receptor", 100);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total $", STableConstants.WIDTH_VALUE_2X);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
+                setTitle("Seleccionar comprobante fiscal digital");
+                break;
+
             case SDataConstants.TRNX_DPS_PAY_PEND:
                 aoTableColumns = new STableColumnForm[7];
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha", STableConstants.WIDTH_DATE);

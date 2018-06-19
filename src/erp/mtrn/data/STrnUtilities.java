@@ -30,6 +30,7 @@ import erp.mmfg.data.SDataProductionOrder;
 import erp.mmfg.data.SDataProductionOrderCharge;
 import erp.mmfg.data.SDataProductionOrderChargeEntry;
 import erp.mmfg.data.SDataProductionOrderChargeEntryLot;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbMms;
 import erp.mod.hrs.db.SDbPayroll;
@@ -3251,5 +3252,93 @@ public abstract class STrnUtilities {
         iog.getDbmsEntries().addAll(iogEntries);
                 
         return iog;
+    }
+    
+    /**
+     * Get CFD primary key by its own UUID.
+     * @param statement DB statement.
+     * @param uuid Desired UUID.
+     * @return 
+     */
+    public static int getCfdIdByUuid(final Statement statement, final String uuid) {
+        String sql = "";
+        ResultSet resultSet = null;
+        int id = SLibConstants.UNDEFINED;
+
+        try {
+            sql = "SELECT id_cfd "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
+                    + "WHERE uuid = '" + uuid + "';";
+            
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(STrnUtilities.class.getName(), e);
+        }
+
+        return id;
+    }
+    
+    /**
+     * Get DPS primary key by UUID of its own CFD.
+     * @param statement DB statement.
+     * @param uuid Desired UUID.
+     * @return 
+     */
+    public static int[] getDpsKeyByUuid(final Statement statement, final String uuid) {
+        String sql = "";
+        ResultSet resultSet = null;
+        int[] key = null;
+
+        try {
+            sql = "SELECT fid_dps_year_n, fid_dps_doc_n "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
+                    + "WHERE uuid = '" + uuid + "';";
+            
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                key = new int[] { resultSet.getInt(1), resultSet.getInt(0) };
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(STrnUtilities.class.getName(), e);
+        }
+
+        return key;
+    }
+    
+    /**
+     * Counts how many payments has the provided DPS, excluding, if any, the provided CFD.
+     * @param statement DB statement.
+     * @param dpsKey Primary key of desired DPS.
+     * @param cfdId Primary key of desired CFD to exclude.
+     * @return 
+     */
+    public static int countDpsPayments(final Statement statement, final int[] dpsKey, final int cfdId) {
+        String sql = "";
+        ResultSet resultSet = null;
+        int count = 0;
+
+        try {
+            sql = "SELECT count(*) "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " "
+                    + "WHERE fid_dps_year_n =" + dpsKey[0] + " AND fid_dps_doc_n = " + dpsKey[1] + " AND fid_cfd_n <> " + cfdId + " AND "
+                    + "fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0] + " AND fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1] + " AND "
+                    + "fid_cl_sys_mov = " + SModSysConsts.FINS_CL_SYS_MOV_MI + " AND "
+                    + "NOT b_del;";
+            
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(STrnUtilities.class.getName(), e);
+        }
+
+        return count;
     }
 }

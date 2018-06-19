@@ -24,7 +24,7 @@ import sa.lib.mail.SMailSender;
 
 /**
  *
- * @author Edwin Carmona, Alfredo Perez
+ * @author Edwin Carmona, Alfredo Perez, Sergio Flores
  */
 public class STreasuryBankLayoutRequest {
     public static final int SND_TP_LAY_BANK = 1;
@@ -33,15 +33,14 @@ public class STreasuryBankLayoutRequest {
     private SGuiClient miClient;
     private final SDbBankLayout moBankLayout;
     
-    public STreasuryBankLayoutRequest(SGuiClient oClient,final SDbBankLayout layout) {
+    public STreasuryBankLayoutRequest(SGuiClient oClient,final SDbBankLayout bankLayout) {
         miClient = oClient;
-        moBankLayout = layout;
+        moBankLayout = bankLayout;
     }
     
     public boolean makeRequestToTreasury() {
         boolean isSent = false;
-        SDbBankLayout oBankLayout = null;
-        SLayoutParameters parameters = null;
+        SBankLayoutParams params = null;
         SDialogComments dialogComments = null;
         File pdf = null;
         
@@ -54,20 +53,21 @@ public class STreasuryBankLayoutRequest {
             moBankLayout.setAuthorizationRequests(moBankLayout.getAuthorizationRequests() + 1);
             comment = dialogComments.getComment();
             
-            oBankLayout = SFinUtils.loadPaymentsXml(miClient, moBankLayout);
+            SDbBankLayout bankLayout = SFinUtils.loadPaymentsXml(miClient, moBankLayout);
+            
             if (moBankLayout != null) {
-                parameters = SFinUtils.getLayoutParameters(miClient, oBankLayout);
-                pdf = STreasuryBankLayoutFile.createDocument(miClient, parameters ,SFinUtils.populateRows(miClient, oBankLayout.getBankPaymentRows(), oBankLayout.getXmlRows(), oBankLayout.getXtaBankPaymentType()));
+                params = SFinUtils.getBankLayoutParams(miClient, bankLayout);
+                pdf = STreasuryBankLayoutFile.createDocument(miClient, params ,SFinUtils.populateRows(miClient, bankLayout.getLayoutBankPaymentRows(), bankLayout.getLayoutBankXmlRows(), bankLayout.getXtaBankPaymentType()));
 
                 if (pdf != null) {
-                    isSent = sendMail(parameters, comment, pdf, null);
+                    isSent = sendMail(params, comment, pdf, null);
 
                     if (isSent) {
                         try {
-                            if (oBankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_NEW_ST) {
-                                SFinUtils.changeLayoutStatus(miClient, oBankLayout, SFinConsts.LAY_BANK_APPROVED_ST);
+                            if (bankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_NEW_ST) {
+                                SFinUtils.changeLayoutStatus(miClient, bankLayout, SFinConsts.LAY_BANK_APPROVED_ST);
                             }
-                            SFinUtils.increaseLayoutRequest(miClient, oBankLayout);
+                            SFinUtils.increaseLayoutRequest(miClient, bankLayout);
                         }
                         catch (Exception e) {
                             SLibUtils.printException(this, e);
@@ -79,19 +79,19 @@ public class STreasuryBankLayoutRequest {
         return isSent;
     }
     
-    public boolean sendMail(SLayoutParameters parameters, String comment, File pdf, String email) {
-        return sendMail(parameters, comment, pdf, SND_TP_LAY_BANK, email);
+    public boolean sendMail(SBankLayoutParams params, String comment, File pdf, String email) {
+        return sendMail(params, comment, pdf, SND_TP_LAY_BANK, email);
     }
     
     /**
      * To send mail a file in format PDF.
-     * @param parameters Object SLayoutParameters type or null.
+     * @param params Object SBankLayoutParams type or null.
      * @param comment comment to body mail.
      * @param pdf file to send mail.
      * @param sendType send type of file mail STreasuryBankLayoutRequest.SND_TP_....
      * @return 
      */
-    public boolean sendMail(SLayoutParameters parameters, String comment, File pdf, int sendType, String email) {
+    public boolean sendMail(SBankLayoutParams params, String comment, File pdf, int sendType, String email) {
         SDbMms mms = null;
         SMailSender sender = null;
         ArrayList<String> toRecipients = null;
@@ -123,15 +123,15 @@ public class STreasuryBankLayoutRequest {
                 if (mms.getRecipientCarbonCopy() != null && !mms.getRecipientCarbonCopy().isEmpty()) {
                     recipientsCc = new ArrayList<String>(Arrays.asList(SLibUtilities.textExplode(mms.getRecipientCarbonCopy(), ";")));
                 }
-                subject = "SOLIC. AUT. " + ((SClientInterface) miClient).getSessionXXX().getCompany().getDbmsDataCompany().getBizPartnerCommercial() + "#" + parameters.getFolio() + "-" + parameters.getAuthRequests();
+                subject = "SOLIC. AUT. " + ((SClientInterface) miClient).getSessionXXX().getCompany().getDbmsDataCompany().getBizPartnerCommercial() + "#" + params.getFolio() + "-" + params.getAuthRequests();
 
-                body = parameters.getCompanyName() + "\n" +
-                       "Fecha y hora de solicitud: " + SLibUtils.DateFormatDatetime.format(parameters.getDateTimeRequest()) + "\n\n" +
-                       "FECHA DE APLICACIÓN: " + SLibUtils.DateFormatDate.format(parameters.getApplicationDate()) + "\n\n" +
-                       "Banco: " + parameters.getBank() + "\n" +
-                       "Cuenta bancaria: " + parameters.getBankAccount() + "\n" +
-                       "Tipo de pago: " + parameters.getTypePayment() + "\n" +
-                       "Total: " + SLibUtils.DecimalFormatValue2D.format( parameters.getOriginalTotal()) + " " + parameters.getCurrency() + "\n\n\n" +
+                body = params.getCompanyName() + "\n" +
+                       "Fecha y hora de solicitud: " + SLibUtils.DateFormatDatetime.format(params.getDateTimeRequest()) + "\n\n" +
+                       "FECHA DE APLICACIÓN: " + SLibUtils.DateFormatDate.format(params.getApplicationDate()) + "\n\n" +
+                       "Banco: " + params.getBank() + "\n" +
+                       "Cuenta bancaria: " + params.getBankAccount() + "\n" +
+                       "Tipo de pago: " + params.getTypePayment() + "\n" +
+                       "Total: " + SLibUtils.DecimalFormatValue2D.format( params.getOriginalTotal()) + " " + params.getCurrency() + "\n\n\n" +
                        comment;
             }
             
@@ -166,5 +166,4 @@ public class STreasuryBankLayoutRequest {
         
         return sent;
     }
-    
 }

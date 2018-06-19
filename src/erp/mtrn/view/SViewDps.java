@@ -96,7 +96,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbGetXml;
     private javax.swing.JButton jbGetAcknowledgmentCancellation;
     private javax.swing.JButton jbSignXml;
-    private javax.swing.JButton jbVerifyCfdi;
+    private javax.swing.JButton jbValidateCfdi;
     private javax.swing.JButton jbSendCfdi;
     private javax.swing.JButton jbDiactivateFlags;
     private javax.swing.JButton jbRestoreSignXml;
@@ -320,10 +320,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbSignXml.addActionListener(this);
         jbSignXml.setToolTipText("Timbrar CFDI");
 
-        jbVerifyCfdi = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")));
-        jbVerifyCfdi.setPreferredSize(new Dimension(23, 23));
-        jbVerifyCfdi.addActionListener(this);
-        jbVerifyCfdi.setToolTipText("Verificar timbrado o cancelación del CFDI");
+        jbValidateCfdi = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")));
+        jbValidateCfdi.setPreferredSize(new Dimension(23, 23));
+        jbValidateCfdi.addActionListener(this);
+        jbValidateCfdi.setToolTipText("Validar timbrado o cancelación del CFDI");
         
         jbSendCfdi = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
         jbSendCfdi.setPreferredSize(new Dimension(23, 23));
@@ -406,7 +406,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbGetXml);
         addTaskBarLowerComponent(jbGetAcknowledgmentCancellation);
         addTaskBarLowerComponent(jbSignXml);
-        addTaskBarLowerComponent(jbVerifyCfdi);
+        addTaskBarLowerComponent(jbValidateCfdi);
         addTaskBarLowerComponent(jbSendCfdi);
         addTaskBarLowerComponent(jbRestoreSignXml);
         addTaskBarLowerComponent(jbRestoreAcknowledgmentCancellation);
@@ -443,7 +443,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetXml.setEnabled((mbIsDoc || mbIsDocAdj));
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbVerifyCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSendCfdi.setEnabled((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj)));
         jbRestoreSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbRestoreAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
@@ -729,7 +729,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         int gui = mbIsCategoryPur ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;    // GUI module
                         dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                        if (dps.getDbmsDataCfd() != null && (dps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || dps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33)) {
+                        if (dps.getDbmsDataCfd() != null && dps.getDbmsDataCfd().isCfdi()) {
                             annul = false;
                             params = new SGuiParams();
 
@@ -1793,10 +1793,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
 
-    private void actionVerifyCfdi() throws Exception {
+    private void actionValidateCfdi() throws Exception {
         SDataDps dps = null;
 
-        if (jbVerifyCfdi.isEnabled()) {
+        if (jbValidateCfdi.isEnabled()) {
            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -1807,10 +1807,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
                 }
                 else if (dps.getDbmsDataCfd() == null) {
-                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento '" + dps.getDpsNumber() + "'.");
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro CFD del documento '" + dps.getDpsNumber() + "'.");
                 }
                 else {
-                    if (SCfdUtils.verifyCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, true)) {
+                    if (SCfdUtils.validateCfdi(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, true)) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                     }
                 }
@@ -2142,8 +2142,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbSignXml) {
                     actionSignXml();
                 }
-                else if (button == jbVerifyCfdi) {
-                    actionVerifyCfdi();
+                else if (button == jbValidateCfdi) {
+                    actionValidateCfdi();
                 }
                 else if (button == jbSendCfdi) {
                     actionSendCfdi();

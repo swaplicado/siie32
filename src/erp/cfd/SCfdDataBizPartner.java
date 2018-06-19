@@ -315,8 +315,8 @@ public class SCfdDataBizPartner {
 
         if (mfVersion == DCfdConsts.CFDI_VER_33) {
             if (mbIsCfdiWithIntCommerce) {
-                if (msBizPartnerRfc.compareTo(SFinConsts.RFC_INT) != 0) {
-                    throw new Exception("El RFC del receptor debe ser '" + SFinConsts.RFC_INT + "'.");
+                if (msBizPartnerRfc.compareTo(DCfdConsts.RFC_GEN_INT) != 0) {
+                    throw new Exception("El RFC del receptor debe ser '" + DCfdConsts.RFC_GEN_INT + "'.");
                 }
                 if (msBizPartnerCountryCode.isEmpty()) {
                     throw new Exception("El código de país del receptor no existe, y es requerido.");
@@ -342,8 +342,8 @@ public class SCfdDataBizPartner {
         }
         else if (mfVersion == DCfdConsts.CFDI_VER_32) {
             if (mbIsCfdiWithIntCommerce) {
-                if (msBizPartnerRfc.compareTo(SFinConsts.RFC_INT) != 0) {
-                    throw new Exception("El RFC del receptor debe ser '" + SFinConsts.RFC_INT + "'.");
+                if (msBizPartnerRfc.compareTo(DCfdConsts.RFC_GEN_INT) != 0) {
+                    throw new Exception("El RFC del receptor debe ser '" + DCfdConsts.RFC_GEN_INT + "'.");
                 }
             }
 

@@ -986,7 +986,7 @@ public class SCfdPrint {
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
         DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = docBuilder.parse(new ByteArrayInputStream(cfd.getAcknowledgmentCancellation().getBytes("UTF-8")));
+        Document doc = docBuilder.parse(new ByteArrayInputStream(cfd.getAcknowledgmentCancellationXml().getBytes("UTF-8")));
         SDataDps dps = null;
         SDataFormerPayrollEmp payrollEmp = null;
         SDbPayrollReceipt payrollReceipt = null;

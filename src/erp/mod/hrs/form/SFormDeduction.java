@@ -68,6 +68,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         jPanel3 = new javax.swing.JPanel();
         moBoolWithholding = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolPayrollTax = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel9 = new javax.swing.JPanel();
         moBoolLoan = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel7 = new javax.swing.JPanel();
         jlLoanType = new javax.swing.JLabel();
@@ -163,15 +164,19 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         moBoolWithholding.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel3.add(moBoolWithholding);
 
-        moBoolPayrollTax.setText("Aplica imp. sobre nómina");
-        moBoolPayrollTax.setPreferredSize(new java.awt.Dimension(150, 23));
+        moBoolPayrollTax.setText("Aplica para impto. sobre nóminas");
+        moBoolPayrollTax.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel3.add(moBoolPayrollTax);
+
+        jPanel2.add(jPanel3);
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moBoolLoan.setText("Es crédito/préstamo");
         moBoolLoan.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel3.add(moBoolLoan);
+        jPanel9.add(moBoolLoan);
 
-        jPanel2.add(jPanel3);
+        jPanel2.add(jPanel9);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -259,6 +264,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JLabel jlAbsenceClass;
     private javax.swing.JLabel jlAbsenceType;
     private javax.swing.JLabel jlAccountingConfigurationType;

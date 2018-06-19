@@ -11,7 +11,7 @@ import java.util.Date;
  *
  * @author Edwin Carmona
  */
-public class SLayoutParameters {
+public class SBankLayoutParams {
     
     private String msTitle;
     private String msCompanyName;

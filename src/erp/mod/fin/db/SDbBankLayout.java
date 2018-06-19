@@ -30,7 +30,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -46,15 +45,9 @@ import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 
-/* IMPORTANT:
- * Every single change made to the definition of this class' table must be updated also in the following classes:
- * - erp.mfin.data.SDataLayoutBank
- * All of them also make raw SQL insertions.
- */
-
 /**
  *
- * @author Juan Barajas, Alfredo Pérez
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
 public class SDbBankLayout extends SDbRegistryUser {
     
@@ -105,387 +98,189 @@ public class SDbBankLayout extends SDbRegistryUser {
     protected int mnXtaBankCurrencyId;
     protected int mnXtaBankPaymentType;
     
-    protected ArrayList<SLayoutBankPaymentRow> maBankPaymentRows;
-    protected ArrayList<SLayoutBankRecord> maBankRecords;
-    protected ArrayList<SLayoutBankXmlRow> maXmlRows;
+    protected ArrayList<SLayoutBankPaymentRow> maLayoutBankPaymentRows;
+    protected ArrayList<SLayoutBankRecord> maLayoutBankRecords;
+    protected ArrayList<SLayoutBankXmlRow> maLayoutBankXmlRows;
     
     /*
-     * Public methods
+     * Private methods
      */
     
-    private void computeLayout(final SGuiSession session) throws Exception {
-        boolean found = false;
-        SXmlBankLayout layout = new SXmlBankLayout();
-        SXmlBankLayoutPayment layoutPayment = null;
-        SXmlBankLayoutPaymentDoc layoutPaymentDoc = null;
-        ArrayList<SXmlBankLayoutPayment> layoutPayments = new ArrayList<>();
+    private void updateLayoutXml(Vector<SDataRecordEntry> recordEntries) {
+        int[] key = new int[] { SLibConsts.UNDEFINED };
+        mnDocsPayed = 0;
+        mdAmountPayed = 0;
         
-        layout.getAttribute(SXmlBankLayout.ATT_LAY_ID).setValue(mnPkBankLayoutId);
-        
-        for (SLayoutBankXmlRow xmlRow : maXmlRows) {
-            layoutPaymentDoc = new SXmlBankLayoutPaymentDoc();
-
-            layoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).setValue(xmlRow.getDpsYear());
-            layoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).setValue(xmlRow.getDpsDoc());
-            layoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).setValue(xmlRow.getAmount());
-            layoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).setValue(xmlRow.getAmountCy());
-            layoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).setValue(xmlRow.getCurrencyId());
-            layoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE).setValue(xmlRow.getExchangeRate());
-            layoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).setValue(xmlRow.getReferenceRecord());
-            layoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).setValue(xmlRow.getObservations());
-            
-            for (SXmlBankLayoutPayment payment : layoutPayments) {
-                found = false;
-                
-                if (mnXtaBankPaymentType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
-                    if (xmlRow.getAgreement().trim().equals((String) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).getValue()) && xmlRow.getAgreementReference().trim().equals((String) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).getValue())) {
-                        found = true;
-                    }
+        for (SDataRecordEntry recordEntry : recordEntries) {
+            for (SLayoutBankXmlRow layoutBankXmlRow : maLayoutBankXmlRows) {
+                if (layoutBankXmlRow.getLayoutXmlRowType() == SModSysConsts.FIN_LAY_BANK_PAY) {
+                    key = new int[] { recordEntry.getFkDpsYearId_n(), recordEntry.getFkDpsDocId_n() };
                 }
-                else {
-                    if (SLibUtilities.compareKeys(new int[] { xmlRow.getBizPartnerBranch(), xmlRow.getBizPartnerBranchAccount() }, 
-                            new int[] { (int) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue(), (int) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue() })) {
-                        found = true;
-                    }
+                else if (layoutBankXmlRow.getLayoutXmlRowType() == SModSysConsts.FIN_LAY_BANK_PREPAY) {
+                    key = new int[] { recordEntry.getFkBizPartnerId_nr() };
                 }
                 
-                if (found) {
-                    payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(((double) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue()) + xmlRow.getAmount());
-                    payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(((double) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).getValue()) + xmlRow.getAmountCy());
-                    payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).setValue(((String) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).getValue()) + "," + xmlRow.getReference());
-                    payment.getXmlElements().add(layoutPaymentDoc);
+                if (SLibUtils.compareKeys(layoutBankXmlRow.getPrimaryKey(), key)) {
+                    if (recordEntry.getIsDeleted()) {
+                        if (SLibUtils.compareKeys(new int[] { layoutBankXmlRow.getBookkeepingYear(), layoutBankXmlRow.getBookkeepingNumber() }, new int[] { recordEntry.getFkBookkeepingYearId_n(), recordEntry.getFkBookkeepingNumberId_n()})) {
+                            layoutBankXmlRow.setAmountPayed(SLibConsts.UNDEFINED);
+                            layoutBankXmlRow.setIsToPayed(false);
+                            layoutBankXmlRow.setRecYear(SLibConsts.UNDEFINED);
+                            layoutBankXmlRow.setRecPeriod(SLibConsts.UNDEFINED);
+                            layoutBankXmlRow.setRecBookkeepingCenter(SLibConsts.UNDEFINED);
+                            layoutBankXmlRow.setRecRecordType("");
+                            layoutBankXmlRow.setRecNumber(SLibConsts.UNDEFINED);
+                            layoutBankXmlRow.setBookkeepingYear(SLibConsts.UNDEFINED);
+                            layoutBankXmlRow.setBookkeepingNumber(SLibConsts.UNDEFINED);
+                        }
+                    }
+                    else {
+                        layoutBankXmlRow.setAmountPayed(layoutBankXmlRow.getAmount());
+                        layoutBankXmlRow.setIsToPayed(true);
+                        layoutBankXmlRow.setRecYear(recordEntry.getPkYearId());
+                        layoutBankXmlRow.setRecPeriod(recordEntry.getPkPeriodId());
+                        layoutBankXmlRow.setRecBookkeepingCenter(recordEntry.getPkBookkeepingCenterId());
+                        layoutBankXmlRow.setRecRecordType(recordEntry.getPkRecordTypeId());
+                        layoutBankXmlRow.setRecNumber(recordEntry.getPkNumberId());
+                        layoutBankXmlRow.setBookkeepingYear(recordEntry.getFkBookkeepingYearId_n());
+                        layoutBankXmlRow.setBookkeepingNumber(recordEntry.getFkBookkeepingNumberId_n());
+                    }
                     break;
                 }
             }
-            
-            if (!found) {
-                layoutPayment = new SXmlBankLayoutPayment();
-            
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(xmlRow.getAmount());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(xmlRow.getAmount());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).setValue(xmlRow.getReference());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CUR).setValue(xmlRow.getCurrencyId());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).setValue(xmlRow.getAgreement());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).setValue(xmlRow.getAgreementReference());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_CON).setValue(xmlRow.getConceptCie());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_EXT_RATE).setValue(xmlRow.getExchangeRate());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).setValue(xmlRow.getConcept());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).setValue(xmlRow.getHsbcFiscalVoucher());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).setValue(xmlRow.getHsbcAccountType());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_BANK_CODE).setValue(xmlRow.getHsbcBankCode());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_DBT).setValue(xmlRow.getHsbcFiscalIdDebit());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_CRD).setValue(xmlRow.getHsbcFiscalIdCredit());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DCRP).setValue(xmlRow.getDescription());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SAN_BANK_CODE).setValue(xmlRow.getSantanderBankCode());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).setValue(xmlRow.getBajioBankCode());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).setValue(xmlRow.getBajioBankNick());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).setValue(xmlRow.getBankKey());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).setValue(xmlRow.getIsToPayed());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BP).setValue(xmlRow.getBizPartner());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).setValue(xmlRow.getBizPartnerBranch());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).setValue(xmlRow.getBizPartnerBranchAccount());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_YEAR).setValue(xmlRow.getRecYear());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_PER).setValue(xmlRow.getRecPeriod());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_BKC).setValue(xmlRow.getRecBookkeepingCenter());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_REC_TP).setValue(xmlRow.getRecRecordType());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).setValue(xmlRow.getRecNumber());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR).setValue(xmlRow.getBookkeepingYear());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM).setValue(xmlRow.getBookkeepingNumber());
-                layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_ROW_REF_REC).setValue(xmlRow.getReferenceRecord());
-                
-                layoutPayment.getXmlElements().add(layoutPaymentDoc);
-                
-                layoutPayments.add(layoutPayment);
+        }
+        
+        for (SLayoutBankXmlRow xmlRow : maLayoutBankXmlRows) {
+            if (xmlRow.getIsToPayed()) {
+                if (xmlRow.getLayoutXmlRowType() == SModSysConsts.FIN_LAY_BANK_PAY) {
+                    mnDocsPayed++;
+                }
+                mdAmountPayed += xmlRow.getAmountPayed();
             }
         }
-        layout.getXmlElements().addAll(layoutPayments);
-        msLayoutXml = layout.getXmlString();
-        mnTransfers = layoutPayments.size();
-        
-        computeLayoutText(session, layoutPayments);
     }
-    
-    private void computeLayoutText(final SGuiSession session, final ArrayList<SXmlBankLayoutPayment> layoutPayments) throws Exception {
-        int layout = 0;
-        int layoutBank = 0;
-        int currencyId = 0;
-        int bizPartnerId = 0;
-        String bizPartner = "";
-        String accountDebit = "";
-        String accountBranchDebit = "";
-        String accountCredit = "";
-        String accountBranchCredit = "";
+
+    private String composeRecordEntryConcept(final SGuiSession session, final int bizPartnerBank, final int bankBank, final String reference, final String bizPartner) throws Exception {
+        String bank = "";
         String layoutTitle = "";
+        String concept = "";
         String sql = "";
         ResultSet resultSet = null;
-        SLayoutBankPaymentTxt paymentTxt = null;
-        ArrayList<SLayoutBankPaymentTxt> paymentTxts = null;
 
         // layout name:
         
-        sql = "SELECT fid_tp_pay_bank, file_name, lay_bank "
+        sql = "SELECT fid_tp_pay_bank, tp_lay_bank, lay_bank "
                 + "FROM erp.finu_tp_lay_bank "
                 + "WHERE id_tp_lay_bank = " + mnFkBankLayoutTypeId;
         
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
-            layout = resultSet.getInt(1);
-            layoutTitle = SLibUtils.textToAscii(resultSet.getString(2));
-            layoutBank = resultSet.getInt(3);
+            layoutTitle = resultSet.getString(2);
         }
         
-        paymentTxts = new ArrayList<>();
+        // Bank to transfer:
         
-        for (SXmlBankLayoutPayment layoutPayment : layoutPayments) {
-            paymentTxt = new SLayoutBankPaymentTxt();
-            
-            // BizPartner:
-        
-            sql = "SELECT bp.id_bp, bp.bp "
-                    + "FROM erp.bpsu_bpb AS bpb "
-                    + "INNER JOIN erp.bpsu_bp AS bp ON bpb.fid_bp = bp.id_bp "
-                    + "WHERE bpb.id_bpb = " + (Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue();
+        sql = "SELECT ct.bp_key "
+                + "FROM erp.bpsu_bank_acc AS bank "
+                + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = bank.fid_bank "
+                + "INNER JOIN erp.bpsu_bp_ct AS ct ON ct.id_bp = bp.id_bp AND ct.id_ct_bp = " + SModSysConsts.BPSS_CT_BP_SUP + " "
+                + "WHERE bank.id_bpb = " + bizPartnerBank + " "
+                + "AND bank.id_bank_acc = " + bankBank;
 
-            resultSet = session.getStatement().executeQuery(sql);
-            if (resultSet.next()) {
-                bizPartnerId = resultSet.getInt(1);
-                bizPartner = resultSet.getString(2);
-            }
-            
-            // Account Debit:
-        
-            sql = "SELECT acc_num, bankb_num "
-                    + "FROM fin_acc_cash AS cash "
-                    + "INNER JOIN erp.bpsu_bank_acc AS bank ON bank.id_bpb = cash.fid_bpb_n AND bank.id_bank_acc = cash.fid_bank_acc_n "
-                    + "WHERE cash.id_cob = " + mnFkBankCompanyBranchId + " "
-                    + "AND cash.id_acc_cash = " + mnFkBankAccountCashId;
-
-            resultSet = session.getStatement().executeQuery(sql);
-            if (resultSet.next()) {
-                accountDebit = resultSet.getString(1);
-                accountBranchDebit = resultSet.getString(2);
-            }
-            
-            // Account Credit:
-        
-            sql = "SELECT fid_cur, " + (layout == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? "acc_num " : "acc_num_std ") + ", bankb_num "
-                    + "FROM erp.bpsu_bank_acc "
-                    + "WHERE id_bpb = " + (Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue() + " "
-                    + "AND id_bank_acc = " + (Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue();
-
-            resultSet = session.getStatement().executeQuery(sql);
-            if (resultSet.next()) {
-                currencyId = resultSet.getInt(1);
-                accountCredit = resultSet.getString(2);
-                accountBranchCredit = resultSet.getString(3);
-            }
-            
-            paymentTxt.setTotalAmount((double) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue());
-            paymentTxt.setReference((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).getValue());
-            paymentTxt.setConcept((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).getValue());
-            paymentTxt.setDescription((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DCRP).getValue());
-            paymentTxt.setBizPartnerId(bizPartnerId);
-            paymentTxt.setBizPartner(bizPartner);
-            paymentTxt.setAccountDebit(accountDebit);
-            paymentTxt.setAccountBranchDebit(accountBranchDebit);
-            paymentTxt.setCurrencyId(currencyId);
-            paymentTxt.setAgreement((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).getValue());
-            paymentTxt.setAgreementReference((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).getValue());
-            paymentTxt.setConceptCie((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_CON).getValue());
-            paymentTxt.setAccountCredit(accountCredit);
-            paymentTxt.setAccountBranchCredit(accountBranchCredit);
-            paymentTxt.setHsbcFiscalVoucher((Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).getValue());
-            paymentTxt.setHsbcBankCode((Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_BANK_CODE).getValue());
-            paymentTxt.setHsbcAccountType((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).getValue());
-            paymentTxt.setHsbcFiscalIdDebit((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_DBT).getValue());
-            paymentTxt.setHsbcFiscalIdCredit((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_CRD).getValue());
-            paymentTxt.setSantanderBankCode((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SAN_BANK_CODE).getValue());
-            paymentTxt.setBajioBankCode((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).getValue());
-            paymentTxt.setBajioBankNick((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).getValue());
-            paymentTxt.setBankKey((int) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).getValue());
-            
-            paymentTxts.add(paymentTxt);
+        resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            bank = resultSet.getString(1);
         }
         
-        switch (layout) {
-            case SDataConstantsSys.FINS_TP_PAY_BANK_THIRD:
-                switch (layoutBank) {
-                   case SFinConsts.LAY_BANK_HSBC:
-                       msLayoutText = SFinUtilities.createLayoutHsbcThird(paymentTxts, layoutTitle);
-                      break;
-                  case SFinConsts.LAY_BANK_SANTANDER:
-                       msLayoutText = SFinUtilities.createLayoutSantanderThird(paymentTxts, mtDateLayout, layoutTitle);
-                      break;
-                  case SFinConsts.LAY_BANK_BANBAJIO:
-                       msLayoutText = SFinUtilities.createLayoutBanBajioThird(paymentTxts, layoutTitle, mtDateLayout, mnConsecutive);
-                      break;
-                  case SFinConsts.LAY_BANK_BBVA:
-                       msLayoutText = SFinUtilities.createLayoutBbvaThird(paymentTxts, layoutTitle);
-                      break;
-                  case SFinConsts.LAY_BANK_BANAMEX:
-                       msLayoutText = SFinUtilities.createLayoutBanamexThird(paymentTxts, layoutTitle);
-                      break;
-                   default:
-                       break;
-                }
-                break;
-                
-           case SDataConstantsSys.FINS_TP_PAY_BANK_TEF:
-                switch (layoutBank) {
-                   case SFinConsts.LAY_BANK_HSBC:
-                       msLayoutText = SFinUtilities.createLayoutHsbcTef(paymentTxts, layoutTitle, mtDateLayout);
-                      break;
-                  case SFinConsts.LAY_BANK_SANTANDER:
-                       msLayoutText = SFinUtilities.createLayoutSantanderTef(paymentTxts, layoutTitle);
-                      break;
-                  case SFinConsts.LAY_BANK_BANBAJIO:
-                       msLayoutText = SFinUtilities.createLayoutBanBajioTef(paymentTxts, layoutTitle, mtDateLayout, mnConsecutive);
-                      break;
-                   case SFinConsts.LAY_BANK_BBVA:
-                       msLayoutText = SFinUtilities.createLayoutBbvaTef(paymentTxts, layoutTitle);
-                      break;
-                   case SFinConsts.LAY_BANK_BANAMEX:
-                       msLayoutText = SFinUtilities.createLayoutBanamexTef(paymentTxts, layoutTitle, session);
-                      break;
-                   default:
-                      break;
-                }
-                break;
-               
-           case SDataConstantsSys.FINS_TP_PAY_BANK_SPEI_FD_N:
-                switch (layoutBank) {
-                   case SFinConsts.LAY_BANK_HSBC:
-                       msLayoutText = SFinUtilities.createLayoutHsbcSpeiFdN(paymentTxts, layoutTitle);
-                       break;
-                  case SFinConsts.LAY_BANK_SANTANDER:
-                       msLayoutText = SFinUtilities.createLayoutSantanderSpeiFdN(paymentTxts, layoutTitle);
-                      break;
-                  case SFinConsts.LAY_BANK_BANBAJIO:
-                       msLayoutText = SFinUtilities.createLayoutBanBajioSpeiFdN(paymentTxts, layoutTitle, mtDateLayout, mnConsecutive);
-                      break;
-                   case SFinConsts.LAY_BANK_BBVA:
-                       msLayoutText = SFinUtilities.createLayoutBbvaSpei(paymentTxts, layoutTitle);
-                      break;
-                   case SFinConsts.LAY_BANK_BANAMEX:
-                       msLayoutText = SFinUtilities.createLayoutBanamexSpei(paymentTxts, layoutTitle, session);
-                      break;
-                   default:
-                       break;
-                }
-                break;
-               
-            case SDataConstantsSys.FINS_TP_PAY_BANK_SPEI_FD_Y:
-                switch (layoutBank) {
-                   case SFinConsts.LAY_BANK_HSBC:
-                       msLayoutText = SFinUtilities.createLayoutHsbcSpeiFdY(paymentTxts, layoutTitle);
-                      break;
-                  case SFinConsts.LAY_BANK_SANTANDER:
-                       msLayoutText = SFinUtilities.createLayoutSantanderSpeiFdY(paymentTxts, layoutTitle);
-                      break;
-                   case SFinConsts.LAY_BANK_BBVA:
-                       msLayoutText = SFinUtilities.createLayoutBbvaSpei(paymentTxts, layoutTitle);
-                      break;
-                   case SFinConsts.LAY_BANK_BANAMEX:
-                       msLayoutText = SFinUtilities.createLayoutBanamexSpei(paymentTxts, layoutTitle, session);
-                      break;
-                   default:
-                       break;
-                }
-                break;
-                
-            case SDataConstantsSys.FINS_TP_PAY_BANK_AGREE:
-                switch (layoutBank) {
-                    case SFinConsts.LAY_BANK_BBVA:
-                        msLayoutText = SFinUtilities.createLayoutBbvaCie(paymentTxts);
-                        break;
-                    default:
-                }
-            break;
-                
-            default:
-        }
+        concept = layoutTitle + " / " + bank + " / F " + reference + " / " + bizPartner;
+        
+        return (concept.length() > 100 ? SLibUtilities.textLeft(concept, 100) : concept).trim();
     }
     
-    private void processLayoutBankPayments(final SGuiSession session) throws Exception {
-        boolean found = false;
-        SLayoutBankRecord bankRecord = null;
-        SLayoutBankPayment paymentApply = null;
-        SLayoutBankPayment paymentDelete = null;
+    private erp.mfin.data.SDataRecordEntry createRecordEntryAccountCash(final SGuiSession session, final SDataDps dps, final String bizPartner, double amountPayed, final int bookkeepingYear, final int bookkeepingNum, final int bizPartnerBank, final int bankBank, String reference) throws Exception {
+        int[] keySystemMoveType = null;
+        int[] keySystemMoveTypeXXX = null;
         
-        for (SLayoutBankPaymentRow paymentRow : maBankPaymentRows) {
-            // payment for delete:
-            
-            found = false;
-            if (paymentRow.getFinRecordLayoutOld() != null) {
-                
-                if (paymentRow.getFinRecordLayout() == null ||
-                        !(SLibUtils.compareKeys(paymentRow.getFinRecordLayout().getPrimaryKey(), paymentRow.getFinRecordLayoutOld().getPrimaryKey()))) {
-                    paymentDelete = paymentRow.getLayoutBankPayment().clone();
-                    
-                    paymentDelete.setAction(SLayoutBankPayment.ACTION_PAY_REMOVE);
-                    
-                    for (SLayoutBankRecord bankRecordRow : maBankRecords) {
-                        if (SLibUtils.compareKeys(bankRecordRow.getFinRecordLayout().getPrimaryKey(), paymentRow.getFinRecordLayoutOld().getPrimaryKey())) {
-                            bankRecordRow.getLayoutBankPayments().add(paymentDelete);
-                            found = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!found) {
-                        bankRecord = new SLayoutBankRecord(paymentRow.getFinRecordLayoutOld());
-                        bankRecord.getLayoutBankPayments().add(paymentDelete);
-                        maBankRecords.add(bankRecord);
-                    }
-                }
-            }
-            
-            // payment for apply:
-            
-            if (paymentRow.getFinRecordLayout() != null) {
-                if (paymentRow.getFinRecordLayoutOld() == null ||
-                        !(SLibUtils.compareKeys(paymentRow.getFinRecordLayout().getPrimaryKey(), paymentRow.getFinRecordLayoutOld().getPrimaryKey()))) {
-                    paymentApply = paymentRow.getLayoutBankPayment().clone();
-                    
-                    paymentApply.setAction(SLayoutBankPayment.ACTION_PAY_APPLY);
-                    
-                    for (SLayoutBankRecord bankRecordRow : maBankRecords) {
-                        if (SLibUtils.compareKeys(bankRecordRow.getFinRecordLayout().getPrimaryKey(), paymentRow.getFinRecordLayout().getPrimaryKey())) {
-                            bankRecordRow.getLayoutBankPayments().add(paymentApply);
-                            found = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!found) {
-                        bankRecord = new SLayoutBankRecord(paymentRow.getFinRecordLayout());
-                        bankRecord.getLayoutBankPayments().add(paymentApply);
-                        maBankRecords.add(bankRecord);
-                    }
-                }
-            }
-        }
+        SDataAccountCash accountCash = new SDataAccountCash();
         
-        if (!maBankRecords.isEmpty()) {
-            processLayoutBankRecord(session);
+        if (accountCash.read(new int[] { mnFkBankCompanyBranchId, mnFkBankAccountCashId }, session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
         }
+
+        if (accountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_CASH) {
+            keySystemMoveTypeXXX = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH;
+        }
+        else {
+            keySystemMoveTypeXXX = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK;
+        }
+
+        SDataRecordEntry recordEntry = new SDataRecordEntry();
+        
+        recordEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[0]);
+        recordEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[1]);
+        recordEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
+        recordEntry.setFkUserNewId(session.getUser().getPkUserId());
+        recordEntry.setDbmsAccountingMoveSubclass(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL, SDbRegistry.FIELD_NAME) + "");
+        recordEntry.setConcept(composeRecordEntryConcept(session, bizPartnerBank, bankBank, reference, bizPartner));
+        recordEntry.setDebit(0);
+        recordEntry.setCredit(amountPayed);
+        recordEntry.setExchangeRate(1);
+        recordEntry.setExchangeRateSystem(1);
+        recordEntry.setDebitCy(0);
+        recordEntry.setCreditCy(amountPayed);
+        recordEntry.setFkCurrencyId(accountCash.getFkCurrencyId());
+        recordEntry.setFkAccountIdXXX(accountCash.getFkAccountId());
+        recordEntry.setFkCostCenterIdXXX_n("");
+        recordEntry.setIsExchangeDifference(false);
+        recordEntry.setIsSystem(true);
+        recordEntry.setIsDeleted(false);
+
+        keySystemMoveType = SModSysConsts.FINS_TP_SYS_MOV_MO_SUP_PAY;
+        recordEntry.setFkSystemMoveClassId(keySystemMoveType[0]);
+        recordEntry.setFkSystemMoveTypeId(keySystemMoveType[1]);
+
+        if (accountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_CASH) {
+            recordEntry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_CSH[0]);
+            recordEntry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_CSH[1]);
+        }
+        else {
+            recordEntry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_BNK[0]);
+            recordEntry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_BNK[1]);
+        }
+
+        recordEntry.setFkSystemMoveCategoryIdXXX(keySystemMoveTypeXXX[0]);
+        recordEntry.setFkSystemMoveTypeIdXXX(keySystemMoveTypeXXX[1]);
+
+        recordEntry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { accountCash.getFkAccountId() }));
+        recordEntry.setDbmsAccountComplement(accountCash.getDbmsCompanyBranchEntity().getEntity());
+        recordEntry.setDbmsCostCenter_n("");
+        recordEntry.setDbmsCurrencyKey(session.getSessionCustom().getCurrencyCode(new int[] { accountCash.getFkCurrencyId() }));
+
+        recordEntry.setReference("");
+        recordEntry.setIsReferenceTax(false);
+        recordEntry.setFkTaxBasicId_n(0);
+        recordEntry.setFkTaxId_n(0);
+
+        recordEntry.setFkBizPartnerId_nr(dps.getFkBizPartnerId_r());
+        recordEntry.setFkBizPartnerBranchId_n(dps.getFkBizPartnerBranchId());
+
+        recordEntry.setFkCompanyBranchId_n(accountCash.getPkCompanyBranchId());
+        recordEntry.setFkEntityId_n(accountCash.getPkAccountCashId());
+        recordEntry.setUnits(0d);
+        recordEntry.setFkItemId_n(0);
+        recordEntry.setFkItemAuxId_n(0);
+        recordEntry.setFkYearId_n(0);
+        recordEntry.setFkDpsYearId_n(dps.getPkYearId());
+        recordEntry.setFkDpsDocId_n(dps.getPkDocId());
+        recordEntry.setFkDpsAdjustmentYearId_n(0);
+        recordEntry.setFkDpsAdjustmentDocId_n(0);
+        recordEntry.setFkBookkeepingYearId_n(bookkeepingYear);
+        recordEntry.setFkBookkeepingNumberId_n(bookkeepingNum);
+
+        return recordEntry;
     }
-    
-    private void processLayoutBankRecord(final SGuiSession session) throws Exception {
-        SDataRecord record = null;
-        
-        for (SLayoutBankRecord bankRecord : maBankRecords) {
-            record = createRecord(bankRecord, session);
-            if (record.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-            }
-            if (record.read(bankRecord.getFinRecordLayout().getPrimaryKey(), session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-            }
-        }
-    }
-    
-    private SDataRecord createRecord(final SLayoutBankRecord bankRecord, final SGuiSession session) throws Exception {
+
+    private SDataRecord createRecord(final SGuiSession session, final SLayoutBankRecord bankRecord) throws Exception {
         String sBizPartner = "";
         double amountPayed = 0;
         int nSortingPosition = 0;
@@ -512,7 +307,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         record = new SDataRecord();
         dps = new SDataDps();
         
-        if (record.read(bankRecord.getFinRecordLayout().getPrimaryKey(), statementAux) != SLibConstants.DB_ACTION_READ_OK) {
+        if (record.read(bankRecord.getLayoutBankRecordKey().getPrimaryKey(), statementAux) != SLibConstants.DB_ACTION_READ_OK) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
         }
         
@@ -542,8 +337,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             
             if (bankPayment.getAction() == SLayoutBankPayment.ACTION_PAY_REMOVE) {
                 for (SDataRecordEntry entry : record.getDbmsRecordEntries()) {
-                    if (SLibUtils.compareKeys(new int[] { entry.getFkBookkeepingYearId_n(), entry.getFkBookkeepingNumberId_n() }, new int[] { bankPayment.getFkBookkeepingYearId_n(), bankPayment.getFkBookkeepingNumberId_n() }) /*&&
-                            SLibUtils.belongsTo(new int[] { entry.getFkSystemMoveCategoryIdXXX(), entry.getFkSystemMoveTypeIdXXX() },  new int[][] { SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK, SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH })*/) {
+                    if (SLibUtils.compareKeys(new int[] { entry.getFkBookkeepingYearId_n(), entry.getFkBookkeepingNumberId_n() }, new int[] { bankPayment.getFkBookkeepingYearId_n(), bankPayment.getFkBookkeepingNumberId_n() })) {
                         entry.setIsDeleted(true);
                         entry.setIsRegistryEdited(true);
                         recordEntriesToProcess.add(entry);
@@ -558,7 +352,7 @@ public class SDbBankLayout extends SDbRegistryUser {
 
                 sBizPartner = session.readField(SModConsts.BPSU_BP, new int[] { bankPayment.getBizPartnerId() }, SDbBizPartner.FIELD_NAME_COMM) + "";
 
-                if (bankPayment.getLayoutPaymentType() == SModSysConsts.FIN_LAY_BANK_DPS) {
+                if (bankPayment.getLayoutPaymentType() == SModSysConsts.FIN_LAY_BANK_PAY) {
                     for (SLayoutBankDps bankDps : bankPayment.getLayoutBankDps()) {
                         if (dps.read(new int[] { bankDps.getPkYearId(), bankDps.getPkDocId() }, statementAux) != SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
@@ -623,7 +417,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                         aReference.add(reference);
                         
                         for (SDataRecordEntry entry : recordDsm.getDbmsRecordEntries()) {
-                            entry.setConcept(createConceptRecordEntry(session, bankPayment.getBizPartnerBranchId(), bankPayment.getBizPartnerBranchAccountId(), reference, sBizPartner));
+                            entry.setConcept(composeRecordEntryConcept(session, bankPayment.getBizPartnerBranchId(), bankPayment.getBizPartnerBranchAccountId(), reference, sBizPartner));
                             entry.setSortingPosition(++nSortingPosition);
                             entry.setFkBookkeepingYearId_n(nBookkeepingYear);
                             entry.setFkBookkeepingNumberId_n(nBookkeepingNum);
@@ -637,7 +431,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                     }
                     recordEntrys.insertElementAt(createRecordEntryAccountCash(session, dps, sBizPartner, amountPayed, nBookkeepingYear, nBookkeepingNum, bankPayment.getBizPartnerBranchId(), bankPayment.getBizPartnerBranchAccountId(), referenceBank), 0);
                 }
-                else if (bankPayment.getLayoutPaymentType() == SModSysConsts.FIN_LAY_BANK_ADV) {
+                else if (bankPayment.getLayoutPaymentType() == SModSysConsts.FIN_LAY_BANK_PREPAY) {
                     accountingAdvance = new SLayoutBankAccountingAdvance(session, bankPayment.getBizPartnerId(), bankPayment.getBizPartnerBranchId(), bankPayment.getBizPartnerBranchAccountId(), mnFkBankCompanyBranchId, mnFkBankAccountCashId);
                     
                     accountingAdvance.setBankLayoutTypeId(mnFkBankLayoutTypeId);
@@ -667,6 +461,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                 mnTransfersPayed++;
             }
         }
+        
         for (SDataRecordEntry entry : recordEntrys) {
             entry.setPkYearId(record.getPkYearId());
             entry.setPkPeriodId(record.getPkPeriodId());
@@ -682,230 +477,411 @@ public class SDbBankLayout extends SDbRegistryUser {
             
             record.getDbmsRecordEntries().add(entry);
         }
+        
         recordEntriesToProcess.addAll(recordEntrys);
         updateLayoutXml(recordEntriesToProcess);
         
         return record;
     }
     
-    private erp.mfin.data.SDataRecordEntry createRecordEntryAccountCash(final SGuiSession session, final SDataDps dps, final String bizPartner, double amountPayed, final int bookkeepingYear, final int bookkeepingNum, final int bizPartnerBank, final int bankBank, String reference) throws Exception {
-        int[] keySystemMoveType = null;
-        int[] keySystemMoveTypeXXX = null;
-        SDataAccountCash accountCash = null;
-        SDataRecordEntry entry = new SDataRecordEntry();
-        
-        accountCash = new SDataAccountCash();
-        if (accountCash.read(new int[] { mnFkBankCompanyBranchId, mnFkBankAccountCashId }, session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+    private void processLayoutBankRecords(final SGuiSession session) throws Exception {
+        for (SLayoutBankRecord record : maLayoutBankRecords) {
+            SDataRecord dataRecord = createRecord(session, record);
+            
+            if (dataRecord.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+            }
+            
+            if (dataRecord.read(record.getLayoutBankRecordKey().getPrimaryKey(), session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+            }
         }
-
-        if (accountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_CASH) {
-            keySystemMoveTypeXXX = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_CASH;
-        }
-        else {
-            keySystemMoveTypeXXX = SDataConstantsSys.FINS_TP_SYS_MOV_CASH_BANK;
-        }
-
-        entry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[0]);
-        entry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[1]);
-        entry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
-        entry.setFkUserNewId(session.getUser().getPkUserId());
-        entry.setDbmsAccountingMoveSubclass(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL, SDbRegistry.FIELD_NAME) + "");
-        entry.setConcept(createConceptRecordEntry(session, bizPartnerBank, bankBank, reference, bizPartner));
-        entry.setDebit(0);
-        entry.setCredit(amountPayed);
-        entry.setExchangeRate(1);
-        entry.setExchangeRateSystem(1);
-        entry.setDebitCy(0);
-        entry.setCreditCy(amountPayed);
-        entry.setFkCurrencyId(accountCash.getFkCurrencyId());
-        entry.setFkAccountIdXXX(accountCash.getFkAccountId());
-        entry.setFkCostCenterIdXXX_n("");
-        entry.setIsExchangeDifference(false);
-        entry.setIsSystem(true);
-        entry.setIsDeleted(false);
-
-        keySystemMoveType = SModSysConsts.FINS_TP_SYS_MOV_MO_SUP_PAY;
-        entry.setFkSystemMoveClassId(keySystemMoveType[0]);
-        entry.setFkSystemMoveTypeId(keySystemMoveType[1]);
-
-        if (accountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_CASH) {
-            entry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_CSH[0]);
-            entry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_CSH[1]);
-        }
-        else {
-            entry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_BNK[0]);
-            entry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_BNK[1]);
-        }
-
-        entry.setFkSystemMoveCategoryIdXXX(keySystemMoveTypeXXX[0]);
-        entry.setFkSystemMoveTypeIdXXX(keySystemMoveTypeXXX[1]);
-
-        entry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { accountCash.getFkAccountId() }));
-        entry.setDbmsAccountComplement(accountCash.getDbmsCompanyBranchEntity().getEntity());
-        entry.setDbmsCostCenter_n("");
-        entry.setDbmsCurrencyKey(session.getSessionCustom().getCurrencyCode(new int[] { accountCash.getFkCurrencyId() }));
-
-        entry.setReference("");
-        entry.setIsReferenceTax(false);
-        entry.setFkTaxBasicId_n(0);
-        entry.setFkTaxId_n(0);
-
-        entry.setFkBizPartnerId_nr(dps.getFkBizPartnerId_r());
-        entry.setFkBizPartnerBranchId_n(dps.getFkBizPartnerBranchId());
-
-        entry.setFkCompanyBranchId_n(accountCash.getPkCompanyBranchId());
-        entry.setFkEntityId_n(accountCash.getPkAccountCashId());
-        entry.setUnits(0d);
-        entry.setFkItemId_n(0);
-        entry.setFkItemAuxId_n(0);
-        entry.setFkYearId_n(0);
-        entry.setFkDpsYearId_n(dps.getPkYearId());
-        entry.setFkDpsDocId_n(dps.getPkDocId());
-        entry.setFkDpsAdjustmentYearId_n(0);
-        entry.setFkDpsAdjustmentDocId_n(0);
-        entry.setFkBookkeepingYearId_n(bookkeepingYear);
-        entry.setFkBookkeepingNumberId_n(bookkeepingNum);
-
-        return entry;
     }
-
-    private String createConceptRecordEntry(final SGuiSession session, final int bizPartnerBank, final int bankBank, final String reference, final String bizPartner) throws Exception {
-        String bank = "";
+    
+    private void processLayoutBankPaymentRows(final SGuiSession session) throws Exception {
+        // go through all rows of bank payments:
+        
+        for (SLayoutBankPaymentRow paymentRow : maLayoutBankPaymentRows) {
+            boolean found = false;
+            
+            // payment to remove:
+            
+            if (paymentRow.getLayoutBankRecordKeyOld() != null) {
+                if (paymentRow.getLayoutBankRecordKey() == null ||
+                        !(SLibUtils.compareKeys(paymentRow.getLayoutBankRecordKeyOld().getPrimaryKey(), paymentRow.getLayoutBankRecordKey().getPrimaryKey()))) {
+                    SLayoutBankPayment lbpClonedToRemove = paymentRow.getLayoutBankPayment().clone();
+                    
+                    lbpClonedToRemove.setAction(SLayoutBankPayment.ACTION_PAY_REMOVE);
+                    
+                    for (SLayoutBankRecord record : maLayoutBankRecords) {
+                        if (SLibUtils.compareKeys(record.getLayoutBankRecordKey().getPrimaryKey(), paymentRow.getLayoutBankRecordKeyOld().getPrimaryKey())) {
+                            record.getLayoutBankPayments().add(lbpClonedToRemove);
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found) {
+                        SLayoutBankRecord layoutBankRecord = new SLayoutBankRecord(paymentRow.getLayoutBankRecordKeyOld());
+                        layoutBankRecord.getLayoutBankPayments().add(lbpClonedToRemove);
+                        maLayoutBankRecords.add(layoutBankRecord);
+                    }
+                }
+            }
+            
+            // payment to apply:
+            
+            if (paymentRow.getLayoutBankRecordKey() != null) {
+                if (paymentRow.getLayoutBankRecordKeyOld() == null ||
+                        !(SLibUtils.compareKeys(paymentRow.getLayoutBankRecordKey().getPrimaryKey(), paymentRow.getLayoutBankRecordKeyOld().getPrimaryKey()))) {
+                    SLayoutBankPayment lbpClonedToApply = paymentRow.getLayoutBankPayment().clone();
+                    
+                    lbpClonedToApply.setAction(SLayoutBankPayment.ACTION_PAY_APPLY);
+                    
+                    for (SLayoutBankRecord record : maLayoutBankRecords) {
+                        if (SLibUtils.compareKeys(record.getLayoutBankRecordKey().getPrimaryKey(), paymentRow.getLayoutBankRecordKey().getPrimaryKey())) {
+                            record.getLayoutBankPayments().add(lbpClonedToApply);
+                            found = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found) {
+                        SLayoutBankRecord layoutBankRecord = new SLayoutBankRecord(paymentRow.getLayoutBankRecordKey());
+                        layoutBankRecord.getLayoutBankPayments().add(lbpClonedToApply);
+                        maLayoutBankRecords.add(layoutBankRecord);
+                    }
+                }
+            }
+        }
+        
+        if (!maLayoutBankRecords.isEmpty()) {
+            processLayoutBankRecords(session);
+        }
+    }
+    
+    private void generateXmlBankLayoutText(final SGuiSession session, final ArrayList<SXmlBankLayoutPayment> layoutPayments) throws Exception {
+        int layout = 0;
+        int layoutBank = 0;
+        int currencyId = 0;
+        int bizPartnerId = 0;
+        String bizPartner = "";
+        String accountDebit = "";
+        String accountBranchDebit = "";
+        String accountCredit = "";
+        String accountBranchCredit = "";
         String layoutTitle = "";
-        String concept = "";
         String sql = "";
         ResultSet resultSet = null;
+        SLayoutBankPaymentTxt layoutBankPaymentTxt = null;
+        ArrayList<SLayoutBankPaymentTxt> layoutBankPaymentTxts = null;
 
         // layout name:
         
-        sql = "SELECT fid_tp_pay_bank, tp_lay_bank, lay_bank "
+        sql = "SELECT fid_tp_pay_bank, file_name, lay_bank "
                 + "FROM erp.finu_tp_lay_bank "
                 + "WHERE id_tp_lay_bank = " + mnFkBankLayoutTypeId;
         
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
-            layoutTitle = resultSet.getString(2);
+            layout = resultSet.getInt(1);
+            layoutTitle = SLibUtils.textToAscii(resultSet.getString(2));
+            layoutBank = resultSet.getInt(3);
         }
         
-        // Bank to transfer:
+        layoutBankPaymentTxts = new ArrayList<>();
         
-        sql = "SELECT ct.bp_key "
-                + "FROM erp.bpsu_bank_acc AS bank "
-                + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = bank.fid_bank "
-                + "INNER JOIN erp.bpsu_bp_ct AS ct ON ct.id_bp = bp.id_bp AND ct.id_ct_bp = " + SModSysConsts.BPSS_CT_BP_SUP + " "
-                + "WHERE bank.id_bpb = " + bizPartnerBank + " "
-                + "AND bank.id_bank_acc = " + bankBank;
+        for (SXmlBankLayoutPayment layoutPayment : layoutPayments) {
+            layoutBankPaymentTxt = new SLayoutBankPaymentTxt();
+            
+            // BizPartner:
+        
+            sql = "SELECT bp.id_bp, bp.bp "
+                    + "FROM erp.bpsu_bpb AS bpb "
+                    + "INNER JOIN erp.bpsu_bp AS bp ON bpb.fid_bp = bp.id_bp "
+                    + "WHERE bpb.id_bpb = " + (Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue();
 
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            bank = resultSet.getString(1);
+            resultSet = session.getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                bizPartnerId = resultSet.getInt(1);
+                bizPartner = resultSet.getString(2);
+            }
+            
+            // Account Debit:
+        
+            sql = "SELECT acc_num, bankb_num "
+                    + "FROM fin_acc_cash AS cash "
+                    + "INNER JOIN erp.bpsu_bank_acc AS bank ON bank.id_bpb = cash.fid_bpb_n AND bank.id_bank_acc = cash.fid_bank_acc_n "
+                    + "WHERE cash.id_cob = " + mnFkBankCompanyBranchId + " "
+                    + "AND cash.id_acc_cash = " + mnFkBankAccountCashId;
+
+            resultSet = session.getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                accountDebit = resultSet.getString(1);
+                accountBranchDebit = resultSet.getString(2);
+            }
+            
+            // Account Credit:
+        
+            sql = "SELECT fid_cur, " + (layout == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? "acc_num " : "acc_num_std ") + ", bankb_num "
+                    + "FROM erp.bpsu_bank_acc "
+                    + "WHERE id_bpb = " + (Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue() + " "
+                    + "AND id_bank_acc = " + (Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue();
+
+            resultSet = session.getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                currencyId = resultSet.getInt(1);
+                accountCredit = resultSet.getString(2);
+                accountBranchCredit = resultSet.getString(3);
+            }
+            
+            layoutBankPaymentTxt.setTotalAmount((double) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue());
+            layoutBankPaymentTxt.setReference((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).getValue());
+            layoutBankPaymentTxt.setConcept((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).getValue());
+            layoutBankPaymentTxt.setDescription((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DCRP).getValue());
+            layoutBankPaymentTxt.setBizPartnerId(bizPartnerId);
+            layoutBankPaymentTxt.setBizPartner(bizPartner);
+            layoutBankPaymentTxt.setAccountDebit(accountDebit);
+            layoutBankPaymentTxt.setAccountBranchDebit(accountBranchDebit);
+            layoutBankPaymentTxt.setCurrencyId(currencyId);
+            layoutBankPaymentTxt.setAgreement((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).getValue());
+            layoutBankPaymentTxt.setAgreementReference((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).getValue());
+            layoutBankPaymentTxt.setConceptCie((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_CON).getValue());
+            layoutBankPaymentTxt.setAccountCredit(accountCredit);
+            layoutBankPaymentTxt.setAccountBranchCredit(accountBranchCredit);
+            layoutBankPaymentTxt.setHsbcFiscalVoucher((Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).getValue());
+            layoutBankPaymentTxt.setHsbcBankCode((Integer) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_BANK_CODE).getValue());
+            layoutBankPaymentTxt.setHsbcAccountType((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).getValue());
+            layoutBankPaymentTxt.setHsbcFiscalIdDebit((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_DBT).getValue());
+            layoutBankPaymentTxt.setHsbcFiscalIdCredit((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_CRD).getValue());
+            layoutBankPaymentTxt.setSantanderBankCode((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SAN_BANK_CODE).getValue());
+            layoutBankPaymentTxt.setBajioBankCode((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).getValue());
+            layoutBankPaymentTxt.setBajioBankNick((String) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).getValue());
+            layoutBankPaymentTxt.setBankKey((int) layoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).getValue());
+            
+            layoutBankPaymentTxts.add(layoutBankPaymentTxt);
         }
         
-        concept = layoutTitle + " / " + bank + " / F " + reference + " / " + bizPartner;
-        
-        return (concept.length() > 100 ? SLibUtilities.textLeft(concept, 100) : concept).trim();
+        switch (layout) {
+            case SDataConstantsSys.FINS_TP_PAY_BANK_THIRD:
+                switch (layoutBank) {
+                   case SFinConsts.LAY_BANK_HSBC:
+                       msLayoutText = SFinUtilities.createLayoutHsbcThird(layoutBankPaymentTxts, layoutTitle);
+                      break;
+                  case SFinConsts.LAY_BANK_SANTANDER:
+                       msLayoutText = SFinUtilities.createLayoutSantanderThird(layoutBankPaymentTxts, mtDateLayout, layoutTitle);
+                      break;
+                  case SFinConsts.LAY_BANK_BANBAJIO:
+                       msLayoutText = SFinUtilities.createLayoutBanBajioThird(layoutBankPaymentTxts, layoutTitle, mtDateLayout, mnConsecutive);
+                      break;
+                  case SFinConsts.LAY_BANK_BBVA:
+                       msLayoutText = SFinUtilities.createLayoutBbvaThird(layoutBankPaymentTxts, layoutTitle);
+                      break;
+                  case SFinConsts.LAY_BANK_BANAMEX:
+                       msLayoutText = SFinUtilities.createLayoutBanamexThird(layoutBankPaymentTxts, layoutTitle);
+                      break;
+                   default:
+                       break;
+                }
+                break;
+                
+           case SDataConstantsSys.FINS_TP_PAY_BANK_TEF:
+                switch (layoutBank) {
+                   case SFinConsts.LAY_BANK_HSBC:
+                       msLayoutText = SFinUtilities.createLayoutHsbcTef(layoutBankPaymentTxts, layoutTitle, mtDateLayout);
+                      break;
+                  case SFinConsts.LAY_BANK_SANTANDER:
+                       msLayoutText = SFinUtilities.createLayoutSantanderTef(layoutBankPaymentTxts, layoutTitle);
+                      break;
+                  case SFinConsts.LAY_BANK_BANBAJIO:
+                       msLayoutText = SFinUtilities.createLayoutBanBajioTef(layoutBankPaymentTxts, layoutTitle, mtDateLayout, mnConsecutive);
+                      break;
+                   case SFinConsts.LAY_BANK_BBVA:
+                       msLayoutText = SFinUtilities.createLayoutBbvaTef(layoutBankPaymentTxts, layoutTitle);
+                      break;
+                   case SFinConsts.LAY_BANK_BANAMEX:
+                       msLayoutText = SFinUtilities.createLayoutBanamexTef(layoutBankPaymentTxts, layoutTitle, session);
+                      break;
+                   default:
+                      break;
+                }
+                break;
+               
+           case SDataConstantsSys.FINS_TP_PAY_BANK_SPEI_FD_N:
+                switch (layoutBank) {
+                   case SFinConsts.LAY_BANK_HSBC:
+                       msLayoutText = SFinUtilities.createLayoutHsbcSpeiFdN(layoutBankPaymentTxts, layoutTitle);
+                       break;
+                  case SFinConsts.LAY_BANK_SANTANDER:
+                       msLayoutText = SFinUtilities.createLayoutSantanderSpeiFdN(layoutBankPaymentTxts, layoutTitle);
+                      break;
+                  case SFinConsts.LAY_BANK_BANBAJIO:
+                       msLayoutText = SFinUtilities.createLayoutBanBajioSpeiFdN(layoutBankPaymentTxts, layoutTitle, mtDateLayout, mnConsecutive);
+                      break;
+                   case SFinConsts.LAY_BANK_BBVA:
+                       msLayoutText = SFinUtilities.createLayoutBbvaSpei(layoutBankPaymentTxts, layoutTitle);
+                      break;
+                   case SFinConsts.LAY_BANK_BANAMEX:
+                       msLayoutText = SFinUtilities.createLayoutBanamexSpei(layoutBankPaymentTxts, layoutTitle, session);
+                      break;
+                   default:
+                       break;
+                }
+                break;
+               
+            case SDataConstantsSys.FINS_TP_PAY_BANK_SPEI_FD_Y:
+                switch (layoutBank) {
+                   case SFinConsts.LAY_BANK_HSBC:
+                       msLayoutText = SFinUtilities.createLayoutHsbcSpeiFdY(layoutBankPaymentTxts, layoutTitle);
+                      break;
+                  case SFinConsts.LAY_BANK_SANTANDER:
+                       msLayoutText = SFinUtilities.createLayoutSantanderSpeiFdY(layoutBankPaymentTxts, layoutTitle);
+                      break;
+                   case SFinConsts.LAY_BANK_BBVA:
+                       msLayoutText = SFinUtilities.createLayoutBbvaSpei(layoutBankPaymentTxts, layoutTitle);
+                      break;
+                   case SFinConsts.LAY_BANK_BANAMEX:
+                       msLayoutText = SFinUtilities.createLayoutBanamexSpei(layoutBankPaymentTxts, layoutTitle, session);
+                      break;
+                   default:
+                       break;
+                }
+                break;
+                
+            case SDataConstantsSys.FINS_TP_PAY_BANK_AGREE:
+                switch (layoutBank) {
+                    case SFinConsts.LAY_BANK_BBVA:
+                        msLayoutText = SFinUtilities.createLayoutBbvaCie(layoutBankPaymentTxts);
+                        break;
+                    default:
+                }
+                break;
+                
+            default:
+        }
     }
     
-    private void updateLayoutXml(Vector<SDataRecordEntry> recordEntries) {
-        int[] key = new int[] { SLibConsts.UNDEFINED };
-        mnDocsPayed = 0;
-        mdAmountPayed = 0;
+    private void generateXmlBankLayout(final SGuiSession session) throws Exception {
+        boolean found = false;
+        SXmlBankLayout xmlBankLayout = new SXmlBankLayout();
+        SXmlBankLayoutPayment xmlBankLayoutPayment = null;
+        SXmlBankLayoutPaymentDoc xmlBankLayoutPaymentDoc = null;
+        ArrayList<SXmlBankLayoutPayment> xmlBankLayoutPayments = new ArrayList<>();
         
-        for (SDataRecordEntry entry : recordEntries) {
-            for (SLayoutBankXmlRow xmlRow : maXmlRows) {
-                if (xmlRow.getLayoutXmlRowType() == SModSysConsts.FIN_LAY_BANK_DPS) {
-                    key = new int[] { entry.getFkDpsYearId_n(), entry.getFkDpsDocId_n() };
+        xmlBankLayout.getAttribute(SXmlBankLayout.ATT_LAY_ID).setValue(mnPkBankLayoutId);
+        
+        for (SLayoutBankXmlRow xmlRow : maLayoutBankXmlRows) {
+            xmlBankLayoutPaymentDoc = new SXmlBankLayoutPaymentDoc();
+
+            xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).setValue(xmlRow.getDpsYear());
+            xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).setValue(xmlRow.getDpsDoc());
+            xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).setValue(xmlRow.getAmount());
+            xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT_CY).setValue(xmlRow.getAmountCy());
+            xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).setValue(xmlRow.getCurrencyId());
+            xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXT_RATE).setValue(xmlRow.getExchangeRate());
+            xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_REF_REC).setValue(xmlRow.getReferenceRecord());
+            xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_OBS).setValue(xmlRow.getObservations());
+            
+            for (SXmlBankLayoutPayment payment : xmlBankLayoutPayments) {
+                found = false;
+                
+                if (mnXtaBankPaymentType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                    if (xmlRow.getAgreement().trim().equals((String) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).getValue()) && xmlRow.getAgreementReference().trim().equals((String) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).getValue())) {
+                        found = true;
+                    }
                 }
-                else if (xmlRow.getLayoutXmlRowType() == SModSysConsts.FIN_LAY_BANK_ADV) {
-                    key = new int[] { entry.getFkBizPartnerId_nr() };
+                else {
+                    if (SLibUtilities.compareKeys(new int[] { xmlRow.getBizPartnerBranch(), xmlRow.getBizPartnerBranchAccount() }, 
+                            new int[] { (int) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).getValue(), (int) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue() })) {
+                        found = true;
+                    }
                 }
                 
-                if (SLibUtils.compareKeys(xmlRow.getPrimaryKey(), key)) {
-                    if (entry.getIsDeleted()) {
-                        if (SLibUtils.compareKeys(new int[] { xmlRow.getBookkeepingYear(), xmlRow.getBookkeepingNumber() }, new int[] { entry.getFkBookkeepingYearId_n(), entry.getFkBookkeepingNumberId_n()})) {
-                            xmlRow.setAmountPayed(SLibConsts.UNDEFINED);
-                            xmlRow.setIsToPayed(false);
-                            xmlRow.setRecYear(SLibConsts.UNDEFINED);
-                            xmlRow.setRecPeriod(SLibConsts.UNDEFINED);
-                            xmlRow.setRecBookkeepingCenter(SLibConsts.UNDEFINED);
-                            xmlRow.setRecRecordType("");
-                            xmlRow.setRecNumber(SLibConsts.UNDEFINED);
-                            xmlRow.setBookkeepingYear(SLibConsts.UNDEFINED);
-                            xmlRow.setBookkeepingNumber(SLibConsts.UNDEFINED);
-                        }
-                    }
-                    else {
-                        xmlRow.setAmountPayed(xmlRow.getAmount());
-                        xmlRow.setIsToPayed(true);
-                        xmlRow.setRecYear(entry.getPkYearId());
-                        xmlRow.setRecPeriod(entry.getPkPeriodId());
-                        xmlRow.setRecBookkeepingCenter(entry.getPkBookkeepingCenterId());
-                        xmlRow.setRecRecordType(entry.getPkRecordTypeId());
-                        xmlRow.setRecNumber(entry.getPkNumberId());
-                        xmlRow.setBookkeepingYear(entry.getFkBookkeepingYearId_n());
-                        xmlRow.setBookkeepingNumber(entry.getFkBookkeepingNumberId_n());
-                    }
+                if (found) {
+                    payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(((double) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).getValue()) + xmlRow.getAmount());
+                    payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(((double) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).getValue()) + xmlRow.getAmountCy());
+                    payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).setValue(((String) payment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).getValue()) + "," + xmlRow.getReference());
+                    payment.getXmlElements().add(xmlBankLayoutPaymentDoc);
                     break;
                 }
             }
-        }
-        for (SLayoutBankXmlRow xmlRow : maXmlRows) {
-            if (xmlRow.getIsToPayed()) {
-                if (xmlRow.getLayoutXmlRowType() == SModSysConsts.FIN_LAY_BANK_DPS) {
-                    mnDocsPayed++;
-                }
-                mdAmountPayed += xmlRow.getAmountPayed();
-            }
-        }
-    }
-
-    private boolean validateDocumentsStatus(final SGuiSession session) throws Exception {
-        SDataDps dps = null;
-        SLayoutBankPayment bankPayment = null;
-        
-        for (SLayoutBankPaymentRow paymentRow : maBankPaymentRows) {
-            bankPayment = paymentRow.getLayoutBankPayment();
             
-            if (bankPayment.getLayoutPaymentType() == SModSysConsts.FIN_LAY_BANK_DPS) {
-                for (SLayoutBankDps bankDps : bankPayment.getLayoutBankDps()) {
-                    dps = new SDataDps();
-                    
-                    if (dps.read(new int[] { bankDps.getPkYearId(), bankDps.getPkDocId() }, session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                    }
-                    if (dps.getIsDeleted()) {
-                        throw new Exception("El documento '" + dps.getDpsNumber() + "' está eliminado.");
-                    }
-                }
+            if (!found) {
+                xmlBankLayoutPayment = new SXmlBankLayoutPayment();
+            
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT).setValue(xmlRow.getAmount());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AMT_CY).setValue(xmlRow.getAmount());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REF_ALP).setValue(xmlRow.getReference());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CUR).setValue(xmlRow.getCurrencyId());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).setValue(xmlRow.getAgreement());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_REF).setValue(xmlRow.getAgreementReference());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE_CON).setValue(xmlRow.getConceptCie());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_EXT_RATE).setValue(xmlRow.getExchangeRate());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_CPT).setValue(xmlRow.getConcept());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_VOU).setValue(xmlRow.getHsbcFiscalVoucher());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_ACC_TP).setValue(xmlRow.getHsbcAccountType());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_BANK_CODE).setValue(xmlRow.getHsbcBankCode());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_DBT).setValue(xmlRow.getHsbcFiscalIdDebit());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_FIS_ID_CRD).setValue(xmlRow.getHsbcFiscalIdCredit());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_HSBC_DCRP).setValue(xmlRow.getDescription());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_SAN_BANK_CODE).setValue(xmlRow.getSantanderBankCode());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_BANK_CODE).setValue(xmlRow.getBajioBankCode());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BAJIO_NICK).setValue(xmlRow.getBajioBankNick());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_KEY).setValue(xmlRow.getBankKey());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_APPLIED).setValue(xmlRow.getIsToPayed());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BP).setValue(xmlRow.getBizPartner());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BP).setValue(xmlRow.getBizPartnerBranch());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).setValue(xmlRow.getBizPartnerBranchAccount());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_YEAR).setValue(xmlRow.getRecYear());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_PER).setValue(xmlRow.getRecPeriod());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_BKC).setValue(xmlRow.getRecBookkeepingCenter());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_REC_TP).setValue(xmlRow.getRecRecordType());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_REC_NUM).setValue(xmlRow.getRecNumber());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_YEAR).setValue(xmlRow.getBookkeepingYear());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BKK_NUM).setValue(xmlRow.getBookkeepingNumber());
+                xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_ROW_REF_REC).setValue(xmlRow.getReferenceRecord());
+                
+                xmlBankLayoutPayment.getXmlElements().add(xmlBankLayoutPaymentDoc);
+                
+                xmlBankLayoutPayments.add(xmlBankLayoutPayment);
             }
+        }
+        
+        xmlBankLayout.getXmlElements().addAll(xmlBankLayoutPayments);
+        msLayoutXml = xmlBankLayout.getXmlString();
+        mnTransfers = xmlBankLayoutPayments.size();
+        
+        generateXmlBankLayoutText(session, xmlBankLayoutPayments);
+    }
+    
+    private boolean validateLayoutBankRecordsPeriods(final SGuiSession session) throws Exception {
+        for (SLayoutBankRecord bankRecord : maLayoutBankRecords) {
+            SDataRecord record = new SDataRecord();
+            
+            if (record.read(bankRecord.getLayoutBankRecordKey().getPrimaryKey(), session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+            }
+            
+            record.checkIsEditable(session.getStatement().getConnection());
         }
         
         return true;
     }
     
-    private boolean validatePeriodRecordLayout(final SGuiSession session) throws Exception {
-        SDataRecord record = null;
-        int i = 0;
-        String sMsg = "";
-        CallableStatement oCallableStatement = null;
-        
-        record = new SDataRecord();
-        for (SLayoutBankRecord bankRecord : maBankRecords) {
-            if (record.read(bankRecord.getFinRecordLayout().getPrimaryKey(), session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-            }
+    private boolean validateLayoutBankPaymentDpsStatus(final SGuiSession session) throws Exception {
+        for (SLayoutBankPaymentRow paymentRow : maLayoutBankPaymentRows) {
+            SLayoutBankPayment bankPayment = paymentRow.getLayoutBankPayment();
             
-            i = 1;
-            oCallableStatement = session.getStatement().getConnection().prepareCall("{ CALL fin_year_per_st(?, ?, ?) }");
-            oCallableStatement.setInt(i++, record.getPkYearId());
-            oCallableStatement.setInt(i++, record.getPkPeriodId());
-            oCallableStatement.registerOutParameter(i++, java.sql.Types.INTEGER);
-            oCallableStatement.execute();
-
-            if (oCallableStatement.getBoolean(i - 1)) {
-                msQueryResult = sMsg + "¡El período contable '" + record.getPkPeriodId() + "' de la póliza '" + record.getPkRecordTypeId() + " - " + record.getPkNumberId() + "' está cerrado!";
-                throw new Exception(msQueryResult);
+            if (bankPayment.getLayoutPaymentType() == SModSysConsts.FIN_LAY_BANK_PAY) {
+                for (SLayoutBankDps bankDps : bankPayment.getLayoutBankDps()) {
+                    SDataDps dps = new SDataDps();
+                    
+                    if (dps.read(new int[] { bankDps.getPkYearId(), bankDps.getPkDocId() }, session.getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                    }
+                    
+                    dps.checkIsReferable();
+                }
             }
         }
         
@@ -1010,9 +986,9 @@ public class SDbBankLayout extends SDbRegistryUser {
     public int getXtaBankCurrencyId() { return mnXtaBankCurrencyId; }
     public int getXtaBankPaymentType() { return mnXtaBankPaymentType; }
     
-    public ArrayList<SLayoutBankPaymentRow> getBankPaymentRows() { return maBankPaymentRows; }
-    public ArrayList<SLayoutBankRecord> getBankRecords() { return maBankRecords; }
-    public ArrayList<SLayoutBankXmlRow> getXmlRows() { return maXmlRows; }
+    public ArrayList<SLayoutBankPaymentRow> getLayoutBankPaymentRows() { return maLayoutBankPaymentRows; }
+    public ArrayList<SLayoutBankRecord> getLayoutBankRecords() { return maLayoutBankRecords; }
+    public ArrayList<SLayoutBankXmlRow> getLayoutBankXmlRows() { return maLayoutBankXmlRows; }
     
     public SDbBankLayout() {
         super(SModConsts.FIN_LAY_BANK);
@@ -1074,9 +1050,9 @@ public class SDbBankLayout extends SDbRegistryUser {
         mnXtaBankCurrencyId = 0;
         mnXtaBankPaymentType = 0;
         
-        maBankPaymentRows = new ArrayList<>();
-        maBankRecords = new ArrayList<>();
-        maXmlRows = new ArrayList<>();
+        maLayoutBankPaymentRows = new ArrayList<>();
+        maLayoutBankRecords = new ArrayList<>();
+        maLayoutBankXmlRows = new ArrayList<>();
     }
 
     @Override
@@ -1188,12 +1164,13 @@ public class SDbBankLayout extends SDbRegistryUser {
             verifyRegistryNew(session);
         }
         
-        processLayoutBankPayments(session);
+        processLayoutBankPaymentRows(session);
         
         if (mbRegistryNew) {
             computePrimaryKey(session);
         }
-        computeLayout(session);
+        
+        generateXmlBankLayout(session);
 
         if (mbRegistryNew) {
             mbDeleted = false;
@@ -1310,16 +1287,16 @@ public class SDbBankLayout extends SDbRegistryUser {
         registry.setXtaLayoutBank(this.getXtaLayoutBank());
         registry.setXtaBankCurrencyId(this.getXtaBankCurrencyId());
 
-        for (SLayoutBankPaymentRow child : maBankPaymentRows) {
-            registry.getBankPaymentRows().add(child.clone());
+        for (SLayoutBankPaymentRow child : maLayoutBankPaymentRows) {
+            registry.getLayoutBankPaymentRows().add(child.clone());
         }
         
-        for (SLayoutBankRecord child : maBankRecords) {
-            registry.getBankRecords().add(child.clone());
+        for (SLayoutBankRecord child : maLayoutBankRecords) {
+            registry.getLayoutBankRecords().add(child.clone());
         }
         
-        for (SLayoutBankXmlRow child : maXmlRows) {
-            registry.getXmlRows().add(child.clone());
+        for (SLayoutBankXmlRow child : maLayoutBankXmlRows) {
+            registry.getLayoutBankXmlRows().add(child.clone());
         }
         
         registry.setRegistryNew(this.isRegistryNew());
@@ -1357,10 +1334,10 @@ public class SDbBankLayout extends SDbRegistryUser {
         boolean can = super.canSave(session);
         
         if (can) {
-            can = validatePeriodRecordLayout(session);
+            can = validateLayoutBankRecordsPeriods(session);
 
             if (can) {
-                can = validateDocumentsStatus(session);
+                can = validateLayoutBankPaymentDpsStatus(session);
             }
         }
         
@@ -1372,7 +1349,7 @@ public class SDbBankLayout extends SDbRegistryUser {
         boolean can = super.canSave(session);
         
         if (can) {
-            can = validatePeriodRecordLayout(session);
+            can = validateLayoutBankRecordsPeriods(session);
             
             if (can && mnTransfersPayed > 0) {
                 can = false;

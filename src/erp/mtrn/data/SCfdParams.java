@@ -40,6 +40,7 @@ public final class SCfdParams implements java.io.Serializable {
     private int mnSorianaTipoBulto;
     private double mdSorianaCantidadBulto;
     protected java.lang.String msSorianaNotaEntradaFolio;
+    protected java.lang.String msSorianaCita;
     protected int mnCfdAddendaSubtype;
     private java.lang.Boolean mbAgregarAddenda;
     private java.lang.String msAcuseCancelacion;
@@ -90,6 +91,7 @@ public final class SCfdParams implements java.io.Serializable {
         mnSorianaTipoBulto = 0;
         mdSorianaCantidadBulto = 0;
         msSorianaNotaEntradaFolio = "";
+        msSorianaCita = "";
         mnCfdAddendaSubtype = 0;
         mbAgregarAddenda = false;
         msAcuseCancelacion = "";
@@ -139,6 +141,7 @@ public final class SCfdParams implements java.io.Serializable {
     public void setSorianaTipoBulto(int n) { mnSorianaTipoBulto = n; }
     public void setSorianaCantidadBulto(double d) { mdSorianaCantidadBulto = d; }
     public void setSorianaNotaEntradaFolio(java.lang.String s) { msSorianaNotaEntradaFolio = s; }
+    public void setSorianaCita(java.lang.String s) { msSorianaCita = s; }
     public void setCfdAddendaSubtype(int n) { mnCfdAddendaSubtype = n; }
     public void setAgregarAddenda(java.lang.Boolean b) { mbAgregarAddenda = b; }
     public void setAcuseCancelacion(java.lang.String s) { msAcuseCancelacion = s; }
@@ -186,6 +189,7 @@ public final class SCfdParams implements java.io.Serializable {
     public int getSorianaTipoBulto() { return mnSorianaTipoBulto; }
     public double getSorianaCantidadBulto() { return mdSorianaCantidadBulto; }
     public java.lang.String getSorianaNotaEntradaFolio() { return msSorianaNotaEntradaFolio; }
+    public java.lang.String getSorianaCita() { return msSorianaCita; }
     public int getCfdAddendaSubtype() { return mnCfdAddendaSubtype; }
     public java.lang.Boolean getAgregarAddenda() { return mbAgregarAddenda; }
     public java.lang.String getAcuseCancelacion() { return msAcuseCancelacion; }

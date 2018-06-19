@@ -237,6 +237,9 @@ public abstract class SDataReadDescriptions {
             case SDataConstants.TRNS_TP_DPS_ETY:
                 sql = "SELECT tp_dps_ety AS descrip FROM erp.trns_tp_dps_ety WHERE id_tp_dps_ety = " + ((int[]) pk)[0] + " ";
                 break;
+            case SDataConstants.TRNS_TP_CFD:
+                sql = "SELECT tp_cfd AS descrip FROM erp.trns_tp_cfd WHERE id_tp_cfd = " + ((int[]) pk)[0] + " ";
+                break;
             case SDataConstants.TRNU_DPS_NAT:
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "dps_nat") + " AS descrip FROM erp.trnu_dps_nat WHERE id_dps_nat = " + ((int[]) pk)[0] + " ";
                 break;
