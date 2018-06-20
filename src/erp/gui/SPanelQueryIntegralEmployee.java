@@ -57,6 +57,9 @@ import sa.lib.gui.SGuiItem;
  * @author Juan Barajas
  */
 public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements STableTabInterface, javax.swing.event.ListSelectionListener, java.awt.event.ActionListener, java.awt.event.ItemListener {
+    
+    public static final String NO_PHOTO = "(Foto no disponible)";
+    public static final String NO_SIGNATURE = "(Firma no disponible)";
 
     int mnPanelType;
     private erp.client.SClientInterface miClient;
@@ -215,8 +218,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfIndemnificationDicL = new javax.swing.JTextField();
         jlDicL = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
-        jlPhoto = new javax.swing.JLabel();
-        jlSignature = new javax.swing.JLabel();
+        jlImgPhoto = new javax.swing.JLabel();
+        jlImgSignature = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -267,7 +270,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos personales:"));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jPanel7.setLayout(new java.awt.GridLayout(9, 0, 0, 5));
+        jPanel7.setLayout(new java.awt.GridLayout(9, 0, 0, 3));
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -548,7 +551,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel12.setLayout(new java.awt.BorderLayout());
 
         jPanel10.setFocusable(false);
-        jPanel10.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
+        jPanel10.setLayout(new java.awt.GridLayout(6, 1, 0, 3));
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -818,16 +821,19 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlPhoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlPhoto.setText("FOTOGRAFÍA");
-        jlPhoto.setPreferredSize(new java.awt.Dimension(100, 100));
-        jPanel6.add(jlPhoto);
-        jlPhoto.getAccessibleContext().setAccessibleName("FOTOGRAFÍA");
+        jlImgPhoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlImgPhoto.setText("Foto");
+        jlImgPhoto.setToolTipText("Foto (tamaño sugerido: 100×100 px)");
+        jlImgPhoto.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jlImgPhoto.setPreferredSize(new java.awt.Dimension(100, 100));
+        jPanel6.add(jlImgPhoto);
 
-        jlSignature.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlSignature.setText("FIRMA");
-        jlSignature.setPreferredSize(new java.awt.Dimension(250, 100));
-        jPanel6.add(jlSignature);
+        jlImgSignature.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlImgSignature.setText("Firma");
+        jlImgSignature.setToolTipText("Firma (tamaño sugerido: 250×100 px)");
+        jlImgSignature.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jlImgSignature.setPreferredSize(new java.awt.Dimension(250, 100));
+        jPanel6.add(jlImgSignature);
 
         jPanel5.add(jPanel6, java.awt.BorderLayout.SOUTH);
 
@@ -898,11 +904,12 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JLabel jlFirstName;
     private javax.swing.JLabel jlFiscalId;
     private javax.swing.JLabel jlFkBloodType;
+    private javax.swing.JLabel jlImgPhoto;
+    private javax.swing.JLabel jlImgSignature;
     private javax.swing.JLabel jlIndemnification;
     private javax.swing.JLabel jlMarital;
     private javax.swing.JLabel jlMwzType;
     private javax.swing.JLabel jlPaymentProp;
-    private javax.swing.JLabel jlPhoto;
     private javax.swing.JLabel jlProportional;
     private javax.swing.JLabel jlRJDj;
     private javax.swing.JLabel jlSalary;
@@ -912,7 +919,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JLabel jlSeniorityYear;
     private javax.swing.JLabel jlSettlement;
     private javax.swing.JLabel jlSex;
-    private javax.swing.JLabel jlSignature;
     private javax.swing.JLabel jlSocialSecurityNumber;
     private javax.swing.JLabel jlTotalAvailables;
     private javax.swing.JLabel jlVacations;
@@ -1292,21 +1298,23 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             jtfWorkingHoursDay.setText(employee.getWorkingHoursDay() + "");
             
             if (employee.getXtaImageIconPhoto_n() != null) {
-                jlPhoto.setIcon(employee.getXtaImageIconPhoto_n());
-                jlPhoto.setText("");
+                jlImgPhoto.setIcon(employee.getXtaImageIconPhoto_n());
+                jlImgPhoto.setText("");
             }
             else {
-                jlPhoto.setIcon(null);
-                jlPhoto.setText("- FOTOGRAFÍA NO DISPONIBLE -");
+                jlImgPhoto.setIcon(null);
+                jlImgPhoto.setText(NO_PHOTO);
             }
+            
             if (employee.getXtaImageIconSignature_n() != null) {
-                jlSignature.setIcon(employee.getXtaImageIconSignature_n());
-                jlSignature.setText("");
+                jlImgSignature.setIcon(employee.getXtaImageIconSignature_n());
+                jlImgSignature.setText("");
             }
             else {
-                jlSignature.setIcon(null);
-                jlSignature.setText("- FIRMA NO DISPONIBLE -");
+                jlImgSignature.setIcon(null);
+                jlImgSignature.setText(NO_SIGNATURE);
             }
+            
             renderBenefit(employee);
             
             if (!mbHasRightEmpWage) {

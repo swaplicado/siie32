@@ -542,7 +542,6 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS rcp ON rcp.id_pay = p.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp "
-                //+ "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND p.id_pay <> " + payrollId + " AND rcp_ear.fk_loan_emp_n = " + loan.getPkEmployeeId() + " AND rcp_ear.fk_loan_loan_n = " + loan.getPkLoanId() + " ";
                 + "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ear.b_del = 0 " + (payrollId == 0 ? "" : "AND p.id_pay <> " + payrollId) + " AND rcp_ear.fk_loan_emp_n = " + loan.getPkEmployeeId() + " AND rcp_ear.fk_loan_loan_n = " + loan.getPkLoanId() + " ";
 
             resultSet = statement.executeQuery(sql);
@@ -557,7 +556,6 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS rcp ON rcp.id_pay = p.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp "
-                //+ "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND p.id_pay <> " + payrollId + " AND rcp_ded.fk_loan_emp_n = " + loan.getPkEmployeeId() + " AND rcp_ded.fk_loan_loan_n = " + loan.getPkLoanId() + " ";
                 + "WHERE (p.id_pay = 0 OR p.b_del = 0) AND rcp.b_del = 0 AND rcp_ded.b_del = 0 " + (payrollId == 0 ? "" : "AND p.id_pay <> " + payrollId) + " AND rcp_ded.fk_loan_emp_n = " + loan.getPkEmployeeId() + " AND rcp_ded.fk_loan_loan_n = " + loan.getPkLoanId() + " ";
 
             resultSet = statement.executeQuery(sql);
@@ -925,14 +923,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
     @Override
     public SHrsEmployee createEmployee(final SHrsPayroll hrsPayroll, final int payrollId, final int employeeId, final int payrollYear, final int payrollYearPeriod, final int fiscalYear, final Date dateStart, final Date dateEnd, final int taxComputationType) throws Exception {
-        //SDbEmployee employee = null; XXX (jbarajas, 2016-04-01) slowly open payroll
-        SHrsEmployee hrsEmployee = null;
-
-        hrsEmployee = new SHrsEmployee(payrollYear, payrollYearPeriod, dateStart, dateEnd, taxComputationType);
-        /* XXX (jbarajas, 2016-04-01) slowly open payroll
-        employee = new SDbEmployee();
-        employee.read(moSession, new int[] { employeeId });
-        */
+        SHrsEmployee hrsEmployee = new SHrsEmployee(payrollYear, payrollYearPeriod, dateStart, dateEnd, taxComputationType);
         
         hrsEmployee.setEmployee(hrsPayroll.getDataEmployee(employeeId));
         hrsEmployee = computeEmployee(hrsEmployee, payrollId, employeeId, payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd, taxComputationType);

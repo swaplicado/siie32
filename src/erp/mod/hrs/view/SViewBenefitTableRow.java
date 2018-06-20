@@ -42,9 +42,11 @@ public class SViewBenefitTableRow extends SGridPaneView {
         msSql = "SELECT "
                 + "vr.id_ben AS " + SDbConsts.FIELD_ID + "1, "
                 + "vr.id_row AS " + SDbConsts.FIELD_ID + "2, "
-                + "'' AS " + SDbConsts.FIELD_CODE + ", "
-                + "'' AS " + SDbConsts.FIELD_NAME + ", "
+                + "v.code AS " + SDbConsts.FIELD_CODE + ", "
+                + "v.name AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.dt_sta, "
+                + "vt.name, "
+                + "pay.name, "
                 + "vr.id_row, "
                 + "vr.mon, "
                 + "vr.ben_day, "
@@ -57,6 +59,10 @@ public class SViewBenefitTableRow extends SGridPaneView {
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " AS v "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_BEN) + " AS vt ON "
+                + "v.fk_tp_ben = vt.id_tp_ben "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS pay ON "
+                + "v.fk_tp_pay_n = pay.id_tp_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS vr ON "
                 + "v.id_ben = vr.id_ben "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
@@ -64,14 +70,18 @@ public class SViewBenefitTableRow extends SGridPaneView {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY v.dt_sta, vr.id_ben, vr.id_row ";
+                + "ORDER BY vt.name, v.name, v.code, v.dt_sta, vr.id_ben, vr.id_row ";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vt.name", "Tipo prestación"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sta", "Inicio vigencia"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "pay.name", "Período pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "vr.id_row", "#"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "vr.mon", "Meses"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "vr.ben_day", "Días"));

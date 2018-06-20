@@ -1455,7 +1455,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
         else {
             rowEmployeeReceipt = new SHrsPayrollRowEmployeeReceipt();
-            rowEmployeeAvailable = new SHrsPayrollRowEmployeeAvailable();
             rowEmployeeAvailable = (SHrsPayrollRowEmployeeAvailable) moGridPaneEmployeesAvailable.getSelectedGridRow();
 
             try {

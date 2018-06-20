@@ -2405,9 +2405,9 @@ public abstract class SHrsUtils {
                 break;
                 
             case SModSysConsts.HRSS_TP_LOAN_PAY_PER:
-                adjustmentAux += hrsDaysPrev == null ? 0 : (double) ((hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()) / hrsDaysPrev.getPeriodDays()) * amoutAdjustment;
+                adjustmentAux += hrsDaysPrev == null ? 0 : (((double) hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()) / hrsDaysPrev.getPeriodDays()) * amoutAdjustment;
                 adjustmentAux += (double) (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid()) / hrsDaysCurr.getPeriodDays() * amoutAdjustment;
-                adjustmentAux += hrsDaysNext == null ? 0 : (double) ((hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()) / hrsDaysNext.getPeriodDays() * amoutAdjustment);
+                adjustmentAux += hrsDaysNext == null ? 0 : (((double) hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()) / hrsDaysNext.getPeriodDays() * amoutAdjustment);
                 
                 if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL) {
                     salaryReference = hrsReceipt.getReceipt().getPaymentDaily();
@@ -2418,14 +2418,15 @@ public abstract class SHrsUtils {
                 else if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL_FIX) {
                     salaryReference = loan.getPaymentPercentageAmount();
                 }
-                //amoutAux = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * hrsReceipt.getReceipt().getPaymentDaily() * loan.getPaymentPercentage() + adjustmentAux; // XXX (2016-03-04) jbarajas
+                
                 amoutAux = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * salaryReference * loan.getPaymentPercentage() + adjustmentAux;
                 break;
                 
             default:
                 break;
         }
-        amout = (SLibUtils.round(amoutAux, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits()));
+        
+        amout = SLibUtils.roundAmount(amoutAux);
         
         return amout;
     }

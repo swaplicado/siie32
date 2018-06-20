@@ -87,14 +87,17 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         jlPaymentFixed = new javax.swing.JLabel();
         moDecPaymentFixed = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlPaymentFixedHelp = new javax.swing.JLabel();
+        jlHelp1 = new javax.swing.JLabel();
         jPanel11 = new javax.swing.JPanel();
         jlPaymentPercentage = new javax.swing.JLabel();
         moDecPaymentPercentage = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlPaymentPercentageHelp = new javax.swing.JLabel();
+        jlHelp2 = new javax.swing.JLabel();
         jPanel16 = new javax.swing.JPanel();
         jlPaymentUma = new javax.swing.JLabel();
         moDecPaymentUma = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlPaymentUmaHelp = new javax.swing.JLabel();
+        jlHelp3 = new javax.swing.JLabel();
         jPanel14 = new javax.swing.JPanel();
         moRadSd = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadSbc = new sa.lib.gui.bean.SBeanFieldRadio();
@@ -115,7 +118,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         jlEmployee.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel13.add(jlEmployee);
 
-        moKeyEmployee.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyEmployee.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel13.add(moKeyEmployee);
 
         jPanel2.add(jPanel13);
@@ -207,7 +210,8 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         jlPaymentAmountHelp.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel9.add(jlPaymentAmountHelp);
 
-        jlHelp.setForeground(java.awt.Color.lightGray);
+        jlHelp.setForeground(java.awt.Color.gray);
+        jlHelp.setText("(ayuda)");
         jlHelp.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jlHelp);
 
@@ -227,6 +231,11 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         jlPaymentFixedHelp.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jlPaymentFixedHelp);
 
+        jlHelp1.setForeground(java.awt.Color.gray);
+        jlHelp1.setText("(por mes)");
+        jlHelp1.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel10.add(jlHelp1);
+
         jPanel2.add(jPanel10);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -243,6 +252,11 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         jlPaymentPercentageHelp.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jlPaymentPercentageHelp);
 
+        jlHelp2.setForeground(java.awt.Color.gray);
+        jlHelp2.setText("(por mes)");
+        jlHelp2.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel11.add(jlHelp2);
+
         jPanel2.add(jPanel11);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -258,6 +272,11 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         jlPaymentUmaHelp.setToolTipText("Monto a pagar expresado en UMA");
         jlPaymentUmaHelp.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel16.add(jlPaymentUmaHelp);
+
+        jlHelp3.setForeground(java.awt.Color.gray);
+        jlHelp3.setText("(por mes)");
+        jlHelp3.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel16.add(jlHelp3);
 
         jPanel2.add(jPanel16);
 
@@ -313,6 +332,9 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlEmployee;
     private javax.swing.JLabel jlHelp;
+    private javax.swing.JLabel jlHelp1;
+    private javax.swing.JLabel jlHelp2;
+    private javax.swing.JLabel jlHelp3;
     private javax.swing.JLabel jlLoanPaymentType;
     private javax.swing.JLabel jlLoanType;
     private javax.swing.JLabel jlNumber;
@@ -363,9 +385,9 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         moTextNumber.setTextSettings(SGuiUtils.getLabelName(jlNumber.getText()), 25);
         moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
         moDateDateEnd_n.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd_n.getText()), false);
-        moDecCapital.setDecimalSettings(SGuiUtils.getLabelName(jlCapital.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, true);
-        moDecTotalAmount.setDecimalSettings(SGuiUtils.getLabelName(jlTotalAmount.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, true);
-        moDecPaymentAmount.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentAmount.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, false);
+        moDecCapital.setDecimalSettings(SGuiUtils.getLabelName(jlCapital.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moDecTotalAmount.setDecimalSettings(SGuiUtils.getLabelName(jlTotalAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moDecPaymentAmount.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDecPaymentFixed.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentFixed.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false);
         moDecPaymentPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentPercentage.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
         moDecPaymentUma.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentUma.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false);
@@ -407,7 +429,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
                 case SModSysConsts.HRSS_TP_LOAN_LOA_COM:
                 case SModSysConsts.HRSS_TP_LOAN_LOA_UNI:
                 case SModSysConsts.HRSS_TP_LOAN_LOA_TPS:
-                    jlHelp.setText("(por periodo de pago)");
+                    jlHelp.setText("(por nómina)");
                     moDecCapital.setEditable(true);
                     moDecTotalAmount.setEditable(true);
                     break;
@@ -669,7 +691,6 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
             if ((SBeanFieldRadio) e.getSource() == moRadOther) {
                 actionEnableFields();
             }
-            
         }
     }
 }

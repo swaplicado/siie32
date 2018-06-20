@@ -4,7 +4,6 @@
  */
 package erp.mod.hrs.db;
 
-import erp.lib.SLibUtilities;
 import erp.mod.SModSysConsts;
 import java.util.ArrayList;
 import java.util.Date;
@@ -352,8 +351,8 @@ public class SHrsPayroll {
         SDbPayrollReceiptDeduction payrollReceiptDeduction = null;
         SHrsPayrollReceiptDeduction hrsPayrollReceiptDeduction = null;
 
-        ArrayList<SHrsPayrollReceiptDeduction> aHrsPayrollReceiptDeductions = new ArrayList<SHrsPayrollReceiptDeduction>();
-        ArrayList<SDbAutomaticDeduction> aAutomaticDeductions = new ArrayList<SDbAutomaticDeduction>();
+        ArrayList<SDbAutomaticDeduction> aAutomaticDeductions;
+        ArrayList<SHrsPayrollReceiptDeduction> aHrsPayrollReceiptDeductions = new ArrayList<>();
 
         try {
             if (moPayroll.isNormal()) {
@@ -361,7 +360,6 @@ public class SHrsPayroll {
 
                 move = 1;
                 for (SDbDeduction deduction : maDeductions) {
-
                     if (deduction.isWithholding()) {
                         hrsPayrollReceiptDeduction = new SHrsPayrollReceiptDeduction();
                         hrsPayrollReceiptDeduction.setDeduction(deduction);
@@ -421,8 +419,7 @@ public class SHrsPayroll {
 
                         amountLoan = SHrsUtils.computeAmoutLoan(hrsPayrollReceipt, loan);
 
-                        if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_COM || loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_UNI ||
-                                loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_TPS) {
+                        if (SLibUtils.belongsTo(loan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOA_COM, SModSysConsts.HRSS_TP_LOAN_LOA_UNI, SModSysConsts.HRSS_TP_LOAN_LOA_TPS })) {
                             balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsPayrollReceipt.getHrsEmployee());
 
                             amountLoan = (amountLoan > balanceLoan ? balanceLoan : amountLoan);
@@ -861,7 +858,7 @@ public class SHrsPayroll {
     }
 
     public ArrayList<SDbAutomaticEarning> getAutomaticEarnings(final int employeeId, final Date dateStart, final Date dateEnd, final int paysheetTypeId) {
-        ArrayList<SDbAutomaticEarning> aAutomaticEarnings = new ArrayList<SDbAutomaticEarning>();
+        ArrayList<SDbAutomaticEarning> aAutomaticEarnings = new ArrayList<>();
 
         for (SDbAutomaticEarning automaticEarning : maAutomaticEarnings) {
             if ((automaticEarning.getFkEmployeeId_n() == SLibConsts.UNDEFINED ||
@@ -876,7 +873,7 @@ public class SHrsPayroll {
     }
 
     public ArrayList<SDbAutomaticDeduction> getAutomaticDeductions(final int employeeId, final Date dateStart, final Date dateEnd, final int paysheetTypeId) {
-        ArrayList<SDbAutomaticDeduction> aAutomaticDeductions = new ArrayList<SDbAutomaticDeduction>();
+        ArrayList<SDbAutomaticDeduction> aAutomaticDeductions = new ArrayList<>();
 
         for (SDbAutomaticDeduction automaticDeduction : maAutomaticDeductions) {
             if ((automaticDeduction.getFkEmployeeId_n() == SLibConsts.UNDEFINED ||
@@ -904,57 +901,39 @@ public class SHrsPayroll {
 
     public SHrsPayrollReceipt createReceipt(final int employeeId, int payrollYear, int payrollYearPeriod, int fiscalYear, Date dateStart, Date dateEnd, final int taxComputationType) throws Exception {
         SDbPayrollReceipt payrollReceipt = null;
-
         SHrsEmployee oHrsEmployee = null;
         SHrsPayrollReceipt oHrsPayrollReceipt = new SHrsPayrollReceipt();
         
         oHrsPayrollReceipt.setHrsPayroll(this);
         
         // Get receipt employee days:
-
-        //oHrsEmployee = moPayrollDataProvider.createEmployee(moPayroll.getPkPayrollId(), employeeId, payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd, taxComputationType);  // XXX (jbarajas, 2016-04-01) slowly open payroll
         oHrsEmployee = moPayrollDataProvider.createEmployee(this, moPayroll.getPkPayrollId(), employeeId, payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd, taxComputationType);
         oHrsEmployee.setHrsPayrollReceipt(oHrsPayrollReceipt);
         oHrsPayrollReceipt.setHrsEmployee(oHrsEmployee);
         
         // Create payrollReceipt:
-        
         payrollReceipt = createPayrollReceipt(oHrsEmployee);
-        
-        /* XXX (jbarajas, 2015-10-07) remove by new table
-        payrollReceipt.setNumberSeries("");
-        payrollReceipt.setNumber(0);
-        payrollReceipt.setDateIssue(dateEnd);
-        payrollReceipt.setDatePayment(dateEnd);
-        payrollReceipt.setFkPaymentSystemTypeId(SDataConstantsSys.TRNU_TP_PAY_SYS_NA);
-        */
         
         oHrsPayrollReceipt.setReceipt(payrollReceipt);
 
         if (moPayroll.isNormal()) {
             // Get absence consumption:
-
             oHrsPayrollReceipt.getAbsenceConsumptions().addAll(getAbsenceConsumptionDays(oHrsPayrollReceipt, oHrsEmployee));
         }
         
         // Get earnings:
-
         oHrsPayrollReceipt.getHrsEarnings().addAll(getPayrollReceiptEarnings(oHrsPayrollReceipt, employeeId, dateStart, dateEnd));
         
         // Compute payrollReceiptDays:
-
         oHrsPayrollReceipt.computeDbPayrollReceiptDays();
 
         // Get deductions:
-            
         oHrsPayrollReceipt.getHrsDeductions().addAll(getPayrollReceiptDeductions(oHrsPayrollReceipt, employeeId, dateStart, dateEnd));
 
         // Compute payrollReceipt:
-        
         oHrsPayrollReceipt.computeReceipt();
 
         // Add hrsReceipt:
-
         maReceipts.add(oHrsPayrollReceipt);
         
         oHrsPayrollReceipt.renumberEarnings();
@@ -1106,7 +1085,7 @@ public class SHrsPayroll {
             earning = null;
             
             for (SDbEarning earningAux : maEarnigs) {
-                if (SLibUtilities.compareKeys(new int[] { receiptAbsenceConsumption.getAbsence().getFkAbsenceClassId(), receiptAbsenceConsumption.getAbsence().getFkAbsenceTypeId() }, new int[] { earningAux.getFkAbsenceClassId_n(), earningAux.getFkAbsenceTypeId_n() })) {
+                if (SLibUtils.compareKeys(new int[] { receiptAbsenceConsumption.getAbsence().getFkAbsenceClassId(), receiptAbsenceConsumption.getAbsence().getFkAbsenceTypeId() }, new int[] { earningAux.getFkAbsenceClassId_n(), earningAux.getFkAbsenceTypeId_n() })) {
                     earning = earningAux;
                     break;
                 }

@@ -79,9 +79,11 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         jPanel17 = new javax.swing.JPanel();
         jlAccountingConfigurationType = new javax.swing.JLabel();
         moKeyAccountingConfigurationType = new sa.lib.gui.bean.SBeanFieldKey();
+        jlAccountingConfigurationTypeHelp = new javax.swing.JLabel();
         jPanel18 = new javax.swing.JPanel();
         jlAccountingRecordType = new javax.swing.JLabel();
         moKeyAccountingRecordType = new sa.lib.gui.bean.SBeanFieldKey();
+        jlAccountingRecordTypeHelp = new javax.swing.JLabel();
         jPanel21 = new javax.swing.JPanel();
         jlAbsenceClass = new javax.swing.JLabel();
         moKeyAbsenceClass = new sa.lib.gui.bean.SBeanFieldKey();
@@ -127,9 +129,9 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         moTextNameAbbreviated.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel22.add(moTextNameAbbreviated);
 
-        jlNameAbbreviatedHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlNameAbbreviatedHelp.setForeground(java.awt.Color.gray);
         jlNameAbbreviatedHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlNameAbbreviatedHelp.setText("(Nombre utilizado para la contabilización y concepto en XML)");
+        jlNameAbbreviatedHelp.setText("<<< para contabilización y para concepto del CFDI (XML)");
         jlNameAbbreviatedHelp.setToolTipText("");
         jlNameAbbreviatedHelp.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel22.add(jlNameAbbreviatedHelp);
@@ -209,6 +211,11 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
         moKeyAccountingConfigurationType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel17.add(moKeyAccountingConfigurationType);
 
+        jlAccountingConfigurationTypeHelp.setForeground(java.awt.Color.gray);
+        jlAccountingConfigurationTypeHelp.setText("<<< manera de configurar cuentas contables");
+        jlAccountingConfigurationTypeHelp.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel17.add(jlAccountingConfigurationTypeHelp);
+
         jPanel2.add(jPanel17);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -219,6 +226,11 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
 
         moKeyAccountingRecordType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel18.add(moKeyAccountingRecordType);
+
+        jlAccountingRecordTypeHelp.setForeground(java.awt.Color.gray);
+        jlAccountingRecordTypeHelp.setText("<<< manera de agrupar asientos contables");
+        jlAccountingRecordTypeHelp.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel18.add(jlAccountingRecordTypeHelp);
 
         jPanel2.add(jPanel18);
 
@@ -268,7 +280,9 @@ public class SFormDeduction extends SBeanForm implements ActionListener {
     private javax.swing.JLabel jlAbsenceClass;
     private javax.swing.JLabel jlAbsenceType;
     private javax.swing.JLabel jlAccountingConfigurationType;
+    private javax.swing.JLabel jlAccountingConfigurationTypeHelp;
     private javax.swing.JLabel jlAccountingRecordType;
+    private javax.swing.JLabel jlAccountingRecordTypeHelp;
     private javax.swing.JLabel jlBenefitType;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlDeductionComputationType;

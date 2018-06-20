@@ -4,7 +4,6 @@
  */
 package erp.mod.hrs.form;
 
-import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbAbsence;
@@ -1364,8 +1363,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                         moKeyDeductionLoan_n.requestFocus();
                     }
                     else {
-                        if (moDeductionLoan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_COM || moDeductionLoan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_UNI ||
-                                moDeductionLoan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_TPS) {
+                        if (SLibUtils.belongsTo(moDeductionLoan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOA_COM, SModSysConsts.HRSS_TP_LOAN_LOA_UNI, SModSysConsts.HRSS_TP_LOAN_LOA_TPS })) {
                             balanceLoan = SHrsUtils.getBalanceLoan(moDeductionLoan, moReceipt.getHrsEmployee());
 
                             if (balanceLoan <= 0) {
@@ -1410,7 +1408,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         try {
             moEarning = null;
             for (SDbEarning earning : moEarnigsMap.values()) {
-                if (earning.getCode().compareToIgnoreCase(SLibUtilities.textTrim(moTextEarningCodeFind.getText())) == 0) {
+                if (earning.getCode().compareToIgnoreCase(SLibUtils.textTrim(moTextEarningCodeFind.getText())) == 0) {
                     moEarning = earning;
                     break;
                 }
@@ -1462,7 +1460,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         try {
             moDeduction = null;
             for (SDbDeduction deduction : moDeductionsMap.values()) {
-                if (deduction.getCode().compareToIgnoreCase(SLibUtilities.textTrim(moTextDeductionCodeFind.getText())) == 0) {
+                if (deduction.getCode().compareToIgnoreCase(SLibUtils.textTrim(moTextDeductionCodeFind.getText())) == 0) {
                     moDeduction = deduction;
                 }
             }
@@ -1727,6 +1725,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
+        
     }
 
     @Override
@@ -1767,6 +1766,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 }
             }
         }
+        
         return validation;
     }
 
@@ -1777,30 +1777,30 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 mbEditable = (boolean) value;
                 setEnableFields(mbEditable);
                 break;
+                
             case SModConsts.HRS_PAY_RCP:
                 moReceipt = (SHrsPayrollReceipt) value;
-
                 renderEmployee();
                 populateEarnings();
                 populateDeductions();
                 populateAbsenceConsumption();
                 break;
+                
             case SModConsts.HRS_EAR:
                 moEarnigsMap = new HashMap<Integer, SDbEarning>();
-
                 for (SDbEarning ear : (ArrayList<SDbEarning>) value) {
                     moEarnigsMap.put(ear.getPkEarningId(), ear);
                 }
                 break;
+                
             case SModConsts.HRS_DED:
                 moDeductionsMap = new HashMap<Integer, SDbDeduction>();
-
                 for (SDbDeduction ded : (ArrayList<SDbDeduction>) value) {
                     moDeductionsMap.put(ded.getPkDeductionId(), ded);
                 }
                 break;
+                
             default:
-                break;
         }
     }
 
@@ -1885,15 +1885,9 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             else if (button == jbDeductionCodeFind) {
                 actionPickDeduction();
             }
-            /*
-            else if (button == jbUpdateTotal) {
-                computeTotal();
-            }
-            */
         }
         else if (e.getSource() instanceof JTextField) {
             JTextField textField = (JTextField) e.getSource();
-
         }
     }
 

@@ -9,6 +9,7 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
+import erp.gui.SPanelQueryIntegralEmployee;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
@@ -149,6 +150,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jPanel42 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
         jPanel19 = new javax.swing.JPanel();
         jPanel26 = new javax.swing.JPanel();
         jlNumber = new javax.swing.JLabel();
@@ -177,6 +179,24 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfEmail = new javax.swing.JTextField();
         jckIsActive = new javax.swing.JCheckBox();
         jckIsDeleted = new javax.swing.JCheckBox();
+        jPanel48 = new javax.swing.JPanel();
+        jPanel47 = new javax.swing.JPanel();
+        jlImgPhoto = new javax.swing.JLabel();
+        jlImgSignature = new javax.swing.JLabel();
+        jPanel49 = new javax.swing.JPanel();
+        jPanel50 = new javax.swing.JPanel();
+        jPanel45 = new javax.swing.JPanel();
+        jlImagePhoto = new javax.swing.JLabel();
+        jtfImagePhoto = new javax.swing.JTextField();
+        jbImagePhoto = new javax.swing.JButton();
+        jbImagePhotoView = new javax.swing.JButton();
+        jbImagePhotoRemove = new javax.swing.JButton();
+        jPanel46 = new javax.swing.JPanel();
+        jlImageSignature = new javax.swing.JLabel();
+        jtfImageSignature = new javax.swing.JTextField();
+        jbImageSignature = new javax.swing.JButton();
+        jbImageSignatureView = new javax.swing.JButton();
+        jbImageSignatureRemove = new javax.swing.JButton();
         jPanel20 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
@@ -272,18 +292,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel39 = new javax.swing.JPanel();
         jlFkCatalogueEducationTypeId = new javax.swing.JLabel();
         jcbFkCatalogueEducationTypeId = new javax.swing.JComboBox<SFormComponentItem>();
-        jPanel45 = new javax.swing.JPanel();
-        jlImagePhoto = new javax.swing.JLabel();
-        jtfImagePhoto = new javax.swing.JTextField();
-        jbImagePhoto = new javax.swing.JButton();
-        jbImagePhotoView = new javax.swing.JButton();
-        jbImagePhotoRemove = new javax.swing.JButton();
-        jPanel46 = new javax.swing.JPanel();
-        jlImageSignature = new javax.swing.JLabel();
-        jtfImageSignature = new javax.swing.JTextField();
-        jbImageSignature = new javax.swing.JButton();
-        jbImageSignatureView = new javax.swing.JButton();
-        jbImageSignatureRemove = new javax.swing.JButton();
         jpBranchAddress = new javax.swing.JPanel();
         jpOficialAddress = new javax.swing.JPanel();
         jPanel40 = new javax.swing.JPanel();
@@ -307,7 +315,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel42.setLayout(new java.awt.BorderLayout());
 
-        jPanel19.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos personales:"));
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos personales:"));
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
         jPanel19.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -366,6 +376,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel29.add(jlFiscalId);
 
+        jtfFiscalId.setText("XAXX010101000");
         jtfFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel29.add(jtfFiscalId);
 
@@ -374,6 +385,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlAlternativeId.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel29.add(jlAlternativeId);
 
+        jftAlternativeId.setText("XAXX01010100000000");
         jftAlternativeId.setFocusLostBehavior(javax.swing.JFormattedTextField.PERSIST);
         jftAlternativeId.setPreferredSize(new java.awt.Dimension(125, 23));
         jftAlternativeId.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -385,10 +397,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jlSocialSecurityNumber.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jlSocialSecurityNumber.setText("NSS:");
-        jlSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel29.add(jlSocialSecurityNumber);
 
-        jtfSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfSocialSecurityNumber.setText("00000000000");
+        jtfSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel29.add(jtfSocialSecurityNumber);
 
         jPanel19.add(jPanel29);
@@ -402,11 +415,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jcbFkBank_n.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel24.add(jcbFkBank_n);
 
+        jlBankAccount.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlBankAccount.setText("Cuenta bancaria:");
         jlBankAccount.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel24.add(jlBankAccount);
 
-        jtfBankAccount.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfBankAccount.setText("000000000000000000");
+        jtfBankAccount.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel24.add(jtfBankAccount);
 
         jPanel19.add(jPanel24);
@@ -420,20 +435,117 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfEmail.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel6.add(jtfEmail);
 
-        jckIsActive.setText("Empleado activo");
+        jckIsActive.setText("Está activo");
         jckIsActive.setEnabled(false);
-        jckIsActive.setPreferredSize(new java.awt.Dimension(200, 23));
+        jckIsActive.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jckIsActive);
 
-        jckIsDeleted.setText("Asociado de negocios eliminado");
-        jckIsDeleted.setPreferredSize(new java.awt.Dimension(200, 23));
+        jckIsDeleted.setText("AN eliminado");
+        jckIsDeleted.setToolTipText("Asociado de negocios eliminado");
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel6.add(jckIsDeleted);
 
         jPanel19.add(jPanel6);
 
-        jPanel42.add(jPanel19, java.awt.BorderLayout.NORTH);
+        jPanel7.add(jPanel19, java.awt.BorderLayout.CENTER);
 
-        jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos laborables:"));
+        jPanel48.setLayout(new java.awt.BorderLayout());
+
+        jlImgPhoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlImgPhoto.setText("Foto");
+        jlImgPhoto.setToolTipText("Foto (tamaño sugerido: 100×100 px)");
+        jlImgPhoto.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jlImgPhoto.setPreferredSize(new java.awt.Dimension(100, 100));
+        jPanel47.add(jlImgPhoto);
+
+        jlImgSignature.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlImgSignature.setText("Firma");
+        jlImgSignature.setToolTipText("Firma (tamaño sugerido: 250×100 px)");
+        jlImgSignature.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jlImgSignature.setPreferredSize(new java.awt.Dimension(250, 100));
+        jPanel47.add(jlImgSignature);
+
+        jPanel48.add(jPanel47, java.awt.BorderLayout.NORTH);
+
+        jPanel49.setLayout(new java.awt.BorderLayout());
+
+        jPanel50.setLayout(new java.awt.GridLayout(2, 0, 0, 5));
+
+        jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        jlImagePhoto.setText("Foto:");
+        jlImagePhoto.setToolTipText("Tamaño sugerido: 100×100 px");
+        jlImagePhoto.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel45.add(jlImagePhoto);
+
+        jtfImagePhoto.setEditable(false);
+        jtfImagePhoto.setToolTipText("Tamaño sugerido: 100×100 px");
+        jtfImagePhoto.setFocusable(false);
+        jtfImagePhoto.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel45.add(jtfImagePhoto);
+
+        jbImagePhoto.setText("jButton3");
+        jbImagePhoto.setToolTipText("Seleccionar foto (tamaño sugerido: 100×100 px)");
+        jbImagePhoto.setFocusable(false);
+        jbImagePhoto.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel45.add(jbImagePhoto);
+
+        jbImagePhotoView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
+        jbImagePhotoView.setToolTipText("Ver foto del empleado");
+        jbImagePhotoView.setFocusable(false);
+        jbImagePhotoView.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel45.add(jbImagePhotoView);
+
+        jbImagePhotoRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
+        jbImagePhotoRemove.setToolTipText("Eliminar foto del empleado");
+        jbImagePhotoRemove.setFocusable(false);
+        jbImagePhotoRemove.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel45.add(jbImagePhotoRemove);
+
+        jPanel50.add(jPanel45);
+
+        jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        jlImageSignature.setText("Firma:");
+        jlImageSignature.setToolTipText("Tamaño sugerido: 250×100 px");
+        jlImageSignature.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel46.add(jlImageSignature);
+
+        jtfImageSignature.setEditable(false);
+        jtfImageSignature.setToolTipText("Tamaño sugerido: 250×100 px");
+        jtfImageSignature.setFocusable(false);
+        jtfImageSignature.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel46.add(jtfImageSignature);
+
+        jbImageSignature.setText("jButton3");
+        jbImageSignature.setToolTipText("Seleccionar firma (tamaño sugerido: 250×100 px)");
+        jbImageSignature.setFocusable(false);
+        jbImageSignature.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel46.add(jbImageSignature);
+
+        jbImageSignatureView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
+        jbImageSignatureView.setToolTipText("Ver firma del empleado");
+        jbImageSignatureView.setFocusable(false);
+        jbImageSignatureView.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel46.add(jbImageSignatureView);
+
+        jbImageSignatureRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
+        jbImageSignatureRemove.setToolTipText("Eliminar firma del empleado");
+        jbImageSignatureRemove.setFocusable(false);
+        jbImageSignatureRemove.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel46.add(jbImageSignatureRemove);
+
+        jPanel50.add(jPanel46);
+
+        jPanel49.add(jPanel50, java.awt.BorderLayout.NORTH);
+
+        jPanel48.add(jPanel49, java.awt.BorderLayout.CENTER);
+
+        jPanel7.add(jPanel48, java.awt.BorderLayout.EAST);
+
+        jPanel42.add(jPanel7, java.awt.BorderLayout.NORTH);
+
+        jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos laborales:"));
         jPanel20.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setLayout(new java.awt.GridLayout(12, 1, 0, 5));
@@ -757,7 +869,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel35.setLayout(new java.awt.BorderLayout());
 
         jPanel43.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos adicionales:"));
-        jPanel43.setLayout(new java.awt.GridLayout(8, 0, 0, 5));
+        jPanel43.setLayout(new java.awt.GridLayout(5, 0, 0, 5));
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
@@ -826,68 +938,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel39.add(jcbFkCatalogueEducationTypeId);
 
         jPanel43.add(jPanel39);
-
-        jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
-
-        jlImagePhoto.setText("Fotografía:");
-        jlImagePhoto.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel45.add(jlImagePhoto);
-
-        jtfImagePhoto.setEditable(false);
-        jtfImagePhoto.setFocusable(false);
-        jtfImagePhoto.setPreferredSize(new java.awt.Dimension(500, 23));
-        jPanel45.add(jtfImagePhoto);
-
-        jbImagePhoto.setText("jButton3");
-        jbImagePhoto.setToolTipText("Seleccionar fotografía");
-        jbImagePhoto.setFocusable(false);
-        jbImagePhoto.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel45.add(jbImagePhoto);
-
-        jbImagePhotoView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
-        jbImagePhotoView.setToolTipText("Ver fotografía del empleado");
-        jbImagePhotoView.setFocusable(false);
-        jbImagePhotoView.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel45.add(jbImagePhotoView);
-
-        jbImagePhotoRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
-        jbImagePhotoRemove.setToolTipText("Eliminar fotografía del empleado");
-        jbImagePhotoRemove.setFocusable(false);
-        jbImagePhotoRemove.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel45.add(jbImagePhotoRemove);
-
-        jPanel43.add(jPanel45);
-
-        jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
-
-        jlImageSignature.setText("Firma:");
-        jlImageSignature.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel46.add(jlImageSignature);
-
-        jtfImageSignature.setEditable(false);
-        jtfImageSignature.setFocusable(false);
-        jtfImageSignature.setPreferredSize(new java.awt.Dimension(500, 23));
-        jPanel46.add(jtfImageSignature);
-
-        jbImageSignature.setText("jButton3");
-        jbImageSignature.setToolTipText("Seleccionar firma");
-        jbImageSignature.setFocusable(false);
-        jbImageSignature.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel46.add(jbImageSignature);
-
-        jbImageSignatureView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
-        jbImageSignatureView.setToolTipText("Ver firma del empleado");
-        jbImageSignatureView.setFocusable(false);
-        jbImageSignatureView.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel46.add(jbImageSignatureView);
-
-        jbImageSignatureRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
-        jbImageSignatureRemove.setToolTipText("Eliminar firma del empleado");
-        jbImageSignatureRemove.setFocusable(false);
-        jbImageSignatureRemove.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel46.add(jbImageSignatureRemove);
-
-        jPanel43.add(jPanel46);
 
         jPanel35.add(jPanel43, java.awt.BorderLayout.NORTH);
 
@@ -1437,6 +1487,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     moXtaImageIconPhoto_n = new ImageIcon(byteArrayOSImagePhoto.toByteArray());
                     mbPhotoChange = true;
                     enableButtonsPhoto(true);
+                    
+                    jlImgPhoto.setIcon(moXtaImageIconPhoto_n);
+                    jlImgPhoto.setText("");
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -1451,6 +1504,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moXtaImageIconPhoto_n = null;
         mbPhotoChange = true;
         enableButtonsPhoto(false);
+        
+        jlImgPhoto.setIcon(null);
+        jlImgPhoto.setText(SPanelQueryIntegralEmployee.NO_PHOTO);
     }
     
     private void actionFileImagePhotoView() {
@@ -1480,6 +1536,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     moXtaImageIconSignature_n = new ImageIcon(byteArrayOSSignatureSignature.toByteArray());
                     mbSignatureChange = true;
                     enableButtonsSignature(true);
+                    
+                    jlImgSignature.setIcon(moXtaImageIconSignature_n);
+                    jlImgSignature.setText("");
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -1494,6 +1553,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moXtaImageIconSignature_n = null;
         mbSignatureChange = true;
         enableButtonsSignature(false);
+                    
+        jlImgSignature.setIcon(null);
+        jlImgSignature.setText(SPanelQueryIntegralEmployee.NO_SIGNATURE);
     }
     
     private void actionFileImageSignatureView() {
@@ -1665,8 +1727,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JPanel jPanel44;
     private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel46;
+    private javax.swing.JPanel jPanel47;
+    private javax.swing.JPanel jPanel48;
+    private javax.swing.JPanel jPanel49;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel50;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -1748,6 +1815,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlFkWorkingDayType;
     private javax.swing.JLabel jlImagePhoto;
     private javax.swing.JLabel jlImageSignature;
+    private javax.swing.JLabel jlImgPhoto;
+    private javax.swing.JLabel jlImgSignature;
     private javax.swing.JLabel jlLastName;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlSalary;
@@ -1787,7 +1856,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mbPhotoChange = false;
         mbSignatureChange = false;
         moXtaImageIconPhoto_n = null;
+        jlImgPhoto.setIcon(null);
+        jlImgPhoto.setText(SPanelQueryIntegralEmployee.NO_PHOTO);
         moXtaImageIconSignature_n = null;
+        jlImgSignature.setIcon(null);
+        jlImgSignature.setText(SPanelQueryIntegralEmployee.NO_SIGNATURE);
 
         moBizPartner = null;
         moBizPartnerBranch = null;
@@ -2030,7 +2103,26 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldFkRecruitmentSchemeType.setFieldValue(new int[] { moEmployee.getFkRecruitmentSchemeTypeId() });
             moFieldFkPositionRiskType.setFieldValue(new int[] { moEmployee.getFkPositionRiskTypeId() });
             moFieldFkMwzType.setFieldValue(new int[] { moEmployee.getFkMwzTypeId() });
+            
+            if (moEmployee.getXtaImageIconPhoto_n() != null) {
+                jlImgPhoto.setIcon(moEmployee.getXtaImageIconPhoto_n());
+                jlImgPhoto.setText("");
+            }
+            else {
+                jlImgPhoto.setIcon(null);
+                jlImgPhoto.setText(SPanelQueryIntegralEmployee.NO_PHOTO);
+            }
+            
+            if (moEmployee.getXtaImageIconSignature_n() != null) {
+                jlImgSignature.setIcon(moEmployee.getXtaImageIconSignature_n());
+                jlImgSignature.setText("");
+            }
+            else {
+                jlImgSignature.setIcon(null);
+                jlImgSignature.setText(SPanelQueryIntegralEmployee.NO_SIGNATURE);
+            }
         }
+        
         moBizPartnerBranch = moBizPartner.getDbmsHqBranch();
         moPanelBizPartnerBranchAddress.setRegistry(moBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial());
 

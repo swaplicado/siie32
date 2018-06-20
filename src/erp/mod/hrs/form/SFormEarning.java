@@ -144,10 +144,10 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jLabel1 = new javax.swing.JLabel();
         moBoolWithholding = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel31 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        jlAccountingConfigurationTypeHelp = new javax.swing.JLabel();
         moBoolPayrollTax = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel32 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
+        jlAccountingRecordTypeHelp = new javax.swing.JLabel();
         moBoolAlternativeTaxCalculation = new sa.lib.gui.bean.SBeanFieldBoolean();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
@@ -190,9 +190,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moTextNameAbbreviated.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel22.add(moTextNameAbbreviated);
 
-        jlNameAbbreviatedHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlNameAbbreviatedHelp.setForeground(java.awt.Color.gray);
         jlNameAbbreviatedHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlNameAbbreviatedHelp.setText("(Nombre utilizado para la contabilización y concepto en XML)");
+        jlNameAbbreviatedHelp.setText("<<< para contabilización y para concepto del CFDI (XML)");
         jlNameAbbreviatedHelp.setToolTipText("");
         jlNameAbbreviatedHelp.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel22.add(jlNameAbbreviatedHelp);
@@ -250,7 +250,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel8.add(jlDummy);
         jPanel8.add(moDecExemptionMwzYear);
 
-        jlExemptionMwzHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlExemptionMwzHelp.setForeground(java.awt.Color.gray);
         jlExemptionMwzHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jlExemptionMwzHelp.setText("(Monto exento expresado en número de salarios mínimos del área geográfica)");
         jlExemptionMwzHelp.setToolTipText("");
@@ -266,7 +266,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel9.add(jlExemptionSalaryEqualsMwzPercentage);
         jPanel9.add(moDecExemptionSalaryEqualsMwzPercentage);
 
-        jlExemptionSalaryEqualsMwzPercentageHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlExemptionSalaryEqualsMwzPercentageHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryEqualsMwzPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jlExemptionSalaryEqualsMwzPercentageHelp.setText("(Porcentaje exención cuando el empleado gana el salario mínimo)");
         jlExemptionSalaryEqualsMwzPercentageHelp.setToolTipText("");
@@ -282,7 +282,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel10.add(jlExemptionSalaryEqualsMwzLimit);
         jPanel10.add(moDecExemptionSalaryEqualsMwzLimit);
 
-        jlExemptionSalaryEqualsMwzLimitHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlExemptionSalaryEqualsMwzLimitHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryEqualsMwzLimitHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jlExemptionSalaryEqualsMwzLimitHelp.setText("(Tope exención expresado en número de salarios mínimos del área geográfica, cuando el empleado gana el salario mínimo)");
         jlExemptionSalaryEqualsMwzLimitHelp.setToolTipText("");
@@ -298,7 +298,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel11.add(jlExemptionSalaryGreaterMwzPercentage);
         jPanel11.add(moDecExemptionSalaryGreaterMwzPercentage);
 
-        jlExemptionSalaryGreaterMwzPercentageHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlExemptionSalaryGreaterMwzPercentageHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryGreaterMwzPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jlExemptionSalaryGreaterMwzPercentageHelp.setText("(Porcentaje exención cuando el empleado gana más del salario mínimo)");
         jlExemptionSalaryGreaterMwzPercentageHelp.setToolTipText("");
@@ -314,7 +314,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel12.add(jlExemptionSalaryGreaterMwzLimit);
         jPanel12.add(moDecExemptionSalaryGreaterMwzLimit);
 
-        jlExemptionSalaryGreaterMwzLimitHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlExemptionSalaryGreaterMwzLimitHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryGreaterMwzLimitHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jlExemptionSalaryGreaterMwzLimitHelp.setText("(Tope exención expresado en número de salarios mínimos del área geográfica, cuando el empleado gana más del salario mínimo)");
         jlExemptionSalaryGreaterMwzLimitHelp.setToolTipText("Exención límite expresado en número de salarios mínimos del área geográfica, cuando el empleado gana más del salario mínimo");
@@ -330,7 +330,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel23.add(jlPayPercentage);
         jPanel23.add(moDecPayPercentage);
 
-        jlPayPercentageHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlPayPercentageHelp.setForeground(java.awt.Color.gray);
         jlPayPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jlPayPercentageHelp.setText("(Porcentaje del pago por unidad)");
         jlPayPercentageHelp.setToolTipText("");
@@ -346,7 +346,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel13.add(jlUnitsMaximumWeek);
         jPanel13.add(moDecUnitsMaximumWeek);
 
-        jlUnitsMaximumWeekHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlUnitsMaximumWeekHelp.setForeground(java.awt.Color.gray);
         jlUnitsMaximumWeekHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jlUnitsMaximumWeekHelp.setText("(Número máximo de unidades permitido por semana)");
         jlUnitsMaximumWeekHelp.setToolTipText("");
@@ -459,7 +459,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel26.add(jPanel27, java.awt.BorderLayout.WEST);
 
-        jPanel28.setLayout(new java.awt.GridLayout(5, 1));
+        jPanel28.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -485,7 +485,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(150, 23));
+        jLabel1.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel30.add(jLabel1);
 
         moBoolWithholding.setText("Es retención de ley");
@@ -496,8 +496,10 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel2.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel31.add(jLabel2);
+        jlAccountingConfigurationTypeHelp.setForeground(java.awt.Color.gray);
+        jlAccountingConfigurationTypeHelp.setText("<<< manera de configurar cuentas contables");
+        jlAccountingConfigurationTypeHelp.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel31.add(jlAccountingConfigurationTypeHelp);
 
         moBoolPayrollTax.setText("Aplica para impto. sobre nóminas");
         moBoolPayrollTax.setPreferredSize(new java.awt.Dimension(250, 23));
@@ -507,10 +509,12 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel3.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel32.add(jLabel3);
+        jlAccountingRecordTypeHelp.setForeground(java.awt.Color.gray);
+        jlAccountingRecordTypeHelp.setText("<<< manera de agrupar asientos contables");
+        jlAccountingRecordTypeHelp.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel32.add(jlAccountingRecordTypeHelp);
 
-        moBoolAlternativeTaxCalculation.setText("Cálculo alterno impto. (Art. 174 RLISR)");
+        moBoolAlternativeTaxCalculation.setText("Usar cálculo alterno impto. (Art. 174 RLISR)");
         moBoolAlternativeTaxCalculation.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel32.add(moBoolAlternativeTaxCalculation);
 
@@ -527,8 +531,6 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -564,7 +566,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlAbsenceClass;
     private javax.swing.JLabel jlAbsenceType;
     private javax.swing.JLabel jlAccountingConfigurationType;
+    private javax.swing.JLabel jlAccountingConfigurationTypeHelp;
     private javax.swing.JLabel jlAccountingRecordType;
+    private javax.swing.JLabel jlAccountingRecordTypeHelp;
     private javax.swing.JLabel jlBenefitType;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlDummy;
