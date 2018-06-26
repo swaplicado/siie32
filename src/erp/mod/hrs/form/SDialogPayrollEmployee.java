@@ -57,7 +57,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPaneFormOwner, ItemListener, ActionListener, KeyListener, CellEditorListener {
 
@@ -222,7 +222,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlPaymentType.setText("Periodo pago:");
+        jlPaymentType.setText("Período pago:");
         jlPaymentType.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel17.add(jlPaymentType);
 
@@ -268,7 +268,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         moDecSalary.setFocusable(false);
         jPanel29.add(moDecSalary);
 
-        jlDateBenefits.setText("Beneficios:");
+        jlDateBenefits.setText("Inicio beneficios:");
         jlDateBenefits.setPreferredSize(new java.awt.Dimension(95, 23));
         jPanel29.add(jlDateBenefits);
 
@@ -295,7 +295,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         jPanel29.add(jlAlternativeId);
 
         moTextAlternativeId.setText("sBeanFieldText1");
-        moTextAlternativeId.setPreferredSize(new java.awt.Dimension(125, 23));
+        moTextAlternativeId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel29.add(moTextAlternativeId);
 
         jPanel15.add(jPanel29);
@@ -335,6 +335,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         jPanel18.add(jlSocialSecurityNumber);
 
         moTextSocialSecurityNumber.setText("sBeanFieldText1");
+        moTextSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel18.add(moTextSocialSecurityNumber);
 
         jPanel15.add(jPanel18);
@@ -358,6 +359,8 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         jlWorkingHoursDay.setText("Horas jornada:");
         jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel19.add(jlWorkingHoursDay);
+
+        moIntWorkingHoursDay.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel19.add(moIntWorkingHoursDay);
 
         jPanel15.add(jPanel19);
@@ -1570,7 +1573,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
     }
 
     private void populateEarnings() {
-        Vector<SGridRow> rows = new Vector<SGridRow>();
+        Vector<SGridRow> rows = new Vector<>();
         SHrsPayrollReceiptEarning hrsReceiptEarningRow = null;
 
         moGridEarningRow.setRowButtonsEnabled(false, true, mbEditable);
@@ -1601,7 +1604,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
     }
 
     private void populateDeductions() {
-        Vector<SGridRow> rows = new Vector<SGridRow>();
+        Vector<SGridRow> rows = new Vector<>();
         SHrsPayrollReceiptDeduction hrsReceiptDeductionRow = null;
 
         moGridDeductionRow.setRowButtonsEnabled(false, false, mbEditable);

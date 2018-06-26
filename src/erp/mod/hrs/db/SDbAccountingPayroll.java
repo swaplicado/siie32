@@ -17,7 +17,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbAccountingPayroll extends SDbRegistryUser {
     
@@ -228,6 +228,7 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
             registry.getChildAccountingPayrollEmployees().add(receipt.clone());
         }
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }

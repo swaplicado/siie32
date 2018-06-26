@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbDeduction extends SDbRegistryUser {
 
@@ -346,6 +346,7 @@ public class SDbDeduction extends SDbRegistryUser {
         registry.setAuxAccountingConfigurationTypeId(this.getAuxAccountingConfigurationTypeId());
         //registry.getAccountingDeduction().addAll(this.getAccountingDeduction());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }

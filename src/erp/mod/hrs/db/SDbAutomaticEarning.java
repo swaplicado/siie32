@@ -20,7 +20,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbAutomaticEarning extends SDbRegistryUser implements SGridRow {
 
@@ -305,6 +305,7 @@ public class SDbAutomaticEarning extends SDbRegistryUser implements SGridRow {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 

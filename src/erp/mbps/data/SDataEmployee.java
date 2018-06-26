@@ -7,6 +7,7 @@ package erp.mbps.data;
 
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mhrs.data.SDataEmployeeRelatives;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsAccounting;
@@ -21,6 +22,7 @@ import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.imageio.ImageIO;
@@ -37,7 +39,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -75,13 +77,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected int mnFkRecruitmentSchemeTypeId;
     protected int mnFkPositionRiskTypeId;
     protected int mnFkWorkingDayTypeId;
-    protected int mnFkCatalogueSexCategoryId;
+    protected int mnFkCatalogueSexClassId;
     protected int mnFkCatalogueSexTypeId;
-    protected int mnFkCatalogueBloodTypeCategoryId;
+    protected int mnFkCatalogueBloodTypeClassId;
     protected int mnFkCatalogueBloodTypeTypeId;
-    protected int mnFkCatalogueMaritalStatusCategoryId;
+    protected int mnFkCatalogueMaritalStatusClassId;
     protected int mnFkCatalogueMaritalStatusTypeId;
-    protected int mnFkCatalogueEducationCategoryId;
+    protected int mnFkCatalogueEducationClassId;
     protected int mnFkCatalogueEducationTypeId;
     protected int mnFkBankId_n;
     protected int mnFkUserInsertId;
@@ -89,6 +91,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
 
+    protected SDataEmployeeRelatives moChildRelatives;
+    
     protected double mdAuxSalary;
     protected double mdAuxWage;
     protected double mdAuxSalarySscBase;
@@ -330,13 +334,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setFkRecruitmentSchemeTypeId(int n) { mnFkRecruitmentSchemeTypeId = n; }
     public void setFkPositionRiskTypeId(int n) { mnFkPositionRiskTypeId = n; }
     public void setFkWorkingDayTypeId(int n) { mnFkWorkingDayTypeId = n; }
-    public void setFkCatalogueSexCategoryId(int n) { mnFkCatalogueSexCategoryId = n; }
+    public void setFkCatalogueSexClassId(int n) { mnFkCatalogueSexClassId = n; }
     public void setFkCatalogueSexTypeId(int n) { mnFkCatalogueSexTypeId = n; }
-    public void setFkCatalogueBloodTypeCategoryId(int n) { mnFkCatalogueBloodTypeCategoryId = n; }
+    public void setFkCatalogueBloodTypeClassId(int n) { mnFkCatalogueBloodTypeClassId = n; }
     public void setFkCatalogueBloodTypeTypeId(int n) { mnFkCatalogueBloodTypeTypeId = n; }
-    public void setFkCatalogueMaritalStatusCategoryId(int n) { mnFkCatalogueMaritalStatusCategoryId = n; }
+    public void setFkCatalogueMaritalStatusClassId(int n) { mnFkCatalogueMaritalStatusClassId = n; }
     public void setFkCatalogueMaritalStatusTypeId(int n) { mnFkCatalogueMaritalStatusTypeId = n; }
-    public void setFkCatalogueEducationCategoryId(int n) { mnFkCatalogueEducationCategoryId = n; }
+    public void setFkCatalogueEducationClassId(int n) { mnFkCatalogueEducationClassId = n; }
     public void setFkCatalogueEducationTypeId(int n) { mnFkCatalogueEducationTypeId = n; }
     public void setFkBankId_n(int n) { mnFkBankId_n = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -344,6 +348,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
 
+    public void setChildRelatives(SDataEmployeeRelatives o) { moChildRelatives = o; }
+    
     public void setAuxSalary(double d) { mdAuxSalary = d; }
     public void setAuxWage(double d) { mdAuxWage = d; }
     public void setAuxSalarySscBase(double d) { mdAuxSalarySscBase = d; }
@@ -388,13 +394,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public int getFkRecruitmentSchemeTypeId() { return mnFkRecruitmentSchemeTypeId; }
     public int getFkPositionRiskTypeId() { return mnFkPositionRiskTypeId; }
     public int getFkWorkingDayTypeId() { return mnFkWorkingDayTypeId; }
-    public int getFkCatalogueSexCategoryId() { return mnFkCatalogueSexCategoryId; }
+    public int getFkCatalogueSexClassId() { return mnFkCatalogueSexClassId; }
     public int getFkCatalogueSexTypeId() { return mnFkCatalogueSexTypeId; }
-    public int getFkCatalogueBloodTypeCategoryId() { return mnFkCatalogueBloodTypeCategoryId; }
+    public int getFkCatalogueBloodTypeClassId() { return mnFkCatalogueBloodTypeClassId; }
     public int getFkCatalogueBloodTypeTypeId() { return mnFkCatalogueBloodTypeTypeId; }
-    public int getFkCatalogueMaritalStatusCategoryId() { return mnFkCatalogueMaritalStatusCategoryId; }
+    public int getFkCatalogueMaritalStatusClassId() { return mnFkCatalogueMaritalStatusClassId; }
     public int getFkCatalogueMaritalStatusTypeId() { return mnFkCatalogueMaritalStatusTypeId; }
-    public int getFkCatalogueEducationCategoryId() { return mnFkCatalogueEducationCategoryId; }
+    public int getFkCatalogueEducationClassId() { return mnFkCatalogueEducationClassId; }
     public int getFkCatalogueEducationTypeId() { return mnFkCatalogueEducationTypeId; }
     public int getFkBankId_n() { return mnFkBankId_n; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -402,6 +408,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
+    public SDataEmployeeRelatives getChildRelatives() { return moChildRelatives; }
+    
     public double getAuxSalary() { return mdAuxSalary; }
     public double getAuxWage() { return mdAuxWage; }
     public double getAuxSalarySscBase() { return mdAuxSalarySscBase; }
@@ -460,19 +468,21 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mnFkRecruitmentSchemeTypeId = 0;
         mnFkPositionRiskTypeId = 0;
         mnFkWorkingDayTypeId = 0;
-        mnFkCatalogueSexCategoryId = 0;
+        mnFkCatalogueSexClassId = 0;
         mnFkCatalogueSexTypeId = 0;
-        mnFkCatalogueBloodTypeCategoryId = 0;
+        mnFkCatalogueBloodTypeClassId = 0;
         mnFkCatalogueBloodTypeTypeId = 0;
-        mnFkCatalogueMaritalStatusCategoryId = 0;
+        mnFkCatalogueMaritalStatusClassId = 0;
         mnFkCatalogueMaritalStatusTypeId = 0;
-        mnFkCatalogueEducationCategoryId = 0;
+        mnFkCatalogueEducationClassId = 0;
         mnFkCatalogueEducationTypeId = 0;
         mnFkBankId_n = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
+        
+        moChildRelatives = null;
 
         mdAuxSalary = 0;
         mdAuxWage = 0;
@@ -541,13 +551,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mnFkRecruitmentSchemeTypeId = resultSet.getInt("fk_tp_rec_sche");
                 mnFkPositionRiskTypeId = resultSet.getInt("fk_tp_pos_risk");
                 mnFkWorkingDayTypeId = resultSet.getInt("fk_tp_work_day");
-                mnFkCatalogueSexCategoryId = resultSet.getInt("fk_cl_cat_sex");
+                mnFkCatalogueSexClassId = resultSet.getInt("fk_cl_cat_sex");
                 mnFkCatalogueSexTypeId = resultSet.getInt("fk_tp_cat_sex");
-                mnFkCatalogueBloodTypeCategoryId = resultSet.getInt("fk_cl_cat_blo");
+                mnFkCatalogueBloodTypeClassId = resultSet.getInt("fk_cl_cat_blo");
                 mnFkCatalogueBloodTypeTypeId = resultSet.getInt("fk_tp_cat_blo");
-                mnFkCatalogueMaritalStatusCategoryId = resultSet.getInt("fk_cl_cat_mar");
+                mnFkCatalogueMaritalStatusClassId = resultSet.getInt("fk_cl_cat_mar");
                 mnFkCatalogueMaritalStatusTypeId = resultSet.getInt("fk_tp_cat_mar");
-                mnFkCatalogueEducationCategoryId = resultSet.getInt("fk_cl_cat_edu");
+                mnFkCatalogueEducationClassId = resultSet.getInt("fk_cl_cat_edu");
                 mnFkCatalogueEducationTypeId = resultSet.getInt("fk_tp_cat_edu");
                 mnFkBankId_n = resultSet.getInt("fk_bank_n");
                 mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
@@ -560,6 +570,44 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 }
                 if (oSignature_n != null) {
                     moXtaImageIconSignature_n = SLibUtilities.convertBlobToImageIcon(oSignature_n);
+                }
+                
+                sql = "SELECT * FROM erp.hrsu_emp_rel WHERE id_emp = " + key[0] + ";";
+                resultSet = statement.executeQuery(sql);
+                if (resultSet.next()) {
+                    moChildRelatives = new SDataEmployeeRelatives();
+                    moChildRelatives.setIsRegistryNew(false);
+                    moChildRelatives.setPkEmployeeId(resultSet.getInt("id_emp"));
+                    moChildRelatives.setMate(resultSet.getString("mate"));
+                    moChildRelatives.setMateDateBirth(resultSet.getDate("mate_dt_bir_n"));
+                    moChildRelatives.setMateDeceased(resultSet.getBoolean("b_mate_dec"));
+                    moChildRelatives.setSon1(resultSet.getString("son_1"));
+                    moChildRelatives.setSonDateBirth1(resultSet.getDate("son_dt_bir_1_n"));
+                    moChildRelatives.setSonDeceased1(resultSet.getBoolean("b_son_dec_1"));
+                    moChildRelatives.setSon2(resultSet.getString("son_2"));
+                    moChildRelatives.setSonDateBirth2(resultSet.getDate("son_dt_bir_2_n"));
+                    moChildRelatives.setSonDeceased2(resultSet.getBoolean("b_son_dec_2"));
+                    moChildRelatives.setSon3(resultSet.getString("son_3"));
+                    moChildRelatives.setSonDateBirth3(resultSet.getDate("son_dt_bir_3_n"));
+                    moChildRelatives.setSonDeceased3(resultSet.getBoolean("b_son_dec_3"));
+                    moChildRelatives.setSon4(resultSet.getString("son_4"));
+                    moChildRelatives.setSonDateBirth4(resultSet.getDate("son_dt_bir_4_n"));
+                    moChildRelatives.setSonDeceased4(resultSet.getBoolean("b_son_dec_4"));
+                    moChildRelatives.setSon5(resultSet.getString("son_5"));
+                    moChildRelatives.setSonDateBirth5(resultSet.getDate("son_dt_bir_5_n"));
+                    moChildRelatives.setSonDeceased5(resultSet.getBoolean("b_son_dec_5"));
+                    moChildRelatives.setFkCatSexClassIdMate(resultSet.getInt("fk_cl_cat_sex_mate"));
+                    moChildRelatives.setFkCatSexTypeIdMate(resultSet.getInt("fk_tp_cat_sex_mate"));
+                    moChildRelatives.setFkCatSexClassIdSon1(resultSet.getInt("fk_cl_cat_sex_son_1"));
+                    moChildRelatives.setFkCatSexTypeIdSon1(resultSet.getInt("fk_tp_cat_sex_son_1"));
+                    moChildRelatives.setFkCatSexClassIdSon2(resultSet.getInt("fk_cl_cat_sex_son_2"));
+                    moChildRelatives.setFkCatSexTypeIdSon2(resultSet.getInt("fk_tp_cat_sex_son_2"));
+                    moChildRelatives.setFkCatSexClassIdSon3(resultSet.getInt("fk_cl_cat_sex_son_3"));
+                    moChildRelatives.setFkCatSexTypeIdSon3(resultSet.getInt("fk_tp_cat_sex_son_3"));
+                    moChildRelatives.setFkCatSexClassIdSon4(resultSet.getInt("fk_cl_cat_sex_son_4"));
+                    moChildRelatives.setFkCatSexTypeIdSon4(resultSet.getInt("fk_tp_cat_sex_son_4"));
+                    moChildRelatives.setFkCatSexClassIdSon5(resultSet.getInt("fk_cl_cat_sex_son_5"));
+                    moChildRelatives.setFkCatSexTypeIdSon5(resultSet.getInt("fk_tp_cat_sex_son_5"));
                 }
 
                 mbIsRegistryNew = false;
@@ -636,13 +684,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         mnFkRecruitmentSchemeTypeId + ", " +
                         mnFkPositionRiskTypeId + ", " +
                         mnFkWorkingDayTypeId + ", " +
-                        mnFkCatalogueSexCategoryId + ", " + 
+                        mnFkCatalogueSexClassId + ", " + 
                         mnFkCatalogueSexTypeId + ", " + 
-                        mnFkCatalogueBloodTypeCategoryId + ", " + 
+                        mnFkCatalogueBloodTypeClassId + ", " + 
                         mnFkCatalogueBloodTypeTypeId + ", " + 
-                        mnFkCatalogueMaritalStatusCategoryId + ", " + 
+                        mnFkCatalogueMaritalStatusClassId + ", " + 
                         mnFkCatalogueMaritalStatusTypeId + ", " + 
-                        mnFkCatalogueEducationCategoryId + ", " + 
+                        mnFkCatalogueEducationClassId + ", " + 
                         mnFkCatalogueEducationTypeId + ", " + 
                         (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
                         mnFkUserInsertId + ", " +
@@ -652,7 +700,6 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         ")";
             }
             else {
-
                 sql = "UPDATE erp.hrsu_emp SET " +
                         //"id_emp = " + mnPkEmployeeId + ", " +
                         "num = '" + msNumber + "', " +
@@ -690,13 +737,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "fk_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId + ", " +
                         "fk_tp_pos_risk = " + mnFkPositionRiskTypeId + ", " +
                         "fk_tp_work_day = " + mnFkWorkingDayTypeId + ", " +
-                        "fk_cl_cat_sex = " + mnFkCatalogueSexCategoryId + ", " +
+                        "fk_cl_cat_sex = " + mnFkCatalogueSexClassId + ", " +
                         "fk_tp_cat_sex = " + mnFkCatalogueSexTypeId + ", " +
-                        "fk_cl_cat_blo = " + mnFkCatalogueBloodTypeCategoryId + ", " +
+                        "fk_cl_cat_blo = " + mnFkCatalogueBloodTypeClassId + ", " +
                         "fk_tp_cat_blo = " + mnFkCatalogueBloodTypeTypeId + ", " +
-                        "fk_cl_cat_mar = " + mnFkCatalogueMaritalStatusCategoryId + ", " +
+                        "fk_cl_cat_mar = " + mnFkCatalogueMaritalStatusClassId + ", " +
                         "fk_tp_cat_mar = " + mnFkCatalogueMaritalStatusTypeId + ", " +
-                        "fk_cl_cat_edu = " + mnFkCatalogueEducationCategoryId + ", " +
+                        "fk_cl_cat_edu = " + mnFkCatalogueEducationClassId + ", " +
                         "fk_tp_cat_edu = " + mnFkCatalogueEducationTypeId + ", " +
                         "fk_bank_n = " + (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
                         //"fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -752,6 +799,50 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
                 preparedStatementmageSignature_n.setBytes(1, byteArrayOSImageSignature.toByteArray());
                 preparedStatementmageSignature_n.execute();
+            }
+            
+            Statement statement = connection.createStatement();
+            
+            sql = "DELETE FROM erp.hrsu_emp_rel WHERE id_emp = " + mnPkEmployeeId + ";";
+            statement.execute(sql);
+            
+            if (moChildRelatives != null) {
+                moChildRelatives.setPkEmployeeId(mnPkEmployeeId);
+                
+                sql = "INSERT INTO erp.hrsu_emp_rel VALUES (" +
+                        moChildRelatives.getPkEmployeeId() + ", " + 
+                        "'" + moChildRelatives.getMate() + "', " + 
+                        (moChildRelatives.getMateDateBirth() == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(moChildRelatives.getMateDateBirth()) + "'") + ", " + 
+                        (moChildRelatives.isMateDeceased() ? 1 : 0) + ", " + 
+                        "'" + moChildRelatives.getSon1() + "', " + 
+                        (moChildRelatives.getSonDateBirth1() == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(moChildRelatives.getSonDateBirth1()) + "'") + ", " +
+                        (moChildRelatives.isSonDeceased1() ? 1 : 0) + ", " + 
+                        "'" + moChildRelatives.getSon2() + "', " + 
+                        (moChildRelatives.getSonDateBirth2() == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(moChildRelatives.getSonDateBirth2()) + "'") + ", " +
+                        (moChildRelatives.isSonDeceased2() ? 1 : 0) + ", " + 
+                        "'" + moChildRelatives.getSon3() + "', " + 
+                        (moChildRelatives.getSonDateBirth3() == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(moChildRelatives.getSonDateBirth3()) + "'") + ", " +
+                        (moChildRelatives.isSonDeceased3() ? 1 : 0) + ", " + 
+                        "'" + moChildRelatives.getSon4() + "', " + 
+                        (moChildRelatives.getSonDateBirth4() == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(moChildRelatives.getSonDateBirth4()) + "'") + ", " +
+                        (moChildRelatives.isSonDeceased4() ? 1 : 0) + ", " + 
+                        "'" + moChildRelatives.getSon5() + "', " + 
+                        (moChildRelatives.getSonDateBirth5() == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(moChildRelatives.getSonDateBirth5()) + "'") + ", " +
+                        (moChildRelatives.isSonDeceased5() ? 1 : 0) + ", " + 
+                        moChildRelatives.getFkCatSexClassIdMate() + ", " + 
+                        moChildRelatives.getFkCatSexTypeIdMate() + ", " + 
+                        moChildRelatives.getFkCatSexClassIdSon1() + ", " + 
+                        moChildRelatives.getFkCatSexTypeIdSon1() + ", " + 
+                        moChildRelatives.getFkCatSexClassIdSon2() + ", " + 
+                        moChildRelatives.getFkCatSexTypeIdSon2() + ", " + 
+                        moChildRelatives.getFkCatSexClassIdSon3() + ", " + 
+                        moChildRelatives.getFkCatSexTypeIdSon3() + ", " + 
+                        moChildRelatives.getFkCatSexClassIdSon4() + ", " + 
+                        moChildRelatives.getFkCatSexTypeIdSon4() + ", " + 
+                        moChildRelatives.getFkCatSexClassIdSon5() + ", " + 
+                        moChildRelatives.getFkCatSexTypeIdSon5() + " " + 
+                        ")";
+                statement.execute(sql);
             }
             
             if (mbIsRegistryNew) {

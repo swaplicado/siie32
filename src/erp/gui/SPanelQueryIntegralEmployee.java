@@ -50,11 +50,12 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiItem;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements STableTabInterface, javax.swing.event.ListSelectionListener, java.awt.event.ActionListener, java.awt.event.ItemListener {
     
@@ -282,7 +283,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfFirstName.setText("X");
         jtfFirstName.setToolTipText("");
         jtfFirstName.setFocusable(false);
-        jtfFirstName.setPreferredSize(new java.awt.Dimension(250, 23));
+        jtfFirstName.setPreferredSize(new java.awt.Dimension(310, 23));
         jPanel13.add(jtfFirstName);
 
         jPanel7.add(jPanel13);
@@ -308,7 +309,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfAlternativeId.setText("X");
         jtfAlternativeId.setToolTipText("");
         jtfAlternativeId.setFocusable(false);
-        jtfAlternativeId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfAlternativeId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel21.add(jtfAlternativeId);
 
         jlSocialSecurityNumber.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -320,7 +321,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfSocialSecurityNumber.setText("X");
         jtfSocialSecurityNumber.setToolTipText("");
         jtfSocialSecurityNumber.setFocusable(false);
-        jtfSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel21.add(jtfSocialSecurityNumber);
 
         jPanel7.add(jPanel21);
@@ -340,7 +341,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jLabel4.setPreferredSize(new java.awt.Dimension(20, 23));
         jPanel22.add(jLabel4);
 
-        jlDateBenefits.setText("Beneficios:");
+        jlDateBenefits.setText("Inicio beneficios:");
         jlDateBenefits.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel22.add(jlDateBenefits);
 
@@ -400,7 +401,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel18.add(jftDateChangeSalary);
 
         jlWage.setText("Sueldo:");
-        jlWage.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlWage.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel18.add(jlWage);
 
         jtfWage.setEditable(false);
@@ -490,8 +491,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfMarital.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jtfMarital);
 
-        jlFkBloodType.setText("Tipo de sangre:");
-        jlFkBloodType.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlFkBloodType.setText("Grupo sanguíneo:");
+        jlFkBloodType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlFkBloodType);
 
         jtfBloodType.setEditable(false);
@@ -528,7 +529,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel9.add(jtfMwzType);
 
         jlWorkingHoursDay.setText("Horas jornada:");
-        jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlWorkingHoursDay);
 
         jtfWorkingHoursDay.setEditable(false);
@@ -536,7 +537,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfWorkingHoursDay.setText("0");
         jtfWorkingHoursDay.setToolTipText("");
         jtfWorkingHoursDay.setFocusable(false);
-        jtfWorkingHoursDay.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfWorkingHoursDay.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(jtfWorkingHoursDay);
 
         jPanel7.add(jPanel9);
@@ -590,7 +591,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jlDummy.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jlDummy);
 
-        jlBenefit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlBenefit.setText("Prestación");
         jlBenefit.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jlBenefit);
@@ -598,12 +598,10 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jlDummy1.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel11.add(jlDummy1);
 
-        jlBenefitProp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlBenefitProp.setText("Parte prop.");
         jlBenefitProp.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jlBenefitProp);
 
-        jlProportional.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlProportional.setText("Proporcional");
         jlProportional.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jlProportional);
@@ -611,9 +609,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jlDummy2.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel11.add(jlDummy2);
 
-        jlPaymentProp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlPaymentProp.setText("Pago prop.");
-        jlPaymentProp.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlPaymentProp.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jlPaymentProp);
 
         jPanel10.add(jPanel11);
@@ -983,12 +980,14 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         resetEmployee();
         resetBenefits();
         resetSettlement();
+        
         i = 0;
         aoTableColumns = new STableColumnForm[17];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empleado", 250);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", 75);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Periodo pago", 100);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", 50);
+        aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Activo", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Período pago", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Categoría", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo empleado", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Departamento", 100);
@@ -1007,9 +1006,11 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePaneEmpAvailable.addTableColumn(aoTableColumns[i]);
         }
+        
         populateBenefits();
         populateEmployee();
         updateOptions();
+        
         jtbStatusEmployeeActive.setSelected(true);
         actionEmpStatusStateChange();
         jbClearFilterPaymentType.addActionListener(this);
@@ -1110,9 +1111,9 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private void populateBenefits() throws Exception {
         int i = 0;
         
-        maBenefitTableAnnByAnniversarys = new ArrayList<SHrsBenefitTableByAnniversary>();
-        maBenefitTableVacationByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
-        maBenefitTableVacationBonByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
+        maBenefitTableAnnByAnniversarys = new ArrayList<>();
+        maBenefitTableVacationByAnniversary = new ArrayList<>();
+        maBenefitTableVacationBonByAnniversary = new ArrayList<>();
         
         for (SDbBenefitTable table : getBenefitTable(SModSysConsts.HRSS_TP_BEN_ANN_BON)) {
             i = 1;
@@ -1123,6 +1124,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
                 }
             }
         }
+        
         for (SDbBenefitTable table : getBenefitTable(SModSysConsts.HRSS_TP_BEN_VAC)) {
             i = 1;
             for (SDbBenefitTableRow tableRow : table.getChildRows()) {
@@ -1132,6 +1134,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
                 }
             }
         }
+        
         for (SDbBenefitTable table : getBenefitTable(SModSysConsts.HRSS_TP_BEN_VAC_BON)) {
             i = 1;
             for (SDbBenefitTableRow tableRow : table.getChildRows()) {
@@ -1151,7 +1154,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         moTablePaneEmpAvailable.createTable(this);
         moTablePaneEmpAvailable.clearTableRows();
         
-        sql = "SELECT emp.*, bp.bp, dep.name, ct.code, tp.code, pay.name, a.street, a.street_num_ext, a.street_num_int, a.neighborhood, a.reference, " +
+        sql = "SELECT emp.*, CAST(emp.num AS UNSIGNED INTEGER) AS _emp_num, bp.bp, dep.name, ct.code, tp.code, pay.name, a.street, a.street_num_ext, a.street_num_int, a.neighborhood, a.reference, " +
                 "a.locality, a.county, a.state, a.zip_code, a.po_box, IF(cty.cty IS NULL, 'MÉXICO', cty.cty) AS f_cty " +
                 "FROM erp.hrsu_emp AS emp " +
                 "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = emp.fk_dep " +
@@ -1176,7 +1179,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             employeeId = resultSet.getInt("id_emp");
             row.setPrimaryKey(new int[] { employeeId });
             row.setPkEmployeeId(employeeId);
-            row.setEmployeeNumber(resultSet.getString("emp.num"));
+            row.setEmployeeNumber(resultSet.getInt("_emp_num"));
             row.setEmployeeName(resultSet.getString("bp.bp"));
             row.setActive(resultSet.getBoolean("emp.b_act"));
             row.setEmployeeCategory(resultSet.getString("ct.code"));
@@ -1286,12 +1289,12 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             }
             jtfBankAccount.setText(employee.getBankAccount());
             jtfBankAccount.setCaretPosition(0);
-            jtfSex.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueSexCategoryId(), employee.getFkCatalogueSexTypeId() }, SDbRegistry.FIELD_NAME) + "");
-            jtfMarital.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueMaritalStatusCategoryId(), employee.getFkCatalogueMaritalStatusTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfSex.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueSexClassId(), employee.getFkCatalogueSexTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfMarital.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueMaritalStatusClassId(), employee.getFkCatalogueMaritalStatusTypeId() }, SDbRegistry.FIELD_NAME) + "");
             jtfMarital.setCaretPosition(0);
-            jtfBloodType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueBloodTypeCategoryId(), employee.getFkCatalogueBloodTypeTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfBloodType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueBloodTypeClassId(), employee.getFkCatalogueBloodTypeTypeId() }, SDbRegistry.FIELD_NAME) + "");
             jtfBloodType.setCaretPosition(0);
-            jtfEducationType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueEducationCategoryId(), employee.getFkCatalogueEducationTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfEducationType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueEducationClassId(), employee.getFkCatalogueEducationTypeId() }, SDbRegistry.FIELD_NAME) + "");
             jtfEducationType.setCaretPosition(0);
             jtfMwzType.setText(miClient.getSession().readField(SModConsts.HRSU_TP_MWZ, new int[] { employee.getFkMwzTypeId() }, SDbRegistry.FIELD_NAME) + "");
             jtfMwzType.setCaretPosition(0);

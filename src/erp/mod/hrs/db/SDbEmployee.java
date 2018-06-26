@@ -27,9 +27,10 @@ import sa.lib.gui.SGuiSession;
  * - erp.mod.hrs.db.SDataEmployee
  * All of them also make raw SQL insertions.
  */
+
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbEmployee extends SDbRegistryUser {
     
@@ -73,13 +74,13 @@ public class SDbEmployee extends SDbRegistryUser {
     protected int mnFkRecruitmentSchemeTypeId;
     protected int mnFkPositionRiskTypeId;
     protected int mnFkWorkingDayTypeId;
-    protected int mnFkCatalogueSexCategoryId;
+    protected int mnFkCatalogueSexClassId;
     protected int mnFkCatalogueSexTypeId;
-    protected int mnFkCatalogueBloodTypeCategoryId;
+    protected int mnFkCatalogueBloodTypeClassId;
     protected int mnFkCatalogueBloodTypeTypeId;
-    protected int mnFkCatalogueMaritalStatusCategoryId;
+    protected int mnFkCatalogueMaritalStatusClassId;
     protected int mnFkCatalogueMaritalStatusTypeId;
-    protected int mnFkCatalogueEducationCategoryId;
+    protected int mnFkCatalogueEducationClassId;
     protected int mnFkCatalogueEducationTypeId;
     protected int mnFkBankId_n;
     /*
@@ -167,13 +168,13 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setFkRecruitmentSchemeTypeId(int n) { mnFkRecruitmentSchemeTypeId = n; }
     public void setFkPositionRiskTypeId(int n) { mnFkPositionRiskTypeId = n; }
     public void setFkWorkingDayTypeId(int n) { mnFkWorkingDayTypeId = n; }
-    public void setFkCatalogueSexCategoryId(int n) { mnFkCatalogueSexCategoryId = n; }
+    public void setFkCatalogueSexClassId(int n) { mnFkCatalogueSexClassId = n; }
     public void setFkCatalogueSexTypeId(int n) { mnFkCatalogueSexTypeId = n; }
-    public void setFkCatalogueBloodTypeCategoryId(int n) { mnFkCatalogueBloodTypeCategoryId = n; }
+    public void setFkCatalogueBloodTypeClassId(int n) { mnFkCatalogueBloodTypeClassId = n; }
     public void setFkCatalogueBloodTypeTypeId(int n) { mnFkCatalogueBloodTypeTypeId = n; }
-    public void setFkCatalogueMaritalStatusCategoryId(int n) { mnFkCatalogueMaritalStatusCategoryId = n; }
+    public void setFkCatalogueMaritalStatusClassId(int n) { mnFkCatalogueMaritalStatusClassId = n; }
     public void setFkCatalogueMaritalStatusTypeId(int n) { mnFkCatalogueMaritalStatusTypeId = n; }
-    public void setFkCatalogueEducationCategoryId(int n) { mnFkCatalogueEducationCategoryId = n; }
+    public void setFkCatalogueEducationClassId(int n) { mnFkCatalogueEducationClassId = n; }
     public void setFkCatalogueEducationTypeId(int n) { mnFkCatalogueEducationTypeId = n; }
     public void setFkBankId_n(int n) { mnFkBankId_n = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -215,13 +216,13 @@ public class SDbEmployee extends SDbRegistryUser {
     public int getFkRecruitmentSchemeTypeId() { return mnFkRecruitmentSchemeTypeId; }
     public int getFkPositionRiskTypeId() { return mnFkPositionRiskTypeId; }
     public int getFkWorkingDayTypeId() { return mnFkWorkingDayTypeId; }
-    public int getFkCatalogueSexCategoryId() { return mnFkCatalogueSexCategoryId; }
+    public int getFkCatalogueSexClassId() { return mnFkCatalogueSexClassId; }
     public int getFkCatalogueSexTypeId() { return mnFkCatalogueSexTypeId; }
-    public int getFkCatalogueBloodTypeCategoryId() { return mnFkCatalogueBloodTypeCategoryId; }
+    public int getFkCatalogueBloodTypeClassId() { return mnFkCatalogueBloodTypeClassId; }
     public int getFkCatalogueBloodTypeTypeId() { return mnFkCatalogueBloodTypeTypeId; }
-    public int getFkCatalogueMaritalStatusCategoryId() { return mnFkCatalogueMaritalStatusCategoryId; }
+    public int getFkCatalogueMaritalStatusClassId() { return mnFkCatalogueMaritalStatusClassId; }
     public int getFkCatalogueMaritalStatusTypeId() { return mnFkCatalogueMaritalStatusTypeId; }
-    public int getFkCatalogueEducationCategoryId() { return mnFkCatalogueEducationCategoryId; }
+    public int getFkCatalogueEducationClassId() { return mnFkCatalogueEducationClassId; }
     public int getFkCatalogueEducationTypeId() { return mnFkCatalogueEducationTypeId; }
     public int getFkBankId_n() { return mnFkBankId_n; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -307,13 +308,13 @@ public class SDbEmployee extends SDbRegistryUser {
         mnFkRecruitmentSchemeTypeId = 0;
         mnFkPositionRiskTypeId = 0;
         mnFkWorkingDayTypeId = 0;
-        mnFkCatalogueSexCategoryId = 0;
+        mnFkCatalogueSexClassId = 0;
         mnFkCatalogueSexTypeId = 0;
-        mnFkCatalogueBloodTypeCategoryId = 0;
+        mnFkCatalogueBloodTypeClassId = 0;
         mnFkCatalogueBloodTypeTypeId = 0;
-        mnFkCatalogueMaritalStatusCategoryId = 0;
+        mnFkCatalogueMaritalStatusClassId = 0;
         mnFkCatalogueMaritalStatusTypeId = 0;
-        mnFkCatalogueEducationCategoryId = 0;
+        mnFkCatalogueEducationClassId = 0;
         mnFkCatalogueEducationTypeId = 0;
         mnFkBankId_n = 0;
         mnFkUserInsertId = 0;
@@ -411,13 +412,13 @@ public class SDbEmployee extends SDbRegistryUser {
             mnFkRecruitmentSchemeTypeId = resultSet.getInt("fk_tp_rec_sche");
             mnFkPositionRiskTypeId = resultSet.getInt("fk_tp_pos_risk");
             mnFkWorkingDayTypeId = resultSet.getInt("fk_tp_work_day");
-            mnFkCatalogueSexCategoryId = resultSet.getInt("fk_cl_cat_sex");
+            mnFkCatalogueSexClassId = resultSet.getInt("fk_cl_cat_sex");
             mnFkCatalogueSexTypeId = resultSet.getInt("fk_tp_cat_sex");
-            mnFkCatalogueBloodTypeCategoryId = resultSet.getInt("fk_cl_cat_blo");
+            mnFkCatalogueBloodTypeClassId = resultSet.getInt("fk_cl_cat_blo");
             mnFkCatalogueBloodTypeTypeId = resultSet.getInt("fk_tp_cat_blo");
-            mnFkCatalogueMaritalStatusCategoryId = resultSet.getInt("fk_cl_cat_mar");
+            mnFkCatalogueMaritalStatusClassId = resultSet.getInt("fk_cl_cat_mar");
             mnFkCatalogueMaritalStatusTypeId = resultSet.getInt("fk_tp_cat_mar");
-            mnFkCatalogueEducationCategoryId = resultSet.getInt("fk_cl_cat_edu");
+            mnFkCatalogueEducationClassId = resultSet.getInt("fk_cl_cat_edu");
             mnFkCatalogueEducationTypeId = resultSet.getInt("fk_tp_cat_edu");
             mnFkBankId_n = resultSet.getInt("fk_bank_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
@@ -502,13 +503,13 @@ public class SDbEmployee extends SDbRegistryUser {
                     mnFkRecruitmentSchemeTypeId + ", " + 
                     mnFkPositionRiskTypeId + ", " + 
                     mnFkWorkingDayTypeId + ", " + 
-                    mnFkCatalogueSexCategoryId + ", " + 
+                    mnFkCatalogueSexClassId + ", " + 
                     mnFkCatalogueSexTypeId + ", " + 
-                    mnFkCatalogueBloodTypeCategoryId + ", " + 
+                    mnFkCatalogueBloodTypeClassId + ", " + 
                     mnFkCatalogueBloodTypeTypeId + ", " + 
-                    mnFkCatalogueMaritalStatusCategoryId + ", " + 
+                    mnFkCatalogueMaritalStatusClassId + ", " + 
                     mnFkCatalogueMaritalStatusTypeId + ", " + 
-                    mnFkCatalogueEducationCategoryId + ", " + 
+                    mnFkCatalogueEducationClassId + ", " + 
                     mnFkCatalogueEducationTypeId + ", " + 
                     (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
                     mnFkUserInsertId + ", " + 
@@ -559,13 +560,13 @@ public class SDbEmployee extends SDbRegistryUser {
                     "fk_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId + ", " +
                     "fk_tp_pos_risk = " + mnFkPositionRiskTypeId + ", " +
                     "fk_tp_work_day = " + mnFkWorkingDayTypeId + ", " +
-                    "fk_cl_cat_sex = " + mnFkCatalogueSexCategoryId + ", " +
+                    "fk_cl_cat_sex = " + mnFkCatalogueSexClassId + ", " +
                     "fk_tp_cat_sex = " + mnFkCatalogueSexTypeId + ", " +
-                    "fk_cl_cat_blo = " + mnFkCatalogueBloodTypeCategoryId + ", " +
+                    "fk_cl_cat_blo = " + mnFkCatalogueBloodTypeClassId + ", " +
                     "fk_tp_cat_blo = " + mnFkCatalogueBloodTypeTypeId + ", " +
-                    "fk_cl_cat_mar = " + mnFkCatalogueMaritalStatusCategoryId + ", " +
+                    "fk_cl_cat_mar = " + mnFkCatalogueMaritalStatusClassId + ", " +
                     "fk_tp_cat_mar = " + mnFkCatalogueMaritalStatusTypeId + ", " +
-                    "fk_cl_cat_edu = " + mnFkCatalogueEducationCategoryId + ", " +
+                    "fk_cl_cat_edu = " + mnFkCatalogueEducationClassId + ", " +
                     "fk_tp_cat_edu = " + mnFkCatalogueEducationTypeId + ", " +
                     "fk_bank_n = " + (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -577,21 +578,21 @@ public class SDbEmployee extends SDbRegistryUser {
         
         session.getStatement().execute(msSql);
 
-            if (moAuxImagePhoto_n != null) {
-                msSql = "UPDATE erp.hrsu_emp SET img_pho_n = ? WHERE id_emp = " + mnPkEmployeeId + " ";
-                
-                preparedStatementmagePhoto_n = session.getStatement().getConnection().prepareStatement(msSql);
-                preparedStatementmagePhoto_n.setBytes(1, moAuxImagePhoto_n);
-                preparedStatementmagePhoto_n.execute();
-            }
-            
-            if (moAuxImageSignature_n != null) {
-                msSql = "UPDATE erp.hrsu_emp SET img_sig_n = ? WHERE id_emp = " + mnPkEmployeeId + " ";
-                
-                preparedStatementmageSignature_n = session.getStatement().getConnection().prepareStatement(msSql);
-                preparedStatementmageSignature_n.setBytes(1, moAuxImageSignature_n);
-                preparedStatementmageSignature_n.execute();
-            }
+        if (moAuxImagePhoto_n != null) {
+            msSql = "UPDATE erp.hrsu_emp SET img_pho_n = ? WHERE id_emp = " + mnPkEmployeeId + " ";
+
+            preparedStatementmagePhoto_n = session.getStatement().getConnection().prepareStatement(msSql);
+            preparedStatementmagePhoto_n.setBytes(1, moAuxImagePhoto_n);
+            preparedStatementmagePhoto_n.execute();
+        }
+
+        if (moAuxImageSignature_n != null) {
+            msSql = "UPDATE erp.hrsu_emp SET img_sig_n = ? WHERE id_emp = " + mnPkEmployeeId + " ";
+
+            preparedStatementmageSignature_n = session.getStatement().getConnection().prepareStatement(msSql);
+            preparedStatementmageSignature_n.setBytes(1, moAuxImageSignature_n);
+            preparedStatementmageSignature_n.execute();
+        }
 
         if (mbRegistryNew || mbActive != mbAuxActive) {
             //createHireLog(session);
@@ -663,13 +664,13 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setFkRecruitmentSchemeTypeId(this.getFkRecruitmentSchemeTypeId());
         registry.setFkPositionRiskTypeId(this.getFkPositionRiskTypeId());
         registry.setFkWorkingDayTypeId(this.getFkWorkingDayTypeId());
-        registry.setFkCatalogueSexCategoryId(this.getFkCatalogueSexCategoryId());
+        registry.setFkCatalogueSexClassId(this.getFkCatalogueSexClassId());
         registry.setFkCatalogueSexTypeId(this.getFkCatalogueSexTypeId());
-        registry.setFkCatalogueBloodTypeCategoryId(this.getFkCatalogueBloodTypeCategoryId());
+        registry.setFkCatalogueBloodTypeClassId(this.getFkCatalogueBloodTypeClassId());
         registry.setFkCatalogueBloodTypeTypeId(this.getFkCatalogueBloodTypeTypeId());
-        registry.setFkCatalogueMaritalStatusCategoryId(this.getFkCatalogueMaritalStatusCategoryId());
+        registry.setFkCatalogueMaritalStatusClassId(this.getFkCatalogueMaritalStatusClassId());
         registry.setFkCatalogueMaritalStatusTypeId(this.getFkCatalogueMaritalStatusTypeId());
-        registry.setFkCatalogueEducationCategoryId(this.getFkCatalogueEducationCategoryId());
+        registry.setFkCatalogueEducationClassId(this.getFkCatalogueEducationClassId());
         registry.setFkCatalogueEducationTypeId(this.getFkCatalogueEducationTypeId());
         registry.setFkBankId_n(this.getFkBankId_n());
         registry.setFkUserInsertId(this.getFkUserInsertId());
@@ -677,6 +678,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 

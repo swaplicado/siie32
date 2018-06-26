@@ -67,6 +67,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenu jmCat;
     private javax.swing.JMenuItem jmiCatEmployee;
     private javax.swing.JMenuItem jmiCatEmployeeIntegral;
+    private javax.swing.JMenuItem jmiCatEmployeeRelatives;
     private javax.swing.JMenuItem jmiCatEmployeeHireLog;
     private javax.swing.JMenuItem jmiCatEmployeeWageLog;
     private javax.swing.JMenuItem jmiCatEmployeeSscBaseLog;
@@ -200,6 +201,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat = new JMenu("Catálogos");
         jmiCatEmployee = new JMenuItem("Empleados");
         jmiCatEmployeeIntegral = new JMenuItem("Consulta integral de empleados");
+        jmiCatEmployeeRelatives = new JMenuItem("Datos personales de empleados");
         jmiCatEmployeeHireLog = new JMenuItem("Bitácora de altas y bajas");
         jmiCatEmployeeWageLog = new JMenuItem("Bitácora de sueldos y salarios");
         jmiCatEmployeeSscBaseLog = new JMenuItem("Bitácora de salarios base de cotización");
@@ -222,6 +224,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmCat.add(jmiCatEmployee);
         jmCat.add(jmiCatEmployeeIntegral);
+        jmCat.add(jmiCatEmployeeRelatives);
+        jmCat.addSeparator();
         jmCat.add(jmiCatEmployeeHireLog);
         jmCat.add(jmiCatEmployeeWageLog);
         jmCat.add(jmiCatEmployeeSscBaseLog);
@@ -392,6 +396,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmiCatEmployee.addActionListener(this);
         jmiCatEmployeeIntegral.addActionListener(this);
+        jmiCatEmployeeRelatives.addActionListener(this);
         jmiCatEmployeeHireLog.addActionListener(this);
         jmiCatEmployeeWageLog.addActionListener(this);
         jmiCatEmployeeSscBaseLog.addActionListener(this);
@@ -488,6 +493,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
         jmiCatEmployee.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight);
         jmiCatEmployeeIntegral.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight);
+        jmiCatEmployeeRelatives.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight);
         jmiCatEmployeeHireLog.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
         jmiCatEmployeeWageLog.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
         jmiCatEmployeeSscBaseLog.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
@@ -802,6 +808,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCatEmployeeIntegral) {
                 showPanelQueryIntegralEmployee(SModConsts.HRSX_EMP_INT);
+            }
+            else if (item == jmiCatEmployeeRelatives) {
+                miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showView(SDataConstants.BPSX_BP_EMP_REL);
             }
             else if (item == jmiCatEmployeeHireLog) {
                 miClient.getSession().showView(SModConsts.HRS_EMP_LOG_HIRE, SLibConsts.UNDEFINED, null);

@@ -832,9 +832,6 @@ public abstract class SModSysConsts {
     public static final int HRSS_CL_HRS_CAT_MAR = 3; // Marital Status
     public static final int HRSS_CL_HRS_CAT_EDU = 4; // Level Of Education
 
-    public static final int[] HRSS_TP_HRS_CAT_MAL = new int[] { 1, 1 }; // Male
-    public static final int[] HRSS_TP_HRS_CAT_FEM = new int[] { 1, 2 }; // Female
-
     public static final int HRSS_TP_PAY_WEE = 1;    // Weekly 
     public static final int HRSS_TP_PAY_FOR = 2;    // Fortnightly 
 

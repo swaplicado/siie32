@@ -14,7 +14,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbAccountingPayrollEmployee extends SDbRegistryUser {
 
@@ -186,6 +186,7 @@ public class SDbAccountingPayrollEmployee extends SDbRegistryUser {
         registry.setFkRecordRecordTypeId(this.getFkRecordRecordTypeId());
         registry.setFkRecordNumberId(this.getFkRecordNumberId());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }

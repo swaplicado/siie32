@@ -24,7 +24,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbAccountingEarning extends SDbRegistryUser {
 
@@ -309,7 +309,6 @@ public class SDbAccountingEarning extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.setRegistryNew(true);
-
         return registry;
     }
 }

@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbEarning extends SDbRegistryUser {
 
@@ -484,6 +484,7 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setAuxAccountingConfigurationTypeId(this.getAuxAccountingConfigurationTypeId());
         //registry.getAccountingEarning().addAll(this.getAccountingEarning()); XXX (jbarajas, 2016-08-05) slowly open payroll
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }
