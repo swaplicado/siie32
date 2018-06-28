@@ -118,7 +118,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         }
 
         int column = 0;
-        STableColumn[] aoTableColumns = new STableColumn[59];
+        STableColumn[] aoTableColumns = new STableColumn[60];
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Empleado", 250);
         aoTableColumns[column] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Clave", 50);
         aoTableColumns[column++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
@@ -148,6 +148,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_mate_age", "Cónyuge edad", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cmate.name", "Cónyuge sexo", 75);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "er.b_mate_dec", "Cónyuge finado", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_parent", "Es mamá/papá", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.son_1", "Hijo 1", 200);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "er.son_dt_bir_1_n", "Hijo 1 nacimiento", STableConstants.WIDTH_DATE);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_son1_age", "Hijo 1 edad", STableConstants.WIDTH_NUM_SMALLINT);
@@ -352,7 +353,8 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(er.son_dt_bir_2_n, '%Y%m')) / 12 AS _son2_age, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(er.son_dt_bir_3_n, '%Y%m')) / 12 AS _son3_age, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(er.son_dt_bir_4_n, '%Y%m')) / 12 AS _son4_age, " +
-                "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(er.son_dt_bir_5_n, '%Y%m')) / 12 AS _son5_age " +
+                "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(er.son_dt_bir_5_n, '%Y%m')) / 12 AS _son5_age, " +
+                "(er.son_1 <> '' OR er.son_2 <> '' OR er.son_3 <> '' OR er.son_4 <> '' OR er.son_5 <> '') _parent " +
                 "FROM erp.bpsu_bp AS bp " +
                 "INNER JOIN erp.usru_usr AS un ON " +
                 "bp.fid_usr_new = un.id_usr " +
