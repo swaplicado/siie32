@@ -212,7 +212,7 @@
                             </Component>
                             <Component class="javax.swing.JFormattedTextField" name="jftAlternativeId">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="XAXX01010100000000"/>
+                                <Property name="text" type="java.lang.String" value="XAXX010101XXXXXX00"/>
                                 <Property name="focusLostBehavior" type="int" value="3"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[150, 23]"/>

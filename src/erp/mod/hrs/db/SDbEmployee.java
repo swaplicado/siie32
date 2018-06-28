@@ -105,31 +105,6 @@ public class SDbEmployee extends SDbRegistryUser {
     protected javax.swing.ImageIcon moXtaImageIconPhoto_n;
     protected javax.swing.ImageIcon moXtaImageIconSignature_n;
     
-    private void createHireLog(SGuiSession session) throws SQLException, Exception {
-        SDbEmployeeHireLog employeeHireLog = null;
-        
-        if (moXtaEmployeeHireLog == null) {
-            employeeHireLog = new SDbEmployeeHireLog();
-        }
-        else {
-            employeeHireLog = moXtaEmployeeHireLog;
-        }
-
-        employeeHireLog.setPkEmployeeId(mnPkEmployeeId);
-        if (mbActive) {
-            employeeHireLog.setDateHire(mtXtaDate);
-            employeeHireLog.setNotesHire(msXtaNotes);
-        }
-        else {
-            employeeHireLog.setDateDismissed_n(mtXtaDate);
-            employeeHireLog.setNotesDismissed(msXtaNotes);
-        }
-        employeeHireLog.setHired(mbActive);
-        employeeHireLog.setFkEmployeeDismissTypeId(mnXtaEmployeeDismissTypeId);
-
-        employeeHireLog.save(session);
-    }
-    
     public SDbEmployee() {
         super(SModConsts.HRSU_EMP);
     }
@@ -259,6 +234,18 @@ public class SDbEmployee extends SDbRegistryUser {
     
     public javax.swing.ImageIcon getXtaImageIconPhoto_n() { return moXtaImageIconPhoto_n; }
     public javax.swing.ImageIcon getXtaImageIconSignature_n() { return moXtaImageIconSignature_n; }
+    
+    public boolean isAssimilable() {
+        return SLibUtils.belongsTo(mnFkRecruitmentSchemeTypeId, new int[] { 
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA,
+            SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH
+        });
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {

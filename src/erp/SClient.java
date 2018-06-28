@@ -106,7 +106,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 119.00";
+    public static final String APP_RELEASE = "3.2 120.00";
     public static final String APP_COPYRIGHT = "2007-2018";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -277,8 +277,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jmiViewModuleMkt = new javax.swing.JMenuItem();
         jmiViewModuleLog = new javax.swing.JMenuItem();
         jmiViewModuleMfg = new javax.swing.JMenuItem();
-        jmiViewModuleHrs = new javax.swing.JMenuItem();
         jmiViewModuleQlt = new javax.swing.JMenuItem();
+        jmiViewModuleHrs = new javax.swing.JMenuItem();
         jmHelp = new javax.swing.JMenu();
         jmiHelpAbout = new javax.swing.JMenuItem();
 
@@ -585,29 +585,24 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         jmiViewModuleMkt.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_6, java.awt.event.InputEvent.CTRL_MASK));
         jmiViewModuleMkt.setText("Módulo comercialización");
-        jmiViewModuleMkt.setEnabled(false);
         jmView.add(jmiViewModuleMkt);
 
         jmiViewModuleLog.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_7, java.awt.event.InputEvent.CTRL_MASK));
         jmiViewModuleLog.setText("Módulo embarques");
-        jmiViewModuleLog.setEnabled(false);
         jmView.add(jmiViewModuleLog);
 
         jmiViewModuleMfg.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_8, java.awt.event.InputEvent.CTRL_MASK));
         jmiViewModuleMfg.setText("Módulo producción");
-        jmiViewModuleMfg.setEnabled(false);
         jmView.add(jmiViewModuleMfg);
 
-        jmiViewModuleHrs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_9, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleHrs.setText("Módulo calidad");
-        jmiViewModuleHrs.setEnabled(false);
-        jmiViewModuleHrs.setInheritsPopupMenu(true);
-        jmView.add(jmiViewModuleHrs);
-
-        jmiViewModuleQlt.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleQlt.setText("Módulo recursos humanos");
-        jmiViewModuleQlt.setEnabled(false);
+        jmiViewModuleQlt.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_9, java.awt.event.InputEvent.CTRL_MASK));
+        jmiViewModuleQlt.setText("Módulo calidad");
+        jmiViewModuleQlt.setInheritsPopupMenu(true);
         jmView.add(jmiViewModuleQlt);
+
+        jmiViewModuleHrs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0, java.awt.event.InputEvent.CTRL_MASK));
+        jmiViewModuleHrs.setText("Módulo recursos humanos");
+        jmView.add(jmiViewModuleHrs);
 
         jMenuBar.add(jmView);
 
@@ -770,8 +765,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtbModuleMkt.addActionListener(this);
         jtbModuleLog.addActionListener(this);
         jtbModuleMfg.addActionListener(this);
-        jtbModuleHrs.addActionListener(this);
         jtbModuleQlt.addActionListener(this);
+        jtbModuleHrs.addActionListener(this);
         jmiFileCurrentDate.addActionListener(this);
         jmiFileSession.addActionListener(this);
         jmiFilePassword.addActionListener(this);
@@ -786,8 +781,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jmiViewModuleMkt.addActionListener(this);
         jmiViewModuleLog.addActionListener(this);
         jmiViewModuleMfg.addActionListener(this);
-        jmiViewModuleHrs.addActionListener(this);
         jmiViewModuleQlt.addActionListener(this);
+        jmiViewModuleHrs.addActionListener(this);
         jmiHelpAbout.addActionListener(this);
         jbCurrentDate.addActionListener(this);
         jbSession.addActionListener(this);
@@ -885,8 +880,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             jmiViewModuleMkt.setEnabled(false);
             jmiViewModuleLog.setEnabled(false);
             jmiViewModuleMfg.setEnabled(false);
-            jmiViewModuleHrs.setEnabled(false);
             jmiViewModuleQlt.setEnabled(false);
+            jmiViewModuleHrs.setEnabled(false);
             
             jButtonGroup.clearSelection();
             jtbModuleCfg.setEnabled(false);
@@ -897,8 +892,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             jtbModuleMkt.setEnabled(false);
             jtbModuleLog.setEnabled(false);
             jtbModuleMfg.setEnabled(false);            
-            jtbModuleHrs.setEnabled(false);
             jtbModuleQlt.setEnabled(false);
+            jtbModuleHrs.setEnabled(false);
 
             jlLogo.setIcon(null);
 
@@ -980,18 +975,18 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 jtbModuleMfg.setEnabled(true);
             }
             
-            if (moSessionXXX.getCompany().getIsModuleHrs() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_HRS, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
-                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_HRS))) {
-                jmiViewModuleHrs.setEnabled(true);
-                jtbModuleHrs.setEnabled(true);
-            }
-
             if (moSessionXXX.getCompany().getIsModuleQty() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_QLT, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_QLT))) {
                 jmiViewModuleQlt.setEnabled(true);
                 jtbModuleQlt.setEnabled(true);
             }
             
+            if (moSessionXXX.getCompany().getIsModuleHrs() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_HRS, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_HRS))) {
+                jmiViewModuleHrs.setEnabled(true);
+                jtbModuleHrs.setEnabled(true);
+            }
+
             jlLogo.setIcon(moSessionXXX.getParamsCompany().getExtraLogoImageIcon_n());
         }
     }
@@ -1324,14 +1319,14 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         renderMenues(moModuleMfg.getMenues());
     }
 
+    private void actionModuleQlt() {
+        jtbModuleQlt.setSelected(true);
+        renderMenues(moModuleQlt.getMenues());
+    }
+    
     private void actionModuleHrs() {
         jtbModuleHrs.setSelected(true);
         renderMenues(moModuleHrs.getMenues());
-    }
-    
-    private void actionModuleQty() {
-        jtbModuleQlt.setSelected(true);
-        renderMenues(moModuleQlt.getMenues());
     }
     
     private void actionFileCurrentDate() {
@@ -1812,7 +1807,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 actionModuleHrs();
             }
             else if (toggleButton == jtbModuleQlt) {
-                actionModuleQty();
+                actionModuleQlt();
             }            
         }
         else if (e.getSource() instanceof javax.swing.JMenuItem) {
@@ -1860,12 +1855,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             else if (item == jmiViewModuleMfg) {
                 actionModuleMfg();
             }         
+            else if (item == jmiViewModuleQlt) {
+                actionModuleQlt();
+            }               
             else if (item == jmiViewModuleHrs) {
                 actionModuleHrs();
             }
-            else if (item == jmiViewModuleQlt) {
-                actionModuleQty();
-            }               
             else if (item == jmiHelpAbout) {
                 actionHelpAbout();
             }

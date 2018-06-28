@@ -46,21 +46,21 @@ public class SHrsPayroll {
         moPayroll = null;
         moPayrollDataProvider = null;
 
-        maLoanTypeAdjustment = new ArrayList<SDbLoanTypeAdjustment>();
-        maUmas = new ArrayList<SDbUma>();
-        maHolidays = new ArrayList<SDbHoliday>();
-        maTaxTables = new ArrayList<SDbTaxTable>();
-        maTaxSubsidyTables = new ArrayList<SDbTaxSubsidyTable>();
-        maSsContributionTables = new ArrayList<SDbSsContributionTable>();
-        maBenefitTables = new ArrayList<SDbBenefitTable>();
-        maBenefitTablesAnniversarys = new ArrayList<SHrsBenefitTableByAnniversary>();
-        maMwzTypeWages = new ArrayList<SDbMwzTypeWage>();
-        maEarnigs = new ArrayList<SDbEarning>();
-        maDeductions = new ArrayList<SDbDeduction>();
-        maAutomaticEarnings = new ArrayList<SDbAutomaticEarning>();
-        maAutomaticDeductions = new ArrayList<SDbAutomaticDeduction>();
-        maEmployees = new ArrayList<SDbEmployee>();
-        maReceipts = new ArrayList<SHrsPayrollReceipt>();
+        maLoanTypeAdjustment = new ArrayList<>();
+        maUmas = new ArrayList<>();
+        maHolidays = new ArrayList<>();
+        maTaxTables = new ArrayList<>();
+        maTaxSubsidyTables = new ArrayList<>();
+        maSsContributionTables = new ArrayList<>();
+        maBenefitTables = new ArrayList<>();
+        maBenefitTablesAnniversarys = new ArrayList<>();
+        maMwzTypeWages = new ArrayList<>();
+        maEarnigs = new ArrayList<>();
+        maDeductions = new ArrayList<>();
+        maAutomaticEarnings = new ArrayList<>();
+        maAutomaticDeductions = new ArrayList<>();
+        maEmployees = new ArrayList<>();
+        maReceipts = new ArrayList<>();
         mbIsLastPayrollPeriod = false;
     }
 

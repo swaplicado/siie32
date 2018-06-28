@@ -166,7 +166,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 aoTableColumns = new STableColumn[26];
                 break;
             case SDataConstants.BPSX_BP_EMP:
-                aoTableColumns = new STableColumn[53];
+                aoTableColumns = new STableColumn[54];
                 break;
             default:
                 break;
@@ -306,6 +306,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ssn", "NSS", 75);
             aoTableColumns[i++].setApostropheOnCsvRequired(true);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_bir", "Nacimiento", STableConstants.WIDTH_DATE);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_e_age", "Edad", STableConstants.WIDTH_NUM_SMALLINT);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_ben", "Inicio beneficios", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_hire", "Última alta", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_dis_n", "Última baja", STableConstants.WIDTH_DATE);
@@ -679,7 +680,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 (mnTabTypeAux01 != SDataConstants.BPSX_BP_EMP ? "" :
                 "CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.ssn, e.dt_bir, e.dt_ben, e.dt_hire, e.dt_dis_n, IF(" + mbHasRightEmpWage + ", e.sal, 0) AS f_sal, IF(" + mbHasRightEmpWage + ", e.dt_sal, NULL) AS f_dt_sal, IF(" + mbHasRightEmpWage + ", e.wage, 0) AS f_wage, " +
                 "IF(" + mbHasRightEmpWage + ", e.dt_wage, NULL) AS f_dt_wage, IF(" + mbHasRightEmpWage + ", e.sal_ssc, 0) AS f_sal_ssc, IF(" + mbHasRightEmpWage + ", e.dt_sal_ssc, NULL) AS f_dt_sal_ssc, e.wrk_hrs_day, e.bank_acc, e.b_mfg_ope, e.b_act, e.b_uni, " +
-                "pay.name, sal.name, emp.name, wrk.name, wrktp.name, mwz.name, dep.name, pos.name, sht.name, con.name, rshe.name, risk.name, bank.name, ") +
+                "pay.name, sal.name, emp.name, wrk.name, wrktp.name, mwz.name, dep.name, pos.name, sht.name, con.name, rshe.name, risk.name, bank.name, " +
+                "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_bir, '%Y%m')) / 12 AS _e_age, ") +
                 "bp.fid_usr_new, bp.fid_usr_edit, bp.fid_usr_del, bp.ts_new, bp.ts_edit, bp.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM erp.bpsu_bp AS bp " +
                 "INNER JOIN erp.bpss_tp_bp_idy AS tp_bp ON " +

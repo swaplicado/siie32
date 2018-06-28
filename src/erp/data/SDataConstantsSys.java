@@ -173,7 +173,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_FIN_BKC = 102007;
     public static final int PRV_FIN_CHECK = 102008;
     public static final int PRV_FIN_TAX_GRP = 102009;
-    public static final int PRV_FIN_REG = 102010;
+    public static final int PRV_FIN_REC = 102010;
     public static final int PRV_FIN_ACC_BP = 102011;
     public static final int PRV_FIN_ACC_ITEM = 102012;
     public static final int PRV_FIN_DPS_DNS = 102013;

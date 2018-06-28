@@ -519,28 +519,48 @@ public class SFormUserRightEntry extends javax.swing.JDialog implements erp.lib.
             moFieldPkCompanyId.setFieldValue(new int[0]);
             moFieldFkTypeRightId.setFieldValue(new int[] { moUserRoleUser.getDbmsFkTypeRoleId() });
             moFieldPkRightId.setFieldValue(new int[] { moUserRoleUser.getPkRoleId() });
-            moFieldFkAccessLevelId.setFieldValue(new int[] { moUserRoleUser.getFkLevelTypeId() });
+            if (moUserRoleUser.getFkLevelTypeId() == SLibConstants.UNDEFINED) {
+                jcbFkAccessLevelId.setSelectedIndex(1); // (SIN ACCESO), otherwise unselectable due to its value of 0 that is equals as "select option"
+            }
+            else {
+                moFieldFkAccessLevelId.setFieldValue(new int[] { moUserRoleUser.getFkLevelTypeId() });
+            }
         }
         else if (mnParamUserRightType == SDataConstants.USRU_PRV_USR) {
             moUserPrivilegeUser = (SDataUserPrivilegeUser) registry;
             moFieldPkCompanyId.setFieldValue(new int[0]);
             moFieldFkTypeRightId.setFieldValue(new int[] { moUserPrivilegeUser.getDbmsFkTypePrivilegeId() });
             moFieldPkRightId.setFieldValue(new int[] { moUserPrivilegeUser.getPkPrivilegeId() });
-            moFieldFkAccessLevelId.setFieldValue(new int[] { moUserPrivilegeUser.getFkLevelTypeId() });
+            if (moUserPrivilegeUser.getFkLevelTypeId() == SLibConstants.UNDEFINED) {
+                jcbFkAccessLevelId.setSelectedIndex(1); // (SIN ACCESO), otherwise unselectable due to its value of 0 that is equals as "select option"
+            }
+            else {
+                moFieldFkAccessLevelId.setFieldValue(new int[] { moUserPrivilegeUser.getFkLevelTypeId() });
+            }
         }
         else if (mnParamUserRightType == SDataConstants.USRU_ROL_CO) {
             moUserRoleCompany = (SDataUserRoleCompany) registry;
             moFieldPkCompanyId.setFieldValue(new int[] { moUserRoleCompany.getPkCompanyId() });
             moFieldFkTypeRightId.setFieldValue(new int[] { moUserRoleCompany.getDbmsFkTypeRoleId()});
             moFieldPkRightId.setFieldValue(new int[] { moUserRoleCompany.getPkRoleId() });
-            moFieldFkAccessLevelId.setFieldValue(new int[] { moUserRoleCompany.getFkLevelTypeId() });
+            if (moUserRoleCompany.getFkLevelTypeId() == SLibConstants.UNDEFINED) {
+                jcbFkAccessLevelId.setSelectedIndex(1); // (SIN ACCESO), otherwise unselectable due to its value of 0 that is equals as "select option"
+            }
+            else {
+                moFieldFkAccessLevelId.setFieldValue(new int[] { moUserRoleCompany.getFkLevelTypeId() });
+            }
         }
         else if (mnParamUserRightType == SDataConstants.USRU_PRV_CO) {
             moUserPrivilegeCompany = (SDataUserPrivilegeCompany) registry;
             moFieldPkCompanyId.setFieldValue(new int[] { moUserPrivilegeCompany.getPkCompanyId() });
             moFieldFkTypeRightId.setFieldValue(new int[] { moUserPrivilegeCompany.getDbmsFkTypePrivilegeId() });
             moFieldPkRightId.setFieldValue(new int[] { moUserPrivilegeCompany.getPkPrivilegeId() });
-            moFieldFkAccessLevelId.setFieldValue(new int[] { moUserPrivilegeCompany.getFkLevelTypeId() });
+            if (moUserPrivilegeCompany.getFkLevelTypeId() == SLibConstants.UNDEFINED) {
+                jcbFkAccessLevelId.setSelectedIndex(1); // (SIN ACCESO), otherwise unselectable due to its value of 0 that is equals as "select option"
+            }
+            else {
+                moFieldFkAccessLevelId.setFieldValue(new int[] { moUserPrivilegeCompany.getFkLevelTypeId() });
+            }
         }
 
         renderCompanySettings();
@@ -556,11 +576,11 @@ public class SFormUserRightEntry extends javax.swing.JDialog implements erp.lib.
             case SDataConstants.USRU_ROL_USR:
                 if (moUserRoleUser == null)  moUserRoleUser = new SDataUserRoleUser();
                 moUserRoleUser.setPkRoleId(moFieldPkRightId.getKeyAsIntArray()[0]);
-                moUserRoleUser.setFkLevelTypeId(moFieldFkAccessLevelId.getKeyAsIntArray()[0] == 0 ? SUtilConsts.LEV_MANAGER : moFieldFkAccessLevelId.getKeyAsIntArray()[0]);
+                moUserRoleUser.setFkLevelTypeId(!jcbFkAccessLevelId.isEnabled() ? SUtilConsts.LEV_MANAGER : moFieldFkAccessLevelId.getKeyAsIntArray()[0]);
                 moUserRoleUser.setDbmsFkTypeRoleId(moFieldFkTypeRightId.getKeyAsIntArray()[0]);
                 moUserRoleUser.setDbmsTypeRole(moFieldFkTypeRightId.getString());
                 moUserRoleUser.setDbmsRole(jcbPkRightId.getSelectedItem().toString());
-                moUserRoleUser.setDbmsLevelType(moFieldFkAccessLevelId.getKeyAsIntArray()[0] == 0 ? "ADMINISTRADOR" : jcbFkAccessLevelId.getSelectedItem().toString());
+                moUserRoleUser.setDbmsLevelType(!jcbFkAccessLevelId.isEnabled() ? "ADMINISTRADOR" : jcbFkAccessLevelId.getSelectedItem().toString());
                 registry = moUserRoleUser;
                 break;
             case SDataConstants.USRU_PRV_USR:
@@ -568,10 +588,10 @@ public class SFormUserRightEntry extends javax.swing.JDialog implements erp.lib.
                     moUserPrivilegeUser = new SDataUserPrivilegeUser();
                 }
                 moUserPrivilegeUser.setPkPrivilegeId(moFieldPkRightId.getKeyAsIntArray()[0]);
-                moUserPrivilegeUser.setFkLevelTypeId(moFieldFkAccessLevelId.getKeyAsIntArray()[0] == 0 ? SUtilConsts.LEV_MANAGER : moFieldFkAccessLevelId.getKeyAsIntArray()[0]);
+                moUserPrivilegeUser.setFkLevelTypeId(!jcbFkAccessLevelId.isEnabled() ? SUtilConsts.LEV_MANAGER : moFieldFkAccessLevelId.getKeyAsIntArray()[0]);
                 moUserPrivilegeUser.setDbmsFkTypePrivilegeId(moFieldFkTypeRightId.getKeyAsIntArray()[0]);
                 moUserPrivilegeUser.setDbmsPrivilege(jcbPkRightId.getSelectedItem().toString());
-                moUserPrivilegeUser.setDbmsLevelType(moFieldFkAccessLevelId.getKeyAsIntArray()[0] == 0 ? "ADMINISTRADOR" : jcbFkAccessLevelId.getSelectedItem().toString());
+                moUserPrivilegeUser.setDbmsLevelType(!jcbFkAccessLevelId.isEnabled() ? "ADMINISTRADOR" : jcbFkAccessLevelId.getSelectedItem().toString());
                 registry = moUserPrivilegeUser;
                 break;
             case SDataConstants.USRU_ROL_CO:
@@ -580,12 +600,12 @@ public class SFormUserRightEntry extends javax.swing.JDialog implements erp.lib.
                 }
                 moUserRoleCompany.setPkCompanyId(moFieldPkCompanyId.getKeyAsIntArray()[0]);
                 moUserRoleCompany.setPkRoleId(moFieldPkRightId.getKeyAsIntArray()[0]);
-                moUserRoleCompany.setFkLevelTypeId(moFieldFkAccessLevelId.getKeyAsIntArray()[0] == 0 ? SUtilConsts.LEV_MANAGER : moFieldFkAccessLevelId.getKeyAsIntArray()[0]);
+                moUserRoleCompany.setFkLevelTypeId(!jcbFkAccessLevelId.isEnabled() ? SUtilConsts.LEV_MANAGER : moFieldFkAccessLevelId.getKeyAsIntArray()[0]);
                 moUserRoleCompany.setDbmsCompany(jcbPkCompanyId.getSelectedItem().toString());
                 moUserRoleCompany.setDbmsFkTypeRoleId(moFieldFkTypeRightId.getKeyAsIntArray()[0]);
                 moUserRoleCompany.setDbmsTypeRole(moFieldFkTypeRightId.getString());
                 moUserRoleCompany.setDbmsRole(jcbPkRightId.getSelectedItem().toString());
-                moUserRoleCompany.setDbmsLevelType(moFieldFkAccessLevelId.getKeyAsIntArray()[0] == 0 ? "ADMINISTRADOR" : jcbFkAccessLevelId.getSelectedItem().toString());
+                moUserRoleCompany.setDbmsLevelType(!jcbFkAccessLevelId.isEnabled() ? "ADMINISTRADOR" : jcbFkAccessLevelId.getSelectedItem().toString());
                 registry = moUserRoleCompany;
                 break;
             case SDataConstants.USRU_PRV_CO:
@@ -594,11 +614,11 @@ public class SFormUserRightEntry extends javax.swing.JDialog implements erp.lib.
                 }
                 moUserPrivilegeCompany.setPkCompanyId(moFieldPkCompanyId.getKeyAsIntArray()[0]);
                 moUserPrivilegeCompany.setPkPrivilegeId(moFieldPkRightId.getKeyAsIntArray()[0]);
-                moUserPrivilegeCompany.setFkLevelTypeId(moFieldFkAccessLevelId.getKeyAsIntArray()[0] == 0 ? SUtilConsts.LEV_MANAGER : moFieldFkAccessLevelId.getKeyAsIntArray()[0]);
+                moUserPrivilegeCompany.setFkLevelTypeId(!jcbFkAccessLevelId.isEnabled() ? SUtilConsts.LEV_MANAGER : moFieldFkAccessLevelId.getKeyAsIntArray()[0]);
                 moUserPrivilegeCompany.setDbmsCompany(jcbPkCompanyId.getSelectedItem().toString());
                 moUserPrivilegeCompany.setDbmsFkTypePrivilegeId(moFieldFkTypeRightId.getKeyAsIntArray()[0]);
                 moUserPrivilegeCompany.setDbmsPrivilege(jcbPkRightId.getSelectedItem().toString());
-                moUserPrivilegeCompany.setDbmsLevelType(moFieldFkAccessLevelId.getKeyAsIntArray()[0] == 0 ? "ADMINISTRADOR" : jcbFkAccessLevelId.getSelectedItem().toString());
+                moUserPrivilegeCompany.setDbmsLevelType(!jcbFkAccessLevelId.isEnabled() ? "ADMINISTRADOR" : jcbFkAccessLevelId.getSelectedItem().toString());
                 registry = moUserPrivilegeCompany;
                 break;
             default:

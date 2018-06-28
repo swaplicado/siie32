@@ -280,6 +280,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel13.add(jlFirstName);
 
         jtfFirstName.setEditable(false);
+        jtfFirstName.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfFirstName.setText("X");
         jtfFirstName.setToolTipText("");
         jtfFirstName.setFocusable(false);

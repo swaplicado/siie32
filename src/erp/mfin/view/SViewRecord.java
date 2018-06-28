@@ -46,7 +46,7 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
     private erp.mfin.view.SPanelFilterRecordType moPanelFilterRecordType;
 
     /**
-     * @param cliente GUI client.
+     * @param client GUI client.
      * @param tabTitle View's tab title.
      * @param viewType View's tipe. Constants allowed: SDataConstants.FIN_REC = standard view, all accounting records; SUtilConsts.AUD = audited records; SUtilConsts.AUD_PEND = audit pending records.
      */
@@ -56,8 +56,7 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
     }
 
     private void initComponents() {
-        int col = 0;
-        int levelRightEdit = SDataConstantsSys.UNDEFINED;
+        int col;
 
         mjbCopy = new JButton(miClient.getImageIcon(SLibConstants.ICON_COPY));
         mjbCopy.setPreferredSize(new Dimension(23, 23));
@@ -65,21 +64,23 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         mjbCopy.addActionListener(this);
         
         mjbPrintRecord = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
-        mjbPrintRecordCy = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
         mjbPrintRecord.setPreferredSize(new Dimension(23, 23));
-        mjbPrintRecordCy.setPreferredSize(new Dimension(23, 23));
         mjbPrintRecord.setToolTipText("Imprimir póliza, moneda local");
-        mjbPrintRecordCy.setToolTipText("Imprimir póliza, moneda póliza");
         mjbPrintRecord.addActionListener(this);
+        
+        mjbPrintRecordCy = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
+        mjbPrintRecordCy.setPreferredSize(new Dimension(23, 23));
+        mjbPrintRecordCy.setToolTipText("Imprimir póliza, moneda póliza");
         mjbPrintRecordCy.addActionListener(this);
         
         mjbAudit = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE));
-        mjbAuditRevoke = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE_NO));
         mjbAudit.setPreferredSize(new Dimension(23, 23));
-        mjbAuditRevoke.setPreferredSize(new Dimension(23, 23));
         mjbAudit.setToolTipText("Marcar como auditado");
-        mjbAuditRevoke.setToolTipText("Desmarcar como auditado");
         mjbAudit.addActionListener(this);
+        
+        mjbAuditRevoke = new JButton(miClient.getImageIcon(SLibConstants.ICON_APPROVE_NO));
+        mjbAuditRevoke.setPreferredSize(new Dimension(23, 23));
+        mjbAuditRevoke.setToolTipText("Desmarcar como auditado");
         mjbAuditRevoke.addActionListener(this);
 
         moTabFilterDeleted = new STabFilterDeleted(this);
@@ -149,12 +150,12 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         }
 
         SFormUtilities.createActionMap(this, this, "publicActionPrint", "print", KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK);
-        levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_REG).Level;
+        int levelRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_REC).Level;
 
-        jbNew.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
-        jbEdit.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
-        mjbCopy.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
+        jbNew.setEnabled(levelRight >= SUtilConsts.LEV_AUTHOR);
+        jbEdit.setEnabled(levelRight >= SUtilConsts.LEV_AUTHOR);
         jbDelete.setEnabled(false);
+        mjbCopy.setEnabled(levelRight >= SUtilConsts.LEV_AUTHOR);
         mjbPrintRecord.setEnabled(true);
         mjbPrintRecordCy.setEnabled(true);
         mjbAudit.setEnabled(mnTabTypeAux01 == SUtilConsts.AUD_PEND);
@@ -366,7 +367,8 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
             default:
         }
         
-        msSql = "SELECT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, r.concept, r.b_adj_year, r.b_adj_audit, r.b_audit, r.b_authorn, r.b_sys, r.b_del, " +
+        msSql = "SELECT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, " +
+                "r.dt, r.concept, r.b_adj_year, r.b_adj_audit, r.b_audit, r.b_authorn, r.b_sys, r.b_del, " +
                 "r.ts_audit, r.ts_authorn, r.ts_new, r.ts_edit, r.ts_del, " +
                 "bkc.code, cob.code, e.ent, uaud.usr, uaut.usr, un.usr, ue.usr, ud.usr, " +
                 "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_per, " +
@@ -393,7 +395,7 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
                 "ac.id_cob = e.id_cob AND ac.id_acc_cash = e.id_ent " +
                 "LEFT OUTER JOIN fin_rec_ety AS re ON " +
                 "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND re.b_del = FALSE " +
-                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
+                (sqlWhere.isEmpty() ? "" : "WHERE " + sqlWhere) +
                 "GROUP BY r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num, r.dt, r.concept, r.b_audit, r.b_authorn, r.b_sys, r.b_del, " +
                 "r.ts_audit, r.ts_authorn, r.ts_new, r.ts_edit, r.ts_del, " +
                 "bkc.code, cob.code, e.ent, uaud.usr, uaut.usr, un.usr, ue.usr, ud.usr " +

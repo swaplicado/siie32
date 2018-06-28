@@ -470,7 +470,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jlAlternativeId.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel29.add(jlAlternativeId);
 
-        jftAlternativeId.setText("XAXX01010100000000");
+        jftAlternativeId.setText("XAXX010101XXXXXX00");
         jftAlternativeId.setFocusLostBehavior(javax.swing.JFormattedTextField.PERSIST);
         jftAlternativeId.setPreferredSize(new java.awt.Dimension(150, 23));
         jftAlternativeId.addFocusListener(new java.awt.event.FocusAdapter() {
