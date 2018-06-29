@@ -26,6 +26,7 @@ public class SDbConfig extends SDbRegistryUser {
     protected int mnFirstDayWeek;
     protected int mnLimitMwzReference;
     protected String msNumberSeries;
+    protected String msSsSubbranch;
     protected String msBajioAffinityGroup;
     protected double mdPayrollTaxRate;
     protected boolean mbFornightStandard;
@@ -61,6 +62,7 @@ public class SDbConfig extends SDbRegistryUser {
     public void setFirstDayWeek(int n) { mnFirstDayWeek = n; }
     public void setLimitMwzReference(int n) { mnLimitMwzReference = n; }
     public void setNumberSeries(String s) { msNumberSeries = s; }
+    public void setSsSubbranch(String s) { msSsSubbranch = s; }
     public void setBajioAffinityGroup(String s) { msBajioAffinityGroup = s; }
     public void setPayrollTaxRate(double d) { mdPayrollTaxRate = d; }
     public void setFornightStandard(boolean b) { mbFornightStandard = b; }
@@ -90,6 +92,7 @@ public class SDbConfig extends SDbRegistryUser {
     public int getFirstDayWeek() { return mnFirstDayWeek; }
     public int getLimitMwzReference() { return mnLimitMwzReference; }
     public String getNumberSeries() { return msNumberSeries; }
+    public String getSsSubbranch() { return msSsSubbranch; }
     public String getBajioAffinityGroup() { return msBajioAffinityGroup; }
     public double getPayrollTaxRate() { return mdPayrollTaxRate; }
     public boolean isFornightStandard() { return mbFornightStandard; }
@@ -133,6 +136,7 @@ public class SDbConfig extends SDbRegistryUser {
         mnFirstDayWeek = 0;
         mnLimitMwzReference = 0;
         msNumberSeries = "";
+        msSsSubbranch = "";
         msBajioAffinityGroup = "";
         mdPayrollTaxRate = 0;
         mbFornightStandard = false;
@@ -197,6 +201,7 @@ public class SDbConfig extends SDbRegistryUser {
             mnFirstDayWeek = resultSet.getInt("fst_day_wee");
             mnLimitMwzReference = resultSet.getInt("lim_mwz_ref");
             msNumberSeries = resultSet.getString("num_ser");
+            msSsSubbranch = resultSet.getString("ss_subbra");
             msBajioAffinityGroup = resultSet.getString("baj_aff_grp");
             mdPayrollTaxRate = resultSet.getDouble("pay_tax_rate");
             mbFornightStandard = resultSet.getBoolean("b_for_std");
@@ -247,6 +252,7 @@ public class SDbConfig extends SDbRegistryUser {
                     mnFirstDayWeek + ", " +
                     mnLimitMwzReference + ", " +
                     "'" + msNumberSeries + "', " + 
+                    "'" + msSsSubbranch + "', " + 
                     "'" + msBajioAffinityGroup + "', " + 
                     mdPayrollTaxRate + ", " + 
                     (mbFornightStandard ? 1 : 0) + ", " + 
@@ -281,6 +287,7 @@ public class SDbConfig extends SDbRegistryUser {
                     "fst_day_wee = " + mnFirstDayWeek + ", " +
                     "lim_mwz_ref = " + mnLimitMwzReference + ", " +
                     "num_ser = '" + msNumberSeries + "', " +
+                    "ss_subbra = '" + msSsSubbranch + "', " +
                     "baj_aff_grp = '" + msBajioAffinityGroup + "', " +
                     "pay_tax_rate = " + mdPayrollTaxRate + ", " +
                     "b_for_std = " + (mbFornightStandard ? 1 : 0) + ", " +
@@ -321,6 +328,7 @@ public class SDbConfig extends SDbRegistryUser {
         registry.setFirstDayWeek(this.getFirstDayWeek());
         registry.setLimitMwzReference(this.getLimitMwzReference());
         registry.setNumberSeries(this.getNumberSeries());
+        registry.setSsSubbranch(this.getSsSubbranch());
         registry.setBajioAffinityGroup(this.getBajioAffinityGroup());
         registry.setPayrollTaxRate(this.getPayrollTaxRate());
         registry.setFornightStandard(this.isFornightStandard());

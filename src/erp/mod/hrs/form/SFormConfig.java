@@ -58,10 +58,6 @@ public class SFormConfig extends SBeanForm {
         jPanel10 = new javax.swing.JPanel();
         jlLimitMwzReference = new javax.swing.JLabel();
         moIntLimitMwzReference = new sa.lib.gui.bean.SBeanFieldInteger();
-        jPanel29 = new javax.swing.JPanel();
-        jlBajioAffinityGroup = new javax.swing.JLabel();
-        moTextBajioAffinityGroup = new sa.lib.gui.bean.SBeanFieldText();
-        jlBajioAffinityGroupHelp = new javax.swing.JLabel();
         jPanel30 = new javax.swing.JPanel();
         jlPayrollTaxRate = new javax.swing.JLabel();
         moDecPayrollTaxRate = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -92,6 +88,16 @@ public class SFormConfig extends SBeanForm {
         jlBank = new javax.swing.JLabel();
         moKeyBank = new sa.lib.gui.bean.SBeanFieldKey();
         jlBankHelp = new javax.swing.JLabel();
+        jPanel29 = new javax.swing.JPanel();
+        jlBajioAffinityGroup = new javax.swing.JLabel();
+        moTextBajioAffinityGroup = new sa.lib.gui.bean.SBeanFieldText();
+        jlBajioAffinityGroupHelp = new javax.swing.JLabel();
+        jPanel33 = new javax.swing.JPanel();
+        jlCfdiNumberSeries = new javax.swing.JLabel();
+        moTextCfdiNumberSeries = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel34 = new javax.swing.JPanel();
+        jlSsSubbranch = new javax.swing.JLabel();
+        moTextSsSubbranch = new sa.lib.gui.bean.SBeanFieldText();
         jPanel16 = new javax.swing.JPanel();
         jPanel27 = new javax.swing.JPanel();
         jlEarningEarning_n = new javax.swing.JLabel();
@@ -132,7 +138,7 @@ public class SFormConfig extends SBeanForm {
         jPanel2.setLayout(new java.awt.GridLayout(1, 2));
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración general:"));
-        jPanel6.setLayout(new java.awt.GridLayout(9, 1, 0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -169,22 +175,6 @@ public class SFormConfig extends SBeanForm {
         jPanel10.add(moIntLimitMwzReference);
 
         jPanel6.add(jPanel10);
-
-        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlBajioAffinityGroup.setText("Grupo afinidad:");
-        jlBajioAffinityGroup.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel29.add(jlBajioAffinityGroup);
-
-        moTextBajioAffinityGroup.setText("sBeanFieldText1");
-        jPanel29.add(moTextBajioAffinityGroup);
-
-        jlBajioAffinityGroupHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlBajioAffinityGroupHelp.setText("(Bajío)");
-        jlBajioAffinityGroupHelp.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel29.add(jlBajioAffinityGroupHelp);
-
-        jPanel6.add(jPanel29);
 
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -301,6 +291,44 @@ public class SFormConfig extends SBeanForm {
         jPanel20.add(jlBankHelp);
 
         jPanel15.add(jPanel20);
+
+        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBajioAffinityGroup.setText("Grupo afinidad:");
+        jlBajioAffinityGroup.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel29.add(jlBajioAffinityGroup);
+
+        moTextBajioAffinityGroup.setText("sBeanFieldText1");
+        jPanel29.add(moTextBajioAffinityGroup);
+
+        jlBajioAffinityGroupHelp.setForeground(new java.awt.Color(109, 109, 109));
+        jlBajioAffinityGroupHelp.setText("(BanBajío)");
+        jlBajioAffinityGroupHelp.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel29.add(jlBajioAffinityGroupHelp);
+
+        jPanel15.add(jPanel29);
+
+        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCfdiNumberSeries.setText("Serie CFDI nómina:");
+        jlCfdiNumberSeries.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel33.add(jlCfdiNumberSeries);
+
+        moTextCfdiNumberSeries.setText("sBeanFieldText1");
+        jPanel33.add(moTextCfdiNumberSeries);
+
+        jPanel15.add(jPanel33);
+
+        jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlSsSubbranch.setText("Subdelegación SS:");
+        jlSsSubbranch.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel34.add(jlSsSubbranch);
+
+        moTextSsSubbranch.setText("sBeanFieldText1");
+        jPanel34.add(moTextSsSubbranch);
+
+        jPanel15.add(jPanel34);
 
         jPanel14.add(jPanel15);
 
@@ -469,6 +497,8 @@ public class SFormConfig extends SBeanForm {
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
+    private javax.swing.JPanel jPanel33;
+    private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel9;
@@ -476,6 +506,7 @@ public class SFormConfig extends SBeanForm {
     private javax.swing.JLabel jlBajioAffinityGroupHelp;
     private javax.swing.JLabel jlBank;
     private javax.swing.JLabel jlBankHelp;
+    private javax.swing.JLabel jlCfdiNumberSeries;
     private javax.swing.JLabel jlDateOperations;
     private javax.swing.JLabel jlDeductionSsContribution_n;
     private javax.swing.JLabel jlDeductionSsContribution_nHelp;
@@ -501,6 +532,7 @@ public class SFormConfig extends SBeanForm {
     private javax.swing.JLabel jlMwzType;
     private javax.swing.JLabel jlMwzTypeHelp;
     private javax.swing.JLabel jlPayrollTaxRate;
+    private javax.swing.JLabel jlSsSubbranch;
     private javax.swing.JLabel jlTaxComputationType;
     private javax.swing.JLabel jlTaxComputationTypeHelp;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolBankAccountUse;
@@ -524,6 +556,8 @@ public class SFormConfig extends SBeanForm {
     private sa.lib.gui.bean.SBeanFieldKey moKeyMwzType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTaxComputationType;
     private sa.lib.gui.bean.SBeanFieldText moTextBajioAffinityGroup;
+    private sa.lib.gui.bean.SBeanFieldText moTextCfdiNumberSeries;
+    private sa.lib.gui.bean.SBeanFieldText moTextSsSubbranch;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -536,7 +570,6 @@ public class SFormConfig extends SBeanForm {
         moIntLimitMwzReference.setIntegerSettings(SGuiUtils.getLabelName(jlLimitMwzReference.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moIntLimitMwzReference.setMinInteger(1);
         moIntLimitMwzReference.setMaxInteger(100);
-        moTextBajioAffinityGroup.setTextSettings(SGuiUtils.getLabelName(jlBajioAffinityGroup.getText()), 5, 0);
         moDecPayrollTaxRate.setDecimalSettings(SGuiUtils.getLabelName(jlPayrollTaxRate.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
         moBoolFornightStandard.setBooleanSettings(SGuiUtils.getLabelName(moBoolFornightStandard.getText()), true);
         moBoolTaxSubsidyEarning.setBooleanSettings(SGuiUtils.getLabelName(moBoolTaxSubsidyEarning.getText()), true);
@@ -546,6 +579,9 @@ public class SFormConfig extends SBeanForm {
         moKeyMwzReferenceType.setKeySettings(miClient, SGuiUtils.getLabelName(jlMwzReferenceType), true);
         moKeyTaxComputationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlTaxComputationType), true);
         moKeyBank.setKeySettings(miClient, SGuiUtils.getLabelName(jlBank), true);
+        moTextBajioAffinityGroup.setTextSettings(SGuiUtils.getLabelName(jlBajioAffinityGroup.getText()), 5);
+        moTextCfdiNumberSeries.setTextSettings(SGuiUtils.getLabelName(jlCfdiNumberSeries), 15, 1);
+        moTextSsSubbranch.setTextSettings(SGuiUtils.getLabelName(jlSsSubbranch), 2);
         moKeyEarningEarning_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningEarning_n), false);
         moKeyEarningVacations_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningVacations_n), false);
         moKeyEarningTax_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningTax_n), false);
@@ -558,7 +594,6 @@ public class SFormConfig extends SBeanForm {
         moFields.addField(moDateDateOperations);
         moFields.addField(moIntFirstDayWeek);
         moFields.addField(moIntLimitMwzReference);
-        moFields.addField(moTextBajioAffinityGroup);
         moFields.addField(moDecPayrollTaxRate);
         moFields.addField(moBoolFornightStandard);
         moFields.addField(moBoolTaxSubsidyEarning);
@@ -568,6 +603,9 @@ public class SFormConfig extends SBeanForm {
         moFields.addField(moKeyMwzReferenceType);
         moFields.addField(moKeyTaxComputationType);
         moFields.addField(moKeyBank);
+        moFields.addField(moTextBajioAffinityGroup);
+        moFields.addField(moTextCfdiNumberSeries);
+        moFields.addField(moTextSsSubbranch);
         moFields.addField(moKeyEarningEarning_n);
         moFields.addField(moKeyEarningVacations_n);
         moFields.addField(moKeyEarningTax_n);
@@ -628,7 +666,6 @@ public class SFormConfig extends SBeanForm {
         moDateDateOperations.setValue(moRegistry.getDateOperations());
         moIntFirstDayWeek.setValue(moRegistry.getFirstDayWeek());
         moIntLimitMwzReference.setValue(moRegistry.getLimitMwzReference());
-        moTextBajioAffinityGroup.setValue(moRegistry.getBajioAffinityGroup());
         moDecPayrollTaxRate.setValue(moRegistry.getPayrollTaxRate());
         moBoolFornightStandard.setValue(moRegistry.isFornightStandard());
         moBoolTaxSubsidyEarning.setValue(moRegistry.isTaxSubsidyEarning());
@@ -638,6 +675,9 @@ public class SFormConfig extends SBeanForm {
         moKeyMwzReferenceType.setValue(new int[] { moRegistry.getFkMwzReferenceTypeId() });
         moKeyTaxComputationType.setValue(new int[] { moRegistry.getFkTaxComputationTypeId() });
         moKeyBank.setValue(new int[] { moRegistry.getFkBankId() });
+        moTextBajioAffinityGroup.setValue(moRegistry.getBajioAffinityGroup());
+        moTextCfdiNumberSeries.setValue(moRegistry.getNumberSeries());
+        moTextSsSubbranch.setValue(moRegistry.getSsSubbranch());
         moKeyEarningEarning_n.setValue(new int[] { moRegistry.getFkEarningEarningId_n() });
         moKeyEarningVacations_n.setValue(new int[] { moRegistry.getFkEarningVacationsId_n() });
         moKeyEarningTax_n.setValue(new int[] { moRegistry.getFkEarningTaxId_n() });
@@ -667,6 +707,8 @@ public class SFormConfig extends SBeanForm {
         registry.setDateOperations(moDateDateOperations.getValue());
         registry.setFirstDayWeek(moIntFirstDayWeek.getValue());
         registry.setLimitMwzReference(moIntLimitMwzReference.getValue());
+        registry.setNumberSeries(moTextCfdiNumberSeries.getValue());
+        registry.setSsSubbranch(moTextSsSubbranch.getValue());
         registry.setBajioAffinityGroup(moTextBajioAffinityGroup.getValue());
         registry.setPayrollTaxRate(moDecPayrollTaxRate.getValue());
         registry.setFornightStandard(moBoolFornightStandard.getValue());
