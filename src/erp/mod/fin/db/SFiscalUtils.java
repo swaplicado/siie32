@@ -42,6 +42,7 @@ public abstract class SFiscalUtils {
     public static final SimpleDateFormat DateFormatFecha = new SimpleDateFormat("yyyy-MM-dd");
     public static final DecimalFormat DecimalFormatBizPartner = new DecimalFormat("00000");
     public static final DecimalFormat DecimalFormatEntity = new DecimalFormat("000");
+    private static double ALLOWED_AMOUNT_DIFF = 0.05;
     
     /**
      * Extracts only decimal characters from text.
@@ -922,7 +923,7 @@ public abstract class SFiscalUtils {
             }
 
             for (SDbFiscalAccountLinkDetail detail : fiscalAccountLinkDetails) {
-                xmlCtas = SFiscalUtils.createElementCatalogo11Ctas(detail);
+                xmlCtas = createElementCatalogo11Ctas(detail);
                 xmlDoc.getXmlElements().add(xmlCtas);
                 fiscalAccountLink.getChildDetails().add(detail);
             }
@@ -1346,7 +1347,7 @@ public abstract class SFiscalUtils {
             }
             else {
                 fiscalAccountLink.getChildDetails().add(fiscalAccountLinkDetail);
-                xmlDoc.getXmlElements().add(SFiscalUtils.createElementCatalogo13Ctas(fiscalAccountLinkDetail));
+                xmlDoc.getXmlElements().add(createElementCatalogo13Ctas(fiscalAccountLinkDetail));
             }
         }
 
@@ -1485,6 +1486,7 @@ public abstract class SFiscalUtils {
                 + "WHERE "
                 + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + " "
                 + "GROUP BY f_acc_id, f_acc_tp_id, f_acc_cl_id, f_acc_spe_id, f_ref_1, f_ref_2, f_acc_code, f_acc_name, f_acc_nat "
+                + "HAVING f_bal_ope <> 0 OR f_dbt <> 0 OR f_cdt <> 0 OR f_bal_clo <> 0 "
                 + ""
                 + "UNION "
                 + ""
@@ -1514,6 +1516,7 @@ public abstract class SFiscalUtils {
                 + "WHERE "
                 + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + " "
                 + "GROUP BY f_acc_id, f_acc_tp_id, f_acc_cl_id, f_acc_spe_id, f_ref_1, f_ref_2, f_acc_code, f_acc_name, f_acc_nat "
+                + "HAVING f_bal_ope <> 0 OR f_dbt <> 0 OR f_cdt <> 0 OR f_bal_clo <> 0 "
                 + ""
                 + "UNION "
                 + ""
@@ -1542,6 +1545,7 @@ public abstract class SFiscalUtils {
                 + "WHERE "
                 + "r.b_del = 0 AND re.b_del = 0 AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + " "
                 + "GROUP BY f_acc_id, f_acc_tp_id, f_acc_cl_id, f_acc_spe_id, f_ref_1, f_ref_2, f_acc_code, f_acc_name, f_acc_nat "
+                + "HAVING f_bal_ope <> 0 OR f_dbt <> 0 OR f_cdt <> 0 OR f_bal_clo <> 0 "
                 + ""
                 + "UNION "
                 + ""
@@ -1860,7 +1864,7 @@ public abstract class SFiscalUtils {
                         + "cuenta contable " + resultSet.getString("f_acc_id") + ":\n'" + resultSet.getString("f_acc_name") + "' (" + resultSet.getString("f_acc_code") + ").");
             }
 
-            xmlCtas = SFiscalUtils.createElementBalanza11Ctas(
+            xmlCtas = createElementBalanza11Ctas(
                     accountCode,
                     resultSet.getDouble("f_bal_ope") * sign,
                     resultSet.getDouble("f_dbt"),
@@ -1894,6 +1898,10 @@ public abstract class SFiscalUtils {
         SDbBizPartner company = null;
         SXmlDocument xmlDoc = null;
         SXmlElement xmlCtas = null;
+        double sumBalOpe = 0;
+        double sumDbt = 0;
+        double sumCdt = 0;
+        double sumBalClo = 0;
         
         if (periodMonth <= SLibTimeConsts.MONTH_MAX) {
             month = periodMonth;
@@ -1973,7 +1981,7 @@ public abstract class SFiscalUtils {
                         + "cuenta contable " + resultSet.getString("f_acc_id") + ":\n'" + resultSet.getString("f_acc_name") + "' (" + resultSet.getString("f_acc_code") + ").");
             }
 
-            xmlCtas = SFiscalUtils.createElementBalanza13Ctas(
+            xmlCtas = createElementBalanza13Ctas(
                     accountCode,
                     resultSet.getDouble("f_bal_ope") * sign,
                     resultSet.getDouble("f_dbt"),
@@ -1981,8 +1989,64 @@ public abstract class SFiscalUtils {
                     resultSet.getDouble("f_bal_clo") * sign);
 
             xmlDoc.getXmlElements().add(xmlCtas);
+            
+            sumBalOpe = SLibUtils.roundAmount(sumBalOpe + resultSet.getDouble("f_bal_ope"));
+            sumDbt = SLibUtils.roundAmount(sumDbt + resultSet.getDouble("f_dbt"));
+            sumCdt = SLibUtils.roundAmount(sumCdt + resultSet.getDouble("f_cdt"));
+            sumBalClo = SLibUtils.roundAmount(sumBalClo + resultSet.getDouble("f_bal_clo"));
         }
 
+        double realBalOpe = 0;
+        double realDbt = 0;
+        double realCdt = 0;
+        double realBalClo = 0;
+        String balDate = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.createDate(periodYear, periodMonth));
+        
+        sql = "SELECT "
+                + "SUM(IF(r.dt < '" + balDate + "', re.debit - re.credit, 0.0)) AS _bal_ope, "
+                + "SUM(IF(r.dt >= '" + balDate + "', re.debit, 0.0)) AS _dbt, "
+                + "SUM(IF(r.dt >= '" + balDate + "', re.credit, 0.0)) AS _cdt, "
+                + "SUM(re.debit - re.credit) AS _bal_clo "
+                + "FROM fin_rec AS r "
+                + "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc "
+                + "AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num "
+                + "WHERE NOT r.b_del AND NOT re.b_del AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + ";";
+
+        resultSet = statement.executeQuery(sql);
+        if (resultSet.next()) {
+            realBalOpe = resultSet.getDouble("_bal_ope");
+            realDbt = resultSet.getDouble("_dbt");
+            realCdt = resultSet.getDouble("_cdt");
+            realBalClo = resultSet.getDouble("_bal_clo");
+        }
+        
+        // check coherence of generated trial balance:
+        
+        if (Math.abs(sumDbt - sumCdt) > ALLOWED_AMOUNT_DIFF) {
+            throw new Exception("Error: ¡El total de cargos de la balanza de comprobación (" + sumDbt + ") es distinto al total de abonos (" + sumCdt + ")!");
+        }
+        if (Math.abs(sumBalClo - (sumBalOpe + sumDbt - sumCdt)) > ALLOWED_AMOUNT_DIFF) {
+            throw new Exception("Error: ¡El saldo final de la balanza de comprobación (" + sumBalClo + ") es distinto a la suma del saldo inicial (" + sumBalOpe + ") + cargos (" + sumDbt + ") - abonos (" + sumCdt + ")!");
+        }
+        if (Math.abs(realDbt - realCdt) > ALLOWED_AMOUNT_DIFF) {
+            throw new Exception("Error: ¡El total de cargos real (" + realDbt + ") es distinto al total de abonos (" + realCdt + ")!");
+        }
+        if (Math.abs(realBalClo - (realBalOpe + realDbt - realCdt)) > ALLOWED_AMOUNT_DIFF) {
+            throw new Exception("Error: ¡El saldo final real (" + realBalClo + ") es distinto a la suma del saldo inicial (" + realBalOpe + ") + cargos (" + realDbt + ") - abonos (" + realCdt + ")!");
+        }
+        if (Math.abs(sumBalOpe - realBalOpe) > ALLOWED_AMOUNT_DIFF) {
+            throw new Exception("Error: ¡El saldo inicial de la balanza de comprobación (" + sumBalOpe + ") es distinto al saldo inicial real (" + realBalOpe + ")!");
+        }
+        if (Math.abs(sumDbt - realDbt) > ALLOWED_AMOUNT_DIFF) {
+            throw new Exception("Error: ¡El total de cargos de la balanza de comprobación (" + sumDbt + ") es distinto al total de cargos real (" + realDbt + ")!");
+        }
+        if (Math.abs(sumCdt - realCdt) > ALLOWED_AMOUNT_DIFF) {
+            throw new Exception("Error: ¡El total de abonos de la balanza de comprobación (" + sumCdt + ") es distinto al total de abonos real (" + realCdt + ")!");
+        }
+        if (Math.abs(sumBalClo - realBalClo) > ALLOWED_AMOUNT_DIFF) {
+            throw new Exception("Error: ¡El saldo final de la balanza de comprobación (" + sumBalClo + ") es distinto al saldo final real (" + realBalClo + ")!");
+        }
+        
         return xmlDoc;
     }
 
@@ -3597,6 +3661,5 @@ public abstract class SFiscalUtils {
         }
 
         return xmlDoc;
-    
     }
 }
