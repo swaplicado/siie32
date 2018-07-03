@@ -885,13 +885,17 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
             
             // check if privilege is assigned at company scope (higher precedence):
             
+            Object[] companyPrivileges = moRightsCompany.keySet().toArray();
+            
             for (SDataAccessCompany access : mvDbmsAccessCompanies) {
                 if (access.getPkCompanyId() == client.getSessionXXX().getCurrentCompany().getPkCompanyId()) {
+                    int[] companyPrivilege = new int[] { access.getPkCompanyId(), privilege };
+                    
                     for (int i = 0; i < moRightsCompany.size(); i++) {
-                        if (SLibUtilities.compareKeys((int[]) moRightsCompany.keySet().toArray()[i], new int[] { access.getPkCompanyId(), privilege })) {
+                        if (SLibUtilities.compareKeys(companyPrivilege, (int[]) companyPrivileges[i])) {
                             Integer levelAux = (Integer) moRightsCompany.values().toArray()[i];
                             if (level == null || levelAux > level) {
-                                level = levelAux;   // search for highest level of privilege assigned at company scope
+                                level = levelAux;   // do not break when found for searching the highest level of privilege assigned to user at company scope
                             }
                         }
                     }
