@@ -830,7 +830,12 @@ public class SModuleHrs extends SGuiModule {
                         view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones automáticas globales");
                         break;
                     case SModSysConsts.HRS_AUT_EMP:
-                        view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones automáticas empleado");
+                        if (params == null) {
+                            view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones automáticas empleado");
+                        }
+                        else {
+                            view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones automáticas empleado (detalle)", params);
+                        }
                         break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -842,7 +847,12 @@ public class SModuleHrs extends SGuiModule {
                         view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones automáticas globales");
                         break;
                     case SModSysConsts.HRS_AUT_EMP:
-                        view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones automáticas empleado");
+                        if (params == null) {
+                            view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones automáticas empleado");
+                        }
+                        else {
+                            view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones automáticas empleado (detalle)", params);
+                        }
                         break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

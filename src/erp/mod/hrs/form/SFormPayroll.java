@@ -839,21 +839,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
      * Private methods
      */
     
-    private void computeTotals() {
-        int countAvailables = 0;
-        int countSelected = 0;
-        
-        for (int i = 0; i < moGridPaneEmployeesAvailable.getModel().getRowCount(); i++) {
-            countAvailables++;
-        }
-        for (int i = 0; i < moGridPaneEmployeesReceipt.getModel().getRowCount(); i++) {
-            countSelected++;
-        }
-        
-        jlTotalAvailables.setText(" " + countAvailables + " empleados disponibles.");
-        jlTotalSelected.setText(" " + countSelected + " recibos de nomina.");
-    }
-
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 1024, 640);
 
@@ -1035,6 +1020,21 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         mvFormGrids.add(moGridPaneEmployeesAvailable);
         mvFormGrids.add(moGridPaneEmployeesReceipt);
+    }
+
+    private void computeTotals() {
+        int countAvailables = 0;
+        int countSelected = 0;
+        
+        for (int i = 0; i < moGridPaneEmployeesAvailable.getModel().getRowCount(); i++) {
+            countAvailables++;
+        }
+        for (int i = 0; i < moGridPaneEmployeesReceipt.getModel().getRowCount(); i++) {
+            countSelected++;
+        }
+        
+        jlTotalAvailables.setText(" " + countAvailables + " empleados disponibles.");
+        jlTotalSelected.setText(" " + countSelected + " recibos de nomina.");
     }
 
     private void clearCurrentValues() {

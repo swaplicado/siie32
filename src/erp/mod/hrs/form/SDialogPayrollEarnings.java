@@ -43,7 +43,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPaneFormOwner, ItemListener, ActionListener, CellEditorListener, KeyListener {
 

@@ -45,6 +45,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
     protected int mnPkEmployeeId;
     protected String msNumber;
+    protected String msLastname1;
+    protected String msLastname2;
     protected String msSocialSecurityNumber;
     protected Date mtDateBirth;
     protected Date mtDateBenefits;
@@ -302,6 +304,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
     public void setNumber(String s) { msNumber = s; }
+    public void setLastname1(String s) { msLastname1 = s; }
+    public void setLastname2(String s) { msLastname2 = s; }
     public void setSocialSecurityNumber(String s) { msSocialSecurityNumber = s; }
     public void setDateBirth(Date t) { mtDateBirth = t; }
     public void setDateBenefits(Date t) { mtDateBenefits = t; }
@@ -362,6 +366,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public String getNumber() { return msNumber; }
+    public String getLastname1() { return msLastname1; }
+    public String getLastname2() { return msLastname2; }
     public String getSocialSecurityNumber() { return msSocialSecurityNumber; }
     public Date getDateBirth() { return mtDateBirth; }
     public Date getDateBenefits() { return mtDateBenefits; }
@@ -419,6 +425,10 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     
     public javax.swing.ImageIcon getXtaImageIconPhoto_n() { return moXtaImageIconPhoto_n; }
     public javax.swing.ImageIcon getXtaImageIconSignature_n() { return moXtaImageIconSignature_n; }
+    
+    public String composeLastname() {
+        return SLibUtils.textTrim(msLastname1 + (msLastname1.isEmpty() ? "" : " ") + msLastname2);
+    }
 
     @Override
     public void setPrimaryKey(Object pk) {
@@ -436,6 +446,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
         mnPkEmployeeId = 0;
         msNumber = "";
+        msLastname1 = "";
+        msLastname2 = "";
         msSocialSecurityNumber = "";
         mtDateBirth = null;
         mtDateBenefits = null;
@@ -515,6 +527,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
             else {
                 mnPkEmployeeId = resultSet.getInt("id_emp");
                 msNumber = resultSet.getString("num");
+                msLastname1 = resultSet.getString("lastname1");
+                msLastname2 = resultSet.getString("lastname2");
                 msSocialSecurityNumber = resultSet.getString("ssn");
                 mtDateBirth = resultSet.getDate("dt_bir");
                 mtDateBenefits = resultSet.getDate("dt_ben");
@@ -652,6 +666,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 sql = "INSERT INTO erp.hrsu_emp VALUES (" +
                         mnPkEmployeeId + ", " +
                         "'" + msNumber + "', " +
+                        "'" + msLastname1 + "', " + 
+                        "'" + msLastname2 + "', " + 
                         "'" + msSocialSecurityNumber + "', " +
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " + 
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " +
@@ -703,6 +719,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 sql = "UPDATE erp.hrsu_emp SET " +
                         //"id_emp = " + mnPkEmployeeId + ", " +
                         "num = '" + msNumber + "', " +
+                        "lastname1 = '" + msLastname1 + "', " +
+                        "lastname2 = '" + msLastname2 + "', " +
                         "ssn = '" + msSocialSecurityNumber + "', " +
                         "dt_bir = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " +
                         "dt_ben = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " +

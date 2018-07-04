@@ -561,7 +561,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 moDialogBizPartnerExport.setFormVisible(true);
 
                 if (moDialogBizPartnerExport.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    nBizPartnerCategoryId = ((Integer)  moDialogBizPartnerExport.getValue(mnBizPartnerCategory)).intValue();
+                    nBizPartnerCategoryId = (Integer)  moDialogBizPartnerExport.getValue(mnBizPartnerCategory);
                     if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showFormForCopy(nBizPartnerCategoryId, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
                         miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
                     }
@@ -657,19 +657,39 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             }
         }
 
-        if (mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_BANK) {
-            sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_bank = 1 ";
+        switch(mnTabTypeAux01) {
+            case SDataConstants.BPSX_BP_CO:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_co ";
+                break;
+            case SDataConstants.BPSX_BP_SUP:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_sup ";
+                break;
+            case SDataConstants.BPSX_BP_CUS:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_cus ";
+                break;
+            case SDataConstants.BPSX_BP_CDR:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_cdr ";
+                break;
+            case SDataConstants.BPSX_BP_DBR:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_dbr ";
+                break;
+            case SDataConstants.BPSU_BP:
+                break;
+            case SDataConstants.BPSX_BP_ATT_CARR:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_car ";
+                break;
+            case SDataConstants.BPSX_BP_ATT_SAL_AGT:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_sal_agt ";
+                break;
+            case SDataConstants.BPSX_BP_ATT_BANK:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_bank ";
+                break;
+            case SDataConstants.BPSX_BP_EMP:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_emp ";
+                break;
+            default:
         }
-        else if (mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_CARR) {
-            sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_car = 1 ";
-        }
-        else if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP) {
-            sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_emp = 1 ";
-        }
-        else if (mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_SAL_AGT) {
-            sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "bp.b_att_sal_agt = 1 ";
-        }
-
+        
         msSql = "SELECT bp.id_bp, bp.bp, bp.bp_comm, bp.fiscal_id, bp.alt_id, bp.web, bp.code_bank_san, bp.code_bank_baj, bp.b_sup, bp.b_cus, bp.b_cdr, bp.b_dbr, bp.b_att_emp, bp.b_del, " +
                 "tp_bp.tp_bp_idy, tax_tp.tax_idy, bp.b_att_bank, bp.b_att_car, bp.b_att_sal_agt, bp.b_att_emp, bp.b_att_par_shh, bp.b_att_rel_pty, " +
                 (mnTabTypeAux01 == SDataConstants.BPSU_BP || mnTabTypeAux01 == SDataConstants.BPSX_BP_ATT_SAL_AGT || mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP ||

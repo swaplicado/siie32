@@ -43,7 +43,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPaneFormOwner, ItemListener, ActionListener, CellEditorListener, KeyListener {
 
@@ -189,7 +189,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Monto $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $"));
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago", moGridEmployeeRow.getTable().getDefaultEditor(Boolean.class));
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);

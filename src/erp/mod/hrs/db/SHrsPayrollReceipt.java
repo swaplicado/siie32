@@ -74,7 +74,7 @@ public class SHrsPayrollReceipt {
     
     private void computeEarnings() {
         for (SHrsPayrollReceiptEarning receiptEarning : maHrsEarnings) {
-            receiptEarning.computeEarning(); //XXX jbarajas 15/04/2015
+            receiptEarning.computeEarning();
         }
     }
 
@@ -1108,7 +1108,6 @@ public class SHrsPayrollReceipt {
         computeDbPayrollReceiptDays();
         computeDeductions();
         computeEarningsExempt();
-         //computeDbPayrollReceipt(); XXX jbarajas 2015-05-11
         computeReceiptTax();
         computeReceiptSsContribution();
         // XXX (jbarajas, 2016-04-11) compute amount per deductions of law

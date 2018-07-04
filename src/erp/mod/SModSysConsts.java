@@ -856,7 +856,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_COMP_HRS = 3;       // Hours
     public static final int HRSS_TP_EAR_COMP_PER_DAY = 12;  // % Day
     public static final int HRSS_TP_EAR_COMP_PER_HRS = 13;  // % Hour
-    public static final int HRSS_TP_EAR_COMP_PER_EAR = 21;  // % Earnings
+    public static final int HRSS_TP_EAR_COMP_PER_EAR = 16;  // % Earnings
 
     public static final int HRSS_TP_EAR_EXEM_NON = 1;       // Non applicable
     public static final int HRSS_TP_EAR_EXEM_PER = 11;      // Percentage
@@ -885,15 +885,16 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_OTH_PAY_TAX_BAL = 4;    // Tax Positive Balance
     public static final int HRSS_TP_OTH_PAY_OTH = 999;  // Other payments
 
-    public static final int HRSS_TP_DED_COMP_AMT = 1;       // Amount
-    public static final int HRSS_TP_DED_COMP_DAY = 2;       // Days
-    public static final int HRSS_TP_DED_COMP_HRS = 3;       // Hours
-    public static final int HRSS_TP_DED_COMP_PER_DAY = 12;  // % Day
-    public static final int HRSS_TP_DED_COMP_PER_HRS = 13;  // % Hour
-    public static final int HRSS_TP_DED_COMP_PBT = 21;      // Pay Before Tax
-    public static final int HRSS_TP_DED_COMP_PAT = 22;      // Pay After Tax
-    public static final int HRSS_TP_DED_COMP_IBT = 26;      // Income Before Tax
-    public static final int HRSS_TP_DED_COMP_IAT = 27;      // Income After Tax
+    public static final int HRSS_TP_DED_COMP_AMT = 1;           // Amount
+    //public static final int HRSS_TP_DED_COMP_DAY = 2;         // Days                 disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_HRS = 3;         // Hours                disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_PER_DAY = 12;    // % Day                disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_PER_HRS = 13;    // % Hour               disabled 2018-07-03 because seemingly has not ever been used
+    public static final int HRSS_TP_DED_COMP_PER_EAR = 16;      // % Earnings
+    //public static final int HRSS_TP_DED_COMP_PBT = 21;        // Pay Before Tax       disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_PAT = 22;        // Pay After Tax        disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_IBT = 26;        // Income Before Tax    disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_IAT = 27;        // Income After Tax     disabled 2018-07-03 because seemingly has not ever been used
 
     public static final int HRSS_TP_DED_SSC = 1;    // Social Security
     public static final int HRSS_TP_DED_TAX = 2;    // Tax

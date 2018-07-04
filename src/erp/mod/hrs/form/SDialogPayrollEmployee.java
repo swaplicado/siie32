@@ -1315,7 +1315,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
     private void actionEarningAdd() {
         boolean add = true;
 
-        if (moTextEarningName.getValue().length() > 0) {
+        if (!moTextEarningName.getValue().isEmpty()) {
             if (moEarning.getFkLoanTypeId() != SModSysConsts.HRSS_TP_LOAN_NON) {
                 if (moKeyEarningLoan_n.getSelectedIndex() <= 0) {
                     miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEarningLoan_n.getText()) + "'. ");

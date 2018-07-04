@@ -26,7 +26,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SFormEarning extends SBeanForm implements ActionListener, ItemListener {
 
@@ -67,6 +67,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel7 = new javax.swing.JPanel();
         jlEarningComputationType = new javax.swing.JLabel();
         moKeyEarningComputationType = new sa.lib.gui.bean.SBeanFieldKey();
+        jlEarningComputationTypeHelp = new javax.swing.JLabel();
         jPanel29 = new javax.swing.JPanel();
         jlDummy1 = new javax.swing.JLabel();
         jlSettingsBase = new javax.swing.JLabel();
@@ -141,7 +142,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jlAbsenceType = new javax.swing.JLabel();
         moKeyAbsenceType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel30 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        jlBenefitTypeHelp = new javax.swing.JLabel();
         moBoolWithholding = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel31 = new javax.swing.JPanel();
         jlAccountingConfigurationTypeHelp = new javax.swing.JLabel();
@@ -192,7 +193,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jlNameAbbreviatedHelp.setForeground(java.awt.Color.gray);
         jlNameAbbreviatedHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlNameAbbreviatedHelp.setText("<<< para contabilización y para concepto del CFDI (XML)");
+        jlNameAbbreviatedHelp.setText("para contabilización y para concepto del CFDI (XML)");
         jlNameAbbreviatedHelp.setToolTipText("");
         jlNameAbbreviatedHelp.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel22.add(jlNameAbbreviatedHelp);
@@ -207,6 +208,13 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         moKeyEarningComputationType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel7.add(moKeyEarningComputationType);
+
+        jlEarningComputationTypeHelp.setForeground(java.awt.Color.gray);
+        jlEarningComputationTypeHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jlEarningComputationTypeHelp.setText("ayuda...");
+        jlEarningComputationTypeHelp.setToolTipText("");
+        jlEarningComputationTypeHelp.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel7.add(jlEarningComputationTypeHelp);
 
         jPanel2.add(jPanel7);
 
@@ -332,7 +340,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jlPayPercentageHelp.setForeground(java.awt.Color.gray);
         jlPayPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlPayPercentageHelp.setText("(Porcentaje del pago por unidad)");
+        jlPayPercentageHelp.setText("(Porcentaje del pago en función del tipo de cálculo de percepción elegido)");
         jlPayPercentageHelp.setToolTipText("");
         jlPayPercentageHelp.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel23.add(jlPayPercentageHelp);
@@ -375,11 +383,11 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel3.add(moBoolDaysAdjustment);
 
         moBoolDaysAbsence.setText("Aplica días incidencia");
-        moBoolDaysAbsence.setPreferredSize(new java.awt.Dimension(125, 23));
+        moBoolDaysAbsence.setPreferredSize(new java.awt.Dimension(140, 23));
         jPanel3.add(moBoolDaysAbsence);
 
-        moBoolDaysWorked.setText("Aplica días trabajados");
-        moBoolDaysWorked.setPreferredSize(new java.awt.Dimension(135, 23));
+        moBoolDaysWorked.setText("Cuenta como días trabajados");
+        moBoolDaysWorked.setPreferredSize(new java.awt.Dimension(185, 23));
         jPanel3.add(moBoolDaysWorked);
 
         moBoolDaysWorkedBased.setText("En base días pagados");
@@ -485,8 +493,8 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
 
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel30.add(jLabel1);
+        jlBenefitTypeHelp.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel30.add(jlBenefitTypeHelp);
 
         moBoolWithholding.setText("Es retención de ley");
         moBoolWithholding.setPreferredSize(new java.awt.Dimension(250, 23));
@@ -497,8 +505,8 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAccountingConfigurationTypeHelp.setForeground(java.awt.Color.gray);
-        jlAccountingConfigurationTypeHelp.setText("<<< manera de configurar cuentas contables");
-        jlAccountingConfigurationTypeHelp.setPreferredSize(new java.awt.Dimension(250, 23));
+        jlAccountingConfigurationTypeHelp.setText("para configurar cuentas contables");
+        jlAccountingConfigurationTypeHelp.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel31.add(jlAccountingConfigurationTypeHelp);
 
         moBoolPayrollTax.setText("Aplica para impto. sobre nóminas");
@@ -510,8 +518,8 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAccountingRecordTypeHelp.setForeground(java.awt.Color.gray);
-        jlAccountingRecordTypeHelp.setText("<<< manera de agrupar asientos contables");
-        jlAccountingRecordTypeHelp.setPreferredSize(new java.awt.Dimension(250, 23));
+        jlAccountingRecordTypeHelp.setText("para agrupar asientos contables al cerrar nóminas");
+        jlAccountingRecordTypeHelp.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel32.add(jlAccountingRecordTypeHelp);
 
         moBoolAlternativeTaxCalculation.setText("Usar cálculo alterno impto. (Art. 174 RLISR)");
@@ -530,7 +538,6 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -570,10 +577,12 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlAccountingRecordType;
     private javax.swing.JLabel jlAccountingRecordTypeHelp;
     private javax.swing.JLabel jlBenefitType;
+    private javax.swing.JLabel jlBenefitTypeHelp;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlDummy;
     private javax.swing.JLabel jlDummy1;
     private javax.swing.JLabel jlEarningComputationType;
+    private javax.swing.JLabel jlEarningComputationTypeHelp;
     private javax.swing.JLabel jlEarningExemptionType;
     private javax.swing.JLabel jlEarningType;
     private javax.swing.JLabel jlExemptionMwz;
@@ -707,6 +716,36 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
     private void itemStateBoolLoan() {
         moKeyLoanType.setEnabled(moBoolLoan.getValue());
     }
+    
+    private void showEarningComputationTypeHelp() {
+        if (moKeyEarningComputationType.getSelectedIndex() <= 0) {
+            jlEarningComputationTypeHelp.setText(SGuiConsts.TXT_BTN_SELECT + " " + SGuiUtils.getLabelName(jlEarningComputationType).toLowerCase() + "...");
+        }
+        else {
+            switch (moKeyEarningComputationType.getValue()[0]) {
+                case SModSysConsts.HRSS_TP_EAR_COMP_AMT:
+                    jlEarningComputationTypeHelp.setText("Monto directo");
+                    break;
+                case SModSysConsts.HRSS_TP_EAR_COMP_DAY:
+                    jlEarningComputationTypeHelp.setText("En función de un número de días de salario base");
+                    break;
+                case SModSysConsts.HRSS_TP_EAR_COMP_HRS:
+                    jlEarningComputationTypeHelp.setText("En función de un número de horas de hora de salario base");
+                    break;
+                case SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY:
+                    jlEarningComputationTypeHelp.setText("En función de un porcentaje de un salario base");
+                    break;
+                case SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS:
+                    jlEarningComputationTypeHelp.setText("En función de un porcentaje de una hora de salario base");
+                    break;
+                case SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR:
+                    jlEarningComputationTypeHelp.setText("En función de un porcentaje sobre el monto de sueldos y salarios");
+                    break;
+                default:
+                    jlEarningComputationTypeHelp.setText("?");
+            }
+        }
+    }
 
     private void itemStateKeyEarningComputationType() {
         if (moKeyEarningComputationType.getValue().length > 0) {
@@ -747,6 +786,8 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
                 }
             }
         }
+        
+        showEarningComputationTypeHelp();
     }
     
     private void itemStateKeyEarningExemptionType() {
@@ -830,6 +871,8 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
+            
+            moRegistry.setFkBenefitTypeId(SModSysConsts.HRSS_TP_BEN_NON);
             moRegistry.setAuxAccountingConfigurationTypeId(SLibConsts.UNDEFINED);
         }
         else {
@@ -946,6 +989,10 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
                 if (moKeyEarningComputationType.getValue()[0] != SModSysConsts.HRSS_TP_EAR_COMP_DAY && moBoolDaysAdjustment.getValue()) {
                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(moBoolDaysAdjustment.getText()) + "'.");
                     validation.setComponent(moBoolDaysAdjustment);
+                }
+                else if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR && !moBoolDaysWorkedBased.getValue()) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(moBoolDaysWorkedBased.getText()) + "'.");
+                    validation.setComponent(moBoolDaysWorkedBased);
                 }
             }
             

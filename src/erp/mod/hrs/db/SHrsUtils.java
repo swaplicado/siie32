@@ -1339,7 +1339,7 @@ public abstract class SHrsUtils {
         }
     }
     
-    public static void SendPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
+    public static void sendPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
         boolean isSent = false;
         HashMap<String, Object> map = new HashMap<>();
         File pdf = null;

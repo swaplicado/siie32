@@ -27,6 +27,7 @@ public class SDbDeduction extends SDbRegistryUser {
     protected String msCode;
     protected String msName;
     protected String msNameAbbreviated;
+    protected double mdRetPercentage;
     protected boolean mbWithholding;
     protected boolean mbPayrollTax;
     /*
@@ -58,6 +59,7 @@ public class SDbDeduction extends SDbRegistryUser {
     public void setCode(String s) { msCode = s; }
     public void setName(String s) { msName = s; }
     public void setNameAbbreviated(String s) { msNameAbbreviated = s; }
+    public void setRetPercentage(double d) { mdRetPercentage = d; }
     public void setWithholding(boolean b) { mbWithholding = b; }
     public void setPayrollTax(boolean b) { mbPayrollTax = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -81,6 +83,7 @@ public class SDbDeduction extends SDbRegistryUser {
     public String getCode() { return msCode; }
     public String getName() { return msName; }
     public String getNameAbbreviated() { return msNameAbbreviated; }
+    public double getRetPercentage() { return mdRetPercentage; }
     public boolean isWithholding() { return mbWithholding; }
     public boolean isPayrollTax() { return mbPayrollTax; }
     public boolean isDeleted() { return mbDeleted; }
@@ -119,6 +122,7 @@ public class SDbDeduction extends SDbRegistryUser {
         msCode = "";
         msName = "";
         msNameAbbreviated = "";
+        mdRetPercentage = 0;
         mbWithholding = false;
         mbPayrollTax = false;
         mbDeleted = false;
@@ -188,6 +192,7 @@ public class SDbDeduction extends SDbRegistryUser {
             msCode = resultSet.getString("code");
             msName = resultSet.getString("name");
             msNameAbbreviated = resultSet.getString("name_abbr");
+            mdRetPercentage = resultSet.getDouble("ret_per");
             mbWithholding = resultSet.getBoolean("b_who");
             mbPayrollTax = resultSet.getBoolean("b_pay_tax");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -248,6 +253,7 @@ public class SDbDeduction extends SDbRegistryUser {
                     "'" + msCode + "', " + 
                     "'" + msName + "', " + 
                     "'" + msNameAbbreviated + "', " + 
+                    mdRetPercentage + ", " + 
                     (mbWithholding ? 1 : 0) + ", " + 
                     (mbPayrollTax ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -276,6 +282,7 @@ public class SDbDeduction extends SDbRegistryUser {
                     "code = '" + msCode + "', " +
                     "name = '" + msName + "', " +
                     "name_abbr = '" + msNameAbbreviated + "', " +
+                    "ret_per = " + mdRetPercentage + ", " +
                     "b_who = " + (mbWithholding ? 1 : 0) + ", " +
                     "b_pay_tax = " + (mbPayrollTax ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -326,6 +333,7 @@ public class SDbDeduction extends SDbRegistryUser {
         registry.setCode(this.getCode());
         registry.setName(this.getName());
         registry.setNameAbbreviated(this.getNameAbbreviated());
+        registry.setRetPercentage(this.getRetPercentage());
         registry.setWithholding(this.isWithholding());
         registry.setPayrollTax(this.isPayrollTax());
         registry.setDeleted(this.isDeleted());

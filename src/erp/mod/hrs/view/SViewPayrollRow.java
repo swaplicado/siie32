@@ -532,7 +532,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        SHrsUtils.SendPayrollReceipt(miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, gridRow.getRowPrimaryKey());
+                        SHrsUtils.sendPayrollReceipt(miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, gridRow.getRowPrimaryKey());
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);

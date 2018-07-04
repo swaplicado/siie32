@@ -40,6 +40,8 @@ public class SDbEmployee extends SDbRegistryUser {
 
     protected int mnPkEmployeeId;
     protected String msNumber;
+    protected String msLastname1;
+    protected String msLastname2;
     protected String msSocialSecurityNumber;
     protected Date mtDateBirth;
     protected Date mtDateBenefits;
@@ -111,6 +113,8 @@ public class SDbEmployee extends SDbRegistryUser {
     
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
     public void setNumber(String s) { msNumber = s; }
+    public void setLastname1(String s) { msLastname1 = s; }
+    public void setLastname2(String s) { msLastname2 = s; }
     public void setSocialSecurityNumber(String s) { msSocialSecurityNumber = s; }
     public void setDateBirth(Date t) { mtDateBirth = t; }
     public void setDateBenefits(Date t) { mtDateBenefits = t; }
@@ -159,6 +163,8 @@ public class SDbEmployee extends SDbRegistryUser {
 
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public String getNumber() { return msNumber; }
+    public String getLastname1() { return msLastname1; }
+    public String getLastname2() { return msLastname2; }
     public String getSocialSecurityNumber() { return msSocialSecurityNumber; }
     public Date getDateBirth() { return mtDateBirth; }
     public Date getDateBenefits() { return mtDateBenefits; }
@@ -263,6 +269,8 @@ public class SDbEmployee extends SDbRegistryUser {
         
         mnPkEmployeeId = 0;
         msNumber = "";
+        msLastname1 = "";
+        msLastname2 = "";
         msSocialSecurityNumber = "";
         mtDateBirth = null;
         mtDateBenefits = null;
@@ -363,6 +371,8 @@ public class SDbEmployee extends SDbRegistryUser {
         else {
             mnPkEmployeeId = resultSet.getInt("id_emp");
             msNumber = resultSet.getString("num");
+            msLastname1 = resultSet.getString("lastname1");
+            msLastname2 = resultSet.getString("lastname2");
             msSocialSecurityNumber = resultSet.getString("ssn");
             mtDateBirth = resultSet.getDate("dt_bir");
             mtDateBenefits = resultSet.getDate("dt_ben");
@@ -458,6 +468,8 @@ public class SDbEmployee extends SDbRegistryUser {
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkEmployeeId + ", " + 
                     "'" + msNumber + "', " + 
+                    "'" + msLastname1 + "', " + 
+                    "'" + msLastname2 + "', " + 
                     "'" + msSocialSecurityNumber + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " + 
@@ -513,6 +525,8 @@ public class SDbEmployee extends SDbRegistryUser {
                     "id_emp = " + mnPkEmployeeId + ", " +
                     */                    
                     "num = '" + msNumber + "', " +
+                    "lastname1 = '" + msLastname1 + "', " +
+                    "lastname2 = '" + msLastname2 + "', " +
                     "ssn = '" + msSocialSecurityNumber + "', " +
                     "dt_bir = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " +
                     "dt_ben = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " +
@@ -619,6 +633,8 @@ public class SDbEmployee extends SDbRegistryUser {
 
         registry.setPkEmployeeId(this.getPkEmployeeId());
         registry.setNumber(this.getNumber());
+        registry.setLastname1(this.getLastname1());
+        registry.setLastname2(this.getLastname2());
         registry.setSocialSecurityNumber(this.getSocialSecurityNumber());
         registry.setDateBirth(this.getDateBirth());
         registry.setDateBenefits(this.getDateBenefits());

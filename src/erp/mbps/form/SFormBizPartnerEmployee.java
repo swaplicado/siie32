@@ -77,8 +77,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.mbps.data.SDataBizPartnerBranch moBizPartnerBranch;
     private erp.mbps.data.SDataEmployee moEmployee;
     private erp.lib.form.SFormField moFieldNumber;
-    private erp.lib.form.SFormField moFieldFirstName;
-    private erp.lib.form.SFormField moFieldLastName;
+    private erp.lib.form.SFormField moFieldFirstname;
+    private erp.lib.form.SFormField moFieldLastname1;
+    private erp.lib.form.SFormField moFieldLastname2;
     private erp.lib.form.SFormField moFieldFiscalId;
     private erp.lib.form.SFormField moFieldAlternativeId;
     private erp.lib.form.SFormField moFieldEmail;
@@ -188,11 +189,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftNumber = new javax.swing.JFormattedTextField();
         jtfBizPartner_Ro = new javax.swing.JTextField();
         jPanel22 = new javax.swing.JPanel();
-        jlFirstName = new javax.swing.JLabel();
-        jtfFirstName = new javax.swing.JTextField();
+        jlFirstname = new javax.swing.JLabel();
+        jtfFirstname = new javax.swing.JTextField();
         jPanel25 = new javax.swing.JPanel();
-        jlLastName = new javax.swing.JLabel();
-        jtfLastName = new javax.swing.JTextField();
+        jlLastname = new javax.swing.JLabel();
+        jtfLastname1 = new javax.swing.JTextField();
+        jtfLastname2 = new javax.swing.JTextField();
         jPanel29 = new javax.swing.JPanel();
         jlFiscalId = new javax.swing.JLabel();
         jtfFiscalId = new javax.swing.JTextField();
@@ -425,33 +427,43 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFirstName.setText("Nombre(s):*");
-        jlFirstName.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel22.add(jlFirstName);
+        jlFirstname.setText("Nombre(s):*");
+        jlFirstname.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel22.add(jlFirstname);
 
-        jtfFirstName.setPreferredSize(new java.awt.Dimension(200, 23));
-        jtfFirstName.addFocusListener(new java.awt.event.FocusAdapter() {
+        jtfFirstname.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfFirstname.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
-                jtfFirstNameFocusLost(evt);
+                jtfFirstnameFocusLost(evt);
             }
         });
-        jPanel22.add(jtfFirstName);
+        jPanel22.add(jtfFirstname);
 
         jPanel19.add(jPanel22);
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlLastName.setText("Apellido(s):*");
-        jlLastName.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel25.add(jlLastName);
+        jlLastname.setText("Apellido(s):*");
+        jlLastname.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel25.add(jlLastname);
 
-        jtfLastName.setPreferredSize(new java.awt.Dimension(200, 23));
-        jtfLastName.addFocusListener(new java.awt.event.FocusAdapter() {
+        jtfLastname1.setToolTipText("Apellido paterno");
+        jtfLastname1.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfLastname1.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
-                jtfLastNameFocusLost(evt);
+                jtfLastname1FocusLost(evt);
             }
         });
-        jPanel25.add(jtfLastName);
+        jPanel25.add(jtfLastname1);
+
+        jtfLastname2.setToolTipText("Apellido materno");
+        jtfLastname2.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfLastname2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jtfLastname2FocusLost(evt);
+            }
+        });
+        jPanel25.add(jtfLastname2);
 
         jPanel19.add(jPanel25);
 
@@ -843,11 +855,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel17.add(jlFkDepartment);
 
         jcbFkDepartment.setPreferredSize(new java.awt.Dimension(350, 23));
-        jcbFkDepartment.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jcbFkDepartmentItemStateChanged(evt);
-            }
-        });
         jPanel17.add(jcbFkDepartment);
 
         jPanel4.add(jPanel17);
@@ -1315,19 +1322,17 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         focusLostAlternativeId();
     }//GEN-LAST:event_jftAlternativeIdFocusLost
 
-    private void jtfFirstNameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfFirstNameFocusLost
-        focusLostFirstName();
-    }//GEN-LAST:event_jtfFirstNameFocusLost
+    private void jtfFirstnameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfFirstnameFocusLost
+        computeBizPartner_Ro();
+    }//GEN-LAST:event_jtfFirstnameFocusLost
 
-    private void jtfLastNameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfLastNameFocusLost
-        focusLostLastName();
-    }//GEN-LAST:event_jtfLastNameFocusLost
+    private void jtfLastname1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfLastname1FocusLost
+        computeBizPartner_Ro();
+    }//GEN-LAST:event_jtfLastname1FocusLost
 
-    private void jcbFkDepartmentItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbFkDepartmentItemStateChanged
-        if (evt.getStateChange() == ItemEvent.SELECTED) {
-            itemStateChangedDepartament();
-        }
-    }//GEN-LAST:event_jcbFkDepartmentItemStateChanged
+    private void jtfLastname2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jtfLastname2FocusLost
+        computeBizPartner_Ro();
+    }//GEN-LAST:event_jtfLastname2FocusLost
 
     private void initComponentsExtra() {
         mvFields = new Vector<>();
@@ -1335,12 +1340,15 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jftNumber, jlNumber);
         moFieldNumber.setLengthMax(10);
         moFieldNumber.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldFirstName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFirstName, jlFirstName);
-        moFieldFirstName.setLengthMax(100);
-        moFieldFirstName.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldLastName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfLastName, jlLastName);
-        moFieldLastName.setLengthMax(100);
-        moFieldLastName.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFirstname = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFirstname, jlFirstname);
+        moFieldFirstname.setLengthMax(100);
+        moFieldFirstname.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldLastname1 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfLastname1, jlLastname);
+        moFieldLastname1.setLengthMax(50);
+        moFieldLastname1.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldLastname2 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfLastname2, jlLastname);
+        moFieldLastname2.setLengthMax(49);
+        moFieldLastname2.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFiscalId, jlFiscalId);
         moFieldFiscalId.setLengthMin(13);
         moFieldFiscalId.setLengthMax(13);
@@ -1502,8 +1510,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jpOficialAddress.add(moPanelBizPartnerBranchAddress, BorderLayout.NORTH);
 
         mvFields.add(moFieldNumber);
-        mvFields.add(moFieldFirstName);
-        mvFields.add(moFieldLastName);
+        mvFields.add(moFieldFirstname);
+        mvFields.add(moFieldLastname1);
+        mvFields.add(moFieldLastname2);
         mvFields.add(moFieldFiscalId);
         mvFields.add(moFieldAlternativeId);
         mvFields.add(moFieldSocialSecurityNumber);
@@ -1587,6 +1596,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jckChangeWage.addItemListener(this);
         jckChangeSalarySscBase.addItemListener(this);
         jcbFkPaymentType.addItemListener(this);
+        jcbFkDepartment.addItemListener(this);
         jftDateBirth.addFocusListener(this);
         jftMateDateBirth.addFocusListener(this);
         jftSonDateBirth1.addFocusListener(this);
@@ -1615,7 +1625,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private void windowActivate() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            jtfFirstName.requestFocus();
+            jtfFirstname.requestFocus();
         }
     }
     
@@ -1630,10 +1640,14 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     }
 
     private String composeName() {
-        String name = moFieldLastName.getString();
+        String name = moFieldLastname1.getString();
 
-        if (!moFieldFirstName.getString().isEmpty()) {
-            name += (name.isEmpty() ? "" : ", ") + moFieldFirstName.getString();
+        if (!moFieldLastname2.getString().isEmpty()) {
+            name += (name.isEmpty() ? "" : " ") + moFieldLastname2.getString();
+        }
+
+        if (!moFieldFirstname.getString().isEmpty()) {
+            name += (name.isEmpty() ? "" : ", ") + moFieldFirstname.getString();
         }
 
         return name;
@@ -1642,14 +1656,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private void computeBizPartner_Ro() {
         jtfBizPartner_Ro.setText(composeName());
         jtfBizPartner_Ro.setCaretPosition(0);
-    }
-
-    private void focusLostFirstName() {
-        computeBizPartner_Ro();
-    }
-
-    private void focusLostLastName() {
-        computeBizPartner_Ro();
     }
 
     private void focusLostAlternativeId() {
@@ -1661,10 +1667,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         }
     }
     private void itemStateChangedDepartament() {
-        renderPosition();
-    }
-    
-    private void renderPosition() {
         if (moFieldFkDepartment.getKeyAsIntArray()[0] > 0) {
             jcbFkPosition.setEnabled(true);
             SFormUtilities.populateComboBox(miClient, jcbFkPosition, SModConsts.HRSU_POS, moFieldFkDepartment.getKeyAsIntArray()[0]);
@@ -2281,7 +2283,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlDateLastDismiss_n;
     private javax.swing.JLabel jlDateLastHire;
     private javax.swing.JLabel jlEmail;
-    private javax.swing.JLabel jlFirstName;
+    private javax.swing.JLabel jlFirstname;
     private javax.swing.JLabel jlFiscalId;
     private javax.swing.JLabel jlFkBank_n;
     private javax.swing.JLabel jlFkCatalogueBloodTypeTypeId;
@@ -2304,7 +2306,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlImageSignature;
     private javax.swing.JLabel jlImgPhoto;
     private javax.swing.JLabel jlImgSignature;
-    private javax.swing.JLabel jlLastName;
+    private javax.swing.JLabel jlLastname;
     private javax.swing.JLabel jlMate;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlRelative;
@@ -2328,11 +2330,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JTextField jtfBankAccount;
     private javax.swing.JTextField jtfBizPartner_Ro;
     private javax.swing.JTextField jtfEmail;
-    private javax.swing.JTextField jtfFirstName;
+    private javax.swing.JTextField jtfFirstname;
     private javax.swing.JTextField jtfFiscalId;
     private javax.swing.JTextField jtfImagePhoto;
     private javax.swing.JTextField jtfImageSignature;
-    private javax.swing.JTextField jtfLastName;
+    private javax.swing.JTextField jtfLastname1;
+    private javax.swing.JTextField jtfLastname2;
     private javax.swing.JTextField jtfMateAge;
     private javax.swing.JTextField jtfMateName;
     private javax.swing.JTextField jtfPkBizPartnerId_Ro;
@@ -2417,6 +2420,14 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfSonAge3.setText("");
         jtfSonAge4.setText("");
         jtfSonAge5.setText("");
+        
+        int[] na = new int[] { SModSysConsts.HRSS_CL_HRS_CAT_SEX, 1 };  // non applying
+        moFieldMateSex.setFieldValue(na);
+        moFieldSonSex1.setFieldValue(na);
+        moFieldSonSex2.setFieldValue(na);
+        moFieldSonSex3.setFieldValue(na);
+        moFieldSonSex4.setFieldValue(na);
+        moFieldSonSex5.setFieldValue(na);
 
         mbUpdatingForm = false;
         jbImagePhotoView.setEnabled(false);
@@ -2433,7 +2444,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         SFormUtilities.populateComboBox(miClient, jcbFkEmployeeType, SModConsts.HRSU_TP_EMP);
         SFormUtilities.populateComboBox(miClient, jcbFkWorkerType, SModConsts.HRSU_TP_WRK);
         SFormUtilities.populateComboBox(miClient, jcbFkDepartment, SModConsts.HRSU_DEP);
-        //SFormUtilities.populateComboBox(miClient, jcbFkPosition, SModConsts.HRSU_POS);
+        //SFormUtilities.populateComboBox(miClient, jcbFkPosition, SModConsts.HRSU_POS); // will be populated on the fly
         SFormUtilities.populateComboBox(miClient, jcbFkShift, SModConsts.HRSU_SHT);
         SFormUtilities.populateComboBox(miClient, jcbFkWorkingDayType, SModConsts.HRSS_TP_WORK_DAY);
         SFormUtilities.populateComboBox(miClient, jcbFkContractType, SModConsts.HRSS_TP_CON);
@@ -2473,7 +2484,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                 if (SDataUtilities.callProcedureVal(miClient, SProcConstants.BPSU_BP, paramsValidation, SLibConstants.EXEC_MODE_VERBOSE) > 0) {
                     if (miClient.showMsgBoxConfirm("El valor del campo '" + jtfBizPartner_Ro.getToolTipText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
                         validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jtfBizPartner_Ro.getToolTipText() + "'.");
-                        validation.setComponent(jtfFirstName);
+                        validation.setComponent(jtfFirstname);
                     }
                 }
 
@@ -2645,10 +2656,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mbUpdatingForm = true;
 
         moBizPartner = (SDataBizPartner) registry;
+        moEmployee = moBizPartner.getDbmsDataEmployee();
 
-        moFieldFirstName.setFieldValue(moBizPartner.getFirstname());
-        moFieldLastName.setFieldValue(moBizPartner.getLastname());
-        computeBizPartner_Ro();
         moFieldFiscalId.setFieldValue(moBizPartner.getFiscalId());
         moFieldAlternativeId.setFieldValue(moBizPartner.getAlternativeId());
         moFieldIsDeleted.setFieldValue(moBizPartner.getIsDeleted());
@@ -2659,9 +2668,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jtfPkBizPartnerId_Ro.setText("" + moBizPartner.getPkBizPartnerId());
 
-        moEmployee = moBizPartner.getDbmsDataEmployee();
-
         if (moEmployee != null) {
+            moFieldLastname1.setFieldValue(moEmployee.getLastname1());
+            moFieldLastname2.setFieldValue(moEmployee.getLastname2());
+            moFieldFirstname.setFieldValue(moBizPartner.getFirstname());
+            computeBizPartner_Ro();
+            
             moFieldNumber.setFieldValue(moEmployee.getNumber());
             moFieldSocialSecurityNumber.setFieldValue(moEmployee.getSocialSecurityNumber());
             moXtaImageIconPhoto_n = moEmployee.getXtaImageIconPhoto_n();
@@ -2683,6 +2695,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldDateLastHire.setFieldValue(moEmployee.getDateLastHire());
             moFieldDateLastDismiss_n.setFieldValue(moEmployee.getDateLastDismiss_n());
             moFieldFkPaymentType.setFieldValue(new int[] { moEmployee.getFkPaymentTypeId() });
+            itemStateChangePaymentType();
             moFieldFkSalaryType.setFieldValue(new int[] { moEmployee.getFkSalaryTypeId() });
 
             moFieldSalary.setFieldValue(moEmployee.getSalary());
@@ -2695,6 +2708,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldFkEmployeeType.setFieldValue(new int[] { moEmployee.getFkEmployeeTypeId() });
             moFieldFkWorkerType.setFieldValue(new int[] { moEmployee.getFkWorkerTypeId() });
             moFieldFkDepartment.setFieldValue(new int[] { moEmployee.getFkDepartmentId() });
+            itemStateChangedDepartament();
             moFieldFkPosition.setFieldValue(new int[] { moEmployee.getFkPositionId() });
             moFieldFkShift.setFieldValue(new int[] { moEmployee.getFkShiftId() });
             moFieldFkWorkingDayType.setFieldValue(new int[] { moEmployee.getFkWorkingDayTypeId()});
@@ -2786,7 +2800,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
         int paymentType = moFieldFkPaymentType.getKeyAsIntArray()[0];
-        String formerBizPartner = "";
         HashSet<Integer> requiredCategories = new HashSet<>();
 
         if (moBizPartner == null) {
@@ -2808,13 +2821,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         //moBizPartner.setPkBizPartnerId(...);
 
-        formerBizPartner = moBizPartner.getBizPartner();
-        moBizPartner.setBizPartner(moFieldLastName.getString() + ", " + moFieldFirstName.getString());
-        if (moBizPartner.getBizPartnerCommercial().isEmpty() || formerBizPartner.compareTo(moBizPartner.getBizPartnerCommercial()) == 0) {
-            moBizPartner.setBizPartnerCommercial(moBizPartner.getBizPartner());
-        }
-        moBizPartner.setLastname(moFieldLastName.getString());
-        moBizPartner.setFirstname(moFieldFirstName.getString());
         moBizPartner.setFiscalId(moFieldFiscalId.getString());
         //moBizPartner.setFiscalFrgId(...);
         moBizPartner.setAlternativeId(moFieldAlternativeId.getString());
@@ -2882,17 +2888,29 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moBizPartner.setDbmsDataEmployee(moEmployee);
         }
         else {
-            moEmployee = moBizPartner.getDbmsDataEmployee();
             moEmployee.setFkUserUpdateId(miClient.getSession().getUser().getPkUserId());
         }
 
         //moEmployee.setPkEmployeeId(...);
         moEmployee.setNumber(moFieldNumber.getString());
+        moEmployee.setLastname1(moFieldLastname1.getString());
+        moEmployee.setLastname2(moFieldLastname2.getString());
         moEmployee.setSocialSecurityNumber(moFieldSocialSecurityNumber.getString());
         moEmployee.setDateBirth(moFieldDateBirth.getDate());
         moEmployee.setDateBenefits(moFieldDateBenefits.getDate());
         moEmployee.setDateLastHire(moFieldDateLastHire.getDate());
         moEmployee.setDateLastDismiss_n(moFieldDateLastDismiss_n.getDate());
+        
+        // update of business partner name MUST BE SET HERE, DO NOT MOVE!, that is just after father and mother surenames and forename already has been set in SDataEmployee!
+        String formerBizPartner = moBizPartner.getBizPartner();
+        moBizPartner.setBizPartner(moEmployee.composeLastname() + ", " + moFieldFirstname.getString());
+        if (moBizPartner.getBizPartnerCommercial().isEmpty() || formerBizPartner.compareTo(moBizPartner.getBizPartnerCommercial()) == 0) {
+            // former business partner name was equal to commercial name, so, set commercial name equal to business partner name again:
+            moBizPartner.setBizPartnerCommercial(moBizPartner.getBizPartner());
+        }
+        //moBizPartner.setLastname(...);    // will be superseded by employee's father and mother surenames consigned in SDataEmployee
+        moBizPartner.setFirstname(moFieldFirstname.getString());
+        // end of update of business partner name
         
         if (paymentType == SModSysConsts.HRSS_TP_PAY_WEE) {
             moEmployee.setSalary(moFieldSalary.getDouble());
@@ -3113,6 +3131,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
                     if (comboBox == jcbFkPaymentType) {
                         itemStateChangePaymentType();
+                    }
+                    else if (comboBox == jcbFkDepartment) {
+                        itemStateChangedDepartament();
                     }
                 }
             }

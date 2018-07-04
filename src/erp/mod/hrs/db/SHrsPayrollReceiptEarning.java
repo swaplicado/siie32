@@ -11,7 +11,7 @@ import sa.lib.grid.SGridRow;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
 
@@ -112,15 +112,16 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
     */
     
     public void computeEarning() {
-        if (moEarning.isDaysWorkedBased() && !moPayrollReceiptEarning.isUserEdited()) {
-            moPayrollReceiptEarning.setAmountUnitary(moHrsPayrollReceipt.getTotalEarningsDependentsDaysWorked() * moEarning.getPayPercentage());
-            computeAmount();
+        if (!moPayrollReceiptEarning.isUserEdited()) {
+            if (moEarning.isDaysWorkedBased()) {
+                moPayrollReceiptEarning.setAmountUnitary(moHrsPayrollReceipt.getTotalEarningsDependentsDaysWorked() * moEarning.getPayPercentage());
+                computeAmount();
+            }
         }
     }
     
     public void computeAmount() {
-        //moPayrollReceiptEarning.setAmount_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-        moPayrollReceiptEarning.setAmount_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moPayrollReceiptEarning.getFactorAmount()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
+        moPayrollReceiptEarning.setAmount_r(SLibUtils.roundAmount((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moPayrollReceiptEarning.getFactorAmount())));
     }
     
     public SHrsPayrollReceiptEarning clone() throws CloneNotSupportedException {
@@ -275,7 +276,7 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
                         else {
                             moPayrollReceiptEarning.setUserEdited(mdXtaValueAlleged != moPayrollReceiptEarning.getUnitsAlleged());
                             moPayrollReceiptEarning.setUnitsAlleged(mdXtaValueAlleged);
-                            moPayrollReceiptEarning.setUnits(SLibUtils.round(moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_DAY ? mdXtaValueAlleged : (!moEarning.isDaysAdjustment() ? mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()));
+                            moPayrollReceiptEarning.setUnits(SLibUtils.roundAmount(moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_DAY ? mdXtaValueAlleged : (!moEarning.isDaysAdjustment() ? mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid())));
                         }
                         // computeEarning(); XXX jbarajas 15/04/2015
                         computeAmount();
@@ -380,7 +381,7 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
                         else {
                             moPayrollReceiptEarning.setUserEdited(mdXtaValueAlleged != moPayrollReceiptEarning.getUnitsAlleged());
                             moPayrollReceiptEarning.setUnitsAlleged(mdXtaValueAlleged);
-                            moPayrollReceiptEarning.setUnits(SLibUtils.round(moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_DAY ? mdXtaValueAlleged : (!moEarning.isDaysAdjustment() ? mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid()), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()));
+                            moPayrollReceiptEarning.setUnits(SLibUtils.roundAmount(moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_DAY ? mdXtaValueAlleged : (!moEarning.isDaysAdjustment() ? mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() : mdXtaValueAlleged * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorCalendar() * moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays().getFactorDaysPaid())));
                         }
 
                         try {

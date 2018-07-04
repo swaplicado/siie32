@@ -4,13 +4,14 @@
  */
 package erp.mod.hrs.db;
 
+import erp.mod.SModSysConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridRow;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SHrsPayrollReceiptDeduction implements SGridRow, Comparable {
     
@@ -76,23 +77,26 @@ public class SHrsPayrollReceiptDeduction implements SGridRow, Comparable {
     public String getXtaLoan() { return msXtaLoan; }
 
     public void computeDeduction() {
-        SDbLoan loan = null;
-        
-        try {
-            if (!moPayrollReceiptDeduction.isUserEdited() && moPayrollReceiptDeduction.getFkLoanLoanId_n() != SLibConsts.UNDEFINED) {
-                loan = moHrsPayrollReceipt.getHrsEmployee().getLoan(moPayrollReceiptDeduction.getFkLoanLoanId_n());
+        if (!moPayrollReceiptDeduction.isUserEdited()) {
+            try {
+                if (moDeduction.getFkDeductionComputationTypeId() == SModSysConsts.HRSS_TP_DED_COMP_PER_EAR) {
+                    moPayrollReceiptDeduction.setAmountUnitary(moHrsPayrollReceipt.getTotalEarningsDependentsDaysWorked() * moDeduction.getRetPercentage());
+                    mdXtaValue = moPayrollReceiptDeduction.getAmountUnitary();
+                }
+                else if (moPayrollReceiptDeduction.getFkLoanLoanId_n() != SLibConsts.UNDEFINED) {
+                    SDbLoan loan = moHrsPayrollReceipt.getHrsEmployee().getLoan(moPayrollReceiptDeduction.getFkLoanLoanId_n());
+                    moPayrollReceiptDeduction.setAmountUnitary(SHrsUtils.computeAmoutLoan(moHrsPayrollReceipt, loan));
+                    mdXtaValue = moPayrollReceiptDeduction.getAmountUnitary();
+                }
 
-                moPayrollReceiptDeduction.setAmountUnitary(SHrsUtils.computeAmoutLoan(moHrsPayrollReceipt, loan));
-                mdXtaValue = moPayrollReceiptDeduction.getAmountUnitary();
+                moPayrollReceiptDeduction.setUnitsAlleged(1);
+                moPayrollReceiptDeduction.setUnits(1);
+                moPayrollReceiptDeduction.setAmountSystem_r(SLibUtils.roundAmount((moPayrollReceiptDeduction.getUnits() * moPayrollReceiptDeduction.getAmountUnitary())));
+                moPayrollReceiptDeduction.setAmount_r(SLibUtils.roundAmount((moPayrollReceiptDeduction.getUnits() * moPayrollReceiptDeduction.getAmountUnitary())));
             }
-
-            moPayrollReceiptDeduction.setUnitsAlleged(1);
-            moPayrollReceiptDeduction.setUnits(1);
-            moPayrollReceiptDeduction.setAmountSystem_r(SLibUtils.round((moPayrollReceiptDeduction.getUnits() * moPayrollReceiptDeduction.getAmountUnitary()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-            moPayrollReceiptDeduction.setAmount_r(SLibUtils.round((moPayrollReceiptDeduction.getUnits() * moPayrollReceiptDeduction.getAmountUnitary()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-        }
-        catch (Exception e) {
-            SLibUtils.printException(this, e);
+            catch (Exception e) {
+                SLibUtils.printException(this, e);
+            }
         }
     }
     
@@ -155,54 +159,57 @@ public class SHrsPayrollReceiptDeduction implements SGridRow, Comparable {
     public Object getRowValueAt(int row) {
         Object value = null;
 
-        if (mnRowType == BY_DED) {
-            switch (row) {
-                case 0:
-                    value = msXtaEmployee;
-                    break;
-                case 1:
-                    value = mdXtaValue;
-                    mbPayment = mdXtaValue != 0;
-                    break;
-                case 2:
-                    value = msXtaUnit;
-                    break;
-                case 3:
-                    value = moPayrollReceiptDeduction.getAmount_r();
-                    break;
-                case 4:
-                    value = mbPayment;
-                    break;
-                case 5:
-                    value = msXtaLoan;
-                    break;
-                default:
-                    break;
-            }
-        }
-        else {
-            switch (row) {
-                case 0:
-                    value = mnPkMoveId;
-                    break;
-                case 1:
-                    value = moDeduction.getName();
-                    break;
-                case 2:
-                    value = mdXtaValue;
-                    break;
-                case 3:
-                    value = msXtaUnit;
-                    break;
-                case 4:
-                    value = moPayrollReceiptDeduction.getAmount_r();
-                    break;
-                case 5:
-                    value = msXtaLoan;
-                    break;
-                default:
-                    break;
-            }
+        switch (mnRowType) {
+            case BY_DED:
+                switch (row) {
+                    case 0:
+                        value = msXtaEmployee;
+                        break;
+                    case 1:
+                        value = mdXtaValue;
+                        mbPayment = mdXtaValue != 0;
+                        break;
+                    case 2:
+                        value = msXtaUnit;
+                        break;
+                    case 3:
+                        value = moPayrollReceiptDeduction.getAmount_r();
+                        break;
+                    case 4:
+                        value = mbPayment;
+                        break;
+                    case 5:
+                        value = msXtaLoan;
+                        break;
+                    default:
+                }
+                break;
+                
+            case BY_EMP:
+                switch (row) {
+                    case 0:
+                        value = mnPkMoveId;
+                        break;
+                    case 1:
+                        value = moDeduction.getName();
+                        break;
+                    case 2:
+                        value = mdXtaValue;
+                        break;
+                    case 3:
+                        value = msXtaUnit;
+                        break;
+                    case 4:
+                        value = moPayrollReceiptDeduction.getAmount_r();
+                        break;
+                    case 5:
+                        value = msXtaLoan;
+                        break;
+                    default:
+                }
+                break;
+                
+            default:
         }
         
         return value;
@@ -210,90 +217,98 @@ public class SHrsPayrollReceiptDeduction implements SGridRow, Comparable {
 
     @Override
     public void setRowValueAt(Object value, int row) {
+        switch (mnRowType) {
+            case BY_DED:
+                switch (row) {
+                    case 0:
+                        break;
+                        
+                    case 1:
+                        mdXtaValue = (double) value;
 
-        if (mnRowType == BY_DED) {
-            switch (row) {
-                case 0:
-                    break;
-                case 1:
-                    mdXtaValue = (double) value;
-                    
-                    if (mdXtaValue != moPayrollReceiptDeduction.getAmountUnitary()) {
-                        moPayrollReceiptDeduction.setUserEdited(true);
-                    }
-                    moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
-                    
-                    /*
-                    // XXX (jbarajas, 2016-04-20) new field for computation type
-                    if (moDeduction.getFkDeductionComputationTypeId() == SModSysConsts.HRSS_TP_DED_COMP_AMT) {
+                        if (mdXtaValue != moPayrollReceiptDeduction.getAmountUnitary()) {
+                            moPayrollReceiptDeduction.setUserEdited(true);
+                        }
                         moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
-                    }
-                    else {
-                        moPayrollReceiptDeduction.setUnitsAlleged(mdXtaValue);
-                        moPayrollReceiptDeduction.setUnits(mdXtaValue);
-                    }
-                    */
-                    
-                    computeDeduction();
-                    mbPayment = mdXtaValue != 0;
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    mbPayment = (boolean) value;
-                    mdXtaValue = !mbPayment ? 0 : mdXtaValue;
-                    moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
-                    
-                    /*
-                    // XXX (jbarajas, 2016-04-20) new field for computation type
-                    if (moDeduction.getFkDeductionComputationTypeId() == SModSysConsts.HRSS_TP_DED_COMP_AMT) {
+
+                        /*
+                        // XXX (jbarajas, 2016-04-20) new field for computation type
+                        if (moDeduction.getFkDeductionComputationTypeId() == SModSysConsts.HRSS_TP_DED_COMP_AMT) {
+                            moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
+                        }
+                        else {
+                            moPayrollReceiptDeduction.setUnitsAlleged(mdXtaValue);
+                            moPayrollReceiptDeduction.setUnits(mdXtaValue);
+                        }
+                        */
+
+                        computeDeduction();
+                        mbPayment = mdXtaValue != 0;
+                        break;
+                        
+                    case 2:
+                    case 3:
+                        break;
+                        
+                    case 4:
+                        mbPayment = (boolean) value;
+                        mdXtaValue = !mbPayment ? 0 : mdXtaValue;
                         moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
-                    }
-                    else {
-                        moPayrollReceiptDeduction.setUnitsAlleged(mdXtaValue);
-                        moPayrollReceiptDeduction.setUnits(mdXtaValue);
-                    }
-                    */
-                    
-                    if (!mbPayment) {
-                        moPayrollReceiptDeduction.setFkLoanEmployeeId_n(SLibConsts.UNDEFINED);
-                        moPayrollReceiptDeduction.setFkLoanLoanId_n(SLibConsts.UNDEFINED);
-                        moPayrollReceiptDeduction.setFkLoanTypeId_n(SLibConsts.UNDEFINED);
-                    }
-                    computeDeduction();
-                    break;
-                case 5:
-                    break;
-                default:
-                    break;
-            }
-        }
-        else {
-            switch (row) {
-                case 0:
-                    break;
-                case 1:
-                    break;
-                case 2:
-                    mdXtaValue = (double) value;
-                    
-                    if (mdXtaValue != moPayrollReceiptDeduction.getAmountUnitary()) {
-                        moPayrollReceiptDeduction.setUserEdited(true);
-                    }
-                    moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
-                    computeDeduction();
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    break;
-                case 5:
-                    break;
-                default:
-                    break;
-            }
+
+                        /*
+                        // XXX (jbarajas, 2016-04-20) new field for computation type
+                        if (moDeduction.getFkDeductionComputationTypeId() == SModSysConsts.HRSS_TP_DED_COMP_AMT) {
+                            moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
+                        }
+                        else {
+                            moPayrollReceiptDeduction.setUnitsAlleged(mdXtaValue);
+                            moPayrollReceiptDeduction.setUnits(mdXtaValue);
+                        }
+                        */
+
+                        if (!mbPayment) {
+                            moPayrollReceiptDeduction.setFkLoanEmployeeId_n(SLibConsts.UNDEFINED);
+                            moPayrollReceiptDeduction.setFkLoanLoanId_n(SLibConsts.UNDEFINED);
+                            moPayrollReceiptDeduction.setFkLoanTypeId_n(SLibConsts.UNDEFINED);
+                        }
+                        
+                        computeDeduction();
+                        break;
+                        
+                    case 5:
+                        break;
+                        
+                    default:
+                }
+                break;
+                
+            case BY_EMP:
+                switch (row) {
+                    case 0:
+                    case 1:
+                        break;
+                        
+                    case 2:
+                        mdXtaValue = (double) value;
+
+                        if (mdXtaValue != moPayrollReceiptDeduction.getAmountUnitary()) {
+                            moPayrollReceiptDeduction.setUserEdited(true);
+                        }
+                        moPayrollReceiptDeduction.setAmountUnitary(mdXtaValue);
+
+                        computeDeduction();
+                        break;
+                        
+                    case 3:
+                    case 4:
+                    case 5:
+                        break;
+                        
+                    default:
+                }
+                break;
+                
+            default:
         }
     }
 

@@ -404,7 +404,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                 // Read aswell customer configuration, if exists:
 
                 if (mbIsCustomer) {
-                    sql = "SELECT count(*) AS f_count FROM mkt_cfg_cus WHERE id_cus = " + mnPkBizPartnerId + " AND b_del = 0 ";
+                    sql = "SELECT count(*) AS f_count FROM mkt_cfg_cus WHERE id_cus = " + mnPkBizPartnerId + " ";
                     resultSet = statement.executeQuery(sql);
                     if (resultSet.next()) {
                         if (resultSet.getInt("f_count") == 1) {
@@ -419,7 +419,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                 // Read aswell sales agent configuration, if exists:
 
                 if (mbIsAttributeSalesAgent) {
-                    sql = "SELECT count(*) AS f_count FROM mkt_cfg_sal_agt WHERE id_sal_agt = " + mnPkBizPartnerId + " AND b_del = 0 ";
+                    sql = "SELECT count(*) AS f_count FROM mkt_cfg_sal_agt WHERE id_sal_agt = " + mnPkBizPartnerId + " ";
                     resultSet = statement.executeQuery(sql);
                     if (resultSet.next()) {
                         if (resultSet.getInt("f_count") == 1) {
@@ -472,6 +472,11 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
+        if (moDbmsDataEmployee != null) {
+            // for employees, last name is splitted into father and mother surenames:
+            msLastname = moDbmsDataEmployee.composeLastname();
+        }
+        
         try {
             callableStatement = connection.prepareCall(
                     "{ CALL erp.bpsu_bp_save(" +
@@ -549,6 +554,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
 
                 if (moDbmsDataCustomerConfig != null) {
                     moDbmsDataCustomerConfig.setPkCustomerId(mnPkBizPartnerId);
+                    moDbmsDataCustomerConfig.setIsDeleted(mbIsDeleted);
                     if (moDbmsDataCustomerConfig.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
@@ -558,6 +564,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
 
                 if (moDbmsDataConfigurationSalesAgent != null) {
                     moDbmsDataConfigurationSalesAgent.setPkSalesAgentId(mnPkBizPartnerId);
+                    moDbmsDataConfigurationSalesAgent.setIsDeleted(mbIsDeleted);
                     if (moDbmsDataConfigurationSalesAgent.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }

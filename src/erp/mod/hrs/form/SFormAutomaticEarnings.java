@@ -4,7 +4,6 @@
  */
 package erp.mod.hrs.form;
 
-import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbAutomaticEarning;
@@ -40,7 +39,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOwner, ActionListener, ItemListener {
 
@@ -303,7 +302,7 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Código percepción"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Percepción"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha inicial"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha final"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/Préstamo"));
@@ -347,69 +346,55 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
     }
 
     private void updateRows() {
-        int row = 0;
-        SDbLoan loan = null;
-        SDbAutomaticEarning automaticRow = null;
-        SGridRow gridRow = null;
-
-        automaticRow = new SDbAutomaticEarning();
-
+        boolean applyUnits = SLibUtils.belongsTo(moEarning.getFkEarningComputationTypeId(), new int[] { SModSysConsts.HRSS_TP_EAR_COMP_DAY, SModSysConsts.HRSS_TP_EAR_COMP_HRS });
+        boolean applyAmount = moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT;
+        
+        SDbAutomaticEarning automaticRow = new SDbAutomaticEarning();
         automaticRow.setPkEarningId(moEarning.getPkEarningId());
-        automaticRow.setUnits((moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT || moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) ? 1 : moComValue.getField().getValue());
-        automaticRow.setAmountUnitary((moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT) ? 1 : moComValue.getField().getValue());
-        automaticRow.setAmount_r(automaticRow.getUnits() * automaticRow.getAmountUnitary());
+        automaticRow.setUnits(!applyUnits ? 1 : moComValue.getField().getValue());
+        automaticRow.setAmountUnitary(!applyAmount ? 1 : moComValue.getField().getValue());
+        automaticRow.setAmount_r(SLibUtils.roundAmount(automaticRow.getUnits() * automaticRow.getAmountUnitary()));
         automaticRow.setDateStart(moDateDateStart.getValue());
         automaticRow.setDateEnd_n(moDateDateEnd_n.getValue());
         automaticRow.setFkPaysheetTypeId(getPaysheetTypeId());
         automaticRow.setFkEarningTypeId(moEarning.getFkEarningTypeId());
         automaticRow.setFkEmployeeId_n(mnFormSubtype != SModSysConsts.HRS_AUT_EMP ? SLibConsts.UNDEFINED : moKeyEmployee.getValue()[0]);
+        
         if (moKeyLoan_n.isEnabled() && moKeyLoan_n.getValue().length > 0) {
             automaticRow.setFkLoanEmployeeId_n(moKeyLoan_n.getValue()[0]);
             automaticRow.setFkLoanLoanId_n(moKeyLoan_n.getValue()[1]);
         }
 
-        try {
-            automaticRow.setXtaEarningCode((String) miClient.getSession().readField(SModConsts.HRS_EAR, new int[] { moEarning.getPkEarningId() }, SDbRegistry.FIELD_CODE));
-            automaticRow.setXtaEarning((String) miClient.getSession().readField(SModConsts.HRS_EAR, new int[] { moEarning.getPkEarningId() }, SDbRegistry.FIELD_NAME));
-            automaticRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { moEarning.getFkEarningComputationTypeId() }, SDbRegistry.FIELD_CODE));
-            automaticRow.setXtaPaysheetType((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY_SHT, new int[] { getPaysheetTypeId() }, SDbRegistry.FIELD_NAME));
-            if (moKeyLoan_n.isEnabled() && moKeyLoan_n.getValue().length > 0) {
-                loan = new SDbLoan();
-
-                loan.read(miClient.getSession(), new int[] { moKeyLoan_n.getValue()[0], moKeyLoan_n.getValue()[1] });
-                automaticRow.setXtaLoan(loan.getLoanIdentificator());
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.printException(this, e);
+        automaticRow.setXtaEarningCode((String) miClient.getSession().readField(SModConsts.HRS_EAR, new int[] { moEarning.getPkEarningId() }, SDbRegistry.FIELD_CODE));
+        automaticRow.setXtaEarning((String) miClient.getSession().readField(SModConsts.HRS_EAR, new int[] { moEarning.getPkEarningId() }, SDbRegistry.FIELD_NAME));
+        automaticRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { moEarning.getFkEarningComputationTypeId() }, SDbRegistry.FIELD_CODE));
+        automaticRow.setXtaPaysheetType((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY_SHT, new int[] { getPaysheetTypeId() }, SDbRegistry.FIELD_NAME));
+        
+        if (moKeyLoan_n.isEnabled() && moKeyLoan_n.getValue().length > 0) {
+            SDbLoan loan = (SDbLoan) miClient.getSession().readRegistry(SModConsts.HRS_LOAN, new int[] { moKeyLoan_n.getValue()[0], moKeyLoan_n.getValue()[1] });
+            automaticRow.setXtaLoan(loan.getLoanIdentificator());
         }
 
-        gridRow = (SGridRow) automaticRow;
+        SGridRow gridRow = (SGridRow) automaticRow;
         moGridAutomaticRow.getModel().getGridRows().add(gridRow);
         moGridAutomaticRow.getModel().renderGridRows();
 
-        row = moGridAutomaticRow.getModel().getRowCount() - 1;
+        int row = moGridAutomaticRow.getModel().getRowCount() - 1;
         moGridAutomaticRow.setSelectedGridRow(row);
     }
 
     private void populateAutomaticRow() throws Exception {
-        Vector<SGridRow> rows = new Vector<SGridRow>();
-        SDbLoan loan = null;
-        SDbEarning earning = null;
+        Vector<SGridRow> rows = new Vector<>();
 
         for (SDbAutomaticEarning row : moRegistry.getAutomaticEarnings()) {
-            earning = new SDbEarning();
-
-            earning.read(miClient.getSession(), new int[] { row.getPkEarningId() });
+            SDbEarning earning = (SDbEarning) miClient.getSession().readRegistry(SModConsts.HRS_EAR, new int[] { row.getPkEarningId() });
 
             row.setXtaEarningCode((String) miClient.getSession().readField(SModConsts.HRS_EAR, new int[] { row.getPkEarningId() }, SDbRegistry.FIELD_CODE));
             row.setXtaEarning((String) miClient.getSession().readField(SModConsts.HRS_EAR, new int[] { row.getPkEarningId() }, SDbRegistry.FIELD_NAME));
             row.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { earning.getFkEarningComputationTypeId() }, SDbRegistry.FIELD_CODE));
             row.setXtaPaysheetType((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY_SHT, new int[] { row.getFkPaysheetTypeId() }, SDbRegistry.FIELD_NAME));
             if (row.getFkLoanEmployeeId_n() != SLibConsts.UNDEFINED) {
-                loan = new SDbLoan();
-
-                loan.read(miClient.getSession(), new int[] { row.getFkLoanEmployeeId_n(), row.getFkLoanLoanId_n() });
+                SDbLoan loan = (SDbLoan) miClient.getSession().readRegistry(SModConsts.HRS_LOAN, new int[] { row.getFkLoanEmployeeId_n(), row.getFkLoanLoanId_n() });
                 row.setXtaLoan(loan.getLoanIdentificator());
             }
 
@@ -432,10 +417,6 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
         }
     }
     
-    private void enableFieldValue(final boolean enable) {
-        moComValue.getField().setEditable(enable);
-    }
-
     private void resetFields() {
         moTextCodeFind.setText("");
         moTextName.setText("");
@@ -517,7 +498,7 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
         boolean load = true;
 
         try {
-            moEarning = SHrsUtils.getEarning(miClient, SLibUtilities.textTrim(moTextCodeFind.getText()));
+            moEarning = SHrsUtils.getEarning(miClient, SLibUtils.textTrim(moTextCodeFind.getText()));
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
@@ -529,7 +510,7 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
         }
         else {
             if ((moEarning.getFkAbsenceClassId_n() != SLibConsts.UNDEFINED && moEarning.getFkAbsenceTypeId_n() != SLibConsts.UNDEFINED) || moEarning.getFkBenefitTypeId() != SModSysConsts.HRSS_TP_BEN_NON) {
-                miClient.showMsgBoxWarning("No se pueden agregar percepciones de tipo incidencia y/o prestación.");
+                miClient.showMsgBoxWarning("No se pueden agregar percepciones de tipo incidencia ni prestación.");
                 load = false;
                 moTextCodeFind.requestFocus();
             }
@@ -544,11 +525,9 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
 
             if (load) {
                 moTextName.setValue(moEarning.getName());
-                
-                enableFieldValue(!moEarning.isDaysWorkedBased());
-                
-                moComValue.getField().getComponent().requestFocus();
+                moComValue.getField().setEditable(!moEarning.isDaysWorkedBased());
                 moComValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { moEarning.getFkEarningComputationTypeId() }, SDbRegistry.FIELD_CODE));
+                moComValue.getField().getComponent().requestFocus();
 
                 resetLoan();
             }

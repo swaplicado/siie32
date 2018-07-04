@@ -134,7 +134,7 @@
                           <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
                         </Property>
                         <Property name="horizontalAlignment" type="int" value="2"/>
-                        <Property name="text" type="java.lang.String" value="&lt;&lt;&lt; para contabilizaci&#xf3;n y para concepto del CFDI (XML)"/>
+                        <Property name="text" type="java.lang.String" value="para contabilizaci&#xf3;n y para concepto del CFDI (XML)"/>
                         <Property name="toolTipText" type="java.lang.String" value=""/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[350, 23]"/>
@@ -162,6 +162,19 @@
                       <Properties>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[200, 23]"/>
+                        </Property>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jlEarningComputationTypeHelp">
+                      <Properties>
+                        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                          <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
+                        </Property>
+                        <Property name="horizontalAlignment" type="int" value="2"/>
+                        <Property name="text" type="java.lang.String" value="ayuda..."/>
+                        <Property name="toolTipText" type="java.lang.String" value=""/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[350, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -422,7 +435,7 @@
                           <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
                         </Property>
                         <Property name="horizontalAlignment" type="int" value="2"/>
-                        <Property name="text" type="java.lang.String" value="(Porcentaje del pago por unidad)"/>
+                        <Property name="text" type="java.lang.String" value="(Porcentaje del pago en funci&#xf3;n del tipo de c&#xe1;lculo de percepci&#xf3;n elegido)"/>
                         <Property name="toolTipText" type="java.lang.String" value=""/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[650, 23]"/>
@@ -509,15 +522,15 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Aplica d&#xed;as incidencia"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[125, 23]"/>
+                          <Dimension value="[140, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolDaysWorked">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Aplica d&#xed;as trabajados"/>
+                        <Property name="text" type="java.lang.String" value="Cuenta como d&#xed;as trabajados"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[135, 23]"/>
+                          <Dimension value="[185, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -766,10 +779,10 @@
                         <Property name="verticalGap" type="int" value="0"/>
                       </Layout>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jLabel1">
+                        <Component class="javax.swing.JLabel" name="jlBenefitTypeHelp">
                           <Properties>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[250, 23]"/>
+                              <Dimension value="[300, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -795,9 +808,9 @@
                             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                               <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
                             </Property>
-                            <Property name="text" type="java.lang.String" value="&lt;&lt;&lt; manera de configurar cuentas contables"/>
+                            <Property name="text" type="java.lang.String" value="para configurar cuentas contables"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[250, 23]"/>
+                              <Dimension value="[300, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
@@ -823,9 +836,9 @@
                             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                               <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>
                             </Property>
-                            <Property name="text" type="java.lang.String" value="&lt;&lt;&lt; manera de agrupar asientos contables"/>
+                            <Property name="text" type="java.lang.String" value="para agrupar asientos contables al cerrar n&#xf3;minas"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[250, 23]"/>
+                              <Dimension value="[300, 23]"/>
                             </Property>
                           </Properties>
                         </Component>
