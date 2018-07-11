@@ -49,7 +49,7 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
     
     protected int mnWorkingDays;
     protected SDbConfig moConfig;
-    protected SDbBenefitTable moBenefit;
+    protected SDbBenefitTable moBenefitTable;
     protected Date mtDateCut;
     protected ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableByAnniversary;
 
@@ -387,17 +387,19 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
     }
     
     private void loadBenefitTables() throws Exception {
-        ArrayList<SDbBenefitTable> aBenefitTables = new ArrayList<SDbBenefitTable>();
+        ArrayList<SDbBenefitTable> aBenefitTables = new ArrayList<>();
         
         if (moConfig.getFkEarningVacationsId_n() == SLibConsts.UNDEFINED) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración vacaciones)");
         }
-        moBenefit = SHrsUtils.getBenefitTableByEarning(miClient.getSession(), moConfig.getFkEarningVacationsId_n(), moEmployee.getFkPaymentTypeId(), (moDateDate.getValue() != null ? moDateDate.getValue() : SLibTimeUtils.createDate(moIntBenefitYear.getValue(), 1, 1)));
         
-        if (moBenefit == null) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Tabla de prestaciones adecuada para la fecha de corte)");
-        }
-        aBenefitTables.add(moBenefit);
+        moBenefitTable = SHrsUtils.getBenefitTableByEarning(
+                miClient.getSession(), 
+                moConfig.getFkEarningVacationsId_n(), 
+                moEmployee.getFkPaymentTypeId(), 
+                (moDateDate.getValue() != null ? moDateDate.getValue() : SLibTimeUtils.createDate(moIntBenefitYear.getValue(), 1, 1)));
+        
+        aBenefitTables.add(moBenefitTable);
         
         maBenefitTableByAnniversary = SHrsUtils.getBenefitTablesAnniversarys(aBenefitTables);
     }
@@ -408,19 +410,12 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
     }
     
     private void setSenority() {
-        int benefitAnn = 0;
-        
-        try {
-            if (moEmployee != null && mtDateCut != null) {
-                benefitAnn = SHrsUtils.getSeniorityEmployee(miClient.getSession(), moEmployee.getDateBenefits(), mtDateCut);
-                
-                jsAnniversary.setValue(benefitAnn == 0 ? 1 : benefitAnn);
+        if (moEmployee != null && mtDateCut != null) {
+            int benefitAnniv = SHrsUtils.getSeniorityEmployee(moEmployee.getDateBenefits(), mtDateCut);
 
-                actionStateChangeAnniversary();
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
+            jsAnniversary.setValue(benefitAnniv == 0 ? 1 : benefitAnniv);
+
+            actionStateChangeAnniversary();
         }
     }
     

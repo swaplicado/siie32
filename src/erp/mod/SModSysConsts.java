@@ -874,10 +874,11 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_DIS = 14;       // Disability
     public static final int HRSS_TP_EAR_TAX_SUB = 17;   // Tax
     public static final int HRSS_TP_EAR_OVR_TME = 19;   // Overtime
+    public static final int HRSS_TP_EAR_VAC_BON = 21;   // Vacation Bonus
     public static final int HRSS_TP_EAR_SEN_BON = 22;   // Seniority bonus 
     public static final int HRSS_TP_EAR_SET = 23;       // Payment by settlement
     public static final int HRSS_TP_EAR_CMP = 25;       // Compensation
-    public static final int HRSS_TP_EAR_OTH = 999;  // Other payments diferent the catalogue earnings type the SAT
+    public static final int HRSS_TP_EAR_OTH = 999;      // Other payments diferent the catalogue earnings type the SAT
 
     public static final int HRSS_TP_OTH_PAY_TAX_REF = 1;    // Tax Refund
     public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2;    // Tax Subsidy

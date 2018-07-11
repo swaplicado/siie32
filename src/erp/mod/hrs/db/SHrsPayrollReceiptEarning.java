@@ -18,8 +18,8 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
     public static final int BY_EMP = 1;
     public static final int BY_EAR = 2;
 
-    protected SDbPayrollReceiptEarning moPayrollReceiptEarning;
     protected SDbEarning moEarning;
+    protected SDbPayrollReceiptEarning moPayrollReceiptEarning;
     protected SHrsPayrollReceipt moHrsPayrollReceipt;
 
     protected int mnPkMoveId;
@@ -34,8 +34,8 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
     protected double mdXtaAmount;
 
     public SHrsPayrollReceiptEarning() {
-        moPayrollReceiptEarning = null;
         moEarning = null;
+        moPayrollReceiptEarning = null;
         moHrsPayrollReceipt = null;
 
         mnPkMoveId = 0;
@@ -50,8 +50,8 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
         mdXtaAmount = 0;
     }
 
-    public void setReceiptEarning(SDbPayrollReceiptEarning o) { moPayrollReceiptEarning = o; }
     public void setEarning(SDbEarning o) { moEarning = o; }
+    public void setReceiptEarning(SDbPayrollReceiptEarning o) { moPayrollReceiptEarning = o; }
     public void setHrsReceipt(SHrsPayrollReceipt o) { moHrsPayrollReceipt = o; }
 
     public void setPkMoveId(int n) { mnPkMoveId = n; }
@@ -65,8 +65,8 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
     public void setXtaLoan(String s) { msXtaLoan = s; }
     public void setXtaAmount(double d) { mdXtaAmount = d; }
 
-    public SDbPayrollReceiptEarning getReceiptEarning() { return moPayrollReceiptEarning; }
     public SDbEarning getEarning() { return moEarning; }
+    public SDbPayrollReceiptEarning getReceiptEarning() { return moPayrollReceiptEarning; }
     public SHrsPayrollReceipt getHrsReceipt() { return moHrsPayrollReceipt; }
 
     public int getPkMoveId() { return mnPkMoveId; }
@@ -79,37 +79,6 @@ public class SHrsPayrollReceiptEarning implements SGridRow, Comparable {
     public String getXtaUnit() { return msXtaUnit; }
     public String getXtaLoan() { return msXtaLoan; }
     public double getXtaAmount() { return mdXtaAmount; }
-    
-    /* XXX jbarajas 15/04/2015
-    public void computeEarning() {
-        switch (moEarning.getFkEarningComputationTypeId()) {
-            case SModSysConsts.HRSS_TP_EAR_COMP_AMT:
-                moPayrollReceiptEarning.setUnitsAlleged(1);
-                moPayrollReceiptEarning.setUnits(1);
-                moPayrollReceiptEarning.setAmountSystem_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-                moPayrollReceiptEarning.setAmount_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-                break;
-            case SModSysConsts.HRSS_TP_EAR_COMP_DAY:
-                moPayrollReceiptEarning.setAmountUnitary(moHrsPayrollReceipt.getReceipt().getPaymentDaily());
-                if (!moHrsPayrollReceipt.getHrsPayroll().getPayroll().isNormal()) {
-                    moPayrollReceiptEarning.setAmountSystem_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-                    moPayrollReceiptEarning.setAmount_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-                }
-                else {
-                    moPayrollReceiptEarning.setAmountSystem_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-                    moPayrollReceiptEarning.setAmount_r(SLibUtils.round(( moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-                }
-                break;
-            case SModSysConsts.HRSS_TP_EAR_COMP_HRS:
-                moPayrollReceiptEarning.setAmountUnitary(moHrsPayrollReceipt.getReceipt().getPaymentHourly());
-                moPayrollReceiptEarning.setAmountSystem_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-                moPayrollReceiptEarning.setAmount_r(SLibUtils.round((moPayrollReceiptEarning.getUnits() * moPayrollReceiptEarning.getAmountUnitary() * moEarning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
-                break;
-            default:
-                break;
-        }
-    }
-    */
     
     public void computeEarning() {
         if (!moPayrollReceiptEarning.isUserEdited()) {

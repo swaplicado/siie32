@@ -41,7 +41,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements ActionListener, FocusListener, ListSelectionListener  {
 
@@ -52,7 +52,7 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
     
     protected int mnAbsenceConsumptionPendingDays;
     protected int mnDiferenceDays;
-    protected SDbBenefitTable moBenefit;
+    protected SDbBenefitTable moBenefitTable;
     protected SHrsBenefit moHrsBenefit;
     protected ArrayList<SHrsBenefit> maHrsBenefits;
     protected ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableByAnniversary;
@@ -301,18 +301,19 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
     }
     
     private void loadBenefitTables() throws Exception {
-        ArrayList<SDbBenefitTable> aBenefitTables = new ArrayList<SDbBenefitTable>();
+        ArrayList<SDbBenefitTable> aBenefitTables = new ArrayList<>();
         
         if (moReceipt.getHrsPayroll().getConfig().getFkEarningVacationsId_n() == SLibConsts.UNDEFINED) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración vacaciones)");
         }
         
-        moBenefit = SHrsUtils.getBenefitTableByEarning(miClient.getSession(), moReceipt.getHrsPayroll().getConfig().getFkEarningVacationsId_n(), moReceipt.getHrsEmployee().getEmployee().getFkPaymentTypeId(), moReceipt.getHrsPayroll().getPayroll().getDateEnd());
+        moBenefitTable = SHrsUtils.getBenefitTableByEarning(
+                miClient.getSession(), 
+                moReceipt.getHrsPayroll().getConfig().getFkEarningVacationsId_n(), 
+                moReceipt.getHrsEmployee().getEmployee().getFkPaymentTypeId(), 
+                moReceipt.getHrsPayroll().getPayroll().getDateEnd());
         
-        if (moBenefit == null) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Tabla de prestaciones adecuada para la fecha de corte)");
-        }
-        aBenefitTables.add(moBenefit);
+        aBenefitTables.add(moBenefitTable);
         
         maBenefitTableByAnniversary = SHrsUtils.getBenefitTablesAnniversarys(aBenefitTables);
     }
@@ -327,7 +328,7 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
             moIntBenefitYear.setValue(benefitYear);
             
             for (SHrsBenefit hrsBenefit : maHrsBenefits) {
-                if (SLibUtils.compareKeys(hrsBenefit.getPrimaryBenefitType(), new int[] { SModSysConsts.HRSS_TP_BEN_VAC, seniority, benefitYear })) {
+                if (SLibUtils.compareKeys(hrsBenefit.getBenefitKey(), new int[] { SModSysConsts.HRSS_TP_BEN_VAC, seniority, benefitYear })) {
                     hrsBenefit.setValuePayedReceipt(moReceipt.getBenefitValue(SModSysConsts.HRSS_TP_BEN_VAC, hrsBenefit.getBenefitAnn(), hrsBenefit.getBenefitYear()));
                     hrsBenefit.setAmountPayedReceipt(moReceipt.getBenefitAmount(SModSysConsts.HRSS_TP_BEN_VAC, hrsBenefit.getBenefitAnn(), hrsBenefit.getBenefitYear()));
                     moIntDaysToPaidTable.setValue((int) hrsBenefit.getValue());
@@ -345,7 +346,7 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
         moHrsBenefit = new SHrsBenefit(mnFormType,  moIntBenefitAnn.getValue(), moIntBenefitYear.getValue());
         
         for (SHrsBenefit hrsBenefit : maHrsBenefits) {
-            if (SLibUtils.compareKeys(hrsBenefit.getPrimaryBenefitType(), new int[] { SModSysConsts.HRSS_TP_BEN_VAC, moIntBenefitAnn.getValue(), moIntBenefitYear.getValue() })) {
+            if (SLibUtils.compareKeys(hrsBenefit.getBenefitKey(), new int[] { SModSysConsts.HRSS_TP_BEN_VAC, moIntBenefitAnn.getValue(), moIntBenefitYear.getValue() })) {
                 moHrsBenefit.setValue(hrsBenefit.getValue());
                 moHrsBenefit.setValuePayed(hrsBenefit.getValuePayed());
                 moHrsBenefit.setAmount(hrsBenefit.getAmount());
@@ -450,14 +451,14 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
                 if (moAbsence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_VAC) {
                     createHrsBenefit();
 
-                    msg = moHrsBenefit.validate(SHrsBenefit.VALID_DAYS_TO_PAID, SHrsBenefit.VALIDATION_ABSENCE_TYPE);
+                    msg = moHrsBenefit.validate(SHrsBenefit.VALID_DAYS_TO_PAY, SHrsBenefit.VALIDATION_ABSENCE_TYPE);
                     if (!msg.isEmpty()) {
                         validation.setMessage(msg);
                         validation.setComponent(moIntEffectiveDays);
                     }
                     
                     if (validation.isValid()) {
-                        msg = moHrsBenefit.validate(SHrsBenefit.VALID_DAYS_TO_PAID_TOTAL, SHrsBenefit.VALIDATION_ABSENCE_TYPE);
+                        msg = moHrsBenefit.validate(SHrsBenefit.VALID_DAYS_TO_PAY_TOTAL, SHrsBenefit.VALIDATION_ABSENCE_TYPE);
                         
                         if (!msg.isEmpty()) {
                             if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {

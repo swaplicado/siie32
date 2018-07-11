@@ -18,7 +18,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores, Juan Barajas
+ * @author Néstor Ávalos, Sergio Flores, Juan Barajas, Sergio Flores
  */
 public class SHrsPayrollReceipt {
 
@@ -34,10 +34,10 @@ public class SHrsPayrollReceipt {
         moReceipt = null;
         moHrsPayroll = null;
         moHrsEmployee = null;
-        maAbsenceConsumptionDays = new ArrayList<SDbAbsenceConsumption>();
-        maHrsEarnings = new ArrayList<SHrsPayrollReceiptEarning>();
-        maHrsDeductions = new ArrayList<SHrsPayrollReceiptDeduction>();
-        maHrsBenefits = new ArrayList<SHrsBenefit>();
+        maAbsenceConsumptionDays = new ArrayList<>();
+        maHrsEarnings = new ArrayList<>();
+        maHrsDeductions = new ArrayList<>();
+        maHrsBenefits = new ArrayList<>();
     }
 
     /*
@@ -80,7 +80,7 @@ public class SHrsPayrollReceipt {
 
     private void computeEarningsExempt() throws Exception {
         SHrsPayrollReceiptAccumulatedEarnings hrsPayrollReceiptAccumulatedEarnings = null;
-        HashMap<Integer, SHrsPayrollReceiptAccumulatedEarnings> earningsMap = new HashMap<Integer, SHrsPayrollReceiptAccumulatedEarnings>();
+        HashMap<Integer, SHrsPayrollReceiptAccumulatedEarnings> earningsMap = new HashMap<>();
 
         // Group earnings:
 
@@ -1055,17 +1055,16 @@ public class SHrsPayrollReceipt {
         try {
             for (SHrsBenefit benefit : maHrsBenefits) {
                 for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarning : maHrsEarnings) {
-                    if (SLibUtils.compareKeys(benefit.getPrimaryBenefitType(), new int[] { hrsPayrollReceiptEarning.getReceiptEarning().getFkBenefitTypeId(), 
+                    if (SLibUtils.compareKeys(benefit.getBenefitKey(), new int[] { hrsPayrollReceiptEarning.getReceiptEarning().getFkBenefitTypeId(), 
                         hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAniversary(), hrsPayrollReceiptEarning.getReceiptEarning().getBenefitYear() })) {
-                        
+
                         benefit.setValuePayedReceipt(0d);
                         benefit.setAmountPayedReceipt(0d);
-                        
+
                         // Obtain benefit table row more appropiate for seniority:
-            
-                        
-                        benefitTable = moHrsPayroll.getBenefitTable(moHrsPayroll.getPayroll().getDateEnd(), hrsPayrollReceiptEarning.getReceiptEarning().getFkBenefitTypeId());
-                        
+
+                        benefitTable = moHrsPayroll.getBenefitTable(hrsPayrollReceiptEarning.getReceiptEarning().getFkBenefitTypeId(), moHrsPayroll.getPayroll().getDateEnd(), moHrsPayroll.getPayroll().getFkPaymentTypeId());
+
                         for (SDbBenefitTableRow row : benefitTable.getChildRows()) {
                             if (row.getMonths() >= (hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAniversary() * SHrsConsts.YEAR_MONTHS)) {
                                 benefitTableRow = row;
@@ -1073,10 +1072,10 @@ public class SHrsPayrollReceipt {
                             }
                         }
 
-                        // Obtain benefit table row more appropiate for seniority, it's for vacation bonification:
+                        // Obtain benefit table row more appropiate for seniority, it's for vacation bonus:
 
                         if (hrsPayrollReceiptEarning.getReceiptEarning().getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                            benefitTableAux = moHrsPayroll.getBenefitTable(moHrsPayroll.getPayroll().getDateEnd(), SModSysConsts.HRSS_TP_BEN_VAC);
+                            benefitTableAux = moHrsPayroll.getBenefitTable(SModSysConsts.HRSS_TP_BEN_VAC, moHrsPayroll.getPayroll().getDateEnd(), moHrsPayroll.getPayroll().getFkPaymentTypeId());
                             
                             for (SDbBenefitTableRow row : benefitTableAux.getChildRows()) {
                                 if (row.getMonths() >= (hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAniversary() * SHrsConsts.YEAR_MONTHS)) {
@@ -1237,7 +1236,8 @@ public class SHrsPayrollReceipt {
         SHrsPayrollReceiptEarning hrsPayrollReceiptEarning = null;
         ArrayList<SHrsPayrollReceiptEarning> aEarningDelete = null;
         double workingDaysAvailable = 0;
-        aEarningDelete = new ArrayList<SHrsPayrollReceiptEarning>();
+        
+        aEarningDelete = new ArrayList<>();
         
         for (SHrsPayrollReceiptEarning earning : moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings()) {
             if (earning.getReceiptEarning().isSystem()) {
@@ -1263,75 +1263,53 @@ public class SHrsPayrollReceipt {
             }
         }
         
-        if (earningNormal != null) {
-
-            for (SHrsPayrollReceiptEarning earning : moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings()) {
-                if (SLibUtils.compareKeys(earning.getEarning().getPrimaryKey(), earningNormal.getPrimaryKey())) {
-                    if (add) {
-                        unitAlleged = earning.getReceiptEarning().getUnitsAlleged() - (unitAlleged > earning.getReceiptEarning().getUnitsAlleged() ? earning.getReceiptEarning().getUnitsAlleged() : unitAlleged);
-                    }
-                    else {
-                        unitAlleged = earning.getReceiptEarning().getUnitsAlleged() + (unitAlleged > workingDaysAvailable ? workingDaysAvailable : unitAlleged);
-                    }
-                    unit = SLibUtils.round((!earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid())), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits());
-                    amount = SLibUtils.round((unit * earning.getReceiptEarning().getAmountUnitary() * earningNormal.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-
-                    earning.getReceiptEarning().setUnitsAlleged(unitAlleged);
-                    earning.getReceiptEarning().setUnits(unit);
-                    earning.getReceiptEarning().setAmount_r(amount);
-                    // XXX (jbarajas, 2016-04-01) remove earning normal with value zero
-                    if (unit <= 0) {
-                        moHrsEmployee.getHrsPayrollReceipt().removeEarning(earning.getPkMoveId());                        
-                    }
-                    else {
-                        moHrsEmployee.getHrsPayrollReceipt().replaceEarning(earning.getPkMoveId(), earning);                        
-                    }
-
-                    found = true;
-                    break;
+        for (SHrsPayrollReceiptEarning earning : moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings()) {
+            if (SLibUtils.compareKeys(earning.getEarning().getPrimaryKey(), earningNormal.getPrimaryKey())) {
+                if (add) {
+                    unitAlleged = earning.getReceiptEarning().getUnitsAlleged() - (unitAlleged > earning.getReceiptEarning().getUnitsAlleged() ? earning.getReceiptEarning().getUnitsAlleged() : unitAlleged);
                 }
+                else {
+                    unitAlleged = earning.getReceiptEarning().getUnitsAlleged() + (unitAlleged > workingDaysAvailable ? workingDaysAvailable : unitAlleged);
+                }
+                unit = SLibUtils.round((!earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid())), SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits());
+                amount = SLibUtils.round((unit * earning.getReceiptEarning().getAmountUnitary() * earningNormal.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+
+                earning.getReceiptEarning().setUnitsAlleged(unitAlleged);
+                earning.getReceiptEarning().setUnits(unit);
+                earning.getReceiptEarning().setAmount_r(amount);
+                // XXX (jbarajas, 2016-04-01) remove earning normal with value zero
+                if (unit <= 0) {
+                    moHrsEmployee.getHrsPayrollReceipt().removeEarning(earning.getPkMoveId());                        
+                }
+                else {
+                    moHrsEmployee.getHrsPayrollReceipt().replaceEarning(earning.getPkMoveId(), earning);                        
+                }
+
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+
+            if (earningNormal.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
+                amount_unt = unitAlleged;
             }
 
-            if (!found) {
+            // XXX (jbarajas, 2016-04-01) remove earning normal with value zero
+            if (unitAlleged > 0) {
+                hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
+                hrsPayrollReceiptEarning.setEarning(earningNormal);
                 
-                if (earningNormal.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
-                    amount_unt = unitAlleged;
-                }
-                /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
-                else if (earningNormal.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
-                    amount_unt = moHrsEmployee.getHrsPayrollReceipt().getReceipt().getPaymentDaily();
-                    unit = !earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid());;
-                }
-                else if (earningNormal.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
-                    amount_unt = moHrsEmployee.getHrsPayrollReceipt().getReceipt().getPaymentHourly();
-                    unit = !earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid());;
-                }
-                else if (earningNormal.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY) {
-                    amount_unt = moHrsEmployee.getHrsPayrollReceipt().getReceipt().getPaymentDaily() * earningNormal.getPayPercentage();
-                    unit = !earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid());;
-                }
-                else if (earningNormal.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
-                    amount_unt = moHrsEmployee.getHrsPayrollReceipt().getReceipt().getPaymentHourly() * earningNormal.getPayPercentage();
-                    unit = !earningNormal.isDaysAdjustment() ? unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() : (unitAlleged * moHrsEmployee.getEmployeeDays().getFactorCalendar() * moHrsEmployee.getEmployeeDays().getFactorDaysPaid());;
-                }
-                amount = SLibUtils.round((unit * amount_unt), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                */
+                payrollReceiptEarning = moHrsPayroll.createHrsPayrollReceiptEarning(
+                        moHrsEmployee.getHrsPayrollReceipt(), null, earningNormal, unitAlleged, amount_unt, true, 
+                        SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings().size() + 1);
 
-                // XXX (jbarajas, 2016-04-01) remove earning normal with value zero
-                if (unitAlleged > 0) {
-                    hrsPayrollReceiptEarning = new SHrsPayrollReceiptEarning();
-                    hrsPayrollReceiptEarning.setEarning(earningNormal);
-                    /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
-                    payrollReceiptEarning = moHrsPayroll.createHrsPayrollReceiptEarning(moHrsEmployee.getEmployee().getPkEmployeeId(), unitAlleged, amount_unt, amount, true, earningNormal,
-                        SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earningNormal.getFkLoanTypeId(), moHrsEmployee.getHrsPayrollReceipt());
-                    */
-                    payrollReceiptEarning = moHrsPayroll.createHrsPayrollReceiptEarning(moHrsEmployee.getHrsPayrollReceipt(), null, unitAlleged, amount_unt, true, earningNormal, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, earningNormal.getFkLoanTypeId(), moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings().size() + 1);
-
-                    hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
-                    hrsPayrollReceiptEarning.setPkMoveId(moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings().size() + 1);
-                    hrsPayrollReceiptEarning.setHrsReceipt(moHrsEmployee.getHrsPayrollReceipt());
-                    moHrsEmployee.getHrsPayrollReceipt().addEarning(hrsPayrollReceiptEarning);
-                }
+                hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
+                hrsPayrollReceiptEarning.setPkMoveId(moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings().size() + 1);
+                hrsPayrollReceiptEarning.setHrsReceipt(moHrsEmployee.getHrsPayrollReceipt());
+                
+                moHrsEmployee.getHrsPayrollReceipt().addEarning(hrsPayrollReceiptEarning);
             }
         }
 
@@ -1359,8 +1337,8 @@ public class SHrsPayrollReceipt {
                 }
             }
         }
-        moHrsEmployee.getHrsPayrollReceipt().removeEarning(earning.getPkMoveId());
         
+        moHrsEmployee.getHrsPayrollReceipt().removeEarning(earning.getPkMoveId());
     }
 
     public void computeDbPayrollReceiptDays() throws Exception {
@@ -1382,9 +1360,10 @@ public class SHrsPayrollReceipt {
         moReceipt.setAnnualTaxableDays_r(moHrsEmployee.getEmployeeDays().getAnnualTaxableDays_r());
         moReceipt.setDaysToBePaid_r(getDaysToBePaid(moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings()));
         moReceipt.setDaysPaid(getDaysWorkedPayed(moHrsEmployee.getHrsPayrollReceipt().getHrsEarnings()));
+        
         computeHrsDaysByPeriod();
     }
-     
+    
     public void computeHrsDaysByPeriod() throws Exception {
         int difDays = 0;
         int year = 0;
@@ -1478,8 +1457,6 @@ public class SHrsPayrollReceipt {
         return new SHrsDaysByPeriod(year, periodYear, daysPeriod, daysPeriodPayroll);
     }
     
-    
-    
     public boolean validateAbsenceConsumption(SDbAbsence absence, SDbAbsenceConsumption absenceConsumption) throws Exception {
         int diferencePendingDays = 0;
         int pendigEffectiveDays = 0;
@@ -1568,7 +1545,7 @@ public class SHrsPayrollReceipt {
         }
         
         return true;
-     }
+    }
     
     public boolean validateDaysToBePaidWithAbsence() throws Exception {
         double daysPayed = 0;
@@ -1592,41 +1569,46 @@ public class SHrsPayrollReceipt {
         
         return true;
     }
-     
-     public SHrsPayrollReceipt clone() throws CloneNotSupportedException {
-        SHrsPayrollReceipt registry = new SHrsPayrollReceipt();
-        
-        registry.setReceipt(this.getReceipt().clone());
-        registry.setHrsPayroll(this.getHrsPayroll());
-        registry.setHrsEmployee(this.getHrsEmployee());
-        
-        for (SDbAbsenceConsumption absenceConsumption : this.getAbsenceConsumptions()) {
-            registry.getAbsenceConsumptions().add(absenceConsumption.clone());
-        }
-        
-        for (SHrsPayrollReceiptEarning hrsEarning : this.getHrsEarnings()) {
-            registry.getHrsEarnings().add(hrsEarning.clone());
-        }
-        
-        for (SHrsPayrollReceiptDeduction hrsDeduction : this.getHrsDeductions()) {
-            registry.getHrsDeductions().add(hrsDeduction.clone());
-        }
-        
-        for (SHrsBenefit hrsBenefit : this.getHrsBenefits()) {
-            registry.getHrsBenefits().add(hrsBenefit.clone());
-        }
-        
-        for (SHrsPayrollReceiptEarning hrsEarning : registry.getHrsEarnings()) {
-            hrsEarning.setHrsReceipt(registry);
-        }
-        
-        for (SHrsPayrollReceiptDeduction hrsDeduction : registry.getHrsDeductions()) {
-            hrsDeduction.setHrsReceipt(registry);
-        }
-        
-        registry.getHrsPayroll().replaceReceipt(registry.getHrsEmployee().getEmployee().getPkEmployeeId(), registry, false);
-        registry.getHrsEmployee().setHrsPayrollReceipt(registry);
-        
-        return registry;
-     }
+    
+    public double calculateBenefit(final SDbEarning earning, final double days, final double percentage) {
+        double units = days * getHrsEmployee().getEmployeeDays().getFactorCalendar() * (!earning.isDaysAdjustment() ? 1d : getHrsEmployee().getEmployeeDays().getFactorDaysPaid());
+        return SLibUtils.roundAmount(units * getReceipt().getPaymentDaily() * (earning.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? percentage : 1d));
+    }
+    
+    public SHrsPayrollReceipt clone() throws CloneNotSupportedException {
+       SHrsPayrollReceipt registry = new SHrsPayrollReceipt();
+
+       registry.setReceipt(this.getReceipt().clone());
+       registry.setHrsPayroll(this.getHrsPayroll());
+       registry.setHrsEmployee(this.getHrsEmployee());
+
+       for (SDbAbsenceConsumption absenceConsumption : this.getAbsenceConsumptions()) {
+           registry.getAbsenceConsumptions().add(absenceConsumption.clone());
+       }
+
+       for (SHrsPayrollReceiptEarning hrsEarning : this.getHrsEarnings()) {
+           registry.getHrsEarnings().add(hrsEarning.clone());
+       }
+
+       for (SHrsPayrollReceiptDeduction hrsDeduction : this.getHrsDeductions()) {
+           registry.getHrsDeductions().add(hrsDeduction.clone());
+       }
+
+       for (SHrsBenefit hrsBenefit : this.getHrsBenefits()) {
+           registry.getHrsBenefits().add(hrsBenefit.clone());
+       }
+
+       for (SHrsPayrollReceiptEarning hrsEarning : registry.getHrsEarnings()) {
+           hrsEarning.setHrsReceipt(registry);
+       }
+
+       for (SHrsPayrollReceiptDeduction hrsDeduction : registry.getHrsDeductions()) {
+           hrsDeduction.setHrsReceipt(registry);
+       }
+
+       registry.getHrsPayroll().replaceReceipt(registry.getHrsEmployee().getEmployee().getPkEmployeeId(), registry, false);
+       registry.getHrsEmployee().setHrsPayrollReceipt(registry);
+
+       return registry;
+    }
 }

@@ -30,6 +30,7 @@ public class SDbConfig extends SDbRegistryUser {
     protected String msBajioAffinityGroup;
     protected double mdPayrollTaxRate;
     protected boolean mbFornightStandard;
+    protected boolean mbAutoVacationBonus;
     protected boolean mbTaxSubsidyEarning;
     protected boolean mbTaxNet;
     protected boolean mbBankAccountUse;
@@ -66,6 +67,7 @@ public class SDbConfig extends SDbRegistryUser {
     public void setBajioAffinityGroup(String s) { msBajioAffinityGroup = s; }
     public void setPayrollTaxRate(double d) { mdPayrollTaxRate = d; }
     public void setFornightStandard(boolean b) { mbFornightStandard = b; }
+    public void setAutoVacationBonus(boolean b) { mbAutoVacationBonus = b; }
     public void setTaxSubsidyEarning(boolean b) { mbTaxSubsidyEarning = b; }
     public void setTaxNet(boolean b) { mbTaxNet = b; }
     public void setBankAccountUse(boolean b) { mbBankAccountUse = b; }
@@ -96,6 +98,7 @@ public class SDbConfig extends SDbRegistryUser {
     public String getBajioAffinityGroup() { return msBajioAffinityGroup; }
     public double getPayrollTaxRate() { return mdPayrollTaxRate; }
     public boolean isFornightStandard() { return mbFornightStandard; }
+    public boolean isAutoVacationBonus() { return mbAutoVacationBonus; }
     public boolean isTaxSubsidyEarning() { return mbTaxSubsidyEarning; }
     public boolean isTaxNet() { return mbTaxNet; }
     public boolean isBankAccountUse() { return mbBankAccountUse; }
@@ -140,6 +143,7 @@ public class SDbConfig extends SDbRegistryUser {
         msBajioAffinityGroup = "";
         mdPayrollTaxRate = 0;
         mbFornightStandard = false;
+        mbAutoVacationBonus = false;
         mbTaxSubsidyEarning = false;
         mbTaxNet = false;
         mbBankAccountUse = false;
@@ -205,6 +209,7 @@ public class SDbConfig extends SDbRegistryUser {
             msBajioAffinityGroup = resultSet.getString("baj_aff_grp");
             mdPayrollTaxRate = resultSet.getDouble("pay_tax_rate");
             mbFornightStandard = resultSet.getBoolean("b_for_std");
+            mbAutoVacationBonus = resultSet.getBoolean("b_auto_vac_bon");
             mbTaxSubsidyEarning = resultSet.getBoolean("b_tax_sub_ear");
             mbTaxNet = resultSet.getBoolean("b_tax_net");
             mbBankAccountUse = resultSet.getBoolean("b_bank_acc_use");
@@ -256,6 +261,7 @@ public class SDbConfig extends SDbRegistryUser {
                     "'" + msBajioAffinityGroup + "', " + 
                     mdPayrollTaxRate + ", " + 
                     (mbFornightStandard ? 1 : 0) + ", " + 
+                    (mbAutoVacationBonus ? 1 : 0) + ", " + 
                     (mbTaxSubsidyEarning ? 1 : 0) + ", " +
                     (mbTaxNet ? 1 : 0) + ", " +
                     (mbBankAccountUse ? 1 : 0) + ", " + 
@@ -291,6 +297,7 @@ public class SDbConfig extends SDbRegistryUser {
                     "baj_aff_grp = '" + msBajioAffinityGroup + "', " +
                     "pay_tax_rate = " + mdPayrollTaxRate + ", " +
                     "b_for_std = " + (mbFornightStandard ? 1 : 0) + ", " +
+                    "b_auto_vac_bon = " + (mbAutoVacationBonus ? 1 : 0) + ", " +
                     "b_tax_sub_ear = " + (mbTaxSubsidyEarning ? 1 : 0) + ", " +
                     "b_tax_net = " + (mbTaxNet ? 1 : 0) + ", " +
                     "b_bank_acc_use = " + (mbBankAccountUse ? 1 : 0) + ", " +
@@ -332,6 +339,7 @@ public class SDbConfig extends SDbRegistryUser {
         registry.setBajioAffinityGroup(this.getBajioAffinityGroup());
         registry.setPayrollTaxRate(this.getPayrollTaxRate());
         registry.setFornightStandard(this.isFornightStandard());
+        registry.setAutoVacationBonus(this.isAutoVacationBonus());
         registry.setTaxSubsidyEarning(this.isTaxSubsidyEarning());
         registry.setTaxNet(this.isTaxNet());
         registry.setBankAccountUse(this.isBankAccountUse());

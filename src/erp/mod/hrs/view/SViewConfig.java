@@ -51,6 +51,7 @@ public class SViewConfig extends SGridPaneView {
                 + "v.baj_aff_grp, "
                 + "v.pay_tax_rate, "
                 + "v.b_for_std, "
+                + "v.b_auto_vac_bon, "
                 + "v.b_tax_sub_ear, "
                 + "v.b_tax_net, "
                 + "v.b_bank_acc_use, "
@@ -115,6 +116,7 @@ public class SViewConfig extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.lim_mwz_ref", "Tope cot SMAR"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.pay_tax_rate", "Imp sobre nóminas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_for_std", "Quincenas fijas 15 días"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_auto_vac_bon", "Pagao auto prima vacacional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_tax_sub_ear", "Sub impto percepción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_tax_net", "Impto neto"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tmwz.name", "Área geo"));

@@ -43,6 +43,8 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
@@ -478,6 +480,22 @@ public abstract class SHrsUtils {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
+    }
+    
+    /**
+     * Checks if period is anniversary of provided date.
+     * @param anniversary
+     * @param periodStart
+     * @param periodEnd
+     * @return 
+     */
+    public static boolean isAnniversaryBelongingToPeriod(final Date anniversary, final Date periodStart, final Date periodEnd) throws Exception {
+        SLibTimeUtils.validatePeriod(periodStart, periodEnd);
+        int[] elementsDate = SLibTimeUtils.digestDate(anniversary);
+        int[] elementsPeriodEnd = SLibTimeUtils.digestDate(periodEnd);
+        elementsDate[0] = elementsPeriodEnd[0];
+        Date newDate = SLibTimeUtils.createDate(elementsDate[0], elementsDate[1], elementsDate[2]);
+        return SLibTimeUtils.isBelongingToPeriod(newDate, periodStart, periodEnd);
     }
     
     /**
@@ -971,35 +989,46 @@ public abstract class SHrsUtils {
 
         return deduction;
     }
-    
-    public static SDbBenefitTable getBenefitTableByEarning(final SGuiSession session, final int earningId, final int paymentType, final Date dateCut) throws Exception {
-        SDbBenefitTable benefitTable = null;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT id_ben "
+    /**
+     * Gets benefits table by earning.
+     * @param session
+     * @param earningId
+     * @param paymentType
+     * @param dateCutOff
+     * @return
+     * @throws Exception if benefit table is not found or on SQL exception as well.
+     */
+    public static SDbBenefitTable getBenefitTableByEarning(final SGuiSession session, final int earningId, final int paymentType, final Date dateCutOff) throws Exception {
+        SDbBenefitTable benefitTable = null;
+
+        String sql = "SELECT id_ben "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
-            + "WHERE b_del = 0 AND fk_ear = " + earningId + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "' "
+            + "WHERE b_del = 0 AND fk_ear = " + earningId + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "' "
             + (paymentType == SLibConsts.UNDEFINED ? "AND fk_tp_pay_n IS NULL" : "AND (fk_tp_pay_n IS NULL OR fk_tp_pay_n = " + paymentType + ")") + " "
             + "ORDER BY dt_sta DESC, id_ben "
             + "LIMIT 1;";
-        resultSet = session.getStatement().executeQuery(sql);
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             benefitTable = new SDbBenefitTable();
             benefitTable.read(session, new int[] { resultSet.getInt("id_ben") });
+        }
+        
+        if (benefitTable == null) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nTabla de prestaciones adecuada para la fecha de corte '" + SLibUtils.DateFormatDate.format(dateCutOff) + "'.");
         }
 
         return benefitTable;
     }
     
-    public static SDbBenefitTable getBenefitTableByDeduction(final SGuiSession session, final int deductionId, final Date dateCut) throws Exception {
+    public static SDbBenefitTable getBenefitTableByDeduction(final SGuiSession session, final int deductionId, final Date dateCutOff) throws Exception {
         SDbBenefitTable benefitTable = null;
         String sql = "";
         ResultSet resultSet = null;
 
         sql = "SELECT id_ben "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
-            + "WHERE b_del = 0 AND fk_ded_n = " + deductionId + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "' "
+            + "WHERE b_del = 0 AND fk_ded_n = " + deductionId + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "' "
             + "ORDER BY dt_sta DESC, id_ben "
             + "LIMIT 1;";
         resultSet = session.getStatement().executeQuery(sql);
@@ -1119,14 +1148,14 @@ public abstract class SHrsUtils {
         return id_ss;
     }
     
-    public static int getRecentBenefitTable(final SGuiSession session, final int benefitType, final int paymentType, final Date dateCut) throws Exception {
+    public static int getRecentBenefitTable(final SGuiSession session, final int benefitType, final int paymentType, final Date dateCutOff) throws Exception {
         int id_ben = 0;
         String sql = "";
         ResultSet resultSet = null;
 
         sql = "SELECT id_ben "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
-            + "WHERE b_del = 0 AND fk_tp_ben = " + benefitType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "' "
+            + "WHERE b_del = 0 AND fk_tp_ben = " + benefitType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "' "
             + (paymentType == SLibConsts.UNDEFINED ? "AND fk_tp_pay_n IS NULL" : "AND (fk_tp_pay_n IS NULL OR fk_tp_pay_n = " + paymentType + ")") + " "
             + "ORDER BY dt_sta DESC, id_ben "
             + "LIMIT 1;";
@@ -1141,6 +1170,7 @@ public abstract class SHrsUtils {
     /**
      * Get recent minimum wage zone
      * @param session SGuiSession
+     * @param idMwzType Minimum wage zone
      * @param start Date start date
      * @return wage double
      * @throws Exception
@@ -1542,7 +1572,7 @@ public abstract class SHrsUtils {
         return balance;
     }
     
-    public static double getIntegrationFactorSbc(final SGuiSession session, final Date dateBenefits, final Date dateCut) throws Exception {
+    public static double getIntegrationFactorSbc(final SGuiSession session, final Date dateBenefits, final Date dateCutOff) throws Exception {
         int seniority = 0;
         int daysTableVacation = 0;
         int daysTableAnnualBonus = 0;
@@ -1557,12 +1587,12 @@ public abstract class SHrsUtils {
         ArrayList<SDbBenefitTable> aTableAnnualBonus = new ArrayList<SDbBenefitTable>();
         ArrayList<SDbBenefitTable> aTableVacationBonus = new ArrayList<SDbBenefitTable>();
         
-        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCut) }));
-        aTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, SLibConsts.UNDEFINED, dateCut) }));
-        aTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, SLibConsts.UNDEFINED, dateCut) }));
+        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutOff) }));
+        aTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, SLibConsts.UNDEFINED, dateCutOff) }));
+        aTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, SLibConsts.UNDEFINED, dateCutOff) }));
         
         if (dateBenefits != null) {
-            seniority = getSeniorityEmployee(session, dateBenefits, dateCut);
+            seniority = getSeniorityEmployee(dateBenefits, dateCutOff);
         }
         else {
             seniority = 1;
@@ -1614,19 +1644,12 @@ public abstract class SHrsUtils {
         return nextNumber;
     }
     
-    public static int getSeniorityEmployee(final SGuiSession session, final Date dateBenefits, final Date dateCut) throws Exception {
-        int seniority = 0;
-        String sql = "";
-        ResultSet resultSet = null;
+    public static int getSeniorityEmployee(final Date dateBenefits, final Date dateCutOff) {
+        DateTime start = new DateTime(dateBenefits);
+        DateTime end = new DateTime(dateCutOff);
+        Period period = new Period(start, end);
         
-        sql = "SELECT TIMESTAMPDIFF(YEAR,'" + SLibUtils.DbmsDateFormatDate.format(dateBenefits) + "','" + 
-                SLibUtils.DbmsDateFormatDate.format(dateCut) + "') ";
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            seniority = resultSet.getInt(1);
-        }
-        
-        return seniority;
+        return period.getYears();
     }
     
     public static int getPaymentVacationsByEmployee(final SGuiSession session, final int employeeId, final int benefitAnn, final int benefitYear) throws Exception {
@@ -1647,12 +1670,12 @@ public abstract class SHrsUtils {
         return seniority;
     }
     
-    public static int getDaysVacationsAll(final SGuiSession session, final int benefitAnn, final Date dateCut) throws Exception {
+    public static int getDaysVacationsAll(final SGuiSession session, final int benefitAnn, final Date dateCutOff) throws Exception {
         int daysTableVacation = 0;
         ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<SDbBenefitTable>();
         ArrayList<SHrsBenefitTableByAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
         
-        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCut) }));
+        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutOff) }));
         
         aTableVacationByAnniversary = getBenefitTablesAnniversarys(aTableVacation);
         
@@ -1899,17 +1922,16 @@ public abstract class SHrsUtils {
         return true;
     }
     
-    public static ArrayList<SHrsBenefit> readHrsBenefits(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int aniversaryLimit, final int benefitYearAux, final int payrrollId, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversary, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversaryAux, final double paymentDaily) throws Exception {
+    public static ArrayList<SHrsBenefit> readHrsBenefits(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int aniversaryLimit, final int benefitYear, final int payrrollId, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversary, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversaryAux, final double paymentDaily) throws Exception {
+        ArrayList<SHrsBenefit> hrsBenefits = new ArrayList<>();
         boolean foundAnniversary = false;
-        ArrayList<SHrsBenefit> aHrsBenefits = new ArrayList<SHrsBenefit>();
         SHrsBenefit hrsBenefit = null;
         SHrsBenefitTableByAnniversary benefitTableRow = null;
         SHrsBenefitTableByAnniversary benefitTableRowAux = null;
         String sql = "";
         ResultSet resultSet = null;
         
-        sql = "SELECT fk_tp_ben, ben_ann, ben_year, SUM(unt_all) AS f_val_payed, " +
-                "SUM(amt_r) AS f_amt_payed " +
+        sql = "SELECT fk_tp_ben, ben_ann, ben_year, SUM(unt_all) AS f_val_payed, SUM(amt_r) AS f_amt_payed " +
                 "FROM hrs_pay_rcp_ear " +
                 "WHERE b_del = 0 AND id_emp = " + employee.getPkEmployeeId() + " AND id_pay <> " + payrrollId + " AND fk_tp_ben = " + benefitType + " AND ben_ann <= " + aniversaryLimit + " " +
                 "GROUP BY fk_tp_ben, ben_ann, ben_year ";
@@ -1920,23 +1942,23 @@ public abstract class SHrsUtils {
             hrsBenefit.setValuePayed(resultSet.getDouble("f_val_payed"));
             hrsBenefit.setAmountPayed(resultSet.getDouble("f_amt_payed"));
             
-            aHrsBenefits.add(hrsBenefit);
+            hrsBenefits.add(hrsBenefit);
         }
         
-        for (SHrsBenefit benefit : aHrsBenefits) {
-            if (SLibUtils.compareKeys(benefit.getPrimaryBenefitType(), new int[] { benefitType, aniversaryLimit, benefitYearAux })) {
+        for (SHrsBenefit benefit : hrsBenefits) {
+            if (SLibUtils.compareKeys(benefit.getBenefitKey(), new int[] { benefitType, aniversaryLimit, benefitYear })) {
                 foundAnniversary = true;
             }
         }
         
         if (!foundAnniversary) {
-            hrsBenefit = new SHrsBenefit(benefitType, aniversaryLimit, benefitYearAux);
-            aHrsBenefits.add(hrsBenefit);
+            hrsBenefit = new SHrsBenefit(benefitType, aniversaryLimit, benefitYear);
+            hrsBenefits.add(hrsBenefit);
         }
         
         // To complete benefits registries accumulated by benefit type:
         
-        for (SHrsBenefit benefit : aHrsBenefits) {
+        for (SHrsBenefit benefit : hrsBenefits) {
             for (SHrsBenefitTableByAnniversary row : benefitTableByAnniversary) {
                 if (row.getBenefitAnn() <= benefit.getBenefitAnn()) {
                     benefitTableRow = row;
@@ -1953,15 +1975,15 @@ public abstract class SHrsUtils {
 
             if (benefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
                 benefit.setValue(benefitTableRow == null || benefitTableRowAux == null ? 0d : benefitTableRowAux.getValue());
-                benefit.setAmount(benefitTableRow == null || benefitTableRowAux == null ? 0d : benefitTableRowAux.getValue() * paymentDaily * benefitTableRow.getValue());
+                benefit.setAmount(benefitTableRow == null || benefitTableRowAux == null ? 0d : SLibUtils.roundAmount(benefitTableRowAux.getValue() * paymentDaily * benefitTableRow.getValue()));
             }
             else {
                 benefit.setValue(benefitTableRow == null ? 0d : benefitTableRow.getValue());
-                benefit.setAmount(benefitTableRow == null ? 0d : benefitTableRow.getValue() * paymentDaily);
+                benefit.setAmount(benefitTableRow == null ? 0d : benefitTableRow.getValue() * SLibUtils.roundAmount(paymentDaily));
             }
         }
-        
-        return aHrsBenefits;
+
+        return hrsBenefits;
     }
     
     public static int getScheduledDays(final SGuiSession session, final SDbEmployee employee, final int benefitAnn, final int benefitYear, final int absenceId) throws Exception {
@@ -2615,14 +2637,13 @@ public abstract class SHrsUtils {
     /**
      * Function for calculated amount net.
      * @param session User GUI session.
-     * @param dSalarySsc base salary contribution of employee.
      * @param grossAmount amount gross.
-     * @param dateCut date of cut.
+     * @param dateCutOff date of cut.
      * @param dateBenefit
      * @return
      * @throws Exception 
      */
-    public static SHrsCalculatedNetGrossAmount computeNetAmountPayment(final SGuiSession session, final double grossAmount, final Date dateCut, final Date dateBenefit) throws Exception {
+    public static SHrsCalculatedNetGrossAmount computeNetAmountPayment(final SGuiSession session, final double grossAmount, final Date dateCutOff, final Date dateBenefit) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;
         SDbTaxSubsidyTable dbSubsidyTable = null;
@@ -2636,20 +2657,20 @@ public abstract class SHrsUtils {
         double dTaxSubsidyAmount = 0;
         double dSsContributionAmount = 0;
         double dTableFactor = 0;
-        int year = SLibTimeUtils.digestYear(dateCut)[0];
-        int days = SLibTimeUtils.getMaxDayOfMonth(dateCut);
+        int year = SLibTimeUtils.digestYear(dateCutOff)[0];
+        int days = SLibTimeUtils.getMaxDayOfMonth(dateCutOff);
         SHrsDaysByPeriod hrsDaysPrev = new SHrsDaysByPeriod(0, 0, 0, 0);
         SHrsDaysByPeriod hrsDaysCurr = new SHrsDaysByPeriod(year, 0, days, days);
         SHrsDaysByPeriod hrsDaysNext = new SHrsDaysByPeriod(0, 0, 0, 0);
         
         dSalaryDiary = grossAmount * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
-        dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCut);
+        dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCutOff);
         
         config = (SDbConfig) session.readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
-        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCut) });
-        dbSubsidyTable = (SDbTaxSubsidyTable) session.readRegistry(SModConsts.HRS_TAX_SUB, new int[] { getRecentTaxSubsidyTable(session, dateCut) });
-        dbSscTable = (SDbSsContributionTable) session.readRegistry(SModConsts.HRS_SSC, new int[] { getRecentSsContributionTable(session, dateCut) });
-        dMwzReference = getRecentMwz(session, config.getFkMwzReferenceTypeId(), dateCut);
+        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCutOff) });
+        dbSubsidyTable = (SDbTaxSubsidyTable) session.readRegistry(SModConsts.HRS_TAX_SUB, new int[] { getRecentTaxSubsidyTable(session, dateCutOff) });
+        dbSscTable = (SDbSsContributionTable) session.readRegistry(SModConsts.HRS_SSC, new int[] { getRecentSsContributionTable(session, dateCutOff) });
+        dMwzReference = getRecentMwz(session, config.getFkMwzReferenceTypeId(), dateCutOff);
         
         dTableFactor = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS) * days;
         
@@ -2670,19 +2691,18 @@ public abstract class SHrsUtils {
     /**
      * Function for calculated amount gross.
      * @param session User GUI session.
-     * @param dSalarySsc base salary contribution of employee.
-     * @param dNetAmount amount net.
-     * @param dateCut date of cut.
+     * @param netAmount amount net.
+     * @param dateCutOff date of cut.
      * @param tolerance
      * @param dateBenefit
      * @return
      * @throws Exception 
      */
-    public static SHrsCalculatedNetGrossAmount computeGrossAmountPayment(final SGuiSession session, final double dNetAmount, final Date dateCut, final double tolerance, final Date dateBenefit) throws Exception {
+    public static SHrsCalculatedNetGrossAmount computeGrossAmountPayment(final SGuiSession session, final double netAmount, final Date dateCutOff, final double tolerance, final Date dateBenefit) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;
         SDbTaxTableRow dbTaxTableRow = null;
-        int days = SLibTimeUtils.getMaxDayOfMonth(dateCut);
+        int days = SLibTimeUtils.getMaxDayOfMonth(dateCutOff);
         double dSalaryDiary = 0;
         double dSalarySsc = 0;
         double dTableFactor = 0;
@@ -2693,7 +2713,7 @@ public abstract class SHrsUtils {
         double dToleranceAux = 0;
         boolean bCalculate = true;
         
-        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCut) });
+        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCutOff) });
         
         dTableFactor = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS) * days;
         
@@ -2703,18 +2723,18 @@ public abstract class SHrsUtils {
                 if (i == 0) {
                     limitInf = SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT);
                 }
-                if (dNetAmount <= SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT)) {
+                if (netAmount <= SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT)) {
                     limitSup = SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT);
                 }
                 
                 average = (limitInf + limitSup) / 2;
                 
                 dSalaryDiary = limitSup * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
-                dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCut);
+                dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCutOff);
 
-                netGrossAmount = computeNetAmountPayment(session, average, dateCut, dateBenefit);
+                netGrossAmount = computeNetAmountPayment(session, average, dateCutOff, dateBenefit);
                 
-                if (netGrossAmount.getNetAmount() > dNetAmount) {
+                if (netGrossAmount.getNetAmount() > netAmount) {
                     break;
                 }
             }
@@ -2725,17 +2745,17 @@ public abstract class SHrsUtils {
             average = (limitInf + limitSup) / 2;
             
             dSalaryDiary = limitSup * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
-            dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCut);
+            dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCutOff);
 
-            netGrossAmount = computeNetAmountPayment(session, average, dateCut, dateBenefit);
+            netGrossAmount = computeNetAmountPayment(session, average, dateCutOff, dateBenefit);
 
-            if (netGrossAmount.getNetAmount() > dNetAmount) {
+            if (netGrossAmount.getNetAmount() > netAmount) {
                 limitSup = average;
             }
             else {
                 limitInf = average;
             }
-            dToleranceAux = SLibUtils.round(dNetAmount - netGrossAmount.getNetAmount(), SUtilConsts.DECS_AMT);
+            dToleranceAux = SLibUtils.round(netAmount - netGrossAmount.getNetAmount(), SUtilConsts.DECS_AMT);
             
             bCalculate = SLibUtils.round(limitInf, SUtilConsts.DECS_AMT) != SLibUtils.round(limitSup, SUtilConsts.DECS_AMT) && Math.abs(dToleranceAux) > tolerance;
         }
@@ -2749,7 +2769,7 @@ public abstract class SHrsUtils {
         return netGrossAmount;
     }
     
-    public static SHrsAmountEarning getAmountEarningByEmployee(final SGuiSession session, final int employeeId, final int earningTypeId, final int periodYear, final Date dateCut) throws Exception {
+    public static SHrsAmountEarning getAmountEarningByEmployee(final SGuiSession session, final int employeeId, final int earningTypeId, final int periodYear, final Date dateCutOff) throws Exception {
         SHrsAmountEarning amountEarning = null;
         String sql = "";
         ResultSet resultSet = null;
@@ -2763,7 +2783,7 @@ public abstract class SHrsUtils {
             "pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp " +
             "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND pr.id_emp = " + employeeId + 
             (earningTypeId == SLibConsts.UNDEFINED ? "" : " AND pre.fk_tp_ear = " + earningTypeId) + " AND " +
-            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "'";
+            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "'";
         
         resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
@@ -2777,7 +2797,7 @@ public abstract class SHrsUtils {
         return amountEarning;
     }
     
-    public static double getAmountDeductionByEmployee(final SGuiSession session, final int employeeId, final int deductionTypeId, final int periodYear, final Date dateCut) throws Exception {
+    public static double getAmountDeductionByEmployee(final SGuiSession session, final int employeeId, final int deductionTypeId, final int periodYear, final Date dateCutOff) throws Exception {
         double amountDeduction = 0;
         String sql = "";
         ResultSet resultSet = null;
@@ -2791,7 +2811,7 @@ public abstract class SHrsUtils {
             "pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp " +
             "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND pr.id_emp = " + employeeId + 
             (deductionTypeId == SLibConsts.UNDEFINED ? "" : " AND prd.fk_tp_ded = " + deductionTypeId) + " AND " +
-            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "'";
+            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "'";
         
         resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
@@ -2801,8 +2821,8 @@ public abstract class SHrsUtils {
         return amountDeduction;
     }
     
-    public static SHrsAmountEarning getAmountEarningsByEmployee(final SGuiSession session, final int employeeId, final int periodYear, final Date dateCut) throws Exception {
-        return getAmountEarningByEmployee(session, employeeId, SLibConsts.UNDEFINED, periodYear, dateCut);
+    public static SHrsAmountEarning getAmountEarningsByEmployee(final SGuiSession session, final int employeeId, final int periodYear, final Date dateCutOff) throws Exception {
+        return getAmountEarningByEmployee(session, employeeId, SLibConsts.UNDEFINED, periodYear, dateCutOff);
     }
     
     /**

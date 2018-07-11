@@ -63,6 +63,7 @@ public class SFormConfig extends SBeanForm {
         moDecPayrollTaxRate = new sa.lib.gui.bean.SBeanFieldDecimal();
         jPanel11 = new javax.swing.JPanel();
         moBoolFornightStandard = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolAutoVacationBonus = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel12 = new javax.swing.JPanel();
         moBoolTaxSubsidyEarning = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel31 = new javax.swing.JPanel();
@@ -190,6 +191,10 @@ public class SFormConfig extends SBeanForm {
         moBoolFornightStandard.setText("Utilizar quincenas fijas de 15 días");
         moBoolFornightStandard.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel11.add(moBoolFornightStandard);
+
+        moBoolAutoVacationBonus.setText("Pago automático prima vacacional en aniversario");
+        moBoolAutoVacationBonus.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel11.add(moBoolAutoVacationBonus);
 
         jPanel6.add(jPanel11);
 
@@ -535,6 +540,7 @@ public class SFormConfig extends SBeanForm {
     private javax.swing.JLabel jlSsSubbranch;
     private javax.swing.JLabel jlTaxComputationType;
     private javax.swing.JLabel jlTaxComputationTypeHelp;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolAutoVacationBonus;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolBankAccountUse;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolFornightStandard;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolTaxNet;
@@ -572,6 +578,7 @@ public class SFormConfig extends SBeanForm {
         moIntLimitMwzReference.setMaxInteger(100);
         moDecPayrollTaxRate.setDecimalSettings(SGuiUtils.getLabelName(jlPayrollTaxRate.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
         moBoolFornightStandard.setBooleanSettings(SGuiUtils.getLabelName(moBoolFornightStandard.getText()), true);
+        moBoolAutoVacationBonus.setBooleanSettings(SGuiUtils.getLabelName(moBoolAutoVacationBonus.getText()), false);
         moBoolTaxSubsidyEarning.setBooleanSettings(SGuiUtils.getLabelName(moBoolTaxSubsidyEarning.getText()), true);
         moBoolTaxNet.setBooleanSettings(SGuiUtils.getLabelName(moBoolTaxNet.getText()), false);
         moBoolBankAccountUse.setBooleanSettings(SGuiUtils.getLabelName(moBoolBankAccountUse.getText()), false);
@@ -596,6 +603,7 @@ public class SFormConfig extends SBeanForm {
         moFields.addField(moIntLimitMwzReference);
         moFields.addField(moDecPayrollTaxRate);
         moFields.addField(moBoolFornightStandard);
+        moFields.addField(moBoolAutoVacationBonus);
         moFields.addField(moBoolTaxSubsidyEarning);
         moFields.addField(moBoolTaxNet);
         moFields.addField(moBoolBankAccountUse);
@@ -668,6 +676,7 @@ public class SFormConfig extends SBeanForm {
         moIntLimitMwzReference.setValue(moRegistry.getLimitMwzReference());
         moDecPayrollTaxRate.setValue(moRegistry.getPayrollTaxRate());
         moBoolFornightStandard.setValue(moRegistry.isFornightStandard());
+        moBoolAutoVacationBonus.setValue(moRegistry.isAutoVacationBonus());
         moBoolTaxSubsidyEarning.setValue(moRegistry.isTaxSubsidyEarning());
         moBoolTaxNet.setValue(moRegistry.isTaxNet());
         moBoolBankAccountUse.setValue(moRegistry.isBankAccountUse());
@@ -712,6 +721,7 @@ public class SFormConfig extends SBeanForm {
         registry.setBajioAffinityGroup(moTextBajioAffinityGroup.getValue());
         registry.setPayrollTaxRate(moDecPayrollTaxRate.getValue());
         registry.setFornightStandard(moBoolFornightStandard.getValue());
+        registry.setAutoVacationBonus(moBoolAutoVacationBonus.getValue());
         registry.setTaxSubsidyEarning(moBoolTaxSubsidyEarning.getValue());
         registry.setTaxNet(moBoolTaxNet.getValue());
         registry.setBankAccountUse(moBoolBankAccountUse.getValue());

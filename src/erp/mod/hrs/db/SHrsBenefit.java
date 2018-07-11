@@ -10,18 +10,19 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SHrsBenefit {
     
     public static final int VALIDATION_BENEFIT_TYPE = 1;
     public static final int VALIDATION_ABSENCE_TYPE = 2;
     
-    public static final int VALID_DAYS_TO_PAID = 10;
-    public static final int VALID_DAYS_TO_PAID_TOTAL = 20;
+    public static final int VALID_DAYS_TO_PAY = 10;
+    public static final int VALID_DAYS_TO_PAY_TOTAL = 20;
     public static final int VALID_DAYS_TABLE = 30;
-    public static final int VALID_AMOUNT_TO_PAID = 40;
-    public static final int VALID_AMOUNT_TO_PAID_AMOUNT_SYS = 50;
+    public static final int VALID_AMOUNT_TO_PAY = 40;
+    public static final int VALID_AMOUNT_TO_PAY_TOTAL = 50;
+    public static final int VALID_AMOUNT_TO_PAID_AMOUNT_SYS = 60;
 
     protected int mnBenefitTypeId;
     protected int mnBenefitAnn;
@@ -68,7 +69,11 @@ public class SHrsBenefit {
     public void setFactorAmount(double d) { mdFactorAmount = d; }
     public void setEditAmount(boolean b) { mbIsEditAmount = b; }
 
-    public int[] getPrimaryBenefitType() { return new int[] { mnBenefitTypeId, mnBenefitAnn, mnBenefitYear }; } 
+    /**
+     * Get benefit key.
+     * @return Array of int containing: ID of benefit type, benefit anniversary and benefit year.
+     */
+    public int[] getBenefitKey() { return new int[] { mnBenefitTypeId, mnBenefitAnn, mnBenefitYear }; } 
     
     public int getBenefitTypeId() { return mnBenefitTypeId; }
     public int getBenefitAnn() { return mnBenefitAnn; }
@@ -84,31 +89,36 @@ public class SHrsBenefit {
     public double getFactorAmount() { return mdFactorAmount; }
     public boolean isEditAmount() { return mbIsEditAmount; }
     
-    public double getValuePending() { return SLibUtils.round((mdValue - mdValuePayed - mdValuePayedReceipt), SLibUtils.DecimalFormatValue4D.getMaximumFractionDigits()) ; }
-    public double getAmountPending() { return SLibUtils.round((mdAmount - mdAmountPayed - mdAmountPayedReceipt), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()); }
+    public double getValuePending() { return SLibUtils.round(mdValue - mdValuePayed - mdValuePayedReceipt, SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()) ; }
+    public double getAmountPending() { return SLibUtils.roundAmount(mdAmount - mdAmountPayed - mdAmountPayedReceipt); }
     
     public String validate(int valid, int validationType) throws Exception {
         String msg = "";
         
         switch (valid) {
-            case VALID_DAYS_TO_PAID:
+            case VALID_DAYS_TO_PAY:
                 if (mdValuePayedReceipt == 0) {
-                    msg = SGuiConsts.ERR_MSG_FIELD_REQ + "'" + (validationType == VALIDATION_BENEFIT_TYPE ? "días a pagar" : "días efectivos") + "'.";
+                    msg = SGuiConsts.ERR_MSG_FIELD_REQ + "'" + (validationType == VALIDATION_BENEFIT_TYPE ? "días por pagar" : "días efectivos") + "'.";
                 }
                 break;
-            case VALID_DAYS_TO_PAID_TOTAL:
+            case VALID_DAYS_TO_PAY_TOTAL:
                 if (getValuePending() < 0) {
-                    msg = "La suma de 'días pagados' + '" + (validationType == VALIDATION_BENEFIT_TYPE ? "días a pagar" : "días efectivos") + "' es mayor al valor del campo 'días'.";
+                    msg = "La suma de 'días pagados' + '" + (validationType == VALIDATION_BENEFIT_TYPE ? "días por pagar" : "días efectivos") + "' es mayor al valor del campo 'días'.";
                 }
                 break;
             case VALID_DAYS_TABLE:
                 if (mdValuePayedReceipt > mdValue) {
-                    msg = SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + (validationType == VALIDATION_BENEFIT_TYPE ? "días a pagar" : "días efectivos") + "' es mayor al valor del campo 'días'.";
+                    msg = SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + (validationType == VALIDATION_BENEFIT_TYPE ? "días por pagar" : "días efectivos") + "' es mayor al valor del campo 'días'.";
                 }
                 break;
-            case VALID_AMOUNT_TO_PAID:
+            case VALID_AMOUNT_TO_PAY:
                 if (mdAmountPayedReceipt == 0) {
-                    msg = SGuiConsts.ERR_MSG_FIELD_REQ + "'monto a pagar'.";
+                    msg = SGuiConsts.ERR_MSG_FIELD_REQ + "'monto por pagar'.";
+                }
+                break;
+            case VALID_AMOUNT_TO_PAY_TOTAL:
+                if (getAmountPending() < 0) {
+                    msg = "La suma de 'monto pagado' + 'monto por pagar' es mayor al valor del campo 'monto'.";
                 }
                 break;
             case VALID_AMOUNT_TO_PAID_AMOUNT_SYS:

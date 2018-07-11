@@ -8,50 +8,27 @@ import java.util.Date;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
-public class SHrsBenefitParams {
+public final class SHrsBenefitParams {
 
-    protected SDbBenefitTable moBenefit;
-    protected SDbBenefitTable moBenefitAux;
-    protected SDbEmployee moEmployee;
-    protected SHrsPayrollReceipt moHrsPayrollReceipt;
-    protected Date mtDateCut;
-    protected int mnPayrollId;
-    protected int mnEarningId;
-    protected int mnEarningComputationTypeId;
-    protected boolean mbIsDaysAdjustment;
+    private final SDbEarning moEarning;
+    private final SDbBenefitTable moBenefitTable;
+    private final SDbBenefitTable moBenefitTableAux;
+    private final SHrsPayrollReceipt moHrsPayrollReceipt;
+    private final Date mtDateCutOff;
 
-    public SHrsBenefitParams(SDbBenefitTable benefit, SDbBenefitTable benefitAux, SDbEmployee employee, SHrsPayrollReceipt hrsPayrollReceipt, Date dateCut, int earningId, int earningComputationType, boolean isDaysAdjustment) {
-        moBenefit = benefit;
-        moBenefitAux = benefitAux;
-        moEmployee = employee;
+    public SHrsBenefitParams(SDbEarning earning, SDbBenefitTable benefit, SDbBenefitTable benefitAux, SHrsPayrollReceipt hrsPayrollReceipt, Date dateCutOff) {
+        moEarning = earning;
+        moBenefitTable = benefit;
+        moBenefitTableAux = benefitAux;
         moHrsPayrollReceipt = hrsPayrollReceipt;
-        mtDateCut = dateCut;
-        
-        mnPayrollId = 0;
-        mnEarningId = earningId;
-        mnEarningComputationTypeId = earningComputationType;
-        mbIsDaysAdjustment = isDaysAdjustment;
+        mtDateCutOff = dateCutOff;
     }
 
-    public void setBenefit(SDbBenefitTable o) { moBenefit = o; }
-    public void setBenefitAux(SDbBenefitTable o) { moBenefitAux = o; }
-    public void setEmployee(SDbEmployee o) { moEmployee = o; }
-    public void setHrsPayrollReceipt(SHrsPayrollReceipt o) { moHrsPayrollReceipt = o; }
-    public void setDateCut(Date t) { mtDateCut = t; }
-    public void setPayrollId(int n) { mnPayrollId = n; }
-    public void setEarningId(int n) { mnEarningId = n; }
-    public void setEarningComputationTypeId(int n) { mnEarningComputationTypeId = n; }
-    public void setIsDaysAdjustment(boolean b) { mbIsDaysAdjustment = b; }
-
-    public SDbBenefitTable getBenefit() { return moBenefit; }
-    public SDbBenefitTable getBenefitAux() { return moBenefitAux; }
-    public SDbEmployee getEmployee() { return moEmployee; }
+    public SDbEarning getEarning() { return moEarning; }
+    public SDbBenefitTable getBenefitTable() { return moBenefitTable; }
+    public SDbBenefitTable getBenefitTableAux() { return moBenefitTableAux; }
     public SHrsPayrollReceipt getHrsPayrollReceipt() { return moHrsPayrollReceipt; }
-    public Date getDateCut() { return mtDateCut; }
-    public int getPayrollId() { return mnPayrollId; }
-    public int getEarningId() { return mnEarningId; }
-    public int getEarningComputationTypeId() { return mnEarningComputationTypeId; }
-    public boolean isDaysAdjustment() { return mbIsDaysAdjustment; }
+    public Date getDateCutOff() { return mtDateCutOff; }
 }

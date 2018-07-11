@@ -8,10 +8,10 @@ import java.util.Date;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public abstract interface SHrsDataProvider {
 
-    public SHrsPayroll createPayroll(final SDbConfig config, final SDbWorkingDaySettings workingDaySettings, final SDbPayroll payroll, final boolean isCopy) throws Exception;
-    public SHrsEmployee createEmployee(final SHrsPayroll hrsPayroll, final int payrollId, final int employeeId, final int payrollYear, final int payrollYearPariod, final int fiscalYear, final Date dateStart, final Date dateEnd, final int taxComputationType) throws Exception;
+    public SHrsPayroll createHrsPayroll(final SDbConfig config, final SDbWorkingDaySettings workingDaySettings, final SDbPayroll payroll, final boolean isCopy) throws Exception;
+    public SHrsEmployee createHrsEmployee(final SHrsPayroll hrsPayroll, final int payrollId, final int employeeId, final int payrollYear, final int payrollYearPeriod, final int fiscalYear, final Date dateStart, final Date dateEnd, final int taxComputationType) throws Exception;
 }

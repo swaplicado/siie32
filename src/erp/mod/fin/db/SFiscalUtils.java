@@ -1881,7 +1881,7 @@ public abstract class SFiscalUtils {
      * Creates XML "Balanza de comprobación" 1.3.
      * @param session GUI user session.
      * @param periodYear Requested period's year.
-     * @param periodMonth Requested period's month.
+     * @param periodMonth Requested period's month. Ranging from 1 up to 13.
      * @param balanceType Trial balance type. Constants defined in <code>SFiscalConsts.BAL_...</code>.
      * @param lastModification Last accounting modification, when trial balance type is "complement", i.e., <code>SFiscalConsts.TRS_CMP</code>). Otherwise <code>null</code> must be provided.
      */
@@ -2000,7 +2000,7 @@ public abstract class SFiscalUtils {
         double realDbt = 0;
         double realCdt = 0;
         double realBalClo = 0;
-        String balDate = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.createDate(periodYear, periodMonth));
+        String balDate = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.createDate(periodYear, month));
         
         sql = "SELECT "
                 + "SUM(IF(r.dt < '" + balDate + "', re.debit - re.credit, 0.0)) AS _bal_ope, "
@@ -2010,7 +2010,8 @@ public abstract class SFiscalUtils {
                 + "FROM fin_rec AS r "
                 + "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc "
                 + "AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num "
-                + "WHERE NOT r.b_del AND NOT re.b_del AND r.id_year = " + periodYear + " AND r.id_per <= " + periodMonth + ";";
+                + "WHERE NOT r.b_del AND NOT re.b_del AND r.id_year = " + periodYear + " AND r.id_per <= " + month
+                + (periodMonth == SLibTimeConsts.MONTH_MAX ? " AND NOT r.b_adj_year AND NOT r.b_adj_audit" : "") + ";";
 
         resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
@@ -2023,28 +2024,44 @@ public abstract class SFiscalUtils {
         // check coherence of generated trial balance:
         
         if (Math.abs(sumDbt - sumCdt) > ALLOWED_AMOUNT_DIFF) {
-            throw new Exception("Error: ¡El total de cargos de la balanza de comprobación (" + sumDbt + ") es distinto al total de abonos (" + sumCdt + ")!");
-        }
-        if (Math.abs(sumBalClo - (sumBalOpe + sumDbt - sumCdt)) > ALLOWED_AMOUNT_DIFF) {
-            throw new Exception("Error: ¡El saldo final de la balanza de comprobación (" + sumBalClo + ") es distinto a la suma del saldo inicial (" + sumBalOpe + ") + cargos (" + sumDbt + ") - abonos (" + sumCdt + ")!");
+            throw new Exception("Error: ¡El total de cargos de la balanza de comprobación "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(sumDbt) + ") es distinto al total de abonos "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(sumCdt) + ")!");
         }
         if (Math.abs(realDbt - realCdt) > ALLOWED_AMOUNT_DIFF) {
-            throw new Exception("Error: ¡El total de cargos real (" + realDbt + ") es distinto al total de abonos (" + realCdt + ")!");
+            throw new Exception("Error: ¡El total de cargos real "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(realDbt) + ") es distinto al total de abonos "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(realCdt) + ")!");
+        }
+        if (Math.abs(sumBalClo - (sumBalOpe + sumDbt - sumCdt)) > ALLOWED_AMOUNT_DIFF) {
+            throw new Exception("Error: ¡El saldo final de la balanza de comprobación "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(sumBalClo) + ") es distinto a la suma del saldo inicial "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(sumBalOpe) + ") + cargos (" + SLibUtils.getDecimalFormatAmount().format(sumDbt) + ") - abonos (" + SLibUtils.getDecimalFormatAmount().format(sumCdt) + ")!");
         }
         if (Math.abs(realBalClo - (realBalOpe + realDbt - realCdt)) > ALLOWED_AMOUNT_DIFF) {
-            throw new Exception("Error: ¡El saldo final real (" + realBalClo + ") es distinto a la suma del saldo inicial (" + realBalOpe + ") + cargos (" + realDbt + ") - abonos (" + realCdt + ")!");
+            throw new Exception("Error: ¡El saldo final real "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(realBalClo) + ") es distinto a la suma del saldo inicial "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(realBalOpe) + ") + cargos (" + SLibUtils.getDecimalFormatAmount().format(realDbt) + ") - abonos (" + SLibUtils.getDecimalFormatAmount().format(realCdt) + ")!");
         }
         if (Math.abs(sumBalOpe - realBalOpe) > ALLOWED_AMOUNT_DIFF) {
-            throw new Exception("Error: ¡El saldo inicial de la balanza de comprobación (" + sumBalOpe + ") es distinto al saldo inicial real (" + realBalOpe + ")!");
+            throw new Exception("Error: ¡El saldo inicial de la balanza de comprobación "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(sumBalOpe) + ") es distinto al saldo inicial real "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(realBalOpe) + ")!");
         }
         if (Math.abs(sumDbt - realDbt) > ALLOWED_AMOUNT_DIFF) {
-            throw new Exception("Error: ¡El total de cargos de la balanza de comprobación (" + sumDbt + ") es distinto al total de cargos real (" + realDbt + ")!");
+            throw new Exception("Error: ¡El total de cargos de la balanza de comprobación "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(sumDbt) + ") es distinto al total de cargos real "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(realDbt) + ")!");
         }
         if (Math.abs(sumCdt - realCdt) > ALLOWED_AMOUNT_DIFF) {
-            throw new Exception("Error: ¡El total de abonos de la balanza de comprobación (" + sumCdt + ") es distinto al total de abonos real (" + realCdt + ")!");
+            throw new Exception("Error: ¡El total de abonos de la balanza de comprobación "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(sumCdt) + ") es distinto al total de abonos real "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(realCdt) + ")!");
         }
         if (Math.abs(sumBalClo - realBalClo) > ALLOWED_AMOUNT_DIFF) {
-            throw new Exception("Error: ¡El saldo final de la balanza de comprobación (" + sumBalClo + ") es distinto al saldo final real (" + realBalClo + ")!");
+            throw new Exception("Error: ¡El saldo final de la balanza de comprobación "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(sumBalClo) + ") es distinto al saldo final real "
+                    + "(" + SLibUtils.getDecimalFormatAmount().format(realBalClo) + ")!");
         }
         
         return xmlDoc;

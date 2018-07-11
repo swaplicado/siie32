@@ -100,13 +100,13 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Sergio Flores
  * @version 3.2
  */
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 122.00";
+    public static final String APP_RELEASE = "3.2 123.00";
     public static final String APP_COPYRIGHT = "2007-2018";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 

@@ -244,7 +244,7 @@ public class SHrsEmployee {
         SHrsBenefit benefit = new SHrsBenefit(benefitType, benefitAnn, benefitYear);
 
         for (SHrsBenefit benefitRow : maHrsBenefit) {
-            if (SLibUtils.compareKeys(benefitRow.getPrimaryBenefitType(), new int[] { benefitType, benefitAnn, benefitYear })) {
+            if (SLibUtils.compareKeys(benefitRow.getBenefitKey(), new int[] { benefitType, benefitAnn, benefitYear })) {
                 benefit = benefitRow;
             }
         }
@@ -258,7 +258,7 @@ public class SHrsEmployee {
         double amount = 0;
         
         for (SHrsBenefit benefitRow : maHrsBenefit) {
-            if (SLibUtils.compareKeys(benefitRow.getPrimaryBenefitType(), hrsBenefit.getPrimaryBenefitType())) {
+            if (SLibUtils.compareKeys(benefitRow.getBenefitKey(), hrsBenefit.getBenefitKey())) {
                 value = benefitRow.getValuePayedReceipt() + hrsBenefit.getValuePayedReceipt();
                 amount = benefitRow.getAmountPayedReceipt() + hrsBenefit.getAmountPayedReceipt();
                 

@@ -59,7 +59,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Néstor Ávalos, Sergio Flores, Edwin Carmona
+ * @author Juan Barajas, Néstor Ávalos, Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 
@@ -1550,7 +1550,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                     moGridPaneEmployeesAvailable.addGridRow(rowEmployeeAvailable);
                     moGridPaneEmployeesAvailable.renderGridRows();
-                    moGridPaneEmployeesAvailable.setSelectedGridRow(moGridPaneEmployeesAvailable.getModel().getRowCount() - 1);
+                    moGridPaneEmployeesAvailable.setSelectedGridRow(moGridPaneEmployeesAvailable.getTable().convertRowIndexToView(moGridPaneEmployeesAvailable.getModel().getRowCount() - 1));
                 }
                 
                 updateFieldsStatus();
@@ -1948,7 +1948,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moDecTotalDeductions.getField().setValue(moRegistry.getAuxTotalDeductions());
             moDecTotalNet.getField().setValue(moRegistry.getAuxTotalNet());
 
-            moHrsPayroll = (new SHrsPayrollDataProvider(miClient.getSession())).createPayroll(moConfig, moWorkingDaySettings, moRegistry, mbPayrollCopy);
+            moHrsPayroll = (new SHrsPayrollDataProvider(miClient.getSession())).createHrsPayroll(moConfig, moWorkingDaySettings, moRegistry, mbPayrollCopy);
 
             jtpPayroll.setSelectedIndex(0);
 
