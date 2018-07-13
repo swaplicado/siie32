@@ -678,6 +678,12 @@ public abstract class SModConsts {
     public static final int HRSX_ABS_MOV = 2064101;
     public static final int HRSX_SSC_UPD = 2064102;
     public static final int HRSX_EAR_SSC = 2064103;
+    public static final int HRSX_LAYOUT_SUA_HIRE = 1;
+    public static final int HRSX_LAYOUT_SUA_SSC = 2;
+    public static final int HRSX_LAYOUT_SUA_DISMISS = 3;
+    
+    public static final int HRSX_HIRE_DISMISSED = 0; // Employee hire log dismissed
+    public static final int HRSX_HIRE_ACTIVE = 1;    // Employee hire log active
 
     public static final int HRSU_TP_PAY_SYS = 2064050;
 

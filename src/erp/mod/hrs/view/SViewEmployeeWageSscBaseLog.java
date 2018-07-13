@@ -6,24 +6,34 @@ package erp.mod.hrs.view;
 
 import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.mod.SModConsts;
+import erp.mod.hrs.form.SDialogLayoutEmployee;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Claudio Peña
  */
-public class SViewEmployeeWageSscBaseLog extends SGridPaneView {
+public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements ActionListener{
 
     private SGridFilterPanelEmployee moFilterEmployee;
+    private JButton jbLayoutEmployeeSBC;    
+    
+    private SDialogLayoutEmployee moDialogLayoutEmployee;
 
     public SViewEmployeeWageSscBaseLog(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_EMP_LOG_SAL_SSC, SLibConsts.UNDEFINED, title);
@@ -35,10 +45,26 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView {
         
         moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
         moFilterEmployee.initFilter(null);
-        
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
+        
+        jbLayoutEmployeeSBC = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout modificación SBC de empleados", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeSBC);
+        
     }
-
+    
+    private void actionLayoutEmployeeSBC() {
+        if (jbLayoutEmployeeSBC.isEnabled()) {
+                try {
+                    moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_SSC);
+                    moDialogLayoutEmployee.resetForm();
+                    moDialogLayoutEmployee.setVisible(true);
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+            }
+        }
+    }
+    
     @Override
     public void prepareSqlQuery() {
         String sql = "";
@@ -125,5 +151,16 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView {
         moSuscriptionsSet.add(SModConsts.HRSU_EMP);
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+
+            if (button == jbLayoutEmployeeSBC) {
+                actionLayoutEmployeeSBC();
+            }
+        }
     }
 }

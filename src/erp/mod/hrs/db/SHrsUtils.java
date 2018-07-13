@@ -482,6 +482,446 @@ public abstract class SHrsUtils {
         }
     }
     
+      /**
+     * Replace special characters
+     * @param input original text
+     * @return output text without characters
+     */
+    public static String removeSpecialChar(String input) {
+        String specialCharacters = "áàäéèëíìïóòöúùuñÁÀÄÉÈËÍÌÏÓÒÖÚÙÜÑçÇ";
+        String replaceCharacters = "aaaeeeiiiooouuu#AAAEEEIIIOOOUUU#cC";
+        String output = input;
+        for (int i = 0; i < specialCharacters.length(); i++) {
+            output = output.replace(specialCharacters.charAt(i), replaceCharacters.charAt(i));
+        }
+        return output;
+    }        
+
+    /**
+     * 
+     * @param client
+     * @param dateApplicationIni
+     * @param dateApplicationEnd
+     * @return
+     * @throws SQLException 
+     */
+    public static ArrayList prepareSqlQueryHigh(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateApplicationIni);
+        String dateEnd = formatter.format(dateApplicationEnd);
+        String sqlId = "";
+        ResultSet resultSet = null;
+        int[] employeeId = null;
+
+        sqlId = "SELECT id_emp FROM HRS_EMP_LOG_HIRE " 
+                + "WHERE dt_hire >= '" + dateIni + "' AND dt_hire <= '" + dateEnd + "' "
+                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_ACTIVE ;
+
+        resultSet = client.getSession().getStatement().executeQuery(sqlId);
+        ArrayList <Integer> resultsId = new ArrayList();
+
+        while (resultSet.next()) {
+          resultsId.add(resultSet.getInt("id_emp"));                  
+        }
+        return resultsId;
+    }
+    
+      /**
+     * 
+     * @param client
+     * @param dateApplicationIni
+     * @param dateApplicationEnd
+     * @return
+     * @throws SQLException 
+     */
+    public static ArrayList prepareSqlQueryMod(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateApplicationIni);
+        String dateEnd = formatter.format(dateApplicationEnd);
+        String sqlId = "";
+        ResultSet resultSet = null;
+        int[] employeeId = null;
+
+        sqlId = "SELECT id_emp FROM hrs_emp_log_sal_ssc " 
+                + "WHERE dt >= '" + dateIni + "' AND dt <= '" + dateEnd + "' " 
+                + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del ";        
+
+        resultSet = client.getSession().getStatement().executeQuery(sqlId);
+        ArrayList <Integer> resultsId = new ArrayList();
+
+        while (resultSet.next()) {
+          resultsId.add(resultSet.getInt("id_emp"));                  
+        }
+        return resultsId;
+    }
+    
+    /**
+     * 
+     * @param client
+     * @param dateApplicationIni
+     * @param dateApplicationEnd
+     * @return
+     * @throws SQLException 
+     */
+    public static ArrayList prepareSqlQueryLow(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateApplicationIni);
+        String dateEnd = formatter.format(dateApplicationEnd);
+        String sqlId = "";
+        ResultSet resultSet = null;
+        int[] employeeId = null;
+
+        sqlId = "SELECT id_emp FROM hrs_emp_log_hire "
+                + "WHERE dt_dis_n >= '" + dateIni + "' AND dt_dis_n <= '" + dateEnd + "' "
+                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + " "; 
+
+        resultSet = client.getSession().getStatement().executeQuery(sqlId);
+        ArrayList <Integer> resultsId = new ArrayList();
+
+        while (resultSet.next()) {
+          resultsId.add(resultSet.getInt("id_emp"));                  
+        }
+        return resultsId;
+    }
+     
+    
+    /**
+     * 
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeRegister(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyyyMMdd HHmm");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);        
+        java.lang.String buffer = "";
+        String sql = "";
+        String fileName = "";
+        String param = "";
+        String ssn = "";
+        String name = "";
+        String fatherName = "";
+        String motherName = "";
+        String curp = "";
+        String salaryType = "";
+        String workerKey = "";
+        String guia = "";
+        double baseSalary = 0;
+        Date dateApplication = null;
+
+        fileName = formatDateTitle.format(new Date()).concat(" Altas.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                ArrayList <Integer> pkPrimaryK = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
+    
+                for (int i = 0; i <= pkPrimaryK.size()-1; i++){
+                int pkUser = pkPrimaryK.get(i);
+                    
+                    sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM, "
+                            + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, "
+                            + "sal.id_tp_sal AS TpSalario, wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.dt_hire AS DateApplication, par.reg_ss AS Param "
+                            + "FROM erp.HRSU_EMP AS emp "
+                            + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                            + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                            + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                            + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                            + "INNER JOIN hrs_emp_log_hire AS hire ON hire.id_emp = emp.id_emp "
+                            + "INNER JOIN cfg_param_co AS par "
+                            + "INNER JOIN hrs_cfg AS cfg "
+                            + "WHERE hire.b_hire = " + (layoutSuaType == SModConsts.HRSX_HIRE_ACTIVE ? SModConsts.HRSX_HIRE_ACTIVE : SModConsts.HRSX_HIRE_DISMISSED) + " AND not hire.b_del "
+                            + "AND hire.dt_hire >= '" + dateIni + "' AND hire.dt_hire <= '" + dateEnd + "' "
+                            + "AND emp.id_emp = " + pkUser;
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        dateApplication = resultSetHeader.getDate("DateApplication");
+                        ssn = resultSetHeader.getString("SSN");
+                        baseSalary = resultSetHeader.getDouble("Salario");
+                        salaryType = resultSetHeader.getString("TpSalario");
+                        workerKey = resultSetHeader.getString("ClaveTrab");
+                        name = resultSetHeader.getString("Nombre");
+                        fatherName = resultSetHeader.getString("ApellidoP");
+                        motherName = resultSetHeader.getString("ApellidoM");
+                        curp = resultSetHeader.getString("CURP");
+                        guia = resultSetHeader.getString("Guia");
+                    }
+
+                    buffer += param.substring(0, 9); // (Employer registration)
+                    buffer += param.substring(9); // (Digit verifier of R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Social Security number)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += removeSpecialChar(fatherName).concat(fatherName.length() > 27 ? fatherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (fatherName.length() == 27 ? 0 : 27 - fatherName.length())))); // (Last name)
+                    buffer += removeSpecialChar(motherName).concat(motherName.length() > 27 ? motherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (motherName.length() == 27 ? 0 : 27 - motherName.length())))); // (Mother's last name)
+                    buffer += removeSpecialChar(name).concat(name.length() > 27 ? name.substring(0, 27) : (SLibUtilities.textRepeat(" ", (name.length() == 27 ? 0 : 27 - name.length())))); // (name)
+                    String.format("%.2f", baseSalary);
+                    String baseSalaryS = String.valueOf(baseSalary);
+                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                    buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 6));
+                    buffer += "1"; // (Type of worker)
+                    buffer += (salaryType.equals(1) ? "0" : salaryType.equals(2) ? "1" : "2"); //(Type of salary)
+                    buffer += "0"; //(Week or reduced working day)
+                    buffer += formatDateData.format(dateApplication); // (Movement date)
+                    buffer += "000"; //(Family medicine unit)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 2));
+                    buffer += "08"; // (Movement type)
+                    buffer += (guia + "400"); // (Guide)
+                    buffer += (workerKey.length() > 10 ? workerKey.substring(0, 10) : (SLibUtilities.textRepeat("0", (workerKey.length() == 10 ? 0 : 10 - workerKey.length())))).concat(workerKey); // (Worker's code)
+                    buffer += SLibUtilities.textRepeat(" ", 1);
+                    buffer += curp; // CURP
+                    buffer += "9"; // (Format Identifier)
+                    buffer += "\n";
+                }
+                    
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (java.lang.Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeModification(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyyyMMdd HHmm");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd); 
+        java.lang.String buffer = "";
+        String sql = "";
+        String param = "";
+        String fileName = "";
+        String ssn = "";
+        String name = "";
+        String fatherName = "";
+        String motherName = "";
+        String curp = "";
+        String salaryType = "";
+        String workerKey = "";
+        String guia = "";
+        double baseSalary = 0;
+        Date dateApplication = null;
+        
+        fileName = formatDateTitle.format(new Date()).concat(" SBC.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                ArrayList <Integer> pkPrimaryK = prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
+    
+                for (int i = 0; i <= pkPrimaryK.size()-1; i++){
+                    int pkUser = pkPrimaryK.get(i);
+
+                    sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM, "
+                            + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, " 
+                            + "sal.id_tp_sal AS TpSalario, wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, ssc.dt AS DateApplication, par.reg_ss AS Param "
+                            + "FROM erp.HRSU_EMP AS emp "
+                            + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                            + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                            + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                            + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                            + "INNER JOIN HRS_EMP_LOG_SAL_SSC AS ssc ON ssc.id_emp = emp.id_emp "
+                            + "INNER JOIN cfg_param_co AS par "
+                            + "INNER JOIN hrs_cfg AS cfg "
+                            + "WHERE ssc.dt >= '" + dateIni + "' AND ssc.dt <= '" + dateEnd + "' AND NOT ssc.b_del "
+                            + "AND emp.id_emp = " + pkUser ; 
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        ssn = resultSetHeader.getString("SSN");
+                        dateApplication = resultSetHeader.getDate("DateApplication");
+                        baseSalary = resultSetHeader.getDouble("Salario");
+                        salaryType = resultSetHeader.getString("TpSalario");
+                        workerKey = resultSetHeader.getString("ClaveTrab");
+                        name = resultSetHeader.getString("Nombre");
+                        fatherName = resultSetHeader.getString("ApellidoP");
+                        motherName = resultSetHeader.getString("ApellidoM");
+                        curp = resultSetHeader.getString("CURP");
+                        guia = resultSetHeader.getString("Guia");
+                    }             
+
+                    buffer += param.substring(0, 9); // (Employer registration)
+                    buffer += param.substring(9); // (Digit verifier of R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Social Security number)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += removeSpecialChar(fatherName).concat(fatherName.length() > 27 ? fatherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (fatherName.length() == 27 ? 0 : 27 - fatherName.length())))); // (Last name)
+                    buffer += removeSpecialChar(motherName).concat(motherName.length() > 27 ? motherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (motherName.length() == 27 ? 0 : 27 - motherName.length())))); // (Mother's last name)
+                    buffer += removeSpecialChar(name).concat(name.length() > 27 ? name.substring(0, 27) : (SLibUtilities.textRepeat(" ", (name.length() == 27 ? 0 : 27 - name.length())))); // (name)
+                    String.format("%.2f", baseSalary);
+                    String baseSalaryS = String.valueOf(baseSalary);
+                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                    buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 6));
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 1));
+                    buffer += (salaryType.equals(1) ? "0" : salaryType.equals(2) ? "1" : "2"); //(Type of salary)
+                    buffer += "0"; //(Week or reduced working day)
+                    buffer += formatDateData.format(dateApplication); // (Movement date)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 5));
+                    buffer += "07"; // (Movement type)
+                    buffer += (guia + "400"); // (Guide)
+                    buffer += (workerKey.length() > 10 ? workerKey.substring(0, 10) : (SLibUtilities.textRepeat("0", (workerKey.length() == 10 ? 0 : 10 - workerKey.length())))).concat(workerKey); // (Worker's code)
+                    buffer += SLibUtilities.textRepeat(" ", 1);
+                    buffer += curp; // CURP
+                    buffer += "9"; // (Format Identifier)
+                    buffer += "\n";                                  
+                }
+                
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (java.lang.Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }    
+    
+    /**
+     * 
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeDelete(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyyyMMdd HHmm");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);  
+        java.lang.String buffer = "";
+        String sql = "";
+        String param = "";
+        String fileName = "";
+        String ssn = "";
+        String name = "";
+        String fatherName = "";
+        String motherName = "";
+        String workerKey = "";
+        String guia = "";
+        String type = "";
+        Date dateApplication = null;
+        
+        fileName = formatDateTitle.format(new Date()).concat(" Bajas.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                ArrayList <Integer> pkPrimaryK = prepareSqlQueryLow(client, dateLayoutStart, dateLayoutEnd);
+    
+                for (int i = 0; i <= pkPrimaryK.size()-1; i++){
+                int pkUser = pkPrimaryK.get(i);
+                
+                    sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM,"
+                          + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, sal.id_tp_sal AS TpSalario, "
+                          + "wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.b_hire AS Motivo, hire.fk_tp_emp_dis AS Tipe, hire.dt_dis_n AS DateApplication, par.reg_ss AS Param "
+                          + "FROM erp.HRSU_EMP AS emp "
+                          + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                          + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                          + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                          + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                          + "INNER JOIN HRS_EMP_LOG_HIRE AS hire ON hire.id_emp = emp.id_emp "
+                          + "INNER JOIN cfg_param_co AS par "
+                          + "INNER JOIN hrs_cfg AS cfg "
+                          + "WHERE hire.b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + " AND not hire.b_del "
+                          + "AND hire.dt_dis_n >= '" + dateIni + "' AND hire.dt_dis_n <= '" + dateEnd + "' "
+                          + "AND emp.id_emp = " + pkUser;
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+                        while (resultSetHeader.next()) {
+                            dateApplication = resultSetHeader.getDate("DateApplication");
+                            param = resultSetHeader.getString("Param");
+                            ssn = resultSetHeader.getString("SSN");
+                            workerKey = resultSetHeader.getString("ClaveTrab");
+                            name = resultSetHeader.getString("Nombre");
+                            fatherName = resultSetHeader.getString("ApellidoP");
+                            motherName = resultSetHeader.getString("ApellidoM");
+                            guia = resultSetHeader.getString("Guia");
+                            type = resultSetHeader.getString("Tipe");
+                        }
+
+
+                    buffer += param.substring(0, 9); // (Employer registration)
+                    buffer += param.substring(9); // (Digit verifier of R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Social Security number)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += removeSpecialChar(fatherName).concat(fatherName.length() > 27 ? fatherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (fatherName.length() == 27 ? 0 : 27 - fatherName.length())))); // (Last name)
+                    buffer += removeSpecialChar(motherName).concat(motherName.length() > 27 ? motherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (motherName.length() == 27 ? 0 : 27 - motherName.length())))); // (Mother's last name)
+                    buffer += removeSpecialChar(name).concat(name.length() > 27 ? name.substring(0, 27) : (SLibUtilities.textRepeat(" ", (name.length() == 27 ? 0 : 27 - name.length())))); // (name)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 15));
+                    buffer += formatDateData.format(dateApplication); // (Movement date)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 5));
+                    buffer += "02"; // (Movement type)
+                    buffer += (guia + "400"); // (Guide)
+                    buffer += (workerKey.length() > 10 ? workerKey.substring(0, 10) : (SLibUtilities.textRepeat("0", (workerKey.length() == 10 ? 0 : 10 - workerKey.length())))).concat(workerKey); // (Worker's code)
+                    buffer += (type.equals(1) ? "6" : type.equals(2) ? "2" : type.equals(3) ? "1" : type.equals(4) ? "3" : "6" );
+                    buffer += SLibUtilities.textRepeat(" ", 18);
+                    buffer += "9"; // (Format Identifier)
+                    buffer += "\n";
+                }
+                
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (java.lang.Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
     /**
      * Checks if period is anniversary of provided date.
      * @param anniversary
