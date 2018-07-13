@@ -118,23 +118,22 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         }
 
         int column = 0;
-        STableColumn[] aoTableColumns = new STableColumn[60];
+        STableColumn[] aoTableColumns = new STableColumn[61];
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Empleado", 250);
         aoTableColumns[column] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Clave", 50);
         aoTableColumns[column++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pay.name", "Período pago", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_id", "RFC", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.alt_id", "CURP", 150);
         aoTableColumns[column] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ssn", "NSS", 75);
         aoTableColumns[column++].setApostropheOnCsvRequired(true);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_bir", "Nacimiento empleado", STableConstants.WIDTH_DATE);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_e_age", "Edad empleado", STableConstants.WIDTH_NUM_SMALLINT);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "csex.name", "Sexo empleado", 75);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cblo.name", "Grupo sanguíneo empleado", 50);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_ben", "Inicio beneficios", STableConstants.WIDTH_DATE);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_e_set", "Antigüedad", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_hire", "Última alta", STableConstants.WIDTH_DATE);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_dis_n", "Última baja", STableConstants.WIDTH_DATE);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pay.name", "Período pago", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "emp.name", "Tipo empleado", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "wrk.name", "Tipo obrero", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_mfg_ope", "Operador", STableConstants.WIDTH_BOOLEAN_2X);
@@ -143,6 +142,8 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pos.name", "Puesto", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_par_shh", "Socio/accionista", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_rel_pty", "Parte relacionada", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "csex.name", "Sexo empleado", 75);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cblo.name", "Grupo sanguíneo empleado", 50);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.mate", "Cónyuge", 200);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "er.mate_dt_bir_n", "Cónyuge nacimiento", STableConstants.WIDTH_DATE);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_mate_age", "Cónyuge edad", STableConstants.WIDTH_NUM_SMALLINT);
@@ -348,6 +349,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
                 "er.son_4, er.son_dt_bir_4_n, er.b_son_dec_4, cson4.name, " +
                 "er.son_5, er.son_dt_bir_5_n, er.b_son_dec_5, cson5.name, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_bir, '%Y%m')) / 12 AS _e_age, " +
+                "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_ben, '%Y%m')) / 12 AS _e_set, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(er.mate_dt_bir_n, '%Y%m')) / 12 AS _mate_age, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(er.son_dt_bir_1_n, '%Y%m')) / 12 AS _son1_age, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(er.son_dt_bir_2_n, '%Y%m')) / 12 AS _son2_age, " +

@@ -1305,7 +1305,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private void renderBenefit(SDataEmployee employee) {
         double paymentDaily = 0;
         double settlementPaymentDaily = 0;
-        int benefitAnn = 0;
+        int benefitAnniv = 0;
         Date dateCutOff = null;
         Date dateBase = null;
         Date dateBaseAnniv = null;
@@ -1326,7 +1326,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             dateCutOff = miClient.getSession().getCurrentDate();
             leapYear = SLibTimeUtils.isLeapYear(SLibTimeUtils.digestYear(dateCutOff)[0]);
             
-            benefitAnn = SHrsUtils.getSeniorityEmployee(employee.getDateBenefits(), dateCutOff);
+            benefitAnniv = SHrsUtils.getSeniorityEmployee(employee.getDateBenefits(), dateCutOff);
             paymentDaily = (employee.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? employee.getSalary() :
                 (config.isFornightStandard() ? ((employee.getWage() * SHrsConsts.YEAR_MONTHS) / (SHrsConsts.FORNIGHT_FIXED_DAYS * SHrsConsts.YEAR_FORNIGHTS)) :
                 ((employee.getWage() * SHrsConsts.YEAR_MONTHS) / SHrsConsts.YEAR_DAYS)));
@@ -1339,18 +1339,18 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
                 dateBaseAnniv = SLibTimeUtils.getBeginOfYear(dateCutOff);
             }
             
-            dateBase = SLibTimeUtils.addDate(employee.getDateBenefits(), benefitAnn, 0, 0);
+            dateBase = SLibTimeUtils.addDate(employee.getDateBenefits(), benefitAnniv, 0, 0);
             
-            jtfSeniority.setText(benefitAnn + "");
-            jtfSeniorityDays.setText(((int) SLibTimeUtils.getDaysDiff(dateCutOff, SLibTimeUtils.addDate(employee.getDateBenefits(), benefitAnn, 0, 0))) + "");
+            jtfSeniority.setText(benefitAnniv + "");
+            jtfSeniorityDays.setText(((int) SLibTimeUtils.getDaysDiff(dateCutOff, SLibTimeUtils.addDate(employee.getDateBenefits(), benefitAnniv, 0, 0))) + "");
             daysElapsed = ((int) SLibTimeUtils.getDaysDiff(dateCutOff, dateBase) + 1);
             daysElapsedAnn = ((int) SLibTimeUtils.getDaysDiff(dateCutOff, dateBaseAnniv) + 1);
-            benefitAnn = benefitAnn == 0 ? 1 : benefitAnn;
+            benefitAnniv = benefitAnniv == 0 ? 1 : benefitAnniv;
             
             // Calculate annual bonus:
             
             for (SHrsBenefitTableByAnniversary row : maBenefitTableAnnByAnniversarys) {
-                if (row.getBenefitAnn() <= benefitAnn) {
+                if (row.getBenefitAnn() <= benefitAnniv) {
                     benefitTableRow = row;
                 }
             }
@@ -1364,7 +1364,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             // Calculate vacation:
             
             for (SHrsBenefitTableByAnniversary row : maBenefitTableVacationByAnniversary) {
-                if (row.getBenefitAnn() <= benefitAnn) {
+                if (row.getBenefitAnn() <= benefitAnniv) {
                     benefitTableRow = row;
                 }
             }
@@ -1378,7 +1378,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             // Calculate vacation bonus:
             
             for (SHrsBenefitTableByAnniversary row : maBenefitTableVacationBonByAnniversary) {
-                if (row.getBenefitAnn() <= benefitAnn) {
+                if (row.getBenefitAnn() <= benefitAnniv) {
                     benefitTableRow = row;
                 }
             }

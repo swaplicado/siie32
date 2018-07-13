@@ -35,13 +35,13 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelectionListener {
     
     protected SDbEmployee moEmployee;
     protected SDbConfig moConfig;
-    protected Date mtDateCut;
+    protected Date mtDateCutOff;
     protected int mnAnniversary;
     protected int mnAnniversaryDays;
     protected int mnAnniversaryYear;
@@ -334,11 +334,11 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
             sql = "SELECT br.ben_day " +
                     "FROM hrs_ben AS b " +
                     "INNER JOIN hrs_ben_row AS br ON br.id_ben = b.id_ben " +
-                    "WHERE fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCut) + "' AND br.id_row = (" +
+                    "WHERE fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutOff) + "' AND br.id_row = (" +
                     "SELECT br.id_row " +
                     "FROM hrs_ben AS b " +
                     "INNER JOIN hrs_ben_row AS br ON b.id_ben = br.id_ben " +
-                    "WHERE fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCut) + "' AND " +
+                    "WHERE fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutOff) + "' AND " +
                     "mon >= " + (anniversary == 0 ? 1 : anniversary) + " * " + SHrsConsts.YEAR_MONTHS + " " +
                     "ORDER BY dt_sta DESC, b.id_ben LIMIT 1) " +
                     "ORDER BY dt_sta DESC, b.id_ben LIMIT 1";
@@ -495,7 +495,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         moTextEmployeeName.setValue(moEmployee.getAuxEmployee());
         moTextBenefitType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_BEN, new int[] { mnFormSubtype }, SDbRegistryUser.FIELD_NAME));
         moTextDateBenefit.setValue(SLibUtils.DateFormatDate.format(moEmployee.getDateBenefits()));
-        moTextDateCut.setValue(SLibUtils.DateFormatDate.format(mtDateCut));
+        moTextDateCut.setValue(SLibUtils.DateFormatDate.format(mtDateCutOff));
         moIntSeniority.setValue(mnAnniversary);
         moIntSeniorityDays.setValue(mnAnniversaryDays);
         //moIntSeniorityDays.setValue(mn);
@@ -503,7 +503,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         showBenefitsMoves();
     }
     
-    public void setFormParams(final int employeeId, final int anniversary, final int anniversaryDays, final int benefitTableId, final Date dateCut) {
+    public void setFormParams(final int employeeId, final int anniversary, final int anniversaryDays, final int benefitTableId, final Date dateCutOff) {
         moEmployee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
         moConfig = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
         
@@ -515,7 +515,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         mnAnniversaryDays = anniversaryDays;
         mnAnniversaryYear = anniversary;
         mnBenefitTableId = benefitTableId;
-        mtDateCut = dateCut;
+        mtDateCutOff = dateCutOff;
         
         initBenefit();
     }

@@ -31,6 +31,7 @@ import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeConsts;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
@@ -166,7 +167,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 aoTableColumns = new STableColumn[26];
                 break;
             case SDataConstants.BPSX_BP_EMP:
-                aoTableColumns = new STableColumn[54];
+                aoTableColumns = new STableColumn[55];
                 break;
             default:
                 break;
@@ -293,6 +294,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Clave", 50);
             aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo", STableConstants.WIDTH_BOOLEAN_2X);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pay.name", "Período pago", 100);
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.fiscal_id", "RFC", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.alt_id", "CURP", 150);
@@ -305,9 +307,10 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP) {
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ssn", "NSS", 75);
             aoTableColumns[i++].setApostropheOnCsvRequired(true);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_bir", "Nacimiento", STableConstants.WIDTH_DATE);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_e_age", "Edad", STableConstants.WIDTH_NUM_SMALLINT);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_bir", "Nacimiento empleado", STableConstants.WIDTH_DATE);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_e_age", "Edad empleado", STableConstants.WIDTH_NUM_SMALLINT);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_ben", "Inicio beneficios", STableConstants.WIDTH_DATE);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_e_sen", "Antigüedad", STableConstants.WIDTH_NUM_SMALLINT);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_hire", "Última alta", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "e.dt_dis_n", "Última baja", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_sal", "Salario $", 100);
@@ -317,7 +320,6 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_sal_ssc", "SBC $", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_dt_sal_ssc", "SBC últ. cambio", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "e.wrk_hrs_day", "Jornada hrs", 50);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pay.name", "Período pago", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sal.name", "Tipo salario", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "emp.name", "Tipo empleado", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "wrk.name", "Tipo obrero", 100);
@@ -701,7 +703,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.ssn, e.dt_bir, e.dt_ben, e.dt_hire, e.dt_dis_n, IF(" + mbHasRightEmpWage + ", e.sal, 0) AS f_sal, IF(" + mbHasRightEmpWage + ", e.dt_sal, NULL) AS f_dt_sal, IF(" + mbHasRightEmpWage + ", e.wage, 0) AS f_wage, " +
                 "IF(" + mbHasRightEmpWage + ", e.dt_wage, NULL) AS f_dt_wage, IF(" + mbHasRightEmpWage + ", e.sal_ssc, 0) AS f_sal_ssc, IF(" + mbHasRightEmpWage + ", e.dt_sal_ssc, NULL) AS f_dt_sal_ssc, e.wrk_hrs_day, e.bank_acc, e.b_mfg_ope, e.b_act, e.b_uni, " +
                 "pay.name, sal.name, emp.name, wrk.name, wrktp.name, mwz.name, dep.name, pos.name, sht.name, con.name, rshe.name, risk.name, bank.name, " +
-                "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_bir, '%Y%m')) / 12 AS _e_age, ") +
+                "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_bir, '%Y%m')) / " + SLibTimeConsts.MONTHS + " AS _e_age, " +
+                "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_ben, '%Y%m')) / " + SLibTimeConsts.MONTHS + " AS _e_sen, ") +
                 "bp.fid_usr_new, bp.fid_usr_edit, bp.fid_usr_del, bp.ts_new, bp.ts_edit, bp.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM erp.bpsu_bp AS bp " +
                 "INNER JOIN erp.bpss_tp_bp_idy AS tp_bp ON " +

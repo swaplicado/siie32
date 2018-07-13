@@ -50,7 +50,7 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
     protected int mnWorkingDays;
     protected SDbConfig moConfig;
     protected SDbBenefitTable moBenefitTable;
-    protected Date mtDateCut;
+    protected Date mtDateCutOff;
     protected ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableByAnniversary;
 
     /**
@@ -410,8 +410,8 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
     }
     
     private void setSenority() {
-        if (moEmployee != null && mtDateCut != null) {
-            int benefitAnniv = SHrsUtils.getSeniorityEmployee(moEmployee.getDateBenefits(), mtDateCut);
+        if (moEmployee != null && mtDateCutOff != null) {
+            int benefitAnniv = SHrsUtils.getSeniorityEmployee(moEmployee.getDateBenefits(), mtDateCutOff);
 
             jsAnniversary.setValue(benefitAnniv == 0 ? 1 : benefitAnniv);
 
@@ -470,10 +470,10 @@ public class SFormAbsence extends SBeanForm implements ItemListener, FocusListen
     
     private void calculateWorkingDays(boolean calculateOnly) {
         mnWorkingDays = 0;
-        mtDateCut = moDateDateEnd.getValue();
+        mtDateCutOff = moDateDateEnd.getValue();
         
-        if (moDateDateStart.getValue() != null && mtDateCut != null) {
-            mnWorkingDays = (int) SLibTimeUtils.getDaysDiff(mtDateCut, moDateDateStart.getValue()) + 1;
+        if (moDateDateStart.getValue() != null && mtDateCutOff != null) {
+            mnWorkingDays = (int) SLibTimeUtils.getDaysDiff(mtDateCutOff, moDateDateStart.getValue()) + 1;
         }
 
         if (!calculateOnly) {
