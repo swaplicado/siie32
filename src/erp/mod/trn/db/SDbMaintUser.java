@@ -18,12 +18,13 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Gil De Jesús, Sergio Flores
+ * @author Gil De Jesús, Sergio Flores, Claudio Peña
  */
 public class SDbMaintUser extends SDbRegistryUser {
     
     protected int mnPkMaintUserId;
     protected java.sql.Blob moFingerprint_n;
+    protected int mnPinNumber;
     protected boolean mbEmployee;
     protected boolean mbContractor;
     protected boolean mbToolsMaintProvider;
@@ -43,6 +44,7 @@ public class SDbMaintUser extends SDbRegistryUser {
 
     public void setPkMaintUserId(int n) { mnPkMaintUserId = n; }
     public void setFingerprint_n(java.sql.Blob o) { moFingerprint_n = o; }
+    public void setPinNumber(int n) { mnPinNumber = n; }
     public void setEmployee(boolean b) { mbEmployee = b; }
     public void setContractor(boolean b) { mbContractor = b; }
     public void setToolsMaintProvider(boolean b) { mbToolsMaintProvider = b; }
@@ -54,6 +56,7 @@ public class SDbMaintUser extends SDbRegistryUser {
 
     public int getPkMaintUserId() { return mnPkMaintUserId; }
     public java.sql.Blob getFingerprint_n() { return moFingerprint_n; }
+    public int getPinNumber() { return mnPinNumber; }
     public boolean isEmployee() { return mbEmployee; }
     public boolean isContractor() { return mbContractor; }
     public boolean isToolsMaintProvider() { return mbToolsMaintProvider; }
@@ -81,6 +84,7 @@ public class SDbMaintUser extends SDbRegistryUser {
 
         mnPkMaintUserId = 0;
         moFingerprint_n = null;
+        mnPinNumber = 0;
         mbEmployee = false;
         mbContractor = false;
         mbToolsMaintProvider = false;
@@ -129,6 +133,7 @@ public class SDbMaintUser extends SDbRegistryUser {
         else {
             mnPkMaintUserId = resultSet.getInt("id_maint_user");
             moFingerprint_n = resultSet.getBlob("fingerprint_n");
+            mnPinNumber = resultSet.getInt("pin_number");
             mbEmployee = resultSet.getBoolean("b_employee");
             mbContractor = resultSet.getBoolean("b_contractor");
             mbToolsMaintProvider = resultSet.getBoolean("b_tool_maint_prov");
@@ -160,6 +165,7 @@ public class SDbMaintUser extends SDbRegistryUser {
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
                     mnPkMaintUserId + ", " + 
                     "NULL, " + 
+                    mnPinNumber + ", " + 
                     (mbEmployee ? 1 : 0) + ", " + 
                     (mbContractor ? 1 : 0) + ", " + 
                     (mbToolsMaintProvider ? 1 : 0) + ", " + 
@@ -176,6 +182,7 @@ public class SDbMaintUser extends SDbRegistryUser {
             msSql = "UPDATE " + getSqlTable() + " SET " +
                     //"id_maint_user = " + mnPkMaintUserId + ", " +
                     //"fingerprint_n = " + moFingerprint_n + ", " +
+                    "pin_number = " + (mnPinNumber) + ", " +
                     "b_employee = " + (mbEmployee ? 1 : 0) + ", " +
                     "b_contractor = " + (mbContractor ? 1 : 0) + ", " +
                     "b_tool_maint_prov = " + (mbToolsMaintProvider ? 1 : 0) + ", " +
@@ -209,6 +216,7 @@ public class SDbMaintUser extends SDbRegistryUser {
 
         registry.setPkMaintUserId(this.getPkMaintUserId());
         registry.setFingerprint_n(this.getFingerprint_n());
+        registry.setPinNumber(this.getPinNumber());
         registry.setEmployee(this.isEmployee());
         registry.setContractor(this.isContractor());
         registry.setToolsMaintProvider(this.isToolsMaintProvider());

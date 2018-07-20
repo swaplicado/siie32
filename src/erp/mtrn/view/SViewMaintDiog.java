@@ -313,28 +313,28 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
 
         int col = 0;
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "iog.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.code", "Código tipo doc.", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.tp_iog", "Tipo doc.", 125);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ent.code", "Almacén", STableConstants.WIDTH_CODE_COB_ENT);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "maint.bp", "Responsable", 200);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "supv.name", "Residente", 200);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_signed", "Firmado", STableConstants.WIDTH_BOOLEAN);
         if (mnTabTypeAux02 == SUtilConsts.PER_DOC) {
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "iog.val_r", "Total $", STableConstants.WIDTH_VALUE_2X);
         }
         if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
+            aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "ioge.qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
+            aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", STableConstants.WIDTH_ITEM);
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.name", "Ítem", 250);
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "maint.name", "Área mantenimiento", 150);
-            aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "ioge.qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
-            aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "unit.symbol", "Unitad", STableConstants.WIDTH_UNIT_SYMBOL);
             aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_price", "Precio unitario $", STableConstants.WIDTH_VALUE_UNITARY);
             aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_value", "Importe $", STableConstants.WIDTH_VALUE_2X);
         }
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "supv.name", "Residente", 200);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ent.code", "Almacén", STableConstants.WIDTH_CODE_COB_ENT);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.code", "Código tipo doc.", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num_cp", "Folio doc. complemento", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog_cp.code", "Código tipo doc. complemento", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog_cp.tp_iog", "Tipo doc. complemento", 125);

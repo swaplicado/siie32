@@ -74,7 +74,7 @@ import sa.lib.srv.SSrvUtils;
 
 /**
  *
- * @author Sergio Flores, Daniel López
+ * @author Sergio Flores, Daniel López, Claudio Peña
  */
 public abstract class STrnUtilities {
 
@@ -2153,6 +2153,8 @@ public abstract class STrnUtilities {
         SDataEmployee employeeUserBuyer = null;
         SDataEmployee employeeUserAuthorize = null;
         boolean isPurchase = false;
+        boolean isPending = false;
+        boolean isReject = false;
         FileOutputStream outputStreamPdf = null;
         
         try {
@@ -2162,6 +2164,8 @@ public abstract class STrnUtilities {
             map = client.createReportParams();
             
             isPurchase = dps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR;
+            isPending = dps.getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING;
+            isReject = dps.getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT;
             
             oCompanyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
             oBizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
@@ -2178,7 +2182,7 @@ public abstract class STrnUtilities {
             if (oCompanyBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
                 nFkEmiAddressFormatTypeId_n = oAddress.getFkAddressTypeId();
             }
-            else {
+            else {                
                 nFkEmiAddressFormatTypeId_n = client.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
             }
             
@@ -2198,7 +2202,7 @@ public abstract class STrnUtilities {
                 bizPartnerUserBuyer = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oUserBuyer.getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
                 employeeUserBuyer = bizPartnerUserBuyer.getDbmsDataEmployee();
             }
-            
+                        
             if (oUserAuthorize.getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
                 bizPartnerUserAuthorize = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oUserAuthorize.getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
                 employeeUserAuthorize = bizPartnerUserAuthorize.getDbmsDataEmployee();
@@ -2225,6 +2229,8 @@ public abstract class STrnUtilities {
                 addressDelivery.length > 3 ? addressDelivery[3] : "");
             map.put("sUserBuyer", sUserBuyer != null ? sUserBuyer : oUserBuyer.getUser());
             map.put("sUserAuthorize", sUserAuthorize != null ? sUserAuthorize : oUserAuthorize.getUser());
+            map.put("bIsPending", isPending);
+            map.put("bIsReject", isReject);
             map.put("nBizPartnerCategory", isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
             map.put("nIdTpCarSup", SModSysConsts.LOGS_TP_CAR_CAR);
             map.put("sNotes", client.getSessionXXX().getParamsCompany().getNotesPurchasesOrder());

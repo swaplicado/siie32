@@ -21,7 +21,7 @@ public abstract class SDataConstantsSys {
 
     public static final int UNDEFINED = 0;
     public static final int NA = 1;
-
+    
     public static final int CFGS_CT_ENT_CASH = 1;
     public static final int CFGS_CT_ENT_WH = 2;
     public static final int CFGS_CT_ENT_POS = 3;
@@ -1598,6 +1598,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_STK_MOV = 207031;       // stock movements detailed per item
     public static final int REP_TRN_STK_MOV_MOV = 207032;   // stock movements detailed per movement
     public static final int REP_TRN_STK_MOV_SUM = 207033;   // stock movements summary
+    public static final int REP_TRN_STK_MOV_SUM_SUM = 207034;   // sumary of stock movements summary
     
     public static final int REP_TRN_CFD = 207101;
     public static final int REP_TRN_CFDI = 207102;

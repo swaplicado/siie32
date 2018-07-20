@@ -56,7 +56,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas, Alfredo Perez, Sergio Flores
+ * @author Juan Barajas, Alfredo Perez, Sergio Flores, Claudio Peña
  */
 public abstract class SHrsUtils {
     

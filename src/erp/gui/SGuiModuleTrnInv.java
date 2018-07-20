@@ -26,6 +26,7 @@ import erp.mtrn.data.STrnDiogComplement;
 import erp.mtrn.form.SDialogDiogSaved;
 import erp.mtrn.form.SDialogRepStock;
 import erp.mtrn.form.SDialogRepStockMoves;
+import erp.mtrn.form.SDialogRepStockMovesSumSum;
 import erp.mtrn.form.SDialogRepStockPeriod;
 import erp.mtrn.form.SDialogRepStockTrackingLot;
 import erp.mtrn.form.SDialogUtilStockClosing;
@@ -147,6 +148,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReportStock;
     private javax.swing.JMenuItem jmiReportStockPeriod;
     private javax.swing.JMenuItem jmiReportStockMoves;
+    private javax.swing.JMenuItem jmiReportStockMovesSumSum;
     private javax.swing.JMenuItem jmiReportStockTrackingLot;
     private javax.swing.JMenu jmMenuRepStats;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendMass;
@@ -158,6 +160,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepStock moDialogRepStock;
     private erp.mtrn.form.SDialogRepStockPeriod moDialogRepStockPeriod;
     private erp.mtrn.form.SDialogRepStockMoves moDialogRepStockMoves;
+    private erp.mtrn.form.SDialogRepStockMovesSumSum moDialogRepStockMovesSumSum;
     private erp.mtrn.form.SDialogRepStockTrackingLot moDialogRepStockTrackingLot;
     private erp.mtrn.form.SFormDiog moFormDiog;
     private erp.mtrn.form.SFormMaintDiog moFormMaintDiog;
@@ -489,14 +492,17 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReportStock = new JMenuItem("Reporte de existencias...");
         jmiReportStockPeriod = new JMenuItem("Reporte de existencias por periodo...");
         jmiReportStockMoves = new JMenuItem("Reporte de movimientos de inventarios...");
+        jmiReportStockMovesSumSum = new JMenuItem("Resumen de movimientos de inventarios...");
         jmiReportStockTrackingLot = new JMenuItem("Reporte de rastreo de lotes...");
         jmMenuRep.add(jmiReportStock);
         jmMenuRep.add(jmiReportStockPeriod);
         jmMenuRep.add(jmiReportStockMoves);
+        jmMenuRep.add(jmiReportStockMovesSumSum);
         jmMenuRep.add(jmiReportStockTrackingLot);
         jmiReportStock.addActionListener(this);
         jmiReportStockPeriod.addActionListener(this);
         jmiReportStockMoves.addActionListener(this);
+        jmiReportStockMovesSumSum.addActionListener(this);
         jmiReportStockTrackingLot.addActionListener(this);
 
         jmMenuRepStats = new JMenu("Estadísticas de producción");
@@ -614,6 +620,16 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         moDialogRepStockMoves.formRefreshCatalogues();
         moDialogRepStockMoves.formReset();
         moDialogRepStockMoves.setFormVisible(true);
+    }
+    
+    private void menuRepStockMovesSumSum() {
+        if (moDialogRepStockMovesSumSum == null) {
+            moDialogRepStockMovesSumSum= new SDialogRepStockMovesSumSum(miClient, SDataConstants.ITMU_ITEM, SDataConstants.BPSU_BP );
+        }
+
+        moDialogRepStockMovesSumSum.formRefreshCatalogues();
+        moDialogRepStockMovesSumSum.formReset();
+        moDialogRepStockMovesSumSum.setFormVisible(true);
     }
 
     private void menuRepStockTrackingLot() {
@@ -1435,6 +1451,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReportStockMoves) {
                 menuRepStockMoves();
+            }
+            else if (item == jmiReportStockMovesSumSum) {
+                menuRepStockMovesSumSum();
             }
             else if (item == jmiReportStockTrackingLot) {
                 menuRepStockTrackingLot();

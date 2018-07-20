@@ -840,7 +840,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         int dataType = SLibConstants.UNDEFINED;
         int[] signatoryKey = null;
         byte[] fingerprint = null;
-        
+                
         switch (mnParamMaintMovementType) {
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART:
             case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL:
@@ -889,6 +889,60 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         }
 
         return fingerprint;
+    }
+    
+    private int getSignatoryFingerPassword() throws SQLException {
+        int dataType = SLibConstants.UNDEFINED;
+        int[] signatoryKey = null;
+        int fingerPassword = 0;
+        
+        switch (mnParamMaintMovementType) {
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST:
+                if (jcbMaintReturnUserSupervisor.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER_SUPV;
+                    signatoryKey = ((SGuiItem) jcbMaintReturnUserSupervisor.getSelectedItem()).getPrimaryKey();
+                }
+                else if (jcbMaintReturnUser.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER;
+                    signatoryKey = ((SGuiItem) jcbMaintReturnUser.getSelectedItem()).getPrimaryKey();
+                }
+                break;
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST:
+                if (jcbMaintUserSupervisor.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER_SUPV;
+                    signatoryKey = ((SGuiItem) jcbMaintUserSupervisor.getSelectedItem()).getPrimaryKey();
+                }
+                else if (jcbMaintUser.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER;
+                    signatoryKey = ((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey();
+                }
+                break;
+            default:
+        }
+        
+        switch (dataType) {
+            case SModConsts.TRN_MAINT_USER:
+                SDbMaintUser user = (SDbMaintUser) miClient.getSession().readRegistry(dataType, signatoryKey);
+                fingerPassword = String.valueOf(user.getPinNumber()).length();
+                
+                if (String.valueOf(user.getPinNumber()).length() == 4) {
+                fingerPassword = user.getPinNumber();
+                }
+                break;
+            case SModConsts.TRN_MAINT_USER_SUPV:
+                getSignatoryFingerprint();
+                break;
+        }
+
+        return fingerPassword;
     }
 
     private void computeEntryValue() {
@@ -1249,16 +1303,27 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     }
 
     private void actionSign() {
-        try {
+        try {                  
             byte[] fingerprint = getSignatoryFingerprint();
+            int fingerPassword = getSignatoryFingerPassword();
             
-            if (fingerprint == null) {
-                throw new Exception("No hay un firmante seleccionado o el firmante carece de huella digital.");
+            if (fingerprint == null && fingerPassword == 0) {
+                throw new Exception("No hay un firmante seleccionado o el firmante carece de huella digital y contraseña.");
             }
-            
-            if (STrnMaintUtilities.verifyFingerprint(miClient, fingerprint)) {
-                moMaintDiogSignature = new SDbMaintDiogSignature();
-                showSignatureStatus();
+            if (fingerprint != null) {
+                if (STrnMaintUtilities.verifyFingerprint(miClient, fingerprint)) {
+                    moMaintDiogSignature = new SDbMaintDiogSignature();
+                    showSignatureStatus();
+                }
+            }            
+            else if (fingerPassword != 0) {
+                if (STrnMaintUtilities.verifyFingerPassword(miClient, fingerPassword)) {
+                        moMaintDiogSignature = new SDbMaintDiogSignature();
+                        showSignatureStatus();                
+                }
+            } 
+            else {
+                throw new Exception("No hay un firmante seleccionado o el firmante carece de huella digital y contraseña.");
             }
         }
         catch (Exception e) {

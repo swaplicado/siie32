@@ -684,6 +684,10 @@ public abstract class SModSysConsts {
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT = 251;     // out status of tools lent
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT = 252;    // out status of tools maintenance
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST = 253;     // out status of tools lost
+    
+    public static final int TRNX_TP_MAINT_MOV_PART = 1;    // Part
+    public static final int TRNX_TP_MAINT_MOV_TOOL = 2;    // Tool
+    public static final int TRNX_TP_MAINT_MOV_ALL = 3;     // All
 
     public static final int TRNU_TP_IOG_ADJ_NA = 1;
 

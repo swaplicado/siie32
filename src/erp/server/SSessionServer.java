@@ -465,7 +465,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         return vTableRows;
     }
 
-    private Vector<Vector<Object>> requestExecuteQuerySimple(String sql) throws SQLException, Exception {
+     private Vector<Vector<Object>> requestExecuteQuerySimple(String sql) throws SQLException, Exception {
         int i = 0;
         int cols = 0;
         Vector<Vector<Object>> vectors = new Vector<Vector<Object>>();
