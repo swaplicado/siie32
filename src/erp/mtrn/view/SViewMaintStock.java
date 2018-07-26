@@ -25,7 +25,7 @@ import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import sa.lib.SLibUtils;
-import sa.lib.grid.SGridUtils;
+import sa.lib.grid.SGridUtils;  
 
 /**
  *
@@ -180,8 +180,8 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[13];
-
+                aoTableColumns = new STableColumn[12];
+                
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL_MAINT:
@@ -233,12 +233,11 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
 
         if (isMaintUserNeeded()) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "s.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.code", "Código tipo doc.", 50);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.tp_iog", "Tipo doc.", 125);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.code", "Código tipo doc.", 40);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.tp_iog", "Tipo doc.", 120);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_bp", "Responsable", 200);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "supv.name", "Residente", 200);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_signed", "Firmado", STableConstants.WIDTH_BOOLEAN);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "ioge.qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
         }
         
         if (isStockCfgNeeded()) {
@@ -252,11 +251,11 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i++].setCellRenderer(SGridUtils.getCellRendererNumberQuantity());
         }
         
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mov_i", "Entradas", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mov_i", "Entradas", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++].setCellRenderer(SGridUtils.getCellRendererNumberQuantity());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mov_o", "Salidas", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mov_o", "Salidas", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++].setCellRenderer(SGridUtils.getCellRendererNumberQuantity());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk", "Existencias", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk", "Existencias", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++].setCellRenderer(SGridUtils.getCellRendererNumberQuantity());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
 
@@ -396,7 +395,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
         msSql = "SELECT s.id_item, s.id_unit, s.dt, i.item_key, i.item, u.symbol, sc.qty_min, sc.rop, sc.qty_max, " +
                 (!isMaintUserNeeded() ? "" : "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), erp.lib_fix_int(d.num, 6)) AS f_num, " +
                 "(SELECT COUNT(*) FROM trn_maint_diog_sig AS sig WHERE sig.fk_diog_year = d.id_year AND sig.fk_diog_doc = d.id_doc AND sig.ts_usr_ins >= d.ts_edit) > 0 AS _signed, " +
-                "tp_iog.tp_iog, tp_iog.code, bpb.code, ent.code, ioge.qty, supv.name," )+
+                "tp_iog.tp_iog, tp_iog.code, bpb.code, ent.code, supv.name, " ) +
                 (!isMaintUserNeeded() ? "" : "COALESCE(b.id_bp, 0) AS _id_bp, COALESCE(b.bp, 'N/D') AS _bp, ") +
                 "IF(SUM(s.mov_in - s.mov_out) <= sc.qty_min, " + STableConstants.ICON_VIEW_LIG_RED + ", " +
                 "IF(sc.qty_min < SUM(s.mov_in - s.mov_out) AND SUM(s.mov_in - s.mov_out) <= sc.rop, "  + STableConstants.ICON_VIEW_LIG_YEL + ", " +
@@ -414,9 +413,8 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 "INNER JOIN erp.trns_tp_iog AS tp_iog ON d.fid_tp_iog = tp_iog.id_tp_iog AND d.fid_ct_iog = tp_iog.id_ct_iog AND d.fid_cl_iog = tp_iog.id_cl_iog " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_cob = bpb.id_bpb " +
                 "INNER JOIN erp.cfgu_cob_ent AS ent ON d.fid_cob = ent.id_cob AND d.fid_wh = ent.id_ent " +
-                "INNER JOIN trn_diog_ety AS ioge ON ioge.id_year = d.id_year AND ioge.id_doc = d.id_doc " +
                 "INNER JOIN trn_maint_user_supv AS supv ON d.fid_maint_user_supv = supv.id_maint_user_supv " +
-                 "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = d.fid_maint_user_n ") +
+                "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = d.fid_maint_user_n ") +
                 "WHERE NOT s.b_del " + (sqlWhere.isEmpty() ? "" : "AND " + sqlWhere) +
                 "GROUP BY s.id_item, s.id_unit, i.item_key, i.item, u.symbol, sc.qty_min, sc.rop, sc.qty_max" +
                 (!isMaintUserNeeded() ? "" : ", b.id_bp, b.bp") + " " +
