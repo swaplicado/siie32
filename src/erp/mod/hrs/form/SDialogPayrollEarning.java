@@ -21,7 +21,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListener {
     
@@ -206,8 +206,8 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
     }
     
     private void enableFields() {
-        moCompUnitAlleged.getField().setEditable(moHrsPayrollReceiptEarning.getEarning().getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT && !moHrsPayrollReceiptEarning.getEarning().isDaysWorkedBased());
-        moCompUnit.getField().setEditable(moHrsPayrollReceiptEarning.getEarning().getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT && !moHrsPayrollReceiptEarning.getEarning().isDaysWorkedBased());
+        moCompUnitAlleged.getField().setEditable(moHrsPayrollReceiptEarning.getEarning().getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT && !moHrsPayrollReceiptEarning.getEarning().isDaysWorkedBasedOn());
+        moCompUnit.getField().setEditable(moHrsPayrollReceiptEarning.getEarning().getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT && !moHrsPayrollReceiptEarning.getEarning().isDaysWorkedBasedOn());
     }
     
     private void renderEarning() {

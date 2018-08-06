@@ -50,9 +50,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
@@ -237,6 +236,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftDateBenefits = new javax.swing.JFormattedTextField();
         jbDateBenefits = new javax.swing.JButton();
         jbDateBenefitsEdit = new javax.swing.JButton();
+        jtfSeniority = new javax.swing.JTextField();
         jPanel14 = new javax.swing.JPanel();
         jlDateLastHire = new javax.swing.JLabel();
         jftDateLastHire = new javax.swing.JFormattedTextField();
@@ -669,6 +669,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jbDateBenefitsEdit.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel8.add(jbDateBenefitsEdit);
 
+        jtfSeniority.setEditable(false);
+        jtfSeniority.setText("99 a, 99 m");
+        jtfSeniority.setToolTipText("Antigüedad");
+        jtfSeniority.setFocusable(false);
+        jtfSeniority.setPreferredSize(new java.awt.Dimension(60, 23));
+        jPanel8.add(jtfSeniority);
+
         jPanel3.add(jPanel8);
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
@@ -982,7 +989,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel34.add(jbDateBirth);
 
         jtfAge.setEditable(false);
-        jtfAge.setText("99 a 99 m");
+        jtfAge.setText("99 a, 99 m");
+        jtfAge.setToolTipText("Edad");
         jtfAge.setFocusable(false);
         jtfAge.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel34.add(jtfAge);
@@ -1081,7 +1089,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel52.add(jbMateDateBirth);
 
         jtfMateAge.setEditable(false);
-        jtfMateAge.setText("99 a 99 m");
+        jtfMateAge.setText("99 a, 99 m");
+        jtfMateAge.setToolTipText("Edad");
         jtfMateAge.setFocusable(false);
         jtfMateAge.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel52.add(jtfMateAge);
@@ -1115,7 +1124,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel53.add(jbSonDateBirth1);
 
         jtfSonAge1.setEditable(false);
-        jtfSonAge1.setText("99 a 99 m");
+        jtfSonAge1.setText("99 a, 99 m");
+        jtfSonAge1.setToolTipText("Edad");
         jtfSonAge1.setFocusable(false);
         jtfSonAge1.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel53.add(jtfSonAge1);
@@ -1149,7 +1159,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel54.add(jbSonDateBirth2);
 
         jtfSonAge2.setEditable(false);
-        jtfSonAge2.setText("99 a 99 m");
+        jtfSonAge2.setText("99 a, 99 m");
+        jtfSonAge2.setToolTipText("Edad");
         jtfSonAge2.setFocusable(false);
         jtfSonAge2.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel54.add(jtfSonAge2);
@@ -1183,7 +1194,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel55.add(jbSonDateBirth3);
 
         jtfSonAge3.setEditable(false);
-        jtfSonAge3.setText("99 a 99 m");
+        jtfSonAge3.setText("99 a, 99 m");
+        jtfSonAge3.setToolTipText("Edad");
         jtfSonAge3.setFocusable(false);
         jtfSonAge3.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel55.add(jtfSonAge3);
@@ -1217,7 +1229,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel56.add(jbSonDateBirth4);
 
         jtfSonAge4.setEditable(false);
-        jtfSonAge4.setText("99 a 99 m");
+        jtfSonAge4.setText("99 a, 99 m");
+        jtfSonAge4.setToolTipText("Edad");
         jtfSonAge4.setFocusable(false);
         jtfSonAge4.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel56.add(jtfSonAge4);
@@ -1251,7 +1264,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel57.add(jbSonDateBirth5);
 
         jtfSonAge5.setEditable(false);
-        jtfSonAge5.setText("99 a 99 m");
+        jtfSonAge5.setText("99 a, 99 m");
+        jtfSonAge5.setToolTipText("Edad");
         jtfSonAge5.setFocusable(false);
         jtfSonAge5.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel57.add(jtfSonAge5);
@@ -1597,6 +1611,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jckChangeSalarySscBase.addItemListener(this);
         jcbFkPaymentType.addItemListener(this);
         jcbFkDepartment.addItemListener(this);
+        jftDateBenefits.addFocusListener(this);
         jftDateBirth.addFocusListener(this);
         jftMateDateBirth.addFocusListener(this);
         jftSonDateBirth1.addFocusListener(this);
@@ -2102,46 +2117,37 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mbUpdatingForm = false;
     }
     
-    private String formatDateBirth(final Date dateBirth) {
-        String string = "";
-        
-        if (dateBirth != null) {
-            DateTime start = new DateTime(dateBirth);
-            DateTime end = new DateTime(miClient.getSession().getSystemDate());
-            Period period = new Period(start, end);
-            
-            string = "" + period.getYears() + " a " + period.getMonths() + " m";
-        }
-        
-        return string;
+    
+    private void focusLostDateBenefits() {
+        jtfSeniority.setText(SLibTimeUtils.formatAge(moFieldDateBenefits.getDate(), miClient.getSession().getSystemDate()));
     }
     
     private void focusLostDateBirth() {
-        jtfAge.setText(formatDateBirth(moFieldDateBirth.getDate()));
+        jtfAge.setText(SLibTimeUtils.formatAge(moFieldDateBirth.getDate(), miClient.getSession().getSystemDate()));
     }
     
     private void focusLostMateDateBirth() {
-        jtfMateAge.setText(formatDateBirth(moFieldMateDateBirth.getDate()));
+        jtfMateAge.setText(SLibTimeUtils.formatAge(moFieldMateDateBirth.getDate(), miClient.getSession().getSystemDate()));
     }
     
     private void focusLostSonDateBirth1() {
-        jtfSonAge1.setText(formatDateBirth(moFieldSonDateBirth1.getDate()));
+        jtfSonAge1.setText(SLibTimeUtils.formatAge(moFieldSonDateBirth1.getDate(), miClient.getSession().getSystemDate()));
     }
     
     private void focusLostSonDateBirth2() {
-        jtfSonAge2.setText(formatDateBirth(moFieldSonDateBirth2.getDate()));
+        jtfSonAge2.setText(SLibTimeUtils.formatAge(moFieldSonDateBirth2.getDate(), miClient.getSession().getSystemDate()));
     }
     
     private void focusLostSonDateBirth3() {
-        jtfSonAge3.setText(formatDateBirth(moFieldSonDateBirth3.getDate()));
+        jtfSonAge3.setText(SLibTimeUtils.formatAge(moFieldSonDateBirth3.getDate(), miClient.getSession().getSystemDate()));
     }
     
     private void focusLostSonDateBirth4() {
-        jtfSonAge4.setText(formatDateBirth(moFieldSonDateBirth4.getDate()));
+        jtfSonAge4.setText(SLibTimeUtils.formatAge(moFieldSonDateBirth4.getDate(), miClient.getSession().getSystemDate()));
     }
     
     private void focusLostSonDateBirth5() {
-        jtfSonAge5.setText(formatDateBirth(moFieldSonDateBirth5.getDate()));
+        jtfSonAge5.setText(SLibTimeUtils.formatAge(moFieldSonDateBirth5.getDate(), miClient.getSession().getSystemDate()));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2341,6 +2347,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JTextField jtfPkBizPartnerId_Ro;
     private javax.swing.JTextField jtfSalary;
     private javax.swing.JTextField jtfSalarySscBase;
+    private javax.swing.JTextField jtfSeniority;
     private javax.swing.JTextField jtfSocialSecurityNumber;
     private javax.swing.JTextField jtfSonAge1;
     private javax.swing.JTextField jtfSonAge2;
@@ -2413,6 +2420,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         //itemStateWage();      // invocked allready by itemStateChangePaymentType()
         itemStateSalarySscBaseChange(false);
         
+        jtfSeniority.setText("");
         jtfAge.setText("");
         jtfMateAge.setText("");
         jtfSonAge1.setText("");
@@ -2692,6 +2700,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldDateBirth.setFieldValue(moEmployee.getDateBirth());
             focusLostDateBirth();
             moFieldDateBenefits.setFieldValue(moEmployee.getDateBenefits());
+            focusLostDateBenefits();
             moFieldDateLastHire.setFieldValue(moEmployee.getDateLastHire());
             moFieldDateLastDismiss_n.setFieldValue(moEmployee.getDateLastDismiss_n());
             moFieldFkPaymentType.setFieldValue(new int[] { moEmployee.getFkPaymentTypeId() });
@@ -3150,7 +3159,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         if (e.getSource() instanceof JFormattedTextField) {
             JFormattedTextField field = (JFormattedTextField) e.getSource();
             
-            if (field == jftDateBirth) {
+            if (field == jftDateBenefits) {
+                focusLostDateBenefits();
+            }
+            else if (field == jftDateBirth) {
                 focusLostDateBirth();
             }
             else if (field == jftMateDateBirth) {

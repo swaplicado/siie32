@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Sergio Flores
  * 
  * Maintenance Log:
  * 
@@ -1096,9 +1096,9 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_CFD_CAT_TAX_REG = 17;  // tax regime
     public static final int TRNS_CFD_CAT_CTY = 18;      // country
     public static final int TRNS_CFD_CAT_CFD_USE = 19;  // CFDI use
-    public static final int TRNS_CFD_CAT_INT_MOV_REA = 21;  // International Commerce: move reason
-    public static final int TRNS_CFD_CAT_INT_OPN_TP = 22;   // International Commerce: operation type
-    public static final int TRNS_CFD_CAT_INT_REQ_KEY = 23;  // International Commerce: request keys
+    public static final int TRNS_CFD_CAT_INT_MOV_REA = 21;  // International Commerce: move reason (Int. Commerce)
+    public static final int TRNS_CFD_CAT_INT_OPN_TP = 22;   // International Commerce: operation type (Int. Commerce)
+    public static final int TRNS_CFD_CAT_INT_REQ_KEY = 23;  // International Commerce: request keys (Int. Commerce)
     
     public static final String TRNS_CFD_CAT_PAY_WAY_99 = "99";  // Por definir
     

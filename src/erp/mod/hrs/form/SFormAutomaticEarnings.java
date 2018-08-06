@@ -346,7 +346,7 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
     }
 
     private void updateRows() {
-        boolean applyUnits = SLibUtils.belongsTo(moEarning.getFkEarningComputationTypeId(), new int[] { SModSysConsts.HRSS_TP_EAR_COMP_DAY, SModSysConsts.HRSS_TP_EAR_COMP_HRS });
+        boolean applyUnits = SLibUtils.belongsTo(moEarning.getFkEarningComputationTypeId(), new int[] { SModSysConsts.HRSS_TP_EAR_COMP_DAYS, SModSysConsts.HRSS_TP_EAR_COMP_HRS });
         boolean applyAmount = moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT;
         
         SDbAutomaticEarning automaticRow = new SDbAutomaticEarning();
@@ -525,7 +525,7 @@ public class SFormAutomaticEarnings extends SBeanForm implements SGridPaneFormOw
 
             if (load) {
                 moTextName.setValue(moEarning.getName());
-                moComValue.getField().setEditable(!moEarning.isDaysWorkedBased());
+                moComValue.getField().setEditable(!moEarning.isDaysWorkedBasedOn());
                 moComValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { moEarning.getFkEarningComputationTypeId() }, SDbRegistry.FIELD_CODE));
                 moComValue.getField().getComponent().requestFocus();
 

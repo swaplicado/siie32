@@ -1,4 +1,3 @@
-
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -7,6 +6,7 @@
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -102,7 +102,13 @@ public class SDbDeduction extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public int getAuxAccountingConfigurationTypeId() { return mnAuxAccountingConfigurationTypeId; }
-    //public ArrayList<SDbAccountingDeduction> getAccountingDeduction() { return maAccountingDeduction; }
+
+    public boolean areUnitsModifiable() {
+        boolean isNotBasedOnUnits = mnFkDeductionComputationTypeId != SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME;
+        boolean isNotAbsence = mnFkAbsenceClassId_n == 0 && mnFkAbsenceTypeId_n == 0;
+        
+        return isNotBasedOnUnits && isNotAbsence;
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {

@@ -10,7 +10,7 @@ import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SHrsBenefit;
 import erp.mod.hrs.db.SHrsBenefitParams;
-import erp.mod.hrs.db.SHrsBenefitTableByAnniversary;
+import erp.mod.hrs.db.SHrsBenefitTableAnniversary;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsPayrollReceipt;
 import erp.mod.hrs.db.SHrsUtils;
@@ -50,8 +50,8 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     protected SDbBenefitTable moBenefitTable;
     protected SDbBenefitTable moBenefitTableAux;
     protected Date mtDateCutOff;
-    protected ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableByAnniversaries;
-    protected ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableByAnniversariesAux;
+    protected ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnniversarys;
+    protected ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnniversarysAux;
     protected SHrsBenefit moHrsBenefit;
     protected ArrayList<SHrsBenefit> maHrsBenefits;
     
@@ -498,10 +498,10 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
             throw new Exception("No existe tabla de prestaciones adecuada para la fecha de corte.");
         }
         
-        maBenefitTableByAnniversaries = moHrsPayrollReceipt.getHrsPayroll().getBenefitTableAnniversary(moBenefitTable.getPkBenefitId());
+        maBenefitTableAnniversarys = moHrsPayrollReceipt.getHrsPayroll().getBenefitTableAnniversary(moBenefitTable.getPkBenefitId());
         
         if (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-            maBenefitTableByAnniversariesAux = moHrsPayrollReceipt.getHrsPayroll().getBenefitTableAnniversary(moBenefitTableAux.getPkBenefitId());
+            maBenefitTableAnniversarysAux = moHrsPayrollReceipt.getHrsPayroll().getBenefitTableAnniversary(moBenefitTableAux.getPkBenefitId());
         }
     }
     
@@ -639,21 +639,21 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     
     private void readHrsBenefitAcummulate(int seniority) {
         boolean found = false;
-        SHrsBenefitTableByAnniversary benefitTableRow = null;
-        SHrsBenefitTableByAnniversary benefitTableRowAux = null;
+        SHrsBenefitTableAnniversary benefitTableAnniversary = null;
+        SHrsBenefitTableAnniversary benefitTableAnniversaryAux = null;
         
         try {
             mnBenefitYear = SLibTimeUtils.digestYear(SLibTimeUtils.addDate(moEmployee.getDateBenefits(), seniority - 1, 0, 0))[0];
             
             // Read benefits accumulated by benefit type:
             
-            maHrsBenefits = SHrsUtils.readHrsBenefits(miClient.getSession(), moEmployee, mnFormType, seniority, mnBenefitYear, moHrsPayrollReceipt.getHrsPayroll().getPayroll().getPkPayrollId(), maBenefitTableByAnniversaries, maBenefitTableByAnniversariesAux, moHrsPayrollReceipt.getReceipt().getPaymentDaily());
+            maHrsBenefits = SHrsUtils.readHrsBenefits(miClient.getSession(), moEmployee, mnFormType, seniority, mnBenefitYear, moHrsPayrollReceipt.getHrsPayroll().getPayroll().getPkPayrollId(), maBenefitTableAnniversarys, maBenefitTableAnniversarysAux, moHrsPayrollReceipt.getReceipt().getPaymentDaily());
             
             // Obtain benefit table row more appropiate for seniority:
             if (moBenefitTable != null) {
-                for (SHrsBenefitTableByAnniversary anniversary : maBenefitTableByAnniversaries) {
+                for (SHrsBenefitTableAnniversary anniversary : maBenefitTableAnniversarys) {
                     if (anniversary.getBenefitAnn() <= seniority) {
-                        benefitTableRow = anniversary;
+                        benefitTableAnniversary = anniversary;
                     }
                 }
             }
@@ -662,9 +662,9 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
             
             if (moBenefitTableAux != null) {
                 if (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                    for (SHrsBenefitTableByAnniversary anniversary : maBenefitTableByAnniversariesAux) {
+                    for (SHrsBenefitTableAnniversary anniversary : maBenefitTableAnniversarysAux) {
                         if (anniversary.getBenefitAnn() <= seniority) {
-                            benefitTableRowAux = anniversary;
+                            benefitTableAnniversaryAux = anniversary;
                         }
                     }
                 }
@@ -676,12 +676,12 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
             }
             
             if (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                moIntBenefitTableDaysToPay.setValue(benefitTableRowAux == null ? 0 : (int) benefitTableRowAux.getValue());
-                moDecBenefitTableBonusPercentage.setValue(benefitTableRow == null ? 0d : benefitTableRow.getValue());
+                moIntBenefitTableDaysToPay.setValue(benefitTableAnniversaryAux == null ? 0 : (int) benefitTableAnniversaryAux.getValue());
+                moDecBenefitTableBonusPercentage.setValue(benefitTableAnniversary == null ? 0d : benefitTableAnniversary.getValue());
             }
             else {
-                moIntBenefitTableDaysToPay.setValue(benefitTableRow == null ? 0 : (int) benefitTableRow.getValue());
-                moDecBenefitTableBonusPercentage.setValue(benefitTableRow == null ? 0d : 1d);
+                moIntBenefitTableDaysToPay.setValue(benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue());
+                moDecBenefitTableBonusPercentage.setValue(benefitTableAnniversary == null ? 0d : 1d);
             }
             
             for (SHrsBenefit hrsBenefit : maHrsBenefits) {  // XXX Sergio Flores, 2018-07-11: It is not necessary to iterate this array, allways has only one element, if any!

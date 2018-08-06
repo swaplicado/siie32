@@ -403,7 +403,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
                 case SModSysConsts.HRSS_TP_DED_COMP_AMT:
                     jlDeductionComputationTypeHelp.setText("Monto directo");
                     break;
-                case SModSysConsts.HRSS_TP_DED_COMP_PER_EAR:
+                case SModSysConsts.HRSS_TP_DED_COMP_PCT_INCOME:
                     jlDeductionComputationTypeHelp.setText("En función de un porcentaje sobre el monto de sueldos y salarios");
                     break;
                 default:
@@ -417,7 +417,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
             moDecRetPercentage.setEnabled(false);
         }
         else {
-            moDecRetPercentage.setEnabled(moKeyDeductionComputationType.getValue()[0] == SModSysConsts.HRSS_TP_DED_COMP_PER_EAR);
+            moDecRetPercentage.setEnabled(moKeyDeductionComputationType.getValue()[0] == SModSysConsts.HRSS_TP_DED_COMP_PCT_INCOME);
         }
         
         if (!moDecRetPercentage.isEnabled()) {

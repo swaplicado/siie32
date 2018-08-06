@@ -47,6 +47,7 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -56,7 +57,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas, Alfredo Perez, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Alfredo Perez, Claudio Peña, Sergio Flores
  */
 public abstract class SHrsUtils {
     
@@ -1443,11 +1444,12 @@ public abstract class SHrsUtils {
         SDbBenefitTable benefitTable = null;
 
         String sql = "SELECT id_ben "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
-            + "WHERE b_del = 0 AND fk_ear = " + earningId + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "' "
-            + (paymentType == SLibConsts.UNDEFINED ? "AND fk_tp_pay_n IS NULL" : "AND (fk_tp_pay_n IS NULL OR fk_tp_pay_n = " + paymentType + ")") + " "
-            + "ORDER BY dt_sta DESC, id_ben "
-            + "LIMIT 1;";
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
+                + "WHERE b_del = 0 AND fk_ear = " + earningId + " AND "
+                + "dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "' AND "
+                + "(fk_tp_pay_n IS NULL" + (paymentType == 0 ? "" : " OR fk_tp_pay_n = " + paymentType) + ") "
+                + "ORDER BY fk_tp_pay_n DESC, dt_sta DESC, id_ben " // priority to requested payment type, if any, and then the most recent starting date
+                + "LIMIT 1;";
         ResultSet resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             benefitTable = new SDbBenefitTable();
@@ -1496,21 +1498,36 @@ public abstract class SHrsUtils {
         return disabilityName;
     }
     
-    public static ArrayList<SHrsBenefitTableByAnniversary> getBenefitTablesAnniversarys(ArrayList<SDbBenefitTable> benefitTables) throws Exception {
-        int i = 0;
-        ArrayList<SHrsBenefitTableByAnniversary> aBenefitTableByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
+    /**
+     * Create anniversary entries from 1 to 99 for each given table of benefits.
+     * @param benefitTables
+     * @return Array of anniversaries (from 1 to 100) for each given table of benefits.
+     */
+    public static ArrayList<SHrsBenefitTableAnniversary> createBenefitTablesAnniversarys(ArrayList<SDbBenefitTable> benefitTables) {
+        ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarys = new ArrayList<>();
         
-        for (SDbBenefitTable table : benefitTables) {
-            i = 1;
-            for (SDbBenefitTableRow tableRow : table.getChildRows()) {
-                while ( i * 12 <= tableRow.getMonths()) {
-                    aBenefitTableByAnniversary.add(new SHrsBenefitTableByAnniversary(table.getPkBenefitId(), i, table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? tableRow.getBenefitBonusPercentage() : tableRow.getBenefitDays()));
-                    i++;
+        benefitTables.stream().filter((table) -> (!table.getChildRows().isEmpty())).forEach((table) -> {
+            int currIndex = 0;      // current index of rows of current benefit table
+            double currValue = 0;   // current value, it can be days or bonus percentage
+            SDbBenefitTableRow currTableRow = null;     // current benefit-table row
+            SDbBenefitTableRow nextTableRow = null;     // next benefit-table row, when available
+            
+            for (int ann = 1; ann <= 100; ann++) {
+                if (currTableRow == null || (nextTableRow != null && (ann * SLibTimeConsts.MONTHS >= nextTableRow.getMonths()))) {
+                    if (currTableRow != null) {
+                        currIndex++;
+                    }
+                    
+                    currTableRow = table.getChildRows().get(currIndex);
+                    nextTableRow = table.getChildRows().size() == currIndex + 1 ? null : table.getChildRows().get(currIndex + 1);
+                    currValue = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? currTableRow.getBenefitBonusPercentage() : currTableRow.getBenefitDays();
                 }
+                
+                benefitTableAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), ann, currValue));
             }
-        }
+        });
 
-        return aBenefitTableByAnniversary;
+        return benefitTableAnniversarys;
     }
 
     /**
@@ -2019,17 +2036,14 @@ public abstract class SHrsUtils {
         double percentageTableVacationBonus = 0;
         double salaryUnit = 1;
         double integrationFactorSbc = 0;
-        SHrsBenefitTableByAnniversary benefitTableRow = null;
-        ArrayList<SHrsBenefitTableByAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
-        ArrayList<SHrsBenefitTableByAnniversary> aTableAnnualBonusByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
-        ArrayList<SHrsBenefitTableByAnniversary> aTableVacationBonusByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
-        ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<SDbBenefitTable>();
-        ArrayList<SDbBenefitTable> aTableAnnualBonus = new ArrayList<SDbBenefitTable>();
-        ArrayList<SDbBenefitTable> aTableVacationBonus = new ArrayList<SDbBenefitTable>();
+        SHrsBenefitTableAnniversary benefitTableAnniversary = null;
+        ArrayList<SDbBenefitTable> benefitTableVacation = new ArrayList<>();
+        ArrayList<SDbBenefitTable> benefitTableAnnualBonus = new ArrayList<>();
+        ArrayList<SDbBenefitTable> benefitTableVacationBonus = new ArrayList<>();
         
-        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutOff) }));
-        aTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, SLibConsts.UNDEFINED, dateCutOff) }));
-        aTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, SLibConsts.UNDEFINED, dateCutOff) }));
+        benefitTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutOff) }));
+        benefitTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, SLibConsts.UNDEFINED, dateCutOff) }));
+        benefitTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, SLibConsts.UNDEFINED, dateCutOff) }));
         
         if (dateBenefits != null) {
             seniority = getSeniorityEmployee(dateBenefits, dateCutOff);
@@ -2038,30 +2052,30 @@ public abstract class SHrsUtils {
             seniority = 1;
         }
         
-        aTableVacationByAnniversary = getBenefitTablesAnniversarys(aTableVacation);
-        aTableAnnualBonusByAnniversary = getBenefitTablesAnniversarys(aTableAnnualBonus);
-        aTableVacationBonusByAnniversary = getBenefitTablesAnniversarys(aTableVacationBonus);
+        ArrayList<SHrsBenefitTableAnniversary> benefitTableVacationAnniversarys = createBenefitTablesAnniversarys(benefitTableVacation);
+        ArrayList<SHrsBenefitTableAnniversary> benefitTableAnnualBonusAnniversarys = createBenefitTablesAnniversarys(benefitTableAnnualBonus);
+        ArrayList<SHrsBenefitTableAnniversary> benefitTableVacationBonusAnniversarys = createBenefitTablesAnniversarys(benefitTableVacationBonus);
         
-        for (SHrsBenefitTableByAnniversary row : aTableVacationByAnniversary) {
-            if (row.getBenefitAnn() <= seniority) {
-                benefitTableRow = row;
+        for (SHrsBenefitTableAnniversary anniversary : benefitTableVacationAnniversarys) {
+            if (anniversary.getBenefitAnn() <= seniority) {
+                benefitTableAnniversary = anniversary;
             }
         }
-        daysTableVacation = benefitTableRow == null ? 0 : (int) benefitTableRow.getValue();
+        daysTableVacation = benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue();
         
-        for (SHrsBenefitTableByAnniversary row : aTableAnnualBonusByAnniversary) {
-            if (row.getBenefitAnn() <= seniority) {
-                benefitTableRow = row;
+        for (SHrsBenefitTableAnniversary anniversary : benefitTableAnnualBonusAnniversarys) {
+            if (anniversary.getBenefitAnn() <= seniority) {
+                benefitTableAnniversary = anniversary;
             }
         }
-        daysTableAnnualBonus = benefitTableRow == null ? 0 : (int) benefitTableRow.getValue();
+        daysTableAnnualBonus = benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue();
         
-        for (SHrsBenefitTableByAnniversary row : aTableVacationBonusByAnniversary) {
-            if (row.getBenefitAnn() <= seniority) {
-                benefitTableRow = row;
+        for (SHrsBenefitTableAnniversary anniversary : benefitTableVacationBonusAnniversarys) {
+            if (anniversary.getBenefitAnn() <= seniority) {
+                benefitTableAnniversary = anniversary;
             }
         }
-        percentageTableVacationBonus = benefitTableRow == null ? 0 : (double) benefitTableRow.getValue();
+        percentageTableVacationBonus = benefitTableAnniversary == null ? 0 : (double) benefitTableAnniversary.getValue();
         
         integrationFactorSbc = salaryUnit + ((double) daysTableAnnualBonus / SHrsConsts.YEAR_DAYS) + (double) (daysTableVacation * percentageTableVacationBonus / SHrsConsts.YEAR_DAYS);
         
@@ -2113,15 +2127,15 @@ public abstract class SHrsUtils {
     public static int getDaysVacationsAll(final SGuiSession session, final int benefitAnn, final Date dateCutOff) throws Exception {
         int daysTableVacation = 0;
         ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<SDbBenefitTable>();
-        ArrayList<SHrsBenefitTableByAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
+        ArrayList<SHrsBenefitTableAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableAnniversary>();
         
         aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutOff) }));
         
-        aTableVacationByAnniversary = getBenefitTablesAnniversarys(aTableVacation);
+        aTableVacationByAnniversary = createBenefitTablesAnniversarys(aTableVacation);
         
-        for (SHrsBenefitTableByAnniversary row : aTableVacationByAnniversary) {
-            if (row.getBenefitAnn() <= benefitAnn) {
-                daysTableVacation += (int) row.getValue();
+        for (SHrsBenefitTableAnniversary anniversary : aTableVacationByAnniversary) {
+            if (anniversary.getBenefitAnn() <= benefitAnn) {
+                daysTableVacation += (int) anniversary.getValue();
             }
         }
         
@@ -2362,18 +2376,18 @@ public abstract class SHrsUtils {
         return true;
     }
     
-    public static ArrayList<SHrsBenefit> readHrsBenefits(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int aniversaryLimit, final int benefitYear, final int payrrollId, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversary, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversaryAux, final double paymentDaily) throws Exception {
+    public static ArrayList<SHrsBenefit> readHrsBenefits(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int anniversaryLimit, final int benefitYear, final int payrrollId, final ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarys, final ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarysAux, final double paymentDaily) throws Exception {
         ArrayList<SHrsBenefit> hrsBenefits = new ArrayList<>();
         boolean foundAnniversary = false;
         SHrsBenefit hrsBenefit = null;
-        SHrsBenefitTableByAnniversary benefitTableRow = null;
-        SHrsBenefitTableByAnniversary benefitTableRowAux = null;
+        SHrsBenefitTableAnniversary benefitTableAnniversary = null;
+        SHrsBenefitTableAnniversary benefitTableAnniversaryAux = null;
         String sql = "";
         ResultSet resultSet = null;
         
         sql = "SELECT fk_tp_ben, ben_ann, ben_year, SUM(unt_all) AS f_val_payed, SUM(amt_r) AS f_amt_payed " +
                 "FROM hrs_pay_rcp_ear " +
-                "WHERE b_del = 0 AND id_emp = " + employee.getPkEmployeeId() + " AND id_pay <> " + payrrollId + " AND fk_tp_ben = " + benefitType + " AND ben_ann <= " + aniversaryLimit + " " +
+                "WHERE b_del = 0 AND id_emp = " + employee.getPkEmployeeId() + " AND id_pay <> " + payrrollId + " AND fk_tp_ben = " + benefitType + " AND ben_ann <= " + anniversaryLimit + " " +
                 "GROUP BY fk_tp_ben, ben_ann, ben_year ";
         resultSet = session.getStatement().executeQuery(sql);
         while (resultSet.next()) {
@@ -2386,40 +2400,40 @@ public abstract class SHrsUtils {
         }
         
         for (SHrsBenefit benefit : hrsBenefits) {
-            if (SLibUtils.compareKeys(benefit.getBenefitKey(), new int[] { benefitType, aniversaryLimit, benefitYear })) {
+            if (SLibUtils.compareKeys(benefit.getBenefitKey(), new int[] { benefitType, anniversaryLimit, benefitYear })) {
                 foundAnniversary = true;
             }
         }
         
         if (!foundAnniversary) {
-            hrsBenefit = new SHrsBenefit(benefitType, aniversaryLimit, benefitYear);
+            hrsBenefit = new SHrsBenefit(benefitType, anniversaryLimit, benefitYear);
             hrsBenefits.add(hrsBenefit);
         }
         
         // To complete benefits registries accumulated by benefit type:
         
         for (SHrsBenefit benefit : hrsBenefits) {
-            for (SHrsBenefitTableByAnniversary row : benefitTableByAnniversary) {
-                if (row.getBenefitAnn() <= benefit.getBenefitAnn()) {
-                    benefitTableRow = row;
+            for (SHrsBenefitTableAnniversary anniversary : benefitTableAnniversarys) {
+                if (anniversary.getBenefitAnn() <= benefit.getBenefitAnn()) {
+                    benefitTableAnniversary = anniversary;
                 }
             }
 
             if (benefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                for (SHrsBenefitTableByAnniversary row : benefitTableByAnniversaryAux) {
-                    if (row.getBenefitAnn() <= benefit.getBenefitAnn()) {
-                        benefitTableRowAux = row;
+                for (SHrsBenefitTableAnniversary anniversary : benefitTableAnniversarysAux) {
+                    if (anniversary.getBenefitAnn() <= benefit.getBenefitAnn()) {
+                        benefitTableAnniversaryAux = anniversary;
                     }
                 }
             }
 
             if (benefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                benefit.setValue(benefitTableRow == null || benefitTableRowAux == null ? 0d : benefitTableRowAux.getValue());
-                benefit.setAmount(benefitTableRow == null || benefitTableRowAux == null ? 0d : SLibUtils.roundAmount(benefitTableRowAux.getValue() * paymentDaily * benefitTableRow.getValue()));
+                benefit.setValue(benefitTableAnniversary == null || benefitTableAnniversaryAux == null ? 0d : benefitTableAnniversaryAux.getValue());
+                benefit.setAmount(benefitTableAnniversary == null || benefitTableAnniversaryAux == null ? 0d : SLibUtils.roundAmount(benefitTableAnniversaryAux.getValue() * paymentDaily * benefitTableAnniversary.getValue()));
             }
             else {
-                benefit.setValue(benefitTableRow == null ? 0d : benefitTableRow.getValue());
-                benefit.setAmount(benefitTableRow == null ? 0d : benefitTableRow.getValue() * SLibUtils.roundAmount(paymentDaily));
+                benefit.setValue(benefitTableAnniversary == null ? 0d : benefitTableAnniversary.getValue());
+                benefit.setAmount(benefitTableAnniversary == null ? 0d : benefitTableAnniversary.getValue() * SLibUtils.roundAmount(paymentDaily));
             }
         }
 
@@ -2431,14 +2445,14 @@ public abstract class SHrsUtils {
         String sql = "";
         ResultSet resultSet = null;
 
-         sql = "SELECT a.id_emp, a.id_abs, SUM(a.eff_day) AS f_days " +
+         sql = "SELECT SUM(a.eff_day) " +
                  "FROM hrs_abs AS a " +
-                 "WHERE a.b_del = 0 AND a.id_emp = " + employee.getPkEmployeeId() + " AND a.id_abs <> " + absenceId + " AND a.ben_year = " + benefitYear + " AND a.ben_ann = " + benefitAnn + " " +
-                 "GROUP BY a.id_emp, a.id_abs ";
+                 "WHERE NOT a.b_del AND a.id_emp = " + employee.getPkEmployeeId() + " AND " +
+                 "a.ben_ann = " + benefitAnn + " AND a.ben_year = " + benefitYear + " AND a.id_abs <> " + absenceId + " ";
          
          resultSet = session.getStatement().executeQuery(sql);
          if (resultSet.next()) {
-             scheduledDays = resultSet.getInt("f_days");
+             scheduledDays = resultSet.getInt(1);
          }
          
         return scheduledDays;

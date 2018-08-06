@@ -29,7 +29,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     protected Date mtDateEnd;
     protected int mnEffectiveDays;
     protected int mnBenefitsYear;
-    protected int mnBenefitsAniversary;
+    protected int mnBenefitsAnniversary;
     protected String msNotes;
     protected boolean mbClosed;
     //protected boolean mbDeleted;
@@ -78,7 +78,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public void setDateEnd(Date t) { mtDateEnd = t; }
     public void setEffectiveDays(int n) { mnEffectiveDays = n; }
     public void setBenefitsYear(int n) { mnBenefitsYear = n; }
-    public void setBenefitsAniversary(int n) { mnBenefitsAniversary = n; }
+    public void setBenefitsAnniversary(int n) { mnBenefitsAnniversary = n; }
     public void setNotes(String s) { msNotes = s; }
     public void setClosed(boolean b) { mbClosed = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -104,7 +104,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public Date getDateEnd() { return mtDateEnd; }
     public int getEffectiveDays() { return mnEffectiveDays; }
     public int getBenefitsYear() { return mnBenefitsYear; }
-    public int getBenefitsAniversary() { return mnBenefitsAniversary; }
+    public int getBenefitsAnniversary() { return mnBenefitsAnniversary; }
     public String getNotes() { return msNotes; }
     public boolean isClosed() { return mbClosed; }
     public boolean isDeleted() { return mbDeleted; }
@@ -145,7 +145,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         mtDateEnd = null;
         mnEffectiveDays = 0;
         mnBenefitsYear = 0;
-        mnBenefitsAniversary = 0;
+        mnBenefitsAnniversary = 0;
         msNotes = "";
         mbClosed = false;
         mbDeleted = false;
@@ -218,7 +218,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
             mtDateEnd = resultSet.getDate("dt_end");
             mnEffectiveDays = resultSet.getInt("eff_day");
             mnBenefitsYear = resultSet.getInt("ben_year");
-            mnBenefitsAniversary = resultSet.getInt("ben_ann");
+            mnBenefitsAnniversary = resultSet.getInt("ben_ann");
             msNotes = resultSet.getString("nts");
             mbClosed = resultSet.getBoolean("b_clo");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -268,7 +268,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " +
                     mnEffectiveDays + ", " +
                     mnBenefitsYear + ", " + 
-                    mnBenefitsAniversary + ", " + 
+                    mnBenefitsAnniversary + ", " + 
                     "'" + msNotes + "', " +
                     (mbClosed ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
@@ -296,7 +296,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                     "dt_end = '" + SLibUtils.DbmsDateFormatDate.format(mtDateEnd) + "', " +
                     "eff_day = " + mnEffectiveDays + ", " +
                     "ben_year = " + mnBenefitsYear + ", " +
-                    "ben_ann = " + mnBenefitsAniversary + ", " +
+                    "ben_ann = " + mnBenefitsAnniversary + ", " +
                     "nts = '" + msNotes + "', " +
                     "b_clo = " + (mbClosed ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -328,7 +328,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         registry.setDateEnd(this.getDateEnd());
         registry.setEffectiveDays(this.getEffectiveDays());
         registry.setBenefitsYear(this.getBenefitsYear());
-        registry.setBenefitsAniversary(this.getBenefitsAniversary());
+        registry.setBenefitsAnniversary(this.getBenefitsAnniversary());
         registry.setNotes(this.getNotes());
         registry.setClosed(this.isClosed());
         registry.setDeleted(this.isDeleted());

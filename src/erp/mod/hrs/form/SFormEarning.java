@@ -726,19 +726,19 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
                 case SModSysConsts.HRSS_TP_EAR_COMP_AMT:
                     jlEarningComputationTypeHelp.setText("Monto directo");
                     break;
-                case SModSysConsts.HRSS_TP_EAR_COMP_DAY:
+                case SModSysConsts.HRSS_TP_EAR_COMP_DAYS:
                     jlEarningComputationTypeHelp.setText("En función de un número de días de salario base");
                     break;
                 case SModSysConsts.HRSS_TP_EAR_COMP_HRS:
                     jlEarningComputationTypeHelp.setText("En función de un número de horas de hora de salario base");
                     break;
-                case SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY:
+                case SModSysConsts.HRSS_TP_EAR_COMP_PCT_DAY:
                     jlEarningComputationTypeHelp.setText("En función de un porcentaje de un salario base");
                     break;
-                case SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS:
+                case SModSysConsts.HRSS_TP_EAR_COMP_PCT_HR:
                     jlEarningComputationTypeHelp.setText("En función de un porcentaje de una hora de salario base");
                     break;
-                case SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR:
+                case SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME:
                     jlEarningComputationTypeHelp.setText("En función de un porcentaje sobre el monto de sueldos y salarios");
                     break;
                 default:
@@ -762,10 +762,10 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
             else {
                 moDecUnitsMaximumWeek.setEnabled(true);
                 
-                if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
+                if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_DAYS) {
                     moBoolDaysWorked.setEnabled(true);
                 }
-                else if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) {
+                else if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME) {
                     moBoolDaysWorkedBased.setEnabled(true);
                 }
                 else {
@@ -775,9 +775,9 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
                     moBoolDaysWorkedBased.setEnabled(false);
                 }
                 
-                if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY ||
-                        moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS ||
-                        moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) {
+                if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PCT_DAY ||
+                        moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PCT_HR ||
+                        moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME) {
                     moDecPayPercentage.setEnabled(true);
                 }
                 else {
@@ -895,7 +895,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         moBoolDaysAdjustment.setValue(moRegistry.isDaysAdjustment());
         moBoolDaysAbsence.setValue(moRegistry.isDaysAbsence());
         moBoolDaysWorked.setValue(moRegistry.isDaysWorked());
-        moBoolDaysWorkedBased.setValue(moRegistry.isDaysWorkedBased());
+        moBoolDaysWorkedBased.setValue(moRegistry.isDaysWorkedBasedOn());
         moBoolWithholding.setValue(moRegistry.isWithholding());
         moBoolPayrollTax.setValue(moRegistry.isPayrollTax());
         moBoolAlternativeTaxCalculation.setValue(moRegistry.isAlternativeTaxCalculation());
@@ -942,7 +942,7 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
         registry.setDaysAdjustment(moBoolDaysAdjustment.getValue());
         registry.setDaysAbsence(moBoolDaysAbsence.getValue());
         registry.setDaysWorked(moBoolDaysWorked.getValue());
-        registry.setDaysWorkedBased(moBoolDaysWorkedBased.getValue());
+        registry.setDaysWorkedBasedOn(moBoolDaysWorkedBased.getValue());
         registry.setWithholding(moBoolWithholding.getValue());
         registry.setPayrollTax(moBoolPayrollTax.getValue());
         registry.setAlternativeTaxCalculation(moBoolAlternativeTaxCalculation.getValue());
@@ -986,11 +986,11 @@ public class SFormEarning extends SBeanForm implements ActionListener, ItemListe
             }
             
             if (validation.isValid()) {
-                if (moKeyEarningComputationType.getValue()[0] != SModSysConsts.HRSS_TP_EAR_COMP_DAY && moBoolDaysAdjustment.getValue()) {
+                if (moKeyEarningComputationType.getValue()[0] != SModSysConsts.HRSS_TP_EAR_COMP_DAYS && moBoolDaysAdjustment.getValue()) {
                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(moBoolDaysAdjustment.getText()) + "'.");
                     validation.setComponent(moBoolDaysAdjustment);
                 }
-                else if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR && !moBoolDaysWorkedBased.getValue()) {
+                else if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME && !moBoolDaysWorkedBased.getValue()) {
                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(moBoolDaysWorkedBased.getText()) + "'.");
                     validation.setComponent(moBoolDaysWorkedBased);
                 }

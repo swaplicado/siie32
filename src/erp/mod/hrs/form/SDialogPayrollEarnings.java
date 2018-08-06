@@ -228,7 +228,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         if (moKeyEarning.getValue()[0] > 0) {
             if ((!(moEarnigs.get(moKeyEarning.getValue()[0]).getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT &&
                             (moEarnigs.get(moKeyEarning.getValue()[0]).getFkAbsenceClassId_n() == SLibConsts.UNDEFINED && moEarnigs.get(moKeyEarning.getValue()[0]).getFkAbsenceTypeId_n() == SLibConsts.UNDEFINED))) ||
-                    moEarnigs.get(moKeyEarning.getValue()[0]).isDaysWorkedBased()) {
+                    moEarnigs.get(moKeyEarning.getValue()[0]).isDaysWorkedBasedOn()) {
                 miClient.showMsgBoxWarning("No se puede modificar el campo 'Valor' para la percepción '" + moEarnigs.get(moKeyEarning.getValue()[0]).getName() + "', solo el campo 'Monto $'");
             }
             
@@ -385,7 +385,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                             hrsReceiptEarningRow.setEarning(earning.getEarning());
                             hrsReceiptEarningRow.setHrsReceipt(hrsReceipt);
                             hrsReceiptEarningRow.setReceiptEarning(earning.getReceiptEarning());
-                            hrsReceiptEarningRow.setRowType(SHrsPayrollReceiptEarning.BY_EAR);
+                            hrsReceiptEarningRow.setInputMode(SHrsPayrollReceiptEarning.INPUT_BY_EAR);
                             hrsReceiptEarningRow.setPkMoveId(earning.getPkMoveId());
                             hrsReceiptEarningRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                             hrsReceiptEarningRow.setXtaValueAlleged(earning.getReceiptEarning().getUnitsAlleged());
@@ -408,7 +408,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                         hrsReceiptEarningRow.setEarning(moEarnigs.get(moKeyEarning.getValue()[0]));
                         hrsReceiptEarningRow.setHrsReceipt(hrsReceipt);
 
-                        hrsReceiptEarningRow.setRowType(SHrsPayrollReceiptEarning.BY_EAR);
+                        hrsReceiptEarningRow.setInputMode(SHrsPayrollReceiptEarning.INPUT_BY_EAR);
                         hrsReceiptEarningRow.setPkMoveId(hrsReceipt.getHrsEarnings().size() + 1);
                         hrsReceiptEarningRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                         hrsReceiptEarningRow.setXtaValueAlleged(0d);
@@ -423,7 +423,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                 }
             }
         }
-        enableFieldValue(rows.size() > 0 && !moEarnigs.get(moKeyEarning.getValue()[0]).isDaysWorkedBased());
+        enableFieldValue(rows.size() > 0 && !moEarnigs.get(moKeyEarning.getValue()[0]).isDaysWorkedBasedOn());
         
         moGridEmployeeRow.populateGrid(rows);
         moGridEmployeeRow.clearSortKeys();

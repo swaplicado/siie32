@@ -183,8 +183,8 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return aBenefitTables;
     }
     
-    private ArrayList<SHrsBenefitTableByAnniversary> getBenefitTablesAnniversarys(ArrayList<SDbBenefitTable> benefitTables) throws Exception {
-        return SHrsUtils.getBenefitTablesAnniversarys(benefitTables);
+    private ArrayList<SHrsBenefitTableAnniversary> getBenefitTableAnniversarys(ArrayList<SDbBenefitTable> benefitTables) throws Exception {
+        return SHrsUtils.createBenefitTablesAnniversarys(benefitTables);
     }
 
     private ArrayList<SDbMwzTypeWage> getMwzTypeWages() throws Exception {
@@ -845,7 +845,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         
         // Benefit tables:
 
-        hrsPayroll.getBenefitTablesAnniversarys().addAll(getBenefitTablesAnniversarys((getBenefitTables())));
+        hrsPayroll.getBenefitTablesAnniversarys().addAll(getBenefitTableAnniversarys((getBenefitTables())));
 
         // Mwz type wages:
 

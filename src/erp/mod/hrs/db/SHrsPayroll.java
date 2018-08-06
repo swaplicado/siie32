@@ -29,7 +29,7 @@ public class SHrsPayroll {
     protected ArrayList<SDbTaxSubsidyTable> maTaxSubsidyTables;
     protected ArrayList<SDbSsContributionTable> maSsContributionTables;
     protected ArrayList<SDbBenefitTable> maBenefitTables;
-    protected ArrayList<SHrsBenefitTableByAnniversary> maBenefitTablesAnniversarys;
+    protected ArrayList<SHrsBenefitTableAnniversary> maBenefitTablesAnniversarys;
     protected ArrayList<SDbMwzTypeWage> maMwzTypeWages;
     protected ArrayList<SDbEarning> maEarnigs;
     protected ArrayList<SDbDeduction> maDeductions;
@@ -174,30 +174,30 @@ public class SHrsPayroll {
                 SDbEarning dbEarning = getDataEarningByType(SModSysConsts.HRSS_TP_EAR_VAC_BON);
                 SDbBenefitTable dbBenefitTableVacBon = getBenefitTable(SModSysConsts.HRSS_TP_BEN_VAC_BON, dateEnd, moPayroll.getFkPaymentTypeId());
                 SDbBenefitTable deBenefitTableVac = getBenefitTable(SModSysConsts.HRSS_TP_BEN_VAC, dateEnd, moPayroll.getFkPaymentTypeId());
-                ArrayList<SHrsBenefitTableByAnniversary> hrsBenefitTableByAnniversariesVacBon = getBenefitTableAnniversary(dbBenefitTableVacBon.getPkBenefitId());
-                ArrayList<SHrsBenefitTableByAnniversary> hrsBenefitTableByAnniversariesVac = getBenefitTableAnniversary(deBenefitTableVac.getPkBenefitId());
-                SHrsBenefitTableByAnniversary hrsBenefitTableByAnniversaryVacBon = null;
-                SHrsBenefitTableByAnniversary hrsBenefitTableByAnniversaryVac = null;
+                ArrayList<SHrsBenefitTableAnniversary> hrsBenefitTableAnniversarysVacBon = getBenefitTableAnniversary(dbBenefitTableVacBon.getPkBenefitId());
+                ArrayList<SHrsBenefitTableAnniversary> hrsBenefitTableAnniversarysVac = getBenefitTableAnniversary(deBenefitTableVac.getPkBenefitId());
+                SHrsBenefitTableAnniversary hrsBenefitTableAnniversaryVacBon = null;
+                SHrsBenefitTableAnniversary hrsBenefitTableAnniversaryVac = null;
                 int benefitAnniv = SHrsUtils.getSeniorityEmployee(employee.getDateBenefits(), dateCutOff);
                 int benefitYear = SLibTimeUtils.digestDate(dateCutOff)[0] - 1;
                 
-                for (SHrsBenefitTableByAnniversary anniversaryVacBon : hrsBenefitTableByAnniversariesVacBon) {
-                    if (anniversaryVacBon.getBenefitAnn() <= benefitAnniv) {
-                        hrsBenefitTableByAnniversaryVacBon = anniversaryVacBon;
+                for (SHrsBenefitTableAnniversary anniversary : hrsBenefitTableAnniversarysVacBon) {
+                    if (anniversary.getBenefitAnn() <= benefitAnniv) {
+                        hrsBenefitTableAnniversaryVacBon = anniversary;
                     }
                 }
         
-                for (SHrsBenefitTableByAnniversary anniversaryVac : hrsBenefitTableByAnniversariesVac) {
-                    if (anniversaryVac.getBenefitAnn() <= benefitAnniv) {
-                        hrsBenefitTableByAnniversaryVac = anniversaryVac;
+                for (SHrsBenefitTableAnniversary anniversary : hrsBenefitTableAnniversarysVac) {
+                    if (anniversary.getBenefitAnn() <= benefitAnniv) {
+                        hrsBenefitTableAnniversaryVac = anniversary;
                     }
                 }
         
-                double days = hrsBenefitTableByAnniversaryVac == null ? 0d : hrsBenefitTableByAnniversaryVac.getValue();
-                double perc = hrsBenefitTableByAnniversaryVacBon == null ? 0d : hrsBenefitTableByAnniversaryVacBon.getValue();
+                double days = hrsBenefitTableAnniversaryVac == null ? 0d : hrsBenefitTableAnniversaryVac.getValue();
+                double perc = hrsBenefitTableAnniversaryVacBon == null ? 0d : hrsBenefitTableAnniversaryVacBon.getValue();
                 double benefit = hrsPayrollReceipt.calculateBenefit(dbEarning, days, perc);
                 
-                ArrayList<SHrsBenefit> hrsBenefits = SHrsUtils.readHrsBenefits(moPayrollDataProvider.getSession(), employee, SModSysConsts.HRSS_TP_BEN_VAC_BON, benefitAnniv, benefitYear, moPayroll.getPkPayrollId(), hrsBenefitTableByAnniversariesVacBon, hrsBenefitTableByAnniversariesVac, hrsPayrollReceipt.getReceipt().getPaymentDaily());
+                ArrayList<SHrsBenefit> hrsBenefits = SHrsUtils.readHrsBenefits(moPayrollDataProvider.getSession(), employee, SModSysConsts.HRSS_TP_BEN_VAC_BON, benefitAnniv, benefitYear, moPayroll.getPkPayrollId(), hrsBenefitTableAnniversarysVacBon, hrsBenefitTableAnniversarysVac, hrsPayrollReceipt.getReceipt().getPaymentDaily());
 
                 double daysPayed = 0;
                 double benefitPayed = 0;
@@ -380,19 +380,19 @@ public class SHrsPayroll {
         if (pDbEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
             amountUnit = pAmountUnit;
         }
-        else if (pDbEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
+        else if (pDbEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAYS) {
             amountUnit = pHrsPayrollReceipt.getReceipt().getPaymentDaily();
         }
         else if (pDbEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
             amountUnit = pHrsPayrollReceipt.getReceipt().getPaymentHourly();
         }
-        else if (pDbEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY) {
+        else if (pDbEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PCT_DAY) {
             amountUnit = pHrsPayrollReceipt.getReceipt().getPaymentDaily() * pDbEarning.getPayPercentage();
         }
-        else if (pDbEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
+        else if (pDbEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PCT_HR) {
             amountUnit = pHrsPayrollReceipt.getReceipt().getPaymentHourly() * pDbEarning.getPayPercentage();
         }
-        else if (pDbEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_EAR) {
+        else if (pDbEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME) {
             amountUnit = pHrsPayrollReceipt.getTotalEarningsDependentsDaysWorked() * pDbEarning.getPayPercentage();
         }
         
@@ -425,7 +425,7 @@ public class SHrsPayroll {
             dbPayrollReceiptEarning.setAmount_r(amount);
             dbPayrollReceiptEarning.setFkBenefitTypeId(pDbEarning.getFkBenefitTypeId());
             dbPayrollReceiptEarning.setBenefitYear(0);
-            dbPayrollReceiptEarning.setBenefitAniversary(0);
+            dbPayrollReceiptEarning.setBenefitAnniversary(0);
         }
         else {
             dbPayrollReceiptEarning.setFactorAmount(pHrsBenefit.getFactorAmount());
@@ -434,7 +434,7 @@ public class SHrsPayroll {
             dbPayrollReceiptEarning.setAmount_r(pHrsBenefit.getAmountPayedReceipt());
             dbPayrollReceiptEarning.setFkBenefitTypeId(pHrsBenefit.getBenefitTypeId());
             dbPayrollReceiptEarning.setBenefitYear(pHrsBenefit.getBenefitYear());
-            dbPayrollReceiptEarning.setBenefitAniversary(pHrsBenefit.getBenefitAnn());
+            dbPayrollReceiptEarning.setBenefitAnniversary(pHrsBenefit.getBenefitAnn());
         }
         dbPayrollReceiptEarning.setAutomatic(pIsAutomatic);
         /*
@@ -489,7 +489,7 @@ public class SHrsPayroll {
     public ArrayList<SDbTaxSubsidyTable> getTaxSubsidyTables() { return maTaxSubsidyTables; }
     public ArrayList<SDbSsContributionTable> getSsContributionTables() { return maSsContributionTables; }
     public ArrayList<SDbBenefitTable> getBenefitTables() { return maBenefitTables; }
-    public ArrayList<SHrsBenefitTableByAnniversary> getBenefitTablesAnniversarys() { return maBenefitTablesAnniversarys; }
+    public ArrayList<SHrsBenefitTableAnniversary> getBenefitTablesAnniversarys() { return maBenefitTablesAnniversarys; }
     public ArrayList<SDbMwzTypeWage> getMwzTypeWages() { return maMwzTypeWages; }
     public ArrayList<SDbEarning> getEarnigs() { return maEarnigs; }
     public ArrayList<SDbDeduction> getDeductions() { return maDeductions; }
@@ -666,12 +666,12 @@ public class SHrsPayroll {
         return benefitTable;
     }
     
-    public ArrayList<SHrsBenefitTableByAnniversary> getBenefitTableAnniversary(final int tableId) {
-        ArrayList<SHrsBenefitTableByAnniversary> aBenefitTableByAnniversary = new ArrayList<>();
+    public ArrayList<SHrsBenefitTableAnniversary> getBenefitTableAnniversary(final int tableId) {
+        ArrayList<SHrsBenefitTableAnniversary> aBenefitTableByAnniversary = new ArrayList<>();
 
-        for (SHrsBenefitTableByAnniversary table : maBenefitTablesAnniversarys) {
-            if (table.getBenefitId() == tableId) {
-                aBenefitTableByAnniversary.add(table);
+        for (SHrsBenefitTableAnniversary anniversary : maBenefitTablesAnniversarys) {
+            if (anniversary.getBenefitId() == tableId) {
+                aBenefitTableByAnniversary.add(anniversary);
             }
         }
 
@@ -1075,7 +1075,7 @@ public class SHrsPayroll {
                 payrollReceiptEarning.setSystem(true);
                 if (earning.getFkBenefitTypeId() != SModSysConsts.HRSS_TP_BEN_NON) {
                     payrollReceiptEarning.setFactorAmount(1);
-                    payrollReceiptEarning.setBenefitAniversary(receiptAbsenceConsumption.getAbsence().getBenefitsAniversary());
+                    payrollReceiptEarning.setBenefitAnniversary(receiptAbsenceConsumption.getAbsence().getBenefitsAnniversary());
                     payrollReceiptEarning.setBenefitYear(receiptAbsenceConsumption.getAbsence().getBenefitsYear());
                 }
                 hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);

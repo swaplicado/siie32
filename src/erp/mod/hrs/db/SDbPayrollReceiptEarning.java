@@ -17,7 +17,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SDbPayrollReceiptEarning extends SDbRegistryUser {
 
@@ -33,7 +33,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     protected double mdAmountExempt;
     protected double mdAmountTaxable;
     protected int mnBenefitYear;
-    protected int mnBenefitAniversary;
+    protected int mnBenefitAnniversary;
     protected boolean mbAlternativeTaxCalculation;
     protected boolean mbUserEdited;
     protected boolean mbAutomatic;
@@ -79,7 +79,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public void setAmountExempt(double d) { mdAmountExempt = d; }
     public void setAmountTaxable(double d) { mdAmountTaxable = d; }
     public void setBenefitYear(int n) { mnBenefitYear = n; }
-    public void setBenefitAniversary(int n) { mnBenefitAniversary = n; }
+    public void setBenefitAnniversary(int n) { mnBenefitAnniversary = n; }
     public void setAlternativeTaxCalculation(boolean b) { mbAlternativeTaxCalculation = b; }
     public void setUserEdited(boolean b) { mbUserEdited = b; }
     public void setAutomatic(boolean b) { mbAutomatic = b; }
@@ -110,7 +110,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public double getAmountExempt() { return mdAmountExempt; }
     public double getAmountTaxable() { return mdAmountTaxable; }
     public int getBenefitYear() { return mnBenefitYear; }
-    public int getBenefitAniversary() { return mnBenefitAniversary; }
+    public int getBenefitAnniversary() { return mnBenefitAnniversary; }
     public boolean isAlternativeTaxCalculation() { return mbAlternativeTaxCalculation; }
     public boolean isUserEdited() { return mbUserEdited; }
     public boolean isAutomatic() { return mbAutomatic; }
@@ -162,7 +162,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         mdAmountExempt = 0;
         mdAmountTaxable = 0;
         mnBenefitYear = 0;
-        mnBenefitAniversary = 0;
+        mnBenefitAnniversary = 0;
         mbAlternativeTaxCalculation = false;
         mbUserEdited = false;
         mbAutomatic = false;
@@ -242,7 +242,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
             mdAmountExempt = resultSet.getDouble("amt_exem");
             mdAmountTaxable = resultSet.getDouble("amt_taxa");
             mnBenefitYear = resultSet.getInt("ben_year");
-            mnBenefitAniversary = resultSet.getInt("ben_ann");
+            mnBenefitAnniversary = resultSet.getInt("ben_ann");
             mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
             mbUserEdited = resultSet.getBoolean("b_usr");
             mbAutomatic = resultSet.getBoolean("b_aut");
@@ -309,7 +309,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     mdAmountExempt + ", " + 
                     mdAmountTaxable + ", " + 
                     mnBenefitYear + ", " + 
-                    mnBenefitAniversary + ", " + 
+                    mnBenefitAnniversary + ", " + 
                     (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     (mbUserEdited ? 1 : 0) + ", " + 
                     (mbAutomatic ? 1 : 0) + ", " + 
@@ -345,7 +345,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     "amt_exem = " + mdAmountExempt + ", " +
                     "amt_taxa = " + mdAmountTaxable + ", " +
                     "ben_year = " + mnBenefitYear + ", " +
-                    "ben_ann = " + mnBenefitAniversary + ", " +
+                    "ben_ann = " + mnBenefitAnniversary + ", " +
                     "b_alt_tax = " + (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     "b_usr = " + (mbUserEdited ? 1 : 0) + ", " +
                     "b_aut = " + (mbAutomatic ? 1 : 0) + ", " +
@@ -396,7 +396,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         registry.setAmountExempt(this.getAmountExempt());
         registry.setAmountTaxable(this.getAmountTaxable());
         registry.setBenefitYear(this.getBenefitYear());
-        registry.setBenefitAniversary(this.getBenefitAniversary());
+        registry.setBenefitAnniversary(this.getBenefitAnniversary());
         registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());
         registry.setUserEdited(this.isUserEdited());
         registry.setAutomatic(this.isAutomatic());

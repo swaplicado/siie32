@@ -1483,7 +1483,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                 moGridPaneEmployeesReceipt.addGridRow(rowEmployeeReceipt);
                 moGridPaneEmployeesReceipt.renderGridRows();
-                moGridPaneEmployeesReceipt.setSelectedGridRow(moGridPaneEmployeesReceipt.getModel().getRowCount() - 1);
+                moGridPaneEmployeesReceipt.setSelectedGridRow(moGridPaneEmployeesReceipt.getTable().convertRowIndexToView(moGridPaneEmployeesReceipt.getModel().getRowCount() - 1));
 
                 updateFieldsStatus();
                 computePayrollValue();

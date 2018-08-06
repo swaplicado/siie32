@@ -29,7 +29,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbBenefitTable;
 import erp.mod.hrs.db.SDbBenefitTableRow;
 import erp.mod.hrs.db.SDbConfig;
-import erp.mod.hrs.db.SHrsBenefitTableByAnniversary;
+import erp.mod.hrs.db.SHrsBenefitTableAnniversary;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import java.awt.BorderLayout;
@@ -68,9 +68,9 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private boolean mbHasRightEmpWage;
     
     private SDataBizPartner moBizPartner;
-    private ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableVacationByAnniversary = null;
-    private ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableVacationBonByAnniversary = null;
-    private ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableAnnByAnniversarys = null;
+    private ArrayList<SHrsBenefitTableAnniversary> maBenefitTableVacationAnniversarys = null;
+    private ArrayList<SHrsBenefitTableAnniversary> maBenefitTableVacationBonusAnniversarys = null;
+    private ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnnualBonusAnniversarys = null;
     
     private int mnFilterPaymentTypeId;
     private int mnFilterDepartamentId;
@@ -1082,15 +1082,15 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private void populateBenefits() throws Exception {
         int i = 0;
         
-        maBenefitTableAnnByAnniversarys = new ArrayList<>();
-        maBenefitTableVacationByAnniversary = new ArrayList<>();
-        maBenefitTableVacationBonByAnniversary = new ArrayList<>();
+        maBenefitTableAnnualBonusAnniversarys = new ArrayList<>();
+        maBenefitTableVacationAnniversarys = new ArrayList<>();
+        maBenefitTableVacationBonusAnniversarys = new ArrayList<>();
         
         for (SDbBenefitTable table : getBenefitTable(SModSysConsts.HRSS_TP_BEN_ANN_BON)) {
             i = 1;
             for (SDbBenefitTableRow tableRow : table.getChildRows()) {
                 while ( i * 12 <= tableRow.getMonths()) {
-                    maBenefitTableAnnByAnniversarys.add(new SHrsBenefitTableByAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitDays()));
+                    maBenefitTableAnnualBonusAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitDays()));
                     i++;
                 }
             }
@@ -1100,7 +1100,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             i = 1;
             for (SDbBenefitTableRow tableRow : table.getChildRows()) {
                 while ( i * 12 <= tableRow.getMonths()) {
-                    maBenefitTableVacationByAnniversary.add(new SHrsBenefitTableByAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitDays()));
+                    maBenefitTableVacationAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitDays()));
                     i++;
                 }
             }
@@ -1110,7 +1110,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             i = 1;
             for (SDbBenefitTableRow tableRow : table.getChildRows()) {
                 while ( i * 12 <= tableRow.getMonths()) {
-                    maBenefitTableVacationBonByAnniversary.add(new SHrsBenefitTableByAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitBonusPercentage()));
+                    maBenefitTableVacationBonusAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitBonusPercentage()));
                     i++;
                 }
             }
@@ -1315,7 +1315,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         double daysProportionalAnnualBonus = 0;
         double daysProportionalVacations = 0;
         SDbConfig config = null;
-        SHrsBenefitTableByAnniversary benefitTableRow = null;
+        SHrsBenefitTableAnniversary benefitTableAnniversary = null;
         
         try {
             jlAnnualBonusPayProp.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
@@ -1349,42 +1349,42 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             
             // Calculate annual bonus:
             
-            for (SHrsBenefitTableByAnniversary row : maBenefitTableAnnByAnniversarys) {
-                if (row.getBenefitAnn() <= benefitAnniv) {
-                    benefitTableRow = row;
+            for (SHrsBenefitTableAnniversary anniversary : maBenefitTableAnnualBonusAnniversarys) {
+                if (anniversary.getBenefitAnn() <= benefitAnniv) {
+                    benefitTableAnniversary = anniversary;
                 }
             }
-            daysProportionalAnnualBonus = (benefitTableRow == null ? 0 : (daysElapsedAnn * benefitTableRow.getValue() / (leapYear ? SHrsConsts.YEAR_DAYS + 1 : SHrsConsts.YEAR_DAYS)));
+            daysProportionalAnnualBonus = (benefitTableAnniversary == null ? 0 : (daysElapsedAnn * benefitTableAnniversary.getValue() / (leapYear ? SHrsConsts.YEAR_DAYS + 1 : SHrsConsts.YEAR_DAYS)));
             
-            jtfAnnualBonusBenefit.setText(SLibUtils.DecimalFormatValue0D.format(benefitTableRow == null ? 0 : benefitTableRow.getValue()) + "");
-            jtfAnnualBonusPropPer.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableRow == null ? 0 : (daysProportionalAnnualBonus / benefitTableRow.getValue()))) + "");
+            jtfAnnualBonusBenefit.setText(SLibUtils.DecimalFormatValue0D.format(benefitTableAnniversary == null ? 0 : benefitTableAnniversary.getValue()) + "");
+            jtfAnnualBonusPropPer.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableAnniversary == null ? 0 : (daysProportionalAnnualBonus / benefitTableAnniversary.getValue()))) + "");
             jtfAnnualBonusProp.setText(SLibUtils.DecimalFormatValue2D.format(daysProportionalAnnualBonus) + "");
             jtfAnnualBonusPayProp.setText(SLibUtils.DecimalFormatValue2D.format(daysProportionalAnnualBonus * paymentDaily) + "");
             
             // Calculate vacation:
             
-            for (SHrsBenefitTableByAnniversary row : maBenefitTableVacationByAnniversary) {
-                if (row.getBenefitAnn() <= benefitAnniv) {
-                    benefitTableRow = row;
+            for (SHrsBenefitTableAnniversary anniversary : maBenefitTableVacationAnniversarys) {
+                if (anniversary.getBenefitAnn() <= benefitAnniv) {
+                    benefitTableAnniversary = anniversary;
                 }
             }
-            daysProportionalVacations = (benefitTableRow == null ? 0 : (daysElapsed * benefitTableRow.getValue() / (leapYear ? SHrsConsts.YEAR_DAYS + 1 : SHrsConsts.YEAR_DAYS)));
+            daysProportionalVacations = (benefitTableAnniversary == null ? 0 : (daysElapsed * benefitTableAnniversary.getValue() / (leapYear ? SHrsConsts.YEAR_DAYS + 1 : SHrsConsts.YEAR_DAYS)));
             
-            jtfVacationsBenefit.setText(SLibUtils.DecimalFormatValue0D.format(benefitTableRow == null ? 0 : benefitTableRow.getValue()) + "");
-            jtfVacationsPropPer.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableRow == null ? 0 : (daysProportionalVacations / benefitTableRow.getValue()))) + "");
+            jtfVacationsBenefit.setText(SLibUtils.DecimalFormatValue0D.format(benefitTableAnniversary == null ? 0 : benefitTableAnniversary.getValue()) + "");
+            jtfVacationsPropPer.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableAnniversary == null ? 0 : (daysProportionalVacations / benefitTableAnniversary.getValue()))) + "");
             jtfVacationsProp.setText(SLibUtils.DecimalFormatValue2D.format(daysProportionalVacations) + "");
             jtfVacationsPayProp.setText(SLibUtils.DecimalFormatValue2D.format(daysProportionalVacations * paymentDaily) + "");
             
             // Calculate vacation bonus:
             
-            for (SHrsBenefitTableByAnniversary row : maBenefitTableVacationBonByAnniversary) {
-                if (row.getBenefitAnn() <= benefitAnniv) {
-                    benefitTableRow = row;
+            for (SHrsBenefitTableAnniversary anniversary : maBenefitTableVacationBonusAnniversarys) {
+                if (anniversary.getBenefitAnn() <= benefitAnniv) {
+                    benefitTableAnniversary = anniversary;
                 }
             }
             
-            jtfVacationsBonusBenefit.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableRow == null ? 0 : benefitTableRow.getValue())) + "");
-            jtfVacationsBonusPayProp.setText(SLibUtils.DecimalFormatValue2D.format((benefitTableRow == null ? 0 : (daysProportionalVacations * benefitTableRow.getValue() * paymentDaily))) + "");
+            jtfVacationsBonusBenefit.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableAnniversary == null ? 0 : benefitTableAnniversary.getValue())) + "");
+            jtfVacationsBonusPayProp.setText(SLibUtils.DecimalFormatValue2D.format((benefitTableAnniversary == null ? 0 : (daysProportionalVacations * benefitTableAnniversary.getValue() * paymentDaily))) + "");
             renderSettlement(Integer.parseInt(jtfSeniority.getText()), Integer.parseInt(jtfSeniorityDays.getText()), settlementPaymentDaily, config.getFkMwzReferenceTypeId());
         }
         catch (Exception e) {

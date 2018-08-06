@@ -6,15 +6,15 @@ package erp.mod.hrs.db;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
-public class SHrsBenefitTableByAnniversary {
+public class SHrsBenefitTableAnniversary {
 
     protected int mnBenefitId;
     protected int mnBenefitAnn;
-    protected double mdValue; // It may be days or bonification percentage
+    protected double mdValue; // can be days or bonus percentage
 
-    public SHrsBenefitTableByAnniversary(int benefitId, int benefitAnn, double value) {
+    public SHrsBenefitTableAnniversary(int benefitId, int benefitAnn, double value) {
         mnBenefitId = benefitId;
         mnBenefitAnn = benefitAnn;
         mdValue = value;

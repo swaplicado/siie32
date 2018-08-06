@@ -10,7 +10,7 @@ import erp.mod.hrs.db.SDbAbsence;
 import erp.mod.hrs.db.SDbAbsenceConsumption;
 import erp.mod.hrs.db.SDbBenefitTable;
 import erp.mod.hrs.db.SHrsBenefit;
-import erp.mod.hrs.db.SHrsBenefitTableByAnniversary;
+import erp.mod.hrs.db.SHrsBenefitTableAnniversary;
 import erp.mod.hrs.db.SHrsPayrollReceipt;
 import erp.mod.hrs.db.SHrsUtils;
 import java.awt.BorderLayout;
@@ -55,7 +55,7 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
     protected SDbBenefitTable moBenefitTable;
     protected SHrsBenefit moHrsBenefit;
     protected ArrayList<SHrsBenefit> maHrsBenefits;
-    protected ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableByAnniversary;
+    protected ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnniversarys;
     
     /**
      * Creates new form SDialogPayrollEmployeeAbsence
@@ -315,14 +315,14 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
         
         aBenefitTables.add(moBenefitTable);
         
-        maBenefitTableByAnniversary = SHrsUtils.getBenefitTablesAnniversarys(aBenefitTables);
+        maBenefitTableAnniversarys = SHrsUtils.createBenefitTablesAnniversarys(aBenefitTables);
     }
     
     private void readHrsBenefitAcummulate(int seniority, int benefitYear) {
         try {
             loadBenefitTables();
             
-            maHrsBenefits = SHrsUtils.readHrsBenefits(miClient.getSession(), moReceipt.getHrsEmployee().getEmployee(), SModSysConsts.HRSS_TP_BEN_VAC, seniority, benefitYear, moReceipt.getHrsPayroll().getPayroll().getPkPayrollId(), maBenefitTableByAnniversary, null, moReceipt.getReceipt().getPaymentDaily());
+            maHrsBenefits = SHrsUtils.readHrsBenefits(miClient.getSession(), moReceipt.getHrsEmployee().getEmployee(), SModSysConsts.HRSS_TP_BEN_VAC, seniority, benefitYear, moReceipt.getHrsPayroll().getPayroll().getPkPayrollId(), maBenefitTableAnniversarys, null, moReceipt.getReceipt().getPaymentDaily());
             
             moIntBenefitAnn.setValue(seniority);
             moIntBenefitYear.setValue(benefitYear);
@@ -397,7 +397,7 @@ public class SDialogPayrollEmployeeAbsence extends SBeanFormDialog implements Ac
             moDateDateStart.setValue(dateConsumptionLast == null ? moAbsence.getDateStart() : SLibTimeUtils.addDate(dateConsumptionLast, 0, 0, 1));
             
             if (moAbsence.getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_VAC) {
-                readHrsBenefitAcummulate(moAbsence.getBenefitsAniversary(), moAbsence.getBenefitsYear());
+                readHrsBenefitAcummulate(moAbsence.getBenefitsAnniversary(), moAbsence.getBenefitsYear());
             }
             else {
                 moIntBenefitAnn.setValue(0);

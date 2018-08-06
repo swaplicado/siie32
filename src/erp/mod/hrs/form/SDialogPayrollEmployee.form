@@ -510,7 +510,7 @@
                                 <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Nombre"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[230, 23]"/>
+                                  <Dimension value="[247, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -532,7 +532,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Cr&#xe9;dito/Pr&#xe9;stamo:*"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[250, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -562,7 +562,7 @@
                             <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyEarningLoan_n">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[250, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -643,7 +643,7 @@
                                 <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Nombre"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[230, 23]"/>
+                                  <Dimension value="[247, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -665,7 +665,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Cr&#xe9;dito/Pr&#xe9;stamo:*"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[250, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -695,7 +695,7 @@
                             <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyDeductionLoan_n">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[150, 23]"/>
+                                  <Dimension value="[250, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>

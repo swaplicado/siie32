@@ -1056,7 +1056,7 @@ public class SHrsPayrollReceipt {
             for (SHrsBenefit benefit : maHrsBenefits) {
                 for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarning : maHrsEarnings) {
                     if (SLibUtils.compareKeys(benefit.getBenefitKey(), new int[] { hrsPayrollReceiptEarning.getReceiptEarning().getFkBenefitTypeId(), 
-                        hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAniversary(), hrsPayrollReceiptEarning.getReceiptEarning().getBenefitYear() })) {
+                        hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAnniversary(), hrsPayrollReceiptEarning.getReceiptEarning().getBenefitYear() })) {
 
                         benefit.setValuePayedReceipt(0d);
                         benefit.setAmountPayedReceipt(0d);
@@ -1066,7 +1066,7 @@ public class SHrsPayrollReceipt {
                         benefitTable = moHrsPayroll.getBenefitTable(hrsPayrollReceiptEarning.getReceiptEarning().getFkBenefitTypeId(), moHrsPayroll.getPayroll().getDateEnd(), moHrsPayroll.getPayroll().getFkPaymentTypeId());
 
                         for (SDbBenefitTableRow row : benefitTable.getChildRows()) {
-                            if (row.getMonths() >= (hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAniversary() * SHrsConsts.YEAR_MONTHS)) {
+                            if (row.getMonths() >= (hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAnniversary() * SHrsConsts.YEAR_MONTHS)) {
                                 benefitTableRow = row;
                                 break;
                             }
@@ -1078,7 +1078,7 @@ public class SHrsPayrollReceipt {
                             benefitTableAux = moHrsPayroll.getBenefitTable(SModSysConsts.HRSS_TP_BEN_VAC, moHrsPayroll.getPayroll().getDateEnd(), moHrsPayroll.getPayroll().getFkPaymentTypeId());
                             
                             for (SDbBenefitTableRow row : benefitTableAux.getChildRows()) {
-                                if (row.getMonths() >= (hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAniversary() * SHrsConsts.YEAR_MONTHS)) {
+                                if (row.getMonths() >= (hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAnniversary() * SHrsConsts.YEAR_MONTHS)) {
                                     benefitTableRowAux = row;
                                     break;
                                 }
@@ -1177,7 +1177,7 @@ public class SHrsPayrollReceipt {
 
         for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarning : maHrsEarnings) {
             if (SLibUtils.compareKeys(new int[] { benefitType, benefitAnn, benefitYear }, new int[] { hrsPayrollReceiptEarning.getReceiptEarning().getFkBenefitTypeId(), 
-                hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAniversary(), hrsPayrollReceiptEarning.getReceiptEarning().getBenefitYear() })) {
+                hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAnniversary(), hrsPayrollReceiptEarning.getReceiptEarning().getBenefitYear() })) {
                 value += hrsPayrollReceiptEarning.getReceiptEarning().getUnitsAlleged();
             }
         }
@@ -1190,7 +1190,7 @@ public class SHrsPayrollReceipt {
 
         for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarning : maHrsEarnings) {
             if (SLibUtils.compareKeys(new int[] { benefitType, benefitAnn, benefitYear }, new int[] { hrsPayrollReceiptEarning.getReceiptEarning().getFkBenefitTypeId(), 
-                hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAniversary(), hrsPayrollReceiptEarning.getReceiptEarning().getBenefitYear() })) {
+                hrsPayrollReceiptEarning.getReceiptEarning().getBenefitAnniversary(), hrsPayrollReceiptEarning.getReceiptEarning().getBenefitYear() })) {
                 amount += hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r();
             }
         }

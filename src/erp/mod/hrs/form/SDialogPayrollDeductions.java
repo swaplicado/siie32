@@ -345,7 +345,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
                             hrsReceiptDeductionRow.setDeduction(deduction.getDeduction());
                             hrsReceiptDeductionRow.setHrsReceipt(hrsReceipt);
                             hrsReceiptDeductionRow.setReceiptDeduction(deduction.getReceiptDeduction());
-                            hrsReceiptDeductionRow.setRowType(SHrsPayrollReceiptDeduction.BY_DED);
+                            hrsReceiptDeductionRow.setInputMode(SHrsPayrollReceiptDeduction.INPUT_BY_DED);
                             hrsReceiptDeductionRow.setPkMoveId(deduction.getPkMoveId());
                             hrsReceiptDeductionRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                             hrsReceiptDeductionRow.setXtaValue(deduction.getReceiptDeduction().getAmountUnitary());
@@ -368,7 +368,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
                         hrsReceiptDeductionRow.setDeduction(moDeductions.get(moKeyDeduction.getValue()[0]));
                         hrsReceiptDeductionRow.setHrsReceipt(hrsReceipt);
 
-                        hrsReceiptDeductionRow.setRowType(SHrsPayrollReceiptDeduction.BY_DED);
+                        hrsReceiptDeductionRow.setInputMode(SHrsPayrollReceiptDeduction.INPUT_BY_DED);
                         hrsReceiptDeductionRow.setPkMoveId(hrsReceipt.getHrsDeductions().size() + 1);
                         hrsReceiptDeductionRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                         hrsReceiptDeductionRow.setXtaValue(0d);

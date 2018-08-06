@@ -61,7 +61,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPaneFormOwner, ItemListener, ActionListener, KeyListener, CellEditorListener {
 
-    protected static final int COL_BAL = 2;
+    protected static final int COL_VAL = 2;
     protected static final int COL_AMT = 5;
 
     protected SHrsPayrollReceipt moHrsPayrollReceipt;
@@ -419,7 +419,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         moTextEarningName.setEditable(false);
         moTextEarningName.setText("sBeanFieldText1");
         moTextEarningName.setToolTipText("Nombre");
-        moTextEarningName.setPreferredSize(new java.awt.Dimension(230, 23));
+        moTextEarningName.setPreferredSize(new java.awt.Dimension(247, 23));
         jPanel8.add(moTextEarningName);
 
         jPanel6.add(jPanel8, java.awt.BorderLayout.NORTH);
@@ -427,7 +427,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlEarningLoan_n.setText("Crédito/Préstamo:*");
-        jlEarningLoan_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlEarningLoan_n.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel2.add(jlEarningLoan_n);
 
         jlEarningValue.setText("Valor:");
@@ -439,7 +439,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        moKeyEarningLoan_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        moKeyEarningLoan_n.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel25.add(moKeyEarningLoan_n);
 
         moComEarningValue.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -476,7 +476,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         moTextDeductionName.setEditable(false);
         moTextDeductionName.setText("sBeanFieldText1");
         moTextDeductionName.setToolTipText("Nombre");
-        moTextDeductionName.setPreferredSize(new java.awt.Dimension(230, 23));
+        moTextDeductionName.setPreferredSize(new java.awt.Dimension(247, 23));
         jPanel9.add(moTextDeductionName);
 
         jPanel7.add(jPanel9, java.awt.BorderLayout.NORTH);
@@ -484,7 +484,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlDeductionLoan_n.setText("Crédito/Préstamo:*");
-        jlDeductionLoan_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlDeductionLoan_n.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel3.add(jlDeductionLoan_n);
 
         jlDeductionValue.setText("Valor:");
@@ -496,7 +496,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        moKeyDeductionLoan_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        moKeyDeductionLoan_n.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel26.add(moKeyDeductionLoan_n);
 
         moComDeductionValue.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -774,7 +774,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Valor", 45, moGridEarningRow.getTable().getDefaultEditor(Double.class));
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Monto unitario $", 80));
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 70, moGridEarningRow.getTable().getDefaultEditor(Double.class));
                 columnForm.setEditable(mbEditable);
@@ -865,7 +865,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Valor", moGridDeductionRow.getTable().getDefaultEditor(Double.class));
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/Préstamo"));
 
@@ -1013,7 +1013,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
     
     private void enableFieldValueEarning() {
         if (moEarning != null) {
-            moComEarningValue.getField().setEditable(!moEarning.isDaysWorkedBased()); // not editable for earnings than dependent of worked days.
+            moComEarningValue.getField().setEditable(!moEarning.isDaysWorkedBasedOn()); // not editable for earnings than dependent of worked days.
         }
     }
     
@@ -1025,10 +1025,8 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             row = moGridEarningRow.getSelectedGridRow();
             hrsReceiptEarningRow = (SHrsPayrollReceiptEarning) row;
             
-            if (col == COL_BAL) {
-                if ((!(hrsReceiptEarningRow.getEarning().getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT &&
-                                (hrsReceiptEarningRow.getEarning().getFkAbsenceClassId_n() == SLibConsts.UNDEFINED && hrsReceiptEarningRow.getEarning().getFkAbsenceTypeId_n() == SLibConsts.UNDEFINED))) ||
-                                        hrsReceiptEarningRow.getEarning().isDaysWorkedBased()) {
+            if (col == COL_VAL) {
+                if (!hrsReceiptEarningRow.getEarning().areUnitsModifiable()) {
                     miClient.showMsgBoxWarning("No se puede modificar el campo 'Valor' para la percepción '" + hrsReceiptEarningRow.getEarning().getName() + "', solo el campo 'Monto $'");
                 }
             }
@@ -1340,7 +1338,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             if (add) {
                 for (SHrsPayrollReceiptEarning earning : moHrsPayrollReceipt.getHrsEarnings()) {
                     if (SLibUtils.compareKeys(new int[] { earning.getEarning().getPkEarningId()}, new int[] { moEarning.getPkEarningId() }) &&
-                            (earning.getEarning().isDaysWorkedBased() || earning.getEarning().getFkEarningExemptionTypeId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL ||
+                            (earning.getEarning().isDaysWorkedBasedOn() || earning.getEarning().getFkEarningExemptionTypeId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL ||
                             earning.getEarning().getFkEarningExemptionTypeYearId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL)) {
                         miClient.showMsgBoxWarning("La percepción '" + moEarning.getName() + "' no se puede agregar, ya existe en el recibo.");
                         add = false;
@@ -1944,8 +1942,8 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
     @Override
     public void editingStopped(ChangeEvent e) {
         switch (moGridEarningRow.getTable().getSelectedColumn()) {
-            case COL_BAL:
-                validateCellEditor(COL_BAL);
+            case COL_VAL:
+                validateCellEditor(COL_VAL);
                 processEditingAppPayment(true);
                 break;
             case COL_AMT:
@@ -1953,15 +1951,13 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 processEditingAppPayment(true);
                 break;
             default:
-                break;
         }
 
         switch (moGridDeductionRow.getTable().getSelectedColumn()) {
-            case COL_BAL:
+            case COL_VAL:
                 processEditingAppPayment(false);
                 break;
             default:
-                break;
         }
     }
 
