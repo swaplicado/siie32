@@ -74,7 +74,7 @@ import sa.lib.srv.SSrvUtils;
 
 /**
  *
- * @author Sergio Flores, Daniel López, Claudio Peña
+ * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores
  */
 public abstract class STrnUtilities {
 
@@ -1849,7 +1849,7 @@ public abstract class STrnUtilities {
                     switch (cfd.getFkCfdTypeId()) {
                         case SDataConstantsSys.TRNS_TP_CFD_INV:
                             dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                            msNumberDoc = (dps.getNumberSeries().length() > 0 ? dps.getNumberSeries() + "-" : "") + dps.getNumber();
+                            msNumberDoc = dps.getDpsNumber();
                             mbIsCancel = dps.getFkDpsStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                             if (SLibUtils.belongsTo(dps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_SAL_INV })) {
                                 msDocumentType =  "Factura";
@@ -1858,6 +1858,15 @@ public abstract class STrnUtilities {
                                 msDocumentType =  "Nota de Crédito";
                             }
                             cancellationDate = dps.getUserEditTs();
+
+                            snd_subject = mms.getTextSubject() + " " + msNumberDoc;
+                            break;
+                            
+                        case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                            msNumberDoc = cfd.getCfdNumber();
+                            mbIsCancel = cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                            msDocumentType =  SDataCfdPayment.NAME;
+                            cancellationDate = cfd.getUserProcessingTs();
 
                             snd_subject = mms.getTextSubject() + " " + msNumberDoc;
                             break;

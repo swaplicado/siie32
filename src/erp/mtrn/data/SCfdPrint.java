@@ -11,6 +11,7 @@ import cfd.ver33.DElementCfdiRelacionado;
 import cfd.ver33.DElementConcepto;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -56,7 +57,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Alfredo Pérez
+ * @author Sergio Flores, Alfredo Pérez, Sergio Flores
  */
 public class SCfdPrint {
 
@@ -64,6 +65,42 @@ public class SCfdPrint {
 
     public SCfdPrint(erp.client.SClientInterface client) {
         miClient = client;
+    }
+    
+    /**
+     * Computes report.
+     * @param cfd
+     * @param reportType
+     * @param map
+     * @param printMode
+     * @param numCopies
+     * @throws Exception 
+     */
+    private void computeReport(final erp.mtrn.data.SDataCfd cfd, final int reportType, final Map<String, Object> map, final int printMode, final int numCopies) throws Exception {
+        JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, reportType, map);
+
+        switch (printMode) {
+            case SDataConstantsPrint.PRINT_MODE_VIEWER:
+                JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
+                jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
+                jasperViewer.setVisible(true);
+                break;
+                
+            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
+                String sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
+                sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
+                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                break;
+                
+            case SDataConstantsPrint.PRINT_MODE_PRINT:
+                for (int copy = 1; copy <= numCopies; copy++) {
+                    JasperPrintManager.printReport(jasperPrint, false);                    
+                }
+                break;
+                
+            default:
+                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+        }
     }
 
     /**
@@ -85,8 +122,6 @@ public class SCfdPrint {
         double dTotalPesoNeto = 0;
         float fVersion = 0;
         Map<String, Object> map = null;
-        JasperPrint jasperPrint = null;
-        JasperViewer jasperViewer = null;
         DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc = docBuilder.parse(new ByteArrayInputStream(cfd.getDocXml().getBytes("UTF-8")));
         SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
@@ -104,7 +139,6 @@ public class SCfdPrint {
         String sDocValueText = "";
         String sTelsEmiDom = "";
         String sTelsEmiExp = "";
-        String sPdfFileName = "";
 
         if (dps.getFkBizPartnerBranchAddressId() != 1) {
             address = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD,
@@ -336,72 +370,8 @@ public class SCfdPrint {
         map.put("dAddPagImporte", dps.getTotalCy_r());
         map.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
         map.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
-
-        /*
-        * XXX Remove addenda of Tron (navalos, 2014-05-07)
-        *
-
-        // Addenda:
-
-        node = SXmlUtils.extractElements(doc, "Addenda").item(0);
-        node = SXmlUtils.extractChildElements(node, "myadd:Addenda1").get(0);
-
-        nodeChild = SXmlUtils.extractChildElements(node, "myadd:Moneda").get(0);
-        namedNodeMapChild = nodeChild.getAttributes();
-
-        map.put("sAddClaveMoneda", SXmlUtils.extractAttributeValue(namedNodeMapChild, "claveMoneda", true));
-        map.put("dAddTipoDeCambio", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMapChild, "tipoDeCambio", true)));
-
-        nodeChild = SXmlUtils.extractChildElements(node, "myadd:Adicional").get(0);
-        namedNodeMapChild = nodeChild.getAttributes();
-
-        map.put("nAddDiasDeCredito", SLibUtilities.parseInt(SXmlUtils.extractAttributeValue(namedNodeMapChild, "diasDeCredito", false)));
-        map.put("sAddEmbarque", SXmlUtils.extractAttributeValue(namedNodeMapChild, "embarque", false));
-        map.put("sAddOrdenDeEmbarque", SXmlUtils.extractAttributeValue(namedNodeMapChild, "ordenDeEmbarque", false));
-        map.put("sAddOrdenDeCompra", SXmlUtils.extractAttributeValue(namedNodeMapChild, "ordenDeCompra", false));
-        map.put("sAddContrato", SXmlUtils.extractAttributeValue(namedNodeMapChild, "contrato", false));
-        map.put("sAddPedido", SXmlUtils.extractAttributeValue(namedNodeMapChild, "pedido", false));
-        map.put("sAddFactura", SXmlUtils.extractAttributeValue(namedNodeMapChild, "factura", false));
-        map.put("sAddCliente", SXmlUtils.extractAttributeValue(namedNodeMapChild, "cliente", false));
-        map.put("sAddSucursal", SXmlUtils.extractAttributeValue(namedNodeMapChild, "sucursal", false));
-        map.put("sAddAgente", SXmlUtils.extractAttributeValue(namedNodeMapChild, "agente", false));
-        map.put("sAddRuta", SXmlUtils.extractAttributeValue(namedNodeMapChild, "ruta", false));
-        map.put("sAddChofer", SXmlUtils.extractAttributeValue(namedNodeMapChild, "chofer", false));
-        map.put("sAddPlacas", SXmlUtils.extractAttributeValue(namedNodeMapChild, "placas", false));
-        map.put("sAddBoleto", SXmlUtils.extractAttributeValue(namedNodeMapChild, "boleto", false));
-        map.put("dAddPesoBruto", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMapChild, "pesoBruto", false)));
-        map.put("dAddPesoNeto", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMapChild, "pesoNeto", false)));
-        map.put("sAddUnidadPesoBruto", SXmlUtils.extractAttributeValue(namedNodeMapChild, "unidadPesoBruto", true));
-        map.put("sAddUnidadPesoNeto", SXmlUtils.extractAttributeValue(namedNodeMapChild, "unidadPesoNeto", true));
-
-        if (SXmlUtils.hasChildElement(node, "myadd:Pagare")) {
-            nodeChild = SXmlUtils.extractChildElements(node, "myadd:Pagare").get(0);
-            namedNodeMapChild = nodeChild.getAttributes();
-
-            map.put("sAddPagFecha", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(dps.getDate()).toUpperCase());
-            map.put("sAddPagFechaDeVencimiento", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(SLibTimeUtilities.addDate(dps.getDateStartCredit(), 0, 0, dps.getDaysOfCredit())).toUpperCase());
-            map.put("dAddPagImporte", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMapChild, "importe", false)));
-            map.put("sAddPagClaveMoneda", SXmlUtils.extractAttributeValue(namedNodeMapChild, "claveMoneda", false));
-            map.put("dAddPagInteresMoratorio", SLibUtilities.parseDouble(SXmlUtils.extractAttributeValue(namedNodeMapChild, "interesMoratorio", false)));
-        }
-        */
-
-        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFD, map);
-        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
-        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
-
-        switch (printMode) {
-            case SDataConstantsPrint.PRINT_MODE_VIEWER:
-                jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Comprobante Fiscal Digital");
-                jasperViewer.setVisible(true);
-                break;
-            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
-                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
-                break;
-            default:
-                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-        }
+        
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFD, map, printMode, 1);
     }
 
     /**
@@ -422,8 +392,6 @@ public class SCfdPrint {
         double dTotalPesoBruto = 0;
         double dTotalPesoNeto = 0;
         Map<String, Object> map = null;
-        JasperPrint jasperPrint = null;
-        JasperViewer jasperViewer = null;
         SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
         SDataBizPartnerBranchAddress address = null;
         SDataBizPartnerBranchContact contact = null;
@@ -434,7 +402,6 @@ public class SCfdPrint {
         String sDocValueText = "";
         String sTelsEmiDom = "";
         String sTelsEmiExp = "";
-        String sPdfFileName = "";
         cfd.ver32.DElementComprobante comprobante = null;
 
         if (dps.getFkBizPartnerBranchAddressId() != 1) {
@@ -673,26 +640,8 @@ public class SCfdPrint {
         map.put("dAddPagImporte", dps.getTotalCy_r());
         map.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
         map.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
-
-        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI, map);
-        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
-        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
-
-        switch (printMode) {
-            case SDataConstantsPrint.PRINT_MODE_VIEWER:
-                jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
-                jasperViewer.setVisible(true);
-                break;
-            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
-                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
-                break;
-            case SDataConstantsPrint.PRINT_MODE_PRINT:
-                JasperPrintManager.printReport(jasperPrint, false);
-                break;
-            default:
-                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-        }
+        
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI, map, printMode, 1);
     }
     
     /**
@@ -860,7 +809,7 @@ public class SCfdPrint {
 
         // Stamp:
 
-        String sSelloEmisor = "";
+        String sSelloCFD = "";
         
         if (comprobante.getEltOpcComplemento() != null) {
             for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
@@ -868,7 +817,7 @@ public class SCfdPrint {
                     cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
                     paramsMap.put("sCfdiVersion", tfd.getAttVersion().getString());
                     paramsMap.put("sCfdiUuid", tfd.getAttUUID().getString());
-                    paramsMap.put("sCfdiSelloCFD", sSelloEmisor = tfd.getAttSelloCFD().getString());
+                    paramsMap.put("sCfdiSelloCFD", sSelloCFD = tfd.getAttSelloCFD().getString());
                     paramsMap.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
                     paramsMap.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
                     paramsMap.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
@@ -878,9 +827,6 @@ public class SCfdPrint {
             }
         }
 
-        paramsMap.put("sUrlCfdi", "https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx");
-        paramsMap.put("sSelloCfdiUltDig", sSelloEmisor.isEmpty() ? SLibUtils.textRepeat("0", 8) : sSelloEmisor.substring(sSelloEmisor.length() - 8, sSelloEmisor.length()));
-        
         // QR Code:
 
         /* IMPORTANT (sflores, 2014-01-15):
@@ -890,6 +836,10 @@ public class SCfdPrint {
          * map.put("oCfdiQrCode", biQrCode.getScaledInstance(biQrCode.getWidth(), biQrCode.getHeight(), Image.SCALE_DEFAULT));
          */
 
+        // params needed by erp.server.SSessionServer.requestFillReport() to generate QR code:
+        
+        paramsMap.put("sSelloCfdiUltDig", sSelloCFD.isEmpty() ? SLibUtils.textRepeat("0", 8) : sSelloCFD.substring(sSelloCFD.length() - 8, sSelloCFD.length()));
+        
         // Aditional info (formerly Addenda1's info):
 
         double dTotalPesoBruto = 0;
@@ -953,140 +903,95 @@ public class SCfdPrint {
         paramsMap.put("saCfdiProdServKeys", productKeys);
         paramsMap.put("saCfdiUnitKeys",  unitKeys);
         
-        JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI_33, paramsMap);
-        String sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
-        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
-
-        switch (printMode) {
-            case SDataConstantsPrint.PRINT_MODE_VIEWER:
-                JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
-                jasperViewer.setVisible(true);
-                break;
-            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
-                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
-                break;
-            case SDataConstantsPrint.PRINT_MODE_PRINT:
-                JasperPrintManager.printReport(jasperPrint, false);
-                break;
-            default:
-                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-        }
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33, paramsMap, printMode, 1);
     }
-
+    
     /**
-     * 
-     * @param cfd
-     * @param printMode
-     * @param subtypeCfd
-     * @throws java.lang.Exception 
+     * Prints CFDI 3.3 with 'complemento de recepción de pagos' 1.0.
+     * @param client
+     * @param cfd CFD
+     * @param printMode Constants defined in SDataConstantsPrint.PRINT_MODE_...
+     * @throws java.lang.Exception
      */
-    public void printAcknowledgment(final erp.mtrn.data.SDataCfd cfd, final int printMode, final int subtypeCfd) throws java.lang.Exception {
-        Map<String, Object> map = null;
-        JasperPrint jasperPrint = null;
-        JasperViewer jasperViewer = null;
-        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = docBuilder.parse(new ByteArrayInputStream(cfd.getAcknowledgmentCancellationXml().getBytes("UTF-8")));
-        SDataDps dps = null;
-        SDataFormerPayrollEmp payrollEmp = null;
-        SDbPayrollReceipt payrollReceipt = null;
-        Node node = null;
-        Node nodeChild = null;
-        NamedNodeMap namedNodeMap = null;
-        String sPdfFileName = "";
-
-        switch (cfd.getFkCfdTypeId()) {
-            case SDataConstantsSys.TRNS_TP_CFD_INV:
-                dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                break;
-            case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                switch (subtypeCfd) {
-                    case SCfdConsts.CFDI_PAYROLL_VER_OLD:
-                        payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                        break;
-                    case SCfdConsts.CFDI_PAYROLL_VER_CUR:
-                        payrollReceipt = new SDbPayrollReceipt();
-                        payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
-                        break;
-                    default:
-                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+    public void printCfdi33_Crp10(final SClientInterface client, final erp.mtrn.data.SDataCfd cfd, final int printMode) throws java.lang.Exception {
+        Map<String, Object> params = miClient.createReportParams();
+        
+        // Comprobante:
+        
+        SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
+        cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(cfd.getDocXml());
+        
+        params.put("sCfdVersion", "" + comprobante.getVersion());    // param needed by erp.server.SSessionServer.requestFillReport() to generate proper QR code
+        params.put("bIsAnnulled", cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
+        params.put("bIsDeleted", false);
+        
+        params.put("sCfdiSerie", comprobante.getAttSerie().getString());
+        params.put("sCfdiFolio", comprobante.getAttFolio().getString());
+        params.put("sCfdiFecha", SLibUtils.DbmsDateFormatDatetime.format(comprobante.getAttFecha().getDatetime()));
+        params.put("sCfdiSello", comprobante.getAttSello().getString());
+        params.put("sCfdiNoCertificado", comprobante.getAttNoCertificado().getString());
+        params.put("sCfdiCertificado", comprobante.getAttCertificado().getString());
+        params.put("sCfdiLugarExpedicion", comprobante.getAttLugarExpedicion().getString());
+        params.put("sCfdiConfirmacion", comprobante.getAttConfirmacion().getString());
+        
+        // CFDI Relacionados:
+        
+        if (comprobante.getEltOpcCfdiRelacionados() != null) {
+            if (!comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().isEmpty()) {
+                params.put("sCfdiRelUUID", comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().get(0).getAttUuid().getString());
+            }
+        }
+        
+        // Emisor:
+        
+        params.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
+        params.put("sEmiNombre", comprobante.getEltEmisor().getAttNombre().getString());
+        params.put("sEmiRegimenFiscal", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_TAX_REG, comprobante.getEltEmisor().getAttRegimenFiscal().getString()));
+        
+        // Receptor:
+        
+        params.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
+        params.put("sRecNombre", comprobante.getEltReceptor().getAttNombre().getString());
+        params.put("sRecResidenciaFiscal", comprobante.getEltReceptor().getAttResidenciaFiscal().getString());
+        params.put("sRecNumRegIdTrib", comprobante.getEltReceptor().getAttNumRegIdTrib().getString());
+        
+        // Stamp:
+        
+        String sSelloCFD = "";
+        
+        if (comprobante.getEltOpcComplemento() != null) {
+            for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
+                if (element instanceof cfd.ver33.DElementTimbreFiscalDigital) {
+                    cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
+                    params.put("sTfdVersion", tfd.getAttVersion().getString());
+                    params.put("sTfdUUID", tfd.getAttUUID().getString());
+                    params.put("sTfdFechaTimbrado", tfd.getAttFechaTimbrado().getString());
+                    params.put("sTfdRfcProvCertif", tfd.getAttRfcProvCertif().getString());
+                    params.put("sTfdNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
+                    params.put("sTfdSelloCFD", sSelloCFD = tfd.getAttSelloCFD().getString());
+                    params.put("sTfdSelloSAT", tfd.getAttSelloSAT().getString());
+                    params.put("sTfdLeyenda", tfd.getAttLeyenda().getString());
                 }
-                break;
-            default:
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+            }
         }
-
-        map = miClient.createReportParams();
-
-        map.put("sCfdiDate", dps == null ? cfd.getTimestamp() : dps.getDate());
-        //map.put("sCfdiFolio", dps == null ? subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (payrollEmp.getNumberSeries() + "-" + payrollEmp.getNumber()) : (payrollReceipt.getNumberSeries() + "-" + payrollReceipt.getNumber()) : (dps.getNumberSeries() + "-" + dps.getNumber())); XXX (jbarajas, 2015-10-07) remove by new table
-        map.put("sCfdiFolio", dps == null ? subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (payrollEmp.getNumberSeries() + "-" + payrollEmp.getNumber()) : (payrollReceipt.getPayrollReceiptIssues() == null ? "" : payrollReceipt.getPayrollReceiptIssues().getNumberSeries() + "-" + payrollReceipt.getPayrollReceiptIssues().getNumber()) : (dps.getNumberSeries() + "-" + dps.getNumber()));
-
-        // Acknowledgment Cancellation:
-
-        node = SXmlUtils.extractElements(doc, "CancelaCFDResult").item(0);
-        if (node == null) {
-            node = SXmlUtils.extractElements(doc, "ns2:CancelaCFDResult").item(0);  // try again
-        }
-        namedNodeMap = node.getAttributes();
-
-        map.put("sEmiRfc", SXmlUtils.extractAttributeValue(namedNodeMap, "RfcEmisor", true));
-        map.put("sDateRequest", SXmlUtils.extractAttributeValue(namedNodeMap, "Fecha", true));
-        map.put("sDateCancel", SXmlUtils.extractAttributeValue(namedNodeMap, "Fecha", true));
-
-        if (SXmlUtils.hasChildElement(node, "Folios")) {
-            node = SXmlUtils.extractChildElements(node, "Folios").get(0);
-        }
-        else {
-            node = SXmlUtils.extractChildElements(node, "ns2:Folios").get(0);      // try again
-        }
-
-        if (SXmlUtils.hasChildElement(node, "UUID")) {
-            nodeChild = SXmlUtils.extractChildElements(node, "UUID").get(0);
-        }
-        else {
-            nodeChild = SXmlUtils.extractChildElements(node, "ns2:UUID").get(0);   // try again
-        }
-        map.put("sUuid", nodeChild.getTextContent());
-
-        if (SXmlUtils.hasChildElement(node, "EstatusUUID")) {
-            nodeChild = SXmlUtils.extractChildElements(node, "EstatusUUID").get(0);    // try again
-        }
-        else {
-            nodeChild = SXmlUtils.extractChildElements(node, "ns2:EstatusUUID").get(0);    // try again
-        }
-        map.put("sStatusCfdi", nodeChild.getTextContent().compareTo(SCfdConsts.UUID_ANNUL) == 0 ? "Cancelado" : "Desconocido");
-
-        node = SXmlUtils.extractElements(doc, "CancelaCFDResult").item(0);
-        if (node == null) {
-            node = SXmlUtils.extractElements(doc, "ns2:CancelaCFDResult").item(0);  // try again
-        }
-
-        node = SXmlUtils.extractChildElements(node, "Signature").get(0);
-        nodeChild = SXmlUtils.extractChildElements(node, "SignatureValue").get(0);
-
-        map.put("sCfdiSelloSAT", nodeChild.getTextContent());
-        map.put("nPkCfdId", cfd.getPkCfdId());
-
-        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI_ACK_CAN, map);
-        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
-        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
-
-        switch (printMode) {
-            case SDataConstantsPrint.PRINT_MODE_VIEWER:
-                jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Acuse de cancelación de CFDI");
-                jasperViewer.setVisible(true);
-                break;
-            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
-                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
-                break;
-            case SDataConstantsPrint.PRINT_MODE_PRINT:
-                JasperPrintManager.printReport(jasperPrint, false);
-                break;
-            default:
-                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-        }
+        
+        // QR code:
+        
+        /* IMPORTANT (sflores, 2014-01-15):
+         * BufferedImage is not serializable, therefore it cannot be send to Server through RMI. QR Code is generated and put into in SSessionServer.requestFillReport().
+         *
+         * biQrCode = DCfd.createQrCodeBufferedImage((String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"));
+         * map.put("oCfdiQrCode", biQrCode.getScaledInstance(biQrCode.getWidth(), biQrCode.getHeight(), Image.SCALE_DEFAULT));
+         */
+        
+        // params needed by erp.server.SSessionServer.requestFillReport() to generate QR code:
+        
+        params.put("sSelloCfdiUltDig", sSelloCFD.isEmpty() ? SLibUtils.textRepeat("0", 8) : sSelloCFD.substring(sSelloCFD.length() - 8, sSelloCFD.length()));
+        
+        // Provide XML for temporary tables and data for printing in method erp.server.SSessionServer.requestFillReport():
+        params.put("xml", cfd.getDocXml());
+        
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33_CRP_10, params, printMode, 1);
     }
     
     /**
@@ -1109,7 +1014,6 @@ public class SCfdPrint {
         double dTotalIncapacidades = 0;
         double dTotalIsr = 0;
 
-        String sPdfFileName = "";
         String sSql = "";
 
         SDataFormerPayroll oFormerPayroll = null;
@@ -1120,8 +1024,6 @@ public class SCfdPrint {
 
         cfd.ver32.DElementComprobante comprobante = null;
         HashMap<String, Object> map = null;
-        JasperPrint jasperPrint = null;
-        JasperViewer jasperViewer = null;
 
         ArrayList aPercepciones = null;
         ArrayList aDeducciones = null;
@@ -1383,28 +1285,8 @@ public class SCfdPrint {
                 map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
             }
         }
-
-        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI_PAYROLL, map);
-        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
-        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
-
-        switch (printMode) {
-            case SDataConstantsPrint.PRINT_MODE_VIEWER:
-                jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
-                jasperViewer.setVisible(true);
-                break;
-            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
-                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
-                break;
-            case SDataConstantsPrint.PRINT_MODE_PRINT:
-                for (int j = 0; j < numCopies; j++) {
-                    JasperPrintManager.printReport(jasperPrint, false);                    
-                }
-                break;
-            default:
-                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-        }
+        
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL, map, printMode, numCopies);
     }
     
     /**
@@ -1429,7 +1311,6 @@ public class SCfdPrint {
         double dTotalIsr = 0;
 
         String sCodeDisability = "";
-        String sPdfFileName = "";
         String sSql = "";
 
         SDataFormerPayroll oFormerPayroll = null;
@@ -1440,8 +1321,6 @@ public class SCfdPrint {
 
         cfd.ver32.DElementComprobante comprobante = null;
         HashMap<String, Object> map = null;
-        JasperPrint jasperPrint = null;
-        JasperViewer jasperViewer = null;
 
         ArrayList aPercepciones = null;
         ArrayList aDeducciones = null;
@@ -1738,28 +1617,8 @@ public class SCfdPrint {
                 map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
             }
         }
-
-        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI_PAYROLL, map);
-        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
-        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
-
-        switch (printMode) {
-            case SDataConstantsPrint.PRINT_MODE_VIEWER:
-                jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
-                jasperViewer.setVisible(true);
-                break;
-            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
-                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
-                break;
-            case SDataConstantsPrint.PRINT_MODE_PRINT:
-                for (int j = 0; j < numCopies; j++) {
-                    JasperPrintManager.printReport(jasperPrint, false);                    
-                }
-                break;
-            default:
-                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
-        }
+        
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL, map, printMode, numCopies);
     }
     
     /**
@@ -1784,7 +1643,6 @@ public class SCfdPrint {
         double dTotalIsr = 0;
 
         String sCodeDisability = "";
-        String sPdfFileName = "";
         String sSql = "";
 
         SDataFormerPayroll oFormerPayroll = null;
@@ -1795,8 +1653,6 @@ public class SCfdPrint {
 
         cfd.ver33.DElementComprobante comprobante = null;
         HashMap<String, Object> map = null;
-        JasperPrint jasperPrint = null;
-        JasperViewer jasperViewer = null;
 
         ArrayList aPercepciones = null;
         ArrayList aDeducciones = null;
@@ -1872,6 +1728,8 @@ public class SCfdPrint {
         map.put("dCfdConceptoValorUnitario", comprobante.getEltConceptos().getEltConceptos().get(0).getAttValorUnitario().getDouble());
         map.put("dCfdConceptoImporte", comprobante.getEltConceptos().getEltConceptos().get(0).getAttImporte().getDouble());
 
+        String sSelloCFD = "";
+        
         for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
             if (element.getName().compareTo("nomina12:Nomina") == 0) {
                 map.put("TipoNomina", ((cfd.ver3.nom12.DElementNomina) element).getAttTipoNomina().getString());
@@ -2084,34 +1942,126 @@ public class SCfdPrint {
                 cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
                 map.put("sCfdiVersion", tfd.getAttVersion().getString());
                 map.put("sCfdiUuid", tfd.getAttUUID().getString());
-                map.put("sCfdiSelloCFD", tfd.getAttSelloCFD().getString());
+                map.put("sCfdiSelloCFD", sSelloCFD = tfd.getAttSelloCFD().getString());
                 map.put("sCfdiSelloSAT", tfd.getAttSelloSAT().getString());
                 map.put("sCfdiNoCertificadoSAT", tfd.getAttNoCertificadoSAT().getString());
                 map.put("sCfdiFechaTimbre", tfd.getAttFechaTimbrado().getString());
                 map.put("sCfdiRfcProvCertif", tfd.getAttRfcProvCertif().getString());
             }
         }
+        
+        // params needed by erp.server.SSessionServer.requestFillReport() to generate QR code:
+        
+        map.put("sSelloCfdiUltDig", sSelloCFD.isEmpty() ? SLibUtils.textRepeat("0", 8) : sSelloCFD.substring(sSelloCFD.length() - 8, sSelloCFD.length()));
+        
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_PAYROLL, map, printMode, numCopies);
+    }
 
-        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CFDI_PAYROLL, map);
-        sPdfFileName = cfd.getDocXmlName().substring(0, cfd.getDocXmlName().lastIndexOf(".xml"));
-        sPdfFileName = miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + sPdfFileName + ".pdf";
+    /**
+     * 
+     * @param cfd
+     * @param printMode
+     * @param subtypeCfd
+     * @throws java.lang.Exception 
+     */
+    public void printCancelAck(final erp.mtrn.data.SDataCfd cfd, final int printMode, final int subtypeCfd) throws java.lang.Exception {
+        Map<String, Object> map = null;
+        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document doc = docBuilder.parse(new ByteArrayInputStream(cfd.getAcknowledgmentCancellationXml().getBytes("UTF-8")));
+        SDataDps dps = null;
+        SDataFormerPayrollEmp payrollEmp = null;
+        SDbPayrollReceipt payrollReceipt = null;
+        Node node = null;
+        Node nodeChild = null;
+        NamedNodeMap namedNodeMap = null;
 
-        switch (printMode) {
-            case SDataConstantsPrint.PRINT_MODE_VIEWER:
-                jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Comprobante Fiscal Digital por Internet");
-                jasperViewer.setVisible(true);
+        map = miClient.createReportParams();
+
+        switch (cfd.getFkCfdTypeId()) {
+            case SDataConstantsSys.TRNS_TP_CFD_INV:
+                dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                
+                map.put("sCfdiDate", dps.getDate());
+                map.put("sCfdiFolio", dps.getDpsNumber());
                 break;
-            case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
-                JasperExportManager.exportReportToPdfFile(jasperPrint, sPdfFileName);
+                
+            case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                map.put("sCfdiDate", cfd.getTimestamp());
+                map.put("sCfdiFolio", cfd.getCfdNumber());
                 break;
-            case SDataConstantsPrint.PRINT_MODE_PRINT:
-                for (int j = 0; j < numCopies; j++) {
-                    JasperPrintManager.printReport(jasperPrint, false);                    
+                
+            case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
+                switch (subtypeCfd) {
+                    case SCfdConsts.CFDI_PAYROLL_VER_OLD:
+                        payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                        
+                        map.put("sCfdiFolio", payrollEmp.getFormerPayrollEmpNumber());
+                        break;
+                        
+                    case SCfdConsts.CFDI_PAYROLL_VER_CUR:
+                        payrollReceipt = new SDbPayrollReceipt();
+                        payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
+                        
+                        map.put("sCfdiFolio", payrollReceipt.getPayrollReceiptIssues().getPayrollReceiptIssueNumber());
+                        break;
+                        
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
+                
+                map.put("sCfdiDate", cfd.getTimestamp());
                 break;
+                
             default:
-                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
+
+        // Acknowledgment Cancellation:
+
+        node = SXmlUtils.extractElements(doc, "CancelaCFDResult").item(0);
+        if (node == null) {
+            node = SXmlUtils.extractElements(doc, "ns2:CancelaCFDResult").item(0);  // try again
+        }
+        namedNodeMap = node.getAttributes();
+
+        map.put("sEmiRfc", SXmlUtils.extractAttributeValue(namedNodeMap, "RfcEmisor", true));
+        map.put("sDateRequest", SXmlUtils.extractAttributeValue(namedNodeMap, "Fecha", true));
+        map.put("sDateCancel", SXmlUtils.extractAttributeValue(namedNodeMap, "Fecha", true));
+
+        if (SXmlUtils.hasChildElement(node, "Folios")) {
+            node = SXmlUtils.extractChildElements(node, "Folios").get(0);
+        }
+        else {
+            node = SXmlUtils.extractChildElements(node, "ns2:Folios").get(0);      // try again
+        }
+
+        if (SXmlUtils.hasChildElement(node, "UUID")) {
+            nodeChild = SXmlUtils.extractChildElements(node, "UUID").get(0);
+        }
+        else {
+            nodeChild = SXmlUtils.extractChildElements(node, "ns2:UUID").get(0);   // try again
+        }
+        map.put("sUuid", nodeChild.getTextContent());
+
+        if (SXmlUtils.hasChildElement(node, "EstatusUUID")) {
+            nodeChild = SXmlUtils.extractChildElements(node, "EstatusUUID").get(0);    // try again
+        }
+        else {
+            nodeChild = SXmlUtils.extractChildElements(node, "ns2:EstatusUUID").get(0);    // try again
+        }
+        map.put("sStatusCfdi", nodeChild.getTextContent().compareTo(SCfdConsts.UUID_ANNUL) == 0 ? "Cancelado" : "Desconocido");
+
+        node = SXmlUtils.extractElements(doc, "CancelaCFDResult").item(0);
+        if (node == null) {
+            node = SXmlUtils.extractElements(doc, "ns2:CancelaCFDResult").item(0);  // try again
+        }
+
+        node = SXmlUtils.extractChildElements(node, "Signature").get(0);
+        nodeChild = SXmlUtils.extractChildElements(node, "SignatureValue").get(0);
+
+        map.put("sCfdiSelloSAT", nodeChild.getTextContent());
+        map.put("nPkCfdId", cfd.getPkCfdId());
+        
+        computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_ACK_CAN, map, printMode, 1);
     }
 }

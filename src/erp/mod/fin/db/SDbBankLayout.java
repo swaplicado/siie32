@@ -184,8 +184,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                 + "FROM erp.bpsu_bank_acc AS bank "
                 + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = bank.fid_bank "
                 + "INNER JOIN erp.bpsu_bp_ct AS ct ON ct.id_bp = bp.id_bp AND ct.id_ct_bp = " + SModSysConsts.BPSS_CT_BP_SUP + " "
-                + "WHERE bank.id_bpb = " + bizPartnerBank + " "
-                + "AND bank.id_bank_acc = " + bankBank;
+                + "WHERE bank.id_bpb = " + bizPartnerBank + " AND bank.id_bank_acc = " + bankBank;
 
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
@@ -413,7 +412,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                         oDsm = (SDataDsm) ((SClientInterface) session.getClient()).getGuiModule(SDataConstants.MOD_FIN).processRegistry(oDsm);
                         recordDsm = oDsm.getDbmsRecord();
 
-                        reference = (!dps.getNumberSeries().isEmpty() ? dps.getNumberSeries() + "-" : "") + dps.getNumber();
+                        reference = dps.getDpsNumber();
                         aReference.add(reference);
                         
                         for (SDataRecordEntry entry : recordDsm.getDbmsRecordEntries()) {

@@ -35,8 +35,8 @@ public final class SCfdPacket implements java.io.Serializable {
     private int mnFkXmlStatusId;                // used in creation of SDataCfd
     private int mnFkXmlDeliveryTypeId;          // used in creation of SDataCfd
     private int mnFkXmlDeliveryStatusId;        // used in creation of SDataCfd
-    private int mnFkCompanyBranchId;            // used in creation of SDataCfd
     private int mnFkUserDeliveryId;             // used in creation of SDataCfd
+    private int mnFkCompanyBranchId;            // used in creation of SDataCfd
     private int mnDpsYearId;                    // used in creation of SDataCfd
     private int mnDpsDocId;                     // used in creation of SDataCfd
     private int mnRecordEntryYearId;                    // used in creation of SDataCfd
@@ -52,8 +52,9 @@ public final class SCfdPacket implements java.io.Serializable {
     private int mnPayrollReceiptEmployeeId;     // used in creation of SDataCfd
     private int mnPayrollReceiptIssueId;        // used in creation of SDataCfd
     
-    private SDataDps moDataDps;
-    private SDataPayrollReceiptIssue moDataPayrollReceiptIssue;
+    private SDataDps moAuxDataDps;
+    private SDataCfdPayment moAuxDataCfdPayment;
+    private SDataPayrollReceiptIssue moAuxDataPayrollReceiptIssue;
 
     private cfd.DElement moAuxCfdRootElement;
     private int mnAuxPacId;
@@ -82,8 +83,8 @@ public final class SCfdPacket implements java.io.Serializable {
         mnFkXmlStatusId = 0;
         mnFkXmlDeliveryTypeId = 0;
         mnFkXmlDeliveryStatusId = 0;
-        mnFkCompanyBranchId = 0;
         mnFkUserDeliveryId = 0;
+        mnFkCompanyBranchId = 0;
         mnDpsYearId = 0;
         mnDpsDocId = 0;
         mnRecordEntryYearId = 0;
@@ -99,8 +100,9 @@ public final class SCfdPacket implements java.io.Serializable {
         mnPayrollReceiptEmployeeId = 0;
         mnPayrollReceiptIssueId = 0;
         
-        moDataDps = null;
-        moDataPayrollReceiptIssue = null;
+        moAuxDataDps = null;
+        moAuxDataCfdPayment = null;
+        moAuxDataPayrollReceiptIssue = null;
         
         moAuxCfdRootElement = null;
         mnAuxPacId = 0;
@@ -129,8 +131,8 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setFkXmlStatusId(int n) { mnFkXmlStatusId = n; }
     public void setFkXmlDeliveryTypeId(int n) { mnFkXmlDeliveryTypeId = n; }
     public void setFkXmlDeliveryStatusId(int n) { mnFkXmlDeliveryStatusId = n; }
-    public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
     public void setFkUserDeliveryId(int n) { mnFkUserDeliveryId = n; }
+    public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
     public void setDpsYearId(int n) { mnDpsYearId = n; }
     public void setDpsDocId(int n) { mnDpsDocId = n; }
     public void setRecordEntryYearId(int n) { mnRecordEntryYearId = n; }
@@ -146,8 +148,9 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setPayrollReceiptEmployeeId(int n) { mnPayrollReceiptEmployeeId = n; }
     public void setPayrollReceiptIssueId(int n) { mnPayrollReceiptIssueId = n; }
     
-    public void setDataDps(SDataDps o) { moDataDps = o; }
-    public void setDataPayrollReceiptIssue(SDataPayrollReceiptIssue o) { moDataPayrollReceiptIssue = o; }
+    public void setAuxDataDps(SDataDps o) { moAuxDataDps = o; }
+    public void setAuxDataCfdPayment(SDataCfdPayment o) { moAuxDataCfdPayment = o; }
+    public void setAuxDataPayrollReceiptIssue(SDataPayrollReceiptIssue o) { moAuxDataPayrollReceiptIssue = o; }
 
     public void setAuxCfdRootElement(cfd.DElement o) { moAuxCfdRootElement = o; }
     public void setAuxPacId(int n) { mnAuxPacId = n; }
@@ -175,8 +178,8 @@ public final class SCfdPacket implements java.io.Serializable {
     public int getFkXmlStatusId() { return mnFkXmlStatusId; }
     public int getFkXmlDeliveryTypeId() { return mnFkXmlDeliveryTypeId; }
     public int getFkXmlDeliveryStatusId() { return mnFkXmlDeliveryStatusId; }
-    public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
     public int getFkUserDeliveryId() { return mnFkUserDeliveryId; }
+    public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
     public int getDpsYearId() { return mnDpsYearId; }
     public int getDpsDocId() { return mnDpsDocId; }
     public int getRecordEntryYearId() { return mnRecordEntryYearId; }
@@ -192,8 +195,9 @@ public final class SCfdPacket implements java.io.Serializable {
     public int getPayrollReceiptEmployeeId() { return mnPayrollReceiptEmployeeId; }
     public int getPayrollReceiptIssueId() { return mnPayrollReceiptIssueId; }
     
-    public SDataDps getDataDps() { return moDataDps; }
-    public SDataPayrollReceiptIssue getDataPayrollReceiptIssue() { return moDataPayrollReceiptIssue; }
+    public SDataDps getAuxDataDps() { return moAuxDataDps; }
+    public SDataCfdPayment getAuxDataCfdPayment() { return moAuxDataCfdPayment; }
+    public SDataPayrollReceiptIssue getAuxDataPayrollReceiptIssue() { return moAuxDataPayrollReceiptIssue; }
     
     public cfd.DElement getAuxCfdRootElement() { return moAuxCfdRootElement; }
     public int getAuxPacId() { return mnAuxPacId; }

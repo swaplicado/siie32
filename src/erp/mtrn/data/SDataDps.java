@@ -86,7 +86,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas, Daniel López
+ * @author Sergio Flores, Juan Barajas, Daniel López, Sergio Flores
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33 {
 
@@ -260,7 +260,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected erp.mtrn.data.SCfdParams moAuxCfdParams;
     protected boolean mbAuxIsNeedCfd;
     protected boolean mbAuxIsNeedCfdCce;
-    protected boolean mbAuxIsValidate;
+    protected boolean mbAuxIsProcessingValidation;
     protected double mdAuxCfdIvaPorcentaje;
 
     protected erp.mfin.data.SDataBookkeepingNumber moDbmsDataBookkeepingNumber;
@@ -518,8 +518,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         statement.execute(sql);
         sql = "DELETE FROM trn_dps_repl WHERE id_old_year = " + mnPkYearId + " AND id_old_doc = " + mnPkDocId + " ";
         statement.execute(sql);
-        sql = "DELETE FROM trn_dps_repl WHERE id_new_year = " + mnPkYearId + " "
-                + "AND id_new_doc = " + mnPkDocId + " ";
+        sql = "DELETE FROM trn_dps_repl WHERE id_new_year = " + mnPkYearId + " AND id_new_doc = " + mnPkDocId + " ";
         statement.execute(sql);
         sql = "DELETE FROM trn_dps_iog_chg WHERE id_dps_year = " + mnPkYearId + " AND id_dps_doc = " + mnPkDocId + " ";
         statement.execute(sql);
@@ -793,14 +792,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             msDbmsError = sMsg + "¡El documento está timbrado!";
             throw new Exception(msDbmsError);
         }
-        else if (moDbmsDataCfd != null && !mbAuxIsValidate && moDbmsDataCfd.getIsProcessingWebService()) {
+        else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && moDbmsDataCfd.getIsProcessingWebService()) {
             mnDbmsErrorId = 22;
             msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_WEB_SERVICE + "!";
             throw new Exception(msDbmsError);
         }
-        else if (moDbmsDataCfd != null && !mbAuxIsValidate && pnAction != SDbConsts.ACTION_ANNUL && moDbmsDataCfd.getIsProcessingStorageXml()) {
+        else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && moDbmsDataCfd.getIsProcessingStorageXml()) {
             mnDbmsErrorId = 23;
             msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_XML_STORAGE + "!";
+            throw new Exception(msDbmsError);
+        }
+        else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && moDbmsDataCfd.getIsProcessingStoragePdf()) {
+            mnDbmsErrorId = 24;
+            msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_PDF_STORAGE + "!";
             throw new Exception(msDbmsError);
         }
         else if (mnFkDpsStatusId != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
@@ -1810,7 +1814,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxCfdParams(erp.mtrn.data.SCfdParams o) { moAuxCfdParams = o; }
     public void setAuxIsNeedCfd(boolean b) { mbAuxIsNeedCfd = b; }
     public void setAuxIsNeedCfdCce(boolean b) { mbAuxIsNeedCfdCce = b; }
-    public void setAuxIsValidate(boolean b) { mbAuxIsValidate = b; }
+    public void setAuxIsProcessingValidation(boolean b) { mbAuxIsProcessingValidation = b; }
 
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
@@ -1828,7 +1832,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public erp.mtrn.data.SCfdParams getAuxCfdParams() { return moAuxCfdParams; }
     public boolean getAuxIsNeedCfd() { return mbAuxIsNeedCfd; }
     public boolean getAuxIsNeedCfdCce() { return mbAuxIsNeedCfdCce; }
-    public boolean getAuxIsValidate() { return mbAuxIsValidate; }
+    public boolean getAuxIsProcessingValidation() { return mbAuxIsProcessingValidation; }
 
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
@@ -2021,6 +2025,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         moAuxCfdParams = null;
         mbAuxIsNeedCfd = false;
         mbAuxIsNeedCfdCce = false;
+        mbAuxIsProcessingValidation = false;
         mdAuxCfdIvaPorcentaje = 0;
 
         moDbmsDataBookkeepingNumber = null;
@@ -2332,12 +2337,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
         }
-        catch (java.sql.SQLException e) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
-            SLibUtilities.printOutException(this, e);
-        }
         catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
+            if (msDbmsError.isEmpty()) {
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_READ;
+            }
+            msDbmsError += "\n" + e.toString();
             SLibUtilities.printOutException(this, e);
         }
 
@@ -2808,67 +2813,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         }
                                     }
                                 }
-                                
-                                /* Deprecated due to especification of CFDI 3.3. Please remove when not needed again! (2018-03-01, Sergio Flores)
-                                if (entry.getIsPrepayment()) {
-                                    thereArePrepayments = true;
-                                    
-                                    if (entry.getQuantity() >= 0) {
-                                        if (entry.getKeyCashAccount_n() != null) {
-                                            // Increment (invoice) or decrement (credit note) cash account's balance:
-
-                                            finAmount = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAmountType.CASH_ACCOUNT, isDocument() ? SFinMovement.INCREMENT : SFinMovement.DECREMENT);
-                                            if (isAdjustment()) {
-                                                finAmount.KeyRefDocument = entry.getKeyAuxDps();
-                                            }
-                                            oAmounts.addAmountForCashAccount(entry.getKeyCashAccount_n(), finAmount); // add grouping by referenced cash account
-                                        }
-                                        else {
-                                            // Increment (invoice) or decrement (credit note) advance billed's balance:
-
-                                            requiredAccountingForPrepaymentsBilled = true;
-                                            
-                                            finAmount = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAmountType.ADVANCE_BILLED, isDocument() ? SFinMovement.INCREMENT : SFinMovement.DECREMENT);
-                                            if (isAdjustment()) {
-                                                finAmount.KeyRefDocument = entry.getKeyAuxDps();
-                                            }
-                                            oAmounts.addAmountForAdvanceBilled(finAmount); // add into lonely group
-                                        }
-                                    }
-                                    else {
-                                        // Increment (credit note) or decrement (invoice) business partner's balance:
-
-                                        if (oAmountBizPartnerPrepayments == null) {
-                                            oAmountBizPartnerPrepayments = new SFinAmount(0, 0, true, SFinAmountType.UNDEFINED, isDocument() ? SFinMovement.DECREMENT : SFinMovement.INCREMENT);
-                                            if (isAdjustment()) {
-                                                oAmountBizPartnerPrepayments.KeyRefDocument = entry.getKeyAuxDps();
-                                            }
-                                            oAmounts.getAmounts().add(oAmountBizPartnerPrepayments);
-                                        }
-
-                                        oAmountBizPartnerPrepayments.addAmount(-entry.getTotal_r(), -entry.getTotalCy_r()); // only one amount per business partner
-                                    }
-                                }
-                                else {
-                                    if (isDocument()) {
-                                        // document is an ordinary invoice, so
-                                        // increment business partner's balance:
-
-                                        if (oAmountBizPartnerBalance == null) {
-                                            oAmountBizPartnerBalance = new SFinAmount(0, 0);
-                                            oAmounts.getAmounts().add(oAmountBizPartnerBalance);
-                                        }
-
-                                        oAmountBizPartnerBalance.addAmount(entry.getTotal_r(), entry.getTotalCy_r()); // only one amount per business partner
-                                    }
-                                    else {
-                                        // document is a credit note, so
-                                        // decrement business partner document's balance:
-
-                                        oAmounts.addAmountForDocument(entry.getKeyAuxDps(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), false, SFinAmountType.UNDEFINED, SFinMovement.DECREMENT)); // add grouping by referenced invoice
-                                    }
-                                }
-                                */
                             }
                         }
                         
@@ -3134,124 +3078,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                         throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\n(" + TXT_OPS_TYPE + ")");
                                 }
                                 
-                                /* Deprecated due to especification of CFDI 3.3. Please remove when not needed again! (2018-03-01, Sergio Flores)
-                                if (entry.getIsPrepayment()) {
-                                    // Document entry for prepayment:
-                                    
-                                    if (entry.getQuantity() >= 0) {
-                                        oAmount = new SFinAmount(entry.getSubtotal_r(), entry.getSubtotalCy_r());
-                                    }
-                                    else {
-                                        oAmount = new SFinAmount(-entry.getSubtotal_r(), -entry.getSubtotalCy_r());
-                                    }
-
-                                    aAmountEntries = oConfigBprOp.prorateAmount(oAmount);
-                                    
-                                    for (i = 0; i < oConfigBprOp.getAccountConfigEntries().size(); i++) {
-                                        oRecordEntry = createAccRecordEntry(
-                                                oConfigBprOp.getAccountConfigEntries().get(i).getAccountId(),
-                                                oConfigBprOp.getAccountConfigEntries().get(i).getCostCenterId(),
-                                                anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
-                                                isAdjustment() ? entry.getKeyAuxDps() : null, null);
-
-                                        oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
-                                        oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
-                                        
-                                        if (entry.getQuantity() >= 0) {
-                                            if (isDebitForOperations()) {
-                                                oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
-                                                oRecordEntry.setCredit(0);
-                                                oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
-                                                oRecordEntry.setCreditCy(0);
-                                            }
-                                            else {
-                                                oRecordEntry.setDebit(0);
-                                                oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
-                                                oRecordEntry.setDebitCy(0);
-                                                oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
-                                            }
-                                        }
-                                        else {
-                                            if (isDebitForOperations()) {
-                                                oRecordEntry.setDebit(0);
-                                                oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
-                                                oRecordEntry.setDebitCy(0);
-                                                oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
-                                            }
-                                            else {
-                                                oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
-                                                oRecordEntry.setCredit(0);
-                                                oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
-                                                oRecordEntry.setCreditCy(0);
-                                            }
-                                        }
-
-                                        oRecordEntry.setConcept(sConcept);
-                                        oRecordEntry.setSortingPosition(++nSortingPosition);
-
-                                        oRecord.getDbmsRecordEntries().add(oRecordEntry);
-                                    }
-                                }
-                                else {
-                                    // Standard document entry:
-                                    
-                                    oConfigItem = new SFinAccountConfig(SFinAccountUtilities.obtainItemAccountConfigs(
-                                            entry.getFkItemRefId_n() != SLibConsts.UNDEFINED ? entry.getFkItemRefId_n() : entry.getFkItemId(), oRecord.getPkBookkeepingCenterId(), 
-                                            mtDate, getAccItemTypeId(entry), isDebitForOperations(), oStatement));
-
-                                    sConceptEntryAux = sConceptAux;
-                                    anSysAccTypeKeyItem = SModSysConsts.FINS_TP_SYS_ACC_NA_NA;
-                                    anSysMvtTypeKeyItem = getSysMvtTypeKeyItem(entry.getFkDpsAdjustmentTypeId());
-                                    anSysMvtTypeKeyItemXXX = getSysMvtTypeKeyItemXXX();
-
-                                    aAmountEntries = oConfigItem.prorateAmount(new SFinAmount(entry.getSubtotal_r(), entry.getSubtotalCy_r()));
-
-                                    for (i = 0; i < oConfigItem.getAccountConfigEntries().size(); i++) {
-                                        oRecordEntry = createAccRecordEntry(
-                                                oConfigItem.getAccountConfigEntries().get(i).getAccountId(),
-                                                !entry.getFkCostCenterId_n().isEmpty() ? entry.getFkCostCenterId_n() : oConfigItem.getAccountConfigEntries().get(i).getCostCenterId(),
-                                                anAccMvtSubclassKey, anSysAccTypeKeyItem, anSysMvtTypeKeyItem, anSysMvtTypeKeyItemXXX,
-                                                isAdjustment() ? entry.getKeyAuxDps() : null, null);
-
-                                        if (isDebitForOperations()) {
-                                            oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
-                                            oRecordEntry.setCredit(0);
-                                            oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
-                                            oRecordEntry.setCreditCy(0);
-                                        }
-                                        else {
-                                            oRecordEntry.setDebit(0);
-                                            oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
-                                            oRecordEntry.setDebitCy(0);
-                                            oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
-                                        }
-
-                                        sConceptEntryAux += (entry.getConcept().length() <= 0 ? "" : "; " + entry.getConcept());
-                                        if (sConceptEntryAux.length() > 100) {
-                                            sConceptEntryAux = sConceptEntryAux.substring(0, 100 - 3).trim() + "...";
-                                        }
-
-                                        oRecordEntry.setConcept(sConceptEntryAux);
-                                        oRecordEntry.setSortingPosition(++nSortingPosition);
-
-                                        if (entry.getFkItemRefId_n() == SLibConsts.UNDEFINED) {
-                                            oRecordEntry.setUnits(entry.getOriginalQuantity());
-                                            oRecordEntry.setFkItemId_n(entry.getFkItemId());
-                                            oRecordEntry.setFkUnitId_n(entry.getFkOriginalUnitId());
-                                            oRecordEntry.setFkItemAuxId_n(SLibConsts.UNDEFINED);
-                                        }
-                                        else {
-                                            oRecordEntry.setUnits(0);
-                                            oRecordEntry.setFkItemId_n(entry.getFkItemRefId_n());
-                                            oRecordEntry.setFkUnitId_n(SModSysConsts.ITMU_UNIT_NA);
-                                            oRecordEntry.setFkItemAuxId_n(entry.getFkItemId());
-                                        }
-
-                                        oRecord.getDbmsRecordEntries().add(oRecordEntry);
-                                    }
-                                }
-                                */
-                                
                                 for (SDataDpsEntryTax tax : entry.getDbmsEntryTaxes()) {
                                     oDpsTaxes.addTax(isDocument() ? (int[]) getPrimaryKey() : entry.getKeyAuxDps(), tax.getKeyTax(), new SFinAmount(tax.getTax(), tax.getTaxCy(), entry.getIsPrepayment() && entry.getOperationsType() != SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY, SFinAccountType.ACC_BIZ_PARTNER, SFinMovementType.MOVT_INCREMENT));
                                 }
@@ -3511,12 +3337,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
             }
         }
-        catch (SQLException e) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
-            SLibUtilities.printOutException(this, e);
-        }
         catch (Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
+            if (msDbmsError.isEmpty()) {
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_SAVE;
+            }
+            msDbmsError += "\n" + e.toString();
             SLibUtilities.printOutException(this, e);
         }
 
@@ -3648,18 +3474,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
             }
         }
-        catch (SQLException exception) {
-            mnLastDbActionResult = SLibConstants.DB_CAN_SAVE_NO;
-            if (msDbmsError.isEmpty()) {
-                msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_SAVE;
-            }
-            SLibUtilities.printOutException(this, exception);
-        }
         catch (Exception exception) {
             mnLastDbActionResult = SLibConstants.DB_CAN_SAVE_NO;
             if (msDbmsError.isEmpty()) {
                 msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_SAVE;
             }
+            msDbmsError += "\n" + exception.toString();
             SLibUtilities.printOutException(this, exception);
         }
 
@@ -3675,18 +3495,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_YES;
             }
         }
-        catch (SQLException exception) {
-            mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_NO;
-            if (msDbmsError.isEmpty()) {
-                msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_ANNUL;
-            }
-            SLibUtilities.printOutException(this, exception);
-        }
         catch (Exception exception) {
             mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_NO;
             if (msDbmsError.isEmpty()) {
                 msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_ANNUL;
             }
+            msDbmsError += "\n" + exception.toString();
             SLibUtilities.printOutException(this, exception);
         }
 
@@ -3702,18 +3516,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnLastDbActionResult = SLibConstants.DB_CAN_DELETE_YES;
             }
         }
-        catch (SQLException exception) {
-            mnLastDbActionResult = SLibConstants.DB_CAN_DELETE_NO;
-            if (msDbmsError.isEmpty()) {
-                msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_DELETE;
-            }
-            SLibUtilities.printOutException(this, exception);
-        }
         catch (Exception exception) {
             mnLastDbActionResult = SLibConstants.DB_CAN_DELETE_NO;
             if (msDbmsError.isEmpty()) {
                 msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_DELETE;
             }
+            msDbmsError += "\n" + exception.toString();
             SLibUtilities.printOutException(this, exception);
         }
 
@@ -3739,7 +3547,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 if (testDeletion(connection, sMsg, SDbConsts.ACTION_ANNUL)) {
                     mnFkDpsStatusId = SDataConstantsSys.TRNS_ST_DPS_ANNULED;
 
-                    sSql = "UPDATE trn_dps SET fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + "fid_tp_dps_ann=" + mnFkDpsAnnulationTypeId + ", " +
+                    sSql = "UPDATE trn_dps SET fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + "fid_tp_dps_ann = " + mnFkDpsAnnulationTypeId + ", " +
                             "stot_prov_r = 0, disc_doc_r = 0, stot_r = 0, tax_charged_r = 0, tax_retained_r = 0, tot_r = 0, " +
                             "stot_prov_cur_r = 0, disc_doc_cur_r = 0, stot_cur_r = 0, tax_charged_cur_r = 0, tax_retained_cur_r = 0, tot_cur_r = 0, " +
                             "fid_usr_edit = " + mnFkUserEditId + ", ts_edit = NOW() " +
@@ -3790,13 +3598,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
             }
         }
-        catch (SQLException exception) {
+        catch (Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_ERROR;
-            SLibUtilities.printOutException(this, exception);
-        }
-        catch (Exception exception) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_ERROR;
-            SLibUtilities.printOutException(this, exception);
+            if (msDbmsError.isEmpty()) {
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_ANNUL;
+            }
+            msDbmsError += "\n" + e.toString();
+            SLibUtilities.printOutException(this, e);
         }
 
         return mnLastDbActionResult;
@@ -3854,13 +3662,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
             }
         }
-        catch (SQLException exception) {
+        catch (Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_DELETE_ERROR;
-            SLibUtilities.printOutException(this, exception);
-        }
-        catch (Exception exception) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_DELETE_ERROR;
-            SLibUtilities.printOutException(this, exception);
+            if (msDbmsError.isEmpty()) {
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_DELETE;
+            }
+            msDbmsError += "\n" + e.toString();
+            SLibUtilities.printOutException(this, e);
         }
 
         return mnLastDbActionResult;

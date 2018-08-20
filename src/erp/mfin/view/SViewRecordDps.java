@@ -71,6 +71,12 @@ public class SViewRecordDps extends erp.lib.table.STableTab {
         renderTableColumns();
         setIsSummaryApplying(true);
 
+        mvSuscriptors.add(mnTabType);
+        mvSuscriptors.add(SDataConstants.TRN_DPS);
+        mvSuscriptors.add(SDataConstants.TRNX_DPS_PAYED);
+        mvSuscriptors.add(SDataConstants.TRNX_DPS_PAY_PEND);
+        mvSuscriptors.add(SDataConstants.TRNX_CFD_PAY_REC);
+
         populateTable();
     }
 

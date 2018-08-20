@@ -182,10 +182,10 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                         }
                         else {
                             if (receiptIssue.isDeleted()) {
-                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getIssueNumber() + "' está eliminado.");
+                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getPayrollReceiptIssueNumber() + "' está eliminado.");
                             }
                             else if (receiptIssue.getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getIssueNumber() + "' está anulado.");
+                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getPayrollReceiptIssueNumber() + "' está anulado.");
                             }
                             else if (!SDataUtilities.isPeriodOpen((SClientInterface) miClient, receiptIssue.getDateIssue())) {
                                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE);

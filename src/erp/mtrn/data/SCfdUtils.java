@@ -112,7 +112,7 @@ import stamp.StampSOAP;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Edwin Carmona, Alfredo Pérez, Claudio Peña
+ * @author Juan Barajas, Sergio Flores, Edwin Carmona, Alfredo Pérez, Claudio Peña, Sergio Flores
  * 
  * Maintenance Log:
  * 2018-01-02, Sergio Flores:
@@ -204,11 +204,11 @@ public abstract class SCfdUtils implements Serializable {
         return can;
     }
 
-    private static boolean canCfdiCancel(final SClientInterface client, final SDataCfd cfd, final boolean isValidate) throws Exception {
+    private static boolean canCfdiCancel(final SClientInterface client, final SDataCfd cfd, final boolean isProcessingValidation) throws Exception {
         SDataCfd cfdAux = cfd;
 
         cfdAux.setAuxIsSign(true);
-        cfdAux.setAuxIsValidate(isValidate);
+        cfdAux.setAuxIsProcessingValidation(isProcessingValidation);
         SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL, cfdAux);
         SServerResponse response = client.getSessionXXX().request(request);
 
@@ -219,12 +219,12 @@ public abstract class SCfdUtils implements Serializable {
         return true;
     }
 
-    private static boolean canCfdiSign(final SClientInterface client, final SDataCfd cfd, final boolean isValidate) throws Exception {
+    private static boolean canCfdiSign(final SClientInterface client, final SDataCfd cfd, final boolean isProcessingValidation) throws Exception {
         SDataCfd cfdAux = cfd;
         boolean can = true;
 
         cfdAux.setAuxIsSign(true);
-        cfdAux.setAuxIsValidate(isValidate);
+        cfdAux.setAuxIsProcessingValidation(isProcessingValidation);
         SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_CAN_SAVE, cfdAux);
         SServerResponse response = client.getSessionXXX().request(request);
 
@@ -241,7 +241,7 @@ public abstract class SCfdUtils implements Serializable {
             else if (isNeedStamps(client, cfd, SDbConsts.ACTION_SAVE, 0) && getStampsAvailable(client, cfd.getFkCfdTypeId(), cfd.getTimestamp(), 0) <= 0) {
                 throw new Exception("No existen timbres disponibles.");
             }
-            else if (!isValidate) {
+            else if (!isProcessingValidation) {
                 if (SLibTimeUtils.convertToDateOnly(cfd.getTimestamp()).after(client.getSessionXXX().getSystemDate())) {
                     can = client.showMsgBoxConfirm("La fecha del documento " +
                             "(" + SLibUtils.DateFormatDate.format(cfd.getTimestamp()) + ") es posterior a la fecha del sistema " +
@@ -311,6 +311,9 @@ public abstract class SCfdUtils implements Serializable {
                 }
                 else if (cfd.getIsProcessingStorageXml()) {
                     throw new Exception(SCfdConsts.ERR_MSG_PROCESSING_XML_STORAGE);
+                }
+                else if (cfd.getIsProcessingStoragePdf()) {
+                    throw new Exception(SCfdConsts.ERR_MSG_PROCESSING_PDF_STORAGE);
                 }
                 else if (cfd.getAcknowledgmentCancellationXml().isEmpty() && getAcknowledgmentCancellationPdf(client, cfd) == null) {
                     throw new Exception("El CFDI no tiene acuse de cancelación.");
@@ -649,12 +652,14 @@ public abstract class SCfdUtils implements Serializable {
         return isConsistent;
     }
 
-    private static boolean managementCfdi(final SClientInterface client, final SDataCfd dataCfd, final int xmlStatusId, final Date date, final boolean isSingle, final boolean isValidate, final int pacId, final int cfdSubtype) throws Exception {
-        return managementCfdi(client, dataCfd, xmlStatusId, date, isSingle, isValidate, pacId, cfdSubtype, "", false);
+    private static boolean managementCfdi(final SClientInterface client, final SDataCfd dataCfd, final int xmlStatusId, final Date date, final boolean isSingle, final boolean isProcessingValidation, final int pacId, final int cfdSubtype) throws Exception {
+        return managementCfdi(client, dataCfd, xmlStatusId, date, isSingle, isProcessingValidation, pacId, cfdSubtype, "", false);
     }
 
-    private static boolean managementCfdi(final SClientInterface client, final SDataCfd dataCfd, final int xmlStatusId, final Date date, final boolean isSingle, final boolean isValidate, final int pacId, final int cfdSubtype, final String xmlSigned, final boolean isUpdateAckPdf) throws Exception {
+    private static boolean managementCfdi(final SClientInterface client, final SDataCfd dataCfd, final int newXmlStatusId, final Date date, final boolean isSingle, final boolean isProcessingValidation, final int pacId, final int cfdSubtype, final String xmlSigned, final boolean isUpdateAckPdf) throws Exception {
+        int[] registryKey = null;
         SDataDps dataDps = null;
+        SDataCfdPayment dataCfdPayment = null;
         SDataPayrollReceiptIssue dataPayrollReceiptIssue = null;
         SSrvLock lock = null;
         SCfdiSignature cfdiSignature = null;
@@ -667,28 +672,29 @@ public abstract class SCfdUtils implements Serializable {
         try {
             switch (dataCfd.getFkCfdTypeId()) {
                 case SDataConstantsSys.TRNS_TP_CFD_INV:
-                    dataDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { dataCfd.getFkDpsYearId_n(), dataCfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                    dataDps.setAuxIsValidate(isValidate);
-
-                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dataDps.getPrimaryKey(), 1000 * 60); // 1 minute timeout
+                    registryKey = new int[] { dataCfd.getFkDpsYearId_n(), dataCfd.getFkDpsDocId_n() };
+                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, registryKey, 1000 * 60);   // 1 minute timeout
                     break;
+                    
+                case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                    registryKey = new int[] { dataCfd.getPkCfdId() };
+                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, registryKey, 1000 * 60);  // 1 minute timeout
+                    break;
+                    
                 case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                     if (cfdSubtype == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
-                        dataPayrollReceiptIssue = new SDataPayrollReceiptIssue();
-
-                        if (dataPayrollReceiptIssue.read(new int[] { dataCfd.getFkPayrollReceiptPayrollId_n(), dataCfd.getFkPayrollReceiptEmployeeId_n(), dataCfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                        }
-
-                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, dataPayrollReceiptIssue.getPrimaryKey(), 1000 * 60); // 1 minute timeout
+                        registryKey = new int[] { dataCfd.getFkPayrollReceiptPayrollId_n(), dataCfd.getFkPayrollReceiptEmployeeId_n(), dataCfd.getFkPayrollReceiptIssueId_n() };
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, registryKey, 1000 * 60);   // 1 minute timeout
                     }
                     break;
                 default:
             }
             
-            if (xmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+            if (newXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                // cancel CFDI:
+                
                 if (!isUpdateAckPdf) {
-                    xmlAcknowledgmentCancellation = cancel(client, dataCfd, date, isValidate, pacId);
+                    xmlAcknowledgmentCancellation = cancel(client, dataCfd, date, isProcessingValidation, pacId);
 
                     if (xmlAcknowledgmentCancellation.isEmpty()) {
                         next = pacId == 0;
@@ -705,8 +711,10 @@ public abstract class SCfdUtils implements Serializable {
                 cfdiSignature = obtainCfdiSignature(dataCfd.getDocXml());
             }
             else {
+                // sign CFDI:
+                
                 if (xmlSigned.length() == 0) {
-                    xmlStamping = sign(client, dataCfd, isValidate);
+                    xmlStamping = sign(client, dataCfd, isProcessingValidation);
                 }
                 else {
                     xmlStamping = xmlSigned;
@@ -731,11 +739,13 @@ public abstract class SCfdUtils implements Serializable {
                         SCfdPacket packet = new SCfdPacket();
                         
                         packet.setCfdId(dataCfd.getPkCfdId());
+                        packet.setCfdSeries(dataCfd.getSeries());
+                        packet.setCfdNumber(dataCfd.getNumber());
                         packet.setCfdCertNumber(dataCfd.getCertNumber());
                         packet.setCfdStringSigned(dataCfd.getStringSigned());
                         packet.setCfdSignature(dataCfd.getSignature());
                         
-                        if (xmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                        if (newXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                             packet.setXml(dataCfd.getDocXml());
                         }
                         else {
@@ -751,32 +761,67 @@ public abstract class SCfdUtils implements Serializable {
                         packet.setAcknowledgmentCancellationXml(xmlAcknowledgmentCancellation.isEmpty() ? dataCfd.getAcknowledgmentCancellationXml() : xmlAcknowledgmentCancellation);
                         packet.setFkCfdTypeId(dataCfd.getFkCfdTypeId());
                         packet.setFkXmlTypeId(dataCfd.getFkXmlTypeId());
-                        packet.setFkXmlStatusId(xmlStatusId);
+                        packet.setFkXmlStatusId(newXmlStatusId);
                         packet.setFkXmlDeliveryTypeId(dataCfd.getFkXmlDeliveryTypeId());
                         packet.setFkXmlDeliveryStatusId(dataCfd.getFkXmlDeliveryStatusId());
                         packet.setFkUserDeliveryId(client.getSession().getUser().getPkUserId());
+                        packet.setFkCompanyBranchId(dataCfd.getFkCompanyBranchId_n());
                         packet.setDpsYearId(dataCfd.getFkDpsYearId_n());
                         packet.setDpsDocId(dataCfd.getFkDpsDocId_n());
+                        //packet.setRecordEntryYearId(...);
+                        //packet.setRecordEntryPeriodId(...);
+                        //packet.setRecordEntryBookkeepingCenterId(...);
+                        //packet.setRecordEntryRecordTypeId(...);
+                        //packet.setRecordEntryNumberId(...);
+                        //packet.setRecordEntryEntryId(...);
                         packet.setPayrollPayrollId(dataCfd.getFkPayrollPayrollId_n());
                         packet.setPayrollEmployeeId(dataCfd.getFkPayrollEmployeeId_n());
                         packet.setPayrollBizPartnerId(dataCfd.getFkPayrollBizPartnerId_n());
                         packet.setPayrollReceiptPayrollId(dataCfd.getFkPayrollReceiptPayrollId_n());
                         packet.setPayrollReceiptEmployeeId(dataCfd.getFkPayrollReceiptEmployeeId_n());
                         packet.setPayrollReceiptIssueId(dataCfd.getFkPayrollReceiptIssueId_n());
-                        
-                        packet.setDataDps(dataCfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED ? dataDps : null);
-                        packet.setDataPayrollReceiptIssue(dataCfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED ? dataPayrollReceiptIssue : null);
+
+                        if (dataCfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                            switch (dataCfd.getFkCfdTypeId()) {
+                                case SDataConstantsSys.TRNS_TP_CFD_INV:
+                                    dataDps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, registryKey, SLibConstants.EXEC_MODE_SILENT);
+                                    dataDps.setAuxIsProcessingValidation(isProcessingValidation);
+                                    
+                                    packet.setAuxDataDps(dataDps);
+                                    break;
+
+                                case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                                    dataCfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(client, SDataConstants.TRNX_CFD_PAY_REC, registryKey, SLibConstants.EXEC_MODE_SILENT);
+                                    dataCfdPayment.setAuxIsProcessingValidation(isProcessingValidation);
+                                    
+                                    packet.setAuxDataCfdPayment(dataCfdPayment);
+                                    break;
+
+                                case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
+                                    if (cfdSubtype == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
+                                        dataPayrollReceiptIssue = new SDataPayrollReceiptIssue();
+                                        if (dataPayrollReceiptIssue.read(registryKey, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                                        }
+                                        
+                                        packet.setAuxDataPayrollReceiptIssue(dataPayrollReceiptIssue);
+                                    }
+                                    break;
+                                    
+                                default:
+                            }
+                        }
                         
                         SDataPac pac = (SDataPac) SDataUtilities.readRegistry(client, SDataConstants.TRN_PAC, new int[] { pacId != SDataConstants.UNDEFINED ? pacId : cfdPacType.getFkPacId() }, SLibConstants.EXEC_MODE_SILENT);
                         
                         packet.setAuxPacId(pac.getPkPacId());
                         packet.setAuxLogSignId(LogSignId);
-                        packet.setAuxStampQuantity(xmlStatusId == SDataConstantsSys.TRNS_ST_DPS_EMITED ? 1 : (pac.getIsPrepayment() && pac.getIsChargedAnnulment() ? 1 : 0));
+                        packet.setAuxStampQuantity(newXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_EMITED ? 1 : (pac.getIsPrepayment() && pac.getIsChargedAnnulment() ? 1 : 0));
                         packet.setAuxStampConsume(consumeStamp);
 
                         // Sign & Cancel Log step #5
-                        createSignCancelLog(client, "", xmlStatusId == SDataConstantsSys.TRNS_ST_DPS_EMITED ? !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN :
-                                !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_SAVE, dataCfd, pacId == 0 ? pacId : pac.getPkPacId());
+                        createSignCancelLog(client, "", newXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_EMITED ? !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN :
+                                !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_SAVE, dataCfd, pacId == 0 ? pacId : pac.getPkPacId());
 
                         saveCfd(client, packet);
 
@@ -785,7 +830,7 @@ public abstract class SCfdUtils implements Serializable {
                         if (isSingle) {
                             warningMessage = verifyCertificateExpiration(client);
                             
-                            if (xmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+                            if (newXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                                 client.showMsgBoxInformation("El documento ha sido anulado correctamente." + (!isNeedStamps(client, dataCfd, SDbConsts.ACTION_ANNUL, pacId == 0 ? pacId : pac.getPkPacId()) || !consumeStamp ? "" :
                                                 "\nTimbres disponibles: " + getStampsAvailable(client, dataCfd.getFkCfdTypeId(), dataCfd.getTimestamp(), pacId == 0 ? pacId : pac.getPkPacId()) + "." + (warningMessage.isEmpty() ? "" : "\n" + warningMessage)));
                             }
@@ -889,7 +934,7 @@ public abstract class SCfdUtils implements Serializable {
      * @return Signed CFD in XML format.
      * @throws TransformerConfigurationException, TransformerException, Exception
      */
-    private static String sign(final SClientInterface client, final SDataCfd cfd, boolean isValidate) throws TransformerConfigurationException, TransformerException, Exception {
+    private static String sign(final SClientInterface client, final SDataCfd cfd, boolean isProcessingValidation) throws TransformerConfigurationException, TransformerException, Exception {
         SDataCfdPacType cfdPacType = null;
         SDataPac pac = null;
         String sCfdi = "";
@@ -899,7 +944,7 @@ public abstract class SCfdUtils implements Serializable {
 
         cfdPacType = getPacConfiguration(client, cfd.getFkCfdTypeId());
 
-        if (isValidate) {
+        if (isProcessingValidation) {
             pac = getPacForValidation(client, cfd);
         }
         else {
@@ -941,14 +986,14 @@ public abstract class SCfdUtils implements Serializable {
                         // Web Service Autentication:
 
                         // Sign & Cancel Log step #1
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                         autenticarResponse = fcgPort.autenticar(sCfdiUser, sCfdiUserPassword);
 
                         if (autenticarResponse.getMensaje() != null) {
                             // Close current Sign & Cancel Log entry with error status:
                             
-                            createSignCancelLog(client, "WsAutenticarResponse Mensaje: [" + autenticarResponse.getMensaje() + "]", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "WsAutenticarResponse Mensaje: [" + autenticarResponse.getMensaje() + "]", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                             System.err.println("WsAutenticarResponse Mensaje: [" + autenticarResponse.getMensaje() + "]");
@@ -958,7 +1003,7 @@ public abstract class SCfdUtils implements Serializable {
                         if (autenticarResponse.getToken() == null) {
                             // Close current Sign & Cancel Log entry with error status:
                             
-                            createSignCancelLog(client, "WsAutenticarResponse Token is null!", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "WsAutenticarResponse Token is null!", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                             System.err.println("WsAutenticarResponse Token is null!");
@@ -968,18 +1013,18 @@ public abstract class SCfdUtils implements Serializable {
                         // Document stamp:
 
                         // Sign & Cancel Log step #2
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
 
                         updateProcessCfd(client, cfd, true);
 
                         // Sign & Cancel Log step #3
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
 
                         timbradoResponse = fcgPort.timbrar(sCfdi, autenticarResponse.getToken());
 
                         if (timbradoResponse.getMensaje() != null) {
                             // Sign & Cancel Log step #4
-                            createSignCancelLog(client, "WsTimbradoResponse Mensaje: [" + timbradoResponse.getMensaje() + "]", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "WsTimbradoResponse Mensaje: [" + timbradoResponse.getMensaje() + "]", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                             updateProcessCfd(client, cfd, false);
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1006,14 +1051,14 @@ public abstract class SCfdUtils implements Serializable {
 
                         // Sign & Cancel Log step #1, not required!
                         // Sign & Cancel Log step #2
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
 
                         updateProcessCfd(client, cfd, true);
 
                         // Sign & Cancel Log step #3
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
 
-                        if (isValidate) {
+                        if (isProcessingValidation) {
                             acuseRecepcionCFDI = port.stamped(sCfdi.getBytes("UTF-8"), sCfdiUser, sCfdiUserPassword);
                         }
                         else {
@@ -1025,7 +1070,7 @@ public abstract class SCfdUtils implements Serializable {
                         if (!maoIncidencias.getValue().getIncidencia().isEmpty()) {
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
-                            if (isValidate) {
+                            if (isProcessingValidation) {
                                 for (Incidencia i : maoIncidencias.getValue().getIncidencia()) {
                                     if (i.getCodigoError().getValue().compareTo(SCfdConsts.UUID_STAMP_PREV_NOT) == 0) {
                                         updateProcessCfd(client, cfd, false);
@@ -1047,7 +1092,7 @@ public abstract class SCfdUtils implements Serializable {
                             }
                             
                             // Sign & Cancel Log step #4
-                            createSignCancelLog(client, sMessageException, !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, sMessageException, !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                             System.err.println("Cfdi: [" + sCfdi + "]");
                             throw new Exception("Error al timbrar el documento: " + sMessageException);
@@ -1076,14 +1121,14 @@ public abstract class SCfdUtils implements Serializable {
                         // Web Service Autentication:
 
                         // Sign & Cancel Log step #1
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                         autenticarResponse = fcgPort.autenticar("pruebasWS", "pruebasWS");
 
                         if (autenticarResponse.getMensaje() != null) {
                             // Close current Sign & Cancel Log entry with error status:
                             
-                            createSignCancelLog(client, "WsAutenticarResponse Mensaje: [" + autenticarResponse.getMensaje() + "]", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "WsAutenticarResponse Mensaje: [" + autenticarResponse.getMensaje() + "]", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                             System.err.println("WsAutenticarResponse Mensaje: [" + autenticarResponse.getMensaje() + "]");
@@ -1093,7 +1138,7 @@ public abstract class SCfdUtils implements Serializable {
                         if (autenticarResponse.getToken() == null) {
                             // Close current Sign & Cancel Log entry with error status:
                             
-                            createSignCancelLog(client, "WsAutenticarResponse Token is null!", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "WsAutenticarResponse Token is null!", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                             System.err.println("WsAutenticarResponse Token is null!");
@@ -1103,18 +1148,18 @@ public abstract class SCfdUtils implements Serializable {
                         // Document stamp:
 
                         // Sign & Cancel Log step #2
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
 
                         updateProcessCfd(client, cfd, true);
 
                         // Sign & Cancel Log step #3
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
 
                         timbradoResponse = fcgPort.timbrar(sCfdi, autenticarResponse.getToken());
 
                         if (timbradoResponse.getMensaje() != null) {
                             // Sign & Cancel Log step #4
-                            createSignCancelLog(client, "WsTimbradoResponse Mensaje: [" + timbradoResponse.getMensaje() + "]", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "WsTimbradoResponse Mensaje: [" + timbradoResponse.getMensaje() + "]", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                             updateProcessCfd(client, cfd, false);
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1141,14 +1186,15 @@ public abstract class SCfdUtils implements Serializable {
 
                         // Sign & Cancel Log step #1, not required!
                         // Sign & Cancel Log step #2, only when validation is not requested
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
 
                         updateProcessCfd(client, cfd, true);
 
                         // Sign & Cancel Log step #3
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
 
-                        if (isValidate) {
+                        /* 2018-08-17, Sergio Flores: Code snippet commented for preventing connection with PAC and subsequent exception due to inactive account:
+                        if (isProcessingValidation) {
                             acuseRecepcionCFDI = port.stamped(sCfdi.getBytes("UTF-8"), "jbarajas@swaplicado.com.mx", "WSfink_2017");
                         }
                         else {
@@ -1160,7 +1206,7 @@ public abstract class SCfdUtils implements Serializable {
                         if (!maoIncidencias.getValue().getIncidencia().isEmpty()) {
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
-                            if (isValidate) {
+                            if (isProcessingValidation) {
                                 for (Incidencia i : maoIncidencias.getValue().getIncidencia()) {
                                     if (i.getCodigoError().getValue().compareTo(SCfdConsts.UUID_STAMP_PREV_NOT) == 0) {
                                         updateProcessCfd(client, cfd, false);
@@ -1182,13 +1228,16 @@ public abstract class SCfdUtils implements Serializable {
                             }
                             
                             // Sign & Cancel Log step #4
-                            createSignCancelLog(client, sMessageException, !isValidate ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, sMessageException, !isProcessingValidation ? SCfdConsts.ACTION_SIGN : SCfdConsts.ACTION_RESTORE_SIGN, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                             System.err.println("Cfdi: [" + sCfdi + "]");
                             throw new Exception("Error al timbrar el documento: " + sMessageException);
                         }
 
                         xml = acuseRecepcionCFDI.getXml().getValue();
+                        */
+                        xml = sCfdi;    // 2018-08-17, Sergio Flores: scamp code snippet to emulate a stamped CFDI
+                        
                         break;
                         
                     default:
@@ -1207,7 +1256,7 @@ public abstract class SCfdUtils implements Serializable {
      * @param date Date of cancelation.
      * @throws Exception
      */
-    private static String cancel(final SClientInterface client, final SDataCfd cfd, final Date date, boolean isValidate, final int pacId) throws Exception {
+    private static String cancel(final SClientInterface client, final SDataCfd cfd, final Date date, boolean isProcessingValidation, final int pacId) throws Exception {
         SDataCfdPacType cfdPacType = null;
         SDataPac pac = null;
         String sRfcEmisor = "";
@@ -1220,7 +1269,7 @@ public abstract class SCfdUtils implements Serializable {
 
         cfdPacType = getPacConfiguration(client, cfd.getFkCfdTypeId());
 
-        if (isValidate) {
+        if (isProcessingValidation) {
             pac = getPacForValidation(client, cfd);
         }
         else {
@@ -1259,14 +1308,14 @@ public abstract class SCfdUtils implements Serializable {
                         // Web Service Autentication:
 
                         // Sign & Cancel Log step #1
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                         autenticarResponse = fcgPort.autenticar(sCfdiUser, sCfdiUserPassword);
 
                         if (autenticarResponse.getMensaje() != null) {
                             // Close current Sign & Cancel Log entry with error status:
                             
-                            createSignCancelLog(client, "WsAutenticarResponse Mensaje: [" + autenticarResponse.getMensaje() + "]", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "WsAutenticarResponse Mensaje: [" + autenticarResponse.getMensaje() + "]", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
@@ -1280,7 +1329,7 @@ public abstract class SCfdUtils implements Serializable {
                         if (autenticarResponse.getToken() == null) {
                             // Close current Sign & Cancel Log entry with error status:
                             
-                            createSignCancelLog(client, "WsAutenticarResponse Token is null!", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "WsAutenticarResponse Token is null!", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
@@ -1295,18 +1344,18 @@ public abstract class SCfdUtils implements Serializable {
                             // Document cancel:
 
                             // Sign & Cancel Log step #2
-                            createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
 
                             updateProcessCfd(client, cfd, true);
 
                             // Sign & Cancel Log step #3
-                            createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
 
                             canceladoResponse = fcgPort.cancelacion1(sRfcEmisor, SLibUtils.DbmsDateFormatDate.format(date), asUuid, companyCertificate.getExtraPublicKeyBytes_n(), companyCertificate.getExtraPrivateKeyBytes_n(), "", autenticarResponse.getToken());
 
                             if (canceladoResponse.getMensaje() != null) {
                                 // Sign & Cancel Log step #4
-                                createSignCancelLog(client, "WsCancelacionResponse Mensaje: [" + canceladoResponse.getMensaje() + "]", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                createSignCancelLog(client, "WsCancelacionResponse Mensaje: [" + canceladoResponse.getMensaje() + "]", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                 updateProcessCfd(client, cfd, false);
                                 client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1326,7 +1375,7 @@ public abstract class SCfdUtils implements Serializable {
                                 if (foliosResponse.getFolio().get(0).getEstatusUUID().compareTo(SCfdConsts.UUID_ANNUL) != 0) {
                                     if (foliosResponse.getFolio().get(0).getEstatusUUID().compareTo(SCfdConsts.UUID_ANNUL_PREV) != 0) {
                                         // Sign & Cancel Log step #4
-                                        createSignCancelLog(client, foliosResponse.getFolio().get(0).getMensaje(), !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                        createSignCancelLog(client, foliosResponse.getFolio().get(0).getMensaje(), !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                         updateProcessCfd(client, cfd, false);
                                         client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1370,25 +1419,25 @@ public abstract class SCfdUtils implements Serializable {
 
                         // Sign & Cancel Log step #1, not required!
                         // Sign & Cancel Log step #2, only when validation is not requested
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
 
                         updateProcessCfd(client, cfd, true);
 
                         // Sign & Cancel Log step #3
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
 
-                        if (isValidate) {
+                        if (isProcessingValidation) {
                             receiptResult = port.getReceipt(sCfdiUser, sCfdiUserPassword, sRfcEmisor, cfd.getUuid(), "C");
                         }
                         else {
                             cancelaCFDResult = port.cancel(uuids, sCfdiUser, sCfdiUserPassword, sRfcEmisor, companyCertificate.getExtraFnkPublicKeyBytes_n(), companyCertificate.getExtraFnkPrivateKeyBytes_n(), true);
                         }
 
-                        if (isValidate) {
+                        if (isProcessingValidation) {
                             if (receiptResult != null) {
                                 if (receiptResult.getSuccess() == null) {
                                     // Sign & Cancel Log step #4
-                                    createSignCancelLog(client, receiptResult.getError().getValue(), !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                    createSignCancelLog(client, receiptResult.getError().getValue(), !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                     updateProcessCfd(client, cfd, false);
                                     client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1401,7 +1450,7 @@ public abstract class SCfdUtils implements Serializable {
                                 else {
                                     if (!receiptResult.getSuccess().getValue()) {
                                         // Sign & Cancel Log step #4
-                                        createSignCancelLog(client, "El UUID: '" + cfd.getUuid() + "' no ha sido cancelado.", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                        createSignCancelLog(client, "El UUID: '" + cfd.getUuid() + "' no ha sido cancelado.", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                         updateProcessCfd(client, cfd, false);
 
@@ -1421,7 +1470,7 @@ public abstract class SCfdUtils implements Serializable {
 
                             if (maoFolios == null) {
                                 // Sign & Cancel Log step #4
-                                createSignCancelLog(client, cancelaCFDResult.getCodEstatus().getValue(), !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                createSignCancelLog(client, cancelaCFDResult.getCodEstatus().getValue(), !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                 updateProcessCfd(client, cfd, false);
                                 client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1434,7 +1483,7 @@ public abstract class SCfdUtils implements Serializable {
                             else {
                                 if (maoFolios.getValue().getFolio().isEmpty()) {
                                     // Sign & Cancel Log step #4
-                                    createSignCancelLog(client, "Codigo: [" + cancelaCFDResult.getCodEstatus().getValue() + "] Error al intentar cancelar CFDI.", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                    createSignCancelLog(client, "Codigo: [" + cancelaCFDResult.getCodEstatus().getValue() + "] Error al intentar cancelar CFDI.", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                     updateProcessCfd(client, cfd, false);
                                     client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1448,7 +1497,7 @@ public abstract class SCfdUtils implements Serializable {
                                     if (maoFolios.getValue().getFolio().get(0).getEstatusUUID().getValue().compareTo(SCfdConsts.UUID_ANNUL) != 0) {
                                         if (maoFolios.getValue().getFolio().get(0).getEstatusUUID().getValue().compareTo(SCfdConsts.UUID_ANNUL_PREV) != 0) {
                                             // Sign & Cancel Log step #4
-                                            createSignCancelLog(client, "Codigo: [" + maoFolios.getValue().getFolio().get(0).getEstatusUUID().getValue() + "] Error al intentar cancelar CFDI.", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                            createSignCancelLog(client, "Codigo: [" + maoFolios.getValue().getFolio().get(0).getEstatusUUID().getValue() + "] Error al intentar cancelar CFDI.", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                             updateProcessCfd(client, cfd, false);
                                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1487,14 +1536,14 @@ public abstract class SCfdUtils implements Serializable {
                         // Web Service Autentication:
 
                         // Sign & Cancel Log step #1
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                         autenticarResponse = fcgPort.autenticar("pruebasWS", "pruebasWS");
 
                         if (autenticarResponse.getMensaje() != null) {
                             // Close current Sign & Cancel Log entry with error status:
                             
-                            createSignCancelLog(client, "WsAutenticarResponse Mensaje: [" + autenticarResponse.getMensaje() + "]", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "WsAutenticarResponse Mensaje: [" + autenticarResponse.getMensaje() + "]", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
@@ -1508,7 +1557,7 @@ public abstract class SCfdUtils implements Serializable {
                         if (autenticarResponse.getToken() == null) {
                             // Close current Sign & Cancel Log entry with error status:
                             
-                            createSignCancelLog(client, "WsAutenticarResponse Token is null!", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "WsAutenticarResponse Token is null!", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_AUTHENTICATION_PAC, cfd, pac.getPkPacId());
 
                             client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
@@ -1523,18 +1572,18 @@ public abstract class SCfdUtils implements Serializable {
                             // Document cancel:
 
                             // Sign & Cancel Log step #2
-                            createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
 
                             updateProcessCfd(client, cfd, true);
 
                             // Sign & Cancel Log step #3
-                            createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
+                            createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
 
                             canceladoResponse = fcgPort.cancelacion1(sRfcEmisor, SLibUtils.DbmsDateFormatDate.format(date), asUuid, companyCertificate.getExtraPublicKeyBytes_n(), companyCertificate.getExtraPrivateKeyBytes_n(), "", autenticarResponse.getToken());
 
                             if (canceladoResponse.getMensaje() != null) {
                                 // Sign & Cancel Log step #4
-                                createSignCancelLog(client, "WsCancelacionResponse Codigo: [" + canceladoResponse.getCodEstatus() + "]", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                createSignCancelLog(client, "WsCancelacionResponse Codigo: [" + canceladoResponse.getCodEstatus() + "]", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                 updateProcessCfd(client, cfd, false);
                                 client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1554,7 +1603,7 @@ public abstract class SCfdUtils implements Serializable {
                                 if (foliosResponse.getFolio().get(0).getEstatusUUID().compareTo(SCfdConsts.UUID_ANNUL) != 0) {
                                     if (foliosResponse.getFolio().get(0).getEstatusUUID().compareTo(SCfdConsts.UUID_ANNUL_PREV) != 0) {
                                         // Sign & Cancel Log step #4
-                                        createSignCancelLog(client, foliosResponse.getFolio().get(0).getMensaje(), !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                        createSignCancelLog(client, foliosResponse.getFolio().get(0).getMensaje(), !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                         updateProcessCfd(client, cfd, false);
 
@@ -1598,25 +1647,26 @@ public abstract class SCfdUtils implements Serializable {
 
                         // Sign & Cancel Log step #1, not required!
                         // Sign & Cancel Log step #2, only when validation is not requested
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_ACTIVATE, cfd, pac.getPkPacId());
 
                         updateProcessCfd(client, cfd, true);
 
                         // Sign & Cancel Log step #3
-                        createSignCancelLog(client, "", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
+                        createSignCancelLog(client, "", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_SEND_RECEIVE, cfd, pac.getPkPacId());
 
-                        if (isValidate) {
+                        /* 2018-08-17, Sergio Flores: Code snippet commented for preventing connection with PAC and subsequent exception due to inactive account:
+                        if (isProcessingValidation) {
                             receiptResult = port.getReceipt("jbarajas@tron.com.mx", "WSfink_2014", sRfcEmisor, cfd.getUuid(), "C");
                         }
                         else {
                             cancelaCFDResult = port.cancel(uuids, "jbarajas@tron.com.mx", "WSfink_2014", sRfcEmisor, companyCertificate.getExtraFnkPublicKeyBytes_n(), companyCertificate.getExtraFnkPrivateKeyBytes_n(), true);
                         }
 
-                        if (isValidate) {
+                        if (isProcessingValidation) {
                             if (receiptResult != null) {
                                 if (receiptResult.getSuccess() == null) {
                                     // Sign & Cancel Log step #4
-                                    createSignCancelLog(client, receiptResult.getError().getValue(), !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                    createSignCancelLog(client, receiptResult.getError().getValue(), !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                     updateProcessCfd(client, cfd, false);
 
@@ -1629,7 +1679,7 @@ public abstract class SCfdUtils implements Serializable {
                                 else {
                                     if (!receiptResult.getSuccess().getValue()) {
                                         // Sign & Cancel Log step #4
-                                        createSignCancelLog(client, "El UUID: '" + cfd.getUuid() + "' no ha sido cancelado.", !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                        createSignCancelLog(client, "El UUID: '" + cfd.getUuid() + "' no ha sido cancelado.", !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                         updateProcessCfd(client, cfd, false);
 
@@ -1651,7 +1701,7 @@ public abstract class SCfdUtils implements Serializable {
 
                             if (maoFolios == null) {
                                 // Sign & Cancel Log step #4
-                                createSignCancelLog(client, cancelaCFDResult.getCodEstatus().getValue(), !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                createSignCancelLog(client, cancelaCFDResult.getCodEstatus().getValue(), !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                 updateProcessCfd(client, cfd, false);
                                 client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1665,7 +1715,7 @@ public abstract class SCfdUtils implements Serializable {
                                 if (maoFolios.getValue().getFolio().get(0).getEstatusUUID().getValue().compareTo(SCfdConsts.UUID_ANNUL) != 0) {
                                     if (maoFolios.getValue().getFolio().get(0).getEstatusUUID().getValue().compareTo(SCfdConsts.UUID_ANNUL_PREV) != 0) {
                                         // Sign & Cancel Log step #4
-                                        createSignCancelLog(client, maoFolios.getValue().getFolio().get(0).getEstatusUUID().getValue(), !isValidate ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
+                                        createSignCancelLog(client, maoFolios.getValue().getFolio().get(0).getEstatusUUID().getValue(), !isProcessingValidation ? SCfdConsts.ACTION_ANNUL : SCfdConsts.ACTION_RESTORE_ANNUL, SCfdConsts.STATUS_RECEIVE_ERR_PAC, cfd, pac.getPkPacId());
 
                                         updateProcessCfd(client, cfd, false);
                                         client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
@@ -1681,6 +1731,8 @@ public abstract class SCfdUtils implements Serializable {
                                 }
                             }
                         }
+                        */
+                        xmlAcuse = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tfd:TimbreFiscalDigital xmlns:tfd=\"http://www.sat.gob.mx/TimbreFiscalDigital\" FechaTimbrado=\"2018-08-16T16:00:02\" NoCertificadoSAT=\"00001000000405332712\" RfcProvCertif=\"FIN1203015JA\" SelloCFD=\"ONDe5/YJVqRfuohNNJA/UjxlR5SIwPlASe2/cKZaDHGQ7XKCOUefidDP3Szk9hHIE8hpJGoXjGqETQ/WKotYMcyOqzR+g0F5SGfhz34NZGVuffBLl4Co073g5ZeWGKiM6WXlim2njxxkhIqBTnf5BMcc7WqtyVfOGnwEZlXhx8kIbYKKWrSqEo72hldAZc8xrGkRikUUzp3aS6z5kDjfRcfIqSyBX1z7fOSjgYT9MXVezgEwKjwrhFUydrtz0Jqd5+KycPcHzedKJo6kbtnDmgKeLiZejGKobJ6VSlbXSYdiL+2Mt58WmUkG3JGCEzGXiBSO6ayz1Hmwjrr3rX84BA==\" SelloSAT=\"byIDPVs6qpW+D76RYX9RbZB4+inyp0QjYqzvX5Q0TObgWn9kcNKKsQ94C1OZrGon5qQx65WMlVjQsjSju6pf0Od6042c9S6emU1ANR3dSrcgtn0FjoNukj6lpgEt992hmf74D3wryVfrsc+NlCTuxFxpN0pO5Z2VADHie3GZRBzH9bH3ul8zO8hkihSqZNd1qtNQX3pW2KYnjaG6nQV0Obq441V1W483IUYxscsCrtDLrRyKvPBJQHNUuKAVyTKqzbJpD4u0tRudLIXtpSk9bj5f6ctYbl5ebZuMzOA3p7Nly/qkRoH2onLcZnx45dxJxid8hukCEojbVtW6jBps4w==\" UUID=\"5E43EBB7-D01A-4D44-A372-4A979A4778D4\" Version=\"1.1\" xsi:schemaLocation=\"http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd\"/>";  // 2018-08-17, Sergio Flores: scamp code snippet to emulate a cancelled CFDI
                         break;
                         
                     default:
@@ -1900,74 +1952,19 @@ public abstract class SCfdUtils implements Serializable {
         SServerResponse response = null;
 
         try {
-            if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_INV) {
-                // Annul DPS:
+            switch (cfd.getFkCfdTypeId()) {
+                case SDataConstantsSys.TRNS_TP_CFD_INV:
+                    // Annul DPS:
 
-                dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-
-                // Attempt to gain data lock:
-
-                lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
-
-                if (dps != null) {
-                    request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
-                    request.setPacket(dps);
-                    response = client.getSessionXXX().request(request);
-
-                    if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                        error = response.getMessage();
-                    }
-                    else {
-                        result = response.getResultType();
-
-                        if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                            error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
-                        }
-                        else {
-                            // Annul registry:
-
-                            dps.setIsRegistryRequestAnnul(true);
-                            dps.setFkDpsAnnulationTypeId(tpDpsAnn);
-                            dps.setFkUserEditId(client.getSession().getUser().getPkUserId());
-
-                            request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
-                            request.setPacket(dps);
-                            response = client.getSessionXXX().request(request);
-
-                            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
-                                error = response.getMessage();
-                            }
-                            else {
-                                result = response.getResultType();
-
-                                if (result != SLibConstants.DB_ACTION_ANNUL_OK) {
-                                    error = SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
-                                }
-                            }
-                        }
-                    }
-                }
-                else {
-                    error = SLibConstants.MSG_ERR_DB_REG_READ;
-                }
-            }
-            else {
-                // Annul Payroll CFDI:
-
-                if (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
-                    receiptIssue = new SDataPayrollReceiptIssue();
-                
-                    if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                    }
+                    dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
 
                     // Attempt to gain data lock:
 
-                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, receiptIssue.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, dps.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
 
-                    if (receiptIssue != null) {
+                    if (dps != null) {
                         request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
-                        request.setPacket(receiptIssue);
+                        request.setPacket(dps);
                         response = client.getSessionXXX().request(request);
 
                         if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
@@ -1982,11 +1979,12 @@ public abstract class SCfdUtils implements Serializable {
                             else {
                                 // Annul registry:
 
-                                receiptIssue.setIsRegistryRequestAnnul(true);
-                                receiptIssue.setFkUserUpdateId(client.getSession().getUser().getPkUserId());
+                                dps.setIsRegistryRequestAnnul(true);
+                                dps.setFkDpsAnnulationTypeId(tpDpsAnn);
+                                dps.setFkUserEditId(client.getSession().getUser().getPkUserId());
 
                                 request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
-                                request.setPacket(receiptIssue);
+                                request.setPacket(dps);
                                 response = client.getSessionXXX().request(request);
 
                                 if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
@@ -2005,9 +2003,72 @@ public abstract class SCfdUtils implements Serializable {
                     else {
                         error = SLibConstants.MSG_ERR_DB_REG_READ;
                     }
-                }
-            }
+                    break;
+                    
+                case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                    // no action needed
+                    break;
+                    
+                case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
+                    // Annul Payroll CFDI:
 
+                    if (subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
+                        receiptIssue = new SDataPayrollReceiptIssue();
+
+                        if (receiptIssue.read(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() }, client.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+
+                        // Attempt to gain data lock:
+
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, receiptIssue.getPrimaryKey(), 1000 * 60);     // 1 minute timeout
+
+                        if (receiptIssue != null) {
+                            request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
+                            request.setPacket(receiptIssue);
+                            response = client.getSessionXXX().request(request);
+
+                            if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                                error = response.getMessage();
+                            }
+                            else {
+                                result = response.getResultType();
+
+                                if (result != SLibConstants.DB_CAN_ANNUL_YES) {
+                                    error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                                }
+                                else {
+                                    // Annul registry:
+
+                                    receiptIssue.setIsRegistryRequestAnnul(true);
+                                    receiptIssue.setFkUserUpdateId(client.getSession().getUser().getPkUserId());
+
+                                    request = new SServerRequest(SServerConstants.REQ_DB_ACTION_ANNUL);
+                                    request.setPacket(receiptIssue);
+                                    response = client.getSessionXXX().request(request);
+
+                                    if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                                        error = response.getMessage();
+                                    }
+                                    else {
+                                        result = response.getResultType();
+
+                                        if (result != SLibConstants.DB_ACTION_ANNUL_OK) {
+                                            error = SLibConstants.MSG_ERR_DB_REG_ANNUL + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            error = SLibConstants.MSG_ERR_DB_REG_READ;
+                        }
+                    }
+                    break;
+                    
+                default:
+            }
+            
             if (!error.isEmpty()) {
                 throw new Exception(error);
             }
@@ -2326,7 +2387,7 @@ public abstract class SCfdUtils implements Serializable {
                 }
             }
             else {
-                throw new Exception("El PAC permite la verificación del timbrado o cancelación del CFDI.");
+                throw new Exception("El PAC sí permite la verificación del timbrado o cancelación del CFDI, favor de intentarlo.");
             }
         }
     }
@@ -2345,6 +2406,7 @@ public abstract class SCfdUtils implements Serializable {
                 signed = true;
             }
         }
+        
         return signed;
     }
 
@@ -2396,68 +2458,75 @@ public abstract class SCfdUtils implements Serializable {
                 canceled = true;
             }
         }
+        
         return canceled;
+    }
+    
+    private static void computePrintCfd(final SClientInterface client, final SDataCfd cfd, final int cfdSubtype, int printMode, int numberCopies) throws Exception {
+        SDataDps dps = null;
+        SCfdParams params = null;
+        SCfdPrint cfdPrint = new SCfdPrint(client);
+
+        switch (cfd.getFkCfdTypeId()) {
+            case SDataConstantsSys.TRNS_TP_CFD_INV:
+                dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                params = createCfdParams(client, dps);
+                dps.setAuxCfdParams(params);
+
+                switch (cfd.getFkXmlTypeId()) {
+                    case SDataConstantsSys.TRNS_TP_XML_CFD:
+                        cfdPrint.printCfd(cfd, printMode, dps);
+                        break;
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                        cfdPrint.printCfdi32(cfd, printMode, dps);
+                        break;
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                        cfdPrint.printCfdi33(cfd, printMode, dps);
+                        break;
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                break;
+
+            case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                cfdPrint.printCfdi33_Crp10(client, cfd, printMode);
+                break;
+
+            case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
+                switch (cfd.getFkXmlTypeId()) {
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                        if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
+                            cfdPrint.printPayrollReceipt32_11(cfd, printMode, numberCopies, cfdSubtype);
+                        }
+                        else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
+                            cfdPrint.printPayrollReceipt32_12(cfd, printMode, numberCopies, cfdSubtype);
+                        }
+                        break;
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                        if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
+                            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                        }
+                        else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
+                            cfdPrint.printPayrollReceipt33_12(cfd, printMode, numberCopies, cfdSubtype);
+                        }
+                        break;
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                break;
+
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
     }
 
     public static void printCfd(final SClientInterface client, final SDataCfd cfd, final int cfdSubtype, int printMode, int numberCopies, boolean isSaveInProcess) throws Exception {
-        SCfdPrint cfdPrint = null;
-        SDataDps dps = null;
-        SCfdParams params = null;
-
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
         else {
             if (canPrint(cfd, isSaveInProcess)) {
-                cfdPrint = new SCfdPrint(client);
-                
-                switch (cfd.getFkCfdTypeId()) {
-                    case SDataConstantsSys.TRNS_TP_CFD_INV:
-                        dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                        params = createCfdParams(client, dps);
-                        dps.setAuxCfdParams(params);
-                        
-                        switch (cfd.getFkXmlTypeId()) {
-                            case SDataConstantsSys.TRNS_TP_XML_CFD:
-                                cfdPrint.printCfd(cfd, printMode, dps);
-                                break;
-                            case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                                cfdPrint.printCfdi32(cfd, printMode, dps);
-                                break;
-                            case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
-                                cfdPrint.printCfdi33(cfd, printMode, dps);
-                                break;
-                            default:
-                                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                        }
-                        break;
-                        
-                    case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                        switch (cfd.getFkXmlTypeId()) {
-                            case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                                if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
-                                    cfdPrint.printPayrollReceipt32_11(cfd, printMode, numberCopies, cfdSubtype);
-                                }
-                                else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                                    cfdPrint.printPayrollReceipt32_12(cfd, printMode, numberCopies, cfdSubtype);
-                                }
-                                break;
-                            case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
-                                if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
-                                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                                }
-                                else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                                    cfdPrint.printPayrollReceipt33_12(cfd, printMode, numberCopies, cfdSubtype);
-                                }
-                                break;
-                            default:
-                                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                        }
-                        break;
-                        
-                    default:
-                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                }
+                computePrintCfd(client, cfd, cfdSubtype, printMode, numberCopies);
             }
         }
     }
@@ -2484,7 +2553,7 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
 
-    public static void printAcknowledgmentCancellationCfd(final SClientInterface client, final SDataCfd cfd, int printMode, final int subtypeCfd) throws Exception {
+    public static void printCfdCancelAck(final SClientInterface client, final SDataCfd cfd, int printMode, final int subtypeCfd) throws Exception {
         SCfdPrint cfdPrint = null;
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
@@ -2495,7 +2564,7 @@ public abstract class SCfdUtils implements Serializable {
                 if (!cfd.getAcknowledgmentCancellationXml().isEmpty()) {
                     cfdPrint = new SCfdPrint(client);
 
-                    cfdPrint.printAcknowledgment(cfd, printMode, subtypeCfd);
+                    cfdPrint.printCancelAck(cfd, printMode, subtypeCfd);
                 }
                 else {
                     printAcknowledgmentCancellationPdf(client, cfd);
@@ -2529,6 +2598,11 @@ public abstract class SCfdUtils implements Serializable {
                     idBizPartnerBranch = dps.getFkBizPartnerBranchId();
                     break;
 
+                case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                    idBizPartner = SDataCfdPayment.getDbmsDataReceptorId(client.getSession().getStatement(), cfd.getPkCfdId());
+                    idBizPartnerBranch = SLibConsts.UNDEFINED; // do not really needed, just for consistence
+                    break;
+                        
                 case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                     idBizPartner = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollBizPartnerId_n() : cfd.getFkPayrollReceiptEmployeeId_n();
                     idBizPartnerBranch = SLibConsts.UNDEFINED; // do not really needed, just for consistence
@@ -2559,16 +2633,14 @@ public abstract class SCfdUtils implements Serializable {
      * @param subtypeCfd When the typeCfd is Payroll, subtype is old version or new version
      * @param isSingle It is true when there is one cfd
      * @param confirmSending It is true when the confirmation will be done.
+     * @return 
      * @throws Exception
      */
-    public static boolean signAndSendCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, boolean isSingle, boolean confirmSending) throws Exception {
-        boolean sign = false;
-        boolean signAndSend = false;
-        boolean catchExceptions = false;
+    public static boolean signAndSendCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final boolean isSingle, final boolean confirmSending) throws Exception {
+        boolean signed = false;
+        boolean signedAndSent = false;
         int idBizPartner = SLibConsts.UNDEFINED;
         int idBizPartnerBranch = SLibConsts.UNDEFINED;
-        SDataDps dps = null;
-        SDataCfd cfdAuxSend = null;
 
         try {
             // Sign CFDI:
@@ -2577,9 +2649,14 @@ public abstract class SCfdUtils implements Serializable {
 
                 switch (cfd.getFkCfdTypeId()) {
                     case SDataConstantsSys.TRNS_TP_CFD_INV:
-                        dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                        SDataDps dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
                         idBizPartner = dps.getFkBizPartnerId_r();
                         idBizPartnerBranch = dps.getFkBizPartnerBranchId();
+                        break;
+
+                    case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                        idBizPartner = SDataCfdPayment.getDbmsDataReceptorId(client.getSession().getStatement(), cfd.getPkCfdId());
+                        idBizPartnerBranch = SLibConsts.UNDEFINED; // do not really needed, just for consistence
                         break;
 
                     case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
@@ -2591,37 +2668,29 @@ public abstract class SCfdUtils implements Serializable {
                 }
 
                 if (!confirmSending || STrnUtilities.confirmSend(client,TXT_SIGN_SEND, cfd, null, idBizPartner, idBizPartnerBranch)) {
-                    sign = signCfdi(client, cfd, subtypeCfd, isSingle, false);
+                    signed = signCfdi(client, cfd, subtypeCfd, isSingle, false);
 
-                    // Send CFDI:
-
-                    if (sign) {
-                        cfdAuxSend = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, cfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-
-                        if (confirmSending) {
-                            confirmSending = false;
-                            catchExceptions = true;
-                        }
-                        else{
-                            catchExceptions = true;
-                        }
-
-                        sendCfd(client, cfdAuxSend.getFkCfdTypeId(), cfdAuxSend, subtypeCfd, false, confirmSending, catchExceptions);
-                        signAndSend = true;
+                    if (signed) {
+                        // read again just signed CFDI:
+                        SDataCfd cfdAuxSend = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, cfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                        
+                        // send CFDI:
+                        sendCfd(client, cfdAuxSend.getFkCfdTypeId(), cfdAuxSend, subtypeCfd, false, false, true);
+                        signedAndSent = true;
                     }
                 }
             }
         }
         catch (Exception e) {
-            if (sign) {
-                throw new Exception("Timbrado, pero no enviado:\n" + e.getMessage());
+            if (signed) {
+                throw new Exception("Documento timbrado, pero no enviado:\n" + e.getMessage());
             }
             else {
                 throw new Exception("No fue posible timbrar ni enviar el documento:\n" + e.getMessage());
             }
         }
         
-        return signAndSend;
+        return signedAndSent;
     }
 
     public static boolean cancelAndSendCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, boolean isSingle, int tpDpsAnn) throws Exception {
@@ -2717,7 +2786,7 @@ public abstract class SCfdUtils implements Serializable {
         packet.setCfdId(dps.getDbmsDataCfd() == null ? SLibConsts.UNDEFINED : dps.getDbmsDataCfd().getPkCfdId());
         packet.setDpsYearId(dps.getPkYearId());
         packet.setDpsDocId(dps.getPkDocId());
-        packet.setDataDps(dps);
+        packet.setAuxDataDps(dps);
 
         SCfdParams params = createCfdParams(client, dps);
         if (params != null) {
@@ -2964,13 +3033,8 @@ public abstract class SCfdUtils implements Serializable {
         return valid;
     }
 
-    public static boolean validateCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final boolean showFinalMessage) throws Exception {
+    public static boolean validateCfdi(final SClientInterface client, final SDataCfd cfd, final int cfdSubtype, final boolean showFinalMessage) throws Exception {
         boolean valid = false;
-        SCfdPrint cfdPrint = null;
-        SDataDps dps = null;
-        SCfdParams params = null;
-        SDataPac pac = null;
-        BufferedWriter bw = null;
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del comprobante fiscal.");
@@ -2979,7 +3043,7 @@ public abstract class SCfdUtils implements Serializable {
             throw new Exception("El comprobante fiscal solicitado no es un CFDI.");
         }
         else {
-            pac = getPacForValidation(client, cfd);
+            SDataPac pac = getPacForValidation(client, cfd);
 
             if (pac == null) {
                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo fue posible determinar un PAC para la verificación del CFDI.");
@@ -3003,80 +3067,32 @@ public abstract class SCfdUtils implements Serializable {
                         if (!cfd.isStamped()) {
                             // Save file XML and set flag XML as correct:
 
-                            valid = restoreSignXml(client, cfd, false, subtypeCfd);
+                            valid = restoreSignXml(client, cfd, false, cfdSubtype);
                         }
                         else {
                             // Save file PDF and set flag PDF as correct:
 
-                            valid = restoreAcknowledgmentCancellation(client, cfd, false, subtypeCfd);
+                            valid = restoreAcknowledgmentCancellation(client, cfd, false, cfdSubtype);
                         }
                     }
                     else {
                         if (!cfd.isStamped()) {
-                            valid = stampedCfdiFinkok(client, cfd, subtypeCfd);
+                            valid = stampedCfdiFinkok(client, cfd, cfdSubtype);
                         }
                         else {
-                            valid = getReceiptCancellationCfdi(client, cfd, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                            valid = getReceiptCancellationCfdi(client, cfd, cfdSubtype, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                         }
                     }
                 }
                 else if (cfd.getIsProcessingStorageXml() || cfd.getIsProcessingStoragePdf()) {
-                    cfdPrint = new SCfdPrint(client);
-
                     if (cfd.getIsProcessingStorageXml()) {
-                        bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName()), "UTF-8"));
+                        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName()), "UTF-8"));
                         bw.write(cfd.getDocXml());
                         bw.close();
                     }
 
                     if (cfd.getIsProcessingStoragePdf()) {
-                        switch (cfd.getFkCfdTypeId()) {
-                            case SDataConstantsSys.TRNS_TP_CFD_INV:
-                                dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                                params = createCfdParams(client, dps);
-                                dps.setAuxCfdParams(params);
-                                
-                                switch (cfd.getFkXmlTypeId()) {
-                                    case SDataConstantsSys.TRNS_TP_XML_CFD:
-                                        cfdPrint.printCfd(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, dps);
-                                        break;
-                                    case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                                        cfdPrint.printCfdi32(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, dps);
-                                        break;
-                                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
-                                        cfdPrint.printCfdi33(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, dps);
-                                        break;
-                                    default:
-                                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                                }
-                                break;
-                                
-                            case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                                switch (cfd.getFkXmlTypeId()) {
-                                    case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                                        if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
-                                            cfdPrint.printPayrollReceipt32_11(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, subtypeCfd);
-                                        }
-                                        else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                                            cfdPrint.printPayrollReceipt32_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, subtypeCfd);
-                                        }
-                                        break;
-                                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
-                                        if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_11) {
-                                            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                                        }
-                                        else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                                            cfdPrint.printPayrollReceipt33_12(cfd, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, subtypeCfd);
-                                        }
-                                        break;
-                                    default:
-                                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                                }
-                                break;
-                                
-                            default:
-                                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
-                        }
+                        computePrintCfd(client, cfd, cfdSubtype, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1);
                     }
                     
                     updateProcessCfd(client, cfd, false);
@@ -3944,10 +3960,10 @@ public abstract class SCfdUtils implements Serializable {
         return true;
     }
 
-    public static String composeCfdWithTfdTimbreFiscalDigital(final SClientInterface client, final SDataCfd xmlCfd, final String xml) throws Exception {
+    public static String composeCfdWithTfdTimbreFiscalDigital(final SClientInterface client, final SDataCfd cfd, final String xml) throws Exception {
         DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document docStamping = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
-        Document docOriginal = docBuilder.parse(new ByteArrayInputStream(xmlCfd.getDocXml().getBytes("UTF-8")));
+        Document docOriginal = docBuilder.parse(new ByteArrayInputStream(cfd.getDocXml().getBytes("UTF-8")));
         DOMImplementationLS domImplementation = (DOMImplementationLS) docStamping.getImplementation();
         LSSerializer lsSerializer = domImplementation.createLSSerializer();
         LSOutput lsOutput =  domImplementation.createLSOutput();
@@ -4028,7 +4044,7 @@ public abstract class SCfdUtils implements Serializable {
         ArrayList<SDataCfd> cfdsValidate = null;
 
         if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
-            cfdsValidate = getPayrollCfds(client, subtypeCfd,  new int[] { subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollPayrollId_n() : cfd.getFkPayrollReceiptPayrollId_n()});
+            cfdsValidate = getPayrollCfds(client, subtypeCfd, new int[] { subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? cfd.getFkPayrollPayrollId_n() : cfd.getFkPayrollReceiptPayrollId_n()});
         }
 
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
@@ -4135,10 +4151,6 @@ public abstract class SCfdUtils implements Serializable {
         return signedSent;
     }
 
-    public static boolean cancelCfdi(final SClientInterface client, final SDataCfd cfd, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, int tpDpsAnn) throws Exception {
-        return cancelCfdi(client, cfd, subtypeCfd, cancellationDate, validateStamp, true, tpDpsAnn);
-    }
-
     public static boolean cancelCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd, final Date cancellationDate, boolean validateStamp, int tpDpsAnn) throws Exception {
         boolean cancel = false;
         int stampsAvailable = 0;
@@ -4234,15 +4246,12 @@ public abstract class SCfdUtils implements Serializable {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
         else {
-            printAcknowledgmentCancellationCfd(client, cfd, SDataConstantsPrint.PRINT_MODE_VIEWER, subtypeCfd);
+            printCfdCancelAck(client, cfd, SDataConstantsPrint.PRINT_MODE_VIEWER, subtypeCfd);
         }
     }
 
     public static void printAcknowledgmentCancellationCfd(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
-        ArrayList<SDataCfd> cfdsAux = null;
-        SDialogResult dialogResult = null;
-
-        cfdsAux = new ArrayList<SDataCfd>();
+        ArrayList<SDataCfd> cfdsAux = new ArrayList<>();
 
         for(SDataCfd cfd : cfds) {
             if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
@@ -4255,12 +4264,11 @@ public abstract class SCfdUtils implements Serializable {
         }
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsAux.size() + " acuses de cancelación?") == JOptionPane.YES_OPTION) {
-                dialogResult = new SDialogResult((SClient) client, "Resultados de impresión de acuses de cancelación", SCfdConsts.PROC_PRT_ACK_ANNUL);
+                SDialogResult dialogResult = new SDialogResult((SClient) client, "Resultados de impresión de acuses de cancelación", SCfdConsts.PROC_PRT_ACK_ANNUL);
                 dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd, subtypeCfd);
                 dialogResult.setVisible(true);
             }
         }
-
     }
 
     public static void printAcknowledgmentCancellationPdf(final SClientInterface client, final SDataCfd cfd) throws Exception {
@@ -4283,9 +4291,13 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
 
+    private static void writeXmlToDisk(final File file, final SDataCfd cfd, final int typeXml) throws Exception {
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF8"));
+        bw.write(typeXml == SDataConstantsSys.TRNS_ST_DPS_EMITED ? cfd.getDocXml() : cfd.getAcknowledgmentCancellationXml());
+        bw.close();
+    }
+    
     public static void getXmlCfd(final SClientInterface client, final SDataCfd cfd) throws Exception {
-        File file = null;
-
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
@@ -4293,7 +4305,7 @@ public abstract class SCfdUtils implements Serializable {
             if (canObtainXml(cfd)) {
                 client.getFileChooser().setSelectedFile(new File(cfd.getDocXmlName()));
                 if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                    file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+                    File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
                     writeXmlToDisk(file, cfd, SDataConstantsSys.TRNS_ST_DPS_EMITED);
                     client.showMsgBoxInformation(SLibConstants.MSG_INF_FILE_CREATE + file.getAbsolutePath());
                 }
@@ -4301,20 +4313,8 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
     
-    public static void writeXmlToDisk(final File file, final SDataCfd cfd, final int typeXml) throws Exception {
-        BufferedWriter bw = null;
-        
-        bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF8"));
-        bw.write(typeXml == SDataConstantsSys.TRNS_ST_DPS_EMITED ? cfd.getDocXml() : cfd.getAcknowledgmentCancellationXml());
-        bw.close();
-    }
-    
     public static void getXmlCfds(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
-        File file = null;
-        File fileAux = null;
-        ArrayList<SDataCfd> cfdsAux = null;
-
-        cfdsAux = new ArrayList<SDataCfd>();
+        ArrayList<SDataCfd> cfdsAux = new ArrayList<>();
 
         for(SDataCfd cfd : cfds) {
             if (cfd != null || !cfd.getDocXml().isEmpty() || !cfd.getDocXmlName().isEmpty()) {
@@ -4328,12 +4328,12 @@ public abstract class SCfdUtils implements Serializable {
         else {
             client.getFileChooser().setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                fileAux = client.getFileChooser().getSelectedFile();
+                File fileAux = client.getFileChooser().getSelectedFile();
                 client.getFileChooser().setFileSelectionMode(JFileChooser.FILES_ONLY);
                 for(SDataCfd cfd : cfdsAux) {
                     if (canObtainXml(cfd)) {
                         client.getFileChooser().setSelectedFile(new File(fileAux, cfd.getDocXmlName()));
-                        file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+                        File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
                         writeXmlToDisk(file, cfd, SDataConstantsSys.TRNS_ST_DPS_EMITED);
                     }
                 }
@@ -4344,8 +4344,6 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     public static void getAcknowledgmentCancellationCfd(final SClientInterface client, final SDataCfd cfd) throws Exception {
-        File file = null;
-
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
@@ -4353,7 +4351,7 @@ public abstract class SCfdUtils implements Serializable {
             if (canObtainAcknowledgmentCancellation(client, cfd)) {
                 client.getFileChooser().setSelectedFile(new File(cfd.getDocXmlName().replaceAll(".xml", "_CANCELA_RESP") + ".xml"));
                 if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                    file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+                    File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
                     writeXmlToDisk(file, cfd, SDataConstantsSys.TRNS_ST_DPS_ANNULED);
                     /*
                     bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),"UTF8"));
@@ -4367,11 +4365,7 @@ public abstract class SCfdUtils implements Serializable {
     }
     
     public static void getAcknowledgmentCancellationCfds(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
-        File file = null;
-        File fileAux = null;
-        ArrayList<SDataCfd> cfdsAux = null;
-
-        cfdsAux = new ArrayList<SDataCfd>();
+        ArrayList<SDataCfd> cfdsAux = new ArrayList<>();
 
         for(SDataCfd cfd : cfds) {
             if ((cfd != null || !cfd.getDocXml().isEmpty() || !cfd.getDocXmlName().isEmpty()) && cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
@@ -4385,12 +4379,12 @@ public abstract class SCfdUtils implements Serializable {
         else {
             client.getFileChooser().setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                fileAux = client.getFileChooser().getSelectedFile();
+                File fileAux = client.getFileChooser().getSelectedFile();
                 client.getFileChooser().setFileSelectionMode(JFileChooser.FILES_ONLY);
                 for(SDataCfd cfd : cfdsAux) {
                     if (canObtainAcknowledgmentCancellation(client, cfd)) {
                         client.getFileChooser().setSelectedFile(new File(fileAux, cfd.getDocXmlName()));
-                        file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+                        File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
                         writeXmlToDisk(file, cfd, SDataConstantsSys.TRNS_ST_DPS_ANNULED);
                     }
                 }
@@ -4410,10 +4404,7 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     public static void sendCfd(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
-        ArrayList<SDataCfd> cfdsAux = null;
-        SDialogResult dialogResult = null;
-
-        cfdsAux = new ArrayList<SDataCfd>();
+        ArrayList<SDataCfd> cfdsAux = new ArrayList<>();
 
         for(SDataCfd cfd : cfds) {
             if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED && !isCfdSent(client, cfd.getPkCfdId())) {
@@ -4426,7 +4417,7 @@ public abstract class SCfdUtils implements Serializable {
         }
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
-                dialogResult = new SDialogResult((SClient) client, "Resultados de envío", SCfdConsts.PROC_SND_DOC);
+                SDialogResult dialogResult = new SDialogResult((SClient) client, "Resultados de envío", SCfdConsts.PROC_SND_DOC);
                 dialogResult.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialogResult.setVisible(true);
             }
@@ -4553,6 +4544,11 @@ public abstract class SCfdUtils implements Serializable {
             case SDataConstantsSys.TRNS_TP_CFD_INV:
                 sqlWhere = "WHERE fid_dps_year_n = " + cfdKey[0] + " AND fid_dps_doc_n = " + cfdKey[1] + " ";
                 break;
+                
+            case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                sqlWhere = "WHERE id_cfd = " + cfdKey[0] + " ";
+                break;
+                
             case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                 switch (subtypeCfd) {
                     case  SCfdConsts.CFDI_PAYROLL_VER_OLD:
@@ -4565,6 +4561,7 @@ public abstract class SCfdUtils implements Serializable {
                         throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
                 break;
+                
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }

@@ -32,7 +32,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
      */
 
     private ArrayList<SDbLoanTypeAdjustment> getLoanTypeAdjustment() throws Exception {
-        String sql = "";
+        String sql;
         SDbLoanTypeAdjustment adjustment = null;
         ArrayList<SDbLoanTypeAdjustment> aAdjustments = new ArrayList<>();
         ResultSet resultSet = null;
@@ -56,7 +56,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     private ArrayList<SDbUma> readUmas() throws Exception {
         SDbUma uma = null;
         ArrayList<SDbUma> umas = new ArrayList<>();
-        String sql = "";
+        String sql;
         ResultSet resultSet = null;
 
         sql = "SELECT id_uma "
@@ -74,7 +74,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
     
     private ArrayList<SDbHoliday> getHolidays() throws Exception {
-        String sql = "";
+        String sql;
         SDbHoliday holiday = null;
         ArrayList<SDbHoliday> aHolidays = new ArrayList<>();
         ResultSet resultSet = null;
@@ -96,7 +96,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
 
     private ArrayList<SDbTaxTable> getTaxTables() throws Exception {
-        String sql = "";
+        String sql;
         SDbTaxTable taxTable = null;
         ArrayList<SDbTaxTable> aTaxTables = new ArrayList<>();
         ResultSet resultSet = null;
@@ -118,7 +118,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
 
     private ArrayList<SDbTaxSubsidyTable> getTaxSubsidyTables() throws Exception {
-        String sql = "";
+        String sql;
         SDbTaxSubsidyTable taxSubsidyTable = null;
         ArrayList<SDbTaxSubsidyTable> aTaxSubsidyTables = new ArrayList<>();
         ResultSet resultSet = null;
@@ -140,7 +140,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
 
     private ArrayList<SDbSsContributionTable> getSsContributionTables() throws Exception {
-        String sql = "";
+        String sql;
         SDbSsContributionTable sSContributionTable = null;
         ArrayList<SDbSsContributionTable> aSsContributionTables = new ArrayList<>();
         ResultSet resultSet = null;
@@ -162,7 +162,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
     
     private ArrayList<SDbBenefitTable> getBenefitTables() throws Exception {
-        String sql = "";
+        String sql;
         SDbBenefitTable benfitTables = null;
         ArrayList<SDbBenefitTable> aBenefitTables = new ArrayList<>();
         ResultSet resultSet = null;
@@ -188,7 +188,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
 
     private ArrayList<SDbMwzTypeWage> getMwzTypeWages() throws Exception {
-        String sql = "";
+        String sql;
         SDbMwzTypeWage mwzTypeWage = null;
         ArrayList<SDbMwzTypeWage> aMwzTypeWages = new ArrayList<>();
         ResultSet resultSet = null;
@@ -210,7 +210,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
 
     private ArrayList<SDbEarning> getEarnings() throws Exception {
-        String sql = "";
+        String sql;
         SDbEarning earning = null;
         ArrayList<SDbEarning> aEarnings = new ArrayList<>();
         ResultSet resultSet = null;
@@ -232,7 +232,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
 
     private ArrayList<SDbDeduction> getDeductions() throws Exception {
-        String sql = "";
+        String sql;
         SDbDeduction deduction = null;
         ArrayList<SDbDeduction> aDeductions = new ArrayList<>();
         ResultSet resultSet = null;
@@ -254,7 +254,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
 
     private ArrayList<SDbAutomaticEarning> getAutomaticEarnings(final int paymentType) throws Exception {
-        String sql = "";
+        String sql;
         SDbAutomaticEarning automaticEarning = null;
         ArrayList<SDbAutomaticEarning> aAutomaticEarnings = new ArrayList<>();
         ResultSet resultSet = null;
@@ -294,7 +294,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
 
     private ArrayList<SDbAutomaticDeduction> getAutomaticDeductions(final int paymentType) throws Exception {
-        String sql = "";
+        String sql;
         SDbAutomaticDeduction automaticDeduction = null;
         ArrayList<SDbAutomaticDeduction> aAutomaticDeductions = new ArrayList<>();
         ResultSet resultSet = null;
@@ -334,7 +334,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
 
     private String getEmployeesByPayroll(final int payrollId) throws Exception {
-        String sql = "";
+        String sql;
         String employeeIds = "";
         ResultSet resultSet = null;
         Statement statement = moSession.getDatabase().getConnection().createStatement();
@@ -354,7 +354,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
     
     private ArrayList<SDbEmployee> getEmployees(final int paymentType, final int payrollId) throws Exception {
-        String sql = "";
+        String sql;
         String employeeIds = "";
         SDbEmployee employee = null;
         ArrayList<SDbEmployee> aEmployees = new ArrayList<>();
@@ -381,7 +381,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
 
     private ArrayList<SHrsPayrollReceipt> getHrsPayrollReceipts(final SHrsPayroll hrsPayroll, final int payrollId, final boolean isCopy, final boolean isNew) throws Exception {
-        String sql = "";
+        String sql;
         SDbPayrollReceipt payrollReceipt = null;
 
         SHrsEmployee hrsEmployee = null;
@@ -482,7 +482,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
     public boolean isLastPayrollForCredits(final int payrollId, final int payrollYear, final int payrollPeriod, final int paymentPeriod) throws Exception {
         boolean isLast = false;
-        String sql = "";
+        String sql;
         ResultSet resultSet = null;
         Statement statement = moSession.getDatabase().getConnection().createStatement();
         
@@ -502,7 +502,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     private ArrayList<SDbLoan> getEmployeeLoans(final int employeeId) throws Exception {
         ArrayList<SDbLoan> aLoans = new ArrayList<>();
         SDbLoan loan = null;
-        String sql = "";
+        String sql;
         ResultSet resultSet = null;
         Statement statement = null;
         
@@ -527,7 +527,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         SHrsLoanPayments loanPayments = null;
         SDbPayrollReceiptEarning receiptEarning = null;
         SDbPayrollReceiptDeduction receiptDeduction = null;
-        String sql = "";
+        String sql;
         ResultSet resultSet = null;
         Statement statement = null;
         double amount = 0;
@@ -603,7 +603,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     private ArrayList<SDbAbsence> getEmployeeAbsences(final int employeeId) throws Exception {
         ArrayList<SDbAbsence> aAbsences = new ArrayList<>();
         SDbAbsence absence = null;
-        String sql = "";
+        String sql;
         ResultSet resultSet = null;
         Statement statement = moSession.getDatabase().getConnection().createStatement();
 
@@ -625,7 +625,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     private ArrayList<SDbAbsenceConsumption> getEmployeeAbsencesConsumption(final ArrayList<SDbAbsence> aAbsences, final int payrollId) throws Exception {
         ArrayList<SDbAbsenceConsumption> aAbsencesConsumptions = new ArrayList<>();
         SDbAbsenceConsumption absenceConsumption = null;
-        String sql = "";
+        String sql;
         ResultSet resultSet = null;
         Statement statement = moSession.getDatabase().getConnection().createStatement();
 
@@ -682,7 +682,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
     private double getEmployeeAccumulatedTaxableEarnings(final int payrollId, final int employeeId, final int periodYear, final Date dateEnd) throws Exception {
         double accumulatedTaxableEarnings = 0;
-        String sql = "";
+        String sql;
         ResultSet resultSet = null;
 
         sql = "SELECT SUM(pre.amt_taxa) AS f_taxa " +
@@ -709,7 +709,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     // XXX (jbarajas, 2016-04-06) articule 174 RLISR
     private double getEmployeeAccumulatedTaxableEarningsAlt(final int payrollId, final int employeeId, final int periodYear, final Date dateEnd) throws Exception {
         double accumulatedTaxableEarnings = 0;
-        String sql = "";
+        String sql;
         ResultSet resultSet = null;
 
         sql = "SELECT SUM(pre.amt_taxa) AS f_taxa " +
@@ -737,7 +737,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
             final int taxComputationType, final boolean byType) throws Exception {
         ArrayList<SHrsAccumulatedEarning> aAccumulatedEarning = new ArrayList<>();
         SHrsAccumulatedEarning accumulatedEarning = null;
-        String sql = "";
+        String sql;
 
         ResultSet resultSet = null;
         Statement statement = moSession.getDatabase().getConnection().createStatement();
@@ -769,7 +769,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     private ArrayList<SHrsAccumulatedDeduction> getEmployeeAccumulatedDeductions(final int payrollId, final int employeeId, final int periodYear, final Date dateStart, final Date dateEnd, final int taxComputationType, final boolean byType) throws Exception {
         ArrayList<SHrsAccumulatedDeduction> aAccumulatedDeductions = new ArrayList<>();
         SHrsAccumulatedDeduction accumulatedDeduction = null;
-        String sql = "";
+        String sql;
 
         ResultSet resultSet = null;
         Statement statement = moSession.getDatabase().getConnection().createStatement();

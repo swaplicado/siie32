@@ -35,6 +35,7 @@ import erp.mod.trn.form.SDialogRepContractStatus;
 import erp.mod.trn.form.SDialogSendMailContract;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataBizPartnerBlocking;
+import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataCfdPayment;
 import erp.mtrn.data.SDataDiogDncDocumentNumberSeries;
 import erp.mtrn.data.SDataDps;
@@ -78,7 +79,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores
  */
 public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -1101,7 +1102,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     }
                     miForm = moFormDpsDeliveryAck;
                     break;
-                case SDataConstants.TRNX_CFD_PAY:
+                case SDataConstants.TRNX_CFD_PAY_REC:
                     if(moFormCfdPayment == null) {
                         moFormCfdPayment = new SFormCfdPayment(miClient);
                     }
@@ -1179,7 +1180,6 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                 SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, formType, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get last updated data in DBMS (e.g. edition timestamp)
                                 dps.setAuxIsNeedCfd(true);
                                 dps.setAuxIsNeedCfdCce(((SDataDps) moRegistry).getAuxIsNeedCfdCce());
-
                                 SCfdUtils.computeCfd(miClient, dps, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV));
                             }
                             catch (java.lang.Exception e) {
@@ -1188,14 +1188,14 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                         }
                         break;
 
-                    case SDataConstants.TRNX_CFD_PAY:
+                    case SDataConstants.TRNX_CFD_PAY_REC:
                         // compute associated CFD of current CFD of Payment:
                         /*
                         CFD data registry was already saved, but without XML of CFD.
                         Now, XML of CFD will be generated and saved client-side by method SCfdUtils.computeCfd().
                         */
                         try {
-                            SDataCfdPayment cfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(miClient, SDataConstants.TRNX_CFD_PAY, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get last updated data in DBMS (e.g. edition timestamp)
+                            SDataCfdPayment cfdPayment = (SDataCfdPayment) SDataUtilities.readRegistry(miClient, SDataConstants.TRNX_CFD_PAY_REC, moRegistry.getPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE); // get last updated data in DBMS (e.g. edition timestamp)
                             cfdPayment.copyCfdMembers((SDataCfdPayment) moRegistry);
                             SCfdUtils.computeCfdiPayment(miClient, cfdPayment, ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAY_REC));
                         }
@@ -1487,7 +1487,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     sViewTitle = "VTA - bitácora envíos CFDI";
                     break;
                     
-                case SDataConstants.TRNX_CFD_PAY:
+                case SDataConstants.TRNX_CFD_PAY_REC:
                     oViewClass = erp.mtrn.view.SViewCfdPayment.class;
                     sViewTitle = "CFDI pagos";
                     break;
@@ -1543,9 +1543,10 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                         annul = false;
                     }
                     else {
-                        if (((SDataDps) moRegistry).getDbmsDataCfd() != null) {
-                            if (((SDataDps) moRegistry).getDbmsDataCfd().getFkDpsYearId_n() != SLibConstants.UNDEFINED) {
-                                if (((SDataDps) moRegistry).getDbmsDataCfd().isCfdi() && ((SDataDps) moRegistry).getDbmsDataCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                        SDataCfd cfd = ((SDataDps) moRegistry).getDbmsDataCfd();
+                        if (cfd != null) {
+                            if (cfd.getFkDpsYearId_n() != SLibConstants.UNDEFINED) {
+                                if (cfd.isCfdi() && cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                                     // Check if registry can be annuled:
 
                                     request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
@@ -1559,27 +1560,76 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                                         result = response.getResultType();
 
                                         if (result != SLibConstants.DB_CAN_ANNUL_YES) {
-                                            error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().length() == 0 ? "" : "\n" + response.getMessage());
+                                            error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage());
                                         }
-                                        /*
-                                        else if (SCfdUtils.isNeedStamps(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SDbConsts.ACTION_ANNUL) && SCfdUtils.getStampsAvailable(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), ((SDataDps) moRegistry).getDate()) <= 0) {
-                                            error = "No existen timbres disponibles.";
-                                        }
-                                        */
                                         else {
-                                            //if ((Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC)) {
-                                                // XXX jbarajas 03/02/2016 sign and sending CFDI
-                                                //SCfdUtils.cancelCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC));
-                                                if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
-                                                    SCfdUtils.cancelAndSendCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
-                                                }
-                                                else {
-                                                    SCfdUtils.cancelCfdi(miClient, ((SDataDps) moRegistry).getDbmsDataCfd(), SLibConstants.UNDEFINED, (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
-                                                }
-                                                result = SLibConstants.DB_ACTION_ANNUL_OK;
-                                                annul = false;
-                                            //}
+                                            if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
+                                                SCfdUtils.cancelAndSendCfdi(miClient, cfd, 0, 
+                                                        (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
+                                                        (boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
+                                                        (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
+                                            }
+                                            else {
+                                                SCfdUtils.cancelCfdi(miClient, cfd, 0, 
+                                                        (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
+                                                        (boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
+                                                        (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
+                                            }
+                                            result = SLibConstants.DB_ACTION_ANNUL_OK;
+                                            annul = false;
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (!error.isEmpty()) {
+                        throw new Exception(error);
+                    }
+
+                    break;
+
+                case SDataConstants.TRNX_CFD_PAY_REC:
+                    moRegistry = (SDataCfdPayment) SDataUtilities.readRegistry(miClient, registryType, pk, SLibConstants.EXEC_MODE_VERBOSE);
+
+                    if (moRegistry == null) {
+                        annul = false;
+                    }
+                    else {
+                        SDataCfd cfd = ((SDataCfdPayment) moRegistry).getDbmsDataCfd();
+                        if (cfd != null) {
+                            if (cfd.isCfdi() && cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                                // Check if registry can be annuled:
+
+                                request = new SServerRequest(SServerConstants.REQ_DB_CAN_ANNUL);
+                                request.setPacket(moRegistry);
+                                response = miClient.getSessionXXX().request(request);
+
+                                if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
+                                    error = response.getMessage();
+                                }
+                                else {
+                                    result = response.getResultType();
+
+                                    if (result != SLibConstants.DB_CAN_ANNUL_YES) {
+                                        error = SLibConstants.MSG_ERR_DB_REG_ANNUL_CAN + (response.getMessage().isEmpty() ? "" : "\n" + response.getMessage());
+                                    }
+                                    else {
+                                        if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticSal()) {
+                                            SCfdUtils.cancelAndSendCfdi(miClient, cfd, 0, 
+                                                    (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
+                                                    (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
+                                                    (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
+                                        }
+                                        else {
+                                            SCfdUtils.cancelCfdi(miClient, cfd, 0, 
+                                                    (Date) params.getParamsMap().get(SGuiConsts.PARAM_DATE), 
+                                                    (Boolean) params.getParamsMap().get(SGuiConsts.PARAM_REQ_DOC), true, 
+                                                    (int) params.getParamsMap().get(SModConsts.TRNU_TP_DPS_ANN));
+                                        }
+                                        result = SLibConstants.DB_ACTION_ANNUL_OK;
+                                        annul = false;
                                     }
                                 }
                             }

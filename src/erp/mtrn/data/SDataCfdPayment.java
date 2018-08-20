@@ -18,6 +18,7 @@ import erp.cfd.SCfdDataImpuesto;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
+import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
@@ -27,18 +28,24 @@ import erp.mod.SModSysConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.cfd.SCfdPaymentEntry;
 import erp.mtrn.data.cfd.SCfdPaymentEntryDoc;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
+import sa.lib.db.SDbConsts;
 
 /**
  * Database registry of CFDI of Payments.
  * @author Sergio Flores
  */
 public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi33 {
+    
+    public static final String NAME = "CFDI complemento recepción pagos";
     
     // members that belong to SDataCfd:
     protected SDataCfd moDbmsDataCfd;
@@ -58,14 +65,45 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     protected int mnAuxFkUserEditId;
     protected int mnAuxFkUserDeleteId;
     
+    // auxiliar members:
+    protected boolean mbAuxIsProcessingValidation;
+    
     /**
      * Creates database registry of CFDI of Payments.
      */
     public SDataCfdPayment() {
-        super(SDataConstants.TRNX_CFD_PAY);
+        super(SDataConstants.TRNX_CFD_PAY_REC);
         reset();
     }
     
+    /*
+     * Private methods
+     */
+    
+    private boolean testAnnulment(java.sql.Connection connection, java.lang.String msg) throws java.lang.Exception {
+        moDbmsDataCfd.setAuxIsProcessingValidation(mbAuxIsProcessingValidation);
+        
+        if (moDbmsDataCfd.testDeletion(msg, SDbConsts.ACTION_ANNUL)) {
+            // Check that document's date belongs to an open period:
+
+            int param = 1;
+            int[] periodKey = SLibTimeUtilities.digestYearMonth(moDbmsDataCfd.getTimestamp());
+            CallableStatement callableStatement = connection.prepareCall("{ CALL fin_year_per_st(?, ?, ?) }");
+            callableStatement.setInt(param++, periodKey[0]);
+            callableStatement.setInt(param++, periodKey[1]);
+            callableStatement.registerOutParameter(param++, java.sql.Types.INTEGER);
+            callableStatement.execute();
+
+            if (callableStatement.getBoolean(param - 1)) {
+                mnDbmsErrorId = 101;
+                msDbmsError = msg + "¡El período contable de la fecha del comprobante está cerrado!";
+                throw new Exception(msDbmsError);
+            }
+        }
+
+        return true;    // if this line is reached, no errors were found
+    }
+
     /*
      * Public methods
      */
@@ -99,6 +137,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public int getFkUserEditId() { return mnAuxFkUserEditId; }
     public int getFkUserDeleteId() { return mnAuxFkUserDeleteId; }
     
+    public void setAuxIsProcessingValidation(boolean b) { mbAuxIsProcessingValidation = b; }
+    
+    public boolean getAuxIsProcessingValidation() { return mbAuxIsProcessingValidation; }
+    
     public void copyCfdMembers(final SDataCfdPayment sourceCfdPayment) {
         this.msAuxCfdConfirmacion = sourceCfdPayment.msAuxCfdConfirmacion;
         this.msAuxCfdEmisorRegimenFiscal = sourceCfdPayment.msAuxCfdEmisorRegimenFiscal;
@@ -106,6 +148,34 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         this.msAuxCfdCfdiRelacionadosTipoRelacion = sourceCfdPayment.msAuxCfdCfdiRelacionadosTipoRelacion;
         this.moAuxCfdDbmsDataCfdCfdiRelacionado = sourceCfdPayment.moAuxCfdDbmsDataCfdCfdiRelacionado;
         this.maAuxCfdPaymentEntries.addAll(sourceCfdPayment.maAuxCfdPaymentEntries);
+    }
+    
+    public void deleteRecord(java.sql.Connection connection) throws java.lang.Exception {
+        String sql;
+        Statement statement = connection.createStatement();
+        
+        sql = "DELETE FROM trn_cfd_fin_rec "
+                + "WHERE id_cfd = " + moDbmsDataCfd.getPkCfdId() + ";";
+        statement.execute(sql);
+
+        sql = "UPDATE fin_rec_ety SET b_del = 1, fid_usr_edit = " + (mnAuxFkUserEditId != 0 ? mnAuxFkUserEditId : SUtilConsts.USR_NA_ID) + ", ts_del = NOW() "
+                + "WHERE fid_cfd_n = " + moDbmsDataCfd.getPkCfdId() + " AND NOT b_del;";
+        statement.execute(sql);
+    }
+
+    public static int getDbmsDataReceptorId(final Statement statement, final int idCfdi) throws Exception {
+        int idReceptor = 0;
+        
+        String sql = "SELECT DISTINCT re.fid_bp_nr "
+                + "FROM fin_rec AS r "
+                + "INNER JOIN fin_rec_ety re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                + "WHERE NOT r.b_del AND NOT re.b_del AND re.fid_cfd_n = " + idCfdi + ";";
+        ResultSet resultSet = statement.executeQuery(sql);
+        if (resultSet.next()) {
+            idReceptor = resultSet.getInt(1);
+        }
+        
+        return idReceptor;
     }
     
     /*
@@ -137,9 +207,11 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         moAuxCfdDbmsDataCfdCfdiRelacionado = null;
         maAuxCfdPaymentEntries = new ArrayList<>();
         
-        mnAuxFkUserNewId = SLibConstants.UNDEFINED;
-        mnAuxFkUserEditId = SLibConstants.UNDEFINED;
-        mnAuxFkUserDeleteId = SLibConstants.UNDEFINED;
+        mnAuxFkUserNewId = 0;
+        mnAuxFkUserEditId = 0;
+        mnAuxFkUserDeleteId = 0;
+        
+        mbAuxIsProcessingValidation = false;
     }
 
     @Override
@@ -193,7 +265,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                         int id = STrnUtilities.getCfdIdByUuid(statement, comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().get(0).getAttUuid().getString());
                         if (id != SLibConstants.UNDEFINED) {
                             moAuxCfdDbmsDataCfdCfdiRelacionado = new SDataCfd();
-                            if (moAuxCfdDbmsDataCfdCfdiRelacionado.read(id, statement) != SLibConstants.DB_ACTION_READ_OK) {
+                            if (moAuxCfdDbmsDataCfdCfdiRelacionado.read(new int[] { id }, statement) != SLibConstants.DB_ACTION_READ_OK) {
                                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
                             }
                         }
@@ -259,7 +331,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                             currencyId, 
                                             pago.getAttMonedaP().getString(), 
                                             pago.getAttMonto().getDouble(), 
-                                            pago.getAttTipoCambioP().getDouble(), 
+                                            currencyId == SModSysConsts.CFGU_CUR_MXN ? 1.0 : pago.getAttTipoCambioP().getDouble(), 
                                             record, 
                                             this);
 
@@ -327,34 +399,37 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     }
 
                     // read 'Receptor' business partner data object:
-                    // NOTE: 2018-05-29, Sergio Flores: This is a vulnerable data retrieval because there is not a strong, reliable, unequivocal reference to 'Receptor' data object!
+                    
+                    int idReceptor = getDbmsDataReceptorId(statement, moDbmsDataCfd.getPkCfdId());
+                    
+                    if (idReceptor == 0) {
+                        // CFDI could not be found in accounting, so try to get receptor ID by its fiscal ID:
+                        sql = "SELECT id_bp "
+                                + "FROM erp.bpsu_bp "
+                                + "WHERE fiscal_id = '" + comprobante.getEltReceptor().getAttRfc().getString() + "' "
+                                + (comprobante.getEltReceptor().getAttNumRegIdTrib().getString().isEmpty() ? "" : "AND fiscal_frg_id = '" + comprobante.getEltReceptor().getAttNumRegIdTrib().getString() + "' ")
+                                + "AND b_cus AND NOT b_del "
+                                + "ORDER BY id_bp DESC LIMIT 1 ";
+                        resultSet = statement.executeQuery(sql);
+                        if (!resultSet.next()) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+                    }
 
-                    sql = "SELECT id_bp "
-                            + "FROM erp.bpsu_bp "
-                            + "WHERE fiscal_id = '" + comprobante.getEltReceptor().getAttRfc().getString() + "' "
-                            + (comprobante.getEltReceptor().getAttNumRegIdTrib().getString().isEmpty() ? "" : "AND fiscal_frg_id = '" + comprobante.getEltReceptor().getAttNumRegIdTrib().getString() + "' ")
-                            + "AND b_cus AND NOT b_del "
-                            + "ORDER BY id_bp DESC LIMIT 1 ";
-                    resultSet = statement.executeQuery(sql);
-                    if (!resultSet.next()) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                    }
-                    else {
-                        moAuxCfdDbmsDataReceptor = new SDataBizPartner();
-                        moAuxCfdDbmsDataReceptor.read(new int[] { resultSet.getInt(1) }, statementAux);
-                    }
+                    moAuxCfdDbmsDataReceptor = new SDataBizPartner();
+                    moAuxCfdDbmsDataReceptor.read(new int[] { idReceptor }, statementAux);
                 }
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
             }
         }
-        catch (java.sql.SQLException e) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
-            SLibUtilities.printOutException(this, e);
-        }
         catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
+            if (msDbmsError.isEmpty()) {
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_READ;
+            }
+            msDbmsError += "\n" + e.toString();
             SLibUtilities.printOutException(this, e);
         }
 
@@ -372,31 +447,15 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE);
             }
             else {
-                String sql;
-                Statement statement = connection.createStatement();
-                
-                // delete former control registries of CFD entries vs. accounting records:
-                
-                int numberEntry = 0;
-                sql = "DELETE FROM trn_cfd_fin_rec WHERE id_cfd = " + moDbmsDataCfd.getPkCfdId() + ";";
-                statement.execute(sql);
+                deleteRecord(connection);
                 
                 // save records (journal vouchers) of all payment entries:
                 
+                int numberEntry = 0;
                 HashMap<String, Integer> hmRecordsSortingPositions = new HashMap<>();
+                Statement statement = connection.createStatement();
                 
                 for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
-                    // each payment entry has its own record (journal voucher), so proceed to delete former entries related to current CFD:
-                    
-                    for (SDataRecordEntry entry : paymentEntry.DataRecord.getDbmsRecordEntries()) {
-                        if (!entry.getIsDeleted() && entry.getFkCfdId_n() == moDbmsDataCfd.getPkCfdId()) {
-                            entry.setIsDeleted(true);
-                            entry.setIsRegistryEdited(true);
-                            entry.setFkUserDeleteId(paymentEntry.AuxUserId);
-                            entry.save(connection);
-                        }
-                    }
-                    
                     // define next sorting position for current record (journal voucher):
                     
                     int nextSortingPosition;
@@ -424,14 +483,14 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     
                     hmRecordsSortingPositions.put(paymentEntry.DataRecord.getRecordPrimaryKey(), nextSortingPosition);
                     
-                    // leave trace of record (journal voucher) was modified:
+                    // leave user trace into record (journal voucher) that it was modified:
                     
                     paymentEntry.DataRecord.setFkUserEditId(paymentEntry.AuxUserId);
                     if (paymentEntry.DataRecord.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                     
-                    sql = "INSERT INTO trn_cfd_fin_rec VALUES (" + moDbmsDataCfd.getPkCfdId() + ", " + ++numberEntry + ", "
+                    String sql = "INSERT INTO trn_cfd_fin_rec VALUES (" + moDbmsDataCfd.getPkCfdId() + ", " + ++numberEntry + ", "
                             + paymentEntry.DataRecord.getPkYearId() + ", " + paymentEntry.DataRecord.getPkPeriodId() + ", " + paymentEntry.DataRecord.getPkBookkeepingCenterId() + ", "
                             + "'" + paymentEntry.DataRecord.getPkRecordTypeId() + "', " + paymentEntry.DataRecord.getPkNumberId() + ", " + paymentEntry.AccountDesKey[0] + ", " + paymentEntry.AccountDesKey[1] + ");";
                     statement.execute(sql);
@@ -443,6 +502,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         }
         catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
+            if (msDbmsError.isEmpty()) {
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_SAVE;
+            }
+            msDbmsError += "\n" + e.toString();
             SLibUtilities.printOutException(this, e);
         }
 
@@ -452,6 +515,55 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     @Override
     public Date getLastDbUpdate() {
         return moDbmsDataCfd.getTimestamp();
+    }
+
+    @Override
+    public int canAnnul(java.sql.Connection connection) {
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
+
+        try {
+            if (testAnnulment(connection, "No se puede anular el comprobante: ")) {
+                mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_YES;
+            }
+        }
+        catch (Exception e) {
+            mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_NO;
+            if (msDbmsError.isEmpty()) {
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_ANNUL;
+            }
+            msDbmsError += "\n" + e.toString();
+            SLibUtilities.printOutException(this, e);
+        }
+
+        return mnLastDbActionResult;
+    }
+
+    @Override
+    public int annul(java.sql.Connection connection) {
+        mnLastDbActionResult = SLibConsts.UNDEFINED;
+
+        try {
+            if (testAnnulment(connection, "No se puede anular el documento: ")) {
+                if (moDbmsDataCfd.annul(connection) != SLibConstants.DB_ACTION_ANNUL_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL);
+                }
+                else {
+                    deleteRecord(connection);
+
+                    mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_OK;
+                }
+            }
+        }
+        catch (Exception e) {
+            mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_ERROR;
+            if (msDbmsError.isEmpty()) {
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_ANNUL;
+            }
+            msDbmsError += "\n" + e.toString();
+            SLibUtilities.printOutException(this, e);
+        }
+
+        return mnLastDbActionResult;
     }
 
     /*

@@ -2002,7 +2002,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PREPAY, new SGuiParams(SModConsts.VIEW_ST_DONE));
             }
             else if (item == jmiFinCfdPayment) {
-                miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY);
+                miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY_REC);
             }
             else if (item == jmiFinImportPayments) {
                 miClient.getSession().showView(SModConsts.FIN_LAY_BANK_DEP, SModSysConsts.FIN_LAY_BANK_PAY, null);

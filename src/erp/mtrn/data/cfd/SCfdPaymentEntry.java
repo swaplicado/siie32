@@ -294,7 +294,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         }
         
         SDataRecordEntry entryAccountCash = createRecordEntryAccountCash(session, accountCash);
-        entryAccountCash.setConcept(accountCash.getAuxCode() + " / F " + sDocuments + "/ " + sBizPartner);;
+        entryAccountCash.setConcept(accountCash.getAuxCode() + " / F " + sDocuments + "/ " + sBizPartner);
         AuxDbmsRecordEntries.add(entryAccountCash);
         
         SDataBookkeepingNumber bookkeepingNumber = new SDataBookkeepingNumber();

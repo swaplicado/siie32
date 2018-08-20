@@ -62,6 +62,7 @@ import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridConsts;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiUtils;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
 
@@ -140,7 +141,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     public SFormCfdPayment(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
-        mnFormType = SDataConstants.TRNX_CFD_PAY;
+        mnFormType = SDataConstants.TRNX_CFD_PAY_REC;
         initComponents();
         initComponentsExtra();
     }
@@ -293,6 +294,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jlDocExchangeRate = new javax.swing.JLabel();
         jtfDocExchangeRate = new javax.swing.JTextField();
         jtfDocExchangeRateCurRo = new javax.swing.JTextField();
+        jbDocExchangeRateInvert = new javax.swing.JButton();
         jPanel36 = new javax.swing.JPanel();
         jlDocBalancePrev = new javax.swing.JLabel();
         jtfDocBalancePrev = new javax.swing.JTextField();
@@ -1018,6 +1020,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocExchangeRateCurRo.setPreferredSize(new java.awt.Dimension(55, 23));
         jPanel35.add(jtfDocExchangeRateCurRo);
 
+        jbDocExchangeRateInvert.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_exc_rate.gif"))); // NOI18N
+        jbDocExchangeRateInvert.setToolTipText("Invertir tipo de cambio (1/x)");
+        jbDocExchangeRateInvert.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel35.add(jbDocExchangeRateInvert);
+
         jPanel8.add(jPanel35);
 
         jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -1238,6 +1245,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldVouDate.setPickerButton(jbVouDatePick);
         moFieldVouTaxRegime = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbVouTaxRegime, jlVouTaxRegime);
         moFieldVouConfirm = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfVouConfirm, jlVouConfirm);
+        moFieldVouConfirm.setLengthMin(5);
         moFieldVouConfirm.setLengthMax(5);
         moFieldRecBizPartner = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbRecBizPartner, jlRecBizPartner);
         moFieldRecBizPartner.setPickerButton(jbRecBizPartnerPick);
@@ -1259,15 +1267,17 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldPayAccountSrcFiscalId.setLengthMax(13);
         moFieldPayAccountSrcFiscalId.setPickerButton(jbPayAccountSrcPick);
         moFieldPayAccountSrcNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountSrcNumber, jlPayAccountNumber);
+        moFieldPayAccountSrcNumber.setLengthMin(10);
         moFieldPayAccountSrcNumber.setLengthMax(50);
         moFieldPayAccountSrcNumber.setPickerButton(jbPayAccountSrcPick);
         moFieldPayAccountSrcEntity = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountSrcEntity, jlPayAccountEntity);
-        moFieldPayAccountSrcEntity.setLengthMax(100);
+        moFieldPayAccountSrcEntity.setLengthMax(300);
         moFieldPayAccountDesFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountDesFiscalId, jlPayAccountFiscalId);
         moFieldPayAccountDesFiscalId.setLengthMin(12);
         moFieldPayAccountDesFiscalId.setLengthMax(12);
         moFieldPayAccountDesFiscalId.setPickerButton(jbPayAccountDesPick);
         moFieldPayAccountDesNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountDesNumber, jlPayAccountNumber);
+        moFieldPayAccountDesNumber.setLengthMin(10);
         moFieldPayAccountDesNumber.setLengthMax(50);
         moFieldPayAccountDesNumber.setPickerButton(jbPayAccountDesPick);
         moFieldPayAccountDes = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPayAccountDes, jlPayAccountDes);
@@ -1379,6 +1389,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbPayPaymentEntryCancel.addActionListener(this);
         jbPayPaymentEntryDelete.addActionListener(this);
         jbDocDpsRelatedPick.addActionListener(this);
+        jbDocExchangeRateInvert.addActionListener(this);
         jbDocPaymentCompute.addActionListener(this);
         jbDocPaymentEntryDocAdd.addActionListener(this);
         jbDocPaymentEntryDocModify.addActionListener(this);
@@ -1813,6 +1824,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void enableVouFields(final boolean enable) {
         jftVouDate.setEditable(enable);
         jftVouDate.setFocusable(enable);
+        jbVouDatePick.setEnabled(enable);
         jcbVouTaxRegime.setEnabled(enable);
         jtfVouConfirm.setEditable(enable);
         jtfVouConfirm.setFocusable(enable);
@@ -1822,9 +1834,17 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jcbRecBizPartner.setEnabled(enable);
         jbRecBizPartnerPick.setEnabled(enable);
         
-        jbRecCfdRelatedAdd.setEnabled(enable);
-        jbRecCfdRelatedDelete.setEnabled(false);
-        jbRecCfdRelatedPick.setEnabled(false);
+        if (enable) {
+            boolean cfdRelatedAvailable = moDataRecCfdRelated != null;
+            jbRecCfdRelatedAdd.setEnabled(!cfdRelatedAvailable);
+            jbRecCfdRelatedDelete.setEnabled(cfdRelatedAvailable);
+            jbRecCfdRelatedPick.setEnabled(cfdRelatedAvailable);
+        }
+        else {
+            jbRecCfdRelatedAdd.setEnabled(false);
+            jbRecCfdRelatedDelete.setEnabled(false);
+            jbRecCfdRelatedPick.setEnabled(false);
+        }
         
         updateRecBizPartnerFields();
     }
@@ -1895,6 +1915,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocInstallment.setFocusable(enable);
         jtfDocExchangeRate.setEditable(false);
         jtfDocExchangeRate.setFocusable(false);
+        jbDocExchangeRateInvert.setEnabled(false);
         jtfDocBalancePrev.setEditable(enable);
         jtfDocBalancePrev.setFocusable(enable);
         jtfDocPayment.setEditable(enable);
@@ -2026,6 +2047,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void actionPerformedRecCfdRelatedAdd() {
         activateRecCfdRelated(false);
         jbRecCfdRelatedPick.requestFocusInWindow();
+        jbRecCfdRelatedPick.doClick();
     }
 
     private void actionPerformedRecCfdRelatedDelete() {
@@ -2207,19 +2229,22 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         
         if (valid) {
+            boolean isReceptorInt = moDataRecBizPartner.getFiscalId().equals(DCfdConsts.RFC_GEN_INT);
+                    
             if (moDataPayRecord == null) {
                 valid = false;
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlPayRecord.getText() + "'.");
                 jbPayRecordPick.requestFocusInWindow();
             }
-            else if (moDataRecBizPartner.getFiscalId().equals(DCfdConsts.RFC_GEN_INT) && moFieldPayAccountSrcEntity.getString().isEmpty()) {
+            else if (!moFieldPayAccountSrcFiscalId.getString().isEmpty() && moFieldPayAccountSrcFiscalId.getString().length() != 12 && !moFieldPayAccountSrcFiscalId.getString().equals(DCfdConsts.RFC_GEN_INT)) {
+                valid = false;
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + SGuiUtils.getLabelName(jlPayAccountFiscalId) + ", " + SGuiUtils.getLabelName(jlPayAccountSrc) + "':\n"
+                        + "de longitud 12 o '" + DCfdConsts.RFC_GEN_INT + "'.");
+                jtfPayAccountSrcFiscalId.requestFocusInWindow();
+            }
+            else if (isReceptorInt && moFieldPayAccountSrcEntity.getString().isEmpty()) {
                 valid = false;
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlPayAccountEntity.getText() + "'.");
-                jtfPayAccountSrcEntity.requestFocusInWindow();
-            }
-            else if (!moDataRecBizPartner.getFiscalId().equals(DCfdConsts.RFC_GEN_INT) && !moFieldPayAccountSrcEntity.getString().isEmpty()) {
-                valid = false;
-                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jlPayAccountEntity.getText() + "'.");
                 jtfPayAccountSrcEntity.requestFocusInWindow();
             }
             else if (moDataPayAccountCash == null) {
@@ -2391,12 +2416,14 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                     moFieldDocExchangeRate.setFieldValue(1d);
                     jtfDocExchangeRate.setEditable(false);
                     jtfDocExchangeRate.setFocusable(false);
+                    jbDocExchangeRateInvert.setEnabled(false);
                     jbDocPaymentCompute.setEnabled(false);
                 }
                 else {
                     moFieldDocExchangeRate.setFieldValue(0d);
                     jtfDocExchangeRate.setEditable(true);
                     jtfDocExchangeRate.setFocusable(true);
+                    jbDocExchangeRateInvert.setEnabled(true);
                     jbDocPaymentCompute.setEnabled(true);
                 }
 
@@ -2409,6 +2436,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 jtfDocInstallment.requestFocusInWindow();
             }
         }
+    }
+    
+    private void actionPerformedDocExchangeRateInvert() {
+        moFieldDocExchangeRate.setDouble(moFieldDocExchangeRate.getDouble() == 0 ? 0 : SLibUtils.round(1d / moFieldDocExchangeRate.getDouble(), SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits()));
+        jtfDocExchangeRate.requestFocusInWindow();
     }
     
     private void actionPerformedDocPaymentCompute() {
@@ -2806,6 +2838,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbDocDpsRelatedPick;
+    private javax.swing.JButton jbDocExchangeRateInvert;
     private javax.swing.JButton jbDocPaymentCompute;
     private javax.swing.JButton jbDocPaymentEntryDocAdd;
     private javax.swing.JButton jbDocPaymentEntryDocCancel;
@@ -3025,7 +3058,6 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 break;
             }
         }
-
         if (!validation.getIsError()) {
             if (mbEditingPaymentEntry) {
                 validation.setMessage("La captura de un pago está en proceso, se debe cancelar o aceptar.");
@@ -3146,11 +3178,16 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         actionPerformedVouNext(false);
         
-        if (!SDataUtilities.isPeriodOpen(miClient, cfd.getTimestamp())) {
+        if (!SDataUtilities.isPeriodOpen(miClient, cfd.getTimestamp()) || !cfd.getUuid().isEmpty()) {
             mbIsFormReadOnly = true;
         }
         
         if (mbIsFormReadOnly) {
+            jbVouResume.setEnabled(false);
+            
+            enablePayControls(false);
+            enableDocControls(false);
+            
             jbOk.setEnabled(false);
             jbCancel.requestFocusInWindow();
         }
@@ -3193,8 +3230,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         cfdPacket.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
         cfdPacket.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
         cfdPacket.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
-        cfdPacket.setFkCompanyBranchId(moDataComBranch.getPkBizPartnerBranchId());
         cfdPacket.setFkUserDeliveryId(miClient.getSession().getUser().getPkUserId());
+        cfdPacket.setFkCompanyBranchId(moDataComBranch.getPkBizPartnerBranchId());
         //cfdPacket.setDpsYearId(...);
         //cfdPacket.setDpsDocId(...);
         //cfdPacket.setRecordEntryYearId(...);
@@ -3224,8 +3261,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moDataCfdPayment.setAuxCfdEmisorRegimenFiscal(moFieldVouTaxRegime.getFieldValue().toString());
         moDataCfdPayment.setAuxCfdDbmsDataReceptor(moDataRecBizPartner);
         
-        moDataCfdPayment.setAuxCfdCfdiRelacionadosTipoRelacion(jtfRecRelationTypeRo.getText());
-        if (jtfRecRelationTypeRo.getText().isEmpty()) {
+        moDataCfdPayment.setAuxCfdCfdiRelacionadosTipoRelacion(msXmlRelationType);
+        if (msXmlRelationType.isEmpty()) {
             moDataCfdPayment.setAuxCfdDbmsDataCfdCfdiRelacionado(null);
         }
         else {
@@ -3335,6 +3372,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
             else if (button == jbDocDpsRelatedPick) {
                 actionPerformedDocDpsRelatedPick();
+            }
+            else if (button == jbDocExchangeRateInvert) {
+                actionPerformedDocExchangeRateInvert();
             }
             else if (button == jbDocPaymentCompute) {
                 actionPerformedDocPaymentCompute();

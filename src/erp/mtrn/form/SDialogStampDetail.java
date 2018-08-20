@@ -26,7 +26,7 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogStampDetail extends javax.swing.JDialog implements java.awt.event.ActionListener {
 
@@ -297,36 +297,44 @@ public class SDialogStampDetail extends javax.swing.JDialog implements java.awt.
         moPaneDetails.clearTableRows();
 
         try {
-            sql = "SELECT xs.dt, xs.id_mov, tp.tp_xml, xs.mov_in, xs.mov_out, IF(dx.fid_tp_cfd = 1, dt.code, '') AS f_tp_doc, vt.pac, tc.tp_cfd, " +
-                    "IF(dx.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_INV + ", CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num), " +
-                    "CONCAT(hr.num_ser, IF(length(hr.num_ser) = 0, '', '-'), hr.num)) AS f_num, IF(dx.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_INV + ", cob.code, '') AS f_cob, dx.uuid " +
-                    "FROM trn_sign AS xs " +
-                    "INNER JOIN erp.trns_tp_sign AS tp ON xs.fid_ct_sign = tp.id_ct_sign  AND xs.fid_tp_sign = tp.id_tp_sign " +
-                    "LEFT OUTER JOIN trn_pac AS vt ON xs.id_pac = vt.id_pac " +
-                    "LEFT OUTER JOIN trn_cfd AS dx ON xs.fid_cfd_n = dx.id_cfd " +
-                    "LEFT OUTER JOIN erp.trns_tp_cfd AS tc ON dx.fid_tp_cfd = tc.id_tp_cfd " +
-                    "LEFT OUTER JOIN trn_dps AS d ON dx.fid_dps_year_n = d.id_year AND dx.fid_dps_doc_n = d.id_doc " +
-                    "LEFT OUTER JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
-                    "LEFT OUTER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
-                    "LEFT OUTER JOIN hrs_sie_pay_emp AS hr ON dx.fid_pay_pay_n = hr.id_pay AND dx.fid_pay_emp_n = hr.id_emp AND dx.fid_pay_bpr_n = hr.fid_bpr_n AND hr.b_del = FALSE " +
-                    "LEFT OUTER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps " +
-                    "AND d.fid_tp_dps = dt.id_tp_dps AND xs.fid_tp_sign = tp.id_tp_sign " +
-                    "WHERE xs.id_year = " + mnParamYear + " AND xs.id_pac = " + mnParamPac + " AND xs.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtParamDateEnd) + "' AND xs.b_del = 0 " +
-                    "ORDER BY xs.dt, xs.id_mov, tp.tp_xml, xs.mov_in, xs.mov_out, f_tp_doc, f_num, f_cob, dx.uuid";
+            sql = "SELECT s.dt, s.id_mov, ts.tp_xml, s.mov_in, s.mov_out, pac.pac, tcfd.tp_cfd, " +
+                    "IF(cfd.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_INV + ", tdps.code, '') AS f_tp_doc, " +
+                    "CASE " +
+                    "WHEN cfd.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_INV + " THEN CONCAT(dps.num_ser, IF(dps.num_ser = '', '', '-'), dps.num) " +
+                    "WHEN cfd.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_PAY_REC + " THEN CONCAT(cfd.ser, IF(cfd.ser = '', '', '-'), cfd.num)" +
+                    "WHEN cfd.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_PAYROLL + " THEN CONCAT(hr.num_ser, IF(hr.num_ser = '', '', '-'), hr.num) END AS f_num, " +
+                    "CASE " +
+                    "WHEN cfd.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_INV + " THEN dpscob.code " +
+                    "WHEN cfd.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_PAY_REC + " THEN cfdcob.code " +
+                    "WHEN cfd.fid_tp_cfd = " + SDataConstantsSys.TRNS_TP_CFD_PAYROLL + " THEN '' END AS f_cob, " +
+                    "cfd.uuid " +
+                    "FROM trn_sign AS s " +
+                    "INNER JOIN erp.trns_tp_sign AS ts ON s.fid_ct_sign = ts.id_ct_sign AND s.fid_tp_sign = ts.id_tp_sign " +
+                    "INNER JOIN trn_pac AS pac ON s.id_pac = pac.id_pac " +
+                    "LEFT OUTER JOIN trn_cfd AS cfd ON s.fid_cfd_n = cfd.id_cfd " +
+                    "LEFT OUTER JOIN erp.trns_tp_cfd AS tcfd ON cfd.fid_tp_cfd = tcfd.id_tp_cfd " +
+                    "LEFT OUTER JOIN trn_dps AS dps ON cfd.fid_dps_year_n = dps.id_year AND cfd.fid_dps_doc_n = dps.id_doc " +
+                    "LEFT OUTER JOIN erp.trnu_tp_dps AS tdps ON dps.fid_ct_dps = tdps.id_ct_dps AND dps.fid_cl_dps = tdps.id_cl_dps AND dps.fid_tp_dps = tdps.id_tp_dps " +
+                    "LEFT OUTER JOIN erp.bpsu_bpb AS bpb ON dps.fid_bpb = bpb.id_bpb " +
+                    "LEFT OUTER JOIN erp.bpsu_bpb AS dpscob ON dps.fid_cob = dpscob.id_bpb " +
+                    "LEFT OUTER JOIN erp.bpsu_bpb AS cfdcob ON cfd.fid_cob_n = cfdcob.id_bpb " +
+                    "LEFT OUTER JOIN hrs_sie_pay_emp AS hr ON cfd.fid_pay_pay_n = hr.id_pay AND cfd.fid_pay_emp_n = hr.id_emp AND cfd.fid_pay_bpr_n = hr.fid_bpr_n AND NOT hr.b_del " +
+                    "WHERE s.id_year = " + mnParamYear + " AND s.id_pac = " + mnParamPac + " AND s.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtParamDateEnd) + "' AND s.b_del = 0 " +
+                    "ORDER BY s.dt, s.id_mov, ts.tp_xml, s.mov_in, s.mov_out, f_tp_doc, f_num, f_cob, cfd.uuid;";
 
             resulSet = miClient.getSession().getStatement().executeQuery(sql);
             while (resulSet.next()) {
                 oRow = new SDialogStampDetailRow(miClient);
-                oRow.setDate(resulSet.getDate("xs.dt"));
-                oRow.setTypeMove(resulSet.getString("tp.tp_xml"));
-                oRow.setMovIn(resulSet.getInt("xs.mov_in"));
-                oRow.setMovOut(resulSet.getInt("xs.mov_out"));
+                oRow.setDate(resulSet.getDate("s.dt"));
+                oRow.setTypeMove(resulSet.getString("ts.tp_xml"));
+                oRow.setMovIn(resulSet.getInt("s.mov_in"));
+                oRow.setMovOut(resulSet.getInt("s.mov_out"));
                 oRow.setStock(nStock += (oRow.getMovIn() - oRow.getMovOut()));
-                oRow.setTypeCfd(resulSet.getString("tc.tp_cfd"));
+                oRow.setTypeCfd(resulSet.getString("tcfd.tp_cfd"));
                 oRow.setTypeDoc(resulSet.getString("f_tp_doc"));
                 oRow.setNumberSer(resulSet.getString("f_num"));
                 oRow.setBranch(resulSet.getString("f_cob"));
-                oRow.setUuid(resulSet.getString("dx.uuid"));
+                oRow.setUuid(resulSet.getString("cfd.uuid"));
                 oRow.prepareTableRow();
                 moPaneDetails.addTableRow(oRow);
             }

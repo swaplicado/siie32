@@ -27,7 +27,9 @@ import erp.lib.table.STableUtilities;
 import erp.mbps.data.SDataEmployee;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mtrn.data.SCfdPacket;
+import erp.mtrn.data.SCfdPaymentUtils;
 import erp.mtrn.data.SDataCfd;
+import erp.mtrn.data.SDataCfdPayment;
 import erp.mtrn.data.SDataCfdSignLog;
 import erp.mtrn.data.SDataSign;
 import java.awt.Graphics;
@@ -57,6 +59,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
 import sa.lib.SLibConsts;
 import sa.lib.SLibRpnArgument;
+import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvRequest;
@@ -125,41 +128,6 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
      * Private functions
      */
     private void createCfd() throws SQLException, NoSuchAlgorithmException, Exception {
-        /*
-        java.sql.Blob blobKeyPrivate = null;
-        java.sql.Blob blobKeyPublic = null;
-        String sql = "SELECT cert_key_priv_n, cert_key_pub_n, cert_num, xml_base_dir FROM cfg_param_co WHERE id_co = " + mnPkCompanyId + " ";
-        ResultSet resultSet = moStatement.executeQuery(sql);
-
-        moServer.renderMessageLn(msSessionServer + "Creating CFD instance...");
-
-        if (!resultSet.next()) {
-            throw new Exception("Company's configuration could not be read.");
-        }
-        else {
-            blobKeyPrivate = resultSet.getBlob("cert_key_priv_n");
-            blobKeyPublic = resultSet.getBlob("cert_key_pub_n");
-
-            if (blobKeyPrivate == null) {
-                moServer.renderMessageLn(msSessionServer + "CFD private key not found!");
-            }
-
-            if (blobKeyPublic == null) {
-                moServer.renderMessageLn(msSessionServer + "CFD public key not found!");
-            }
-
-            if (blobKeyPrivate != null && blobKeyPublic != null) {
-                moCfd = new DCfd(
-                        blobKeyPrivate.getBytes(1, (int) blobKeyPrivate.length()),  // first byte is 1
-                        blobKeyPublic.getBytes(1, (int) blobKeyPublic.length()),   // first byte is 1
-                        resultSet.getString("cert_num"),
-                        resultSet.getString("xml_base_dir"));
-
-                moServer.renderMessageLn(msSessionServer + "CFD instance successfully created!");
-            }
-        }
-        */
-
         String sql = "SELECT xml_base_dir FROM cfg_param_co WHERE id_co = " + mnPkCompanyId + " ";
         ResultSet resultSet = moStatement.executeQuery(sql);
 
@@ -182,15 +150,23 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
          * IMPORTANT:
          * BufferedImage is not serializable, therefore it cannot be send to Server through RMI. QR Code is generated and put into in SSessionServer.requestFillReport().
          */
-
-        if (reportType == SDataConstantsSys.REP_TRN_CFDI || reportType == SDataConstantsSys.REP_TRN_CFDI_33 || reportType == SDataConstantsSys.REP_TRN_CFDI_PAYROLL) {
+        
+        // generate QR code:
+        if (SLibUtils.belongsTo(reportType, new int[] { SDataConstantsSys.REP_TRN_CFDI, SDataConstantsSys.REP_TRN_CFDI_33, SDataConstantsSys.REP_TRN_CFDI_33_CRP_10, SDataConstantsSys.REP_TRN_CFDI_PAYROLL })) {
             BufferedImage biQrCode = null;
             
             if (Float.parseFloat((String) map.get("sCfdVersion")) == DCfdConsts.CFDI_VER_32) {
                 biQrCode = DCfd.createQrCodeBufferedImageCfdi32((String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"));
             }
             else if (Float.parseFloat((String) map.get("sCfdVersion")) == DCfdConsts.CFDI_VER_33) {
-                biQrCode = DCfd.createQrCodeBufferedImageCfdi33((String) map.get("sUrlCfdi"), (String) map.get("sCfdiUuid"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sSelloCfdiUltDig"));
+                if (reportType == SDataConstantsSys.REP_TRN_CFDI_33_CRP_10) {
+                    // params names are slightly different in CFDI 3.3 with CRP 1.0, and total is allways zero:
+                    biQrCode = DCfd.createQrCodeBufferedImageCfdi33((String) map.get("sTfdUUID"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), 0, (String) map.get("sSelloCfdiUltDig"));
+                }
+                else {
+                    // params names for other cases of CFDI 3.3:
+                    biQrCode = DCfd.createQrCodeBufferedImageCfdi33((String) map.get("sCfdiUuid"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sSelloCfdiUltDig"));
+                }
             }
             
             if (biQrCode != null) {
@@ -198,7 +174,11 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
             }
         }
         
-        if (reportType == SDataConstantsSys.REP_TRN_DPS_ORDER && (boolean) map.get("bIsSupplier")) {
+        if (reportType == SDataConstantsSys.REP_TRN_CFDI_33_CRP_10) {
+            map.put("nParamSessionId", mnSessionId);
+            SCfdPaymentUtils.createTemporaryDataCfdi33_Crp10(moCompanyDatabase.getConnection(), mnSessionId, map.get("xml").toString());
+        }
+        else if (reportType == SDataConstantsSys.REP_TRN_DPS_ORDER && (boolean) map.get("bIsSupplier")) {
             GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
             
             if (((SDataEmployee) map.get("oUserBuyer")) != null && ((SDataEmployee) map.get("oUserBuyer")).getXtaImageIconSignature_n() != null) {
@@ -222,11 +202,11 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
          */
 
         name = SDataUtilities.getReportFileName(reportType);
-        if (name.length() > 0) {
+        if (!name.isEmpty()) {
             file = new File(name);
             jasperReport = (JasperReport) JRLoader.loadObject(file);
 
-            map.put("oSubreportConnection", moCompanyDatabase.getConnection());
+            map.put("oSubreportConnection", moCompanyDatabase.getConnection()); // 2018-08-16, Sergio Flores: What is the purpose of this param?, WTF!
             jasperPrint = JasperFillManager.fillReport(jasperReport, map, moCompanyDatabase.getConnection());
         }
 
@@ -557,29 +537,50 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
                 if (result == SLibConstants.DB_CFD_OK) {
                     if (packet.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                        if (packet.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_INV && packet.getDataDps() != null) {
-                           // Annul DPS registry:
+                        // annul as well associated registry:
+                        
+                        switch (packet.getFkCfdTypeId()) {
+                            case SDataConstantsSys.TRNS_TP_CFD_INV:
+                                if (packet.getAuxDataDps() != null) {
+                                    result = ((SDataRegistry) packet.getAuxDataDps()).canAnnul(moCompanyDatabase.getConnection());
 
-                            result = ((SDataRegistry) packet.getDataDps()).canAnnul(moCompanyDatabase.getConnection());
+                                    if (result == SLibConstants.DB_CAN_ANNUL_YES) {
+                                        result = ((SDataRegistry) packet.getAuxDataDps()).annul(moCompanyDatabase.getConnection());
 
-                            if (result == SLibConstants.DB_CAN_ANNUL_YES) {
-                                result = ((SDataRegistry) packet.getDataDps()).annul(moCompanyDatabase.getConnection());
-
-                                if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
-                                    result = SLibConstants.DB_CFD_OK;
+                                        if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
+                                            result = SLibConstants.DB_CFD_OK;
+                                        }
+                                    } 
                                 }
-                            } 
-                        }
-                        else if (packet.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL && packet.getDataPayrollReceiptIssue() != null) {
-                            result = ((SDataRegistry) packet.getDataPayrollReceiptIssue()).canAnnul(moCompanyDatabase.getConnection());
+                                break;
+                                
+                            case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                                if (packet.getAuxDataCfdPayment()!= null) {
+                                    result = ((SDataRegistry) packet.getAuxDataCfdPayment()).canAnnul(moCompanyDatabase.getConnection());
 
-                            if (result == SLibConstants.DB_CAN_ANNUL_YES) {
-                                result = ((SDataRegistry) packet.getDataPayrollReceiptIssue()).annul(moCompanyDatabase.getConnection());
-
-                                if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
-                                    result = SLibConstants.DB_CFD_OK;
+                                    if (result == SLibConstants.DB_CAN_ANNUL_YES) {
+                                        // irregular way to annul registries (CFD has just been annulled):
+                                        ((SDataCfdPayment) packet.getAuxDataCfdPayment()).deleteRecord(moCompanyDatabase.getConnection());
+                                        result = SLibConstants.DB_CFD_OK;
+                                    } 
                                 }
-                            }
+                                break;
+                                
+                            case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
+                                if (packet.getAuxDataPayrollReceiptIssue() != null) {
+                                    result = ((SDataRegistry) packet.getAuxDataPayrollReceiptIssue()).canAnnul(moCompanyDatabase.getConnection());
+
+                                    if (result == SLibConstants.DB_CAN_ANNUL_YES) {
+                                        result = ((SDataRegistry) packet.getAuxDataPayrollReceiptIssue()).annul(moCompanyDatabase.getConnection());
+
+                                        if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
+                                            result = SLibConstants.DB_CFD_OK;
+                                        }
+                                    }
+                                }
+                                break;
+                                
+                            default:
                         }
                     }
                 }

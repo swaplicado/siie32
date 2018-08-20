@@ -463,6 +463,9 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                         registryType = SModConsts.TRN_DPS;
                         break;
                         
+                    case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                        throw new Exception("Not supported yet!");
+                        
                     case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                         switch (mnSubtypeCfd) {
                             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
@@ -513,7 +516,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             break;
                             
                         case SCfdConsts.PROC_PRT_ACK_ANNUL:
-                            SCfdUtils.printAcknowledgmentCancellationCfd(miClient, cfd, SDataConstantsPrint.PRINT_MODE_PRINT, mnSubtypeCfd);
+                            SCfdUtils.printCfdCancelAck(miClient, cfd, SDataConstantsPrint.PRINT_MODE_PRINT, mnSubtypeCfd);
                             detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Impreso.\n";
                             break;
                             
