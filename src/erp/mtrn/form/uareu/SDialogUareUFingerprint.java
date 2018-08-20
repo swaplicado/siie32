@@ -88,7 +88,7 @@ public class SDialogUareUFingerprint extends javax.swing.JDialog implements erp.
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Huellas digitales");
+        setTitle("DigitalPersona U.are.U 4500 Fingerprint Reader");
         setModal(true);
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {

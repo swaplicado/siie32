@@ -43,7 +43,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPaneFormOwner, ItemListener, ActionListener, CellEditorListener, KeyListener {
 
@@ -228,7 +228,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         if (moKeyEarning.getValue()[0] > 0) {
             if ((!(moEarnigs.get(moKeyEarning.getValue()[0]).getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT &&
                             (moEarnigs.get(moKeyEarning.getValue()[0]).getFkAbsenceClassId_n() == SLibConsts.UNDEFINED && moEarnigs.get(moKeyEarning.getValue()[0]).getFkAbsenceTypeId_n() == SLibConsts.UNDEFINED))) ||
-                    moEarnigs.get(moKeyEarning.getValue()[0]).isDaysWorkedBased()) {
+                    moEarnigs.get(moKeyEarning.getValue()[0]).isDaysWorkedBasedOn()) {
                 miClient.showMsgBoxWarning("No se puede modificar el campo 'Valor' para la percepción '" + moEarnigs.get(moKeyEarning.getValue()[0]).getName() + "', solo el campo 'Monto $'");
             }
             
@@ -240,61 +240,6 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         moGridEmployeeRow.renderGridRows();
         moGridEmployeeRow.setSelectedGridRow(0);
     }
-    
-    /* XXX (jbarajas, 2016-09-12) concentrate in one place the calculation of perceptions and deductions.
-    private SDbPayrollReceiptEarning createReceipEarning(SHrsPayrollReceipt payrollReceipt, SHrsPayrollReceiptEarning row) {
-        double amount = 0;
-        SDbPayrollReceiptEarning receiptEarning = null;
-        
-        receiptEarning = new SDbPayrollReceiptEarning();
-        
-        receiptEarning.setPkPayrollId(payrollReceipt.getReceipt().getPkPayrollId());
-        receiptEarning.setPkEmployeeId(payrollReceipt.getHrsEmployee().getEmployee().getPkEmployeeId());
-        receiptEarning.setPkMoveId(row.getPkMoveId());
-        receiptEarning.setAutomatic(false);
-        receiptEarning.setAlternativeTaxCalculation(row.getEarning().isAlternativeTaxCalculation());// XXX (jbarajas, 2016-04-06) articule 174 RLISR
-        
-        // Unit:
-        
-        if (row.getEarning().getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
-            receiptEarning.setUnitsAlleged(1d);
-            receiptEarning.setUnits(1d);
-        }
-        else {
-            receiptEarning.setUnitsAlleged(row.getXtaValueAlleged());
-            receiptEarning.setUnits(row.getXtaValue());
-        }
-        
-        // Amount unitary:
-        
-        if (row.getEarning().getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
-            receiptEarning.setAmountUnitary(row.getXtaValue());
-        }
-        else if (row.getEarning().getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_DAY) {
-            receiptEarning.setAmountUnitary(payrollReceipt.getReceipt().getPaymentDaily());
-        }
-        else if (row.getEarning().getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_HRS) {
-            receiptEarning.setAmountUnitary(payrollReceipt.getReceipt().getPaymentHourly());
-        }
-        else if (row.getEarning().getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_DAY) {
-            receiptEarning.setAmountUnitary(payrollReceipt.getReceipt().getPaymentDaily() * row.getEarning().getPayPercentage());
-        }
-        else if (row.getEarning().getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PER_HRS) {
-            receiptEarning.setAmountUnitary(payrollReceipt.getReceipt().getPaymentHourly() * row.getEarning().getPayPercentage());
-        }
-        receiptEarning.setFactorAmount(1);
-        
-        amount = SLibUtils.round((receiptEarning.getUnits() * receiptEarning.getAmountUnitary() * row.getEarning().getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-        receiptEarning.setAmountSystem_r(amount);
-        
-        receiptEarning.setAmount_r(amount);
-        receiptEarning.setFkEarningTypeId(row.getEarning().getFkEarningTypeId());
-        receiptEarning.setFkEarningId(row.getEarning().getPkEarningId());
-        receiptEarning.setFkBenefitTypeId(row.getEarning().getFkBenefitTypeId());
-        
-        return receiptEarning;
-    }
-    */
     
     private SDbPayrollReceiptEarning createReceipEarning(SHrsPayrollReceipt payrollReceipt, SHrsPayrollReceiptEarning row) {
         double amount_unt = 0;
@@ -308,7 +253,9 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
             unit = row.getXtaValueAlleged();
         }
 
-        return payrollReceipt.getHrsPayroll().createHrsPayrollReceiptEarning(payrollReceipt, null, unit, amount_unt, false, row.getEarning(), SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, row.getPkMoveId());
+        return payrollReceipt.getHrsPayroll().createHrsPayrollReceiptEarning(
+                payrollReceipt, null, row.getEarning(), unit, amount_unt, false, 
+                SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, row.getPkMoveId());
     }
     
     private void initEmployee() {
@@ -346,12 +293,6 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
             hrsReceiptEarningRow = (SHrsPayrollReceiptEarning) row;
             
             hrsReceiptEarningRow.setEarning(moEarnigs.get(hrsReceiptEarningRow.getRowPrimaryKey()[0]));
-            
-            /* Unnecessary upgrade can not change the loan
-            if (hrsReceiptEarning.getReceiptEarning() != null && hrsReceiptEarning.getReceiptEarning().getFkLoanEmployeeId_n() != SLibConsts.UNDEFINED) {
-                hrsReceiptEarning.setXtaLoan(hrsReceiptEarning.getHrsReceipt().getHrsEmployee().getLoanIdentificator(hrsReceiptEarning.getReceiptEarning().getFkLoanLoanId_n()).getLoanIdentificator());
-            }
-            */
             
             for (SHrsPayrollReceipt hrsReceipt : maReceipts) { // read receipt
                 found = false;
@@ -444,7 +385,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                             hrsReceiptEarningRow.setEarning(earning.getEarning());
                             hrsReceiptEarningRow.setHrsReceipt(hrsReceipt);
                             hrsReceiptEarningRow.setReceiptEarning(earning.getReceiptEarning());
-                            hrsReceiptEarningRow.setRowType(SHrsPayrollReceiptEarning.BY_EAR);
+                            hrsReceiptEarningRow.setInputMode(SHrsPayrollReceiptEarning.INPUT_BY_EAR);
                             hrsReceiptEarningRow.setPkMoveId(earning.getPkMoveId());
                             hrsReceiptEarningRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                             hrsReceiptEarningRow.setXtaValueAlleged(earning.getReceiptEarning().getUnitsAlleged());
@@ -467,7 +408,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                         hrsReceiptEarningRow.setEarning(moEarnigs.get(moKeyEarning.getValue()[0]));
                         hrsReceiptEarningRow.setHrsReceipt(hrsReceipt);
 
-                        hrsReceiptEarningRow.setRowType(SHrsPayrollReceiptEarning.BY_EAR);
+                        hrsReceiptEarningRow.setInputMode(SHrsPayrollReceiptEarning.INPUT_BY_EAR);
                         hrsReceiptEarningRow.setPkMoveId(hrsReceipt.getHrsEarnings().size() + 1);
                         hrsReceiptEarningRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                         hrsReceiptEarningRow.setXtaValueAlleged(0d);
@@ -482,7 +423,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                 }
             }
         }
-        enableFieldValue(rows.size() > 0 && !moEarnigs.get(moKeyEarning.getValue()[0]).isDaysWorkedBased());
+        enableFieldValue(rows.size() > 0 && !moEarnigs.get(moKeyEarning.getValue()[0]).isDaysWorkedBasedOn());
         
         moGridEmployeeRow.populateGrid(rows);
         moGridEmployeeRow.clearSortKeys();
@@ -575,7 +516,6 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
-        
     }
     
     @Override
@@ -598,10 +538,12 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
 
     @Override
     public void reloadCatalogues() {
+        
     }
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
+        
     }
 
     @Override
@@ -727,6 +669,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
 
     @Override
     public void keyTyped(KeyEvent e) {
+        
     }
 
     @Override
@@ -744,5 +687,6 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
 
     @Override
     public void keyReleased(KeyEvent e) {
+        
     }
 }

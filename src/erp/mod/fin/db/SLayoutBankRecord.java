@@ -2,6 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mod.fin.db;
 
 import java.util.ArrayList;
@@ -9,21 +10,21 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
 public class SLayoutBankRecord {
 
-    protected SFinRecordLayout moFinRecordLayout;
+    protected SLayoutBankRecordKey moLayoutBankRecordKey;
     protected ArrayList<SLayoutBankPayment> maLayoutBankPayments;
 
-    public SLayoutBankRecord(SFinRecordLayout recordLayout) {
-        moFinRecordLayout = recordLayout;
+    public SLayoutBankRecord(SLayoutBankRecordKey recordLayout) {
+        moLayoutBankRecordKey = recordLayout;
         maLayoutBankPayments = new ArrayList<>();
     }
 
-    public void setFinRecordLayout(SFinRecordLayout n) { moFinRecordLayout = n; }
+    public void setLayoutBankRecordKey(SLayoutBankRecordKey n) { moLayoutBankRecordKey = n; }
 
-    public SFinRecordLayout getFinRecordLayout() { return moFinRecordLayout; }
+    public SLayoutBankRecordKey getLayoutBankRecordKey() { return moLayoutBankRecordKey; }
     
     public ArrayList<SLayoutBankPayment> getLayoutBankPayments() { return maLayoutBankPayments; }
     
@@ -55,7 +56,7 @@ public class SLayoutBankRecord {
     
     @Override
     public SLayoutBankRecord clone() {
-        SLayoutBankRecord layoutBankRecord = new SLayoutBankRecord(moFinRecordLayout);
+        SLayoutBankRecord layoutBankRecord = new SLayoutBankRecord(moLayoutBankRecordKey);
         
         for (SLayoutBankPayment payment : maLayoutBankPayments) {
             layoutBankRecord.getLayoutBankPayments().add(payment.clone());

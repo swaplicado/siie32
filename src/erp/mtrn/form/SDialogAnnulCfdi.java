@@ -16,12 +16,13 @@ import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -192,7 +193,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void enableFieldDpsAnnulationType() {
-        moKeyDpsAnnulationType.setEnabled(mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_INV);
+        moKeyDpsAnnulationType.setEnabled(SLibUtils.belongsTo(mnCfdiType, new int[] { SDataConstantsSys.TRNS_TP_CFD_INV, SDataConstantsSys.TRNS_TP_CFD_PAY_REC }));
     }
 
     private void windowActivated() {
@@ -403,5 +404,4 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
             }
         }
     }
-
 }

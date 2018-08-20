@@ -8,6 +8,8 @@ package erp.lib.table;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.gui.SGuiDate;
+import java.util.Date;
+import sa.lib.SLibTimeUtils;
 
 /**
  *
@@ -112,14 +114,14 @@ public class STabFilterDatePeriod extends javax.swing.JPanel {
 }//GEN-LAST:event_jbSystemDateActionPerformed
 
     private void jbSystemYearMonthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSystemYearMonthActionPerformed
-        moGuiDate = new SGuiDate(miClient.getSessionXXX().getWorkingDate().getTime(), SLibConstants.GUI_DATE_AS_YEAR_MONTH);
+        moGuiDate = new SGuiDate(SLibTimeUtils.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()).getTime(), SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moSetting.setSetting(SLibTimeUtilities.digestYearMonth(moGuiDate));
         miTableTab.updateSetting(moSetting);
         renderDate();
 }//GEN-LAST:event_jbSystemYearMonthActionPerformed
 
     private void jbSystemYearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSystemYearActionPerformed
-        moGuiDate = new SGuiDate(miClient.getSessionXXX().getWorkingDate().getTime(), SLibConstants.GUI_DATE_AS_YEAR);
+        moGuiDate = new SGuiDate(SLibTimeUtils.getEndOfYear(miClient.getSessionXXX().getWorkingDate()).getTime(), SLibConstants.GUI_DATE_AS_YEAR);
         moSetting.setSetting(SLibTimeUtilities.digestYear(moGuiDate));
         miTableTab.updateSetting(moSetting);
         renderDate();
@@ -207,4 +209,11 @@ public class STabFilterDatePeriod extends javax.swing.JPanel {
     private javax.swing.JTextField jtfDate;
     // End of variables declaration//GEN-END:variables
 
+    /*
+     * Public methods
+     */
+    
+    public Date getDate() {
+        return moGuiDate;
+    }
 }

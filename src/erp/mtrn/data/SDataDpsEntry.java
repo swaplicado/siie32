@@ -132,6 +132,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msDbmsCostCenterCode;
     protected java.lang.String msDbmsCostCenter_n;
     protected java.lang.String msDbmsItemRef_n;
+    protected int mnDbmsItemBrandId;
+    protected java.lang.String msDbmsItemBrand;
     protected java.lang.String msDbmsItemClaveProdServ;
     protected java.lang.String msDbmsUnidadClave;
     protected java.lang.String msDbmsOriginalUnidadClave;
@@ -395,6 +397,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsCostCenterCode(java.lang.String s) { msDbmsCostCenterCode = s; }
     public void setDbmsCostCenter_n(java.lang.String s) { msDbmsCostCenter_n = s; }
     public void setDbmsItemRef_n(java.lang.String s) { msDbmsItemRef_n = s; }
+    public void setDbmsItemBrandId(int n) { mnDbmsItemBrandId = n; }
+    public void setDbmsItemBrand(java.lang.String s) { msDbmsItemBrand = s; }
     public void setDbmsItemClaveProdServ (java.lang.String s) { msDbmsItemClaveProdServ = s; }
     public void setDbmsUnidadClave(java.lang.String s) { msDbmsUnidadClave = s; }
     public void setDbmsOriginalUnidadClave(java.lang.String s) { msDbmsOriginalUnidadClave = s; }
@@ -428,6 +432,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getDbmsCostCenterCode() { return msDbmsCostCenterCode; }
     public java.lang.String getDbmsCostCenter_n() { return msDbmsCostCenter_n; }
     public java.lang.String getDbmsItemRef_n() { return msDbmsItemRef_n; }
+    public int getDbmsItemBrandId() { return mnDbmsItemBrandId; }
+    public java.lang.String getDbmsItemBrand() { return msDbmsItemBrand; }
     public java.lang.String getDbmsItemClaveProdServ() { return msDbmsItemClaveProdServ; }
     public java.lang.String getDbmsUnidadClave() { return msDbmsUnidadClave; }
     public java.lang.String getDbmsOriginalUnidadClave() { return msDbmsOriginalUnidadClave; }
@@ -603,6 +609,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         msDbmsCostCenterCode = "";
         msDbmsCostCenter_n = "";
         msDbmsItemRef_n = "";
+        mnDbmsItemBrandId = 0;
+        msDbmsItemBrand = "";
         msDbmsItemClaveProdServ = "";
         msDbmsUnidadClave = "";
         msDbmsOriginalUnidadClave = "";
@@ -658,9 +666,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
         try {
             sql = "SELECT de.*, " +
-                    "i.item, i.fid_cfd_prod_serv_n, i.tariff, i.custs_unit, i.custs_equiv, i.fid_igen, " +
+                    "i.item, i.fid_cfd_prod_serv_n, i.tariff, i.custs_unit, i.custs_equiv, i.fid_igen, i.fid_brd, " +
                     "igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, igen.fid_cfd_prod_serv, " +
-                    "u.symbol, ou.symbol, ou.unit_base_equiv, ou.symbol_custs, ou.unit_custs, cu.code, ocu.code, " +
+                    "u.symbol, ou.symbol, ou.unit_base_equiv, ou.symbol_custs, ou.unit_custs, cu.code, ocu.code, brd.brd, " +
                     "tr.tax_reg, tda.stp_dps_adj, tde.tp_dps_ety, cc.code, cc.cc, ir.item, ade.bac_num_pos, ade.bac_cen, ade.lor_num_ety, ade.sor_cod, " +
                     "ade.ele_ord, ade.ele_barc, ade.ele_cag, ade.ele_cag_price_u, ade.ele_par, ade.ele_par_price_u " +
                     "FROM trn_dps_ety AS de " +
@@ -670,6 +678,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "INNER JOIN erp.itmu_unit as ou ON de.fid_orig_unit = ou.id_unit " +
                     "INNER JOIN erp.itms_cfd_unit AS cu ON u.fid_cfd_unit = cu.id_cfd_unit " +
                     "INNER JOIN erp.itms_cfd_unit AS ocu ON ou.fid_cfd_unit = ocu.id_cfd_unit " +
+                    "INNER JOIN erp.itmu_brd AS brd ON i.fid_brd = brd.id_brd " +
                     "INNER JOIN erp.finu_tax_reg AS tr ON de.fid_tax_reg = tr.id_tax_reg " +
                     "INNER JOIN erp.trns_stp_dps_adj AS tda ON de.fid_tp_dps_adj = tda.id_tp_dps_adj AND de.fid_stp_dps_adj = tda.id_stp_dps_adj " +
                     "INNER JOIN erp.trns_tp_dps_ety AS tde ON de.fid_tp_dps_ety = tde.id_tp_dps_ety " +
@@ -848,6 +857,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
 
                 msDbmsUnidadClave = resultSet.getString("cu.code");
                 msDbmsOriginalUnidadClave = resultSet.getString("ocu.code");
+                mnDbmsItemBrandId = resultSet.getInt("i.fid_brd");
+                msDbmsItemBrand = resultSet.getString("brd.brd");
                 msDbmsTariff = resultSet.getString("i.tariff");
                 msDbmsCustomsUnit = resultSet.getString("ou.unit_custs");
                 msDbmsCustomsUnitSymbol = resultSet.getString("ou.symbol_custs");
@@ -1716,6 +1727,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setDbmsDpsEntryType(msDbmsDpsEntryType);
         clone.setDbmsCostCenter_n(msDbmsCostCenter_n);
         clone.setDbmsItemRef_n(msDbmsItemRef_n);
+        clone.setDbmsItemBrandId(mnDbmsItemBrandId);
+        clone.setDbmsItemBrand(msDbmsItemBrand);
         clone.setDbmsItemClaveProdServ(msDbmsItemClaveProdServ);
         clone.setDbmsUnidadClave(msDbmsUnidadClave);
         clone.setDbmsOriginalUnidadClave(msDbmsOriginalUnidadClave);

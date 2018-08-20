@@ -11,8 +11,19 @@ import erp.form.SFormOptionPicker;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
-import erp.mbps.data.*;
-import erp.mbps.form.*;
+import erp.mbps.data.SDataBizPartner;
+import erp.mbps.data.SDataBizPartnerBizAreaCatalogue;
+import erp.mbps.data.SDataBizPartnerBranchBankAccount;
+import erp.mbps.data.SDataBizPartnerBranchContact;
+import erp.mbps.data.SDataBizPartnerType;
+import erp.mbps.form.SFormBizPartner;
+import erp.mbps.form.SFormBizPartnerAttribute;
+import erp.mbps.form.SFormBizPartnerBizArea;
+import erp.mbps.form.SFormBizPartnerBranchBankAccount;
+import erp.mbps.form.SFormBizPartnerBranchContact;
+import erp.mbps.form.SFormBizPartnerEmployee;
+import erp.mbps.form.SFormBizPartnerSimple;
+import erp.mbps.form.SFormBizPartnerType;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
@@ -530,6 +541,10 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                         default:
                     }
                     auxType01 = viewType;
+                    break;
+                case SDataConstants.BPSX_BP_EMP_REL:
+                    oViewClass = erp.mbps.view.SViewBizPartnerEmployeeRelatives.class;
+                    sViewTitle = "Datos personales empleados";
                     break;
                 case SDataConstants.BPSU_BP_CT:
                     oViewClass = erp.mbps.view.SViewBizPartnerCategory.class;

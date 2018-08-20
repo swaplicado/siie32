@@ -16,7 +16,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
 
@@ -30,7 +30,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     protected double mdAmountSystem_r;
     protected double mdAmount_r;
     protected int mnBenefitYear;
-    protected int mnBenefitAniversary;
+    protected int mnBenefitAnniversary;
     protected boolean mbUserEdited;
     protected boolean mbAutomatic;
     //protected boolean mbDeleted;
@@ -64,7 +64,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public void setAmountSystem_r(double d) { mdAmountSystem_r = d; }
     public void setAmount_r(double d) { mdAmount_r = d; }
     public void setBenefitYear(int n) { mnBenefitYear = n; }
-    public void setBenefitAniversary(int n) { mnBenefitAniversary = n; }
+    public void setBenefitAnniversary(int n) { mnBenefitAnniversary = n; }
     public void setUserEdited(boolean b) { mbUserEdited = b; }
     public void setAutomatic(boolean b) { mbAutomatic = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -92,7 +92,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public double getAmountSystem_r() { return mdAmountSystem_r; }
     public double getAmount_r() { return mdAmount_r; }
     public int getBenefitYear() { return mnBenefitYear; }
-    public int getBenefitAniversary() { return mnBenefitAniversary; }
+    public int getBenefitAnniversary() { return mnBenefitAnniversary; }
     public boolean isUserEdited() { return mbUserEdited; }
     public boolean isAutomatic() { return mbAutomatic; }
     public boolean isDeleted() { return mbDeleted; }
@@ -136,7 +136,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         mdAmountSystem_r = 0;
         mdAmount_r = 0;
         mnBenefitYear = 0;
-        mnBenefitAniversary = 0;
+        mnBenefitAnniversary = 0;
         mbUserEdited = false;
         mbAutomatic = false;
         mbDeleted = false;
@@ -207,7 +207,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
             mdAmountSystem_r = resultSet.getDouble("amt_sys_r");
             mdAmount_r = resultSet.getDouble("amt_r");
             mnBenefitYear = resultSet.getInt("ben_year");
-            mnBenefitAniversary = resultSet.getInt("ben_ann");
+            mnBenefitAnniversary = resultSet.getInt("ben_ann");
             mbUserEdited = resultSet.getBoolean("b_usr");
             mbAutomatic = resultSet.getBoolean("b_aut");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -269,7 +269,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     mdAmountSystem_r + ", " + 
                     mdAmount_r + ", " + 
                     mnBenefitYear + ", " + 
-                    mnBenefitAniversary + ", " + 
+                    mnBenefitAnniversary + ", " + 
                     (mbUserEdited ? 1 : 0) + ", " + 
                     (mbAutomatic ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -302,7 +302,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     "amt_sys_r = " + mdAmountSystem_r + ", " +
                     "amt_r = " + mdAmount_r + ", " +
                     "ben_year = " + mnBenefitYear + ", " +
-                    "ben_ann = " + mnBenefitAniversary + ", " +
+                    "ben_ann = " + mnBenefitAnniversary + ", " +
                     "b_usr = " + (mbUserEdited ? 1 : 0) + ", " +
                     "b_aut = " + (mbAutomatic ? 1 : 0) + ", " +
                     //"b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -348,7 +348,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         registry.setAmountSystem_r(this.getAmountSystem_r());
         registry.setAmount_r(this.getAmount_r());
         registry.setBenefitYear(this.getBenefitYear());
-        registry.setBenefitAniversary(this.getBenefitAniversary());
+        registry.setBenefitAnniversary(this.getBenefitAnniversary());
         registry.setUserEdited(this.isUserEdited());
         registry.setAutomatic(this.isAutomatic());
         registry.setDeleted(this.isDeleted());

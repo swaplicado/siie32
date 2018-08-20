@@ -25,12 +25,13 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Gil De Jesús, Sergio Flores
+ * @author Gil De Jesús, Sergio Flores, Claudio Peña
  */
 public class SFormMaintUser extends SBeanForm implements ActionListener {
 
     private SDbMaintUser moRegistry;
-    private byte[] maFingerprintBytes;
+    private byte[] mabFingerprintBytes;
+    private int mnFingerPassword;
 
     /**
      * Creates new form SFormMaintUser.
@@ -67,13 +68,17 @@ public class SFormMaintUser extends SBeanForm implements ActionListener {
         jtfFingerprintStatus = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         jbFingerprintVerify = new javax.swing.JButton();
-        jPanel6 = new javax.swing.JPanel();
         jbFingerprintDelete = new javax.swing.JButton();
+        jPanel7 = new javax.swing.JPanel();
+        jbFingerPasswordEnroll = new javax.swing.JButton();
+        jtfFingerPasswordStatus = new javax.swing.JTextField();
+        jPanel8 = new javax.swing.JPanel();
+        jbFingerPasswordDelete = new javax.swing.JButton();
 
         moTextName.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         moTextName.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -115,15 +120,32 @@ public class SFormMaintUser extends SBeanForm implements ActionListener {
         jbFingerprintVerify.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel4.add(jbFingerprintVerify);
 
-        jPanel2.add(jPanel4);
-
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
         jbFingerprintDelete.setText("Borrar huella digital");
         jbFingerprintDelete.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel6.add(jbFingerprintDelete);
+        jPanel4.add(jbFingerprintDelete);
 
-        jPanel2.add(jPanel6);
+        jPanel2.add(jPanel4);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbFingerPasswordEnroll.setText("Capturar contraseña");
+        jbFingerPasswordEnroll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel7.add(jbFingerPasswordEnroll);
+
+        jtfFingerPasswordStatus.setEditable(false);
+        jtfFingerPasswordStatus.setFocusable(false);
+        jtfFingerPasswordStatus.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel7.add(jtfFingerPasswordStatus);
+
+        jPanel2.add(jPanel7);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbFingerPasswordDelete.setText("Borrar contraseña");
+        jbFingerPasswordDelete.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel8.add(jbFingerPasswordDelete);
+
+        jPanel2.add(jPanel8);
 
         moTextName.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
@@ -136,11 +158,15 @@ public class SFormMaintUser extends SBeanForm implements ActionListener {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JButton jbFingerPasswordDelete;
+    private javax.swing.JButton jbFingerPasswordEnroll;
     private javax.swing.JButton jbFingerprintDelete;
     private javax.swing.JButton jbFingerprintEnroll;
     private javax.swing.JButton jbFingerprintVerify;
     private javax.swing.JLabel jlMaintUser;
+    private javax.swing.JTextField jtfFingerPasswordStatus;
     private javax.swing.JTextField jtfFingerprintStatus;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolContractor;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolEmployee;
@@ -166,22 +192,35 @@ public class SFormMaintUser extends SBeanForm implements ActionListener {
     }
     
     private void showFingerprintStatus() {
-        jtfFingerprintStatus.setText(maFingerprintBytes != null ? STrnMaintConstants.FINGERPRINT_WITH : STrnMaintConstants.FINGERPRINT_WITHOUT);
+        jtfFingerprintStatus.setText(mabFingerprintBytes != null ? STrnMaintConstants.FINGERPRINT_WITH : STrnMaintConstants.FINGERPRINT_WITHOUT);
         jtfFingerprintStatus.setCaretPosition(0);
         
-        jbFingerprintEnroll.setEnabled(maFingerprintBytes == null);
-        jbFingerprintVerify.setEnabled(maFingerprintBytes != null);
-        jbFingerprintDelete.setEnabled(maFingerprintBytes != null);
+        jbFingerprintEnroll.setEnabled(mabFingerprintBytes == null);
+        jbFingerprintVerify.setEnabled(mabFingerprintBytes != null);
+        jbFingerprintDelete.setEnabled(mabFingerprintBytes != null);
+    }
+    
+    private void showFingerPasswordStatus() {
+        jtfFingerPasswordStatus.setText(mnFingerPassword != 0 ? STrnMaintConstants.FINGERPASSWORD_WITH : STrnMaintConstants.FINGERPASSWORD_WITHOUT);
+        jtfFingerPasswordStatus.setCaretPosition(0);
+        
+        jbFingerPasswordEnroll.setEnabled(mnFingerPassword == 0);        
+        jbFingerPasswordDelete.setEnabled(mnFingerPassword != 0);
     }
     
     private void actionFingerprintEnroll() {
-        maFingerprintBytes = STrnMaintUtilities.enrollFingerprint((SClientInterface) miClient);
+        mabFingerprintBytes = STrnMaintUtilities.enrollFingerprint((SClientInterface) miClient);
         showFingerprintStatus();
         jbFingerprintVerify.requestFocus();
     }
+    
+    private void actionFingerPasswordEnroll() {
+        mnFingerPassword = STrnMaintUtilities.enrollFingerPassword((SClientInterface) miClient);
+        showFingerPasswordStatus();
+    }
 
     private void actionFingerprintVerify() {
-        if (STrnMaintUtilities.verifyFingerprint((SClientInterface) miClient, maFingerprintBytes)) {
+        if (STrnMaintUtilities.verifyFingerprint((SClientInterface) miClient, mabFingerprintBytes)) {
             miClient.showMsgBoxInformation(STrnMaintConstants.VERIFIED);
         }
         else {
@@ -191,24 +230,36 @@ public class SFormMaintUser extends SBeanForm implements ActionListener {
 
     private void actionFingerprintDelete() {
         if (miClient.showMsgBoxConfirm("¿Borrar huella digital?") == JOptionPane.YES_OPTION) {
-            maFingerprintBytes = null;
+            mabFingerprintBytes = null;
             showFingerprintStatus();
             jbFingerprintEnroll.requestFocus();
+        }
+    }
+    
+    private void actionFingerPasswordDelete() {
+        if (miClient.showMsgBoxConfirm("¿Borrar la contraseña?") == JOptionPane.YES_OPTION) {
+            mnFingerPassword = 0;
+            showFingerPasswordStatus();
+            jbFingerPasswordEnroll.requestFocus();
         }
     }
 
     @Override
     public void addAllListeners() {
         jbFingerprintEnroll.addActionListener(this);
+        jbFingerPasswordEnroll.addActionListener(this);
         jbFingerprintVerify.addActionListener(this);
         jbFingerprintDelete.addActionListener(this);
+        jbFingerPasswordDelete.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
         jbFingerprintEnroll.removeActionListener(this);
+        jbFingerPasswordEnroll.removeActionListener(this);
         jbFingerprintVerify.removeActionListener(this);
         jbFingerprintDelete.removeActionListener(this);
+        jbFingerPasswordDelete.removeActionListener(this);
     }
 
     @Override
@@ -261,7 +312,7 @@ public class SFormMaintUser extends SBeanForm implements ActionListener {
         moBoolEmployee.setValue(moRegistry.isEmployee());
         moBoolContractor.setValue(moRegistry.isContractor());
         moBoolToolsMaintProv.setValue(moRegistry.isToolsMaintProvider());
-        maFingerprintBytes = moRegistry.getFingerprint_n() == null ? null : moRegistry.getFingerprint_n().getBytes(1, (int) moRegistry.getFingerprint_n().length());
+        mabFingerprintBytes = moRegistry.getFingerprint_n() == null ? null : moRegistry.getFingerprint_n().getBytes(1, (int) moRegistry.getFingerprint_n().length());
         showFingerprintStatus();
 
         setFormEditable(true);
@@ -301,7 +352,8 @@ public class SFormMaintUser extends SBeanForm implements ActionListener {
         registry.setEmployee(moBoolEmployee.getValue());
         registry.setContractor(moBoolContractor.getValue());
         registry.setToolsMaintProvider(moBoolToolsMaintProv.getValue());
-        registry.setAuxFingerprintBytes(maFingerprintBytes);
+        registry.setAuxFingerprintBytes(mabFingerprintBytes);
+        registry.setPinNumber(mnFingerPassword);
 
         return registry;
     }
@@ -326,6 +378,12 @@ public class SFormMaintUser extends SBeanForm implements ActionListener {
             }
             else if (button == jbFingerprintDelete) {
                 actionFingerprintDelete();
+            }
+            else if (button == jbFingerPasswordEnroll) {
+                actionFingerPasswordEnroll();
+            }
+            else if (button == jbFingerPasswordDelete) {
+                actionFingerPasswordDelete();
             }
         }
     }

@@ -37,6 +37,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     protected java.lang.String msFiscalSettings;
     protected java.lang.String msNotesPurchasesOrder;
     protected java.lang.String msPaymentEmail;
+    protected java.lang.String msPaymentNumberSeries;
     protected java.lang.String msRegistrySs;
     protected double mdInterestDelayRate;
     protected int mnPricePolicyForPurchases;
@@ -132,6 +133,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public void setFiscalSettings(java.lang.String s) { msFiscalSettings = s; }
     public void setNotesPurchasesOrder(java.lang.String s) { msNotesPurchasesOrder = s; }
     public void setPaymentEmail(java.lang.String s) { msPaymentEmail = s; }
+    public void setPaymentNumberSeries(java.lang.String s) { msPaymentNumberSeries = s; }
     public void setRegistrySs(java.lang.String s) { msRegistrySs = s; }
     public void setInterestDelayRate(double d) { mdInterestDelayRate = d; }
     public void setPricePolicyForPurchases(int n) { mnPricePolicyForPurchases = n; }
@@ -218,6 +220,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
     public java.lang.String getFiscalSettings() { return msFiscalSettings; }
     public java.lang.String getNotesPurchasesOrder() { return msNotesPurchasesOrder; }
     public java.lang.String getPaymentEmail() { return msPaymentEmail; }
+    public java.lang.String getPaymentNumberSeries() { return msPaymentNumberSeries; }
     public java.lang.String getRegistrySs() { return msRegistrySs; }
     public double getInterestDelayRate() { return mdInterestDelayRate; }
     public int getPricePolicyForPurchases() { return mnPricePolicyForPurchases; }
@@ -339,6 +342,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
         msFiscalSettings = "";
         msNotesPurchasesOrder = "";
         msPaymentEmail = "";
+        msPaymentNumberSeries = "";
         msRegistrySs = "";
         mdInterestDelayRate = 0;
         mnPricePolicyForPurchases = 0;
@@ -451,6 +455,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 msFiscalSettings = resultSet.getString("fiscal_settings");
                 msNotesPurchasesOrder = resultSet.getString("notes_pur_ord");
                 msPaymentEmail = resultSet.getString("pay_email");
+                msPaymentNumberSeries = resultSet.getString("pay_num_ser");
                 msRegistrySs = resultSet.getString("reg_ss");
                 mdInterestDelayRate = resultSet.getDouble("int_delay_rate");
                 mnPricePolicyForPurchases = resultSet.getInt("price_pol_pur");
@@ -591,7 +596,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkConfigCoId);
             callableStatement.setInt(nParam++, mnDaysOfGraceSupplier);
             callableStatement.setInt(nParam++, mnDaysOfGraceCustomer);

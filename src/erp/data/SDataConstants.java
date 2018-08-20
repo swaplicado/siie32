@@ -178,8 +178,9 @@ public abstract class SDataConstants {
     public static final int BPSX_BP_CDR = 204510;
     public static final int BPSX_BP_DBR = 204511;
     public static final int BPSX_BP_EMP = 204512;
-    public static final int BPSX_BP_INT_SUP = 204608; //international suppliers
-    public static final int BPSX_BP_INT_CUS = 204609; //international customers
+    public static final int BPSX_BP_EMP_REL = 204513;   // employee relatives
+    public static final int BPSX_BP_INT_SUP = 204608;   //international suppliers
+    public static final int BPSX_BP_INT_CUS = 204609;   //international customers
 
     public static final int BPSX_BP_X_SUP_CUS = 204514;
     public static final int BPSX_BP_X_CDR_DBR = 204515;
@@ -457,6 +458,7 @@ public abstract class SDataConstants {
     public static final int TRN_TP_CFD_PAC = 207098;    // out of place! (sflores, 2014-02-17)
     public static final int TRN_MMS_LOG = 207099;       // out of place! (sflores, 2014-01-28)
     public static final int TRN_CFD_SIGN_LOG = 207100;  // out of place! (sflores, 2014-09-01)
+    public static final int TRN_CFD_FIN_REC = 207104;
     public static final int TRN_DVY = 207111;
     public static final int TRN_DVY_ETY = 207112;
 
@@ -531,8 +533,11 @@ public abstract class SDataConstants {
 
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;
+    public static final int TRNX_CFD_PAY_REC = 207611;
+    public static final int TRNX_DPS_ACT_VIEW_LINKS = 207614;
     public static final int TRNX_MAINT_DIOG = 207651;
     public static final int TRNX_MAINT_STK = 207652;
+    public static final int TRNX_MAINT_MOV = 207653;
     
     // XXX
     public static final int TRNX_DSM_ETY_SOURCE = 207601;
@@ -543,11 +548,6 @@ public abstract class SDataConstants {
     public static final int TRNX_TP_DPS = 207606;
     public static final int TRNX_SAL_PUR_TOT = 207607;
     public static final int TRNX_SAL_PUR_GLB = 207608;
-
-    public static final int TRNX_DPS_ACT_ANNUL = 207611;
-    public static final int TRNX_DPS_ACT_RISS = 207612;
-    public static final int TRNX_DPS_ACT_REPL = 207613;
-    public static final int TRNX_DPS_ACT_VIEW_LINKS = 207614;   
     // XXX
 
     public static final int TRNX_MFG_ORD = 207620;
@@ -944,6 +944,7 @@ public abstract class SDataConstants {
         TablesMap.put(TRN_CFD, "trn_cfd");
         TablesMap.put(TRN_CFD_SIGN_LOG, "trn_cfd_sign_log");
         TablesMap.put(TRN_CFD_SND_LOG, "trn_cfd_snd_log");
+        TablesMap.put(TRN_CFD_FIN_REC, "trn_cfd_fin_rec");
         TablesMap.put(TRN_PAC, "trn_pac");
         TablesMap.put(TRN_TP_CFD_PAC, "trn_tp_cfd_pac");
         TablesMap.put(TRN_SIGN, "trn_sign");

@@ -454,7 +454,7 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
         String columns = "";
         
         if (moRadReportTypePayEmp.isSelected()) {
-            columns = " 0 AS _g0, p.id_pay AS _g1, id_bp AS _g2, " + type + " AS _g3, '' AS _g0_name, CONCAT(tp_pay.code, '-', f_int_str(p.num,2), ' (', f_int_str(p.per_year,4), '-', f_int_str(p.per,2), ')') AS _g1_name, bp.bp AS _g2_name, ";
+            columns = " 0 AS _g0, p.id_pay AS _g1, id_bp AS _g2, " + type + " AS _g3, '' AS _g0_name, CONCAT(tp_pay.id_tp_pay, '-', UPPER(LEFT(tp_pay.name, 3)), '-', f_int_str(p.num,2), ' (', f_int_str(p.per_year,4), '-', f_int_str(p.per,2), ')') AS _g1_name, bp.bp AS _g2_name, ";
         }
         else if (moRadReportTypePayDepartamentEmp.isSelected()) {
             columns = " p.id_pay AS _g0, id_dep AS _g1, id_bp AS _g2, " + type + " AS _g3, CONCAT(tp_pay.code, '-', f_int_str(p.num,2), ' (', f_int_str(p.per_year,4), '-', f_int_str(p.per,2), ')') AS _g0_name, dep.code AS f_dep_code, dep.name AS _g1_name, bp.bp AS _g2_name, ";

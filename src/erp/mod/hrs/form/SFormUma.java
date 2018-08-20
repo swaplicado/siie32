@@ -69,7 +69,7 @@ public class SFormUma extends SBeanForm {
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAmount.setText("Valor UMA:*");
+        jlAmount.setText("Valor diario UMA:*");
         jlAmount.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlAmount);
         jPanel6.add(moCurAmount);

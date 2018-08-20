@@ -2,6 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.server;
 
 import cfd.DCfd;
@@ -26,7 +27,9 @@ import erp.lib.table.STableUtilities;
 import erp.mbps.data.SDataEmployee;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mtrn.data.SCfdPacket;
+import erp.mtrn.data.SCfdPaymentUtils;
 import erp.mtrn.data.SDataCfd;
+import erp.mtrn.data.SDataCfdPayment;
 import erp.mtrn.data.SDataCfdSignLog;
 import erp.mtrn.data.SDataSign;
 import java.awt.Graphics;
@@ -125,41 +128,6 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
      * Private functions
      */
     private void createCfd() throws SQLException, NoSuchAlgorithmException, Exception {
-        /*
-        java.sql.Blob blobKeyPrivate = null;
-        java.sql.Blob blobKeyPublic = null;
-        String sql = "SELECT cert_key_priv_n, cert_key_pub_n, cert_num, xml_base_dir FROM cfg_param_co WHERE id_co = " + mnPkCompanyId + " ";
-        ResultSet resultSet = moStatement.executeQuery(sql);
-
-        moServer.renderMessageLn(msSessionServer + "Creating CFD instance...");
-
-        if (!resultSet.next()) {
-            throw new Exception("Company's configuration could not be read.");
-        }
-        else {
-            blobKeyPrivate = resultSet.getBlob("cert_key_priv_n");
-            blobKeyPublic = resultSet.getBlob("cert_key_pub_n");
-
-            if (blobKeyPrivate == null) {
-                moServer.renderMessageLn(msSessionServer + "CFD private key not found!");
-            }
-
-            if (blobKeyPublic == null) {
-                moServer.renderMessageLn(msSessionServer + "CFD public key not found!");
-            }
-
-            if (blobKeyPrivate != null && blobKeyPublic != null) {
-                moCfd = new DCfd(
-                        blobKeyPrivate.getBytes(1, (int) blobKeyPrivate.length()),  // first byte is 1
-                        blobKeyPublic.getBytes(1, (int) blobKeyPublic.length()),   // first byte is 1
-                        resultSet.getString("cert_num"),
-                        resultSet.getString("xml_base_dir"));
-
-                moServer.renderMessageLn(msSessionServer + "CFD instance successfully created!");
-            }
-        }
-        */
-
         String sql = "SELECT xml_base_dir FROM cfg_param_co WHERE id_co = " + mnPkCompanyId + " ";
         ResultSet resultSet = moStatement.executeQuery(sql);
 
@@ -182,15 +150,23 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
          * IMPORTANT:
          * BufferedImage is not serializable, therefore it cannot be send to Server through RMI. QR Code is generated and put into in SSessionServer.requestFillReport().
          */
-
-        if (reportType == SDataConstantsSys.REP_TRN_CFDI || reportType == SDataConstantsSys.REP_TRN_CFDI_33 || reportType == SDataConstantsSys.REP_TRN_CFDI_PAYROLL) {
+        
+        // generate QR code:
+        if (SLibUtils.belongsTo(reportType, new int[] { SDataConstantsSys.REP_TRN_CFDI, SDataConstantsSys.REP_TRN_CFDI_33, SDataConstantsSys.REP_TRN_CFDI_33_CRP_10, SDataConstantsSys.REP_TRN_CFDI_PAYROLL })) {
             BufferedImage biQrCode = null;
             
             if (Float.parseFloat((String) map.get("sCfdVersion")) == DCfdConsts.CFDI_VER_32) {
                 biQrCode = DCfd.createQrCodeBufferedImageCfdi32((String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sCfdiUuid"));
             }
             else if (Float.parseFloat((String) map.get("sCfdVersion")) == DCfdConsts.CFDI_VER_33) {
-                biQrCode = DCfd.createQrCodeBufferedImageCfdi33((String) map.get("sUrlCfdi"), (String) map.get("sCfdiUuid"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sSelloCfdiUltDig"));
+                if (reportType == SDataConstantsSys.REP_TRN_CFDI_33_CRP_10) {
+                    // params names are slightly different in CFDI 3.3 with CRP 1.0, and total is allways zero:
+                    biQrCode = DCfd.createQrCodeBufferedImageCfdi33((String) map.get("sTfdUUID"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), 0, (String) map.get("sSelloCfdiUltDig"));
+                }
+                else {
+                    // params names for other cases of CFDI 3.3:
+                    biQrCode = DCfd.createQrCodeBufferedImageCfdi33((String) map.get("sCfdiUuid"), (String) map.get("sEmiRfc"), (String) map.get("sRecRfc"), Double.parseDouble("" + map.get("dCfdTotal")), (String) map.get("sSelloCfdiUltDig"));
+                }
             }
             
             if (biQrCode != null) {
@@ -198,7 +174,11 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
             }
         }
         
-        if (reportType == SDataConstantsSys.REP_TRN_DPS_ORDER && (boolean) map.get("bIsSupplier")) {
+        if (reportType == SDataConstantsSys.REP_TRN_CFDI_33_CRP_10) {
+            map.put("nParamSessionId", mnSessionId);
+            SCfdPaymentUtils.createTemporaryDataCfdi33_Crp10(moCompanyDatabase.getConnection(), mnSessionId, map.get("xml").toString());
+        }
+        else if (reportType == SDataConstantsSys.REP_TRN_DPS_ORDER && (boolean) map.get("bIsSupplier")) {
             GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
             
             if (((SDataEmployee) map.get("oUserBuyer")) != null && ((SDataEmployee) map.get("oUserBuyer")).getXtaImageIconSignature_n() != null) {
@@ -222,11 +202,11 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
          */
 
         name = SDataUtilities.getReportFileName(reportType);
-        if (name.length() > 0) {
+        if (!name.isEmpty()) {
             file = new File(name);
             jasperReport = (JasperReport) JRLoader.loadObject(file);
 
-            map.put("oSubreportConnection", moCompanyDatabase.getConnection());
+            map.put("oSubreportConnection", moCompanyDatabase.getConnection()); // 2018-08-16, Sergio Flores: What is the purpose of this param?, WTF!
             jasperPrint = JasperFillManager.fillReport(jasperReport, map, moCompanyDatabase.getConnection());
         }
 
@@ -465,7 +445,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         return vTableRows;
     }
 
-    private Vector<Vector<Object>> requestExecuteQuerySimple(String sql) throws SQLException, Exception {
+     private Vector<Vector<Object>> requestExecuteQuerySimple(String sql) throws SQLException, Exception {
         int i = 0;
         int cols = 0;
         Vector<Vector<Object>> vectors = new Vector<Vector<Object>>();
@@ -503,168 +483,104 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
     @SuppressWarnings("static-access")
     private int requestEmitCfd(SCfdPacket packet) throws Exception {
         int result = SLibConstants.UNDEFINED;
-        SDataCfd cfd = null;
-        SDataSign xmlSign = null;
-        String xmlFile = "";
-        String xmlFileName = "";
-        Date dateCfd = null;
-        boolean omitXmlDeclaration = false;
-        SDataCfdSignLog cfdSignLog = null;
 
         if (moCfd == null) {
-            throw new Exception("CFD has not been instanciated!");
+            throw new Exception("CFD-default-settings object has not been instanciated yet!");
         }
         else {
-            if (packet.getCfdRootElement() == null) {
-                xmlFile = packet.getXml();
-                xmlFileName = packet.getXmlName();
-                dateCfd = packet.getXmlDate();
-                omitXmlDeclaration = true;
-            }
-            else if (packet.getCfdRootElement() instanceof cfd.ver2.DElementComprobante) {
-                xmlFile = ((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getElementForXml();
+            SDataCfd dataCfd = packet.createDataCfd();
 
-                xmlFileName += ((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
-                xmlFileName += ((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
-                xmlFileName += (((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
-                xmlFileName += moCfd.getDecimalFormat().format(SLibUtils.parseLong(((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
-                dateCfd = ((cfd.ver2.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
-            }
-            else if (packet.getCfdRootElement() instanceof cfd.ver32.DElementComprobante) {
-                xmlFile = ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getElementForXml();
-
-                xmlFileName += ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
-                xmlFileName += ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getOption().substring(0, 1).toUpperCase() + "_";
-                xmlFileName += (((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
-                xmlFileName += moCfd.getDecimalFormat().format(SLibUtils.parseLong(((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
-                dateCfd = ((cfd.ver32.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
-            }
-            else if (packet.getCfdRootElement() instanceof cfd.ver33.DElementComprobante) {
-                xmlFile = ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getElementForXml();
-
-                xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getEltEmisor().getAttRfc().getString() + "_";
-                xmlFileName += ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttTipoDeComprobante().getString() + "_";
-                xmlFileName += (((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString().length() == 0 ? "" : ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttSerie().getString() + "_");
-                xmlFileName += moCfd.getDecimalFormat().format(SLibUtils.parseLong(((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttFolio().getString())) + ".xml";
-                dateCfd = ((cfd.ver33.DElementComprobante) packet.getCfdRootElement()).getAttFecha().getDatetime();
+            if (dataCfd.save(moCompanyDatabase.getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
+                result = SLibConstants.DB_CFD_ERROR;
             }
             else {
-                throw new Exception("Not supported CFD version!");
-            }
-
-            xmlFile = (omitXmlDeclaration ? "" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>\n") + xmlFile;
-
-            if (packet.getGenerateQrCode() && (packet.getRfcEmisor().isEmpty() || packet.getRfcReceptor().isEmpty() || packet.getUuid().isEmpty())) {
-                throw new Exception("The two-dimensional bar code can not be created!");
-            }
-
-            cfd = new SDataCfd();
-            cfd.setPkCfdId(packet.getCfdId());
-            cfd.setTimestamp(dateCfd);
-            cfd.setCertNumber(packet.getCertNumber());
-            cfd.setStringSigned(packet.getStringSigned());
-            cfd.setSignature(packet.getSignature());
-            cfd.setDocXml(xmlFile);
-            cfd.setDocXmlName(xmlFileName);
-            cfd.setAcknowledgmentCancellationXml(packet.getAcknowledgmentCancellation());
-            cfd.setUuid(packet.getUuid());
-            cfd.setIsConsistent(packet.getIsConsistent());
-            cfd.setFkCfdTypeId(packet.getFkCfdTypeId());
-            cfd.setFkXmlTypeId(packet.getFkXmlTypeId());
-            cfd.setFkXmlStatusId(packet.getFkXmlStatusId());
-            cfd.setFkXmlDeliveryTypeId(packet.getFkXmlDeliveryTypeId());
-            cfd.setFkXmlDeliveryStatusId(packet.getFkXmlDeliveryStatusId());
-            cfd.setFkUserProcessingId(packet.getFkUserDeliveryId());
-            cfd.setFkUserDeliveryId(packet.getFkUserDeliveryId());
-            cfd.setFkDpsYearId_n(packet.getDpsYearId());
-            cfd.setFkDpsDocId_n(packet.getDpsDocId());
-            cfd.setFkPayrollPayrollId_n(packet.getPayrollPayrollId());
-            cfd.setFkPayrollEmployeeId_n(packet.getPayrollEmployeeId());
-            cfd.setFkPayrollBizPartnerId_n(packet.getPayrollBizPartnerId());
-            cfd.setFkPayrollReceiptPayrollId_n(packet.getPayrollReceiptPayrollId());
-            cfd.setFkPayrollReceiptEmployeeId_n(packet.getPayrollReceiptEmployeeId());
-            cfd.setFkPayrollReceiptIssueId_n(packet.getPayrollReceiptIssueId());
-            cfd.setGenerateQrCode(packet.getGenerateQrCode());
-
-            cfd.setAuxRfcEmisor(packet.getRfcEmisor());
-            cfd.setAuxRfcReceptor(packet.getRfcReceptor());
-            cfd.setAuxTotalCy(packet.getTotalCy());
-
-            if (cfd.save(moCompanyDatabase.getConnection()) == SLibConstants.DB_ACTION_SAVE_OK) {
                 result = SLibConstants.DB_CFD_OK;
 
                 // XXX Guardar bitácora de timbrado 6
 
-                cfdSignLog = new SDataCfdSignLog();
+                SDataCfdSignLog cfdSignLog = new SDataCfdSignLog();
 
-                if (packet.getLogSignId() != SLibConstants.UNDEFINED) {
-                    cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getLogSignId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STATUS_DIACTIVATE_PAC);
+                if (packet.getAuxLogSignId() != SLibConstants.UNDEFINED) {
+                    cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getAuxLogSignId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STATUS_DIACTIVATE_PAC);
                 }
 
-                cfd.saveField(moCompanyDatabase.getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ACC_WS, false);
-                cfd.saveField(moCompanyDatabase.getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ACC_USR, packet.getFkUserDeliveryId());
+                dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_WS, false);
+                dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_USR, packet.getFkUserDeliveryId());
 
-                if (packet.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_NEW && packet.getConsumeStamp()) {
-                    xmlSign = new SDataSign();
+                if (packet.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_NEW && packet.getAuxStampConsume()) {
+                    SDataSign sign = new SDataSign();
+                    sign.setPkYearId(SLibTimeUtilities.digestYear(dataCfd.getTimestamp())[0]);
+                    sign.setPkPacId(packet.getAuxPacId());
+                    sign.setDate(mtTimestamp);
+                    sign.setMoveOut(packet.getAuxStampQuantity());
+                    sign.setFkCfdId_n(dataCfd.getPkCfdId());
+                    
                     if (packet.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
-                        xmlSign.setPkYearId(SLibTimeUtilities.digestYear(cfd.getTimestamp())[0]);
-                        xmlSign.setPkPacId(packet.getPacId());
-                        xmlSign.setDate(mtTimestamp);
-                        xmlSign.setMoveIn(0);
-                        xmlSign.setMoveOut(packet.getQuantityStamp());
-                        xmlSign.setIsDeleted(false);
-                        xmlSign.setFkSignCategoryId(SDataConstantsSys.TRNS_TP_SIGN_OUT_EMITED[0]);
-                        xmlSign.setFkSignTypeId(SDataConstantsSys.TRNS_TP_SIGN_OUT_EMITED[1]);
-                        xmlSign.setFkCfdId_n(cfd.getPkCfdId());
+                        sign.setFkSignCategoryId(SDataConstantsSys.TRNS_TP_SIGN_OUT_EMITED[0]);
+                        sign.setFkSignTypeId(SDataConstantsSys.TRNS_TP_SIGN_OUT_EMITED[1]);
                     }
                     else if (packet.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                        xmlSign.setPkYearId(SLibTimeUtilities.digestYear(cfd.getTimestamp())[0]);
-                        xmlSign.setPkPacId(packet.getPacId());
-                        xmlSign.setDate(mtTimestamp);
-                        xmlSign.setMoveIn(0);
-                        xmlSign.setMoveOut(packet.getQuantityStamp());
-                        xmlSign.setIsDeleted(false);
-                        xmlSign.setFkSignCategoryId(SDataConstantsSys.TRNS_TP_SIGN_OUT_ANNULED[0]);
-                        xmlSign.setFkSignTypeId(SDataConstantsSys.TRNS_TP_SIGN_OUT_ANNULED[1]);
-                        xmlSign.setFkCfdId_n(cfd.getPkCfdId());
+                        sign.setFkSignCategoryId(SDataConstantsSys.TRNS_TP_SIGN_OUT_ANNULED[0]);
+                        sign.setFkSignTypeId(SDataConstantsSys.TRNS_TP_SIGN_OUT_ANNULED[1]);
                     }
                     
                     // XXX Guardar bitácora de timbrado 7
 
-                    if (packet.getLogSignId() != SLibConstants.UNDEFINED) {
-                        cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getLogSignId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STATUS_CONSUME_STAMP);
+                    if (packet.getAuxLogSignId() != SLibConstants.UNDEFINED) {
+                        cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getAuxLogSignId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STATUS_CONSUME_STAMP);
                     }
 
-                    if (xmlSign.save(moCompanyDatabase.getConnection()) == SLibConstants.DB_ACTION_SAVE_OK) {
+                    if (sign.save(moCompanyDatabase.getConnection()) == SLibConstants.DB_ACTION_SAVE_OK) {
                         result = SLibConstants.DB_CFD_OK;
                     }
                 }
 
                 if (result == SLibConstants.DB_CFD_OK) {
                     if (packet.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                        if (packet.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_INV && packet.getDps() != null) {
-                           // Annul DPS registry:
+                        // annul as well associated registry:
+                        
+                        switch (packet.getFkCfdTypeId()) {
+                            case SDataConstantsSys.TRNS_TP_CFD_INV:
+                                if (packet.getAuxDataDps() != null) {
+                                    result = ((SDataRegistry) packet.getAuxDataDps()).canAnnul(moCompanyDatabase.getConnection());
 
-                            result = ((SDataRegistry) packet.getDps()).canAnnul(moCompanyDatabase.getConnection());
+                                    if (result == SLibConstants.DB_CAN_ANNUL_YES) {
+                                        result = ((SDataRegistry) packet.getAuxDataDps()).annul(moCompanyDatabase.getConnection());
 
-                            if (result == SLibConstants.DB_CAN_ANNUL_YES) {
-                                result = ((SDataRegistry) packet.getDps()).annul(moCompanyDatabase.getConnection());
-
-                                if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
-                                    result = SLibConstants.DB_CFD_OK;
+                                        if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
+                                            result = SLibConstants.DB_CFD_OK;
+                                        }
+                                    } 
                                 }
-                            } 
-                        }
-                        else if (packet.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL && packet.getPayrollReceiptIssue() != null) {
-                            result = ((SDataRegistry) packet.getPayrollReceiptIssue()).canAnnul(moCompanyDatabase.getConnection());
+                                break;
+                                
+                            case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                                if (packet.getAuxDataCfdPayment()!= null) {
+                                    result = ((SDataRegistry) packet.getAuxDataCfdPayment()).canAnnul(moCompanyDatabase.getConnection());
 
-                            if (result == SLibConstants.DB_CAN_ANNUL_YES) {
-                                result = ((SDataRegistry) packet.getPayrollReceiptIssue()).annul(moCompanyDatabase.getConnection());
-
-                                if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
-                                    result = SLibConstants.DB_CFD_OK;
+                                    if (result == SLibConstants.DB_CAN_ANNUL_YES) {
+                                        // irregular way to annul registries (CFD has just been annulled):
+                                        ((SDataCfdPayment) packet.getAuxDataCfdPayment()).deleteRecord(moCompanyDatabase.getConnection());
+                                        result = SLibConstants.DB_CFD_OK;
+                                    } 
                                 }
-                            }
+                                break;
+                                
+                            case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
+                                if (packet.getAuxDataPayrollReceiptIssue() != null) {
+                                    result = ((SDataRegistry) packet.getAuxDataPayrollReceiptIssue()).canAnnul(moCompanyDatabase.getConnection());
+
+                                    if (result == SLibConstants.DB_CAN_ANNUL_YES) {
+                                        result = ((SDataRegistry) packet.getAuxDataPayrollReceiptIssue()).annul(moCompanyDatabase.getConnection());
+
+                                        if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
+                                            result = SLibConstants.DB_CFD_OK;
+                                        }
+                                    }
+                                }
+                                break;
+                                
+                            default:
                         }
                     }
                 }
@@ -672,12 +588,12 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 if (result == SLibConstants.DB_CFD_OK) {
                     if (packet.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                         try {
-                            moCfd.write(xmlFile, xmlFileName, dateCfd, packet.getStringSigned(), packet.getSignature(), packet.getCertNumber(), packet.getCertBase64(), omitXmlDeclaration);
+                            moCfd.write(packet.getXml(), packet.getXmlName(), packet.getXmlDate(), packet.getCfdStringSigned(), packet.getCfdSignature());
 
                             // Set flag XML as correct:
 
-                            cfd.saveField(moCompanyDatabase.getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ACC_XML_STO, false);
-                            cfd.saveField(moCompanyDatabase.getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ACC_USR, packet.getFkUserDeliveryId());
+                            dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_XML_STO, false);
+                            dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_USR, packet.getFkUserDeliveryId());
                         }
                         catch (Exception e) {
                             result = SLibConstants.DB_CFD_OK;
@@ -687,13 +603,10 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     else {
                         // Set flag XML as correct:
 
-                        cfd.saveField(moCompanyDatabase.getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ACC_XML_STO, false);
-                        cfd.saveField(moCompanyDatabase.getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ACC_USR, packet.getFkUserDeliveryId());
+                        dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_XML_STO, false);
+                        dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_USR, packet.getFkUserDeliveryId());
                     }
                 }
-            }
-            else {
-                result = SLibConstants.DB_CFD_ERROR;
             }
         }
 

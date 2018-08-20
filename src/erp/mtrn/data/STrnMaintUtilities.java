@@ -7,6 +7,7 @@ package erp.mtrn.data;
 
 import erp.client.SClientInterface;
 import erp.lib.SLibConstants;
+import erp.mtrn.form.uareu.SDialogUareUFingerPassword;
 import erp.mtrn.form.uareu.SDialogUareUFingerprint;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -45,12 +46,39 @@ public abstract class STrnMaintUtilities {
         return fingerprint;
     }
     
+    public static int enrollFingerPassword(final SClientInterface client) {
+        int fingerPassword = 0;
+        SDialogUareUFingerPassword dialog = new SDialogUareUFingerPassword(client,  SDialogUareUFingerprint.MODE_ENROLLMENT);
+        
+        dialog.formReset();
+        dialog.setVisible(true);
+        if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            fingerPassword = (int) Integer.parseInt(dialog.getValue(SDialogUareUFingerPassword.VALUE_FINGERPASSWORD));
+        }
+        
+        return fingerPassword;
+    }
+    
     public static boolean verifyFingerprint(final SClientInterface client, final byte[] fingerprint) {
         boolean verified = false;
         SDialogUareUFingerprint dialog = new SDialogUareUFingerprint(client, SDialogUareUFingerprint.MODE_VERIFICATION);
         
         dialog.formReset();
         dialog.setValue(SDialogUareUFingerprint.VALUE_FINGERPRINT, fingerprint);
+        dialog.setVisible(true);
+        if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+            verified = true;
+        }
+        
+        return verified;
+    }
+    
+    public static boolean verifyFingerPassword(final SClientInterface client, final int fingerPassword) {
+        boolean verified = false;
+        SDialogUareUFingerPassword dialog = new SDialogUareUFingerPassword(client, SDialogUareUFingerprint.MODE_VERIFICATION);
+        
+        dialog.formReset();
+        dialog.setValue(SDialogUareUFingerPassword.VALUE_FINGERPASSWORD, fingerPassword);
         dialog.setVisible(true);
         if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             verified = true;

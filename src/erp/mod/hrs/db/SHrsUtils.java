@@ -43,8 +43,11 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.util.JRLoader;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -54,7 +57,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas, Alfredo Perez, Sergio Flores
+ * @author Juan Barajas, Alfredo Perez, Claudio Peña, Sergio Flores
  */
 public abstract class SHrsUtils {
     
@@ -478,6 +481,462 @@ public abstract class SHrsUtils {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
+    }
+    
+      /**
+     * Replace special characters
+     * @param input original text
+     * @return output text without characters
+     */
+    public static String removeSpecialChar(String input) {
+        String specialCharacters = "áàäéèëíìïóòöúùuñÁÀÄÉÈËÍÌÏÓÒÖÚÙÜÑçÇ";
+        String replaceCharacters = "aaaeeeiiiooouuu#AAAEEEIIIOOOUUU#cC";
+        String output = input;
+        for (int i = 0; i < specialCharacters.length(); i++) {
+            output = output.replace(specialCharacters.charAt(i), replaceCharacters.charAt(i));
+        }
+        return output;
+    }        
+
+    /**
+     * 
+     * @param client
+     * @param dateApplicationIni
+     * @param dateApplicationEnd
+     * @return
+     * @throws SQLException 
+     */
+    public static ArrayList prepareSqlQueryHigh(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateApplicationIni);
+        String dateEnd = formatter.format(dateApplicationEnd);
+        String sqlId = "";
+        ResultSet resultSet = null;
+        int[] employeeId = null;
+
+        sqlId = "SELECT id_emp FROM HRS_EMP_LOG_HIRE " 
+                + "WHERE dt_hire >= '" + dateIni + "' AND dt_hire <= '" + dateEnd + "' "
+                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_ACTIVE ;
+
+        resultSet = client.getSession().getStatement().executeQuery(sqlId);
+        ArrayList <Integer> resultsId = new ArrayList();
+
+        while (resultSet.next()) {
+          resultsId.add(resultSet.getInt("id_emp"));                  
+        }
+        return resultsId;
+    }
+    
+      /**
+     * 
+     * @param client
+     * @param dateApplicationIni
+     * @param dateApplicationEnd
+     * @return
+     * @throws SQLException 
+     */
+    public static ArrayList prepareSqlQueryMod(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateApplicationIni);
+        String dateEnd = formatter.format(dateApplicationEnd);
+        String sqlId = "";
+        ResultSet resultSet = null;
+        int[] employeeId = null;
+
+        sqlId = "SELECT id_emp FROM hrs_emp_log_sal_ssc " 
+                + "WHERE dt >= '" + dateIni + "' AND dt <= '" + dateEnd + "' " 
+                + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del ";        
+
+        resultSet = client.getSession().getStatement().executeQuery(sqlId);
+        ArrayList <Integer> resultsId = new ArrayList();
+
+        while (resultSet.next()) {
+          resultsId.add(resultSet.getInt("id_emp"));                  
+        }
+        return resultsId;
+    }
+    
+    /**
+     * 
+     * @param client
+     * @param dateApplicationIni
+     * @param dateApplicationEnd
+     * @return
+     * @throws SQLException 
+     */
+    public static ArrayList prepareSqlQueryLow(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateApplicationIni);
+        String dateEnd = formatter.format(dateApplicationEnd);
+        String sqlId = "";
+        ResultSet resultSet = null;
+        int[] employeeId = null;
+
+        sqlId = "SELECT id_emp FROM hrs_emp_log_hire "
+                + "WHERE dt_dis_n >= '" + dateIni + "' AND dt_dis_n <= '" + dateEnd + "' "
+                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + " "; 
+
+        resultSet = client.getSession().getStatement().executeQuery(sqlId);
+        ArrayList <Integer> resultsId = new ArrayList();
+
+        while (resultSet.next()) {
+          resultsId.add(resultSet.getInt("id_emp"));                  
+        }
+        return resultsId;
+    }
+     
+    
+    /**
+     * 
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeRegister(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyyyMMdd HHmm");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);        
+        java.lang.String buffer = "";
+        String sql = "";
+        String fileName = "";
+        String param = "";
+        String ssn = "";
+        String name = "";
+        String fatherName = "";
+        String motherName = "";
+        String curp = "";
+        String salaryType = "";
+        String workerKey = "";
+        String guia = "";
+        double baseSalary = 0;
+        Date dateApplication = null;
+
+        fileName = formatDateTitle.format(new Date()).concat(" Altas.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                ArrayList <Integer> pkPrimaryK = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
+    
+                for (int i = 0; i <= pkPrimaryK.size()-1; i++){
+                int pkUser = pkPrimaryK.get(i);
+                    
+                    sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM, "
+                            + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, "
+                            + "sal.id_tp_sal AS TpSalario, wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.dt_hire AS DateApplication, par.reg_ss AS Param "
+                            + "FROM erp.HRSU_EMP AS emp "
+                            + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                            + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                            + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                            + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                            + "INNER JOIN hrs_emp_log_hire AS hire ON hire.id_emp = emp.id_emp "
+                            + "INNER JOIN cfg_param_co AS par "
+                            + "INNER JOIN hrs_cfg AS cfg "
+                            + "WHERE hire.b_hire = " + (layoutSuaType == SModConsts.HRSX_HIRE_ACTIVE ? SModConsts.HRSX_HIRE_ACTIVE : SModConsts.HRSX_HIRE_DISMISSED) + " AND not hire.b_del "
+                            + "AND hire.dt_hire >= '" + dateIni + "' AND hire.dt_hire <= '" + dateEnd + "' "
+                            + "AND emp.id_emp = " + pkUser;
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        dateApplication = resultSetHeader.getDate("DateApplication");
+                        ssn = resultSetHeader.getString("SSN");
+                        baseSalary = resultSetHeader.getDouble("Salario");
+                        salaryType = resultSetHeader.getString("TpSalario");
+                        workerKey = resultSetHeader.getString("ClaveTrab");
+                        name = resultSetHeader.getString("Nombre");
+                        fatherName = resultSetHeader.getString("ApellidoP");
+                        motherName = resultSetHeader.getString("ApellidoM");
+                        curp = resultSetHeader.getString("CURP");
+                        guia = resultSetHeader.getString("Guia");
+                    }
+
+                    buffer += param.substring(0, 9); // (Employer registration)
+                    buffer += param.substring(9); // (Digit verifier of R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Social Security number)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += removeSpecialChar(fatherName).concat(fatherName.length() > 27 ? fatherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (fatherName.length() == 27 ? 0 : 27 - fatherName.length())))); // (Last name)
+                    buffer += removeSpecialChar(motherName).concat(motherName.length() > 27 ? motherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (motherName.length() == 27 ? 0 : 27 - motherName.length())))); // (Mother's last name)
+                    buffer += removeSpecialChar(name).concat(name.length() > 27 ? name.substring(0, 27) : (SLibUtilities.textRepeat(" ", (name.length() == 27 ? 0 : 27 - name.length())))); // (name)
+                    String.format("%.2f", baseSalary);
+                    String baseSalaryS = String.valueOf(baseSalary);
+                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                    buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 6));
+                    buffer += "1"; // (Type of worker)
+                    buffer += (salaryType.equals(1) ? "0" : salaryType.equals(2) ? "1" : "2"); //(Type of salary)
+                    buffer += "0"; //(Week or reduced working day)
+                    buffer += formatDateData.format(dateApplication); // (Movement date)
+                    buffer += "000"; //(Family medicine unit)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 2));
+                    buffer += "08"; // (Movement type)
+                    buffer += (guia + "400"); // (Guide)
+                    buffer += (workerKey.length() > 10 ? workerKey.substring(0, 10) : (SLibUtilities.textRepeat("0", (workerKey.length() == 10 ? 0 : 10 - workerKey.length())))).concat(workerKey); // (Worker's code)
+                    buffer += SLibUtilities.textRepeat(" ", 1);
+                    buffer += curp; // CURP
+                    buffer += "9"; // (Format Identifier)
+                    buffer += "\n";
+                }
+                    
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (java.lang.Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+
+    /**
+     * 
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeModification(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyyyMMdd HHmm");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd); 
+        java.lang.String buffer = "";
+        String sql = "";
+        String param = "";
+        String fileName = "";
+        String ssn = "";
+        String name = "";
+        String fatherName = "";
+        String motherName = "";
+        String curp = "";
+        String salaryType = "";
+        String workerKey = "";
+        String guia = "";
+        double baseSalary = 0;
+        Date dateApplication = null;
+        
+        fileName = formatDateTitle.format(new Date()).concat(" SBC.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                ArrayList <Integer> pkPrimaryK = prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
+    
+                for (int i = 0; i <= pkPrimaryK.size()-1; i++){
+                    int pkUser = pkPrimaryK.get(i);
+
+                    sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM, "
+                            + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, " 
+                            + "sal.id_tp_sal AS TpSalario, wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, ssc.dt AS DateApplication, par.reg_ss AS Param "
+                            + "FROM erp.HRSU_EMP AS emp "
+                            + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                            + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                            + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                            + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                            + "INNER JOIN HRS_EMP_LOG_SAL_SSC AS ssc ON ssc.id_emp = emp.id_emp "
+                            + "INNER JOIN cfg_param_co AS par "
+                            + "INNER JOIN hrs_cfg AS cfg "
+                            + "WHERE ssc.dt >= '" + dateIni + "' AND ssc.dt <= '" + dateEnd + "' AND NOT ssc.b_del "
+                            + "AND emp.id_emp = " + pkUser ; 
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        ssn = resultSetHeader.getString("SSN");
+                        dateApplication = resultSetHeader.getDate("DateApplication");
+                        baseSalary = resultSetHeader.getDouble("Salario");
+                        salaryType = resultSetHeader.getString("TpSalario");
+                        workerKey = resultSetHeader.getString("ClaveTrab");
+                        name = resultSetHeader.getString("Nombre");
+                        fatherName = resultSetHeader.getString("ApellidoP");
+                        motherName = resultSetHeader.getString("ApellidoM");
+                        curp = resultSetHeader.getString("CURP");
+                        guia = resultSetHeader.getString("Guia");
+                    }             
+
+                    buffer += param.substring(0, 9); // (Employer registration)
+                    buffer += param.substring(9); // (Digit verifier of R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Social Security number)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += removeSpecialChar(fatherName).concat(fatherName.length() > 27 ? fatherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (fatherName.length() == 27 ? 0 : 27 - fatherName.length())))); // (Last name)
+                    buffer += removeSpecialChar(motherName).concat(motherName.length() > 27 ? motherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (motherName.length() == 27 ? 0 : 27 - motherName.length())))); // (Mother's last name)
+                    buffer += removeSpecialChar(name).concat(name.length() > 27 ? name.substring(0, 27) : (SLibUtilities.textRepeat(" ", (name.length() == 27 ? 0 : 27 - name.length())))); // (name)
+                    String.format("%.2f", baseSalary);
+                    String baseSalaryS = String.valueOf(baseSalary);
+                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                    buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 6));
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 1));
+                    buffer += (salaryType.equals(1) ? "0" : salaryType.equals(2) ? "1" : "2"); //(Type of salary)
+                    buffer += "0"; //(Week or reduced working day)
+                    buffer += formatDateData.format(dateApplication); // (Movement date)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 5));
+                    buffer += "07"; // (Movement type)
+                    buffer += (guia + "400"); // (Guide)
+                    buffer += (workerKey.length() > 10 ? workerKey.substring(0, 10) : (SLibUtilities.textRepeat("0", (workerKey.length() == 10 ? 0 : 10 - workerKey.length())))).concat(workerKey); // (Worker's code)
+                    buffer += SLibUtilities.textRepeat(" ", 1);
+                    buffer += curp; // CURP
+                    buffer += "9"; // (Format Identifier)
+                    buffer += "\n";                                  
+                }
+                
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (java.lang.Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }    
+    
+    /**
+     * 
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeDelete(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyyyMMdd HHmm");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateIni = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);  
+        java.lang.String buffer = "";
+        String sql = "";
+        String param = "";
+        String fileName = "";
+        String ssn = "";
+        String name = "";
+        String fatherName = "";
+        String motherName = "";
+        String workerKey = "";
+        String guia = "";
+        String type = "";
+        Date dateApplication = null;
+        
+        fileName = formatDateTitle.format(new Date()).concat(" Bajas.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                ArrayList <Integer> pkPrimaryK = prepareSqlQueryLow(client, dateLayoutStart, dateLayoutEnd);
+    
+                for (int i = 0; i <= pkPrimaryK.size()-1; i++){
+                int pkUser = pkPrimaryK.get(i);
+                
+                    sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM,"
+                          + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, sal.id_tp_sal AS TpSalario, "
+                          + "wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.b_hire AS Motivo, hire.fk_tp_emp_dis AS Tipe, hire.dt_dis_n AS DateApplication, par.reg_ss AS Param "
+                          + "FROM erp.HRSU_EMP AS emp "
+                          + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                          + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                          + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                          + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                          + "INNER JOIN HRS_EMP_LOG_HIRE AS hire ON hire.id_emp = emp.id_emp "
+                          + "INNER JOIN cfg_param_co AS par "
+                          + "INNER JOIN hrs_cfg AS cfg "
+                          + "WHERE hire.b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + " AND not hire.b_del "
+                          + "AND hire.dt_dis_n >= '" + dateIni + "' AND hire.dt_dis_n <= '" + dateEnd + "' "
+                          + "AND emp.id_emp = " + pkUser;
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+                        while (resultSetHeader.next()) {
+                            dateApplication = resultSetHeader.getDate("DateApplication");
+                            param = resultSetHeader.getString("Param");
+                            ssn = resultSetHeader.getString("SSN");
+                            workerKey = resultSetHeader.getString("ClaveTrab");
+                            name = resultSetHeader.getString("Nombre");
+                            fatherName = resultSetHeader.getString("ApellidoP");
+                            motherName = resultSetHeader.getString("ApellidoM");
+                            guia = resultSetHeader.getString("Guia");
+                            type = resultSetHeader.getString("Tipe");
+                        }
+
+
+                    buffer += param.substring(0, 9); // (Employer registration)
+                    buffer += param.substring(9); // (Digit verifier of R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Social Security number)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += removeSpecialChar(fatherName).concat(fatherName.length() > 27 ? fatherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (fatherName.length() == 27 ? 0 : 27 - fatherName.length())))); // (Last name)
+                    buffer += removeSpecialChar(motherName).concat(motherName.length() > 27 ? motherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (motherName.length() == 27 ? 0 : 27 - motherName.length())))); // (Mother's last name)
+                    buffer += removeSpecialChar(name).concat(name.length() > 27 ? name.substring(0, 27) : (SLibUtilities.textRepeat(" ", (name.length() == 27 ? 0 : 27 - name.length())))); // (name)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 15));
+                    buffer += formatDateData.format(dateApplication); // (Movement date)
+                    buffer += String.valueOf(SLibUtilities.textRepeat(" ", 5));
+                    buffer += "02"; // (Movement type)
+                    buffer += (guia + "400"); // (Guide)
+                    buffer += (workerKey.length() > 10 ? workerKey.substring(0, 10) : (SLibUtilities.textRepeat("0", (workerKey.length() == 10 ? 0 : 10 - workerKey.length())))).concat(workerKey); // (Worker's code)
+                    buffer += (type.equals(1) ? "6" : type.equals(2) ? "2" : type.equals(3) ? "1" : type.equals(4) ? "3" : "6" );
+                    buffer += SLibUtilities.textRepeat(" ", 18);
+                    buffer += "9"; // (Format Identifier)
+                    buffer += "\n";
+                }
+                
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (java.lang.Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
+    /**
+     * Checks if period is anniversary of provided date.
+     * @param anniversary
+     * @param periodStart
+     * @param periodEnd
+     * @return 
+     */
+    public static boolean isAnniversaryBelongingToPeriod(final Date anniversary, final Date periodStart, final Date periodEnd) throws Exception {
+        SLibTimeUtils.validatePeriod(periodStart, periodEnd);
+        int[] elementsDate = SLibTimeUtils.digestDate(anniversary);
+        int[] elementsPeriodEnd = SLibTimeUtils.digestDate(periodEnd);
+        elementsDate[0] = elementsPeriodEnd[0];
+        Date newDate = SLibTimeUtils.createDate(elementsDate[0], elementsDate[1], elementsDate[2]);
+        return SLibTimeUtils.isBelongingToPeriod(newDate, periodStart, periodEnd);
     }
     
     /**
@@ -971,35 +1430,47 @@ public abstract class SHrsUtils {
 
         return deduction;
     }
-    
-    public static SDbBenefitTable getBenefitTableByEarning(final SGuiSession session, final int earningId, final int paymentType, final Date dateCut) throws Exception {
-        SDbBenefitTable benefitTable = null;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT id_ben "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
-            + "WHERE b_del = 0 AND fk_ear = " + earningId + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "' "
-            + (paymentType == SLibConsts.UNDEFINED ? "AND fk_tp_pay_n IS NULL" : "AND (fk_tp_pay_n IS NULL OR fk_tp_pay_n = " + paymentType + ")") + " "
-            + "ORDER BY dt_sta DESC, id_ben "
-            + "LIMIT 1;";
-        resultSet = session.getStatement().executeQuery(sql);
+    /**
+     * Gets benefits table by earning.
+     * @param session
+     * @param earningId
+     * @param paymentType
+     * @param dateCutOff
+     * @return
+     * @throws Exception if benefit table is not found or on SQL exception as well.
+     */
+    public static SDbBenefitTable getBenefitTableByEarning(final SGuiSession session, final int earningId, final int paymentType, final Date dateCutOff) throws Exception {
+        SDbBenefitTable benefitTable = null;
+
+        String sql = "SELECT id_ben "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
+                + "WHERE b_del = 0 AND fk_ear = " + earningId + " AND "
+                + "dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "' AND "
+                + "(fk_tp_pay_n IS NULL" + (paymentType == 0 ? "" : " OR fk_tp_pay_n = " + paymentType) + ") "
+                + "ORDER BY fk_tp_pay_n DESC, dt_sta DESC, id_ben " // priority to requested payment type, if any, and then the most recent starting date
+                + "LIMIT 1;";
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             benefitTable = new SDbBenefitTable();
             benefitTable.read(session, new int[] { resultSet.getInt("id_ben") });
+        }
+        
+        if (benefitTable == null) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nTabla de prestaciones adecuada para la fecha de corte '" + SLibUtils.DateFormatDate.format(dateCutOff) + "'.");
         }
 
         return benefitTable;
     }
     
-    public static SDbBenefitTable getBenefitTableByDeduction(final SGuiSession session, final int deductionId, final Date dateCut) throws Exception {
+    public static SDbBenefitTable getBenefitTableByDeduction(final SGuiSession session, final int deductionId, final Date dateCutOff) throws Exception {
         SDbBenefitTable benefitTable = null;
         String sql = "";
         ResultSet resultSet = null;
 
         sql = "SELECT id_ben "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
-            + "WHERE b_del = 0 AND fk_ded_n = " + deductionId + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "' "
+            + "WHERE b_del = 0 AND fk_ded_n = " + deductionId + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "' "
             + "ORDER BY dt_sta DESC, id_ben "
             + "LIMIT 1;";
         resultSet = session.getStatement().executeQuery(sql);
@@ -1027,21 +1498,36 @@ public abstract class SHrsUtils {
         return disabilityName;
     }
     
-    public static ArrayList<SHrsBenefitTableByAnniversary> getBenefitTablesAnniversarys(ArrayList<SDbBenefitTable> benefitTables) throws Exception {
-        int i = 0;
-        ArrayList<SHrsBenefitTableByAnniversary> aBenefitTableByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
+    /**
+     * Create anniversary entries from 1 to 99 for each given table of benefits.
+     * @param benefitTables
+     * @return Array of anniversaries (from 1 to 100) for each given table of benefits.
+     */
+    public static ArrayList<SHrsBenefitTableAnniversary> createBenefitTablesAnniversarys(ArrayList<SDbBenefitTable> benefitTables) {
+        ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarys = new ArrayList<>();
         
-        for (SDbBenefitTable table : benefitTables) {
-            i = 1;
-            for (SDbBenefitTableRow tableRow : table.getChildRows()) {
-                while ( i * 12 <= tableRow.getMonths()) {
-                    aBenefitTableByAnniversary.add(new SHrsBenefitTableByAnniversary(table.getPkBenefitId(), i, table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? tableRow.getBenefitBonusPercentage() : tableRow.getBenefitDays()));
-                    i++;
+        benefitTables.stream().filter((table) -> (!table.getChildRows().isEmpty())).forEach((table) -> {
+            int currIndex = 0;      // current index of rows of current benefit table
+            double currValue = 0;   // current value, it can be days or bonus percentage
+            SDbBenefitTableRow currTableRow = null;     // current benefit-table row
+            SDbBenefitTableRow nextTableRow = null;     // next benefit-table row, when available
+            
+            for (int ann = 1; ann <= 100; ann++) {
+                if (currTableRow == null || (nextTableRow != null && (ann * SLibTimeConsts.MONTHS >= nextTableRow.getMonths()))) {
+                    if (currTableRow != null) {
+                        currIndex++;
+                    }
+                    
+                    currTableRow = table.getChildRows().get(currIndex);
+                    nextTableRow = table.getChildRows().size() == currIndex + 1 ? null : table.getChildRows().get(currIndex + 1);
+                    currValue = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? currTableRow.getBenefitBonusPercentage() : currTableRow.getBenefitDays();
                 }
+                
+                benefitTableAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), ann, currValue));
             }
-        }
+        });
 
-        return aBenefitTableByAnniversary;
+        return benefitTableAnniversarys;
     }
 
     /**
@@ -1119,14 +1605,14 @@ public abstract class SHrsUtils {
         return id_ss;
     }
     
-    public static int getRecentBenefitTable(final SGuiSession session, final int benefitType, final int paymentType, final Date dateCut) throws Exception {
+    public static int getRecentBenefitTable(final SGuiSession session, final int benefitType, final int paymentType, final Date dateCutOff) throws Exception {
         int id_ben = 0;
         String sql = "";
         ResultSet resultSet = null;
 
         sql = "SELECT id_ben "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
-            + "WHERE b_del = 0 AND fk_tp_ben = " + benefitType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "' "
+            + "WHERE b_del = 0 AND fk_tp_ben = " + benefitType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "' "
             + (paymentType == SLibConsts.UNDEFINED ? "AND fk_tp_pay_n IS NULL" : "AND (fk_tp_pay_n IS NULL OR fk_tp_pay_n = " + paymentType + ")") + " "
             + "ORDER BY dt_sta DESC, id_ben "
             + "LIMIT 1;";
@@ -1141,6 +1627,7 @@ public abstract class SHrsUtils {
     /**
      * Get recent minimum wage zone
      * @param session SGuiSession
+     * @param idMwzType Minimum wage zone
      * @param start Date start date
      * @return wage double
      * @throws Exception
@@ -1339,7 +1826,7 @@ public abstract class SHrsUtils {
         }
     }
     
-    public static void SendPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
+    public static void sendPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
         boolean isSent = false;
         HashMap<String, Object> map = new HashMap<>();
         File pdf = null;
@@ -1542,56 +2029,53 @@ public abstract class SHrsUtils {
         return balance;
     }
     
-    public static double getIntegrationFactorSbc(final SGuiSession session, final Date dateBenefits, final Date dateCut) throws Exception {
+    public static double getIntegrationFactorSbc(final SGuiSession session, final Date dateBenefits, final Date dateCutOff) throws Exception {
         int seniority = 0;
         int daysTableVacation = 0;
         int daysTableAnnualBonus = 0;
         double percentageTableVacationBonus = 0;
         double salaryUnit = 1;
         double integrationFactorSbc = 0;
-        SHrsBenefitTableByAnniversary benefitTableRow = null;
-        ArrayList<SHrsBenefitTableByAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
-        ArrayList<SHrsBenefitTableByAnniversary> aTableAnnualBonusByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
-        ArrayList<SHrsBenefitTableByAnniversary> aTableVacationBonusByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
-        ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<SDbBenefitTable>();
-        ArrayList<SDbBenefitTable> aTableAnnualBonus = new ArrayList<SDbBenefitTable>();
-        ArrayList<SDbBenefitTable> aTableVacationBonus = new ArrayList<SDbBenefitTable>();
+        SHrsBenefitTableAnniversary benefitTableAnniversary = null;
+        ArrayList<SDbBenefitTable> benefitTableVacation = new ArrayList<>();
+        ArrayList<SDbBenefitTable> benefitTableAnnualBonus = new ArrayList<>();
+        ArrayList<SDbBenefitTable> benefitTableVacationBonus = new ArrayList<>();
         
-        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCut) }));
-        aTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, SLibConsts.UNDEFINED, dateCut) }));
-        aTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, SLibConsts.UNDEFINED, dateCut) }));
+        benefitTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutOff) }));
+        benefitTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, SLibConsts.UNDEFINED, dateCutOff) }));
+        benefitTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, SLibConsts.UNDEFINED, dateCutOff) }));
         
         if (dateBenefits != null) {
-            seniority = getSeniorityEmployee(session, dateBenefits, dateCut);
+            seniority = getSeniorityEmployee(dateBenefits, dateCutOff);
         }
         else {
             seniority = 1;
         }
         
-        aTableVacationByAnniversary = getBenefitTablesAnniversarys(aTableVacation);
-        aTableAnnualBonusByAnniversary = getBenefitTablesAnniversarys(aTableAnnualBonus);
-        aTableVacationBonusByAnniversary = getBenefitTablesAnniversarys(aTableVacationBonus);
+        ArrayList<SHrsBenefitTableAnniversary> benefitTableVacationAnniversarys = createBenefitTablesAnniversarys(benefitTableVacation);
+        ArrayList<SHrsBenefitTableAnniversary> benefitTableAnnualBonusAnniversarys = createBenefitTablesAnniversarys(benefitTableAnnualBonus);
+        ArrayList<SHrsBenefitTableAnniversary> benefitTableVacationBonusAnniversarys = createBenefitTablesAnniversarys(benefitTableVacationBonus);
         
-        for (SHrsBenefitTableByAnniversary row : aTableVacationByAnniversary) {
-            if (row.getBenefitAnn() <= seniority) {
-                benefitTableRow = row;
+        for (SHrsBenefitTableAnniversary anniversary : benefitTableVacationAnniversarys) {
+            if (anniversary.getBenefitAnn() <= seniority) {
+                benefitTableAnniversary = anniversary;
             }
         }
-        daysTableVacation = benefitTableRow == null ? 0 : (int) benefitTableRow.getValue();
+        daysTableVacation = benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue();
         
-        for (SHrsBenefitTableByAnniversary row : aTableAnnualBonusByAnniversary) {
-            if (row.getBenefitAnn() <= seniority) {
-                benefitTableRow = row;
+        for (SHrsBenefitTableAnniversary anniversary : benefitTableAnnualBonusAnniversarys) {
+            if (anniversary.getBenefitAnn() <= seniority) {
+                benefitTableAnniversary = anniversary;
             }
         }
-        daysTableAnnualBonus = benefitTableRow == null ? 0 : (int) benefitTableRow.getValue();
+        daysTableAnnualBonus = benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue();
         
-        for (SHrsBenefitTableByAnniversary row : aTableVacationBonusByAnniversary) {
-            if (row.getBenefitAnn() <= seniority) {
-                benefitTableRow = row;
+        for (SHrsBenefitTableAnniversary anniversary : benefitTableVacationBonusAnniversarys) {
+            if (anniversary.getBenefitAnn() <= seniority) {
+                benefitTableAnniversary = anniversary;
             }
         }
-        percentageTableVacationBonus = benefitTableRow == null ? 0 : (double) benefitTableRow.getValue();
+        percentageTableVacationBonus = benefitTableAnniversary == null ? 0 : (double) benefitTableAnniversary.getValue();
         
         integrationFactorSbc = salaryUnit + ((double) daysTableAnnualBonus / SHrsConsts.YEAR_DAYS) + (double) (daysTableVacation * percentageTableVacationBonus / SHrsConsts.YEAR_DAYS);
         
@@ -1614,19 +2098,12 @@ public abstract class SHrsUtils {
         return nextNumber;
     }
     
-    public static int getSeniorityEmployee(final SGuiSession session, final Date dateBenefits, final Date dateCut) throws Exception {
-        int seniority = 0;
-        String sql = "";
-        ResultSet resultSet = null;
+    public static int getSeniorityEmployee(final Date dateBenefits, final Date dateCutOff) {
+        DateTime start = new DateTime(dateBenefits);
+        DateTime end = new DateTime(dateCutOff);
+        Period period = new Period(start, end);
         
-        sql = "SELECT TIMESTAMPDIFF(YEAR,'" + SLibUtils.DbmsDateFormatDate.format(dateBenefits) + "','" + 
-                SLibUtils.DbmsDateFormatDate.format(dateCut) + "') ";
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            seniority = resultSet.getInt(1);
-        }
-        
-        return seniority;
+        return period.getYears();
     }
     
     public static int getPaymentVacationsByEmployee(final SGuiSession session, final int employeeId, final int benefitAnn, final int benefitYear) throws Exception {
@@ -1647,18 +2124,18 @@ public abstract class SHrsUtils {
         return seniority;
     }
     
-    public static int getDaysVacationsAll(final SGuiSession session, final int benefitAnn, final Date dateCut) throws Exception {
+    public static int getDaysVacationsAll(final SGuiSession session, final int benefitAnn, final Date dateCutOff) throws Exception {
         int daysTableVacation = 0;
         ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<SDbBenefitTable>();
-        ArrayList<SHrsBenefitTableByAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
+        ArrayList<SHrsBenefitTableAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableAnniversary>();
         
-        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCut) }));
+        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutOff) }));
         
-        aTableVacationByAnniversary = getBenefitTablesAnniversarys(aTableVacation);
+        aTableVacationByAnniversary = createBenefitTablesAnniversarys(aTableVacation);
         
-        for (SHrsBenefitTableByAnniversary row : aTableVacationByAnniversary) {
-            if (row.getBenefitAnn() <= benefitAnn) {
-                daysTableVacation += (int) row.getValue();
+        for (SHrsBenefitTableAnniversary anniversary : aTableVacationByAnniversary) {
+            if (anniversary.getBenefitAnn() <= benefitAnn) {
+                daysTableVacation += (int) anniversary.getValue();
             }
         }
         
@@ -1899,19 +2376,18 @@ public abstract class SHrsUtils {
         return true;
     }
     
-    public static ArrayList<SHrsBenefit> readHrsBenefits(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int aniversaryLimit, final int benefitYearAux, final int payrrollId, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversary, final ArrayList<SHrsBenefitTableByAnniversary> benefitTableByAnniversaryAux, final double paymentDaily) throws Exception {
+    public static ArrayList<SHrsBenefit> readHrsBenefits(final SGuiSession session, final SDbEmployee employee, final int benefitType, final int anniversaryLimit, final int benefitYear, final int payrrollId, final ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarys, final ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarysAux, final double paymentDaily) throws Exception {
+        ArrayList<SHrsBenefit> hrsBenefits = new ArrayList<>();
         boolean foundAnniversary = false;
-        ArrayList<SHrsBenefit> aHrsBenefits = new ArrayList<SHrsBenefit>();
         SHrsBenefit hrsBenefit = null;
-        SHrsBenefitTableByAnniversary benefitTableRow = null;
-        SHrsBenefitTableByAnniversary benefitTableRowAux = null;
+        SHrsBenefitTableAnniversary benefitTableAnniversary = null;
+        SHrsBenefitTableAnniversary benefitTableAnniversaryAux = null;
         String sql = "";
         ResultSet resultSet = null;
         
-        sql = "SELECT fk_tp_ben, ben_ann, ben_year, SUM(unt_all) AS f_val_payed, " +
-                "SUM(amt_r) AS f_amt_payed " +
+        sql = "SELECT fk_tp_ben, ben_ann, ben_year, SUM(unt_all) AS f_val_payed, SUM(amt_r) AS f_amt_payed " +
                 "FROM hrs_pay_rcp_ear " +
-                "WHERE b_del = 0 AND id_emp = " + employee.getPkEmployeeId() + " AND id_pay <> " + payrrollId + " AND fk_tp_ben = " + benefitType + " AND ben_ann <= " + aniversaryLimit + " " +
+                "WHERE b_del = 0 AND id_emp = " + employee.getPkEmployeeId() + " AND id_pay <> " + payrrollId + " AND fk_tp_ben = " + benefitType + " AND ben_ann <= " + anniversaryLimit + " " +
                 "GROUP BY fk_tp_ben, ben_ann, ben_year ";
         resultSet = session.getStatement().executeQuery(sql);
         while (resultSet.next()) {
@@ -1920,48 +2396,48 @@ public abstract class SHrsUtils {
             hrsBenefit.setValuePayed(resultSet.getDouble("f_val_payed"));
             hrsBenefit.setAmountPayed(resultSet.getDouble("f_amt_payed"));
             
-            aHrsBenefits.add(hrsBenefit);
+            hrsBenefits.add(hrsBenefit);
         }
         
-        for (SHrsBenefit benefit : aHrsBenefits) {
-            if (SLibUtils.compareKeys(benefit.getPrimaryBenefitType(), new int[] { benefitType, aniversaryLimit, benefitYearAux })) {
+        for (SHrsBenefit benefit : hrsBenefits) {
+            if (SLibUtils.compareKeys(benefit.getBenefitKey(), new int[] { benefitType, anniversaryLimit, benefitYear })) {
                 foundAnniversary = true;
             }
         }
         
         if (!foundAnniversary) {
-            hrsBenefit = new SHrsBenefit(benefitType, aniversaryLimit, benefitYearAux);
-            aHrsBenefits.add(hrsBenefit);
+            hrsBenefit = new SHrsBenefit(benefitType, anniversaryLimit, benefitYear);
+            hrsBenefits.add(hrsBenefit);
         }
         
         // To complete benefits registries accumulated by benefit type:
         
-        for (SHrsBenefit benefit : aHrsBenefits) {
-            for (SHrsBenefitTableByAnniversary row : benefitTableByAnniversary) {
-                if (row.getBenefitAnn() <= benefit.getBenefitAnn()) {
-                    benefitTableRow = row;
+        for (SHrsBenefit benefit : hrsBenefits) {
+            for (SHrsBenefitTableAnniversary anniversary : benefitTableAnniversarys) {
+                if (anniversary.getBenefitAnn() <= benefit.getBenefitAnn()) {
+                    benefitTableAnniversary = anniversary;
                 }
             }
 
             if (benefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                for (SHrsBenefitTableByAnniversary row : benefitTableByAnniversaryAux) {
-                    if (row.getBenefitAnn() <= benefit.getBenefitAnn()) {
-                        benefitTableRowAux = row;
+                for (SHrsBenefitTableAnniversary anniversary : benefitTableAnniversarysAux) {
+                    if (anniversary.getBenefitAnn() <= benefit.getBenefitAnn()) {
+                        benefitTableAnniversaryAux = anniversary;
                     }
                 }
             }
 
             if (benefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                benefit.setValue(benefitTableRow == null || benefitTableRowAux == null ? 0d : benefitTableRowAux.getValue());
-                benefit.setAmount(benefitTableRow == null || benefitTableRowAux == null ? 0d : benefitTableRowAux.getValue() * paymentDaily * benefitTableRow.getValue());
+                benefit.setValue(benefitTableAnniversary == null || benefitTableAnniversaryAux == null ? 0d : benefitTableAnniversaryAux.getValue());
+                benefit.setAmount(benefitTableAnniversary == null || benefitTableAnniversaryAux == null ? 0d : SLibUtils.roundAmount(benefitTableAnniversaryAux.getValue() * paymentDaily * benefitTableAnniversary.getValue()));
             }
             else {
-                benefit.setValue(benefitTableRow == null ? 0d : benefitTableRow.getValue());
-                benefit.setAmount(benefitTableRow == null ? 0d : benefitTableRow.getValue() * paymentDaily);
+                benefit.setValue(benefitTableAnniversary == null ? 0d : benefitTableAnniversary.getValue());
+                benefit.setAmount(benefitTableAnniversary == null ? 0d : benefitTableAnniversary.getValue() * SLibUtils.roundAmount(paymentDaily));
             }
         }
-        
-        return aHrsBenefits;
+
+        return hrsBenefits;
     }
     
     public static int getScheduledDays(final SGuiSession session, final SDbEmployee employee, final int benefitAnn, final int benefitYear, final int absenceId) throws Exception {
@@ -1969,14 +2445,14 @@ public abstract class SHrsUtils {
         String sql = "";
         ResultSet resultSet = null;
 
-         sql = "SELECT a.id_emp, a.id_abs, SUM(a.eff_day) AS f_days " +
+         sql = "SELECT SUM(a.eff_day) " +
                  "FROM hrs_abs AS a " +
-                 "WHERE a.b_del = 0 AND a.id_emp = " + employee.getPkEmployeeId() + " AND a.id_abs <> " + absenceId + " AND a.ben_year = " + benefitYear + " AND a.ben_ann = " + benefitAnn + " " +
-                 "GROUP BY a.id_emp, a.id_abs ";
+                 "WHERE NOT a.b_del AND a.id_emp = " + employee.getPkEmployeeId() + " AND " +
+                 "a.ben_ann = " + benefitAnn + " AND a.ben_year = " + benefitYear + " AND a.id_abs <> " + absenceId + " ";
          
          resultSet = session.getStatement().executeQuery(sql);
          if (resultSet.next()) {
-             scheduledDays = resultSet.getInt("f_days");
+             scheduledDays = resultSet.getInt(1);
          }
          
         return scheduledDays;
@@ -2374,8 +2850,7 @@ public abstract class SHrsUtils {
             case SModSysConsts.HRSS_TP_LOAN_PAY_AMT:
                 amoutMonth = loan.getPaymentAmount() + amoutAdjustment;
                 
-                if (loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_COM || loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_UNI ||
-                        loan.getFkLoanTypeId() == SModSysConsts.HRSS_TP_LOAN_LOA_TPS) {
+                if (SLibUtils.belongsTo(loan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOA_COM, SModSysConsts.HRSS_TP_LOAN_LOA_UNI, SModSysConsts.HRSS_TP_LOAN_LOA_TPS })) {
                     amoutAux = amoutMonth;
                 
                     balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsReceipt.getHrsEmployee());
@@ -2383,18 +2858,18 @@ public abstract class SHrsUtils {
                     amoutAux = (amoutAux > balanceLoan ? balanceLoan : amoutAux);
                 }
                 else {
-                    amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getPeriodDays() * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
-                    amoutAux += amoutMonth / hrsDaysCurr.getPeriodDays() * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
-                    amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getPeriodDays() * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
+                    amoutAux += hrsDaysPrev == null ? 0 : ((amoutMonth / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
+                    amoutAux += (amoutMonth / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
+                    amoutAux += hrsDaysNext == null ? 0 : ((amoutMonth / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
                 }
                 break;
                 
             case SModSysConsts.HRSS_TP_LOAN_PAY_FIX:
                 amoutMonth = loan.getPaymentFixed() * hrsReceipt.getHrsPayroll().getPayroll().getMwzReferenceWage() + amoutAdjustment;
                 
-                amoutAux += hrsDaysPrev == null ? 0 : (amoutMonth / hrsDaysPrev.getPeriodDays() * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
-                amoutAux += amoutMonth / hrsDaysCurr.getPeriodDays() * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
-                amoutAux += hrsDaysNext == null ? 0 : (amoutMonth / hrsDaysNext.getPeriodDays() * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
+                amoutAux += hrsDaysPrev == null ? 0 : ((amoutMonth / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
+                amoutAux += (amoutMonth / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
+                amoutAux += hrsDaysNext == null ? 0 : ((amoutMonth / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
                 break;
                 
             case SModSysConsts.HRSS_TP_LOAN_PAY_UMA:
@@ -2406,9 +2881,9 @@ public abstract class SHrsUtils {
                 break;
                 
             case SModSysConsts.HRSS_TP_LOAN_PAY_PER:
-                adjustmentAux += hrsDaysPrev == null ? 0 : (double) ((hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()) / hrsDaysPrev.getPeriodDays()) * amoutAdjustment;
+                adjustmentAux += hrsDaysPrev == null ? 0 : (((double) hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()) / hrsDaysPrev.getPeriodDays()) * amoutAdjustment;
                 adjustmentAux += (double) (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid()) / hrsDaysCurr.getPeriodDays() * amoutAdjustment;
-                adjustmentAux += hrsDaysNext == null ? 0 : (double) ((hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()) / hrsDaysNext.getPeriodDays() * amoutAdjustment);
+                adjustmentAux += hrsDaysNext == null ? 0 : (((double) hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()) / hrsDaysNext.getPeriodDays() * amoutAdjustment);
                 
                 if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL) {
                     salaryReference = hrsReceipt.getReceipt().getPaymentDaily();
@@ -2419,14 +2894,15 @@ public abstract class SHrsUtils {
                 else if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL_FIX) {
                     salaryReference = loan.getPaymentPercentageAmount();
                 }
-                //amoutAux = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * hrsReceipt.getReceipt().getPaymentDaily() * loan.getPaymentPercentage() + adjustmentAux; // XXX (2016-03-04) jbarajas
+                
                 amoutAux = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * salaryReference * loan.getPaymentPercentage() + adjustmentAux;
                 break;
                 
             default:
                 break;
         }
-        amout = (SLibUtils.round(amoutAux, SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits()));
+        
+        amout = SLibUtils.roundAmount(amoutAux);
         
         return amout;
     }
@@ -2439,7 +2915,6 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax.
      * @throws Exception 
      */
-    
     public static double computeAmoutTax(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
         double dTaxComputed = 0;
         SDbTaxTableRow dbTaxTableRow = null;
@@ -2463,7 +2938,6 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax subsidy.
      * @throws Exception 
      */
-    
     public static double computeAmoutTaxSubsidy(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
         double dSubsidyComputed = 0;
         SDbTaxSubsidyTableRow dbSubsidyTableRow = null;
@@ -2490,7 +2964,6 @@ public abstract class SHrsUtils {
      * @return double amount calculated of security social contribution.
      * @throws Exception 
      */
-    
     public static double computeSSContribution(final SDbSsContributionTable dbSscTable, final double dSalarySsc, final double dMwzReferenceWage, final SHrsDaysByPeriod hrsDaysPrev,
                                                     final SHrsDaysByPeriod hrsDaysCurr, final SHrsDaysByPeriod hrsDaysNext) throws Exception {
         SDbSsContributionTableRow dbSscTableRow = null;
@@ -2542,7 +3015,6 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax.
      * @throws Exception 
      */
-    
     public static double computeAmoutTaxAlt(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
         double amountFractionI = 0;
         double amountFractionII = 0;
@@ -2584,7 +3056,6 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax subsidy.
      * @throws Exception 
      */
-    
     public static double computeAmoutTaxSubsidyAlt(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
         double amountFractionI = 0;
         double amountFractionII = 0;
@@ -2620,15 +3091,13 @@ public abstract class SHrsUtils {
     /**
      * Function for calculated amount net.
      * @param session User GUI session.
-     * @param dSalarySsc base salary contribution of employee.
      * @param grossAmount amount gross.
-     * @param dateCut date of cut.
+     * @param dateCutOff date of cut.
      * @param dateBenefit
      * @return
      * @throws Exception 
      */
-    
-    public static SHrsCalculatedNetGrossAmount computeNetAmountPayment(final SGuiSession session, final double grossAmount, final Date dateCut, final Date dateBenefit) throws Exception {
+    public static SHrsCalculatedNetGrossAmount computeNetAmountPayment(final SGuiSession session, final double grossAmount, final Date dateCutOff, final Date dateBenefit) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;
         SDbTaxSubsidyTable dbSubsidyTable = null;
@@ -2642,20 +3111,20 @@ public abstract class SHrsUtils {
         double dTaxSubsidyAmount = 0;
         double dSsContributionAmount = 0;
         double dTableFactor = 0;
-        int year = SLibTimeUtils.digestYear(dateCut)[0];
-        int days = SLibTimeUtils.getMaxDayOfMonth(dateCut);
+        int year = SLibTimeUtils.digestYear(dateCutOff)[0];
+        int days = SLibTimeUtils.getMaxDayOfMonth(dateCutOff);
         SHrsDaysByPeriod hrsDaysPrev = new SHrsDaysByPeriod(0, 0, 0, 0);
         SHrsDaysByPeriod hrsDaysCurr = new SHrsDaysByPeriod(year, 0, days, days);
         SHrsDaysByPeriod hrsDaysNext = new SHrsDaysByPeriod(0, 0, 0, 0);
         
         dSalaryDiary = grossAmount * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
-        dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCut);
+        dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCutOff);
         
         config = (SDbConfig) session.readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
-        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCut) });
-        dbSubsidyTable = (SDbTaxSubsidyTable) session.readRegistry(SModConsts.HRS_TAX_SUB, new int[] { getRecentTaxSubsidyTable(session, dateCut) });
-        dbSscTable = (SDbSsContributionTable) session.readRegistry(SModConsts.HRS_SSC, new int[] { getRecentSsContributionTable(session, dateCut) });
-        dMwzReference = getRecentMwz(session, config.getFkMwzReferenceTypeId(), dateCut);
+        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCutOff) });
+        dbSubsidyTable = (SDbTaxSubsidyTable) session.readRegistry(SModConsts.HRS_TAX_SUB, new int[] { getRecentTaxSubsidyTable(session, dateCutOff) });
+        dbSscTable = (SDbSsContributionTable) session.readRegistry(SModConsts.HRS_SSC, new int[] { getRecentSsContributionTable(session, dateCutOff) });
+        dMwzReference = getRecentMwz(session, config.getFkMwzReferenceTypeId(), dateCutOff);
         
         dTableFactor = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS) * days;
         
@@ -2676,20 +3145,18 @@ public abstract class SHrsUtils {
     /**
      * Function for calculated amount gross.
      * @param session User GUI session.
-     * @param dSalarySsc base salary contribution of employee.
-     * @param dNetAmount amount net.
-     * @param dateCut date of cut.
+     * @param netAmount amount net.
+     * @param dateCutOff date of cut.
      * @param tolerance
      * @param dateBenefit
      * @return
      * @throws Exception 
      */
-    
-    public static SHrsCalculatedNetGrossAmount computeGrossAmountPayment(final SGuiSession session, final double dNetAmount, final Date dateCut, final double tolerance, final Date dateBenefit) throws Exception {
+    public static SHrsCalculatedNetGrossAmount computeGrossAmountPayment(final SGuiSession session, final double netAmount, final Date dateCutOff, final double tolerance, final Date dateBenefit) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;
         SDbTaxTableRow dbTaxTableRow = null;
-        int days = SLibTimeUtils.getMaxDayOfMonth(dateCut);
+        int days = SLibTimeUtils.getMaxDayOfMonth(dateCutOff);
         double dSalaryDiary = 0;
         double dSalarySsc = 0;
         double dTableFactor = 0;
@@ -2700,7 +3167,7 @@ public abstract class SHrsUtils {
         double dToleranceAux = 0;
         boolean bCalculate = true;
         
-        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCut) });
+        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCutOff) });
         
         dTableFactor = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS) * days;
         
@@ -2710,18 +3177,18 @@ public abstract class SHrsUtils {
                 if (i == 0) {
                     limitInf = SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT);
                 }
-                if (dNetAmount <= SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT)) {
+                if (netAmount <= SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT)) {
                     limitSup = SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT);
                 }
                 
                 average = (limitInf + limitSup) / 2;
                 
                 dSalaryDiary = limitSup * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
-                dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCut);
+                dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCutOff);
 
-                netGrossAmount = computeNetAmountPayment(session, average, dateCut, dateBenefit);
+                netGrossAmount = computeNetAmountPayment(session, average, dateCutOff, dateBenefit);
                 
-                if (netGrossAmount.getNetAmount() > dNetAmount) {
+                if (netGrossAmount.getNetAmount() > netAmount) {
                     break;
                 }
             }
@@ -2732,17 +3199,17 @@ public abstract class SHrsUtils {
             average = (limitInf + limitSup) / 2;
             
             dSalaryDiary = limitSup * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
-            dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCut);
+            dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCutOff);
 
-            netGrossAmount = computeNetAmountPayment(session, average, dateCut, dateBenefit);
+            netGrossAmount = computeNetAmountPayment(session, average, dateCutOff, dateBenefit);
 
-            if (netGrossAmount.getNetAmount() > dNetAmount) {
+            if (netGrossAmount.getNetAmount() > netAmount) {
                 limitSup = average;
             }
             else {
                 limitInf = average;
             }
-            dToleranceAux = SLibUtils.round(dNetAmount - netGrossAmount.getNetAmount(), SUtilConsts.DECS_AMT);
+            dToleranceAux = SLibUtils.round(netAmount - netGrossAmount.getNetAmount(), SUtilConsts.DECS_AMT);
             
             bCalculate = SLibUtils.round(limitInf, SUtilConsts.DECS_AMT) != SLibUtils.round(limitSup, SUtilConsts.DECS_AMT) && Math.abs(dToleranceAux) > tolerance;
         }
@@ -2756,7 +3223,7 @@ public abstract class SHrsUtils {
         return netGrossAmount;
     }
     
-    public static SHrsAmountEarning getAmountEarningByEmployee(final SGuiSession session, final int employeeId, final int earningTypeId, final int periodYear, final Date dateCut) throws Exception {
+    public static SHrsAmountEarning getAmountEarningByEmployee(final SGuiSession session, final int employeeId, final int earningTypeId, final int periodYear, final Date dateCutOff) throws Exception {
         SHrsAmountEarning amountEarning = null;
         String sql = "";
         ResultSet resultSet = null;
@@ -2770,7 +3237,7 @@ public abstract class SHrsUtils {
             "pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp " +
             "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND pr.id_emp = " + employeeId + 
             (earningTypeId == SLibConsts.UNDEFINED ? "" : " AND pre.fk_tp_ear = " + earningTypeId) + " AND " +
-            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "'";
+            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "'";
         
         resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
@@ -2784,7 +3251,7 @@ public abstract class SHrsUtils {
         return amountEarning;
     }
     
-    public static double getAmountDeductionByEmployee(final SGuiSession session, final int employeeId, final int deductionTypeId, final int periodYear, final Date dateCut) throws Exception {
+    public static double getAmountDeductionByEmployee(final SGuiSession session, final int employeeId, final int deductionTypeId, final int periodYear, final Date dateCutOff) throws Exception {
         double amountDeduction = 0;
         String sql = "";
         ResultSet resultSet = null;
@@ -2798,7 +3265,7 @@ public abstract class SHrsUtils {
             "pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp " +
             "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND pr.id_emp = " + employeeId + 
             (deductionTypeId == SLibConsts.UNDEFINED ? "" : " AND prd.fk_tp_ded = " + deductionTypeId) + " AND " +
-            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCut) + "'";
+            "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "'";
         
         resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
@@ -2808,8 +3275,8 @@ public abstract class SHrsUtils {
         return amountDeduction;
     }
     
-    public static SHrsAmountEarning getAmountEarningsByEmployee(final SGuiSession session, final int employeeId, final int periodYear, final Date dateCut) throws Exception {
-        return getAmountEarningByEmployee(session, employeeId, SLibConsts.UNDEFINED, periodYear, dateCut);
+    public static SHrsAmountEarning getAmountEarningsByEmployee(final SGuiSession session, final int employeeId, final int periodYear, final Date dateCutOff) throws Exception {
+        return getAmountEarningByEmployee(session, employeeId, SLibConsts.UNDEFINED, periodYear, dateCutOff);
     }
     
     /**

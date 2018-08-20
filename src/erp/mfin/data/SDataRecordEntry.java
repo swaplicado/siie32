@@ -15,6 +15,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
@@ -337,7 +338,39 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public int[] getKeySystemMoveClass() { return new int[] { mnFkSystemMoveClassId }; }
     public int[] getKeySystemMoveType() { return new int[] { mnFkSystemMoveClassId, mnFkSystemMoveTypeId }; }
     public int[] getKeySystemMoveTypeXXX() { return new int[] { mnFkSystemMoveCategoryIdXXX, mnFkSystemMoveTypeIdXXX }; }
+    
+    /**
+     * Composes record period in format yyyy-mm (i.e., year-month).
+     * @return 
+     */
+    public java.lang.String getRecordPeriod() {
+        return SLibUtils.DecimalFormatCalendarYear.format(mnPkYearId) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(mnPkPeriodId);
+    }
 
+    /**
+     * Composes record number in format tp-000000 (i.e., type-number).
+     * @return 
+     */
+    public java.lang.String getRecordNumber() {
+        return msPkRecordTypeId + "-" + SLibUtils.DecimalNumberFormat.format(mnPkNumberId);
+    }
+
+    /**
+     * Composes record primary key in format yyyy-mm-0-tp-000000 (i.e., year-month-BKC-type-number).
+     * @return 
+     */
+    public String getRecordPrimaryKey() {
+        return getRecordPeriod() + "-" + mnPkBookkeepingCenterId + "-" + getRecordNumber();
+    }
+    
+    /**
+     * Composes record entry primary key in format yyyy-mm-0-tp-000000-000000 (i.e., year-month-BKC-type-number-entry).
+     * @return 
+     */
+    public String getRecordEntryPrimaryKey() {
+        return getRecordPrimaryKey() + "-" + SLibUtils.DecimalNumberFormat.format(mnPkEntryId);
+    }
+    
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkYearId = (Integer) ((Object[]) pk)[0];

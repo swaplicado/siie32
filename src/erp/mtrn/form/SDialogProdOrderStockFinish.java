@@ -927,7 +927,7 @@ public class SDialogProdOrderStockFinish extends javax.swing.JDialog implements 
 
                 try {
                     stock = STrnUtilities.obtainStock(miClient, mnYear, moParamProdOrderSource.getFkItemId_r(), moParamProdOrderSource.getFkUnitId_r(), SLibConstants.UNDEFINED,
-                            manWarehouseDestinyKey[0], manWarehouseDestinyKey[1], null, (int[]) (moParamDiog.getDbmsDataCounterpartDiog() != null ? moParamDiog.getDbmsDataCounterpartDiog().getPrimaryKey() : moParamDiog.getPrimaryKey()));
+                            manWarehouseDestinyKey[0], manWarehouseDestinyKey[1], SLibConstants.UNDEFINED, null, (int[]) (moParamDiog.getDbmsDataCounterpartDiog() != null ? moParamDiog.getDbmsDataCounterpartDiog().getPrimaryKey() : moParamDiog.getPrimaryKey()));
                 }
                 catch (Exception e) {
                     SLibUtilities.printOutException(this, e);

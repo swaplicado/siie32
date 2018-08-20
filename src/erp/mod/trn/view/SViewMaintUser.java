@@ -5,6 +5,7 @@
 package erp.mod.trn.view;
 
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Gil De Jesús, Sergio Flores
+ * @author Gil De Jesús, Sergio Flores, Claudio Peña 
  */
 public class SViewMaintUser extends SGridPaneView {
 
@@ -67,6 +68,7 @@ public class SViewMaintUser extends SGridPaneView {
                 + "v.b_contractor, "
                 + "v.b_tool_maint_prov, "
                 + "v.fingerprint_n IS NOT NULL AS _fingerprint_set, "
+                + "IF (v.pin_number = " + SDataConstantsSys.UNDEFINED + ", '" + SDataConstantsSys.UNDEFINED + "', '" + SModConsts.HRSX_LAYOUT_SUA_HIRE + "') AS _pin,"
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -94,6 +96,7 @@ public class SViewMaintUser extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_contractor", "Contratista"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_tool_maint_prov", "Prov. mantto. herramientas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_fingerprint_set", "Huella digital"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_pin", "Contraseña"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

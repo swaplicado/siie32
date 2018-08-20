@@ -1,4 +1,3 @@
-
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -7,19 +6,21 @@
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbEarning extends SDbRegistryUser {
 
@@ -40,7 +41,7 @@ public class SDbEarning extends SDbRegistryUser {
     protected boolean mbDaysAdjustment;
     protected boolean mbDaysAbsence;
     protected boolean mbDaysWorked;
-    protected boolean mbDaysWorkedBased;
+    protected boolean mbDaysWorkedBasedOn;
     protected boolean mbWithholding;
     protected boolean mbAlternativeTaxCalculation;
     protected boolean mbPayrollTax;
@@ -87,7 +88,7 @@ public class SDbEarning extends SDbRegistryUser {
     public void setDaysAdjustment(boolean b) { mbDaysAdjustment = b; }
     public void setDaysAbsence(boolean b) { mbDaysAbsence = b; }
     public void setDaysWorked(boolean b) { mbDaysWorked = b; }
-    public void setDaysWorkedBased(boolean b) { mbDaysWorkedBased = b; }
+    public void setDaysWorkedBasedOn(boolean b) { mbDaysWorkedBasedOn = b; }
     public void setWithholding(boolean b) { mbWithholding = b; }
     public void setAlternativeTaxCalculation(boolean b) { mbAlternativeTaxCalculation = b; }
     public void setPayrollTax(boolean b) { mbPayrollTax = b; }
@@ -127,7 +128,7 @@ public class SDbEarning extends SDbRegistryUser {
     public boolean isDaysAdjustment() { return mbDaysAdjustment; }
     public boolean isDaysAbsence() { return mbDaysAbsence; }
     public boolean isDaysWorked() { return mbDaysWorked; }
-    public boolean isDaysWorkedBased() { return mbDaysWorkedBased; }
+    public boolean isDaysWorkedBasedOn() { return mbDaysWorkedBasedOn; }
     public boolean isWithholding() { return mbWithholding; }
     public boolean isAlternativeTaxCalculation() { return mbAlternativeTaxCalculation; }
     public boolean isPayrollTax() { return mbPayrollTax; }
@@ -149,7 +150,14 @@ public class SDbEarning extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
     public int getAuxAccountingConfigurationTypeId() { return mnAuxAccountingConfigurationTypeId; }
-    //public ArrayList<SDbAccountingEarning> getAccountingEarning() { return maAccountingEarning; } XXX (jbarajas, 2016-08-05) slowly open payroll
+    
+    public boolean areUnitsModifiable() {
+        boolean isNotBasedOnDaysWorked = !mbDaysWorkedBasedOn;
+        boolean isNotBasedOnUnits = !SLibUtils.belongsTo(mnFkEarningComputationTypeId, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT, SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME });
+        boolean isNotAbsence = mnFkAbsenceClassId_n == 0 && mnFkAbsenceTypeId_n == 0;
+        
+        return isNotBasedOnDaysWorked && isNotBasedOnUnits && isNotAbsence;
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -182,7 +190,7 @@ public class SDbEarning extends SDbRegistryUser {
         mbDaysAdjustment = false;
         mbDaysAbsence = false;
         mbDaysWorked = false;
-        mbDaysWorkedBased = false;
+        mbDaysWorkedBasedOn = false;
         mbWithholding = false;
         mbAlternativeTaxCalculation = false;
         mbPayrollTax = false;
@@ -204,7 +212,6 @@ public class SDbEarning extends SDbRegistryUser {
         mtTsUserUpdate = null;
         
         mnAuxAccountingConfigurationTypeId = 0;
-        //maAccountingEarning = new ArrayList<SDbAccountingEarning>(); XXX (jbarajas, 2016-08-05) slowly open payroll
     }
 
     @Override
@@ -268,7 +275,7 @@ public class SDbEarning extends SDbRegistryUser {
             mbDaysAdjustment = resultSet.getBoolean("b_day_adj");
             mbDaysAbsence = resultSet.getBoolean("b_day_abs");
             mbDaysWorked = resultSet.getBoolean("b_day_wrk");
-            mbDaysWorkedBased = resultSet.getBoolean("b_day_wrk_bas");
+            mbDaysWorkedBasedOn = resultSet.getBoolean("b_day_wrk_bas");
             mbWithholding = resultSet.getBoolean("b_who");
             mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
             mbPayrollTax = resultSet.getBoolean("b_pay_tax");
@@ -291,21 +298,6 @@ public class SDbEarning extends SDbRegistryUser {
 
             mnAuxAccountingConfigurationTypeId = mnFkAccountingConfigurationTypeId;
 
-            /* XXX (jbarajas, 2016-08-05) slowly open payroll
-            statement = session.getStatement().getConnection().createStatement();
-
-            msSql = "SELECT id_ref " +
-                    "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_EAR) + " " +
-                    "WHERE b_del = 0 AND id_ear = " + mnPkEarningId + " AND id_tp_acc = " + mnFkAccountingConfigurationTypeId + " ";
-            resultSet = statement.executeQuery(msSql);
-            while (resultSet.next()) {
-
-                accountingEarning = new SDbAccountingEarning();
-                accountingEarning.read(session, new int[] { mnPkEarningId, mnFkAccountingConfigurationTypeId, resultSet.getInt(1) });
-                maAccountingEarning.add(accountingEarning);
-            }
-            */
-            
             mbRegistryNew = false;
         }
 
@@ -345,7 +337,7 @@ public class SDbEarning extends SDbRegistryUser {
                     (mbDaysAdjustment ? 1 : 0) + ", " + 
                     (mbDaysAbsence ? 1 : 0) + ", " + 
                     (mbDaysWorked ? 1 : 0) + ", " + 
-                    (mbDaysWorkedBased ? 1 : 0) + ", " + 
+                    (mbDaysWorkedBasedOn ? 1 : 0) + ", " + 
                     (mbWithholding ? 1 : 0) + ", " + 
                     (mbAlternativeTaxCalculation ? 1 : 0) + ", " + 
                     (mbPayrollTax ? 1 : 0) + ", " + 
@@ -390,7 +382,7 @@ public class SDbEarning extends SDbRegistryUser {
                     "b_day_adj = " + (mbDaysAdjustment ? 1 : 0) + ", " +
                     "b_day_abs = " + (mbDaysAbsence ? 1 : 0) + ", " +
                     "b_day_wrk = " + (mbDaysWorked ? 1 : 0) + ", " +
-                    "b_day_wrk_bas = " + (mbDaysWorkedBased ? 1 : 0) + ", " +
+                    "b_day_wrk_bas = " + (mbDaysWorkedBasedOn ? 1 : 0) + ", " +
                     "b_who = " + (mbWithholding ? 1 : 0) + ", " +
                     "b_alt_tax = " + (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     "b_pay_tax = " + (mbPayrollTax ? 1 : 0) + ", " +
@@ -418,23 +410,6 @@ public class SDbEarning extends SDbRegistryUser {
         
         SHrsUtils.createAccountingEarningConfiguration(session, mnPkEarningId, mnFkAccountingConfigurationTypeId, mnAuxAccountingConfigurationTypeId, mbRegistryNew);
         
-        /*  XXX (jbarajas, 2016-08-05) slowly open payroll
-        if (mbRegistryNew || (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
-                mnAuxAccountingConfigurationTypeId != mnFkAccountingConfigurationTypeId)) {
-            for (SDbAccountingEarning dbAccountingEarning : maAccountingEarning) {
-                if (SLibUtils.compareKeys(new int[] { dbAccountingEarning.getPkEarningId() }, new int[] { mnPkEarningId })) {
-                    dbAccountingEarning.setDeleted(true);
-                    dbAccountingEarning.save(session);
-                }
-            }
-        }
-        createAccountingEarningConfiguration(session);
-        
-        for (SDbAccountingEarning dbAccountingEarning : maAccountingEarning) {
-            dbAccountingEarning.save(session);
-        }
-        */
-        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -460,7 +435,7 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setDaysAdjustment(this.isDaysAdjustment());
         registry.setDaysAbsence(this.isDaysAbsence());
         registry.setDaysWorked(this.isDaysWorked());
-        registry.setDaysWorkedBased(this.isDaysWorkedBased());
+        registry.setDaysWorkedBasedOn(this.isDaysWorkedBasedOn());
         registry.setWithholding(this.isWithholding());
         registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());
         registry.setPayrollTax(this.isPayrollTax());
@@ -482,8 +457,8 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
         registry.setAuxAccountingConfigurationTypeId(this.getAuxAccountingConfigurationTypeId());
-        //registry.getAccountingEarning().addAll(this.getAccountingEarning()); XXX (jbarajas, 2016-08-05) slowly open payroll
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }

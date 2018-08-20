@@ -21,7 +21,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbPayrollReceiptIssue extends SDbRegistryUser {
 
@@ -117,7 +117,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
         return false;
     }
     
-    public java.lang.String getIssueNumber() {
+    public java.lang.String getPayrollReceiptIssueNumber() {
         return (msNumberSeries.isEmpty() ? "" : msNumberSeries + "-") + mnNumber;
     }
 

@@ -16,7 +16,7 @@ import java.util.Date;
 
 /**
  *
- * @author Juan Manuel Barajas Cárabes
+ * @author Juan Barajas
  */
 public class SDataSign extends erp.lib.data.SDataRegistry implements java.io.Serializable  {
 

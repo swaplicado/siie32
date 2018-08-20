@@ -650,7 +650,7 @@ public class SDialogDpsStockSupply extends javax.swing.JDialog implements Action
             try {
                 stock = STrnUtilities.obtainStock(miClient, mnYear, 
                         stockSupplyRow.getFkItemId(), stockSupplyRow.getFkUnitId(), SLibConstants.UNDEFINED, 
-                        manWarehouseKey[0], manWarehouseKey[1], null, 
+                        manWarehouseKey[0], manWarehouseKey[1], SLibConstants.UNDEFINED, null, 
                         (int[]) moParamDiog.getPrimaryKey());
                 
                 stockMoveParams = new STrnStockMove();

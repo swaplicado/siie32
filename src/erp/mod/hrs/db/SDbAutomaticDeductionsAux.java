@@ -17,7 +17,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbAutomaticDeductionsAux extends SDbRegistry {
     
@@ -130,6 +130,7 @@ public class SDbAutomaticDeductionsAux extends SDbRegistry {
         
         registry.getAutomaticDeductions().clone();
         
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }

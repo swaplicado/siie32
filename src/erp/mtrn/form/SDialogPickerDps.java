@@ -44,6 +44,8 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
     private int mnYear;
     private int[] manDpsClassPk;
     private int[] manBizPartnerPk;
+    private int mnCfdType;
+    private String msRfcRec;
     private java.lang.Object moFilterKey;
     private erp.lib.table.STablePane moPaneOptions;
 
@@ -279,6 +281,18 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                  tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Acuses adjuntos", 50);
                  break;
                  
+            case SDataConstants.TRN_CFD:
+                tableColumns = new STableColumnForm[8];
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Fecha-hora CFD", STableConstants.WIDTH_DATE_TIME);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo CFD", 100);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Versión CFD", 50);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Folio CFD", STableConstants.WIDTH_DOC_NUM);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "UUID", 100);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "RFC receptor", 100);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total $", STableConstants.WIDTH_VALUE_2X);
+                tableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
+                break;
+                
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
@@ -390,6 +404,8 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
         mnYear = 0;
         manDpsClassPk = null;
         manBizPartnerPk = null;
+        mnCfdType = SLibConstants.UNDEFINED;
+        msRfcRec = "";
         moFilterKey = null;
 
         jtfDpsClass.setText("");
@@ -453,6 +469,11 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
     @Override
     public void setFilterKey(Object filterKey) {
         moFilterKey = filterKey;
+        
+        manDpsClassPk = null;
+        manBizPartnerPk = null;
+        mnCfdType = SLibConstants.UNDEFINED;
+        msRfcRec = "";
 
         switch (mnOptionType) {
             case SDataConstants.TRNX_DPS_PAY_PEND:
@@ -491,16 +512,35 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                 }
                 break;
 
+            case SDataConstants.TRN_CFD:
+                switch (((Object[]) moFilterKey).length) {
+                    case 2:
+                        mnCfdType = (int) ((Object[]) moFilterKey)[0];
+                        msRfcRec = (String) ((Object[]) moFilterKey)[1];
+                        break;
+                    default:
+                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
+                }
+                break;
+
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
 
-        jtfDpsClass.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_CL_DPS, manDpsClassPk));
-        jtfDpsClass.setToolTipText(jtfDpsClass.getText());
+        if (manDpsClassPk != null) {
+            jtfDpsClass.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_CL_DPS, manDpsClassPk));
+            jtfDpsClass.setToolTipText(jtfDpsClass.getText());
+            jtfBizPartner.setText(manBizPartnerPk == null ? SLibConstants.TXT_ALL : SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, manBizPartnerPk));
+            jtfBizPartner.setToolTipText(manBizPartnerPk == null ? null : jtfBizPartner.getText());
+        }
+        else if (mnCfdType != SLibConstants.UNDEFINED) {
+            jtfDpsClass.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNS_TP_CFD, new int[] { mnCfdType }));
+            jtfDpsClass.setToolTipText(jtfDpsClass.getText());
+            jtfBizPartner.setText(msRfcRec);
+            jtfBizPartner.setToolTipText(jtfBizPartner.getText());
+        }
+        
         jtfDpsClass.setCaretPosition(0);
-
-        jtfBizPartner.setText(manBizPartnerPk == null ? SLibConstants.TXT_ALL : SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, manBizPartnerPk));
-        jtfBizPartner.setToolTipText(manBizPartnerPk == null ? null : jtfBizPartner.getText());
         jtfBizPartner.setCaretPosition(0);
     }
 

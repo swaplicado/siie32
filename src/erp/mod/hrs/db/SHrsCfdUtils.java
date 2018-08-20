@@ -2,6 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mod.hrs.db;
 
 import cfd.DCfdUtils;
@@ -160,31 +161,21 @@ public abstract class SHrsCfdUtils {
     
     public static SDataCfd computeCfdi(final SGuiSession session, final SHrsFormerPayrollReceipt receipt, final int receiptIssue, final boolean cfdiPendingSigned) throws Exception {
         boolean add = true;
-        String sql = "";
-        SCfdPacket packet = null;
-        SDbFormerPayrollImport payrollImport = null;
-        cfd.ver32.DElementComprobante comprobanteCfdi32 = null;
-        cfd.ver33.DElementComprobante comprobanteCfdi33 = null;
-        ArrayList<SCfdPacket> moCfdPackets = new ArrayList<SCfdPacket>();
-        ResultSet resultSet = null;
-        
         int cfdId = SLibConsts.UNDEFINED;
         
-        sql = "SELECT id_cfd, fid_st_xml " 
+        String sql = "SELECT id_cfd, fid_st_xml " 
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
                 + "WHERE fid_pay_rcp_pay_n = " + receipt.getPayroll().getPkNominaId() + " AND fid_pay_rcp_emp_n = " + receipt.getPkEmpleadoId() + " AND fid_pay_rcp_iss_n = " + receiptIssue + " "
                 + "ORDER BY id_cfd ";
 
-        resultSet = session.getStatement().executeQuery(sql);
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             if (resultSet.getInt("fid_st_xml") != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                 if (resultSet.getInt("fid_st_xml") == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                     add = !cfdiPendingSigned;
                 }
                 else {
-                    if (cfdId == SLibConsts.UNDEFINED) {
-                        cfdId = resultSet.getInt("id_cfd");
-                    }
+                    cfdId = resultSet.getInt("id_cfd");
                 }
             }
         }
@@ -192,29 +183,29 @@ public abstract class SHrsCfdUtils {
         if (add) {
             // generate CFDI:
 
-            packet = new SCfdPacket();
-            packet.setDpsYearId(0);
-            packet.setDpsDocId(0);
-            packet.setCfdId(cfdId);
-            packet.setIsConsistent(cfdId == SLibConstants.UNDEFINED);
+            cfd.ver32.DElementComprobante comprobanteCfdi32 = null;
+            cfd.ver33.DElementComprobante comprobanteCfdi33 = null;
             
+            SCfdPacket packet = new SCfdPacket();
+            packet.setCfdId(cfdId);
+            //packet.setIsCfdConsistent(cfdId == SLibConstants.UNDEFINED);
+        
             int xmlType = ((SSessionCustom) session.getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
             float cfdVersion = SLibConsts.UNDEFINED;
+            
             switch (xmlType) {
-                case SDataConstantsSys.TRNS_TP_XML_CFD:
-                    break;
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                         comprobanteCfdi32 = (cfd.ver32.DElementComprobante) SCfdUtils.createCfdi32RootElement((SClientInterface) session.getClient(), receipt);
                         cfdVersion = comprobanteCfdi32.getVersion();
                         
-                        packet.setStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi32));
+                        packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi32));
                         packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
                     break;
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
                         comprobanteCfdi33 = (cfd.ver33.DElementComprobante) SCfdUtils.createCfdi33RootElement((SClientInterface) session.getClient(), receipt);
                         cfdVersion = comprobanteCfdi33.getVersion();
                         
-                        packet.setStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi33));
+                        packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi33));
                         packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
                     break;
                 default:
@@ -229,42 +220,32 @@ public abstract class SHrsCfdUtils {
             packet.setPayrollReceiptPayrollId(receipt.getPayroll().getPkNominaId());
             packet.setPayrollReceiptEmployeeId(receipt.getAuxEmpleadoId());
             packet.setPayrollReceiptIssueId(receiptIssue);
-            packet.setRfcEmisor("");
-            packet.setRfcReceptor("");
-            packet.setTotalCy(0);
-            packet.setAcknowledgmentCancellation("");
-            packet.setUuid("");
-            packet.setConsumeStamp(false);
-            packet.setGenerateQrCode(false);
             
-            packet.setSignature(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).sign(packet.getStringSigned(), SLibTimeUtilities.digestYear(receipt.getPayroll().getFecha())[0]));
-            packet.setCertNumber(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).getCertNumber());
-            packet.setCertBase64(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).getCertBase64());
+            packet.setCfdCertNumber(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).getCertNumber());
+            packet.setCfdSignature(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).sign(packet.getCfdStringSigned(), SLibTimeUtilities.digestYear(receipt.getPayroll().getFecha())[0]));
             
             switch (xmlType) {
-                case SDataConstantsSys.TRNS_TP_XML_CFD:
-                    break;
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
-                    comprobanteCfdi32.getAttSello().setString(packet.getSignature());
-                    packet.setCfdRootElement(comprobanteCfdi32);
+                    comprobanteCfdi32.getAttSello().setString(packet.getCfdSignature());
+                    packet.setAuxCfdRootElement(comprobanteCfdi32);
                     break;
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
-                    comprobanteCfdi33.getAttSello().setString(packet.getSignature());
-                    packet.setCfdRootElement(comprobanteCfdi33);
+                    comprobanteCfdi33.getAttSello().setString(packet.getCfdSignature());
+                    packet.setAuxCfdRootElement(comprobanteCfdi33);
                     break;
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
             }
 
-            moCfdPackets.add(packet);
+            ArrayList<SCfdPacket> cfdPackets = new ArrayList<>();
+            cfdPackets.add(packet);
 
             // end of Generate CFDI
             
-            payrollImport = new SDbFormerPayrollImport();
-            
+            SDbFormerPayrollImport payrollImport = new SDbFormerPayrollImport();
             payrollImport.setPayrollId(receipt.getPayroll().getPkNominaId());
             payrollImport.setRegenerateOnlyNonStampedCfdi(cfdiPendingSigned);
-            payrollImport.setCfdPackets(moCfdPackets);
+            payrollImport.getCfdPackets().addAll(cfdPackets);
             
             SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
             request.setPacket(payrollImport);

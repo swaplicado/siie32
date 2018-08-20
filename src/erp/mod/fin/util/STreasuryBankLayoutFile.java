@@ -25,7 +25,7 @@ import sa.lib.gui.SGuiClient;
  */
 public abstract class STreasuryBankLayoutFile {
     
-    public static File createDocument(final SGuiClient client, final SLayoutParameters parameters, final ArrayList<SDocumentRequestRow> bankPayments) {
+    public static File createDocument(final SGuiClient client, final SBankLayoutParams params, final ArrayList<SDocumentRequestRow> bankPayments) {
         Map<String, Object> map = null;
         JasperPrint jasperPrint = null;
         byte[] reportBytes = null;
@@ -36,20 +36,20 @@ public abstract class STreasuryBankLayoutFile {
 
         try {
             map = client.createReportParams();
-            map.put("sTitle", parameters.getTitle());
-            map.put("sCompany",parameters.getCompanyName());
-            map.put("sDateStamp", SLibUtils.DateFormatDatetime.format(parameters.getDateTimeRequest()));
-            map.put("sApplicationDate",  SLibUtils.DateFormatDate.format(parameters.getApplicationDate()));
-            map.put("sLayoutType", parameters.getLayoutType());
+            map.put("sTitle", params.getTitle());
+            map.put("sCompany",params.getCompanyName());
+            map.put("sDateStamp", SLibUtils.DateFormatDatetime.format(params.getDateTimeRequest()));
+            map.put("sApplicationDate",  SLibUtils.DateFormatDate.format(params.getApplicationDate()));
+            map.put("sLayoutType", params.getLayoutType());
             map.put("nTransfers", bankPayments.size());                
-            map.put("sBank", parameters.getBank());
-            map.put("sBankAccount", parameters.getBankAccount());
-            map.put("sPaymentType", parameters.getTypePayment());
-            map.put("sCurrency", parameters.getCurrency());
-            map.put("dCurrencyTotal", parameters.getTotal());
-            map.put("dOriginalTotal", parameters.getOriginalTotal());
-            map.put("bIsDifferentCurrency", parameters.getIsDifferentCurrency());
-            map.put("sCurrencyDps", parameters.getCurrencyDps());
+            map.put("sBank", params.getBank());
+            map.put("sBankAccount", params.getBankAccount());
+            map.put("sPaymentType", params.getTypePayment());
+            map.put("sCurrency", params.getCurrency());
+            map.put("dCurrencyTotal", params.getTotal());
+            map.put("dOriginalTotal", params.getOriginalTotal());
+            map.put("bIsDifferentCurrency", params.getIsDifferentCurrency());
+            map.put("sCurrencyDps", params.getCurrencyDps());
             
             fileTemporal = new File("reps/fin_lay_bank.jasper");
             reporte = (JasperReport) JRLoader.loadObject(fileTemporal);
@@ -60,7 +60,7 @@ public abstract class STreasuryBankLayoutFile {
             fos.write(reportBytes);
             fos.close();
 
-            file = new File(fileTemporal.getParentFile() + "\\" + SLibUtilities.textToAlphanumeric(parameters.getCompanyName()) + "#" + parameters.getFolio() + "-" + parameters.getAuthRequests() + ".pdf");
+            file = new File(fileTemporal.getParentFile() + "\\" + SLibUtilities.textToAlphanumeric(params.getCompanyName()) + "#" + params.getFolio() + "-" + params.getAuthRequests() + ".pdf");
             fos = new FileOutputStream(file);
             fos.write(reportBytes);
             fos.close();

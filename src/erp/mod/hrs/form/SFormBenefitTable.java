@@ -35,7 +35,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SFormBenefitTable extends SBeanForm implements ActionListener, ItemListener {
 
@@ -113,7 +113,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel15.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCode.setText("Código:*");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -124,7 +124,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel15.add(jPanel5);
 
-        jPanel13.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlName.setText("Nombre:*");
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -136,7 +136,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel15.add(jPanel13);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Inicio vigencia:*");
         jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -149,7 +149,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel16.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel18.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBenefitType.setText("Tipo prestación:*");
         jlBenefitType.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -160,7 +160,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel16.add(jPanel18);
 
-        jPanel12.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEarning.setText("Percepción:*");
         jlEarning.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -171,7 +171,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel16.add(jPanel12);
 
-        jPanel17.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDeduction.setText("Deducción:");
         jlDeduction.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -182,9 +182,9 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel16.add(jPanel17);
 
-        jPanel14.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentType.setText("Periodo pago:");
+        jlPaymentType.setText("Período pago:");
         jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlPaymentType);
 
@@ -202,23 +202,23 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel7.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jPanel8.setLayout(new java.awt.FlowLayout(3, 5, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlMonths.setText("Meses:*");
+        jlMonths.setText("Meses base:*");
         jlMonths.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlMonths);
 
-        jlBenefitDays.setText("Días:*");
+        jlBenefitDays.setText("Días prestación:*");
         jlBenefitDays.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlBenefitDays);
 
-        jlBenefitBonusPercentage.setText("Prima:*");
+        jlBenefitBonusPercentage.setText("Prima prestación:*");
         jlBenefitBonusPercentage.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel8.add(jlBenefitBonusPercentage);
 
         jPanel7.add(jPanel8);
 
-        jPanel9.setLayout(new java.awt.FlowLayout(3, 5, 0));
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
         jPanel9.add(moIntMonths);
         jPanel9.add(moIntBenefitDays);
 
@@ -318,7 +318,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
         moIntMonths.setIntegerSettings(SGuiUtils.getLabelName(jlMonths), SGuiConsts.GUI_TYPE_INT, false);
         moIntBenefitDays.setIntegerSettings(SGuiUtils.getLabelName(jlBenefitDays), SGuiConsts.GUI_TYPE_INT, false);
-        moDecBenefitBonusPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlBenefitBonusPercentage), SGuiConsts.GUI_TYPE_DEC_PER_TAX, false);
+        moDecBenefitBonusPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlBenefitBonusPercentage), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
 
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
@@ -342,12 +342,12 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> columns = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Meses"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Días"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_TAX, "Prima"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_4B, "Meses base"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_4B, "Días prestación"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_DISC, "Prima prestación"));
 
                 return columns;
             }

@@ -2,6 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mod;
 
 /**
@@ -481,6 +482,7 @@ public abstract class SModSysConsts {
     public static final int FINS_FISCAL_BANK_NA = 999;
     public static final int FINS_FISCAL_PAY_MET_NA = 98;
 
+    // constants for generation of e-accounting files:
     public static final int FINS_TP_FISCAL_ACC_LINK_ACC = 1;
     public static final int FINS_TP_FISCAL_ACC_LINK_CSH_CSH = 11;
     public static final int FINS_TP_FISCAL_ACC_LINK_CSH_BNK = 12;
@@ -522,11 +524,16 @@ public abstract class SModSysConsts {
     public static final String FINU_TP_REC_JOURNAL = "Dr";
     public static final String FINU_TP_REC_CASH_BANK = "CB";
     
-    public static final int FIN_LAY_BANK_ACC = 1;   // layout accounting
-    public static final int FIN_LAY_BANK_DPS = 2;   // layout for payable accounts
-    public static final int FIN_LAY_BANK_ADV = 3;   // layout for advance payments
-    public static final int FIN_LAY_BANK_OWN = 11;  // layout for own transfers
-    public static final int FIN_LAY_BANK_QRY = 21;  // used only as grid identifier!
+    /** Accounting of bank layout */
+    public static final int FIN_LAY_BANK_ACC = 1;
+    /** Bank layout for payments */
+    public static final int FIN_LAY_BANK_PAY = 2;
+    /** Bank layout for prepayments */
+    public static final int FIN_LAY_BANK_PREPAY = 3;
+    /** Bank layout for own transfers */
+    public static final int FIN_LAY_BANK_OWN = 11;
+    /** Used only as grid identifier! */
+    public static final int FIN_LAY_BANK_QRY = 21;
 
     /*
      * Transactions
@@ -677,6 +684,10 @@ public abstract class SModSysConsts {
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT = 251;     // out status of tools lent
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT = 252;    // out status of tools maintenance
     public static final int TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST = 253;     // out status of tools lost
+    
+    public static final int TRNX_TP_MAINT_MOV_PART = 1;    // Part
+    public static final int TRNX_TP_MAINT_MOV_TOOL = 2;    // Tool
+    public static final int TRNX_TP_MAINT_MOV_ALL = 3;     // All
 
     public static final int TRNU_TP_IOG_ADJ_NA = 1;
 
@@ -825,9 +836,6 @@ public abstract class SModSysConsts {
     public static final int HRSS_CL_HRS_CAT_MAR = 3; // Marital Status
     public static final int HRSS_CL_HRS_CAT_EDU = 4; // Level Of Education
 
-    public static final int[] HRSS_TP_HRS_CAT_MAL = new int[] { 1, 1 }; // Male
-    public static final int[] HRSS_TP_HRS_CAT_FEM = new int[] { 1, 2 }; // Female
-
     public static final int HRSS_TP_PAY_WEE = 1;    // Weekly 
     public static final int HRSS_TP_PAY_FOR = 2;    // Fortnightly 
 
@@ -847,12 +855,12 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_TAX_COMP_PAY = 2;   // Payroll
     public static final int HRSS_TP_TAX_COMP_ANN = 3;   // Annual
 
-    public static final int HRSS_TP_EAR_COMP_AMT = 1;       // Amount
-    public static final int HRSS_TP_EAR_COMP_DAY = 2;       // Days
-    public static final int HRSS_TP_EAR_COMP_HRS = 3;       // Hours
-    public static final int HRSS_TP_EAR_COMP_PER_DAY = 12;  // % Day
-    public static final int HRSS_TP_EAR_COMP_PER_HRS = 13;  // % Hour
-    public static final int HRSS_TP_EAR_COMP_PER_EAR = 21;  // % Earnings
+    public static final int HRSS_TP_EAR_COMP_AMT = 1;           // Amount
+    public static final int HRSS_TP_EAR_COMP_DAYS = 2;          // Days
+    public static final int HRSS_TP_EAR_COMP_HRS = 3;           // Hours
+    public static final int HRSS_TP_EAR_COMP_PCT_DAY = 12;      // % of Day
+    public static final int HRSS_TP_EAR_COMP_PCT_HR = 13;       // % of Hour
+    public static final int HRSS_TP_EAR_COMP_PCT_INCOME = 16;   // % of Income
 
     public static final int HRSS_TP_EAR_EXEM_NON = 1;       // Non applicable
     public static final int HRSS_TP_EAR_EXEM_PER = 11;      // Percentage
@@ -870,10 +878,11 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_DIS = 14;       // Disability
     public static final int HRSS_TP_EAR_TAX_SUB = 17;   // Tax
     public static final int HRSS_TP_EAR_OVR_TME = 19;   // Overtime
+    public static final int HRSS_TP_EAR_VAC_BON = 21;   // Vacation Bonus
     public static final int HRSS_TP_EAR_SEN_BON = 22;   // Seniority bonus 
     public static final int HRSS_TP_EAR_SET = 23;       // Payment by settlement
     public static final int HRSS_TP_EAR_CMP = 25;       // Compensation
-    public static final int HRSS_TP_EAR_OTH = 999;  // Other payments diferent the catalogue earnings type the SAT
+    public static final int HRSS_TP_EAR_OTH = 999;      // Other payments diferent the catalogue earnings type the SAT
 
     public static final int HRSS_TP_OTH_PAY_TAX_REF = 1;    // Tax Refund
     public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2;    // Tax Subsidy
@@ -881,15 +890,16 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_OTH_PAY_TAX_BAL = 4;    // Tax Positive Balance
     public static final int HRSS_TP_OTH_PAY_OTH = 999;  // Other payments
 
-    public static final int HRSS_TP_DED_COMP_AMT = 1;       // Amount
-    public static final int HRSS_TP_DED_COMP_DAY = 2;       // Days
-    public static final int HRSS_TP_DED_COMP_HRS = 3;       // Hours
-    public static final int HRSS_TP_DED_COMP_PER_DAY = 12;  // % Day
-    public static final int HRSS_TP_DED_COMP_PER_HRS = 13;  // % Hour
-    public static final int HRSS_TP_DED_COMP_PBT = 21;      // Pay Before Tax
-    public static final int HRSS_TP_DED_COMP_PAT = 22;      // Pay After Tax
-    public static final int HRSS_TP_DED_COMP_IBT = 26;      // Income Before Tax
-    public static final int HRSS_TP_DED_COMP_IAT = 27;      // Income After Tax
+    public static final int HRSS_TP_DED_COMP_AMT = 1;           // Amount
+    //public static final int HRSS_TP_DED_COMP_DAYS = 2;        // Days                 disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_HRS = 3;         // Hours                disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_PCT_DAY = 12;    // % of Day             disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_PCT_HR = 13;     // % of Hour            disabled 2018-07-03 because seemingly has not ever been used
+    public static final int HRSS_TP_DED_COMP_PCT_INCOME = 16;   // % of Income
+    //public static final int HRSS_TP_DED_COMP_PBT = 21;        // Pay Before Tax       disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_PAT = 22;        // Pay After Tax        disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_IBT = 26;        // Income Before Tax    disabled 2018-07-03 because seemingly has not ever been used
+    //public static final int HRSS_TP_DED_COMP_IAT = 27;        // Income After Tax     disabled 2018-07-03 because seemingly has not ever been used
 
     public static final int HRSS_TP_DED_SSC = 1;    // Social Security
     public static final int HRSS_TP_DED_TAX = 2;    // Tax

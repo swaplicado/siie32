@@ -1,4 +1,4 @@
- /*
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -52,7 +52,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author  Sergio Flores
+ * @author Sergio Flores
  */
 public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
 
@@ -2662,9 +2662,6 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        SDataCfd cfd = null;
-        ArrayList<SDataCfd> aCfds = null;
-        String sFileXml = "";
         int[] keySystemAccountType = getSystemAccountTypeKey();
         int[] keySystemMoveType = getSystemMoveTypeKey();
         int[] keySystemMoveTypeXXX = getSystemMoveTypeKeyXXX();
@@ -2777,7 +2774,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         else {
             moRecordEntry.setFkCheckWalletId_n(moFieldFkCheckId_n.getKeyAsIntArray()[0]);
             moRecordEntry.setFkCheckId_n(moFieldFkCheckId_n.getKeyAsIntArray()[1]);
-            moRecordEntry.setAuxCheckNumber(((Integer) ((SFormComponentItem) jcbFkCheckId_n.getSelectedItem()).getComplement()).intValue());
+            moRecordEntry.setAuxCheckNumber((Integer) ((SFormComponentItem) jcbFkCheckId_n.getSelectedItem()).getComplement());
         }
 
         if (jbFkDps.isEnabled() && moEntryDps != null) {
@@ -2798,9 +2795,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             moRecordEntry.setFkDpsAdjustmentDocId_n(0);
         }
         
-        aCfds = new ArrayList<SDataCfd>();
+        // process added XML files of CFDI:
+        
+        ArrayList<SDataCfd> cfds = new ArrayList<>();
+        
         for (SDataCfdRecordRow row : maCfdRecordRows) {
-            cfd = null;
+            SDataCfd cfd = null;
             
             for (SDataCfd cfdAux : moRecordEntry.getDbmsDataCfds()) {
                 if (SLibUtilities.compareKeys(new int[] { row.getCfdId() }, new int[] { cfdAux.getPkCfdId() })) {
@@ -2809,17 +2809,18 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 }
             }
             
-            if (row.getNameXml().length() > 0) {
+            if (!row.getNameXml().isEmpty()) {
                 try {
                     if (cfd == null) {
+                        String xml = SXmlUtils.readXml(row.getPathXml());
+                        
                         cfd = new SDataCfd();
-                    
-                        sFileXml = SXmlUtils.readXml(row.getPathXml());
                         cfd.setCertNumber("");
                         cfd.setStringSigned("");
                         cfd.setSignature("");
-                        cfd.setDocXml(sFileXml);
+                        cfd.setDocXml(xml);
                         cfd.setDocXmlName(row.getNameXml());
+                        cfd.setIsConsistent(true);
                         cfd.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_INV);
                         cfd.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_NA);
                         cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
@@ -2841,24 +2842,23 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     if (row.getNameXml().length() == 0 && cfd != null) {
                         cfd.setDocXml("");
                         cfd.setDocXmlName("");
+                        cfd.setIsConsistent(true);
                         cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
                     }
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
                 }
-                //moRecordEntry.setDbmsDataCfd(null);
             }
             
             if (cfd != null) {
-                cfd.setIsConsistent(true);
-                aCfds.add(cfd);
+                cfds.add(cfd);
             }
         }
         
         moRecordEntry.getDbmsDataCfds().clear();
-        if (aCfds.size() > 0) {
-            moRecordEntry.getDbmsDataCfds().addAll(aCfds);
+        if (cfds.size() > 0) {
+            moRecordEntry.getDbmsDataCfds().addAll(cfds);
         }
 
         return moRecordEntry;

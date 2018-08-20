@@ -522,7 +522,7 @@ public class SDialogDpsStockReturn extends javax.swing.JDialog implements Action
             // Available stock is processed in inventory units:
 
             try {
-                stock = STrnUtilities.obtainStock(miClient, mnYear, stockReturnRow.getFkItemId(), stockReturnRow.getFkUnitId(), SLibConstants.UNDEFINED, manWarehouseKey[0], manWarehouseKey[1], null, (int[]) moParamDiog.getPrimaryKey());
+                stock = STrnUtilities.obtainStock(miClient, mnYear, stockReturnRow.getFkItemId(), stockReturnRow.getFkUnitId(), SLibConstants.UNDEFINED, manWarehouseKey[0], manWarehouseKey[1], SLibConstants.UNDEFINED, null, (int[]) moParamDiog.getPrimaryKey());
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);

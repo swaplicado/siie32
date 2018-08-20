@@ -83,7 +83,7 @@ public class SFormLoanAdjustmentDeduction extends SBeanForm implements ItemListe
         jlEmployee.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel13.add(jlEmployee);
 
-        moKeyEmployee.setPreferredSize(new java.awt.Dimension(300, 23));
+        moKeyEmployee.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel13.add(moKeyEmployee);
 
         jPanel2.add(jPanel13);
@@ -94,7 +94,7 @@ public class SFormLoanAdjustmentDeduction extends SBeanForm implements ItemListe
         jlLoanType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel7.add(jlLoanType);
 
-        moKeyLoanType.setPreferredSize(new java.awt.Dimension(300, 23));
+        moKeyLoanType.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel7.add(moKeyLoanType);
 
         jPanel2.add(jPanel7);
@@ -105,7 +105,7 @@ public class SFormLoanAdjustmentDeduction extends SBeanForm implements ItemListe
         jlLoan.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel12.add(jlLoan);
 
-        moKeyLoan.setPreferredSize(new java.awt.Dimension(300, 23));
+        moKeyLoan.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel12.add(moKeyLoan);
 
         jPanel2.add(jPanel12);
@@ -136,8 +136,7 @@ public class SFormLoanAdjustmentDeduction extends SBeanForm implements ItemListe
         jlNotes.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel14.add(jlNotes);
 
-        moTextNotes.setText("sBeanFieldText1");
-        moTextNotes.setPreferredSize(new java.awt.Dimension(300, 23));
+        moTextNotes.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel14.add(moTextNotes);
 
         jPanel2.add(jPanel14);

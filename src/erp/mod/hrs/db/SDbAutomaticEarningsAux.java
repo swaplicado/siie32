@@ -17,7 +17,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbAutomaticEarningsAux extends SDbRegistry {
     
@@ -130,6 +130,7 @@ public class SDbAutomaticEarningsAux extends SDbRegistry {
         
         registry.getAutomaticEarnings().clone();
         
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }

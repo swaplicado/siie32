@@ -1,4 +1,3 @@
-
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -7,6 +6,7 @@
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbDeduction extends SDbRegistryUser {
 
@@ -27,6 +27,7 @@ public class SDbDeduction extends SDbRegistryUser {
     protected String msCode;
     protected String msName;
     protected String msNameAbbreviated;
+    protected double mdRetPercentage;
     protected boolean mbWithholding;
     protected boolean mbPayrollTax;
     /*
@@ -50,136 +51,6 @@ public class SDbDeduction extends SDbRegistryUser {
     
     protected int mnAuxAccountingConfigurationTypeId;
     
-    /*
-    protected ArrayList<SDbAccountingDeduction> maAccountingDeduction;
-    
-    private SDbAccountingDeduction createAccountingDeduction() {
-        SDbAccountingDeduction accountingDeduction = null;
-        
-        accountingDeduction = new SDbAccountingDeduction();
-            
-        accountingDeduction.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-        accountingDeduction.setFkCostCenterId_n(SLibConsts.UNDEFINED);
-        accountingDeduction.setFkItemId_n(SLibConsts.UNDEFINED);
-        accountingDeduction.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
-        accountingDeduction.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
-        accountingDeduction.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
-        /*
-        accountingDeduction.setFkUserInsertId();
-        accountingDeduction.setFkUserUpdateId();
-        accountingDeduction.setTsUserInsert();
-        accountingDeduction.setTsUserUpdate();
-        
-        return accountingDeduction;
-    }
-    
-    private SDbAccountingDeduction getAccountingConfigurationDepartament(final int departamentId) throws Exception {
-        SDbAccountingDeduction accountingDeduction = null;
-        
-        for (SDbAccountingDeduction dbAccountingDeduction : maAccountingDeduction) {
-            if (dbAccountingDeduction.getPkReferenceId() == departamentId) {
-                accountingDeduction = dbAccountingDeduction.clone();
-                break;
-            }
-        }
-        
-        if (accountingDeduction == null) {
-            accountingDeduction = createAccountingDeduction();
-        }
-        
-        return accountingDeduction;
-    }
-    
-    private void createAccountingConfiguration(final SGuiSession session) throws Exception {
-        ResultSet resultSet = null;
-        String sql = "";
-        ArrayList<SDbAccountingDeduction> aAccountingDeduction = new ArrayList<SDbAccountingDeduction>();
-        ArrayList<SDbDepartment> departments = new ArrayList<SDbDepartment>();
-        ArrayList<SDbEmployee> employees = new ArrayList<SDbEmployee>();
-        SDbAccountingDeduction accountingDeduction = null;
-        SDbDepartment department = null;
-        SDbEmployee employee = null;
-        
-        if (mnAuxAccountingConfigurationTypeId != mnFkAccountingConfigurationTypeId) {
-            switch (mnFkAccountingConfigurationTypeId) {
-                case SModSysConsts.HRSS_TP_ACC_GBL:
-                    accountingDeduction = createAccountingDeduction();
-            
-                    accountingDeduction.setPkDeductionId(mnPkDeductionId);
-                    accountingDeduction.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_GBL);
-                    accountingDeduction.setPkReferenceId(SLibConsts.UNDEFINED);
-                    accountingDeduction.setDeleted(false);
-                    
-                    aAccountingDeduction.add(accountingDeduction);
-                    break;
-                case SModSysConsts.HRSS_TP_ACC_DEP:
-                    sql = "SELECT id_dep FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " ";
-                    
-                    resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-                    while (resultSet.next()) {
-                        department = (SDbDepartment) session.readRegistry(SModConsts.HRSU_DEP, new int[] { resultSet.getInt(1) });
-                        departments.add(department);
-                    }
-                    
-                    for (SDbDepartment dbDepartment : departments) {
-                        if (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
-                                mnAuxAccountingConfigurationTypeId < mnFkAccountingConfigurationTypeId && !maAccountingDeduction.isEmpty()) {
-                            accountingDeduction = maAccountingDeduction.get(0).clone();
-                        }
-                        else {
-                            accountingDeduction = createAccountingDeduction();
-                        }
-                        accountingDeduction.setDeleted(false);
-                        accountingDeduction.setPkDeductionId(mnPkDeductionId);
-                        accountingDeduction.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_DEP);
-                        accountingDeduction.setPkReferenceId(dbDepartment.getPkDepartmentId());
-
-                        aAccountingDeduction.add(accountingDeduction);
-                    }
-                    
-                    break;
-                case SModSysConsts.HRSS_TP_ACC_EMP:
-                    sql = "SELECT id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " ";
-                    
-                    resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-                    while (resultSet.next()) {
-                        employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { resultSet.getInt(1) });
-                        employees.add(employee);
-                    }
-                    
-                    for (SDbEmployee dbEmployee : employees) {
-                        if (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
-                                mnAuxAccountingConfigurationTypeId < mnFkAccountingConfigurationTypeId) {
-                            if (mnAuxAccountingConfigurationTypeId == SModSysConsts.HRSS_TP_ACC_GBL && !maAccountingDeduction.isEmpty()) {
-                                accountingDeduction = maAccountingDeduction.get(0).clone();
-                            }
-                            else {
-                                accountingDeduction = getAccountingConfigurationDepartament(dbEmployee.getFkDepartmentId());
-                            }
-                        }
-                        else {
-                            accountingDeduction = createAccountingDeduction();
-                        }
-                        accountingDeduction.setDeleted(false);
-                        accountingDeduction.setPkDeductionId(mnPkDeductionId);
-                        accountingDeduction.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_EMP);
-                        accountingDeduction.setPkReferenceId(dbEmployee.getPkEmployeeId());
-
-                        aAccountingDeduction.add(accountingDeduction);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        
-        if (!aAccountingDeduction.isEmpty()) {
-            maAccountingDeduction.clear();
-            maAccountingDeduction.addAll(aAccountingDeduction);
-        }
-    }
-    */
-    
     public SDbDeduction() {
         super(SModConsts.HRS_DED);
     }
@@ -188,6 +59,7 @@ public class SDbDeduction extends SDbRegistryUser {
     public void setCode(String s) { msCode = s; }
     public void setName(String s) { msName = s; }
     public void setNameAbbreviated(String s) { msNameAbbreviated = s; }
+    public void setRetPercentage(double d) { mdRetPercentage = d; }
     public void setWithholding(boolean b) { mbWithholding = b; }
     public void setPayrollTax(boolean b) { mbPayrollTax = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -211,6 +83,7 @@ public class SDbDeduction extends SDbRegistryUser {
     public String getCode() { return msCode; }
     public String getName() { return msName; }
     public String getNameAbbreviated() { return msNameAbbreviated; }
+    public double getRetPercentage() { return mdRetPercentage; }
     public boolean isWithholding() { return mbWithholding; }
     public boolean isPayrollTax() { return mbPayrollTax; }
     public boolean isDeleted() { return mbDeleted; }
@@ -229,7 +102,13 @@ public class SDbDeduction extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public int getAuxAccountingConfigurationTypeId() { return mnAuxAccountingConfigurationTypeId; }
-    //public ArrayList<SDbAccountingDeduction> getAccountingDeduction() { return maAccountingDeduction; }
+
+    public boolean areUnitsModifiable() {
+        boolean isNotBasedOnUnits = mnFkDeductionComputationTypeId != SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME;
+        boolean isNotAbsence = mnFkAbsenceClassId_n == 0 && mnFkAbsenceTypeId_n == 0;
+        
+        return isNotBasedOnUnits && isNotAbsence;
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -249,6 +128,7 @@ public class SDbDeduction extends SDbRegistryUser {
         msCode = "";
         msName = "";
         msNameAbbreviated = "";
+        mdRetPercentage = 0;
         mbWithholding = false;
         mbPayrollTax = false;
         mbDeleted = false;
@@ -318,6 +198,7 @@ public class SDbDeduction extends SDbRegistryUser {
             msCode = resultSet.getString("code");
             msName = resultSet.getString("name");
             msNameAbbreviated = resultSet.getString("name_abbr");
+            mdRetPercentage = resultSet.getDouble("ret_per");
             mbWithholding = resultSet.getBoolean("b_who");
             mbPayrollTax = resultSet.getBoolean("b_pay_tax");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -378,6 +259,7 @@ public class SDbDeduction extends SDbRegistryUser {
                     "'" + msCode + "', " + 
                     "'" + msName + "', " + 
                     "'" + msNameAbbreviated + "', " + 
+                    mdRetPercentage + ", " + 
                     (mbWithholding ? 1 : 0) + ", " + 
                     (mbPayrollTax ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -406,6 +288,7 @@ public class SDbDeduction extends SDbRegistryUser {
                     "code = '" + msCode + "', " +
                     "name = '" + msName + "', " +
                     "name_abbr = '" + msNameAbbreviated + "', " +
+                    "ret_per = " + mdRetPercentage + ", " +
                     "b_who = " + (mbWithholding ? 1 : 0) + ", " +
                     "b_pay_tax = " + (mbPayrollTax ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -456,6 +339,7 @@ public class SDbDeduction extends SDbRegistryUser {
         registry.setCode(this.getCode());
         registry.setName(this.getName());
         registry.setNameAbbreviated(this.getNameAbbreviated());
+        registry.setRetPercentage(this.getRetPercentage());
         registry.setWithholding(this.isWithholding());
         registry.setPayrollTax(this.isPayrollTax());
         registry.setDeleted(this.isDeleted());
@@ -476,6 +360,7 @@ public class SDbDeduction extends SDbRegistryUser {
         registry.setAuxAccountingConfigurationTypeId(this.getAuxAccountingConfigurationTypeId());
         //registry.getAccountingDeduction().addAll(this.getAccountingDeduction());
 
+        registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
 }

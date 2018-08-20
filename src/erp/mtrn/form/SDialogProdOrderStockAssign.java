@@ -22,12 +22,12 @@ import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
 import erp.mmfg.data.SDataProductionOrder;
-import erp.mtrn.data.STrnStock;
-import erp.mtrn.data.STrnStockSegregationUtils;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.STrnProdOrderStockAssignRow;
+import erp.mtrn.data.STrnStock;
 import erp.mtrn.data.STrnStockMove;
+import erp.mtrn.data.STrnStockSegregationUtils;
 import erp.mtrn.data.STrnUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -974,7 +974,7 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
             // Available stock is processed in inventory units:
 
             try {
-                stock = STrnUtilities.obtainStock(miClient, mnYear, stockAssignRow.getFkItemId(), stockAssignRow.getFkUnitId(), SLibConstants.UNDEFINED, manWarehouseSourceKey[0], manWarehouseSourceKey[1], null, (int[]) moParamDiog.getPrimaryKey());
+                stock = STrnUtilities.obtainStock(miClient, mnYear, stockAssignRow.getFkItemId(), stockAssignRow.getFkUnitId(), SLibConstants.UNDEFINED, manWarehouseSourceKey[0], manWarehouseSourceKey[1], SLibConstants.UNDEFINED, null, (int[]) moParamDiog.getPrimaryKey());
                 
                 stockMoveParams = new STrnStockMove();
                 stockMoveParams.setPkCompanyBranchId(manWarehouseSourceKey[0]);
@@ -999,7 +999,7 @@ public class SDialogProdOrderStockAssign extends javax.swing.JDialog implements 
                 stockMoveParams.setPkUnitId(stockAssignRow.getFkUnitId());
                 stockMoveParams.setWarehouseType(SDataConstantsSys.CFGS_TP_ENT_WH_MFG_MS[1]);
                 
-                objStock = STrnStockSegregationUtils.getStock(miClient, stockMoveParams);
+                objStock = STrnStockSegregationUtils.getStock(miClient, stockMoveParams, null);
                 surplus = objStock.getAvailableStock();
             }
             catch (Exception e) {

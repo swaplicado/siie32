@@ -241,7 +241,7 @@ public abstract class STrnStockSegregationUtils {
         STrnStock stock = null;
         STrnStock segregatedStock = null;
         
-        stock = getStock(client, stockMoveParams);
+        stock = getStock(client, stockMoveParams, null);
         
         segregatedStock = getStockSegregated(client, stockMoveParams);
         stock.setSegregationIncreases(segregatedStock.getSegregationIncreases());
@@ -258,7 +258,7 @@ public abstract class STrnStockSegregationUtils {
      * @return The STrnStock object containing the values obtained.
      * @throws Exception 
      */
-    public static STrnStock getStock(final SClientInterface client, final STrnStockMove stockMoveParams) throws Exception {
+    public static STrnStock getStock(final SClientInterface client, final STrnStockMove stockMoveParams, final int[] iogKey_n) throws Exception {
         STrnStock stock = new STrnStock();
         ResultSet result = null;
         
@@ -279,6 +279,9 @@ public abstract class STrnStockSegregationUtils {
         if (stockMoveParams.getPkLotId() != 0) {
             sql += "AND stk.id_lot = " + stockMoveParams.getPkLotId() + " ";
         }
+        if (iogKey_n != null) {
+            sql += "AND NOT (stk.fid_diog_year = " + iogKey_n[0] + " AND stk.fid_diog_doc = " + iogKey_n[1] + ") ";
+        }
         
         try {
             result = client.getSession().getStatement().executeQuery(sql);
@@ -287,7 +290,6 @@ public abstract class STrnStockSegregationUtils {
                 stock.setMovementIn(result.getDouble("f_mov_in"));
                 stock.setMovementOut(result.getDouble("f_mov_out"));
             }
-            
         }
         catch (SQLException ex) {
             SLibUtils.printException(client, ex);

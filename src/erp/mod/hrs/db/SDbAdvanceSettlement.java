@@ -16,7 +16,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbAdvanceSettlement extends SDbRegistryUser {
 
@@ -212,7 +212,6 @@ public class SDbAdvanceSettlement extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
         registry.setRegistryNew(this.isRegistryNew());
-        
         return registry;
     }
 }

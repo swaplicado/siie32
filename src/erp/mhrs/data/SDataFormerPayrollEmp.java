@@ -112,6 +112,10 @@ public class SDataFormerPayrollEmp extends erp.lib.data.SDataRegistry implements
     public java.lang.String getFkRecordTypeId() { return msFkRecordTypeId; }
     public int getFkNumberId() { return mnFkNumberId; }
 
+    public java.lang.String getFormerPayrollEmpNumber() {
+        return (msNumberSeries.isEmpty() ? "" : msNumberSeries + "-") + mnNumber;
+    }
+
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkPayrollId = ((int[]) pk)[0];

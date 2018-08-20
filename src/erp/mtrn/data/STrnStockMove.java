@@ -91,6 +91,11 @@ public class STrnStockMove implements java.io.Serializable {
         mtAuxLotDateExpiration = null;
         mbAuxIsLotBlocked = false;
         mbAuxIsMoveBeingDeleted = false;
+        mnSegregationId = 0;
+        manSegregationReference = null;
+        mnSegregationType = 0;
+        mbIsCurrentSegregationExcluded = false;
+        mnWarehouseType = 0;
     }
 
     public void setPkYearId(int n) { mnPkYearId = n; }
@@ -157,6 +162,11 @@ public class STrnStockMove implements java.io.Serializable {
         move.setAuxLotDateExpiration(this.getAuxLotDateExpiration());
         move.setAuxIsLotBlocked(this.getAuxIsLotBlocked());
         move.setAuxIsMoveBeingDeleted(this.getAuxIsMoveBeingDeleted());
+        move.setSegregationId(this.getSegregationId());
+        move.setSegregationReference(this.getSegregationReference());
+        move.setSegregationType(this.getSegregationType());
+        move.setIsCurrentSegregationExcluded(this.getIsCurrentSegregationExcluded());
+        move.setWarehouseType(this.getWarehouseType());
 
         return move;
     }

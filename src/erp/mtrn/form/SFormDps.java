@@ -2,6 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mtrn.form;
 
 import cfd.DCfdUtils;
@@ -33,6 +34,7 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STablePaneGrid;
 import erp.lib.table.STableRow;
 import erp.mbps.data.SDataBizPartner;
+import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mcfg.data.SDataParamsCompany;
@@ -179,15 +181,16 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldBachocoOrganizacionCompra;
     private erp.lib.form.SFormField moFieldBachocoDivision;
     private erp.lib.form.SFormField moFieldDpsDescripcion;
+    private erp.lib.form.SFormField moFieldCfdAddendaSubtypeId;
     private erp.lib.form.SFormField moFieldStore;
     private erp.lib.form.SFormField moFieldGoodsDelivery;
-    private erp.lib.form.SFormField moFieldDateRemission;
+    private erp.lib.form.SFormField moFieldRemissionDate;
     private erp.lib.form.SFormField moFieldRemission;
     private erp.lib.form.SFormField moFieldSalesOrder;
-    private erp.lib.form.SFormField moFieldCfdAddendaSubtypeId;
     private erp.lib.form.SFormField moFieldBulkType;
     private erp.lib.form.SFormField moFieldBulkQty;
     private erp.lib.form.SFormField moFieldNumberNoteIn;
+    private erp.lib.form.SFormField moFieldAppointment;
     private erp.lib.form.SFormField moFieldFileXml;
     private erp.lib.form.SFormField moFieldCfdiPaymentWay;
     private erp.lib.form.SFormField moFieldCfdiPaymentMethod;
@@ -252,7 +255,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private double mdOrigDiscountDocPercentage;
     private boolean mbOrigIsDiscountDocApplying;
     private boolean mbIsLocalCurrency;
-    private java.lang.String msFileXmlPath;
+    private java.lang.String msFileXmlJustLoaded;
     private java.lang.Object moRecordUserKey;
     private sa.lib.srv.SSrvLock moRecordUserLock;
     private erp.mfin.data.SDataRecord moRecordUser;
@@ -559,14 +562,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbSystemNotes = new javax.swing.JButton();
         jpAddendaData = new javax.swing.JPanel();
         jPanel91 = new javax.swing.JPanel();
-        jPanel67 = new javax.swing.JPanel();
-        jPanel58 = new javax.swing.JPanel();
+        jPanel117 = new javax.swing.JPanel();
+        jPanel118 = new javax.swing.JPanel();
         jPanel68 = new javax.swing.JPanel();
         jlFkCfdAddendaTypeId = new javax.swing.JLabel();
         jtfFkCfdAddendaTypeId = new javax.swing.JTextField();
         jPanel41 = new javax.swing.JPanel();
-        jlCfdAddendaSubtypeId = new javax.swing.JLabel();
-        jcbCfdAddendaSubtypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jlCfdAddendaSubtype = new javax.swing.JLabel();
+        jcbCfdAddendaSubtype = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel69 = new javax.swing.JPanel();
         jlFolioNotaRecepcion = new javax.swing.JLabel();
         jtfFolioNotaRecepcion = new javax.swing.JTextField();
@@ -582,7 +585,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel81 = new javax.swing.JPanel();
         jlDpsDescripcion = new javax.swing.JLabel();
         jtfDpsDescripcion = new javax.swing.JTextField();
-        jPanel76 = new javax.swing.JPanel();
+        jPanel119 = new javax.swing.JPanel();
         jPanel82 = new javax.swing.JPanel();
         jlStore = new javax.swing.JLabel();
         jtfStore = new javax.swing.JTextField();
@@ -607,12 +610,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel90 = new javax.swing.JPanel();
         jlNumberNoteIn = new javax.swing.JLabel();
         jtfNumberNoteIn = new javax.swing.JTextField();
+        jPanel120 = new javax.swing.JPanel();
+        jlAppointment = new javax.swing.JLabel();
+        jtfAppointment = new javax.swing.JTextField();
         jPanel73 = new javax.swing.JPanel();
         jPanel74 = new javax.swing.JPanel();
         jPanel75 = new javax.swing.JPanel();
         jlFileXml = new javax.swing.JLabel();
         jtfFileXml = new javax.swing.JTextField();
-        jbFileXml = new javax.swing.JButton();
+        jbLoadFileXml = new javax.swing.JButton();
         jbDeleteFileXml = new javax.swing.JButton();
         jPanel105 = new javax.swing.JPanel();
         jPanel95 = new javax.swing.JPanel();
@@ -1936,12 +1942,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel91.setBorder(javax.swing.BorderFactory.createTitledBorder("Addenda:"));
         jPanel91.setLayout(new java.awt.BorderLayout());
 
-        jPanel67.setMinimumSize(new java.awt.Dimension(300, 195));
-        jPanel67.setPreferredSize(new java.awt.Dimension(625, 195));
-        jPanel67.setLayout(new java.awt.BorderLayout());
+        jPanel117.setLayout(new java.awt.GridLayout(1, 2));
 
-        jPanel58.setPreferredSize(new java.awt.Dimension(325, 23));
-        jPanel58.setLayout(new java.awt.GridLayout(8, 1));
+        jPanel118.setLayout(new java.awt.GridLayout(9, 1, 0, 2));
 
         jPanel68.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel68.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -1957,18 +1960,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfFkCfdAddendaTypeId.setPreferredSize(new java.awt.Dimension(170, 23));
         jPanel68.add(jtfFkCfdAddendaTypeId);
 
-        jPanel58.add(jPanel68);
+        jPanel118.add(jPanel68);
 
         jPanel41.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCfdAddendaSubtypeId.setText("Subtipo addenda: *");
-        jlCfdAddendaSubtypeId.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel41.add(jlCfdAddendaSubtypeId);
+        jlCfdAddendaSubtype.setText("Subtipo addenda: *");
+        jlCfdAddendaSubtype.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel41.add(jlCfdAddendaSubtype);
 
-        jcbCfdAddendaSubtypeId.setPreferredSize(new java.awt.Dimension(170, 23));
-        jPanel41.add(jcbCfdAddendaSubtypeId);
+        jcbCfdAddendaSubtype.setPreferredSize(new java.awt.Dimension(170, 23));
+        jPanel41.add(jcbCfdAddendaSubtype);
 
-        jPanel58.add(jPanel41);
+        jPanel118.add(jPanel41);
 
         jPanel69.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1980,7 +1983,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfFolioNotaRecepcion.setPreferredSize(new java.awt.Dimension(170, 23));
         jPanel69.add(jtfFolioNotaRecepcion);
 
-        jPanel58.add(jPanel69);
+        jPanel118.add(jPanel69);
 
         jPanel70.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1992,7 +1995,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfBachocoSociedad.setPreferredSize(new java.awt.Dimension(170, 23));
         jPanel70.add(jtfBachocoSociedad);
 
-        jPanel58.add(jPanel70);
+        jPanel118.add(jPanel70);
 
         jPanel71.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2004,7 +2007,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfBachocoOrganizacion.setPreferredSize(new java.awt.Dimension(170, 23));
         jPanel71.add(jtfBachocoOrganizacion);
 
-        jPanel58.add(jPanel71);
+        jPanel118.add(jPanel71);
 
         jPanel72.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2016,7 +2019,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfBachocoDivision.setPreferredSize(new java.awt.Dimension(170, 23));
         jPanel72.add(jtfBachocoDivision);
 
-        jPanel58.add(jPanel72);
+        jPanel118.add(jPanel72);
 
         jPanel81.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2028,12 +2031,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfDpsDescripcion.setPreferredSize(new java.awt.Dimension(170, 23));
         jPanel81.add(jtfDpsDescripcion);
 
-        jPanel58.add(jPanel81);
+        jPanel118.add(jPanel81);
 
-        jPanel67.add(jPanel58, java.awt.BorderLayout.WEST);
+        jPanel117.add(jPanel118);
 
-        jPanel76.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel76.setLayout(new java.awt.GridLayout(8, 1));
+        jPanel119.setLayout(new java.awt.GridLayout(9, 1, 0, 2));
 
         jPanel82.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2046,7 +2048,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfStore.setPreferredSize(new java.awt.Dimension(170, 23));
         jPanel82.add(jtfStore);
 
-        jPanel76.add(jPanel82);
+        jPanel119.add(jPanel82);
 
         jPanel87.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2059,7 +2061,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfGoodsDelivery.setPreferredSize(new java.awt.Dimension(170, 23));
         jPanel87.add(jtfGoodsDelivery);
 
-        jPanel76.add(jPanel87);
+        jPanel119.add(jPanel87);
 
         jPanel77.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2071,7 +2073,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jftRemissionDate.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel77.add(jftRemissionDate);
 
-        jPanel76.add(jPanel77);
+        jPanel119.add(jPanel77);
 
         jPanel79.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2083,7 +2085,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfRemission.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel79.add(jtfRemission);
 
-        jPanel76.add(jPanel79);
+        jPanel119.add(jPanel79);
 
         jPanel88.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2095,7 +2097,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfSalesOrder.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel88.add(jtfSalesOrder);
 
-        jPanel76.add(jPanel88);
+        jPanel119.add(jPanel88);
 
         jPanel83.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2106,14 +2108,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfBulkType.setText("00000000");
         jtfBulkType.setToolTipText("Folio");
         jtfBulkType.setPreferredSize(new java.awt.Dimension(100, 23));
-        jtfBulkType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfBulkTypeActionPerformed(evt);
-            }
-        });
         jPanel83.add(jtfBulkType);
 
-        jPanel76.add(jPanel83);
+        jPanel119.add(jPanel83);
 
         jPanel78.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2125,7 +2122,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfBulkQuantity.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel78.add(jtfBulkQuantity);
 
-        jPanel76.add(jPanel78);
+        jPanel119.add(jPanel78);
 
         jPanel90.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -2138,11 +2135,23 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfNumberNoteIn.setPreferredSize(new java.awt.Dimension(170, 23));
         jPanel90.add(jtfNumberNoteIn);
 
-        jPanel76.add(jPanel90);
+        jPanel119.add(jPanel90);
 
-        jPanel67.add(jPanel76, java.awt.BorderLayout.CENTER);
+        jPanel120.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel91.add(jPanel67, java.awt.BorderLayout.NORTH);
+        jlAppointment.setText("Cita: *");
+        jlAppointment.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel120.add(jlAppointment);
+
+        jtfAppointment.setText("00000000");
+        jtfAppointment.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel120.add(jtfAppointment);
+
+        jPanel119.add(jPanel120);
+
+        jPanel117.add(jPanel119);
+
+        jPanel91.add(jPanel117, java.awt.BorderLayout.NORTH);
 
         jpAddendaData.add(jPanel91, java.awt.BorderLayout.WEST);
 
@@ -2164,10 +2173,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfFileXml.setPreferredSize(new java.awt.Dimension(190, 23));
         jPanel75.add(jtfFileXml);
 
-        jbFileXml.setText("...");
-        jbFileXml.setToolTipText("Seleccionar archivo XML...");
-        jbFileXml.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel75.add(jbFileXml);
+        jbLoadFileXml.setText("...");
+        jbLoadFileXml.setToolTipText("Seleccionar archivo XML...");
+        jbLoadFileXml.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel75.add(jbLoadFileXml);
 
         jbDeleteFileXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
         jbDeleteFileXml.setToolTipText("Eliminar archivo XML");
@@ -2496,10 +2505,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         actionCancel();
     }//GEN-LAST:event_formWindowClosing
 
-    private void jtfBulkTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfBulkTypeActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jtfBulkTypeActionPerformed
-
     private void initComponentsExtra() {
         int i = 0;
         STableColumnForm[] aoTableColumns = null;
@@ -2608,24 +2613,33 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldDpsDescripcion = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfDpsDescripcion, jlDpsDescripcion);
         moFieldDpsDescripcion.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldDpsDescripcion.setLengthMax(35);
+        moFieldCfdAddendaSubtypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdAddendaSubtype, jlCfdAddendaSubtype);
+        moFieldCfdAddendaSubtypeId.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldStore = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfStore, jlStore);
+        moFieldStore.setDecimalFormat(SLibUtils.DecimalFormatIntegerRaw);
         moFieldStore.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldGoodsDelivery = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfGoodsDelivery, jlGoodsDelivery);
+        moFieldGoodsDelivery.setDecimalFormat(SLibUtils.DecimalFormatIntegerRaw);
         moFieldGoodsDelivery.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
-        moFieldDateRemission = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftRemissionDate, jlRemissionDate);
-        moFieldDateRemission.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
+        moFieldRemissionDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftRemissionDate, jlRemissionDate);
+        moFieldRemissionDate.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldRemission = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfRemission, jlRemission);
         moFieldRemission.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
+        moFieldRemission.setLengthMax(25);
         moFieldSalesOrder = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfSalesOrder, jlSalesOrder);
         moFieldSalesOrder.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
-        moFieldCfdAddendaSubtypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdAddendaSubtypeId, jlCfdAddendaSubtypeId);
-        moFieldCfdAddendaSubtypeId.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
+        moFieldSalesOrder.setLengthMax(25);
         moFieldBulkType = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfBulkType, jlBulkType);
+        moFieldBulkType.setDecimalFormat(SLibUtils.DecimalFormatIntegerRaw);
         moFieldBulkType.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldBulkQty = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfBulkQuantity, jlBulkQuantity);
         moFieldBulkQty.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldNumberNoteIn = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfNumberNoteIn, jlNumberNoteIn);
         moFieldNumberNoteIn.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
+        moFieldNumberNoteIn.setLengthMax(25);
+        moFieldAppointment = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfAppointment, jlAppointment);
+        moFieldAppointment.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
+        moFieldAppointment.setLengthMax(10);
         moFieldFileXml = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFileXml, jlFileXml);
         moFieldFileXml.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldCfdiTaxRegime = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdiTaxRegime, jlCfdiTaxRegime);
@@ -2716,20 +2730,21 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldPlate);
         mvFields.add(moFieldTicket);
 
-        mvFields.add(moFieldCfdAddendaSubtypeId);
         mvFields.add(moFieldFolioNotaRecepcion);
         mvFields.add(moFieldBachocoSociedad);
         mvFields.add(moFieldBachocoOrganizacionCompra);
         mvFields.add(moFieldBachocoDivision);
         mvFields.add(moFieldDpsDescripcion);
+        mvFields.add(moFieldCfdAddendaSubtypeId);
         mvFields.add(moFieldStore);
         mvFields.add(moFieldGoodsDelivery);
-        mvFields.add(moFieldDateRemission);
+        mvFields.add(moFieldRemissionDate);
         mvFields.add(moFieldRemission);
         mvFields.add(moFieldSalesOrder);
         mvFields.add(moFieldBulkType);
         mvFields.add(moFieldBulkQty);
         mvFields.add(moFieldNumberNoteIn);
+        mvFields.add(moFieldAppointment);
         mvFields.add(moFieldFileXml);
         mvFields.add(moFieldCfdiTaxRegime);
         mvFields.add(moFieldCfdiCfdiUsage);
@@ -2895,7 +2910,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbFkCarrierId_n.addActionListener(this);
         jbFkVehicleId_n.addActionListener(this);
         jbFkProductionOrderId_n.addActionListener(this);
-        jbFileXml.addActionListener(this);
+        jbLoadFileXml.addActionListener(this);
         jbDeleteFileXml.addActionListener(this);
         jbCfdiCfdiRelated.addActionListener(this);
         jtbEntryFilter.addActionListener(this);
@@ -2924,7 +2939,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbFkIncotermId.addItemListener(this);
         jcbFkCarrierTypeId.addItemListener(this);
         jcbFkVehicleTypeId_n.addItemListener(this);
-        jcbCfdAddendaSubtypeId.addItemListener(this);
+        jcbCfdAddendaSubtype.addItemListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "publicActionDependentNew", "dependentNew", KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "publicActionDependentEdit", "dependentEdit", KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK);
@@ -3131,7 +3146,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         boolean isCfdiVer33 = mnCfdXmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_33;
         
         jlFileXml.setEnabled(enableXmlFields);
-        jbFileXml.setEnabled(enableXmlFields);
+        jbLoadFileXml.setEnabled(enableXmlFields);
         jbDeleteFileXml.setEnabled(enableXmlFields);
         
         jcbCfdiTaxRegime.setEnabled(enableFields && isCfdiVer33);
@@ -3180,12 +3195,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         boolean enableFields = enable && isCfdEmissionRequired();
         
         if (moBizPartner != null) {
+            jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { moBizPartnerCategory.getFkCfdAddendaTypeId() }));
+            
             switch (moBizPartnerCategory.getFkCfdAddendaTypeId()) {
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_NA:
-                    jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_NA }));
                     break;
                     
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
+                    jlCfdAddendaSubtype.setEnabled(enableFields);
+                    jcbCfdAddendaSubtype.setEnabled(enableFields);
                     jlStore.setEnabled(enableFields);
                     jtfStore.setEnabled(enableFields);
                     jlGoodsDelivery.setEnabled(enableFields);
@@ -3194,30 +3212,29 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     jftRemissionDate.setEnabled(enableFields);
                     jlRemission.setEnabled(enableFields);
                     jtfRemission.setEnabled(enableFields);
+                    jlSalesOrder.setEnabled(enableFields);
+                    jtfSalesOrder.setEnabled(enableFields);
                     jlBulkType.setEnabled(enableFields);
                     jtfBulkType.setEnabled(enableFields);
                     jlBulkQuantity.setEnabled(enableFields);
                     jtfBulkQuantity.setEnabled(enableFields);
-                    jlSalesOrder.setEnabled(enableFields);
-                    jtfSalesOrder.setEnabled(enableFields);
-                    jlCfdAddendaSubtypeId.setEnabled(enableFields);
-                    jcbCfdAddendaSubtypeId.setEnabled(enableFields);
                     jlNumberNoteIn.setEnabled(enableFields);
                     jtfNumberNoteIn.setEnabled(enableFields);
-                    jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA }));
+                    jlAppointment.setEnabled(enableFields);
+                    jtfAppointment.setEnabled(enableFields);
                     
-                    jcbCfdAddendaSubtypeId.removeAllItems();
-                    jcbCfdAddendaSubtypeId.addItem(new SFormComponentItem(new int[] { SCfdConsts.ADD_SORIANA_NOR }, "Normal"));
-                    jcbCfdAddendaSubtypeId.addItem(new SFormComponentItem(new int[] { SCfdConsts.ADD_SORIANA_EXT }, "Extemporánea"));
+                    jcbCfdAddendaSubtype.removeAllItems();
+                    jcbCfdAddendaSubtype.addItem(new SFormComponentItem(new int[] { }, "(Seleccionar subtipo addenda)"));
+                    jcbCfdAddendaSubtype.addItem(new SFormComponentItem(new int[] { SCfdConsts.ADD_SORIANA_NOR }, "Normal"));
+                    jcbCfdAddendaSubtype.addItem(new SFormComponentItem(new int[] { SCfdConsts.ADD_SORIANA_EXT }, "Extemporánea"));
                     
-                    SFormUtilities.locateComboBoxItem(jcbCfdAddendaSubtypeId, new int[] { (moDps.getDbmsDataAddenda() != null ? moDps.getDbmsDataAddenda().getCfdAddendaSubtype() : SCfdConsts.ADD_SORIANA_NOR) });
-                    itemChangeCfdAddendaSubtypeId();
+                    SFormUtilities.locateComboBoxItem(jcbCfdAddendaSubtype, new int[] { (moDps.getDbmsDataAddenda() != null ? moDps.getDbmsDataAddenda().getCfdAddendaSubtype() : SCfdConsts.ADD_SORIANA_NOR) });
+                    itemChangeCfdAddendaSubtype();
                     break;
                     
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
                     jlFolioNotaRecepcion.setEnabled(enableFields);
                     jtfFolioNotaRecepcion.setEnabled(enableFields);
-                    jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL }));
                     break;
                     
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
@@ -3227,7 +3244,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     jtfBachocoOrganizacion.setEnabled(enableFields);
                     jlBachocoDivision.setEnabled(enableFields);
                     jtfBachocoDivision.setEnabled(enableFields);
-                    jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO }));
                     break;
                     
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
@@ -3235,11 +3251,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     jtfBachocoSociedad.setEnabled(enableFields);
                     jlDpsDescripcion.setEnabled(enableFields);
                     jtfDpsDescripcion.setEnabled(enableFields);
-                    jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO }));
                     break;
                     
                 case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
-                    jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA }));
                     break;
                     
                 default:
@@ -3251,75 +3265,83 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
      * XXX Refactor this method! (sflores, 2017-02-23)
      */
     private void setAddendaData() {
+        int nCfdAddendaSubtype = 0;
+        int nSorianaTienda = 0;
+        int nGoodsDelivery = 0;
+        Date tSorianaRemisionFecha = null;
+        String sSorianaRemisionFolio = "";
+        String sSorianaPedidoFolio = "";
+        int nSorianaBultoTipo = 0;
+        double dSorianaBultoCantidad = 0;
+        String sSorianaFolioNotaEntrada = "";
+        String sSorianaCita = "";
         String sFolioNotaRecepcion = "";
         String sBachocoSociedad = "";
         String sBachocoOrganizacion = "";
         String sBachocoDivision = "";
         String sDpsDescripcion = "";
-        int nSorianaTienda = 0;
-        int nGoodsDelivery = 0;
-        int nSorianaTipoBulto = 0;
-        int nCfdAddendaSubtype = 0;
-        Date tSorianaFechaRemision = null;
-        String sSorianaFolioRemision = "";
-        String sSorianaFolioPedido = "";
-        String sSorianaFolioNotaEntrada = "";
-        double dSorianaCantidadBulto = 0;
+        
+        jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { moBizPartnerCategory.getFkCfdAddendaTypeId() }));
 
         switch(moBizPartnerCategory.getFkCfdAddendaTypeId()) {
             case SDataConstantsSys.BPSS_TP_CFD_ADD_NA:
-                jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_NA }));
                 break;
 
             case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
+                jlCfdAddendaSubtype.setEnabled(false);
+                jcbCfdAddendaSubtype.setEnabled(false);
                 jlStore.setEnabled(true);
                 jtfStore.setEnabled(false);
                 jlGoodsDelivery.setEnabled(true);
                 jtfGoodsDelivery.setEnabled(false);
-                jlBulkType.setEnabled(true);
-                jtfBulkType.setEnabled(false);
-                jlBulkQuantity.setEnabled(true);
-                jtfBulkQuantity.setEnabled(false);
+                jlRemissionDate.setEnabled(true);
+                jftRemissionDate.setEnabled(false);
                 jlRemission.setEnabled(true);
                 jtfRemission.setEnabled(false);
                 jlSalesOrder.setEnabled(true);
                 jtfSalesOrder.setEnabled(false);
-                jlCfdAddendaSubtypeId.setEnabled(false);
-                jcbCfdAddendaSubtypeId.setEnabled(false);
-                jlNumberNoteIn.setEnabled(false);
+                jlBulkType.setEnabled(true);
+                jtfBulkType.setEnabled(false);
+                jlBulkQuantity.setEnabled(true);
+                jtfBulkQuantity.setEnabled(false);
+                jlNumberNoteIn.setEnabled(true);
                 jtfNumberNoteIn.setEnabled(false);
-                jlRemissionDate.setEnabled(true);
-                jftRemissionDate.setEnabled(false);
-                jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA }));
+                jlAppointment.setEnabled(true);
+                jtfAppointment.setEnabled(false);
+                
                 if (moDps.getDbmsDataAddenda() != null && moDps.getDbmsDataAddenda().getSorianaTienda() > 0) {
+                    nCfdAddendaSubtype = moDps.getDbmsDataAddenda().getCfdAddendaSubtype();
                     nSorianaTienda = moDps.getDbmsDataAddenda().getSorianaTienda();
                     nGoodsDelivery = moDps.getDbmsDataAddenda().getSorianaEntregaMercancia();
-                    tSorianaFechaRemision = moDps.getDbmsDataAddenda().getSorianaRemisionFecha();
-                    sSorianaFolioRemision = moDps.getDbmsDataAddenda().getSorianaRemisionFolio();
-                    sSorianaFolioPedido = moDps.getDbmsDataAddenda().getSorianaPedidoFolio();
-                    nCfdAddendaSubtype = moDps.getDbmsDataAddenda().getCfdAddendaSubtype();
+                    tSorianaRemisionFecha = moDps.getDbmsDataAddenda().getSorianaRemisionFecha();
+                    sSorianaRemisionFolio = moDps.getDbmsDataAddenda().getSorianaRemisionFolio();
+                    sSorianaPedidoFolio = moDps.getDbmsDataAddenda().getSorianaPedidoFolio();
+                    nSorianaBultoTipo = moDps.getDbmsDataAddenda().getSorianaBultoTipo();
+                    dSorianaBultoCantidad = moDps.getDbmsDataAddenda().getSorianaBultoCantidad();
                     sSorianaFolioNotaEntrada = moDps.getDbmsDataAddenda().getSorianaNotaEntradaFolio();
-                    nSorianaTipoBulto = moDps.getDbmsDataAddenda().getSorianaBultoTipo();
-                    dSorianaCantidadBulto = moDps.getDbmsDataAddenda().getSorianaBultoCantidad();
+                    sSorianaCita = moDps.getDbmsDataAddenda().getSorianaCita();
                 }
+                
+                moFieldCfdAddendaSubtypeId.setFieldValue(new int[] { nCfdAddendaSubtype });
                 moFieldStore.setFieldValue(nSorianaTienda);
                 moFieldGoodsDelivery.setFieldValue(nGoodsDelivery);
-                moFieldDateRemission.setFieldValue(tSorianaFechaRemision);
-                moFieldRemission.setFieldValue(sSorianaFolioRemision);
-                moFieldSalesOrder.setFieldValue(sSorianaFolioPedido);
-                moFieldCfdAddendaSubtypeId.setFieldValue(new int[] { nCfdAddendaSubtype });
+                moFieldRemissionDate.setFieldValue(tSorianaRemisionFecha);
+                moFieldRemission.setFieldValue(sSorianaRemisionFolio);
+                moFieldSalesOrder.setFieldValue(sSorianaPedidoFolio);
+                moFieldBulkType.setFieldValue(nSorianaBultoTipo);
+                moFieldBulkQty.setFieldValue(dSorianaBultoCantidad);
                 moFieldNumberNoteIn.setFieldValue(sSorianaFolioNotaEntrada);
-                moFieldBulkType.setFieldValue(nSorianaTipoBulto);
-                moFieldBulkQty.setFieldValue(dSorianaCantidadBulto);
+                moFieldAppointment.setFieldValue(sSorianaCita);
                 break;
 
             case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
                 jlFolioNotaRecepcion.setEnabled(true);
                 jtfFolioNotaRecepcion.setEnabled(false);
-                jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL }));
+                
                 if (moDps.getDbmsDataAddenda() != null && moDps.getDbmsDataAddenda().getLorealFolioNotaRecepcion().length() > 0) {
                     sFolioNotaRecepcion = moDps.getDbmsDataAddenda().getLorealFolioNotaRecepcion();
                 }
+                
                 moFieldFolioNotaRecepcion.setString(sFolioNotaRecepcion);
                 break;
 
@@ -3330,12 +3352,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 jtfBachocoOrganizacion.setEnabled(false);
                 jlBachocoDivision.setEnabled(true);
                 jtfBachocoDivision.setEnabled(false);
-                jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO }));
+                
                 if (moDps.getDbmsDataAddenda() != null && moDps.getDbmsDataAddenda().getBachocoSociedad().length() > 0) {
                     sBachocoSociedad = moDps.getDbmsDataAddenda().getBachocoSociedad();
                     sBachocoOrganizacion = moDps.getDbmsDataAddenda().getBachocoSociedad();
                     sBachocoDivision = moDps.getDbmsDataAddenda().getBachocoDivision();
                 }
+                
                 moFieldBachocoSociedad.setString(sBachocoSociedad);
                 moFieldBachocoOrganizacionCompra.setString(sBachocoOrganizacion);
                 moFieldBachocoDivision.setString(sBachocoDivision);
@@ -3346,17 +3369,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 jtfBachocoSociedad.setEnabled(false);
                 jlDpsDescripcion.setEnabled(true);
                 jtfDpsDescripcion.setEnabled(false);
-                jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO }));
+                
                 if (moDps.getDbmsDataAddenda() != null && moDps.getDbmsDataAddenda().getBachocoSociedad().length() > 0) {
                     sBachocoSociedad = moDps.getDbmsDataAddenda().getBachocoSociedad();
                     sDpsDescripcion = moDps.getDbmsDataAddenda().getModeloDpsDescripcion();
                 }
+                
                 moFieldBachocoSociedad.setString(sBachocoSociedad);
                 moFieldDpsDescripcion.setString(sDpsDescripcion);
                 break;
 
             case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
-                jtfFkCfdAddendaTypeId.setText(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRN_DPS_ADD, new int[] { SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA }));
                 break;
                 
             default:
@@ -3524,7 +3547,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         // update International Commerce data required (if applies) to calculate document's value:
         if (isCfdIntCommerceRequired()) {
             if (isCurrencyUsd()) {
-                //moFieldCfdCceExchangeRateUsd.setFieldValue(SLibUtils.round(moFieldExchangeRate.getDouble(), DCfdUtils.AmountFormat.getMaximumFractionDigits()));  XXX needs to be removed?
                 moFieldCfdCceExchangeRateUsd.setFieldValue(moFieldExchangeRate.getDouble());
             }
             moDps.getDbmsDataDpsCfd().setCfdCceTipoCambioUSD(SLibUtils.getDecimalFormatExchangeRate().format(moFieldCfdCceExchangeRateUsd.getDouble()));
@@ -5084,6 +5106,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
+    /**
+     * Creates CFD parameters.
+     * NOTE 2018-05-16, Sergio Flores: This method is replicated in private static method erp.mtrn.data.SCfdUtils.createCfdParams(SClientInterface, SDataDps)!
+     *      It is not clear yet if method version in current class is really needed.
+     *      It seems that is used to process Addenda registrys when saving DPS, so, by now, it cannot be removed.
+     * @return CFD parameters.
+     */
     private erp.mtrn.data.SCfdParams createCfdParams() {
         String factura = "";
         String pedido = "";
@@ -5094,9 +5123,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         SDataDps dpsContrato = null;
         SDataCustomerBranchConfig customerBranchConfig = null;
         SCfdParams params = new SCfdParams();
+        SDataBizPartner bizPartner = moBizPartner;
+        SDataBizPartnerBranch bizPartnerBranch = moBizPartnerBranch;
         
-        params.setReceptor(moBizPartner);
-        params.setReceptorBranch(moBizPartnerBranch);
+        params.setReceptor(bizPartner);
+        params.setReceptorBranch(bizPartnerBranch);
         params.setEmisor(miClient.getSessionXXX().getCompany().getDbmsDataCompany());
 
         if (moDps.getFkCompanyBranchId() == miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId()) {
@@ -5115,7 +5146,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (entryDocumento.isAccountable()) {
                 for (SDataDpsDpsLink linkPedido : entryDocumento.getDbmsDpsLinksAsDestiny()) {
                     if (!linkPedido.getDbmsIsSourceDeleted() && !linkPedido.getDbmsIsSourceEntryDeleted()) {
-                        dpsPedido = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, linkPedido.getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                        //dpsPedido = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, linkPedido.getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                        dpsPedido = STrnUtilities.getFirtsLinkOrderType(miClient, moDps);
                         pedido = (dpsPedido.getNumberSeries().length() == 0 ? "" : dpsPedido.getNumberSeries() + "-") + dpsPedido.getNumber();
 
                         // Lookup for "contrato" (the first one found):
@@ -5194,32 +5226,42 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         params.setSorianaTienda(moFieldStore.getInteger());
         params.setSorianaEntregaMercancia(moFieldGoodsDelivery.getInteger());
-        params.setSorianaFechaRemision(moFieldDateRemission.getDate());
+        params.setSorianaFechaRemision(moFieldRemissionDate.getDate());
         params.setSorianaFolioRemision(moFieldRemission.getString());
         params.setSorianaFolioPedido(moFieldSalesOrder.getString());
         params.setSorianaTipoBulto(moFieldBulkType.getInteger());
         params.setSorianaCantidadBulto(moFieldBulkQty.getDouble());
-        params.setSorianaNotaEntradaFolio(moFieldNumberNoteIn.getString());
-        
-        if (jcbCfdAddendaSubtypeId.isEnabled()) {
+        params.setSorianaNotaEntradaFolio(!jtfNumberNoteIn.isEnabled() ? "" : moFieldNumberNoteIn.getString());
+        params.setSorianaCita(moFieldAppointment.getString());
+
+        if (jcbCfdAddendaSubtype.isEnabled() && jcbCfdAddendaSubtype.getSelectedIndex() > 0) {
             params.setCfdAddendaSubtype(moFieldCfdAddendaSubtypeId.getKeyAsIntArray()[0]);
         }
         else {
             params.setCfdAddendaSubtype(SLibConstants.UNDEFINED);
         }
 
-        if (mnCfdXmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_32) {
-            params.setRegimenFiscal(SLibUtilities.textExplode(miClient.getSessionXXX().getParamsCompany().getFiscalSettings(), ";"));
-        }
-        else if (mnCfdXmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
-            params.setRegimenFiscal(new String[] { miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal() });
+        switch (mnCfdXmlType) {
+            case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                if (isCfdIntCommerceRequired()) {
+                    params.setRegimenFiscal(new String[] { miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal() });
+                }
+                else {
+                    params.setRegimenFiscal(SLibUtilities.textExplode(miClient.getSessionXXX().getParamsCompany().getFiscalSettings(), ";"));
+                }
+                break;
+            case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                params.setRegimenFiscal(new String[] { miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal() });
+                break;
+            default:
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
 
-        params.setAgregarAddenda(mnCfdXmlType == SDataConstantsSys.TRNS_TP_XML_CFD);
+        params.setAgregarAddenda(mnCfdXmlType == SDataConstantsSys.TRNS_TP_XML_CFD); // WARNING: This line of code differs from counterpart method in class SCfdUtils!!!
 
         // Ruta:
 
-        customerBranchConfig = (SDataCustomerBranchConfig) SDataUtilities.readRegistry(miClient, SDataConstants.MKT_CFG_CUSB, new int[] { moBizPartnerBranch.getPkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+        customerBranchConfig = (SDataCustomerBranchConfig) SDataUtilities.readRegistry(miClient, SDataConstants.MKT_CFG_CUSB, new int[] { bizPartnerBranch.getPkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
 
         if (customerBranchConfig != null) {
             if (customerBranchConfig.getFkSalesRouteId() != 0) {
@@ -6633,10 +6675,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
                     if (SCfdUtils.validateEmisorXmlExpenses(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
                         moFieldFileXml.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
-                        msFileXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+                        msFileXmlJustLoaded = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
                     }
                 }
-                else{
+                else {
                     miClient.showMsgBoxInformation("El archivo solo puede ser XML");
                 }
             }
@@ -6648,7 +6690,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
     
     private void actionDeleteFileXml() {
-        moFieldFileXml.setFieldValue("");            
+        moFieldFileXml.setFieldValue("");
+        msFileXmlJustLoaded = "";
     }
     
     private void actionCfdiCfdiRelated() {
@@ -7043,12 +7086,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbFkVehicleId_n.setEnabled(enableVehicle);
     }
 
-    private void itemChangeCfdAddendaSubtypeId() {
-        if (moFieldCfdAddendaSubtypeId.getKeyAsIntArray()[0] == SCfdConsts.ADD_SORIANA_NOR) {
-            jtfNumberNoteIn.setEnabled(false);
+    private void itemChangeCfdAddendaSubtype() {
+        if (jcbCfdAddendaSubtype.isEnabled() && jcbCfdAddendaSubtype.getSelectedIndex() > 0 && moFieldCfdAddendaSubtypeId.getKeyAsIntArray()[0] == SCfdConsts.ADD_SORIANA_EXT) {
+            jtfNumberNoteIn.setEnabled(true);
         }
         else {
-            jtfNumberNoteIn.setEnabled(true);
+            jtfNumberNoteIn.setEnabled(false);
         }
 
     }
@@ -7121,28 +7164,28 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (mnParamCurrentUserPrivilegeLevel != SDataConstantsSys.UNDEFINED && mnParamCurrentUserPrivilegeLevel < SUtilConsts.LEV_AUTHOR) {
             msg += "\n- El usuario '" + miClient.getSessionXXX().getUser().getUser() + "' no tiene el nivel de derecho suficiente para modificar el registro.";
         }
-        if (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().isStamped()) {
+        if (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().isStamped()) {
             msg += "\n- Este documento es un CFDI y está emitido.";
         }
-        if (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().isStamped() && moDps.getDbmsDataCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+        if (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().isStamped() && moDps.getDbmsDataCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
             msg += "\n- Este documento es un CFDI y está anulado.";
         }
-        if (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().isStamped()) {
+        if (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().isStamped()) {
             msg += "\n- Este documento de ajuste es un CFDI y está emitido.";
         }
-        if (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().isStamped() && moDps.getDbmsDataCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
+        if (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().isStamped() && moDps.getDbmsDataCfd().getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
             msg += "\n- Este documento de ajuste es un CFDI y está anulado.";
         }
-        if (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().getIsProcessingWebService()) {
+        if (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingWebService()) {
             msg += "\n- Este documento es un CFDI y está en proceso de comunicación con el WS.";
         }
-        if (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().getIsProcessingStorageXml()) {
+        if (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingStorageXml()) {
             msg += "\n- Este documento es un CFDI y está en proceso de almacenamiento en el disco.";
         }
-        if (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().getIsProcessingWebService()) {
+        if (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingWebService()) {
             msg += "\n- Este documento de ajuste es un CFDI y está en proceso de comunicación con el WS.";
         }
-        if (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().getIsProcessingStorageXml()) {
+        if (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingStorageXml()) {
             msg += "\n- Este documento de ajuste es un CFDI y está en proceso de almacenamiento en el disco.";
         }
 
@@ -7307,7 +7350,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel114;
     private javax.swing.JPanel jPanel115;
     private javax.swing.JPanel jPanel116;
+    private javax.swing.JPanel jPanel117;
+    private javax.swing.JPanel jPanel118;
+    private javax.swing.JPanel jPanel119;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel120;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
@@ -7357,7 +7404,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel55;
     private javax.swing.JPanel jPanel56;
     private javax.swing.JPanel jPanel57;
-    private javax.swing.JPanel jPanel58;
     private javax.swing.JPanel jPanel59;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel60;
@@ -7367,7 +7413,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel64;
     private javax.swing.JPanel jPanel65;
     private javax.swing.JPanel jPanel66;
-    private javax.swing.JPanel jPanel67;
     private javax.swing.JPanel jPanel68;
     private javax.swing.JPanel jPanel69;
     private javax.swing.JPanel jPanel7;
@@ -7377,7 +7422,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel73;
     private javax.swing.JPanel jPanel74;
     private javax.swing.JPanel jPanel75;
-    private javax.swing.JPanel jPanel76;
     private javax.swing.JPanel jPanel77;
     private javax.swing.JPanel jPanel78;
     private javax.swing.JPanel jPanel79;
@@ -7424,13 +7468,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbEntryViewLinks;
     private javax.swing.JButton jbEntryWizard;
     private javax.swing.JButton jbExchangeRate;
-    private javax.swing.JButton jbFileXml;
     private javax.swing.JButton jbFkCarrierId_n;
     private javax.swing.JButton jbFkCurrencyId;
     private javax.swing.JButton jbFkIncotermId;
     private javax.swing.JButton jbFkModeOfTransportationTypeId;
     private javax.swing.JButton jbFkProductionOrderId_n;
     private javax.swing.JButton jbFkVehicleId_n;
+    private javax.swing.JButton jbLoadFileXml;
     private javax.swing.JButton jbNotesDelete;
     private javax.swing.JButton jbNotesEdit;
     private javax.swing.JButton jbNotesNew;
@@ -7443,7 +7487,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbSystemNotes;
     private javax.swing.JButton jbTaxRegionId;
     private javax.swing.JComboBox<SFormComponentItem> jcbAdjustmentSubtypeId;
-    private javax.swing.JComboBox<SFormComponentItem> jcbCfdAddendaSubtypeId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbCfdAddendaSubtype;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdCceMoveReason;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdCceOperationType;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdCceRequestKey;
@@ -7499,6 +7543,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JFormattedTextField jftDateStartCredit;
     private javax.swing.JFormattedTextField jftRemissionDate;
     private javax.swing.JLabel jlAdjustmentSubtypeId;
+    private javax.swing.JLabel jlAppointment;
     private javax.swing.JLabel jlBachocoDivision;
     private javax.swing.JLabel jlBachocoOrganizacion;
     private javax.swing.JLabel jlBachocoSociedad;
@@ -7510,7 +7555,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlBizPartnerBranchAddressMain02;
     private javax.swing.JLabel jlBulkQuantity;
     private javax.swing.JLabel jlBulkType;
-    private javax.swing.JLabel jlCfdAddendaSubtypeId;
+    private javax.swing.JLabel jlCfdAddendaSubtype;
     private javax.swing.JLabel jlCfdCceCertificateOrigin;
     private javax.swing.JLabel jlCfdCceExchangeRateUsd;
     private javax.swing.JLabel jlCfdCceMoveReason;
@@ -7612,6 +7657,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JSeparator jsNotes01;
     private javax.swing.JToggleButton jtbEntryFilter;
     private javax.swing.JToggleButton jtbNotesFilter;
+    private javax.swing.JTextField jtfAppointment;
     private javax.swing.JTextField jtfBachocoDivision;
     private javax.swing.JTextField jtfBachocoOrganizacion;
     private javax.swing.JTextField jtfBachocoSociedad;
@@ -7765,7 +7811,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mbHasRightOmitSourceDoc = mbIsSales ? 
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_OMT_DOC_SRC).HasRight :
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_OMT_DOC_SRC).HasRight;
-        msFileXmlPath  = "";
+        msFileXmlJustLoaded  = "";
         
         moPaneGridEntries.createTable();
         moPaneGridEntries.clearTableRows();
@@ -7859,24 +7905,26 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfBachocoDivision.setEnabled(false);
         jlDpsDescripcion.setEnabled(false);
         jtfDpsDescripcion.setEnabled(false);
+        jlCfdAddendaSubtype.setEnabled(false);
+        jcbCfdAddendaSubtype.setEnabled(false);
         jlStore.setEnabled(false);
         jtfStore.setEnabled(false);
         jlGoodsDelivery.setEnabled(false);
         jtfGoodsDelivery.setEnabled(false);
-        jlBulkType.setEnabled(false);
-        jtfBulkType.setEnabled(false);
-        jlBulkQuantity.setEnabled(false);
-        jtfBulkQuantity.setEnabled(false);
+        jlRemissionDate.setEnabled(false);
+        jftRemissionDate.setEnabled(false);
         jlRemission.setEnabled(false);
         jtfRemission.setEnabled(false);
         jlSalesOrder.setEnabled(false);
         jtfSalesOrder.setEnabled(false);
-        jlCfdAddendaSubtypeId.setEnabled(false);
-        jcbCfdAddendaSubtypeId.setEnabled(false);
+        jlBulkType.setEnabled(false);
+        jtfBulkType.setEnabled(false);
+        jlBulkQuantity.setEnabled(false);
+        jtfBulkQuantity.setEnabled(false);
         jlNumberNoteIn.setEnabled(false);
         jtfNumberNoteIn.setEnabled(false);
-        jlRemissionDate.setEnabled(false);
-        jftRemissionDate.setEnabled(false);
+        jlAppointment.setEnabled(false);
+        jtfAppointment.setEnabled(false);
 
         mdOrigExchangeRate = 0;
         mdOrigDiscountDocPercentage = 0;
@@ -8348,7 +8396,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                             jtfBulkQty.requestFocus();
                                         }
                                         */
-                                        if (moFieldDateRemission.getDate() == null) {
+                                        if (moFieldRemissionDate.getDate() == null) {
                                             validation.setMessage(SLibConstants.MSG_ERR_GUI_DATE);
                                             validation.setComponent(jftRemissionDate);
                                             jTabbedPane.setSelectedIndex(3);
@@ -8745,6 +8793,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         if (isCfdXmlFilePermitted()) {
             if (moDps.getDbmsDataCfd() != null) {
                 moFieldFileXml.setFieldValue(moDps.getDbmsDataCfd().getDocXmlName());
+                msFileXmlJustLoaded = "";
             }
         }
 
@@ -8757,12 +8806,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbEdit.setEnabled(!(mbParamIsReadOnly || moDps.getIsAudited() || moDps.getIsAuthorized() || moDps.getIsSystem() ||
                 (!mbIsPeriodOpen && (mbIsDoc || mbIsAdj)) || moDps.getFkDpsValidityStatusId() != SDataConstantsSys.TRNS_ST_DPS_VAL_EFF ||
                 (mnParamCurrentUserPrivilegeLevel != SDataConstantsSys.UNDEFINED && mnParamCurrentUserPrivilegeLevel < SUtilConsts.LEV_AUTHOR) ||
-                (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().isStamped()) ||
-                (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().isStamped()) ||
-                (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().getIsProcessingWebService()) ||
-                (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().getIsProcessingStorageXml()) ||
-                (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().getIsProcessingWebService()) ||
-                (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && (moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || moDps.getDbmsDataCfd().getFkXmlTypeId() == SDataConstantsSys.TRNS_TP_XML_CFDI_33) && moDps.getDbmsDataCfd().getIsProcessingStorageXml())));
+                (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().isStamped()) ||
+                (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().isStamped()) ||
+                (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingWebService()) ||
+                (moDps.isDocumentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingStorageXml()) ||
+                (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingWebService()) ||
+                (moDps.isAdjustmentSal() && moDps.getDbmsDataCfd() != null && moDps.getDbmsDataCfd().isCfdi() && moDps.getDbmsDataCfd().getIsProcessingStorageXml())));
 
         jbEditHelp.setEnabled(!jbEdit.isEnabled());
         jbOk.setEnabled(false);
@@ -8781,10 +8830,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        SDataCfd cfd = null;
-        String sFileXml = "";
-        SDataDpsEntry entry = null;
-
         if (moDps.getIsRegistryNew()) {
             moDps.setPkYearId(SLibTimeUtilities.digestYear(moFieldDate.getDate())[0]);
             moDps.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
@@ -8899,7 +8944,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         moDps.getDbmsDpsEntries().clear();
         for (STableRow row : moPaneGridEntries.getGridRows()) {
-            entry = (SDataDpsEntry) row.getData();
+            SDataDpsEntry entry = (SDataDpsEntry) row.getData();
             if (!entry.getIsRegistryEdited()) {
                 entry.setIsRegistryEdited(recalculateEntries);  // force entry recalculation when saved
             }
@@ -8917,7 +8962,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         // Set record user object:
 
         moDps.getRegistryComplements().clear();
-
         if (!jckRecordUser.isSelected()) {
             releaseRecordUserLock();    // if lock was gained, release it
             moDps.setDbmsRecordKey(null);
@@ -9002,6 +9046,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setAuxIsNeedCfdCce(false);
             moDps.setApprovalYear(0);
             moDps.setApprovalNumber(0);
+            moDps.setAuxCfdParams(null);
         }
         else {
             moDps.setAuxIsNeedCfd(true);
@@ -9011,49 +9056,44 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moDps.setAuxCfdParams(createCfdParams());
         }
 
-        if (!msFileXmlPath.isEmpty()) {
+        // process added XML file of CFDI:
+        
+        if (!msFileXmlJustLoaded.isEmpty()) {
+            // an XML has just been provided to be attached to current registry:
             try {
-                cfd = moDps.getDbmsDataCfd() != null ? moDps.getDbmsDataCfd() : new SDataCfd();
-
-                sFileXml = SXmlUtils.readXml(msFileXmlPath);
-                if (cfd != null) {
-                    cfd.setCertNumber("");
-                    cfd.setStringSigned("");
-                    cfd.setSignature("");
-                    cfd.setDocXml(sFileXml);
-                    cfd.setDocXmlName(moFieldFileXml.getString());
-                    cfd.setIsConsistent(true);
-                    cfd.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_INV);
-                    cfd.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_NA);
-                    cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
-                    cfd.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
-                    cfd.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
-                    cfd.setFkUserProcessingId(miClient.getSession().getUser().getPkUserId());
-                    cfd.setFkUserDeliveryId(miClient.getSession().getUser().getPkUserId());
-
-                    moDps.setDbmsDataCfd(cfd);
-                }
+                String xml = SXmlUtils.readXml(msFileXmlJustLoaded);
+                SDataCfd cfd = moDps.getDbmsDataCfd() != null ? moDps.getDbmsDataCfd() : new SDataCfd();
+                
+                cfd.setCertNumber("");
+                cfd.setStringSigned("");
+                cfd.setSignature("");
+                cfd.setDocXml(xml);
+                cfd.setDocXmlName(moFieldFileXml.getString());
+                cfd.setIsConsistent(true);
+                cfd.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_INV);
+                cfd.setFkXmlTypeId(SDataConstantsSys.TRNS_TP_XML_NA);
+                cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_EMITED);
+                cfd.setFkXmlDeliveryTypeId(SModSysConsts.TRNS_TP_XML_DVY_NA);
+                cfd.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
+                cfd.setFkUserProcessingId(miClient.getSession().getUser().getPkUserId());
+                cfd.setFkUserDeliveryId(miClient.getSession().getUser().getPkUserId());
+                
+                moDps.setDbmsDataCfd(cfd);
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
             }
         }
-        else {
-            try {
-                if (moFieldFileXml.getString().isEmpty() && moDps.getDbmsDataCfd() != null) {
-                    cfd = moDps.getDbmsDataCfd();
-                    
-                    cfd.setDocXml("");
-                    cfd.setDocXmlName("");
-                    cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
-                    cfd.setIsConsistent(true);
-                    
-                    moDps.setDbmsDataCfd(cfd);
-                }
-            }
-            catch (Exception e) {
-                SLibUtilities.renderException(this, e);
-            }            
+        else if (moFieldFileXml.getString().isEmpty() && moDps.getDbmsDataCfd() != null) {
+            // XXX NOTE: 2018-05-24, Sergio Flores: Check if this code is correct. It seems it does not, because when XML file is deleted, it is preserved... why?!
+            SDataCfd cfd = moDps.getDbmsDataCfd();
+
+            cfd.setDocXml("");
+            cfd.setDocXmlName("");
+            cfd.setIsConsistent(true);
+            cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW);
+
+            moDps.setDbmsDataCfd(cfd);
         }
 
         return moDps;
@@ -9204,7 +9244,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             else if (button == jbFkVehicleId_n) {
                 actionFkVehicleId_n();
             }
-            else if (button == jbFileXml) {
+            else if (button == jbLoadFileXml) {
                 actionLoadFileXml();
             }
             else if (button == jbDeleteFileXml) {
@@ -9304,8 +9344,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     else if (comboBox == jcbFkVehicleTypeId_n) {
                         itemChangeFkVehicleTypeId_n();
                     }
-                    else if (comboBox == jcbCfdAddendaSubtypeId) {
-                        itemChangeCfdAddendaSubtypeId();
+                    else if (comboBox == jcbCfdAddendaSubtype) {
+                        itemChangeCfdAddendaSubtype();
                     }
                 }
             }

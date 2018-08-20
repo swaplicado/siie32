@@ -6,7 +6,12 @@ package erp.mod.hrs.view;
 
 import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.mod.SModConsts;
+import erp.mod.hrs.form.SDialogLayoutEmployee;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
@@ -14,16 +19,21 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterValue;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Claudio Peña
  */
-public class SViewEmployeeHireLog extends SGridPaneView {
-
+public class SViewEmployeeHireLog extends SGridPaneView implements ActionListener {
+    
     private SGridFilterPanelEmployee moFilterEmployee;
+    private JButton jbLayoutEmployeeHire;
+    private JButton jbLayoutEmployeeDismiss;
+    
+    private SDialogLayoutEmployee moDialogLayoutEmployee;
 
     public SViewEmployeeHireLog(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_EMP_LOG_HIRE, SLibConsts.UNDEFINED, title);
@@ -35,10 +45,31 @@ public class SViewEmployeeHireLog extends SGridPaneView {
         
         moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
         moFilterEmployee.initFilter(null);
-        
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
+        
+        jbLayoutEmployeeHire = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout alta empleados", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeHire);
+        jbLayoutEmployeeDismiss = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout baja empleados", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeDismiss);
+        
     }
 
+    private void actionLayoutEmployeeHire() {
+        if (jbLayoutEmployeeHire.isEnabled()) {     
+            moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_HIRE);
+            moDialogLayoutEmployee.resetForm();
+            moDialogLayoutEmployee.setVisible(true);  
+        }
+    }
+    
+    private void actionLayoutEmployeeDismiss(){
+        if (jbLayoutEmployeeDismiss.isEnabled()) {
+            moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_DISMISS);
+            moDialogLayoutEmployee.resetForm();
+            moDialogLayoutEmployee.setVisible(true);  
+        }
+    }
+    
     @Override
     public void prepareSqlQuery() {
         String sql = "";
@@ -135,5 +166,19 @@ public class SViewEmployeeHireLog extends SGridPaneView {
         moSuscriptionsSet.add(SModConsts.HRSU_TP_EMP_DIS);
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+
+            if (button == jbLayoutEmployeeHire) {
+                actionLayoutEmployeeHire();
+            }
+            else if (button == jbLayoutEmployeeDismiss) {
+                actionLayoutEmployeeDismiss();
+            }
+        }
     }
 }

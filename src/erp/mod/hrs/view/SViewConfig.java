@@ -16,7 +16,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewConfig extends SGridPaneView {
 
@@ -46,11 +46,15 @@ public class SViewConfig extends SGridPaneView {
                 + "v.dt_ops, "
                 + "v.fst_day_wee, "
                 + "v.lim_mwz_ref, "
+                + "v.num_ser, "
+                + "v.ss_subbra, "
                 + "v.baj_aff_grp, "
                 + "v.pay_tax_rate, "
                 + "v.b_for_std, "
+                + "v.b_auto_vac_bon, "
                 + "v.b_tax_sub_ear, "
                 + "v.b_tax_net, "
+                + "v.b_bank_acc_use, "
                 + "tmwz.name, "
                 + "tmwz_ref.name, "
                 + "ttax_comp.name, "
@@ -110,15 +114,18 @@ public class SViewConfig extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_ops", "Inicio operaciones"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.fst_day_wee", "1er día semana"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.lim_mwz_ref", "Tope cot SMAR"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.baj_aff_grp", "Grupo afinidad (bajío)"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.pay_tax_rate", "Imp sobre nóminas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_for_std", "Quincenas fijas 15 días"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_auto_vac_bon", "Pagao auto prima vacacional"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_tax_sub_ear", "Sub impto percepción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_tax_net", "Impto neto"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tmwz.name", "Área geo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tmwz_ref.name", "Área geo referencia"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ttax_comp.name", "Cálculo impto default"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.num_ser", "Serie CFDI"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.ss_subbra", "Subdelegación SS"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "bank.name", "Banco default"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.baj_aff_grp", "Grupo afinidad (BanBajío)"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "eear.name", "Percep normal"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "evac.name", "Percep vacaciones"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "etax.name", "Percep impto"));

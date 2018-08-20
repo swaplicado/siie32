@@ -2,6 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mod.fin.form;
 
 import erp.client.SClientInterface;
@@ -41,20 +42,20 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Uriel Castañeda, Alfredo Pérez
+ * @author Uriel Castañeda, Alfredo Pérez, Sergio Flores
  */
-public class SDialogLayoutsBankCardex extends SBeanFormDialog implements ListSelectionListener {
+public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSelectionListener {
     
     private SDbBankLayout moBankLayout;
     private SGridPaneForm moGridPayments;
 
     /**
-     * Creates new form SDialogLayoutsBankCardex
+     * Creates new form SDialogBankLayoutCardex
      * @param client
      * @param formSubtype
      * @param title
      */
-    public SDialogLayoutsBankCardex(SGuiClient client, int formSubtype, String title) {
+    public SDialogBankLayoutCardex(SGuiClient client, int formSubtype, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.FIN_LAY_BANK, formSubtype, title);
         initComponents();
         initComponentsCustom();
@@ -292,24 +293,23 @@ public class SDialogLayoutsBankCardex extends SBeanFormDialog implements ListSel
         int numberDocs = 0;
         double total = 0d; 
         boolean found = false;
-        SDbBankLayout layout = null;
         SLayoutBankCardextRow auxRow = new SLayoutBankCardextRow(miClient);
         ArrayList<SGridRow> rows = new ArrayList<>();
         SDataDps dps = null;
         
         jtfRows.setText("0/0");
         
-        layout = SFinUtils.loadPaymentsXml(miClient, moBankLayout);
+        SDbBankLayout bankLayout = SFinUtils.loadPaymentsXml(miClient, moBankLayout);
         
         jtfRegistryKey.setText(SLibUtils.textKey(moBankLayout.getPrimaryKey()));
         jtfDate.setText(((SClientInterface) miClient).getSessionXXX().getFormatters().getDateFormat().format(moBankLayout.getDateLayout()));
         
         //renderLayoutTypeBank(layout.getFkBankLayoutTypeId());
         
-        jtfLayoutType.setText(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.FINU_TP_LAY_BANK, new int[] { layout.getFkBankLayoutTypeId() }, SLibConstants.DESCRIPTION_CODE));
-        renderAccountSettings(new int[] {layout.getFkBankCompanyBranchId(), layout.getFkBankAccountCashId()});
+        jtfLayoutType.setText(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.FINU_TP_LAY_BANK, new int[] { bankLayout.getFkBankLayoutTypeId() }, SLibConstants.DESCRIPTION_CODE));
+        renderAccountSettings(new int[] {bankLayout.getFkBankCompanyBranchId(), bankLayout.getFkBankAccountCashId()});
        
-        for (SLayoutBankXmlRow row : layout.getXmlRows()) {
+        for (SLayoutBankXmlRow row : bankLayout.getLayoutBankXmlRows()) {
             auxRow.setBizPartnerId(row.getBizPartner());
             auxRow.setBizPartnerBranchId(row.getBizPartnerBranch());
             auxRow.setBizPartnerBranchAccountId(row.getBizPartnerBranchAccount());
@@ -329,7 +329,7 @@ public class SDialogLayoutsBankCardex extends SBeanFormDialog implements ListSel
             auxRow.setObservation(row.getObservations());
             
             total = total + auxRow.getBalanceTot().getAmountOriginal();
-            for (SLayoutBankPaymentRow rowPay : layout.getBankPaymentRows()) {
+            for (SLayoutBankPaymentRow rowPay : bankLayout.getLayoutBankPaymentRows()) {
                 found = false;
                 if (moBankLayout.getXtaBankPaymentType() == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
                     if (auxRow.getAgreement().equals(rowPay.getAgreement()) && auxRow.getAgreementRefernce().equals(rowPay.getAgreementReference())) {

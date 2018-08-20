@@ -10,6 +10,7 @@ import erp.mod.SModSysConsts;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
@@ -19,17 +20,37 @@ import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewAutomaticDeductions extends SGridPaneView implements ActionListener {
 
+    private boolean mbShowDetailForEmployees;
     private SGridFilterPanelEmployee moFilterEmployee;
 
+    /**
+     * 
+     * @param client GUI client.
+     * @param gridSubtype Options defined as constants in SModSysConsts: HRS_AUT_GBL & HRS_AUT_EMP.
+     * @param title View's tab title.
+     */
     public SViewAutomaticDeductions(SGuiClient client, int gridSubtype, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSX_AUT_DED, gridSubtype, title);
+        this(client, gridSubtype, title, null);
+    }
+
+    /**
+     * 
+     * @param client GUI client.
+     * @param gridSubtype Options defined as constants in SModSysConsts: HRS_AUT_GBL & HRS_AUT_EMP.
+     * @param title View's tab title.
+     * @param params GUI params for defining if view is in detail by providing a param type as SUtilConsts.QRY_DET when subtype is HRS_AUT_EMP.
+     */
+    public SViewAutomaticDeductions(SGuiClient client, int gridSubtype, String title, SGuiParams params) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSX_AUT_DED, gridSubtype, title, params);
+        mbShowDetailForEmployees = params == null ? false : params.getType() == SUtilConsts.QRY_DET;
         initComponentsCustom();
     }
 
@@ -101,6 +122,8 @@ public class SViewAutomaticDeductions extends SGridPaneView implements ActionLis
                 + "ded.code, "
                 + "ded.name, "
                 + "bp.bp, "
+                + "emp.b_act, "
+                + "tp.name, "
                 + "l.num, "
                 + "tl.code, "
                 + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " WHERE id_tp_pay_sht = v.fk_tp_pay_sht) AS tp_pay_sht, "
@@ -126,23 +149,30 @@ public class SViewAutomaticDeductions extends SGridPaneView implements ActionLis
                 + "v.fk_emp_n = bp.id_bp "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON "
                 + "v.fk_emp_n = emp.id_emp "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON "
+                + "emp.fk_tp_pay = tp.id_tp_pay "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_LOAN) + " AS l ON "
                 + "v.fk_loan_emp_n = l.id_emp AND v.fk_loan_loan_n = l.id_loan "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_LOAN) + " AS tl ON "
                 + "v.fk_tp_loan_n = tl.id_tp_loan "
                 + "WHERE "+ (mnGridSubtype == SModSysConsts.HRS_AUT_GBL ? "v.fk_emp_n IS NULL " : "v.fk_emp_n IS NOT NULL ")
                 + (sql.isEmpty() ? "" : " AND " + sql)
-                + (mnGridSubtype == SModSysConsts.HRS_AUT_GBL ? "" : "GROUP BY v.fk_emp_n ")
-                + (mnGridSubtype == SModSysConsts.HRS_AUT_GBL ? "ORDER BY v.id_ded, v.id_aut " : "ORDER BY bp.bp, v.fk_emp_n ");
+                + (mnGridSubtype == SModSysConsts.HRS_AUT_GBL || mbShowDetailForEmployees ? "" : "GROUP BY v.fk_emp_n ")    // very weird and UGLY way of making query as summary!
+                + (mnGridSubtype == SModSysConsts.HRS_AUT_GBL ? "ORDER BY ded.code, v.id_ded, v.id_aut " : "ORDER BY bp.bp, v.fk_emp_n" + (!mbShowDetailForEmployees ? "" : ", ded.code, v.id_ded, v.id_aut") + " ");
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        if (mnGridSubtype == SModSysConsts.HRS_AUT_GBL) {
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "ded.name", SGridConsts.COL_TITLE_NAME));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "ded.code", SGridConsts.COL_TITLE_CODE));
+        if (mnGridSubtype == SModSysConsts.HRS_AUT_GBL || mbShowDetailForEmployees) {
+            if (mbShowDetailForEmployees) {
+                gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.bp", "Empleado"));
+                gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "emp.b_act", "Activo"));
+                gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp.name", "Período pago"));
+            }
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "ded.code", SGridConsts.COL_TITLE_CODE + " deducción"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "ded.name", SGridConsts.COL_TITLE_NAME + " deducción"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_8D, "v.amt_r", "Valor"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "vtc.code", "Unidad"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, "Fecha inicial"));
@@ -156,7 +186,9 @@ public class SViewAutomaticDeductions extends SGridPaneView implements ActionLis
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_UPD_TS, SGridConsts.COL_TITLE_USER_UPD_TS));
         }
         else {
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "bp.bp", "Empleado"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.bp", "Empleado"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "emp.b_act", "Activo"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tp.name", "Período pago"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

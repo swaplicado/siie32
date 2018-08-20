@@ -10,7 +10,6 @@
  */
 
 package erp.mtrn.form;
-
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -32,28 +31,32 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.itm.db.SItmConsts;
 import erp.mod.trn.db.SDbMaintConfig;
+import erp.mod.trn.db.SDbMaintDiogSignature;
 import erp.mod.trn.db.SDbMaintUser;
+import erp.mod.trn.db.SDbMaintUserSupervisor;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataDiogMaintMovementEntryRow;
 import erp.mtrn.data.SDataDiogNotes;
 import erp.mtrn.data.STrnItemFound;
 import erp.mtrn.data.STrnMaintConstants;
+import erp.mtrn.data.STrnMaintUtilities;
 import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnStockValidator;
 import erp.mtrn.data.STrnUtilities;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.sql.SQLException;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import sa.gui.util.SUtilConsts;
-import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridUtils;
@@ -62,26 +65,33 @@ import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 
+
 /**
  *
- * @author Gil De Jesús, Sergio Flores
+ * @author Gil De Jesús, Sergio Flores, Claudio Peña
  */
 public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
     
-    public static final String SERIES_ADJ_IN  = "MAE";
+    public static final String SERIES_ADJ_IN = "MAE";
     public static final String SERIES_ADJ_OUT = "MAS";
     public static final String SERIES_TRA_IN = "MTE";
     public static final String SERIES_TRA_OUT = "MTS";
+    public static final Color COLOR_SIGNED = new Color(255, 255, 102);
+    public static final Color COLOR_NONSIGNED = new Color(102, 255, 102);
     
     private int mnFormType;
+    
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
+    protected int mnTabTypeAux01;
     private boolean mbResetingForm;
+    
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
     private erp.client.SClientInterface miClient;
 
     private erp.mtrn.data.SDataDiog moDiog;
+    private erp.mod.trn.db.SDbMaintDiogSignature moMaintDiogSignature;
     private erp.lib.form.SFormField moFieldDate;
     private erp.lib.form.SFormField moFieldMaintUser;
     private erp.lib.form.SFormField moFieldMaintUserSupervisor;
@@ -92,7 +102,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     private erp.lib.form.SFormField moFieldEntryQuantity;
     private erp.lib.form.SFormField moFieldEntryValueUnit;
     private erp.lib.form.SFormField moFieldEntryValue;
-
+   
     private java.util.Vector<erp.mtrn.data.SDataDiogEntry> mvDeletedDiogEntries;
     private erp.lib.table.STablePane moPaneDiogEntries;
 
@@ -108,7 +118,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     private erp.mcfg.data.SDataCompanyBranchEntity moWarehouseSource;
     private erp.mcfg.data.SDataCompanyBranchEntity moWarehouseDestiny;
     private erp.mitm.data.SDataItem moEntryItem;
-
+    
     /**
      * Creates new form SFormMaintDiog.
      * @param client GUI client.
@@ -589,11 +599,11 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         moFieldDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDate, jlDate);
         moFieldDate.setPickerButton(jbDate);
         moFieldMaintUser = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbMaintUser, jlMaintUser);
-        moFieldMaintUserSupervisor = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbMaintUserSupervisor, jlMaintUserSupervisor);
+        moFieldMaintUserSupervisor = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbMaintUserSupervisor, jlMaintUserSupervisor);
         moFieldNotes = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfNotes, jlNotes);
         moFieldNotes.setLengthMax(255);
         moFieldMaintReturnUser = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbMaintReturnUser, jlMaintReturnUser);
-        moFieldMaintReturnUserSupervisor = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbMaintReturnUserSupervisor, jlMaintReturnUserSupervisor);
+        moFieldMaintReturnUserSupervisor = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbMaintReturnUserSupervisor, jlMaintReturnUserSupervisor);
         moFieldEntryMaintArea = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbEntryMaintArea, jlEntryMaintArea);
         moFieldEntryQuantity = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfEntryQuantity, jlEntryQuantity);
         moFieldEntryQuantity.setDecimalFormat(SLibUtils.getDecimalFormatQuantity());
@@ -624,16 +634,17 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         jbEntryAdd.addActionListener(this);
         jbEntryClear.addActionListener(this);
         jbEntryDelete.addActionListener(this);
+        jbSign.addActionListener(this);
+        jtfEntryTextToFind.addActionListener(this);
         jcbMaintUser.addItemListener(this);
         jcbMaintReturnUser.addItemListener(this);
-        jtfEntryTextToFind.addActionListener(this);
         jtfEntryQuantity.addFocusListener(this);
         jtfEntryValueUnit.addFocusListener(this);
         jtfEntryValue.addFocusListener(this);
 
         int i = 0;
         STableColumnForm tableColumnsEntry[] = new STableColumnForm[14];
-        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
+        tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave ítem", STableConstants.WIDTH_ITEM_KEY);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
         tableColumnsEntry[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Área mantenimiento", 150);
         tableColumnsEntry[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Cantidad", STableConstants.WIDTH_QUANTITY);
@@ -679,8 +690,8 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
     
     private boolean shouldEnableMaintUserSupervisor() {
         return mnParamMaintUserType == SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR &&
-                mnMaintMovementIogCategory == SModSysConsts.TRNS_CT_IOG_OUT &&
-                jcbMaintUser.getSelectedIndex() > 0;
+                mnMaintMovementIogCategory == SModSysConsts.TRNS_CT_IOG_OUT &&                
+                jcbMaintUser.getSelectedIndex() > 0;                
     }
 
     private boolean shouldEnableMaintReturnUserSupervisor() {
@@ -688,13 +699,25 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 mnMaintMovementIogCategory == SModSysConsts.TRNS_CT_IOG_IN &&
                 jcbMaintReturnUser.getSelectedIndex() > 0;
     }
+    
+    private boolean shouldCheckMaintUserStock() {
+        return SLibUtils.belongsTo(mnParamMaintMovementType, 
+                new int[] {
+                    SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT,
+                    SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT,
+                    SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST });
+//                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT,
+//                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT,
+//                    SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST });
+    }
 
     private void populateMaintUserSupervisor() {
         jcbMaintUserSupervisor.setEnabled(false);
         jcbMaintUserSupervisor.removeAllItems();
+        jcbMaintUser.getSelectedItem();
         
         if (shouldEnableMaintUserSupervisor()) {
-            miClient.getSession().populateCatalogue(jcbMaintUserSupervisor, SModConsts.TRN_MAINT_USER_SUPV, SLibConsts.UNDEFINED, new SGuiParams(((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey()));
+            miClient.getSession().populateCatalogue(jcbMaintUserSupervisor, SModConsts.TRN_MAINT_USER_SUPV, SLibConstants.UNDEFINED, new SGuiParams(((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey()));
             jcbMaintUserSupervisor.setEnabled(true);
         }
     }
@@ -704,18 +727,18 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         jcbMaintReturnUserSupervisor.removeAllItems();
         
         if (shouldEnableMaintReturnUserSupervisor()) {
-            miClient.getSession().populateCatalogue(jcbMaintReturnUserSupervisor, SModConsts.TRN_MAINT_USER_SUPV, SLibConsts.UNDEFINED, new SGuiParams(((SGuiItem) jcbMaintReturnUser.getSelectedItem()).getPrimaryKey()));
+            miClient.getSession().populateCatalogue(jcbMaintReturnUserSupervisor, SModConsts.TRN_MAINT_USER_SUPV, SLibConstants.UNDEFINED, new SGuiParams(((SGuiItem) jcbMaintReturnUser.getSelectedItem()).getPrimaryKey()));
             jcbMaintReturnUserSupervisor.setEnabled(true);
-        }
+       }
     }
     
     private Vector<SDataDiogEntry> getAllEntries() {
         Vector<SDataDiogEntry> entries = new Vector<SDataDiogEntry>();
 
         for (STableRow row : moPaneDiogEntries.getTableModel().getTableRows()) {
-            entries.add((SDataDiogEntry) row.getData());
+            entries.add((SDataDiogEntry) row.getData());        
         }
-
+       
         entries.addAll(mvDeletedDiogEntries);
 
         return entries;
@@ -786,6 +809,140 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             
             jbSign.setEnabled(true);
         }
+    }
+
+    private boolean isDiogSigned() {
+        return moMaintDiogSignature != null && (moMaintDiogSignature.isRegistryNew() || (!moDiog.getIsRegistryNew() && !moMaintDiogSignature.getTsUserInsert().before(moDiog.getUserEditTs())));
+    }
+    
+    private void showSignatureStatus() {
+        if (isDiogSigned()) {
+            jtfSignatureStatus.setText(STrnMaintConstants.SIGNED);
+            jtfSignatureStatus.setBackground(COLOR_SIGNED);
+            jcbMaintReturnUser.setEnabled(false);
+            jcbMaintReturnUserSupervisor.setEnabled(false);
+        }
+        else {
+            jtfSignatureStatus.setText(STrnMaintConstants.NONSIGNED);
+            jtfSignatureStatus.setBackground(COLOR_NONSIGNED);
+        }
+        jtfSignatureStatus.setCaretPosition(0);
+    }
+    
+    private void removeSignature() {
+        if (moMaintDiogSignature != null) {
+            moMaintDiogSignature = null;
+            showSignatureStatus();
+        }
+    }
+    
+    private byte[] getSignatoryFingerprint() throws SQLException {
+        int dataType = SLibConstants.UNDEFINED;
+        int[] signatoryKey = null;
+        byte[] fingerprint = null;
+                
+        switch (mnParamMaintMovementType) {
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST:
+                if (jcbMaintReturnUserSupervisor.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER_SUPV;
+                    signatoryKey = ((SGuiItem) jcbMaintReturnUserSupervisor.getSelectedItem()).getPrimaryKey();
+                }
+                else if (jcbMaintReturnUser.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER;
+                    signatoryKey = ((SGuiItem) jcbMaintReturnUser.getSelectedItem()).getPrimaryKey();
+                }
+                break;
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST:
+                if (jcbMaintUserSupervisor.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER_SUPV;
+                    signatoryKey = ((SGuiItem) jcbMaintUserSupervisor.getSelectedItem()).getPrimaryKey();
+                }
+                else if (jcbMaintUser.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER;
+                    signatoryKey = ((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey();
+                }
+                break;
+            default:
+        }
+        
+        switch (dataType) {
+            case SModConsts.TRN_MAINT_USER:
+                SDbMaintUser user = (SDbMaintUser) miClient.getSession().readRegistry(dataType, signatoryKey);
+                if (user.getFingerprint_n() != null) {
+                    fingerprint = user.getFingerprint_n().getBytes(1, (int) user.getFingerprint_n().length());
+                }
+                break;
+            case SModConsts.TRN_MAINT_USER_SUPV:
+                SDbMaintUserSupervisor userSupervisor = (SDbMaintUserSupervisor) miClient.getSession().readRegistry(dataType, signatoryKey);
+                if (userSupervisor.getFingerprint_n() != null) {
+                    fingerprint = userSupervisor.getFingerprint_n().getBytes(1, (int) userSupervisor.getFingerprint_n().length());
+                }
+                break;
+        }
+
+        return fingerprint;
+    }
+    
+    private int getSignatoryFingerPassword() throws SQLException {
+        int dataType = SLibConstants.UNDEFINED;
+        int[] signatoryKey = null;
+        int fingerPassword = 0;
+        
+        switch (mnParamMaintMovementType) {
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LENT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_MAINT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_IN_STAT_TOOL_LOST:
+                if (jcbMaintReturnUserSupervisor.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER_SUPV;
+                    signatoryKey = ((SGuiItem) jcbMaintReturnUserSupervisor.getSelectedItem()).getPrimaryKey();
+                }
+                else if (jcbMaintReturnUser.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER;
+                    signatoryKey = ((SGuiItem) jcbMaintReturnUser.getSelectedItem()).getPrimaryKey();
+                }
+                break;
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LENT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_MAINT:
+            case SModSysConsts.TRNS_TP_MAINT_MOV_OUT_STAT_TOOL_LOST:
+                if (jcbMaintUserSupervisor.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER_SUPV;
+                    signatoryKey = ((SGuiItem) jcbMaintUserSupervisor.getSelectedItem()).getPrimaryKey();
+                }
+                else if (jcbMaintUser.getSelectedIndex() > 0) {
+                    dataType = SModConsts.TRN_MAINT_USER;
+                    signatoryKey = ((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey();
+                }
+                break;
+            default:
+        }
+        
+        switch (dataType) {
+            case SModConsts.TRN_MAINT_USER:
+                SDbMaintUser user = (SDbMaintUser) miClient.getSession().readRegistry(dataType, signatoryKey);
+                fingerPassword = String.valueOf(user.getPinNumber()).length();
+                
+                if (String.valueOf(user.getPinNumber()).length() == 4) {
+                fingerPassword = user.getPinNumber();
+                }
+                break;
+            case SModConsts.TRN_MAINT_USER_SUPV:
+                getSignatoryFingerprint();
+                break;
+        }
+
+        return fingerPassword;
     }
 
     private void computeEntryValue() {
@@ -868,6 +1025,81 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
 
         return bIsAppropriate;
     }
+    
+    public void actionOk() {
+        SFormValidation validation = formValidate();
+       
+        if (validation.getIsError()) {
+            if (validation.getComponent() != null) {
+                validation.getComponent().requestFocus();
+            }
+            if (validation.getMessage().length() > 0) {
+                miClient.showMsgBoxWarning(validation.getMessage());
+            }
+        }
+        else {
+            mnFormResult = SLibConstants.FORM_RESULT_OK;
+            setVisible(false);
+        }
+    }
+
+    public void actionCancel() {
+        boolean close = true;
+
+        if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && (moDiog == null || (moDiog != null && !moDiog.getIsSystem()))) {
+            close = miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_FORM_CLOSE) == JOptionPane.YES_OPTION;
+        }
+
+        if (close) {
+            mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
+            setVisible(false);
+        }
+    }
+
+    private void actionEdit() {
+        boolean edit = false;
+        
+        if (edit) {
+            setUpControls();
+            removeSignature();
+
+            jbEdit.setEnabled(false);
+            jbEditHelp.setEnabled(false);
+            jbOk.setEnabled(true);
+
+            if (jftDate.isEditable()) {
+                jftDate.requestFocus();
+            }
+            else if (jtfNumber.isEditable()) {
+                jtfNumber.requestFocus();
+            }
+            else {
+                jbCancel.requestFocus();
+            }
+        }
+        
+        mnFormStatus = SLibConstants.FORM_STATUS_EDIT;
+        
+        jbEdit.setEnabled(false);
+
+        jbOk.setEnabled(true);
+        jbCancel.setEnabled(true);
+
+        setUpControls();
+        removeSignature();
+
+        jtfEntryTextToFind.requestFocus();
+    }
+
+    private void actionEditHelp() {
+        String help = moDiog.getNonEditableHelp();
+
+        miClient.showMsgBoxInformation(help.length() == 0 ? "No fué posible determinar por qué el documento es de sólo lectura." : help);
+    }
+    
+    private void actionDate() {
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDate.getDate(), moFieldDate);
+    }
 
     private void actionCopyMaintUser() {
         if (jcbMaintUser.getSelectedIndex() > 0 && jcbMaintReturnUser.isEnabled()) {
@@ -875,28 +1107,10 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             
             if (jcbMaintUserSupervisor.getSelectedIndex() > 0 && jcbMaintReturnUserSupervisor.isEnabled()) {
                 SGuiUtils.locateItem(jcbMaintReturnUserSupervisor, ((SGuiItem) jcbMaintUserSupervisor.getSelectedItem()).getPrimaryKey());
+                
             }
             
             jcbMaintReturnUser.requestFocus();
-        }
-    }
-
-    private void actionDate() {
-        miClient.getGuiDatePickerXXX().pickDate(moFieldDate.getDate(), moFieldDate);
-    }
-
-    private void actionEntryTextToFind() {
-        STrnItemFound itemFound = STrnUtilities.computeItemFound(miClient, SLibUtilities.textTrim(jtfEntryTextToFind.getText()));
-
-        if (itemFound.getItemFoundIds() == null) {
-            miClient.showMsgBoxWarning("No se encontró ningún ítem con clave '" + itemFound.getItemKey() + "'.");
-        }
-        else if (itemFound.getItemFoundIds().length > 1) {
-            miClient.showMsgBoxWarning("Se encontraron " + itemFound.getItemFoundIds().length + " ítems con clave '" + itemFound.getItemKey() + "'.");
-        }
-        else {
-            renderItemEntry(new int[] { itemFound.getItemFoundIds()[0] }, itemFound.getQuantity());
-            jtfEntryQuantity.requestFocus();
         }
     }
 
@@ -920,10 +1134,25 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         }
     }
 
+    private void actionEntryTextToFind() {
+        STrnItemFound itemFound = STrnUtilities.computeItemFound(miClient, SLibUtilities.textTrim(jtfEntryTextToFind.getText()));
+
+        if (itemFound.getItemFoundIds() == null) {
+            miClient.showMsgBoxWarning("No se encontró ningún ítem con clave '" + itemFound.getItemKey() + "'.");
+        }
+        else if (itemFound.getItemFoundIds().length > 1) {
+            miClient.showMsgBoxWarning("Se encontraron " + itemFound.getItemFoundIds().length + " ítems con clave '" + itemFound.getItemKey() + "'.");
+        }
+        else {
+            renderItemEntry(new int[] { itemFound.getItemFoundIds()[0] }, itemFound.getQuantity());
+            jtfEntryQuantity.requestFocus();
+        }
+    }
+
     public void actionEntryAdd() {
         if (jbEntryAdd.isEnabled()) {
             boolean error = false;
-            
+
             for (int i = 0; i < mvFields.size(); i++) {
                 if (!((SFormField) mvFields.get(i)).validateField()) {
                     error = true;
@@ -970,7 +1199,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 else if (moFieldEntryValueUnit.getDouble() == 0 && mnIogCategoryId == SDataConstantsSys.TRNS_CT_IOG_IN && miClient.showMsgBoxConfirm("¿Está seguro que desea agregar una partida sin valor?") != JOptionPane.YES_OPTION) {
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlEntryValueUnit.getText() + "'.");
                     jtfEntryValueUnit.requestFocus();
-                }
+                }                
                 else if (validateAppropriateWarehousesItem(moEntryItem.getPkItemId())) {
                     SDataDiogEntry iogEntry = new SDataDiogEntry();
                     iogEntry.setPkYearId(SLibConstants.UNDEFINED);
@@ -1021,6 +1250,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                     setUpControls();
                     actionEntryClear();
                     computeDocTotals();
+                    removeSignature();
                 }
             }
         }
@@ -1066,60 +1296,41 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                     }
 
                     computeDocTotals();
+                    removeSignature();
                 }
             }
         }
     }
 
-    public void actionOk() {
-        SFormValidation validation = formValidate();
-
-        if (validation.getIsError()) {
-            if (validation.getComponent() != null) {
-                validation.getComponent().requestFocus();
+    private void actionSign() {
+        try {                  
+            byte[] fingerprint = getSignatoryFingerprint();
+            int fingerPassword = getSignatoryFingerPassword();
+            
+            if (fingerprint == null && fingerPassword == 0) {
+                throw new Exception("No hay un firmante seleccionado o el firmante carece de huella digital y contraseña.");
             }
-            if (validation.getMessage().length() > 0) {
-                miClient.showMsgBoxWarning(validation.getMessage());
+            if (fingerprint != null) {
+                if (STrnMaintUtilities.verifyFingerprint(miClient, fingerprint)) {
+                    moMaintDiogSignature = new SDbMaintDiogSignature();
+                    showSignatureStatus();
+                }
+            }            
+            else if (fingerPassword != 0) {
+                if (STrnMaintUtilities.verifyFingerPassword(miClient, fingerPassword)) {
+                        moMaintDiogSignature = new SDbMaintDiogSignature();
+                        showSignatureStatus();                
+                }
+            } 
+            else {
+                throw new Exception("No hay un firmante seleccionado o el firmante carece de huella digital y contraseña.");
             }
         }
-        else {
-            mnFormResult = SLibConstants.FORM_RESULT_OK;
-            setVisible(false);
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
         }
     }
 
-    public void actionCancel() {
-        boolean close = true;
-
-        if (mnFormStatus == SLibConstants.FORM_STATUS_EDIT && (moDiog == null || (moDiog != null && !moDiog.getIsSystem()))) {
-            close = miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_FORM_CLOSE) == JOptionPane.YES_OPTION;
-        }
-
-        if (close) {
-            mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
-            setVisible(false);
-        }
-    }
-
-    private void actionEdit() {
-        mnFormStatus = SLibConstants.FORM_STATUS_EDIT;
-
-        jbEdit.setEnabled(false);
-
-        jbOk.setEnabled(true);
-        jbCancel.setEnabled(true);
-
-        setUpControls();
-
-        jtfEntryTextToFind.requestFocus();
-    }
-
-    private void actionEditHelp() {
-        String help = moDiog.getNonEditableHelp();
-
-        miClient.showMsgBoxInformation(help.length() == 0 ? "No fué posible determinar por qué el documento es de sólo lectura." : help);
-    }
-    
     private void stateChangedMaintUser() {
         populateMaintUserSupervisor();
     }
@@ -1216,7 +1427,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         
         mnParamMaintMovementType = maintMovementType;
         mnParamMaintUserType = maintUserType;
-        mnMaintMovementIogCategory = SLibConsts.UNDEFINED;
+        mnMaintMovementIogCategory = SLibConstants.UNDEFINED;
         manIogTypeKey = null;
         mbMaintAreaNeeded = false;
         mbWarehouseDestinyNeeded = false;
@@ -1361,7 +1572,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         
         mbResetingForm = false;
     }
-
+    
     @Override
     public void formClearRegistry() {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -1400,12 +1611,10 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         mvDeletedDiogEntries.clear();
         moPaneDiogEntries.clearTableRows();
         
-        jtfSignatureStatus.setText(STrnMaintConstants.NONSIGNED);
-        jtfSignatureStatus.setCaretPosition(0);
-
         setUpControls();
         actionEntryClear();
         computeDocTotals();
+        removeSignature();
 
         mbResetingForm = false;
     }
@@ -1416,8 +1625,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         
         miClient.getSession().populateCatalogue(jcbMaintUser, SModConsts.TRN_MAINT_USER, mnParamMaintUserType, null);
         miClient.getSession().populateCatalogue(jcbMaintReturnUser, SModConsts.TRN_MAINT_USER, mnParamMaintUserType, null);
-        miClient.getSession().populateCatalogue(jcbEntryMaintArea, SModConsts.TRN_MAINT_AREA, SLibConsts.UNDEFINED, null);
-
+        miClient.getSession().populateCatalogue(jcbEntryMaintArea, SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);
         mbResetingForm = false;
     }
 
@@ -1448,8 +1656,10 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 validation.setMessage("El documento debe tener al menos una partida.");
             }
             else {
+                // Validate stock:
+                
                 try {
-                    Vector<SDataDiogEntry> entries = new Vector<SDataDiogEntry>(getAllEntries());
+                    Vector<SDataDiogEntry> entries = new Vector<>(getAllEntries());
 
                     // Validate that item is not inactive or restricted on in moves:
 
@@ -1468,28 +1678,32 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                         }
                     }
 
-                    // Validate item lots and segregations:
+                    // Validate item lots:
+                   
+                    String validationMsg = STrnStockValidator.validateStockLots(miClient, entries, mnIogCategoryId, false);
 
-                    String validationMsg;
-                    
-                    validationMsg = STrnStockValidator.validateStockLots(miClient, entries, mnIogCategoryId, false);
                     if (!validationMsg.isEmpty()) {
                         throw new Exception(validationMsg);
                     }
 
-                    if (!SLibUtilities.belongsTo(manIogTypeKey, new int[][] { SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_WP_ASD, SDataConstantsSys.TRNS_TP_IOG_OUT_MFG_FG_ASD, SDataConstantsSys.TRNS_TP_IOG_OUT_ADJ_INV })) {
-                        /*
-                        NOTE:
-                        Segregations left here only for consistence with SFormDiog, they are harmless, but not really needed for stock-movements of parts and tools.
-                        */
-                        int segregationType = SLibConstants.UNDEFINED;
-                        int[] segregationReferenceKey = null;
-
-                        validationMsg = STrnStockValidator.validateStockMoves(miClient, entries, mnIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate(), segregationType, segregationReferenceKey);
-                        if (validationMsg.length() > 0) {
-                            throw new Exception(validationMsg);
-                        }
+                    validationMsg = STrnStockValidator.validateStockMoves(miClient, entries, mnIogCategoryId, moDiog == null ? new int[] { year, 0 } : (int[]) moDiog.getPrimaryKey(), 
+                            (int[]) moWarehouseSource.getPrimaryKey(), false, moFieldDate.getDate(), 
+                            SLibConstants.UNDEFINED, null, !shouldCheckMaintUserStock() ? SLibConstants.UNDEFINED : ((SGuiItem) jcbMaintUser.getSelectedItem()).getPrimaryKey()[0]);
+                    if (!validationMsg.isEmpty()) {
+                        throw new Exception(validationMsg);
                     }
+            
+                    if (!isDiogSigned()) {
+                        if (getSignatoryFingerprint() == null) {
+                            miClient.showMsgBoxInformation("El firmante carece de huella digital.\nEl movimiento deberá ser firmado posteriormente.");
+                        }
+                        else {
+                            if (miClient.showMsgBoxConfirm("¿Deseas dejar el movimiento sin firmar?") != JOptionPane.YES_OPTION) {
+                                validation.setMessage("Se debe firmar el movimiento.");
+                                validation.setComponent(jbSign);
+                            }
+                        }
+                    }                
                 }
                 catch (Exception e) {
                     validation.setMessage(e.toString());
@@ -1529,10 +1743,10 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         moDiog = (SDataDiog) registry;
         
         // define type of maintenance-user:
-        
-        int maintUserType = SLibConsts.UNDEFINED;
+
+        int maintUserType = SLibConstants.UNDEFINED;
         SDbMaintUser maintUser = (SDbMaintUser) miClient.getSession().readRegistry(SModConsts.TRN_MAINT_USER, new int[] { moDiog.getFkMaintUserId_n() });
-        
+       
         if (maintUser.isEmployee()) {
             maintUserType = SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE;
         }
@@ -1542,9 +1756,9 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         else if (maintUser.isToolsMaintProvider()) {
             maintUserType = SModSysConsts.TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV;
         }
-        
+
         // set form parameters to configure form accordingly:
-        
+
         try {
             setParamMaintMovementSettings(moDiog.getFkMaintMovementTypeId(), maintUserType);
             formRefreshCatalogues();
@@ -1554,7 +1768,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         }
 
         // Form controls:
-
+                
         jbOk.setEnabled(false);
         jbCancel.setEnabled(true);
 
@@ -1583,13 +1797,13 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         populateMaintReturnUserSupervisor();
         SGuiUtils.locateItem(jcbMaintReturnUserSupervisor, new int[] { moDiog.getFkMaintReturnUserSupervisorId() });
 
-        // Document entries
-
+        // Document entries:
+        
         for (SDataDiogEntry entry : moDiog.getDbmsEntries()) {
             if (!entry.getIsDeleted()) {
                 moPaneDiogEntries.addTableRow(new SDataDiogMaintMovementEntryRow(entry));
             }
-        }
+        }        
         moPaneDiogEntries.renderTableRows();
         moPaneDiogEntries.setTableRowSelection(0);
         computeDocTotals();
@@ -1600,8 +1814,16 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             moFieldNotes.setString(moDiog.getDbmsNotes().get(0).getNotes());
         }
         
-        jtfSignatureStatus.setText(STrnMaintConstants.NONSIGNED);
-        jtfSignatureStatus.setCaretPosition(0);
+        // Document signature:
+        
+        if (moDiog.getDbmsLastDiogSignatureId() == SLibConstants.UNDEFINED) {
+            moMaintDiogSignature = null;
+        }
+        else {
+            moMaintDiogSignature = (SDbMaintDiogSignature) miClient.getSession().readRegistry(SModConsts.TRN_MAINT_DIOG_SIG, new int[] { moDiog.getDbmsLastDiogSignatureId() });
+        }
+        
+        showSignatureStatus();
         
         setUpControls();
         
@@ -1618,7 +1840,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             //moDiog.setPkDocId(...);
             moDiog.setNumberSeries(jtfSeries.getText());
             //moDiog.setNumber(...);
-            
+
             moDiog.setFkDiogCategoryId(manIogTypeKey[0]);
             moDiog.setFkDiogClassId(manIogTypeKey[1]);
             moDiog.setFkDiogTypeId(manIogTypeKey[2]);
@@ -1660,7 +1882,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
         moDiog.setFkMaintUserSupervisorId(jcbMaintUserSupervisor.getSelectedIndex() <= 0 ? SModSysConsts.TRN_MAINT_USER_SUPV_NA : ((SGuiItem) jcbMaintUserSupervisor.getSelectedItem()).getPrimaryKey()[0]);
         moDiog.setFkMaintReturnUserId_n(jcbMaintReturnUser.getSelectedIndex() <= 0 ? SLibConstants.UNDEFINED : ((SGuiItem) jcbMaintReturnUser.getSelectedItem()).getPrimaryKey()[0]);
         moDiog.setFkMaintReturnUserSupervisorId(jcbMaintReturnUserSupervisor.getSelectedIndex() <= 0 ? SModSysConsts.TRN_MAINT_USER_SUPV_NA : ((SGuiItem) jcbMaintReturnUserSupervisor.getSelectedItem()).getPrimaryKey()[0]);
-        
+
         moDiog.setFkUserShippedId(SUtilConsts.USR_NA_ID);
         moDiog.setFkUserAuditedId(SUtilConsts.USR_NA_ID);
         moDiog.setFkUserAuthorizedId(SUtilConsts.USR_NA_ID);
@@ -1702,7 +1924,7 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             diogNotes.setIsRegistryEdited(true);
             moDiog.getDbmsNotes().add(diogNotes);
         }
-
+        
         if (mbWarehouseDestinyNeeded) {
             try {
                 int[] diogTypeCounterpartKey = STrnUtilities.getIogTypeCounterpart(manIogTypeKey);
@@ -1714,12 +1936,16 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 diogCounterpart.setFkDiogTypeId(diogTypeCounterpartKey[2]);
                 diogCounterpart.setFkCompanyBranchId(moWarehouseDestiny.getPkCompanyBranchId());
                 diogCounterpart.setFkWarehouseId(moWarehouseDestiny.getPkEntityId());
+                diogCounterpart.setFkDpsYearId_n(SLibConstants.UNDEFINED);
+                diogCounterpart.setFkDpsDocId_n(SLibConstants.UNDEFINED);
+                diogCounterpart.setFkDiogYearId_n(SLibConstants.UNDEFINED); // necesary to break link to himself
+                diogCounterpart.setFkDiogDocId_n(SLibConstants.UNDEFINED);  // necesary to break link to himself
 
                 if (moDiog.getDbmsDataCounterpartDiog() == null) {
-                    diogCounterpart.setPkYearId(moDiog.getPkYearId());
-                    //diogCounterpart.setPkDocId(...);
+                    diogCounterpart.setPkYearId(moDiog.getPkYearId());                    
+                    diogCounterpart.setPkDocId(0);
                     diogCounterpart.setNumberSeries(msSeriesIogCounterpart);
-                    //diogCounterpart.setNumber(...);
+                    diogCounterpart.setNumber("");
                 }
                 else {
                     diogCounterpart.setPkYearId(moDiog.getDbmsDataCounterpartDiog().getPkYearId());
@@ -1745,10 +1971,14 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 SLibUtilities.renderException(this, e);
             }
         }
-
+        
+        if (isDiogSigned()) {
+            moDiog.setAuxSignDiog(true);
+        }
+        
         return moDiog;
     }
-
+    
     @Override
     public void setValue(int type, java.lang.Object value) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -1799,6 +2029,9 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
             else if (button == jbEntryDelete) {
                 actionEntryDelete();
             }
+            else if (button == jbSign) {
+                actionSign();
+            }
         }
         else if (e.getSource() instanceof JTextField) {
             JTextField textField = (JTextField) e.getSource();
@@ -1848,5 +2081,5 @@ public class SFormMaintDiog extends javax.swing.JDialog implements erp.lib.form.
                 computeEntryValue();
             }
         }
-    }
+    } 
 }

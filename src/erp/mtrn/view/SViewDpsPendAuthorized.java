@@ -7,6 +7,7 @@ package erp.mtrn.view;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
 import erp.gui.SModuleUtilities;
@@ -20,23 +21,36 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mbps.data.SDataBizPartnerBranch;
+import erp.mbps.data.SDataBizPartnerBranchAddress;
+import erp.mbps.data.SDataBizPartnerBranchContact;
+import erp.mcfg.data.SDataCurrency;
+import erp.mitm.data.SDataUnit;
 import erp.mod.SModConsts;
+import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.STrnUtilities;
+import erp.musr.data.SDataUser;
+import erp.print.SDataConstantsPrint;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
 import erp.table.STabFilterDocumentNature;
 import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterUsers;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.util.Map;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Claudio Peña
  */
 public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -45,6 +59,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
     private javax.swing.JButton mjbViewDps;
     private javax.swing.JButton mjbViewNotes;
     private javax.swing.JButton mjbViewLinks;
+    private javax.swing.JButton mjPrint;        
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
     private erp.lib.table.STabFilterDateCutOff moTabFilterDateCutOff;
@@ -95,24 +110,28 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         mjbViewDps = new JButton(miClient.getImageIcon(SLibConstants.ICON_LOOK));
         mjbViewNotes = new JButton(miClient.getImageIcon(SLibConstants.ICON_NOTES));
         mjbViewLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_LINK));
+        mjPrint = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
 
         mjbAuthorize.setPreferredSize(new Dimension(23, 23));
         mjbReject.setPreferredSize(new Dimension(23, 23));
         mjbViewDps.setPreferredSize(new Dimension(23, 23));
         mjbViewNotes.setPreferredSize(new Dimension(23, 23));
         mjbViewLinks.setPreferredSize(new Dimension(23, 23));
+        mjPrint.setPreferredSize(new Dimension(23, 23));
 
         mjbAuthorize.addActionListener(this);
         mjbReject.addActionListener(this);
         mjbViewDps.addActionListener(this);
         mjbViewNotes.addActionListener(this);
         mjbViewLinks.addActionListener(this);
-
+        mjPrint.addActionListener(this);
+        
         mjbAuthorize.setToolTipText("Autorizar documento");
         mjbReject.setToolTipText("Rechazar documento");
         mjbViewDps.setToolTipText("Ver documento");
         mjbViewNotes.setToolTipText("Ver notas");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
+        mjPrint.setToolTipText("Imprimir documento");
 
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
@@ -138,6 +157,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
 
         addTaskBarUpperComponent(mjbAuthorize);
         addTaskBarUpperComponent(mjbReject);
+        addTaskBarUpperComponent(mjPrint);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(isViewDocsPending() ? moTabFilterDateCutOff : moTabFilterDatePeriod);
         addTaskBarUpperSeparator();
@@ -156,6 +176,13 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
 
         mjbAuthorize.setEnabled(hasRightAuthorize && (isViewDocsPending() || isViewDocsRejected()));
         mjbReject.setEnabled((hasRightAuthorize || mbHasRightRejectOwn) && (isViewDocsPending() || isViewDocsAuthorized()));
+        if (isOrderPur()) {
+            mjPrint.setEnabled(true);
+        }
+        else {
+            mjPrint.setEnabled(false);
+        }
+            
         mjbViewDps.setEnabled(true);
         mjbViewNotes.setEnabled(true);
         mjbViewLinks.setEnabled(true);
@@ -392,6 +419,159 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         }
     }
 
+    private void actionPrint() {
+        if (mjPrint.isEnabled()) {
+            int i = 0;
+            String sUserBuyer = "";
+            String sUserAuthorize = "";
+            int nFkEmiAddressFormatTypeId_n = 0;
+            int nFkRecAddressFormatTypeId_n = 0;
+            boolean bincludeCountry = false;
+            int[] keyDpsType = null;
+            String[] addressOficial = null;
+            String[] addressContract = null;
+            String[] addressDelivery = null;
+            String[] addressDeliveryCompany = null;
+            Cursor cursor = getCursor();
+            Map<String, Object> map = null;
+            JasperPrint jasperPrint = null;
+            JasperViewer jasperViewer = null;
+            SDataDps oDps = null;
+            SDataBizPartnerBranch oCompanyBranch = null;
+            SDataBizPartnerBranch oBizPartnerBranch = null;
+            SDataBizPartnerBranchAddress oAddress = null;
+            SDataBizPartnerBranchContact oContact = null;
+            SDataUser oUserBuyer = null;
+            SDataUser oUserAuthorize = null;
+            SDataCurrency oCurrency = null;
+            SDataUnit oUnit = null;
+            Vector<String> vPrice = null;
+            Vector<String> vUnit = null;
+            String sContact = "";
+
+            if (moTablePane.getSelectedTableRow() == null/* && !isBizPartnerBlocked()*/|| moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+
+                if (oDps.getDbmsDataCfd() != null) {
+                    try {
+                        SCfdUtils.printCfd(miClient, oDps.getDbmsDataCfd(), SLibConstants.UNDEFINED, SDataConstantsPrint.PRINT_MODE_VIEWER, 1, false);
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
+                }
+                else {
+                    oCompanyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { oDps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+                    oBizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { oDps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+                    oAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, new int [] { oDps.getFkBizPartnerBranchId(),
+                        oDps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
+                    oCurrency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { oDps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
+
+                    if (oBizPartnerBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+                        nFkRecAddressFormatTypeId_n = oBizPartnerBranch.getFkAddressFormatTypeId_n();
+                    }
+                    else {
+                        nFkRecAddressFormatTypeId_n = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+                    }
+
+                    if (oCompanyBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+                        nFkEmiAddressFormatTypeId_n = oAddress.getFkAddressTypeId();
+                    }
+                    else {
+                        nFkEmiAddressFormatTypeId_n = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
+                    }
+
+                    if (oAddress.getFkCountryId_n() == oCompanyBranch.getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n()) {
+                        bincludeCountry = false;
+                    }
+                    else {
+                        bincludeCountry = true;
+                    }
+
+                    addressOficial = oBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkRecAddressFormatTypeId_n,
+                        SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
+                    addressContract = oBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkRecAddressFormatTypeId_n,
+                        SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
+                    addressDelivery = oAddress.obtainAddress(nFkRecAddressFormatTypeId_n,
+                        SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
+                    addressDeliveryCompany = oCompanyBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkEmiAddressFormatTypeId_n,
+                        SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
+                    oUserBuyer = (SDataUser) SDataUtilities.readRegistry(miClient, SDataConstants.USRU_USR, new int[] { oDps.getFkUserNewId() }, SLibConstants.EXEC_MODE_SILENT);
+                    oUserAuthorize = (SDataUser) SDataUtilities.readRegistry(miClient, SDataConstants.USRU_USR, new int[] { oDps.getFkUserAuthorizedId() }, SLibConstants.EXEC_MODE_SILENT);
+
+                    sUserBuyer = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.USRU_USR, new int[] { oDps.getFkUserNewId() });
+                    sUserAuthorize = SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.USRU_USR, new int[] { oDps.getFkUserAuthorizedId() });
+
+                    keyDpsType = new int[] { oDps.getFkDpsCategoryId(), oDps.getFkDpsClassId(), oDps.getFkDpsTypeId() };
+
+                    if (SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD) ||
+                        SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_ORD)) {
+                        // Order:
+
+                        if (SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD) && oDps.getIsAuthorized()) {
+                            miClient.showMsgBoxWarning("No se puede imprimir el documento porque:\n-No está autorizado.");
+                        }
+                        else {
+                            try {
+                                
+                                STrnUtilities.createReportOrder(miClient, null, oDps, SDataConstantsPrint.PRINT_MODE_VIEWER);
+                            }
+                            catch (Exception e) {
+                                SLibUtilities.renderException(this, e);
+                            }
+                            finally {
+                                setCursor(cursor);
+                            }
+                        }
+                    }
+                    else if (SLibUtilities.compareKeys(keyDpsType, SDataConstantsSys.TRNU_TP_DPS_SAL_INV)) {
+                        // Sales document:
+
+                        try {
+                            setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                            oContact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
+                                    miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+
+                            map = miClient.createReportParams();
+                            map.put("nIdYear", oDps.getPkYearId());
+                            map.put("nIdDoc", oDps.getPkDocId());
+                            map.put("sAddressLine1", addressOficial[0]);
+                            map.put("sAddressLine2", addressOficial[1]);
+                            map.put("sAddressLine3", addressOficial[2]);
+                            map.put("sAddressLine4", addressOficial.length > 3 ? addressOficial[3] : "");
+                            map.put("sAddressDelivery1", addressDelivery[0].compareTo(addressOficial[0]) == 0 ? "": addressDelivery[0]);
+                            map.put("sAddressDelivery2", addressDelivery[1].compareTo(addressOficial[1]) == 0 ? "DOMICILIO DEL CLIENTE": addressDelivery[1]);
+                            map.put("sAddressDelivery3", addressDelivery[2].compareTo(addressOficial[2]) == 0 ? "": addressDelivery[2]);
+                            map.put("sAddressDelivery4", addressDelivery.length > 3 && addressOficial.length > 3 ?
+                                addressDelivery[3].compareTo(addressOficial[3]) == 0 ? "": addressDelivery[3] : "");
+                            map.put("nBizPartnerCategory", SDataConstantsSys.BPSS_CT_BP_CUS);
+                            map.put("sValueText", SLibUtilities.translateValueToText(oDps.getTotalCy_r(), 2,
+                                oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                SLibConstants.LAN_ENGLISH, oCurrency.getTextSingular(), oCurrency.getTextPlural(), oCurrency.getTextPrefix(), oCurrency.getTextSuffix()));
+                            map.put("sErpCurrencyKey", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
+                            map.put("bShowBackground", false);
+                            map.put("sManagerFinance", oContact == null ? "" : SLibUtilities.textTrim(oContact.getContactPrefix() + " " + oContact.getFirstname() + " " + oContact.getLastname()));
+
+                            jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS, map);
+                            jasperViewer = new JasperViewer(jasperPrint, false);
+                            jasperViewer.setTitle("Impresión de factura");
+                            jasperViewer.setVisible(true);
+                        }
+                        catch (Exception e) {
+                            SLibUtilities.renderException(this, e);
+                        }
+                        finally {
+                            setCursor(cursor);
+                        }
+                    }
+                }
+            }
+        }
+    }        
+
     @Override
     @SuppressWarnings("unchecked")
     public void createSqlQuery() {
@@ -557,6 +737,9 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
             }
             else if (button == mjbViewLinks) {
                 actionViewLinks();
+            }
+            else if (button == mjPrint) {
+                actionPrint();
             }
         }
     }

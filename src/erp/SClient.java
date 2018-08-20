@@ -100,13 +100,13 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Sergio Flores
  * @version 3.2
  */
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 114.02";
+    public static final String APP_RELEASE = "3.2 123.01";
     public static final String APP_COPYRIGHT = "2007-2018";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -245,6 +245,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jPanel2 = new javax.swing.JPanel();
         jlLogo = new javax.swing.JLabel();
         jTabbedPane = new javax.swing.JTabbedPane();
+        jPanel3 = new javax.swing.JPanel();
         jpStatus = new javax.swing.JPanel();
         jtfSystemDate = new javax.swing.JTextField();
         jtfCurrentDate = new javax.swing.JTextField();
@@ -257,7 +258,9 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jbSession = new javax.swing.JButton();
         jtfUser = new javax.swing.JTextField();
         jtfLoginTimestamp = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
         jlAppRelease = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         jMenuBar = new javax.swing.JMenuBar();
         jmFile = new javax.swing.JMenu();
         jmiFileCurrentDate = new javax.swing.JMenuItem();
@@ -277,8 +280,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jmiViewModuleMkt = new javax.swing.JMenuItem();
         jmiViewModuleLog = new javax.swing.JMenuItem();
         jmiViewModuleMfg = new javax.swing.JMenuItem();
-        jmiViewModuleHrs = new javax.swing.JMenuItem();
         jmiViewModuleQlt = new javax.swing.JMenuItem();
+        jmiViewModuleHrs = new javax.swing.JMenuItem();
         jmHelp = new javax.swing.JMenu();
         jmiHelpAbout = new javax.swing.JMenuItem();
 
@@ -450,91 +453,132 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         getContentPane().add(jpToolBars, java.awt.BorderLayout.NORTH);
         getContentPane().add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
-        jpStatus.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 5));
+        jPanel3.setBackground(java.awt.Color.black);
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        jpStatus.setBackground(java.awt.Color.black);
+        jpStatus.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 2));
 
         jtfSystemDate.setEditable(false);
+        jtfSystemDate.setForeground(java.awt.Color.white);
         jtfSystemDate.setText("01/01/2000");
         jtfSystemDate.setToolTipText("Fecha de sistema");
         jtfSystemDate.setFocusable(false);
+        jtfSystemDate.setOpaque(false);
         jtfSystemDate.setPreferredSize(new java.awt.Dimension(65, 20));
         jpStatus.add(jtfSystemDate);
 
         jtfCurrentDate.setEditable(false);
+        jtfCurrentDate.setForeground(java.awt.Color.white);
         jtfCurrentDate.setText("01/01/2000");
         jtfCurrentDate.setToolTipText("Fecha de trabajo");
         jtfCurrentDate.setFocusable(false);
+        jtfCurrentDate.setOpaque(false);
         jtfCurrentDate.setPreferredSize(new java.awt.Dimension(65, 20));
         jpStatus.add(jtfCurrentDate);
 
-        jbCurrentDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/gui_cal.gif"))); // NOI18N
+        jbCurrentDate.setBackground(java.awt.Color.black);
+        jbCurrentDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/gui_date.gif"))); // NOI18N
         jbCurrentDate.setToolTipText("Cambiar fecha de trabajo...");
+        jbCurrentDate.setContentAreaFilled(false);
         jbCurrentDate.setPreferredSize(new java.awt.Dimension(23, 23));
         jpStatus.add(jbCurrentDate);
 
-        jtfLoginCompanyBranch.setBackground(java.awt.Color.lightGray);
         jtfLoginCompanyBranch.setEditable(false);
+        jtfLoginCompanyBranch.setBackground(java.awt.Color.lightGray);
+        jtfLoginCompanyBranch.setForeground(java.awt.Color.white);
         jtfLoginCompanyBranch.setText("BRANCH");
         jtfLoginCompanyBranch.setToolTipText("Sucursal de la empresa actual");
         jtfLoginCompanyBranch.setFocusable(false);
+        jtfLoginCompanyBranch.setOpaque(false);
         jtfLoginCompanyBranch.setPreferredSize(new java.awt.Dimension(150, 20));
         jpStatus.add(jtfLoginCompanyBranch);
 
         jtfLoginEntityCh.setEditable(false);
         jtfLoginEntityCh.setBackground(java.awt.Color.lightGray);
+        jtfLoginEntityCh.setForeground(java.awt.Color.white);
         jtfLoginEntityCh.setText("CH");
         jtfLoginEntityCh.setToolTipText("Cuenta de efectivo actual");
         jtfLoginEntityCh.setFocusable(false);
-        jtfLoginEntityCh.setPreferredSize(new java.awt.Dimension(65, 20));
+        jtfLoginEntityCh.setOpaque(false);
+        jtfLoginEntityCh.setPreferredSize(new java.awt.Dimension(50, 20));
         jpStatus.add(jtfLoginEntityCh);
 
         jtfLoginEntityWh.setEditable(false);
         jtfLoginEntityWh.setBackground(java.awt.Color.lightGray);
+        jtfLoginEntityWh.setForeground(java.awt.Color.white);
         jtfLoginEntityWh.setText("WH");
         jtfLoginEntityWh.setToolTipText("Almacén actual");
         jtfLoginEntityWh.setFocusable(false);
-        jtfLoginEntityWh.setPreferredSize(new java.awt.Dimension(65, 20));
+        jtfLoginEntityWh.setOpaque(false);
+        jtfLoginEntityWh.setPreferredSize(new java.awt.Dimension(50, 20));
         jpStatus.add(jtfLoginEntityWh);
 
         jtfLoginEntityPlt.setEditable(false);
         jtfLoginEntityPlt.setBackground(java.awt.Color.lightGray);
+        jtfLoginEntityPlt.setForeground(java.awt.Color.white);
         jtfLoginEntityPlt.setText("PLT");
         jtfLoginEntityPlt.setToolTipText("Planta actual");
         jtfLoginEntityPlt.setFocusable(false);
-        jtfLoginEntityPlt.setPreferredSize(new java.awt.Dimension(65, 20));
+        jtfLoginEntityPlt.setOpaque(false);
+        jtfLoginEntityPlt.setPreferredSize(new java.awt.Dimension(50, 20));
         jpStatus.add(jtfLoginEntityPlt);
 
         jtfLoginEntityPos.setEditable(false);
         jtfLoginEntityPos.setBackground(java.awt.Color.lightGray);
+        jtfLoginEntityPos.setForeground(java.awt.Color.white);
         jtfLoginEntityPos.setText("POS");
         jtfLoginEntityPos.setToolTipText("Punto de venta actual");
         jtfLoginEntityPos.setFocusable(false);
-        jtfLoginEntityPos.setPreferredSize(new java.awt.Dimension(65, 20));
+        jtfLoginEntityPos.setOpaque(false);
+        jtfLoginEntityPos.setPreferredSize(new java.awt.Dimension(50, 20));
         jpStatus.add(jtfLoginEntityPos);
 
+        jbSession.setBackground(java.awt.Color.black);
+        jbSession.setForeground(java.awt.Color.white);
         jbSession.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/gui_session.gif"))); // NOI18N
         jbSession.setToolTipText("Cambiar sesión...");
+        jbSession.setContentAreaFilled(false);
+        jbSession.setOpaque(false);
         jbSession.setPreferredSize(new java.awt.Dimension(23, 23));
         jpStatus.add(jbSession);
 
         jtfUser.setEditable(false);
+        jtfUser.setForeground(java.awt.Color.white);
         jtfUser.setText("user");
         jtfUser.setToolTipText("Usuario actual");
         jtfUser.setFocusable(false);
+        jtfUser.setOpaque(false);
         jtfUser.setPreferredSize(new java.awt.Dimension(75, 20));
         jpStatus.add(jtfUser);
 
         jtfLoginTimestamp.setEditable(false);
+        jtfLoginTimestamp.setForeground(new java.awt.Color(0, 153, 153));
         jtfLoginTimestamp.setText("01/01/2000 00:00:00 +0000");
         jtfLoginTimestamp.setToolTipText("Marca de tiempo de acceso");
+        jtfLoginTimestamp.setBorder(null);
         jtfLoginTimestamp.setFocusable(false);
+        jtfLoginTimestamp.setOpaque(false);
         jtfLoginTimestamp.setPreferredSize(new java.awt.Dimension(150, 20));
         jpStatus.add(jtfLoginTimestamp);
 
+        jPanel3.add(jpStatus, java.awt.BorderLayout.WEST);
+
+        jPanel4.setBackground(java.awt.Color.black);
+
+        jlAppRelease.setForeground(new java.awt.Color(0, 153, 153));
+        jlAppRelease.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jlAppRelease.setText("RELEASE");
         jlAppRelease.setPreferredSize(new java.awt.Dimension(100, 20));
-        jpStatus.add(jlAppRelease);
+        jPanel4.add(jlAppRelease);
 
-        getContentPane().add(jpStatus, java.awt.BorderLayout.SOUTH);
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/swap_logo_9.jpg"))); // NOI18N
+        jLabel1.setToolTipText("www.swaplicado.com.mx");
+        jPanel4.add(jLabel1);
+
+        jPanel3.add(jPanel4, java.awt.BorderLayout.LINE_END);
+
+        getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
 
         jmFile.setText("Archivo");
 
@@ -585,29 +629,24 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         jmiViewModuleMkt.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_6, java.awt.event.InputEvent.CTRL_MASK));
         jmiViewModuleMkt.setText("Módulo comercialización");
-        jmiViewModuleMkt.setEnabled(false);
         jmView.add(jmiViewModuleMkt);
 
         jmiViewModuleLog.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_7, java.awt.event.InputEvent.CTRL_MASK));
         jmiViewModuleLog.setText("Módulo embarques");
-        jmiViewModuleLog.setEnabled(false);
         jmView.add(jmiViewModuleLog);
 
         jmiViewModuleMfg.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_8, java.awt.event.InputEvent.CTRL_MASK));
         jmiViewModuleMfg.setText("Módulo producción");
-        jmiViewModuleMfg.setEnabled(false);
         jmView.add(jmiViewModuleMfg);
 
-        jmiViewModuleHrs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_9, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleHrs.setText("Módulo calidad");
-        jmiViewModuleHrs.setEnabled(false);
-        jmiViewModuleHrs.setInheritsPopupMenu(true);
-        jmView.add(jmiViewModuleHrs);
-
-        jmiViewModuleQlt.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0, java.awt.event.InputEvent.CTRL_MASK));
-        jmiViewModuleQlt.setText("Módulo recursos humanos");
-        jmiViewModuleQlt.setEnabled(false);
+        jmiViewModuleQlt.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_9, java.awt.event.InputEvent.CTRL_MASK));
+        jmiViewModuleQlt.setText("Módulo calidad");
+        jmiViewModuleQlt.setInheritsPopupMenu(true);
         jmView.add(jmiViewModuleQlt);
+
+        jmiViewModuleHrs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_0, java.awt.event.InputEvent.CTRL_MASK));
+        jmiViewModuleHrs.setText("Módulo recursos humanos");
+        jmView.add(jmiViewModuleHrs);
 
         jMenuBar.add(jmView);
 
@@ -770,8 +809,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtbModuleMkt.addActionListener(this);
         jtbModuleLog.addActionListener(this);
         jtbModuleMfg.addActionListener(this);
-        jtbModuleHrs.addActionListener(this);
         jtbModuleQlt.addActionListener(this);
+        jtbModuleHrs.addActionListener(this);
         jmiFileCurrentDate.addActionListener(this);
         jmiFileSession.addActionListener(this);
         jmiFilePassword.addActionListener(this);
@@ -786,8 +825,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jmiViewModuleMkt.addActionListener(this);
         jmiViewModuleLog.addActionListener(this);
         jmiViewModuleMfg.addActionListener(this);
-        jmiViewModuleHrs.addActionListener(this);
         jmiViewModuleQlt.addActionListener(this);
+        jmiViewModuleHrs.addActionListener(this);
         jmiHelpAbout.addActionListener(this);
         jbCurrentDate.addActionListener(this);
         jbSession.addActionListener(this);
@@ -885,8 +924,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             jmiViewModuleMkt.setEnabled(false);
             jmiViewModuleLog.setEnabled(false);
             jmiViewModuleMfg.setEnabled(false);
-            jmiViewModuleHrs.setEnabled(false);
             jmiViewModuleQlt.setEnabled(false);
+            jmiViewModuleHrs.setEnabled(false);
             
             jButtonGroup.clearSelection();
             jtbModuleCfg.setEnabled(false);
@@ -897,8 +936,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             jtbModuleMkt.setEnabled(false);
             jtbModuleLog.setEnabled(false);
             jtbModuleMfg.setEnabled(false);            
-            jtbModuleHrs.setEnabled(false);
             jtbModuleQlt.setEnabled(false);
+            jtbModuleHrs.setEnabled(false);
 
             jlLogo.setIcon(null);
 
@@ -980,18 +1019,18 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 jtbModuleMfg.setEnabled(true);
             }
             
-            if (moSessionXXX.getCompany().getIsModuleHrs() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_HRS, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
-                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_HRS))) {
-                jmiViewModuleHrs.setEnabled(true);
-                jtbModuleHrs.setEnabled(true);
-            }
-
             if (moSessionXXX.getCompany().getIsModuleQty() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_QLT, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
                     (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_QLT))) {
                 jmiViewModuleQlt.setEnabled(true);
                 jtbModuleQlt.setEnabled(true);
             }
             
+            if (moSessionXXX.getCompany().getIsModuleHrs() && moSessionXXX.getUser().hasAccessToModule(SDataConstants.MOD_HRS, moSessionXXX.getCurrentCompany().getPkCompanyId()) && 
+                    (moCfgProcessor == null || moCfgProcessor.isModuleVisible("" + SDataConstants.MOD_HRS))) {
+                jmiViewModuleHrs.setEnabled(true);
+                jtbModuleHrs.setEnabled(true);
+            }
+
             jlLogo.setIcon(moSessionXXX.getParamsCompany().getExtraLogoImageIcon_n());
         }
     }
@@ -1324,14 +1363,14 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         renderMenues(moModuleMfg.getMenues());
     }
 
+    private void actionModuleQlt() {
+        jtbModuleQlt.setSelected(true);
+        renderMenues(moModuleQlt.getMenues());
+    }
+    
     private void actionModuleHrs() {
         jtbModuleHrs.setSelected(true);
         renderMenues(moModuleHrs.getMenues());
-    }
-    
-    private void actionModuleQty() {
-        jtbModuleQlt.setSelected(true);
-        renderMenues(moModuleQlt.getMenues());
     }
     
     private void actionFileCurrentDate() {
@@ -1476,9 +1515,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup jButtonGroup;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JMenuBar jMenuBar;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JButton jbCurrentDate;
@@ -1812,7 +1854,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 actionModuleHrs();
             }
             else if (toggleButton == jtbModuleQlt) {
-                actionModuleQty();
+                actionModuleQlt();
             }            
         }
         else if (e.getSource() instanceof javax.swing.JMenuItem) {
@@ -1860,12 +1902,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
             else if (item == jmiViewModuleMfg) {
                 actionModuleMfg();
             }         
+            else if (item == jmiViewModuleQlt) {
+                actionModuleQlt();
+            }               
             else if (item == jmiViewModuleHrs) {
                 actionModuleHrs();
             }
-            else if (item == jmiViewModuleQlt) {
-                actionModuleQty();
-            }               
             else if (item == jmiHelpAbout) {
                 actionHelpAbout();
             }
@@ -2183,6 +2225,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         map.put("oTimeFormat", SLibUtils.DateFormatTime);
         map.put("oValueFormat", SLibUtils.getDecimalFormatAmount());
         map.put("sImageDir", moSessionXXX.getParamsCompany().getImagesDirectory());
+        map.put("sXmlBaseDir", moSessionXXX.getParamsCompany().getXmlBaseDirectory());
 
         return map;
     }

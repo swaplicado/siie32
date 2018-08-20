@@ -29,7 +29,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbBenefitTable;
 import erp.mod.hrs.db.SDbBenefitTableRow;
 import erp.mod.hrs.db.SDbConfig;
-import erp.mod.hrs.db.SHrsBenefitTableByAnniversary;
+import erp.mod.hrs.db.SHrsBenefitTableAnniversary;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import java.awt.BorderLayout;
@@ -50,13 +50,17 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiItem;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements STableTabInterface, javax.swing.event.ListSelectionListener, java.awt.event.ActionListener, java.awt.event.ItemListener {
+    
+    public static final String NO_PHOTO = "(Foto no disponible)";
+    public static final String NO_SIGNATURE = "(Firma no disponible)";
 
     int mnPanelType;
     private erp.client.SClientInterface miClient;
@@ -64,9 +68,9 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private boolean mbHasRightEmpWage;
     
     private SDataBizPartner moBizPartner;
-    private ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableVacationByAnniversary = null;
-    private ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableVacationBonByAnniversary = null;
-    private ArrayList<SHrsBenefitTableByAnniversary> maBenefitTableAnnByAnniversarys = null;
+    private ArrayList<SHrsBenefitTableAnniversary> maBenefitTableVacationAnniversarys = null;
+    private ArrayList<SHrsBenefitTableAnniversary> maBenefitTableVacationBonusAnniversarys = null;
+    private ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnnualBonusAnniversarys = null;
     
     private int mnFilterPaymentTypeId;
     private int mnFilterDepartamentId;
@@ -215,8 +219,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfIndemnificationDicL = new javax.swing.JTextField();
         jlDicL = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
-        jlPhoto = new javax.swing.JLabel();
-        jlSignature = new javax.swing.JLabel();
+        jlImgPhoto = new javax.swing.JLabel();
+        jlImgSignature = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -267,7 +271,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos personales:"));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jPanel7.setLayout(new java.awt.GridLayout(9, 0, 0, 5));
+        jPanel7.setLayout(new java.awt.GridLayout(9, 0, 0, 3));
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -276,10 +280,10 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel13.add(jlFirstName);
 
         jtfFirstName.setEditable(false);
+        jtfFirstName.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfFirstName.setText("X");
-        jtfFirstName.setToolTipText("");
         jtfFirstName.setFocusable(false);
-        jtfFirstName.setPreferredSize(new java.awt.Dimension(250, 23));
+        jtfFirstName.setPreferredSize(new java.awt.Dimension(310, 23));
         jPanel13.add(jtfFirstName);
 
         jPanel7.add(jPanel13);
@@ -292,7 +296,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jtfFiscalId.setEditable(false);
         jtfFiscalId.setText("X");
-        jtfFiscalId.setToolTipText("");
         jtfFiscalId.setFocusable(false);
         jtfFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel21.add(jtfFiscalId);
@@ -303,9 +306,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jtfAlternativeId.setEditable(false);
         jtfAlternativeId.setText("X");
-        jtfAlternativeId.setToolTipText("");
         jtfAlternativeId.setFocusable(false);
-        jtfAlternativeId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfAlternativeId.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel21.add(jtfAlternativeId);
 
         jlSocialSecurityNumber.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -315,9 +317,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jtfSocialSecurityNumber.setEditable(false);
         jtfSocialSecurityNumber.setText("X");
-        jtfSocialSecurityNumber.setToolTipText("");
         jtfSocialSecurityNumber.setFocusable(false);
-        jtfSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfSocialSecurityNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel21.add(jtfSocialSecurityNumber);
 
         jPanel7.add(jPanel21);
@@ -337,7 +338,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jLabel4.setPreferredSize(new java.awt.Dimension(20, 23));
         jPanel22.add(jLabel4);
 
-        jlDateBenefits.setText("Beneficios:");
+        jlDateBenefits.setText("Inicio beneficios:");
         jlDateBenefits.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel22.add(jlDateBenefits);
 
@@ -385,7 +386,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfSalary.setEditable(false);
         jtfSalary.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfSalary.setText("0.0000");
-        jtfSalary.setToolTipText("");
         jtfSalary.setFocusable(false);
         jtfSalary.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel18.add(jtfSalary);
@@ -397,13 +397,12 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel18.add(jftDateChangeSalary);
 
         jlWage.setText("Sueldo:");
-        jlWage.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlWage.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel18.add(jlWage);
 
         jtfWage.setEditable(false);
         jtfWage.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfWage.setText("0.0000");
-        jtfWage.setToolTipText("");
         jtfWage.setFocusable(false);
         jtfWage.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel18.add(jtfWage);
@@ -425,7 +424,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfSalarySscBase.setEditable(false);
         jtfSalarySscBase.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfSalarySscBase.setText("0.0000");
-        jtfSalarySscBase.setToolTipText("");
         jtfSalarySscBase.setFocusable(false);
         jtfSalarySscBase.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel20.add(jtfSalarySscBase);
@@ -446,7 +444,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jtfBank.setEditable(false);
         jtfBank.setText("X");
-        jtfBank.setToolTipText("");
         jtfBank.setFocusable(false);
         jtfBank.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel19.add(jtfBank);
@@ -471,7 +468,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jtfSex.setEditable(false);
         jtfSex.setText("X");
-        jtfSex.setToolTipText("");
         jtfSex.setFocusable(false);
         jtfSex.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jtfSex);
@@ -482,18 +478,16 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jtfMarital.setEditable(false);
         jtfMarital.setText("X");
-        jtfMarital.setToolTipText("");
         jtfMarital.setFocusable(false);
         jtfMarital.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jtfMarital);
 
-        jlFkBloodType.setText("Tipo de sangre:");
-        jlFkBloodType.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlFkBloodType.setText("Grupo sanguíneo:");
+        jlFkBloodType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlFkBloodType);
 
         jtfBloodType.setEditable(false);
         jtfBloodType.setText("X");
-        jtfBloodType.setToolTipText("");
         jtfBloodType.setFocusable(false);
         jtfBloodType.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel16.add(jtfBloodType);
@@ -508,7 +502,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jtfEducationType.setEditable(false);
         jtfEducationType.setText("X");
-        jtfEducationType.setToolTipText("");
         jtfEducationType.setFocusable(false);
         jtfEducationType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jtfEducationType);
@@ -519,21 +512,19 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jtfMwzType.setEditable(false);
         jtfMwzType.setText("X");
-        jtfMwzType.setToolTipText("");
         jtfMwzType.setFocusable(false);
         jtfMwzType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jtfMwzType);
 
         jlWorkingHoursDay.setText("Horas jornada:");
-        jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlWorkingHoursDay);
 
         jtfWorkingHoursDay.setEditable(false);
         jtfWorkingHoursDay.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfWorkingHoursDay.setText("0");
-        jtfWorkingHoursDay.setToolTipText("");
         jtfWorkingHoursDay.setFocusable(false);
-        jtfWorkingHoursDay.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfWorkingHoursDay.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(jtfWorkingHoursDay);
 
         jPanel7.add(jPanel9);
@@ -548,7 +539,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jPanel12.setLayout(new java.awt.BorderLayout());
 
         jPanel10.setFocusable(false);
-        jPanel10.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
+        jPanel10.setLayout(new java.awt.GridLayout(6, 1, 0, 3));
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -559,7 +550,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfSeniority.setEditable(false);
         jtfSeniority.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfSeniority.setText("0");
-        jtfSeniority.setToolTipText("");
         jtfSeniority.setFocusable(false);
         jtfSeniority.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel26.add(jtfSeniority);
@@ -571,7 +561,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfSeniorityDays.setEditable(false);
         jtfSeniorityDays.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfSeniorityDays.setText("0");
-        jtfSeniorityDays.setToolTipText("");
         jtfSeniorityDays.setFocusable(false);
         jtfSeniorityDays.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel26.add(jtfSeniorityDays);
@@ -587,7 +576,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jlDummy.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jlDummy);
 
-        jlBenefit.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlBenefit.setText("Prestación");
         jlBenefit.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jlBenefit);
@@ -595,12 +583,10 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jlDummy1.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel11.add(jlDummy1);
 
-        jlBenefitProp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlBenefitProp.setText("Parte prop.");
         jlBenefitProp.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jlBenefitProp);
 
-        jlProportional.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlProportional.setText("Proporcional");
         jlProportional.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jlProportional);
@@ -608,9 +594,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jlDummy2.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel11.add(jlDummy2);
 
-        jlPaymentProp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlPaymentProp.setText("Pago prop.");
-        jlPaymentProp.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlPaymentProp.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(jlPaymentProp);
 
         jPanel10.add(jPanel11);
@@ -624,7 +609,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfAnnualBonusBenefit.setEditable(false);
         jtfAnnualBonusBenefit.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfAnnualBonusBenefit.setText("0");
-        jtfAnnualBonusBenefit.setToolTipText("");
         jtfAnnualBonusBenefit.setFocusable(false);
         jtfAnnualBonusBenefit.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel27.add(jtfAnnualBonusBenefit);
@@ -636,7 +620,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfAnnualBonusPropPer.setEditable(false);
         jtfAnnualBonusPropPer.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfAnnualBonusPropPer.setText("0 %");
-        jtfAnnualBonusPropPer.setToolTipText("");
         jtfAnnualBonusPropPer.setFocusable(false);
         jtfAnnualBonusPropPer.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel27.add(jtfAnnualBonusPropPer);
@@ -644,7 +627,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfAnnualBonusProp.setEditable(false);
         jtfAnnualBonusProp.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfAnnualBonusProp.setText("0");
-        jtfAnnualBonusProp.setToolTipText("");
         jtfAnnualBonusProp.setFocusable(false);
         jtfAnnualBonusProp.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel27.add(jtfAnnualBonusProp);
@@ -656,7 +638,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfAnnualBonusPayProp.setEditable(false);
         jtfAnnualBonusPayProp.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfAnnualBonusPayProp.setText("0");
-        jtfAnnualBonusPayProp.setToolTipText("");
         jtfAnnualBonusPayProp.setFocusable(false);
         jtfAnnualBonusPayProp.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel27.add(jtfAnnualBonusPayProp);
@@ -676,7 +657,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfVacationsBenefit.setEditable(false);
         jtfVacationsBenefit.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfVacationsBenefit.setText("0");
-        jtfVacationsBenefit.setToolTipText("");
         jtfVacationsBenefit.setFocusable(false);
         jtfVacationsBenefit.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel28.add(jtfVacationsBenefit);
@@ -688,7 +668,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfVacationsPropPer.setEditable(false);
         jtfVacationsPropPer.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfVacationsPropPer.setText("0 %");
-        jtfVacationsPropPer.setToolTipText("");
         jtfVacationsPropPer.setFocusable(false);
         jtfVacationsPropPer.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel28.add(jtfVacationsPropPer);
@@ -696,7 +675,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfVacationsProp.setEditable(false);
         jtfVacationsProp.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfVacationsProp.setText("0");
-        jtfVacationsProp.setToolTipText("");
         jtfVacationsProp.setFocusable(false);
         jtfVacationsProp.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel28.add(jtfVacationsProp);
@@ -708,7 +686,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfVacationsPayProp.setEditable(false);
         jtfVacationsPayProp.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfVacationsPayProp.setText("0");
-        jtfVacationsPayProp.setToolTipText("");
         jtfVacationsPayProp.setFocusable(false);
         jtfVacationsPayProp.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel28.add(jtfVacationsPayProp);
@@ -728,7 +705,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfVacationsBonusBenefit.setEditable(false);
         jtfVacationsBonusBenefit.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfVacationsBonusBenefit.setText("0 %");
-        jtfVacationsBonusBenefit.setToolTipText("");
         jtfVacationsBonusBenefit.setFocusable(false);
         jtfVacationsBonusBenefit.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel29.add(jtfVacationsBonusBenefit);
@@ -739,7 +715,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfVacationsBonusPayProp.setEditable(false);
         jtfVacationsBonusPayProp.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfVacationsBonusPayProp.setText("0");
-        jtfVacationsBonusPayProp.setToolTipText("");
         jtfVacationsBonusPayProp.setFocusable(false);
         jtfVacationsBonusPayProp.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel29.add(jtfVacationsBonusPayProp);
@@ -759,7 +734,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfSettlement.setEditable(false);
         jtfSettlement.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfSettlement.setText("0");
-        jtfSettlement.setToolTipText("");
         jtfSettlement.setFocusable(false);
         jtfSettlement.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel31.add(jtfSettlement);
@@ -771,7 +745,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfIndemnification.setEditable(false);
         jtfIndemnification.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfIndemnification.setText("0");
-        jtfIndemnification.setToolTipText("");
         jtfIndemnification.setFocusable(false);
         jtfIndemnification.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel31.add(jtfIndemnification);
@@ -785,7 +758,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfIndemnificationDisL.setEditable(false);
         jtfIndemnificationDisL.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfIndemnificationDisL.setText("0");
-        jtfIndemnificationDisL.setToolTipText("");
         jtfIndemnificationDisL.setFocusable(false);
         jtfIndemnificationDisL.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel31.add(jtfIndemnificationDisL);
@@ -799,7 +771,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jtfIndemnificationDicL.setEditable(false);
         jtfIndemnificationDicL.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfIndemnificationDicL.setText("0");
-        jtfIndemnificationDicL.setToolTipText("");
         jtfIndemnificationDicL.setFocusable(false);
         jtfIndemnificationDicL.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel31.add(jtfIndemnificationDicL);
@@ -818,16 +789,19 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlPhoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlPhoto.setText("FOTOGRAFÍA");
-        jlPhoto.setPreferredSize(new java.awt.Dimension(100, 100));
-        jPanel6.add(jlPhoto);
-        jlPhoto.getAccessibleContext().setAccessibleName("FOTOGRAFÍA");
+        jlImgPhoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlImgPhoto.setText("Foto");
+        jlImgPhoto.setToolTipText("Foto (tamaño sugerido: 100×100 px)");
+        jlImgPhoto.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jlImgPhoto.setPreferredSize(new java.awt.Dimension(100, 100));
+        jPanel6.add(jlImgPhoto);
 
-        jlSignature.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlSignature.setText("FIRMA");
-        jlSignature.setPreferredSize(new java.awt.Dimension(250, 100));
-        jPanel6.add(jlSignature);
+        jlImgSignature.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlImgSignature.setText("Firma");
+        jlImgSignature.setToolTipText("Firma (tamaño sugerido: 250×100 px)");
+        jlImgSignature.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jlImgSignature.setPreferredSize(new java.awt.Dimension(250, 100));
+        jPanel6.add(jlImgSignature);
 
         jPanel5.add(jPanel6, java.awt.BorderLayout.SOUTH);
 
@@ -898,11 +872,12 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JLabel jlFirstName;
     private javax.swing.JLabel jlFiscalId;
     private javax.swing.JLabel jlFkBloodType;
+    private javax.swing.JLabel jlImgPhoto;
+    private javax.swing.JLabel jlImgSignature;
     private javax.swing.JLabel jlIndemnification;
     private javax.swing.JLabel jlMarital;
     private javax.swing.JLabel jlMwzType;
     private javax.swing.JLabel jlPaymentProp;
-    private javax.swing.JLabel jlPhoto;
     private javax.swing.JLabel jlProportional;
     private javax.swing.JLabel jlRJDj;
     private javax.swing.JLabel jlSalary;
@@ -912,7 +887,6 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JLabel jlSeniorityYear;
     private javax.swing.JLabel jlSettlement;
     private javax.swing.JLabel jlSex;
-    private javax.swing.JLabel jlSignature;
     private javax.swing.JLabel jlSocialSecurityNumber;
     private javax.swing.JLabel jlTotalAvailables;
     private javax.swing.JLabel jlVacations;
@@ -977,12 +951,14 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         resetEmployee();
         resetBenefits();
         resetSettlement();
+        
         i = 0;
         aoTableColumns = new STableColumnForm[17];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empleado", 250);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", 75);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Periodo pago", 100);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", 50);
+        aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Activo", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Período pago", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Categoría", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo empleado", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Departamento", 100);
@@ -1001,9 +977,11 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePaneEmpAvailable.addTableColumn(aoTableColumns[i]);
         }
+        
         populateBenefits();
         populateEmployee();
         updateOptions();
+        
         jtbStatusEmployeeActive.setSelected(true);
         actionEmpStatusStateChange();
         jbClearFilterPaymentType.addActionListener(this);
@@ -1104,33 +1082,35 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private void populateBenefits() throws Exception {
         int i = 0;
         
-        maBenefitTableAnnByAnniversarys = new ArrayList<SHrsBenefitTableByAnniversary>();
-        maBenefitTableVacationByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
-        maBenefitTableVacationBonByAnniversary = new ArrayList<SHrsBenefitTableByAnniversary>();
+        maBenefitTableAnnualBonusAnniversarys = new ArrayList<>();
+        maBenefitTableVacationAnniversarys = new ArrayList<>();
+        maBenefitTableVacationBonusAnniversarys = new ArrayList<>();
         
         for (SDbBenefitTable table : getBenefitTable(SModSysConsts.HRSS_TP_BEN_ANN_BON)) {
             i = 1;
             for (SDbBenefitTableRow tableRow : table.getChildRows()) {
                 while ( i * 12 <= tableRow.getMonths()) {
-                    maBenefitTableAnnByAnniversarys.add(new SHrsBenefitTableByAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitDays()));
+                    maBenefitTableAnnualBonusAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitDays()));
                     i++;
                 }
             }
         }
+        
         for (SDbBenefitTable table : getBenefitTable(SModSysConsts.HRSS_TP_BEN_VAC)) {
             i = 1;
             for (SDbBenefitTableRow tableRow : table.getChildRows()) {
                 while ( i * 12 <= tableRow.getMonths()) {
-                    maBenefitTableVacationByAnniversary.add(new SHrsBenefitTableByAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitDays()));
+                    maBenefitTableVacationAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitDays()));
                     i++;
                 }
             }
         }
+        
         for (SDbBenefitTable table : getBenefitTable(SModSysConsts.HRSS_TP_BEN_VAC_BON)) {
             i = 1;
             for (SDbBenefitTableRow tableRow : table.getChildRows()) {
                 while ( i * 12 <= tableRow.getMonths()) {
-                    maBenefitTableVacationBonByAnniversary.add(new SHrsBenefitTableByAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitBonusPercentage()));
+                    maBenefitTableVacationBonusAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), i, tableRow.getBenefitBonusPercentage()));
                     i++;
                 }
             }
@@ -1145,7 +1125,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         moTablePaneEmpAvailable.createTable(this);
         moTablePaneEmpAvailable.clearTableRows();
         
-        sql = "SELECT emp.*, bp.bp, dep.name, ct.code, tp.code, pay.name, a.street, a.street_num_ext, a.street_num_int, a.neighborhood, a.reference, " +
+        sql = "SELECT emp.*, CAST(emp.num AS UNSIGNED INTEGER) AS _emp_num, bp.bp, dep.name, ct.code, tp.code, pay.name, a.street, a.street_num_ext, a.street_num_int, a.neighborhood, a.reference, " +
                 "a.locality, a.county, a.state, a.zip_code, a.po_box, IF(cty.cty IS NULL, 'MÉXICO', cty.cty) AS f_cty " +
                 "FROM erp.hrsu_emp AS emp " +
                 "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = emp.fk_dep " +
@@ -1170,7 +1150,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             employeeId = resultSet.getInt("id_emp");
             row.setPrimaryKey(new int[] { employeeId });
             row.setPkEmployeeId(employeeId);
-            row.setEmployeeNumber(resultSet.getString("emp.num"));
+            row.setEmployeeNumber(resultSet.getInt("_emp_num"));
             row.setEmployeeName(resultSet.getString("bp.bp"));
             row.setActive(resultSet.getBoolean("emp.b_act"));
             row.setEmployeeCategory(resultSet.getString("ct.code"));
@@ -1280,33 +1260,35 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             }
             jtfBankAccount.setText(employee.getBankAccount());
             jtfBankAccount.setCaretPosition(0);
-            jtfSex.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueSexCategoryId(), employee.getFkCatalogueSexTypeId() }, SDbRegistry.FIELD_NAME) + "");
-            jtfMarital.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueMaritalStatusCategoryId(), employee.getFkCatalogueMaritalStatusTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfSex.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueSexClassId(), employee.getFkCatalogueSexTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfMarital.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueMaritalStatusClassId(), employee.getFkCatalogueMaritalStatusTypeId() }, SDbRegistry.FIELD_NAME) + "");
             jtfMarital.setCaretPosition(0);
-            jtfBloodType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueBloodTypeCategoryId(), employee.getFkCatalogueBloodTypeTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfBloodType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueBloodTypeClassId(), employee.getFkCatalogueBloodTypeTypeId() }, SDbRegistry.FIELD_NAME) + "");
             jtfBloodType.setCaretPosition(0);
-            jtfEducationType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueEducationCategoryId(), employee.getFkCatalogueEducationTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfEducationType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueEducationClassId(), employee.getFkCatalogueEducationTypeId() }, SDbRegistry.FIELD_NAME) + "");
             jtfEducationType.setCaretPosition(0);
             jtfMwzType.setText(miClient.getSession().readField(SModConsts.HRSU_TP_MWZ, new int[] { employee.getFkMwzTypeId() }, SDbRegistry.FIELD_NAME) + "");
             jtfMwzType.setCaretPosition(0);
             jtfWorkingHoursDay.setText(employee.getWorkingHoursDay() + "");
             
             if (employee.getXtaImageIconPhoto_n() != null) {
-                jlPhoto.setIcon(employee.getXtaImageIconPhoto_n());
-                jlPhoto.setText("");
+                jlImgPhoto.setIcon(employee.getXtaImageIconPhoto_n());
+                jlImgPhoto.setText("");
             }
             else {
-                jlPhoto.setIcon(null);
-                jlPhoto.setText("- FOTOGRAFÍA NO DISPONIBLE -");
+                jlImgPhoto.setIcon(null);
+                jlImgPhoto.setText(NO_PHOTO);
             }
+            
             if (employee.getXtaImageIconSignature_n() != null) {
-                jlSignature.setIcon(employee.getXtaImageIconSignature_n());
-                jlSignature.setText("");
+                jlImgSignature.setIcon(employee.getXtaImageIconSignature_n());
+                jlImgSignature.setText("");
             }
             else {
-                jlSignature.setIcon(null);
-                jlSignature.setText("- FIRMA NO DISPONIBLE -");
+                jlImgSignature.setIcon(null);
+                jlImgSignature.setText(NO_SIGNATURE);
             }
+            
             renderBenefit(employee);
             
             if (!mbHasRightEmpWage) {
@@ -1323,17 +1305,17 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private void renderBenefit(SDataEmployee employee) {
         double paymentDaily = 0;
         double settlementPaymentDaily = 0;
-        int benefitAnn = 0;
-        Date mtDateCut = null;
-        Date mtDateBase = null;
-        Date mtDateBaseAnn = null;
+        int benefitAnniv = 0;
+        Date dateCutOff = null;
+        Date dateBase = null;
+        Date dateBaseAnniv = null;
         boolean leapYear = false;
         int daysElapsed = 0;
         int daysElapsedAnn = 0;
         double daysProportionalAnnualBonus = 0;
         double daysProportionalVacations = 0;
         SDbConfig config = null;
-        SHrsBenefitTableByAnniversary benefitTableRow = null;
+        SHrsBenefitTableAnniversary benefitTableAnniversary = null;
         
         try {
             jlAnnualBonusPayProp.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
@@ -1341,69 +1323,68 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             jlVacationsBonusPayProp.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
             
             config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
-            mtDateCut = miClient.getSession().getCurrentDate();
-            leapYear = SLibTimeUtils.isLeapYear(SLibTimeUtils.digestYear(mtDateCut)[0]);
+            dateCutOff = miClient.getSession().getCurrentDate();
+            leapYear = SLibTimeUtils.isLeapYear(SLibTimeUtils.digestYear(dateCutOff)[0]);
             
-            benefitAnn = SHrsUtils.getSeniorityEmployee(miClient.getSession(), employee.getDateBenefits(), mtDateCut);
+            benefitAnniv = SHrsUtils.getSeniorityEmployee(employee.getDateBenefits(), dateCutOff);
             paymentDaily = (employee.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? employee.getSalary() :
                 (config.isFornightStandard() ? ((employee.getWage() * SHrsConsts.YEAR_MONTHS) / (SHrsConsts.FORNIGHT_FIXED_DAYS * SHrsConsts.YEAR_FORNIGHTS)) :
                 ((employee.getWage() * SHrsConsts.YEAR_MONTHS) / SHrsConsts.YEAR_DAYS)));
-            //settlementPaymentDaily = (employee.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? employee.getSalary() : (employee.getWage() / 30.04));
             settlementPaymentDaily = (employee.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? employee.getSalary() : (employee.getWage() / SHrsConsts.MONTH_DAYS_FIXED));
             
-            if (employee.getDateBenefits().compareTo(SLibTimeUtils.getBeginOfYear(mtDateCut)) >= 0) {
-                mtDateBaseAnn = employee.getDateBenefits();
+            if (employee.getDateBenefits().compareTo(SLibTimeUtils.getBeginOfYear(dateCutOff)) >= 0) {
+                dateBaseAnniv = employee.getDateBenefits();
             }
             else {
-                mtDateBaseAnn = SLibTimeUtils.getBeginOfYear(mtDateCut);
+                dateBaseAnniv = SLibTimeUtils.getBeginOfYear(dateCutOff);
             }
             
-            mtDateBase = SLibTimeUtils.addDate(employee.getDateBenefits(), benefitAnn, 0, 0);
+            dateBase = SLibTimeUtils.addDate(employee.getDateBenefits(), benefitAnniv, 0, 0);
             
-            jtfSeniority.setText(benefitAnn + "");
-            jtfSeniorityDays.setText(((int) SLibTimeUtils.getDaysDiff(mtDateCut, SLibTimeUtils.addDate(employee.getDateBenefits(), benefitAnn, 0, 0))) + "");
-            daysElapsed = ((int) SLibTimeUtils.getDaysDiff(mtDateCut, mtDateBase) + 1);
-            daysElapsedAnn = ((int) SLibTimeUtils.getDaysDiff(mtDateCut, mtDateBaseAnn) + 1);
-            benefitAnn = benefitAnn == 0 ? 1 : benefitAnn;
+            jtfSeniority.setText(benefitAnniv + "");
+            jtfSeniorityDays.setText(((int) SLibTimeUtils.getDaysDiff(dateCutOff, SLibTimeUtils.addDate(employee.getDateBenefits(), benefitAnniv, 0, 0))) + "");
+            daysElapsed = ((int) SLibTimeUtils.getDaysDiff(dateCutOff, dateBase) + 1);
+            daysElapsedAnn = ((int) SLibTimeUtils.getDaysDiff(dateCutOff, dateBaseAnniv) + 1);
+            benefitAnniv = benefitAnniv == 0 ? 1 : benefitAnniv;
             
             // Calculate annual bonus:
             
-            for (SHrsBenefitTableByAnniversary row : maBenefitTableAnnByAnniversarys) {
-                if (row.getBenefitAnn() <= benefitAnn) {
-                    benefitTableRow = row;
+            for (SHrsBenefitTableAnniversary anniversary : maBenefitTableAnnualBonusAnniversarys) {
+                if (anniversary.getBenefitAnn() <= benefitAnniv) {
+                    benefitTableAnniversary = anniversary;
                 }
             }
-            daysProportionalAnnualBonus = (benefitTableRow == null ? 0 : (daysElapsedAnn * benefitTableRow.getValue() / (leapYear ? SHrsConsts.YEAR_DAYS + 1 : SHrsConsts.YEAR_DAYS)));
+            daysProportionalAnnualBonus = (benefitTableAnniversary == null ? 0 : (daysElapsedAnn * benefitTableAnniversary.getValue() / (leapYear ? SHrsConsts.YEAR_DAYS + 1 : SHrsConsts.YEAR_DAYS)));
             
-            jtfAnnualBonusBenefit.setText(SLibUtils.DecimalFormatValue0D.format(benefitTableRow == null ? 0 : benefitTableRow.getValue()) + "");
-            jtfAnnualBonusPropPer.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableRow == null ? 0 : (daysProportionalAnnualBonus / benefitTableRow.getValue()))) + "");
+            jtfAnnualBonusBenefit.setText(SLibUtils.DecimalFormatValue0D.format(benefitTableAnniversary == null ? 0 : benefitTableAnniversary.getValue()) + "");
+            jtfAnnualBonusPropPer.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableAnniversary == null ? 0 : (daysProportionalAnnualBonus / benefitTableAnniversary.getValue()))) + "");
             jtfAnnualBonusProp.setText(SLibUtils.DecimalFormatValue2D.format(daysProportionalAnnualBonus) + "");
             jtfAnnualBonusPayProp.setText(SLibUtils.DecimalFormatValue2D.format(daysProportionalAnnualBonus * paymentDaily) + "");
             
-            // Calculate vacations:
+            // Calculate vacation:
             
-            for (SHrsBenefitTableByAnniversary row : maBenefitTableVacationByAnniversary) {
-                if (row.getBenefitAnn() <= benefitAnn) {
-                    benefitTableRow = row;
+            for (SHrsBenefitTableAnniversary anniversary : maBenefitTableVacationAnniversarys) {
+                if (anniversary.getBenefitAnn() <= benefitAnniv) {
+                    benefitTableAnniversary = anniversary;
                 }
             }
-            daysProportionalVacations = (benefitTableRow == null ? 0 : (daysElapsed * benefitTableRow.getValue() / (leapYear ? SHrsConsts.YEAR_DAYS + 1 : SHrsConsts.YEAR_DAYS)));
+            daysProportionalVacations = (benefitTableAnniversary == null ? 0 : (daysElapsed * benefitTableAnniversary.getValue() / (leapYear ? SHrsConsts.YEAR_DAYS + 1 : SHrsConsts.YEAR_DAYS)));
             
-            jtfVacationsBenefit.setText(SLibUtils.DecimalFormatValue0D.format(benefitTableRow == null ? 0 : benefitTableRow.getValue()) + "");
-            jtfVacationsPropPer.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableRow == null ? 0 : (daysProportionalVacations / benefitTableRow.getValue()))) + "");
+            jtfVacationsBenefit.setText(SLibUtils.DecimalFormatValue0D.format(benefitTableAnniversary == null ? 0 : benefitTableAnniversary.getValue()) + "");
+            jtfVacationsPropPer.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableAnniversary == null ? 0 : (daysProportionalVacations / benefitTableAnniversary.getValue()))) + "");
             jtfVacationsProp.setText(SLibUtils.DecimalFormatValue2D.format(daysProportionalVacations) + "");
             jtfVacationsPayProp.setText(SLibUtils.DecimalFormatValue2D.format(daysProportionalVacations * paymentDaily) + "");
             
-            // Calculate vacations bonus:
+            // Calculate vacation bonus:
             
-            for (SHrsBenefitTableByAnniversary row : maBenefitTableVacationBonByAnniversary) {
-                if (row.getBenefitAnn() <= benefitAnn) {
-                    benefitTableRow = row;
+            for (SHrsBenefitTableAnniversary anniversary : maBenefitTableVacationBonusAnniversarys) {
+                if (anniversary.getBenefitAnn() <= benefitAnniv) {
+                    benefitTableAnniversary = anniversary;
                 }
             }
             
-            jtfVacationsBonusBenefit.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableRow == null ? 0 : benefitTableRow.getValue())) + "");
-            jtfVacationsBonusPayProp.setText(SLibUtils.DecimalFormatValue2D.format((benefitTableRow == null ? 0 : (daysProportionalVacations * benefitTableRow.getValue() * paymentDaily))) + "");
+            jtfVacationsBonusBenefit.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableAnniversary == null ? 0 : benefitTableAnniversary.getValue())) + "");
+            jtfVacationsBonusPayProp.setText(SLibUtils.DecimalFormatValue2D.format((benefitTableAnniversary == null ? 0 : (daysProportionalVacations * benefitTableAnniversary.getValue() * paymentDaily))) + "");
             renderSettlement(Integer.parseInt(jtfSeniority.getText()), Integer.parseInt(jtfSeniorityDays.getText()), settlementPaymentDaily, config.getFkMwzReferenceTypeId());
         }
         catch (Exception e) {

@@ -140,6 +140,7 @@ import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataBizPartnerBlocking;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataCfdPacType;
+import erp.mtrn.data.SDataCfdPayment;
 import erp.mtrn.data.SDataCfdSignLog;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.SDataDiogDocumentNumberSeries;
@@ -212,7 +213,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Sergio Flores
  */
 public abstract class SDataUtilities {
 
@@ -711,6 +712,9 @@ public abstract class SDataUtilities {
                 break;
             case SDataConstants.TRN_CFD_SIGN_LOG:
                 registry = new SDataCfdSignLog();
+                break;
+            case SDataConstants.TRNX_CFD_PAY_REC:
+                registry = new SDataCfdPayment();
                 break;
             case SDataConstants.TRN_PAC:
                 registry = new SDataPac();
@@ -2961,6 +2965,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_TRN_STK_MOV_SUM:
                 name = "reps/trn_stk_mov_sum.jasper";
                 break;
+            case SDataConstantsSys.REP_TRN_STK_MOV_SUM_SUM:
+                name = "reps/trn_stk_mov_sum_sum.jasper";
+                break;
             case SDataConstantsSys.REP_TRN_PS:
                 name = "reps/trn_ps.jasper";
                 break;
@@ -3038,6 +3045,9 @@ public abstract class SDataUtilities {
                 break;
             case SDataConstantsSys.REP_TRN_CFDI_33:
                 name = "reps/trn_cfdi_33.jasper";
+                break;
+            case SDataConstantsSys.REP_TRN_CFDI_33_CRP_10:
+                name = "reps/trn_cfdi_33_crp_10.jasper";
                 break;
             case SDataConstantsSys.REP_TRN_CFDI_PAYROLL:
                 name = "reps/trn_cfdi_payroll.jasper";
@@ -3630,5 +3640,5 @@ public abstract class SDataUtilities {
         }
 
         return costCenter;
-    }
+    }   
 }

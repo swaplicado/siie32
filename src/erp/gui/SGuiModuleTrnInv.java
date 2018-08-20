@@ -26,6 +26,7 @@ import erp.mtrn.data.STrnDiogComplement;
 import erp.mtrn.form.SDialogDiogSaved;
 import erp.mtrn.form.SDialogRepStock;
 import erp.mtrn.form.SDialogRepStockMoves;
+import erp.mtrn.form.SDialogRepStockMovesSumSum;
 import erp.mtrn.form.SDialogRepStockPeriod;
 import erp.mtrn.form.SDialogRepStockTrackingLot;
 import erp.mtrn.form.SDialogUtilStockClosing;
@@ -115,7 +116,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiIogMaintStockToolLost;
     private javax.swing.JMenuItem jmiIogMaintStockTool;
     private javax.swing.JMenuItem jmiIogMaintMovementPart;
+    private javax.swing.JMenuItem jmiIogMaintMovementPartDetail;
     private javax.swing.JMenuItem jmiIogMaintMovementTool;
+    private javax.swing.JMenuItem jmiIogMaintMovementToolDetail;
     private javax.swing.JMenuItem jmiIogMaintMovementToolLent;
     private javax.swing.JMenuItem jmiIogMaintMovementToolMaint;
     private javax.swing.JMenuItem jmiIogMaintMovementToolLost;
@@ -145,6 +148,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiReportStock;
     private javax.swing.JMenuItem jmiReportStockPeriod;
     private javax.swing.JMenuItem jmiReportStockMoves;
+    private javax.swing.JMenuItem jmiReportStockMovesSumSum;
     private javax.swing.JMenuItem jmiReportStockTrackingLot;
     private javax.swing.JMenu jmMenuRepStats;
     private javax.swing.JMenuItem jmiRepStatsMfgConsumePendMass;
@@ -156,6 +160,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepStock moDialogRepStock;
     private erp.mtrn.form.SDialogRepStockPeriod moDialogRepStockPeriod;
     private erp.mtrn.form.SDialogRepStockMoves moDialogRepStockMoves;
+    private erp.mtrn.form.SDialogRepStockMovesSumSum moDialogRepStockMovesSumSum;
     private erp.mtrn.form.SDialogRepStockTrackingLot moDialogRepStockTrackingLot;
     private erp.mtrn.form.SFormDiog moFormDiog;
     private erp.mtrn.form.SFormMaintDiog moFormMaintDiog;
@@ -326,7 +331,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMfgConsumePend.addActionListener(this);
         jmiMfgConsumePendEntry.addActionListener(this);
         jmiMfgConsumed.addActionListener(this);
-        jmiMfgConsumedEntry.addActionListener(this);
+        jmiMfgConsumedEntry.addActionListener(this);    
 
         jmMenuIog = new JMenu("Docs. inventarios");
         jmiIogStock = new JMenuItem("Docs. inventarios");
@@ -348,7 +353,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMaintStockToolLost = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase());
         jmiIogMaintStockTool = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase() + " (todas)");
         jmiIogMaintMovementPart = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase());
+        jmiIogMaintMovementPartDetail = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase() + " a detalle");      
         jmiIogMaintMovementTool = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase());
+        jmiIogMaintMovementToolDetail = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase() + " a detalle");
         jmiIogMaintMovementToolLent = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LENT.toLowerCase());
         jmiIogMaintMovementToolMaint = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_MAINT.toLowerCase());
         jmiIogMaintMovementToolLost = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase());
@@ -390,7 +397,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmIogMaint.add(jmiIogMaintStockTool);
         jmIogMaint.addSeparator();
         jmIogMaint.add(jmiIogMaintMovementPart);
+        jmIogMaint.add(jmiIogMaintMovementPartDetail);
         jmIogMaint.add(jmiIogMaintMovementTool);
+        jmIogMaint.add(jmiIogMaintMovementToolDetail);
         jmIogMaint.addSeparator();
         jmIogMaint.add(jmiIogMaintMovementToolLent);
         jmIogMaint.add(jmiIogMaintMovementToolMaint);
@@ -432,7 +441,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMaintStockToolLost.addActionListener(this);
         jmiIogMaintStockTool.addActionListener(this);
         jmiIogMaintMovementPart.addActionListener(this);
+        jmiIogMaintMovementPartDetail.addActionListener(this);
         jmiIogMaintMovementTool.addActionListener(this);
+        jmiIogMaintMovementToolDetail.addActionListener(this);
         jmiIogMaintMovementToolLent.addActionListener(this);
         jmiIogMaintMovementToolMaint.addActionListener(this);
         jmiIogMaintMovementToolLost.addActionListener(this);
@@ -481,14 +492,17 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiReportStock = new JMenuItem("Reporte de existencias...");
         jmiReportStockPeriod = new JMenuItem("Reporte de existencias por periodo...");
         jmiReportStockMoves = new JMenuItem("Reporte de movimientos de inventarios...");
+        jmiReportStockMovesSumSum = new JMenuItem("Resumen de movimientos de inventarios...");
         jmiReportStockTrackingLot = new JMenuItem("Reporte de rastreo de lotes...");
         jmMenuRep.add(jmiReportStock);
         jmMenuRep.add(jmiReportStockPeriod);
         jmMenuRep.add(jmiReportStockMoves);
+        jmMenuRep.add(jmiReportStockMovesSumSum);
         jmMenuRep.add(jmiReportStockTrackingLot);
         jmiReportStock.addActionListener(this);
         jmiReportStockPeriod.addActionListener(this);
         jmiReportStockMoves.addActionListener(this);
+        jmiReportStockMovesSumSum.addActionListener(this);
         jmiReportStockTrackingLot.addActionListener(this);
 
         jmMenuRepStats = new JMenu("Estadísticas de producción");
@@ -606,6 +620,16 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         moDialogRepStockMoves.formRefreshCatalogues();
         moDialogRepStockMoves.formReset();
         moDialogRepStockMoves.setFormVisible(true);
+    }
+    
+    private void menuRepStockMovesSumSum() {
+        if (moDialogRepStockMovesSumSum == null) {
+            moDialogRepStockMovesSumSum= new SDialogRepStockMovesSumSum(miClient, SDataConstants.ITMU_ITEM, SDataConstants.BPSU_BP );
+        }
+
+        moDialogRepStockMovesSumSum.formRefreshCatalogues();
+        moDialogRepStockMovesSumSum.formReset();
+        moDialogRepStockMovesSumSum.setFormVisible(true);
     }
 
     private void menuRepStockTrackingLot() {
@@ -916,10 +940,26 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                     title = "Docs. ";
                     switch (auxType01){
                         case SModSysConsts.TRNX_MAINT_PART:
-                            title += "consumos " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase();
-                            break;
+                            switch (auxType02) {
+                                case SUtilConsts.PER_ITM:
+                                    title += "consumos " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase() + " a detalle";
+                                    break;
+                                case SUtilConsts.PER_DOC:                           
+                                    title += "consumos " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase();
+                                    break;
+                                default:
+                            }
+                            break;                        
                         case SModSysConsts.TRNX_MAINT_TOOL:
-                            title += "consumos " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase();
+                            switch (auxType02) {
+                                case SUtilConsts.PER_ITM:
+                                    title += "consumos " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase()  + " a detalle";
+                                    break;
+                                case SUtilConsts.PER_DOC:                           
+                                    title += "consumos " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase();
+                                    break;
+                                default:
+                            }
                             break;
                         case SModSysConsts.TRNX_MAINT_TOOL_LENT:
                             title += SModSysConsts.TXT_TRNX_MAINT_TOOL_LENT.toLowerCase();
@@ -1328,10 +1368,16 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                 showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL);
             }
             else if (item == jmiIogMaintMovementPart) {
-                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_PART);
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_PART, SUtilConsts.PER_DOC);
+            }
+            else if (item == jmiIogMaintMovementPartDetail) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_PART, SUtilConsts.PER_ITM);
             }
             else if (item == jmiIogMaintMovementTool) {
-                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL);
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL, SUtilConsts.PER_DOC);
+            }
+            else if (item == jmiIogMaintMovementToolDetail) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL, SUtilConsts.PER_ITM);
             }
             else if (item == jmiIogMaintMovementToolLent) {
                 showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL_LENT);
@@ -1405,6 +1451,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiReportStockMoves) {
                 menuRepStockMoves();
+            }
+            else if (item == jmiReportStockMovesSumSum) {
+                menuRepStockMovesSumSum();
             }
             else if (item == jmiReportStockTrackingLot) {
                 menuRepStockTrackingLot();

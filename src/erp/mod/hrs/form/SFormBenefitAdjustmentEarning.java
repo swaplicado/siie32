@@ -30,7 +30,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemListener, ChangeListener {
 
@@ -294,7 +294,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
 
         moKeyEmployee.setValue(new int[] { idEmployee });
         moKeyBenefitType.setValue(new int[] { moRegistry.getFkBenefitTypeId() });
-        jsAnniversary.setValue((Integer) moRegistry.getBenefitAniversary() == 0 ? (Integer) 1 : (Integer) moRegistry.getBenefitAniversary());
+        jsAnniversary.setValue((Integer) moRegistry.getBenefitAnniversary() == 0 ? (Integer) 1 : (Integer) moRegistry.getBenefitAnniversary());
         moIntBenefitYear.setValue(moRegistry.getBenefitYear());
         moDateDate.setValue(earningComplement.getDate());
         moDecDaysToPaid.setValue(moRegistry.getUnitsAlleged());
@@ -326,7 +326,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
         registry.setAmount_r(moCurPayment.getField().getValue());
         registry.setAutomatic(true);
         registry.setAlternativeTaxCalculation(earning.isAlternativeTaxCalculation());// XXX (jbarajas, 2016-04-06) articule 174 RLISR
-        registry.setBenefitAniversary((Integer) jsAnniversary.getValue());
+        registry.setBenefitAnniversary((Integer) jsAnniversary.getValue());
         registry.setBenefitYear(moIntBenefitYear.getValue());
         registry.setFkEarningTypeId(earning.getFkEarningTypeId());
         registry.setFkEarningId(earning.getPkEarningId());

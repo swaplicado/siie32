@@ -210,6 +210,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinLayoutBankAdvances;
     private javax.swing.JMenuItem jmiFinLayoutBankPendingAdvances;
     private javax.swing.JMenuItem jmiFinLayoutBankDoneAdvances;
+    private javax.swing.JMenuItem jmiFinCfdPayment;
     private javax.swing.JMenuItem jmiFinImportPayments;
 
     private javax.swing.JMenu jmRep;
@@ -360,29 +361,6 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     }
 
     private void initComponents() {
-        boolean hasYearRight = false;
-        boolean hasYearPeriodRight = false;
-        boolean hasExcRateRight = false;
-        boolean hasCatAccRight = false;
-        boolean hasCatCcRight = false;
-        boolean hasCatAccCashRight = false;
-        boolean hasCatBkcRight = false;
-        boolean hasCatCheckRight = false;
-        boolean hasCatTaxRight = false;
-        boolean hasBkrRight = false;
-        boolean hasAutAccBpRight = false;
-        boolean hasAutAccItemRight = false;
-        boolean hasMoveAccCash = false;
-        boolean hasMoveBpCdr = false;
-        boolean hasMoveBpDbr = false;
-        boolean hasCounterReceiptRight = false;
-        boolean hasRepRight = false;
-        boolean hasRepStatementRight = false;
-        boolean hasRepFinRateRight = false;
-        boolean hasGblCatAccCfg = false;
-        boolean hasGblCatAccTax = false;
-        boolean hasGblCatAccMisc = false;
-
         jmCfg = new JMenu("Configuración");
 
         jmiCfgAbp = new JMenu("Paquetes de contabilización automática");
@@ -559,7 +537,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin = new JMenu("Finanzas");
 
         jmiFinExchangeRate = new JMenuItem("Tipos de cambio");
-        jmiFinExchangeRateAdjusment = new JMenuItem("Ajuste de tipo de cambio");
+        jmiFinExchangeRateAdjusment = new JMenuItem("Valuación de saldos en moneda extranjera");
         jmiFinExchangeDifferenceDps = new JMenuItem("Diferencias cambiarias en documentos pagados");
         jmiFinCashCheck = new JMenuItem("Cheques");
         jmiFinCashCounterReceipt = new JMenuItem("Contrarrecibos");
@@ -570,9 +548,11 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankAdvances = new JMenuItem("Layouts de anticipos");
         jmiFinLayoutBankPendingAdvances = new JMenuItem("Layouts de anticipos por pagar");
         jmiFinLayoutBankDoneAdvances = new JMenuItem("Layouts de anticipos pagados");
+        jmiFinCfdPayment = new JMenuItem("CFDI recepción de pagos");
         jmiFinImportPayments = new JMenuItem("Importación de pagos BBVA");
 
         jmFin.add(jmiFinExchangeRate);
+        jmFin.addSeparator();
         jmFin.add(jmiFinExchangeRateAdjusment);
         jmFin.add(jmiFinExchangeDifferenceDps);
         jmFin.addSeparator();
@@ -586,8 +566,13 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.add(jmiFinLayoutBankAdvances);
         jmFin.add(jmiFinLayoutBankPendingAdvances);
         jmFin.add(jmiFinLayoutBankDoneAdvances);
-//        jmFin.addSeparator();
-//        jmFin.add(jmiFinImportPayments);
+        jmFin.addSeparator();
+        jmFin.add(jmiFinCfdPayment);
+        jmiFinCfdPayment.setEnabled(false);
+        /* XXX Not released yet! (2018-05-03, Sergio Flores)
+        jmFin.addSeparator();
+        jmFin.add(jmiFinImportPayments);
+        */
 
         jmRep = new JMenu("Reportes");
 
@@ -855,6 +840,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankAdvances.addActionListener(this);
         jmiFinLayoutBankPendingAdvances.addActionListener(this);
         jmiFinLayoutBankDoneAdvances.addActionListener(this);
+        jmiFinCfdPayment.addActionListener(this);
         jmiFinImportPayments.addActionListener(this);
 
         jmiCfgAbpEntityCash.addActionListener(this);
@@ -940,122 +926,140 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         // User rights:
 
-        hasYearRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_YEAR).HasRight;
-        hasYearPeriodRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_PER).HasRight;
-        hasExcRateRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_EXC_RATE).HasRight;
-        hasCatAccRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_ACC).HasRight;
-        hasCatAccCashRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_ACC_CASH).HasRight;
-        hasCatCcRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_CC).HasRight;
-        hasCatBkcRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_BKC).HasRight;
-        hasCatCheckRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_CHECK).HasRight;
-        hasCatTaxRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_TAX_GRP).HasRight;
-        hasBkrRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_REG).HasRight;
-        hasAutAccBpRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_ACC_BP).HasRight;
-        hasAutAccItemRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_ACC_ITEM).HasRight;
-        hasMoveAccCash = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_MOV_ACC_CASH).HasRight;
-        hasMoveBpCdr = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_MOV_CDR).HasRight;
-        hasMoveBpDbr = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_MOV_DBR).HasRight;
+        boolean hasRightYear = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_YEAR).HasRight;
+        boolean hasRightYearPeriod = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_PER).HasRight;
+        boolean hasRightExcRate = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_EXC_RATE).HasRight;
+        boolean hasRightCatAcc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_ACC).HasRight;
+        boolean hasRightCatAccCash = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_ACC_CASH).HasRight;
+        boolean hasRightCatCc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_CC).HasRight;
+        boolean hasRightCatCheck = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_CHECK).HasRight;
+        boolean hasRightCatTax = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_TAX_GRP).HasRight;
+        boolean hasRightBookkeeping = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_REC).HasRight;
+        boolean hasRightAutAccBp = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_ACC_BP).HasRight;
+        boolean hasRightAutAccItem = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_ACC_ITEM).HasRight;
+        boolean hasRightMoveAccCash = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_MOV_ACC_CASH).HasRight;
+        boolean hasRightMoveBpCdr = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_MOV_CDR).HasRight;
+        boolean hasRightMoveBpDbr = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_MOV_DBR).HasRight;
 
-        hasCounterReceiptRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_COUNTER_RCPT).HasRight;
-        hasRepStatementRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_REP_STATS).HasRight;
-        hasRepFinRateRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_REP_INDEX).HasRight;
-        hasRepRight = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_REP).HasRight;
-        hasGblCatAccCfg = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_FIN_ACC_CFG).HasRight;
-        hasGblCatAccTax = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_FIN_ACC_TAX).HasRight;
-        hasGblCatAccMisc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_FIN_ACC_MISC).HasRight;
+        boolean hasRightCounterRcpt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_COUNTER_RCPT).HasRight;
+        boolean hasRightRepStats = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_REP_STATS).HasRight;
+        boolean hasRightRep = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_REP).HasRight;
+        boolean hasRightGblCatAccCfg = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_FIN_ACC_CFG).HasRight;
+        boolean hasRightGblCatAccTax = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_FIN_ACC_TAX).HasRight;
+        boolean hasRightGblCatAccMisc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_FIN_ACC_MISC).HasRight;
 
-        jmCfg.setEnabled(hasGblCatAccCfg || hasAutAccBpRight || hasAutAccItemRight || hasGblCatAccTax);
+        jmCfg.setEnabled(hasRightGblCatAccCfg || hasRightAutAccBp || hasRightAutAccItem || hasRightGblCatAccTax);
 
-        jmCfgAbpLink.setEnabled(hasGblCatAccCfg || hasAutAccBpRight || hasAutAccItemRight);
-        jmiCfgAbpLinkCashAccount.setEnabled(hasGblCatAccCfg);
-        jmiCfgAbpLinkWarehouse.setEnabled(hasGblCatAccCfg);
-        jmiCfgAbpLinkPlant.setEnabled(hasGblCatAccCfg);
-        jmiCfgAbpLinkBizPartner.setEnabled(hasAutAccBpRight);
-        jmiCfgAbpLinkItem.setEnabled(hasAutAccItemRight);
-        jmiCfgAccItemLink.setEnabled(hasAutAccItemRight);
-        jmiCfgTaxItemLink.setEnabled(hasAutAccItemRight);
-        jmiCfgAbp.setEnabled(hasGblCatAccCfg || hasAutAccBpRight || hasAutAccItemRight || hasGblCatAccTax);
-        jmiCfgAbpEntityCash.setEnabled(hasGblCatAccCfg);
-        jmiCfgAbpEntityWarehouse.setEnabled(hasGblCatAccCfg);
-        jmiCfgAbpEntityPlant.setEnabled(hasGblCatAccCfg);
-        jmiCfgAbpBizPartner.setEnabled(hasAutAccBpRight);
-        jmiCfgAbpItem.setEnabled(hasAutAccItemRight);
-        jmiCfgAbpTax.setEnabled(hasGblCatAccTax);
+        jmCfgAbpLink.setEnabled(hasRightGblCatAccCfg || hasRightAutAccBp || hasRightAutAccItem);
+        jmiCfgAbpLinkCashAccount.setEnabled(hasRightGblCatAccCfg);
+        jmiCfgAbpLinkWarehouse.setEnabled(hasRightGblCatAccCfg);
+        jmiCfgAbpLinkPlant.setEnabled(hasRightGblCatAccCfg);
+        jmiCfgAbpLinkBizPartner.setEnabled(hasRightAutAccBp);
+        jmiCfgAbpLinkItem.setEnabled(hasRightAutAccItem);
+        jmiCfgAccItemLink.setEnabled(hasRightAutAccItem);
+        jmiCfgTaxItemLink.setEnabled(hasRightAutAccItem);
+        jmiCfgAbp.setEnabled(hasRightGblCatAccCfg || hasRightAutAccBp || hasRightAutAccItem || hasRightGblCatAccTax);
+        jmiCfgAbpEntityCash.setEnabled(hasRightGblCatAccCfg);
+        jmiCfgAbpEntityWarehouse.setEnabled(hasRightGblCatAccCfg);
+        jmiCfgAbpEntityPlant.setEnabled(hasRightGblCatAccCfg);
+        jmiCfgAbpBizPartner.setEnabled(hasRightAutAccBp);
+        jmiCfgAbpItem.setEnabled(hasRightAutAccItem);
+        jmiCfgAbpTax.setEnabled(hasRightGblCatAccTax);
 
         jmCat.setEnabled(
-                hasGblCatAccCfg || hasExcRateRight || hasGblCatAccTax || hasGblCatAccMisc ||
-                hasCatAccRight || hasCatCcRight || hasCatAccCashRight || hasCatBkcRight || hasCatCheckRight || hasCatTaxRight ||
-                hasBkrRight || hasAutAccBpRight || hasAutAccItemRight);
-        jmiCatAccount.setEnabled(hasGblCatAccCfg || hasCatAccRight);
-        jmiCatFiscalAccount.setEnabled(hasGblCatAccCfg || hasCatAccRight);
-        jmiCatCostCenter.setEnabled(hasGblCatAccCfg || hasCatCcRight);
-        jmiCatCashAccountCash.setEnabled(hasGblCatAccCfg || hasCatAccCashRight);
-        jmiCatCashAccountBank.setEnabled(hasGblCatAccCfg || hasCatAccCashRight);
-        jmiCatCardIssuer.setEnabled(hasGblCatAccCfg || hasCatAccCashRight);
-        jmiCatCheckWallet.setEnabled(hasGblCatAccCfg || hasCatCheckRight);
-        jmiCatCheckFormat.setEnabled(hasGblCatAccCfg || hasCatCheckRight);
-        jmiCatTaxRegion.setEnabled(hasGblCatAccCfg || hasCatTaxRight);
-        jmiCatTaxIdentity.setEnabled(hasGblCatAccCfg || hasCatTaxRight);
-        jmiCatTaxBasic.setEnabled(hasGblCatAccCfg || hasGblCatAccTax || hasCatTaxRight);
-        jmiCatTaxGroup.setEnabled(hasGblCatAccCfg || hasGblCatAccTax || hasCatTaxRight);
-        jmiCatConceptAdministrativeType.setEnabled(hasGblCatAccCfg || hasGblCatAccMisc);
-        jmiCatConceptTaxableType.setEnabled(hasGblCatAccCfg || hasGblCatAccMisc);
+                hasRightGblCatAccCfg || hasRightGblCatAccTax || hasRightGblCatAccMisc ||
+                hasRightCatAcc || hasRightCatCc || hasRightCatAccCash || hasRightCatCheck || hasRightCatTax ||
+                hasRightAutAccBp || hasRightAutAccItem);
+        jmiCatAccount.setEnabled(hasRightGblCatAccCfg || hasRightCatAcc);
+        jmiCatFiscalAccount.setEnabled(hasRightGblCatAccCfg || hasRightCatAcc);
+        jmiCatCostCenter.setEnabled(hasRightGblCatAccCfg || hasRightCatCc);
+        jmiCatCashAccountCash.setEnabled(hasRightGblCatAccCfg || hasRightCatAccCash);
+        jmiCatCashAccountBank.setEnabled(hasRightGblCatAccCfg || hasRightCatAccCash);
+        jmiCatCardIssuer.setEnabled(hasRightGblCatAccCfg || hasRightCatAccCash);
+        jmiCatCheckWallet.setEnabled(hasRightGblCatAccCfg || hasRightCatCheck);
+        jmiCatCheckFormat.setEnabled(hasRightGblCatAccCfg || hasRightCatCheck);
+        jmiCatTaxRegion.setEnabled(hasRightGblCatAccCfg || hasRightCatTax);
+        jmiCatTaxIdentity.setEnabled(hasRightGblCatAccCfg || hasRightCatTax);
+        jmiCatTaxBasic.setEnabled(hasRightGblCatAccCfg || hasRightGblCatAccTax || hasRightCatTax);
+        jmiCatTaxGroup.setEnabled(hasRightGblCatAccCfg || hasRightGblCatAccTax || hasRightCatTax);
+        jmiCatConceptAdministrativeType.setEnabled(hasRightGblCatAccCfg || hasRightGblCatAccMisc);
+        jmiCatConceptTaxableType.setEnabled(hasRightGblCatAccCfg || hasRightGblCatAccMisc);
 
-        jmCatSysAcc.setEnabled(hasGblCatAccCfg || hasGblCatAccTax || hasAutAccBpRight || hasAutAccItemRight);
+        jmCatSysAcc.setEnabled(hasRightGblCatAccCfg || hasRightGblCatAccTax || hasRightAutAccBp || hasRightAutAccItem);
         //jmiCatSysAccTaxGroupForItem.setEnabled(hasGblCatAccTax);
         jmiCatSysAccTaxGroupForItem.setEnabled(false);          // no longer needed (sflores, 2013-11-12)
         //jmiCatSysAccTaxGroupForItemGeneric.setEnabled(hasGblCatAccTax);
         jmiCatSysAccTaxGroupForItemGeneric.setEnabled(false);   // no longer needed (sflores, 2013-11-12)
-        jmiCatSysAccAccountForBizPartner.setEnabled(hasAutAccBpRight);
-        jmiCatSysAccAccountForItem.setEnabled(hasAutAccItemRight);
-        jmiCatSysAccAccountForTax.setEnabled(hasGblCatAccTax);
-        jmiCatSysAccCostCenterForItem.setEnabled(hasGblCatAccCfg);
+        jmiCatSysAccAccountForBizPartner.setEnabled(hasRightAutAccBp);
+        jmiCatSysAccAccountForItem.setEnabled(hasRightAutAccItem);
+        jmiCatSysAccAccountForTax.setEnabled(hasRightGblCatAccTax);
+        jmiCatSysAccCostCenterForItem.setEnabled(hasRightGblCatAccCfg);
 
-        jmBkk.setEnabled(hasYearRight || hasYearPeriodRight);
-        jmiBkkYearOpenClose.setEnabled(hasYearPeriodRight);
-        jmiBkkFiscalYearClosing.setEnabled(hasYearRight);
-        jmiBkkFiscalYearClosingDel.setEnabled(hasYearRight);
-        jmiBkkFiscalYearOpening.setEnabled(hasYearRight);
-        jmiBkkFiscalYearOpeningDel.setEnabled(hasYearRight);
+        jmBkk.setEnabled(hasRightYear || hasRightYearPeriod);
+        jmiBkkYearOpenClose.setEnabled(hasRightYearPeriod);
+        jmiBkkFiscalYearClosing.setEnabled(hasRightYear);
+        jmiBkkFiscalYearClosingDel.setEnabled(hasRightYear);
+        jmiBkkFiscalYearOpening.setEnabled(hasRightYear);
+        jmiBkkFiscalYearOpeningDel.setEnabled(hasRightYear);
 
-        jmRec.setEnabled(hasBkrRight || hasRepRight || hasMoveAccCash || hasMoveBpCdr || hasMoveBpDbr);
-        jmiRecRec.setEnabled(hasBkrRight);
-        jmiRecRecEtyXmlIncome.setEnabled(hasBkrRight);
-        jmiRecRecEtyXmlExpenses.setEnabled(hasBkrRight);
-        jmiRecRecCash.setEnabled(hasBkrRight);
-        jmiRecRecCash.setEnabled(false);    // XXX temporal code!!! (sflores, 2013-07-27)
-        jmiRecAud.setEnabled(hasBkrRight);
-        jmiRecAudPend.setEnabled(hasBkrRight);
-        jmiRecBal.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecBalAll.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecCashAccBalountCash.setEnabled(hasBkrRight || hasMoveAccCash || hasRepRight);
-        jmiRecCashAccBalountBank.setEnabled(hasBkrRight || hasMoveAccCash || hasRepRight);
-        jmiRecBizPartnerBalCus.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecBizPartnerBalSup.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecBizPartnerBalDbr.setEnabled(hasBkrRight || hasMoveBpDbr || hasRepRight);
-        jmiRecBizPartnerBalCdr.setEnabled(hasBkrRight || hasMoveBpCdr || hasRepRight);
-        jmiRecBalInventory.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecBalTaxDebit.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecBalTaxCredit.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecBalProfitLoss.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecBookkeepingMoves.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecDpsBizPartnerCus.setEnabled(hasBkrRight || hasRepRight);
-        jmiRecDpsBizPartnerSup.setEnabled(hasBkrRight || hasRepRight);
+        jmRec.setEnabled(hasRightBookkeeping || hasRightRep || hasRightMoveAccCash || hasRightMoveBpCdr || hasRightMoveBpDbr);
+        jmiRecRec.setEnabled(hasRightBookkeeping);
+        jmiRecRecEtyXmlIncome.setEnabled(hasRightBookkeeping);
+        jmiRecRecEtyXmlExpenses.setEnabled(hasRightBookkeeping);
+        jmiRecRecCash.setEnabled(hasRightBookkeeping || hasRightMoveAccCash);
+        jmiRecAud.setEnabled(hasRightBookkeeping);
+        jmiRecAudPend.setEnabled(hasRightBookkeeping);
+        jmiRecBal.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecBalAll.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecCashAccBalountCash.setEnabled(hasRightBookkeeping || hasRightMoveAccCash || hasRightRep);
+        jmiRecCashAccBalountBank.setEnabled(hasRightBookkeeping || hasRightMoveAccCash || hasRightRep);
+        jmiRecBizPartnerBalCus.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecBizPartnerBalSup.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecBizPartnerBalDbr.setEnabled(hasRightBookkeeping || hasRightMoveBpDbr || hasRightRep);
+        jmiRecBizPartnerBalCdr.setEnabled(hasRightBookkeeping || hasRightMoveBpCdr || hasRightRep);
+        jmiRecBalInventory.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecBalTaxDebit.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecBalTaxCredit.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecBalProfitLoss.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecBookkeepingMoves.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecDpsBizPartnerCus.setEnabled(hasRightBookkeeping || hasRightRep);
+        jmiRecDpsBizPartnerSup.setEnabled(hasRightBookkeeping || hasRightRep);
 
-        jmFin.setEnabled(hasExcRateRight || hasMoveAccCash || hasCounterReceiptRight);
-        jmiFinExchangeRate.setEnabled(hasExcRateRight);
-        jmiFinCashCheck.setEnabled(hasMoveAccCash);
-        jmiFinCashCounterReceipt.setEnabled(hasCounterReceiptRight);
-        jmiFinLayoutBank.setEnabled(hasMoveAccCash);
-        jmiFinLayoutBankPending.setEnabled(hasMoveAccCash);
-        jmiFinLayoutBankDone.setEnabled(hasMoveAccCash);
-        jmiFinLayoutBankAdvances.setEnabled(hasMoveAccCash);
-        jmiFinLayoutBankPendingAdvances.setEnabled(hasMoveAccCash);
-        jmiFinLayoutBankDoneAdvances.setEnabled(hasMoveAccCash);
-        jmiFinImportPayments.setEnabled(hasMoveAccCash);
+        jmFin.setEnabled(hasRightExcRate || hasRightMoveAccCash || hasRightCounterRcpt);
+        jmiFinExchangeRate.setEnabled(hasRightExcRate);
+        jmiFinCashCheck.setEnabled(hasRightMoveAccCash);
+        jmiFinCashCounterReceipt.setEnabled(hasRightCounterRcpt);
+        jmiFinLayoutBank.setEnabled(hasRightMoveAccCash);
+        jmiFinLayoutBankPending.setEnabled(hasRightMoveAccCash);
+        jmiFinLayoutBankDone.setEnabled(hasRightMoveAccCash);
+        jmiFinLayoutBankAdvances.setEnabled(hasRightMoveAccCash);
+        jmiFinLayoutBankPendingAdvances.setEnabled(hasRightMoveAccCash);
+        jmiFinLayoutBankDoneAdvances.setEnabled(hasRightMoveAccCash);
+        jmiFinCfdPayment.setEnabled(hasRightMoveAccCash);
+        jmiFinImportPayments.setEnabled(hasRightMoveAccCash);
 
-        jmRep.setEnabled(hasRepRight || hasRepFinRateRight || hasRepStatementRight);
-        jmRepFinStat.setEnabled(hasRepStatementRight);
+        jmRep.setEnabled(hasRightRep || hasRightRepStats || hasRightMoveAccCash);
+        jmRepTrialBal.setEnabled(hasRightRep);
+        jmRepFinStat.setEnabled(hasRightRepStats);
+        jmRepCashAccBal.setEnabled(hasRightRep || hasRightMoveAccCash);
+        jmRepCashAccMovs.setEnabled(hasRightRep || hasRightMoveAccCash);
+        jmRepBizPartnerBal.setEnabled(hasRightRep);
+        jmRepBizPartnerBalAging.setEnabled(hasRightRep);
+        jmRepBizPartnerStat.setEnabled(hasRightRep);
+        jmRepBizPartnerAccMovs.setEnabled(hasRightRep);
+        jmiRepBizPartnerLedger.setEnabled(hasRightRep);
+        jmRepAccMovs.setEnabled(hasRightRep);
+        jmRepCashFlow.setEnabled(hasRightRep);
+        jmRepAccIncExp.setEnabled(hasRightRep);
+        jmiRepCashFlowExpected.setEnabled(hasRightRep);;
+        jmiRepLedgerAccount.setEnabled(hasRightRep);
+        jmiRepLedgerCostCenter.setEnabled(hasRightRep);
+        jmiRepConceptAdmin.setEnabled(hasRightRep);
+        jmiRepConceptTax.setEnabled(hasRightRep);
+        jmiRepPrtJournalVouchers.setEnabled(hasRightRep);
+        jmiRepPrtChartOfAccounts.setEnabled(hasRightRep);
+        jmiRepTaxesByConcept.setEnabled(hasRightRep);
+        jmRepFiscal.setEnabled(hasRightRep);
         
         // GUI configuration:
         
@@ -1147,6 +1151,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
             switch (formType) {
                 case SDataConstants.FIN_REC:
+                case SDataConstants.FINX_REC_CASH:
                     if (moFormRecord == null) {
                         moFormRecord = new SFormRecord(miClient);
                     }
@@ -1979,25 +1984,28 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 showView(SDataConstants.TRN_CTR);
             }
             else if (item == jmiFinLayoutBank) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_DPS, null);
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PAY, null);
             }
             else if (item == jmiFinLayoutBankPending) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_DPS, new SGuiParams(SModConsts.VIEW_ST_PEND));
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PAY, new SGuiParams(SModConsts.VIEW_ST_PEND));
             }
             else if (item == jmiFinLayoutBankDone) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_DPS, new SGuiParams(SModConsts.VIEW_ST_DONE));
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PAY, new SGuiParams(SModConsts.VIEW_ST_DONE));
             }
             else if (item == jmiFinLayoutBankAdvances) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_ADV, null);
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PREPAY, null);
             }
             else if (item == jmiFinLayoutBankPendingAdvances) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_ADV, new SGuiParams(SModConsts.VIEW_ST_PEND));
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PREPAY, new SGuiParams(SModConsts.VIEW_ST_PEND));
             }
             else if (item == jmiFinLayoutBankDoneAdvances) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_ADV, new SGuiParams(SModConsts.VIEW_ST_DONE));
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PREPAY, new SGuiParams(SModConsts.VIEW_ST_DONE));
+            }
+            else if (item == jmiFinCfdPayment) {
+                miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY_REC);
             }
             else if (item == jmiFinImportPayments) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK_DEP, SModSysConsts.FIN_LAY_BANK_DPS, null);
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK_DEP, SModSysConsts.FIN_LAY_BANK_PAY, null);
             }
             else if (item == jmiRepTrialBalStandard) {
                 new SDialogRepTrialBalanceDual(miClient, SDataConstants.FIN_ACC, false).setVisible(true);

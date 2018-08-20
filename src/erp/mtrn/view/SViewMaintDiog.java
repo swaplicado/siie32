@@ -27,15 +27,17 @@ import erp.table.STabFilterCompanyBranchEntity;
 import erp.table.STabFilterDocumentType;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
+import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -57,15 +59,22 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
      * @param auxType01 Use case of view: SModSysConsts.TRNX_MAINT_...
      */
     public SViewMaintDiog(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
-        super(client, tabTitle, SDataConstants.TRNX_MAINT_DIOG, auxType01);
+        this(client, tabTitle, auxType01, SUtilConsts.PER_DOC);
+    }
+
+    /**
+     * Creates view for stock-movements related to maintenance.
+     * @param client GUI client.
+     * @param tabTitle GUI-tab title.
+     * @param auxType01 Use case of view: SModSysConsts.TRNX_MAINT_...
+     * @param auxType02 Grouping level: by document (SUtilConsts.PER_DOC) or by item (SUtilConsts.PER_ITEM)
+     */
+    public SViewMaintDiog(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01, int auxType02) {
+        super(client, tabTitle, SDataConstants.TRNX_MAINT_DIOG, auxType01, auxType02);
         initComponents();
     }
 
     private void initComponents() {
-        int i = 0;
-        int levelRightInOtherInt = SDataConstantsSys.UNDEFINED;
-        int levelRightOutOtherInt = SDataConstantsSys.UNDEFINED;
-
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterCompanyBranchEntity = new STabFilterCompanyBranchEntity(miClient, this, SDataConstantsSys.CFGS_CT_ENT_WH);
@@ -247,8 +256,8 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
         jbPrint.setToolTipText("Imprimir documento");
         addTaskBarUpperComponent(jbPrint);
 
-        levelRightInOtherInt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_IN_INT).Level;
-        levelRightOutOtherInt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_OUT_INT).Level;
+        int levelRightInOtherInt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_IN_INT).Level;
+        int levelRightOutOtherInt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_OUT_INT).Level;
 
         jbNew.setEnabled(false);
         jbEdit.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR || levelRightOutOtherInt >=  SUtilConsts.LEV_AUTHOR);
@@ -265,48 +274,91 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
         jbViewNotes.setEnabled(true);
         jbPrint.setEnabled(true);
 
-        STableField[] aoKeyFields = new STableField[2];
-        STableColumn[] aoTableColumns = new STableColumn[28];
-
-        i = 0;
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "iog.id_year");
-        aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "iog.id_doc");
-        for (i = 0; i < aoKeyFields.length; i++) {
-            moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
+        STableField[] aoKeyFields;
+        STableColumn[] aoTableColumns;
+        
+        switch (mnTabTypeAux02) {
+            case SUtilConsts.PER_DOC:
+                aoKeyFields = new STableField[2];
+                aoTableColumns = new STableColumn[29];
+                break;
+            case SUtilConsts.PER_ITM:
+                aoKeyFields = new STableField[3];
+                aoTableColumns = new STableColumn[28];
+                break;
+            default:
+                aoKeyFields = null;
+                aoTableColumns = null;
         }
 
-        i = 0;
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "iog.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.code", "Código tipo doc.", STableConstants.WIDTH_CODE_DOC);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.tp_iog", "Tipo doc.", 125);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ent.code", "Almacén", STableConstants.WIDTH_CODE_COB_ENT);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "iog.val_r", "Valor $", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num_cp", "Folio doc. complemento", STableConstants.WIDTH_DOC_NUM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog_cp.code", "Código tipo doc. complemento", STableConstants.WIDTH_CODE_DOC);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog_cp.tp_iog", "Tipo doc. complemento", 125);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb_cp.code", "Sucursal empresa complemento", STableConstants.WIDTH_CODE_COB);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ent_cp.code", "Almacén complemento", STableConstants.WIDTH_CODE_COB_ENT);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rec", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "iog.ref", "Referencia", STableConstants.WIDTH_RECORD_NUM);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_audit", "Auditado", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaud.usr", "Usr. auditoría", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_audit", "Auditoría", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_authorn", "Autorizado", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaut.usr", "Usr. autorización", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_authorn", "Autorización", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_sys", "Sistema", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ue.usr", "Usr. modificación", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_edit", "Modificación", STableConstants.WIDTH_DATE_TIME);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ud.usr", "Usr. eliminación", STableConstants.WIDTH_USER);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_del", "Eliminación", STableConstants.WIDTH_DATE_TIME);
+        int field = 0;
+        switch (mnTabTypeAux02) {
+            case SUtilConsts.PER_DOC:
+                aoKeyFields[field++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "iog.id_year");
+                aoKeyFields[field++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "iog.id_doc");
+                break;
+            case SUtilConsts.PER_ITM:
+                aoKeyFields[field++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "ioge.id_year");
+                aoKeyFields[field++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "ioge.id_doc");
+                aoKeyFields[field++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "ioge.id_ety");
+                break;
+            default:
+                aoKeyFields = null;
+                aoTableColumns = null;
+        }
+        
+        for (field = 0; field < aoKeyFields.length; field++) {
+            moTablePane.getPrimaryKeyFields().add(aoKeyFields[field]); 
+        }
 
-        for (i = 0; i < aoTableColumns.length; i++) {
-            moTablePane.addTableColumn(aoTableColumns[i]);
+        int col = 0;
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "iog.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.tp_iog", "Tipo doc.", 125);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "maint.bp", "Responsable", 200);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_signed", "Firmado", STableConstants.WIDTH_BOOLEAN);
+        if (mnTabTypeAux02 == SUtilConsts.PER_DOC) {
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "iog.val_r", "Total $", STableConstants.WIDTH_VALUE_2X);
+        }
+        if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
+            aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "ioge.qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
+            aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", STableConstants.WIDTH_ITEM);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.name", "Ítem", 250);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "maint.name", "Área mantenimiento", 150);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "unit.symbol", "Unitad", STableConstants.WIDTH_UNIT_SYMBOL);
+            aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_price", "Precio unitario $", STableConstants.WIDTH_VALUE_UNITARY);
+            aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_value", "Importe $", STableConstants.WIDTH_VALUE_2X);
+        }
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "supv.name", "Residente", 200);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ent.code", "Almacén", STableConstants.WIDTH_CODE_COB_ENT);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.code", "Código tipo doc.", STableConstants.WIDTH_CODE_DOC);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num_cp", "Folio doc. complemento", STableConstants.WIDTH_DOC_NUM);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog_cp.code", "Código tipo doc. complemento", STableConstants.WIDTH_CODE_DOC);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog_cp.tp_iog", "Tipo doc. complemento", 125);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb_cp.code", "Sucursal empresa complemento", STableConstants.WIDTH_CODE_COB);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ent_cp.code", "Almacén complemento", STableConstants.WIDTH_CODE_COB_ENT);
+        if (mnTabTypeAux02 == SUtilConsts.PER_DOC) {
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_audit", "Auditado", STableConstants.WIDTH_BOOLEAN);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaud.usr", "Usr. auditoría", STableConstants.WIDTH_USER);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_audit", "Auditoría", STableConstants.WIDTH_DATE_TIME);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_authorn", "Autorizado", STableConstants.WIDTH_BOOLEAN);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaut.usr", "Usr. autorización", STableConstants.WIDTH_USER);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_authorn", "Autorización", STableConstants.WIDTH_DATE_TIME);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "iog.b_sys", "Sistema", STableConstants.WIDTH_BOOLEAN);
+        }
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);      
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ue.usr", "Usr. modificación", STableConstants.WIDTH_USER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_edit", "Modificación", STableConstants.WIDTH_DATE_TIME);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ud.usr", "Usr. eliminación", STableConstants.WIDTH_USER);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "iog.ts_del", "Eliminación", STableConstants.WIDTH_DATE_TIME);
+        
+        for (col = 0; col < aoTableColumns.length; col++) {
+            moTablePane.addTableColumn(aoTableColumns[col]);
         }
 
         SFormUtilities.createActionMap(this, this, "actionPrint", "print", KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK);
@@ -386,13 +438,13 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
     @SuppressWarnings("unchecked")
     public void createSqlQuery() {
         int[] key = null;
-        String sqlWhere = "";
+        String sqlWhere = "";        
         STableSetting setting = null;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
-                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "iog.b_del = 0 ";
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "NOT " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".b_del ";
             }
             else if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "iog.dt");
@@ -409,7 +461,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_TP) {
-                key = (int[]) setting.getSetting();
+                key = (int[]) setting.getSetting();                
                 if (key != null) {
                     sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "iog.fid_ct_iog = " + key[0] + " AND iog.fid_cl_iog = " + key[1] + " AND iog.fid_tp_iog = " + key[2] + " ";
                 }
@@ -435,31 +487,81 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
             default:
         }
         
-        msSql = "SELECT iog.id_year, iog.id_doc, iog.dt, iog.val_r, iog.ref, iog.b_audit, iog.b_authorn, iog.b_sys, iog.b_del, " +
+        switch (mnTabTypeAux02) {
+            case SUtilConsts.PER_DOC:
+                break;
+            case SUtilConsts.PER_ITM:
+                sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "NOT iog.b_del ";
+                break;
+            default:
+        }
+        
+        Date date = moTabFilterDatePeriod.getDate();
+        
+        msSql = "SELECT " ;
+                if (mnTabTypeAux02 == SUtilConsts.PER_DOC) {
+                    msSql += "iog.id_year, iog.id_doc, iog.b_del, ";
+                }
+                else if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
+                    msSql +=  "ioge.id_year, ioge.id_doc, ioge.id_ety, ioge.b_del, " ;
+                }
+                msSql += "iog.dt, iog.val_r, iog.b_audit, iog.b_authorn, iog.b_sys, " +
                 "CONCAT(iog.num_ser, IF(LENGTH(iog.num_ser) = 0, '', '-'), erp.lib_fix_int(iog.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS f_num, " +
                 "tp_iog.tp_iog, tp_iog.code, bpb.code, ent.code, " +
-                "CONCAT(iog_cp.num_ser, IF(LENGTH(iog_cp.num_ser) = 0, '', '-'), erp.lib_fix_int(iog_cp.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS f_num_cp, " +
+                "maint.bp, supv.name, ";
+                if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
+                   msSql +=  "ioge.qty, ioge.val_u, ioge.fid_item, ioge.fid_unit, ioge.fid_maint_area, i.item_key, i.name, unit.symbol, maint.name, " + 
+                             "IF(iog.fid_ct_iog = " + SDataConstantsSys.TRNS_CT_IOG_IN + " , ioge.val_u, t._avg_prc) AS _price, " +
+                             "IF(iog.fid_ct_iog = " + SDataConstantsSys.TRNS_CT_IOG_IN + " , ioge.val_u, t._avg_prc) * ioge.qty AS _value, ";
+                }
+                msSql += "CONCAT(iog_cp.num_ser, IF(LENGTH(iog_cp.num_ser) = 0, '', '-'), erp.lib_fix_int(iog_cp.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS f_num_cp, " +
                 "tp_iog_cp.tp_iog, tp_iog_cp.code, bpb_cp.code, ent_cp.code, " +
-                "CONCAT(r.fid_rec_tp_rec, '-', erp.lib_fix_int(r.fid_rec_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_rec, " +
-                "iog.ts_audit, iog.ts_authorn, iog.ts_new, iog.ts_edit, iog.ts_del, uaud.usr, uaut.usr, un.usr, ue.usr, ud.usr " +
+                "iog.ts_audit, iog.ts_authorn, iog.ts_new, iog.ts_edit, iog.ts_del, uaud.usr, uaut.usr, un.usr, ue.usr, ud.usr, " +
+                "(SELECT COUNT(*) FROM trn_maint_diog_sig AS sig WHERE sig.fk_diog_year = iog.id_year AND sig.fk_diog_doc = iog.id_doc AND sig.ts_usr_ins >= iog.ts_edit) > 0 AS _signed " +
                 "FROM trn_diog AS iog " +
-                "INNER JOIN erp.trns_ct_iog AS ct_iog ON iog.fid_ct_iog = ct_iog.id_ct_iog " +
-                "INNER JOIN erp.trns_cl_iog AS cl_iog ON iog.fid_cl_iog = cl_iog.id_cl_iog AND iog.fid_ct_iog = cl_iog.id_ct_iog " +
                 "INNER JOIN erp.trns_tp_iog AS tp_iog ON iog.fid_tp_iog = tp_iog.id_tp_iog AND iog.fid_ct_iog = tp_iog.id_ct_iog AND iog.fid_cl_iog = tp_iog.id_cl_iog " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON iog.fid_cob = bpb.id_bpb " +
                 "INNER JOIN erp.cfgu_cob_ent AS ent ON iog.fid_cob = ent.id_cob AND iog.fid_wh = ent.id_ent " +
                 "INNER JOIN erp.usru_usr AS uaud ON iog.fid_usr_audit = uaud.id_usr " +
                 "INNER JOIN erp.usru_usr AS uaut ON iog.fid_usr_authorn = uaut.id_usr " +
-                "INNER JOIN erp.usru_usr AS un ON iog.fid_usr_new = un.id_usr " +
-                "INNER JOIN erp.usru_usr AS ue ON iog.fid_usr_edit = ue.id_usr " +
-                "INNER JOIN erp.usru_usr AS ud ON iog.fid_usr_del = ud.id_usr " +
+                "INNER JOIN trn_maint_user_supv AS supv ON iog.fid_maint_user_supv = supv.id_maint_user_supv "; 
+                if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
+                   msSql +=  "INNER JOIN trn_diog_ety AS ioge ON ioge.id_year = iog.id_year AND ioge.id_doc = iog.id_doc " +
+                            "INNER JOIN erp.itmu_item AS i ON i.id_item = ioge.fid_item " +
+                            "INNER JOIN erp.itmu_unit AS unit ON unit.id_unit = ioge.fid_unit " +
+                            "INNER JOIN trn_maint_area AS maint ON maint.id_maint_area = ioge.fid_maint_area ";
+                }                
+                msSql += "INNER JOIN erp.usru_usr AS un ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_new = un.id_usr " +
+                "INNER JOIN erp.usru_usr AS ue ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_edit = ue.id_usr " +
+                "INNER JOIN erp.usru_usr AS ud ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_del = ud.id_usr ";
+                if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
+                    msSql += "LEFT OUTER JOIN " +
+                            "(SELECT *, COALESCE(t._ext_dbt / t._ext_mov_in, 0.0) AS _avg_prc " +
+                            "FROM (" +
+                            "SELECT id_item, id_unit, id_cob, id_wh, " +
+                            "SUM(mov_in) AS _mov_in, SUM(mov_out) AS _mov_out, SUM(mov_in - mov_out) AS _stk, " +
+                            "SUM(debit) AS _dbt, SUM(credit) AS _cdt, SUM(debit - credit) AS _bal, " +
+                            "SUM(IF(fid_ct_iog = " + SDataConstantsSys.TRNS_CL_IOG_IN_EXT[0] + " AND fid_cl_iog <= " + SDataConstantsSys.TRNS_CL_IOG_IN_EXT[1] + ", mov_in, 0)) AS _ext_mov_in, " +
+                            "SUM(IF(fid_ct_iog = " + SDataConstantsSys.TRNS_CL_IOG_IN_EXT[0] + " AND fid_cl_iog <= " + SDataConstantsSys.TRNS_CL_IOG_IN_EXT[1] + ", debit, 0)) AS _ext_dbt " +
+                            "FROM trn_stk " +
+                            "WHERE id_year = " + SLibTimeUtils.digestYear(date)[0] + " AND dt < '" + SLibUtils.DbmsDateFormatDate.format(date) + "' AND NOT b_del " +
+                            "GROUP BY id_item, id_unit, id_cob, id_wh " +
+                            "ORDER BY id_item, id_unit, id_cob, id_wh) AS t) AS t ON " +
+                            "t.id_item = ioge.fid_item AND t.id_unit = ioge.fid_unit AND t.id_cob = iog.fid_cob AND t.id_wh = iog.fid_wh " ;
+                }
+                msSql += "LEFT OUTER JOIN erp.bpsu_bp AS maint ON iog.fid_maint_user_n = maint.id_bp " +
                 "LEFT OUTER JOIN trn_diog AS iog_cp ON iog.fid_diog_year_n = iog_cp.id_year AND iog.fid_diog_doc_n = iog_cp.id_doc " +
                 "LEFT OUTER JOIN erp.trns_tp_iog AS tp_iog_cp ON iog_cp.fid_tp_iog = tp_iog_cp.id_tp_iog AND iog_cp.fid_ct_iog = tp_iog_cp.id_ct_iog AND iog_cp.fid_cl_iog = tp_iog_cp.id_cl_iog " +
                 "LEFT OUTER JOIN erp.bpsu_bpb AS bpb_cp ON iog_cp.fid_cob = bpb_cp.id_bpb " +
                 "LEFT OUTER JOIN erp.cfgu_cob_ent AS ent_cp ON iog_cp.fid_cob = ent_cp.id_cob AND iog_cp.fid_wh = ent_cp.id_ent " +
-                "LEFT OUTER JOIN trn_diog_rec AS r ON iog.id_year = r.id_iog_year AND iog.id_doc = r.id_iog_doc " +
-                (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) +
-                "ORDER BY iog.dt, f_num, iog.id_year, iog.id_doc ";
+                (sqlWhere.isEmpty() ? "" : "WHERE " + sqlWhere) +
+                "ORDER BY iog.dt, f_num, ";
+                if (mnTabTypeAux02 == SUtilConsts.PER_DOC) {
+                    msSql += "iog.id_year, iog.id_doc " ;
+                }
+                else if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
+                    msSql +=  "ioge.id_year, ioge.id_doc, ioge.id_ety ";
+                }
     }
 
     @Override
@@ -529,7 +631,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
             }
             
             if (button == jbAdjOut1) {
-                actionMove(movements[0], users[0]);
+                    actionMove(movements[0], users[0]);
             }
             else if (button == jbAdjOut2) {
                 actionMove(movements[0], users[1]);

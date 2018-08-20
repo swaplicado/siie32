@@ -855,81 +855,6 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         return hasRole;
     }
 
-    /*
-    public boolean hasUserPrivilege(int privilegeId, int companyId, int companyBranchId, java.util.Vector<erp.musr.data.SDataRole> roles) {
-        boolean access = false;
-
-        if (mbExtraIsSpecialSuperUser) {
-            access = true;
-        }
-        else {
-            if (privilegeId == SDataConstantsSys.PRV_CFG_CO ||
-                    privilegeId == SDataConstantsSys.PRV_CFG_ERP ||
-                    privilegeId == SDataConstantsSys.PRV_CAT_CFG_LAN ||
-                    privilegeId == SDataConstantsSys.PRV_CAT_CFG_CUR ||
-                    privilegeId == SDataConstantsSys.PRV_CAT_CFG_CO ||
-                    privilegeId == SDataConstantsSys.PRV_CAT_USR) {
-                access = mbExtraIsSpecialConfigurator;
-            }
-            else {
-                access = mbExtraIsSpecialAdministrator;
-
-                if (!access) {
-                    for (SDataUserPrivilegeUser priv : mvDbmsUserPrivilegesUser) {
-                        if (privilegeId == priv.getPkPrivilegeId()) {
-                            access = true;
-                        }
-                    }
-                }
-
-                if (!access) {
-                    if (companyId != 0) {
-                        for (SDataUserPrivilegeCompany priv : mvDbmsUserPrivilegesCompany) {
-                            if (privilegeId == priv.getPkPrivilegeId() && companyId == priv.getPkCompanyId()) {
-                                access = true;
-                            }
-                        }
-                    }
-                }
-
-                if (!access) {
-                    if (companyBranchId != 0) {
-                        for (SDataUserPrivilegeCompanyBranch priv : mvDbmsUserPrivilegesCompanyBranch) {
-                            if (privilegeId == priv.getPkPrivilegeId() && companyBranchId == priv.getPkCompanyBranchId()) {
-                                access = true;
-                            }
-                        }
-                    }
-                }
-
-                if (!access) {
-                    int roleId = SLibConstants.UNDEFINED;
-
-                    for (SDataRole role : roles) {
-                        if (roleId != SLibConstants.UNDEFINED) {
-                            break;
-                        }
-                        else {
-                            for (SDataPrivilege priv : role.getDbmsPrivileges()) {
-                                if (privilegeId == priv.getPkPrivilegeId()) {
-                                    roleId = role.getPkRoleId();
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (roleId != SLibConstants.UNDEFINED) {
-                        access = hasUserRole(roleId, companyId, companyBranchId);
-                    }
-                }
-            }
-        }
-
-        return access;
-    }
-    */
-
     /**
      * This funtion looks for a specific privilege for the user logged and
      * determines if it has right.
@@ -938,8 +863,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
      * @param privilege The privilege to look.
      */
     public erp.musr.data.SDataUser.Right hasRight(erp.client.SClientInterface client, int privilege) {
-        Integer level = null;
-        SDataUser.Right right = new SDataUser.Right(privilege, false, SUtilConsts.LEV_READ);
+        SDataUser.Right right = new SDataUser.Right(privilege, false, SLibConstants.UNDEFINED);
 
         if (hasSpecialRole(SDataConstantsSys.ROL_SPE_SUPER)) {
             right.HasRight = true;
@@ -951,36 +875,47 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
             right.Level = SUtilConsts.LEV_MANAGER;
         }
         else if (hasSpecialRole(SDataConstantsSys.ROL_SPE_ADMOR) &&
-                !SLibUtilities.belongsTo(privilege, new int[] { SDataConstantsSys.PRV_CFG_ERP, SDataConstantsSys.PRV_CFG_CO, SDataConstantsSys.PRV_CAT_USR })) {
+                !SLibUtilities.belongsTo(privilege, new int[] { SDataConstantsSys.PRV_CFG_ERP, SDataConstantsSys.PRV_CFG_CO })) {
             right.HasRight = true;
             right.Level = SUtilConsts.LEV_MANAGER;
         }
 
-
         if (!right.HasRight) {
-            if (!right.HasRight) {
-                for (SDataAccessCompany access : mvDbmsAccessCompanies) {
-                    if (access.getPkCompanyId() == client.getSessionXXX().getCurrentCompany().getPkCompanyId()) {
-                        for (int i = 0; i < moRightsCompany.size(); i++) {
-                            if (SLibUtilities.compareKeys((int[]) moRightsCompany.keySet().toArray()[i], new int[] { access.getPkCompanyId(), privilege })) {
-                                level = (Integer) moRightsCompany.values().toArray()[i];
-                                break;
+            Integer level = null;
+            
+            // check if privilege is assigned at company scope (higher precedence):
+            
+            Object[] companyPrivileges = moRightsCompany.keySet().toArray();
+            
+            for (SDataAccessCompany access : mvDbmsAccessCompanies) {
+                if (access.getPkCompanyId() == client.getSessionXXX().getCurrentCompany().getPkCompanyId()) {
+                    int[] companyPrivilege = new int[] { access.getPkCompanyId(), privilege };
+                    
+                    for (int i = 0; i < moRightsCompany.size(); i++) {
+                        if (SLibUtilities.compareKeys(companyPrivilege, (int[]) companyPrivileges[i])) {
+                            Integer levelAux = (Integer) moRightsCompany.values().toArray()[i];
+                            if (level == null || levelAux > level) {
+                                level = levelAux;   // do not break when found for searching the highest level of privilege assigned to user at company scope
                             }
                         }
-                        if (level != null) {
-                            right.HasRight = true;
-                            right.Level = level;
-                            break;
-                        }
+                    }
+                    
+                    if (level != null) {
+                        right.HasRight = level > SLibConstants.UNDEFINED;
+                        right.Level = level;
+                        break;
                     }
                 }
+            }
 
-                if (!right.HasRight) {
-                    level = moRightsUser.get(privilege);
-                    if (level != null) {
-                        right.HasRight = true;
-                        right.Level = level;
-                    }
+            // check if privilege is assigned at user scope (lesser precedence):
+            
+            if (level == null) {
+                level = moRightsUser.get(privilege);
+                
+                if (level != null) {
+                    right.HasRight = level > SLibConstants.UNDEFINED;
+                    right.Level = level;
                 }
             }
         }

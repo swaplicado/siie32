@@ -59,12 +59,12 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Néstor Ávalos, Sergio Flores, Edwin Carmona
+ * @author Juan Barajas, Néstor Ávalos, Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 
-    private final static String TXT_WITH_TAX_SUB_PAY = "Con pago de subsidio al impuesto.";
-    private final static String TXT_WITHOUT_TAX_SUB_PAY = "Sin pago de subsidio al impuesto";
+    private final static String TXT_WITH_TAX_SUB_PAY = "CON pago de Subsidio para el Empleo";
+    private final static String TXT_WITHOUT_TAX_SUB_PAY = "SIN pago de Subsidio para el Empleo";
     
     private SDbPayroll moRegistry;
     private SDbConfig moConfig;
@@ -183,8 +183,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel19 = new javax.swing.JPanel();
         moBoolSsContribution = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel18 = new javax.swing.JPanel();
-        jbTaxSubsidyChange = new javax.swing.JButton();
+        jlMwzType1 = new javax.swing.JLabel();
         moTextWithTaxSubsidy = new sa.lib.gui.bean.SBeanFieldText();
+        jbTaxSubsidyChange = new javax.swing.JButton();
         jPanel22 = new javax.swing.JPanel();
         jlMwzType = new javax.swing.JLabel();
         moKeyMwzType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -238,7 +239,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jtpPayroll.setTabPlacement(javax.swing.JTabbedPane.LEFT);
-        jtpPayroll.setToolTipText("");
         jtpPayroll.setAutoscrolls(true);
         jtpPayroll.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
@@ -259,9 +259,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel8.add(jlPaymentType);
 
         jtfPaymentType.setEditable(false);
+        jtfPaymentType.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jtfPaymentType.setText("jTextField1");
         jtfPaymentType.setFocusable(false);
-        jtfPaymentType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jtfPaymentType);
 
         jPanel6.add(jPanel8);
@@ -271,8 +272,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jlYear.setText("Año nómina:*");
         jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel35.add(jlYear);
-
-        moIntPeriodYear.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel35.add(moIntPeriodYear);
 
         jbEditPeriodYear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
@@ -287,8 +286,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jlFiscalYear.setText("Año fiscal:*");
         jlFiscalYear.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel42.add(jlFiscalYear);
-
-        moIntFiscalYear.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel42.add(moIntFiscalYear);
 
         jbEditFiscalYear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
@@ -304,8 +301,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jlNumber.setText("Número nómina:*");
         jlNumber.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlNumber);
-
-        moIntNumber.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel9.add(moIntNumber);
 
         jbEditNumber.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
@@ -365,8 +360,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jlPeriod.setText("Período nómina:*");
         jlPeriod.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel36.add(jlPeriod);
-
-        moIntPeriod.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel36.add(moIntPeriod);
 
         jbEditPeriod.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
@@ -383,7 +376,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel12.add(jlPayrollDays);
 
         moIntPayrollDays.setEditable(false);
-        moIntPayrollDays.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel12.add(moIntPayrollDays);
 
         jPanel6.add(jPanel12);
@@ -395,7 +387,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel13.add(jlWorkingDays);
 
         moIntWorkingDays.setEditable(false);
-        moIntWorkingDays.setPreferredSize(new java.awt.Dimension(103, 23));
         jPanel13.add(moIntWorkingDays);
 
         jPanel6.add(jPanel13);
@@ -496,15 +487,19 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbTaxSubsidyChange.setText("...");
-        jbTaxSubsidyChange.setToolTipText("Cambiar estatus de pago de subsidio al impuesto");
-        jbTaxSubsidyChange.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel18.add(jbTaxSubsidyChange);
+        jlMwzType1.setText("Subsidio para el Empleo:");
+        jlMwzType1.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel18.add(jlMwzType1);
 
         moTextWithTaxSubsidy.setEditable(false);
         moTextWithTaxSubsidy.setText("sBeanFieldText1");
-        moTextWithTaxSubsidy.setPreferredSize(new java.awt.Dimension(275, 23));
+        moTextWithTaxSubsidy.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel18.add(moTextWithTaxSubsidy);
+
+        jbTaxSubsidyChange.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/gui/img/icon_upd.gif"))); // NOI18N
+        jbTaxSubsidyChange.setToolTipText("Cambiar preferencia de pago de Subsidio para el Empleo");
+        jbTaxSubsidyChange.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel18.add(jbTaxSubsidyChange);
 
         jPanel21.add(jPanel18);
 
@@ -568,7 +563,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jpPayroll.add(jPanel41, java.awt.BorderLayout.CENTER);
 
-        jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Totales:"));
+        jPanel20.setBorder(javax.swing.BorderFactory.createTitledBorder("Totales de la nómina:"));
         jPanel20.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel38.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
@@ -625,7 +620,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel33.setLayout(new java.awt.BorderLayout());
         jpReceipts.add(jPanel33, java.awt.BorderLayout.NORTH);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos de nómina:"));
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos de la nómina:"));
         jPanel5.setLayout(new java.awt.BorderLayout(5, 5));
 
         jPanel31.setLayout(new java.awt.GridLayout(1, 2, 0, 5));
@@ -785,6 +780,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlMwzReferenceType;
     private javax.swing.JLabel jlMwzReferenceWage;
     private javax.swing.JLabel jlMwzType;
+    private javax.swing.JLabel jlMwzType1;
     private javax.swing.JLabel jlMwzWage;
     private javax.swing.JLabel jlNotes;
     private javax.swing.JLabel jlNumber;
@@ -843,21 +839,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
      * Private methods
      */
     
-    private void computeTotals() {
-        int countAvailables = 0;
-        int countSelected = 0;
-        
-        for (int i = 0; i < moGridPaneEmployeesAvailable.getModel().getRowCount(); i++) {
-            countAvailables++;
-        }
-        for (int i = 0; i < moGridPaneEmployeesReceipt.getModel().getRowCount(); i++) {
-            countSelected++;
-        }
-        
-        jlTotalAvailables.setText(" " + countAvailables + " empleados disponibles.");
-        jlTotalSelected.setText(" " + countSelected + " recibos de nomina.");
-    }
-
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 1024, 640);
 
@@ -939,7 +920,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
                 SGridColumnForm[] columns = new SGridColumnForm[2];
 
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 250);
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave");
 
                 gridColumnsForm.addAll(Arrays.asList((SGridColumnForm[]) columns));
@@ -971,7 +952,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
                 SGridColumnForm[] columns = new SGridColumnForm[5];
 
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 250);
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total percepciones $");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total deducciones $");
@@ -1039,6 +1020,21 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         mvFormGrids.add(moGridPaneEmployeesAvailable);
         mvFormGrids.add(moGridPaneEmployeesReceipt);
+    }
+
+    private void computeTotals() {
+        int countAvailables = 0;
+        int countSelected = 0;
+        
+        for (int i = 0; i < moGridPaneEmployeesAvailable.getModel().getRowCount(); i++) {
+            countAvailables++;
+        }
+        for (int i = 0; i < moGridPaneEmployeesReceipt.getModel().getRowCount(); i++) {
+            countSelected++;
+        }
+        
+        jlTotalAvailables.setText(" " + countAvailables + " empleados disponibles.");
+        jlTotalSelected.setText(" " + countSelected + " recibos de nomina.");
     }
 
     private void clearCurrentValues() {
@@ -1455,7 +1451,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
         else {
             rowEmployeeReceipt = new SHrsPayrollRowEmployeeReceipt();
-            rowEmployeeAvailable = new SHrsPayrollRowEmployeeAvailable();
             rowEmployeeAvailable = (SHrsPayrollRowEmployeeAvailable) moGridPaneEmployeesAvailable.getSelectedGridRow();
 
             try {
@@ -1488,7 +1483,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                 moGridPaneEmployeesReceipt.addGridRow(rowEmployeeReceipt);
                 moGridPaneEmployeesReceipt.renderGridRows();
-                moGridPaneEmployeesReceipt.setSelectedGridRow(moGridPaneEmployeesReceipt.getModel().getRowCount() - 1);
+                moGridPaneEmployeesReceipt.setSelectedGridRow(moGridPaneEmployeesReceipt.getTable().convertRowIndexToView(moGridPaneEmployeesReceipt.getModel().getRowCount() - 1));
 
                 updateFieldsStatus();
                 computePayrollValue();
@@ -1555,7 +1550,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
                     moGridPaneEmployeesAvailable.addGridRow(rowEmployeeAvailable);
                     moGridPaneEmployeesAvailable.renderGridRows();
-                    moGridPaneEmployeesAvailable.setSelectedGridRow(moGridPaneEmployeesAvailable.getModel().getRowCount() - 1);
+                    moGridPaneEmployeesAvailable.setSelectedGridRow(moGridPaneEmployeesAvailable.getTable().convertRowIndexToView(moGridPaneEmployeesAvailable.getModel().getRowCount() - 1));
                 }
                 
                 updateFieldsStatus();
@@ -1666,7 +1661,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
     }
     
-    private void actionTaxSubsidy() {
+    private void actionTaxSubsidyChange() {
        if (mbIsWithTaxSubsidy) {
            if (miClient.showMsgBoxConfirm("Se quitará el pago de subsidio al impuesto a todos los recibos que lo tengan.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                mbIsWithTaxSubsidy = false;
@@ -1953,7 +1948,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moDecTotalDeductions.getField().setValue(moRegistry.getAuxTotalDeductions());
             moDecTotalNet.getField().setValue(moRegistry.getAuxTotalNet());
 
-            moHrsPayroll = (new SHrsPayrollDataProvider(miClient.getSession())).createPayroll(moConfig, moWorkingDaySettings, moRegistry, mbPayrollCopy);
+            moHrsPayroll = (new SHrsPayrollDataProvider(miClient.getSession())).createHrsPayroll(moConfig, moWorkingDaySettings, moRegistry, mbPayrollCopy);
 
             jtpPayroll.setSelectedIndex(0);
 
@@ -2149,7 +2144,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     actionReceiptCaptureDeductions();
                 }
                 else if (button == jbTaxSubsidyChange) {
-                    actionTaxSubsidy();
+                    actionTaxSubsidyChange();
                 }
             }
         }

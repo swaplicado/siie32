@@ -4,7 +4,6 @@
  */
 package erp.mod.hrs.form;
 
-import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbAutomaticDeduction;
@@ -40,7 +39,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneFormOwner, ActionListener, ItemListener {
 
@@ -303,7 +302,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Código deducción"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Deducción"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha inicial"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha final"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/Préstamo"));
@@ -347,71 +346,55 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
     }
 
     private void updateRows() {
-        int row = 0;
-        SDbLoan loan = null;
-        SDbAutomaticDeduction automaticRow = null;
-        SGridRow gridRow = null;
-
-        automaticRow = new SDbAutomaticDeduction();
-
+        boolean applyUnits = false; // all deductions are not function of countable units
+        boolean applyAmount = moDeduction.getFkDeductionComputationTypeId() == SModSysConsts.HRSS_TP_DED_COMP_AMT;
+        
+        SDbAutomaticDeduction automaticRow = new SDbAutomaticDeduction();
         automaticRow.setPkDeductionId(moDeduction.getPkDeductionId());
-        automaticRow.setUnits(1);
-        automaticRow.setAmountUnitary(moComValue.getField().getValue());
-        automaticRow.setAmount_r(automaticRow.getUnits() * automaticRow.getAmountUnitary());
+        automaticRow.setUnits(!applyUnits ? 1 : moComValue.getField().getValue()); // by now, units will be allways 1!
+        automaticRow.setAmountUnitary(!applyAmount ? 1 : moComValue.getField().getValue());
+        automaticRow.setAmount_r(SLibUtils.roundAmount(automaticRow.getUnits() * automaticRow.getAmountUnitary()));
         automaticRow.setDateStart(moDateDateStart.getValue());
         automaticRow.setDateEnd_n(moDateDateEnd_n.getValue());
         automaticRow.setFkPaysheetTypeId(getPaysheetTypeId());
         automaticRow.setFkDeductionTypeId(moDeduction.getFkDeductionTypeId());
         automaticRow.setFkEmployeeId_n(mnFormSubtype != SModSysConsts.HRS_AUT_EMP ? SLibConsts.UNDEFINED : moKeyEmployee.getValue()[0]);
+        
         if (moKeyLoan_n.isEnabled() && moKeyLoan_n.getValue().length > 0) {
             automaticRow.setFkLoanEmployeeId_n(moKeyLoan_n.getValue()[0]);
             automaticRow.setFkLoanLoanId_n(moKeyLoan_n.getValue()[1]);
         }
 
-        try {
-            automaticRow.setXtaDeductionCode((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { moDeduction.getPkDeductionId() }, SDbRegistry.FIELD_CODE));
-            automaticRow.setXtaDeduction((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { moDeduction.getPkDeductionId() }, SDbRegistry.FIELD_NAME));
-            //automaticRow.setXtaUnit("MXN"); XXX (jbarajas, 2016-04-20) new field for computation type
-            automaticRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
-            automaticRow.setXtaPaysheetType((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY_SHT, new int[] { getPaysheetTypeId() }, SDbRegistry.FIELD_NAME));
-            if (moKeyLoan_n.isEnabled() && moKeyLoan_n.getValue().length > 0) {
-                loan = new SDbLoan();
-
-                loan.read(miClient.getSession(), new int[] { moKeyLoan_n.getValue()[0], moKeyLoan_n.getValue()[1] });
-                automaticRow.setXtaLoan(loan.getLoanIdentificator());
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.printException(this, e);
+        automaticRow.setXtaDeductionCode((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { moDeduction.getPkDeductionId() }, SDbRegistry.FIELD_CODE));
+        automaticRow.setXtaDeduction((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { moDeduction.getPkDeductionId() }, SDbRegistry.FIELD_NAME));
+        automaticRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
+        automaticRow.setXtaPaysheetType((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY_SHT, new int[] { getPaysheetTypeId() }, SDbRegistry.FIELD_NAME));
+        
+        if (moKeyLoan_n.isEnabled() && moKeyLoan_n.getValue().length > 0) {
+            SDbLoan loan = (SDbLoan) miClient.getSession().readRegistry(SModConsts.HRS_LOAN, new int[] { moKeyLoan_n.getValue()[0], moKeyLoan_n.getValue()[1] });
+            automaticRow.setXtaLoan(loan.getLoanIdentificator());
         }
 
-        gridRow = (SGridRow) automaticRow;
+        SGridRow gridRow = (SGridRow) automaticRow;
         moGridAutomaticRow.getModel().getGridRows().add(gridRow);
         moGridAutomaticRow.getModel().renderGridRows();
 
-        row = moGridAutomaticRow.getModel().getRowCount() - 1;
+        int row = moGridAutomaticRow.getModel().getRowCount() - 1;
         moGridAutomaticRow.setSelectedGridRow(row);
     }
 
     private void populateAutomaticRow() throws Exception {
-        Vector<SGridRow> rows = new Vector<SGridRow>();
-        SDbLoan loan = null;
-        SDbDeduction deduction = null;
+        Vector<SGridRow> rows = new Vector<>();
 
         for (SDbAutomaticDeduction row : moRegistry.getAutomaticDeductions()) {
-            deduction = new SDbDeduction();
-
-            deduction.read(miClient.getSession(), new int[] { row.getPkDeductionId() });
+            SDbDeduction deduction = (SDbDeduction) miClient.getSession().readRegistry(SModConsts.HRS_DED, new int[] { row.getPkDeductionId() });
 
             row.setXtaDeductionCode((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { row.getPkDeductionId() }, SDbRegistry.FIELD_CODE));
             row.setXtaDeduction((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { row.getPkDeductionId() }, SDbRegistry.FIELD_NAME));
-            row.setXtaPaysheetType((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY_SHT, new int[] { row.getFkPaysheetTypeId() }, SDbRegistry.FIELD_NAME));
-            //row.setXtaUnit("MXN"); XXX (jbarajas, 2016-04-20) new field for computation type
             row.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { deduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
+            row.setXtaPaysheetType((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY_SHT, new int[] { row.getFkPaysheetTypeId() }, SDbRegistry.FIELD_NAME));
             if (row.getFkLoanEmployeeId_n() != SLibConsts.UNDEFINED) {
-                loan = new SDbLoan();
-
-                loan.read(miClient.getSession(), new int[] { row.getFkLoanEmployeeId_n(), row.getFkLoanLoanId_n() });
+                SDbLoan loan = (SDbLoan) miClient.getSession().readRegistry(SModConsts.HRS_LOAN, new int[] { row.getFkLoanEmployeeId_n(), row.getFkLoanLoanId_n() });
                 row.setXtaLoan(loan.getLoanIdentificator());
             }
 
@@ -514,7 +497,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         boolean load = true;
 
         try {
-            moDeduction = SHrsUtils.getDeduction(miClient, SLibUtilities.textTrim(moTextCodeFind.getText()));
+            moDeduction = SHrsUtils.getDeduction(miClient, SLibUtils.textTrim(moTextCodeFind.getText()));
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
@@ -525,6 +508,12 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
             moTextCodeFind.requestFocus();
         }
         else {
+            if ((moDeduction.getFkAbsenceClassId_n() != SLibConsts.UNDEFINED && moDeduction.getFkAbsenceTypeId_n() != SLibConsts.UNDEFINED) || moDeduction.getFkBenefitTypeId() != SModSysConsts.HRSS_TP_BEN_NON) {
+                miClient.showMsgBoxWarning("No se pueden agregar deducciones de tipo incidencia ni prestación.");
+                load = false;
+                moTextCodeFind.requestFocus();
+            }
+            
             if (moDeduction.getFkLoanTypeId() != SModSysConsts.HRSS_TP_LOAN_NON) {
                 if (mnFormSubtype == SModSysConsts.HRS_AUT_GBL) {
                     miClient.showMsgBoxWarning("No se pueden agregar deducciones de tipo crédito/préstamo.");
@@ -535,9 +524,9 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
 
             if (load) {
                 moTextName.setValue(moDeduction.getName());
-                moComValue.getField().getComponent().requestFocus();
-                //moComValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE)); XXX (jbarajas, 2016-04-20) new field for computation type
+                moComValue.getField().setEditable(moDeduction.getFkDeductionComputationTypeId() == SModSysConsts.HRSS_TP_DED_COMP_AMT);
                 moComValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
+                moComValue.getField().getComponent().requestFocus();
 
                 resetLoan();
             }

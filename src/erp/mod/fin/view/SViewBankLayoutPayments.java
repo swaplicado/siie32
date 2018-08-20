@@ -2,6 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mod.fin.view;
 
 import erp.cfd.SCfdConsts;
@@ -31,7 +32,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez
+ * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Sergio Flores
  */
 public class SViewBankLayoutPayments extends SGridPaneView implements ActionListener {
 
@@ -52,6 +53,7 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
             
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
+        
         jbPayment = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money.gif")), "Aplicar pagos", this);
         jbCloseLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), (mnGridMode == SModConsts.VIEW_ST_PEND ? "Cerrar" : "Abrir") + " layout para pago", this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPayment);
@@ -175,8 +177,7 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
                 + "l.fk_usr_upd = uu.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
                 + "l.fk_usr_clo_pay = uc.id_usr "
-                + "WHERE l.trn_tp = " + (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_DPS ? SFinConsts.LAY_BANK_TYPE_DPS : SFinConsts.LAY_BANK_TYPE_ADV) + (sql.length() == 0 ? "" : " AND " + sql) + " "
-                //+ (sql.length() == 0 ? "" : "WHERE " + sql)
+                + "WHERE l.trn_tp = " + mnGridSubtype + (sql.length() == 0 ? "" : " AND " + sql) + " "
                 + (mnGridMode == SModConsts.VIEW_ST_PEND ? "HAVING f_tra_x_pay <> 0 AND l.b_clo_pay = 0 " : "HAVING f_tra_x_pay = 0 OR l.b_clo_pay = 1 ")
                 + "ORDER BY l.dt_lay, l.dt_due, l.id_lay_bank ";
     }

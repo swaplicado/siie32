@@ -13,7 +13,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Uriel Castañeda, Alfredo Pérez
+ * @author Uriel Castañeda, Alfredo Pérez, Sergio Flores
  */
 public class SLayoutBankCardextRow implements SGridRow {
 
@@ -122,11 +122,11 @@ public class SLayoutBankCardextRow implements SGridRow {
     public void setPrimaryKey(int[] pk) {
         int[] key = new int[] { SLibConsts.UNDEFINED };
         
-        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
+        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_PAY) {
             mnPkYearId = pk[0];
             mnPkDocId = pk[1];
         }
-        else if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_ADV) {
+        else if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_PREPAY) {
             mnBizPartnerId = pk[0];
         }
         
@@ -165,7 +165,7 @@ public class SLayoutBankCardextRow implements SGridRow {
     public int[] getRowPrimaryKey() {
         int[] key = new int[] { SLibConsts.UNDEFINED };
         
-        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_DPS) {
+        if (mnLayoutRowType == SModSysConsts.FIN_LAY_BANK_PAY) {
             key = new int[] { mnPkYearId, mnPkDocId };
         }
 

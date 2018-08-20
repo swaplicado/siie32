@@ -30,6 +30,7 @@ import erp.mmfg.data.SDataProductionOrder;
 import erp.mmfg.data.SDataProductionOrderCharge;
 import erp.mmfg.data.SDataProductionOrderChargeEntry;
 import erp.mmfg.data.SDataProductionOrderChargeEntryLot;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.cfg.db.SDbMms;
 import erp.mod.hrs.db.SDbPayroll;
@@ -73,7 +74,7 @@ import sa.lib.srv.SSrvUtils;
 
 /**
  *
- * @author Sergio Flores, Daniel López
+ * @author Sergio Flores, Daniel López, Claudio Peña, Sergio Flores
  */
 public abstract class STrnUtilities {
 
@@ -141,53 +142,6 @@ public abstract class STrnUtilities {
     }
 
     /**
-     * Obtains available stock on a certain year.
-     * @param client ERP Client interface.
-     * @param itemId Lot item ID (primary key).
-     * @param unitId Lot unit ID (primary key).
-     * @param lotId_n Lot ID (primary key), can be 0 meaning undefined.
-     * @param cobId_n Company branch ID (primary key), can be 0 meaning undefined.
-     * @param whId_n Warehouse ID (primary key), can be 0 meaning undefined.
-     * @returns Available stock for provided params.
-     */
-    @SuppressWarnings("unchecked")
-    public static double obtainStock(final SClientInterface client, final int year, final int itemId, final int unitId, final int lotId_n, final int companyBranchId_n, final int warehouseId_n) throws Exception {
-        return obtainStock(client, year, itemId, unitId, lotId_n, companyBranchId_n, warehouseId_n, null, null);
-    }
-
-    /**
-     * Obtains available stock on a certain year.
-     * @param client ERP Client interface.
-     * @param itemId Lot item ID (primary key).
-     * @param unitId Lot unit ID (primary key).
-     * @param lotId_n Lot ID (primary key), can be 0 meaning undefined.
-     * @param cobId_n Company branch ID (primary key), can be 0 meaning undefined.
-     * @param whId_n Warehouse ID (primary key), can be 0 meaning undefined.
-     * @param iogKey_n Primary key of IOG being edited.
-     * @returns Available stock for provided params.
-     */
-    @SuppressWarnings("unchecked")
-    public static double obtainStock(final SClientInterface client, final int year, final int itemId, final int unitId, final int lotId_n, final int companyBranchId_n, final int warehouseId_n, final int[] iogKey_n) throws Exception {
-        return obtainStock(client, year, itemId, unitId, lotId_n, companyBranchId_n, warehouseId_n, null, iogKey_n);
-    }
-
-    /**
-     * Obtains available stock on a certain year up to cut off date.
-     * @param client ERP Client interface.
-     * @param itemId Lot item ID (primary key).
-     * @param unitId Lot unit ID (primary key).
-     * @param lotId_n Lot ID (primary key), can be 0 meaning undefined.
-     * @param cobId_n Company branch ID (primary key), can be 0 meaning undefined.
-     * @param whId_n Warehouse ID (primary key), can be 0 meaning undefined.
-     * @param dateCutOff_n Cut off date.
-     * @returns Available stock for provided params.
-     */
-    @SuppressWarnings("unchecked")
-    public static double obtainStock(final SClientInterface client, final int year, final int itemId, final int unitId, final int lotId_n, final int companyBranchId_n, final int warehouseId_n, final Date dateCutOff_n) throws Exception {
-        return obtainStock(client, year, itemId, unitId, lotId_n, companyBranchId_n, warehouseId_n, dateCutOff_n, null);
-    }
-
-    /**
      * Obtains available stock on a certain year up to cut off date.
      * @param client ERP Client interface.
      * @param itemId Lot item ID (primary key).
@@ -200,7 +154,7 @@ public abstract class STrnUtilities {
      * @returns Available stock for provided params.
      */
     @SuppressWarnings("unchecked")
-    public static double obtainStock(final SClientInterface client, final int year, final int itemId, final int unitId, final int lotId_n, final int companyBranchId_n, final int warehouseId_n, final Date dateCutOff_n, final int[] iogKey_n) throws Exception {
+    public static double obtainStock(final SClientInterface client, final int year, final int itemId, final int unitId, final int lotId_n, final int companyBranchId_n, final int warehouseId_n, final int maintUserId_n, final Date dateCutOff_n, final int[] iogKey_n) throws Exception {
         double stock = 0;
         String sql = "";
         ResultSet resulSet = null;
@@ -209,6 +163,7 @@ public abstract class STrnUtilities {
                 (lotId_n == SLibConstants.UNDEFINED ? "NULL" : "" + lotId_n) + ", " +
                 (companyBranchId_n == SLibConstants.UNDEFINED ? "NULL" : "" + companyBranchId_n) + ", " +
                 (warehouseId_n == SLibConstants.UNDEFINED ? "NULL" : "" + warehouseId_n) + ", " +
+                (maintUserId_n == SLibConstants.UNDEFINED ? "NULL" : "" + maintUserId_n) + ", " +
                 (dateCutOff_n == null ? "NULL" : "'" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(dateCutOff_n) + "'") + ", " +
                 (iogKey_n == null || (iogKey_n[0] == SLibConstants.UNDEFINED || iogKey_n[1] == SLibConstants.UNDEFINED) ? "NULL, NULL" : "" + iogKey_n[0] + ", " + iogKey_n[1]) + ") ";
 
@@ -1894,7 +1849,7 @@ public abstract class STrnUtilities {
                     switch (cfd.getFkCfdTypeId()) {
                         case SDataConstantsSys.TRNS_TP_CFD_INV:
                             dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                            msNumberDoc = (dps.getNumberSeries().length() > 0 ? dps.getNumberSeries() + "-" : "") + dps.getNumber();
+                            msNumberDoc = dps.getDpsNumber();
                             mbIsCancel = dps.getFkDpsStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                             if (SLibUtils.belongsTo(dps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_INV, SDataConstantsSys.TRNU_TP_DPS_SAL_INV })) {
                                 msDocumentType =  "Factura";
@@ -1903,6 +1858,15 @@ public abstract class STrnUtilities {
                                 msDocumentType =  "Nota de Crédito";
                             }
                             cancellationDate = dps.getUserEditTs();
+
+                            snd_subject = mms.getTextSubject() + " " + msNumberDoc;
+                            break;
+                            
+                        case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                            msNumberDoc = cfd.getCfdNumber();
+                            mbIsCancel = cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                            msDocumentType =  SDataCfdPayment.NAME;
+                            cancellationDate = cfd.getUserProcessingTs();
 
                             snd_subject = mms.getTextSubject() + " " + msNumberDoc;
                             break;
@@ -2038,8 +2002,8 @@ public abstract class STrnUtilities {
             status = "PENDIENTE.";
         }
         
-        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ACK_DVY, sorianaUtils.getAcknowledgment().replaceAll("'", "\""));
-        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_MSJ_DVY, sorianaUtils.getAcknowledgmentMsg().replaceAll("'", "\""));
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_ACK_DVY, sorianaUtils.getAcknowledgment().replaceAll("'", "\""));
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_MSJ_DVY, sorianaUtils.getAcknowledgmentMsg().replaceAll("'", "\""));
 
         /* 2018-01-26 (Sergio Flores): "Paralelo" web service is supposed not to be active anymore.
         soriana.utils.SSorianaUtils sorianaUtilsParalelo;
@@ -2059,13 +2023,13 @@ public abstract class STrnUtilities {
             status = "PENDIENTE.";
         }
 
-        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ACK_DVY, sorianaUtilsParalelo.getAcknowledgment().replaceAll("'", "\""));
-        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_MSJ_DVY, sorianaUtilsParalelo.getAcknowledgmentMsg().replaceAll("'", "\""));
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_ACK_DVY, sorianaUtilsParalelo.getAcknowledgment().replaceAll("'", "\""));
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_MSJ_DVY, sorianaUtilsParalelo.getAcknowledgmentMsg().replaceAll("'", "\""));
         */
         
-        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_TP_XML_DVY, SModSysConsts.TRNS_TP_XML_DVY_WS_SOR);
-        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_ST_XML_DVY, statusId);
-        cfd.saveField(client.getSession().getStatement().getConnection(), new int[] { cfd.getPkCfdId() }, SDataCfd.FIELD_USR_DVY, client.getSession().getUser().getPkUserId());
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_TP_XML_DVY, SModSysConsts.TRNS_TP_XML_DVY_WS_SOR);
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_ST_XML_DVY, statusId);
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_USR_DVY, client.getSession().getUser().getPkUserId());
 
         client.getFrame().setCursor(cursor);
         client.showMsgBoxInformation("El documento '" + dps.getNumberSeries() + (dps.getNumberSeries().length() > 0 ? "-" : "") + dps.getNumber() + (statusId == SModSysConsts.TRNS_ST_XML_DVY_PENDING ? "' sigue " : "' fue ") + status);
@@ -2198,6 +2162,8 @@ public abstract class STrnUtilities {
         SDataEmployee employeeUserBuyer = null;
         SDataEmployee employeeUserAuthorize = null;
         boolean isPurchase = false;
+        boolean isPending = false;
+        boolean isReject = false;
         FileOutputStream outputStreamPdf = null;
         
         try {
@@ -2207,6 +2173,8 @@ public abstract class STrnUtilities {
             map = client.createReportParams();
             
             isPurchase = dps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR;
+            isPending = dps.getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING;
+            isReject = dps.getFkDpsAuthorizationStatusId() == SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT;
             
             oCompanyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
             oBizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
@@ -2223,7 +2191,7 @@ public abstract class STrnUtilities {
             if (oCompanyBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
                 nFkEmiAddressFormatTypeId_n = oAddress.getFkAddressTypeId();
             }
-            else {
+            else {                
                 nFkEmiAddressFormatTypeId_n = client.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
             }
             
@@ -2243,7 +2211,7 @@ public abstract class STrnUtilities {
                 bizPartnerUserBuyer = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oUserBuyer.getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
                 employeeUserBuyer = bizPartnerUserBuyer.getDbmsDataEmployee();
             }
-            
+                        
             if (oUserAuthorize.getFkBizPartnerId_n() != SLibConstants.UNDEFINED) {
                 bizPartnerUserAuthorize = (SDataBizPartner) SDataUtilities.readRegistry(client, SDataConstants.BPSU_BP, new int[] { oUserAuthorize.getFkBizPartnerId_n() }, SLibConstants.EXEC_MODE_SILENT); 
                 employeeUserAuthorize = bizPartnerUserAuthorize.getDbmsDataEmployee();
@@ -2270,6 +2238,8 @@ public abstract class STrnUtilities {
                 addressDelivery.length > 3 ? addressDelivery[3] : "");
             map.put("sUserBuyer", sUserBuyer != null ? sUserBuyer : oUserBuyer.getUser());
             map.put("sUserAuthorize", sUserAuthorize != null ? sUserAuthorize : oUserAuthorize.getUser());
+            map.put("bIsPending", isPending);
+            map.put("bIsReject", isReject);
             map.put("nBizPartnerCategory", isPurchase ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
             map.put("nIdTpCarSup", SModSysConsts.LOGS_TP_CAR_CAR);
             map.put("sNotes", client.getSessionXXX().getParamsCompany().getNotesPurchasesOrder());
@@ -3297,5 +3267,93 @@ public abstract class STrnUtilities {
         iog.getDbmsEntries().addAll(iogEntries);
                 
         return iog;
+    }
+    
+    /**
+     * Get CFD primary key by its own UUID.
+     * @param statement DB statement.
+     * @param uuid Desired UUID.
+     * @return 
+     */
+    public static int getCfdIdByUuid(final Statement statement, final String uuid) {
+        String sql = "";
+        ResultSet resultSet = null;
+        int id = SLibConstants.UNDEFINED;
+
+        try {
+            sql = "SELECT id_cfd "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
+                    + "WHERE uuid = '" + uuid + "';";
+            
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(STrnUtilities.class.getName(), e);
+        }
+
+        return id;
+    }
+    
+    /**
+     * Get DPS primary key by UUID of its own CFD.
+     * @param statement DB statement.
+     * @param uuid Desired UUID.
+     * @return 
+     */
+    public static int[] getDpsKeyByUuid(final Statement statement, final String uuid) {
+        String sql = "";
+        ResultSet resultSet = null;
+        int[] key = null;
+
+        try {
+            sql = "SELECT fid_dps_year_n, fid_dps_doc_n "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
+                    + "WHERE uuid = '" + uuid + "';";
+            
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                key = new int[] { resultSet.getInt(1), resultSet.getInt(0) };
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(STrnUtilities.class.getName(), e);
+        }
+
+        return key;
+    }
+    
+    /**
+     * Counts how many payments has the provided DPS, excluding, if any, the provided CFD.
+     * @param statement DB statement.
+     * @param dpsKey Primary key of desired DPS.
+     * @param cfdId Primary key of desired CFD to exclude.
+     * @return 
+     */
+    public static int countDpsPayments(final Statement statement, final int[] dpsKey, final int cfdId) {
+        String sql = "";
+        ResultSet resultSet = null;
+        int count = 0;
+
+        try {
+            sql = "SELECT count(*) "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " "
+                    + "WHERE fid_dps_year_n =" + dpsKey[0] + " AND fid_dps_doc_n = " + dpsKey[1] + " AND fid_cfd_n <> " + cfdId + " AND "
+                    + "fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0] + " AND fid_tp_sys_mov_xxx = " + SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1] + " AND "
+                    + "fid_cl_sys_mov = " + SModSysConsts.FINS_CL_SYS_MOV_MI + " AND "
+                    + "NOT b_del;";
+            
+            resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                count = resultSet.getInt(1);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.printException(STrnUtilities.class.getName(), e);
+        }
+
+        return count;
     }
 }

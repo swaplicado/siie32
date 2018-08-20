@@ -182,10 +182,10 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                         }
                         else {
                             if (receiptIssue.isDeleted()) {
-                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getIssueNumber() + "' está eliminado.");
+                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getPayrollReceiptIssueNumber() + "' está eliminado.");
                             }
                             else if (receiptIssue.getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getIssueNumber() + "' está anulado.");
+                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getPayrollReceiptIssueNumber() + "' está anulado.");
                             }
                             else if (!SDataUtilities.isPeriodOpen((SClientInterface) miClient, receiptIssue.getDateIssue())) {
                                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
@@ -474,7 +474,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        needUpdate = SCfdUtils.verifyCfdi((SClientInterface) miClient, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR, true);
+                        needUpdate = SCfdUtils.validateCfdi((SClientInterface) miClient, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR, true);
 
                         if (needUpdate) {
                             miClient.getSession().notifySuscriptors(mnGridType);
@@ -532,7 +532,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        SHrsUtils.SendPayrollReceipt(miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, gridRow.getRowPrimaryKey());
+                        SHrsUtils.sendPayrollReceipt(miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, gridRow.getRowPrimaryKey());
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);

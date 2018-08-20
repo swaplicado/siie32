@@ -11,7 +11,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
 public class SLayoutBankPaymentRow implements SGridRow {
 
@@ -39,8 +39,8 @@ public class SLayoutBankPaymentRow implements SGridRow {
     protected Date mtRecordDate;
     
     protected SLayoutBankPayment moLayoutBankPayment;
-    protected SFinRecordLayout moFinRecordLayout;
-    protected SFinRecordLayout moFinRecordLayoutOld;
+    protected SLayoutBankRecordKey moLayoutBankRecordKey;
+    protected SLayoutBankRecordKey moLayoutBankRecordKeyOld;
 
     public SLayoutBankPaymentRow(SGuiClient client) {
         miClient = client;
@@ -70,8 +70,8 @@ public class SLayoutBankPaymentRow implements SGridRow {
         mtRecordDate = null;
         
         moLayoutBankPayment = null;
-        moFinRecordLayout = null;
-        moFinRecordLayoutOld = null;
+        moLayoutBankRecordKey = null;
+        moLayoutBankRecordKeyOld = null;
     }
     
     public void setBizPartnerId(int n) { mnBizPartnerId = n; }
@@ -96,8 +96,8 @@ public class SLayoutBankPaymentRow implements SGridRow {
     public void setRecordDate(Date t) { mtRecordDate = t; }
     
     public void setLayoutBankPayment(SLayoutBankPayment o) { moLayoutBankPayment = o; }
-    public void setFinRecordLayout(SFinRecordLayout o) { moFinRecordLayout = o; }
-    public void setFinRecordLayoutOld(SFinRecordLayout o) { moFinRecordLayoutOld = o; }
+    public void setLayoutBankRecordKey(SLayoutBankRecordKey o) { moLayoutBankRecordKey = o; }
+    public void setLayoutBankRecordKeyOld(SLayoutBankRecordKey o) { moLayoutBankRecordKeyOld = o; }
     
     public void setPrimaryKey(int[] pk) {
         mnBizPartnerId = pk[0];
@@ -127,8 +127,8 @@ public class SLayoutBankPaymentRow implements SGridRow {
     public Date getRecordDate() { return mtRecordDate; }
     
     public SLayoutBankPayment getLayoutBankPayment() { return moLayoutBankPayment; }
-    public SFinRecordLayout getFinRecordLayout() { return moFinRecordLayout; }
-    public SFinRecordLayout getFinRecordLayoutOld() { return moFinRecordLayoutOld; }
+    public SLayoutBankRecordKey getLayoutBankRecordKey() { return moLayoutBankRecordKey; }
+    public SLayoutBankRecordKey getLayoutBankRecordKeyOld() { return moLayoutBankRecordKeyOld; }
 
     @Override
     public int[] getRowPrimaryKey() {
@@ -279,8 +279,8 @@ public class SLayoutBankPaymentRow implements SGridRow {
         registry.setRecordDate(this.getRecordDate());
         
         registry.setLayoutBankPayment(this.getLayoutBankPayment());
-        registry.setFinRecordLayout(this.getFinRecordLayout());
-        registry.setFinRecordLayoutOld(this.getFinRecordLayoutOld());
+        registry.setLayoutBankRecordKey(this.getLayoutBankRecordKey());
+        registry.setLayoutBankRecordKeyOld(this.getLayoutBankRecordKeyOld());
         
         return registry;
     }

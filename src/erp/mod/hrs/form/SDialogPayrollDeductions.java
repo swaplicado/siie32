@@ -43,7 +43,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPaneFormOwner, ItemListener, ActionListener, CellEditorListener, KeyListener {
 
@@ -189,7 +189,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Monto $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $"));
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago", moGridEmployeeRow.getTable().getDefaultEditor(Boolean.class));
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
@@ -345,7 +345,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
                             hrsReceiptDeductionRow.setDeduction(deduction.getDeduction());
                             hrsReceiptDeductionRow.setHrsReceipt(hrsReceipt);
                             hrsReceiptDeductionRow.setReceiptDeduction(deduction.getReceiptDeduction());
-                            hrsReceiptDeductionRow.setRowType(SHrsPayrollReceiptDeduction.BY_DED);
+                            hrsReceiptDeductionRow.setInputMode(SHrsPayrollReceiptDeduction.INPUT_BY_DED);
                             hrsReceiptDeductionRow.setPkMoveId(deduction.getPkMoveId());
                             hrsReceiptDeductionRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                             hrsReceiptDeductionRow.setXtaValue(deduction.getReceiptDeduction().getAmountUnitary());
@@ -368,7 +368,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
                         hrsReceiptDeductionRow.setDeduction(moDeductions.get(moKeyDeduction.getValue()[0]));
                         hrsReceiptDeductionRow.setHrsReceipt(hrsReceipt);
 
-                        hrsReceiptDeductionRow.setRowType(SHrsPayrollReceiptDeduction.BY_DED);
+                        hrsReceiptDeductionRow.setInputMode(SHrsPayrollReceiptDeduction.INPUT_BY_DED);
                         hrsReceiptDeductionRow.setPkMoveId(hrsReceipt.getHrsDeductions().size() + 1);
                         hrsReceiptDeductionRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                         hrsReceiptDeductionRow.setXtaValue(0d);

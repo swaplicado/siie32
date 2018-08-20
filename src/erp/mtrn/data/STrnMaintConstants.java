@@ -19,4 +19,7 @@ public class STrnMaintConstants {
     
     public static final String FINGERPRINT_WITH = "Con huella digital";
     public static final String FINGERPRINT_WITHOUT = "Sin huella digital";
+    
+    public static final String FINGERPASSWORD_WITH = "Con contraseña";
+    public static final String FINGERPASSWORD_WITHOUT = "Sin contraseña";
 }

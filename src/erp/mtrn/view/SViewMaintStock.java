@@ -25,11 +25,11 @@ import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import sa.lib.SLibUtils;
-import sa.lib.grid.SGridUtils;
+import sa.lib.grid.SGridUtils;  
 
 /**
  *
- * @author Sergio Flores, Gil De Jesús
+ * @author Sergio Flores, Gil De Jesús, Claudio Peña
  */
 public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -78,13 +78,13 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
         jbCardex.addActionListener(this);
         addTaskBarUpperComponent(jbCardex);
         jbCardex.setEnabled(!isMaintUserNeeded());
-        
+ 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDate);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperSeparator();
-
+        
         switch (mnTabTypeAux01) {
             case SModSysConsts.TRNX_MAINT_PART:
                 break;
@@ -120,6 +120,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 
             case SModSysConsts.TRNX_MAINT_TOOL_LENT:
                 jbMaintLentEmpIn = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_maint_lent_emp_in.gif")));
+                
                 jbMaintLentEmpIn.setPreferredSize(new Dimension(23, 23));
                 jbMaintLentEmpIn.setToolTipText("Devolución herramienta empleado");
                 jbMaintLentEmpIn.addActionListener(this);
@@ -130,6 +131,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 jbMaintLentContIn.setToolTipText("Devolución herramienta contratista");
                 jbMaintLentContIn.addActionListener(this);
                 addTaskBarUpperComponent(jbMaintLentContIn);
+
                 break;
                 
             case SModSysConsts.TRNX_MAINT_TOOL_MAINT:
@@ -159,7 +161,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
 
-                aoTableColumns = new STableColumn[10];
+                aoTableColumns = new STableColumn[11];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL:
@@ -173,15 +175,33 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL_LENT:
-            case SModSysConsts.TRNX_MAINT_TOOL_MAINT:
-            case SModSysConsts.TRNX_MAINT_TOOL_LOST:
                 i = 0;
                 aoKeyFields = new STableField[3];
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
+                aoTableColumns = new STableColumn[12];
+                
+                break;
 
+            case SModSysConsts.TRNX_MAINT_TOOL_MAINT:
+                 i = 0;
+                aoKeyFields = new STableField[3];
+                aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
+                aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
+                aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
                 aoTableColumns = new STableColumn[7];
+
+                break;
+
+            case SModSysConsts.TRNX_MAINT_TOOL_LOST:           
+                i = 0;
+                aoKeyFields = new STableField[3];
+                aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
+                aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
+                aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
+                aoTableColumns = new STableColumn[7];
+
                 break;
 
             default:
@@ -194,16 +214,30 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
 
         i = 0;
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+            if (mnTabTypeAux01 == SModSysConsts.TRNX_MAINT_TOOL_LENT || mnTabTypeAux01 == SModSysConsts.TRNX_MAINT_TOOL_AVL || mnTabTypeAux01 == SModSysConsts.TRNX_MAINT_TOOL_MAINT
+                || mnTabTypeAux01 == SModSysConsts.TRNX_MAINT_TOOL_LOST || mnTabTypeAux01 == SModSysConsts.TRNX_MAINT_TOOL) {
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+            }
+            else {
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "s.dt", "Fecha", 100);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+            }
         }
         else {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "s.dt", "Fecha", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
         }
 
         if (isMaintUserNeeded()) {
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "s.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.code", "Código tipo doc.", 40);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.tp_iog", "Tipo doc.", 120);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_bp", "Responsable", 200);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "supv.name", "Residente", 200);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_signed", "Firmado", STableConstants.WIDTH_BOOLEAN);
         }
         
         if (isStockCfgNeeded()) {
@@ -217,11 +251,11 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i++].setCellRenderer(SGridUtils.getCellRendererNumberQuantity());
         }
         
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mov_i", "Entradas", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mov_i", "Entradas", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++].setCellRenderer(SGridUtils.getCellRendererNumberQuantity());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mov_o", "Salidas", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_mov_o", "Salidas", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++].setCellRenderer(SGridUtils.getCellRendererNumberQuantity());
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk", "Existencias", STableConstants.WIDTH_QUANTITY_2X);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_stk", "Existencias", STableConstants.WIDTH_QUANTITY);
         aoTableColumns[i++].setCellRenderer(SGridUtils.getCellRendererNumberQuantity());
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
 
@@ -247,7 +281,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
     
     private boolean isMaintUserNeeded() {
         return SLibUtils.belongsTo(mnTabTypeAux01, new int [] { SModSysConsts.TRNX_MAINT_TOOL_LENT, SModSysConsts.TRNX_MAINT_TOOL_MAINT, SModSysConsts.TRNX_MAINT_TOOL_LOST });
-    }
+    }   
     
     private int[] getWarehouseKey() {
         int[] key = null;
@@ -285,7 +319,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
             miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(SDataConstants.TRNX_MAINT_DIOG);
         }
     }
-
+    
     @Override
     public void actionNew() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -358,7 +392,10 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
             sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " ";
         }
         
-        msSql = "SELECT s.id_item, s.id_unit, i.item_key, i.item, u.symbol, sc.qty_min, sc.rop, sc.qty_max, " +
+        msSql = "SELECT s.id_item, s.id_unit, s.dt, i.item_key, i.item, u.symbol, sc.qty_min, sc.rop, sc.qty_max, " +
+                (!isMaintUserNeeded() ? "" : "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), erp.lib_fix_int(d.num, 6)) AS f_num, " +
+                "(SELECT COUNT(*) FROM trn_maint_diog_sig AS sig WHERE sig.fk_diog_year = d.id_year AND sig.fk_diog_doc = d.id_doc AND sig.ts_usr_ins >= d.ts_edit) > 0 AS _signed, " +
+                "tp_iog.tp_iog, tp_iog.code, bpb.code, ent.code, supv.name, " ) +
                 (!isMaintUserNeeded() ? "" : "COALESCE(b.id_bp, 0) AS _id_bp, COALESCE(b.bp, 'N/D') AS _bp, ") +
                 "IF(SUM(s.mov_in - s.mov_out) <= sc.qty_min, " + STableConstants.ICON_VIEW_LIG_RED + ", " +
                 "IF(sc.qty_min < SUM(s.mov_in - s.mov_out) AND SUM(s.mov_in - s.mov_out) <= sc.rop, "  + STableConstants.ICON_VIEW_LIG_YEL + ", " +
@@ -373,12 +410,16 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 "INNER JOIN trn_stk_cfg AS sc ON sc.id_item = s.id_item AND sc.id_unit = s.id_unit AND sc.id_cob = s.id_cob AND sc.id_wh = s.id_wh " +
                 (!isMaintUserNeeded() ? "" : 
                 "INNER JOIN trn_diog AS d ON d.id_year = s.fid_diog_year AND d.id_doc = s.fid_diog_doc " +
+                "INNER JOIN erp.trns_tp_iog AS tp_iog ON d.fid_tp_iog = tp_iog.id_tp_iog AND d.fid_ct_iog = tp_iog.id_ct_iog AND d.fid_cl_iog = tp_iog.id_cl_iog " +
+                "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_cob = bpb.id_bpb " +
+                "INNER JOIN erp.cfgu_cob_ent AS ent ON d.fid_cob = ent.id_cob AND d.fid_wh = ent.id_ent " +
+                "INNER JOIN trn_maint_user_supv AS supv ON d.fid_maint_user_supv = supv.id_maint_user_supv " +
                 "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = d.fid_maint_user_n ") +
                 "WHERE NOT s.b_del " + (sqlWhere.isEmpty() ? "" : "AND " + sqlWhere) +
                 "GROUP BY s.id_item, s.id_unit, i.item_key, i.item, u.symbol, sc.qty_min, sc.rop, sc.qty_max" +
                 (!isMaintUserNeeded() ? "" : ", b.id_bp, b.bp") + " " +
                 sqlHaving +
-                "ORDER BY " + (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") +
+                "ORDER BY " + (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key,  ") +
                 "s.id_item, u.symbol, s.id_unit" +
                 (!isMaintUserNeeded() ? "" : ", b.bp, b.id_bp") + " ";
     }

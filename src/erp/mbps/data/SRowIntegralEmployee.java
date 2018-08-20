@@ -6,13 +6,13 @@ package erp.mbps.data;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SRowIntegralEmployee extends erp.lib.table.STableRow {
 
     protected int mnPkEmployeeId;
     protected String msEmployeeName;
-    protected String msEmployeeNumber;
+    protected int mnEmployeeNumber;
     protected boolean mbActive;
     protected String msEmployeeCategory;
     protected String msEmployeeType;
@@ -32,7 +32,7 @@ public class SRowIntegralEmployee extends erp.lib.table.STableRow {
     public SRowIntegralEmployee() {
         mnPkEmployeeId = 0;
         msEmployeeName = "";
-        msEmployeeNumber = "";
+        mnEmployeeNumber = 0;
         mbActive = false;
         msEmployeeCategory = "";
         msEmployeeType = "";
@@ -54,9 +54,9 @@ public class SRowIntegralEmployee extends erp.lib.table.STableRow {
     public void prepareTableRow() {
         mvValues.clear();
         mvValues.add(msEmployeeName);
-        mvValues.add(msEmployeeNumber);
-        mvValues.add(msSalaryType);
+        mvValues.add(mnEmployeeNumber);
         mvValues.add(mbActive);
+        mvValues.add(msSalaryType);
         mvValues.add(msEmployeeCategory);
         mvValues.add(msEmployeeType);
         mvValues.add(msDepartament);
@@ -74,7 +74,7 @@ public class SRowIntegralEmployee extends erp.lib.table.STableRow {
 
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
     public void setEmployeeName(String s) { msEmployeeName = s; }
-    public void setEmployeeNumber(String s) { msEmployeeNumber = s; }
+    public void setEmployeeNumber(int n) { mnEmployeeNumber = n; }
     public void setActive(boolean b) { mbActive = b; }
     public void setEmployeeCategory(String s) { msEmployeeCategory = s; }
     public void setEmployeeType(String s) { msEmployeeType = s; }
@@ -92,8 +92,8 @@ public class SRowIntegralEmployee extends erp.lib.table.STableRow {
     public void setCountry(String s) { msCountry = s; }
 
     public int getPkEmployeeId() { return mnPkEmployeeId; }
-    public String getEmployeeName() { return msEmployeeName ; }
-    public String getEmployeeNumber() { return msEmployeeNumber ; }
+    public String getEmployeeName() { return msEmployeeName; }
+    public int getEmployeeNumber() { return mnEmployeeNumber; }
     public boolean isActive() { return mbActive; }
     public String getEmployeeCategory() { return msEmployeeCategory; }
     public String getEmployeeType() { return msEmployeeType; }

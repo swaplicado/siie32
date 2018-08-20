@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Sergio Flores
  * 
  * Maintenance Log:
  * 
@@ -21,7 +21,7 @@ public abstract class SDataConstantsSys {
 
     public static final int UNDEFINED = 0;
     public static final int NA = 1;
-
+    
     public static final int CFGS_CT_ENT_CASH = 1;
     public static final int CFGS_CT_ENT_WH = 2;
     public static final int CFGS_CT_ENT_POS = 3;
@@ -173,7 +173,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_FIN_BKC = 102007;
     public static final int PRV_FIN_CHECK = 102008;
     public static final int PRV_FIN_TAX_GRP = 102009;
-    public static final int PRV_FIN_REG = 102010;
+    public static final int PRV_FIN_REC = 102010;
     public static final int PRV_FIN_ACC_BP = 102011;
     public static final int PRV_FIN_ACC_ITEM = 102012;
     public static final int PRV_FIN_DPS_DNS = 102013;
@@ -1096,9 +1096,9 @@ public abstract class SDataConstantsSys {
     public static final int TRNS_CFD_CAT_TAX_REG = 17;  // tax regime
     public static final int TRNS_CFD_CAT_CTY = 18;      // country
     public static final int TRNS_CFD_CAT_CFD_USE = 19;  // CFDI use
-    public static final int TRNS_CFD_CAT_INT_MOV_REA = 21;  // International Commerce: move reason
-    public static final int TRNS_CFD_CAT_INT_OPN_TP = 22;   // International Commerce: operation type
-    public static final int TRNS_CFD_CAT_INT_REQ_KEY = 23;  // International Commerce: request keys
+    public static final int TRNS_CFD_CAT_INT_MOV_REA = 21;  // International Commerce: move reason (Int. Commerce)
+    public static final int TRNS_CFD_CAT_INT_OPN_TP = 22;   // International Commerce: operation type (Int. Commerce)
+    public static final int TRNS_CFD_CAT_INT_REQ_KEY = 23;  // International Commerce: request keys (Int. Commerce)
     
     public static final String TRNS_CFD_CAT_PAY_WAY_99 = "99";  // Por definir
     
@@ -1598,10 +1598,12 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_STK_MOV = 207031;       // stock movements detailed per item
     public static final int REP_TRN_STK_MOV_MOV = 207032;   // stock movements detailed per movement
     public static final int REP_TRN_STK_MOV_SUM = 207033;   // stock movements summary
+    public static final int REP_TRN_STK_MOV_SUM_SUM = 207034;   // sumary of stock movements summary
     
     public static final int REP_TRN_CFD = 207101;
     public static final int REP_TRN_CFDI = 207102;
     public static final int REP_TRN_CFDI_33 = 207112;
+    public static final int REP_TRN_CFDI_33_CRP_10 = 207113;
     public static final int REP_TRN_CFDI_ACK_CAN = 207103;
     public static final int REP_TRN_SHIP = 207104;
     public static final int REP_TRN_COMMS_ITEM = 207105;

@@ -99,9 +99,8 @@ public abstract class SBpsUtils {
     }
     
     /**
-     * Get the bizparter id by fiscal id and category
-     * 
-     * @param session
+     * Get business partner ID by fiscal ID and business partner category.
+     * @param session GUI session.
      * @param fiscalId String
      * @param bizPartnerCategory int
      * @return 
