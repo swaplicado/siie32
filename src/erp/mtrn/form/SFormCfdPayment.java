@@ -332,7 +332,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Póliza contable"); // NOI18N
+        setTitle("CFDI recepción de pagos"); // NOI18N
         setModal(true);
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {

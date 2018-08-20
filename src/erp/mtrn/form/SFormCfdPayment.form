@@ -3,7 +3,7 @@
 <Form version="1.5" maxVersion="1.5" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="0"/>
-    <Property name="title" type="java.lang.String" value="P&#xf3;liza contable" noResource="true"/>
+    <Property name="title" type="java.lang.String" value="CFDI recepci&#xf3;n de pagos" noResource="true"/>
     <Property name="modal" type="boolean" value="true"/>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
