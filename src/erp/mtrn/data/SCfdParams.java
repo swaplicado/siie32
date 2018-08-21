@@ -153,7 +153,7 @@ public final class SCfdParams implements java.io.Serializable {
     public void setRfcEmisor(java.lang.String s) { msRfcEmisor = s; }
     public void setRfcReceptor(java.lang.String s) { msRfcReceptor = s; }
     public void setTotalCy(double d) { mdTotalCy = d; }
-    public void setRegimenFiscal(java.lang.String[] s) { masRegimenFiscal = s; }
+    public void setRegimenFiscal(java.lang.String[] as) { masRegimenFiscal = as; }
     public void setComsumirTimbre(java.lang.Boolean b) { mbComsumirTimbre = b; }
     public void setElektraOrder(java.lang.String s) { msElektraOrder = s; }
     public void setElektraBarcode(java.lang.String s) { msElektraBarcode = s; }

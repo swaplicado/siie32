@@ -1881,6 +1881,8 @@ public abstract class SCfdUtils implements Serializable {
             
             int xmlType = moDps.getDbmsDataCfd() != null ? moDps.getDbmsDataCfd().getFkXmlTypeId() : ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV);
             switch (xmlType) {
+                case SDataConstantsSys.TRNS_TP_XML_CFD:
+                    break;
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                     if (moDps.getDbmsDataDpsCfd() != null && moDps.getDbmsDataDpsCfd().hasInternationalCommerce()) {
                         params.setRegimenFiscal(new String[] { miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal() });
