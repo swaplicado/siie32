@@ -1255,7 +1255,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldPayHour = new SFormField(miClient, SLibConstants.DATA_TYPE_TIME, true, jftPayHour, jlPayHour);
         moFieldPayPaymentWay = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPayPaymentWay, jlPayPaymentWay);
         moFieldPayCurrency = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPayCurrency, jlPayCurrency);
-        moFieldPayAmount = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, true, jtfPayAmount, jlPayAmount);
+        moFieldPayAmount = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfPayAmount, jlPayAmount);
         moFieldPayAmount.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
         moFieldPayExchangeRate = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfPayExchangeRate, new JLabel(jtfPayExchangeRate.getToolTipText()));
         moFieldPayExchangeRate.setDecimalFormat(SLibUtils.getDecimalFormatExchangeRate());
@@ -1285,9 +1285,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldDocInstallment = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfDocInstallment, jlDocInstallment);
         moFieldDocExchangeRate = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfDocExchangeRate, jlDocExchangeRate);
         moFieldDocExchangeRate.setDecimalFormat(SLibUtils.getDecimalFormatExchangeRate());
-        moFieldDocBalancePrev = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, true, jtfDocBalancePrev, jlDocBalancePrev);
+        moFieldDocBalancePrev = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfDocBalancePrev, jlDocBalancePrev);
         moFieldDocBalancePrev.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
-        moFieldDocPayment = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, true, jtfDocPayment, jlDocPayment);
+        moFieldDocPayment = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfDocPayment, jlDocPayment);
         moFieldDocPayment.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
 
         mvFields = new Vector<>();
