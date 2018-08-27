@@ -139,6 +139,15 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         super(SDataConstants.FIN_REC_ETY);
         reset();
     }
+    
+    private void sanitizeData() {
+        if (msConcept.length() > 100) {
+            msConcept = msConcept.substring(0, 100 - 3).trim() + "...";
+        }
+        if (msReference.length() > 15) {
+            msReference = msReference.substring(0, 15 - 3).trim() + "...";
+        }
+    }
 
     public void setPkYearId(int n) { mnPkYearId = n; }
     public void setPkPeriodId(int n) { mnPkPeriodId = n; }
@@ -762,6 +771,8 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                     mnFkCheckId_n = moDbmsCheck.getPkCheckId();
                 }
             }
+            
+            sanitizeData();
 
             callableStatement = connection.prepareCall(
                     "{ CALL fin_rec_ety_save(" +
