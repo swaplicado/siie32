@@ -1292,7 +1292,7 @@ public abstract class SCfdUtils implements Serializable {
 
             client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
             if (client.getSessionXXX().getParamsCompany().getIsCfdiProduction()) {
-                // CFDI signing production environment:
+                // CFDI cancelling production environment:
                 
                 switch (pac.getPkPacId()) {
                     case SModSysConsts.TRN_PAC_FCG:
@@ -1408,7 +1408,7 @@ public abstract class SCfdUtils implements Serializable {
                         aUuids.getString().addAll(asUuid);
 
                         QName uuidQName = new QName("uuids");
-                        JAXBElement<StringArray> uuidValue = new JAXBElement<StringArray>(uuidQName, StringArray.class, aUuids);
+                        JAXBElement<StringArray> uuidValue = new JAXBElement<>(uuidQName, StringArray.class, aUuids);
 
                         uuids.setUuids(uuidValue);
 
@@ -1520,7 +1520,7 @@ public abstract class SCfdUtils implements Serializable {
                 }
             }
             else {
-                // CFDI signing production environment:
+                // CFDI cancelling testing environment:
                 
                 switch (pac.getPkPacId()) {
                     case SModSysConsts.TRN_PAC_FCG:
