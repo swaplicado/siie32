@@ -20,7 +20,7 @@ import sa.lib.gui.SGuiConsts;
  * @author Antonio Ortega
  */
 public class SUtilMigrateXml extends javax.swing.JFrame {
-    
+
     private erp.lib.data.SDataDatabase moDbMySqlSiie;
     private final ArrayList<JTextField> maTextFields = new ArrayList<>();
 
@@ -310,7 +310,7 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
                 final String databasePort = jtfDatabasePort.getText();
                 final String databaseName = jtfDatabaseName.getText();
                 final String databaseUser = jtfDatabaseUser.getText();
-                final String databasePswd = jtfDatabasePswd.getText();
+                final String databasePswd = new String(jtfDatabasePswd.getPassword());
 
                 // Company MySQL database connection:
                 moDbMySqlSiie.connect(databaseHost, databasePort, databaseName, databaseUser, databasePswd);
@@ -327,7 +327,7 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
                 SBaseXUtils.executeBaseXQuery(baseXSession, createBaseXDBQuery);
 
                 // Select relevant document data from MySQL database:
-                final String cfdQuery = "SELECT id_cfd, doc_xml, doc_xml_name FROM trn_cfd WHERE node_id_n IS NULL ORDER BY id_cfd;";
+                final String cfdQuery = "SELECT id_cfd, doc_xml FROM trn_cfd WHERE doc_xml_uuid = '' ORDER BY id_cfd;";
 
                 Statement statement = moDbMySqlSiie.getConnection().createStatement();
                 ResultSet resultSet = moDbMySqlSiie.getConnection().createStatement().executeQuery(cfdQuery);
@@ -336,10 +336,10 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
                     totalFiles++;
 
                     System.out.println("Processing file " + totalFiles);
-                    
+
                     String cfdId = resultSet.getString("id_cfd");
                     String xmlDocBody = resultSet.getString("doc_xml");
-                    String xmlDocName = resultSet.getString("doc_xml_name");
+                    String xmlUuid = SBaseXUtils.generateUniqueXmlId(moDbMySqlSiie.getConnection());
 
                     if (!xmlDocBody.isEmpty()) {
                         // escape XML special characters.
@@ -347,24 +347,16 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
 
                         // Parse the xml body and add it to the BaseX database.
                         String addXmlToDBQuery
-                                = "db:add(\"" + databaseName + "\", fn:parse-xml(\"" + xmlDocBody + "\"), \"" + xmlDocName + "\")";
+                                = "db:replace(\"" + databaseName + "\", \"/" + xmlUuid + ".xml" + "\", fn:parse-xml(\"" + xmlDocBody + "\"))";
                         try {
                             SBaseXUtils.executeBaseXQuery(baseXSession, addXmlToDBQuery);
-                        }
-                        catch (IOException e) {
+                        } catch (IOException e) {
                             // File could not be parsed, add it to malformed files array and continue with the next.
                             badFilesIDs.add(cfdId);
                             continue;
                         }
 
-                        // Obtain the last inserted document of the BaseX database and return its node-id
-                        String getLastDBEntryQuery
-                                = "let $last := collection(\"" + databaseName + "\")[last()]\n"
-                                + "return db:node-id($last)";
-                        ArrayList<String> queryResult = SBaseXUtils.executeBaseXQuery(baseXSession, getLastDBEntryQuery);
-
-                        // Insert the document node-id and add it to the MySQL database as reference. 
-                        String updateNodeIdQuery = "UPDATE trn_cfd SET node_id_n = " + queryResult.get(0) + " WHERE id_cfd = " + cfdId + ";";
+                        String updateNodeIdQuery = "UPDATE trn_cfd SET doc_xml_uuid = '" + xmlUuid + "' WHERE id_cfd = " + cfdId + ";";
                         statement.executeUpdate(updateNodeIdQuery);
                     }
                     else {
@@ -382,8 +374,7 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
                 String message = hadErrors ? "Migration ended with warnings, check console output" : "Migration completed successfully";
 
                 JOptionPane.showMessageDialog(this, message, "Info", hadErrors ? JOptionPane.WARNING_MESSAGE : JOptionPane.INFORMATION_MESSAGE);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);
             }
         }

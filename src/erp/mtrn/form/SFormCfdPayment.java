@@ -3216,8 +3216,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         //cfdPacket.setCfdCertNumber(...);
         //cfdPacket.setCfdStringSigned(...);
         //cfdPacket.setCfdSignature(...);
-        //cfdPacket.setXml(...);
-        //cfdPacket.setXmlName(...);
+        //cfdPacket.setDocXmlUuid(...);
+        //cfdPacket.setDocXml(...);
+        //cfdPacket.setDocXmlName(...);
         cfdPacket.setXmlDate(SCfdUtils.composeDatetime(moFieldVouDate.getDate()));
         //cfdPacket.setXmlRfcEmisor(...);
         //cfdPacket.setXmlRfcReceptor(...);

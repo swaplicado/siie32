@@ -21,8 +21,9 @@ public final class SCfdPacket implements java.io.Serializable {
     private java.lang.String msCfdCertNumber;   // used in creation of SDataCfd
     private java.lang.String msCfdStringSigned; // used in creation of SDataCfd
     private java.lang.String msCfdSignature;    // used in creation of SDataCfd
-    private java.lang.String msXml;             // used in creation of SDataCfd
-    private java.lang.String msXmlName;         // used in creation of SDataCfd
+    private java.lang.String msDocXmlUuid;      // used in creation of SDataCfd
+    private java.lang.String msDocXml;          // used in creation of SDataCfd
+    private java.lang.String msDocXmlName;      // used in creation of SDataCfd
     private java.util.Date mtXmlDatetime;       // used in creation of SDataCfd
     private java.lang.String msXmlRfcEmisor;    // used in creation of SDataCfd
     private java.lang.String msXmlRfcReceptor;  // used in creation of SDataCfd
@@ -69,8 +70,9 @@ public final class SCfdPacket implements java.io.Serializable {
         msCfdCertNumber = "";
         msCfdStringSigned = "";
         msCfdSignature = "";
-        msXml = "";
-        msXmlName = "";
+        msDocXmlUuid = "";
+        msDocXml = "";
+        msDocXmlName = "";
         mtXmlDatetime = null;
         msXmlRfcEmisor = "";
         msXmlRfcReceptor = "";
@@ -117,8 +119,9 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setCfdCertNumber(java.lang.String s) { msCfdCertNumber = s; }
     public void setCfdStringSigned(java.lang.String s) { msCfdStringSigned = s; }
     public void setCfdSignature(java.lang.String s) { msCfdSignature = s; }
-    public void setXml(java.lang.String s) { msXml = s; }
-    public void setXmlName(java.lang.String s) { msXmlName = s; }
+    public void setDocXmlUuid(java.lang.String s) { msDocXmlUuid = s; }
+    public void setDocXml(java.lang.String s) { msDocXml = s; }
+    public void setDocXmlName(java.lang.String s) { msDocXmlName = s; }
     public void setXmlDate(java.util.Date t) { mtXmlDatetime = t; }
     public void setXmlRfcEmisor(java.lang.String s) { msXmlRfcEmisor = s; }
     public void setXmlRfcReceptor(java.lang.String s) { msXmlRfcReceptor = s; }
@@ -164,8 +167,9 @@ public final class SCfdPacket implements java.io.Serializable {
     //public java.lang.String getCfdCertNumber() { return msCfdCertNumber; }
     public java.lang.String getCfdStringSigned() { return msCfdStringSigned; }
     public java.lang.String getCfdSignature() { return msCfdSignature; }
-    public java.lang.String getXml() { return msXml; }
-    public java.lang.String getXmlName() { return msXmlName; }
+    public java.lang.String getDocXmlUuid() { return msDocXmlUuid; }
+    public java.lang.String getDocXml() { return msDocXml; }
+    public java.lang.String getDocXmlName() { return msDocXmlName; }
     public java.util.Date getXmlDate() { return mtXmlDatetime; }
     //public java.lang.String getXmlRfcEmisor() { return msXmlRfcEmisor; }
     //public java.lang.String getXmlRfcReceptor() { return msXmlRfcReceptor; }
@@ -218,18 +222,18 @@ public final class SCfdPacket implements java.io.Serializable {
             addXmlHeader = false;   // it is assumed that XML already has its header
         }
         else if (moAuxCfdRootElement instanceof cfd.ver2.DElementComprobante) {
-            msXml = ((cfd.ver2.DElementComprobante) moAuxCfdRootElement).getElementForXml();
-            msXmlName = DCfd.createFileName((cfd.ver2.DElementComprobante) moAuxCfdRootElement) + ".xml";
+            msDocXml = ((cfd.ver2.DElementComprobante) moAuxCfdRootElement).getElementForXml();
+            msDocXmlName = DCfd.createFileName((cfd.ver2.DElementComprobante) moAuxCfdRootElement) + ".xml";
             mtXmlDatetime = ((cfd.ver2.DElementComprobante) moAuxCfdRootElement).getAttFecha().getDatetime();
         }
         else if (moAuxCfdRootElement instanceof cfd.ver32.DElementComprobante) {
-            msXml = ((cfd.ver32.DElementComprobante) moAuxCfdRootElement).getElementForXml();
-            msXmlName = DCfd.createFileName((cfd.ver32.DElementComprobante) moAuxCfdRootElement) + ".xml";
+            msDocXml = ((cfd.ver32.DElementComprobante) moAuxCfdRootElement).getElementForXml();
+            msDocXmlName = DCfd.createFileName((cfd.ver32.DElementComprobante) moAuxCfdRootElement) + ".xml";
             mtXmlDatetime = ((cfd.ver32.DElementComprobante) moAuxCfdRootElement).getAttFecha().getDatetime();
         }
         else if (moAuxCfdRootElement instanceof cfd.ver33.DElementComprobante) {
-            msXml = ((cfd.ver33.DElementComprobante) moAuxCfdRootElement).getElementForXml();
-            msXmlName = DCfd.createFileName((cfd.ver33.DElementComprobante) moAuxCfdRootElement) + ".xml";
+            msDocXml = ((cfd.ver33.DElementComprobante) moAuxCfdRootElement).getElementForXml();
+            msDocXmlName = DCfd.createFileName((cfd.ver33.DElementComprobante) moAuxCfdRootElement) + ".xml";
             mtXmlDatetime = ((cfd.ver33.DElementComprobante) moAuxCfdRootElement).getAttFecha().getDatetime();
         }
         else {
@@ -237,7 +241,7 @@ public final class SCfdPacket implements java.io.Serializable {
         }
 
         if (addXmlHeader) {
-            msXml = SXmlConsts.XML_HEADER + msXml;
+            msDocXml = SXmlConsts.XML_HEADER + msDocXml;
         }
 
         SDataCfd cfd = new SDataCfd();
@@ -248,8 +252,9 @@ public final class SCfdPacket implements java.io.Serializable {
         cfd.setCertNumber(msCfdCertNumber);
         cfd.setStringSigned(msCfdStringSigned);
         cfd.setSignature(msCfdSignature);
-        cfd.setDocXml(msXml);
-        cfd.setDocXmlName(msXmlName);
+        cfd.setDocXmlUuid(msDocXmlUuid);
+        cfd.setDocXml(msDocXml);
+        cfd.setDocXmlName(msDocXmlName);
         cfd.setDocXmlRfcEmi(msXmlRfcEmisor);
         cfd.setDocXmlRfcRec(msXmlRfcReceptor);
         cfd.setDocXmlTot(mdXmlTotalCy);

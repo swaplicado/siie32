@@ -1,10 +1,16 @@
 package erp;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
+import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,6 +34,8 @@ import org.xml.sax.SAXException;
 
 public abstract class SBaseXUtils {
 
+    private static final SimpleDateFormat mDateFormatter = new SimpleDateFormat("yyyy/MM/dd - HH:mm:ss");
+
     private static SBaseXClient BaseXClient = null;
     private static DocumentBuilder DocumentBuilder = null;
     private static XPath XPath = null;
@@ -42,7 +50,7 @@ public abstract class SBaseXUtils {
      * @return {@link SBaseXClient} singleton instance
      */
     public static SBaseXClient getBaseXSessionInstance(final String host, final int port, final String username,
-        final String password) throws IOException {
+            final String password) throws IOException {
 
         if (BaseXClient == null) {
             BaseXClient = new SBaseXClient(host, port, username, password);
@@ -138,7 +146,7 @@ public abstract class SBaseXUtils {
     /**
      *
      * Extracts the database host name from a MySQL URL string
-     * 
+     *
      * @param databseURL The MySQL database URL string.
      * @return
      */
@@ -147,11 +155,11 @@ public abstract class SBaseXUtils {
 
         return splitResult[2].split(":")[0];
     }
-    
+
     /**
      *
      * Extracts the database name from a MySQL URL string
-     * 
+     *
      * @param databseURL The MySQL database URL string.
      * @return
      */
@@ -159,11 +167,28 @@ public abstract class SBaseXUtils {
         String[] splitResult = databseURL.split("/");
 
         String databaseName = splitResult[3];
-        if (splitResult[3].contains(Pattern.quote("?"))) {
-            databaseName = splitResult[3].split(Pattern.quote("?"))[0];
+        if (databaseName.contains("?")) {
+            databaseName = splitResult[3].split("\\?")[0];
         }
 
         return databaseName;
+    }
+
+    /**
+     * Write the provided error String to a text file in the root directory
+     *
+     * @param errorString
+     */
+    public static void logError(String errorString) {
+        try (FileWriter fw = new FileWriter("BaseXErrorLog.txt", true)) {
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            String body = mDateFormatter.format(timestamp) + ": " + errorString + "\r\n";
+
+            fw.write(body);
+            fw.close();
+        } catch (IOException ex) {
+            System.err.println("Could not write error to log: " + ex.getMessage());
+        }
     }
 
     /**
@@ -198,4 +223,27 @@ public abstract class SBaseXUtils {
             XPath = xpathFactory.newXPath();
         }
     }
+
+    /**
+     * Generate a unique uuid string that does not already exist in the database represented by the connection object provided.
+     *
+     * @param connection
+     * @return New UUID String.
+     * @throws SQLException
+     */
+    public static String generateUniqueXmlId(Connection connection) throws SQLException {
+        String newUuid;
+        boolean uuidExists;
+        do {
+            newUuid = UUID.randomUUID().toString();
+            String verifyColumnQuery = "SELECT count(*) FROM trn_cfd WHERE doc_xml_uuid = '" + newUuid + "' LIMIT 1";
+            
+            ResultSet checkResult = connection.createStatement().executeQuery(verifyColumnQuery);
+            checkResult.next();
+            uuidExists = checkResult.getInt("count(*)") == 1;
+        } while (uuidExists);
+
+        return newUuid;        
+    }
+
 }
