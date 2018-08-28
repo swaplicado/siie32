@@ -162,8 +162,9 @@ public abstract class SHrsCfdUtils {
     public static SDataCfd computeCfdi(final SGuiSession session, final SHrsFormerPayrollReceipt receipt, final int receiptIssue, final boolean cfdiPendingSigned) throws Exception {
         boolean add = true;
         int cfdId = SLibConsts.UNDEFINED;
+        String docXmlUuid = "";
         
-        String sql = "SELECT id_cfd, fid_st_xml " 
+        String sql = "SELECT id_cfd, doc_xml_uuid, fid_st_xml " 
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
                 + "WHERE fid_pay_rcp_pay_n = " + receipt.getPayroll().getPkNominaId() + " AND fid_pay_rcp_emp_n = " + receipt.getPkEmpleadoId() + " AND fid_pay_rcp_iss_n = " + receiptIssue + " "
                 + "ORDER BY id_cfd ";
@@ -176,6 +177,7 @@ public abstract class SHrsCfdUtils {
                 }
                 else {
                     cfdId = resultSet.getInt("id_cfd");
+                    docXmlUuid = resultSet.getString("doc_xml_uuid");
                 }
             }
         }
@@ -223,6 +225,7 @@ public abstract class SHrsCfdUtils {
             
             packet.setCfdCertNumber(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).getCertNumber());
             packet.setCfdSignature(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).sign(packet.getCfdStringSigned(), SLibTimeUtilities.digestYear(receipt.getPayroll().getFecha())[0]));
+            packet.setDocXmlUuid(docXmlUuid);
             
             switch (xmlType) {
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_32:

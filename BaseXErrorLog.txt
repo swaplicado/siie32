@@ -1,0 +1,61 @@
+2018/08/22 - 09:22:54: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+2018/08/22 - 09:23:01: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+2018/08/22 - 09:23:01: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+2018/08/22 - 09:23:11: java.io.IOException: Stopped at ., 1/30:
+[FODC0006] SAX: "" (Line 19): El contenido no está permitido en la sección final.
+2018/08/22 - 09:25:12: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+2018/08/22 - 09:25:18: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+2018/08/22 - 09:25:18: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+2018/08/22 - 09:25:27: java.io.IOException: Stopped at ., 1/30:
+[FODC0006] SAX: "" (Line 19): El contenido no está permitido en la sección final.
+2018/08/22 - 09:29:56: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+
+2018/08/22 - 09:30:05: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+
+2018/08/22 - 09:30:05: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+
+2018/08/22 - 09:30:18: java.io.IOException: Stopped at ., 1/30:
+[FODC0006] SAX: "" (Line 19): El contenido no está permitido en la sección final.
+
+2018/08/22 - 09:31:04: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+
+2018/08/22 - 09:31:10: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+
+2018/08/22 - 09:31:10: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+
+2018/08/22 - 09:31:19: java.io.IOException: Stopped at ., 1/30:
+[FODC0006] SAX: "" (Line 19): El contenido no está permitido en la sección final.
+
+2018/08/22 - 13:45:29: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+2018/08/22 - 13:45:59: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+2018/08/22 - 13:46:45: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+2018/08/22 - 13:48:23: java.io.IOException: Stopped at ., 1/25:
+[XPDY0002] null: no context value bound.
+2018/08/22 - 15:31:50: java.io.IOException: Stopped at ., 1/4:
+[XPST0017] fn:doc(uri): 2 arguments supplied, 1 expected.
+2018/08/23 - 13:13:00: java.io.IOException: Stopped at ., 1/4:
+[basex:doc] Database path '/erp_gs/e4b898fa-a12f-40fc-9de6-3f121b3d1fd8' yields no documents.
+2018/08/27 - 09:19:12: java.net.ConnectException: Connection refused: connect
+2018/08/27 - 09:19:25: java.net.ConnectException: Connection refused: connect
+2018/08/27 - 09:19:26: java.net.ConnectException: Connection refused: connect
+2018/08/27 - 09:21:42: java.net.ConnectException: Connection refused: connect
+2018/08/27 - 09:59:47: java.net.ConnectException: Connection refused: connect
+2018/08/27 - 14:13:38: java.net.ConnectException: Connection refused: connect
+2018/08/27 - 14:13:48: java.net.ConnectException: Connection refused: connect
+2018/08/27 - 14:13:49: java.net.ConnectException: Connection refused: connect
+2018/08/27 - 14:15:59: java.net.ConnectException: Connection refused: connect

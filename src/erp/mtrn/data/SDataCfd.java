@@ -6,15 +6,19 @@
 package erp.mtrn.data;
 
 import cfd.DCfdUtils;
+import erp.SBaseXClient;
+import erp.SBaseXUtils;
 import erp.cfd.SCfdConsts;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.STrnUtils;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -59,6 +63,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msCertNumber;
     protected java.lang.String msStringSigned;
     protected java.lang.String msSignature;
+    protected java.lang.String msDocXmlUuid;
     protected java.lang.String msDocXml;
     protected java.lang.String msDocXmlName;
     protected java.lang.String msDocXmlRfcEmi;
@@ -187,6 +192,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setCertNumber(java.lang.String s) { msCertNumber = s; }
     public void setStringSigned(java.lang.String s) { msStringSigned = s; }
     public void setSignature(java.lang.String s) { msSignature = s; }
+    public void setDocXmlUuid(java.lang.String s) { msDocXmlUuid = s; }
     public void setDocXml(java.lang.String s) { msDocXml = s; }
     public void setDocXmlName(java.lang.String s) { msDocXmlName = s; }
     public void setDocXmlRfcEmi(java.lang.String s) { msDocXmlRfcEmi = s; }
@@ -243,6 +249,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.String getCertNumber() { return msCertNumber; }
     public java.lang.String getStringSigned() { return msStringSigned; }
     public java.lang.String getSignature() { return msSignature; }
+    public java.lang.String getDocXmlUuid() { return msDocXmlUuid; }
     public java.lang.String getDocXml() { return msDocXml; }
     public java.lang.String getDocXmlName() { return msDocXmlName; }
     public java.lang.String getDocXmlRfcEmi() { return msDocXmlRfcEmi; }
@@ -404,6 +411,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         msCertNumber = "";
         msStringSigned = "";
         msSignature = "";
+        msDocXmlUuid = "";
         msDocXml = "";
         msDocXmlName = "";
         msDocXmlRfcEmi = "";
@@ -479,7 +487,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 msCertNumber = resultSet.getString("cert_num");
                 msStringSigned = resultSet.getString("str_signed");
                 msSignature = resultSet.getString("signature");
-                msDocXml = resultSet.getString("doc_xml");
+                msDocXmlUuid = resultSet.getString("doc_xml_uuid");
+                msDocXml = resultSet.getString("doc_xml");                                
                 msDocXmlName = resultSet.getString("doc_xml_name");
                 msDocXmlRfcEmi = resultSet.getString("xml_rfc_emi");
                 msDocXmlRfcRec = resultSet.getString("xml_rfc_rec");
@@ -521,6 +530,27 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkUserDeliveryId = resultSet.getInt("fid_usr_dvy");
                 mtUserProcessingTs = resultSet.getTimestamp("ts_prc");
                 mtUserDeliveryTs = resultSet.getTimestamp("ts_dvy");
+                
+                
+                String mysqlDatabaseURL = statement.getConnection().getMetaData().getURL();
+            
+                String databaseHost = SBaseXUtils.getDbHostFromUrl(mysqlDatabaseURL);
+                String databaseName = SBaseXUtils.getDbNameFromUrl(mysqlDatabaseURL);
+            
+                String xmlDocument = null;
+                try{
+                    // Company BaseX database connection
+                    SBaseXClient baseXSession = SBaseXUtils.getBaseXSessionInstance(databaseHost, 1984, "admin", "admin");
+                    String getDocumentByNodeID = "doc(\"/"+ databaseName + "/" + msDocXmlUuid +".xml\")";                
+                    xmlDocument  = SBaseXUtils.executeBaseXQuery(baseXSession, getDocumentByNodeID).get(0);                    
+                }
+                catch(Exception e){ 
+                   SBaseXUtils.logError(e.toString());
+                }
+                if (xmlDocument != null) {
+                    msDocXml = xmlDocument;
+                }
+                
                 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -575,15 +605,17 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         mnNumber = resultSet.getInt(1);
                     }
                 }
-
+            
+                msDocXmlUuid = SBaseXUtils.generateUniqueXmlId(connection);
+         
                 sql = "INSERT INTO trn_cfd (id_cfd, ser, num, " +
-                        "ts, cert_num, str_signed, signature, doc_xml, doc_xml_name, xml_rfc_emi, xml_rfc_rec, xml_tot, xml_mon, " +
+                        "ts, cert_num, str_signed, signature, doc_xml_uuid, doc_xml, doc_xml_name, xml_rfc_emi, xml_rfc_rec, xml_tot, xml_mon, " +
                         "xml_tc, xml_sign_n, uuid, qrc_n, ack_can_xml, ack_can_pdf_n, ack_dvy, msg_dvy, b_prc_ws, b_prc_sto_xml, " +
                         "b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, fid_cob_n, fid_dps_year_n, fid_dps_doc_n, " +
                         "fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, " +
                         "fid_pay_rcp_iss_n, fid_usr_prc, fid_usr_dvy, ts_prc, ts_dvy) " +
                         "VALUES (" + mnPkCfdId + ", ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
@@ -592,13 +624,13 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             else {
                 bIsUpd = true;
                 
-                sql = "UPDATE trn_cfd SET ser = ?, num = ?, ts = ?, cert_num = ?, str_signed = ?, signature = ?, " +
+                sql = "UPDATE trn_cfd SET ser = ?, num = ?, ts = ?, cert_num = ?, str_signed = ?, signature = ?, doc_xml_uuid = ?, " +
                         "doc_xml = ?, doc_xml_name = ?, xml_rfc_emi = ?, xml_rfc_rec = ?, xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, " +
                         "uuid = ?, qrc_n = ?, ack_can_xml = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, " +
                         "fid_tp_cfd = ?, fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_cob_n = ?, " +
                         "fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, " +
                         "fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
-                        "WHERE id_cfd = " + mnPkCfdId + " ";
+                        "WHERE id_cfd = " + mnPkCfdId + " ";               
             }
             
             parseCfdiAttributes(connection, msDocXml);
@@ -611,6 +643,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement.setString(index++, msCertNumber);
             preparedStatement.setString(index++, msStringSigned);
             preparedStatement.setString(index++, msSignature);
+            preparedStatement.setString(index++, msDocXmlUuid);
             preparedStatement.setString(index++, SLibUtils.textToSql(msDocXml));
             preparedStatement.setString(index++, SLibUtils.textToSql(msDocXmlName));
             preparedStatement.setString(index++, msDocXmlRfcEmi);
@@ -716,7 +749,13 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             
             preparedStatement.setInt(index++, mnFkUserDeliveryId);
             
-            preparedStatement.execute();
+            preparedStatement.execute();            
+            
+            try {
+                addFileToBaseXDb(connection);
+            } catch(Exception e){ 
+               SBaseXUtils.logError(e.toString());
+            }
             
             mnDbmsErrorId = 0;
             msDbmsError = "";
@@ -874,5 +913,23 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         connection.createStatement().execute(sSql);
         
         mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
+    }
+
+    private void addFileToBaseXDb(Connection connection) throws SQLException, IOException, Exception {
+            String mysqlDatabaseURL = connection.getMetaData().getURL();
+            
+            String databaseHost = SBaseXUtils.getDbHostFromUrl(mysqlDatabaseURL);
+            String databaseName = SBaseXUtils.getDbNameFromUrl(mysqlDatabaseURL);
+            
+            // Company BaseX database connection.
+            SBaseXClient baseXSession = SBaseXUtils.getBaseXSessionInstance(databaseHost, 1984, "admin", "admin");
+              
+            // escape XML special characters.
+            String xmlDocBody = SBaseXUtils.escapeSpecialCharacters(msDocXml);
+              
+            // Parse the xml body and add it to the BaseX database.
+            String addXmlToDBQuery = "db:replace(\"" + databaseName + "\", \"/" + msDocXmlUuid + ".xml" + "\", fn:parse-xml(\"" + xmlDocBody + "\"))";
+                     
+            SBaseXUtils.executeBaseXQuery(baseXSession, addXmlToDBQuery);
     }
 }

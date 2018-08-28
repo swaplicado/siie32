@@ -445,6 +445,7 @@ public abstract class SCfdUtils implements Serializable {
                 boolean isConsistent = false;
                 boolean add = true;
                 int cfdId = SLibConsts.UNDEFINED;
+                String docXmlUuid = "";
 
                 if (payrollXml != null) {
                     for (SHrsFormerPayrollReceipt receiptXml : payrollXml.getChildPayrollReceipts()) {
@@ -470,7 +471,7 @@ public abstract class SCfdUtils implements Serializable {
                         }
 
                         if (isFound) {
-                            String sql = "SELECT id_cfd, fid_st_xml " +
+                            String sql = "SELECT id_cfd, doc_xml_uuid, fid_st_xml " +
                                     "FROM trn_cfd WHERE fid_pay_pay_n = " + payroll.getPkNominaId() + " AND fid_pay_emp_n = " + payrollReceipt.getAuxEmpleadoId() +
                                     " AND fid_pay_bpr_n = " + payrollReceipt.getPkEmpleadoId() + " ORDER BY id_cfd ";
 
@@ -484,6 +485,7 @@ public abstract class SCfdUtils implements Serializable {
                                     else {
                                         if (cfdId == SLibConsts.UNDEFINED) {
                                             cfdId = resultSet.getInt("id_cfd");
+                                            docXmlUuid = resultSet.getString("doc_xml_uuid");
                                         }
                                     }
                                 }
@@ -546,6 +548,7 @@ public abstract class SCfdUtils implements Serializable {
                     
                     packet.setCfdCertNumber(client.getCfdSignature(cfdVersion).getCertNumber());
                     packet.setCfdSignature(client.getCfdSignature(cfdVersion).sign(packet.getCfdStringSigned(), SLibTimeUtilities.digestYear(payroll.getFecha())[0]));
+                    packet.setDocXmlUuid(docXmlUuid);
                     
                     switch (xmlType) {
                         case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
@@ -744,15 +747,16 @@ public abstract class SCfdUtils implements Serializable {
                         packet.setCfdCertNumber(dataCfd.getCertNumber());
                         packet.setCfdStringSigned(dataCfd.getStringSigned());
                         packet.setCfdSignature(dataCfd.getSignature());
+                        packet.setDocXmlUuid(dataCfd.getDocXmlUuid());
                         
                         if (newXmlStatusId == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                            packet.setXml(dataCfd.getDocXml());
+                            packet.setDocXml(dataCfd.getDocXml());
                         }
                         else {
-                            packet.setXml(composeCfdWithTfdTimbreFiscalDigital(client, dataCfd, xmlStamping));
+                            packet.setDocXml(composeCfdWithTfdTimbreFiscalDigital(client, dataCfd, xmlStamping));
                         }
                         
-                        packet.setXmlName(dataCfd.getDocXmlName());
+                        packet.setDocXmlName(dataCfd.getDocXmlName());
                         packet.setXmlDate(dataCfd.getTimestamp());
                         packet.setXmlRfcEmisor(cfdiSignature.getRfcEmisor());
                         packet.setXmlRfcReceptor(cfdiSignature.getRfcReceptor());
@@ -1234,7 +1238,7 @@ public abstract class SCfdUtils implements Serializable {
                             throw new Exception("Error al timbrar el documento: " + sMessageException);
                         }
 
-                        xml = acuseRecepcionCFDI.getXml().getValue();
+                        xml = acuseRecepcionCFDI.getDocXml().getValue();
                         */
                         xml = sCfdi;    // 2018-08-17, Sergio Flores: scamp code snippet to emulate a stamped CFDI
                         
@@ -2837,7 +2841,8 @@ public abstract class SCfdUtils implements Serializable {
             
             packet.setCfdCertNumber(client.getCfdSignature(cfdVersion).getCertNumber());
             packet.setCfdSignature(client.getCfdSignature(cfdVersion).sign(packet.getCfdStringSigned(), SLibTimeUtilities.digestYear(dps.getDate())[0]));
-
+            packet.setDocXmlUuid(dps.getDbmsDataCfd() == null ? "" : dps.getDbmsDataCfd().getDocXmlUuid());
+                        
             switch (xmlType) {
                 case SDataConstantsSys.TRNS_TP_XML_CFD:
                     comprobanteCfd.getAttSello().setString(packet.getCfdSignature());
@@ -2966,6 +2971,7 @@ public abstract class SCfdUtils implements Serializable {
 
         packet.setCfdCertNumber(client.getCfdSignature(cfdVersion).getCertNumber());
         packet.setCfdSignature(client.getCfdSignature(cfdVersion).sign(packet.getCfdStringSigned(), SLibTimeUtilities.digestYear(cfdPayment.getComprobanteFecha())[0]));
+        packet.setDocXmlUuid(cfd == null ? "" : cfd.getDocXmlUuid());
 
         switch (xmlType) {
             case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
