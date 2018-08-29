@@ -2537,8 +2537,8 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
 
-    public static void printCfds(final SClientInterface client, final ArrayList<SDataCfd> cfds, int numberCopies, final int subtypeCfd) throws Exception {
-        ArrayList<SDataCfd> cfdsPrintable = new ArrayList<SDataCfd>();
+    public static void printCfds(final SClientInterface client, final ArrayList<SDataCfd> cfds, int numberCopies, String typeDepPayroll ,final int subtypeCfd) throws Exception {
+        ArrayList<SDataCfd> cfdsPrintable = new ArrayList<>();
 
         for (SDataCfd cfd : cfds) {
             if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
@@ -4456,17 +4456,17 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     public static ArrayList<SDataCfd> getPayrollCfds(final SClientInterface client, final int typeCfd, final int[] payrollKey) throws Exception {
-        return getPayrollCfds(client, typeCfd, payrollKey, SLibConsts.UNDEFINED);
-    }
+        return getPayrollCfds(client, typeCfd, payrollKey, "" , SLibConsts.UNDEFINED);
+    }    
     
-    public static ArrayList<SDataCfd> getPayrollCfds(final SClientInterface client, final int typeCfd, final int[] payrollKey, int orderBy) throws Exception {
+     public static ArrayList<SDataCfd> getPayrollCfds(final SClientInterface client, final int typeCfd, final int[] payrollKey, String typeDepPayroll, int orderBy) throws Exception {
         String sql = "";
         String sqlInner = "";
         String sqlWhere = "";
         ResultSet resultSet = null;
         ArrayList<SDataCfd> cfds = null;
         SDataCfd cfd = null;
-
+                                                                                
         cfds = new ArrayList<SDataCfd>();
 
         switch (typeCfd) {
@@ -4477,9 +4477,21 @@ public abstract class SCfdUtils implements Serializable {
                 sqlInner = "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
                             + "c.fid_pay_rcp_pay_n = pei.id_pay AND c.fid_pay_rcp_emp_n = pei.id_emp AND c.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " ";
                 
-                if (orderBy == SUtilConsts.PER_BPR) {
+                if (orderBy == SUtilConsts.PER_DOC) {
                     sqlInner += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
-                            + "bp.id_bp = pei.id_emp ";
+                            + "bp.id_bp = pei.id_emp "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pe ON "
+                            + "c.fid_pay_rcp_pay_n = pe.id_pay AND c.fid_pay_rcp_emp_n = pe.id_emp "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON "
+                            + "dep.id_dep = pe.fk_dep ";
+                }
+                else if (orderBy == SUtilConsts.PER_BPR) {
+                    sqlInner += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
+                                + "bp.id_bp = pei.id_emp "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pe ON "
+                                + "c.fid_pay_rcp_pay_n = pe.id_pay AND c.fid_pay_rcp_emp_n = pe.id_emp "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON "
+                                + "dep.id_dep = pe.fk_dep ";
                 }
                 else if (orderBy == SUtilConsts.PER_REF) {
                     sqlInner += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
@@ -4488,8 +4500,15 @@ public abstract class SCfdUtils implements Serializable {
                                 + "c.fid_pay_rcp_pay_n = pe.id_pay AND c.fid_pay_rcp_emp_n = pe.id_emp "
                                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON "
                                 + "dep.id_dep = pe.fk_dep ";
-                }
-                sqlWhere = "WHERE NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) AND c.fid_pay_rcp_pay_n = " + payrollKey[0] + 
+                }                
+                sqlWhere += "WHERE " ;
+                        if (typeDepPayroll.equals("")) {
+                            sqlWhere += "";
+                        }
+                        else {
+                            sqlWhere += "pe.fk_dep IN ( " +  typeDepPayroll + " ) AND ";
+                             }
+                        sqlWhere += "NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) AND c.fid_pay_rcp_pay_n = " + payrollKey[0] + 
                         (orderBy == SUtilConsts.PER_DOC ? " ORDER BY pei.num_ser, CAST(pei.num AS UNSIGNED INTEGER), pei.id_pay, pei.id_emp, pei.id_iss " : 
                         orderBy == SUtilConsts.PER_BPR ? " ORDER BY bp.bp, bp.id_bp " : orderBy == SUtilConsts.PER_REF ? " ORDER BY dep.code, dep.name, dep.id_dep, bp.bp, bp.id_bp " : " ORDER BY c.id_cfd ");
                 break;
