@@ -7,7 +7,7 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SHrsCfdUtils;
-import erp.mod.hrs.db.SRowDepartamentPanelArea;
+import erp.mod.hrs.db.SRowDepartmentPanelArea;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,9 +33,9 @@ import sa.lib.gui.bean.SBeanPanel;
 
 /**
  *
- * @author JBarajas, Claudio Peña
+ * @author Juan Barajas, Claudio Peña
  */
-public class SPanelHrsDepartamentsArea extends SBeanPanel implements ItemListener, ActionListener {
+public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener, ActionListener {
 
     protected SGridPaneForm moGridDepartamentsRow;
     protected JButton mjbSelectAll;
@@ -53,7 +53,7 @@ public class SPanelHrsDepartamentsArea extends SBeanPanel implements ItemListene
      * @param client
      * @param payrollKey
      */
-    public SPanelHrsDepartamentsArea(final SGuiClient client, final int[] payrollKey) {
+    public SPanelHrsDepartmentsArea(final SGuiClient client, final int[] payrollKey) {
         setPanelSettings(client);
         payrollKeyNum = payrollKey;
         initComponents();
@@ -143,12 +143,12 @@ public class SPanelHrsDepartamentsArea extends SBeanPanel implements ItemListene
     }
         
     private void getDepartaments() {
-        SRowDepartamentPanelArea payRow = null;
+        SRowDepartmentPanelArea payRow = null;
         mnNumberDepartamentsSelects = 0;
         mbIsSelectedAll = false;
         
         for (SGridRow row : moGridDepartamentsRow.getModel().getGridRows()) {
-            payRow = (SRowDepartamentPanelArea) row;
+            payRow = (SRowDepartmentPanelArea) row;
             
             if (payRow.isSelected()) {
                 msDepartamentsSelectedsId += (msDepartamentsSelectedsId.length() == 0 ? "" : ", ") + payRow.getDepartamentId();
@@ -161,10 +161,10 @@ public class SPanelHrsDepartamentsArea extends SBeanPanel implements ItemListene
     }
     
     private void itemStateChangedSelectAll(boolean selected) {
-        SRowDepartamentPanelArea payRow = null;
+        SRowDepartmentPanelArea payRow = null;
         
         for (SGridRow row : moGridDepartamentsRow.getModel().getGridRows()) {
-            payRow = (SRowDepartamentPanelArea) row;
+            payRow = (SRowDepartmentPanelArea) row;
             payRow.setIsSelected(selected);
         }
         moGridDepartamentsRow.renderGridRows();
@@ -174,8 +174,8 @@ public class SPanelHrsDepartamentsArea extends SBeanPanel implements ItemListene
     private void populateDepartaments() {
         String sql = "";
         ResultSet resultSet = null;
-        Vector<SGridRow> rows = new Vector<SGridRow>();
-        SRowDepartamentPanelArea departament = null;
+        Vector<SGridRow> rows = new Vector<>();
+        SRowDepartmentPanelArea department = null;
         
         moGridDepartamentsRow.getModel().clearGridRows();
         moGridDepartamentsRow.getModel().clearGrid();
@@ -188,14 +188,14 @@ public class SPanelHrsDepartamentsArea extends SBeanPanel implements ItemListene
 
             resultSet = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
             while (resultSet.next()) {
-                departament = new SRowDepartamentPanelArea(resultSet.getInt("id_dep"));
+                department = new SRowDepartmentPanelArea(resultSet.getInt("id_dep"));
 
-                departament.setDepartamentCode(resultSet.getString("code"));
-                departament.setDepartamentName(resultSet.getString("name"));                
-                departament.setNumNom(SHrsCfdUtils.getDepType(miClient, payrollKeyNum[0] ,resultSet.getInt("id_dep")));
+                department.setDepartamentCode(resultSet.getString("code"));
+                department.setDepartamentName(resultSet.getString("name"));                
+                department.setNumNom(SHrsCfdUtils.getDepType(miClient, payrollKeyNum[0] ,resultSet.getInt("id_dep")));
                 
 
-                rows.add(departament);
+                rows.add(department);
             }
         }
         catch (Exception e) {

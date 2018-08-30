@@ -11,7 +11,7 @@ import sa.lib.grid.SGridRow;
  *
  * @author Juan Barajas, Claudio Peña
  */
-public class SRowDepartamentPanelArea implements SGridRow {
+public class SRowDepartmentPanelArea implements SGridRow {
 
     protected int mnDepartamentId;
     protected String mnDepartamentCode;
@@ -20,7 +20,7 @@ public class SRowDepartamentPanelArea implements SGridRow {
 
     protected boolean mbIsSelected;
 
-    public SRowDepartamentPanelArea(int departamentId) {
+    public SRowDepartmentPanelArea(int departamentId) {
         mnDepartamentId = departamentId;
         mnDepartamentCode = "";
         msDepartamentName = "";

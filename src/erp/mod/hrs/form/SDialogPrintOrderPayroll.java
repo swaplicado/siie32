@@ -24,7 +24,7 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
     protected int mnOrderByType;
     protected String moDepsPallroy;
     protected String typeIdDep;
-    protected SPanelHrsDepartamentsArea moPanelHrsDepartamentsNom;
+    protected SPanelHrsDepartmentsArea moPanelHrsDepartmentsNom;
     private int[] payrollKeyNum;
     
     /**
@@ -150,9 +150,8 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
 
     private void initComponentsCustom() throws Exception {
         SGuiUtils.setWindowBounds(this, 640, 400);
-//    private void initComponentsCustom() throws Exception {
-//        SGuiUtils.setWindowBounds(this, 550, 480);
-        moPanelHrsDepartamentsNom = new SPanelHrsDepartamentsArea(miClient, payrollKeyNum);
+        
+        moPanelHrsDepartmentsNom = new SPanelHrsDepartmentsArea(miClient, payrollKeyNum);
 
         jbSave.setText("Aceptar");
         
@@ -161,7 +160,7 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
         moRadOrderByEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByEmployee.getText()), false);
         moRadOrderByDepartament.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByDepartament.getText()), false);
         
-        jPanel7.add(moPanelHrsDepartamentsNom, BorderLayout.CENTER);
+        jPanel7.add(moPanelHrsDepartmentsNom, BorderLayout.CENTER);
 
         moFields.addField(moIntNumCopies);
         moFields.addField(moRadOrderByNumber);
@@ -186,7 +185,7 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
       SGuiValidation validation = moFields.validateFields();
         if (validation.isValid()) {
             if (validation.isValid()) {
-                validation = moPanelHrsDepartamentsNom.validatePanel();
+                validation = moPanelHrsDepartmentsNom.validatePanel();
             }
         }
 
@@ -231,13 +230,13 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
     }
     
     public Object getString(String typeDep) {       
-       if (moPanelHrsDepartamentsNom.mbIsSelectedAll) {
+       if (moPanelHrsDepartmentsNom.mbIsSelectedAll) {
 
             return typeDep = "";
         }
         else {
 
-            return moPanelHrsDepartamentsNom.msDepartamentsSelectedsId;            
+            return moPanelHrsDepartmentsNom.msDepartamentsSelectedsId;            
         }
     }
 }

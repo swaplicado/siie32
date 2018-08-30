@@ -2513,7 +2513,7 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     public static void printCfds(final SClientInterface client, final ArrayList<SDataCfd> cfds, int numberCopies, final int subtypeCfd) throws Exception {
-        ArrayList<SDataCfd> cfdsPrintable = new ArrayList<SDataCfd>();
+        ArrayList<SDataCfd> cfdsPrintable = new ArrayList<>();
 
         for (SDataCfd cfd : cfds) {
             if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {

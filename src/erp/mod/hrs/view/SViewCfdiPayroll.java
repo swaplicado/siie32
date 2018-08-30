@@ -481,7 +481,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                                     }
                                 }
                                 
-                                SCfdUtils.printCfds((SClientInterface) miClient, cfdsPrintable, numberCopies, typeDepPayroll, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
+                                SCfdUtils.printCfds((SClientInterface) miClient, cfdsPrintable, numberCopies, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                             }
                         }
                         else {

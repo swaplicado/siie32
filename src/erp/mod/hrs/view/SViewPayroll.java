@@ -342,7 +342,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                             String typeDepPayroll = (String) dialogPrintOrderPayroll.getString(SLibConstants.TXT_OK);
                             int numberCopies = (int) dialogPrintOrderPayroll.getValue(SLibConsts.UNDEFINED); // XXX 2018-01-12 (Sergio Flores): Fix this! WTF!
 
-                            SCfdUtils.printCfds((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), typeDepPayroll, orderBy), numberCopies, typeDepPayroll, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+                            SCfdUtils.printCfds((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), typeDepPayroll, orderBy), numberCopies, SCfdConsts.CFDI_PAYROLL_VER_CUR);
                         }
                     }
                     catch (Exception e) {
