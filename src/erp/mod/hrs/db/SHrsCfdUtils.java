@@ -24,12 +24,13 @@ import erp.server.SServerResponse;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Irving Sánchez, Juan Barajas, Sergio Flores
+ * @author Irving Sánchez, Juan Barajas, Sergio Flores, Claudio Peña
  * 
  * Maintenance Log:
  * 2018-01-02, Sergio Flores:
@@ -293,5 +294,28 @@ public abstract class SHrsCfdUtils {
         else {
             SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
         }
+    }
+    
+    public static int getDepType(SGuiClient client, final int payrollKeyNum , int typeDepArea) throws Exception {
+        String sql = "";
+        ResultSet resultSet = null;
+        int idAreaDep = 0;
+
+        sql = "SELECT COUNT(c.id_cfd) AS numberDep "
+            + "FROM trn_cfd AS c "
+            + "INNER JOIN hrs_pay_rcp_iss AS pei ON c.fid_pay_rcp_pay_n = pei.id_pay AND c.fid_pay_rcp_emp_n = pei.id_emp AND c.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = " + SLibConsts.UNDEFINED + " AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " "
+            + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = pei.id_emp "
+            + "INNER JOIN hrs_pay_rcp AS pe ON c.fid_pay_rcp_pay_n = pe.id_pay AND c.fid_pay_rcp_emp_n = pe.id_emp "
+            + "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pe.fk_dep "
+            + "WHERE pe.fk_dep IN ( " + typeDepArea + " ) AND NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = " + SLibConsts.UNDEFINED + ") "
+            + "AND c.fid_pay_rcp_pay_n = " + payrollKeyNum + " "
+            + "ORDER BY pei.num_ser, CAST(pei.num AS UNSIGNED INTEGER), pei.id_pay, pei.id_emp, pei.id_iss ";
+
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+            while (resultSet.next()) {
+                idAreaDep = resultSet.getInt("numberDep");
+            }
+                        
+        return idAreaDep;
     }
 }

@@ -52,7 +52,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Néstor Ávalos, Juan Barajas, Alfredo Perez, Sergio Flores
+ * @author Néstor Ávalos, Juan Barajas, Alfredo Perez, Sergio Flores, Claudio Peña
  */
 public class SViewPayroll extends SGridPaneView implements ActionListener {
 
@@ -334,14 +334,15 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        SDialogPrintOrderPayroll dialogPrintOrderPayroll = new SDialogPrintOrderPayroll(miClient, "Ordenamiento de impresión");
+                        SDialogPrintOrderPayroll dialogPrintOrderPayroll = new SDialogPrintOrderPayroll(miClient, gridRow.getRowPrimaryKey() , "Ordenamiento de impresión");
                         dialogPrintOrderPayroll.setVisible(true);
-                        
+
                         if (dialogPrintOrderPayroll.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                             int orderBy = (int) dialogPrintOrderPayroll.getValue(SGuiConsts.PARAM_KEY);
+                            String typeDepPayroll = (String) dialogPrintOrderPayroll.getString(SLibConstants.TXT_OK);
                             int numberCopies = (int) dialogPrintOrderPayroll.getValue(SLibConsts.UNDEFINED); // XXX 2018-01-12 (Sergio Flores): Fix this! WTF!
-                            
-                            SCfdUtils.printCfds((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), orderBy), numberCopies, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+
+                            SCfdUtils.printCfds((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), typeDepPayroll, orderBy), numberCopies, typeDepPayroll, SCfdConsts.CFDI_PAYROLL_VER_CUR);
                         }
                     }
                     catch (Exception e) {
