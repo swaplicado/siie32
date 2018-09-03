@@ -139,7 +139,6 @@
         </Component>
         <Component class="javax.swing.JTextField" name="jtfDatabaseHost">
           <Properties>
-            <Property name="text" type="java.lang.String" value="192.168.1.233"/>
             <Property name="toolTipText" type="java.lang.String" value="Database Host"/>
           </Properties>
         </Component>
@@ -176,7 +175,6 @@
         </Component>
         <Component class="javax.swing.JTextField" name="jtfDatabaseName">
           <Properties>
-            <Property name="text" type="java.lang.String" value="erp_otsa"/>
             <Property name="toolTipText" type="java.lang.String" value="Database Name"/>
           </Properties>
         </Component>
@@ -187,7 +185,6 @@
         </Component>
         <Component class="javax.swing.JTextField" name="jtfDatabaseUser">
           <Properties>
-            <Property name="text" type="java.lang.String" value="root"/>
             <Property name="toolTipText" type="java.lang.String" value="Database User"/>
           </Properties>
         </Component>
@@ -198,7 +195,6 @@
         </Component>
         <Component class="javax.swing.JPasswordField" name="jtfDatabasePswd">
           <Properties>
-            <Property name="text" type="java.lang.String" value="msroot"/>
             <Property name="toolTipText" type="java.lang.String" value="Database Password"/>
           </Properties>
         </Component>

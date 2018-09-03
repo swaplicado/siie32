@@ -548,7 +548,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                     // Company BaseX database connection
                     SBaseXClient baseXSession = SBaseXUtils.getBaseXSessionInstance(databaseHost, 1984, "admin", "admin");
                     String getDocumentByNodeID = "doc(\"/"+ databaseName + "/" + msDocXmlUuid +".xml\")";                
-                    xmlDocument  = SBaseXUtils.executeBaseXQuery(baseXSession, getDocumentByNodeID).get(0);                     
+                    xmlDocument  = SBaseXUtils.executeBaseXQuery(baseXSession, getDocumentByNodeID).get(0);                    
                 }
                 catch(Exception e){ 
                    SBaseXUtils.logError("READ ERROR - " + ExceptionUtils.getStackTrace(e));
@@ -760,7 +760,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             
             try {
                 addFileToBaseXDb(connection);
-            } catch(Exception e){                 
+            } catch(Exception e){ 
                SBaseXUtils.logError("SAVE ERROR - " + ExceptionUtils.getStackTrace(e) + " - XML DATA: " + msDocXml );
             }
             
@@ -936,7 +936,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
               
             // Parse the xml body and add it to the BaseX database.
             String addXmlToDBQuery = "db:replace(\"" + databaseName + "\", \"/" + msDocXmlUuid + ".xml" + "\", fn:parse-xml(\"" + xmlDocBody + "\"))";
-            
-            SBaseXUtils.executeBaseXQuery(baseXSession, addXmlToDBQuery);        
+                     
+            SBaseXUtils.executeBaseXQuery(baseXSession, addXmlToDBQuery);
     }
 }

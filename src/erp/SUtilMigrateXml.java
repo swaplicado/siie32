@@ -66,7 +66,6 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
 
         jlDatabaseHost.setText("Host:");
 
-        jtfDatabaseHost.setText("192.168.1.233");
         jtfDatabaseHost.setToolTipText("Database Host");
 
         jlDatabasePort.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -82,17 +81,14 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
 
         jlDatabaseName.setText("Name:");
 
-        jtfDatabaseName.setText("erp_otsa");
         jtfDatabaseName.setToolTipText("Database Name");
 
         jlDatabaseUser.setText("User:");
 
-        jtfDatabaseUser.setText("root");
         jtfDatabaseUser.setToolTipText("Database User");
 
         jlDatabasePswd.setText("Password:");
 
-        jtfDatabasePswd.setText("msroot");
         jtfDatabasePswd.setToolTipText("Database Password");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
