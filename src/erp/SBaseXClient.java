@@ -48,7 +48,7 @@ public final class SBaseXClient implements Closeable {
 
         socket = new Socket();
         socket.setTcpNoDelay(true);
-        socket.connect(new InetSocketAddress(host, port), 5000);
+        socket.connect(new InetSocketAddress(host, port), 20000);
         in = new BufferedInputStream(socket.getInputStream());
         out = socket.getOutputStream();
 

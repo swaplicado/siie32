@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -547,10 +548,10 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                     // Company BaseX database connection
                     SBaseXClient baseXSession = SBaseXUtils.getBaseXSessionInstance(databaseHost, 1984, "admin", "admin");
                     String getDocumentByNodeID = "doc(\"/"+ databaseName + "/" + msDocXmlUuid +".xml\")";                
-                    xmlDocument  = SBaseXUtils.executeBaseXQuery(baseXSession, getDocumentByNodeID).get(0);                    
+                    xmlDocument  = SBaseXUtils.executeBaseXQuery(baseXSession, getDocumentByNodeID).get(0);                     
                 }
                 catch(Exception e){ 
-                   SBaseXUtils.logError(e.toString());
+                   SBaseXUtils.logError("READ ERROR - " + ExceptionUtils.getStackTrace(e));
                 }
                 if (xmlDocument != null) {
                     msDocXml = xmlDocument;
@@ -759,8 +760,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             
             try {
                 addFileToBaseXDb(connection);
-            } catch(Exception e){ 
-               SBaseXUtils.logError(e.toString());
+            } catch(Exception e){                 
+               SBaseXUtils.logError("SAVE ERROR - " + ExceptionUtils.getStackTrace(e) + " - XML DATA: " + msDocXml );
             }
             
             mnDbmsErrorId = 0;
@@ -935,7 +936,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
               
             // Parse the xml body and add it to the BaseX database.
             String addXmlToDBQuery = "db:replace(\"" + databaseName + "\", \"/" + msDocXmlUuid + ".xml" + "\", fn:parse-xml(\"" + xmlDocBody + "\"))";
-                     
-            SBaseXUtils.executeBaseXQuery(baseXSession, addXmlToDBQuery);
+            
+            SBaseXUtils.executeBaseXQuery(baseXSession, addXmlToDBQuery);        
     }
 }

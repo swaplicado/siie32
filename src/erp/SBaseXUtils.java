@@ -74,10 +74,11 @@ public abstract class SBaseXUtils {
 
         ArrayList<String> results = new ArrayList<>();
 
-        SBaseXClient.Query query = session.query(input);
-        while (query.more()) {
-            String nextValue = query.next();
-            results.add(nextValue);
+        try (SBaseXClient.Query query = session.query(input)) {
+            while (query.more()) {
+                String nextValue = query.next();
+                results.add(nextValue);
+            }
         }
 
         return results;

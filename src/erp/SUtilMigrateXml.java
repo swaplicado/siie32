@@ -13,6 +13,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import sa.lib.gui.SGuiConsts;
 
 /**
@@ -64,7 +66,7 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
 
         jlDatabaseHost.setText("Host:");
 
-        jtfDatabaseHost.setText("127.0.0.1");
+        jtfDatabaseHost.setText("192.168.1.233");
         jtfDatabaseHost.setToolTipText("Database Host");
 
         jlDatabasePort.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -80,7 +82,7 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
 
         jlDatabaseName.setText("Name:");
 
-        jtfDatabaseName.setText("erp_gs");
+        jtfDatabaseName.setText("erp_otsa");
         jtfDatabaseName.setToolTipText("Database Name");
 
         jlDatabaseUser.setText("User:");
@@ -326,7 +328,7 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
                         + "  else ()";
                 SBaseXUtils.executeBaseXQuery(baseXSession, createBaseXDBQuery);
 
-                // Select relevant document data from MySQL database:
+                // Select relevant document data from MySQL database:  
                 final String cfdQuery = "SELECT id_cfd, doc_xml FROM trn_cfd WHERE doc_xml_uuid = '' ORDER BY id_cfd;";
 
                 Statement statement = moDbMySqlSiie.getConnection().createStatement();
@@ -342,6 +344,12 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
                     String xmlUuid = SBaseXUtils.generateUniqueXmlId(moDbMySqlSiie.getConnection());
 
                     if (!xmlDocBody.isEmpty()) {
+                        // check body for illegal XML unicode characters, if found skip document.
+                        if (StringUtils.containsAny(xmlDocBody, "\u009D\u001F\u0019\u0016\u001C\u0007\u0018\u0012\u001B\u0015\uFFFD")) {
+                            badFilesIDs.add(cfdId);
+                            continue;
+                        }
+
                         // escape XML special characters.
                         xmlDocBody = SBaseXUtils.escapeSpecialCharacters(xmlDocBody);
 
@@ -353,6 +361,7 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
                         } catch (IOException e) {
                             // File could not be parsed, add it to malformed files array and continue with the next.
                             badFilesIDs.add(cfdId);
+                            SBaseXUtils.logError("MIGRATION ERROR - " + e.toString());
                             continue;
                         }
 
@@ -375,6 +384,7 @@ public class SUtilMigrateXml extends javax.swing.JFrame {
 
                 JOptionPane.showMessageDialog(this, message, "Info", hadErrors ? JOptionPane.WARNING_MESSAGE : JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception e) {
+                SBaseXUtils.logError("Export ERROR - " + ExceptionUtils.getStackTrace(e));
                 JOptionPane.showMessageDialog(this, e, "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
