@@ -372,17 +372,17 @@ public class SDialogRepStockMovesSumSum extends javax.swing.JDialog implements e
             try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 if (jrbReportTypePart.isSelected()) {
-                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN ( " + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART + " ) AND NOT iog.b_del ";
+                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN ( " + SModSysConsts.TRNS_TP_MAINT_MOV_NA + ", "  + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART + " ) AND NOT iog.b_del ";
                     sSqlWhereDetailWh += " AND s.id_wh = " + partWharehouse + " ";
                     sTypeReport = SModSysConsts.TRNX_TP_MAINT_MOV_PART;
                 }
                 else if (jrbReportTypeTool.isSelected()) {
-                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN ( " + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL + ", " +  SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL + " ) AND NOT iog.b_del ";
+                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN ( " + SModSysConsts.TRNS_TP_MAINT_MOV_NA + ", "  + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL + ", " +  SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL + " ) AND NOT iog.b_del ";
                     sSqlWhereDetailWh += " AND s.id_wh = " + toolWharehouse + " ";
                     sTypeReport = SModSysConsts.TRNX_TP_MAINT_MOV_TOOL;
                 }
                 else if (jrbReportTypeAll.isSelected()) {
-                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN ( " + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL + ", " +  SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL + ", "
+                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN ( " + SModSysConsts.TRNS_TP_MAINT_MOV_NA + ", "  + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL + ", " +  SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL + ", "
                             + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART + " )AND NOT iog.b_del ";
                     sSqlWhereDetailWh += "";
                     sTypeReport = SModSysConsts.TRNX_TP_MAINT_MOV_ALL;                    
@@ -400,7 +400,7 @@ public class SDialogRepStockMovesSumSum extends javax.swing.JDialog implements e
                 }
                 
                 if (jcbItemGeneric.getSelectedIndex() > 0 ) {
-                    sSqlWhereFilter += " AND i.id_item = " + moFieldItemGeneric.getKeyAsIntArray()[0];
+                    sSqlWhereFilter += " AND s.id_item = " + moFieldItemGeneric.getKeyAsIntArray()[0];
                 }
                 
                 if (jcbMaintenanceArea.getSelectedIndex() > 0 ) {                   
@@ -411,7 +411,7 @@ public class SDialogRepStockMovesSumSum extends javax.swing.JDialog implements e
                 if (jcbResponsable.getSelectedIndex() > 0 ) {
                     sSqlWhereFilter += " AND maint.id_bp = " + moFieldResponsable.getKeyAsIntArray()[0];
                 }
-                
+
                 map = miClient.createReportParams();
                 map.put("tDtInitial", moFieldDateStart.getDate());
                 map.put("tDtEnd", moFieldDateEnd.getDate());
