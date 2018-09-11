@@ -7,6 +7,7 @@ package erp.mtrn.form;
 
 import cfd.DCfdConsts;
 import cfd.ver33.DCfdi33Catalogs;
+import cfd.ver33.DCfdi33Utils;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -89,6 +90,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private erp.mbps.data.SDataBizPartnerBranch moDataComBranch;
     private erp.mbps.data.SDataBizPartner moDataRecBizPartner;
     private erp.mtrn.data.SDataCfd moDataRecCfdRelated;
+    private java.lang.String msRecCfdRelatedUuid;
+    private java.lang.String msRecCfdRelatedUuidOnFocusGained;
     
     private erp.mfin.data.SDataRecord moDataPayRecord;
     private erp.mfin.data.SDataAccountCash moDataPayAccountCash;
@@ -96,7 +99,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private erp.mtrn.data.cfd.SCfdPaymentEntry moPaymentEntry;
     private erp.mtrn.data.cfd.SCfdPaymentEntryDoc moPaymentEntryDoc;
 
-    private String msXmlRelationType;
+    private java.lang.String msXmlRelationType;
     private java.util.HashMap<java.lang.String, sa.lib.srv.SSrvLock> moRecordLocksMap;  // key: record's primary key as string; value: corresponding gained lock
     private erp.mfin.form.SDialogRecordPicker moDialogPayRecordPicker;
     private erp.mtrn.form.SDialogPickerDps moDialogRecDpsRelatedPicker;
@@ -112,6 +115,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     // business partner:
     private erp.lib.form.SFormField moFieldRecBizPartner;
     private erp.lib.form.SFormField moFieldRecCfdiUse;
+    private erp.lib.form.SFormField moFieldRecCfdRelatedUuid;
     
     // current payment:
     private erp.lib.form.SFormField moFieldPayDate;
@@ -204,7 +208,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jPanel17 = new javax.swing.JPanel();
         jlRecCfdRelated = new javax.swing.JLabel();
         jtfRecCfdRelatedNumberRo = new javax.swing.JTextField();
-        jtfRecCfdRelatedUuidRo = new javax.swing.JTextField();
+        jtfRecCfdRelatedUuid = new javax.swing.JTextField();
         jtfRecCfdRelatedVersionRo = new javax.swing.JTextField();
         jbRecCfdRelatedPick = new javax.swing.JButton();
         jpRegistryRows = new javax.swing.JPanel();
@@ -278,7 +282,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jPanel14 = new javax.swing.JPanel();
         jlDocDpsRelated = new javax.swing.JLabel();
         jtfDocDpsRelatedNumberRo = new javax.swing.JTextField();
-        jtfDocDpsRelatedUuidRo = new javax.swing.JTextField();
+        jtfDocDpsRelatedUuid = new javax.swing.JTextField();
         jtfDocDpsRelatedVersionRo = new javax.swing.JTextField();
         jbDocDpsRelatedPick = new javax.swing.JButton();
         jPanel21 = new javax.swing.JPanel();
@@ -581,12 +585,10 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfRecCfdRelatedNumberRo.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel17.add(jtfRecCfdRelatedNumberRo);
 
-        jtfRecCfdRelatedUuidRo.setEditable(false);
-        jtfRecCfdRelatedUuidRo.setText("402A8A38-B980-412A-9485-29222D7095C4");
-        jtfRecCfdRelatedUuidRo.setToolTipText("UUID");
-        jtfRecCfdRelatedUuidRo.setFocusable(false);
-        jtfRecCfdRelatedUuidRo.setPreferredSize(new java.awt.Dimension(225, 23));
-        jPanel17.add(jtfRecCfdRelatedUuidRo);
+        jtfRecCfdRelatedUuid.setText("402A8A38-B980-412A-9485-29222D7095C4");
+        jtfRecCfdRelatedUuid.setToolTipText("UUID");
+        jtfRecCfdRelatedUuid.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel17.add(jtfRecCfdRelatedUuid);
 
         jtfRecCfdRelatedVersionRo.setEditable(false);
         jtfRecCfdRelatedVersionRo.setText("0.0");
@@ -938,12 +940,12 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocDpsRelatedNumberRo.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jtfDocDpsRelatedNumberRo);
 
-        jtfDocDpsRelatedUuidRo.setEditable(false);
-        jtfDocDpsRelatedUuidRo.setText("402A8A38-B980-412A-9485-29222D7095C4");
-        jtfDocDpsRelatedUuidRo.setToolTipText("UUID");
-        jtfDocDpsRelatedUuidRo.setFocusable(false);
-        jtfDocDpsRelatedUuidRo.setPreferredSize(new java.awt.Dimension(225, 23));
-        jPanel14.add(jtfDocDpsRelatedUuidRo);
+        jtfDocDpsRelatedUuid.setEditable(false);
+        jtfDocDpsRelatedUuid.setText("402A8A38-B980-412A-9485-29222D7095C4");
+        jtfDocDpsRelatedUuid.setToolTipText("UUID");
+        jtfDocDpsRelatedUuid.setFocusable(false);
+        jtfDocDpsRelatedUuid.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel14.add(jtfDocDpsRelatedUuid);
 
         jtfDocDpsRelatedVersionRo.setEditable(false);
         jtfDocDpsRelatedVersionRo.setText("0.0");
@@ -1250,6 +1252,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldRecBizPartner = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbRecBizPartner, jlRecBizPartner);
         moFieldRecBizPartner.setPickerButton(jbRecBizPartnerPick);
         moFieldRecCfdiUse = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbRecCfdiUsage, jlRecCfdiUsage);
+        moFieldRecCfdRelatedUuid = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfRecCfdRelatedUuid, jlRecCfdRelated);
+        moFieldRecCfdRelatedUuid.setLengthMin(36);
+        moFieldRecCfdRelatedUuid.setLengthMax(36);
         moFieldPayDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftPayDate, jlPayDate);
         moFieldPayDate.setPickerButton(jbPayDatePick);
         moFieldPayHour = new SFormField(miClient, SLibConstants.DATA_TYPE_TIME, true, jftPayHour, jlPayHour);
@@ -1296,6 +1301,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         mvFields.add(moFieldVouConfirm);
         mvFields.add(moFieldRecBizPartner);
         mvFields.add(moFieldRecCfdiUse);
+        mvFields.add(moFieldRecCfdRelatedUuid);
         
         // initialize inner forms:
         
@@ -1404,6 +1410,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jcbPayAccountDes.addItemListener(this);
         jcbRecBizPartner.addItemListener(this);
         
+        jtfRecCfdRelatedUuid.addFocusListener(this);
         jtfPayAmount.addFocusListener(this);
         jtfPayExchangeRate.addFocusListener(this);
         jtfDocExchangeRate.addFocusListener(this);
@@ -1651,23 +1658,26 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void renderRecCfdRelated() {
         if (moDataRecCfdRelated == null) {
             jtfRecCfdRelatedNumberRo.setText("");
-            jtfRecCfdRelatedUuidRo.setText("");
             jtfRecCfdRelatedVersionRo.setText("");
+        }
+        else {
+            jtfRecCfdRelatedNumberRo.setText(moDataRecCfdRelated.getCfdNumber());
+            jtfRecCfdRelatedVersionRo.setText("" + SCfdUtils.getCfdVersion(moDataRecCfdRelated.getFkXmlTypeId()));
             
+            jtfRecCfdRelatedNumberRo.setCaretPosition(0);
+            jtfRecCfdRelatedVersionRo.setCaretPosition(0);
+        }
+        
+        jtfRecCfdRelatedUuid.setText(msRecCfdRelatedUuid); // can be empty when related CFDI is not stored in SIIE, e.g., third-party CFDI!
+        jtfRecCfdRelatedUuid.setCaretPosition(0);
+        
+        if (moDataRecCfdRelated == null && msRecCfdRelatedUuid.isEmpty()) {
             msXmlRelationType = "";
             jtfRecRelationTypeRo.setText("");
         }
         else {
-            jtfRecCfdRelatedNumberRo.setText(moDataRecCfdRelated.getCfdNumber());
-            jtfRecCfdRelatedUuidRo.setText(moDataRecCfdRelated.getUuid());
-            jtfRecCfdRelatedVersionRo.setText("" + SCfdUtils.getCfdVersion(moDataRecCfdRelated.getFkXmlTypeId()));
-            
             msXmlRelationType = DCfdi33Catalogs.REL_TP_SUSTITUCION; // fixed value in CFDI 3.3!
             jtfRecRelationTypeRo.setText(((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs().composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_REL_TP, msXmlRelationType));
-            
-            jtfRecCfdRelatedNumberRo.setCaretPosition(0);
-            jtfRecCfdRelatedUuidRo.setCaretPosition(0);
-            jtfRecCfdRelatedVersionRo.setCaretPosition(0);
             
             jtfRecRelationTypeRo.setCaretPosition(0);
         }
@@ -1676,7 +1686,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void renderDocDpsRelated() {
         if (moDataDocDpsRelated == null) {
             jtfDocDpsRelatedNumberRo.setText("");
-            jtfDocDpsRelatedUuidRo.setText("");
+            jtfDocDpsRelatedUuid.setText("");
             jtfDocDpsRelatedVersionRo.setText("");
             jtfDocPaymentMethodRo.setText("");
             jtfDocCurrencyRo.setText("");
@@ -1689,13 +1699,13 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         else {
             jtfDocDpsRelatedNumberRo.setText(moDataDocDpsRelated.getDpsNumber());
-            jtfDocDpsRelatedUuidRo.setText(moDataDocDpsRelated.getDbmsDataCfd().getUuid());
+            jtfDocDpsRelatedUuid.setText(moDataDocDpsRelated.getDbmsDataCfd().getUuid());
             jtfDocDpsRelatedVersionRo.setText("" + SCfdUtils.getCfdVersion(moDataDocDpsRelated.getDbmsDataCfd().getFkXmlTypeId()));
             jtfDocPaymentMethodRo.setText(moDataDocDpsRelated.getDbmsDataDpsCfd().getPaymentMethod());
             jtfDocCurrencyRo.setText(moDataDocDpsRelated.getDbmsCurrency());
             
             jtfDocDpsRelatedNumberRo.setCaretPosition(0);
-            jtfDocDpsRelatedUuidRo.setCaretPosition(0);
+            jtfDocDpsRelatedUuid.setCaretPosition(0);
             jtfDocDpsRelatedVersionRo.setCaretPosition(0);
             jtfDocPaymentMethodRo.setCaretPosition(0);
             jtfDocCurrencyRo.setCaretPosition(0);
@@ -1835,14 +1845,18 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbRecBizPartnerPick.setEnabled(enable);
         
         if (enable) {
-            boolean cfdRelatedAvailable = moDataRecCfdRelated != null;
+            boolean cfdRelatedAvailable = moDataRecCfdRelated != null || !msRecCfdRelatedUuid.isEmpty();
             jbRecCfdRelatedAdd.setEnabled(!cfdRelatedAvailable);
             jbRecCfdRelatedDelete.setEnabled(cfdRelatedAvailable);
+            jtfRecCfdRelatedUuid.setEditable(cfdRelatedAvailable);
+            jtfRecCfdRelatedUuid.setFocusable(cfdRelatedAvailable);
             jbRecCfdRelatedPick.setEnabled(cfdRelatedAvailable);
         }
         else {
             jbRecCfdRelatedAdd.setEnabled(false);
             jbRecCfdRelatedDelete.setEnabled(false);
+            jtfRecCfdRelatedUuid.setEditable(false);
+            jtfRecCfdRelatedUuid.setFocusable(false);
             jbRecCfdRelatedPick.setEnabled(false);
         }
         
@@ -1856,9 +1870,12 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void activateRecCfdRelated(final boolean activateControlsForAddition) {
         jbRecCfdRelatedAdd.setEnabled(activateControlsForAddition);
         jbRecCfdRelatedDelete.setEnabled(!activateControlsForAddition);
+        jtfRecCfdRelatedUuid.setEditable(!activateControlsForAddition);
+        jtfRecCfdRelatedUuid.setFocusable(!activateControlsForAddition);
         jbRecCfdRelatedPick.setEnabled(!activateControlsForAddition);
         
         moDataRecCfdRelated = null;
+        msRecCfdRelatedUuid = "";
         renderRecCfdRelated();
     }
 
@@ -1988,6 +2005,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         fields.add(moFieldVouConfirm);
         fields.add(moFieldRecBizPartner);
         fields.add(moFieldRecCfdiUse);
+        fields.add(moFieldRecCfdRelatedUuid);
         
         for (SFormField field : fields) {
             if (!field.validateField()) {
@@ -2065,6 +2083,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         if (moDialogRecDpsRelatedPicker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             moDataRecCfdRelated = (SDataCfd) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_CFD, moDialogRecDpsRelatedPicker.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+            msRecCfdRelatedUuid = moDataRecCfdRelated.getUuid();
             renderRecCfdRelated();
         }
     }
@@ -2297,11 +2316,32 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
             
             moPaymentEntry.Operation = moFieldPayOperation.getString();
-            moPaymentEntry.AccountSrcFiscalId = moFieldPayAccountSrcFiscalId.getString();
-            moPaymentEntry.AccountSrcNumber = moFieldPayAccountSrcNumber.getString();
-            moPaymentEntry.AccountSrcEntity = moFieldPayAccountSrcEntity.getString();
-            moPaymentEntry.AccountDesFiscalId = moFieldPayAccountDesFiscalId.getString();
-            moPaymentEntry.AccountDesNumber = moFieldPayAccountDesNumber.getString();
+            
+            if (DCfdi33Utils.notRequiredAccountPayer(moPaymentEntry.PaymentWay)) {
+                moPaymentEntry.AccountSrcFiscalId = "";
+                moPaymentEntry.AccountSrcNumber = "";
+            }
+            else {
+                moPaymentEntry.AccountSrcFiscalId = moFieldPayAccountSrcFiscalId.getString();
+                moPaymentEntry.AccountSrcNumber = moFieldPayAccountSrcNumber.getString();
+            }
+            
+            if (DCfdi33Utils.notRequiredBankPayer(moPaymentEntry.PaymentWay)) {
+                moPaymentEntry.AccountSrcEntity = "";
+            }
+            else {
+                moPaymentEntry.AccountSrcEntity = moFieldPayAccountSrcEntity.getString();
+            }
+            
+            if (DCfdi33Utils.notRequiredAccountReceipt(moPaymentEntry.PaymentWay)) {
+                moPaymentEntry.AccountDesFiscalId = "";
+                moPaymentEntry.AccountDesNumber = "";
+            }
+            else {
+                moPaymentEntry.AccountDesFiscalId = moFieldPayAccountDesFiscalId.getString();
+                moPaymentEntry.AccountDesNumber = moFieldPayAccountDesNumber.getString();
+            }
+            
             moPaymentEntry.AccountDesKey = moFieldPayAccountDes.getKeyAsIntArray();
             moPaymentEntry.prepareTableRow();
             
@@ -2497,7 +2537,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         else if (moDataDocDpsRelated.getDbmsDataCfd().getUuid().isEmpty()) {
             valid = false;
-            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDocDpsRelated.getText() + ": " + jtfDocDpsRelatedUuidRo.getToolTipText() + "'.");
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDocDpsRelated.getText() + ": " + jtfDocDpsRelatedUuid.getToolTipText() + "'.");
             jbDocDpsRelatedPick.requestFocusInWindow();
         }
         else if (!moDataDocDpsRelated.getDbmsDataDpsCfd().getPaymentMethod().equals(DCfdi33Catalogs.MDP_PPD)) {
@@ -2691,6 +2731,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jtfRecCountryRo.setText("");
             jtfRecForeignFiscalIdRo.setText("");
             moFieldRecCfdiUse.resetField();
+            moFieldRecCfdRelatedUuid.resetField();
             
             jbRecCfdRelatedAdd.setEnabled(false);
         }
@@ -2700,6 +2741,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jtfRecCountryRo.setText(moDataRecBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountryCode());
             jtfRecForeignFiscalIdRo.setText(moDataRecBizPartner.getFiscalFrgId());
             moFieldRecCfdiUse.setFieldValue(DCfdi33Catalogs.CFDI_USO_POR_DEF); // fixed value in CFDI 3.3!
+            moFieldRecCfdRelatedUuid.setFieldValue("");
             
             jtfRecFiscalIdRo.setCaretPosition(0);
             jtfRecCountryRo.setCaretPosition(0);
@@ -2766,6 +2808,18 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             
             moFieldPayAccountDesFiscalId.setString(fiscalId);
             moFieldPayAccountDesNumber.setString(number);
+        }
+    }
+    
+    private void focusGainedRecCfdRelatedUuid() {
+        msRecCfdRelatedUuidOnFocusGained = jtfRecCfdRelatedUuid.getText();
+    }
+
+    private void focusLostRecCfdRelatedUuid() {
+        msRecCfdRelatedUuid = jtfRecCfdRelatedUuid.getText();
+        if (!msRecCfdRelatedUuid.equals(msRecCfdRelatedUuidOnFocusGained)) {
+            moDataRecCfdRelated = null;
+            renderRecCfdRelated();
         }
     }
 
@@ -2930,7 +2984,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JTextField jtfDocBalancePrevPayRo;
     private javax.swing.JTextField jtfDocCurrencyRo;
     private javax.swing.JTextField jtfDocDpsRelatedNumberRo;
-    private javax.swing.JTextField jtfDocDpsRelatedUuidRo;
+    private javax.swing.JTextField jtfDocDpsRelatedUuid;
     private javax.swing.JTextField jtfDocDpsRelatedVersionRo;
     private javax.swing.JTextField jtfDocExchangeRate;
     private javax.swing.JTextField jtfDocExchangeRateCurRo;
@@ -2959,7 +3013,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JTextField jtfPayTotalPaymentsLocalRo;
     private javax.swing.JTextField jtfPayTotalPaymentsRo;
     private javax.swing.JTextField jtfRecCfdRelatedNumberRo;
-    private javax.swing.JTextField jtfRecCfdRelatedUuidRo;
+    private javax.swing.JTextField jtfRecCfdRelatedUuid;
     private javax.swing.JTextField jtfRecCfdRelatedVersionRo;
     private javax.swing.JTextField jtfRecCountryRo;
     private javax.swing.JTextField jtfRecFiscalIdRo;
@@ -3001,6 +3055,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moDataComBranch = null;
         moDataRecBizPartner = null;
         moDataRecCfdRelated = null;
+        msRecCfdRelatedUuid = "";
+        msRecCfdRelatedUuidOnFocusGained = "";
         
         moDataPayRecord = null;
         moDataPayAccountCash = null;
@@ -3163,6 +3219,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             moFieldRecBizPartner.setFieldValue(new int[] { moDataCfdPayment.getAuxCfdDbmsDataReceptor().getPkBizPartnerId() });    // event item state changed thrown!
 
             moDataRecCfdRelated = moDataCfdPayment.getAuxCfdDbmsDataCfdCfdiRelacionado();
+            msRecCfdRelatedUuid = moDataCfdPayment.getAuxCfdCfdiRelacionadoUuid();
             renderRecCfdRelated();
         }
         
@@ -3268,6 +3325,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         else {
             moDataCfdPayment.setAuxCfdDbmsDataCfdCfdiRelacionado(moDataRecCfdRelated);
+            moDataCfdPayment.setAuxCfdCfdiRelacionadoUuid(msRecCfdRelatedUuid);
         }
 
         try {
@@ -3428,7 +3486,13 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
     @Override
     public void focusGained(FocusEvent e) {
-        
+        if (e.getSource() instanceof JTextField) {
+            JTextField textField = (JTextField) e.getSource();
+            
+            if (textField == jtfRecCfdRelatedUuid) {
+                focusGainedRecCfdRelatedUuid();
+            }
+        }
     }
 
     @Override
@@ -3436,7 +3500,10 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         if (e.getSource() instanceof JTextField) {
             JTextField textField = (JTextField) e.getSource();
             
-            if (textField == jtfPayAmount || textField == jtfPayExchangeRate) {
+            if (textField == jtfRecCfdRelatedUuid) {
+                focusLostRecCfdRelatedUuid();
+            }
+            else if (textField == jtfPayAmount || textField == jtfPayExchangeRate) {
                 focusLostPayExchangeRate();
             }
             else if (textField == jtfDocExchangeRate) {
