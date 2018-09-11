@@ -20,7 +20,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -537,7 +536,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mtUserProcessingTs = resultSet.getTimestamp("ts_prc");
                 mtUserDeliveryTs = resultSet.getTimestamp("ts_dvy");
                 
-                
+                /* XXX 2018-09-11, Sergio Flores: By now, BaseX exportation of XML is disabled, until this schema is properly evaluated and validated.
                 String mysqlDatabaseURL = statement.getConnection().getMetaData().getURL();
             
                 String databaseHost = SBaseXUtils.getDbHostFromUrl(mysqlDatabaseURL);
@@ -556,7 +555,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 if (xmlDocument != null) {
                     msDocXml = xmlDocument;
                 }
-                
+                */
                 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -612,7 +611,9 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
             
+                /* XXX 2018-09-11, Sergio Flores: By now, BaseX exportation of XML is disabled, until this schema is properly evaluated and validated.
                 msDocXmlUuid = SBaseXUtils.generateUniqueXmlId(connection);
+                */
          
                 sql = "INSERT INTO trn_cfd (id_cfd, ser, num, " +
                         "ts, cert_num, str_signed, signature, doc_xml_uuid, doc_xml, doc_xml_name, xml_rfc_emi, xml_rfc_rec, xml_tot, xml_mon, " +
@@ -758,11 +759,14 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             
             preparedStatement.execute();            
             
+            /* XXX 2018-09-11, Sergio Flores: By now, BaseX exportation of XML is disabled, until this schema is properly evaluated and validated.
             try {
                 addFileToBaseXDb(connection);
-            } catch(Exception e){ 
+            }
+            catch(Exception e) { 
                SBaseXUtils.logError("SAVE ERROR - " + ExceptionUtils.getStackTrace(e) + " - XML DATA: " + msDocXml );
             }
+            */
             
             mnDbmsErrorId = 0;
             msDbmsError = "";
@@ -922,6 +926,13 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
     }
 
+    /**
+     * XXX 2018-09-11, Sergio Flores: This BaseX exportation of XML needs to be properly evaluated and validated to be safely used.
+     * @param connection
+     * @throws SQLException
+     * @throws IOException
+     * @throws Exception 
+     */
     private void addFileToBaseXDb(Connection connection) throws SQLException, IOException, Exception {
             String mysqlDatabaseURL = connection.getMetaData().getURL();
             

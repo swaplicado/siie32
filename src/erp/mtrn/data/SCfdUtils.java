@@ -358,9 +358,14 @@ public abstract class SCfdUtils implements Serializable {
     
     private static boolean existsCfdiEmitInconsist(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
         if (cfds != null) {
-            for (SDataCfd cfd : cfds) {
-                if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED && !cfd.getIsConsistent()) {
-                    throw new Exception("Existen CFDI emitidos e inconsistentes, para la nómina '" + cfd.getFkPayrollPayrollId_n() + "'.");
+            if (cfds.isEmpty()) {
+                return false;
+            }
+            else {
+                for (SDataCfd cfd : cfds) {
+                    if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED && !cfd.getIsConsistent()) {
+                        throw new Exception("Existen CFDI emitidos e inconsistentes, para la nómina '" + cfd.getFkPayrollPayrollId_n() + "'.");
+                    }
                 }
             }
         }
@@ -2988,28 +2993,33 @@ public abstract class SCfdUtils implements Serializable {
 
     public static boolean verifyCfdi(final SClientInterface client, final ArrayList<SDataCfd> cfds, final int subtypeCfd) throws Exception {
         boolean valid = false;
-        ArrayList<SDataCfd> cfdsValidate = null;
+        ArrayList<SDataCfd> cfdsVerify = null;
         SDialogResult dialogResult = null;
         
-        cfdsValidate = new ArrayList<SDataCfd>();
+        cfdsVerify = new ArrayList<>();
         
         if (cfds.isEmpty()) {
-            client.showMsgBoxInformation("No existen documentos para validar.");
+            client.showMsgBoxInformation("No existen documentos para verificar.");
         }
         else {
             for (SDataCfd cfd : cfds) {
                 // XXX 2018-01-08, Sergio Flores: Check this for statement, CFD are being added twice when if statement evaluates to true!:
                 if (cfd.getIsProcessingWebService() || cfd.getIsProcessingStorageXml() || cfd.getIsProcessingStoragePdf()) {
-                    cfdsValidate.add(cfd);
+                    cfdsVerify.add(cfd);
                 }
-                //cfdsValidate.add(cfd);
+                //cfdsVerify.add(cfd);
             }
 
-            if (existsCfdiEmitInconsist(client, cfdsValidate)) {
-                int stampsAvailable = getStampsAvailable(client, cfdsValidate.get(0).getFkCfdTypeId(), cfdsValidate.get(0).getTimestamp(), 0);
-                dialogResult = new SDialogResult((SClient) client, "Resultados de verificación", SCfdConsts.PROC_REQ_VERIFY);
-                dialogResult.setFormParams(client, cfdsValidate, null, stampsAvailable, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
-                dialogResult.setVisible(true);
+            if (cfdsVerify.isEmpty()) {
+                client.showMsgBoxInformation("No existen documentos para verificar.");
+            }
+            else {
+                if (existsCfdiEmitInconsist(client, cfdsVerify)) {
+                    int stampsAvailable = getStampsAvailable(client, cfdsVerify.get(0).getFkCfdTypeId(), cfdsVerify.get(0).getTimestamp(), 0);
+                    dialogResult = new SDialogResult((SClient) client, "Resultados de verificación", SCfdConsts.PROC_REQ_VERIFY);
+                    dialogResult.setFormParams(client, cfdsVerify, null, stampsAvailable, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                    dialogResult.setVisible(true);
+                }
             }
         }
 

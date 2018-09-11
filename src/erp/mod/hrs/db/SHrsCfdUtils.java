@@ -49,11 +49,11 @@ public abstract class SHrsCfdUtils {
                 throw new Exception("No se pueden generar CFDI, la nómina no está cerrada.");
             }
             else if (resultSet.getBoolean("b_del")) {
-                throw new Exception("No se pueden generar CFDI, la nómina no está eliminada.");
+                throw new Exception("No se pueden generar CFDI, la nómina está eliminada.");
             }
         }
-        validateReceiptsPendingCfdi(session, payrollId);
-        return true;
+        
+        return validateReceiptsPendingCfdi(session, payrollId);
     }
     
     public static ArrayList<SHrsPayrollEmployeeReceipt> getReceiptsPendig(final SGuiSession session,  final int payrollId) throws Exception {
@@ -191,7 +191,7 @@ public abstract class SHrsCfdUtils {
             
             SCfdPacket packet = new SCfdPacket();
             packet.setCfdId(cfdId);
-            //packet.setIsCfdConsistent(cfdId == SLibConstants.UNDEFINED);
+            packet.setIsCfdConsistent(cfdId == SLibConstants.UNDEFINED);
         
             int xmlType = ((SSessionCustom) session.getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
             float cfdVersion = SLibConsts.UNDEFINED;
@@ -283,7 +283,7 @@ public abstract class SHrsCfdUtils {
         payrollReceipt.setRegimenFiscal(((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
         payrollReceipt.setCfdiRelacionadosTipoRelacion("");
         
-        cfd = computeCfdi(session, payrollReceipt, keyReceipt[2], false);
+        cfd = computeCfdi(session, payrollReceipt, keyReceipt[2], true);
         if (cfd == null) {
             throw new Exception("Error al leer el CFD, no se encontró el registro.");
         }

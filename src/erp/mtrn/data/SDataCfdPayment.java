@@ -782,7 +782,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                 if (!pago.getAttMonedaP().getString().equals(doctoRelacionado.getAttMonedaDR().getString())) {
                     doctoRelacionado.getAttTipoCambioDR().setDouble(paymentEntryDoc.ExchangeRate);
                 }
-                doctoRelacionado.getAttMetodoPagoDR().setString(paymentEntryDoc.DataDps.getDbmsDataDpsCfd().getPaymentMethod());
+                doctoRelacionado.getAttMetodoDePagoDR().setString(paymentEntryDoc.DataDps.getDbmsDataDpsCfd().getPaymentMethod());
                 doctoRelacionado.getAttNumParcialidad().setInteger(paymentEntryDoc.Installment);
                 doctoRelacionado.getAttImpSaldoAnt().setDouble(paymentEntryDoc.BalancePrev);
                 doctoRelacionado.getAttImpPagado().setDouble(paymentEntryDoc.Payment);

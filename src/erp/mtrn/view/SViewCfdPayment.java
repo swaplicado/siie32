@@ -161,7 +161,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         moTablePane.getPrimaryKeyFields().add(aoKeyFields[0]);
 
         int col = 0;
-        STableColumn[] aoTableColumns = new STableColumn[8];
+        STableColumn[] aoTableColumns = new STableColumn[9];
         
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_num", "Folio CFDI", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "c.ts", "Fecha-hora CFDI", STableConstants.WIDTH_DATE_TIME);
@@ -172,7 +172,8 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.uuid", "UUID", 250);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.xml_rfc_rec", "RFC receptor", 100);
-        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_bp", "Receptor", 300);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.bp", "Receptor", 300);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.fiscal_id", "RFC receptor", 100);
         
         for (col = 0; col < aoTableColumns.length; col++) {
             moTablePane.addTableColumn(aoTableColumns[col]);
@@ -466,13 +467,15 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
     
     @Override
     public void createSqlQuery() {
-        String where = "";
+        String where = "";      // for main from
+        String whereRe = "";    // for from in derived table 're'
         STableSetting setting = null;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
-                where += (where.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "c.ts");
+                where += (where.isEmpty() ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "c.ts");
+                whereRe += (whereRe.isEmpty() ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "r.dt");
             }
         }
 
@@ -486,17 +489,17 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                 STableConstants.ICON_XML_SIGN + " " + /* CFDI signed, canceled only SIIE */
                 "))))) AS _ico_xml, " +
                 "cob.code AS _cob_code, " +
-                "(SELECT b.bp " +
-                "FROM erp.bpsu_bp AS b " +
-                "WHERE b.id_bp IN (" +
-                "SELECT DISTINCT re.fid_bp_nr " +
-                "FROM fin_rec AS r " +
-                "INNER JOIN fin_rec_ety re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
-                "WHERE re.fid_cfd_n = c.id_cfd AND NOT r.b_del AND NOT re.b_del)) AS _bp " +
+                "b.bp, b.fiscal_id " +
                 "FROM trn_cfd AS c " +
                 "INNER JOIN erp.bpsu_bpb AS cob ON c.fid_cob_n = cob.id_bpb " +
-                (where.isEmpty() ? "" : "WHERE " + where ) +
-                "ORDER BY c.ser, c.num, c.ts, c.id_cfd ";
+                "LEFT OUTER JOIN " +
+                "(SELECT DISTINCT re.fid_cfd_n, re.fid_bp_nr " +
+                "FROM fin_rec AS r " +
+                "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
+                "WHERE " + whereRe + " AND NOT r.b_del AND NOT re.b_del AND re.fid_cfd_n IS NOT NULL AND re.fid_bp_nr IS NOT NULL) AS re ON re.fid_cfd_n = c.id_cfd " +
+                "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = re.fid_bp_nr " +
+                (where.isEmpty() ? "" : "WHERE " + where) +
+                "ORDER BY c.ser, CONVERT(c.num, UNSIGNED), c.ts, c.id_cfd ";
     }
 
     @Override

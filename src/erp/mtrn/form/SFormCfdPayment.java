@@ -1274,7 +1274,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldPayAccountSrcEntity.setLengthMax(300);
         moFieldPayAccountDesFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountDesFiscalId, jlPayAccountFiscalId);
         moFieldPayAccountDesFiscalId.setLengthMin(12);
-        moFieldPayAccountDesFiscalId.setLengthMax(12);
+        moFieldPayAccountDesFiscalId.setLengthMax(13);
         moFieldPayAccountDesFiscalId.setPickerButton(jbPayAccountDesPick);
         moFieldPayAccountDesNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountDesNumber, jlPayAccountNumber);
         moFieldPayAccountDesNumber.setLengthMin(10);

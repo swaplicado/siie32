@@ -145,10 +145,6 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     }
     
     private void actionImportPayroll() {
-        SDbPayroll payroll = null;
-        SDialogPayrollReceiptCfdi receiptCfdi = null;
-        SDialogResult dialogResult = null;
-        
         if (jbImport.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
@@ -156,17 +152,16 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             else {
                 try {
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                    payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, gridRow.getRowPrimaryKey());
+                    int payroll = gridRow.getRowPrimaryKey()[0];
                     
-                    if (SHrsCfdUtils.canGenetareCfdReceipts(miClient.getSession(), payroll.getPkPayrollId())) {
-                        receiptCfdi = new SDialogPayrollReceiptCfdi((SClientInterface) miClient, SHrsCfdUtils.getReceiptsPendig(miClient.getSession(), payroll.getPkPayrollId()));
+                    if (SHrsCfdUtils.canGenetareCfdReceipts(miClient.getSession(), payroll)) {
+                        SDialogPayrollReceiptCfdi receiptCfdi = new SDialogPayrollReceiptCfdi((SClientInterface) miClient, SHrsCfdUtils.getReceiptsPendig(miClient.getSession(), payroll));
                         receiptCfdi.resetForm();
                         receiptCfdi.setVisible(true);
 
                         if (receiptCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                 int stampsAvailable = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, miClient.getSession().getCurrentDate(), SLibConsts.UNDEFINED);
-                                dialogResult = new SDialogResult(miClient, "Resultados de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
+                                SDialogResult dialogResult = new SDialogResult(miClient, "Resultados de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
                                 dialogResult.setFormParams((SClientInterface) miClient, null, receiptCfdi.manPayrollEmployeeReceipts, stampsAvailable, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                                 dialogResult.setVisible(true);
                         }

@@ -113,4 +113,9 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public Date getDatePayment() { return mtDatePayment; }
     public String getPaymentTypeSys() { return msPaymentTypeSys ; }
     public int getPaymentTypeSysId() { return mnPaymentTypeSysId; }
+    
+    @Override
+    public int[] getRowPrimaryKey() {
+        return new int[] { mnPkPayrollId, mnPkEmployeeId, mnPkIssueId };
+    }
 }

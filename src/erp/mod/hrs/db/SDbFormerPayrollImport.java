@@ -75,7 +75,7 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
             Statement statement = connection.createStatement();
 
             String sql = "UPDATE trn_cfd SET b_con = 0 "
-                    + "WHERE fid_pay_pay_n = " + mnPayrollId + " AND fid_st_xml <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " ";
+                    + "WHERE fid_pay_pay_n = " + mnPayrollId + " AND fid_st_xml <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "; // TODO: 2018-08-31, Sergio Flores: fix this, because is called each time a CFDI from the same payroll is saved, making the other CFDI reset for b_con!
             statement.execute(sql);
 
             for (SCfdPacket packet: maCfdPackets) {
@@ -86,6 +86,7 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
                 }
                 else {
                     SDataCfd dataCfd = packet.createDataCfd();
+                    dataCfd.setIsConsistent(true);
                     if (dataCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }

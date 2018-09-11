@@ -976,6 +976,45 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
     }
 
     @Override
+    public void actionRowDelete() {
+        if (jbRowDelete.isEnabled()) {
+            if (jtTable.getSelectedRowCount() == 0) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROWS);
+            }
+            else if (miClient.showMsgBoxConfirm(SGridConsts.MSG_CONFIRM_REG_DEL) == JOptionPane.YES_OPTION) {
+                boolean updates = false;
+                SGridRow[] gridRows = getSelectedGridRows();
+
+                for (SGridRow gridRow : gridRows) {
+                    if (((SGridRowView) gridRow).getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    }
+                    else if (((SGridRowView) gridRow).isRowSystem()) {
+                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                    }
+                    else if (!((SGridRowView) gridRow).isDeletable()) {
+                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_DELETABLE);
+                    }
+                    else {
+                        try {
+                            if (SCfdUtils.deletePayroll((SClientInterface) miClient, gridRow.getRowPrimaryKey()[0])) {
+                                updates = true;
+                            }
+                        }
+                        catch (Exception e) {
+                            SLibUtils.showException(this, e);
+                        }
+                    }
+                }
+
+                if (updates) {
+                    miClient.getSession().notifySuscriptors(mnGridType);
+                }
+            }
+        }
+    }
+
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
@@ -1015,45 +1054,6 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
             }
             else if (button == jbDeactivateControlFlags) {
                 actionDeactivateControlFlags();
-            }
-        }
-    }
-
-    @Override
-    public void actionRowDelete() {
-        if (jbRowDelete.isEnabled()) {
-            if (jtTable.getSelectedRowCount() == 0) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROWS);
-            }
-            else if (miClient.showMsgBoxConfirm(SGridConsts.MSG_CONFIRM_REG_DEL) == JOptionPane.YES_OPTION) {
-                boolean updates = false;
-                SGridRow[] gridRows = getSelectedGridRows();
-
-                for (SGridRow gridRow : gridRows) {
-                    if (((SGridRowView) gridRow).getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                    }
-                    else if (((SGridRowView) gridRow).isRowSystem()) {
-                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                    }
-                    else if (!((SGridRowView) gridRow).isDeletable()) {
-                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_DELETABLE);
-                    }
-                    else {
-                        try {
-                            if (SCfdUtils.deletePayroll((SClientInterface) miClient, gridRow.getRowPrimaryKey()[0])) {
-                                updates = true;
-                            }
-                        }
-                        catch (Exception e) {
-                            SLibUtils.showException(this, e);
-                        }
-                    }
-                }
-
-                if (updates) {
-                    miClient.getSession().notifySuscriptors(mnGridType);
-                }
             }
         }
     }
