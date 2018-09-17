@@ -2792,6 +2792,7 @@ public abstract class SFiscalUtils {
 
         resultSetRec = statementRec.executeQuery(sql);
         while (resultSetRec.next()) {
+            //System.out.println("Processing voucher: id_bkc=" + resultSetRec.getInt("id_bkc") + ", id_tp_rec=" + resultSetRec.getString("id_tp_rec") + ", id_num=" + resultSetRec.getInt("id_num") + "...");
             xmlPoliza = createElementPolizas13Poliza(resultSetRec.getString("r.id_tp_rec") + "-" + resultSetRec.getInt("r.id_num"), resultSetRec.getDate("r.dt"), resultSetRec.getString("r.concept"));
 
             sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety, re.debit, re.credit, re.concept, re.exc_rate, "
@@ -2809,19 +2810,23 @@ public abstract class SFiscalUtils {
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS a ON re.fid_acc = a.id_acc "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS al ON al.code = CONCAT(LEFT(a.code, 6), REPEAT('0', 42)) "
+                    // link to cash accounts (company branch entities):
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK_DET) + " AS fald1 ON "
                     + "fald1.id_year = " + coaPeriod[0] + " AND fald1.id_per = " + coaPeriod[1] + " AND fald1.id_acc = a.pk_acc AND "
                     + "fald1.id_tp_fiscal_acc_link BETWEEN " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_CSH_CSH + " AND " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_CSH_BNK + " AND "
                     + "fald1.id_ref_1 = re.fid_cob_n AND fald1.id_ref_2 = re.fid_ent_n "
+                    // link to business partners:
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK_DET) + " AS fald2 ON "
                     + "fald2.id_year = " + coaPeriod[0] + " AND fald2.id_per = " + coaPeriod[1] + " AND fald2.id_acc = a.pk_acc AND "
                     + "fald2.id_tp_fiscal_acc_link BETWEEN " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_SUP + " AND " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_BPS_CUS_ADV + " AND "
                     + "fald2.id_ref_1 = re.fid_bp_nr AND fald2.id_ref_2 = " + SLibConsts.UNDEFINED + " "
+                    // link to items:
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK_DET) + " AS fald3 ON "
                     + "fald3.id_year = " + coaPeriod[0] + " AND fald3.id_per = " + coaPeriod[1] + " AND fald3.id_acc = a.pk_acc AND ("
-                    + "(fald3.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_INC + " AND re.debit = 0.0) OR "
-                    + "(fald3.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_EXP + " AND re.credit = 0.0)) AND "
+                    + "(fald3.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_INC + "/* AND re.debit = 0.0*/) OR "    // TODO: 2018-09-17, Sergio Flores: Remove commented query snippet if no longer needed
+                    + "(fald3.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_EXP + "/* AND re.credit = 0.0*/)) AND " // TODO: 2018-09-17, Sergio Flores: Remove commented query snippet if no longer needed
                     + "fald3.id_ref_1 = re.fid_item_n AND fald3.id_ref_2 = " + SLibConsts.UNDEFINED + " "
+                    // link to accounting accounts:
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK_DET) + " AS fald4 ON "
                     + "fald4.id_year = " + coaPeriod[0] + " AND fald4.id_per = " + coaPeriod[1] + " AND fald4.id_acc = a.pk_acc AND "
                     + "fald4.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_ACC + " AND "
@@ -3026,7 +3031,6 @@ public abstract class SFiscalUtils {
                     xmlPago = null;
 
                     if (resultSetRecEty.getInt("re.fid_check_wal_n") != SLibConsts.UNDEFINED) {
-//                        xmlPago = createElementPolizas11Cheque(resultSetRecEty.getString("chk.num"), resultSetRecEty.getString("fbnk.code"), resultSetRecEty.getString("bnk_fcur.code"), resultSetRecEty.getString("acsh_bnk.acc_num"),
                         xmlPago = createElementPolizas13Cheque(resultSetRecEty.getString("chk.num"), resultSetRecEty.getString("fbnk.code"),resultSetRecEty.getString("bnk_fcur.code"), resultSetRecEty.getString("acsh_bnk.acc_num"),
                                 resultSetRecEty.getDate("chk.dt"), resultSetRecEty.getString("chk.benef"), resultSetRecEty.getString("chk_bp.fiscal_id") == null ? DCfdConsts.RFC_GEN_NAC : resultSetRecEty.getString("chk_bp.fiscal_id"),
                                 resultSetRecEty.getDouble("chk.val"), resultSetRecEty.getString("bnk_fcur.code"), resultSetRecEty.getDouble("re.exc_rate"));
@@ -3274,7 +3278,7 @@ public abstract class SFiscalUtils {
                 "al.fid_tp_acc_r = " + SModSysConsts.FINS_TP_ACC_RES + " " +
                 "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK_DET) + " AS fld ON fld.id_year = " + coaPeriod[0] + " AND fld.id_per = " + coaPeriod[1] + " AND " +
                 "fld.id_acc = a.pk_acc AND fld.id_tp_fiscal_acc_link BETWEEN " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_INC + " AND " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_EXP + " AND " +
-                "fld.id_ref_1 = re.fid_item_n AND fld.id_ref_2 = 0 " +
+                "fld.id_ref_1 = re.fid_item_n AND fld.id_ref_2 = " + SLibConsts.UNDEFINED + " " +
                 "WHERE r.id_year = " + periodYear + " AND r.dt <= '" + dateClose + "' " + sqlFilter +
                 "GROUP BY fld.id_acc, fld.id_tp_fiscal_acc_link, fld.id_ref_1, fld.id_ref_2, fld.acc_code, fld.acc_name, fld.nat, a.id_acc, a.acc, al.fid_tp_acc_r, al.fid_cl_acc_r " +
                 "" +
