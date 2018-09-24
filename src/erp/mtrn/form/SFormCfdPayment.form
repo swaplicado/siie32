@@ -1421,7 +1421,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocBalancePrev">
+                            <Component class="javax.swing.JTextField" name="jtfDocDocBalancePrev">
                               <Properties>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
                                 <Property name="text" type="java.lang.String" value="999,999,999.99"/>
@@ -1430,7 +1430,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocBalancePrevCurRo">
+                            <Component class="javax.swing.JTextField" name="jtfDocDocBalancePrevCurRo">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -1443,7 +1443,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocBalancePrevPayRo">
+                            <Component class="javax.swing.JTextField" name="jtfDocPayBalancePrevRo">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
@@ -1454,7 +1454,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocBalancePrevPayCurRo">
+                            <Component class="javax.swing.JTextField" name="jtfDocPayBalancePrevCurRo">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -1484,7 +1484,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocPayment">
+                            <Component class="javax.swing.JTextField" name="jtfDocDocPayment">
                               <Properties>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
                                 <Property name="text" type="java.lang.String" value="999,999,999.99"/>
@@ -1493,7 +1493,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocPaymentCurRo">
+                            <Component class="javax.swing.JTextField" name="jtfDocDocPaymentCurRo">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -1506,7 +1506,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocPaymentPayRo">
+                            <Component class="javax.swing.JTextField" name="jtfDocPayPaymentRo">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
@@ -1517,7 +1517,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocPaymentPayCurRo">
+                            <Component class="javax.swing.JTextField" name="jtfDocPayPaymentCurRo">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -1558,7 +1558,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocBalancePend">
+                            <Component class="javax.swing.JTextField" name="jtfDocDocBalancePend">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
@@ -1569,7 +1569,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocBalancePendCurRo">
+                            <Component class="javax.swing.JTextField" name="jtfDocDocBalancePendCurRo">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
@@ -1582,7 +1582,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocBalancePendPayRo">
+                            <Component class="javax.swing.JTextField" name="jtfDocPayBalancePendRo">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="horizontalAlignment" type="int" value="11"/>
@@ -1593,7 +1593,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jtfDocBalancePendPayCurRo">
+                            <Component class="javax.swing.JTextField" name="jtfDocPayBalancePendCurRo">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">

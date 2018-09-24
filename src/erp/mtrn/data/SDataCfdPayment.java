@@ -382,13 +382,13 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                         // add XML related document of XML payment:
 
                                         SCfdPaymentEntryDoc paymentEntryDoc = new SCfdPaymentEntryDoc(
-                                                numberDoc, 
+                                                paymentEntry,
                                                 dps, 
+                                                numberDoc, 
                                                 doctoRelacionado.getAttNumParcialidad().getInteger(), 
                                                 doctoRelacionado.getAttImpSaldoAnt().getDouble(), 
                                                 doctoRelacionado.getAttImpPagado().getDouble(), 
-                                                currencyId == dps.getFkCurrencyId() ? 1.0 : doctoRelacionado.getAttTipoCambioDR().getDouble(), 
-                                                paymentEntry);
+                                                currencyId == dps.getFkCurrencyId() ? 1.0 : doctoRelacionado.getAttTipoCambioDR().getDouble());
 
                                         paymentEntryDoc.prepareTableRow();
                                         paymentEntry.PaymentEntryDocs.add(paymentEntryDoc);
@@ -790,9 +790,9 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                 }
                 doctoRelacionado.getAttMetodoDePagoDR().setString(paymentEntryDoc.DataDps.getDbmsDataDpsCfd().getPaymentMethod());
                 doctoRelacionado.getAttNumParcialidad().setInteger(paymentEntryDoc.Installment);
-                doctoRelacionado.getAttImpSaldoAnt().setDouble(paymentEntryDoc.BalancePrev);
-                doctoRelacionado.getAttImpPagado().setDouble(paymentEntryDoc.Payment);
-                doctoRelacionado.getAttImpSaldoInsoluto().setDouble(paymentEntryDoc.BalancePend);
+                doctoRelacionado.getAttImpSaldoAnt().setDouble(paymentEntryDoc.DocBalancePrev);
+                doctoRelacionado.getAttImpPagado().setDouble(paymentEntryDoc.DocPayment);
+                doctoRelacionado.getAttImpSaldoInsoluto().setDouble(paymentEntryDoc.DocBalancePend);
                 
                 pago.getEltDoctoRelacionados().add(doctoRelacionado);
             }
