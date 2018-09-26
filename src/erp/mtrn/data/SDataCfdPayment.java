@@ -638,12 +638,12 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public String getComprobanteTipoComprobante() {
-        return DCfdi33Catalogs.CFD_TP_P;    // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
+        return DCfdi33Catalogs.CFD_TP_P; // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
     }
 
     @Override
     public String getComprobanteMetodoPago() {
-        return "";  // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+        return ""; // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
     }
 
     @Override
@@ -710,7 +710,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public String getReceptorUsoCFDI() {
-        return DCfdi33Catalogs.CFDI_USO_POR_DEF;    // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
+        return DCfdi33Catalogs.CFDI_USO_POR_DEF; // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
     }
 
     @Override
@@ -807,6 +807,6 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public DElement getElementAddenda() {
-        return null;    // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+        return null;    // not implemented yet in CFDI 3.3 with Complement of Receipt of Payments 1.0!
     }
 }

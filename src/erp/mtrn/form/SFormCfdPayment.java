@@ -108,15 +108,15 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private erp.lib.table.STablePaneGrid moPaneGridPayments;
     private erp.lib.table.STablePaneGrid moPaneGridPaymentDocs;
     
-    // CFD:
-    private erp.lib.form.SFormField moFieldVouDate;
-    private erp.lib.form.SFormField moFieldVouTaxRegime;
-    private erp.lib.form.SFormField moFieldVouConfirm;
-    
     // business partner:
     private erp.lib.form.SFormField moFieldRecBizPartner;
     private erp.lib.form.SFormField moFieldRecCfdiUse;
     private erp.lib.form.SFormField moFieldRecCfdRelatedUuid;
+    
+    // CFD:
+    private erp.lib.form.SFormField moFieldVouDate;
+    private erp.lib.form.SFormField moFieldVouTaxRegime;
+    private erp.lib.form.SFormField moFieldVouConfirm;
     
     // current payment:
     private erp.lib.form.SFormField moFieldPayDate;
@@ -161,6 +161,30 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jpRegistry = new javax.swing.JPanel();
         jpRegistryHead = new javax.swing.JPanel();
+        jpRegistryHeadRec = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jlRecBizPartner = new javax.swing.JLabel();
+        jcbRecBizPartner = new javax.swing.JComboBox();
+        jbRecBizPartnerPick = new javax.swing.JButton();
+        jPanel12 = new javax.swing.JPanel();
+        jlRecFiscalId = new javax.swing.JLabel();
+        jtfRecFiscalIdRo = new javax.swing.JTextField();
+        jtfRecCountryRo = new javax.swing.JTextField();
+        jtfRecForeignFiscalIdRo = new javax.swing.JTextField();
+        jPanel15 = new javax.swing.JPanel();
+        jlRecCfdiUsage = new javax.swing.JLabel();
+        jcbRecCfdiUsage = new javax.swing.JComboBox();
+        jPanel17 = new javax.swing.JPanel();
+        jlRecCfdRelated = new javax.swing.JLabel();
+        jtfRecCfdRelatedNumberRo = new javax.swing.JTextField();
+        jtfRecCfdRelatedUuid = new javax.swing.JTextField();
+        jtfRecCfdRelatedVersionRo = new javax.swing.JTextField();
+        jbRecCfdRelatedPick = new javax.swing.JButton();
+        jPanel16 = new javax.swing.JPanel();
+        jlRecRelationType = new javax.swing.JLabel();
+        jtfRecRelationTypeRo = new javax.swing.JTextField();
+        jbRecCfdRelatedAdd = new javax.swing.JButton();
+        jbRecCfdRelatedDelete = new javax.swing.JButton();
         jpRegistryHeadVou = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jlVouNumber = new javax.swing.JLabel();
@@ -188,30 +212,6 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jPanel42 = new javax.swing.JPanel();
         jbVouNext = new javax.swing.JButton();
         jbVouResume = new javax.swing.JButton();
-        jpRegistryHeadRec = new javax.swing.JPanel();
-        jPanel11 = new javax.swing.JPanel();
-        jlRecBizPartner = new javax.swing.JLabel();
-        jcbRecBizPartner = new javax.swing.JComboBox();
-        jbRecBizPartnerPick = new javax.swing.JButton();
-        jPanel12 = new javax.swing.JPanel();
-        jlRecFiscalId = new javax.swing.JLabel();
-        jtfRecFiscalIdRo = new javax.swing.JTextField();
-        jtfRecCountryRo = new javax.swing.JTextField();
-        jtfRecForeignFiscalIdRo = new javax.swing.JTextField();
-        jPanel15 = new javax.swing.JPanel();
-        jlRecCfdiUsage = new javax.swing.JLabel();
-        jcbRecCfdiUsage = new javax.swing.JComboBox();
-        jPanel16 = new javax.swing.JPanel();
-        jlRecRelationType = new javax.swing.JLabel();
-        jtfRecRelationTypeRo = new javax.swing.JTextField();
-        jbRecCfdRelatedAdd = new javax.swing.JButton();
-        jbRecCfdRelatedDelete = new javax.swing.JButton();
-        jPanel17 = new javax.swing.JPanel();
-        jlRecCfdRelated = new javax.swing.JLabel();
-        jtfRecCfdRelatedNumberRo = new javax.swing.JTextField();
-        jtfRecCfdRelatedUuid = new javax.swing.JTextField();
-        jtfRecCfdRelatedVersionRo = new javax.swing.JTextField();
-        jbRecCfdRelatedPick = new javax.swing.JButton();
         jpRegistryRows = new javax.swing.JPanel();
         jpRegistryRowsPays = new javax.swing.JPanel();
         jpPays = new javax.swing.JPanel();
@@ -353,6 +353,123 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jpRegistryHead.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
 
+        jpRegistryHeadRec.setBorder(javax.swing.BorderFactory.createTitledBorder("Deudor:"));
+        jpRegistryHeadRec.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRecBizPartner.setText("Deudor:*");
+        jlRecBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel11.add(jlRecBizPartner);
+
+        jcbRecBizPartner.setMaximumRowCount(16);
+        jcbRecBizPartner.setPreferredSize(new java.awt.Dimension(360, 23));
+        jPanel11.add(jcbRecBizPartner);
+
+        jbRecBizPartnerPick.setText("...");
+        jbRecBizPartnerPick.setToolTipText("Seleccionar asociado de negocios");
+        jbRecBizPartnerPick.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel11.add(jbRecBizPartnerPick);
+
+        jpRegistryHeadRec.add(jPanel11);
+
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRecFiscalId.setText("RFC:");
+        jlRecFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlRecFiscalId);
+
+        jtfRecFiscalIdRo.setEditable(false);
+        jtfRecFiscalIdRo.setText("XAXX010101000");
+        jtfRecFiscalIdRo.setToolTipText("RFC");
+        jtfRecFiscalIdRo.setFocusable(false);
+        jtfRecFiscalIdRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jtfRecFiscalIdRo);
+
+        jtfRecCountryRo.setEditable(false);
+        jtfRecCountryRo.setText("XXX");
+        jtfRecCountryRo.setToolTipText("País de residencia");
+        jtfRecCountryRo.setFocusable(false);
+        jtfRecCountryRo.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel12.add(jtfRecCountryRo);
+
+        jtfRecForeignFiscalIdRo.setEditable(false);
+        jtfRecForeignFiscalIdRo.setText("TEXT");
+        jtfRecForeignFiscalIdRo.setToolTipText("ID tributario");
+        jtfRecForeignFiscalIdRo.setFocusable(false);
+        jtfRecForeignFiscalIdRo.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel12.add(jtfRecForeignFiscalIdRo);
+
+        jpRegistryHeadRec.add(jPanel12);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRecCfdiUsage.setText("Uso CFDI:*");
+        jlRecCfdiUsage.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel15.add(jlRecCfdiUsage);
+
+        jcbRecCfdiUsage.setMaximumRowCount(16);
+        jcbRecCfdiUsage.setPreferredSize(new java.awt.Dimension(360, 23));
+        jPanel15.add(jcbRecCfdiUsage);
+
+        jpRegistryHeadRec.add(jPanel15);
+
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRecCfdRelated.setText("Doc. relacionado:*");
+        jlRecCfdRelated.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel17.add(jlRecCfdRelated);
+
+        jtfRecCfdRelatedNumberRo.setEditable(false);
+        jtfRecCfdRelatedNumberRo.setText("A-999999");
+        jtfRecCfdRelatedNumberRo.setToolTipText("Serie y folio");
+        jtfRecCfdRelatedNumberRo.setFocusable(false);
+        jtfRecCfdRelatedNumberRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel17.add(jtfRecCfdRelatedNumberRo);
+
+        jtfRecCfdRelatedUuid.setText("402A8A38-B980-412A-9485-29222D7095C4");
+        jtfRecCfdRelatedUuid.setToolTipText("UUID");
+        jtfRecCfdRelatedUuid.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel17.add(jtfRecCfdRelatedUuid);
+
+        jtfRecCfdRelatedVersionRo.setEditable(false);
+        jtfRecCfdRelatedVersionRo.setText("0.0");
+        jtfRecCfdRelatedVersionRo.setToolTipText("Versión del CFD");
+        jtfRecCfdRelatedVersionRo.setFocusable(false);
+        jtfRecCfdRelatedVersionRo.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel17.add(jtfRecCfdRelatedVersionRo);
+
+        jbRecCfdRelatedPick.setText("...");
+        jbRecCfdRelatedPick.setToolTipText("Seleccionar doc. relacionado");
+        jbRecCfdRelatedPick.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel17.add(jbRecCfdRelatedPick);
+
+        jpRegistryHeadRec.add(jPanel17);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRecRelationType.setText("Tipo relación:");
+        jlRecRelationType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel16.add(jlRecRelationType);
+
+        jtfRecRelationTypeRo.setEditable(false);
+        jtfRecRelationTypeRo.setText("TEXT");
+        jtfRecRelationTypeRo.setFocusable(false);
+        jtfRecRelationTypeRo.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel16.add(jtfRecRelationTypeRo);
+
+        jbRecCfdRelatedAdd.setText("Agregar");
+        jbRecCfdRelatedAdd.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel16.add(jbRecCfdRelatedAdd);
+
+        jbRecCfdRelatedDelete.setText("Eliminar");
+        jbRecCfdRelatedDelete.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel16.add(jbRecCfdRelatedDelete);
+
+        jpRegistryHeadRec.add(jPanel16);
+
+        jpRegistryHead.add(jpRegistryHeadRec);
+
         jpRegistryHeadVou.setBorder(javax.swing.BorderFactory.createTitledBorder("Comprobante:"));
         jpRegistryHeadVou.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
@@ -427,7 +544,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfVouBranchNameRo.setText("TEXT");
         jtfVouBranchNameRo.setToolTipText("Nombre de la sucursal");
         jtfVouBranchNameRo.setFocusable(false);
-        jtfVouBranchNameRo.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfVouBranchNameRo.setPreferredSize(new java.awt.Dimension(225, 23));
         jPanel7.add(jtfVouBranchNameRo);
 
         jtfVouBranchCodeRo.setEditable(false);
@@ -441,7 +558,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfVouPlaceIssueRo.setText("99999");
         jtfVouPlaceIssueRo.setToolTipText("Lugar de expedición");
         jtfVouPlaceIssueRo.setFocusable(false);
-        jtfVouPlaceIssueRo.setPreferredSize(new java.awt.Dimension(90, 23));
+        jtfVouPlaceIssueRo.setPreferredSize(new java.awt.Dimension(78, 23));
         jPanel7.add(jtfVouPlaceIssueRo);
 
         jpRegistryHeadVou.add(jPanel7);
@@ -453,7 +570,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jPanel9.add(jlVouTaxRegime);
 
         jcbVouTaxRegime.setMaximumRowCount(16);
-        jcbVouTaxRegime.setPreferredSize(new java.awt.Dimension(350, 23));
+        jcbVouTaxRegime.setPreferredSize(new java.awt.Dimension(363, 23));
         jPanel9.add(jcbVouTaxRegime);
 
         jpRegistryHeadVou.add(jPanel9);
@@ -490,123 +607,6 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jpRegistryHead.add(jpRegistryHeadVou);
 
-        jpRegistryHeadRec.setBorder(javax.swing.BorderFactory.createTitledBorder("Receptor:"));
-        jpRegistryHeadRec.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
-
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlRecBizPartner.setText("Receptor:*");
-        jlRecBizPartner.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel11.add(jlRecBizPartner);
-
-        jcbRecBizPartner.setMaximumRowCount(16);
-        jcbRecBizPartner.setPreferredSize(new java.awt.Dimension(350, 23));
-        jPanel11.add(jcbRecBizPartner);
-
-        jbRecBizPartnerPick.setText("...");
-        jbRecBizPartnerPick.setToolTipText("Seleccionar asociado de negocios");
-        jbRecBizPartnerPick.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel11.add(jbRecBizPartnerPick);
-
-        jpRegistryHeadRec.add(jPanel11);
-
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlRecFiscalId.setText("RFC:");
-        jlRecFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jlRecFiscalId);
-
-        jtfRecFiscalIdRo.setEditable(false);
-        jtfRecFiscalIdRo.setText("XAXX010101000");
-        jtfRecFiscalIdRo.setToolTipText("RFC");
-        jtfRecFiscalIdRo.setFocusable(false);
-        jtfRecFiscalIdRo.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jtfRecFiscalIdRo);
-
-        jtfRecCountryRo.setEditable(false);
-        jtfRecCountryRo.setText("XXX");
-        jtfRecCountryRo.setToolTipText("País de residencia");
-        jtfRecCountryRo.setFocusable(false);
-        jtfRecCountryRo.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel12.add(jtfRecCountryRo);
-
-        jtfRecForeignFiscalIdRo.setEditable(false);
-        jtfRecForeignFiscalIdRo.setText("TEXT");
-        jtfRecForeignFiscalIdRo.setToolTipText("ID tributario");
-        jtfRecForeignFiscalIdRo.setFocusable(false);
-        jtfRecForeignFiscalIdRo.setPreferredSize(new java.awt.Dimension(190, 23));
-        jPanel12.add(jtfRecForeignFiscalIdRo);
-
-        jpRegistryHeadRec.add(jPanel12);
-
-        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlRecCfdiUsage.setText("Uso CFDI:*");
-        jlRecCfdiUsage.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel15.add(jlRecCfdiUsage);
-
-        jcbRecCfdiUsage.setMaximumRowCount(16);
-        jcbRecCfdiUsage.setPreferredSize(new java.awt.Dimension(350, 23));
-        jPanel15.add(jcbRecCfdiUsage);
-
-        jpRegistryHeadRec.add(jPanel15);
-
-        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlRecRelationType.setText("Tipo relación:");
-        jlRecRelationType.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel16.add(jlRecRelationType);
-
-        jtfRecRelationTypeRo.setEditable(false);
-        jtfRecRelationTypeRo.setText("TEXT");
-        jtfRecRelationTypeRo.setFocusable(false);
-        jtfRecRelationTypeRo.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel16.add(jtfRecRelationTypeRo);
-
-        jbRecCfdRelatedAdd.setText("Agregar");
-        jbRecCfdRelatedAdd.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel16.add(jbRecCfdRelatedAdd);
-
-        jbRecCfdRelatedDelete.setText("Eliminar");
-        jbRecCfdRelatedDelete.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel16.add(jbRecCfdRelatedDelete);
-
-        jpRegistryHeadRec.add(jPanel16);
-
-        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlRecCfdRelated.setText("Doc. relacionado:*");
-        jlRecCfdRelated.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel17.add(jlRecCfdRelated);
-
-        jtfRecCfdRelatedNumberRo.setEditable(false);
-        jtfRecCfdRelatedNumberRo.setText("A-999999");
-        jtfRecCfdRelatedNumberRo.setToolTipText("Serie y folio");
-        jtfRecCfdRelatedNumberRo.setFocusable(false);
-        jtfRecCfdRelatedNumberRo.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel17.add(jtfRecCfdRelatedNumberRo);
-
-        jtfRecCfdRelatedUuid.setText("402A8A38-B980-412A-9485-29222D7095C4");
-        jtfRecCfdRelatedUuid.setToolTipText("UUID");
-        jtfRecCfdRelatedUuid.setPreferredSize(new java.awt.Dimension(225, 23));
-        jPanel17.add(jtfRecCfdRelatedUuid);
-
-        jtfRecCfdRelatedVersionRo.setEditable(false);
-        jtfRecCfdRelatedVersionRo.setText("0.0");
-        jtfRecCfdRelatedVersionRo.setToolTipText("Versión del CFD");
-        jtfRecCfdRelatedVersionRo.setFocusable(false);
-        jtfRecCfdRelatedVersionRo.setPreferredSize(new java.awt.Dimension(25, 23));
-        jPanel17.add(jtfRecCfdRelatedVersionRo);
-
-        jbRecCfdRelatedPick.setText("...");
-        jbRecCfdRelatedPick.setToolTipText("Seleccionar doc. relacionado");
-        jbRecCfdRelatedPick.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel17.add(jbRecCfdRelatedPick);
-
-        jpRegistryHeadRec.add(jPanel17);
-
-        jpRegistryHead.add(jpRegistryHeadRec);
-
         jpRegistry.add(jpRegistryHead, java.awt.BorderLayout.NORTH);
 
         jpRegistryRows.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
@@ -642,12 +642,12 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jftPayHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("HH:mm:ss"))));
         jftPayHour.setText("01:01:01");
         jftPayHour.setToolTipText("Hora");
-        jftPayHour.setPreferredSize(new java.awt.Dimension(75, 23));
+        jftPayHour.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel25.add(jftPayHour);
 
         jlPayHourTip.setForeground(java.awt.Color.gray);
-        jlPayHourTip.setText("hh:mm:ss");
-        jlPayHourTip.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlPayHourTip.setText("hh:mm:ss (24 h)");
+        jlPayHourTip.setPreferredSize(new java.awt.Dimension(92, 23));
         jPanel25.add(jlPayHourTip);
 
         jPanel24.add(jPanel25);
@@ -713,7 +713,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfPayAmountLocalRo.setText("999,999,999.99");
         jtfPayAmountLocalRo.setToolTipText("Monto de pago");
         jtfPayAmountLocalRo.setFocusable(false);
-        jtfPayAmountLocalRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfPayAmountLocalRo.setPreferredSize(new java.awt.Dimension(102, 23));
         jPanel29.add(jtfPayAmountLocalRo);
 
         jtfPayAmountLocalCurRo.setEditable(false);
@@ -921,7 +921,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jpRegistryRows.add(jpRegistryRowsPays);
 
-        jpRegistryRowsDocs.setBorder(javax.swing.BorderFactory.createTitledBorder("Documentos:"));
+        jpRegistryRowsDocs.setBorder(javax.swing.BorderFactory.createTitledBorder("Documentos relacionados del pago:"));
         jpRegistryRowsDocs.setLayout(new java.awt.BorderLayout(0, 5));
 
         jpDocs.setLayout(new java.awt.BorderLayout(0, 5));
@@ -1297,12 +1297,12 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldDocPayment.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
 
         mvFields = new Vector<>();
-        mvFields.add(moFieldVouDate);
-        mvFields.add(moFieldVouTaxRegime);
-        mvFields.add(moFieldVouConfirm);
         mvFields.add(moFieldRecBizPartner);
         mvFields.add(moFieldRecCfdiUse);
         mvFields.add(moFieldRecCfdRelatedUuid);
+        mvFields.add(moFieldVouDate);
+        mvFields.add(moFieldVouTaxRegime);
+        mvFields.add(moFieldVouConfirm);
         
         // initialize inner forms:
         
@@ -1457,7 +1457,10 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
             
             if (mbIsFormReady) {
-                if (jftVouDate.isEditable()) {
+                if (jcbRecBizPartner.isEnabled()) {
+                    jcbRecBizPartner.requestFocusInWindow();
+                }
+                else if (jftVouDate.isEditable()) {
                     jftVouDate.requestFocusInWindow();
                 }
                 else if (jcbVouTaxRegime.isEnabled()) {
@@ -2064,7 +2067,15 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             clearPayPayment(false, false);
             clearDocPaymentDoc(false, false);
             
-            jftVouDate.requestFocusInWindow();
+            if (jcbRecBizPartner.isEnabled()) {
+                jcbRecBizPartner.requestFocusInWindow();
+            }
+            else if (jftVouDate.isEditable()) {
+                jftVouDate.requestFocusInWindow();
+            }
+            else if (jcbVouTaxRegime.isEnabled()) {
+                jcbVouTaxRegime.requestFocusInWindow();
+            }
         }
     }
 
@@ -2420,7 +2431,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
     private void actionPerformedDocDpsRelatedPick() {
         int year = SLibTimeUtils.digestYear(moFieldVouDate.getDate())[0];
-        Object[] filterKey = new Object[] { year, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, moFieldRecBizPartner.getKeyAsIntArray() };
+        Object[] filterKey = new Object[] { year, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, moFieldRecBizPartner.getKeyAsIntArray(), moDataCfdPayment == null ? 0 : moDataCfdPayment.getDbmsDataCfd().getPkCfdId() };
         
         moDialogDocDpsRelatedPicker.formReset();
         moDialogDocDpsRelatedPicker.setFilterKey(filterKey);
