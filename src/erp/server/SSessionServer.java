@@ -588,7 +588,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 if (result == SLibConstants.DB_CFD_OK) {
                     if (packet.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
                         try {
-                            moCfd.write(packet.getXml(), packet.getXmlName(), packet.getXmlDate(), packet.getCfdStringSigned(), packet.getCfdSignature());
+                            moCfd.write(packet.getDocXml(), packet.getDocXmlName(), packet.getXmlDate(), packet.getCfdStringSigned(), packet.getCfdSignature());
 
                             // Set flag XML as correct:
 

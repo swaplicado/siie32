@@ -42,9 +42,9 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     public String PaymentWay;
     public int CurrencyId;
     public String CurrencyKey;
-    public double Amount;
-    public double ExchangeRate;
-    public double AmountLocal;
+    public double Amount;       // amount of payment
+    public double ExchangeRate; // exchange rate
+    public double AmountLocal;  // amount of payment in local currency
     public String Operation;
     public String AccountSrcFiscalId;
     public String AccountSrcNumber;
@@ -57,9 +57,11 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     public ArrayList<SCfdPaymentEntryDoc> PaymentEntryDocs;
     
     public int AuxGridIndex;
+    public int AuxUserId;
     public double AuxTotalPayments;
     public double AuxTotalPaymentsLocal;
-    public int AuxUserId;
+    public double AuxTotalLimMin;
+    public double AuxTotalLimMax;
     public ArrayList<SDataRecordEntry> AuxDbmsRecordEntries;
     
     public SCfdPaymentEntry(int number, Date date, String paymentWay, int currencyId, String currencyKey, double amount, double exchangeRate, SDataRecord dataRecord, SDataCfdPayment parentPayment) {
@@ -83,12 +85,11 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         PaymentEntryDocs = new ArrayList<>();
         
         AuxGridIndex = -1;
-        AuxTotalPayments = 0;
-        AuxTotalPaymentsLocal = 0;
         AuxUserId = 0;
         AuxDbmsRecordEntries = new ArrayList<>();
         
         computeAmountLocal();
+        computeTotalPayments();
     }
     
     /**
@@ -103,13 +104,17 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
      */
     public void computeTotalPayments() {
         AuxTotalPayments = 0;
+        AuxTotalPaymentsLocal = 0;
+        AuxTotalLimMin = 0;
+        AuxTotalLimMax = 0;
         
         for (SCfdPaymentEntryDoc paymentEntryDoc : PaymentEntryDocs) {
             paymentEntryDoc.computePaymentAmounts();
-            AuxTotalPayments = SLibUtils.roundAmount(AuxTotalPayments + paymentEntryDoc.PaymentPay);
+            AuxTotalPayments = SLibUtils.roundAmount(AuxTotalPayments + paymentEntryDoc.PayPayment);
+            AuxTotalPaymentsLocal = SLibUtils.roundAmount(AuxTotalPaymentsLocal + paymentEntryDoc.PayPaymentLocal);
+            AuxTotalLimMin += paymentEntryDoc.PayPaymentLimMin;
+            AuxTotalLimMax += paymentEntryDoc.PayPaymentLimMax;
         }
-        
-        AuxTotalPaymentsLocal = SLibUtils.roundAmount(AuxTotalPayments * ExchangeRate);
     }
     
     /**
@@ -233,16 +238,16 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
 
             oDsmEntry.setSourceReference("");
             oDsmEntry.setFkSourceCurrencyId(paymentEntryDoc.DataDps.getFkCurrencyId());
-            oDsmEntry.setSourceValueCy(paymentEntryDoc.PaymentPay);
-            oDsmEntry.setSourceValue(SLibUtils.roundAmount(paymentEntryDoc.PaymentPay * ExchangeRate));
+            oDsmEntry.setSourceValueCy(paymentEntryDoc.PayPayment);
+            oDsmEntry.setSourceValue(SLibUtils.roundAmount(paymentEntryDoc.PayPayment * ExchangeRate));
             oDsmEntry.setSourceExchangeRateSystem(ExchangeRate);
             oDsmEntry.setSourceExchangeRate(ExchangeRate);
 
             oDsmEntry.setFkDestinyDpsYearId_n(paymentEntryDoc.DataDps.getPkYearId());
             oDsmEntry.setFkDestinyDpsDocId_n(paymentEntryDoc.DataDps.getPkDocId());
             oDsmEntry.setFkDestinyCurrencyId(paymentEntryDoc.DataDps.getFkCurrencyId());
-            oDsmEntry.setDestinyValueCy(paymentEntryDoc.Payment);
-            oDsmEntry.setDestinyValue(SLibUtils.roundAmount(paymentEntryDoc.PaymentPay * ExchangeRate));
+            oDsmEntry.setDestinyValueCy(paymentEntryDoc.DocPayment);
+            oDsmEntry.setDestinyValue(SLibUtils.roundAmount(paymentEntryDoc.PayPayment * ExchangeRate));
             oDsmEntry.setDestinyExchangeRateSystem(ExchangeRate);
             oDsmEntry.setDestinyExchangeRate(ExchangeRate);
             oDsmEntry.setDbmsFkDpsCategoryId(paymentEntryDoc.DataDps.getFkDpsCategoryId());

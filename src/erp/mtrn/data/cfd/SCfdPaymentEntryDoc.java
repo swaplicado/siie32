@@ -5,6 +5,7 @@
  */
 package erp.mtrn.data.cfd;
 
+import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDps;
 import sa.lib.SLibUtils;
 
@@ -14,32 +15,44 @@ import sa.lib.SLibUtils;
  */
 public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     
-    public int Number;
-    public SDataDps DataDps;
-    public int Installment;
-    public double BalancePrev;      // in original currency of document
-    public double Payment;          // in original currency of document
-    public double BalancePend;      // in original currency of document
-    public double ExchangeRate;     // to exchange original currency of document into currency of payment
-    public double BalancePrevPay;   // in currency of payment
-    public double PaymentPay;       // in currency of payment
-    public double BalancePendPay;   // in currency of payment
-    public int AuxGridIndex;
     public SCfdPaymentEntry ParentPaymentEntry;
+    public SDataDps DataDps;
     
-    public SCfdPaymentEntryDoc(int number, SDataDps dataDps, int installment, double balancePrev, double payment, double exchangeRate, SCfdPaymentEntry parentPaymentEntry) {
-        Number = number;
-        DataDps = dataDps;
-        Installment = installment;
-        BalancePrev = balancePrev;
-        Payment = payment;
-        //BalancePend...    set in method computePaymentAmounts()
-        ExchangeRate = exchangeRate;
-        //BalancePrevPay... set in method computePaymentAmounts()
-        //PaymentPay...     set in method computePaymentAmounts()
-        //BalancePendPay... set in method computePaymentAmounts()
-        AuxGridIndex = -1;
+    public int Number;
+    public int Installment;
+    public double DocBalancePrev;   // in original currency of document
+    public double DocPayment;       // in original currency of document
+    public double DocBalancePend;   // in original currency of document
+    public double ExchangeRate;     // to exchange original currency of document into currency of payment
+    public double PayBalancePrev;   // in currency of payment
+    public double PayPayment;       // in currency of payment
+    public double PayBalancePend;   // in currency of payment
+    
+    public double PayPaymentLimMin; // minimum limit according to Official Input Guide for CFDI with payments complement.
+    public double PayPaymentLimMax; // maximum limit according to Official Input Guide for CFDI with payments complement.
+    public double PayPaymentLocal;  // payment in local currency
+    
+    public int AuxGridIndex;
+    
+    public SCfdPaymentEntryDoc(SCfdPaymentEntry parentPaymentEntry, SDataDps dataDps, int number, int installment, double balancePrev, double payment, double exchangeRate) {
         ParentPaymentEntry = parentPaymentEntry;
+        DataDps = dataDps;
+        
+        Number = number;
+        Installment = installment;
+        DocBalancePrev = balancePrev;
+        DocPayment = payment;
+        //DocBalancePend...     set in method computePaymentAmounts()
+        ExchangeRate = exchangeRate;
+        //PayBalancePrev...     set in method computePaymentAmounts()
+        //PayPayment...         set in method computePaymentAmounts()
+        //PayBalancePend...     set in method computePaymentAmounts()
+        
+        //PayPaymentLimMin...   set in method computePaymentAmounts()
+        //PayPaymentLimMax...   set in method computePaymentAmounts()
+        //PayPaymentLocal...    set in method computePaymentAmounts()
+        
+        AuxGridIndex = -1;
         
         computePaymentAmounts();
     }
@@ -48,7 +61,7 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
      * Computes pending balance in document currency.
      */
     public void computeBalancePend() {
-        BalancePend = SLibUtils.roundAmount(BalancePrev - Payment);
+        DocBalancePend = SLibUtils.roundAmount(DocBalancePrev - DocPayment);
     }
     
     /**
@@ -57,14 +70,41 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     public void computePaymentAmounts() {
         computeBalancePend();
         if (ExchangeRate == 0) {
-            BalancePrevPay = 0;
-            PaymentPay = 0;
-            BalancePendPay = 0;
+            // compute payment in terms of currency of payment:
+            PayBalancePrev = 0;
+            PayPayment = 0;
+            PayBalancePend = 0;
+            
+            // compute minimum and maximum limits when totaling payment in terms of currency of payment due to rounding issues:
+            PayPaymentLimMin = 0;
+            PayPaymentLimMax = 0;
+            
+            // compute payment in local currency:
+            PayPaymentLocal = 0;
         }
         else {
-            BalancePrevPay = SLibUtils.roundAmount(BalancePrev / ExchangeRate);
-            PaymentPay = SLibUtils.roundAmount(Payment / ExchangeRate);
-            BalancePendPay = SLibUtils.roundAmount(BalancePend / ExchangeRate);
+            // compute payment in terms of currency of payment:
+            PayBalancePrev = SLibUtils.roundAmount(DocBalancePrev / ExchangeRate);
+            PayPayment = SLibUtils.roundAmount(DocPayment / ExchangeRate);
+            PayBalancePend = SLibUtils.roundAmount(DocBalancePend / ExchangeRate);
+            
+            // compute minimum and maximum limits when totaling payment in terms of currency of payment due to rounding issues:
+            PayPaymentLimMin = (DocPayment - (Math.pow(10d, -2d) / 2d)) / (ExchangeRate + (Math.pow(10d, -2d) / 2d) - 0.0000000001);
+            PayPaymentLimMax = (DocPayment + (Math.pow(10d, -2d) / 2d) - 0.0000000001) / (ExchangeRate - (Math.pow(10d, -2d) / 2d));
+            
+            // compute payment in local currency:
+            if (DataDps.getFkCurrencyId() == SModSysConsts.CFGU_CUR_MXN) {
+                // related document is in local currency
+                PayPaymentLocal = DocPayment;
+            }
+            else if (ParentPaymentEntry.CurrencyId == SModSysConsts.CFGU_CUR_MXN) {
+                // payment is in local currency
+                PayPaymentLocal = PayPayment;
+            }
+            else {
+                // compute amount with exchange rate of payment:
+                PayPaymentLocal = SLibUtils.roundAmount(PayPayment * ParentPaymentEntry.ExchangeRate);
+            }
         }
     }
 
@@ -78,12 +118,12 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
         mvValues.add(DataDps.getDpsNumber());
         mvValues.add(DataDps.getDbmsDataCfd().getUuid());
         mvValues.add(Installment);
-        mvValues.add(BalancePrev);
-        mvValues.add(Payment);
-        mvValues.add(BalancePend);
+        mvValues.add(DocBalancePrev);
+        mvValues.add(DocPayment);
+        mvValues.add(DocBalancePend);
         mvValues.add(DataDps.getDbmsCurrencyKey());
         mvValues.add(ExchangeRate);
-        mvValues.add(PaymentPay);
+        mvValues.add(PayPayment);
         mvValues.add(ParentPaymentEntry.CurrencyKey);
     }
 }

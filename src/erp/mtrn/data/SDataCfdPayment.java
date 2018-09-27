@@ -57,7 +57,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     protected String msAuxCfdEmisorRegimenFiscal;
     protected SDataBizPartner moAuxCfdDbmsDataReceptor;
     protected String msAuxCfdCfdiRelacionadosTipoRelacion;
-    protected SDataCfd moAuxCfdDbmsDataCfdCfdiRelacionado;
+    protected String msAuxCfdCfdiRelacionadoUuid; // available when CFDI is not stored in SIIE, e.g., third-party CFDI
+    protected SDataCfd moAuxCfdDbmsDataCfdCfdiRelacionado; // available when CFDI is stored in SIIE
     protected ArrayList<SCfdPaymentEntry> maAuxCfdPaymentEntries;
     
     // members that belong to SDataRecord:
@@ -120,12 +121,14 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public void setAuxCfdEmisorRegimenFiscal(String s) { msAuxCfdEmisorRegimenFiscal = s; }
     public void setAuxCfdDbmsDataReceptor(SDataBizPartner o) { moAuxCfdDbmsDataReceptor = o; }
     public void setAuxCfdCfdiRelacionadosTipoRelacion(String s) { msAuxCfdCfdiRelacionadosTipoRelacion = s; }
+    public void setAuxCfdCfdiRelacionadoUuid(String s) { msAuxCfdCfdiRelacionadoUuid = s; }
     public void setAuxCfdDbmsDataCfdCfdiRelacionado(SDataCfd o) { moAuxCfdDbmsDataCfdCfdiRelacionado = o; }
     
     public String getAuxCfdConfirmacion() { return msAuxCfdConfirmacion; }
     public String getAuxCfdEmisorRegimenFiscal() { return msAuxCfdEmisorRegimenFiscal; }
     public SDataBizPartner getAuxCfdDbmsDataReceptor() { return moAuxCfdDbmsDataReceptor; }
     public String getAuxCfdCfdiRelacionadosTipoRelacion() { return msAuxCfdCfdiRelacionadosTipoRelacion; }
+    public String getAuxCfdCfdiRelacionadoUuid() { return msAuxCfdCfdiRelacionadoUuid; }
     public SDataCfd getAuxCfdDbmsDataCfdCfdiRelacionado() { return moAuxCfdDbmsDataCfdCfdiRelacionado; }
     public ArrayList<SCfdPaymentEntry> getAuxCfdPaymentEntries() { return maAuxCfdPaymentEntries; }
     
@@ -146,6 +149,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         this.msAuxCfdEmisorRegimenFiscal = sourceCfdPayment.msAuxCfdEmisorRegimenFiscal;
         this.moAuxCfdDbmsDataReceptor = sourceCfdPayment.moAuxCfdDbmsDataReceptor;
         this.msAuxCfdCfdiRelacionadosTipoRelacion = sourceCfdPayment.msAuxCfdCfdiRelacionadosTipoRelacion;
+        this.msAuxCfdCfdiRelacionadoUuid = sourceCfdPayment.msAuxCfdCfdiRelacionadoUuid;
         this.moAuxCfdDbmsDataCfdCfdiRelacionado = sourceCfdPayment.moAuxCfdDbmsDataCfdCfdiRelacionado;
         this.maAuxCfdPaymentEntries.addAll(sourceCfdPayment.maAuxCfdPaymentEntries);
     }
@@ -204,6 +208,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         msAuxCfdEmisorRegimenFiscal = "";
         moAuxCfdDbmsDataReceptor = null;
         msAuxCfdCfdiRelacionadosTipoRelacion = "";
+        msAuxCfdCfdiRelacionadoUuid = "";
         moAuxCfdDbmsDataCfdCfdiRelacionado = null;
         maAuxCfdPaymentEntries = new ArrayList<>();
         
@@ -262,7 +267,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
                     if (comprobante.getEltOpcCfdiRelacionados() != null) {
                         msAuxCfdCfdiRelacionadosTipoRelacion = comprobante.getEltOpcCfdiRelacionados().getAttTipoRelacion().getString();
-                        int id = STrnUtilities.getCfdIdByUuid(statement, comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().get(0).getAttUuid().getString());
+                        msAuxCfdCfdiRelacionadoUuid = comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().get(0).getAttUuid().getString();
+                        int id = STrnUtilities.getCfdIdByUuid(statement, msAuxCfdCfdiRelacionadoUuid);
                         if (id != SLibConstants.UNDEFINED) {
                             moAuxCfdDbmsDataCfdCfdiRelacionado = new SDataCfd();
                             if (moAuxCfdDbmsDataCfdCfdiRelacionado.read(new int[] { id }, statement) != SLibConstants.DB_ACTION_READ_OK) {
@@ -376,13 +382,13 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                         // add XML related document of XML payment:
 
                                         SCfdPaymentEntryDoc paymentEntryDoc = new SCfdPaymentEntryDoc(
-                                                numberDoc, 
+                                                paymentEntry,
                                                 dps, 
+                                                numberDoc, 
                                                 doctoRelacionado.getAttNumParcialidad().getInteger(), 
                                                 doctoRelacionado.getAttImpSaldoAnt().getDouble(), 
                                                 doctoRelacionado.getAttImpPagado().getDouble(), 
-                                                currencyId == dps.getFkCurrencyId() ? 1.0 : doctoRelacionado.getAttTipoCambioDR().getDouble(), 
-                                                paymentEntry);
+                                                currencyId == dps.getFkCurrencyId() ? 1.0 : doctoRelacionado.getAttTipoCambioDR().getDouble());
 
                                         paymentEntryDoc.prepareTableRow();
                                         paymentEntry.PaymentEntryDocs.add(paymentEntryDoc);
@@ -632,12 +638,12 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public String getComprobanteTipoComprobante() {
-        return DCfdi33Catalogs.CFD_TP_P;    // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
+        return DCfdi33Catalogs.CFD_TP_P; // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
     }
 
     @Override
     public String getComprobanteMetodoPago() {
-        return "";  // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+        return ""; // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
     }
 
     @Override
@@ -659,9 +665,9 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public ArrayList<String> getCfdiRelacionados() {
         ArrayList<String> cfdis = null;
         
-        if (moAuxCfdDbmsDataCfdCfdiRelacionado != null) {
+        if (!msAuxCfdCfdiRelacionadoUuid.isEmpty()) {
             cfdis = new ArrayList<>();
-            cfdis.add(moAuxCfdDbmsDataCfdCfdiRelacionado.getUuid());
+            cfdis.add(msAuxCfdCfdiRelacionadoUuid);
         }
         
         return cfdis;
@@ -704,7 +710,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public String getReceptorUsoCFDI() {
-        return DCfdi33Catalogs.CFDI_USO_POR_DEF;    // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
+        return DCfdi33Catalogs.CFDI_USO_POR_DEF; // fixed value required as is in CFDI 3.3 with Complement of Receipt of Payments 1.0
     }
 
     @Override
@@ -782,11 +788,11 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                 if (!pago.getAttMonedaP().getString().equals(doctoRelacionado.getAttMonedaDR().getString())) {
                     doctoRelacionado.getAttTipoCambioDR().setDouble(paymentEntryDoc.ExchangeRate);
                 }
-                doctoRelacionado.getAttMetodoPagoDR().setString(paymentEntryDoc.DataDps.getDbmsDataDpsCfd().getPaymentMethod());
+                doctoRelacionado.getAttMetodoDePagoDR().setString(paymentEntryDoc.DataDps.getDbmsDataDpsCfd().getPaymentMethod());
                 doctoRelacionado.getAttNumParcialidad().setInteger(paymentEntryDoc.Installment);
-                doctoRelacionado.getAttImpSaldoAnt().setDouble(paymentEntryDoc.BalancePrev);
-                doctoRelacionado.getAttImpPagado().setDouble(paymentEntryDoc.Payment);
-                doctoRelacionado.getAttImpSaldoInsoluto().setDouble(paymentEntryDoc.BalancePend);
+                doctoRelacionado.getAttImpSaldoAnt().setDouble(paymentEntryDoc.DocBalancePrev);
+                doctoRelacionado.getAttImpPagado().setDouble(paymentEntryDoc.DocPayment);
+                doctoRelacionado.getAttImpSaldoInsoluto().setDouble(paymentEntryDoc.DocBalancePend);
                 
                 pago.getEltDoctoRelacionados().add(doctoRelacionado);
             }
@@ -801,6 +807,6 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public DElement getElementAddenda() {
-        return null;    // not required in CFDI 3.3 with Complement of Receipt of Payments 1.0!
+        return null;    // not implemented yet in CFDI 3.3 with Complement of Receipt of Payments 1.0!
     }
 }

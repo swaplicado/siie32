@@ -42,22 +42,24 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
     private boolean mbFirstTime;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
 
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldFkPaymentSystemTypeId;
     private erp.lib.form.SFormField moFieldDate;
     private erp.lib.form.SFormField moFieldDatePayment;
     private erp.lib.table.STablePaneGrid moTablePaneReceiptAvailable;
     private erp.lib.table.STablePaneGrid moTablePaneReceiptSelected;
-    private ArrayList<SHrsPayrollEmployeeReceipt> maHrsPayrollEmployeeReceipt;
+    private final ArrayList<SHrsPayrollEmployeeReceipt> maHrsPayrollEmployeeReceipt;
     private SDbConfig moConfig;
     public ArrayList<int[]> manPayrollEmployeeReceipts;
 
-    /** Creates new form SDialogPayrollImport */
+    /** Creates new form SDialogPayrollImport
+     * @param client
+     * @param hrsPayrollEmployeeReceipt */
     public SDialogPayrollReceiptCfdi(erp.client.SClientInterface client, ArrayList<SHrsPayrollEmployeeReceipt> hrsPayrollEmployeeReceipt) {
         super(client.getFrame(), true);
         miClient = client;
         maHrsPayrollEmployeeReceipt = hrsPayrollEmployeeReceipt;
-        manPayrollEmployeeReceipts = new ArrayList<int[]>();
+        manPayrollEmployeeReceipts = new ArrayList<>();
         initComponents();
         initComponentsExtra();
     }
@@ -491,24 +493,17 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
     
     @SuppressWarnings("unchecked")
     private void computePayroll() throws java.lang.Exception {
-        int payrollId = 0;
-        int employeeId = 0;
-        int issueId = 0;
-        SDbPayrollReceiptIssue receiptIssue = null;
-        SHrsPayrollEmployeeReceipt employeeReceipt = null;
+        SDbPayrollReceiptIssue receiptIssue = new SDbPayrollReceiptIssue();
         
-        receiptIssue = new SDbPayrollReceiptIssue();
         for (STableRow row : moTablePaneReceiptSelected.getGridRows()) {
-            employeeReceipt = (SHrsPayrollEmployeeReceipt) row;
-            payrollId = employeeReceipt.getPkPayrollId();
-            employeeId = employeeReceipt.getPkEmployeeId();
-            issueId = employeeReceipt.getPkIssueId();
+            SHrsPayrollEmployeeReceipt receipt = (SHrsPayrollEmployeeReceipt) row;
+            int[] receiptKey = receipt.getRowPrimaryKey();
             
-            receiptIssue.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId, issueId }, SDbPayrollReceiptIssue.FIELD_NUMBER_SERIES, employeeReceipt.getNumberSeries());
-            receiptIssue.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId, issueId }, SDbPayrollReceiptIssue.FIELD_DATE_ISSUE, employeeReceipt.getDateIssue());
-            receiptIssue.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId, issueId }, SDbPayrollReceiptIssue.FIELD_DATE_PAYMENT, employeeReceipt.getDatePayment());
-            receiptIssue.saveField(miClient.getSession().getStatement(), new int[] { payrollId, employeeId, issueId }, SDbPayrollReceiptIssue.FIELD_TYPE_PAYMENT_SYS, employeeReceipt.getPaymentTypeSysId());
-            manPayrollEmployeeReceipts.add(new int[] { payrollId, employeeId, issueId });
+            receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_NUMBER_SERIES, receipt.getNumberSeries());
+            receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_DATE_ISSUE, receipt.getDateIssue());
+            receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_DATE_PAYMENT, receipt.getDatePayment());
+            receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_TYPE_PAYMENT_SYS, receipt.getPaymentTypeSysId());
+            manPayrollEmployeeReceipts.add(receiptKey);
         }
     }
 

@@ -33,7 +33,7 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface, java.awt.event.ActionListener {
 
@@ -44,6 +44,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
     private int mnYear;
     private int[] manDpsClassPk;
     private int[] manBizPartnerPk;
+    private int mnCfdId;
     private int mnCfdType;
     private String msRfcRec;
     private java.lang.Object moFilterKey;
@@ -404,6 +405,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
         mnYear = 0;
         manDpsClassPk = null;
         manBizPartnerPk = null;
+        mnCfdId = 0;
         mnCfdType = SLibConstants.UNDEFINED;
         msRfcRec = "";
         moFilterKey = null;
@@ -485,6 +487,7 @@ public class SDialogPickerDps extends javax.swing.JDialog implements erp.lib.for
                         manBizPartnerPk = null;
                         break;
                     case 3:
+                    case 4:
                         mnYear = (Integer) ((Object[]) moFilterKey)[0];
                         manDpsClassPk = (int[]) ((Object[]) moFilterKey)[1];
                         manBizPartnerPk = (int[]) ((Object[]) moFilterKey)[2];

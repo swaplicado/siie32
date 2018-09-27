@@ -24,8 +24,11 @@ import erp.mod.fin.util.STreasuryBankLayoutRequest;
 import erp.print.SDataConstantsPrint;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,6 +39,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -483,7 +488,112 @@ public abstract class SHrsUtils {
         }
     }
     
-      /**
+    /**
+    * Creates layout CSV of payroll with HSBC.
+    *@param client
+    *@param payrollId
+    *@param dateApplication
+    *@param consecutiveDay
+    *@param employees employees ids
+    */
+     public static void createLayoutHsbcPayroll(SGuiClient client, int payrollId, Date dateApplication, int consecutiveDay, String[] employees) {
+        ResultSet resulSet = null;
+        Statement statement = null;
+        String sql = "";
+        String fileName = "";
+        String employeesId = "";
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
+        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
+        String sNameEmploy = "";
+        String sAccountCredit = "";
+        String sAmount = "";
+        StringBuilder headerLayout = new StringBuilder();
+        StringBuilder bodyLayout = new StringBuilder();
+        int nCont = 0;
+        double mdBalanceTot = 0.0;
+        double dTotalBalance = 0.0;
+        
+        SimpleDateFormat formatDate = new SimpleDateFormat("ddMMyyyy");
+        
+        fileName = formatDateTitle.format(new Date()).concat(" HSBC nom.csv");
+        
+        employeesId = SLibUtils.textImplode(employees, ",");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                
+                sql = "SELECT rcp.id_emp, emp.bank_acc, b.bp, " +
+                        "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) - " +
+                        "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS _pay_net " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
+                        "INNER JOIN erp.bpsu_bp AS b ON emp.id_emp = b.id_bp " +
+                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
+                        "AND rcp.id_emp IN (" + employeesId + ") " +
+                        "ORDER BY rcp.id_emp, emp.bank_acc, b.bp";
+                
+                resulSet = statement.executeQuery(sql);
+                while (resulSet.next()) {
+                    nCont++;
+
+                    sNameEmploy = resulSet.getString("bp");
+                    String[] parts = sNameEmploy.split(",");
+                    sNameEmploy = parts[1] + " " + parts[0];
+                    mdBalanceTot = resulSet.getDouble("_pay_net");
+                    sAmount = formatDesc.format(mdBalanceTot);
+
+                    dTotalBalance = SLibUtils.roundAmount(dTotalBalance + mdBalanceTot);
+                    bodyLayout.append(SLibUtilities.textTrim(resulSet.getString("emp.bank_acc"))).append(',');
+                    bodyLayout.append(sAmount).append(',');
+                    bodyLayout.append("PAGO NOMINA").append(',');
+                    bodyLayout.append(sNameEmploy);
+                    bodyLayout.append("\r\n");
+                }
+                
+                headerLayout.append("MXPRLF").append(',');
+                headerLayout.append("F").append(",");
+                headerLayout.append(sAccountCredit).append(',');
+                headerLayout.append(dTotalBalance).append(',');
+                headerLayout.append(nCont).append(',');
+                headerLayout.append(formatDate.format(new Date())).append(',');
+                headerLayout.append("").append(',');
+                headerLayout.append("PAGO NOMINA QUINCENAL").append(',');
+                headerLayout.append("\r\n");
+                headerLayout.append(bodyLayout.toString());
+
+                String path = file.toString();
+                try {
+                    OutputStream outputStream = new FileOutputStream(path.endsWith(".csv") ? path : path + ".csv");
+                    Writer outputStreamWriter = new OutputStreamWriter(outputStream,"UTF-8");
+                    outputStreamWriter.write(headerLayout.toString());
+                    outputStreamWriter.close();
+                }
+                catch (FileNotFoundException ex) {
+                    Logger.getLogger(SHrsUtils.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (java.lang.Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+	
+    /**
      * Replace special characters
      * @param input original text
      * @return output text without characters

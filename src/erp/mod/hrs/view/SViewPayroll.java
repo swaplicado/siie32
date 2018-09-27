@@ -52,7 +52,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Néstor Ávalos, Juan Barajas, Alfredo Perez, Sergio Flores
+ * @author Néstor Ávalos, Juan Barajas, Alfredo Perez, Sergio Flores, Claudio Peña
  */
 public class SViewPayroll extends SGridPaneView implements ActionListener {
 
@@ -145,10 +145,6 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     }
     
     private void actionImportPayroll() {
-        SDbPayroll payroll = null;
-        SDialogPayrollReceiptCfdi receiptCfdi = null;
-        SDialogResult dialogResult = null;
-        
         if (jbImport.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
@@ -156,17 +152,16 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             else {
                 try {
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                    payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, gridRow.getRowPrimaryKey());
+                    int payroll = gridRow.getRowPrimaryKey()[0];
                     
-                    if (SHrsCfdUtils.canGenetareCfdReceipts(miClient.getSession(), payroll.getPkPayrollId())) {
-                        receiptCfdi = new SDialogPayrollReceiptCfdi((SClientInterface) miClient, SHrsCfdUtils.getReceiptsPendig(miClient.getSession(), payroll.getPkPayrollId()));
+                    if (SHrsCfdUtils.canGenetareCfdReceipts(miClient.getSession(), payroll)) {
+                        SDialogPayrollReceiptCfdi receiptCfdi = new SDialogPayrollReceiptCfdi((SClientInterface) miClient, SHrsCfdUtils.getReceiptsPendig(miClient.getSession(), payroll));
                         receiptCfdi.resetForm();
                         receiptCfdi.setVisible(true);
 
                         if (receiptCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                 int stampsAvailable = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, miClient.getSession().getCurrentDate(), SLibConsts.UNDEFINED);
-                                dialogResult = new SDialogResult(miClient, "Resultados de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
+                                SDialogResult dialogResult = new SDialogResult(miClient, "Resultados de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
                                 dialogResult.setFormParams((SClientInterface) miClient, null, receiptCfdi.manPayrollEmployeeReceipts, stampsAvailable, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                                 dialogResult.setVisible(true);
                         }
@@ -334,14 +329,15 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        SDialogPrintOrderPayroll dialogPrintOrderPayroll = new SDialogPrintOrderPayroll(miClient, "Ordenamiento de impresión");
+                        SDialogPrintOrderPayroll dialogPrintOrderPayroll = new SDialogPrintOrderPayroll(miClient, gridRow.getRowPrimaryKey() , "Ordenamiento de impresión");
                         dialogPrintOrderPayroll.setVisible(true);
-                        
+
                         if (dialogPrintOrderPayroll.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                             int orderBy = (int) dialogPrintOrderPayroll.getValue(SGuiConsts.PARAM_KEY);
+                            String typeDepPayroll = (String) dialogPrintOrderPayroll.getString(SLibConstants.TXT_OK);
                             int numberCopies = (int) dialogPrintOrderPayroll.getValue(SLibConsts.UNDEFINED); // XXX 2018-01-12 (Sergio Flores): Fix this! WTF!
-                            
-                            SCfdUtils.printCfds((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), orderBy), numberCopies, SCfdConsts.CFDI_PAYROLL_VER_CUR);
+
+                            SCfdUtils.printCfds((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey(), typeDepPayroll, orderBy), numberCopies, SCfdConsts.CFDI_PAYROLL_VER_CUR);
                         }
                     }
                     catch (Exception e) {

@@ -51,7 +51,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Claudio Peña
  */
 public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
 
@@ -71,7 +71,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
 
     private SDialogAnnulCfdi moDialogAnnulCfdi;
     private SDialogFormerPayrollDate moDialogFormerPayrollDate;
-
+  
     public SViewCfdiPayroll(SGuiClient client, int subType, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_SIE_PAY, subType, title, params);
         setRowButtonsEnabled(false, false, false, false, mnGridSubtype == SModConsts.VIEW_SC_SUM);
@@ -462,25 +462,25 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 else {
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
-                            SDialogPrintOrderPayroll dialogPrintOrderPayroll = new SDialogPrintOrderPayroll(miClient, "Ordenamiento de impresión");
-
+                            SDialogPrintOrderPayroll dialogPrintOrderPayroll = new SDialogPrintOrderPayroll(miClient, gridRow.getRowPrimaryKey() ,"Ordenamiento de impresión");
                             dialogPrintOrderPayroll.setVisible(true);
-                            
+
                             ArrayList<SDataCfd> cfdsAvailable = new ArrayList<SDataCfd>();
                             ArrayList<SDataCfd> cfdsPrintable = new ArrayList<SDataCfd>();
-                            
+
                             if (dialogPrintOrderPayroll.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                 int orderBy = (int) dialogPrintOrderPayroll.getValue(SGuiConsts.PARAM_KEY);
+                                String typeDepPayroll = (String) dialogPrintOrderPayroll.getString(SLibConstants.TXT_OK);
                                 int numberCopies = (int) dialogPrintOrderPayroll.getValue(SLibConsts.UNDEFINED);
 
-                                cfdsAvailable = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey(), orderBy);
-
+                                cfdsAvailable = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey(), typeDepPayroll, orderBy);
+ 
                                 for(SDataCfd cfd : cfdsAvailable) {
                                     if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                                         cfdsPrintable.add(cfd);
                                     }
                                 }
-
+                                
                                 SCfdUtils.printCfds((SClientInterface) miClient, cfdsPrintable, numberCopies, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
                             }
                         }
@@ -976,6 +976,45 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
     }
 
     @Override
+    public void actionRowDelete() {
+        if (jbRowDelete.isEnabled()) {
+            if (jtTable.getSelectedRowCount() == 0) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROWS);
+            }
+            else if (miClient.showMsgBoxConfirm(SGridConsts.MSG_CONFIRM_REG_DEL) == JOptionPane.YES_OPTION) {
+                boolean updates = false;
+                SGridRow[] gridRows = getSelectedGridRows();
+
+                for (SGridRow gridRow : gridRows) {
+                    if (((SGridRowView) gridRow).getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    }
+                    else if (((SGridRowView) gridRow).isRowSystem()) {
+                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                    }
+                    else if (!((SGridRowView) gridRow).isDeletable()) {
+                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_DELETABLE);
+                    }
+                    else {
+                        try {
+                            if (SCfdUtils.deletePayroll((SClientInterface) miClient, gridRow.getRowPrimaryKey()[0])) {
+                                updates = true;
+                            }
+                        }
+                        catch (Exception e) {
+                            SLibUtils.showException(this, e);
+                        }
+                    }
+                }
+
+                if (updates) {
+                    miClient.getSession().notifySuscriptors(mnGridType);
+                }
+            }
+        }
+    }
+
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
@@ -1015,45 +1054,6 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
             }
             else if (button == jbDeactivateControlFlags) {
                 actionDeactivateControlFlags();
-            }
-        }
-    }
-
-    @Override
-    public void actionRowDelete() {
-        if (jbRowDelete.isEnabled()) {
-            if (jtTable.getSelectedRowCount() == 0) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROWS);
-            }
-            else if (miClient.showMsgBoxConfirm(SGridConsts.MSG_CONFIRM_REG_DEL) == JOptionPane.YES_OPTION) {
-                boolean updates = false;
-                SGridRow[] gridRows = getSelectedGridRows();
-
-                for (SGridRow gridRow : gridRows) {
-                    if (((SGridRowView) gridRow).getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                    }
-                    else if (((SGridRowView) gridRow).isRowSystem()) {
-                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                    }
-                    else if (!((SGridRowView) gridRow).isDeletable()) {
-                        miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_DELETABLE);
-                    }
-                    else {
-                        try {
-                            if (SCfdUtils.deletePayroll((SClientInterface) miClient, gridRow.getRowPrimaryKey()[0])) {
-                                updates = true;
-                            }
-                        }
-                        catch (Exception e) {
-                            SLibUtils.showException(this, e);
-                        }
-                    }
-                }
-
-                if (updates) {
-                    miClient.getSession().notifySuscriptors(mnGridType);
-                }
             }
         }
     }

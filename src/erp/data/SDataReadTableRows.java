@@ -2122,6 +2122,7 @@ public abstract class SDataReadTableRows {
                  * 1. int representing fiscal year.
                  * 2. int array of document class primary key.
                  * 3. int array of business partner primary key (optional).
+                 * 4. int of CFD ID (optional, can also be 0, if so, it is discarted).
                  */
 
                 aoPkFields = new STableField[2];
@@ -2153,6 +2154,7 @@ public abstract class SDataReadTableRows {
                         "re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_BPS + " AND " +
                         "re.fid_tp_sys_mov_xxx = " + (((int[]) ((Object[]) filterKey)[1])[0] == SDataConstantsSys.TRNS_CT_DPS_PUR ?
                             SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]) + " " +
+                        (((Object[]) filterKey).length != 4 ? "" : "AND (re.fid_cfd_n IS NULL OR (re.fid_cfd_n IS NOT NULL AND re.fid_cfd_n <> " + ((Object[]) filterKey)[3] + ")) ") + 
                         "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +
                         "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " + (((Object[]) filterKey).length == 2 ? "" : "AND d.fid_bp_r = " + ((int[]) ((Object[]) filterKey)[2])[0] + " ") +
                         "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +

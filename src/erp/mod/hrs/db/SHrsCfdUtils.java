@@ -24,12 +24,13 @@ import erp.server.SServerResponse;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Irving Sánchez, Juan Barajas, Sergio Flores
+ * @author Irving Sánchez, Juan Barajas, Sergio Flores, Claudio Peña
  * 
  * Maintenance Log:
  * 2018-01-02, Sergio Flores:
@@ -48,11 +49,11 @@ public abstract class SHrsCfdUtils {
                 throw new Exception("No se pueden generar CFDI, la nómina no está cerrada.");
             }
             else if (resultSet.getBoolean("b_del")) {
-                throw new Exception("No se pueden generar CFDI, la nómina no está eliminada.");
+                throw new Exception("No se pueden generar CFDI, la nómina está eliminada.");
             }
         }
-        validateReceiptsPendingCfdi(session, payrollId);
-        return true;
+        
+        return validateReceiptsPendingCfdi(session, payrollId);
     }
     
     public static ArrayList<SHrsPayrollEmployeeReceipt> getReceiptsPendig(final SGuiSession session,  final int payrollId) throws Exception {
@@ -162,8 +163,9 @@ public abstract class SHrsCfdUtils {
     public static SDataCfd computeCfdi(final SGuiSession session, final SHrsFormerPayrollReceipt receipt, final int receiptIssue, final boolean cfdiPendingSigned) throws Exception {
         boolean add = true;
         int cfdId = SLibConsts.UNDEFINED;
+        String docXmlUuid = "";
         
-        String sql = "SELECT id_cfd, fid_st_xml " 
+        String sql = "SELECT id_cfd, doc_xml_uuid, fid_st_xml " 
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
                 + "WHERE fid_pay_rcp_pay_n = " + receipt.getPayroll().getPkNominaId() + " AND fid_pay_rcp_emp_n = " + receipt.getPkEmpleadoId() + " AND fid_pay_rcp_iss_n = " + receiptIssue + " "
                 + "ORDER BY id_cfd ";
@@ -176,6 +178,7 @@ public abstract class SHrsCfdUtils {
                 }
                 else {
                     cfdId = resultSet.getInt("id_cfd");
+                    docXmlUuid = resultSet.getString("doc_xml_uuid");
                 }
             }
         }
@@ -188,7 +191,7 @@ public abstract class SHrsCfdUtils {
             
             SCfdPacket packet = new SCfdPacket();
             packet.setCfdId(cfdId);
-            //packet.setIsCfdConsistent(cfdId == SLibConstants.UNDEFINED);
+            packet.setIsCfdConsistent(cfdId == SLibConstants.UNDEFINED);
         
             int xmlType = ((SSessionCustom) session.getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
             float cfdVersion = SLibConsts.UNDEFINED;
@@ -223,6 +226,7 @@ public abstract class SHrsCfdUtils {
             
             packet.setCfdCertNumber(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).getCertNumber());
             packet.setCfdSignature(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).sign(packet.getCfdStringSigned(), SLibTimeUtilities.digestYear(receipt.getPayroll().getFecha())[0]));
+            packet.setDocXmlUuid(docXmlUuid);
             
             switch (xmlType) {
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
@@ -279,7 +283,7 @@ public abstract class SHrsCfdUtils {
         payrollReceipt.setRegimenFiscal(((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
         payrollReceipt.setCfdiRelacionadosTipoRelacion("");
         
-        cfd = computeCfdi(session, payrollReceipt, keyReceipt[2], false);
+        cfd = computeCfdi(session, payrollReceipt, keyReceipt[2], true);
         if (cfd == null) {
             throw new Exception("Error al leer el CFD, no se encontró el registro.");
         }
@@ -290,5 +294,28 @@ public abstract class SHrsCfdUtils {
         else {
             SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
         }
+    }
+    
+    public static int getDepType(SGuiClient client, final int payrollKeyNum , int typeDepArea) throws Exception {
+        String sql = "";
+        ResultSet resultSet = null;
+        int idAreaDep = 0;
+
+        sql = "SELECT COUNT(c.id_cfd) AS numberDep "
+            + "FROM trn_cfd AS c "
+            + "INNER JOIN hrs_pay_rcp_iss AS pei ON c.fid_pay_rcp_pay_n = pei.id_pay AND c.fid_pay_rcp_emp_n = pei.id_emp AND c.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = " + SLibConsts.UNDEFINED + " AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " "
+            + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = pei.id_emp "
+            + "INNER JOIN hrs_pay_rcp AS pe ON c.fid_pay_rcp_pay_n = pe.id_pay AND c.fid_pay_rcp_emp_n = pe.id_emp "
+            + "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pe.fk_dep "
+            + "WHERE pe.fk_dep IN ( " + typeDepArea + " ) AND NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = " + SLibConsts.UNDEFINED + ") "
+            + "AND c.fid_pay_rcp_pay_n = " + payrollKeyNum + " "
+            + "ORDER BY pei.num_ser, CAST(pei.num AS UNSIGNED INTEGER), pei.id_pay, pei.id_emp, pei.id_iss ";
+
+        resultSet = client.getSession().getStatement().executeQuery(sql);
+            while (resultSet.next()) {
+                idAreaDep = resultSet.getInt("numberDep");
+            }
+                        
+        return idAreaDep;
     }
 }

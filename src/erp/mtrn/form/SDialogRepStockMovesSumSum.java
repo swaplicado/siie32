@@ -49,6 +49,8 @@ public class SDialogRepStockMovesSumSum extends javax.swing.JDialog implements e
     private int mnFormStatus;
     private int mnOptionType;
     private int mnOptionType2;
+    private int partWharehouse = 19; // Id of wharehouse the part's.
+    private int toolWharehouse = 20; // Id of wharehouse the tool's .  
     private boolean mbFirstTime;
     private boolean mbResetingForm;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
@@ -352,6 +354,7 @@ public class SDialogRepStockMovesSumSum extends javax.swing.JDialog implements e
         JasperPrint jasperPrint = null;
         JasperViewer jasperViewer = null;
         String sSqlWhereDetail = "";
+        String sSqlWhereDetailWh = "";
         String sSqlWhereGroup = "";
         String sqlWhere = "";
         String sSqlWhereFilter = "";
@@ -369,17 +372,20 @@ public class SDialogRepStockMovesSumSum extends javax.swing.JDialog implements e
             try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 if (jrbReportTypePart.isSelected()) {
-                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN ( " + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART + " ) AND NOT iog.b_del ";
-                    sTypeReport =  SModSysConsts.TRNX_TP_MAINT_MOV_PART;
+                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN ( " + SModSysConsts.TRNS_TP_MAINT_MOV_NA + ", "  + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART + " ) AND NOT iog.b_del ";
+                    sSqlWhereDetailWh += " AND s.id_wh = " + partWharehouse + " ";
+                    sTypeReport = SModSysConsts.TRNX_TP_MAINT_MOV_PART;
                 }
                 else if (jrbReportTypeTool.isSelected()) {
-                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN (" + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL + ", " +  SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL + ") AND NOT iog.b_del ";
+                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN ( " + SModSysConsts.TRNS_TP_MAINT_MOV_NA + ", "  + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL + ", " +  SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL + " ) AND NOT iog.b_del ";
+                    sSqlWhereDetailWh += " AND s.id_wh = " + toolWharehouse + " ";
                     sTypeReport = SModSysConsts.TRNX_TP_MAINT_MOV_TOOL;
                 }
                 else if (jrbReportTypeAll.isSelected()) {
-                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN (" + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL + ", " +  SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL + ", "
+                    sSqlWhereDetail += " AND iog.fid_maint_mov_tp IN ( " + SModSysConsts.TRNS_TP_MAINT_MOV_NA + ", "  + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_TOOL + ", " +  SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_TOOL + ", "
                             + SModSysConsts.TRNS_TP_MAINT_MOV_IN_CONS_PART + ", " + SModSysConsts.TRNS_TP_MAINT_MOV_OUT_CONS_PART + " )AND NOT iog.b_del ";
-                    sTypeReport = SModSysConsts.TRNX_TP_MAINT_MOV_ALL;
+                    sSqlWhereDetailWh += "";
+                    sTypeReport = SModSysConsts.TRNX_TP_MAINT_MOV_ALL;                    
                 }
                 
                 if (jrbAgrupArea.isSelected()) {                    
@@ -390,14 +396,14 @@ public class SDialogRepStockMovesSumSum extends javax.swing.JDialog implements e
                 }
                 
                 if (jcbItemGeneric.getSelectedIndex() > 0 || jcbMaintenanceArea.getSelectedIndex() > 0 || jcbResponsable.getSelectedIndex() > 0) {
-                    sqlWhere += " WHERE s.id_year = " + SLibTimeUtilities.digestYear(moFieldDateEnd.getDate())[0];
+                    sqlWhere += " AND s.id_year = " + SLibTimeUtilities.digestYear(moFieldDateEnd.getDate())[0];
                 }
                 
                 if (jcbItemGeneric.getSelectedIndex() > 0 ) {
-                    sSqlWhereFilter += " AND i.id_item = " + moFieldItemGeneric.getKeyAsIntArray()[0];
+                    sSqlWhereFilter += " AND s.id_item = " + moFieldItemGeneric.getKeyAsIntArray()[0];
                 }
                 
-                if (jcbMaintenanceArea.getSelectedIndex() > 0 ) { //casts                    
+                if (jcbMaintenanceArea.getSelectedIndex() > 0 ) {                   
                     int pkMaintenance = ((SGuiItem) jcbMaintenanceArea.getSelectedItem()).getPrimaryKey()[0];
                     sSqlWhereFilter += " AND maint.id_maint_area = " + pkMaintenance;
                 }
@@ -405,7 +411,7 @@ public class SDialogRepStockMovesSumSum extends javax.swing.JDialog implements e
                 if (jcbResponsable.getSelectedIndex() > 0 ) {
                     sSqlWhereFilter += " AND maint.id_bp = " + moFieldResponsable.getKeyAsIntArray()[0];
                 }
-                
+
                 map = miClient.createReportParams();
                 map.put("tDtInitial", moFieldDateStart.getDate());
                 map.put("tDtEnd", moFieldDateEnd.getDate());
@@ -415,6 +421,7 @@ public class SDialogRepStockMovesSumSum extends javax.swing.JDialog implements e
                 map.put("sMaintenanceArea", jcbMaintenanceArea.getSelectedIndex() <= 0 ? "(TODAS)" : jcbMaintenanceArea.getSelectedItem().toString());
                 map.put("sMaintenanceArea", jcbResponsable.getSelectedIndex() <= 0 ? "(TODAS)" : jcbResponsable.getSelectedItem().toString());
                 map.put("sSqlWhereDetail", sSqlWhereDetail);
+                map.put("sSqlWhereDetailWh", sSqlWhereDetailWh);
                 map.put("sSqlWhereGroup", sSqlWhereGroup);
                 map.put("sSqlWhere", sqlWhere);
                 map.put("sSqlWhereFilter", sSqlWhereFilter);
