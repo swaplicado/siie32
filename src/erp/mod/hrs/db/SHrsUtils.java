@@ -26,6 +26,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -490,13 +491,14 @@ public abstract class SHrsUtils {
     
     /**
     * Creates layout CSV of payroll with HSBC.
-    *@param client
-    *@param payrollId
-    *@param dateApplication
-    *@param consecutiveDay
-    *@param employees employees ids
+    * @param client
+    * @param payrollId
+    * @param dateApplication
+    * @param consecutiveDay
+    * @param employees employees ids
+    * @param accountDebit
     */
-     public static void createLayoutHsbcPayroll(SGuiClient client, int payrollId, Date dateApplication, int consecutiveDay, String[] employees) {
+     public static void createLayoutHsbcPayroll(SGuiClient client, int payrollId, Date dateApplication, int consecutiveDay, String[] employees, String accountDebit) {
         ResultSet resulSet = null;
         Statement statement = null;
         String sql = "";
@@ -513,20 +515,22 @@ public abstract class SHrsUtils {
         double mdBalanceTot = 0.0;
         double dTotalBalance = 0.0;
         
+        sAccountCredit = SLibUtilities.textTrim(accountDebit);
+
         SimpleDateFormat formatDate = new SimpleDateFormat("ddMMyyyy");
-        
+
         fileName = formatDateTitle.format(new Date()).concat(" HSBC nom.csv");
-        
+
         employeesId = SLibUtils.textImplode(employees, ",");
-        
+
         client.getFileChooser().setSelectedFile(new File(fileName));
-        
+
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
                 statement = client.getSession().getStatement();
-                
+
                 sql = "SELECT rcp.id_emp, emp.bank_acc, b.bp, " +
                         "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                         "FROM hrs_pay_rcp AS r " +
@@ -543,7 +547,7 @@ public abstract class SHrsUtils {
                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
                         "AND rcp.id_emp IN (" + employeesId + ") " +
                         "ORDER BY rcp.id_emp, emp.bank_acc, b.bp";
-                
+
                 resulSet = statement.executeQuery(sql);
                 while (resulSet.next()) {
                     nCont++;
@@ -561,7 +565,7 @@ public abstract class SHrsUtils {
                     bodyLayout.append(sNameEmploy);
                     bodyLayout.append("\r\n");
                 }
-                
+
                 headerLayout.append("MXPRLF").append(',');
                 headerLayout.append("F").append(",");
                 headerLayout.append(sAccountCredit).append(',');
@@ -587,7 +591,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (SQLException | IOException e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }

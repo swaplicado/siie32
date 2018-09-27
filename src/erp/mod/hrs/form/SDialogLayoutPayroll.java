@@ -585,7 +585,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements FocusListen
                     employeesId[indexEmployee] = row.getPkEmployeeId() + "";
                     indexEmployee++;
                 }
-
+                
                 switch (moKeyLayoutId.getValue()[0]) {
                     case SFinConsts.LAY_BANK_BANBAJIO:
                        SHrsUtils.createLayoutBanBajioPayroll(miClient, mnPayrollId, moKeyLayoutId.getSelectedItem().getItem(), moDateEmission.getValue(), msAccountDebit, moIntConsecutiveDay.getValue(), employeesId);
@@ -597,7 +597,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements FocusListen
                        SHrsUtils.createLayoutBancomerPayroll(miClient, mnPayrollId, moDateValueApplication,  moIntConsecutiveDay.getValue(), employeesId);
                        break;
                     case SFinConsts.LAY_BANK_HSBC:
-                       SHrsUtils.createLayoutHsbcPayroll(miClient, mnPayrollId, moDateValueApplication,  moIntConsecutiveDay.getValue(), employeesId);
+                       SHrsUtils.createLayoutHsbcPayroll(miClient, mnPayrollId, moDateValueApplication,  moIntConsecutiveDay.getValue(), employeesId, msAccountDebit);
                        break;
                     default :
                         break; 
