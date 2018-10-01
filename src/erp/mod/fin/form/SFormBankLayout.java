@@ -96,6 +96,18 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private static final int COL_APP_PAY_BANK = 10;
     private static final int COL_AGREE = 12;
     private static final int COL_AGREE_REF = 13;
+    
+    private static final int COL_PRE_BIZ_PARTNER = 0;
+    private static final int COL_PRE_BIZ_PARTNER_KEY = 1;
+    private static final int COL_PRE_BALANCE_TOT = 2;
+    private static final int COL_PRE_CURRENCY_KEY = 3;
+    private static final int COL_PRE_AGREEMENT= 4;
+    private static final int COL_PRE_AGREEMENT_REFERENCE = 5;
+    private static final int COL_PRE_CONCEPT_CIE = 6;
+    private static final int COL_PRE_MAIL = 7;
+    private static final int COL_PRE_BIZ_PARTNER_CREDIT_FISCAL_ID = 8;
+    private static final int COL_PRE_REFERENCE = 9;
+    private static final int COL_PRE_OBSERVATIONS = 10;
 
     private int mnLayoutBank;
     private int mnBankLayoutType;
@@ -2957,7 +2969,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 }
                 break;
             case COL_APP:
-                if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_ACC || mnFormSubtype == SModSysConsts.FIN_LAY_BANK_PAY) {
+                if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_ACC || mnFormSubtype == SModSysConsts.FIN_LAY_BANK_PREPAY) {
                     processEditingAppPayment();
                 }
                 else if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_PREPAY) {

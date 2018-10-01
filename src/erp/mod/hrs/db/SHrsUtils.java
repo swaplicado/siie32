@@ -508,7 +508,6 @@ public abstract class SHrsUtils {
         SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
         String sNameEmploy = "";
         String sAccountCredit = "";
-        String sAmount = "";
         StringBuilder headerLayout = new StringBuilder();
         StringBuilder bodyLayout = new StringBuilder();
         int nCont = 0;
@@ -556,16 +555,15 @@ public abstract class SHrsUtils {
                     String[] parts = sNameEmploy.split(",");
                     sNameEmploy = parts[1] + " " + parts[0];
                     mdBalanceTot = resulSet.getDouble("_pay_net");
-                    sAmount = formatDesc.format(mdBalanceTot);
-
                     dTotalBalance = SLibUtils.roundAmount(dTotalBalance + mdBalanceTot);
+                    sNameEmploy = removeSpecialChar(sNameEmploy);
                     bodyLayout.append(SLibUtilities.textTrim(resulSet.getString("emp.bank_acc"))).append(',');
-                    bodyLayout.append(sAmount).append(',');
+                    bodyLayout.append(mdBalanceTot).append(',');
                     bodyLayout.append("PAGO NOMINA").append(',');
-                    bodyLayout.append(sNameEmploy);
+                    bodyLayout.append(sNameEmploy.substring(1,sNameEmploy.length() <= 35 ? sNameEmploy.length() : 35)).append(",,,,");
                     bodyLayout.append("\r\n");
                 }
-
+                
                 headerLayout.append("MXPRLF").append(',');
                 headerLayout.append("F").append(",");
                 headerLayout.append(sAccountCredit).append(',');
@@ -573,7 +571,7 @@ public abstract class SHrsUtils {
                 headerLayout.append(nCont).append(',');
                 headerLayout.append(formatDate.format(new Date())).append(',');
                 headerLayout.append("").append(',');
-                headerLayout.append("PAGO NOMINA QUINCENAL").append(',');
+                headerLayout.append("PAGO NOMINA QUINCENAL");
                 headerLayout.append("\r\n");
                 headerLayout.append(bodyLayout.toString());
 
