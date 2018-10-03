@@ -457,7 +457,7 @@ public class SLayoutBankRow implements SGridRow {
                         value = msCurrencyKey;
                         break;
                     case 4:
-                        if (!msAgreement.isEmpty()) { //if (mnLayoutRowSubType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) { alphalapz
+                        if (!msAgreement.isEmpty()) { 
                             value = msAgreement;
                         }
                         else {
