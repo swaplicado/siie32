@@ -96,7 +96,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private static final int COL_APP_PAY_BANK = 10;
     private static final int COL_AGREE = 12;
     private static final int COL_AGREE_REF = 13;
-
+    
     private int mnLayoutBank;
     private int mnBankLayoutType;
     private int mnBankPaymentType;
@@ -649,7 +649,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 
                 switch (mnFormSubtype) {
                     case SModSysConsts.FIN_LAY_BANK_ACC:
-                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor", 300));
+                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor",200));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Clave proveedor", 50));
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Aplicar pago", moGridPayments.getTable().getDefaultEditor(Boolean.class));
                         column.setEditable(true);
@@ -672,7 +672,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         break;
                         
                     case SModSysConsts.FIN_LAY_BANK_PAY:
-                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor", 250));
+                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor",200));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Tipo doc", 40));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio doc", 80));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha doc"));
@@ -716,7 +716,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         break;
                         
                     case SModSysConsts.FIN_LAY_BANK_PREPAY:
-                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor", 300));
+                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor", 200));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Clave proveedor", 50));
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Monto a pagar $", moGridPayments.getTable().getDefaultEditor(Double.class));
                         column.setEditable(true);
@@ -950,6 +950,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             case SModSysConsts.FIN_LAY_BANK_PAY:
             case SModSysConsts.FIN_LAY_BANK_PREPAY:
                 moDateDateLayout.setEditable(true);
+                
                 moKeyLayoutBank.setEnabled(enable);
                 moKeyBankLayoutType.setEnabled(enable && moKeyLayoutBank.getSelectedIndex() > 0);
                 moKeyBankCurrency.setEnabled(enable && moKeyBankLayoutType.getSelectedIndex() > 0);
@@ -2454,7 +2455,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             moGridPayments.getTable().getTableHeader().setEnabled(false);
             moGridPayments.getTable().setColumnSelectionAllowed(false);
             moGridPayments.getTable().getTableHeader().setReorderingAllowed(false);
-            moGridPayments.getTable().getTableHeader().setResizingAllowed(true);
+            moGridPayments.getTable().getTableHeader().setResizingAllowed(true);            
             moGridPayments.getTable().setRowSorter(new TableRowSorter<>(moGridPayments.getModel()));
             moGridPayments.getTable().getColumnModel().getColumn(COL_APP_PAY_BANK).setCellEditor(null);
             
@@ -2957,7 +2958,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 }
                 break;
             case COL_APP:
-                if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_ACC || mnFormSubtype == SModSysConsts.FIN_LAY_BANK_PAY) {
+                if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_ACC || mnFormSubtype == SModSysConsts.FIN_LAY_BANK_PREPAY) {
                     processEditingAppPayment();
                 }
                 else if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_PREPAY) {
