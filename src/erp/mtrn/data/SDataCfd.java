@@ -89,6 +89,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkXmlDeliveryTypeId;
     protected int mnFkXmlDeliveryStatusId;
     protected int mnFkCompanyBranchId_n;
+    protected int mnFkFactoringBankId_n;
     protected int mnFkDpsYearId_n;
     protected int mnFkDpsDocId_n;
     protected int mnFkRecordYearId_n;
@@ -219,6 +220,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkXmlDeliveryTypeId(int n) { mnFkXmlDeliveryTypeId = n; }
     public void setFkXmlDeliveryStatusId(int n) { mnFkXmlDeliveryStatusId = n; }
     public void setFkCompanyBranchId_n(int n) { mnFkCompanyBranchId_n = n; }
+    public void setFkFactoringBankId_n(int n) { mnFkFactoringBankId_n = n; }
     public void setFkDpsYearId_n(int n) { mnFkDpsYearId_n = n; }
     public void setFkDpsDocId_n(int n) { mnFkDpsDocId_n = n; }
     public void setFkRecordYearId_n(int n) { mnFkRecordYearId_n = n; }
@@ -277,6 +279,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkXmlDeliveryTypeId() { return mnFkXmlDeliveryTypeId; }
     public int getFkXmlDeliveryStatusId() { return mnFkXmlDeliveryStatusId; }
     public int getFkCompanyBranchId_n() { return mnFkCompanyBranchId_n; }
+    public int getFkFactoringBankId_n() { return mnFkFactoringBankId_n; }
     public int getFkDpsYearId_n() { return mnFkDpsYearId_n; }
     public int getFkDpsDocId_n() { return mnFkDpsDocId_n; }
     public int getFkRecordYearId_n() { return mnFkRecordYearId_n; }
@@ -440,6 +443,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkXmlDeliveryTypeId = 0;
         mnFkXmlDeliveryStatusId = 0;
         mnFkCompanyBranchId_n = 0;
+        mnFkFactoringBankId_n = 0;
         mnFkDpsYearId_n = 0;
         mnFkDpsDocId_n = 0;
         mnFkRecordYearId_n = 0;
@@ -517,6 +521,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkXmlDeliveryTypeId = resultSet.getInt("fid_tp_xml_dvy");
                 mnFkXmlDeliveryStatusId = resultSet.getInt("fid_st_xml_dvy");
                 mnFkCompanyBranchId_n = resultSet.getInt("fid_cob_n");
+                mnFkFactoringBankId_n = resultSet.getInt("fid_fact_bank_n");
                 mnFkDpsYearId_n = resultSet.getInt("fid_dps_year_n");
                 mnFkDpsDocId_n = resultSet.getInt("fid_dps_doc_n");
                 mnFkRecordYearId_n = resultSet.getInt("fid_rec_year_n");
@@ -618,13 +623,13 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 sql = "INSERT INTO trn_cfd (id_cfd, ser, num, " +
                         "ts, cert_num, str_signed, signature, doc_xml_uuid, doc_xml, doc_xml_name, xml_rfc_emi, xml_rfc_rec, xml_tot, xml_mon, " +
                         "xml_tc, xml_sign_n, uuid, qrc_n, can_st, ack_can_xml, ack_can_pdf_n, ack_dvy, msg_dvy, b_prc_ws, b_prc_sto_xml, " +
-                        "b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, fid_cob_n, fid_dps_year_n, fid_dps_doc_n, " +
+                        "b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, fid_cob_n, fid_fact_bank_n, fid_dps_year_n, fid_dps_doc_n, " +
                         "fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, " +
                         "fid_pay_rcp_iss_n, fid_usr_prc, fid_usr_dvy, ts_prc, ts_dvy) " +
                         "VALUES (" + mnPkCfdId + ", ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, NOW(), NOW())";
             }
@@ -634,7 +639,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 sql = "UPDATE trn_cfd SET ser = ?, num = ?, ts = ?, cert_num = ?, str_signed = ?, signature = ?, doc_xml_uuid = ?, " +
                         "doc_xml = ?, doc_xml_name = ?, xml_rfc_emi = ?, xml_rfc_rec = ?, xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, " +
                         "uuid = ?, qrc_n = ?, can_st = ?, ack_can_xml = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, " +
-                        "fid_tp_cfd = ?, fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_cob_n = ?, " +
+                        "fid_tp_cfd = ?, fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_cob_n = ?, fid_fact_bank_n = ?, " +
                         "fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, " +
                         "fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
                         "WHERE id_cfd = " + mnPkCfdId + " ";               
@@ -701,6 +706,13 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
             else {
                 preparedStatement.setInt(index++, mnFkCompanyBranchId_n);
+            }
+            
+            if (mnFkFactoringBankId_n == SLibConsts.UNDEFINED) {
+                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
+            }
+            else {
+                preparedStatement.setInt(index++, mnFkFactoringBankId_n);
             }
             
             if (mnFkDpsYearId_n == SLibConsts.UNDEFINED) {

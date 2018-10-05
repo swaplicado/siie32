@@ -7,6 +7,7 @@ package erp.mtrn.data.cfd;
 
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDps;
+import java.util.HashMap;
 import sa.lib.SLibUtils;
 
 /**
@@ -15,10 +16,25 @@ import sa.lib.SLibUtils;
  */
 public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     
+    public static final int TYPE_PAY = 1;
+    public static final int TYPE_INT = 2;
+    public static final int TYPE_FEE = 3;
+    public static final int TYPE_FEE_VAT = 4;
+    
+    public static final HashMap<Integer, String> Types = new HashMap<>();
+    
+    static {
+        Types.put(TYPE_PAY, "Pago");
+        Types.put(TYPE_INT, "Intereses");
+        Types.put(TYPE_FEE, "Comisiones");
+        Types.put(TYPE_FEE_VAT, "IVA comisiones");
+    }
+    
     public SCfdPaymentEntry ParentPaymentEntry;
     public SDataDps DataDps;
     
     public int Number;
+    public int Type;
     public int Installment;
     public double DocBalancePrev;   // in original currency of document
     public double DocPayment;       // in original currency of document
@@ -34,11 +50,12 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     
     public int AuxGridIndex;
     
-    public SCfdPaymentEntryDoc(SCfdPaymentEntry parentPaymentEntry, SDataDps dataDps, int number, int installment, double balancePrev, double payment, double exchangeRate) {
+    public SCfdPaymentEntryDoc(SCfdPaymentEntry parentPaymentEntry, SDataDps dataDps, int number, int type, int installment, double balancePrev, double payment, double exchangeRate) {
         ParentPaymentEntry = parentPaymentEntry;
         DataDps = dataDps;
         
         Number = number;
+        Type = type;
         Installment = installment;
         DocBalancePrev = balancePrev;
         DocPayment = payment;
@@ -57,6 +74,13 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
         computePaymentAmounts();
     }
     
+    /**
+     * Gets entry type.
+     */
+    public String getType() {
+        return Types.get(Type);
+    }
+
     /**
      * Computes pending balance in document currency.
      */
@@ -125,5 +149,6 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
         mvValues.add(ExchangeRate);
         mvValues.add(PayPayment);
         mvValues.add(ParentPaymentEntry.CurrencyKey);
+        mvValues.add(Types.get(Type));
     }
 }

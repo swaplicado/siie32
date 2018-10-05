@@ -1132,7 +1132,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         oDsmEntry.setDbmsFkDpsCategoryId(moDps.getFkDpsCategoryId());
         oDsmEntry.setDbmsDestinyDps(moDps.getDpsNumber());
         oDsmEntry.setDbmsSubclassMove(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP));
-        oDsmEntry.setDbmsBiz(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
+        oDsmEntry.setDbmsBizPartner(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
         oDsmEntry.setDbmsDestinyTpDps(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId(), moDps.getFkDpsTypeId() }, SLibConstants.DESCRIPTION_CODE));
 
         oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);

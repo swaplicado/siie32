@@ -38,6 +38,7 @@ public final class SCfdPacket implements java.io.Serializable {
     private int mnFkXmlDeliveryStatusId;        // used in creation of SDataCfd
     private int mnFkUserDeliveryId;             // used in creation of SDataCfd
     private int mnFkCompanyBranchId;            // used in creation of SDataCfd
+    private int mnFkFactoringBankId;            // used in creation of SDataCfd
     private int mnDpsYearId;                    // used in creation of SDataCfd
     private int mnDpsDocId;                     // used in creation of SDataCfd
     private int mnRecordEntryYearId;                    // used in creation of SDataCfd
@@ -136,6 +137,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setFkXmlDeliveryStatusId(int n) { mnFkXmlDeliveryStatusId = n; }
     public void setFkUserDeliveryId(int n) { mnFkUserDeliveryId = n; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
+    public void setFkFactoringBankId(int n) { mnFkFactoringBankId = n; }
     public void setDpsYearId(int n) { mnDpsYearId = n; }
     public void setDpsDocId(int n) { mnDpsDocId = n; }
     public void setRecordEntryYearId(int n) { mnRecordEntryYearId = n; }
@@ -184,6 +186,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public int getFkXmlDeliveryStatusId() { return mnFkXmlDeliveryStatusId; }
     public int getFkUserDeliveryId() { return mnFkUserDeliveryId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
+    public int getFkFactoringBankId() { return mnFkFactoringBankId; }
     public int getDpsYearId() { return mnDpsYearId; }
     public int getDpsDocId() { return mnDpsDocId; }
     public int getRecordEntryYearId() { return mnRecordEntryYearId; }
@@ -270,6 +273,7 @@ public final class SCfdPacket implements java.io.Serializable {
         cfd.setFkXmlDeliveryTypeId(mnFkXmlDeliveryTypeId);
         cfd.setFkXmlDeliveryStatusId(mnFkXmlDeliveryStatusId);
         cfd.setFkCompanyBranchId_n(mnFkCompanyBranchId);
+        cfd.setFkFactoringBankId_n(mnFkFactoringBankId);
         cfd.setFkDpsYearId_n(mnDpsYearId);
         cfd.setFkDpsDocId_n(mnDpsDocId);
         cfd.setFkRecordYearId_n(mnRecordEntryYearId);
