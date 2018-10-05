@@ -919,41 +919,41 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP)) {
             sSubsystem = "APP; " + oDsmEntry.getDbmsDestinyTpDps() + " " + oDsmEntry.getDbmsDestinyDps() + "; " +
-                    (oDsmEntry.getDbmsBiz().toString().length() > 30 ? oDsmEntry.getDbmsBiz().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBiz()) + "; " +
+                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; " +
                     renderReference(oDsmEntry, true);
         }
         else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_TRA)) {
             sSubsystem = "TRP; " + renderReference(oDsmEntry, true) + " > " + renderReference(oDsmEntry, false) + "; " +
-                    (oDsmEntry.getDbmsBiz().toString().length() > 30 ? oDsmEntry.getDbmsBiz().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBiz());
+                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner());
         }
         else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_CLO)) {
             sSubsystem = "CIP; " + oDsmEntry.getFkDestinyAccountId_n() + "; " +
-                    (oDsmEntry.getDbmsBiz().toString().length() > 30 ? oDsmEntry.getDbmsBiz().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBiz()) + "; "  +
+                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; "  +
                     renderReference(oDsmEntry, true);
         }
         else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_OPE)) {
             sSubsystem = "ABP; " + oDsmEntry.getFkSourceAccountId_n() + "; " +
-                    (oDsmEntry.getDbmsBiz().toString().length() > 30 ? oDsmEntry.getDbmsBiz().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBiz()) + "; "  +
+                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; "  +
                     renderReference(oDsmEntry, false);
         }
         else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_APP)) {
             sSubsystem = "APS; " + oDsmEntry.getDbmsSourceTpDps() + " " + oDsmEntry.getDbmsSourceDps() + "; " +
-                    (oDsmEntry.getDbmsBiz().toString().length() > 30 ? oDsmEntry.getDbmsBiz().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBiz()) + "; "  +
+                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; "  +
                     renderReference(oDsmEntry, false);
         }
         else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_TRA)) {
             sSubsystem = "TRS; " + oDsmEntry.getDbmsSourceTpDps() + " " + oDsmEntry.getDbmsSourceDps() + " > " +
                     oDsmEntry.getDbmsDestinyTpDps() + " " + oDsmEntry.getDbmsDestinyDps() + "; " +
-                    (oDsmEntry.getDbmsBiz().toString().length() > 30 ? oDsmEntry.getDbmsBiz().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBiz());
+                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner());
         }
         else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_CLO)) {
             sSubsystem = "CIS; " + oDsmEntry.getDbmsSourceTpDps() + " " + oDsmEntry.getDbmsSourceDps() + "; " +
-                    (oDsmEntry.getDbmsBiz().toString().length() > 30 ? oDsmEntry.getDbmsBiz().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBiz()) + "; "  +
+                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; "  +
                      oDsmEntry.getFkDestinyAccountId_n();
         }
         else if (SLibUtilities.compareKeys(oKey, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_BAL_OPE)) {
             sSubsystem = "ABS; " + oDsmEntry.getDbmsDestinyTpDps() + " " + oDsmEntry.getDbmsDestinyDps() + "; " +
-                    (oDsmEntry.getDbmsBiz().toString().length() > 30 ? oDsmEntry.getDbmsBiz().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBiz()) + "; "  +
+                    (oDsmEntry.getDbmsBizPartner().toString().length() > 30 ? oDsmEntry.getDbmsBizPartner().toString().substring(0, 27) + "..." : oDsmEntry.getDbmsBizPartner()) + "; "  +
                     oDsmEntry.getFkSourceAccountId_n();
         }
 

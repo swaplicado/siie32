@@ -64,7 +64,7 @@ public class SDataDsmEntryRow extends erp.lib.table.STableRow {
         SDataDsmEntry data = (SDataDsmEntry) moData;
 
         mvValues.clear();
-        mvValues.add(data.getDbmsBiz().toString().length() > 0 ? data.getDbmsBiz() : "-");
+        mvValues.add(data.getDbmsBizPartner().toString().length() > 0 ? data.getDbmsBizPartner() : "-");
         mvValues.add(data.getDbmsSubclassMove().toString().length() > 0 ? data.getDbmsSubclassMove() : "-");
         mvValues.add(renderReferenceSourceDescription(data));
         mvValues.add(data.getFkSourceAccountId_n().toString().length() > 0 ? data.getFkSourceAccountId_n() : "-");

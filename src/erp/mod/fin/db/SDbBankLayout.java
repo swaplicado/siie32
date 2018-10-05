@@ -378,7 +378,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                         oDsmEntry.setDbmsFkDpsCategoryId(dps.getFkDpsCategoryId());
                         oDsmEntry.setDbmsDestinyDps((!dps.getNumberSeries().isEmpty() ? dps.getNumberSeries() + "-" : "") + dps.getNumber());
                         oDsmEntry.setDbmsSubclassMove(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP, SDbRegistry.FIELD_NAME) + "");
-                        oDsmEntry.setDbmsBiz(sBizPartner);
+                        oDsmEntry.setDbmsBizPartner(sBizPartner);
                         oDsmEntry.setDbmsDestinyTpDps(session.readField(SModConsts.TRNU_TP_DPS, new int[] { dps.getFkDpsCategoryId(), dps.getFkDpsClassId(), dps.getFkDpsTypeId() }, SDbRegistry.FIELD_CODE) + "");
 
                         oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);

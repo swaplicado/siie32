@@ -24,11 +24,13 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import sa.lib.SLibTimeUtils;
 
 /**
  *
@@ -71,6 +73,8 @@ public class SDialogRecordPicker extends javax.swing.JDialog implements erp.lib.
         jPanel6 = new javax.swing.JPanel();
         jlPeriod = new javax.swing.JLabel();
         jtfPeriod = new javax.swing.JTextField();
+        jbMonthPrev = new javax.swing.JButton();
+        jbMonthNext = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jlOption = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
@@ -96,7 +100,7 @@ public class SDialogRecordPicker extends javax.swing.JDialog implements erp.lib.
 
         jPanel4.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPeriod.setText("Período contable:");
         jlPeriod.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -108,8 +112,19 @@ public class SDialogRecordPicker extends javax.swing.JDialog implements erp.lib.
         jtfPeriod.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jtfPeriod);
 
+        jbMonthPrev.setText("<");
+        jbMonthPrev.setToolTipText("Un mes atrás");
+        jbMonthPrev.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel6.add(jbMonthPrev);
+
+        jbMonthNext.setText(">");
+        jbMonthNext.setToolTipText("Un mes adelante");
+        jbMonthNext.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel6.add(jbMonthNext);
+
         jPanel4.add(jPanel6);
 
+        jPanel5.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 5, 0, 0));
         jPanel5.setLayout(new java.awt.BorderLayout());
 
         jlOption.setText("Seleccionar una póliza contable:");
@@ -163,8 +178,8 @@ public class SDialogRecordPicker extends javax.swing.JDialog implements erp.lib.
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-900)/2, (screenSize.height-600)/2, 900, 600);
+        setSize(new java.awt.Dimension(900, 600));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -204,6 +219,8 @@ public class SDialogRecordPicker extends javax.swing.JDialog implements erp.lib.
         jbSeek.addActionListener(this);
         jbExportCsv.addActionListener(this);
         jbRefresh.addActionListener(this);
+        jbMonthNext.addActionListener(this);
+        jbMonthPrev.addActionListener(this);
         jtfSeek.addActionListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "focusSeek", "seek", KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK);
@@ -237,6 +254,18 @@ public class SDialogRecordPicker extends javax.swing.JDialog implements erp.lib.
             }
         }
     }
+    
+    private void actionMonthPrev() {
+        Date date = (Date) moFilterKey;
+        setFilterKey(SLibTimeUtils.addDate(date, 0, -1, 0));
+        formRefreshOptionPane();
+    }
+
+    private void actionMonthNext() {
+        Date date = (Date) moFilterKey;
+        setFilterKey(SLibTimeUtils.addDate(date, 0, 1, 0));
+        formRefreshOptionPane();
+    }
 
     private void actionOk() {
         if (moPaneOptions.getSelectedTableRow() == null) {
@@ -265,6 +294,8 @@ public class SDialogRecordPicker extends javax.swing.JDialog implements erp.lib.
     private javax.swing.JPanel jPanel6;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbExportCsv;
+    private javax.swing.JButton jbMonthNext;
+    private javax.swing.JButton jbMonthPrev;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbRefresh;
     private javax.swing.JButton jbSeek;
@@ -417,6 +448,12 @@ public class SDialogRecordPicker extends javax.swing.JDialog implements erp.lib.
             }
             else if (button == jbRefresh) {
                 actionRefresh();
+            }
+            else if (button == jbMonthPrev) {
+                actionMonthPrev();
+            }
+            else if (button == jbMonthNext) {
+                actionMonthNext();
             }
         }
         else if (e.getSource() instanceof javax.swing.JTextField) {

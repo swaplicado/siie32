@@ -774,6 +774,7 @@ public abstract class SCfdUtils implements Serializable {
                         packet.setFkXmlDeliveryStatusId(dataCfd.getFkXmlDeliveryStatusId());
                         packet.setFkUserDeliveryId(client.getSession().getUser().getPkUserId());
                         packet.setFkCompanyBranchId(dataCfd.getFkCompanyBranchId_n());
+                        packet.setFkFactoringBankId(dataCfd.getFkFactoringBankId_n());
                         packet.setDpsYearId(dataCfd.getFkDpsYearId_n());
                         packet.setDpsDocId(dataCfd.getFkDpsDocId_n());
                         //packet.setRecordEntryYearId(...);
@@ -2916,12 +2917,14 @@ public abstract class SCfdUtils implements Serializable {
             packet.setCfdSeries("");
             packet.setCfdNumber(0);
             packet.setFkCompanyBranchId(SLibConsts.UNDEFINED);
+            packet.setFkFactoringBankId(SLibConsts.UNDEFINED);
         }
         else {
             packet.setCfdId(cfd.getPkCfdId());
             packet.setCfdSeries(cfd.getSeries());
             packet.setCfdNumber(cfd.getNumber());
             packet.setFkCompanyBranchId(cfd.getFkCompanyBranchId_n());
+            packet.setFkFactoringBankId(cfd.getFkFactoringBankId_n());
         }
 
         float cfdVersion = SLibConsts.UNDEFINED;

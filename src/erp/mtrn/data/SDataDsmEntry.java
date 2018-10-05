@@ -60,7 +60,7 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msDbmsAccountPay;
     protected java.lang.String msDbmsAccountOp;
     protected java.lang.String msDbmsSubclassMove;
-    protected java.lang.String msDbmsBiz;
+    protected java.lang.String msDbmsBizPartner;
     protected java.lang.String msDbmsSourceCurrencyKey;
     protected java.lang.String msDbmsSourceAccount;
     protected java.lang.String msDbmsSourceDps;
@@ -157,7 +157,7 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsAccountPay (java.lang.String s) { msDbmsAccountPay = s; }
     public void setDbmsAccountOp (java.lang.String s) { msDbmsAccountOp = s; }
     public void setDbmsSubclassMove(java.lang.String s) { msDbmsSubclassMove = s; }
-    public void setDbmsBiz(java.lang.String s) { msDbmsBiz = s; }
+    public void setDbmsBizPartner(java.lang.String s) { msDbmsBizPartner = s; }
     public void setDbmsSourceCurrencyKey(java.lang.String s) { msDbmsSourceCurrencyKey = s; }
     public void setDbmsSourceAccount(java.lang.String s) { msDbmsSourceAccount = s; }
     public void setDbmsSourceDps(java.lang.String s) { msDbmsSourceDps = s; }
@@ -179,7 +179,7 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getDbmsAccountPay() { return msDbmsAccountPay; }
     public java.lang.String getDbmsAccountOp() { return msDbmsAccountOp; }
     public java.lang.String getDbmsSubclassMove() { return msDbmsSubclassMove; }
-    public java.lang.String getDbmsBiz() { return msDbmsBiz; }
+    public java.lang.String getDbmsBizPartner() { return msDbmsBizPartner; }
     public java.lang.String getDbmsSourceCurrencyKey() { return msDbmsSourceCurrencyKey; }
     public java.lang.String getDbmsSourceAccount() { return msDbmsSourceAccount; }
     public java.lang.String getDbmsSourceDps() { return msDbmsSourceDps; }
@@ -240,7 +240,7 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
         msDbmsAccountPay = "";
         msDbmsAccountOp = "";
         msDbmsSubclassMove = "";
-        msDbmsBiz = "";
+        msDbmsBizPartner = "";
         msDbmsSourceCurrencyKey = "";
         msDbmsSourceAccount = "";
         msDbmsSourceDps = "";
@@ -341,8 +341,8 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
 
                 msDbmsSubclassMove = resultSet.getString("cls.cls_acc_mov");
                 if (resultSet.wasNull()) msDbmsSubclassMove = "";
-                msDbmsBiz = resultSet.getString("bp.bp");
-                if (resultSet.wasNull()) msDbmsBiz = "";
+                msDbmsBizPartner = resultSet.getString("bp.bp");
+                if (resultSet.wasNull()) msDbmsBizPartner = "";
                 msDbmsSourceCurrencyKey = resultSet.getString("cur1.cur_key");
                 if (resultSet.wasNull()) msDbmsSourceCurrencyKey = "";
                 msDbmsSourceAccount = resultSet.getString("acc1.acc");
