@@ -16,11 +16,16 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mmfg.data.SDataExplotionMaterials;
 import erp.mmfg.data.SDataProductionOrder;
+import erp.mmfg.data.explosion.SExplosionMaterialsProcess;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -49,6 +54,8 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
     private java.util.Vector<erp.lib.form.SFormComponentItem> mvItemsEntities = null;
 
     private boolean mbIsUniversalCompany;
+    
+    private File moFileToExplode;
 
     /** Creates new form DFormCompany */
     public SDialogExplotionMaterials(erp.client.SClientInterface client) {
@@ -91,6 +98,11 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
         jtfDate = new javax.swing.JFormattedTextField();
         jlDummy14 = new javax.swing.JLabel();
         jbDate = new javax.swing.JButton();
+        jlSpace = new javax.swing.JLabel();
+        jlDate2 = new javax.swing.JLabel();
+        jchExplosionFile = new javax.swing.JCheckBox();
+        jtFileName = new javax.swing.JTextField();
+        jbSelectFile = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jlProdOrdStart = new javax.swing.JLabel();
         jcbProdOrdStart = new javax.swing.JComboBox<SFormComponentItem>();
@@ -206,6 +218,32 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
         jbDate.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel30.add(jbDate);
 
+        jlSpace.setText(" ");
+        jlSpace.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel30.add(jlSpace);
+
+        jlDate2.setText("Explosión desde archivo:");
+        jlDate2.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel30.add(jlDate2);
+
+        jchExplosionFile.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                onFileCheckChanges(evt);
+            }
+        });
+        jPanel30.add(jchExplosionFile);
+
+        jtFileName.setEditable(false);
+        jtFileName.setPreferredSize(new java.awt.Dimension(155, 23));
+        jPanel30.add(jtFileName);
+
+        jbSelectFile.setText("...");
+        jbSelectFile.setToolTipText("Seleccionar orden de producción");
+        jbSelectFile.setEnabled(false);
+        jbSelectFile.setFocusable(false);
+        jbSelectFile.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel30.add(jbSelectFile);
+
         jPanel8.add(jPanel30);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
@@ -305,6 +343,16 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
         itemStateChangedProdOrdStart();
     }//GEN-LAST:event_jcbProdOrdStartItemStateChanged
 
+    private void onFileCheckChanges(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_onFileCheckChanges
+        jbSelectFile.setEnabled(jchExplosionFile.isSelected());
+        jcbProdOrdStart.setEnabled(! jchExplosionFile.isSelected());
+        jcbProdOrdEnd.setEnabled(! jchExplosionFile.isSelected());
+        jckIsComplete.setSelected(! jchExplosionFile.isSelected());
+        jckIsComplete.setEnabled(! jchExplosionFile.isSelected());
+        jckIsProgrammed.setSelected(! jchExplosionFile.isSelected());
+        jckIsProgrammed.setEnabled(! jchExplosionFile.isSelected());
+    }//GEN-LAST:event_onFileCheckChanges
+
     private void initComponentsExtra() {
         mvFields = new Vector<SFormField>();
 
@@ -321,7 +369,6 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
         moFieldProdOrdEnd.setPickerButton(jbProdOrdEnd);
 
         mvFields.add(moFieldFkCobId);
-        //mvFields.add(moFieldFkEntityId);
         mvFields.add(moFieldDate);
         mvFields.add(moFieldProdOrdStart);
         mvFields.add(moFieldProdOrdEnd);
@@ -330,6 +377,7 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
         jbCancel.addActionListener(this);
         jbFkCobId.addActionListener(this);
         jbDate.addActionListener(this);
+        jbSelectFile.addActionListener(this);
         jbProdOrdStart.addActionListener(this);
         jbProdOrdEnd.addActionListener(this);
 
@@ -446,28 +494,46 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
         validation = formValidate();
         if (!validation.getIsError()) {
             if (validateProductionOrders() == 0) {
-                oExplotionMaterials.formReset();
-                oExplotionMaterials.setValue(1, moFieldFkCobId.getKey());
+                if (! jchExplosionFile.isSelected()) {
+                    oExplotionMaterials.formReset();
+                    oExplotionMaterials.setValue(1, moFieldFkCobId.getKey());
 
-                ArrayList<int[]> fkEntityId = new ArrayList<>();
-                for(SFormComponentItem item : jliFkEntityId.getSelectedValuesList()) {
-                    fkEntityId.add((int[]) item.getPrimaryKey());
+                    ArrayList<int[]> fkEntityId = new ArrayList<>();
+                    for(SFormComponentItem item : jliFkEntityId.getSelectedValuesList()) {
+                        fkEntityId.add((int[]) item.getPrimaryKey());
+                    }
+
+                    oExplotionMaterials.setValue(2, jliFkEntityId.getSelectedIndex() >= 0 ? fkEntityId : null);
+                    oExplotionMaterials.setValue(3, moFieldDate.getDate());
+                    oExplotionMaterials.setValue(4, mbIsForecast);
+                    oExplotionMaterials.setValue(5, jckIsComplete.isSelected());
+                    oExplotionMaterials.setValue(6, jckIsProgrammed.isSelected());
+                    oExplotionMaterials.setValue(7, jcbProdOrdStart.getSelectedItem().toString());
+                    oExplotionMaterials.setValue(8, jcbProdOrdEnd.getSelectedItem().toString());
+                    oExplotionMaterials.setValue(9, new int[] {moFieldProdOrdStart.getKeyAsIntArray()[0], moFieldProdOrdStart.getKeyAsIntArray()[1], moFieldProdOrdEnd.getKeyAsIntArray()[0], moFieldProdOrdEnd.getKeyAsIntArray()[1]});
+                    oExplotionMaterials.setTitle("Explosión de órdenes de producción");
+                    oExplotionMaterials.setVisible(true);
+
+                    if (oExplotionMaterials.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+                        moExplotionMaterials = (SDataExplotionMaterials) oExplotionMaterials.getRegistry();
+                        mbIsExplode = true;
+                    }
                 }
-
-                oExplotionMaterials.setValue(2, jliFkEntityId.getSelectedIndex() >= 0 ? fkEntityId : null);
-                oExplotionMaterials.setValue(3, moFieldDate.getDate());
-                oExplotionMaterials.setValue(4, mbIsForecast);
-                oExplotionMaterials.setValue(5, jckIsComplete.isSelected());
-                oExplotionMaterials.setValue(6, jckIsProgrammed.isSelected());
-                oExplotionMaterials.setValue(7, jcbProdOrdStart.getSelectedItem().toString());
-                oExplotionMaterials.setValue(8, jcbProdOrdEnd.getSelectedItem().toString());
-                oExplotionMaterials.setValue(9, new int[] {moFieldProdOrdStart.getKeyAsIntArray()[0], moFieldProdOrdStart.getKeyAsIntArray()[1], moFieldProdOrdEnd.getKeyAsIntArray()[0], moFieldProdOrdEnd.getKeyAsIntArray()[1]});
-                oExplotionMaterials.setTitle("Explosión de órdenes de producción");
-                oExplotionMaterials.setVisible(true);
-
-                if (oExplotionMaterials.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
-                    moExplotionMaterials = (SDataExplotionMaterials) oExplotionMaterials.getRegistry();
-                    mbIsExplode = true;
+                else {
+                    if (moFileToExplode == null) {
+                        JOptionPane.showMessageDialog(this, "Debe seleccionar un archivo", "Error", JOptionPane.ERROR_MESSAGE);
+                        jbSelectFile.setFocusPainted(true);
+                        return;
+                    }
+                    
+                    SExplosionMaterialsProcess oExplosion = new SExplosionMaterialsProcess();
+                    String sResult = oExplosion.explodeFile(miClient, moFileToExplode.getAbsolutePath(), moFieldFkCobId.getKeyAsIntArray()[0], moFieldDate.getDate());
+                    if (! sResult.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, sResult, "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(this, "La explosión se realizó correctamente, archivo guardado.", "Realizado", JOptionPane.INFORMATION_MESSAGE);
+                    }
                 }
             }
         }
@@ -482,9 +548,16 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
                 miClient.getSessionXXX().getIsUniversalCompanyBranch(moFieldFkCobId.getKeyAsIntArray()[0]) ||
                 miClient.getSessionXXX().getIsUniversalCompanyBranchEntities(moFieldFkCobId.getKeyAsIntArray()[0], SDataConstantsSys.CFGS_CT_ENT_PLANT);
     }
-
-    private void actionEdit(boolean edit) {
-
+    
+    private void actionSelectFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Delimitado por comas .csv", "csv");
+        fileChooser.setFileFilter(filter);
+        fileChooser.showOpenDialog(this);
+        
+        File selectedFile = fileChooser.getSelectedFile();
+        moFileToExplode = selectedFile;
+        jtFileName.setText(moFileToExplode.getName());
     }
 
     private void actionOk() {
@@ -543,12 +616,15 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
     private javax.swing.JButton jbFkCobId;
     private javax.swing.JButton jbProdOrdEnd;
     private javax.swing.JButton jbProdOrdStart;
+    private javax.swing.JButton jbSelectFile;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCobId;
     private javax.swing.JComboBox<SFormComponentItem> jcbProdOrdEnd;
     private javax.swing.JComboBox<SFormComponentItem> jcbProdOrdStart;
+    private javax.swing.JCheckBox jchExplosionFile;
     private javax.swing.JCheckBox jckIsComplete;
     private javax.swing.JCheckBox jckIsProgrammed;
     private javax.swing.JLabel jlDate;
+    private javax.swing.JLabel jlDate2;
     private javax.swing.JLabel jlDummy1;
     private javax.swing.JLabel jlDummy14;
     private javax.swing.JLabel jlDummy2;
@@ -557,8 +633,10 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
     private javax.swing.JLabel jlFkEntityId;
     private javax.swing.JLabel jlProdOrdEnd;
     private javax.swing.JLabel jlProdOrdStart;
+    private javax.swing.JLabel jlSpace;
     private javax.swing.JList<SFormComponentItem> jliFkEntityId;
     private javax.swing.JPanel jpHead;
+    private javax.swing.JTextField jtFileName;
     private javax.swing.JFormattedTextField jtfDate;
     // End of variables declaration//GEN-END:variables
 
@@ -588,6 +666,9 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
 
         moFieldDate.setDate(miClient.getSessionXXX().getWorkingDate());
         moFieldFkCobId.setKey(new int[] { miClient.getSessionXXX().getCurrentCompanyBranchId() });
+        jchExplosionFile.setSelected(false);
+        jtFileName.setText("");
+        moFileToExplode = null;
     }
 
     @Override
@@ -692,6 +773,9 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
             }
             else if (button == jbDate) {
                 actionDate();
+            }
+            else if (button == jbSelectFile) {
+                actionSelectFile();
             }
         }
     }
