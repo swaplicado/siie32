@@ -2880,7 +2880,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 }
                 break;
             case COL_APP:
-                if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_ACC || mnFormSubtype == SModSysConsts.FIN_LAY_BANK_PREPAY) {
+                if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_ACC || mnFormSubtype == SModSysConsts.FIN_LAY_BANK_PAY) {
                     processEditingAppPayment();
                 }
                 else if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_PREPAY) {
