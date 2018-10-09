@@ -75,6 +75,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     public int AuxGridIndex;
     public int AuxUserId;
     public int AuxFactoringBankId;
+    public String AuxFactoringBankFiscalId;
     public double AuxTotalPayments;
     public double AuxTotalPaymentsLocal;
     public double AuxTotalLimMin;
@@ -105,6 +106,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         AuxGridIndex = -1;
         AuxUserId = 0;
         AuxFactoringBankId = 0;
+        AuxFactoringBankFiscalId = "";
         AuxDbmsRecordEntries = new ArrayList<>();
         
         computeAmountLocal();
@@ -543,5 +545,6 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         mvValues.add(AccountDesFiscalId);
         mvValues.add(AccountDesNumber);
         mvValues.add(Types.get(Type));
+        mvValues.add(AuxFactoringBankFiscalId);
     }
 }

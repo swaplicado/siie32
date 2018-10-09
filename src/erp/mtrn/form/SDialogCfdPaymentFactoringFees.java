@@ -263,7 +263,7 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
         jtfDocPaymentMethodRo.setEditable(false);
         jtfDocPaymentMethodRo.setText("TEXT");
         jtfDocPaymentMethodRo.setFocusable(false);
-        jtfDocPaymentMethodRo.setPreferredSize(new java.awt.Dimension(350, 23));
+        jtfDocPaymentMethodRo.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel21.add(jtfDocPaymentMethodRo);
 
         jPanel6.add(jPanel21);
@@ -279,7 +279,7 @@ public class SDialogCfdPaymentFactoringFees extends javax.swing.JDialog implemen
         jtfDocCurrencyRo.setEditable(false);
         jtfDocCurrencyRo.setText("TEXT");
         jtfDocCurrencyRo.setFocusable(false);
-        jtfDocCurrencyRo.setPreferredSize(new java.awt.Dimension(350, 23));
+        jtfDocCurrencyRo.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel22.add(jtfDocCurrencyRo);
 
         jPanel6.add(jPanel22);

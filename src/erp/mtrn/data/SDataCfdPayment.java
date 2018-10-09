@@ -286,6 +286,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                         }
                     }
 
+                    if (moDbmsDataCfd.getFkFactoringBankId_n() != 0) {
+                        moAuxCfdDbmsDataReceptorFactoring = new SDataBizPartner();
+                        moAuxCfdDbmsDataReceptorFactoring.read(new int[] { moDbmsDataCfd.getFkFactoringBankId_n() }, statementAux);
+                    }
                     // extract complement:
 
                     int numberEntry = 0;
@@ -361,7 +365,11 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                     paymentEntry.AccountDesFiscalId = pago.getAttRfcEmisorCtaBen().getString();
                                     paymentEntry.AccountDesNumber = pago.getAttCtaBeneficiario().getString();
                                     paymentEntry.AccountDesKey = accountCashKey;
-                                    paymentEntry.AuxFactoringBankId = moDbmsDataCfd.getFkFactoringBankId_n();
+                                    
+                                    if (moAuxCfdDbmsDataReceptorFactoring != null) {
+                                        paymentEntry.AuxFactoringBankId = moAuxCfdDbmsDataReceptorFactoring.getPkBizPartnerId();
+                                        paymentEntry.AuxFactoringBankFiscalId = moAuxCfdDbmsDataReceptorFactoring.getFiscalId();
+                                    }
 
                                     // get XML related documents of XML payments:
 
@@ -459,11 +467,6 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
                     moAuxCfdDbmsDataReceptor = new SDataBizPartner();
                     moAuxCfdDbmsDataReceptor.read(new int[] { idReceptor }, statementAux);
-                    
-                    if (moDbmsDataCfd.getFkFactoringBankId_n() != 0) {
-                        moAuxCfdDbmsDataReceptorFactoring = new SDataBizPartner();
-                        moAuxCfdDbmsDataReceptorFactoring.read(new int[] { moDbmsDataCfd.getFkFactoringBankId_n() }, statementAux);
-                    }
                 }
 
                 mbIsRegistryNew = false;
