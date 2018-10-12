@@ -494,15 +494,15 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
         validation = formValidate();
         if (!validation.getIsError()) {
             if (validateProductionOrders() == 0) {
+                
+                ArrayList<int[]> fkEntityId = new ArrayList<>();
+                for(SFormComponentItem item : jliFkEntityId.getSelectedValuesList()) {
+                    fkEntityId.add((int[]) item.getPrimaryKey());
+                }
+                    
                 if (! jchExplosionFile.isSelected()) {
                     oExplotionMaterials.formReset();
                     oExplotionMaterials.setValue(1, moFieldFkCobId.getKey());
-
-                    ArrayList<int[]> fkEntityId = new ArrayList<>();
-                    for(SFormComponentItem item : jliFkEntityId.getSelectedValuesList()) {
-                        fkEntityId.add((int[]) item.getPrimaryKey());
-                    }
-
                     oExplotionMaterials.setValue(2, jliFkEntityId.getSelectedIndex() >= 0 ? fkEntityId : null);
                     oExplotionMaterials.setValue(3, moFieldDate.getDate());
                     oExplotionMaterials.setValue(4, mbIsForecast);
@@ -526,8 +526,13 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
                         return;
                     }
                     
+                    int iWhs = 0;
+                    if (fkEntityId.size() > 0) {
+                        iWhs = fkEntityId.get(0)[1];
+                    }
+                    
                     SExplosionMaterialsProcess oExplosion = new SExplosionMaterialsProcess();
-                    String sResult = oExplosion.explodeFile(miClient, moFileToExplode.getAbsolutePath(), moFieldFkCobId.getKeyAsIntArray()[0], moFieldDate.getDate());
+                    String sResult = oExplosion.explodeFile(miClient, moFileToExplode.getAbsolutePath(), moFieldFkCobId.getKeyAsIntArray()[0], iWhs, moFieldDate.getDate());
                     if (! sResult.isEmpty()) {
                         JOptionPane.showMessageDialog(this, sResult, "Error", JOptionPane.ERROR_MESSAGE);
                     }

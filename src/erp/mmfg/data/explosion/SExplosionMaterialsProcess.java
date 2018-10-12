@@ -43,11 +43,12 @@ public class SExplosionMaterialsProcess {
      * @param miClient
      * @param fileName file to read
      * @param iBranch id of branch to stock
+     * @param iWhs id of selected warehouse
      * @param oDate date of evaluation
      * 
      * @return String with errors ocurred, if the string is empty there were no errors
      */
-    public String explodeFile(final erp.client.SClientInterface miClient, String fileName, final int iBranch, Date oDate) {
+    public String explodeFile(final erp.client.SClientInterface miClient, String fileName, final int iBranch, final int iWhs, Date oDate) {
         String sResult = "";
         
         try {
@@ -74,7 +75,7 @@ public class SExplosionMaterialsProcess {
                 vStkParams.add(ingredient.getPkUnitId()); // Unid
                 vStkParams.add(null); // Lot
                 vStkParams.add(iBranch); // Company branch
-                vStkParams.add(null); // Warehouse
+                vStkParams.add(iWhs == 0 ? null : iWhs); // Warehouse
                 vStkParams.add(null); // maintenance user
                 vStkParams.add("'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(oDate) + "'"); // Date
                 vStkParams = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_STK_GET, vStkParams, SLibConstants.EXEC_MODE_SILENT);
