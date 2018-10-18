@@ -5,6 +5,7 @@
 
 package erp.mtrn.data;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -19,6 +20,7 @@ public class STrnStockMove implements java.io.Serializable {
     protected int mnPkLotId;
     protected int mnPkCompanyBranchId;
     protected int mnPkWarehouseId;
+    protected ArrayList<Integer> mlPkWarehouseIds;
     protected double mdQuantity;
     protected double mdValue;
     protected String msSerialNumber;
@@ -96,6 +98,7 @@ public class STrnStockMove implements java.io.Serializable {
         mnSegregationType = 0;
         mbIsCurrentSegregationExcluded = false;
         mnWarehouseType = 0;
+        mlPkWarehouseIds = null;
     }
 
     public void setPkYearId(int n) { mnPkYearId = n; }
@@ -125,6 +128,7 @@ public class STrnStockMove implements java.io.Serializable {
     public int getPkLotId() { return mnPkLotId; }
     public int getPkCompanyBranchId() { return mnPkCompanyBranchId; }
     public int getPkWarehouseId() { return mnPkWarehouseId; }
+    public ArrayList<Integer> getLWarehouseIds() { return mlPkWarehouseIds; }
     public double getQuantity() { return mdQuantity; }
     public double getValue() { return mdValue; }
     public String getSerialNumber() { return msSerialNumber; }
@@ -142,6 +146,7 @@ public class STrnStockMove implements java.io.Serializable {
 
     public void setLotKey(int[] key) { mnPkItemId = key[0]; mnPkUnitId = key[1]; mnPkLotId = key[2]; }
     public void setWarehouseKey(int[] key) { mnPkCompanyBranchId = key[0]; mnPkWarehouseId = key[1]; }
+    public void setWarehousesList(ArrayList<Integer> whss) { mlPkWarehouseIds = whss; }
     public void setStockMoveKey(int[] key) { mnPkYearId = key[0]; mnPkItemId = key[1]; mnPkUnitId = key[2]; mnPkLotId = key[3]; mnPkCompanyBranchId = key[4]; mnPkWarehouseId = key[5]; }
 
     public int[] getLotKey() { return new int[] { mnPkItemId, mnPkUnitId, mnPkLotId }; }
