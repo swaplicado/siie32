@@ -526,15 +526,15 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
                         return;
                     }
                     
-                    ArrayList<Integer> whss = new ArrayList();
+                    ArrayList<Integer> lWhs = new ArrayList();
                     if (fkEntityId.size() > 0) {
                         for (int[] whs : fkEntityId) {
-                           whss.add(whs[1]);
+                           lWhs.add(whs[1]);
                         }
                     }
                     
                     SExplosionMaterialsProcess oExplosion = new SExplosionMaterialsProcess();
-                    String sResult = oExplosion.explodeFile(miClient, moFileToExplode.getAbsolutePath(), moFieldFkCobId.getKeyAsIntArray()[0], whss, moFieldDate.getDate());
+                    String sResult = oExplosion.explodeFile(miClient, moFileToExplode.getAbsolutePath(), moFieldFkCobId.getKeyAsIntArray()[0], lWhs, moFieldDate.getDate());
                     if (! sResult.isEmpty()) {
                         JOptionPane.showMessageDialog(this, sResult, "Error", JOptionPane.ERROR_MESSAGE);
                     }
