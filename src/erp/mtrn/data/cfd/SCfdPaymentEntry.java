@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mtrn.data.cfd;
 
 import erp.client.SClientInterface;
@@ -40,20 +41,20 @@ import sa.lib.gui.SGuiSession;
  */
 public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     
-    public static final int TYPE_STANDARD = 1;
-    public static final int TYPE_FACTORING_PAY = 11;
-    public static final int TYPE_FACTORING_FEE = 12;
+    public static final int TYPE_STANDARD = 1;          // standard payment
+    public static final int TYPE_FACTORING_PAY = 11;    // payment make with factoring
+    public static final int TYPE_FACTORING_FEE = 12;    // factoring fees considered as payment
     
     public static final HashMap<Integer, String> Types = new HashMap<>();
     
     static {
         Types.put(TYPE_STANDARD, "Estándar");
-        Types.put(TYPE_FACTORING_PAY, "Factoraje: pago neto");
+        Types.put(TYPE_FACTORING_PAY, "Factoraje: pago");
         Types.put(TYPE_FACTORING_FEE, "Factoraje: intereses y comisiones");
     }
     
     public int Number;
-    public int Type;
+    public int Type;    // payment type
     public Date Date;
     public String PaymentWay;
     public int CurrencyId;
@@ -204,8 +205,8 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         recordEntry.setIsSystem(true);
         recordEntry.setIsDeleted(false);
 
-        recordEntry.setFkSystemMoveClassId(SModSysConsts.FINS_TP_SYS_MOV_MO_CUS_PAY[0]);
-        recordEntry.setFkSystemMoveTypeId(SModSysConsts.FINS_TP_SYS_MOV_MO_CUS_PAY[1]);
+        recordEntry.setFkSystemMoveClassId(SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_PAY[0]);
+        recordEntry.setFkSystemMoveTypeId(SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_PAY[1]);
 
         if (accountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_CASH) {
             recordEntry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_ENT_CSH_CSH[0]);
@@ -273,8 +274,8 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         recordEntry.setIsSystem(true);
         recordEntry.setIsDeleted(false);
 
-        recordEntry.setFkSystemMoveClassId(SModSysConsts.FINS_TP_SYS_MOV_MO_CUS_PAY[0]);
-        recordEntry.setFkSystemMoveTypeId(SModSysConsts.FINS_TP_SYS_MOV_MO_CUS_PAY[1]);
+        recordEntry.setFkSystemMoveClassId(SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_PAY[0]);
+        recordEntry.setFkSystemMoveTypeId(SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_PAY[1]);
 
         recordEntry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[0]);
         recordEntry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[1]);
@@ -311,6 +312,98 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         return recordEntry;
     }
 
+    private erp.mfin.data.SDataRecordEntry createRecordEntryXrtDiff(final SGuiSession session, 
+            final String accountId, final String costCenterId, final int itemId, final int currencyId,
+            final double xrtDiff) throws Exception {
+        SDataRecordEntry recordEntry = new SDataRecordEntry();
+        
+        recordEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[0]);
+        recordEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[1]);
+        recordEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
+        recordEntry.setFkUserNewId(session.getUser().getPkUserId());
+        recordEntry.setDbmsAccountingMoveSubclass(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL, SDbRegistry.FIELD_NAME).toString());
+        //recordEntry.setConcept(...);          // will be set in method processRecord()
+        if (xrtDiff >= 0) {
+            recordEntry.setDebit(0);
+            recordEntry.setCredit(xrtDiff);   // income
+        }
+        else {
+            recordEntry.setDebit(-xrtDiff);   // expense
+            recordEntry.setCredit(0);
+        }
+        recordEntry.setExchangeRate(0);
+        recordEntry.setExchangeRateSystem(0);
+        recordEntry.setDebitCy(0);
+        recordEntry.setCreditCy(0);
+        //recordEntry.setSortingPosition(...);  // will be set when CFD Payment is saved
+        recordEntry.setFkCurrencyId(currencyId);
+        recordEntry.setFkAccountIdXXX(accountId);
+        recordEntry.setFkCostCenterIdXXX_n(costCenterId);
+        recordEntry.setIsExchangeDifference(true);
+        recordEntry.setIsSystem(true);
+        recordEntry.setIsDeleted(false);
+
+        recordEntry.setFkSystemMoveClassId(SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_PAY[0]);
+        recordEntry.setFkSystemMoveTypeId(SModSysConsts.FINS_TP_SYS_MOV_MI_CUS_PAY[1]);
+
+        recordEntry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[0]);
+        recordEntry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[1]);
+
+        recordEntry.setFkSystemMoveCategoryIdXXX(SDataConstantsSys.FINS_TP_SYS_MOV_NA[0]);
+        recordEntry.setFkSystemMoveTypeIdXXX(SDataConstantsSys.FINS_TP_SYS_MOV_NA[1]);
+
+        recordEntry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { accountId }));
+        recordEntry.setDbmsAccountComplement("");
+        recordEntry.setDbmsCostCenter_n(SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.FIN_CC, new Object[] { costCenterId }));
+        recordEntry.setDbmsCurrencyKey(session.getSessionCustom().getCurrencyCode(new int[] { currencyId }));
+
+        recordEntry.setReference("");
+        recordEntry.setIsReferenceTax(false);
+        recordEntry.setFkTaxBasicId_n(0);
+        recordEntry.setFkTaxId_n(0);
+
+        recordEntry.setFkBizPartnerId_nr(0);
+        recordEntry.setFkBizPartnerBranchId_n(0);
+
+        recordEntry.setFkCompanyBranchId_n(0);
+        recordEntry.setFkEntityId_n(0);
+        recordEntry.setUnits(0d);
+        recordEntry.setFkItemId_n(itemId);
+        recordEntry.setFkItemAuxId_n(0);
+        recordEntry.setFkYearId_n(0);
+        recordEntry.setFkDpsYearId_n(0);
+        recordEntry.setFkDpsDocId_n(0);
+        recordEntry.setFkDpsAdjustmentYearId_n(0);
+        recordEntry.setFkDpsAdjustmentDocId_n(0);
+        //recordEntry.setFkBookkeepingYearId_n(...);    // will be set in method processRecord()
+        //recordEntry.setFkBookkeepingNumberId_n(...);  // will be set in method processRecord()
+
+        return recordEntry;
+    }
+    
+    /**
+     * This will update supplied recor entry!
+     */
+    private void normalizeRecordEntry(SGuiSession session, SDataRecordEntry recordEntry, SDataBookkeepingNumber bookkeepingNumber, String bizPartnerName) {
+        recordEntry.setPkYearId(DataRecord.getPkYearId());
+        recordEntry.setPkPeriodId(DataRecord.getPkPeriodId());
+        recordEntry.setPkBookkeepingCenterId(DataRecord.getPkBookkeepingCenterId());
+        recordEntry.setPkRecordTypeId(DataRecord.getPkRecordTypeId());
+        recordEntry.setPkNumberId(DataRecord.getPkNumberId());
+        //entry.setPkEntryId(...);          // will be set when saved!
+        
+        //entry.setSortingPosition(...);    // will be set when saved!
+        recordEntry.setFkBookkeepingYearId_n(bookkeepingNumber.getPkYearId());
+        recordEntry.setFkBookkeepingNumberId_n(bookkeepingNumber.getPkNumberId());
+        
+        recordEntry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { recordEntry.getFkAccountId() }));
+        recordEntry.setDbmsCurrencyKey(session.getSessionCustom().getCurrencyCode(new int[] { recordEntry.getFkCurrencyId() }));
+        
+        if (recordEntry.getFkSystemMoveCategoryIdXXX() == SDataConstantsSys.FINS_CT_SYS_MOV_BPS) {
+            recordEntry.setDbmsAccountComplement(bizPartnerName);
+        }
+    }
+
     /**
      * Process all entries of record (journal voucher) for accounting of payment.
      * NOTE: This method must be called in GUI form, before saving this registry!
@@ -326,8 +419,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         SDataDsm oDsm = new SDataDsm();
         
         HashSet<String> documentsSet = new HashSet<>();
-        String concept;
-        String bizPartnerName = session.readField(SModConsts.BPSU_BP, new int[] { DataParentPayment.getAuxCfdDbmsDataReceptor().getPkBizPartnerId()}, SDbBizPartner.FIELD_NAME_COMM).toString();
+        String bizPartnerName = session.readField(SModConsts.BPSU_BP, new int[] { DataParentPayment.getAuxCfdDbmsDataReceptor().getPkBizPartnerId() }, SDbBizPartner.FIELD_NAME_COMM).toString();
         SDataAccountCash accountCash = (SDataAccountCash) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC_CASH, AccountDesKey, SLibConstants.EXEC_MODE_VERBOSE);
         
         // bookkeeping of application of payments:
@@ -403,6 +495,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
 
             oDsm = (SDataDsm) ((SClientInterface) session.getClient()).getGuiModule(SDataConstants.MOD_FIN).processRegistry(oDsm);
             
+            String concept;
             if (session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId })) {
                 // payment in domestic currency:
                 concept = "F " + paymentEntryDoc.DataDps.getDpsNumber() + " " + 
@@ -452,7 +545,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                     case SCfdPaymentEntryDoc.TYPE_FEE_VAT:
                         String accountId = SFinAccountUtilities.obtainTaxAccountId(
                                 new int[] { paramsCompany.getFkCfdPaymentBankFeeTaxBasicId_n(), paramsCompany.getFkCfdPaymentBankFeeTaxId_n() }, 
-                                SDataConstantsSys.TRNS_CT_DPS_SAL, Date, SDataConstantsSys.FINX_ACC_PAY, session.getStatement());
+                                SDataConstantsSys.TRNS_CT_DPS_PUR, Date, SDataConstantsSys.FINX_ACC_PAY, session.getStatement());
                         
                         entryDoubleEntry = createRecordEntryDoubleEntry(session, 
                                 accountId, "", 
@@ -466,33 +559,35 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                 entryDoubleEntry.setConcept(concept);
                 AuxDbmsRecordEntries.add(entryDoubleEntry);
             }
-
+            
             oDsm.getDbmsEntry().clear();
             
             documentsSet.add(paymentEntryDoc.DataDps.getDpsNumber());
         }
         
+        String documents = "";
+        for (String document : documentsSet.toArray(new String[0])) {
+            documents += (documents.isEmpty() ? "" : " ") + document;
+        }
+        
+        String concept;
+        if (session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId })) {
+            // payment in domestic currency:
+            concept = "F " + documents + " " + 
+                    bizPartnerName + " " + 
+                    accountCash.getAuxCode();
+        }
+        else {
+            // payment in foreign currency:
+            concept = "F " + documents + " " + 
+                    bizPartnerName + " " + 
+                    "$" + SLibUtils.getDecimalFormatAmount().format(Amount) + " " + CurrencyKey + " " + 
+                    "TC " + SLibUtils.getDecimalFormatExchangeRate().format(ExchangeRate) + " " + 
+                    accountCash.getAuxCode();
+        }
+        
         if (Type == TYPE_STANDARD) {
-            String documents = "";
-            for (String document : documentsSet.toArray(new String[0])) {
-                documents += (documents.isEmpty() ? "" : " ") + document;
-            }
-
             SDataRecordEntry entryAccountCash = createRecordEntryAccountCash(session, accountCash, Amount, ExchangeRate, AmountLocal);
-            if (session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId })) {
-                // payment in domestic currency:
-                concept = "F " + documents + " " + 
-                        bizPartnerName + " " + 
-                        accountCash.getAuxCode();
-            }
-            else {
-                // payment in foreign currency:
-                concept = "F " + documents + " " + 
-                        bizPartnerName + " " + 
-                        "$" + SLibUtils.getDecimalFormatAmount().format(Amount) + " " + CurrencyKey + " " + 
-                        "TC " + SLibUtils.getDecimalFormatExchangeRate().format(ExchangeRate) + " " + 
-                        accountCash.getAuxCode();
-            }
             entryAccountCash.setConcept(concept);
             AuxDbmsRecordEntries.add(entryAccountCash);
         }
@@ -503,24 +598,47 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         if (bookkeepingNumber.save(session.getStatement().getConnection()) != SLibConstants.DB_ACTION_SAVE_OK) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
         }
+        
+        double totDebit = 0;
+        double totCredit = 0;
 
         for (SDataRecordEntry entry : AuxDbmsRecordEntries) {
-            entry.setPkYearId(DataRecord.getPkYearId());
-            entry.setPkPeriodId(DataRecord.getPkPeriodId());
-            entry.setPkBookkeepingCenterId(DataRecord.getPkBookkeepingCenterId());
-            entry.setPkRecordTypeId(DataRecord.getPkRecordTypeId());
-            entry.setPkNumberId(DataRecord.getPkNumberId());
-            //entry.setPkEntryId(...);          // will be set when saved!
+            normalizeRecordEntry(session, entry, bookkeepingNumber, bizPartnerName);
             
-            //entry.setSortingPosition(...);    // will be set when saved!
-            entry.setFkBookkeepingYearId_n(bookkeepingNumber.getPkYearId());
-            entry.setFkBookkeepingNumberId_n(bookkeepingNumber.getPkNumberId());
-            
-            entry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { entry.getFkAccountId() }));
-            entry.setDbmsCurrencyKey(session.getSessionCustom().getCurrencyCode(new int[] { entry.getFkCurrencyId() }));
-
-            if (entry.getFkSystemMoveCategoryIdXXX() == SDataConstantsSys.FINS_CT_SYS_MOV_BPS) {
-                entry.setDbmsAccountComplement(bizPartnerName);
+            totDebit = SLibUtils.roundAmount(totDebit + entry.getDebit());
+            totCredit = SLibUtils.roundAmount(totCredit + entry.getCredit());
+        }
+        
+        double xrtDiff = SLibUtils.roundAmount(totDebit - totCredit);
+        if (Math.abs(xrtDiff) >= 0.01) {
+            if (session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId })) {
+                // differences not allowed for system currency:
+                throw new Exception("La suma de cargos " + SLibUtils.getDecimalFormatAmount().format(totDebit) + " " + session.getSessionCustom().getLocalCurrencyCode() + " " +
+                        "es distinto a la suma de abonos " + SLibUtils.getDecimalFormatAmount().format(totCredit) + " " + session.getSessionCustom().getLocalCurrencyCode() + " " +
+                        "por " + SLibUtils.getDecimalFormatAmount().format(totDebit - totCredit) + ".");
+            }
+            else {
+                // treat difference as exchange rate difference:
+                SDataParamsCompany paramsCompany = (SDataParamsCompany) session.getConfigCompany();
+                
+                SDataRecordEntry entryXrtDiff;
+                
+                if (xrtDiff > 0) {
+                    entryXrtDiff = createRecordEntryXrtDiff(session, 
+                            paramsCompany.getFkAccountDifferenceIncomeId_n(), paramsCompany.getFkCostCenterDifferenceIncomeId_n(), 
+                            paramsCompany.getFkItemDifferenceIncomeId_n(), CurrencyId, 
+                            xrtDiff);
+                }
+                else {
+                    entryXrtDiff = createRecordEntryXrtDiff(session, 
+                            paramsCompany.getFkAccountDifferenceExpenseId_n(), paramsCompany.getFkCostCenterDifferenceExpenseId_n(), 
+                            paramsCompany.getFkItemDifferenceExpenseId_n(), CurrencyId, 
+                            xrtDiff);
+                }
+                
+                normalizeRecordEntry(session, entryXrtDiff, bookkeepingNumber, bizPartnerName);
+                entryXrtDiff.setConcept(concept);
+                AuxDbmsRecordEntries.add(entryXrtDiff);
             }
         }
     }

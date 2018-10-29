@@ -1012,8 +1012,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         double credit = 0;
 
         for (int i = 0; i < moPaneGridEntries.getTableGuiRowCount(); i++) {
-            debit += ((SDataRecordEntry) moPaneGridEntries.getTableRow(i).getData()).getDebit();
-            credit += ((SDataRecordEntry) moPaneGridEntries.getTableRow(i).getData()).getCredit();
+            debit = SLibUtils.roundAmount(debit + ((SDataRecordEntry) moPaneGridEntries.getTableRow(i).getData()).getDebit());
+            credit = SLibUtils.roundAmount(credit + ((SDataRecordEntry) moPaneGridEntries.getTableRow(i).getData()).getCredit());
         }
 
         jtfDebit.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(debit));

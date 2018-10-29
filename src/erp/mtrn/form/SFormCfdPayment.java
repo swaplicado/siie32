@@ -122,7 +122,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     
     // current payment:
     private erp.lib.form.SFormField moFieldPayDate;
-    private erp.lib.form.SFormField moFieldPayHour;
+    private erp.lib.form.SFormField moFieldPayTime;
     private erp.lib.form.SFormField moFieldPayPaymentWay;
     private erp.lib.form.SFormField moFieldPayCurrency;
     private erp.lib.form.SFormField moFieldPayFactoringBank;
@@ -224,19 +224,22 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jlPayDate = new javax.swing.JLabel();
         jftPayDate = new javax.swing.JFormattedTextField();
         jbPayDatePick = new javax.swing.JButton();
-        jlPayHour = new javax.swing.JLabel();
-        jftPayHour = new javax.swing.JFormattedTextField();
-        jlPayHourTip = new javax.swing.JLabel();
+        jlPayTime = new javax.swing.JLabel();
+        jftPayTime = new javax.swing.JFormattedTextField();
+        jLabel2 = new javax.swing.JLabel();
         jPanel26 = new javax.swing.JPanel();
         jlPayPaymentWay = new javax.swing.JLabel();
         jcbPayPaymentWay = new javax.swing.JComboBox();
         jckPayFactoring = new javax.swing.JCheckBox();
-        jrbPayFactoringPay = new javax.swing.JRadioButton();
-        jrbPayFactoringFee = new javax.swing.JRadioButton();
         jPanel28 = new javax.swing.JPanel();
         jlPayCurrency = new javax.swing.JLabel();
         jcbPayCurrency = new javax.swing.JComboBox();
-        jlPayAccountEntity1 = new javax.swing.JLabel();
+        jrbPayFactoringPay = new javax.swing.JRadioButton();
+        jrbPayFactoringFee = new javax.swing.JRadioButton();
+        jPanel30 = new javax.swing.JPanel();
+        jlPayOperation = new javax.swing.JLabel();
+        jtfPayOperation = new javax.swing.JTextField();
+        jlPayFactoringBank = new javax.swing.JLabel();
         jcbPayFactoringBank = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel29 = new javax.swing.JPanel();
         jlPayAmount = new javax.swing.JLabel();
@@ -246,9 +249,6 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbPayExchangeRatePick = new javax.swing.JButton();
         jtfPayAmountLocalRo = new javax.swing.JTextField();
         jtfPayAmountLocalCurRo = new javax.swing.JTextField();
-        jPanel30 = new javax.swing.JPanel();
-        jlPayOperation = new javax.swing.JLabel();
-        jtfPayOperation = new javax.swing.JTextField();
         jPanel27 = new javax.swing.JPanel();
         jlPayRecord = new javax.swing.JLabel();
         jtfPayRecordDateRo = new javax.swing.JTextField();
@@ -645,20 +645,21 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbPayDatePick.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel25.add(jbPayDatePick);
 
-        jlPayHour.setText("Hora pago:*");
-        jlPayHour.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel25.add(jlPayHour);
+        jlPayTime.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlPayTime.setText("Hora pago:*");
+        jlPayTime.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel25.add(jlPayTime);
 
-        jftPayHour.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("HH:mm:ss"))));
-        jftPayHour.setText("01:01:01");
-        jftPayHour.setToolTipText("Hora");
-        jftPayHour.setPreferredSize(new java.awt.Dimension(65, 23));
-        jPanel25.add(jftPayHour);
+        jftPayTime.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("HH:mm:ss"))));
+        jftPayTime.setText("01:01:01");
+        jftPayTime.setToolTipText("Hora (hh:mm:ss, 24h)");
+        jftPayTime.setPreferredSize(new java.awt.Dimension(60, 23));
+        jPanel25.add(jftPayTime);
 
-        jlPayHourTip.setForeground(java.awt.Color.gray);
-        jlPayHourTip.setText("hh:mm:ss (24 h)");
-        jlPayHourTip.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel25.add(jlPayHourTip);
+        jLabel2.setForeground(new java.awt.Color(153, 153, 153));
+        jLabel2.setText("hh:mm:ss (24 h)");
+        jLabel2.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel25.add(jLabel2);
 
         jPanel24.add(jPanel25);
 
@@ -672,21 +673,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jcbPayPaymentWay.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel26.add(jcbPayPaymentWay);
 
-        jckPayFactoring.setText("Factoraje:");
-        jckPayFactoring.setPreferredSize(new java.awt.Dimension(75, 23));
+        jckPayFactoring.setText("Pago con factoraje:");
+        jckPayFactoring.setPreferredSize(new java.awt.Dimension(205, 23));
         jPanel26.add(jckPayFactoring);
-
-        bgFactoring.add(jrbPayFactoringPay);
-        jrbPayFactoringPay.setText("Pago");
-        jrbPayFactoringPay.setToolTipText("Pago neto");
-        jrbPayFactoringPay.setPreferredSize(new java.awt.Dimension(55, 23));
-        jPanel26.add(jrbPayFactoringPay);
-
-        bgFactoring.add(jrbPayFactoringFee);
-        jrbPayFactoringFee.setText("Int./com.");
-        jrbPayFactoringFee.setToolTipText("Intereses y comisiones");
-        jrbPayFactoringFee.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel26.add(jrbPayFactoringFee);
 
         jPanel24.add(jPanel26);
 
@@ -702,16 +691,40 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jcbPayCurrency.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel28.add(jcbPayCurrency);
 
-        jlPayAccountEntity1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlPayAccountEntity1.setText("Banco:");
-        jlPayAccountEntity1.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel28.add(jlPayAccountEntity1);
+        bgFactoring.add(jrbPayFactoringPay);
+        jrbPayFactoringPay.setText("Pago");
+        jrbPayFactoringPay.setToolTipText("Pago");
+        jrbPayFactoringPay.setPreferredSize(new java.awt.Dimension(55, 23));
+        jPanel28.add(jrbPayFactoringPay);
+
+        bgFactoring.add(jrbPayFactoringFee);
+        jrbPayFactoringFee.setText("Intereses y comisiones");
+        jrbPayFactoringFee.setToolTipText("Intereses y comisiones");
+        jrbPayFactoringFee.setPreferredSize(new java.awt.Dimension(145, 23));
+        jPanel28.add(jrbPayFactoringFee);
+
+        jPanel24.add(jPanel28);
+
+        jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPayOperation.setText("Núm. operación:");
+        jlPayOperation.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel30.add(jlPayOperation);
+
+        jtfPayOperation.setText("TEXT");
+        jtfPayOperation.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel30.add(jtfPayOperation);
+
+        jlPayFactoringBank.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlPayFactoringBank.setText("Banco:");
+        jlPayFactoringBank.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel30.add(jlPayFactoringBank);
 
         jcbPayFactoringBank.setToolTipText("Banco factoraje");
         jcbPayFactoringBank.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel28.add(jcbPayFactoringBank);
+        jPanel30.add(jcbPayFactoringBank);
 
-        jPanel24.add(jPanel28);
+        jPanel24.add(jPanel30);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -760,18 +773,6 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jPanel24.add(jPanel29);
 
-        jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlPayOperation.setText("Núm. operación:");
-        jlPayOperation.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel30.add(jlPayOperation);
-
-        jtfPayOperation.setText("TEXT");
-        jtfPayOperation.setPreferredSize(new java.awt.Dimension(350, 23));
-        jPanel30.add(jtfPayOperation);
-
-        jPanel24.add(jPanel30);
-
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPayRecord.setText("Póliza contable:*");
@@ -811,29 +812,31 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jPanel24.add(jPanel27);
 
+        jPanel40.setBackground(java.awt.SystemColor.controlHighlight);
         jPanel40.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jLabel1.setText("Cta. bancaria:");
+        jLabel1.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel40.add(jLabel1);
 
-        jlPayAccountFiscalId.setText("RFC entidad:");
+        jlPayAccountFiscalId.setText("RFC banco:");
         jlPayAccountFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel40.add(jlPayAccountFiscalId);
 
-        jlPayAccountNumber.setText("Número cuenta:");
+        jlPayAccountNumber.setText("Núm. cta. bancaria:");
         jlPayAccountNumber.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel40.add(jlPayAccountNumber);
 
         jlPayAccountEntity.setText("Banco:");
-        jlPayAccountEntity.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlPayAccountEntity.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel40.add(jlPayAccountEntity);
 
         jPanel24.add(jPanel40);
 
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPayAccountSrc.setText("Cta. ordenante:");
-        jlPayAccountSrc.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlPayAccountSrc.setText("Ordenante:");
+        jlPayAccountSrc.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel31.add(jlPayAccountSrc);
 
         jtfPayAccountSrcFiscalId.setText("XAXX010101000");
@@ -845,7 +848,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jPanel31.add(jtfPayAccountSrcNumber);
 
         jtfPayAccountSrcEntity.setText("TEXT");
-        jtfPayAccountSrcEntity.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfPayAccountSrcEntity.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel31.add(jtfPayAccountSrcEntity);
 
         jbPayAccountSrcPick.setText("...");
@@ -857,8 +860,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPayAccountDes.setText("Cta. beneficiaria:*");
-        jlPayAccountDes.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlPayAccountDes.setText("Beneficiaria:*");
+        jlPayAccountDes.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel32.add(jlPayAccountDes);
 
         jtfPayAccountDesFiscalId.setEditable(false);
@@ -873,7 +876,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfPayAccountDesNumber.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel32.add(jtfPayAccountDesNumber);
 
-        jcbPayAccountDes.setPreferredSize(new java.awt.Dimension(125, 23));
+        jcbPayAccountDes.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel32.add(jcbPayAccountDes);
 
         jbPayAccountDesPick.setText("...");
@@ -1296,7 +1299,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldRecCfdRelatedUuid.setLengthMax(36);
         moFieldPayDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftPayDate, jlPayDate);
         moFieldPayDate.setPickerButton(jbPayDatePick);
-        moFieldPayHour = new SFormField(miClient, SLibConstants.DATA_TYPE_TIME, true, jftPayHour, jlPayHour);
+        moFieldPayTime = new SFormField(miClient, SLibConstants.DATA_TYPE_TIME, true, jftPayTime, jlPayTime);
         moFieldPayPaymentWay = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPayPaymentWay, jlPayPaymentWay);
         moFieldPayCurrency = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPayCurrency, jlPayCurrency);
         moFieldPayFactoringBank = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPayFactoringBank, jckPayFactoring);
@@ -1365,7 +1368,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda pago", STableConstants.WIDTH_CURRENCY_KEY);
         colsPayments[colPayment] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Tipo cambio", STableConstants.WIDTH_EXCHANGE_RATE);
         colsPayments[colPayment++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererExchangeRate());
-        colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Póliza contable", 100);
+        colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Póliza contable", 125);
         colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Núm. operación", 100);
         colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "RFC emisor ordenante", 100);
         colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta ordenante", 125);
@@ -1662,7 +1665,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void renderPayPaymentEntry() {
         if (moPaymentEntry == null) {
             moFieldPayDate.resetField();
-            moFieldPayHour.resetField();
+            moFieldPayTime.resetField();
             moFieldPayPaymentWay.resetField();
             itemStateChangedPayPaymentWay();
             moFieldPayCurrency.resetField();
@@ -1687,7 +1690,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         else {
             moFieldPayDate.setFieldValue(moPaymentEntry.Date);
-            moFieldPayHour.setFieldValue(moPaymentEntry.Date);
+            moFieldPayTime.setFieldValue(moPaymentEntry.Date);
             moFieldPayPaymentWay.setFieldValue(moPaymentEntry.PaymentWay);
             itemStateChangedPayPaymentWay();
             moFieldPayCurrency.setFieldValue(new int[] { moPaymentEntry.CurrencyId });
@@ -1973,8 +1976,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jftPayDate.setEditable(enable);
         jftPayDate.setFocusable(enable);
         jbPayDatePick.setEnabled(enable);
-        jftPayHour.setEditable(enable);
-        jftPayHour.setFocusable(enable);
+        jftPayTime.setEditable(enable);
+        jftPayTime.setFocusable(enable);
         jcbPayPaymentWay.setEnabled(enable);
         jckPayFactoring.setEnabled(enable);
         jcbPayCurrency.setEnabled(enable);
@@ -2010,6 +2013,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jrbPayFactoringFee.setEnabled(activate);
         
         if (!activate) {
+            jrbPayFactoringPay.setSelected(true);
             moFieldPayFactoringBank.resetField();
         }
     }
@@ -2300,7 +2304,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         // default date: session's current date:
         moFieldPayDate.setFieldValue(miClient.getSession().getCurrentDate());
         // default hour: 12:00:
-        moFieldPayHour.setFieldValue(new Date(miClient.getSession().getCurrentDate().getTime() + (1000 * 60 * 60 * 12)));
+        moFieldPayTime.setFieldValue(new Date(miClient.getSession().getCurrentDate().getTime() + (1000 * 60 * 60 * 12)));
         // customer's default payment way, if any:
         if (!moDataRecBizPartner.getDbmsCategorySettingsCus().getCfdiPaymentWay().equals(DCfdi33Catalogs.FDP_POR_DEF)) {
             moFieldPayPaymentWay.setFieldValue(moDataRecBizPartner.getDbmsCategorySettingsCus().getCfdiPaymentWay());
@@ -2342,7 +2346,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         ArrayList<SFormField> fields = new ArrayList<>();
         
         fields.add(moFieldPayDate);
-        fields.add(moFieldPayHour);
+        fields.add(moFieldPayTime);
         fields.add(moFieldPayPaymentWay);
         fields.add(moFieldPayCurrency);
         fields.add(moFieldPayAmount);
@@ -2437,7 +2441,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             GregorianCalendar gcDate = new GregorianCalendar();
             GregorianCalendar gcHour = new GregorianCalendar();
             gcDate.setTime(moFieldPayDate.getDate());
-            gcHour.setTime(moFieldPayHour.getTime());
+            gcHour.setTime(moFieldPayTime.getTime());
             gcDate.add(Calendar.HOUR_OF_DAY, gcHour.get(Calendar.HOUR_OF_DAY));
             gcDate.add(Calendar.MINUTE, gcHour.get(Calendar.MINUTE));
             gcDate.add(Calendar.SECOND, gcHour.get(Calendar.SECOND));
@@ -2567,7 +2571,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             
             try {
                 // remove current payment from grid of payments:
-                SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.removeTableRow(moPaneGridPayments.getTable().getSelectedRow());
+                SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.removeTableRow(index);
                 releaseRecordLock(paymentEntry.DataRecord);
             }
             catch (Exception e) {
@@ -2883,7 +2887,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
     private void actionPerformedDocPaymentEntryDocDelete() {
         if (jbDocPaymentEntryDocDelete.isEnabled()) {
-            if (moPaneGridPaymentDocs.getSelectedTableRow() == null) {
+            SCfdPaymentEntryDoc paymentEntryDoc = (SCfdPaymentEntryDoc) moPaneGridPaymentDocs.getSelectedTableRow();
+            
+            if (paymentEntryDoc == null) {
                 miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_ROW);
                 moPaneGridPaymentDocs.getTable().requestFocusInWindow();
             }
@@ -2891,18 +2897,18 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 int index = moPaneGridPaymentDocs.getTable().getSelectedRow();
 
                 // remove current doc from grid of docs:
-                moPaneGridPaymentDocs.removeTableRow(moPaneGridPaymentDocs.getTable().getSelectedRow());
+                moPaneGridPaymentDocs.removeTableRow(index);
 
                 // remove current doc from current payment:
                 SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
-                paymentEntry.PaymentEntryDocs.remove((SCfdPaymentEntryDoc) moPaneGridPaymentDocs.getSelectedTableRow());
+                paymentEntry.PaymentEntryDocs.remove(paymentEntryDoc);
 
                 // renumber all docs:
                 int number = 0;
                 for (STableRow row : moPaneGridPaymentDocs.getGridRows()) {
-                    SCfdPaymentEntryDoc paymentEntryDoc = (SCfdPaymentEntryDoc) row;
-                    paymentEntryDoc.Number = ++number;
-                    paymentEntryDoc.prepareTableRow();
+                    SCfdPaymentEntryDoc doc = (SCfdPaymentEntryDoc) row;
+                    doc.Number = ++number;
+                    doc.prepareTableRow();
                 }
 
                 // update grid of docs:
@@ -3099,6 +3105,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgFactoring;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -3170,7 +3177,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JComboBox jcbVouTaxRegime;
     private javax.swing.JCheckBox jckPayFactoring;
     private javax.swing.JFormattedTextField jftPayDate;
-    private javax.swing.JFormattedTextField jftPayHour;
+    private javax.swing.JFormattedTextField jftPayTime;
     private javax.swing.JFormattedTextField jftVouDate;
     private javax.swing.JLabel jlDocBalancePend;
     private javax.swing.JLabel jlDocBalancePrev;
@@ -3183,18 +3190,17 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlDocPaymentType;
     private javax.swing.JLabel jlPayAccountDes;
     private javax.swing.JLabel jlPayAccountEntity;
-    private javax.swing.JLabel jlPayAccountEntity1;
     private javax.swing.JLabel jlPayAccountFiscalId;
     private javax.swing.JLabel jlPayAccountNumber;
     private javax.swing.JLabel jlPayAccountSrc;
     private javax.swing.JLabel jlPayAmount;
     private javax.swing.JLabel jlPayCurrency;
     private javax.swing.JLabel jlPayDate;
-    private javax.swing.JLabel jlPayHour;
-    private javax.swing.JLabel jlPayHourTip;
+    private javax.swing.JLabel jlPayFactoringBank;
     private javax.swing.JLabel jlPayOperation;
     private javax.swing.JLabel jlPayPaymentWay;
     private javax.swing.JLabel jlPayRecord;
+    private javax.swing.JLabel jlPayTime;
     private javax.swing.JLabel jlPayTotalPayments;
     private javax.swing.JLabel jlRecBizPartner;
     private javax.swing.JLabel jlRecCfdRelated;
@@ -3365,24 +3371,24 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         actionPerformedVouResume();
         itemStateChangedRecBizPartner();
-
+        
         computeVouTotal();
         computePayTotalPayments();
         
         jbOk.setEnabled(true);
     }
-
+    
     @Override
     public void formRefreshCatalogues() {
         SFormUtilities.populateComboBox(miClient, jcbRecBizPartner, SDataConstants.BPSX_BP_CUS);
         SFormUtilities.populateComboBox(miClient, jcbPayFactoringBank, SDataConstants.BPSX_BP_ATT_BANK);
         SFormUtilities.populateComboBox(miClient, jcbPayCurrency, SDataConstants.CFGU_CUR);
     }
-
+    
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         SFormValidation validation = new SFormValidation();
-
+        
         for (SFormField field : mvFields) {
             if (!((erp.lib.form.SFormField) field).validateField()) {
                 validation.setIsError(true);
@@ -3527,30 +3533,30 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 }
             }
         }
-
+        
         return validation;
     }
-
+    
     @Override
     public void setFormStatus(int status) {
         mnFormStatus = status;
     }
-
+    
     @Override
     public void setFormVisible(boolean visible) {
         setVisible(visible);
     }
-
+    
     @Override
     public int getFormStatus() {
         return mnFormStatus;
     }
-
+    
     @Override
     public int getFormResult() {
         return mnFormResult;
     }
-
+    
     @Override
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
         moDataCfdPayment = (SDataCfdPayment) registry;
@@ -3582,7 +3588,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         if (moDataCfdPayment.getAuxCfdDbmsDataReceptor() != null) {
             moFieldRecBizPartner.setFieldValue(new int[] { moDataCfdPayment.getAuxCfdDbmsDataReceptor().getPkBizPartnerId() });    // event item state changed thrown!
-
+            
             moDataRecCfdRelated = moDataCfdPayment.getAuxCfdDbmsDataCfdCfdiRelacionado();
             msRecCfdRelatedUuid = moDataCfdPayment.getAuxCfdCfdiRelacionadoUuid();
             renderRecCfdRelated();
@@ -3710,7 +3716,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             moDataCfdPayment.setAuxCfdDbmsDataCfdCfdiRelacionado(moDataRecCfdRelated);
             moDataCfdPayment.setAuxCfdCfdiRelacionadoUuid(msRecCfdRelatedUuid);
         }
-
+        
         try {
             moDataCfdPayment.getAuxCfdPaymentEntries().clear();
             for (STableRow row : moPaneGridPayments.getGridRows()) {
@@ -3723,16 +3729,16 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
-
+        
         // send as well locks of journal vouchers:
         moDataCfdPayment.getRegistryComplements().clear();
         for (SSrvLock lock : moRecordLocksMap.values()) {
             moDataCfdPayment.getRegistryComplements().add(lock);
         }
-
+        
         return moDataCfdPayment;
     }
-
+    
     @Override
     public void setValue(int type, java.lang.Object value) {
         switch (type) {
@@ -3742,17 +3748,17 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             default:
         }
     }
-
+    
     @Override
     public java.lang.Object getValue(int type) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
+    
     @Override
     public javax.swing.JLabel getTimeoutLabel() {
         return null;
     }
-
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
