@@ -794,17 +794,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && moDbmsDataCfd.getIsProcessingWebService()) {
             mnDbmsErrorId = 22;
-            msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_WEB_SERVICE + "!";
+            msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_WS_PAC + "!";
             throw new Exception(msDbmsError);
         }
         else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && moDbmsDataCfd.getIsProcessingStorageXml()) {
             mnDbmsErrorId = 23;
-            msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_XML_STORAGE + "!";
+            msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_XML_STORAGE + "!";
             throw new Exception(msDbmsError);
         }
         else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && moDbmsDataCfd.getIsProcessingStoragePdf()) {
             mnDbmsErrorId = 24;
-            msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_PDF_STORAGE + "!";
+            msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_PDF_STORAGE + "!";
             throw new Exception(msDbmsError);
         }
         else if (mnFkDpsStatusId != SDataConstantsSys.TRNS_ST_DPS_EMITED) {
@@ -3491,16 +3491,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
-            if (testDeletion(connection, "No se puede anular el documento: ", SDbConsts.ACTION_ANNUL)) {
+            if (testDeletion(connection, "No se puede anular el documento:\n", SDbConsts.ACTION_ANNUL)) {
                 mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_YES;
             }
         }
         catch (Exception exception) {
             mnLastDbActionResult = SLibConstants.DB_CAN_ANNUL_NO;
             if (msDbmsError.isEmpty()) {
-                msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_ANNUL;
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_ANNUL + "\n" + exception.toString();
             }
-            msDbmsError += "\n" + exception.toString();
             SLibUtilities.printOutException(this, exception);
         }
 
@@ -3512,16 +3511,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
-            if (testDeletion(connection, "No se puede eliminar el documento: ", SDbConsts.ACTION_DELETE)) {
+            if (testDeletion(connection, "No se puede eliminar el documento:\n", SDbConsts.ACTION_DELETE)) {
                 mnLastDbActionResult = SLibConstants.DB_CAN_DELETE_YES;
             }
         }
         catch (Exception exception) {
             mnLastDbActionResult = SLibConstants.DB_CAN_DELETE_NO;
             if (msDbmsError.isEmpty()) {
-                msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_DELETE;
+                msDbmsError = SLibConstants.MSG_ERR_DB_REG_CAN_DELETE + "\n" + exception.toString();
             }
-            msDbmsError += "\n" + exception.toString();
             SLibUtilities.printOutException(this, exception);
         }
 

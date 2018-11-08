@@ -501,11 +501,11 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 SDataCfdSignLog cfdSignLog = new SDataCfdSignLog();
 
                 if (packet.getAuxLogSignId() != SLibConstants.UNDEFINED) {
-                    cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getAuxLogSignId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STATUS_DIACTIVATE_PAC);
+                    cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getAuxLogSignId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR);
                 }
 
-                dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_WS, false);
-                dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_USR, packet.getFkUserDeliveryId());
+                dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_PRC_WS, false);
+                dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_PRC_USR, packet.getFkUserDeliveryId());
 
                 if (packet.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_NEW && packet.getAuxStampConsume()) {
                     SDataSign sign = new SDataSign();
@@ -527,7 +527,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     // XXX Guardar bitácora de timbrado 7
 
                     if (packet.getAuxLogSignId() != SLibConstants.UNDEFINED) {
-                        cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getAuxLogSignId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STATUS_CONSUME_STAMP);
+                        cfdSignLog.saveField(moCompanyDatabase.getConnection(), new int[] { packet.getAuxLogSignId() }, SDataCfdSignLog.FIELD_CODE_STP, SCfdConsts.STEP_CODE_CONSUME_STAMP);
                     }
 
                     if (sign.save(moCompanyDatabase.getConnection()) == SLibConstants.DB_ACTION_SAVE_OK) {
@@ -592,8 +592,8 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
                             // Set flag XML as correct:
 
-                            dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_XML_STO, false);
-                            dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_USR, packet.getFkUserDeliveryId());
+                            dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_PRC_STO_XML, false);
+                            dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_PRC_USR, packet.getFkUserDeliveryId());
                         }
                         catch (Exception e) {
                             result = SLibConstants.DB_CFD_OK;
@@ -603,8 +603,8 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     else {
                         // Set flag XML as correct:
 
-                        dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_XML_STO, false);
-                        dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_ACC_USR, packet.getFkUserDeliveryId());
+                        dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_PRC_STO_XML, false);
+                        dataCfd.saveField(moCompanyDatabase.getConnection(), SDataCfd.FIELD_PRC_USR, packet.getFkUserDeliveryId());
                     }
                 }
             }

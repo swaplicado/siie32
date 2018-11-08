@@ -226,7 +226,7 @@ public abstract class SHrsCfdUtils {
             
             packet.setCfdCertNumber(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).getCertNumber());
             packet.setCfdSignature(((SClientInterface) session.getClient()).getCfdSignature(cfdVersion).sign(packet.getCfdStringSigned(), SLibTimeUtilities.digestYear(receipt.getPayroll().getFecha())[0]));
-            packet.setDocXmlUuid(docXmlUuid);
+            packet.setBaseXUuid(docXmlUuid);
             
             switch (xmlType) {
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_32:

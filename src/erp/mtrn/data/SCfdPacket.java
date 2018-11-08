@@ -21,7 +21,7 @@ public final class SCfdPacket implements java.io.Serializable {
     private java.lang.String msCfdCertNumber;   // used in creation of SDataCfd
     private java.lang.String msCfdStringSigned; // used in creation of SDataCfd
     private java.lang.String msCfdSignature;    // used in creation of SDataCfd
-    private java.lang.String msDocXmlUuid;      // used in creation of SDataCfd
+    private java.lang.String msBaseXUuid;       // used in creation of SDataCfd
     private java.lang.String msDocXml;          // used in creation of SDataCfd
     private java.lang.String msDocXmlName;      // used in creation of SDataCfd
     private java.util.Date mtXmlDatetime;       // used in creation of SDataCfd
@@ -71,7 +71,7 @@ public final class SCfdPacket implements java.io.Serializable {
         msCfdCertNumber = "";
         msCfdStringSigned = "";
         msCfdSignature = "";
-        msDocXmlUuid = "";
+        msBaseXUuid = "";
         msDocXml = "";
         msDocXmlName = "";
         mtXmlDatetime = null;
@@ -120,7 +120,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setCfdCertNumber(java.lang.String s) { msCfdCertNumber = s; }
     public void setCfdStringSigned(java.lang.String s) { msCfdStringSigned = s; }
     public void setCfdSignature(java.lang.String s) { msCfdSignature = s; }
-    public void setDocXmlUuid(java.lang.String s) { msDocXmlUuid = s; }
+    public void setBaseXUuid(java.lang.String s) { msBaseXUuid = s; }
     public void setDocXml(java.lang.String s) { msDocXml = s; }
     public void setDocXmlName(java.lang.String s) { msDocXmlName = s; }
     public void setXmlDate(java.util.Date t) { mtXmlDatetime = t; }
@@ -169,7 +169,7 @@ public final class SCfdPacket implements java.io.Serializable {
     //public java.lang.String getCfdCertNumber() { return msCfdCertNumber; }
     public java.lang.String getCfdStringSigned() { return msCfdStringSigned; }
     public java.lang.String getCfdSignature() { return msCfdSignature; }
-    public java.lang.String getDocXmlUuid() { return msDocXmlUuid; }
+    public java.lang.String getBaseXUuid() { return msBaseXUuid; }
     public java.lang.String getDocXml() { return msDocXml; }
     public java.lang.String getDocXmlName() { return msDocXmlName; }
     public java.util.Date getXmlDate() { return mtXmlDatetime; }
@@ -255,7 +255,7 @@ public final class SCfdPacket implements java.io.Serializable {
         cfd.setCertNumber(msCfdCertNumber);
         cfd.setStringSigned(msCfdStringSigned);
         cfd.setSignature(msCfdSignature);
-        cfd.setDocXmlUuid(msDocXmlUuid);
+        cfd.setBaseXUuid(msBaseXUuid);
         cfd.setDocXml(msDocXml);
         cfd.setDocXmlName(msDocXmlName);
         cfd.setDocXmlRfcEmi(msXmlRfcEmisor);

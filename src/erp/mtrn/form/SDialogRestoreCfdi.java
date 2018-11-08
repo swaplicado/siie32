@@ -144,7 +144,7 @@ public class SDialogRestoreCfdi extends javax.swing.JDialog implements erp.lib.f
         jbOk.addActionListener(this);
         jbFile.addActionListener(this);
         
-        if (mnFormType == SCfdConsts.ACTION_SIGN) {
+        if (mnFormType == SCfdConsts.ACTION_CODE_PRC_SIGN) {
             setTitle("Recuperar CFDI timbrado");
         }
         else {

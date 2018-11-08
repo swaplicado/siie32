@@ -41,16 +41,19 @@ import sa.lib.xml.SXmlUtils;
  */
 public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
-    public static final int FIELD_ACC_WS = 1;
-    public static final int FIELD_ACC_XML_STO = 4;
-    public static final int FIELD_ACC_PDF_STO = 5;
-    public static final int FIELD_ACC_USR = 6;
-    public static final int FIELD_ACK_DVY = 7;
-    public static final int FIELD_MSJ_DVY = 8;
-    public static final int FIELD_TP_XML_DVY = 9;
-    public static final int FIELD_ST_XML_DVY = 10;
-    public static final int FIELD_USR_DVY = 11;
-    public static final int FIELD_B_CON = 12;
+    public static final int FIELD_PRC_WS = 11;
+    public static final int FIELD_PRC_STO_XML = 12;
+    public static final int FIELD_PRC_STO_PDF = 13;
+    public static final int FIELD_PRC_CON = 14;
+    public static final int FIELD_PRC_USR = 15;
+    
+    public static final int FIELD_DVY_ACK = 21;
+    public static final int FIELD_DVY_MSG = 22;
+    public static final int FIELD_DVY_TP = 23;
+    public static final int FIELD_DVY_ST = 24;
+    public static final int FIELD_DVY_USR = 25;
+
+    public static final int FIELD_CAN_ST = 31;
 
     private final static int DATA_TYPE_TEXT = 1;
     private final static int DATA_TYPE_NUMBER = 2;
@@ -63,7 +66,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msCertNumber;
     protected java.lang.String msStringSigned;
     protected java.lang.String msSignature;
-    protected java.lang.String msDocXmlUuid;
+    protected java.lang.String msBasexUuid;
     protected java.lang.String msDocXml;
     protected java.lang.String msDocXmlName;
     protected java.lang.String msDocXmlRfcEmi;
@@ -194,7 +197,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setCertNumber(java.lang.String s) { msCertNumber = s; }
     public void setStringSigned(java.lang.String s) { msStringSigned = s; }
     public void setSignature(java.lang.String s) { msSignature = s; }
-    public void setDocXmlUuid(java.lang.String s) { msDocXmlUuid = s; }
+    public void setBaseXUuid(java.lang.String s) { msBasexUuid = s; }
     public void setDocXml(java.lang.String s) { msDocXml = s; }
     public void setDocXmlName(java.lang.String s) { msDocXmlName = s; }
     public void setDocXmlRfcEmi(java.lang.String s) { msDocXmlRfcEmi = s; }
@@ -253,7 +256,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.String getCertNumber() { return msCertNumber; }
     public java.lang.String getStringSigned() { return msStringSigned; }
     public java.lang.String getSignature() { return msSignature; }
-    public java.lang.String getDocXmlUuid() { return msDocXmlUuid; }
+    public java.lang.String getBaseXUuid() { return msBasexUuid; }
     public java.lang.String getDocXml() { return msDocXml; }
     public java.lang.String getDocXmlName() { return msDocXmlName; }
     public java.lang.String getDocXmlRfcEmi() { return msDocXmlRfcEmi; }
@@ -319,15 +322,15 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         if (!mbAuxIsProcessingValidation) {
             if (mbIsProcessingWebService) {
-                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_WEB_SERVICE + "!";
+                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_WS_PAC + "!";
                 throw new Exception(msDbmsError);
             }
             if (action != SDbConsts.ACTION_ANNUL && mbIsProcessingStorageXml) {
-                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_XML_STORAGE + "!";
+                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_XML_STORAGE + "!";
                 throw new Exception(msDbmsError);
             }
             if (action != SDbConsts.ACTION_ANNUL && mbIsProcessingStoragePdf) {
-                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_PDF_STORAGE + "!";
+                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_PDF_STORAGE + "!";
                 throw new Exception(msDbmsError);
             }
         }
@@ -417,7 +420,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         msCertNumber = "";
         msStringSigned = "";
         msSignature = "";
-        msDocXmlUuid = "";
+        msBasexUuid = "";
         msDocXml = "";
         msDocXmlName = "";
         msDocXmlRfcEmi = "";
@@ -495,7 +498,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 msCertNumber = resultSet.getString("cert_num");
                 msStringSigned = resultSet.getString("str_signed");
                 msSignature = resultSet.getString("signature");
-                msDocXmlUuid = resultSet.getString("doc_xml_uuid");
+                msBasexUuid = resultSet.getString("doc_xml_uuid");
                 msDocXml = resultSet.getString("doc_xml");                                
                 msDocXmlName = resultSet.getString("doc_xml_name");
                 msDocXmlRfcEmi = resultSet.getString("xml_rfc_emi");
@@ -655,7 +658,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement.setString(index++, msCertNumber);
             preparedStatement.setString(index++, msStringSigned);
             preparedStatement.setString(index++, msSignature);
-            preparedStatement.setString(index++, msDocXmlUuid);
+            preparedStatement.setString(index++, msBasexUuid);
             preparedStatement.setString(index++, SLibUtils.textToSql(msDocXml));
             preparedStatement.setString(index++, SLibUtils.textToSql(msDocXmlName));
             preparedStatement.setString(index++, msDocXmlRfcEmi);
@@ -897,35 +900,38 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         sSql = "UPDATE trn_cfd SET ";
 
         switch (field) {
-            case FIELD_ACC_WS:
+            case FIELD_PRC_WS:
                 sSql += "b_prc_ws = " + value + " ";
                 break;
-            case FIELD_ACC_XML_STO:
+            case FIELD_PRC_STO_XML:
                 sSql += "b_prc_sto_xml = " + value + " ";
                 break;
-            case FIELD_ACC_PDF_STO:
+            case FIELD_PRC_STO_PDF:
                 sSql += "b_prc_sto_pdf = " + value + " ";
                 break;
-            case FIELD_ACC_USR:
+            case FIELD_PRC_CON:
+                sSql += "b_con = " + value + " ";
+                break;
+            case FIELD_PRC_USR:
                 sSql += "fid_usr_prc = " + value + ", ts_prc = NOW() ";
                 break;
-            case FIELD_ACK_DVY:
+            case FIELD_DVY_ACK:
                 sSql += "ack_dvy = '" + value + "' ";
                 break;
-            case FIELD_MSJ_DVY:
+            case FIELD_DVY_MSG:
                 sSql += "msg_dvy = '" + value + "' ";
                 break;
-            case FIELD_TP_XML_DVY:
+            case FIELD_DVY_TP:
                 sSql += "fid_tp_xml_dvy = " + value + " ";
                 break;
-            case FIELD_ST_XML_DVY:
+            case FIELD_DVY_ST:
                 sSql += "fid_st_xml_dvy = " + value + " ";
                 break;
-            case FIELD_USR_DVY:
+            case FIELD_DVY_USR:
                 sSql += "fid_usr_dvy = " + value + ", ts_dvy = NOW() ";
                 break;
-            case FIELD_B_CON:
-                sSql += "b_con = " + value + " ";
+            case FIELD_CAN_ST:
+                sSql += "can_st = '" + value + "' ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -946,20 +952,20 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
      * @throws Exception 
      */
     private void addFileToBaseXDb(Connection connection) throws SQLException, IOException, Exception {
-            String mysqlDatabaseURL = connection.getMetaData().getURL();
-            
-            String databaseHost = SBaseXUtils.getDbHostFromUrl(mysqlDatabaseURL);
-            String databaseName = SBaseXUtils.getDbNameFromUrl(mysqlDatabaseURL);
-            
-            // Company BaseX database connection.
-            SBaseXClient baseXSession = SBaseXUtils.getBaseXSessionInstance(databaseHost, 1984, "admin", "admin");
-              
-            // escape XML special characters.
-            String xmlDocBody = SBaseXUtils.escapeSpecialCharacters(msDocXml);
-              
-            // Parse the xml body and add it to the BaseX database.
-            String addXmlToDBQuery = "db:replace(\"" + databaseName + "\", \"/" + msDocXmlUuid + ".xml" + "\", fn:parse-xml(\"" + xmlDocBody + "\"))";
-                     
-            SBaseXUtils.executeBaseXQuery(baseXSession, addXmlToDBQuery);
+        String mysqlDatabaseURL = connection.getMetaData().getURL();
+
+        String databaseHost = SBaseXUtils.getDbHostFromUrl(mysqlDatabaseURL);
+        String databaseName = SBaseXUtils.getDbNameFromUrl(mysqlDatabaseURL);
+
+        // Company BaseX database connection:
+        SBaseXClient baseXSession = SBaseXUtils.getBaseXSessionInstance(databaseHost, 1984, "admin", "admin");
+
+        // escape XML special characters:
+        String xmlDocBody = SBaseXUtils.escapeSpecialCharacters(msDocXml);
+
+        // Parse the xml body and add it to the BaseX database:
+        String addXmlToDBQuery = "db:replace(\"" + databaseName + "\", \"/" + msBasexUuid + ".xml" + "\", fn:parse-xml(\"" + xmlDocBody + "\"))";
+
+        SBaseXUtils.executeBaseXQuery(baseXSession, addXmlToDBQuery);
     }
 }

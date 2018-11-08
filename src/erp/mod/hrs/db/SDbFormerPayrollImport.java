@@ -82,7 +82,7 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
                 if (packet.getCfdId() != SLibConstants.UNDEFINED && packet.getIsCfdConsistent()) {
                     SDataCfd dataCfd = new SDataCfd();
                     dataCfd.read(new int[] { packet.getCfdId() }, statement);
-                    dataCfd.saveField(connection, SDataCfd.FIELD_B_CON, true);
+                    dataCfd.saveField(connection, SDataCfd.FIELD_PRC_CON, true);
                 }
                 else {
                     SDataCfd dataCfd = packet.createDataCfd();
