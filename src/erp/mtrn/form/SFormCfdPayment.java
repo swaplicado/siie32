@@ -3534,6 +3534,13 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
         }
         
+        if (!validation.getIsError() && moDataCfdPayment != null && !moDataCfdPayment.getIsRegistryNew()) {
+            if (miClient.showMsgBoxConfirm("La contabilización actual del CFDI será descartada y reemplazada acorde a sus valores actuales.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                validation.setMessage("Favor de verificar si los valores actuales del CFDI son correctos.");
+                validation.setComponent(jbCancel);
+            }
+        }
+        
         return validation;
     }
     
@@ -3718,6 +3725,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         
         try {
+            if (!moDataCfdPayment.getIsRegistryNew()) {
+                // NOTE: This is very seldom, no data updates made in Client, but are necessary due to tax calculations in invoices payments:
+                moDataCfdPayment.deleteRecordFin(miClient.getSession().getStatement().getConnection());
+            }
+            
             moDataCfdPayment.getAuxCfdPaymentEntries().clear();
             for (STableRow row : moPaneGridPayments.getGridRows()) {
                 SCfdPaymentEntry entry = (SCfdPaymentEntry) row;

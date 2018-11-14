@@ -29,6 +29,7 @@ public final class SCfdPacket implements java.io.Serializable {
     private java.lang.String msXmlRfcReceptor;  // used in creation of SDataCfd
     private double mdXmlTotalCy;                // used in creation of SDataCfd
     private java.lang.String msCfdUuid;         // used in creation of SDataCfd
+    private java.lang.String msCancellationStatus;              // used in creation of SDataCfd
     private java.lang.String msAcknowledgmentCancellationXml;   // used in creation of SDataCfd
     private boolean mbIsCfdConsistent;          // used in creation of SDataCfd
     private int mnFkCfdTypeId;                  // used in creation of SDataCfd
@@ -79,6 +80,7 @@ public final class SCfdPacket implements java.io.Serializable {
         msXmlRfcReceptor = "";
         mdXmlTotalCy = 0;
         msCfdUuid = "";
+        msCancellationStatus = "";
         msAcknowledgmentCancellationXml = "";
         mbIsCfdConsistent = true;
         mnFkCfdTypeId = 0 ;
@@ -128,6 +130,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setXmlRfcReceptor(java.lang.String s) { msXmlRfcReceptor = s; }
     public void setXmlTotalCy(double d) { mdXmlTotalCy = d; }
     public void setCfdUuid(java.lang.String s) { msCfdUuid = s; }
+    public void setCancellationStatus(java.lang.String s) { msCancellationStatus = s; }
     public void setAcknowledgmentCancellationXml(java.lang.String s) { msAcknowledgmentCancellationXml = s; }
     public void setIsCfdConsistent(boolean b) { mbIsCfdConsistent = b; }
     public void setFkCfdTypeId(int n) { mnFkCfdTypeId = n; }
@@ -177,6 +180,7 @@ public final class SCfdPacket implements java.io.Serializable {
     //public java.lang.String getXmlRfcReceptor() { return msXmlRfcReceptor; }
     //public double getXmlTotalCy() { return mdXmlTotalCy; }
     //public java.lang.String getCfdUuid() { return msCfdUuid; }
+    public java.lang.String getCancellationStatus() { return msCancellationStatus; }
     public java.lang.String getAcknowledgmentCancellationXml() { return msAcknowledgmentCancellationXml; }
     public boolean getIsCfdConsistent() { return mbIsCfdConsistent; }
     public int getFkCfdTypeId() { return mnFkCfdTypeId; }
@@ -264,6 +268,7 @@ public final class SCfdPacket implements java.io.Serializable {
         //cfd...
         cfd.setUuid(msCfdUuid);
         //cfd...
+        cfd.setCancellationStatus(msCancellationStatus);
         cfd.setAcknowledgmentCancellationXml(msAcknowledgmentCancellationXml);
         //cfd...
         cfd.setIsConsistent(mbIsCfdConsistent);

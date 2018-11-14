@@ -516,17 +516,16 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                 AuxDbmsRecordEntries.add(entry);
             }
             
-            if (isFactoring()) {
+            if (Type == TYPE_FACTORING_FEE) {
+                // accounting counterpart for factoring fees:
+                
                 // add as well bokkeeping registry for cash account:
                 SDataRecordEntry entryDoubleEntry = null;
                 SDataParamsCompany paramsCompany = (SDataParamsCompany) session.getConfigCompany();
                 
                 switch (paymentEntryDoc.Type) {
                     case SCfdPaymentEntryDoc.TYPE_PAY:
-                        entryDoubleEntry = createRecordEntryAccountCash(session, 
-                                accountCash, 
-                                paymentEntryDoc.PayPayment, ExchangeRate, paymentEntryDoc.PayPaymentLocal);
-                        break;
+                        throw new Exception("Opción inválida para intereses y comisiones de factoraje.");
                         
                     case SCfdPaymentEntryDoc.TYPE_INT:
                         entryDoubleEntry = createRecordEntryDoubleEntry(session, 
@@ -545,7 +544,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                     case SCfdPaymentEntryDoc.TYPE_FEE_VAT:
                         String accountId = SFinAccountUtilities.obtainTaxAccountId(
                                 new int[] { paramsCompany.getFkCfdPaymentBankFeeTaxBasicId_n(), paramsCompany.getFkCfdPaymentBankFeeTaxId_n() }, 
-                                SDataConstantsSys.TRNS_CT_DPS_PUR, Date, SDataConstantsSys.FINX_ACC_PAY, session.getStatement());
+                                SDataConstantsSys.TRNS_CT_DPS_PUR, Date, SDataConstantsSys.FINX_ACC_PAY, session.getStatement()); // VAT in favor, so it is treat as VAT from purchases
                         
                         entryDoubleEntry = createRecordEntryDoubleEntry(session, 
                                 accountId, "", 
@@ -586,7 +585,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                     accountCash.getAuxCode();
         }
         
-        if (Type == TYPE_STANDARD) {
+        if (Type == TYPE_STANDARD || Type == TYPE_FACTORING_PAY) {
             SDataRecordEntry entryAccountCash = createRecordEntryAccountCash(session, accountCash, Amount, ExchangeRate, AmountLocal);
             entryAccountCash.setConcept(concept);
             AuxDbmsRecordEntries.add(entryAccountCash);

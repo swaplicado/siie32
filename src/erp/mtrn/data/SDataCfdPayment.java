@@ -163,17 +163,27 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         this.maAuxCfdPaymentEntries.addAll(sourceCfdPayment.maAuxCfdPaymentEntries);
     }
     
-    public void deleteRecord(java.sql.Connection connection) throws java.lang.Exception {
+    private void deleteRecordCfd(java.sql.Connection connection) throws java.lang.Exception {
         String sql;
         Statement statement = connection.createStatement();
         
         sql = "DELETE FROM trn_cfd_fin_rec "
                 + "WHERE id_cfd = " + moDbmsDataCfd.getPkCfdId() + ";";
         statement.execute(sql);
-
+    }
+    
+    public void deleteRecordFin(java.sql.Connection connection) throws java.lang.Exception {
+        String sql;
+        Statement statement = connection.createStatement();
+        
         sql = "UPDATE fin_rec_ety SET b_del = 1, fid_usr_edit = " + (mnAuxFkUserEditId != 0 ? mnAuxFkUserEditId : SUtilConsts.USR_NA_ID) + ", ts_del = NOW() "
                 + "WHERE fid_cfd_n = " + moDbmsDataCfd.getPkCfdId() + " AND NOT b_del;";
         statement.execute(sql);
+    }
+    
+    public void deleteAccounting(java.sql.Connection connection) throws java.lang.Exception {
+        deleteRecordCfd(connection);
+        deleteRecordFin(connection);
     }
 
     public static int getDbmsDataReceptorId(final Statement statement, final int idCfdi) throws Exception {
@@ -291,6 +301,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                         moAuxCfdDbmsDataReceptorFactoring = new SDataBizPartner();
                         moAuxCfdDbmsDataReceptorFactoring.read(new int[] { moDbmsDataCfd.getFkFactoringBankId_n() }, statementAux);
                     }
+                    
                     // extract complement:
 
                     int numberEntry = 0;
@@ -493,16 +504,30 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         try {
             // save CFD:
             
+            boolean wasRegistryNew = moDbmsDataCfd.getPkCfdId() == 0;
+            
             if (moDbmsDataCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE);
             }
             else {
-                deleteRecord(connection);
-                
+                if (!wasRegistryNew) {
+                    // delete last CFDI accounting movements in database:
+                    deleteAccounting(connection);
+
+                    // delete last CFDI accounting movements in memory:
+                    for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
+                        for (SDataRecordEntry recordEntry : paymentEntry.DataRecord.getDbmsRecordEntries()) {
+                            if (recordEntry.getFkCfdId_n() == moDbmsDataCfd.getPkCfdId()) {
+                                recordEntry.setIsDeleted(true);
+                            }
+                        }
+                    }
+                }
+
                 // save records (journal vouchers) of all payment entries:
                 
                 int numberEntry = 0;
-                HashMap<String, Integer> hmRecordsSortingPositions = new HashMap<>();
+                HashMap<String, Integer> mapRecordsSortingPositions = new HashMap<>();
                 Statement statement = connection.createStatement();
                 
                 for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
@@ -510,8 +535,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     
                     int nextSortingPosition;
                     
-                    if (hmRecordsSortingPositions.containsKey(paymentEntry.DataRecord.getRecordPrimaryKey())) {
-                        nextSortingPosition = hmRecordsSortingPositions.get(paymentEntry.DataRecord.getRecordPrimaryKey());
+                    if (mapRecordsSortingPositions.containsKey(paymentEntry.DataRecord.getRecordPrimaryKey())) {
+                        nextSortingPosition = mapRecordsSortingPositions.get(paymentEntry.DataRecord.getRecordPrimaryKey());
                     }
                     else {
                         nextSortingPosition = paymentEntry.DataRecord.getLastSortingPosition() + 1;
@@ -531,7 +556,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     
                     // preserve next sorting position for current record (journal voucher):
                     
-                    hmRecordsSortingPositions.put(paymentEntry.DataRecord.getRecordPrimaryKey(), nextSortingPosition);
+                    mapRecordsSortingPositions.put(paymentEntry.DataRecord.getRecordPrimaryKey(), nextSortingPosition);
                     
                     // leave user trace into record (journal voucher) that it was modified:
                     
@@ -598,7 +623,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL);
                 }
                 else {
-                    deleteRecord(connection);
+                    deleteAccounting(connection);
 
                     mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_OK;
                 }

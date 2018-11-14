@@ -767,6 +767,7 @@ public abstract class SCfdUtils implements Serializable {
                         packet.setXmlRfcReceptor(cfdiSignature.getRfcReceptor());
                         packet.setXmlTotalCy(cfdiSignature.getTotalCy());
                         packet.setCfdUuid(cfdiSignature.getUuid());
+                        packet.setCancellationStatus(dataCfd.getCancellationStatus());
                         packet.setAcknowledgmentCancellationXml(xmlAckCancellation.isEmpty() ? dataCfd.getAcknowledgmentCancellationXml() : xmlAckCancellation);
                         packet.setFkCfdTypeId(dataCfd.getFkCfdTypeId());
                         packet.setFkXmlTypeId(dataCfd.getFkXmlTypeId());
@@ -1526,21 +1527,26 @@ public abstract class SCfdUtils implements Serializable {
                                         next = false;
                                     }
                                     else {
+                                        String cancelStatusCode = "";
+                                        switch (ackQuery.CancelStatus) {
+                                            case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
+                                                cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT_CODE;
+                                                break;
+                                            case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
+                                                cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT_CODE;
+                                                break;
+                                            case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:
+                                                cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_CODE;
+                                                break;
+                                            default:
+                                        }
+                                        
+                                        cfd.setCancellationStatus(cancelStatusCode);
+                                        cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, cancelStatusCode);
+                                        
                                         xmlAcuse = receiptResult.getReceipt().getValue();
                                         xmlAcuse = xmlAcuse.replace("&lt;", "<"); // XXX, 2018-08-29, Sergio Flores: are really needed?
                                         xmlAcuse = xmlAcuse.replace("&gt;", ">"); // XXX, 2018-08-29, Sergio Flores: are really needed?
-                                        
-                                        switch (ackQuery.CancelStatus) {
-                                            case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
-                                                cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT_CODE);
-                                                break;
-                                            case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
-                                                cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT_CODE);
-                                                break;
-                                            case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:
-                                                cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_CODE);
-                                                break;
-                                        }
                                     }
                                 }
                             }
@@ -1624,7 +1630,9 @@ public abstract class SCfdUtils implements Serializable {
                                                         default:
                                                     }
 
+                                                    cfd.setCancellationStatus(cancelStatusCode);
                                                     cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, cancelStatusCode);
+                                                    
                                                     xmlAcuse = cancelaCFDResult.getAcuse().getValue();
                                                     xmlAcuse = xmlAcuse.replace("&lt;", "<"); // XXX, 2018-08-29, Sergio Flores: are really needed?
                                                     xmlAcuse = xmlAcuse.replace("&gt;", ">"); // XXX, 2018-08-29, Sergio Flores: are really needed?

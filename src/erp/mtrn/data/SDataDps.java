@@ -261,6 +261,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxIsNeedCfd;
     protected boolean mbAuxIsNeedCfdCce;
     protected boolean mbAuxIsProcessingValidation;
+    protected boolean mbAuxIsProcessingCancellation;
     protected double mdAuxCfdIvaPorcentaje;
 
     protected erp.mfin.data.SDataBookkeepingNumber moDbmsDataBookkeepingNumber;
@@ -792,17 +793,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             msDbmsError = sMsg + "¡El documento está timbrado!";
             throw new Exception(msDbmsError);
         }
-        else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && moDbmsDataCfd.getIsProcessingWebService()) {
+        else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && !mbAuxIsProcessingCancellation && moDbmsDataCfd.getIsProcessingWebService()) {
             mnDbmsErrorId = 22;
             msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_WS_PAC + "!";
             throw new Exception(msDbmsError);
         }
-        else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && moDbmsDataCfd.getIsProcessingStorageXml()) {
+        else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && !mbAuxIsProcessingCancellation && moDbmsDataCfd.getIsProcessingStorageXml()) {
             mnDbmsErrorId = 23;
             msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_XML_STORAGE + "!";
             throw new Exception(msDbmsError);
         }
-        else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && moDbmsDataCfd.getIsProcessingStoragePdf()) {
+        else if (moDbmsDataCfd != null && !mbAuxIsProcessingValidation && !mbAuxIsProcessingCancellation && moDbmsDataCfd.getIsProcessingStoragePdf()) {
             mnDbmsErrorId = 24;
             msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_PDF_STORAGE + "!";
             throw new Exception(msDbmsError);
@@ -1815,6 +1816,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxIsNeedCfd(boolean b) { mbAuxIsNeedCfd = b; }
     public void setAuxIsNeedCfdCce(boolean b) { mbAuxIsNeedCfdCce = b; }
     public void setAuxIsProcessingValidation(boolean b) { mbAuxIsProcessingValidation = b; }
+    public void setAuxIsProcessingCancellation(boolean b) { mbAuxIsProcessingCancellation = b; }
 
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
@@ -1833,6 +1835,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxIsNeedCfd() { return mbAuxIsNeedCfd; }
     public boolean getAuxIsNeedCfdCce() { return mbAuxIsNeedCfdCce; }
     public boolean getAuxIsProcessingValidation() { return mbAuxIsProcessingValidation; }
+    public boolean getAuxIsProcessingCancellation() { return mbAuxIsProcessingCancellation; }
 
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
@@ -2026,6 +2029,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxIsNeedCfd = false;
         mbAuxIsNeedCfdCce = false;
         mbAuxIsProcessingValidation = false;
+        mbAuxIsProcessingCancellation = false;
         mdAuxCfdIvaPorcentaje = 0;
 
         moDbmsDataBookkeepingNumber = null;

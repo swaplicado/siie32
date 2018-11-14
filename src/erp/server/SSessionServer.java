@@ -542,6 +542,8 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                         switch (packet.getFkCfdTypeId()) {
                             case SDataConstantsSys.TRNS_TP_CFD_INV:
                                 if (packet.getAuxDataDps() != null) {
+                                    packet.getAuxDataDps().setAuxIsProcessingCancellation(true);
+                                    
                                     result = ((SDataRegistry) packet.getAuxDataDps()).canAnnul(moCompanyDatabase.getConnection());
 
                                     if (result == SLibConstants.DB_CAN_ANNUL_YES) {
@@ -560,7 +562,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
                                     if (result == SLibConstants.DB_CAN_ANNUL_YES) {
                                         // irregular way to annul registries (CFD has just been annulled):
-                                        ((SDataCfdPayment) packet.getAuxDataCfdPayment()).deleteRecord(moCompanyDatabase.getConnection());
+                                        ((SDataCfdPayment) packet.getAuxDataCfdPayment()).deleteAccounting(moCompanyDatabase.getConnection());
                                         result = SLibConstants.DB_CFD_OK;
                                     } 
                                 }
