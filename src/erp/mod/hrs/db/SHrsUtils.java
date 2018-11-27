@@ -504,13 +504,13 @@ public abstract class SHrsUtils {
         String sql = "";
         String fileName = "";
         String employeesId = "";
-        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
         SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
         String sNameEmploy = "";
         String sAccountCredit = "";
         StringBuilder headerLayout = new StringBuilder();
         StringBuilder bodyLayout = new StringBuilder();
         int nCont = 0;
+        int type = 0;
         double mdBalanceTot = 0.0;
         double dTotalBalance = 0.0;
         
@@ -530,7 +530,7 @@ public abstract class SHrsUtils {
             try {
                 statement = client.getSession().getStatement();
 
-                sql = "SELECT rcp.id_emp, emp.bank_acc, b.bp, " +
+                sql = "SELECT rcp.id_emp, emp.bank_acc, b.bp, p.fk_tp_pay, " +
                         "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                         "FROM hrs_pay_rcp AS r " +
                         "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
@@ -545,12 +545,12 @@ public abstract class SHrsUtils {
                         "INNER JOIN erp.bpsu_bp AS b ON emp.id_emp = b.id_bp " +
                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
                         "AND rcp.id_emp IN (" + employeesId + ") " +
-                        "ORDER BY rcp.id_emp, emp.bank_acc, b.bp";
+                        "ORDER BY rcp.id_emp, emp.bank_acc, b.bp;";
 
                 resulSet = statement.executeQuery(sql);
                 while (resulSet.next()) {
                     nCont++;
-
+                    type = resulSet.getInt("fk_tp_pay");
                     sNameEmploy = resulSet.getString("bp");
                     String[] parts = sNameEmploy.split(",");
                     sNameEmploy = parts[1] + " " + parts[0];
@@ -571,7 +571,7 @@ public abstract class SHrsUtils {
                 headerLayout.append(nCont).append(',');
                 headerLayout.append(formatDate.format(new Date())).append(',');
                 headerLayout.append("").append(',');
-                headerLayout.append("PAGO NOMINA QUINCENAL");
+                headerLayout.append("PAGO NOMINA ").append( type == SModSysConsts.HRSS_TP_PAY_WEE ? "SEMANAL" : "QUINCENAL");
                 headerLayout.append("\r\n");
                 headerLayout.append(bodyLayout.toString());
 
