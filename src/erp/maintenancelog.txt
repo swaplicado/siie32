@@ -1,7 +1,26 @@
 ================================================================================
 2018-10-31, 3.2 125.1
-Sergio Abraham Flores Gutiérrez
+Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación del nuevo esquema de cancelación de CFDI 2018.
 ================================================================================
+
+================================================================================
+2018-10-31, 3.2 126.1
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Actualización catálogo PAC para cargar timbre por cancelación con Finkok.
+================================================================================
+
+================================================================================
+2018-10-31, 3.2 126.2
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejora al manejo de diferencias cambiarias en CFDI de recepción de pagos.
+2) Corrección al concepto en el archivo layout para la dispersión de nóminas 
+    semanales con HSBC.
+================================================================================
+
+improvement to management of exchange rate differences
+
 #eof

@@ -45,6 +45,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -94,6 +95,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private erp.mtrn.data.SDataCfd moDataRecCfdRelated;
     private java.lang.String msRecCfdRelatedUuid;
     private java.lang.String msRecCfdRelatedUuidOnFocusGained;
+    private java.text.DecimalFormat moExchangeRateFormat;
     
     private erp.mfin.data.SDataRecord moDataPayRecord;
     private erp.mfin.data.SDataAccountCash moDataPayAccountCash;
@@ -1283,6 +1285,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
      */
 
     private void initComponentsExtra() {
+        moExchangeRateFormat = new DecimalFormat("#,#0.000000");
+        
         // initialize input fields:
         
         moFieldVouDate = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftVouDate, jlVouDate);
@@ -1332,7 +1336,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldPayAccountDes.setPickerButton(jbPayAccountDesPick);
         moFieldDocInstallment = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfDocInstallment, jlDocInstallment);
         moFieldDocExchangeRate = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfDocExchangeRate, jlDocExchangeRate);
-        moFieldDocExchangeRate.setDecimalFormat(SLibUtils.getDecimalFormatExchangeRate());
+        moFieldDocExchangeRate.setDecimalFormat(moExchangeRateFormat);
         moFieldDocBalancePrev = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfDocDocBalancePrev, jlDocBalancePrev);
         moFieldDocBalancePrev.setDecimalFormat(SLibUtils.getDecimalFormatAmount());
         moFieldDocPayment = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfDocDocPayment, jlDocPayment);
@@ -2670,7 +2674,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     }
     
     private void actionPerformedDocExchangeRateInvert() {
-        moFieldDocExchangeRate.setDouble(moFieldDocExchangeRate.getDouble() == 0 ? 0 : SLibUtils.round(1d / moFieldDocExchangeRate.getDouble(), SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits()));
+        moFieldDocExchangeRate.setDouble(moFieldDocExchangeRate.getDouble() == 0 ? 0 : SLibUtils.round(1d / moFieldDocExchangeRate.getDouble(), moExchangeRateFormat.getMaximumFractionDigits()));
         jtfDocExchangeRate.requestFocusInWindow();
         computeDocPaymentAmounts();
     }
@@ -3461,7 +3465,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                     }
                     else if (!SDataUtilities.isPeriodOpen(miClient, paymentEntry.DataRecord.getDate())) {
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_PER_CLOSE + "\n"
-                                + "En el pago #" + paymentEntry.Number + " la póliza contable " + paymentEntry.DataRecord.getRecordPrimaryKey() + " tiene fecha " + SLibUtils.DateFormatDate.format(paymentEntry.DataRecord.getDate()) + ".");
+                                + "En el pago #" + paymentEntry.Number + " la póliza contable '" + paymentEntry.DataRecord.getRecordPrimaryKey() + "' "
+                                + "tiene fecha " + SLibUtils.DateFormatDate.format(paymentEntry.DataRecord.getDate()) + ".");
                         validation.setComponent(moPaneGridPayments.getTable());
                         moPaneGridPayments.setTableRowSelection(index);
                         break;
@@ -3474,8 +3479,10 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                     }
                     else if (paymentEntry.AuxTotalPayments > paymentEntry.Amount) {
                         validation.setMessage("En el pago #" + paymentEntry.Number + " "
-                                + "la suma de importes pagados en la moneda del pago $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + paymentEntry.CurrencyKey + "\n"
-                                + "es mayor que el monto del pago $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + paymentEntry.CurrencyKey + " "
+                                + "la suma de importes pagados en la moneda del pago $ "
+                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + paymentEntry.CurrencyKey + "\n"
+                                + "es mayor que el monto del pago $ "
+                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + paymentEntry.CurrencyKey + " "
                                 + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.AuxTotalPayments - paymentEntry.Amount) + ".");
                         validation.setComponent(moPaneGridPayments.getTable());
                         moPaneGridPayments.setTableRowSelection(index);
@@ -3483,35 +3490,65 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                     }
                     else if (paymentEntry.AuxTotalPayments < paymentEntry.Amount && miClient.showMsgBoxConfirm(
                             "En el pago #" + paymentEntry.Number + " "
-                            + "la suma de importes pagados en la moneda del pago $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + paymentEntry.CurrencyKey + "\n"
-                            + "es menor que el monto del pago $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + paymentEntry.CurrencyKey + " "
+                            + "la suma de importes pagados en la moneda del pago $ "
+                            + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + paymentEntry.CurrencyKey + "\n"
+                            + "es menor que el monto del pago $ "
+                            + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + paymentEntry.CurrencyKey + " "
                             + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.Amount - paymentEntry.AuxTotalPayments) + ".\n"
                             + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
-                        validation.setMessage("Ajustar los importes pagados a documentos relacionados del pago #" + paymentEntry.Number + ".");
+                        validation.setMessage("Ajustar y corregir los importes pagados a los documentos relacionados del pago #" + paymentEntry.Number + ".");
                         validation.setComponent(moPaneGridPayments.getTable());
                         moPaneGridPayments.setTableRowSelection(index);
                         break;
                     }
-                    else if (paymentEntry.AuxTotalPaymentsLocal > paymentEntry.AmountLocal) {
-                        validation.setMessage("En el pago #" + paymentEntry.Number + " "
-                                + "la suma de importes pagados en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "\n"
-                                + "es mayor al monto del pago en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + " "
-                                + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal) + ".");
-                        validation.setComponent(moPaneGridPayments.getTable());
-                        moPaneGridPayments.setTableRowSelection(index);
-                        break;
-                    }
-                    else if (paymentEntry.AuxTotalPaymentsLocal < paymentEntry.AmountLocal && miClient.showMsgBoxConfirm(
-                            "En el pago #" + paymentEntry.Number + " "
-                            + "la suma de importes pagados en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "\n"
-                            + "es menor al monto del pago en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + " "
-                            + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal) + ".\n"
-                            + "¡IMPORTANTE: Será necesario realizar manualmente un ajuste contable para corregir la diferencia!\n"
-                            + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
-                        validation.setMessage("Ajustar los importes pagados a documentos relacionados del pago #" + paymentEntry.Number + ".");
-                        validation.setComponent(moPaneGridPayments.getTable());
-                        moPaneGridPayments.setTableRowSelection(index);
-                        break;
+                    else {
+                        /*
+                        Check that there is not differences in local currency with payment received and payments applied.
+                        Note that if payment and all related documents are both in local currency, no differences are allowed.
+                        */
+                        
+                        boolean areAllLocal = miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { paymentEntry.CurrencyId });
+                        
+                        if (areAllLocal) {
+                            for (SCfdPaymentEntryDoc doc : paymentEntry.PaymentEntryDocs) {
+                                if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { doc.DataDps.getFkCurrencyId() })) {
+                                    areAllLocal = false;
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        String message;
+                        
+                        if (paymentEntry.AuxTotalPaymentsLocal > paymentEntry.AmountLocal) {
+                            message = "En el pago #" + paymentEntry.Number + " "
+                                    + "la suma de importes pagados en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "\n"
+                                    + "es mayor al monto del pago en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + " "
+                                    + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal) + ".";
+
+                            if (areAllLocal || miClient.showMsgBoxConfirm(message + "\n¡IMPORTANTE: Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n"
+                                + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
+                                validation.setMessage(areAllLocal ? message : "Ajustar y corregir los importes pagados a los documentos relacionados del pago #" + paymentEntry.Number + ".");
+                                validation.setComponent(moPaneGridPayments.getTable());
+                                moPaneGridPayments.setTableRowSelection(index);
+                                break;
+                            }
+                        }
+                        
+                        if (paymentEntry.AuxTotalPaymentsLocal < paymentEntry.AmountLocal) {
+                            message = "En el pago #" + paymentEntry.Number + " "
+                                    + "la suma de importes pagados en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "\n"
+                                    + "es menor al monto del pago en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + " "
+                                    + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.AmountLocal - paymentEntry.AuxTotalPaymentsLocal) + ".";
+
+                            if (areAllLocal || miClient.showMsgBoxConfirm(message + "\n¡IMPORTANTE: Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n"
+                                + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
+                                validation.setMessage(areAllLocal ? message : "Ajustar y corregir los importes pagados a los documentos relacionados del pago #" + paymentEntry.Number + ".");
+                                validation.setComponent(moPaneGridPayments.getTable());
+                                moPaneGridPayments.setTableRowSelection(index);
+                                break;
+                            }
+                        }
                     }
                     
                     index++;
@@ -3535,7 +3572,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         
         if (!validation.getIsError() && moDataCfdPayment != null && !moDataCfdPayment.getIsRegistryNew()) {
-            if (miClient.showMsgBoxConfirm("La contabilización actual del CFDI será descartada y reemplazada acorde a sus valores actuales.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+            if (miClient.showMsgBoxConfirm("La contabilización actual del CFDI será descartada y reemplazada de acuerdo a sus valores actuales.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
                 validation.setMessage("Favor de verificar si los valores actuales del CFDI son correctos.");
                 validation.setComponent(jbCancel);
             }

@@ -423,8 +423,18 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         SDataAccountCash accountCash = (SDataAccountCash) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC_CASH, AccountDesKey, SLibConstants.EXEC_MODE_VERBOSE);
         
         // bookkeeping of application of payments:
+        
+        boolean areAllDocsLocal = true;
 
         for (SCfdPaymentEntryDoc paymentEntryDoc : PaymentEntryDocs) {
+            // check if all docs are in local currency:
+            
+            if (!session.getSessionCustom().isLocalCurrency(new int[] { paymentEntryDoc.DataDps.getFkCurrencyId() })) {
+                areAllDocsLocal = false;
+            }
+            
+            // generate DSM entry for the accounting of current payment:
+            
             SDataDsmEntry oDsmEntry = new SDataDsmEntry();
 
             oDsmEntry.setPkYearId(session.getCurrentYear());
@@ -610,7 +620,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         
         double xrtDiff = SLibUtils.roundAmount(totDebit - totCredit);
         if (Math.abs(xrtDiff) >= 0.01) {
-            if (session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId })) {
+            if (session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId }) && areAllDocsLocal) {
                 // differences not allowed for system currency:
                 throw new Exception("La suma de cargos " + SLibUtils.getDecimalFormatAmount().format(totDebit) + " " + session.getSessionCustom().getLocalCurrencyCode() + " " +
                         "es distinto a la suma de abonos " + SLibUtils.getDecimalFormatAmount().format(totCredit) + " " + session.getSessionCustom().getLocalCurrencyCode() + " " +
