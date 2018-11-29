@@ -6,7 +6,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 ================================================================================
 
 ================================================================================
-2018-10-31, 3.2 126.1
+2018-11-29, 3.2 126.1
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Actualización catálogo PAC para cargar timbre por cancelación con Finkok.
@@ -17,10 +17,14 @@ Sergio Abraham FLORES GUTIÉRREZ
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Mejora al manejo de diferencias cambiarias en CFDI de recepción de pagos.
-2) Corrección al concepto en el archivo layout para la dispersión de nóminas 
-    semanales con HSBC.
 ================================================================================
 
-improvement to management of exchange rate differences
+================================================================================
+2018-11-29, 3.2 126.3
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al concepto en el archivo layout para la dispersión de nóminas 
+    semanales con HSBC.
+================================================================================
 
 #eof
