@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Software Aplicado
+ * @author Sergio Flores
  */
 public class SCfdUtilsHandler {
     

@@ -453,7 +453,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    SCfdUtils.resetCfdiDiactivateFlags(miClient, cfd);
+                    SCfdUtils.resetCfdiDeactivateFlags(miClient, cfd);
                     miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                 }
                 catch (Exception e) {

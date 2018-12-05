@@ -1619,23 +1619,23 @@ public abstract class SHrsUtils {
         ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarys = new ArrayList<>();
         
         benefitTables.stream().filter((table) -> (!table.getChildRows().isEmpty())).forEach((table) -> {
-            int currIndex = 0;      // current index of rows of current benefit table
-            double currValue = 0;   // current value, it can be days or bonus percentage
-            SDbBenefitTableRow currTableRow = null;     // current benefit-table row
-            SDbBenefitTableRow nextTableRow = null;     // next benefit-table row, when available
+            int currIndex = -1; // current index of row for current benefit table
+            double benefit = 0; // current benefit, expressed as days or bonus percentage
+            SDbBenefitTableRow tableRow = null; // current benefit-table row
             
-            for (int ann = 1; ann <= 100; ann++) {
-                if (currTableRow == null || (nextTableRow != null && (ann * SLibTimeConsts.MONTHS >= nextTableRow.getMonths()))) {
-                    if (currTableRow != null) {
-                        currIndex++;
+            for (int year = 1; year <= 100; year++) {
+                if (tableRow == null || (year * SLibTimeConsts.MONTHS) >= tableRow.getMonths()) {
+                    if (currIndex + 1 >= table.getChildRows().size()) {
+                        benefit = 0;
                     }
-                    
-                    currTableRow = table.getChildRows().get(currIndex);
-                    nextTableRow = table.getChildRows().size() == currIndex + 1 ? null : table.getChildRows().get(currIndex + 1);
-                    currValue = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? currTableRow.getBenefitBonusPercentage() : currTableRow.getBenefitDays();
+                    else {
+                        ++currIndex;
+                        tableRow = table.getChildRows().get(currIndex);
+                        benefit = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? tableRow.getBenefitBonusPercentage() : tableRow.getBenefitDays();
+                    }
                 }
                 
-                benefitTableAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), ann, currValue));
+                benefitTableAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), year, benefit));
             }
         });
 

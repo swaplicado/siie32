@@ -1418,7 +1418,7 @@ public abstract class SCfdUtils implements Serializable {
                         // Sign & Cancel Log step #3
                         createSignCancelLog(client, "", !isValidation ? SCfdConsts.ACTION_CODE_PRC_ANNUL : SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_SEND_RECV, cfd, pac.getPkPacId());
                         
-                        // Check CFD cancel status:
+                        // Check CFDI cancellable status:
                         
                         boolean getAckCancellation = false;
                         SCfdUtilsHandler cfdUtilsHandler = new SCfdUtilsHandler(client);
@@ -1437,7 +1437,7 @@ public abstract class SCfdUtils implements Serializable {
                                 if (isValidation) {
                                     updateProcessCfd(client, cfd, false);
 
-                                    // Sign & Cancel Log step #3
+                                    // Sign & Cancel Log step #6
                                     createSignCancelLog(client, "", SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR, cfd, pac.getPkPacId());
                                     throw new Exception("El CFDI está vigente.");
                                 }
@@ -1459,36 +1459,40 @@ public abstract class SCfdUtils implements Serializable {
                                     case DCfdi33Consts.ESTATUS_CANCEL_PROC: // CFDI cancellation is in process
                                         cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_PROC_CODE);
                                         client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
-                                        throw new Exception("La solicitud de cancelación del CFD está pendiente de ser aceptada o rechazada por el receptor.");
+                                        throw new Exception("La solicitud de cancelación del CFDI está pendiente de ser aceptada o rechazada por el receptor.");
 
                                     case DCfdi33Consts.ESTATUS_CANCEL_RECH: // CFDI cancellation was rejected by receptor
+                                        updateProcessCfd(client, cfd, false);
+
+                                        // Sign & Cancel Log step #6
+                                        createSignCancelLog(client, "", SCfdConsts.ACTION_CODE_PRC_ANNUL, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR, cfd, pac.getPkPacId());
+                                        
                                         cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_RECH_CODE);
                                         client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
-                                        throw new Exception("La solicitud de cancelación del CFD fue rechazada por el receptor.");
+                                        throw new Exception("La solicitud de cancelación del CFDI fue rechazada por el receptor.");
                                         
                                     case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
                                     case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
-                                    case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:
-                                        throw new Exception("El estatus de cancelación del CFD es inconsistente.");
+                                    case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:       // it is not clear wich expression is the good one
+                                    case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_EXT:   // it is not clear wich expression is the good one
+                                        throw new Exception("El estatus de cancelación del CFDI es inconsistente.");
                                         
                                     case DCfdi33Consts.ESTATUS_CANCEL_NINGUNO:
                                         // CFD about to be cancelled for the first time or maybe a cancellation is still in process (in pending buffer)!
                                         break;
                                         
                                     default:
-                                        throw new Exception("El estatus de cancelación del CFD es desconocido.");
+                                        throw new Exception("El estatus de cancelación del CFDI es desconocido.");
                                 }
                                 break;
 
                             case DCfdi33Consts.CFDI_ESTATUS_NO_ENC:
                                 // CFDI was 'not found' before fiscal authority:
-                                if (isValidation) {
-                                    updateProcessCfd(client, cfd, false);
+                                updateProcessCfd(client, cfd, false);
 
-                                    // Sign & Cancel Log step #3
-                                    createSignCancelLog(client, "", SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR, cfd, pac.getPkPacId());
-                                    throw new Exception("El CFD no fue encontrado ante el SAT.");
-                                }
+                                // Sign & Cancel Log step #3
+                                createSignCancelLog(client, "", SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR, cfd, pac.getPkPacId());
+                                throw new Exception("El CFD no fue encontrado ante el SAT.");
 
                             default:
                         }
@@ -1527,7 +1531,7 @@ public abstract class SCfdUtils implements Serializable {
                                         next = false;
                                     }
                                     else {
-                                        String cancelStatusCode = "";
+                                        String cancelStatusCode = "?";
                                         switch (ackQuery.CancelStatus) {
                                             case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
                                                 cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT_CODE;
@@ -1535,7 +1539,8 @@ public abstract class SCfdUtils implements Serializable {
                                             case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
                                                 cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT_CODE;
                                                 break;
-                                            case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:
+                                            case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:       // it is not clear wich expression is the good one
+                                            case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_EXT:   // it is not clear wich expression is the good one
                                                 cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_CODE;
                                                 break;
                                             default:
@@ -1545,8 +1550,12 @@ public abstract class SCfdUtils implements Serializable {
                                         cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, cancelStatusCode);
                                         
                                         xmlAcuse = receiptResult.getReceipt().getValue();
-                                        xmlAcuse = xmlAcuse.replace("&lt;", "<"); // XXX, 2018-08-29, Sergio Flores: are really needed?
-                                        xmlAcuse = xmlAcuse.replace("&gt;", ">"); // XXX, 2018-08-29, Sergio Flores: are really needed?
+                                        /*
+                                        Cancellation cknowledgment comes wraped in another XML (SOAP response),
+                                        so '<' and '>' must be represented with its correspondign character entity references.
+                                        */
+                                        xmlAcuse = xmlAcuse.replace("&lt;", "<");
+                                        xmlAcuse = xmlAcuse.replace("&gt;", ">");
                                     }
                                 }
                             }
@@ -1578,94 +1587,98 @@ public abstract class SCfdUtils implements Serializable {
                                 }
                                 next = false;
                             }
-                            else {
-                                if (elementFolios.getValue().getFolio().isEmpty()) {
-                                    // Sign & Cancel Log step #4
-                                    createSignCancelLog(client, "Codigo: [" + cancelaCFDResult.getCodEstatus().getValue() + "] Error al intentar cancelar CFDI.", !isValidation ? SCfdConsts.ACTION_CODE_PRC_ANNUL : SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_PAC_RECV_ERR, cfd, pac.getPkPacId());
+                            else if (elementFolios.getValue().getFolio().isEmpty()) {
+                                // Sign & Cancel Log step #4
+                                createSignCancelLog(client, "Codigo: [" + cancelaCFDResult.getCodEstatus().getValue() + "] Error al intentar cancelar CFDI.", !isValidation ? SCfdConsts.ACTION_CODE_PRC_ANNUL : SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_PAC_RECV_ERR, cfd, pac.getPkPacId());
 
-                                    updateProcessCfd(client, cfd, false);
-                                    client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                                updateProcessCfd(client, cfd, false);
+                                client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
-                                    if (pacId == 0) {
-                                        throw new Exception("Codigo: [" + cancelaCFDResult.getCodEstatus().getValue() + "] Error al intentar cancelar CFDI.");
-                                    }
-                                    next = false;
+                                if (pacId == 0) {
+                                    throw new Exception("Codigo: [" + cancelaCFDResult.getCodEstatus().getValue() + "] Error al intentar cancelar CFDI.");
                                 }
-                                else {
-                                    String estatusUuid = elementFolios.getValue().getFolio().get(0).getEstatusUUID().getValue();
-                                    switch (estatusUuid) {
-                                        case SCfdConsts.UUID_CANCEL_OK:
-                                        case SCfdConsts.UUID_CANCEL_ALREADY:
-                                            // CFDI is cancelled, or a cancellation request is in process:
-                                            
-                                            String estatusCancelacion = elementFolios.getValue().getFolio().get(0).getEstatusCancelacion().getValue();
-                                            switch (estatusCancelacion) {
-                                                case DCfdi33Consts.ESTATUS_CANCEL_PROC:
-                                                    // CFDI cancellation is in process:
-                                                    cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_PROC_CODE);
-                                                    client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
-                                                    throw new Exception("La solicitud de cancelación del CFDI ha sido enviada al receptor.");
+                                next = false;
+                            }
+                            else {
+                                String estatusUuid = elementFolios.getValue().getFolio().get(0).getEstatusUUID().getValue();
+                                switch (estatusUuid) {
+                                    case SCfdConsts.UUID_CANCEL_OK:
+                                    case SCfdConsts.UUID_CANCEL_ALREADY:
+                                        // CFDI is cancelled, or a cancellation request is in process:
 
-                                                case DCfdi33Consts.ESTATUS_CANCEL_RECH:
-                                                    // CFDI cancellation was rejected by receptor:
-                                                    cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_RECH_CODE);
-                                                    client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
-                                                    throw new Exception("La solicitud de cancelación del CFDI ha sido rechazada por el receptor.");
+                                        String estatusCancelacion = elementFolios.getValue().getFolio().get(0).getEstatusCancelacion().getValue();
+                                        switch (estatusCancelacion) {
+                                            case DCfdi33Consts.ESTATUS_CANCEL_PROC:
+                                                // CFDI cancellation is in process:
+                                                cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_PROC_CODE);
+                                                client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
+                                                throw new Exception("La solicitud de cancelación del CFDI ha sido enviada al receptor.");
 
-                                                case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
-                                                case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
-                                                case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:
-                                                    // CFDI was canceled!:
-                                                    String cancelStatusCode = "";
-                                                    switch (estatusCancelacion) {
-                                                        case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
-                                                            cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT_CODE;
-                                                            break;
-                                                        case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
-                                                            cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT_CODE;
-                                                            break;
-                                                        case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:
-                                                            cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_CODE;
-                                                            break;
-                                                        default:
-                                                    }
+                                            case DCfdi33Consts.ESTATUS_CANCEL_RECH:
+                                                // CFDI cancellation was rejected by receptor:
+                                                cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_RECH_CODE);
+                                                client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
+                                                throw new Exception("La solicitud de cancelación del CFDI ha sido rechazada por el receptor.");
 
-                                                    cfd.setCancellationStatus(cancelStatusCode);
-                                                    cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, cancelStatusCode);
-                                                    
-                                                    xmlAcuse = cancelaCFDResult.getAcuse().getValue();
-                                                    xmlAcuse = xmlAcuse.replace("&lt;", "<"); // XXX, 2018-08-29, Sergio Flores: are really needed?
-                                                    xmlAcuse = xmlAcuse.replace("&gt;", ">"); // XXX, 2018-08-29, Sergio Flores: are really needed?
-                                                    break;
-                                                    
-                                                case DCfdi33Consts.ESTATUS_CANCEL_NINGUNO:
-                                                    // CFDI in pending buffer:
-                                                    cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_PEND_BUFF_CODE);
-                                                    client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
-                                                    throw new Exception("El CFDI ya está en el controlador de espera (pending buffer), en proceso de ser cancelado.");
-                                                    
-                                                default:
-                                                    // unexpected cancellation code status:
-                                                    cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, "?");
-                                                    client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
-                                                    throw new Exception("El estatus de cancelación del CFDI es desconocido: [" + estatusCancelacion + "].");
-                                            }
-                                            break;
-                                            
-                                        default:
-                                            // unexpected response code:
-                                            
-                                            // Sign & Cancel Log step #4
-                                            createSignCancelLog(client, "Codigo: [" + estatusUuid + "] Error al intentar cancelar CFDI.", !isValidation ? SCfdConsts.ACTION_CODE_PRC_ANNUL : SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_PAC_RECV_ERR, cfd, pac.getPkPacId());
+                                            case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
+                                            case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
+                                            case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:       // it is not clear wich expression is the good one
+                                            case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_EXT:   // it is not clear wich expression is the good one
+                                                // CFDI was canceled!:
+                                                String cancelStatusCode = "";
+                                                switch (estatusCancelacion) {
+                                                    case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
+                                                        cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT_CODE;
+                                                        break;
+                                                    case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
+                                                        cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT_CODE;
+                                                        break;
+                                                    case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:       // it is not clear wich expression is the good one
+                                                    case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_EXT:   // it is not clear wich expression is the good one
+                                                        cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_CODE;
+                                                        break;
+                                                    default:
+                                                }
 
-                                            updateProcessCfd(client, cfd, false);
-                                            client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                                                cfd.setCancellationStatus(cancelStatusCode);
+                                                cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, cancelStatusCode);
 
-                                            if (pacId == 0) {
-                                                throw new Exception("Codigo: [" + estatusUuid + "] Error al intentar cancelar CFDI.");
-                                            }
-                                            next = false;
-                                    }
+                                                xmlAcuse = cancelaCFDResult.getAcuse().getValue();
+                                                /*
+                                                Cancellation cknowledgment comes wraped in another XML (SOAP response),
+                                                so '<' and '>' must be represented with its correspondign character entity references.
+                                                */
+                                                xmlAcuse = xmlAcuse.replace("&lt;", "<");
+                                                xmlAcuse = xmlAcuse.replace("&gt;", ">");
+                                                break;
+
+                                            case DCfdi33Consts.ESTATUS_CANCEL_NINGUNO:
+                                                // CFDI in pending buffer:
+                                                cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_PEND_BUFF_CODE);
+                                                client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
+                                                throw new Exception("El CFDI ya está en el controlador de espera (pending buffer), en proceso de ser cancelado.");
+
+                                            default:
+                                                // unexpected cancellation code status:
+                                                cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, "?");
+                                                client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
+                                                throw new Exception("El estatus de cancelación del CFDI es desconocido: [" + estatusCancelacion + "].");
+                                        }
+                                        break;
+
+                                    default:
+                                        // unexpected response code:
+
+                                        // Sign & Cancel Log step #4
+                                        createSignCancelLog(client, "Codigo: [" + estatusUuid + "] Error al intentar cancelar CFDI.", !isValidation ? SCfdConsts.ACTION_CODE_PRC_ANNUL : SCfdConsts.ACTION_CODE_VAL_ANNUL, SCfdConsts.STEP_CODE_PAC_RECV_ERR, cfd, pac.getPkPacId());
+
+                                        updateProcessCfd(client, cfd, false);
+                                        client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+                                        if (pacId == 0) {
+                                            throw new Exception("Codigo: [" + estatusUuid + "] Error al intentar cancelar CFDI.");
+                                        }
+                                        next = false;
                                 }
                             }
                         }
@@ -1829,8 +1842,12 @@ public abstract class SCfdUtils implements Serializable {
                                     }
                                     else {
                                         xmlAcuse = receiptResult.getReceipt().getValue();
-                                        xmlAcuse = xmlAcuse.replace("&lt;", "<"); // XXX, 2018-08-29, Sergio Flores: are really needed?
-                                        xmlAcuse = xmlAcuse.replace("&gt;", ">"); // XXX, 2018-08-29, Sergio Flores: are really needed?
+                                        /*
+                                        Cancellation cknowledgment comes wraped in another XML (SOAP response),
+                                        so '<' and '>' must be represented with its correspondign character entity references.
+                                        * /
+                                        xmlAcuse = xmlAcuse.replace("&lt;", "<");
+                                        xmlAcuse = xmlAcuse.replace("&gt;", ">");
                                     }
                                 }
                             }
@@ -2539,20 +2556,27 @@ public abstract class SCfdUtils implements Serializable {
         return true;
     }
 
-    public static void resetCfdiDiactivateFlags(final SClientInterface client, final SDataCfd cfd) throws Exception {
+    public static void resetCfdiDeactivateFlags(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
         }
         else {
-            if (!isSignedByFinkok(client, cfd)) {
-                if (client.showMsgBoxConfirm("Si limpia las inconsistencias del timbrado o cancelación del CFDI puede " + (!cfd.isStamped() ? "timbrarse dos veces" : "ser que ya esté cancelado") + " el CFDI.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+            boolean deactivate = true;
+            if (isSignedByFinkok(client, cfd)) {
+                if (client.showMsgBoxConfirm("El PAC de timbrado del CFDI permite verificar el timbrado o cancelación.\n"
+                        + "Se sugiere realizar dicha verificación de timbrado o cancelación.\n"
+                        + "¿Está seguro que desea continuar con la limpieza de inconsistencias de timbrado o cancelación del CFDI?") != JOptionPane.YES_OPTION) {
+                    deactivate = false;
+                }
+            }
+            if (deactivate) {
+                if (client.showMsgBoxConfirm("Si limpia las inconsistencias del timbrado o cancelación del CFDI puede " + 
+                        (!cfd.isStamped() ? "timbrarse más de una vez" : "que ya esté cancelado") + ".\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                     updateProcessCfd(client, cfd, false);
+                    cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, "");
                     LogSignId = 0;
                     createSignCancelLog(client, "", SCfdConsts.ACTION_CODE_RESET_FLAGS, SCfdConsts.STEP_CODE_NA, cfd, SLibConsts.UNDEFINED);
                 }
-            }
-            else {
-                throw new Exception("El PAC sí permite la verificación del timbrado o cancelación del CFDI, favor de intentarlo.");
             }
         }
     }

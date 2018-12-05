@@ -1945,7 +1945,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
                 }
                 else {
-                    SCfdUtils.resetCfdiDiactivateFlags(miClient, dps.getDbmsDataCfd());
+                    SCfdUtils.resetCfdiDeactivateFlags(miClient, dps.getDbmsDataCfd());
                     miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                 }
            }

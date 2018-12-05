@@ -16,6 +16,7 @@ import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
@@ -74,7 +75,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
         
-        moDialogBenefitCardex = new SDialogBenefitCardex(miClient, mnGridSubtype, "Control de la prest");
+        moDialogBenefitCardex = new SDialogBenefitCardex(miClient, mnGridSubtype, "Control de la prestación");
     }
 
     private void actionShowCardex() {
@@ -183,7 +184,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
                 + "" + pDateCutOff + " AS _p_dt_cutoff, "
                 + " "
                 // # employee's seniority:
-                + "@sen_raw := ROUND(DATEDIFF(" + pDateCutOff + ", e.dt_ben) / " + SHrsConsts.YEAR_DAYS + ", 2) AS _sen_raw, "
+                + "@sen_raw := ROUND(DATEDIFF(" + pDateCutOff + ", e.dt_ben) / " + SHrsConsts.YEAR_DAYS + ", 4) AS _sen_raw, "
                 + "@sen_as_years := TIMESTAMPDIFF(YEAR, e.dt_ben, " + pDateCutOff + ") AS _sen_as_years, "
                 + "@sen_as_months := TIMESTAMPDIFF(MONTH, e.dt_ben, " + pDateCutOff + ") AS _sen_as_months, "
                 + " "
@@ -235,28 +236,28 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
                 + " "
                 // # estimated current-year benefit:
                 + " "
-                + "@curr_ben_days := IF(@sen_as_years = 0, "
-                + "COALESCE((SELECT br.ben_day FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br WHERE br.id_ben = @id_ben_day AND br.id_row = 1), 0), "
-                + "COALESCE((SELECT br.ben_day FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br WHERE br.id_ben = @id_ben_day AND mon <= @sen_as_months ORDER BY br.mon DESC, br.id_row LIMIT 1), 0)) AS _curr_ben_days, "
+                + "@curr_ben_days := "
+                + "COALESCE((SELECT br.ben_day FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br "
+                + "WHERE br.id_ben = @id_ben_day AND @sen_raw <= (br.mon / " + SLibTimeConsts.MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS _curr_ben_days, "
                 + "@curr_ben_days_prop := @curr_ben_days * @curr_prop AS _curr_ben_days_prop, "
                 + "@curr_ben_amt_prop := ROUND(@curr_sal_day * @curr_ben_days_prop, 2) AS _curr_ben_amt_prop, "
                 + " "
-                + "@curr_ben_bon_perc := IF(@sen_as_years = 0, "
-                + "COALESCE((SELECT br.ben_bon_per FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br WHERE br.id_ben = @id_ben_bon AND br.id_row = 1), 0), "
-                + "COALESCE((SELECT br.ben_bon_per FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br WHERE br.id_ben = @id_ben_bon AND mon <= @sen_as_months ORDER BY br.mon DESC, br.id_row LIMIT 1), 0)) AS _curr_ben_bon_perc, "
+                + "@curr_ben_bon_perc := "
+                + "COALESCE((SELECT br.ben_bon_per FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br "
+                + "WHERE br.id_ben = @id_ben_bon AND @sen_raw <= (br.mon / " + SLibTimeConsts.MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS _curr_ben_bon_perc, "
                 + "@curr_ben_bon_amt_prop := ROUND(@curr_ben_amt_prop * @curr_ben_bon_perc, 2) AS _curr_ben_bon_amt_prop, "
                 + " "
                 // # estimated previous-year benefit:
                 + " "
-                + "@prev_ben_days := IF(@sen_as_years - 1 = 0, "
-                + "COALESCE((SELECT br.ben_day FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br WHERE br.id_ben = @id_ben_day AND br.id_row = 1), 0), "
-                + "COALESCE((SELECT br.ben_day FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br WHERE br.id_ben = @id_ben_day AND mon <= @sen_as_months - " + SHrsConsts.YEAR_MONTHS + " ORDER BY br.mon DESC, br.id_row LIMIT 1), 0)) AS _prev_ben_days, "
+                + "@prev_ben_days := IF(@sen_as_years < 1, 0, "
+                + "COALESCE((SELECT br.ben_day FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br "
+                + "WHERE br.id_ben = @id_ben_day AND (@sen_raw - 1) <= (br.mon / " + SLibTimeConsts.MONTHS + ") ORDER BY br.id_row LIMIT 1), 0)) AS _prev_ben_days, "
                 + "@prev_ben_days_prop := @prev_ben_days * @prev_prop AS _prev_ben_days_prop, "
                 + "@prev_ben_amt_prop := ROUND(@curr_sal_day * @prev_ben_days_prop, 2) AS _prev_ben_amt_prop, "
                 + " "
-                + "@prev_ben_bon_perc := IF(@sen_as_years = 0, "
-                + "COALESCE((SELECT br.ben_bon_per FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br WHERE br.id_ben = @id_ben_bon AND br.id_row = 1), 0), "
-                + "COALESCE((SELECT br.ben_bon_per FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br WHERE br.id_ben = @id_ben_bon AND mon <= @sen_as_months ORDER BY br.mon DESC, br.id_row LIMIT 1), 0)) AS _prev_ben_bon_perc, "
+                + "@prev_ben_bon_perc := IF(@sen_as_years < 1, 0, "
+                + "COALESCE((SELECT br.ben_bon_per FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " AS br "
+                + "WHERE br.id_ben = @id_ben_bon AND (@sen_raw - 1) <= (br.mon / " + SLibTimeConsts.MONTHS + ") ORDER BY br.id_row LIMIT 1), 0)) AS _prev_ben_bon_perc, "
                 + "@prev_ben_bon_amt_prop := ROUND(@prev_ben_amt_prop * @prev_ben_bon_perc, 2) AS _prev_ben_bon_amt_prop, "
                 + " "
                 // # payed current-year benefit:
@@ -344,66 +345,76 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        SGridColumnView column = null;
+        String benefit = "?";
+        switch (mnGridSubtype) {
+            case SModSysConsts.HRSS_TP_BEN_ANN_BON:
+                benefit = "gratificación anual";
+                break;
+            case SModSysConsts.HRSS_TP_BEN_VAC:
+            case SModSysConsts.HRSS_TP_BEN_VAC_BON:
+                benefit = "vacaciones";
+                break;
+            default:
+        }
+        
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
-
+        
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, "Empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, SDbConsts.FIELD_CODE, "Clave"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_emp_act", "Activo"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_pay_tp_name", "Período pago"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_pay_tp_name", "Período pago", 75));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_curr_sal_day", "Salario diario $", 75));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_emp_dt_ben", "Inicio beneficios"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_p_dt_cutoff", "Corte"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_sen_raw", "Antigüedad", 50));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_sen_as_years", "Años antigüedad", 50));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_sen_as_months", "Meses antigüedad", 50));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_curr_sal_day", "Salario diario $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_ben_day_name", "Tabla prests"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_sen_as_months", "Antigüedad meses", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_sen_raw", "Antigüedad años", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_ben_day_name", "Tabla " + benefit));
         
         if (mnGridSubtype == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_ben_bon_name", "Tabla prima"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_ben_bon_name", "Tabla prima vacacional"));
         }
         
         // benefit of current year:
         
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "_curr_ben_year", "Año actual prests"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "_curr_ben_anniv", "Aniv actual prests", 35));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "_curr_ben_year", "Año " + benefit + " actual"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "_curr_ben_anniv", "Aniv " + benefit + " actual", 35));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_curr_dt_base", "Base actual"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_curr_days_elapsed", "Días transc actual"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_curr_days_elapsed", "D transcurridos actual"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_curr_prop", "Parte prop actual"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_curr_ben_days", "Días prest actual"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_curr_ben_days_prop", "Días prest prop actual"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_curr_ben_amt_prop", "Prest prop actual $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_curr_ben_days", "D " + benefit + " actual"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_curr_ben_days_prop", "D prop " + benefit + " actual"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_curr_ben_amt_prop", "$ prop " + benefit + " actual"));
         
         if (mnGridSubtype == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_DISC, "_curr_ben_bon_perc", "Prima actual %"));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_curr_ben_bon_amt_prop", "Prima actual $"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_DISC, "_curr_ben_bon_perc", "% prima vac actual"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_curr_ben_bon_amt_prop", "$ prima vac actual"));
         }
         
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_curr_pay_days", "Días prest pag actual"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_curr_pay_amt", "Prest pag actual $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_diff_curr_pay_days", "Dif días prest pag actual"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_diff_curr_pay_amt", "Dif prest pag actual $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_curr_pay_days", "Acum D " + benefit + " actual"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_curr_pay_amt", "Acum $ " + benefit + " actual"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_diff_curr_pay_days", "Rezago D " + benefit + " actual"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_diff_curr_pay_amt", "Rezago $ " + benefit + " actual"));
         
         // benefit of previous year:
         
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "_prev_ben_year", "Año prev prests"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "_prev_ben_anniv", "Aniv prev prests", 35));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "_prev_ben_year", "Año " + benefit + " prev"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "_prev_ben_anniv", "Aniv " + benefit + " prev", 35));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "_prev_dt_base", "Base prev"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_prev_days_elapsed", "Días transc prev"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_prev_days_elapsed", "D transcurridos prev"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_prev_prop", "Parte prop prev"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_prev_ben_days", "Días prest prev"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_prev_ben_days_prop", "Días prest prop prev"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_prev_ben_amt_prop", "Prest prop prev $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "_prev_ben_days", "D " + benefit + " prev"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_prev_ben_days_prop", "D prop " + benefit + " prev"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_prev_ben_amt_prop", "$ prop " + benefit + " prev"));
         
         if (mnGridSubtype == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_DISC, "_prev_ben_bon_perc", "Prima prev %"));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_prev_ben_bon_amt_prop", "Prima prev $"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_DISC, "_prev_ben_bon_perc", "% prima vac prev"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_prev_ben_bon_amt_prop", "$ prima vac prev"));
         }
         
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_prev_pay_days", "Días prest pag prev"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_prev_pay_amt", "Prest pag prev $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_diff_prev_pay_days", "Dif días prest pag prev"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_diff_prev_pay_amt", "Dif prest pag prev $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_prev_pay_days", "Acum D " + benefit + " prev"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_prev_pay_amt", "Acum $ " + benefit + " prev"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_4D, "_diff_prev_pay_days", "Rezago D " + benefit + " prev"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_diff_prev_pay_amt", "Rezago $ " + benefit + " prev"));
         
         return gridColumnsViews;
     }
