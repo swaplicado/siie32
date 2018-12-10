@@ -171,6 +171,14 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     public String getType() {
         return Types.get(Type);
     }
+    
+    /**
+     * Checks if amount is totally applied.
+     * @return 
+     */
+    public boolean isAmountTotallyApplied() {
+        return Math.abs(Amount - AuxTotalPayments) < 0.01;
+    }
 
     private erp.mfin.data.SDataRecordEntry createRecordEntryAccountCash(final SGuiSession session, final SDataAccountCash accountCash, 
             final double amountCur, final double xrt, final double amountDom) throws Exception {
@@ -618,36 +626,39 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             totCredit = SLibUtils.roundAmount(totCredit + entry.getCredit());
         }
         
-        double xrtDiff = SLibUtils.roundAmount(totDebit - totCredit);
-        if (Math.abs(xrtDiff) >= 0.01) {
-            if (session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId }) && areAllDocsLocal) {
-                // differences not allowed for system currency:
-                throw new Exception("La suma de cargos " + SLibUtils.getDecimalFormatAmount().format(totDebit) + " " + session.getSessionCustom().getLocalCurrencyCode() + " " +
-                        "es distinto a la suma de abonos " + SLibUtils.getDecimalFormatAmount().format(totCredit) + " " + session.getSessionCustom().getLocalCurrencyCode() + " " +
-                        "por " + SLibUtils.getDecimalFormatAmount().format(totDebit - totCredit) + ".");
-            }
-            else {
-                // treat difference as exchange rate difference:
-                SDataParamsCompany paramsCompany = (SDataParamsCompany) session.getConfigCompany();
-                
-                SDataRecordEntry entryXrtDiff;
-                
-                if (xrtDiff > 0) {
-                    entryXrtDiff = createRecordEntryXrtDiff(session, 
-                            paramsCompany.getFkAccountDifferenceIncomeId_n(), paramsCompany.getFkCostCenterDifferenceIncomeId_n(), 
-                            paramsCompany.getFkItemDifferenceIncomeId_n(), CurrencyId, 
-                            xrtDiff);
+        if (isAmountTotallyApplied()) {
+            double xrtDiff = SLibUtils.roundAmount(totDebit - totCredit);
+            
+            if (Math.abs(xrtDiff) >= 0.01) {
+                if (session.getSessionCustom().isLocalCurrency(new int[] { CurrencyId }) && areAllDocsLocal) {
+                    // differences not allowed for system currency:
+                    throw new Exception("La suma de cargos " + SLibUtils.getDecimalFormatAmount().format(totDebit) + " " + session.getSessionCustom().getLocalCurrencyCode() + " " +
+                            "es distinto a la suma de abonos " + SLibUtils.getDecimalFormatAmount().format(totCredit) + " " + session.getSessionCustom().getLocalCurrencyCode() + " " +
+                            "por " + SLibUtils.getDecimalFormatAmountUnitary().format(totDebit - totCredit) + ".");
                 }
                 else {
-                    entryXrtDiff = createRecordEntryXrtDiff(session, 
-                            paramsCompany.getFkAccountDifferenceExpenseId_n(), paramsCompany.getFkCostCenterDifferenceExpenseId_n(), 
-                            paramsCompany.getFkItemDifferenceExpenseId_n(), CurrencyId, 
-                            xrtDiff);
+                    // treat difference as exchange rate difference:
+                    SDataParamsCompany paramsCompany = (SDataParamsCompany) session.getConfigCompany();
+
+                    SDataRecordEntry entryXrtDiff;
+
+                    if (xrtDiff > 0) {
+                        entryXrtDiff = createRecordEntryXrtDiff(session, 
+                                paramsCompany.getFkAccountDifferenceIncomeId_n(), paramsCompany.getFkCostCenterDifferenceIncomeId_n(), 
+                                paramsCompany.getFkItemDifferenceIncomeId_n(), CurrencyId, 
+                                xrtDiff);
+                    }
+                    else {
+                        entryXrtDiff = createRecordEntryXrtDiff(session, 
+                                paramsCompany.getFkAccountDifferenceExpenseId_n(), paramsCompany.getFkCostCenterDifferenceExpenseId_n(), 
+                                paramsCompany.getFkItemDifferenceExpenseId_n(), CurrencyId, 
+                                xrtDiff);
+                    }
+
+                    normalizeRecordEntry(session, entryXrtDiff, bookkeepingNumber, bizPartnerName);
+                    entryXrtDiff.setConcept(concept);
+                    AuxDbmsRecordEntries.add(entryXrtDiff);
                 }
-                
-                normalizeRecordEntry(session, entryXrtDiff, bookkeepingNumber, bizPartnerName);
-                entryXrtDiff.setConcept(concept);
-                AuxDbmsRecordEntries.add(entryXrtDiff);
             }
         }
     }

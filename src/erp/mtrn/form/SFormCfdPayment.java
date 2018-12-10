@@ -3526,7 +3526,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                     + "es mayor al monto del pago en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + " "
                                     + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal) + ".";
 
-                            if (areAllLocal || miClient.showMsgBoxConfirm(message + "\n¡IMPORTANTE: Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n"
+                            if (areAllLocal || miClient.showMsgBoxConfirm(message + (paymentEntry.isAmountTotallyApplied() ? "\n¡IMPORTANTE: Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n" : "")
                                 + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
                                 validation.setMessage(areAllLocal ? message : "Ajustar y corregir los importes pagados a los documentos relacionados del pago #" + paymentEntry.Number + ".");
                                 validation.setComponent(moPaneGridPayments.getTable());
@@ -3541,7 +3541,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                     + "es menor al monto del pago en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + " "
                                     + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.AmountLocal - paymentEntry.AuxTotalPaymentsLocal) + ".";
 
-                            if (areAllLocal || miClient.showMsgBoxConfirm(message + "\n¡IMPORTANTE: Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n"
+                            if (areAllLocal || miClient.showMsgBoxConfirm(message + (paymentEntry.isAmountTotallyApplied() ? "\n¡IMPORTANTE: Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n" : "")
                                 + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
                                 validation.setMessage(areAllLocal ? message : "Ajustar y corregir los importes pagados a los documentos relacionados del pago #" + paymentEntry.Number + ".");
                                 validation.setComponent(moPaneGridPayments.getTable());
