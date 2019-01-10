@@ -20,6 +20,7 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataUnit;
+import erp.mod.SModConsts;
 import erp.mtrn.data.SDataStockLot;
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
@@ -28,6 +29,7 @@ import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
+import sa.lib.db.SDbRegistry;
 
 /**
  *
@@ -39,14 +41,15 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
     private static final int COL_OUT = 10;
     private static final int COL_STOCK = 11;
 
-    private int mnFormMode;
     private boolean mbFirstTime;
     private erp.client.SClientInterface miClient;
     private erp.lib.table.STablePane moPaneStockMoves;
 
     private int mnParamYear;
     private Date mtParamDateCutOff;
-    private int[] manWarehouseKey;
+    private int[] manParamWarehouseKey;
+    private int mnParamFormMode; // SLibConstants.MODE_QTY o SLibConstants.MODE_QTY_EXT
+    private int mnParamMaintUser;
     private erp.mitm.data.SDataItem moParamItem;
     private erp.mitm.data.SDataUnit moParamUnit;
     private erp.mbps.data.SDataBizPartnerBranch moParamCompanyBranch;
@@ -95,6 +98,8 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
         jPanel9 = new javax.swing.JPanel();
         jlYear = new javax.swing.JLabel();
         jtfYear = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jPanel16 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
@@ -117,6 +122,7 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
         jbRefresh = new javax.swing.JButton();
         jpControls = new javax.swing.JPanel();
         jbClose = new javax.swing.JButton();
+        jtfMaintUser = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Tarjeta auxiliar de almacén");
@@ -245,13 +251,23 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
         jlYear.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel9.add(jlYear);
 
-        jtfYear.setBackground(new java.awt.Color(153, 204, 255));
         jtfYear.setEditable(false);
+        jtfYear.setBackground(new java.awt.Color(153, 204, 255));
         jtfYear.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         jtfYear.setText("2000");
         jtfYear.setFocusable(false);
         jtfYear.setPreferredSize(new java.awt.Dimension(40, 23));
         jPanel9.add(jtfYear);
+
+        jButton1.setText("+");
+        jButton1.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jButton1.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel9.add(jButton1);
+
+        jButton2.setText("-");
+        jButton2.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jButton2.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel9.add(jButton2);
 
         jPanel5.add(jPanel9);
 
@@ -367,16 +383,22 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
 
         getContentPane().add(jpStockMoves, java.awt.BorderLayout.CENTER);
 
-        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpControls.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        jpControls.setLayout(new java.awt.BorderLayout());
 
         jbClose.setText("Cerrar");
         jbClose.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpControls.add(jbClose);
+        jpControls.add(jbClose, java.awt.BorderLayout.EAST);
+
+        jtfMaintUser.setEditable(false);
+        jtfMaintUser.setFocusable(false);
+        jtfMaintUser.setPreferredSize(new java.awt.Dimension(300, 23));
+        jpControls.add(jtfMaintUser, java.awt.BorderLayout.WEST);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-968)/2, (screenSize.height-634)/2, 968, 634);
+        setSize(new java.awt.Dimension(968, 634));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -512,8 +534,9 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
                     "LEFT OUTER JOIN erp.cfgu_cob_ent AS mfg_ent ON mfg.fid_cob = mfg_ent.id_cob AND mfg.fid_ent = mfg_ent.id_ent " +
                     "WHERE s.id_year = " + mnParamYear + " AND s.id_item = " + moParamItem.getPkItemId() + " AND s.id_unit = " + moParamUnit.getPkUnitId() + " " +
                     (moParamStockLot == null ? "" : "AND s.id_lot = " + moParamStockLot.getPkLotId() + " ") +
-                    (manWarehouseKey[0] == SLibConstants.UNDEFINED ? "" : "AND s.id_cob = " + manWarehouseKey[0] + " ") +
-                    (manWarehouseKey[1] == SLibConstants.UNDEFINED ? "" : "AND s.id_wh = " + manWarehouseKey[1] + " ") +
+                    (manParamWarehouseKey[0] == SLibConstants.UNDEFINED ? "" : "AND s.id_cob = " + manParamWarehouseKey[0] + " ") +
+                    (manParamWarehouseKey[1] == SLibConstants.UNDEFINED ? "" : "AND s.id_wh = " + manParamWarehouseKey[1] + " ") +
+                    (mnParamMaintUser == SLibConstants.UNDEFINED ? "" : "AND iog.fid_maint_user_n = " + mnParamMaintUser + " ") +
                     "AND s.b_del = 0 AND s.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(mtParamDateCutOff) + "' " +
                     "ORDER BY s.dt, st.code, st.tp_iog, iog.num_ser, erp.lib_fix_int(iog.num, " + SDataConstantsSys.NUM_LEN_IOG + "), " +
                     "l.lot, s.id_year, s.id_item, s.id_unit, s.id_lot, s.id_cob, s.id_wh, s.id_mov ";
@@ -593,13 +616,13 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
             SLibUtilities.renderException(this, e);
         }
 
-        jtfIn.setText((mnFormMode == SLibConstants.MODE_QTY ?
+        jtfIn.setText((mnParamFormMode == SLibConstants.MODE_QTY ?
             miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat() :
             miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat()).format(inSum));
-        jtfOut.setText((mnFormMode == SLibConstants.MODE_QTY ?
+        jtfOut.setText((mnParamFormMode == SLibConstants.MODE_QTY ?
             miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat() :
             miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat()).format(outSum));
-        jtfStock.setText((mnFormMode == SLibConstants.MODE_QTY ?
+        jtfStock.setText((mnParamFormMode == SLibConstants.MODE_QTY ?
             miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat() :
             miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat()).format(stock));
     }
@@ -609,6 +632,8 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -648,6 +673,7 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
     private javax.swing.JTextField jtfLot;
     private javax.swing.JTextField jtfLotDateExpiration;
     private javax.swing.JTextField jtfLotUnitSymbol;
+    private javax.swing.JTextField jtfMaintUser;
     private javax.swing.JTextField jtfOut;
     private javax.swing.JTextField jtfOutUnitSymbol;
     private javax.swing.JTextField jtfSeek;
@@ -681,11 +707,16 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
     }
 
     public void setFormParams(final Date dateCutOff, final int itemId, final int unitId, final int lotId, final int[] warehouseKey, int mode) {
+        setFormParams(dateCutOff, itemId, unitId, lotId, warehouseKey, mode, 0);
+    }
+
+    public void setFormParams(final Date dateCutOff, final int itemId, final int unitId, final int lotId, final int[] warehouseKey, int mode, int maintUser) {
         mnParamYear = SLibTimeUtilities.digestYear(dateCutOff)[0];
         mtParamDateCutOff = dateCutOff;
-        manWarehouseKey = warehouseKey;
-        mnFormMode = mode;
-
+        manParamWarehouseKey = warehouseKey;
+        mnParamFormMode = mode;
+        mnParamMaintUser = maintUser;
+        
         if (itemId == SLibConstants.UNDEFINED) {
             moParamCompanyBranch = null;
             moParamWarehouse = null;
@@ -711,8 +742,8 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
             jtfStockUnitSymbol.setText("");
         }
         else {
-            moParamCompanyBranch = (SDataBizPartnerBranch) (manWarehouseKey[0] == SLibConstants.UNDEFINED ? null : SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { manWarehouseKey[0] }, SLibConstants.EXEC_MODE_VERBOSE));
-            moParamWarehouse = (SDataCompanyBranchEntity) (manWarehouseKey[1] == SLibConstants.UNDEFINED ? null : SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_COB_ENT, manWarehouseKey, SLibConstants.EXEC_MODE_VERBOSE));
+            moParamCompanyBranch = (SDataBizPartnerBranch) (manParamWarehouseKey[0] == SLibConstants.UNDEFINED ? null : SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { manParamWarehouseKey[0] }, SLibConstants.EXEC_MODE_VERBOSE));
+            moParamWarehouse = (SDataCompanyBranchEntity) (manParamWarehouseKey[1] == SLibConstants.UNDEFINED ? null : SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_COB_ENT, manParamWarehouseKey, SLibConstants.EXEC_MODE_VERBOSE));
             moParamItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { itemId }, SLibConstants.EXEC_MODE_VERBOSE);
             moParamUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { unitId }, SLibConstants.EXEC_MODE_VERBOSE);
             moParamStockLot = (SDataStockLot) (lotId == SLibConstants.UNDEFINED ? null : SDataUtilities.readRegistry(miClient, SDataConstants.TRN_LOT, new int[] { itemId, unitId, lotId }, SLibConstants.EXEC_MODE_VERBOSE));
@@ -752,12 +783,21 @@ public class SDialogStockCardex extends javax.swing.JDialog implements java.awt.
             jtfStockUnitSymbol.setCaretPosition(0);
         }
 
+        // show maintenance user if necessary:
+        if (mnParamMaintUser == SLibConstants.UNDEFINED) {
+            jtfMaintUser.setText("");
+        }
+        else {
+            jtfMaintUser.setText((String) miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { mnParamMaintUser }, SDbRegistry.FIELD_NAME));
+            jtfMaintUser.setCaretPosition(0);
+        }
+        
         setDecimals();
         showStockMoves();
     }
 
     public void setDecimals() {
-        DefaultTableCellRenderer tcr = mnFormMode == SLibConstants.MODE_QTY ?
+        DefaultTableCellRenderer tcr = mnParamFormMode == SLibConstants.MODE_QTY ?
             miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity() :
             miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary();
 

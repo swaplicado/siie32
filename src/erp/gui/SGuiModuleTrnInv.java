@@ -108,31 +108,31 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiIogMfgConsumeOut;
     private javax.swing.JMenuItem jmiIogAuditPending;
     private javax.swing.JMenuItem jmiIogAudited;
-    private javax.swing.JMenu jmIogMaint;
-    private javax.swing.JMenuItem jmiIogMaintStockPart;
-    private javax.swing.JMenuItem jmiIogMaintStockToolAvl;
-    private javax.swing.JMenuItem jmiIogMaintStockToolLent;
-    private javax.swing.JMenuItem jmiIogMaintStockToolMaint;
-    private javax.swing.JMenuItem jmiIogMaintStockToolLost;
-    private javax.swing.JMenuItem jmiIogMaintStockTool;
-    private javax.swing.JMenuItem jmiIogMaintMovementPart;
-    private javax.swing.JMenuItem jmiIogMaintMovementPartDetail;
-    private javax.swing.JMenuItem jmiIogMaintMovementTool;
-    private javax.swing.JMenuItem jmiIogMaintMovementToolDetail;
-    private javax.swing.JMenuItem jmiIogMaintMovementToolLent;
-    private javax.swing.JMenuItem jmiIogMaintMovementToolMaint;
-    private javax.swing.JMenuItem jmiIogMaintMovementToolLost;
-    private javax.swing.JMenuItem jmiIogMaintUserEmployee;
-    private javax.swing.JMenuItem jmiIogMaintUserContractor;
-    private javax.swing.JMenuItem jmiIogMaintUserContractorSupv;
-    private javax.swing.JMenuItem jmiIogMaintUserToolMaintProv;
-    private javax.swing.JMenuItem jmiIogMaintArea;
     private javax.swing.JMenuItem jmiIogInventoryValuation;
     private javax.swing.JMenuItem jmiIogInventoryMfgCost;
     private javax.swing.JMenuItem jmiIogStockValueByWarehouse;
     private javax.swing.JMenuItem jmiIogStockValueByItem;
     private javax.swing.JMenuItem jmiIogStockTheoricalCost;
-    private javax.swing.JMenuItem jmiIogStockClosing;
+    
+    private javax.swing.JMenu jmMenuMaint;
+    private javax.swing.JMenuItem jmiMaintStockPart;
+    private javax.swing.JMenuItem jmiMaintStockToolAvl;
+    private javax.swing.JMenuItem jmiMaintStockToolLent;
+    private javax.swing.JMenuItem jmiMaintStockToolMaint;
+    private javax.swing.JMenuItem jmiMaintStockToolLost;
+    private javax.swing.JMenuItem jmiMaintStockTool;
+    private javax.swing.JMenuItem jmiMaintMovementPart;
+    private javax.swing.JMenuItem jmiMaintMovementPartDetail;
+    private javax.swing.JMenuItem jmiMaintMovementTool;
+    private javax.swing.JMenuItem jmiMaintMovementToolDetail;
+    private javax.swing.JMenuItem jmiMaintMovementToolLent;
+    private javax.swing.JMenuItem jmiMaintMovementToolMaint;
+    private javax.swing.JMenuItem jmiMaintMovementToolLost;
+    private javax.swing.JMenuItem jmiMaintUserEmployee;
+    private javax.swing.JMenuItem jmiMaintUserContractor;
+    private javax.swing.JMenuItem jmiMaintUserContractorSupv;
+    private javax.swing.JMenuItem jmiMaintUserToolMaintProv;
+    private javax.swing.JMenuItem jmiMaintArea;
     
     private javax.swing.JMenu jmMenuStk;
     private javax.swing.JMenuItem jmiStkStock;
@@ -143,6 +143,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiStkStockMovementsEntry;
     private javax.swing.JMenuItem jmiStkStockRotation;
     private javax.swing.JMenuItem jmiStkStockRotationLot;
+    private javax.swing.JMenuItem jmiStkStockClosing;
 
     private javax.swing.JMenu jmMenuRep;
     private javax.swing.JMenuItem jmiReportStock;
@@ -199,6 +200,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightMfgFgAsg = false;
         boolean hasRightMfgFgDev = false;
         boolean hasRightMfgCon = false;
+        boolean hasRightMaint = false;
 
         jmMenuCat = new JMenu("Catálogos");
         jmiCatStockLot = new JMenuItem("Lotes");
@@ -345,31 +347,11 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMfgConsumeOut = new JMenuItem("Docs. salida por consumo de insumos y productos");
         jmiIogAuditPending = new JMenuItem("Docs. inventarios por auditar");
         jmiIogAudited = new JMenuItem("Docs. inventarios auditados");
-        jmIogMaint = new JMenu("Mantenimiento");
-        jmiIogMaintStockPart = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase());
-        jmiIogMaintStockToolAvl = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_AVL.toLowerCase());
-        jmiIogMaintStockToolLent = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LENT.toLowerCase());
-        jmiIogMaintStockToolMaint = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_MAINT.toLowerCase());
-        jmiIogMaintStockToolLost = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase());
-        jmiIogMaintStockTool = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase() + " (todas)");
-        jmiIogMaintMovementPart = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase());
-        jmiIogMaintMovementPartDetail = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase() + " a detalle");      
-        jmiIogMaintMovementTool = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase());
-        jmiIogMaintMovementToolDetail = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase() + " a detalle");
-        jmiIogMaintMovementToolLent = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LENT.toLowerCase());
-        jmiIogMaintMovementToolMaint = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_MAINT.toLowerCase());
-        jmiIogMaintMovementToolLost = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase());
-        jmiIogMaintUserEmployee = new JMenuItem("Empleados");
-        jmiIogMaintUserContractor = new JMenuItem("Contratistas");
-        jmiIogMaintUserContractorSupv = new JMenuItem("Residentes de contratistas");
-        jmiIogMaintUserToolMaintProv = new JMenuItem("Proveedores de mantto. de herramientas");
-        jmiIogMaintArea = new JMenuItem("Áreas de mantenimiento");
         jmiIogInventoryValuation = new JMenuItem("Valuación de inventarios");
         jmiIogInventoryMfgCost = new JMenuItem("Costos de producción por producto");
         jmiIogStockValueByWarehouse = new JMenuItem("Valor de inventarios por almacén");
         jmiIogStockValueByItem = new JMenuItem("Valor de inventarios por ítem");
         jmiIogStockTheoricalCost = new JMenuItem("Valor valuación vs. valor teórico");
-        jmiIogStockClosing = new JMenuItem("Generación de inventarios iniciales...");
         
         jmMenuIog.add(jmiIogStock);
         jmMenuIog.addSeparator();
@@ -388,40 +370,12 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuIog.add(jmiIogAuditPending);
         jmMenuIog.add(jmiIogAudited);
         jmMenuIog.addSeparator();
-        jmIogMaint.add(jmiIogMaintStockPart);
-        jmIogMaint.addSeparator();
-        jmIogMaint.add(jmiIogMaintStockToolAvl);
-        jmIogMaint.add(jmiIogMaintStockToolLent);
-        jmIogMaint.add(jmiIogMaintStockToolMaint);
-        jmIogMaint.add(jmiIogMaintStockToolLost);
-        jmIogMaint.add(jmiIogMaintStockTool);
-        jmIogMaint.addSeparator();
-        jmIogMaint.add(jmiIogMaintMovementPart);
-        jmIogMaint.add(jmiIogMaintMovementPartDetail);
-        jmIogMaint.add(jmiIogMaintMovementTool);
-        jmIogMaint.add(jmiIogMaintMovementToolDetail);
-        jmIogMaint.addSeparator();
-        jmIogMaint.add(jmiIogMaintMovementToolLent);
-        jmIogMaint.add(jmiIogMaintMovementToolMaint);
-        jmIogMaint.add(jmiIogMaintMovementToolLost);
-        jmIogMaint.addSeparator();
-        jmIogMaint.add(jmiIogMaintUserEmployee);
-        jmIogMaint.add(jmiIogMaintUserContractor);
-        jmIogMaint.add(jmiIogMaintUserContractorSupv);
-        jmIogMaint.add(jmiIogMaintUserToolMaintProv);
-        jmIogMaint.addSeparator();
-        jmIogMaint.add(jmiIogMaintArea);
-        jmMenuIog.add(jmIogMaint);
-        jmMenuIog.addSeparator();
         jmMenuIog.add(jmiIogInventoryValuation);
         jmMenuIog.add(jmiIogInventoryMfgCost);
         jmMenuIog.add(jmiIogStockValueByWarehouse);
         jmMenuIog.add(jmiIogStockValueByItem);
         //jmMenuIog.add(jmiIogStockValueByDiogType); sflores, 2016-03-09, evaluating to remove it
         jmMenuIog.add(jmiIogStockTheoricalCost);
-        jmMenuIog.addSeparator();
-        jmMenuIog.add(jmiIogStockClosing);
-        
         
         jmiIogStock.addActionListener(this);
         jmiIogMfgRmAssign.addActionListener(this);
@@ -434,30 +388,74 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogMfgConsumeOut.addActionListener(this);
         jmiIogAuditPending.addActionListener(this);
         jmiIogAudited.addActionListener(this);
-        jmiIogMaintStockPart.addActionListener(this);
-        jmiIogMaintStockToolAvl.addActionListener(this);
-        jmiIogMaintStockToolLent.addActionListener(this);
-        jmiIogMaintStockToolMaint.addActionListener(this);
-        jmiIogMaintStockToolLost.addActionListener(this);
-        jmiIogMaintStockTool.addActionListener(this);
-        jmiIogMaintMovementPart.addActionListener(this);
-        jmiIogMaintMovementPartDetail.addActionListener(this);
-        jmiIogMaintMovementTool.addActionListener(this);
-        jmiIogMaintMovementToolDetail.addActionListener(this);
-        jmiIogMaintMovementToolLent.addActionListener(this);
-        jmiIogMaintMovementToolMaint.addActionListener(this);
-        jmiIogMaintMovementToolLost.addActionListener(this);
-        jmiIogMaintUserEmployee.addActionListener(this);
-        jmiIogMaintUserContractor.addActionListener(this);
-        jmiIogMaintUserContractorSupv.addActionListener(this);
-        jmiIogMaintUserToolMaintProv.addActionListener(this);
-        jmiIogMaintArea.addActionListener(this);
         jmiIogInventoryValuation.addActionListener(this);
         jmiIogInventoryMfgCost.addActionListener(this);
         jmiIogStockValueByWarehouse.addActionListener(this);
         jmiIogStockValueByItem.addActionListener(this);
         jmiIogStockTheoricalCost.addActionListener(this);
-        jmiIogStockClosing.addActionListener(this);
+        
+        jmMenuMaint = new JMenu("Mantto.");
+        jmiMaintStockPart = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase());
+        jmiMaintStockToolAvl = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_AVL.toLowerCase());
+        jmiMaintStockToolLent = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LENT.toLowerCase());
+        jmiMaintStockToolMaint = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_MAINT.toLowerCase());
+        jmiMaintStockToolLost = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase());
+        jmiMaintStockTool = new JMenuItem("Stock " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase() + " (todas)");
+        jmiMaintMovementPart = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase());
+        jmiMaintMovementPartDetail = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_PART.toLowerCase() + " a detalle");      
+        jmiMaintMovementTool = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase());
+        jmiMaintMovementToolDetail = new JMenuItem("Docs. consumos de " + SModSysConsts.TXT_TRNX_MAINT_TOOL.toLowerCase() + " a detalle");
+        jmiMaintMovementToolLent = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LENT.toLowerCase());
+        jmiMaintMovementToolMaint = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_MAINT.toLowerCase());
+        jmiMaintMovementToolLost = new JMenuItem("Docs. " + SModSysConsts.TXT_TRNX_MAINT_TOOL_LOST.toLowerCase());
+        jmiMaintUserEmployee = new JMenuItem("Empleados");
+        jmiMaintUserContractor = new JMenuItem("Contratistas");
+        jmiMaintUserContractorSupv = new JMenuItem("Residentes de contratistas");
+        jmiMaintUserToolMaintProv = new JMenuItem("Proveedores de mantto. de herramientas");
+        jmiMaintArea = new JMenuItem("Áreas de mantenimiento");
+        
+        jmMenuMaint.add(jmiMaintStockPart);
+        jmMenuMaint.addSeparator();
+        jmMenuMaint.add(jmiMaintStockToolAvl);
+        jmMenuMaint.add(jmiMaintStockToolLent);
+        jmMenuMaint.add(jmiMaintStockToolMaint);
+        jmMenuMaint.add(jmiMaintStockToolLost);
+        jmMenuMaint.add(jmiMaintStockTool);
+        jmMenuMaint.addSeparator();
+        jmMenuMaint.add(jmiMaintMovementPart);
+        jmMenuMaint.add(jmiMaintMovementPartDetail);
+        jmMenuMaint.add(jmiMaintMovementTool);
+        jmMenuMaint.add(jmiMaintMovementToolDetail);
+        jmMenuMaint.addSeparator();
+        jmMenuMaint.add(jmiMaintMovementToolLent);
+        jmMenuMaint.add(jmiMaintMovementToolMaint);
+        jmMenuMaint.add(jmiMaintMovementToolLost);
+        jmMenuMaint.addSeparator();
+        jmMenuMaint.add(jmiMaintUserEmployee);
+        jmMenuMaint.add(jmiMaintUserContractor);
+        jmMenuMaint.add(jmiMaintUserContractorSupv);
+        jmMenuMaint.add(jmiMaintUserToolMaintProv);
+        jmMenuMaint.addSeparator();
+        jmMenuMaint.add(jmiMaintArea);
+        
+        jmiMaintStockPart.addActionListener(this);
+        jmiMaintStockToolAvl.addActionListener(this);
+        jmiMaintStockToolLent.addActionListener(this);
+        jmiMaintStockToolMaint.addActionListener(this);
+        jmiMaintStockToolLost.addActionListener(this);
+        jmiMaintStockTool.addActionListener(this);
+        jmiMaintMovementPart.addActionListener(this);
+        jmiMaintMovementPartDetail.addActionListener(this);
+        jmiMaintMovementTool.addActionListener(this);
+        jmiMaintMovementToolDetail.addActionListener(this);
+        jmiMaintMovementToolLent.addActionListener(this);
+        jmiMaintMovementToolMaint.addActionListener(this);
+        jmiMaintMovementToolLost.addActionListener(this);
+        jmiMaintUserEmployee.addActionListener(this);
+        jmiMaintUserContractor.addActionListener(this);
+        jmiMaintUserContractorSupv.addActionListener(this);
+        jmiMaintUserToolMaintProv.addActionListener(this);
+        jmiMaintArea.addActionListener(this);
         
         jmMenuStk = new JMenu("Inventarios");
         jmiStkStock = new JMenuItem("Existencias");
@@ -468,6 +466,8 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockMovementsEntry = new JMenuItem("Movimientos de inventarios a detalle");
         jmiStkStockRotation = new JMenuItem("Rotación");
         jmiStkStockRotationLot = new JMenuItem("Rotación por lote");
+        jmiStkStockClosing = new JMenuItem("Generación de inventarios iniciales...");
+        
         jmMenuStk.add(jmiStkStock);
         jmMenuStk.add(jmiStkStockLot);
         jmMenuStk.addSeparator();
@@ -479,6 +479,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockRotation);
         jmMenuStk.add(jmiStkStockRotationLot);
+        jmMenuStk.addSeparator();
+        jmMenuStk.add(jmiStkStockClosing);
+        
         jmiStkStock.addActionListener(this);
         jmiStkStockLot.addActionListener(this);
         jmiStkStockWarehouse.addActionListener(this);
@@ -487,6 +490,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockMovementsEntry.addActionListener(this);
         jmiStkStockRotation.addActionListener(this);
         jmiStkStockRotationLot.addActionListener(this);
+        jmiStkStockClosing.addActionListener(this);
 
         jmMenuRep = new JMenu("Reportes");
         jmiReportStock = new JMenuItem("Reporte de existencias...");
@@ -545,29 +549,13 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         hasRightMfgFgAsg = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_MFG_FG_ASG).HasRight;
         hasRightMfgFgDev = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_MFG_FG_DEV).HasRight;
         hasRightMfgCon = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_MFG_CON).HasRight;
+        hasRightMaint = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_MAINT).HasRight;
 
         jmMenuCat.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt);
         jmMenuDpsPurSup.setEnabled(hasRightInPur);
         jmMenuDpsPurRet.setEnabled(hasRightOutPur);
         jmMenuDpsSalSup.setEnabled(hasRightOutSal);
         jmMenuDpsSalRet.setEnabled(hasRightInSal);
-        jmMenuIog.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt || hasRightMfgRmAsg || hasRightMfgRmDev || hasRightMfgWpAsg || hasRightMfgWpDev || hasRightMfgFgAsg || hasRightMfgFgDev);
-        jmiIogMfgRmAssign.setEnabled(hasRightMfgRmAsg);
-        jmiIogMfgRmReturn.setEnabled(hasRightMfgRmDev);
-        jmiIogMfgWpAssign.setEnabled(hasRightMfgWpAsg);
-        jmiIogMfgWpReturn.setEnabled(hasRightMfgWpDev);
-        jmiIogMfgFgAssign.setEnabled(hasRightMfgFgAsg);
-        jmiIogMfgFgReturn.setEnabled(hasRightMfgFgDev);
-        jmiIogMfgConsumeIn.setEnabled(hasRightMfgCon);
-        jmiIogMfgConsumeOut.setEnabled(hasRightMfgCon);
-        jmiIogAuditPending.setEnabled(hasRightAudit);
-        jmiIogAudited.setEnabled(hasRightAudit);
-        jmiIogInventoryValuation.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiIogInventoryMfgCost.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiIogStockValueByWarehouse.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiIogStockValueByItem.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiIogStockTheoricalCost.setEnabled(hasRightInAdj || hasRightOutAdj);
-        jmiIogStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmMenuMfg.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev || hasRightMfgWpAsg || hasRightMfgWpDev || hasRightMfgFgAsg || hasRightMfgFgDev);
         jmiMfgPanelProdOrder.setEnabled(true);
         jmiMfgAssignPend.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
@@ -584,7 +572,25 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiMfgConsumePendEntry.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
         jmiMfgConsumed.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
         jmiMfgConsumedEntry.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
+        jmMenuIog.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt || hasRightMfgRmAsg || hasRightMfgRmDev || hasRightMfgWpAsg || hasRightMfgWpDev || hasRightMfgFgAsg || hasRightMfgFgDev);
+        jmiIogMfgRmAssign.setEnabled(hasRightMfgRmAsg);
+        jmiIogMfgRmReturn.setEnabled(hasRightMfgRmDev);
+        jmiIogMfgWpAssign.setEnabled(hasRightMfgWpAsg);
+        jmiIogMfgWpReturn.setEnabled(hasRightMfgWpDev);
+        jmiIogMfgFgAssign.setEnabled(hasRightMfgFgAsg);
+        jmiIogMfgFgReturn.setEnabled(hasRightMfgFgDev);
+        jmiIogMfgConsumeIn.setEnabled(hasRightMfgCon);
+        jmiIogMfgConsumeOut.setEnabled(hasRightMfgCon);
+        jmiIogAuditPending.setEnabled(hasRightAudit);
+        jmiIogAudited.setEnabled(hasRightAudit);
+        jmiIogInventoryValuation.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiIogInventoryMfgCost.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiIogStockValueByWarehouse.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiIogStockValueByItem.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmiIogStockTheoricalCost.setEnabled(hasRightInAdj || hasRightOutAdj);
+        jmMenuMaint.setEnabled(hasRightMaint);
         jmMenuStk.setEnabled(hasRightStock);
+        jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmMenuRep.setEnabled(hasRightReports);
         jmMenuRepStats.setEnabled(hasRightMfgRmAsg || hasRightMfgRmDev);
 
@@ -1183,7 +1189,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
 
     @Override
     public javax.swing.JMenu[] getMenues() {
-        return new JMenu[] { jmMenuCat, jmMenuDpsPurSup, jmMenuDpsPurRet, jmMenuDpsSalSup, jmMenuDpsSalRet, jmMenuMfg, jmMenuIog, jmMenuStk, jmMenuRep };
+        return new JMenu[] { jmMenuCat, jmMenuDpsPurSup, jmMenuDpsPurRet, jmMenuDpsSalSup, jmMenuDpsSalRet, jmMenuMfg, jmMenuIog, jmMenuMaint, jmMenuStk, jmMenuRep };
     }
 
     @Override
@@ -1349,60 +1355,6 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiIogAudited) {
                 showView(SDataConstants.TRN_DIOG, SDataConstants.TRNX_DIOG_AUDITED);
             }
-            else if (item == jmiIogMaintStockPart) {
-                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_PART);
-            }
-            else if (item == jmiIogMaintStockToolAvl) {
-                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL_AVL);
-            }
-            else if (item == jmiIogMaintStockToolLent) {
-                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL_LENT);
-            }
-            else if (item == jmiIogMaintStockToolMaint) {
-                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL_MAINT);
-            }
-            else if (item == jmiIogMaintStockToolLost) {
-                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL_LOST);
-            }
-            else if (item == jmiIogMaintStockTool) {
-                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL);
-            }
-            else if (item == jmiIogMaintMovementPart) {
-                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_PART, SUtilConsts.PER_DOC);
-            }
-            else if (item == jmiIogMaintMovementPartDetail) {
-                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_PART, SUtilConsts.PER_ITM);
-            }
-            else if (item == jmiIogMaintMovementTool) {
-                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL, SUtilConsts.PER_DOC);
-            }
-            else if (item == jmiIogMaintMovementToolDetail) {
-                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL, SUtilConsts.PER_ITM);
-            }
-            else if (item == jmiIogMaintMovementToolLent) {
-                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL_LENT);
-            }
-            else if (item == jmiIogMaintMovementToolMaint) {
-                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL_MAINT);
-            }
-            else if (item == jmiIogMaintMovementToolLost) {
-                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL_LOST);
-            }
-            else if (item == jmiIogMaintUserEmployee) {
-                miClient.getSession().showView(SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE, null);
-            }
-            else if (item == jmiIogMaintUserContractor) {
-                miClient.getSession().showView(SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR, null);
-            }
-            else if (item == jmiIogMaintUserContractorSupv) {
-                miClient.getSession().showView(SModConsts.TRN_MAINT_USER_SUPV, SLibConstants.UNDEFINED, null);
-            }
-            else if (item == jmiIogMaintUserToolMaintProv) {
-                miClient.getSession().showView(SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV, null);
-            }
-            else if (item == jmiIogMaintArea) {
-                miClient.getSession().showView(SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);
-            }
             else if (item == jmiIogInventoryValuation) {
                 miClient.getSession().showView(SModConsts.TRN_INV_VAL, SLibConstants.UNDEFINED, null);
             }
@@ -1415,9 +1367,59 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             else if (item == jmiIogStockValueByItem) {
                 miClient.getSession().showView(SModConsts.TRNX_STK_COST, SModConsts.ITMU_ITEM, null);
             }
-            else if (item == jmiIogStockClosing) {
-                moDialogUtilStockClosing.resetForm();
-                moDialogUtilStockClosing.setVisible(true);
+            else if (item == jmiMaintStockPart) {
+                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_PART);
+            }
+            else if (item == jmiMaintStockToolAvl) {
+                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL_AVL);
+            }
+            else if (item == jmiMaintStockToolLent) {
+                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL_LENT);
+            }
+            else if (item == jmiMaintStockToolMaint) {
+                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL_MAINT);
+            }
+            else if (item == jmiMaintStockToolLost) {
+                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL_LOST);
+            }
+            else if (item == jmiMaintStockTool) {
+                showView(SDataConstants.TRNX_MAINT_STK, SModSysConsts.TRNX_MAINT_TOOL);
+            }
+            else if (item == jmiMaintMovementPart) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_PART, SUtilConsts.PER_DOC);
+            }
+            else if (item == jmiMaintMovementPartDetail) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_PART, SUtilConsts.PER_ITM);
+            }
+            else if (item == jmiMaintMovementTool) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL, SUtilConsts.PER_DOC);
+            }
+            else if (item == jmiMaintMovementToolDetail) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL, SUtilConsts.PER_ITM);
+            }
+            else if (item == jmiMaintMovementToolLent) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL_LENT);
+            }
+            else if (item == jmiMaintMovementToolMaint) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL_MAINT);
+            }
+            else if (item == jmiMaintMovementToolLost) {
+                showView(SDataConstants.TRNX_MAINT_DIOG, SModSysConsts.TRNX_MAINT_TOOL_LOST);
+            }
+            else if (item == jmiMaintUserEmployee) {
+                miClient.getSession().showView(SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE, null);
+            }
+            else if (item == jmiMaintUserContractor) {
+                miClient.getSession().showView(SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR, null);
+            }
+            else if (item == jmiMaintUserContractorSupv) {
+                miClient.getSession().showView(SModConsts.TRN_MAINT_USER_SUPV, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiMaintUserToolMaintProv) {
+                miClient.getSession().showView(SModConsts.TRN_MAINT_USER, SModSysConsts.TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV, null);
+            }
+            else if (item == jmiMaintArea) {
+                miClient.getSession().showView(SModConsts.TRN_MAINT_AREA, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiStkStock) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK);
@@ -1445,6 +1447,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiStkStockRotationLot) {
                 showView(SDataConstants.TRNX_STK_ROTATION, SDataConstants.TRNX_STK_LOT);
+            }
+            else if (item == jmiStkStockClosing) {
+                moDialogUtilStockClosing.resetForm();
+                moDialogUtilStockClosing.setVisible(true);
             }
             else if (item == jmiReportStock) {
                 menuRepStock();

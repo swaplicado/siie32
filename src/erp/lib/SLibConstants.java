@@ -121,8 +121,10 @@ public abstract class SLibConstants {
 
     public static final int MODE_STK_ASD = 1;   // stock assigned
     public static final int MODE_STK_RET = 2;   // stock returned
-    public static final int MODE_QTY = 1;       // quantity
-    public static final int MODE_QTY_EXT = 2;   // extended quantity
+    /** Quantity. */
+    public static final int MODE_QTY = 1;
+    /** Extended quantity. */
+    public static final int MODE_QTY_EXT = 2;
     public static final int MODE_AS_SRC = 1;    // as source
     public static final int MODE_AS_DES = 2;    // as destiny
 

@@ -209,6 +209,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_DOC_ORD_DELAY = 103023;
     public static final int PRV_PUR_DOC_OMT_DOC_SRC = 103024;
     public static final int PRV_PUR_PRICE_CHG = 103031;
+    public static final int PRV_PUR_CRED_CONFIG = 103041;
     public static final int PRV_PUR_ITEM_SUP = 103051;
     public static final int PRV_PUR_REP = 103901;
 
@@ -235,6 +236,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_DOC_ORD_DELAY = 104023;
     public static final int PRV_SAL_DOC_OMT_DOC_SRC = 104024;
     public static final int PRV_SAL_PRICE_CHG = 104031;
+    public static final int PRV_SAL_CRED_CONFIG = 104041;
     public static final int PRV_SAL_REP = 104901;
 
     public static final int PRV_INV_DIOG_CFG = 105001;
@@ -262,6 +264,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_INV_MFG_FG_ASG = 105055;
     public static final int PRV_INV_MFG_FG_DEV = 105056;
     public static final int PRV_INV_MFG_CON = 105057;
+    public static final int PRV_INV_MAINT = 105058;
     public static final int PRV_INV_REP = 105901;
 
     public static final int PRV_MKT_CUS_CFG = 106001;
