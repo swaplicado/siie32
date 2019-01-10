@@ -21,7 +21,7 @@ public final class SCfdPacket implements java.io.Serializable {
     private java.lang.String msCfdCertNumber;   // used in creation of SDataCfd
     private java.lang.String msCfdStringSigned; // used in creation of SDataCfd
     private java.lang.String msCfdSignature;    // used in creation of SDataCfd
-    private java.lang.String msDocXmlUuid;      // used in creation of SDataCfd
+    private java.lang.String msBaseXUuid;       // used in creation of SDataCfd
     private java.lang.String msDocXml;          // used in creation of SDataCfd
     private java.lang.String msDocXmlName;      // used in creation of SDataCfd
     private java.util.Date mtXmlDatetime;       // used in creation of SDataCfd
@@ -29,6 +29,7 @@ public final class SCfdPacket implements java.io.Serializable {
     private java.lang.String msXmlRfcReceptor;  // used in creation of SDataCfd
     private double mdXmlTotalCy;                // used in creation of SDataCfd
     private java.lang.String msCfdUuid;         // used in creation of SDataCfd
+    private java.lang.String msCancellationStatus;              // used in creation of SDataCfd
     private java.lang.String msAcknowledgmentCancellationXml;   // used in creation of SDataCfd
     private boolean mbIsCfdConsistent;          // used in creation of SDataCfd
     private int mnFkCfdTypeId;                  // used in creation of SDataCfd
@@ -38,6 +39,7 @@ public final class SCfdPacket implements java.io.Serializable {
     private int mnFkXmlDeliveryStatusId;        // used in creation of SDataCfd
     private int mnFkUserDeliveryId;             // used in creation of SDataCfd
     private int mnFkCompanyBranchId;            // used in creation of SDataCfd
+    private int mnFkFactoringBankId;            // used in creation of SDataCfd
     private int mnDpsYearId;                    // used in creation of SDataCfd
     private int mnDpsDocId;                     // used in creation of SDataCfd
     private int mnRecordEntryYearId;                    // used in creation of SDataCfd
@@ -70,7 +72,7 @@ public final class SCfdPacket implements java.io.Serializable {
         msCfdCertNumber = "";
         msCfdStringSigned = "";
         msCfdSignature = "";
-        msDocXmlUuid = "";
+        msBaseXUuid = "";
         msDocXml = "";
         msDocXmlName = "";
         mtXmlDatetime = null;
@@ -78,6 +80,7 @@ public final class SCfdPacket implements java.io.Serializable {
         msXmlRfcReceptor = "";
         mdXmlTotalCy = 0;
         msCfdUuid = "";
+        msCancellationStatus = "";
         msAcknowledgmentCancellationXml = "";
         mbIsCfdConsistent = true;
         mnFkCfdTypeId = 0 ;
@@ -119,7 +122,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setCfdCertNumber(java.lang.String s) { msCfdCertNumber = s; }
     public void setCfdStringSigned(java.lang.String s) { msCfdStringSigned = s; }
     public void setCfdSignature(java.lang.String s) { msCfdSignature = s; }
-    public void setDocXmlUuid(java.lang.String s) { msDocXmlUuid = s; }
+    public void setBaseXUuid(java.lang.String s) { msBaseXUuid = s; }
     public void setDocXml(java.lang.String s) { msDocXml = s; }
     public void setDocXmlName(java.lang.String s) { msDocXmlName = s; }
     public void setXmlDate(java.util.Date t) { mtXmlDatetime = t; }
@@ -127,6 +130,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setXmlRfcReceptor(java.lang.String s) { msXmlRfcReceptor = s; }
     public void setXmlTotalCy(double d) { mdXmlTotalCy = d; }
     public void setCfdUuid(java.lang.String s) { msCfdUuid = s; }
+    public void setCancellationStatus(java.lang.String s) { msCancellationStatus = s; }
     public void setAcknowledgmentCancellationXml(java.lang.String s) { msAcknowledgmentCancellationXml = s; }
     public void setIsCfdConsistent(boolean b) { mbIsCfdConsistent = b; }
     public void setFkCfdTypeId(int n) { mnFkCfdTypeId = n; }
@@ -136,6 +140,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public void setFkXmlDeliveryStatusId(int n) { mnFkXmlDeliveryStatusId = n; }
     public void setFkUserDeliveryId(int n) { mnFkUserDeliveryId = n; }
     public void setFkCompanyBranchId(int n) { mnFkCompanyBranchId = n; }
+    public void setFkFactoringBankId(int n) { mnFkFactoringBankId = n; }
     public void setDpsYearId(int n) { mnDpsYearId = n; }
     public void setDpsDocId(int n) { mnDpsDocId = n; }
     public void setRecordEntryYearId(int n) { mnRecordEntryYearId = n; }
@@ -167,7 +172,7 @@ public final class SCfdPacket implements java.io.Serializable {
     //public java.lang.String getCfdCertNumber() { return msCfdCertNumber; }
     public java.lang.String getCfdStringSigned() { return msCfdStringSigned; }
     public java.lang.String getCfdSignature() { return msCfdSignature; }
-    public java.lang.String getDocXmlUuid() { return msDocXmlUuid; }
+    public java.lang.String getBaseXUuid() { return msBaseXUuid; }
     public java.lang.String getDocXml() { return msDocXml; }
     public java.lang.String getDocXmlName() { return msDocXmlName; }
     public java.util.Date getXmlDate() { return mtXmlDatetime; }
@@ -175,6 +180,7 @@ public final class SCfdPacket implements java.io.Serializable {
     //public java.lang.String getXmlRfcReceptor() { return msXmlRfcReceptor; }
     //public double getXmlTotalCy() { return mdXmlTotalCy; }
     //public java.lang.String getCfdUuid() { return msCfdUuid; }
+    public java.lang.String getCancellationStatus() { return msCancellationStatus; }
     public java.lang.String getAcknowledgmentCancellationXml() { return msAcknowledgmentCancellationXml; }
     public boolean getIsCfdConsistent() { return mbIsCfdConsistent; }
     public int getFkCfdTypeId() { return mnFkCfdTypeId; }
@@ -184,6 +190,7 @@ public final class SCfdPacket implements java.io.Serializable {
     public int getFkXmlDeliveryStatusId() { return mnFkXmlDeliveryStatusId; }
     public int getFkUserDeliveryId() { return mnFkUserDeliveryId; }
     public int getFkCompanyBranchId() { return mnFkCompanyBranchId; }
+    public int getFkFactoringBankId() { return mnFkFactoringBankId; }
     public int getDpsYearId() { return mnDpsYearId; }
     public int getDpsDocId() { return mnDpsDocId; }
     public int getRecordEntryYearId() { return mnRecordEntryYearId; }
@@ -252,7 +259,7 @@ public final class SCfdPacket implements java.io.Serializable {
         cfd.setCertNumber(msCfdCertNumber);
         cfd.setStringSigned(msCfdStringSigned);
         cfd.setSignature(msCfdSignature);
-        cfd.setDocXmlUuid(msDocXmlUuid);
+        cfd.setBaseXUuid(msBaseXUuid);
         cfd.setDocXml(msDocXml);
         cfd.setDocXmlName(msDocXmlName);
         cfd.setDocXmlRfcEmi(msXmlRfcEmisor);
@@ -261,6 +268,7 @@ public final class SCfdPacket implements java.io.Serializable {
         //cfd...
         cfd.setUuid(msCfdUuid);
         //cfd...
+        cfd.setCancellationStatus(msCancellationStatus);
         cfd.setAcknowledgmentCancellationXml(msAcknowledgmentCancellationXml);
         //cfd...
         cfd.setIsConsistent(mbIsCfdConsistent);
@@ -270,6 +278,7 @@ public final class SCfdPacket implements java.io.Serializable {
         cfd.setFkXmlDeliveryTypeId(mnFkXmlDeliveryTypeId);
         cfd.setFkXmlDeliveryStatusId(mnFkXmlDeliveryStatusId);
         cfd.setFkCompanyBranchId_n(mnFkCompanyBranchId);
+        cfd.setFkFactoringBankId_n(mnFkFactoringBankId);
         cfd.setFkDpsYearId_n(mnDpsYearId);
         cfd.setFkDpsDocId_n(mnDpsDocId);
         cfd.setFkRecordYearId_n(mnRecordEntryYearId);

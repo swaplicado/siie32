@@ -97,7 +97,7 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         jPanel4.add(jlDateStart);
 
         jtfDateStart.setText("dd/mm/yyyy");
-        jtfDateStart.setPreferredSize(new java.awt.Dimension(120, 23));
+        jtfDateStart.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel4.add(jtfDateStart);
 
         jbDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
@@ -169,11 +169,14 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         mvFields = new Vector<SFormField>();
         mvFields.add(moFieldDate);
         mvFields.add(moFieldAnnulSat);
-        mvFields.add( moFieldTypeAnnul);
+        mvFields.add(moFieldTypeAnnul);
 
         jbCancel.addActionListener(this);
         jbOk.addActionListener(this);
         jbDate.addActionListener(this);
+        
+        miClient.getSession().populateCatalogue(moKeyDpsAnnulationType, SModConsts.TRNU_TP_DPS_ANN, SLibConsts.UNDEFINED, null);
+        moKeyDpsAnnulationType.setValue(new int[] { SModSysConsts.TRNU_TP_DPS_ANN_NA });
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -188,8 +191,6 @@ public class SDialogAnnulCfdi extends javax.swing.JDialog implements erp.lib.for
         };
         
         SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
-        miClient.getSession().populateCatalogue(moKeyDpsAnnulationType, SModConsts.TRNU_TP_DPS_ANN, SLibConsts.UNDEFINED, null);
-        moKeyDpsAnnulationType.setValue(new int[] { SModSysConsts.TRNU_TP_DPS_ANN_NA });
     }
 
     private void enableFieldDpsAnnulationType() {

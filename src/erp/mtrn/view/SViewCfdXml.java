@@ -74,6 +74,7 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.TRN_DPS);
         mvSuscriptors.add(SModConsts.HRS_SIE_PAY);
+        mvSuscriptors.add(SModConsts.TRN_CFD);
 
         populateTable();
     }

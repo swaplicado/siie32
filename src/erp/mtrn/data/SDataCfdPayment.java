@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package erp.mtrn.data;
 
 import cfd.DCfdConsts;
@@ -56,6 +57,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     protected String msAuxCfdConfirmacion;
     protected String msAuxCfdEmisorRegimenFiscal;
     protected SDataBizPartner moAuxCfdDbmsDataReceptor;
+    protected SDataBizPartner moAuxCfdDbmsDataReceptorFactoring;
     protected String msAuxCfdCfdiRelacionadosTipoRelacion;
     protected String msAuxCfdCfdiRelacionadoUuid; // available when CFDI is not stored in SIIE, e.g., third-party CFDI
     protected SDataCfd moAuxCfdDbmsDataCfdCfdiRelacionado; // available when CFDI is stored in SIIE
@@ -80,6 +82,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     /*
      * Private methods
      */
+    
+    public SDataBizPartner getEffectiveReceptor() {
+        return moAuxCfdDbmsDataReceptorFactoring != null ? moAuxCfdDbmsDataReceptorFactoring : moAuxCfdDbmsDataReceptor;
+    }
     
     private boolean testAnnulment(java.sql.Connection connection, java.lang.String msg) throws java.lang.Exception {
         moDbmsDataCfd.setAuxIsProcessingValidation(mbAuxIsProcessingValidation);
@@ -120,6 +126,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public void setAuxCfdConfirmacion(String s) { msAuxCfdConfirmacion = s; }
     public void setAuxCfdEmisorRegimenFiscal(String s) { msAuxCfdEmisorRegimenFiscal = s; }
     public void setAuxCfdDbmsDataReceptor(SDataBizPartner o) { moAuxCfdDbmsDataReceptor = o; }
+    public void setAuxCfdDbmsDataReceptorFactoring(SDataBizPartner o) { moAuxCfdDbmsDataReceptorFactoring = o; }
     public void setAuxCfdCfdiRelacionadosTipoRelacion(String s) { msAuxCfdCfdiRelacionadosTipoRelacion = s; }
     public void setAuxCfdCfdiRelacionadoUuid(String s) { msAuxCfdCfdiRelacionadoUuid = s; }
     public void setAuxCfdDbmsDataCfdCfdiRelacionado(SDataCfd o) { moAuxCfdDbmsDataCfdCfdiRelacionado = o; }
@@ -127,6 +134,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
     public String getAuxCfdConfirmacion() { return msAuxCfdConfirmacion; }
     public String getAuxCfdEmisorRegimenFiscal() { return msAuxCfdEmisorRegimenFiscal; }
     public SDataBizPartner getAuxCfdDbmsDataReceptor() { return moAuxCfdDbmsDataReceptor; }
+    public SDataBizPartner getAuxCfdDbmsDataReceptorFactoring() { return moAuxCfdDbmsDataReceptorFactoring; }
     public String getAuxCfdCfdiRelacionadosTipoRelacion() { return msAuxCfdCfdiRelacionadosTipoRelacion; }
     public String getAuxCfdCfdiRelacionadoUuid() { return msAuxCfdCfdiRelacionadoUuid; }
     public SDataCfd getAuxCfdDbmsDataCfdCfdiRelacionado() { return moAuxCfdDbmsDataCfdCfdiRelacionado; }
@@ -148,23 +156,34 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         this.msAuxCfdConfirmacion = sourceCfdPayment.msAuxCfdConfirmacion;
         this.msAuxCfdEmisorRegimenFiscal = sourceCfdPayment.msAuxCfdEmisorRegimenFiscal;
         this.moAuxCfdDbmsDataReceptor = sourceCfdPayment.moAuxCfdDbmsDataReceptor;
+        this.moAuxCfdDbmsDataReceptorFactoring = sourceCfdPayment.moAuxCfdDbmsDataReceptorFactoring;
         this.msAuxCfdCfdiRelacionadosTipoRelacion = sourceCfdPayment.msAuxCfdCfdiRelacionadosTipoRelacion;
         this.msAuxCfdCfdiRelacionadoUuid = sourceCfdPayment.msAuxCfdCfdiRelacionadoUuid;
         this.moAuxCfdDbmsDataCfdCfdiRelacionado = sourceCfdPayment.moAuxCfdDbmsDataCfdCfdiRelacionado;
         this.maAuxCfdPaymentEntries.addAll(sourceCfdPayment.maAuxCfdPaymentEntries);
     }
     
-    public void deleteRecord(java.sql.Connection connection) throws java.lang.Exception {
+    private void deleteRecordCfd(java.sql.Connection connection) throws java.lang.Exception {
         String sql;
         Statement statement = connection.createStatement();
         
         sql = "DELETE FROM trn_cfd_fin_rec "
                 + "WHERE id_cfd = " + moDbmsDataCfd.getPkCfdId() + ";";
         statement.execute(sql);
-
+    }
+    
+    public void deleteRecordFin(java.sql.Connection connection) throws java.lang.Exception {
+        String sql;
+        Statement statement = connection.createStatement();
+        
         sql = "UPDATE fin_rec_ety SET b_del = 1, fid_usr_edit = " + (mnAuxFkUserEditId != 0 ? mnAuxFkUserEditId : SUtilConsts.USR_NA_ID) + ", ts_del = NOW() "
                 + "WHERE fid_cfd_n = " + moDbmsDataCfd.getPkCfdId() + " AND NOT b_del;";
         statement.execute(sql);
+    }
+    
+    public void deleteAccounting(java.sql.Connection connection) throws java.lang.Exception {
+        deleteRecordCfd(connection);
+        deleteRecordFin(connection);
     }
 
     public static int getDbmsDataReceptorId(final Statement statement, final int idCfdi) throws Exception {
@@ -207,6 +226,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         msAuxCfdConfirmacion = "";
         msAuxCfdEmisorRegimenFiscal = "";
         moAuxCfdDbmsDataReceptor = null;
+        moAuxCfdDbmsDataReceptorFactoring = null;
         msAuxCfdCfdiRelacionadosTipoRelacion = "";
         msAuxCfdCfdiRelacionadoUuid = "";
         moAuxCfdDbmsDataCfdCfdiRelacionado = null;
@@ -252,9 +272,9 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                         + "LIMIT 1;";
                 resultSet = statement.executeQuery(sql);
                 if (resultSet.next()) {
-                    mnAuxFkUserNewId = resultSet.getInt(1);
-                    mnAuxFkUserEditId = resultSet.getInt(2);
-                    mnAuxFkUserDeleteId = resultSet.getInt(3);
+                    mnAuxFkUserNewId = resultSet.getInt("fid_usr_new");
+                    mnAuxFkUserEditId = resultSet.getInt("fid_usr_edit");
+                    mnAuxFkUserDeleteId = resultSet.getInt("fid_usr_del");
                 }
                 
                 // parse CFDI to extract auxiliar data:
@@ -277,9 +297,15 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                         }
                     }
 
+                    if (moDbmsDataCfd.getFkFactoringBankId_n() != 0) {
+                        moAuxCfdDbmsDataReceptorFactoring = new SDataBizPartner();
+                        moAuxCfdDbmsDataReceptorFactoring.read(new int[] { moDbmsDataCfd.getFkFactoringBankId_n() }, statementAux);
+                    }
+                    
                     // extract complement:
 
                     int numberEntry = 0;
+                    int[] paymentEntryDocTypes = new int[] { SCfdPaymentEntryDoc.TYPE_INT, SCfdPaymentEntryDoc.TYPE_FEE, SCfdPaymentEntryDoc.TYPE_FEE_VAT };
 
                     if (comprobante.getEltOpcComplemento() != null) {
                         for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
@@ -313,8 +339,9 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
                                     SDataRecord record;
                                     int[] accountCashKey;
+                                    int paymentEntryType;
 
-                                    sql = "SELECT fid_rec_year, fid_rec_per, fid_rec_bkc, fid_rec_tp_rec, fid_rec_num, fid_acc_cash_cob, fid_acc_cash_acc_cash "
+                                    sql = "SELECT ety_type, fid_rec_year, fid_rec_per, fid_rec_bkc, fid_rec_tp_rec, fid_rec_num, fid_acc_cash_cob, fid_acc_cash_acc_cash "
                                             + "FROM trn_cfd_fin_rec "
                                             + "WHERE id_cfd = " + moDbmsDataCfd.getPkCfdId() + " AND id_ety = " + numberEntry + ";";
                                     resultSet = statement.executeQuery(sql);
@@ -326,12 +353,14 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                         record = new SDataRecord();
                                         record.read(new Object[] { resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num") }, statementAux);
                                         accountCashKey = new int[] { resultSet.getInt("fid_acc_cash_cob"), resultSet.getInt("fid_acc_cash_acc_cash") };
+                                        paymentEntryType = resultSet.getInt("ety_type");
                                     }
 
                                     // add XML payment:
 
                                     SCfdPaymentEntry paymentEntry = new SCfdPaymentEntry(
                                             numberEntry, 
+                                            paymentEntryType, 
                                             pago.getAttFechaPago().getDatetime(), 
                                             pago.getAttFormaDePagoP().getString(), 
                                             currencyId, 
@@ -348,6 +377,11 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                     paymentEntry.AccountDesFiscalId = pago.getAttRfcEmisorCtaBen().getString();
                                     paymentEntry.AccountDesNumber = pago.getAttCtaBeneficiario().getString();
                                     paymentEntry.AccountDesKey = accountCashKey;
+                                    
+                                    if (moAuxCfdDbmsDataReceptorFactoring != null) {
+                                        paymentEntry.AuxFactoringBankId = moAuxCfdDbmsDataReceptorFactoring.getPkBizPartnerId();
+                                        paymentEntry.AuxFactoringBankFiscalId = moAuxCfdDbmsDataReceptorFactoring.getFiscalId();
+                                    }
 
                                     // get XML related documents of XML payments:
 
@@ -380,11 +414,32 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                         }
 
                                         // add XML related document of XML payment:
+                                        
+                                        int paymentEntryDocType;
+                                        
+                                        switch (paymentEntryType) {
+                                            case SCfdPaymentEntry.TYPE_STANDARD:
+                                            case SCfdPaymentEntry.TYPE_FACTORING_PAY:
+                                                paymentEntryDocType = SCfdPaymentEntryDoc.TYPE_PAY;
+                                                break;
+                                                
+                                            case SCfdPaymentEntry.TYPE_FACTORING_FEE:
+                                                /* XXX By now there is no way to identify if specific payment is for
+                                                 * interests, fees or VAT of fees.
+                                                 * It is assumed that the type that is more frecuent is interests, then fees, then VAT of fees.
+                                                 */
+                                                paymentEntryDocType = paymentEntryDocTypes[numberDoc - 1];  // XXX improve this, precision of data recovered is error prone!
+                                                break;
+                                                
+                                            default:
+                                                throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\nEl tipo de pago " + paymentEntryType + " es inválido.");
+                                        }
 
                                         SCfdPaymentEntryDoc paymentEntryDoc = new SCfdPaymentEntryDoc(
-                                                paymentEntry,
+                                                paymentEntry, 
                                                 dps, 
                                                 numberDoc, 
+                                                paymentEntryDocType, 
                                                 doctoRelacionado.getAttNumParcialidad().getInteger(), 
                                                 doctoRelacionado.getAttImpSaldoAnt().getDouble(), 
                                                 doctoRelacionado.getAttImpPagado().getDouble(), 
@@ -449,16 +504,30 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         try {
             // save CFD:
             
+            boolean wasRegistryNew = moDbmsDataCfd.getPkCfdId() == 0;
+            
             if (moDbmsDataCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                 throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE);
             }
             else {
-                deleteRecord(connection);
-                
+                if (!wasRegistryNew) {
+                    // delete last CFDI accounting movements in database:
+                    deleteAccounting(connection);
+
+                    // delete last CFDI accounting movements in memory:
+                    for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
+                        for (SDataRecordEntry recordEntry : paymentEntry.DataRecord.getDbmsRecordEntries()) {
+                            if (recordEntry.getFkCfdId_n() == moDbmsDataCfd.getPkCfdId()) {
+                                recordEntry.setIsDeleted(true);
+                            }
+                        }
+                    }
+                }
+
                 // save records (journal vouchers) of all payment entries:
                 
                 int numberEntry = 0;
-                HashMap<String, Integer> hmRecordsSortingPositions = new HashMap<>();
+                HashMap<String, Integer> mapRecordsSortingPositions = new HashMap<>();
                 Statement statement = connection.createStatement();
                 
                 for (SCfdPaymentEntry paymentEntry : maAuxCfdPaymentEntries) {
@@ -466,8 +535,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     
                     int nextSortingPosition;
                     
-                    if (hmRecordsSortingPositions.containsKey(paymentEntry.DataRecord.getRecordPrimaryKey())) {
-                        nextSortingPosition = hmRecordsSortingPositions.get(paymentEntry.DataRecord.getRecordPrimaryKey());
+                    if (mapRecordsSortingPositions.containsKey(paymentEntry.DataRecord.getRecordPrimaryKey())) {
+                        nextSortingPosition = mapRecordsSortingPositions.get(paymentEntry.DataRecord.getRecordPrimaryKey());
                     }
                     else {
                         nextSortingPosition = paymentEntry.DataRecord.getLastSortingPosition() + 1;
@@ -487,7 +556,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     
                     // preserve next sorting position for current record (journal voucher):
                     
-                    hmRecordsSortingPositions.put(paymentEntry.DataRecord.getRecordPrimaryKey(), nextSortingPosition);
+                    mapRecordsSortingPositions.put(paymentEntry.DataRecord.getRecordPrimaryKey(), nextSortingPosition);
                     
                     // leave user trace into record (journal voucher) that it was modified:
                     
@@ -496,7 +565,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                     
-                    String sql = "INSERT INTO trn_cfd_fin_rec VALUES (" + moDbmsDataCfd.getPkCfdId() + ", " + ++numberEntry + ", "
+                    String sql = "INSERT INTO trn_cfd_fin_rec VALUES (" + moDbmsDataCfd.getPkCfdId() + ", " + ++numberEntry + ", " + paymentEntry.Type + ", "
                             + paymentEntry.DataRecord.getPkYearId() + ", " + paymentEntry.DataRecord.getPkPeriodId() + ", " + paymentEntry.DataRecord.getPkBookkeepingCenterId() + ", "
                             + "'" + paymentEntry.DataRecord.getPkRecordTypeId() + "', " + paymentEntry.DataRecord.getPkNumberId() + ", " + paymentEntry.AccountDesKey[0] + ", " + paymentEntry.AccountDesKey[1] + ");";
                     statement.execute(sql);
@@ -554,7 +623,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_ANNUL);
                 }
                 else {
-                    deleteRecord(connection);
+                    deleteAccounting(connection);
 
                     mnLastDbActionResult = SLibConstants.DB_ACTION_ANNUL_OK;
                 }
@@ -690,22 +759,22 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public int getReceptorId() {
-        return moAuxCfdDbmsDataReceptor.getPkBizPartnerId();
+        return getEffectiveReceptor().getPkBizPartnerId();
     }
 
     @Override
     public int getReceptorSucursalId() {
-        return moAuxCfdDbmsDataReceptor.getDbmsHqBranch().getPkBizPartnerBranchId();
+        return getEffectiveReceptor().getDbmsHqBranch().getPkBizPartnerBranchId();
     }
 
     @Override
     public String getReceptorResidenciaFiscal() {
-        return moAuxCfdDbmsDataReceptor.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountryCode();
+        return getEffectiveReceptor().getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getCountryCode();
     }
 
     @Override
     public String getReceptorNumRegIdTrib() {
-        return moAuxCfdDbmsDataReceptor.getFiscalFrgId();
+        return getEffectiveReceptor().getFiscalFrgId();
     }
 
     @Override

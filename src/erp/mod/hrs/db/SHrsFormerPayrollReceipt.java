@@ -291,7 +291,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         cfd.ver3.nom12.DElementHorasExtra horasExtra = new cfd.ver3.nom12.DElementHorasExtra();
 
         horasExtra.getAttDias().setInteger((int) concept.getCantidad());
-        horasExtra.getAttTipoHoras().setString(concept.getPkSubtipoConcepto() == SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1] ? SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE_COD : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE_COD);
+        horasExtra.getAttTipoHoras().setString(concept.getPkSubtipoConcepto() == SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1] ? SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE_CODE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE_CODE);
         horasExtra.getAttHorasExtra().setInteger(concept.getHoras_r());
         horasExtra.getAttImportePagado().setDouble(concept.getTotalGravado() + concept.getTotalExento());
         

@@ -2002,8 +2002,8 @@ public abstract class STrnUtilities {
             status = "PENDIENTE.";
         }
         
-        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_ACK_DVY, sorianaUtils.getAcknowledgment().replaceAll("'", "\""));
-        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_MSJ_DVY, sorianaUtils.getAcknowledgmentMsg().replaceAll("'", "\""));
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_DVY_ACK, sorianaUtils.getAcknowledgment().replaceAll("'", "\""));
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_DVY_MSG, sorianaUtils.getAcknowledgmentMsg().replaceAll("'", "\""));
 
         /* 2018-01-26 (Sergio Flores): "Paralelo" web service is supposed not to be active anymore.
         soriana.utils.SSorianaUtils sorianaUtilsParalelo;
@@ -2027,9 +2027,9 @@ public abstract class STrnUtilities {
         cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_MSJ_DVY, sorianaUtilsParalelo.getAcknowledgmentMsg().replaceAll("'", "\""));
         */
         
-        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_TP_XML_DVY, SModSysConsts.TRNS_TP_XML_DVY_WS_SOR);
-        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_ST_XML_DVY, statusId);
-        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_USR_DVY, client.getSession().getUser().getPkUserId());
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_DVY_TP, SModSysConsts.TRNS_TP_XML_DVY_WS_SOR);
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_DVY_ST, statusId);
+        cfd.saveField(client.getSession().getStatement().getConnection(), SDataCfd.FIELD_DVY_USR, client.getSession().getUser().getPkUserId());
 
         client.getFrame().setCursor(cursor);
         client.showMsgBoxInformation("El documento '" + dps.getNumberSeries() + (dps.getNumberSeries().length() > 0 ? "-" : "") + dps.getNumber() + (statusId == SModSysConsts.TRNS_ST_XML_DVY_PENDING ? "' sigue " : "' fue ") + status);

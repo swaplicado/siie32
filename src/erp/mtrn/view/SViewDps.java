@@ -32,6 +32,7 @@ import erp.mitm.data.SDataUnit;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SCfdUtils;
+import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.form.SDialogAnnulCfdi;
@@ -97,10 +98,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbGetAcknowledgmentCancellation;
     private javax.swing.JButton jbSignXml;
     private javax.swing.JButton jbValidateCfdi;
+    private javax.swing.JButton jbGetCfdiCancelStatus;
     private javax.swing.JButton jbSendCfdi;
-    private javax.swing.JButton jbDiactivateFlags;
+    private javax.swing.JButton jbResetPacFlags;
     private javax.swing.JButton jbRestoreSignXml;
-    private javax.swing.JButton jbRestoreAcknowledgmentCancellation;
+    private javax.swing.JButton jbRestoreAckCancellation;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
@@ -323,6 +325,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbValidateCfdi.addActionListener(this);
         jbValidateCfdi.setToolTipText("Validar timbrado o cancelación del CFDI");
         
+        jbGetCfdiCancelStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
+        jbGetCfdiCancelStatus.setPreferredSize(new Dimension(23, 23));
+        jbGetCfdiCancelStatus.addActionListener(this);
+        jbGetCfdiCancelStatus.setToolTipText("Checar estatus cancelación CFDI");
+        
         jbSendCfdi = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
         jbSendCfdi.setPreferredSize(new Dimension(23, 23));
         jbSendCfdi.addActionListener(this);
@@ -333,15 +340,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbRestoreSignXml.addActionListener(this);
         jbRestoreSignXml.setToolTipText("Insertar XML timbrado del CFDI");
 
-        jbRestoreAcknowledgmentCancellation = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert_annul.gif")));
-        jbRestoreAcknowledgmentCancellation.setPreferredSize(new Dimension(23, 23));
-        jbRestoreAcknowledgmentCancellation.addActionListener(this);
-        jbRestoreAcknowledgmentCancellation.setToolTipText("Insertar PDF del acuse de cancelación del CFDI");
+        jbRestoreAckCancellation = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert_annul.gif")));
+        jbRestoreAckCancellation.setPreferredSize(new Dimension(23, 23));
+        jbRestoreAckCancellation.addActionListener(this);
+        jbRestoreAckCancellation.setToolTipText("Insertar PDF del acuse de cancelación del CFDI");
 
-        jbDiactivateFlags = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")));
-        jbDiactivateFlags.setPreferredSize(new Dimension(23, 23));
-        jbDiactivateFlags.addActionListener(this);
-        jbDiactivateFlags.setToolTipText("Limpiar inconsistencias de timbrado o cancelación del CFDI");
+        jbResetPacFlags = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")));
+        jbResetPacFlags.setPreferredSize(new Dimension(23, 23));
+        jbResetPacFlags.addActionListener(this);
+        jbResetPacFlags.setToolTipText("Limpiar inconsistencias de timbrado o cancelación del CFDI");
 
         moTabFilterUser = new STabFilterUsers(miClient, this);
         moTabFilterUser.removeButtonUser();
@@ -405,10 +412,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbGetAcknowledgmentCancellation);
         addTaskBarLowerComponent(jbSignXml);
         addTaskBarLowerComponent(jbValidateCfdi);
+        addTaskBarLowerComponent(jbGetCfdiCancelStatus);
         addTaskBarLowerComponent(jbSendCfdi);
         addTaskBarLowerComponent(jbRestoreSignXml);
-        addTaskBarLowerComponent(jbRestoreAcknowledgmentCancellation);
-        addTaskBarLowerComponent(jbDiactivateFlags);
+        addTaskBarLowerComponent(jbRestoreAckCancellation);
+        addTaskBarLowerComponent(jbResetPacFlags);
         addTaskBarLowerSeparator();
         addTaskBarLowerComponent(moTabFilterUser);
         addTaskBarLowerSeparator();
@@ -442,16 +450,17 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbGetCfdiCancelStatus.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSendCfdi.setEnabled((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj)));
         jbRestoreSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbRestoreAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbDiactivateFlags.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbRestoreAckCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbResetPacFlags.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
 
         STableField[] aoKeyFields = new STableField[2];
         STableColumn[] aoTableColumns = null;
 
         if (mbIsDoc || mbIsDocAdj) {
-            aoTableColumns = new STableColumn[46];  // four extra columns for accounting record
+            aoTableColumns = new STableColumn[47];  // extra columns for accounting record and CFD info
         }
         else {
             aoTableColumns = new STableColumn[41];
@@ -493,6 +502,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_ico_xml", "XML", STableConstants.WIDTH_ICON);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
+            if (mbIsDoc || mbIsDocAdj) {
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "x.can_st", "Estatus cancelación", 35);
+            }
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dt.code", "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "d.num_ref", "Referencia doc.", STableConstants.WIDTH_DOC_NUM_REF);
@@ -511,6 +523,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_ico_xml", "CFD", STableConstants.WIDTH_ICON);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
+            if (mbIsDoc || mbIsDocAdj) {
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "x.can_st", "Estatus cancelación", 35);
+            }
 
             if (mbIsCategoryPur) {
                 if (miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
@@ -1816,9 +1831,29 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                     }
                 }
-           }
+            }
         }
+    }
+    
+    private void actionGetCfdiCancelStatus() throws Exception {
+        if (jbGetCfdiCancelStatus.isEnabled()) {
+           if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
+                if (dps.getIsDeleted()) {
+                    miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
+                }
+                else if (dps.getDbmsDataCfd() == null) {
+                    miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro CFD del documento '" + dps.getDpsNumber() + "'.");
+                }
+                else {
+                    miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(dps.getDbmsDataCfd()).composeMessage());
+                }
+            }
+        }
     }
 
     private void actionSendCfdi() {
@@ -1871,11 +1906,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
 
-    private void actionRestoreAcknowledgmentCancellation() throws Exception {
+    private void actionRestoreAckCancellation() throws Exception {
         boolean needUpdate = true;
         SDataDps dps = null;
 
-        if (jbRestoreAcknowledgmentCancellation.isEnabled()) {
+        if (jbRestoreAckCancellation.isEnabled()) {
            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -1896,10 +1931,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
 
-    private void actionCfdiDiactivateFlags() throws Exception {
+    private void actionResetPacFlags() throws Exception {
         SDataDps dps = null;
 
-        if (jbDiactivateFlags.isEnabled()) {
+        if (jbResetPacFlags.isEnabled()) {
            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -1910,7 +1945,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
                 }
                 else {
-                    SCfdUtils.resetCfdiDiactivateFlags(miClient, dps.getDbmsDataCfd());
+                    SCfdUtils.resetCfdiDeactivateFlags(miClient, dps.getDbmsDataCfd());
                     miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                 }
            }
@@ -1958,14 +1993,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "WHERE spl.id_des_doc = d.id_doc AND src.id_year = d.id_year AND src.b_del = 0 LIMIT 1) AS f_ord_num, " +
                 "(SELECT CONCAT(ord.id_year, '-', ord.num) FROM mfg_ord AS ord WHERE d.fid_mfg_year_n = ord.id_year AND d.fid_mfg_ord_n = ord.id_ord) AS num_ord, " +
                 "IF(d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
-                "IF(x.ts IS NULL OR doc_xml = '', " + STableConstants.ICON_NULL  + ", " + /* not is CFD not is CFDI */
-                "IF(x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + /* is CFD */
-                "IF(x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + /* CFDI pending sign */
-                "IF(LENGTH(x.ack_can_xml) = 0 AND x.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + /* CFDI signed, canceled only SIIE */
-                "IF(LENGTH(x.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " + /* CFDI canceled with cancellation acknowledgment in XML format */
-                "IF(x.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + /* CFDI canceled with cancellation acknowledgment in PDF format */
-                STableConstants.ICON_XML_SIGN + " " + /* CFDI signed, canceled only SIIE */
+                "IF(x.ts IS NULL OR doc_xml = '', " + STableConstants.ICON_NULL  + ", " + // not is CFD nor CFDI
+                "IF(x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + // is CFD
+                "IF(x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + // CFDI pending sign
+                "IF(LENGTH(x.ack_can_xml) = 0 AND x.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + // CFDI signed, canceled only SIIE
+                "IF(LENGTH(x.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " +  // CFDI canceled with cancellation acknowledgment in XML format
+                "IF(x.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + // CFDI canceled with cancellation acknowledgment in PDF format
+                STableConstants.ICON_XML_SIGN + " " + // CFDI signed, canceled only SIIE
                 ")))))) AS f_ico_xml, " +
+                "x.can_st, " + // cancellation status
                 "bp.id_bp, bp.bp, bpc.bp_key, bpb.id_bpb, bpb.bpb, " +
                 "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, " +
                 "'" + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "' AS f_cur_key_local, " +
@@ -2147,22 +2183,28 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbValidateCfdi) {
                     actionValidateCfdi();
                 }
+                else if (button == jbGetCfdiCancelStatus) {
+                    actionGetCfdiCancelStatus();
+                }
                 else if (button == jbSendCfdi) {
                     actionSendCfdi();
                 }
                 else if (button == jbRestoreSignXml) {
                     actionRestoreSignXml();
                 }
-                else if (button == jbRestoreAcknowledgmentCancellation) {
-                    actionRestoreAcknowledgmentCancellation();
+                else if (button == jbRestoreAckCancellation) {
+                    actionRestoreAckCancellation();
                 }
-                else if (button == jbDiactivateFlags) {
-                    actionCfdiDiactivateFlags();
+                else if (button == jbResetPacFlags) {
+                    actionResetPacFlags();
                 }
             }
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
+        }
+        finally {
+            miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
 }

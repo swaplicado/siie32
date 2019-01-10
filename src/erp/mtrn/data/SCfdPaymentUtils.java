@@ -106,7 +106,7 @@ public abstract class SCfdPaymentUtils {
                             + "Serie CHAR(25),"
                             + "Folio CHAR(40),"
                             + "MonedaDR CHAR(3),"
-                            + "TipoCambioDR DECIMAL(19, 4),"
+                            + "TipoCambioDR DECIMAL(21, 6),"
                             + "NumParcialidad SMALLINT UNSIGNED,"
                             + "ImpSaldoAnt DECIMAL(17, 2),"
                             + "ImpPagado DECIMAL(17, 2),"

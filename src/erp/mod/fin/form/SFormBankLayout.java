@@ -96,7 +96,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private static final int COL_APP_PAY_BANK = 10;
     private static final int COL_AGREE = 12;
     private static final int COL_AGREE_REF = 13;
-
+    
     private int mnLayoutBank;
     private int mnBankLayoutType;
     private int mnBankPaymentType;
@@ -598,7 +598,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jbExchangeRateReset.setToolTipText("Poner TC original del documento");
         jbExchangeRateReset.setMargin(new Insets (2, 2, 2, 2));
         jbExchangeRateReset.setPreferredSize(new java.awt.Dimension(85, 23));
-        
+
         jbExchangeRateRefresh = new JButton("TC actual");
         jbExchangeRateRefresh.setToolTipText("Poner TC actual");
         jbExchangeRateRefresh.setMargin(new Insets (2, 2, 2, 2));
@@ -611,12 +611,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jbGridRowsUncheckAll = new JButton("Nada");
         jbGridRowsUncheckAll.setToolTipText("Selecionar nada");
         jbGridRowsUncheckAll.setPreferredSize(new java.awt.Dimension(85, 23));
-        
+
         jckShowOnlyDocsDateDue = new JCheckBox("Solo documentos del vecimiento",true);
         jckShowOnlyDocsDateDue.setPreferredSize(new Dimension(200, 23));
         jckShowOnlyBenefsWithAccounts = new JCheckBox("Solo cuentas bancarias configuradas");
         jckShowOnlyBenefsWithAccounts.setPreferredSize(new Dimension(200, 23));
-        
+
         switch (mnFormSubtype) {
             case SModSysConsts.FIN_LAY_BANK_ACC:
                 // custom text of buttons fits well
@@ -634,9 +634,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
             default:
         }
-        
+
         moGridPayments = new SGridPaneForm(miClient, SModConsts.FIN_LAY_BANK, mnFormSubtype, "Detalle") {
-            
+
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -646,10 +646,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             public ArrayList<SGridColumnForm> createGridColumns() {
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
                 SGridColumnForm column = null;
-                
+
                 switch (mnFormSubtype) {
                     case SModSysConsts.FIN_LAY_BANK_ACC:
-                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor", 300));
+                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor",200));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Clave proveedor", 50));
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Aplicar pago", moGridPayments.getTable().getDefaultEditor(Boolean.class));
                         column.setEditable(true);
@@ -670,9 +670,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Folio póliza", 65));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha póliza"));
                         break;
-                        
+
                     case SModSysConsts.FIN_LAY_BANK_PAY:
-                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor", 250));
+                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor",200));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_NUM, "Tipo doc", 40));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Folio doc", 80));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha doc"));
@@ -714,9 +714,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         column.setEditable(true);
                         gridColumnsForm.add(column);
                         break;
-                        
+
                     case SModSysConsts.FIN_LAY_BANK_PREPAY:
-                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor", 300));
+                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Proveedor", 200));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Clave proveedor", 50));
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Monto a pagar $", moGridPayments.getTable().getDefaultEditor(Double.class));
                         column.setEditable(true);
@@ -744,10 +744,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         column.setEditable(true);
                         gridColumnsForm.add(column);
                         break;
-                        
+
                     default:
                 }
-                
+
                 moGridPayments.getTable().getDefaultEditor(Double.class).addCellEditorListener(SFormBankLayout.this);
                 moGridPayments.getTable().getDefaultEditor(Boolean.class).addCellEditorListener(SFormBankLayout.this);
                 moGridPayments.getTable().getDefaultEditor(String.class).addCellEditorListener(SFormBankLayout.this);
@@ -757,29 +757,29 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 return gridColumnsForm;
             }
         };
-       
+
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jckShowOnlyDocsDateDue);
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jckShowOnlyBenefsWithAccounts);
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExchangeRateReset);
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbExchangeRateRefresh);
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGridRowsCheckAll);
         moGridPayments.getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGridRowsUncheckAll);
-        
+
         jpSettings.add(moGridPayments, BorderLayout.CENTER);
     }
-    
+
     private boolean validateDebtsToPay() throws Exception {
         boolean found = false;
         int visibleRows = 0;
         ArrayList<SLayoutBankRow> layoutBankRows = new ArrayList<>();
         SLayoutBankRow layoutBankRow = null;
-        
+
         updateLayoutRow();
 
         for (SGridRow rowAux : moGridPayments.getModel().getGridRows()) {
             layoutBankRow = (SLayoutBankRow) rowAux;
             visibleRows++;
-            
+
             for (int row = 0; row < mvLayoutRows.size(); row++) {
                 if (SLibUtilities.compareKeys(layoutBankRow.getRowPrimaryKey(), mvLayoutRows.get(row).getRowPrimaryKey()) && mvLayoutRows.get(row).getIsForPayment()) {
                     if (mnBankPaymentType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
@@ -791,7 +791,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         }
                         else {
                             found = false;
-                            
+
                             for (SLayoutBankRow layoutRow : layoutBankRows) {
                                 if (SLibUtilities.compareKeys(new int[] { layoutRow.getBizPartnerId(), }, new int[] { mvLayoutRows.get(row).getBizPartnerId() }) &&
                                     layoutRow.getAccountCredit().compareTo(mvLayoutRows.get(row).getAccountCredit()) == 0) {
@@ -800,7 +800,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                     break;
                                 }
                             }
-                            
+
                             if (!found) {
                                 layoutBankRows.add(mvLayoutRows.get(row));
                             }
@@ -812,7 +812,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         }
                         else {
                             found = false;
-                            
+
                             for (SLayoutBankRow layoutRow : layoutBankRows) {
                                 if (SLibUtilities.compareKeys(new int[] { layoutRow.getBizPartnerId(), }, new int[] { mvLayoutRows.get(row).getBizPartnerId() }) &&
                                     layoutRow.getAccountCredit().compareTo(mvLayoutRows.get(row).getAccountCredit()) == 0) {
@@ -821,13 +821,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                     break;
                                 }
                             }
-                            
+
                             if (!found) {
                                 layoutBankRows.add(mvLayoutRows.get(row));
                             }
                         }
                     }
-                    
+
                     if (mvLayoutRows.get(row).getBalanceTot().getExchangeRate() == 0) {
                         throw new Exception("No ha especificado el tipo de cambio el renglón : " + visibleRows);
                     }
@@ -837,9 +837,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 }
             }
         }
-        
+
         // validate "alias" for payment with BanBajio Bank:
-        
+
         if (mnLayoutBank == SFinConsts.LAY_BANK_BANBAJIO) {
             for (SLayoutBankRow layoutRow : layoutBankRows) {
                 if (layoutRow.getBajioBankAlias().isEmpty()) {
@@ -847,18 +847,18 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 }
             }
         }
-        
+
         if (layoutBankRows.isEmpty()) {
             throw new Exception("No ha especificado ningún renglón para pago.");
         }
-        
+
         return true;
     }
-    
+
     private boolean validateRecord(final boolean isSelectedAll) throws Exception {
         SLayoutBankPaymentRow payRow = null;
         mnNumberRecordDistint = 0;
-        
+
         if (moCurrentRecord == null) {
             jbPickRecord.requestFocus();
             throw new Exception(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRecord) + "'.");
@@ -866,7 +866,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         else if (isSelectedAll) {
             for (SGridRow rowAux : moGridPayments.getModel().getGridRows()) {
                 payRow = (SLayoutBankPaymentRow) rowAux;
-                
+
                 if (payRow.getIsForPayment()) {
                     if (payRow.getLayoutBankRecordKey() != null) {
                         if (!SLibUtils.compareKeys(payRow.getLayoutBankRecordKey().getPrimaryKey(), moCurrentRecord.getPrimaryKey())) {
@@ -875,13 +875,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     }
                 }
             }
-            
+
             for (SLayoutBankRecord bankRecordRow : maLayoutBankRecords) {
                 if (!SLibUtils.compareKeys(bankRecordRow.getLayoutBankRecordKey().getPrimaryKey(), moCurrentRecord.getPrimaryKey())) {
                     mnNumberRecordDistint++;
                 }
             }
-            
+
             if (mnNumberRecordDistint != 0) {
                 if (miClient.showMsgBoxConfirm("Existen '" + mnNumberRecordDistint + "' transferencias en pólizas distintas, a las cuáles se la reemplazará la póliza por la '" + moCurrentRecord.getRecordPeriod() + "-" + moCurrentRecord.getRecordNumber() + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
                    throw new Exception("Existen '" + mnNumberRecordDistint + "' transferencias en pólizas distintas.");
@@ -890,14 +890,14 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         }
         return true;
     }
-    
+
     private boolean isEditableConsecutive() {
         return mnLayoutBank == SFinConsts.LAY_BANK_BANBAJIO;
     }
-    
+
     private boolean isEditableConcept() {
         boolean editable = false;
-        
+
         switch (mnLayoutBank) {
             case SFinConsts.LAY_BANK_HSBC:
                 editable = mnBankPaymentType == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD;
@@ -917,15 +917,15 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         return editable;
     }
-    
+
     private boolean isEditableGridReferenceConcept() {
         return (mnBankPaymentType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE);
     }
-    
+
     private boolean isExchangeRateNotRequired() {
         return miClient.getSession().getSessionCustom().isLocalCurrency(moKeyDpsCurrency.getValue()) || SLibUtils.compareKeys(moKeyDpsCurrency.getValue(), moKeyBankCurrency.getValue());
     }
-    
+
     private void enableFieldsForm(boolean enable) {
         switch (mnFormSubtype){
             case SModSysConsts.FIN_LAY_BANK_ACC:
@@ -935,21 +935,22 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 moKeyBankCurrency.setEnabled(false);
                 moKeyBankAccountCash.setEnabled(false);
                 jbPickRecord.setEnabled(true);
-                
+
                 moIntConsecutive.setEditable(false);
                 moTextConcept.setEditable(false);
                 moKeyDpsCurrency.setEnabled(false);
                 moDecExchangeRate.setEnabled(false);
                 jbPickExchangeRate.setEnabled(false);
                 moDateDateDue.setEditable(false);
-                
+
                 jbGridRowsShow.setEnabled(false);
                 jbGridRowsClear.setEnabled(false);
                 break;
-                
+
             case SModSysConsts.FIN_LAY_BANK_PAY:
             case SModSysConsts.FIN_LAY_BANK_PREPAY:
                 moDateDateLayout.setEditable(true);
+
                 moKeyLayoutBank.setEnabled(enable);
                 moKeyBankLayoutType.setEnabled(enable && moKeyLayoutBank.getSelectedIndex() > 0);
                 moKeyBankCurrency.setEnabled(enable && moKeyBankLayoutType.getSelectedIndex() > 0);
@@ -2189,10 +2190,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             mltAccountCredit.clear();
             mltAgreement.clear();
             mltAgreementReference.clear();
-            
+
             if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_PAY) {
                 for (int i = 0; i < mvLayoutRows.size(); i++) {
-                    
+
                     if (!jckShowOnlyDocsDateDue.isSelected()) {
                         if (!jckShowOnlyBenefsWithAccounts.isSelected()) {
                             mltAccountCredit.add(mvLayoutRows.get(i).getAccountCredits());
@@ -2240,88 +2241,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         moGridPayments.renderGridRows();
         moGridPayments.setSelectedGridRow(0);
     }
-/* -->
-    private void loadLayoutRow() {
-        updateLayoutRow();
-        moGridPayments.clearGridRows();
-        
-        if (mvLayoutRows != null) {
-            mltAccountCredit.clear();
-            mltAgreement.clear();
-            mltAgreementReference.clear();
-            
-            if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_DPS) {
-                for (int i = 0; i < mvLayoutRows.size(); i++) {
-                    if (!jckShowOnlyDocsDateDue.isSelected()) {
-                        if (!jckShowOnlyBenefsWithAccounts.isSelected()) {
-                            mltAccountCredit.add(mvLayoutRows.get(i).getAccountCredits());
-                            mltAgreementReference.add(mhAgreeAgreeRef.get(mvLayoutRows.get(i).getAgreement()));
-                            moGridPayments.addGridRow(mvLayoutRows.get(i));
-                        }
-                        else {
-                            if (mvLayoutRows.get(i).getAccountCredits().size() > 0) {
-                                mltAccountCredit.add(mvLayoutRows.get(i).getAccountCredits());
-                                mltAgreementReference.add(mhAgreeAgreeRef.get(mvLayoutRows.get(i).getAgreement()));
-                                moGridPayments.addGridRow(mvLayoutRows.get(i));
-                            }
-                        }
-                    }
-                    else if (moDateDateDue.getValue().equals(mvLayoutRows.get(i).getDateMaturityRo())) {
-                        if (!jckShowOnlyBenefsWithAccounts.isSelected()) {
-                            mltAgreementReference.add(mhAgreeAgreeRef.get(mvLayoutRows.get(i).getAgreement()));
-                            mltAccountCredit.add(mvLayoutRows.get(i).getAccountCredits());
-                            moGridPayments.addGridRow(mvLayoutRows.get(i));
-                        }
-                        else {
-                            if (mvLayoutRows.get(i).getAccountCredits().size() > 0) {
-                                mltAgreementReference.add(mhAgreeAgreeRef.get(mvLayoutRows.get(i).getAgreement()));
-                                mltAccountCredit.add(mvLayoutRows.get(i).getAccountCredits());
-                                moGridPayments.addGridRow(mvLayoutRows.get(i));
-                            }
-                        }
-                    }
-                }
-            }
-            else if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_ADV) {
-                for (int i = 0; i < mvLayoutRows.size(); i++) {
-                    if (!jckShowOnlyBenefsWithAccounts.isSelected()) {
-                        mltAccountCredit.add(mvLayoutRows.get(i).getAccountCredits());
-                        moGridPayments.addGridRow(mvLayoutRows.get(i));
-                    }
-                    else {
-                        if (mvLayoutRows.get(i).getAccountCredits().size() > 0) {
-                            mltAccountCredit.add(mvLayoutRows.get(i).getAccountCredits());
-                            moGridPayments.addGridRow(mvLayoutRows.get(i));
-                        }
-                    }
-                }
-            }
-            else if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_ADV) {
-                for (int i = 0; i < mvLayoutRows.size(); i++) {
-                    if (!jckShowOnlyBenefsWithAccounts.isSelected()) { 
-                        mltAccountCredit.add(mvLayoutRows.get(i).getAccountCredits());
-                        moGridPayments.addGridRow(mvLayoutRows.get(i));
-                    }
-                    else {
-                        if (mvLayoutRows.get(i).getAccountCredits().size() > 0) {
-                            mltAccountCredit.add(mvLayoutRows.get(i).getAccountCredits());
-                            moGridPayments.addGridRow(mvLayoutRows.get(i));
-                        }
-                    }
-                }
-            }
-        }
-        
-        computeBalancePayment();
-        moTableCellEditorOptions.setElements(mltAccountCredit);
-        moTableCellAgreementReference.setElements(mltAgreementReference);
-        moGridPayments.renderGridRows();
-        moGridPayments.setSelectedGridRow(0);
-    }
-<-- */
+
     private String createSqlQuery() {
         String sql = "";
-      
+
         if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_PAY) {
             sql = "SELECT b.id_bp, b.bp, b.fiscal_id, d.id_year, d.id_doc, d.dt AS dt, " +
                      "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
@@ -2364,17 +2287,17 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     "AND b.b_del = 0 AND bct.b_del = 0 " +
                     "ORDER BY bp, id_bp; ";
         }
-        
+
         return sql;
     }
-    
+
     @SuppressWarnings("unchecked")
     public void populateGridRowsWithDps(final boolean isNeedValidateRows) {
         String sql = "";
         ResultSet resulSet = null;
         Cursor cursor = getCursor();
         Vector<SGridRow> rows = new Vector<>();
-        
+
         mvLayoutRows = new Vector<>();
         mltAccountCredit = new ArrayList<>();
         mltAgreement= new ArrayList<>();
@@ -2383,7 +2306,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            
+
             sql = createSqlQuery();
             resulSet = miClient.getSession().getStatement().executeQuery(sql);
             while (resulSet.next()) {
@@ -2430,11 +2353,11 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 oRow.setConcept(moTextConcept.getValue());
                 oRow.setDescription(moTextConcept.getValue());
                 oRow.setObservations("");
-                
+
                 oRow.getAccountCredits().addAll(maAccountCredit);
                 oRow.getAgreementsReferences().addAll(maAgreementsReference);
                 oRow.getBranchBankAccountCredits().addAll(maBranchBankAccountsCredit);
-                
+
                 if (moDateDateDue.getValue().equals(resulSet.getDate("dt_mat")) && maBranchBankAccountsCredit.size() > 0) {
                     rows.add(oRow);
                     mltAccountCredit.add(maAccountCredit);
@@ -2445,23 +2368,23 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 if (!maAgreements.isEmpty()) {
                     mltAgreementReference.add(mhAgreeAgreeRef.get(msAgreement));
                 }
-                
+
                 mvLayoutRows.add(oRow);
             }
             moGridPayments.populateGrid(rows);
             moGridPayments.createGridColumns();
-            
+
             moGridPayments.getTable().getTableHeader().setEnabled(false);
             moGridPayments.getTable().setColumnSelectionAllowed(false);
             moGridPayments.getTable().getTableHeader().setReorderingAllowed(false);
-            moGridPayments.getTable().getTableHeader().setResizingAllowed(true);
+            moGridPayments.getTable().getTableHeader().setResizingAllowed(true);            
             moGridPayments.getTable().setRowSorter(new TableRowSorter<>(moGridPayments.getModel()));
             moGridPayments.getTable().getColumnModel().getColumn(COL_APP_PAY_BANK).setCellEditor(null);
-            
+
             if (moKeyBankCurrency.getValue().length > 0 && moKeyDpsCurrency.getValue().length > 0) {
                 ((SGridColumnForm) moGridPayments.getGridColumn(COL_EXC_RATE)).setEditable(moKeyBankCurrency.getValue()[0] != moKeyDpsCurrency.getValue()[0]);
             }
-            
+
             if (moGridPayments.getTable().getRowCount() > 0) {
                 moGridPayments.renderGridRows();
                 moGridPayments.setSelectedGridRow(0);
@@ -2475,11 +2398,11 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             if (isNeedValidateRows && moGridPayments.getTable().getRowCount() <= 0) {
                 miClient.showMsgBoxInformation("No se encontró ningún documento para los parámetros especificados.");
             }
-            
+
             setCursor(cursor);
         }
     }
-    
+
     public void populateGridRowsWithBeneficiaries(final boolean isNeedValidateRows) {
         String sql = "";
         ResultSet resulSet = null;
@@ -2536,18 +2459,18 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 if (!maAgreements.isEmpty()) {
                     mltAgreementReference.add(mhAgreeAgreeRef.get(msAgreement));
                 }
-                
+
                 mvLayoutRows.add(oRow);
             }
             moGridPayments.populateGrid(rows);
             moGridPayments.createGridColumns();
-            
+
             moGridPayments.getTable().setColumnSelectionAllowed(false);
             moGridPayments.getTable().getTableHeader().setReorderingAllowed(false);
             moGridPayments.getTable().getTableHeader().setResizingAllowed(true);
             moGridPayments.getTable().setRowSorter(new TableRowSorter<>(moGridPayments.getModel()));
             moGridPayments.getTable().getTableHeader().setEnabled(false);
-            
+
             if (moGridPayments.getTable().getRowCount() > 0) {
                 moGridPayments.renderGridRows();
                 moGridPayments.setSelectedGridRow(0);
@@ -2565,7 +2488,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             setCursor(cursor);
         }
     }
-       
+
     @Override
     public void addAllListeners() {
         moKeyLayoutBank.addItemListener(this);
@@ -2576,7 +2499,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jckShowOnlyDocsDateDue.addItemListener(this);
         jckShowOnlyBenefsWithAccounts.addItemListener(this);
         moTableCellEditorOptions.addCellEditorListener(this);
-        
+
         jbPickLayoutPath.addActionListener(this);
         jbGridRowsShow.addActionListener(this);
         jbGridRowsClear.addActionListener(this);
@@ -2603,7 +2526,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jbExchangeRateRefresh.removeActionListener(this);
         jckShowOnlyDocsDateDue.removeItemListener(this);
         jckShowOnlyBenefsWithAccounts.removeItemListener(this);
-        
+
         jbPickExchangeRate.removeActionListener(this);
         moKeyBankCurrency.removeItemListener(this);
     }
@@ -2619,22 +2542,22 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
         moRegistry = (SDbBankLayout) registry;
-        
+
         removeAllListeners();
         reloadCatalogues();
-        
+
         if (moRegistry.isRegistryNew()) {
             jckShowOnlyDocsDateDue.setSelected(true);
-            
+
             moRegistry.setDateLayout(miClient.getSession().getCurrentDate());
             moRegistry.setDateDue(miClient.getSession().getCurrentDate());
-            
+
             jtfNumber.setText("");
             jtfRegistryKey.setText("");
         }
         else {
             jckShowOnlyDocsDateDue.setSelected(false);
-            
+
             jtfNumber.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));       // same value!
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));  // same value!
         }
@@ -2736,7 +2659,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
             }
         }
-        
+
         addAllListeners();
     }
 
@@ -2746,7 +2669,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         if (mnFormSubtype != SModSysConsts.FIN_LAY_BANK_ACC) {
             // current form is for integrate a bank layout of payments or prepayments:
-            
+
             //registry.setPkLayBankId();
             registry.setDateLayout(moDateDateLayout.getValue());
             registry.setDateDue(moDateDateDue.getValue());
@@ -2785,9 +2708,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             registry.setPostSaveMethod(registry.getClass().getMethod("writeLayout", SGuiClient.class));
             registry.setPostSaveMethodArgs(new Object[] { miClient });
         }
-        
+
         registry.getLayoutBankXmlRows().addAll(maXmlRows);
-         
+
         if (mnFormSubtype == SModSysConsts.FIN_LAY_BANK_ACC) {
             for (SGridRow row : moGridPayments.getModel().getGridRows()) {
                 SLayoutBankPaymentRow paymentRow = (SLayoutBankPaymentRow) row;
@@ -2796,17 +2719,17 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     registry.getLayoutBankPaymentRows().add(paymentRow);
                 }
             }
-            
+
             registry.setTransfers(moGridPayments.getModel().getGridRows().size());
         }
-        
+
         registry.setExchangeRate(1d);
         registry.setXtaBankPaymentType(mnBankPaymentType);
-        
+
         if (!maLocks.isEmpty()) {
             registry.getLocks().addAll(maLocks);
         }
-        
+
         return registry;
     }
 
@@ -2819,7 +2742,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlLayoutPath) + "'.");
                 validation.setComponent(jbPickLayoutPath);
             }
-            
+
             if (validation.isValid()) {
                 try {
                     for (SSrvLock lock : maLocks) {
@@ -2835,7 +2758,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         return validation;
     }
-    
+
     @Override
     public void actionSave() {
         try  {
@@ -2853,7 +2776,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             SLibUtils.showException(this, e);
         }
     }
-    
+
     @Override
     public void actionCancel() {
         if (jbCancel.isEnabled()) {
@@ -2874,7 +2797,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
-            
+
             if (button == jbPickRecord) {
                 actionPickRecord();
             }
@@ -2939,7 +2862,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
         }
     }
-    
+
     @Override
     public void editingStopped(ChangeEvent e) {
         switch (moGridPayments.getTable().getSelectedColumn()) {
@@ -2984,13 +2907,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     public void editingCanceled(ChangeEvent e) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
     private class BankLayoutType {
         public int BankLayoutType;
         public int BankPaymentType;
         public int LayoutBank;
         public int BizPartnerBank;
-        
+
         /**
          * Creates new BankLayoutType.
          * @param bankLayoutType Bank layout type ID, PK of erp.finu_tp_lay_bank, i.e., bank & layout payment type.

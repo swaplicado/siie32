@@ -5,7 +5,6 @@
 
 package erp.mod.fin.view;
 
-import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.mfin.data.SFinUtilities;
 import erp.mod.SModConsts;
@@ -291,7 +290,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_BANBAJIO + ", '" + SFinConsts.TXT_LAY_BANK_BANBAJIO + "', "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_BBVA + ", '" + SFinConsts.TXT_LAY_BANK_BBVA + "', "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_BANAMEX + ", '" + SFinConsts.TXT_LAY_BANK_BANAMEX + "', "
-                + "'" + SCfdConsts.UNIDENTIFIED + "'))))) AS f_lay, "
+                + "'?'))))) AS f_lay, "
                 + "CONCAT(e.ent, ' (', e.code, ')') AS f_ent, l.b_del, "
                 + "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE a.fid_cur = c.id_cur) AS f_cur_key, "
                 + "l.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "

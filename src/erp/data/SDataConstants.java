@@ -26,14 +26,14 @@ public abstract class SDataConstants {
     public static final int MOD_HRS = 109000;
     public static final int MOD_QLT = 110000;
     public static final int MOD_XXX = 199999;
-    
+
     public static final int MOD_CFG_CFG = 101100;
     public static final int MOD_CFG_CFG_CFG = 101110;   // configuration
     public static final int MOD_CFG_CFG_DNS = 101120;   // Document Number Series
     public static final int MOD_CFG_CFG_DNC = 101130;   // Document Numbering Center
     public static final int MOD_CFG_CAT = 101200;
     public static final int MOD_CFG_REP = 101900;
-    
+
     public static final int MOD_FIN_CFG = 102100;
     public static final int MOD_FIN_CAT = 102200;
     public static final int MOD_FIN_CAT_CPT = 102240;   // concepts
@@ -43,7 +43,7 @@ public abstract class SDataConstants {
     public static final int MOD_FIN_FIN_CSH = 102520;   // cash: checks & counter-receipts
     public static final int MOD_FIN_REP = 102900;
     public static final int MOD_FIN_REP_AUX = 102940;
-    
+
     public static final int MOD_PUR_CAT = 103100;
     public static final int MOD_PUR_EST = 103200;
     public static final int MOD_PUR_CON = 103300;
@@ -55,7 +55,7 @@ public abstract class SDataConstants {
     public static final int MOD_PUR_REP = 103900;
     public static final int MOD_PUR_REP_CON = 103909;   // contracts
     public static final int MOD_PUR_REP_CST = 103910;   // costs
-    
+
     public static final int MOD_SAL_CAT = 104100;
     public static final int MOD_SAL_EST = 104200;
     public static final int MOD_SAL_CON = 104300;
@@ -68,11 +68,11 @@ public abstract class SDataConstants {
     public static final int MOD_SAL_REP_CON = 104909;   // contracts
     public static final int MOD_SAL_REP_SHI = 104910;   // shipments
     public static final int MOD_SAL_REP_MIN = 104911;   // money in
-    
+
     public static final int MOD_MFG_HRS = 108500;       // labor hours
-    
+
     public static final int MOD_HRS_IMP = 109500;       // import
-    
+
     public static final int GLOBAL_CAT_CFG = 201000;
     public static final int GLOBAL_CAT_USR = 202000;
     public static final int GLOBAL_CAT_LOC = 203000;
@@ -105,7 +105,7 @@ public abstract class SDataConstants {
     public static final int CFG_PARAM_CO = 201016;
     public static final int CFGU_CERT = 201017;
     public static final int CFGU_SHIFT = 201018;
-    
+
     public static final int CFGX_COB_ENT_CASH = 201501;
     public static final int CFGX_COB_ENT_WH = 201502;
     public static final int CFGX_COB_ENT_POS = 201503;
@@ -511,7 +511,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DPS_SEND_PEND = 207573;
     public static final int TRNX_DPS_SENT = 207574;
     public static final int TRNX_DOC_REMISSION = 207575;
- 
+
     public static final int TRNX_STK_STK = 207581;
     public static final int TRNX_STK_STK_WH = 207582;
     public static final int TRNX_STK_LOT = 207583;
@@ -538,7 +538,7 @@ public abstract class SDataConstants {
     public static final int TRNX_MAINT_DIOG = 207651;
     public static final int TRNX_MAINT_STK = 207652;
     public static final int TRNX_MAINT_MOV = 207653;
-    
+
     // XXX
     public static final int TRNX_DSM_ETY_SOURCE = 207601;
     public static final int TRNX_DSM_ETY_DESTINY = 207602;
@@ -673,11 +673,11 @@ public abstract class SDataConstants {
     public static final int HRS_SIE_PAY = 220001;
     public static final int HRS_SIE_PAY_EMP = 220002;
     public static final int HRS_SIE_PAY_MOV = 220003;
-       
+
     public static final int MAX_ID = 1000000;
 
     public static final java.lang.String MSG_ERR_DATA_NOT_FOUND = "El tipo de registro no existe.";
-    
+
     public static final HashMap<Integer, String> TablesMap = new HashMap<>();
 
     static {

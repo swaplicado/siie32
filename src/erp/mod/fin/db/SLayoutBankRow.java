@@ -457,7 +457,7 @@ public class SLayoutBankRow implements SGridRow {
                         value = msCurrencyKey;
                         break;
                     case 4:
-                        if (!msAgreement.isEmpty()) { //if (mnLayoutRowSubType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) { alphalapz
+                        if (!msAgreement.isEmpty()) { 
                             value = msAgreement;
                         }
                         else {
@@ -497,10 +497,10 @@ public class SLayoutBankRow implements SGridRow {
     }
 
     @Override
-    public void setRowValueAt(Object value, int row) {
+    public void setRowValueAt(Object value, int col) {
         switch (mnLayoutRowType) {
             case SModSysConsts.FIN_LAY_BANK_PAY:
-                switch (row) {
+                switch (col) {
                     case 0:
                     case 1:
                     case 2:
@@ -589,7 +589,7 @@ public class SLayoutBankRow implements SGridRow {
                     }
                     break;
             case SModSysConsts.FIN_LAY_BANK_PREPAY:
-                switch (row) {
+                switch (col) {
                     case 0:
                     case 1:
                         break;

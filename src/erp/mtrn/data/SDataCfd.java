@@ -41,16 +41,19 @@ import sa.lib.xml.SXmlUtils;
  */
 public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
-    public static final int FIELD_ACC_WS = 1;
-    public static final int FIELD_ACC_XML_STO = 4;
-    public static final int FIELD_ACC_PDF_STO = 5;
-    public static final int FIELD_ACC_USR = 6;
-    public static final int FIELD_ACK_DVY = 7;
-    public static final int FIELD_MSJ_DVY = 8;
-    public static final int FIELD_TP_XML_DVY = 9;
-    public static final int FIELD_ST_XML_DVY = 10;
-    public static final int FIELD_USR_DVY = 11;
-    public static final int FIELD_B_CON = 12;
+    public static final int FIELD_PRC_WS = 11;
+    public static final int FIELD_PRC_STO_XML = 12;
+    public static final int FIELD_PRC_STO_PDF = 13;
+    public static final int FIELD_PRC_CON = 14;
+    public static final int FIELD_PRC_USR = 15;
+    
+    public static final int FIELD_DVY_ACK = 21;
+    public static final int FIELD_DVY_MSG = 22;
+    public static final int FIELD_DVY_TP = 23;
+    public static final int FIELD_DVY_ST = 24;
+    public static final int FIELD_DVY_USR = 25;
+
+    public static final int FIELD_CAN_ST = 31;
 
     private final static int DATA_TYPE_TEXT = 1;
     private final static int DATA_TYPE_NUMBER = 2;
@@ -63,7 +66,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.String msCertNumber;
     protected java.lang.String msStringSigned;
     protected java.lang.String msSignature;
-    protected java.lang.String msDocXmlUuid;
+    protected java.lang.String msBasexUuid;
     protected java.lang.String msDocXml;
     protected java.lang.String msDocXmlName;
     protected java.lang.String msDocXmlRfcEmi;
@@ -89,6 +92,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkXmlDeliveryTypeId;
     protected int mnFkXmlDeliveryStatusId;
     protected int mnFkCompanyBranchId_n;
+    protected int mnFkFactoringBankId_n;
     protected int mnFkDpsYearId_n;
     protected int mnFkDpsDocId_n;
     protected int mnFkRecordYearId_n;
@@ -140,7 +144,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         sql = "SELECT " +
                 "erp.f_get_xml_atr('cfdi:Emisor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
                 "erp.f_get_xml_atr('cfdi:Receptor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
-                "erp.f_get_xml_atr('cfdi:Comprobante', 'Total=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
+                "erp.f_get_xml_atr('cfdi:Comprobante', ' Total=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " + // without preceeding blank, attribute 'SubTotal' value is get!
                 "erp.f_get_xml_atr('cfdi:Comprobante', 'TipoCambio=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
                 "erp.f_get_xml_atr('cfdi:Comprobante', 'Moneda=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
                 "CAST(REPLACE(erp.f_get_xml_atr('cfdi:Complemento', 'FechaTimbrado=', '" + xmlSafe + "', " + DATA_TYPE_DATE + "), 'T', ' ') AS DATETIME) AS _xml_timbrado, " +
@@ -166,7 +170,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             sql = "SELECT " +
                 "erp.f_get_xml_atr('Emisor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
                 "erp.f_get_xml_atr('Receptor', 'rfc=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
-                "erp.f_get_xml_atr('Comprobante', 'Total=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
+                "erp.f_get_xml_atr('Comprobante', ' Total=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
                 "erp.f_get_xml_atr('Comprobante', 'TipoCambio=', '" + xmlSafe + "', " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
                 "erp.f_get_xml_atr('Comprobante', 'Moneda=', '" + xmlSafe + "', " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
                 "NULL AS _xml_timbrado, " +
@@ -193,7 +197,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setCertNumber(java.lang.String s) { msCertNumber = s; }
     public void setStringSigned(java.lang.String s) { msStringSigned = s; }
     public void setSignature(java.lang.String s) { msSignature = s; }
-    public void setDocXmlUuid(java.lang.String s) { msDocXmlUuid = s; }
+    public void setBaseXUuid(java.lang.String s) { msBasexUuid = s; }
     public void setDocXml(java.lang.String s) { msDocXml = s; }
     public void setDocXmlName(java.lang.String s) { msDocXmlName = s; }
     public void setDocXmlRfcEmi(java.lang.String s) { msDocXmlRfcEmi = s; }
@@ -219,6 +223,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkXmlDeliveryTypeId(int n) { mnFkXmlDeliveryTypeId = n; }
     public void setFkXmlDeliveryStatusId(int n) { mnFkXmlDeliveryStatusId = n; }
     public void setFkCompanyBranchId_n(int n) { mnFkCompanyBranchId_n = n; }
+    public void setFkFactoringBankId_n(int n) { mnFkFactoringBankId_n = n; }
     public void setFkDpsYearId_n(int n) { mnFkDpsYearId_n = n; }
     public void setFkDpsDocId_n(int n) { mnFkDpsDocId_n = n; }
     public void setFkRecordYearId_n(int n) { mnFkRecordYearId_n = n; }
@@ -251,7 +256,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public java.lang.String getCertNumber() { return msCertNumber; }
     public java.lang.String getStringSigned() { return msStringSigned; }
     public java.lang.String getSignature() { return msSignature; }
-    public java.lang.String getDocXmlUuid() { return msDocXmlUuid; }
+    public java.lang.String getBaseXUuid() { return msBasexUuid; }
     public java.lang.String getDocXml() { return msDocXml; }
     public java.lang.String getDocXmlName() { return msDocXmlName; }
     public java.lang.String getDocXmlRfcEmi() { return msDocXmlRfcEmi; }
@@ -277,6 +282,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkXmlDeliveryTypeId() { return mnFkXmlDeliveryTypeId; }
     public int getFkXmlDeliveryStatusId() { return mnFkXmlDeliveryStatusId; }
     public int getFkCompanyBranchId_n() { return mnFkCompanyBranchId_n; }
+    public int getFkFactoringBankId_n() { return mnFkFactoringBankId_n; }
     public int getFkDpsYearId_n() { return mnFkDpsYearId_n; }
     public int getFkDpsDocId_n() { return mnFkDpsDocId_n; }
     public int getFkRecordYearId_n() { return mnFkRecordYearId_n; }
@@ -316,15 +322,15 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         if (!mbAuxIsProcessingValidation) {
             if (mbIsProcessingWebService) {
-                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_WEB_SERVICE + "!";
+                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_WS_PAC + "!";
                 throw new Exception(msDbmsError);
             }
             if (action != SDbConsts.ACTION_ANNUL && mbIsProcessingStorageXml) {
-                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_XML_STORAGE + "!";
+                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_XML_STORAGE + "!";
                 throw new Exception(msDbmsError);
             }
             if (action != SDbConsts.ACTION_ANNUL && mbIsProcessingStoragePdf) {
-                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESSING_PDF_STORAGE + "!";
+                msDbmsError = sMsg + "¡" + SCfdConsts.ERR_MSG_PROCESS_PDF_STORAGE + "!";
                 throw new Exception(msDbmsError);
             }
         }
@@ -414,7 +420,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         msCertNumber = "";
         msStringSigned = "";
         msSignature = "";
-        msDocXmlUuid = "";
+        msBasexUuid = "";
         msDocXml = "";
         msDocXmlName = "";
         msDocXmlRfcEmi = "";
@@ -440,6 +446,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkXmlDeliveryTypeId = 0;
         mnFkXmlDeliveryStatusId = 0;
         mnFkCompanyBranchId_n = 0;
+        mnFkFactoringBankId_n = 0;
         mnFkDpsYearId_n = 0;
         mnFkDpsDocId_n = 0;
         mnFkRecordYearId_n = 0;
@@ -491,7 +498,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 msCertNumber = resultSet.getString("cert_num");
                 msStringSigned = resultSet.getString("str_signed");
                 msSignature = resultSet.getString("signature");
-                msDocXmlUuid = resultSet.getString("doc_xml_uuid");
+                msBasexUuid = resultSet.getString("doc_xml_uuid");
                 msDocXml = resultSet.getString("doc_xml");                                
                 msDocXmlName = resultSet.getString("doc_xml_name");
                 msDocXmlRfcEmi = resultSet.getString("xml_rfc_emi");
@@ -517,6 +524,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkXmlDeliveryTypeId = resultSet.getInt("fid_tp_xml_dvy");
                 mnFkXmlDeliveryStatusId = resultSet.getInt("fid_st_xml_dvy");
                 mnFkCompanyBranchId_n = resultSet.getInt("fid_cob_n");
+                mnFkFactoringBankId_n = resultSet.getInt("fid_fact_bank_n");
                 mnFkDpsYearId_n = resultSet.getInt("fid_dps_year_n");
                 mnFkDpsDocId_n = resultSet.getInt("fid_dps_doc_n");
                 mnFkRecordYearId_n = resultSet.getInt("fid_rec_year_n");
@@ -618,13 +626,13 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 sql = "INSERT INTO trn_cfd (id_cfd, ser, num, " +
                         "ts, cert_num, str_signed, signature, doc_xml_uuid, doc_xml, doc_xml_name, xml_rfc_emi, xml_rfc_rec, xml_tot, xml_mon, " +
                         "xml_tc, xml_sign_n, uuid, qrc_n, can_st, ack_can_xml, ack_can_pdf_n, ack_dvy, msg_dvy, b_prc_ws, b_prc_sto_xml, " +
-                        "b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, fid_cob_n, fid_dps_year_n, fid_dps_doc_n, " +
+                        "b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, fid_cob_n, fid_fact_bank_n, fid_dps_year_n, fid_dps_doc_n, " +
                         "fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, " +
                         "fid_pay_rcp_iss_n, fid_usr_prc, fid_usr_dvy, ts_prc, ts_dvy) " +
                         "VALUES (" + mnPkCfdId + ", ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, NOW(), NOW())";
             }
@@ -634,7 +642,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 sql = "UPDATE trn_cfd SET ser = ?, num = ?, ts = ?, cert_num = ?, str_signed = ?, signature = ?, doc_xml_uuid = ?, " +
                         "doc_xml = ?, doc_xml_name = ?, xml_rfc_emi = ?, xml_rfc_rec = ?, xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, " +
                         "uuid = ?, qrc_n = ?, can_st = ?, ack_can_xml = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, " +
-                        "fid_tp_cfd = ?, fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_cob_n = ?, " +
+                        "fid_tp_cfd = ?, fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_cob_n = ?, fid_fact_bank_n = ?, " +
                         "fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, " +
                         "fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
                         "WHERE id_cfd = " + mnPkCfdId + " ";               
@@ -650,7 +658,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement.setString(index++, msCertNumber);
             preparedStatement.setString(index++, msStringSigned);
             preparedStatement.setString(index++, msSignature);
-            preparedStatement.setString(index++, msDocXmlUuid);
+            preparedStatement.setString(index++, msBasexUuid);
             preparedStatement.setString(index++, SLibUtils.textToSql(msDocXml));
             preparedStatement.setString(index++, SLibUtils.textToSql(msDocXmlName));
             preparedStatement.setString(index++, msDocXmlRfcEmi);
@@ -701,6 +709,13 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
             else {
                 preparedStatement.setInt(index++, mnFkCompanyBranchId_n);
+            }
+            
+            if (mnFkFactoringBankId_n == SLibConsts.UNDEFINED) {
+                preparedStatement.setNull(index++, java.sql.Types.INTEGER);
+            }
+            else {
+                preparedStatement.setInt(index++, mnFkFactoringBankId_n);
             }
             
             if (mnFkDpsYearId_n == SLibConsts.UNDEFINED) {
@@ -885,35 +900,38 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         sSql = "UPDATE trn_cfd SET ";
 
         switch (field) {
-            case FIELD_ACC_WS:
+            case FIELD_PRC_WS:
                 sSql += "b_prc_ws = " + value + " ";
                 break;
-            case FIELD_ACC_XML_STO:
+            case FIELD_PRC_STO_XML:
                 sSql += "b_prc_sto_xml = " + value + " ";
                 break;
-            case FIELD_ACC_PDF_STO:
+            case FIELD_PRC_STO_PDF:
                 sSql += "b_prc_sto_pdf = " + value + " ";
                 break;
-            case FIELD_ACC_USR:
+            case FIELD_PRC_CON:
+                sSql += "b_con = " + value + " ";
+                break;
+            case FIELD_PRC_USR:
                 sSql += "fid_usr_prc = " + value + ", ts_prc = NOW() ";
                 break;
-            case FIELD_ACK_DVY:
+            case FIELD_DVY_ACK:
                 sSql += "ack_dvy = '" + value + "' ";
                 break;
-            case FIELD_MSJ_DVY:
+            case FIELD_DVY_MSG:
                 sSql += "msg_dvy = '" + value + "' ";
                 break;
-            case FIELD_TP_XML_DVY:
+            case FIELD_DVY_TP:
                 sSql += "fid_tp_xml_dvy = " + value + " ";
                 break;
-            case FIELD_ST_XML_DVY:
+            case FIELD_DVY_ST:
                 sSql += "fid_st_xml_dvy = " + value + " ";
                 break;
-            case FIELD_USR_DVY:
+            case FIELD_DVY_USR:
                 sSql += "fid_usr_dvy = " + value + ", ts_dvy = NOW() ";
                 break;
-            case FIELD_B_CON:
-                sSql += "b_con = " + value + " ";
+            case FIELD_CAN_ST:
+                sSql += "can_st = '" + value + "' ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -934,20 +952,20 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
      * @throws Exception 
      */
     private void addFileToBaseXDb(Connection connection) throws SQLException, IOException, Exception {
-            String mysqlDatabaseURL = connection.getMetaData().getURL();
-            
-            String databaseHost = SBaseXUtils.getDbHostFromUrl(mysqlDatabaseURL);
-            String databaseName = SBaseXUtils.getDbNameFromUrl(mysqlDatabaseURL);
-            
-            // Company BaseX database connection.
-            SBaseXClient baseXSession = SBaseXUtils.getBaseXSessionInstance(databaseHost, 1984, "admin", "admin");
-              
-            // escape XML special characters.
-            String xmlDocBody = SBaseXUtils.escapeSpecialCharacters(msDocXml);
-              
-            // Parse the xml body and add it to the BaseX database.
-            String addXmlToDBQuery = "db:replace(\"" + databaseName + "\", \"/" + msDocXmlUuid + ".xml" + "\", fn:parse-xml(\"" + xmlDocBody + "\"))";
-                     
-            SBaseXUtils.executeBaseXQuery(baseXSession, addXmlToDBQuery);
+        String mysqlDatabaseURL = connection.getMetaData().getURL();
+
+        String databaseHost = SBaseXUtils.getDbHostFromUrl(mysqlDatabaseURL);
+        String databaseName = SBaseXUtils.getDbNameFromUrl(mysqlDatabaseURL);
+
+        // Company BaseX database connection:
+        SBaseXClient baseXSession = SBaseXUtils.getBaseXSessionInstance(databaseHost, 1984, "admin", "admin");
+
+        // escape XML special characters:
+        String xmlDocBody = SBaseXUtils.escapeSpecialCharacters(msDocXml);
+
+        // Parse the xml body and add it to the BaseX database:
+        String addXmlToDBQuery = "db:replace(\"" + databaseName + "\", \"/" + msBasexUuid + ".xml" + "\", fn:parse-xml(\"" + xmlDocBody + "\"))";
+
+        SBaseXUtils.executeBaseXQuery(baseXSession, addXmlToDBQuery);
     }
 }

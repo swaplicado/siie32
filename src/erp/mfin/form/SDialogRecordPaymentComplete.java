@@ -1600,7 +1600,7 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         oDsmEntry.setDbmsFkDpsCategoryId(moDps.getFkDpsCategoryId());
         oDsmEntry.setDbmsDestinyDps((moDps.getNumberSeries().toString().length() > 0 ? moDps.getNumberSeries() + "-" : "") + moDps.getNumber());
         oDsmEntry.setDbmsSubclassMove(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP));
-        oDsmEntry.setDbmsBiz(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
+        oDsmEntry.setDbmsBizPartner(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
         oDsmEntry.setDbmsDestinyTpDps(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId(), moDps.getFkDpsTypeId() }, SLibConstants.DESCRIPTION_CODE));
 
         /*

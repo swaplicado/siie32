@@ -2805,8 +2805,8 @@ public abstract class SFiscalUtils {
                     + "fald4.id_ref_1 AS f_ld4_ref1, fald4.id_ref_2 AS f_ld4_ref2, fald4.acc_code, fald4.acc_name, "
                     + "re.fid_dps_year_n, re.fid_dps_doc_n, doc.num_ser, doc.num, doc.dt, doc.tot_r, doc.exc_rate, doc_cur.id_cur, doc_fcur.id_fiscal_cur, doc_fcur.code, "
                     + "@pos := INSTR(cfd.doc_xml, 'UUID=') AS f_cfd_pos, UPPER(IF(@pos = 0, '', MID(cfd.doc_xml, @pos + 6, 36))) AS f_cfd_uuid, doc_bp.fiscal_id, doc_bp.fiscal_frg_id, "
-                    + "re.fid_check_wal_n, re.fid_check_n, acsh_bnk.acc_num, fbnk.id_fiscal_bank, fbnk.code, bnk_fcur.id_fiscal_cur, bnk_fcur.code, chk.num, chk.dt, chk.val, chk.benef, chk_bp.bp, chk_bp.fiscal_id "
-                    + ""
+                    + "re.fid_check_wal_n, re.fid_check_n, acsh_bnk.acc_num, fbnk.id_fiscal_bank, fbnk.code, bnk_fcur.id_fiscal_cur, bnk_fcur.code, chk.num, chk.dt, chk.val, chk.benef, chk_bp.bp, chk_bp.fiscal_id, "
+                    + "fbnk.id_fiscal_bank, fbnk.code "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS a ON re.fid_acc = a.id_acc "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS al ON al.code = CONCAT(LEFT(a.code, 6), REPEAT('0', 42)) "
@@ -3031,7 +3031,8 @@ public abstract class SFiscalUtils {
                     xmlPago = null;
 
                     if (resultSetRecEty.getInt("re.fid_check_wal_n") != SLibConsts.UNDEFINED) {
-                        xmlPago = createElementPolizas13Cheque(resultSetRecEty.getString("chk.num"), resultSetRecEty.getString("fbnk.code"),resultSetRecEty.getString("bnk_fcur.code"), resultSetRecEty.getString("acsh_bnk.acc_num"),
+                        //xmlPago = createElementPolizas13Cheque(resultSetRecEty.getString("chk.num"), resultSetRecEty.getString("fbnk.code"),resultSetRecEty.getString("bnk_fcur.code"), resultSetRecEty.getString("acsh_bnk.acc_num"),
+                        xmlPago = createElementPolizas13Cheque(resultSetRecEty.getString("chk.num"), resultSetRecEty.getString("fbnk.id_fiscal_bank"),resultSetRecEty.getString("fbnk.code"), resultSetRecEty.getString("acsh_bnk.acc_num"),
                                 resultSetRecEty.getDate("chk.dt"), resultSetRecEty.getString("chk.benef"), resultSetRecEty.getString("chk_bp.fiscal_id") == null ? DCfdConsts.RFC_GEN_NAC : resultSetRecEty.getString("chk_bp.fiscal_id"),
                                 resultSetRecEty.getDouble("chk.val"), resultSetRecEty.getString("bnk_fcur.code"), resultSetRecEty.getDouble("re.exc_rate"));
                     }

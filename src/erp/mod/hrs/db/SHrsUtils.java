@@ -26,6 +26,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -490,44 +491,46 @@ public abstract class SHrsUtils {
     
     /**
     * Creates layout CSV of payroll with HSBC.
-    *@param client
-    *@param payrollId
-    *@param dateApplication
-    *@param consecutiveDay
-    *@param employees employees ids
+    * @param client
+    * @param payrollId
+    * @param dateApplication
+    * @param consecutiveDay
+    * @param employees employees ids
+    * @param accountDebit
     */
-     public static void createLayoutHsbcPayroll(SGuiClient client, int payrollId, Date dateApplication, int consecutiveDay, String[] employees) {
+     public static void createLayoutHsbcPayroll(SGuiClient client, int payrollId, Date dateApplication, int consecutiveDay, String[] employees, String accountDebit) {
         ResultSet resulSet = null;
         Statement statement = null;
         String sql = "";
         String fileName = "";
         String employeesId = "";
-        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
         SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
         String sNameEmploy = "";
         String sAccountCredit = "";
-        String sAmount = "";
         StringBuilder headerLayout = new StringBuilder();
         StringBuilder bodyLayout = new StringBuilder();
         int nCont = 0;
+        int type = 0;
         double mdBalanceTot = 0.0;
         double dTotalBalance = 0.0;
         
+        sAccountCredit = SLibUtilities.textTrim(accountDebit);
+
         SimpleDateFormat formatDate = new SimpleDateFormat("ddMMyyyy");
-        
+
         fileName = formatDateTitle.format(new Date()).concat(" HSBC nom.csv");
-        
+
         employeesId = SLibUtils.textImplode(employees, ",");
-        
+
         client.getFileChooser().setSelectedFile(new File(fileName));
-        
+
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {
                 statement = client.getSession().getStatement();
-                
-                sql = "SELECT rcp.id_emp, emp.bank_acc, b.bp, " +
+
+                sql = "SELECT rcp.id_emp, emp.bank_acc, b.bp, p.fk_tp_pay, " +
                         "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                         "FROM hrs_pay_rcp AS r " +
                         "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
@@ -542,23 +545,22 @@ public abstract class SHrsUtils {
                         "INNER JOIN erp.bpsu_bp AS b ON emp.id_emp = b.id_bp " +
                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
                         "AND rcp.id_emp IN (" + employeesId + ") " +
-                        "ORDER BY rcp.id_emp, emp.bank_acc, b.bp";
-                
+                        "ORDER BY rcp.id_emp, emp.bank_acc, b.bp;";
+
                 resulSet = statement.executeQuery(sql);
                 while (resulSet.next()) {
                     nCont++;
-
+                    type = resulSet.getInt("fk_tp_pay");
                     sNameEmploy = resulSet.getString("bp");
                     String[] parts = sNameEmploy.split(",");
                     sNameEmploy = parts[1] + " " + parts[0];
                     mdBalanceTot = resulSet.getDouble("_pay_net");
-                    sAmount = formatDesc.format(mdBalanceTot);
-
                     dTotalBalance = SLibUtils.roundAmount(dTotalBalance + mdBalanceTot);
+                    sNameEmploy = removeSpecialChar(sNameEmploy);
                     bodyLayout.append(SLibUtilities.textTrim(resulSet.getString("emp.bank_acc"))).append(',');
-                    bodyLayout.append(sAmount).append(',');
+                    bodyLayout.append(mdBalanceTot).append(',');
                     bodyLayout.append("PAGO NOMINA").append(',');
-                    bodyLayout.append(sNameEmploy);
+                    bodyLayout.append(sNameEmploy.substring(1,sNameEmploy.length() <= 35 ? sNameEmploy.length() : 35)).append(",,,,");
                     bodyLayout.append("\r\n");
                 }
                 
@@ -569,7 +571,7 @@ public abstract class SHrsUtils {
                 headerLayout.append(nCont).append(',');
                 headerLayout.append(formatDate.format(new Date())).append(',');
                 headerLayout.append("").append(',');
-                headerLayout.append("PAGO NOMINA QUINCENAL").append(',');
+                headerLayout.append("PAGO NOMINA ").append( type == SModSysConsts.HRSS_TP_PAY_WEE ? "SEMANAL" : "QUINCENAL");
                 headerLayout.append("\r\n");
                 headerLayout.append(bodyLayout.toString());
 
@@ -587,7 +589,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (SQLException | IOException e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -1617,23 +1619,23 @@ public abstract class SHrsUtils {
         ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarys = new ArrayList<>();
         
         benefitTables.stream().filter((table) -> (!table.getChildRows().isEmpty())).forEach((table) -> {
-            int currIndex = 0;      // current index of rows of current benefit table
-            double currValue = 0;   // current value, it can be days or bonus percentage
-            SDbBenefitTableRow currTableRow = null;     // current benefit-table row
-            SDbBenefitTableRow nextTableRow = null;     // next benefit-table row, when available
+            int currIndex = -1; // current index of row for current benefit table
+            double benefit = 0; // current benefit, expressed as days or bonus percentage
+            SDbBenefitTableRow tableRow = null; // current benefit-table row
             
-            for (int ann = 1; ann <= 100; ann++) {
-                if (currTableRow == null || (nextTableRow != null && (ann * SLibTimeConsts.MONTHS >= nextTableRow.getMonths()))) {
-                    if (currTableRow != null) {
-                        currIndex++;
+            for (int year = 1; year <= 100; year++) {
+                if (tableRow == null || (year * SLibTimeConsts.MONTHS) >= tableRow.getMonths()) {
+                    if (currIndex + 1 >= table.getChildRows().size()) {
+                        benefit = 0;
                     }
-                    
-                    currTableRow = table.getChildRows().get(currIndex);
-                    nextTableRow = table.getChildRows().size() == currIndex + 1 ? null : table.getChildRows().get(currIndex + 1);
-                    currValue = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? currTableRow.getBenefitBonusPercentage() : currTableRow.getBenefitDays();
+                    else {
+                        ++currIndex;
+                        tableRow = table.getChildRows().get(currIndex);
+                        benefit = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? tableRow.getBenefitBonusPercentage() : tableRow.getBenefitDays();
+                    }
                 }
                 
-                benefitTableAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), ann, currValue));
+                benefitTableAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), year, benefit));
             }
         });
 

@@ -254,30 +254,45 @@ public abstract class STrnStockSegregationUtils {
      * Obtains stocks ignoring segregations
      * 
      * @param client
-     * @param stockMoveParams contains the attributes needed for the filter.
+     * @param oStockMoveParams contains the attributes needed for the filter.
      * @return The STrnStock object containing the values obtained.
      * @throws Exception 
      */
-    public static STrnStock getStock(final SClientInterface client, final STrnStockMove stockMoveParams, final int[] iogKey_n) throws Exception {
+    public static STrnStock getStock(final SClientInterface client, final STrnStockMove oStockMoveParams, final int[] iogKey_n) throws Exception {
         STrnStock stock = new STrnStock();
         ResultSet result = null;
         
         String sql = "SELECT COALESCE(SUM(stk.mov_in), 0) AS f_mov_in, COALESCE(SUM(stk.mov_out), 0) AS f_mov_out " +
                 "FROM trn_stk AS stk " +
                 "INNER JOIN erp.cfgu_cob_ent AS ent ON stk.id_cob = ent.id_cob AND stk.id_wh = ent.id_ent " +
-                "WHERE NOT ent.b_del AND NOT stk.b_del AND stk.id_year = " + stockMoveParams.getPkYearId() + " AND stk.id_item = " + stockMoveParams.getPkItemId() + " AND stk.id_unit = " + stockMoveParams.getPkUnitId() + " ";
+                "WHERE NOT ent.b_del AND NOT stk.b_del AND stk.id_year = " + oStockMoveParams.getPkYearId() + " AND stk.id_item = " + oStockMoveParams.getPkItemId() + " AND stk.id_unit = " + oStockMoveParams.getPkUnitId() + " ";
         
-        if (stockMoveParams.getPkCompanyBranchId() != 0) {
-            sql += "AND stk.id_cob = " + stockMoveParams.getPkCompanyBranchId() + " ";
+        if (oStockMoveParams.getPkCompanyBranchId() != 0) {
+            sql += "AND stk.id_cob = " + oStockMoveParams.getPkCompanyBranchId() + " ";
         }
-        if (stockMoveParams.getPkWarehouseId()!= 0) {
-            sql += "AND stk.id_wh = " + stockMoveParams.getPkWarehouseId() + " ";
+        if (oStockMoveParams.getPkWarehouseId() != 0) {
+            sql += "AND stk.id_wh = " + oStockMoveParams.getPkWarehouseId() + " ";
         }
-        if (stockMoveParams.getWarehouseType() != 0) {
-            sql += "AND ent.fid_tp_ent = " + stockMoveParams.getWarehouseType() + " ";
+        else if (oStockMoveParams.getLWarehouseIds() != null && oStockMoveParams.getLWarehouseIds().size() > 0) {
+            String warehouses = "";
+            int index = 0;
+            
+            for (int whs : oStockMoveParams.getLWarehouseIds()) {
+                warehouses += whs;
+                
+                if ((index + 1) < oStockMoveParams.getLWarehouseIds().size()) {
+                    warehouses += ",";
+                }
+                index++;
+            }
+            
+            sql += "AND stk.id_wh IN (" + warehouses + ") ";
         }
-        if (stockMoveParams.getPkLotId() != 0) {
-            sql += "AND stk.id_lot = " + stockMoveParams.getPkLotId() + " ";
+        if (oStockMoveParams.getWarehouseType() != 0) {
+            sql += "AND ent.fid_tp_ent = " + oStockMoveParams.getWarehouseType() + " ";
+        }
+        if (oStockMoveParams.getPkLotId() != 0) {
+            sql += "AND stk.id_lot = " + oStockMoveParams.getPkLotId() + " ";
         }
         if (iogKey_n != null) {
             sql += "AND NOT (stk.fid_diog_year = " + iogKey_n[0] + " AND stk.fid_diog_doc = " + iogKey_n[1] + ") ";

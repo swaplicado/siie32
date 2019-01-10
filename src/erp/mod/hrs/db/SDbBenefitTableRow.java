@@ -209,9 +209,12 @@ public class SDbBenefitTableRow extends SDbRegistryUser implements SGridRow {
                 value = mnMonths;
                 break;
             case 2:
-                value = mnBenefitDays;
+                value = mnMonths / 12;
                 break;
             case 3:
+                value = mnBenefitDays;
+                break;
+            case 4:
                 value = mdBenefitBonusPercentage;
                 break;
             default:

@@ -33,7 +33,7 @@ import sa.lib.grid.SGridUtils;
  */
 public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
-    private javax.swing.JButton jbCardex;
+    private javax.swing.JButton jbStockCardex;
     private javax.swing.JButton jbMaintLentEmpOut;
     private javax.swing.JButton jbMaintLentContOut;
     private javax.swing.JButton jbMaintMaintOut;
@@ -72,12 +72,12 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
 
-        jbCardex = new JButton(miClient.getImageIcon(SLibConstants.ICON_KARDEX));
-        jbCardex.setPreferredSize(new Dimension(23, 23));
-        jbCardex.setToolTipText("Ver tarjeta auxiliar de almacén");
-        jbCardex.addActionListener(this);
-        addTaskBarUpperComponent(jbCardex);
-        jbCardex.setEnabled(!isMaintUserNeeded());
+        jbStockCardex = new JButton(miClient.getImageIcon(SLibConstants.ICON_KARDEX));
+        jbStockCardex.setPreferredSize(new Dimension(23, 23));
+        jbStockCardex.setToolTipText("Ver tarjeta auxiliar de almacén");
+        jbStockCardex.addActionListener(this);
+        addTaskBarUpperComponent(jbStockCardex);
+        //jbStockCardex.setEnabled(!isMaintUserNeeded());
  
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDate);
@@ -161,7 +161,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
 
-                aoTableColumns = new STableColumn[11];
+                aoTableColumns = new STableColumn[10];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL:
@@ -180,8 +180,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[12];
-                
+                aoTableColumns = new STableColumn[9];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL_MAINT:
@@ -190,8 +189,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[7];
-
+                aoTableColumns = new STableColumn[9];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL_LOST:           
@@ -200,8 +198,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[7];
-
+                aoTableColumns = new STableColumn[9];
                 break;
 
             default:
@@ -214,33 +211,21 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
 
         i = 0;
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
-            if (mnTabTypeAux01 == SModSysConsts.TRNX_MAINT_TOOL_LENT || mnTabTypeAux01 == SModSysConsts.TRNX_MAINT_TOOL_AVL || mnTabTypeAux01 == SModSysConsts.TRNX_MAINT_TOOL_MAINT
-                || mnTabTypeAux01 == SModSysConsts.TRNX_MAINT_TOOL_LOST || mnTabTypeAux01 == SModSysConsts.TRNX_MAINT_TOOL) {
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
-            }
-            else {
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "s.dt", "Fecha", 100);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
-            }
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
         }
         else {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "s.dt", "Fecha", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
         }
 
         if (isMaintUserNeeded()) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "s.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.code", "Código tipo doc.", 40);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp_iog.tp_iog", "Tipo doc.", 120);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_bp", "Responsable", 200);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "supv.name", "Residente", 200);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_signed", "Firmado", STableConstants.WIDTH_BOOLEAN);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "_diog_dt", "Primer movimiento", 100);
         }
         
-        if (isStockCfgNeeded()) {
+        if (isStockMaintPart()) {
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_ico", "Estatus existencias", STableConstants.WIDTH_ICON);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererIcon());
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "sc.qty_min", "Mínimo", STableConstants.WIDTH_QUANTITY);
@@ -275,13 +260,17 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
         moTablePane.setDoubleClickAction(this, "actionCardex");
     }
     
-    private boolean isStockCfgNeeded() {
-        return SLibUtils.belongsTo(mnTabTypeAux01, new int [] { SModSysConsts.TRNX_MAINT_PART });
-    }
-    
     private boolean isMaintUserNeeded() {
-        return SLibUtils.belongsTo(mnTabTypeAux01, new int [] { SModSysConsts.TRNX_MAINT_TOOL_LENT, SModSysConsts.TRNX_MAINT_TOOL_MAINT, SModSysConsts.TRNX_MAINT_TOOL_LOST });
+        return SLibUtils.belongsTo(mnTabTypeAux01, new int [] { 
+            SModSysConsts.TRNX_MAINT_TOOL_LENT, 
+            SModSysConsts.TRNX_MAINT_TOOL_MAINT, 
+            SModSysConsts.TRNX_MAINT_TOOL_LOST });
     }   
+    
+    private boolean isStockMaintPart() {
+        return SLibUtils.belongsTo(mnTabTypeAux01, new int [] { 
+            SModSysConsts.TRNX_MAINT_PART });
+    }
     
     private int[] getWarehouseKey() {
         int[] key = null;
@@ -336,14 +325,18 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
     }
 
     public void actionCardex() {
-        if (jbCardex.isEnabled()) {
+        if (jbStockCardex.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
                 int[] rowKey = (int[]) moTablePane.getSelectedTableRow().getPrimaryKey();
                 int itemId = rowKey[0];
                 int unitId = rowKey[1];
+                int maintUserId = 0;
+                if (isMaintUserNeeded()) {
+                    maintUserId = rowKey[2];
+                }
 
                 moDialogStockCardex.formReset();
-                moDialogStockCardex.setFormParams(moTabFilterDate.getDate(), itemId, unitId, SLibConstants.UNDEFINED, getWarehouseKey(), SLibConstants.MODE_QTY);
+                moDialogStockCardex.setFormParams(moTabFilterDate.getDate(), itemId, unitId, SLibConstants.UNDEFINED, getWarehouseKey(), SLibConstants.MODE_QTY, maintUserId);
                 moDialogStockCardex.setVisible(true);
             }
         }
@@ -392,11 +385,8 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
             sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " ";
         }
         
-        msSql = "SELECT s.id_item, s.id_unit, s.dt, i.item_key, i.item, u.symbol, sc.qty_min, sc.rop, sc.qty_max, " +
-                (!isMaintUserNeeded() ? "" : "CONCAT(d.num_ser, IF(LENGTH(d.num_ser) = 0, '', '-'), erp.lib_fix_int(d.num, 6)) AS f_num, " +
-                "(SELECT COUNT(*) FROM trn_maint_diog_sig AS sig WHERE sig.fk_diog_year = d.id_year AND sig.fk_diog_doc = d.id_doc AND sig.ts_usr_ins >= d.ts_edit) > 0 AS _signed, " +
-                "tp_iog.tp_iog, tp_iog.code, bpb.code, ent.code, supv.name, " ) +
-                (!isMaintUserNeeded() ? "" : "COALESCE(b.id_bp, 0) AS _id_bp, COALESCE(b.bp, 'N/D') AS _bp, ") +
+        msSql = "SELECT s.id_item, s.id_unit, i.item_key, i.item, u.symbol, sc.qty_min, sc.rop, sc.qty_max, " +
+                (!isMaintUserNeeded() ? "" : "COALESCE(b.id_bp, 0) AS _id_bp, COALESCE(b.bp, 'N/D') AS _bp, supv.name, MIN(d.dt) AS _diog_dt, ") +
                 "IF(SUM(s.mov_in - s.mov_out) <= sc.qty_min, " + STableConstants.ICON_VIEW_LIG_RED + ", " +
                 "IF(sc.qty_min < SUM(s.mov_in - s.mov_out) AND SUM(s.mov_in - s.mov_out) <= sc.rop, "  + STableConstants.ICON_VIEW_LIG_YEL + ", " +
                 "IF(SUM(s.mov_in - s.mov_out) > sc.rop AND SUM(s.mov_in - s.mov_out) <= sc.qty_max, "  + STableConstants.ICON_VIEW_LIG_GRE + ", " +
@@ -410,9 +400,6 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 "INNER JOIN trn_stk_cfg AS sc ON sc.id_item = s.id_item AND sc.id_unit = s.id_unit AND sc.id_cob = s.id_cob AND sc.id_wh = s.id_wh " +
                 (!isMaintUserNeeded() ? "" : 
                 "INNER JOIN trn_diog AS d ON d.id_year = s.fid_diog_year AND d.id_doc = s.fid_diog_doc " +
-                "INNER JOIN erp.trns_tp_iog AS tp_iog ON d.fid_tp_iog = tp_iog.id_tp_iog AND d.fid_ct_iog = tp_iog.id_ct_iog AND d.fid_cl_iog = tp_iog.id_cl_iog " +
-                "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_cob = bpb.id_bpb " +
-                "INNER JOIN erp.cfgu_cob_ent AS ent ON d.fid_cob = ent.id_cob AND d.fid_wh = ent.id_ent " +
                 "INNER JOIN trn_maint_user_supv AS supv ON d.fid_maint_user_supv = supv.id_maint_user_supv " +
                 "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = d.fid_maint_user_n ") +
                 "WHERE NOT s.b_del " + (sqlWhere.isEmpty() ? "" : "AND " + sqlWhere) +
@@ -431,7 +418,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
         if (e.getSource() instanceof javax.swing.JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbCardex) {
+            if (button == jbStockCardex) {
                 actionCardex();
             }
             else if (button == jbMaintLentEmpOut) {

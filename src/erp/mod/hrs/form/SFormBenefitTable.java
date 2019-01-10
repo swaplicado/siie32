@@ -36,6 +36,7 @@ import sa.lib.gui.bean.SBeanForm;
 /**
  *
  * @author Juan Barajas, Sergio Flores
+ * 2018-12-04, Sergio Flores: Improvement of UI usability.
  */
 public class SFormBenefitTable extends SBeanForm implements ActionListener, ItemListener {
 
@@ -204,7 +205,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlMonths.setText("Meses base:*");
+        jlMonths.setText("Meses tope:*");
         jlMonths.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlMonths);
 
@@ -213,7 +214,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         jPanel8.add(jlBenefitDays);
 
         jlBenefitBonusPercentage.setText("Prima prestación:*");
-        jlBenefitBonusPercentage.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlBenefitBonusPercentage.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel8.add(jlBenefitBonusPercentage);
 
         jPanel7.add(jPanel8);
@@ -222,7 +223,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         jPanel9.add(moIntMonths);
         jPanel9.add(moIntBenefitDays);
 
-        moDecBenefitBonusPercentage.setPreferredSize(new java.awt.Dimension(125, 23));
+        moDecBenefitBonusPercentage.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel9.add(moDecBenefitBonusPercentage);
 
         jbRowAdd.setText("Agregar");
@@ -345,7 +346,8 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_4B, "Meses base"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_4B, "Meses tope"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_4B, "Años tope equivalentes"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_4B, "Días prestación"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_DISC, "Prima prestación"));
 
