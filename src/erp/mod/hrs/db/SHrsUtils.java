@@ -423,6 +423,7 @@ public abstract class SHrsUtils {
         DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
         SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
         double mdBalance = 0;
+        double auxTotal = 0;
         
         fileName = formatDateTitle.format(new Date()).concat(" bbva nom.txt");
         
@@ -473,12 +474,14 @@ public abstract class SHrsUtils {
                     buffer += "001";
                     
                     bw.write(buffer);
+                    auxTotal += mdBalance;
                     bw.newLine();
                 }
 
                 bw.flush();
                 bw.close();
-
+                client.showMsgBoxInformation("Total: " + SLibUtils.DecimalFormatValue2D.format(auxTotal));
+                
                 if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
                     SLibUtilities.launchFile(file.getPath());
                 }
@@ -527,7 +530,7 @@ public abstract class SHrsUtils {
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
-            try {
+            try {   
                 statement = client.getSession().getStatement();
 
                 sql = "SELECT rcp.id_emp, emp.bank_acc, b.bp, p.fk_tp_pay, " +
@@ -774,8 +777,8 @@ public abstract class SHrsUtils {
                         guia = resultSetHeader.getString("Guia");
                     }
 
-                    buffer += param.substring(0, 9); // (Employer registration)
-                    buffer += param.substring(9); // (Digit verifier of R.P)
+                    buffer += param.substring(0, 10); // (Employer registration)
+                    buffer += param.substring(10); // (Digit verifier of R.P)
                     buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Social Security number)
                     buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
                     buffer += removeSpecialChar(fatherName).concat(fatherName.length() > 27 ? fatherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (fatherName.length() == 27 ? 0 : 27 - fatherName.length())))); // (Last name)
@@ -890,8 +893,8 @@ public abstract class SHrsUtils {
                         guia = resultSetHeader.getString("Guia");
                     }             
 
-                    buffer += param.substring(0, 9); // (Employer registration)
-                    buffer += param.substring(9); // (Digit verifier of R.P)
+                    buffer += param.substring(0, 10); // (Employer registration)
+                    buffer += param.substring(10); // (Digit verifier of R.P)
                     buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Social Security number)
                     buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
                     buffer += removeSpecialChar(fatherName).concat(fatherName.length() > 27 ? fatherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (fatherName.length() == 27 ? 0 : 27 - fatherName.length())))); // (Last name)
@@ -945,7 +948,7 @@ public abstract class SHrsUtils {
         SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyyyMMdd HHmm");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateIni = formatter.format(dateLayoutStart);
-        String dateEnd = formatter.format(dateLayoutEnd);  
+        String dateEnd = formatter.format(dateLayoutEnd);
         java.lang.String buffer = "";
         String sql = "";
         String param = "";
@@ -1002,8 +1005,8 @@ public abstract class SHrsUtils {
                         }
 
 
-                    buffer += param.substring(0, 9); // (Employer registration)
-                    buffer += param.substring(9); // (Digit verifier of R.P)
+                    buffer += param.substring(0, 10); // (Employer registration)
+                    buffer += param.substring(10); // (Digit verifier of R.P)
                     buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Social Security number)
                     buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
                     buffer += removeSpecialChar(fatherName).concat(fatherName.length() > 27 ? fatherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (fatherName.length() == 27 ? 0 : 27 - fatherName.length())))); // (Last name)
@@ -1032,6 +1035,53 @@ public abstract class SHrsUtils {
             catch (java.lang.Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
+        }
+    }
+
+    public static void updateEmployeeSBC(SGuiClient client, int layoutSuaType, int idEmployeSBC, Date dateSystem) {
+        ResultSet resultSetHeader = null;
+        Statement statement = null;
+        int id_emp = 0;
+        int nLogId = 0;
+        int id_Emp = idEmployeSBC;
+        int b_del = 0;
+        double sal = 0;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = formatter.format(dateSystem);
+        String sql = "";
+        String usr_upd = "";
+        String usr_ins = "";
+             
+        try {
+            statement = client.getSession().getStatement();
+                         
+                sql = "SELECT COALESCE(MAX(id_log), 0) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " WHERE id_emp = " + id_Emp ;
+                resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+                    if (resultSetHeader.next()) {
+                        nLogId = resultSetHeader.getInt(1);
+                    }
+                    // Comente el update para que no cambie nada en la BD
+/*
+                sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " SET " +
+                    "id_emp = '" + id_emp + "', " +
+                    "id_log = '" + nLogId + "', " +
+                    "dt = '" + currentDate + "', " +
+//                    "dt = '" + SLibUtils.DbmsDateFormatDate.format(dt) + "', " +
+                    "sal_ssc = '" + sal + "', " +
+                    "b_del = '" + b_del + "', " +
+                    "fk_usr_ins = '" + usr_ins + "', " +
+                    "fk_usr_upd = '" + usr_upd + "', " +
+                    "ts_usr_ins = " + "NOW()" + ", " +
+                    "ts_usr_upd = " + "NOW()" + " " +
+                    "WHERE id_emp = " + id_emp + " AND id_log = " + nLogId;
+
+                    client.getSession().getStatement().execute(sql);
+                    */
+                    client.showMsgBoxInformation("SBC actualizados");
+
+        }
+        catch (SQLException e) {
+            SLibUtilities.renderException(STableUtilities.class.getName(), e);
         }
     }
     
@@ -1619,23 +1669,23 @@ public abstract class SHrsUtils {
         ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarys = new ArrayList<>();
         
         benefitTables.stream().filter((table) -> (!table.getChildRows().isEmpty())).forEach((table) -> {
-            int currIndex = -1; // current index of row for current benefit table
-            double benefit = 0; // current benefit, expressed as days or bonus percentage
-            SDbBenefitTableRow tableRow = null; // current benefit-table row
+            int currIndex = 0;      // current index of rows of current benefit table
+            double currValue = 0;   // current value, it can be days or bonus percentage
+            SDbBenefitTableRow currTableRow = null;     // current benefit-table row
+            SDbBenefitTableRow nextTableRow = null;     // next benefit-table row, when available
             
-            for (int year = 1; year <= 100; year++) {
-                if (tableRow == null || (year * SLibTimeConsts.MONTHS) >= tableRow.getMonths()) {
-                    if (currIndex + 1 >= table.getChildRows().size()) {
-                        benefit = 0;
+            for (int ann = 1; ann <= 100; ann++) {
+                if (currTableRow == null || (nextTableRow != null && (ann * SLibTimeConsts.MONTHS >= nextTableRow.getMonths()))) {
+                    if (currTableRow != null) {
+                        currIndex++;
                     }
-                    else {
-                        ++currIndex;
-                        tableRow = table.getChildRows().get(currIndex);
-                        benefit = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? tableRow.getBenefitBonusPercentage() : tableRow.getBenefitDays();
-                    }
+                    
+                    currTableRow = table.getChildRows().get(currIndex);
+                    nextTableRow = table.getChildRows().size() == currIndex + 1 ? null : table.getChildRows().get(currIndex + 1);
+                    currValue = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? currTableRow.getBenefitBonusPercentage() : currTableRow.getBenefitDays();
                 }
                 
-                benefitTableAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), year, benefit));
+                benefitTableAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), ann, currValue));
             }
         });
 
