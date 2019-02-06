@@ -691,10 +691,9 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
     public int save(java.sql.Connection connection) {
         int i = 0;
         int nParam = 1;
-        String sSql = "";
+        boolean bIsOtherItem = false;
 
         CallableStatement callableStatement = null;
-        Statement statement = null;
 
         SDataProductionOrderCharge charge = null;
         SDataProductionOrderPeriod period = null;
@@ -723,6 +722,10 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
                     mnFkLotId_n = oStockLot.getPkLotId();
                 }
             }
+            
+            if (mnPkOrderId != 0) {
+                bIsOtherItem = this.isOtherItem(mnPkYearId, mnPkOrderId, mnFkItemId_r, mnFkUnitId_r, connection);
+            }
 
             callableStatement = connection.prepareCall(
                     "{ CALL mfg_ord_save(" +
@@ -732,6 +735,7 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?) }");
+            
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkOrderId);
             callableStatement.setString(nParam++, msNumber);
@@ -815,17 +819,21 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
                 */
                 
                 // Save charges:
-
-                for (i = 0; i < mvDbmsProductionOrderCharges.size(); i++) {
-                    charge = (SDataProductionOrderCharge) mvDbmsProductionOrderCharges.get(i);
-                    if (charge != null) {
-                        charge.setPkYearId(mnPkYearId);
-                        charge.setPkOrderId(mnPkOrderId);
-                        //charge.setPkChargeId(0);
-                        if (charge.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                if (! bIsOtherItem) {
+                    for (i = 0; i < mvDbmsProductionOrderCharges.size(); i++) {
+                        charge = (SDataProductionOrderCharge) mvDbmsProductionOrderCharges.get(i);
+                        if (charge != null) {
+                            charge.setPkYearId(mnPkYearId);
+                            charge.setPkOrderId(mnPkOrderId);
+                            //charge.setPkChargeId(0);
+                            if (charge.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                            }
                         }
                     }
+                }
+                else {
+                    this.deleteCharges(mnPkYearId, mnPkOrderId, connection);
                 }
 
                 // Save periods:
@@ -864,6 +872,58 @@ public class SDataProductionOrder extends erp.lib.data.SDataRegistry implements 
         }
 
         return mnLastDbActionResult;
+    }
+    
+    /**
+     * This method determines if the item of production order has been changed in the current operation
+     * 
+     * @param iYearId
+     * @param iProdOrdId
+     * @param iItemId
+     * @param iUnitId
+     * @param connection
+     * 
+     * @return true if the production order saved has a different item
+     * 
+     * @throws SQLException 
+     */
+    private boolean isOtherItem(final int iYearId, final int iProdOrdId, final int iItemId, final int iUnitId, java.sql.Connection connection) throws SQLException {
+        
+        String sql = "SELECT "
+                            + "fid_item_r, fid_unit_r "
+                        + "FROM mfg_ord "
+                        + "WHERE id_year = " + iYearId 
+                                + " AND id_ord = " + iProdOrdId 
+                                + " AND fid_item_r = " + iItemId 
+                                + " AND fid_unit_r = " + iUnitId 
+                                + " AND NOT b_del "
+                        + ";";
+
+        ResultSet resultSet = connection.createStatement().executeQuery(sql);
+        
+        return !resultSet.next();
+    }
+    
+    /**
+     * clean the previous charges of database, forcing the user to explode the production order again
+     * 
+     * @param iYearId
+     * @param iProdOrdId
+     * @param connection
+     * @return
+     * @throws SQLException 
+     */
+    private boolean deleteCharges(final int iYearId, final int iProdOrdId, java.sql.Connection connection) throws SQLException {
+        String sqlCharLots = "DELETE FROM mfg_ord_chg_ety_lot WHERE id_ord = " + iProdOrdId + " AND id_year = " + iYearId + ";";
+        int rL = connection.createStatement().executeUpdate(sqlCharLots);
+        
+        String sqlCharEty = "DELETE FROM mfg_ord_chg_ety WHERE id_ord = " + iProdOrdId + " AND id_year = " + iYearId + ";";
+        int rE = connection.createStatement().executeUpdate(sqlCharEty);
+        
+        String sqlChar = "DELETE FROM mfg_ord_chg WHERE id_ord = " + iProdOrdId + " AND id_year = " + iYearId + ";";
+        int rC = connection.createStatement().executeUpdate(sqlChar);
+        
+        return (rL + rE + rC) > 0;
     }
 
     @Override
