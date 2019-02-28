@@ -62,6 +62,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
+import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridConsts;
@@ -75,6 +76,9 @@ import sa.lib.srv.SSrvUtils;
  * @author  Sergio Flores
  */
 public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener, javax.swing.event.ListSelectionListener {
+    
+    private static final int MODE_DPS_PICK_PEND = 1;
+    private static final int MODE_DPS_PICK_ALL = 2;
     
     private final int mnFormType;
     private int mnFormResult;
@@ -107,7 +111,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private java.util.HashMap<java.lang.String, sa.lib.srv.SSrvLock> moRecordLocksMap;  // key: record's primary key as string; value: corresponding gained lock
     private erp.mfin.form.SDialogRecordPicker moDialogPayRecordPicker;
     private erp.mtrn.form.SDialogPickerDps moDialogRecDpsRelatedPicker;
-    private erp.mtrn.form.SDialogPickerDps moDialogDocDpsRelatedPicker;
+    private erp.mtrn.form.SDialogPickerDps moDialogDocDpsRelatedPickerPend;
+    private erp.mtrn.form.SDialogPickerDps moDialogDocDpsRelatedPickerAll;
     private erp.mtrn.form.SDialogCfdPaymentFactoringFees moDialogCfdPaymentFactoringFees;
     private erp.lib.table.STablePaneGrid moPaneGridPayments;
     private erp.lib.table.STablePaneGrid moPaneGridPaymentDocs;
@@ -295,7 +300,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocDpsRelatedNumberRo = new javax.swing.JTextField();
         jtfDocDpsRelatedUuid = new javax.swing.JTextField();
         jtfDocDpsRelatedVersionRo = new javax.swing.JTextField();
-        jbDocDpsRelatedPick = new javax.swing.JButton();
+        jbDocDpsRelatedPickPend = new javax.swing.JButton();
+        jbDocDpsRelatedPickAll = new javax.swing.JButton();
         jPanel21 = new javax.swing.JPanel();
         jlDocPaymentMethod = new javax.swing.JLabel();
         jtfDocPaymentMethodRo = new javax.swing.JTextField();
@@ -495,7 +501,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfVouNumberRo.setText("A-999999");
         jtfVouNumberRo.setToolTipText("Serie y folio");
         jtfVouNumberRo.setFocusable(false);
-        jtfVouNumberRo.setPreferredSize(new java.awt.Dimension(103, 23));
+        jtfVouNumberRo.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel5.add(jtfVouNumberRo);
 
         jtfVouUuidRo.setEditable(false);
@@ -596,7 +602,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jPanel10.add(jlVouConfirm);
 
         jtfVouConfirm.setText("TEXT");
-        jtfVouConfirm.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfVouConfirm.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jtfVouConfirm);
 
         jPanel41.add(jPanel10);
@@ -970,7 +976,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocDpsRelatedNumberRo.setText("A-999999");
         jtfDocDpsRelatedNumberRo.setToolTipText("Serie y folio");
         jtfDocDpsRelatedNumberRo.setFocusable(false);
-        jtfDocDpsRelatedNumberRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfDocDpsRelatedNumberRo.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel14.add(jtfDocDpsRelatedNumberRo);
 
         jtfDocDpsRelatedUuid.setEditable(false);
@@ -987,10 +993,15 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocDpsRelatedVersionRo.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel14.add(jtfDocDpsRelatedVersionRo);
 
-        jbDocDpsRelatedPick.setText("...");
-        jbDocDpsRelatedPick.setToolTipText("Seleccionar doc. relacionado");
-        jbDocDpsRelatedPick.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel14.add(jbDocDpsRelatedPick);
+        jbDocDpsRelatedPickPend.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
+        jbDocDpsRelatedPickPend.setToolTipText("Seleccionar doc. relacionado con saldo");
+        jbDocDpsRelatedPickPend.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel14.add(jbDocDpsRelatedPickPend);
+
+        jbDocDpsRelatedPickAll.setText("...");
+        jbDocDpsRelatedPickAll.setToolTipText("Seleccionar doc. relacionado");
+        jbDocDpsRelatedPickAll.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel14.add(jbDocDpsRelatedPickAll);
 
         jPanel8.add(jPanel14);
 
@@ -1354,8 +1365,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         moDialogPayRecordPicker = new SDialogRecordPicker(miClient, SDataConstants.FINX_REC_USER);
         moDialogRecDpsRelatedPicker = new SDialogPickerDps(miClient, SDataConstants.TRN_CFD);
-        //moDialogDocDpsRelatedPicker = new SDialogPickerDps(miClient, SDataConstants.TRNX_DPS_PAY_PEND);
-        moDialogDocDpsRelatedPicker = new SDialogPickerDps(miClient, SDataConstants.TRN_DPS);
+        moDialogDocDpsRelatedPickerPend = new SDialogPickerDps(miClient, SDataConstants.TRNX_DPS_PAY_PEND);
+        moDialogDocDpsRelatedPickerAll = new SDialogPickerDps(miClient, SDataConstants.TRN_DPS);
         
         // initialize payments grid:
 
@@ -1445,7 +1456,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbPayPaymentEntryOk.addActionListener(this);
         jbPayPaymentEntryCancel.addActionListener(this);
         jbPayPaymentEntryDelete.addActionListener(this);
-        jbDocDpsRelatedPick.addActionListener(this);
+        jbDocDpsRelatedPickPend.addActionListener(this);
+        jbDocDpsRelatedPickAll.addActionListener(this);
         jbDocExchangeRateInvert.addActionListener(this);
         jbDocPaymentCompute.addActionListener(this);
         jbDocPaymentEntryDocAdd.addActionListener(this);
@@ -2040,7 +2052,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     }
     
     private void enableDocFields(final boolean enable) {
-        jbDocDpsRelatedPick.setEnabled(enable);
+        jbDocDpsRelatedPickPend.setEnabled(enable);
+        jbDocDpsRelatedPickAll.setEnabled(enable);
         jtfDocInstallment.setEditable(enable);
         jtfDocInstallment.setFocusable(enable);
         jtfDocExchangeRate.setEditable(false);
@@ -2603,17 +2616,35 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
     }
 
-    private void actionPerformedDocDpsRelatedPick() {
+    /**
+     * 
+     * @param mode DPS pending or DPS all.
+     */
+    private void actionPerformedDocDpsRelatedPick(int mode) {
+        SDialogPickerDps pickerDps;
+        Object[] filterKey;
         int year = SLibTimeUtils.digestYear(moFieldVouDate.getDate())[0];
-        //Object[] filterKey = new Object[] { year, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, moFieldRecBizPartner.getKeyAsIntArray(), moDataCfdPayment == null ? 0 : moDataCfdPayment.getDbmsDataCfd().getPkCfdId() };
-        Object[] filterKey = new Object[] { SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, moFieldRecBizPartner.getKeyAsIntArray() };
         
-        moDialogDocDpsRelatedPicker.formReset();
-        moDialogDocDpsRelatedPicker.setFilterKey(filterKey);
-        moDialogDocDpsRelatedPicker.formRefreshOptionPane();
-        moDialogDocDpsRelatedPicker.setFormVisible(true);
+        switch (mode) {
+            case MODE_DPS_PICK_PEND:
+                pickerDps = moDialogDocDpsRelatedPickerPend;
+                filterKey = new Object[] { year, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, moFieldRecBizPartner.getKeyAsIntArray(), moDataCfdPayment == null ? 0 : moDataCfdPayment.getDbmsDataCfd().getPkCfdId() };
+                break;
+            case MODE_DPS_PICK_ALL:
+                pickerDps = moDialogDocDpsRelatedPickerAll;
+                filterKey = new Object[] { SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, moFieldRecBizPartner.getKeyAsIntArray() };
+                break;
+            default:
+                miClient.showMsgBoxWarning(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                return;
+        }
+        
+        pickerDps.formReset();
+        pickerDps.setFilterKey(filterKey);
+        pickerDps.formRefreshOptionPane();
+        pickerDps.setFormVisible(true);
 
-        if (moDialogDocDpsRelatedPicker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+        if (pickerDps.getFormResult() == SLibConstants.FORM_RESULT_OK) {
             SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
             
             // validate that doc has not been already added:
@@ -2623,11 +2654,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             int installments = 0;
             
             for (SCfdPaymentEntryDoc paymentEntryDoc : paymentEntry.PaymentEntryDocs) {
-                if (SLibUtils.compareKeys(paymentEntryDoc.DataDps.getPrimaryKey(), moDialogDocDpsRelatedPicker.getSelectedPrimaryKey())) {
+                if (SLibUtils.compareKeys(paymentEntryDoc.DataDps.getPrimaryKey(), pickerDps.getSelectedPrimaryKey())) {
                     if (miClient.showMsgBoxConfirm("El documento relacionado " + paymentEntryDoc.DataDps.getDpsNumber() + " ya está agregado en el pago #" + paymentEntry.Number + ".\n"
                             + "¿Está seguro que desea agregarlo otra vez?") != JOptionPane.YES_OPTION) {
                         isValid = false;
-                        jbDocDpsRelatedPick.requestFocusInWindow();
+                        jbDocDpsRelatedPickPend.requestFocusInWindow();
                         break;
                     }
                     docPayments = SLibUtils.roundAmount(docPayments + paymentEntryDoc.DocPayment);
@@ -2640,7 +2671,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
                 double[] balance = new double[] { 0, 0 };
                 
-                moDataDocDpsRelated = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moDialogDocDpsRelatedPicker.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                moDataDocDpsRelated = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, pickerDps.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
 
                 try {
                     renderDocDpsRelated();
@@ -2740,9 +2771,17 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 jbDocPaymentEntryDocCancel.setEnabled(true);
 
                 if (adding) {
-                    jbDocDpsRelatedPick.doClick();  // shortcut to pick doc
-                    if (moDialogDocDpsRelatedPicker.getFormResult() != SLibConstants.FORM_RESULT_OK) {
-                        actionPerformedDocPaymentEntryDocCancel();
+                    jbDocDpsRelatedPickPend.doClick(); // shortcut to pick doc
+                    if (moDialogDocDpsRelatedPickerPend.getFormResult() != SLibConstants.FORM_RESULT_OK) {
+                        if (miClient.showMsgBoxConfirm("¿Desea buscar entre todos los documentos del deudor?") == JOptionPane.YES_OPTION) {
+                            jbDocDpsRelatedPickAll.doClick(); // shortcut to pick doc
+                            if (moDialogDocDpsRelatedPickerAll.getFormResult() != SLibConstants.FORM_RESULT_OK) {
+                                actionPerformedDocPaymentEntryDocCancel();
+                            }
+                        }
+                        else {
+                            actionPerformedDocPaymentEntryDocCancel();
+                        }
                     }
                 }
                 else {
@@ -2776,17 +2815,17 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         if (moDataDocDpsRelated == null) {
             valid = false;
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDocDpsRelated.getText() + "'.");
-            jbDocDpsRelatedPick.requestFocusInWindow();
+            jbDocDpsRelatedPickPend.requestFocusInWindow();
         }
         else if (moDataDocDpsRelated.getDbmsDataCfd().getUuid().isEmpty()) {
             valid = false;
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDocDpsRelated.getText() + ": " + jtfDocDpsRelatedUuid.getToolTipText() + "'.");
-            jbDocDpsRelatedPick.requestFocusInWindow();
+            jbDocDpsRelatedPickPend.requestFocusInWindow();
         }
         else if (!moDataDocDpsRelated.getDbmsDataDpsCfd().getPaymentMethod().equals(DCfdi33Catalogs.MDP_PPD)) {
             valid = false;
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlDocPaymentMethod.getText() + "'.");
-            jbDocDpsRelatedPick.requestFocusInWindow();
+            jbDocDpsRelatedPickPend.requestFocusInWindow();
         }
         
         if (valid) {
@@ -3147,7 +3186,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbDocDpsRelatedPick;
+    private javax.swing.JButton jbDocDpsRelatedPickAll;
+    private javax.swing.JButton jbDocDpsRelatedPickPend;
     private javax.swing.JButton jbDocExchangeRateInvert;
     private javax.swing.JButton jbDocPaymentCompute;
     private javax.swing.JButton jbDocPaymentEntryDocAdd;
@@ -3869,8 +3909,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             else if (button == jbPayPaymentEntryDelete) {
                 actionPerformedPayPaymentEntryDelete();
             }
-            else if (button == jbDocDpsRelatedPick) {
-                actionPerformedDocDpsRelatedPick();
+            else if (button == jbDocDpsRelatedPickPend) {
+                actionPerformedDocDpsRelatedPick(MODE_DPS_PICK_PEND);
+            }
+            else if (button == jbDocDpsRelatedPickAll) {
+                actionPerformedDocDpsRelatedPick(MODE_DPS_PICK_ALL);
             }
             else if (button == jbDocExchangeRateInvert) {
                 actionPerformedDocExchangeRateInvert();

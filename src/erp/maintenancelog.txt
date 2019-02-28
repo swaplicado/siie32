@@ -1,4 +1,10 @@
 ================================================================================
+2019-02-28, 3.2 131.2
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de búsqueda dual de documentos con saldo y también todos los documentos del deudor en la captura de CFDI de recepción de pagos.
+
+================================================================================
 2019-02-28, 3.2 131.1
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
