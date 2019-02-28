@@ -116,7 +116,7 @@ public abstract class SHrsFormerUtils {
             hrsPayroll.setTotalPercepciones(resultSet.getDouble("f_per"));
             hrsPayroll.setTotalDeducciones(resultSet.getDouble("f_ded"));
             hrsPayroll.setTotalRetenciones(resultSet.getDouble("f_rent_ret"));
-            hrsPayroll.setDescripcion(SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("f_descrip")), 100)); // 100 = pay_note column width
+            //hrsPayroll.setDescripcion(SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("f_descrip")), 100)); // 100 = pay_note column width
             hrsPayroll.setEmpresaId(resultSetClient.getInt("p.id_co"));
             hrsPayroll.setSucursalEmpresaId(resultSetClient.getInt("bpb.id_bpb"));
             hrsPayroll.setRegimenFiscal(new String[] { SLibUtilities.textTrim(resultSetClient.getString("p.fiscal_settings")) });
@@ -332,12 +332,12 @@ public abstract class SHrsFormerUtils {
                             SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE);
                         hrsPayrollExtraTime.setDias(hrsPayrollConcept.getCantidad());
                         hrsPayrollExtraTime.setHorasExtra(hrsPayrollConcept.getHoras_r());
-                        hrsPayrollExtraTime.setImportePagado(hrsPayrollConcept.getTotalGravado() + hrsPayrollConcept.getTotalExento());
+                        hrsPayrollExtraTime.setImportePagado(hrsPayrollConcept.getTotalImporte());
 
                         hrsPayrollConcept.setChildPayrollExtraTimes(hrsPayrollExtraTime);
                     }
 
-                    hrsPayrollReceipt.getChildPayrollConcept().add(hrsPayrollConcept);
+                    hrsPayrollReceipt.getChildPayrollConcepts().add(hrsPayrollConcept);
                 }
 
                 resultSetAux.close();
@@ -387,7 +387,7 @@ public abstract class SHrsFormerUtils {
                     hrsPayrollConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
                     hrsPayrollConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
 
-                    hrsPayrollReceipt.getChildPayrollConcept().add(hrsPayrollConcept);
+                    hrsPayrollReceipt.getChildPayrollConcepts().add(hrsPayrollConcept);
                 }
 
                 resultSetAux.close();

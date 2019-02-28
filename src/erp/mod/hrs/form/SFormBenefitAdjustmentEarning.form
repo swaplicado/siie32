@@ -163,7 +163,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlDaysToPaid">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="D&#xed;as:*"/>
+                    <Property name="text" type="java.lang.String" value="D&#xed;as ajuste:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
                     </Property>
@@ -182,7 +182,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlTotalAmount">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Monto:"/>
+                    <Property name="text" type="java.lang.String" value="Monto ajuste:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
                     </Property>

@@ -5,6 +5,7 @@
 package erp.mod.hrs.db;
 
 import java.util.Date;
+import sa.lib.SLibUtils;
 import sa.lib.grid.SGridRow;
 
 /**
@@ -83,11 +84,11 @@ public class SRowCalculateIncomeTax implements SGridRow {
     public Date getDateHire() { return mtDateHire; }
     public Date getDateDismisss_n() { return mtDateDismisss_n; }
     
-    public double getDiferenceTax() { return mdCalculatedTax - mdRetainedTax; }
+    public double getDiferenceTax() { return SLibUtils.roundAmount(mdCalculatedTax - mdRetainedTax); }
     
-    public double getDiferenceSubsidy() { return mdCalculatedSubsidy - mdGivenSubsidy; }
+    public double getDiferenceSubsidy() { return SLibUtils.roundAmount(mdCalculatedSubsidy - mdGivenSubsidy); }
     
-    public double getDiferenceNet() { return (mdCalculatedTax - mdRetainedTax) - (mdCalculatedSubsidy - mdGivenSubsidy); }
+    public double getDiferenceNet() { return SLibUtils.roundAmount(getDiferenceTax() - getDiferenceSubsidy()); }
 
     @Override
     public int[] getRowPrimaryKey() {

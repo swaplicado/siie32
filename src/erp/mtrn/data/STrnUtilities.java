@@ -1892,10 +1892,10 @@ public abstract class STrnUtilities {
                                     payrollReceipt = new SDbPayrollReceipt();
                                     payrollReceipt.read(client.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
                                     msNumberDoc = payroll.getPeriodYear() + " " + (payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_WEE) == 0 ? SHrsFormerConsts.PAY_WEE_ABB : payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_BIW) == 0 ? SHrsFormerConsts.PAY_BIW_ABB : payroll.getAuxPaymentType().compareTo(SHrsFormerConsts.PAY_MON) == 0 ? SHrsFormerConsts.PAY_MON_ABB : "") + " " +
-                                        numberFormat.format(payroll.getNumber()) + " " + (payrollReceipt.getPayrollReceiptIssues() == null ? "" : (payrollReceipt.getPayrollReceiptIssues().getNumberSeries().length() > 0 ? payrollReceipt.getPayrollReceiptIssues().getNumberSeries() + "-" : "") + payrollReceipt.getPayrollReceiptIssues().getNumber());
-                                    mbIsCancel = payrollReceipt.getPayrollReceiptIssues() == null ?  cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED : payrollReceipt.getPayrollReceiptIssues().getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
+                                        numberFormat.format(payroll.getNumber()) + " " + (payrollReceipt.getPayrollReceiptIssue() == null ? "" : (payrollReceipt.getPayrollReceiptIssue().getNumberSeries().length() > 0 ? payrollReceipt.getPayrollReceiptIssue().getNumberSeries() + "-" : "") + payrollReceipt.getPayrollReceiptIssue().getNumber());
+                                    mbIsCancel = payrollReceipt.getPayrollReceiptIssue() == null ?  cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED : payrollReceipt.getPayrollReceiptIssue().getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                                     msDocumentType =  "Recibo de nómina";
-                                    cancellationDate = payrollReceipt.getPayrollReceiptIssues() == null ? cfd.getTimestamp() : payrollReceipt.getPayrollReceiptIssues().getTsUserUpdate();
+                                    cancellationDate = payrollReceipt.getPayrollReceiptIssue() == null ? cfd.getTimestamp() : payrollReceipt.getPayrollReceiptIssue().getTsUserUpdate();
 
                                     snd_subject = mms.getTextSubject() + " " + msNumberDoc;
                                     break;

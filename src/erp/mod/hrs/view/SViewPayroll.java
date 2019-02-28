@@ -58,7 +58,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
     
-    private JButton jbImport;
+    private JButton jbGenerateSign;
     private JButton jbAnnul;
     private JButton jbGetXml;
     private JButton jbGetAcknowledgmentCancellation;
@@ -88,7 +88,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
-        jbImport = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT), "Generar y timbrar CFDI", this);
+        jbGenerateSign = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT), "Generar y timbrar CFDI", this);
         jbAnnul = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL), "Anular nómina", this);
         jbGetXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML), "Obtener XML del comprobante", this);
         jbGetAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_CANCEL), "Obtener XML del acuse de cancelación del CFDI", this);
@@ -102,7 +102,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         
         moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient);
         
-        jbImport.setEnabled(true);
+        jbGenerateSign.setEnabled(true);
         /* XXX (jbarajas, 2016-08-16) slowly open payroll
         jbAnnul.setEnabled(true);
         //jbGetXml.setEnabled(true);
@@ -113,7 +113,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         */
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbImport);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGenerateSign);
         /* XXX (jbarajas, 2016-08-16) slowly open payroll
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAnnul);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetXml);
@@ -144,8 +144,8 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         }
     }
     
-    private void actionImportPayroll() {
-        if (jbImport.isEnabled()) {
+    private void actionGenerateSignPayroll() {
+        if (jbGenerateSign.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -160,10 +160,10 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                         receiptCfdi.setVisible(true);
 
                         if (receiptCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                int stampsAvailable = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, miClient.getSession().getCurrentDate(), SLibConsts.UNDEFINED);
-                                SDialogResult dialogResult = new SDialogResult(miClient, "Resultados de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
-                                dialogResult.setFormParams((SClientInterface) miClient, null, receiptCfdi.manPayrollEmployeeReceipts, stampsAvailable, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
-                                dialogResult.setVisible(true);
+                            int stampsAvailable = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, miClient.getSession().getCurrentDate(), SLibConsts.UNDEFINED);
+                            SDialogResult dialogResult = new SDialogResult(miClient, "Resultados de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
+                            dialogResult.setFormParams((SClientInterface) miClient, null, receiptCfdi.getPayrollEmployeeReceipts(), stampsAvailable, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                            dialogResult.setVisible(true);
                         }
                     }
                 }
@@ -717,8 +717,8 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbImport) {
-                actionImportPayroll();
+            if (button == jbGenerateSign) {
+                actionGenerateSignPayroll();
             }
             else if (button == jbAnnul) {
                 actionAnnulPayroll();

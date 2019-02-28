@@ -283,7 +283,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
                 if (SLibUtils.compareKeys(new int[] { hrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId() }, new int[] { hrsReceiptDeductionRow.getHrsReceipt().getHrsEmployee().getEmployee().getPkEmployeeId() })) { // recibo del empleado en el grid
                     hrsReceiptDeductionRow.setHrsReceipt(hrsReceipt);
 
-                    for (SHrsPayrollReceiptDeduction deductionRow : hrsReceipt.getHrsDeductions()) { // read array list ear/ded
+                    for (SHrsPayrollReceiptDeduction deductionRow : hrsReceipt.getHrsReceiptDeductions()) { // read array list ear/ded
                         found = true;
 
                         if (SLibUtils.compareKeys(deductionRow.getRowPrimaryKey(), hrsReceiptDeductionRow.getRowPrimaryKey())) {  // exists ear/ded
@@ -337,7 +337,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
             for (SHrsPayrollReceipt hrsReceipt : maReceipts) { // read receipt
                 found = false;
                 
-                for (SHrsPayrollReceiptDeduction deduction : hrsReceipt.getHrsDeductions()) { // read array list ear/ded
+                for (SHrsPayrollReceiptDeduction deduction : hrsReceipt.getHrsReceiptDeductions()) { // read array list ear/ded
                     if (SLibUtils.compareKeys(deduction.getHrsReceipt().getHrsEmployee().getEmployee().getPrimaryKey(), hrsReceipt.getHrsEmployee().getEmployee().getPrimaryKey())) {
                         if (SLibUtils.compareKeys(new int[] { deduction.getDeduction().getPkDeductionId() }, new int[] { moKeyDeduction.getValue()[0] })) {  // exists ear/ded
                             hrsReceiptDeductionRow = new SHrsPayrollReceiptDeduction();
@@ -369,7 +369,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
                         hrsReceiptDeductionRow.setHrsReceipt(hrsReceipt);
 
                         hrsReceiptDeductionRow.setInputMode(SHrsPayrollReceiptDeduction.INPUT_BY_DED);
-                        hrsReceiptDeductionRow.setPkMoveId(hrsReceipt.getHrsDeductions().size() + 1);
+                        hrsReceiptDeductionRow.setPkMoveId(hrsReceipt.getHrsReceiptDeductions().size() + 1);
                         hrsReceiptDeductionRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                         hrsReceiptDeductionRow.setXtaValue(0d);
                         //hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT }, SDbRegistry.FIELD_CODE)); XXX (jbarajas, 2016-04-20) new field for computation type

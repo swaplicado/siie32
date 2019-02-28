@@ -49,7 +49,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     protected SDbEmployee moEmployee;
     protected SDbBenefitTable moBenefitTable;
     protected SDbBenefitTable moBenefitTableAux;
-    protected Date mtDateCutOff;
+    protected Date mtDateCutoff;
     protected ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnniversarys;
     protected ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnniversarysAux;
     protected SHrsBenefit moHrsBenefit;
@@ -95,8 +95,8 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
         jlDateBase = new javax.swing.JLabel();
         moDateBaseDate = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel14 = new javax.swing.JPanel();
-        jlDateCutOff = new javax.swing.JLabel();
-        moDateCutOff = new sa.lib.gui.bean.SBeanFieldDate();
+        jlDateCutoff = new javax.swing.JLabel();
+        moDateCutoff = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel9 = new javax.swing.JPanel();
         jlSeniority = new javax.swing.JLabel();
         moIntSeniority = new sa.lib.gui.bean.SBeanFieldInteger();
@@ -177,10 +177,10 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateCutOff.setText("Fecha corte:");
-        jlDateCutOff.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel14.add(jlDateCutOff);
-        jPanel14.add(moDateCutOff);
+        jlDateCutoff.setText("Fecha corte:");
+        jlDateCutoff.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel14.add(jlDateCutoff);
+        jPanel14.add(moDateCutoff);
 
         jPanel2.add(jPanel14);
 
@@ -334,7 +334,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     private javax.swing.JLabel jlBenefitTableDaysToPay;
     private javax.swing.JLabel jlDateBase;
     private javax.swing.JLabel jlDateBenefit;
-    private javax.swing.JLabel jlDateCutOff;
+    private javax.swing.JLabel jlDateCutoff;
     private javax.swing.JLabel jlDateLastDismiss_n;
     private javax.swing.JLabel jlDaysElapsed;
     private javax.swing.JLabel jlDaysPayed;
@@ -350,7 +350,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAmountToPay;
     private sa.lib.gui.bean.SBeanFieldDate moDateBaseDate;
     private sa.lib.gui.bean.SBeanFieldDate moDateBenefitDate;
-    private sa.lib.gui.bean.SBeanFieldDate moDateCutOff;
+    private sa.lib.gui.bean.SBeanFieldDate moDateCutoff;
     private sa.lib.gui.bean.SBeanFieldDate moDateLastDismiss_n;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecBenefitTableBonusPercentage;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecDaysPayed;
@@ -375,7 +375,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
         moDateBenefitDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateBenefit.getText()), true);
         moDateLastDismiss_n.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateLastDismiss_n.getText()), false);
         moDateBaseDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateBase.getText()), true);
-        moDateCutOff.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCutOff.getText()), true);
+        moDateCutoff.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCutoff.getText()), true);
         moIntSeniority.setIntegerSettings(SGuiUtils.getLabelName(jlSeniority), SGuiConsts.GUI_TYPE_INT, false);
         moIntSeniorityDays.setIntegerSettings(SGuiUtils.getLabelName(jlSeniority), SGuiConsts.GUI_TYPE_INT, false);
         moIntDaysElapsed.setIntegerSettings(SGuiUtils.getLabelName(jlAnniversary.getText()), SGuiConsts.GUI_TYPE_INT, false);
@@ -398,7 +398,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
         moFields.addField(moDateBenefitDate);
         moFields.addField(moDateLastDismiss_n);
         moFields.addField(moDateBaseDate);
-        moFields.addField(moDateCutOff);
+        moFields.addField(moDateCutoff);
         moFields.addField(moIntSeniority);
         moFields.addField(moIntSeniorityDays);
         moFields.addField(moIntDaysElapsed);
@@ -465,8 +465,8 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     
     private void setBenefitAnniv(final int benefitAnniv) {
         moIntSeniority.setValue(benefitAnniv);
-        moIntSeniorityDays.setValue((int) SLibTimeUtils.getDaysDiff(mtDateCutOff, SLibTimeUtils.addDate(moEmployee.getDateBenefits(), benefitAnniv, 0, 0)));
-        moIntDaysElapsed.setValue((int) SLibTimeUtils.getDaysDiff(mtDateCutOff, moDateBaseDate.getValue()));
+        moIntSeniorityDays.setValue((int) SLibTimeUtils.getDaysDiff(mtDateCutoff, SLibTimeUtils.addDate(moEmployee.getDateBenefits(), benefitAnniv, 0, 0)));
+        moIntDaysElapsed.setValue((int) SLibTimeUtils.getDaysDiff(mtDateCutoff, moDateBaseDate.getValue()));
     }
     
     private void loadBenefitTables(SDbBenefitTable benefitTable, SDbBenefitTable benefitTableAux) throws Exception {
@@ -474,7 +474,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
             moBenefitTable = SHrsUtils.getBenefitTableByEarning(miClient.getSession(), 
                     moEarning.getPkEarningId(), 
                     moHrsPayrollReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId(), 
-                    mtDateCutOff);
+                    mtDateCutoff);
         }
         else {
             moBenefitTable = benefitTable;
@@ -487,7 +487,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
             int tableAuxId = SHrsUtils.getRecentBenefitTable(miClient.getSession(), 
                     SModSysConsts.HRSS_TP_BEN_VAC, 
                     moHrsPayrollReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId(), 
-                    mtDateCutOff);
+                    mtDateCutoff);
             moBenefitTableAux = moHrsPayrollReceipt.getHrsPayroll().getBenefitTable(tableAuxId);
         }
         else {
@@ -506,7 +506,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     }
     
     private void actionPerformedPayProportional() {
-        boolean isLeapYear = SLibTimeUtils.isLeapYear(SLibTimeUtils.digestYear(mtDateCutOff)[0]);
+        boolean isLeapYear = SLibTimeUtils.isLeapYear(SLibTimeUtils.digestYear(mtDateCutoff)[0]);
 
         moDecDaysToPay.setValue((moIntBenefitTableDaysToPay.getValue() - moDecDaysPayed.getValue()) * ((double) moIntDaysElapsed.getValue() / (double) (SHrsConsts.YEAR_DAYS + (isLeapYear ? 1 : 0))));
         computeBenefitToPay();
@@ -521,24 +521,24 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     }
     
     private void focusLostDateCutOff() throws Exception {
-        mtDateCutOff = moDateCutOff.getValue();
+        mtDateCutoff = moDateCutoff.getValue();
         
-        if (mtDateCutOff == null) {
-            moDateCutOff.requestFocus();
-            throw new Exception(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlDateCutOff) + "'.");
+        if (mtDateCutoff == null) {
+            moDateCutoff.requestFocus();
+            throw new Exception(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'.");
         }
         else {
-            int benefitAnniv = SHrsUtils.getSeniorityEmployee(moEmployee.getDateBenefits(), mtDateCutOff);
+            int benefitAnniv = SHrsUtils.getSeniorityEmployee(moEmployee.getDateBenefits(), mtDateCutoff);
 
-            setDateBaseDate(mtDateCutOff, benefitAnniv);
+            setDateBaseDate(mtDateCutoff, benefitAnniv);
 
-            if (mtDateCutOff.compareTo(moDateBaseDate.getValue()) < 0) {
-                moDateCutOff.requestFocus();
-                throw new Exception(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutOff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateBase) + "'.");
+            if (mtDateCutoff.compareTo(moDateBaseDate.getValue()) < 0) {
+                moDateCutoff.requestFocus();
+                throw new Exception(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateBase) + "'.");
             }
-            else if (!moEmployee.isActive() && mtDateCutOff.compareTo(moDateLastDismiss_n.getValue()) > 0) {
-                moDateCutOff.requestFocus();
-                throw new Exception(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutOff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateLastDismiss_n) + "'.");
+            else if (!moEmployee.isActive() && mtDateCutoff.compareTo(moDateLastDismiss_n.getValue()) > 0) {
+                moDateCutoff.requestFocus();
+                throw new Exception(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateLastDismiss_n) + "'.");
             }
             else {
                 setBenefitAnniv(benefitAnniv);
@@ -602,10 +602,10 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     }
     
     private void readHrsBenefit() {
-        int benefitAnniv = SHrsUtils.getSeniorityEmployee(moEmployee.getDateBenefits(), mtDateCutOff);
+        int benefitAnniv = SHrsUtils.getSeniorityEmployee(moEmployee.getDateBenefits(), mtDateCutoff);
 
         if (!moEmployee.isActive()) {
-            if (mtDateCutOff.compareTo(SLibTimeUtils.addDate(moEmployee.getDateBenefits(), benefitAnniv, 0, 0)) > 0) {
+            if (mtDateCutoff.compareTo(SLibTimeUtils.addDate(moEmployee.getDateBenefits(), benefitAnniv, 0, 0)) > 0) {
                 mnBenefitAnnivLimit = benefitAnniv + 1;
             }
             else {
@@ -620,8 +620,8 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
         moTextBenefit.setText(moBenefitTable.getName());
         moDateBenefitDate.setValue(moEmployee.getDateBenefits());
 
-        moDateCutOff.setValue(mtDateCutOff);
-        setDateBaseDate(mtDateCutOff, benefitAnniv);
+        moDateCutoff.setValue(mtDateCutoff);
+        setDateBaseDate(mtDateCutoff, benefitAnniv);
 
         setBenefitAnniv(benefitAnniv);
 
@@ -741,13 +741,13 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
             if (validation.isValid()) {
                 createHrsBenefit();
                 
-                if (mtDateCutOff.compareTo(moDateBaseDate.getValue()) < 0) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutOff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateBase) + "'.");
-                    validation.setComponent(moDateCutOff);
+                if (mtDateCutoff.compareTo(moDateBaseDate.getValue()) < 0) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateBase) + "'.");
+                    validation.setComponent(moDateCutoff);
                 }
-                else if (!moEmployee.isActive() && mtDateCutOff.compareTo(moDateLastDismiss_n.getValue()) > 0) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutOff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateLastDismiss_n) + "'.");
-                    validation.setComponent(moDateCutOff);
+                else if (!moEmployee.isActive() && mtDateCutoff.compareTo(moDateLastDismiss_n.getValue()) > 0) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateLastDismiss_n) + "'.");
+                    validation.setComponent(moDateCutoff);
                 }
                 else if ((Integer) jsAnniversary.getValue() == 0) {
                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlAnniversary) + "'.");
@@ -832,7 +832,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     @Override
     public void addAllListeners() {
         jsAnniversary.addChangeListener(this);
-        moDateCutOff.getComponent().addFocusListener(this);
+        moDateCutoff.getComponent().addFocusListener(this);
         moDecDaysToPay.addFocusListener(this);
         moCurAmountToPay.getField().getComponent().addFocusListener(this);
         jbPayProportional.addActionListener(this);
@@ -842,7 +842,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     @Override
     public void removeAllListeners() {
         jsAnniversary.removeChangeListener(this);
-        moDateCutOff.getComponent().removeFocusListener(this);
+        moDateCutoff.getComponent().removeFocusListener(this);
         moDecDaysToPay.removeFocusListener(this);
         moCurAmountToPay.getField().getComponent().removeFocusListener(this);
         jbPayProportional.removeActionListener(this);
@@ -869,7 +869,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
                 moEmployee = params.getHrsPayrollReceipt().getHrsEmployee().getEmployee();
                 moBenefitTable = params.getBenefitTable();
                 moBenefitTableAux = params.getBenefitTableAux();
-                mtDateCutOff = params.getDateCutOff();
+                mtDateCutoff = params.getDateCutOff();
                 
                 try {
                     loadBenefitTables(params.getBenefitTable(), params.getBenefitTableAux());
@@ -931,7 +931,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
         if (evt.getSource() instanceof JFormattedTextField) {
             JFormattedTextField formattedTextField = (JFormattedTextField) evt.getSource();
 
-            if (formattedTextField == moDateCutOff.getComponent()) {
+            if (formattedTextField == moDateCutoff.getComponent()) {
                 try {
                     focusLostDateCutOff();
                 }

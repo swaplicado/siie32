@@ -4,6 +4,7 @@
  */
 package erp.mod.hrs.db;
 
+import cfd.ver33.DCfdi33Catalogs;
 import erp.SClient;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SDialogResult;
@@ -480,7 +481,7 @@ public abstract class SHrsUtils {
 
                 bw.flush();
                 bw.close();
-                client.showMsgBoxInformation("Total: " + SLibUtils.DecimalFormatValue2D.format(auxTotal));
+                client.showMsgBoxInformation("Total: " + SLibUtils.getDecimalFormatAmount().format(auxTotal));
                 
                 if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
                     SLibUtilities.launchFile(file.getPath());
@@ -603,7 +604,7 @@ public abstract class SHrsUtils {
      * @param input original text
      * @return output text without characters
      */
-    public static String removeSpecialChar(String input) {
+    private static String removeSpecialChar(String input) {
         String specialCharacters = "áàäéèëíìïóòöúùuñÁÀÄÉÈËÍÌÏÓÒÖÚÙÜÑçÇ";
         String replaceCharacters = "aaaeeeiiiooouuu#AAAEEEIIIOOOUUU#cC";
         String output = input;
@@ -621,7 +622,7 @@ public abstract class SHrsUtils {
      * @return
      * @throws SQLException 
      */
-    public static ArrayList prepareSqlQueryHigh(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    private static ArrayList prepareSqlQueryHigh(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateIni = formatter.format(dateApplicationIni);
         String dateEnd = formatter.format(dateApplicationEnd);
@@ -642,7 +643,7 @@ public abstract class SHrsUtils {
         return resultsId;
     }
     
-      /**
+    /**
      * 
      * @param client
      * @param dateApplicationIni
@@ -650,7 +651,7 @@ public abstract class SHrsUtils {
      * @return
      * @throws SQLException 
      */
-    public static ArrayList prepareSqlQueryMod(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    private static ArrayList prepareSqlQueryMod(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateIni = formatter.format(dateApplicationIni);
         String dateEnd = formatter.format(dateApplicationEnd);
@@ -679,7 +680,7 @@ public abstract class SHrsUtils {
      * @return
      * @throws SQLException 
      */
-    public static ArrayList prepareSqlQueryLow(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    private static ArrayList prepareSqlQueryLow(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateIni = formatter.format(dateApplicationIni);
         String dateEnd = formatter.format(dateApplicationEnd);
@@ -700,7 +701,6 @@ public abstract class SHrsUtils {
         return resultsId;
     }
      
-    
     /**
      * 
      * @param client
@@ -1164,7 +1164,7 @@ public abstract class SHrsUtils {
         ArrayList<SDataPayrollReceiptIssue> receiptIssues = null;
         SDataPayrollReceiptIssue receiptIssue = null;
 
-        receiptIssues = new ArrayList<SDataPayrollReceiptIssue>();
+        receiptIssues = new ArrayList<>();
 
         sql = "SELECT id_pay, id_emp, id_iss " +
                 "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " " + 
@@ -1215,9 +1215,9 @@ public abstract class SHrsUtils {
                     break;
 
                 case SModSysConsts.HRSS_TP_PAY_FOR:
-                    if (number > SHrsConsts.YEAR_FORNIGHTS) {
+                    if (number > SHrsConsts.YEAR_FORTNIGHTS) {
                         // maximum number of fortnightly payrolls must be 24:
-                        validNumber = SHrsConsts.YEAR_FORNIGHTS;
+                        validNumber = SHrsConsts.YEAR_FORTNIGHTS;
                     }
                     break;
 
@@ -1254,9 +1254,9 @@ public abstract class SHrsUtils {
     /**
      * Validate information necesary basic for capture payroll.
      * @param session User GUI session.
-     * @param config Object with information of configuration the module resource human
-     * @param workingDaySettings Configuration of days working
-     * @return true if is valid
+     * @param config Object with information of configuration the module resource human.
+     * @param workingDaySettings Configuration of days working.
+     * @return true if is valid.
      * @throws Exception 
      */
     public static boolean validatePayroll(final SGuiSession session, final SDbConfig config, final SDbWorkingDaySettings workingDaySettings) throws Exception {
@@ -1272,19 +1272,34 @@ public abstract class SHrsUtils {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + " (Configuración de días laborables)");
         }
         else if (config.getFkEarningEarningId_n() == SLibConsts.UNDEFINED) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración percepción normal)");
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de percepción normal)");
         }
         else if (config.getFkEarningVacationsId_n() == SLibConsts.UNDEFINED) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración vacaciones)");
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de percepción vacaciones)");
         }
+        /* 2019-02-07, Sergio Flores: Not implemented yet! Even not in form of payroll configuration!
+        else if (config.getFkEarningTaxId_n() == SLibConsts.UNDEFINED) {
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de percepción impuesto)");
+        }
+        */
         else if (config.getFkEarningTaxSubsidyId_n() == SLibConsts.UNDEFINED) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración subsidio impuesto)");
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de percepción subsidio para el empleo)");
         }
+        /* 2019-02-07, Sergio Flores: Not implemented yet! Even not in form of payroll configuration!
+        else if (config.getFkEarningSsContributionId_n()== SLibConsts.UNDEFINED) {
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de percepción retención de SS)");
+        }
+        */
         else if (config.getFkDeductionTaxId_n() == SLibConsts.UNDEFINED) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración impuesto)");
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de deducción impuesto)");
         }
+        /* 2019-02-07, Sergio Flores: Not implemented yet! Even not in form of payroll configuration!
+        else if (config.getFkDeductionTaxSubsidyId_n()== SLibConsts.UNDEFINED) {
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de deducción subsidio para el empleo)");
+        }
+        */
         else if (config.getFkDeductionSsContributionId_n() == SLibConsts.UNDEFINED) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración SS)");
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de deducción retención de SS)");
         }
         
         statement = session.getStatement().getConnection().createStatement();
@@ -1296,7 +1311,7 @@ public abstract class SHrsUtils {
         resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
             deduction = new SDbDeduction();
-            deduction.read(session, new int[] { resultSet.getInt("id_ded") });;
+            deduction.read(session, new int[] { resultSet.getInt("id_ded") });
         }
         
         sql = "SELECT id_emp, id_loan " +
@@ -1669,23 +1684,23 @@ public abstract class SHrsUtils {
         ArrayList<SHrsBenefitTableAnniversary> benefitTableAnniversarys = new ArrayList<>();
         
         benefitTables.stream().filter((table) -> (!table.getChildRows().isEmpty())).forEach((table) -> {
-            int currIndex = 0;      // current index of rows of current benefit table
-            double currValue = 0;   // current value, it can be days or bonus percentage
-            SDbBenefitTableRow currTableRow = null;     // current benefit-table row
-            SDbBenefitTableRow nextTableRow = null;     // next benefit-table row, when available
+            int currIndex = -1; // current index of row for current benefit table
+            double benefit = 0; // current benefit, expressed as days or bonus percentage
+            SDbBenefitTableRow tableRow = null; // current benefit-table row
             
-            for (int ann = 1; ann <= 100; ann++) {
-                if (currTableRow == null || (nextTableRow != null && (ann * SLibTimeConsts.MONTHS >= nextTableRow.getMonths()))) {
-                    if (currTableRow != null) {
-                        currIndex++;
+            for (int year = 1; year <= 100; year++) {
+                if (tableRow == null || (year * SLibTimeConsts.MONTHS) >= tableRow.getMonths()) {
+                    if (currIndex + 1 >= table.getChildRows().size()) {
+                        benefit = 0;
                     }
-                    
-                    currTableRow = table.getChildRows().get(currIndex);
-                    nextTableRow = table.getChildRows().size() == currIndex + 1 ? null : table.getChildRows().get(currIndex + 1);
-                    currValue = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? currTableRow.getBenefitBonusPercentage() : currTableRow.getBenefitDays();
+                    else {
+                        ++currIndex;
+                        tableRow = table.getChildRows().get(currIndex);
+                        benefit = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? tableRow.getBenefitBonusPercentage() : tableRow.getBenefitDays();
+                    }
                 }
                 
-                benefitTableAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), ann, currValue));
+                benefitTableAnniversarys.add(new SHrsBenefitTableAnniversary(table.getPkBenefitId(), year, benefit));
             }
         });
 
@@ -1699,7 +1714,7 @@ public abstract class SHrsUtils {
      * @return id_tax int
      * @throws Exception
      */
-    public static int getRecentTaxTable(final  SGuiSession session, final Date start) throws SQLException, Exception {
+    public static int getRecentTaxTable(final SGuiSession session, final Date start) throws SQLException, Exception {
         int id_tax = 0;
         String sql = "";
         ResultSet resultSet = null;
@@ -1724,7 +1739,7 @@ public abstract class SHrsUtils {
      * @return id_tax_sub int
      * @throws Exception
      */
-    public static int getRecentTaxSubsidyTable(final  SGuiSession session, final Date start) throws SQLException, Exception {
+    public static int getRecentTaxSubsidyTable(final SGuiSession session, final Date start) throws SQLException, Exception {
         int id_tax_sub = 0;
         String sql = "";
         ResultSet resultSet = null;
@@ -1749,7 +1764,7 @@ public abstract class SHrsUtils {
      * @return id_ss int
      * @throws Exception
      */
-    public static int getRecentSsContributionTable(final  SGuiSession session, final Date start) throws SQLException, Exception {
+    public static int getRecentSsContributionTable(final SGuiSession session, final Date start) throws SQLException, Exception {
         int id_ss = 0;
         String sql = "";
         ResultSet resultSet = null;
@@ -1787,24 +1802,45 @@ public abstract class SHrsUtils {
     }
 
     /**
-     * Get recent minimum wage zone
+     * Gets recent UMA.
      * @param session SGuiSession
-     * @param idMwzType Minimum wage zone
-     * @param start Date start date
+     * @param start Date start.
      * @return wage double
      * @throws Exception
      */
-    public static double getRecentMwz(final  SGuiSession session, final int idMwzType, final Date start) throws SQLException, Exception {
-        double wage = 0;
-        String sql = "";
-        ResultSet resultSet = null;
+    public static double getRecentUma(final SGuiSession session, final Date start) throws Exception {
+        double uma = 0;
 
-        sql = "SELECT wage "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_MWZ_WAGE) + " "
-            + "WHERE b_del = 0 AND id_tp_mwz = " + idMwzType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
-            + "ORDER BY dt_sta DESC, id_tp_mwz, id_wage "
+        String sql = "SELECT amt "
+            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_UMA) + " "
+            + "WHERE NOT b_del AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
+            + "ORDER BY dt_sta DESC, id_uma "
             + "LIMIT 1;";
-        resultSet = session.getStatement().executeQuery(sql);
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            uma = resultSet.getDouble(1);
+        }
+
+        return uma;
+    }
+
+    /**
+     * Gets recent minimum wage from desired minimum wage zone.
+     * @param session SGuiSession
+     * @param idMwzType Minimum wage zone
+     * @param start Date start.
+     * @return wage double
+     * @throws Exception
+     */
+    public static double getRecentMinimumWage(final SGuiSession session, final int idMwzType, final Date start) throws Exception {
+        double wage = 0;
+
+        String sql = "SELECT wage "
+            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_MWZ_WAGE) + " "
+            + "WHERE NOT b_del AND id_tp_mwz = " + idMwzType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
+            + "ORDER BY dt_sta DESC, id_wage "
+            + "LIMIT 1;";
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             wage = resultSet.getDouble(1);
         }
@@ -1818,8 +1854,8 @@ public abstract class SHrsUtils {
         SDbLoan loan = null;
         SDataBizPartner bizPartnerCompany = null;
         SDataBizPartner bizPartnerEmployee = null;
-        SDbPayrollReceipt payrollReceipt = null;
         SDbPayroll payroll = null;
+        SDbPayrollReceipt payrollReceipt = null;
         HashMap<String, Object> map = null;
         ArrayList aPercepciones = null;
         ArrayList aDeducciones = null;
@@ -1828,7 +1864,7 @@ public abstract class SHrsUtils {
         payroll = new SDbPayroll();
         payroll.read(client.getSession(), new int[] { payrollKey[0] });
         
-        for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) {
+        for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) { // TODO Improve this receipt lookup, is bizarre!
             if (SLibUtils.compareKeys(receipt.getPrimaryKey(), new int[] { payrollKey[0], payrollKey[1] })) {
                 payrollReceipt = receipt;
             }
@@ -1844,38 +1880,33 @@ public abstract class SHrsUtils {
 
         map = client.createReportParams();
 
-        map.put("bIsReceipt", true);
+        map.put("bIsReceipt", true); // print as a simple receipt!
 
         map.put("sEmiRfc", bizPartnerCompany.getFiscalId());
         map.put("sRecRfc", bizPartnerEmployee.getFiscalId());
         map.put("ReceptorNombre", bizPartnerEmployee.getBizPartner());
         map.put("nPayrrollId", payrollReceipt.getPkPayrollId());
         map.put("nEmployeeId", payrollReceipt.getPkEmployeeId());
-        map.put("NominaNumTipo", payroll.getNumber() + "  " + (String) client.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { payroll.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
+        map.put("NominaNumTipo", payroll.getNumber() + " " + (String) client.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { payroll.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
         map.put("NominaFolio", "");
-
-        SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         map.put("RegistroPatronal", ((SClientInterface) client).getSessionXXX().getParamsCompany().getRegistrySs());
         map.put("CURP", bizPartnerEmployee.getAlternativeId());
         map.put("NumEmpleado", bizPartnerEmployee.getDbmsDataEmployee().getNumber());
         map.put("NumSeguridadSocial", bizPartnerEmployee.getDbmsDataEmployee().getSocialSecurityNumber());
-        map.put("FechaInicialPago", oSimpleDateFormat.format(payroll.getDateStart()));
-        map.put("FechaFinalPago", oSimpleDateFormat.format(payroll.getDateEnd()));
+        map.put("FechaInicialPago", SLibUtils.DateFormatDate.format(payroll.getDateStart()));
+        map.put("FechaFinalPago", SLibUtils.DateFormatDate.format(payroll.getDateEnd()));
         map.put("NumDiasNoLaborados", payrollReceipt.getDaysNotWorkedPaid() + payrollReceipt.getDaysNotWorkedNotPaid());
         map.put("NumDiasLaborados", payrollReceipt.getDaysWorked());
         map.put("NumDiasPagados", payrollReceipt.getDaysPaid());
         map.put("Departamento", (String) client.getSession().readField(SModConsts.HRSU_DEP, new int[] { bizPartnerEmployee.getDbmsDataEmployee().getFkDepartmentId() }, SDbRegistry.FIELD_NAME));
         map.put("Puesto", (String) client.getSession().readField(SModConsts.HRSU_POS, new int[] { bizPartnerEmployee.getDbmsDataEmployee().getFkPositionId() }, SDbRegistry.FIELD_NAME));
         map.put("PeriodicidadPago", (String) client.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { bizPartnerEmployee.getDbmsDataEmployee().getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
-        //map.put("Sueldo", bizPartnerEmployee.getDbmsDataEmployee().getSalary());
-        map.put("Sueldo", payrollReceipt.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? payrollReceipt.getSalary() : ((payrollReceipt.getWage() * SHrsConsts.YEAR_MONTHS) / SHrsConsts.YEAR_DAYS));
-        //map.put("SalarioBaseCotApor", bizPartnerEmployee.getDbmsDataEmployee().getSalarySscBase());
-        //map.put("SalarioDiarioIntegrado", bizPartnerEmployee.getDbmsDataEmployee().getSalarySscBase());
+        map.put("Sueldo", payrollReceipt.getEffectiveSalary(payroll.isFortnightStandard()));
         map.put("SalarioBaseCotApor", payrollReceipt.getSalarySscBase());
         map.put("SalarioDiarioIntegrado", payrollReceipt.getSalarySscBase());
 
-        map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(bizPartnerEmployee.getDbmsDataEmployee().getDateLastHire()));
+        map.put("FechaInicioRelLaboral", SLibUtils.DateFormatDate.format(bizPartnerEmployee.getDbmsDataEmployee().getDateLastHire()));
         map.put("TipoJornada", bizPartnerEmployee.getDbmsDataEmployee().getWorkingHoursDay() + " hr");
 
         map.put("TipoEmpleado", (String) client.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { bizPartnerEmployee.getDbmsDataEmployee().getFkEmployeeTypeId() }, SDbRegistry.FIELD_NAME));
@@ -1973,7 +2004,7 @@ public abstract class SHrsUtils {
      */
     public static void printPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
         HashMap<String, Object> map = new HashMap<>();
-        map = getMapPayrollReceipt(client,pnPrintMode,payrollKey);
+        map = getMapPayrollReceipt(client, pnPrintMode, payrollKey);
         
         switch (pnPrintMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
@@ -2174,14 +2205,14 @@ public abstract class SHrsUtils {
             balance -= hrsEmployee.getLoanPayment(loan.getPkLoanId()).getTotalPayment();
         }
         
-        for (SHrsPayrollReceiptEarning earning : hrsEmployee.getHrsPayrollReceipt().getHrsEarnings()) {
+        for (SHrsPayrollReceiptEarning earning : hrsEmployee.getHrsPayrollReceipt().getHrsReceiptEarnings()) {
             if (SLibUtils.compareKeys(new int[] { earning.getReceiptEarning().getFkLoanEmployeeId_n(), earning.getReceiptEarning().getFkLoanLoanId_n()}, 
                     loan.getPrimaryKey()) && earning.getReceiptEarning().isUserEdited()) {
                 balance += earning.getReceiptEarning().getAmount_r();
             }
         }
         
-        for (SHrsPayrollReceiptDeduction deduction : hrsEmployee.getHrsPayrollReceipt().getHrsDeductions()) {
+        for (SHrsPayrollReceiptDeduction deduction : hrsEmployee.getHrsPayrollReceipt().getHrsReceiptDeductions()) {
             if (SLibUtils.compareKeys(new int[] { deduction.getReceiptDeduction().getFkLoanEmployeeId_n(), deduction.getReceiptDeduction().getFkLoanLoanId_n()}, 
                     loan.getPrimaryKey()) && deduction.getReceiptDeduction().isUserEdited()) {
                 balance -= deduction.getReceiptDeduction().getAmount_r();
@@ -2191,7 +2222,7 @@ public abstract class SHrsUtils {
         return balance;
     }
     
-    public static double getIntegrationFactorSbc(final SGuiSession session, final Date dateBenefits, final Date dateCutOff) throws Exception {
+    public static double getIntegrationFactorSbc(final SGuiSession session, final Date dateBenefits, final Date dateCutoff) throws Exception {
         int seniority = 0;
         int daysTableVacation = 0;
         int daysTableAnnualBonus = 0;
@@ -2203,12 +2234,12 @@ public abstract class SHrsUtils {
         ArrayList<SDbBenefitTable> benefitTableAnnualBonus = new ArrayList<>();
         ArrayList<SDbBenefitTable> benefitTableVacationBonus = new ArrayList<>();
         
-        benefitTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutOff) }));
-        benefitTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, SLibConsts.UNDEFINED, dateCutOff) }));
-        benefitTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, SLibConsts.UNDEFINED, dateCutOff) }));
+        benefitTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutoff) }));
+        benefitTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, SLibConsts.UNDEFINED, dateCutoff) }));
+        benefitTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, SLibConsts.UNDEFINED, dateCutoff) }));
         
         if (dateBenefits != null) {
-            seniority = getSeniorityEmployee(dateBenefits, dateCutOff);
+            seniority = getSeniorityEmployee(dateBenefits, dateCutoff);
         }
         else {
             seniority = 1;
@@ -2273,11 +2304,11 @@ public abstract class SHrsUtils {
         String sql = "";
         ResultSet resultSet = null;
         
-        sql = "SELECT COALESCE(SUM(ear.unt_all), 0) AS f_payed_unt " +
+        sql = "SELECT COALESCE(SUM(e.unt_all), 0) AS f_payed_unt " +
                 "FROM hrs_pay_rcp AS rcp " +
-                "INNER JOIN hrs_pay_rcp_ear AS ear ON ear.id_pay = rcp.id_pay AND ear.id_emp = rcp.id_emp " +
-                "WHERE rcp.id_emp = " + employeeId + " AND rcp.b_del = 0 AND ear.b_del = 0 AND ear.fk_tp_ben = 21 AND ear.ben_ann = " + benefitAnn + 
-                " AND ear.ben_year = " + benefitYear + " ";
+                "INNER JOIN hrs_pay_rcp_ear AS e ON e.id_pay = rcp.id_pay AND e.id_emp = rcp.id_emp " +
+                "WHERE rcp.id_emp = " + employeeId + " AND rcp.b_del = 0 AND e.b_del = 0 AND e.fk_tp_ben = 21 AND e.ben_ann = " + benefitAnn + 
+                " AND e.ben_year = " + benefitYear + " ";
         resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             seniority = resultSet.getInt(1);
@@ -2286,12 +2317,12 @@ public abstract class SHrsUtils {
         return seniority;
     }
     
-    public static int getDaysVacationsAll(final SGuiSession session, final int benefitAnn, final Date dateCutOff) throws Exception {
+    public static int getDaysVacationsAll(final SGuiSession session, final int benefitAnn, final Date dateCutoff) throws Exception {
         int daysTableVacation = 0;
         ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<SDbBenefitTable>();
         ArrayList<SHrsBenefitTableAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableAnniversary>();
         
-        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutOff) }));
+        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutoff) }));
         
         aTableVacationByAnniversary = createBenefitTablesAnniversarys(aTableVacation);
         
@@ -2621,14 +2652,13 @@ public abstract class SHrsUtils {
     }
     
     public static SHrsFormerPayroll readPayroll(final SClientInterface client, final int[] keyPayroll) throws SQLException, Exception {
-        int f_emp_map_bp = 0;
-        int f_emp_id = 0;
-        int claveOficial = 0;
         int nPaymentType = 0;
+        int nBankDefaultId = 0;
+        int nEarningSubCompId = 0;
+        String sEarTaxSubsidyCode = "";
         boolean bBankAccountUse = false;
         String sql = "";
         String deductionsTaxRetained = "";
-        String cia_reg_imss = "";
         double dAmountEarTax = 0;
         double dAmountEarExe = 0;
         double dAmountDedTax = 0;
@@ -2656,47 +2686,42 @@ public abstract class SHrsUtils {
 
         // Settings module human resource:
 
-        sql = "SELECT b_bank_acc_use FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + "";
+        sql = "SELECT cfg.b_bank_acc_use, cfg.fk_bank, cfg.fk_ear_tax_sub_comp_n, e.code AS _tax_sub_code "
+                + "FROM hrs_cfg AS cfg "
+                + "LEFT OUTER JOIN hrs_ear AS e ON cfg.fk_ear_tax_sub_n = e.id_ear "
+                + "WHERE cfg.id_cfg = " + SUtilConsts.BPR_CO_ID + "; ";
         
         resultSet = statement.executeQuery(sql);
         if (resultSet.next()) {
             bBankAccountUse = resultSet.getBoolean("b_bank_acc_use");
+            nBankDefaultId = resultSet.getInt("fk_bank");
+            nEarningSubCompId = resultSet.getInt("fk_ear_tax_sub_comp_n");
+            sEarTaxSubsidyCode = resultSet.getString("_tax_sub_code");
         }
         
         // Obtain deductions for tax retained:
         
-        sql = "SELECT id_ded FROM hrs_ded WHERE fk_tp_ded = " + SModSysConsts.HRSS_TP_DED_TAX + "";
+        sql = "SELECT id_ded FROM hrs_ded WHERE fk_tp_ded = " + SModSysConsts.HRSS_TP_DED_TAX + "; ";
         
         resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
             deductionsTaxRetained += (deductionsTaxRetained.length() == 0 ? "" : ", ") + resultSet.getInt("id_ded");
         }
 
-        // Obtain payroll header:
+        // Obtain payroll header (this is always an one-row query):
 
-        sql = "SELECT p.per_year, p.id_pay, tp.code, p.num, p.id_pay, NOW() AS f_date, p.dt_sta, p.dt_end, p.fk_tp_pay_sht, " +
-                "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
-                "FROM hrs_pay_rcp AS r " +
-                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
-                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) AS f_ear, " +
-                "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
-                "FROM hrs_pay_rcp AS r " +
-                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
-                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS f_ded, " +
-                "pei.dt_iss, " +
-                "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
-                "FROM hrs_pay_rcp AS r " +
-                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
-                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.fk_ded IN (" + deductionsTaxRetained + ")) AS f_rent_ret, " +
-                "'" + SHrsConsts.TXT_CON_DESC + "' AS f_descrip, p.fk_tp_pay " +
+        sql = "SELECT pri.dt_iss, p.dt_sta, p.dt_end, p.per_year, p.num, p.fk_tp_pay, p.fk_tp_pay_sht, " +
+                "(SELECT COALESCE(SUM(pre.amt_r), 0.0) FROM hrs_pay_rcp_ear AS pre " +
+                "WHERE pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp AND NOT pre.b_del) AS _ear, " +
+                "(SELECT COALESCE(SUM(prd.amt_r), 0.0) FROM hrs_pay_rcp_ded AS prd " +
+                "WHERE prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp AND NOT prd.b_del) AS _ded, " +
+                "(SELECT COALESCE(SUM(prd.amt_r), 0.0) FROM hrs_pay_rcp_ded AS prd " +
+                "WHERE prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp AND NOT prd.b_del AND prd.fk_ded IN (" + deductionsTaxRetained + ")) AS _ded_tax " +
                 "FROM hrs_pay AS p " +
-                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                "INNER JOIN hrs_pay_rcp_iss AS pei ON " +
-                "rcp.id_pay = pei.id_pay AND rcp.id_emp = pei.id_emp AND pei.b_del = 0 AND pei.id_iss = " + keyPayroll[2] + " " +
-                "INNER JOIN erp.hrss_tp_pay AS tp ON p.fk_tp_pay = tp.id_tp_pay " +
-                "WHERE rcp.id_pay = " + keyPayroll[0] + " AND rcp.b_del = 0 AND rcp.id_emp = " + keyPayroll[1] + " " + 
-                "GROUP BY p.per_year, p.per, tp.code, p.num, p.id_pay, f_date, p.dt_sta, p.dt_end " +
-                "ORDER BY p.per_year DESC, p.per DESC, tp.code, p.num, p.id_pay, f_date, p.dt_sta, p.dt_end; ";
+                "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                "INNER JOIN hrs_pay_rcp_iss AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp " +
+                "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pri.b_del AND " +
+                "pri.id_pay = " + keyPayroll[0] + " AND pri.id_emp = " + keyPayroll[1] + " AND pri.id_iss = " + keyPayroll[2] + "; ";
         
         resultSet = statement.executeQuery(sql);
         if (!resultSet.next()) {
@@ -2704,278 +2729,277 @@ public abstract class SHrsUtils {
         }
         else {
             payroll = new SHrsFormerPayroll(client);
-            payroll.setPkNominaId(resultSet.getInt("id_pay"));
-            payroll.setFecha(resultSet.getDate("pei.dt_iss"));
-            payroll.setFechaInicial(resultSet.getDate("dt_sta"));
-            payroll.setFechaFinal(resultSet.getDate("dt_end"));
-            payroll.setTotalPercepciones(resultSet.getDouble("f_ear"));
-            payroll.setTotalDeducciones(resultSet.getDouble("f_ded"));
-            payroll.setTotalRetenciones(resultSet.getDouble("f_rent_ret"));
-            payroll.setDescripcion(SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("f_descrip")), 100)); // 100 = pay_note column width
+            payroll.setPkNominaId(keyPayroll[0]);
+            payroll.setFecha(resultSet.getDate("pri.dt_iss"));
+            payroll.setFechaInicial(resultSet.getDate("p.dt_sta"));
+            payroll.setFechaFinal(resultSet.getDate("p.dt_end"));
+            payroll.setTotalPercepciones(resultSet.getDouble("_ear"));
+            payroll.setTotalDeducciones(resultSet.getDouble("_ded"));
+            payroll.setTotalRetenciones(resultSet.getDouble("_ded_tax"));
             payroll.setEmpresaId(client.getSession().getConfigCompany().getCompanyId());
             payroll.setSucursalEmpresaId(client.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId());
             payroll.setRegimenFiscal(new String[] { client.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal() });
             payroll.setFkNominaTipoId(resultSet.getInt("p.fk_tp_pay_sht"));
             
             nPaymentType = resultSet.getInt("p.fk_tp_pay");
-        }
 
-        // Obtain employer registry:
+            // Obtain employee payroll receipt (this is always an one-row query):
 
-        cia_reg_imss = client.getSessionXXX().getParamsCompany().getRegistrySs();
+            sql = "SELECT emp.num AS f_emp_num, bp.alt_id AS f_emp_curp, emp.ssn AS f_emp_nss, " +
+                    "tsch.code AS f_emp_reg_tp, pr.day_pad AS f_emp_dias_pag, dep.name AS f_emp_dep, " +
+                    "pr.pay_tax_sub_assd, pr.pay_tax_sub_comp, pr.pay_tax_sub_pend_r, pr.pay_tax_sub_payd, " +
+                    (bBankAccountUse ? "emp.bank_acc" : "''") + " AS f_emp_bank_clabe, " +
+                    "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE " + nBankDefaultId + " END AS f_emp_bank, " +
+                    "pr.sal, pr.wage, pr.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_ini, p.dt_end AS f_nom_fin, " +
+                    "pri.dt_pay, pri.num_ser, pri.num, pri.fk_tp_pay_sys, " +
+                    "TIMESTAMPDIFF(DAY, emp.dt_hire, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
+                    "tcon.code AS f_emp_cont_tp, twkd.code AS f_emp_jorn_tp, tpay.code AS f_emp_pay, pr.sal_ssc AS f_emp_sal_bc, trsk.code AS f_emp_risk, " +
+                    "IF(emp.b_uni, '" + DCfdi33Catalogs.TxtSí + "', '" + DCfdi33Catalogs.TxtNo + "') AS f_emp_union, " +
+                    "NOW() AS f_emp_date_edit " +
+                    "FROM hrs_pay AS p " +
+                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                    "INNER JOIN hrs_pay_rcp_iss AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp " +
+                    "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = pr.id_emp " +
+                    "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = bp.id_bp " +
+                    "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
+                    "INNER JOIN erp.hrsu_pos AS pos ON pos.id_pos = pr.fk_pos " +
+                    "INNER JOIN erp.hrss_tp_con AS tcon ON tcon.id_tp_con = pr.fk_tp_con " +
+                    "INNER JOIN erp.hrss_tp_rec_sche AS tsch ON tsch.id_tp_rec_sche = pr.fk_tp_rec_sche " +
+                    "INNER JOIN erp.hrss_tp_pos_risk AS trsk ON trsk.id_tp_pos_risk = pr.fk_tp_pos_risk " +
+                    "INNER JOIN erp.hrss_tp_work_day AS twkd ON pr.fk_tp_work_day = twkd.id_tp_work_day " +
+                    "INNER JOIN erp.hrss_tp_pay AS tpay ON p.fk_tp_pay = tpay.id_tp_pay " +
+                    "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pri.b_del AND " +
+                    "pri.id_pay = " + keyPayroll[0] + " AND pri.id_emp = " + keyPayroll[1] + " AND pri.id_iss = " + keyPayroll[2] + "; ";
+            resultSet = statement.executeQuery(sql);
 
-        // Obtain employee payroll:
+            while (resultSet.next()) {
+                dAmountEarTax = 0;
+                dAmountEarExe = 0;
+                dAmountDedTax = 0;
+                dAmountDedExe = 0;
+                dTotalEar = 0;
+                dTotalDed = 0;
+                dTotalDedRet = 0;
+                dAmountMonth = 0;
 
-        sql = "SELECT bp.bp, bp.id_bp AS f_emp_map_bp, emp.id_emp AS f_emp_id, emp.num AS f_emp_num, bp.alt_id AS f_emp_curp, emp.ssn AS f_emp_nss, " +
-                "sch.code AS f_emp_reg_tp, rcp.day_pad AS f_emp_dias_pag, d.name AS f_emp_dep, d.code AS f_emp_dep_cve, " +
-                (bBankAccountUse ? "emp.bank_acc" : "''") + " AS f_emp_bank_clabe, " +
-                "pei.dt_pay, pei.num_ser, pei.num, pei.fk_tp_pay_sys, " +
-                "CASE WHEN emp.fk_bank_n IS NOT NULL THEN emp.fk_bank_n ELSE (SELECT fk_bank FROM hrs_cfg WHERE id_cfg = " + SUtilConsts.BPR_CO_ID + ") END AS f_emp_bank, " +
-                "rcp.dt_hire AS f_emp_alta, p.dt_sta AS f_nom_date_start, p.dt_end AS f_nom_date_end, " +
-                "TIMESTAMPDIFF(DAY, emp.dt_hire, p.dt_end) / " + SHrsConsts.WEEK_DAYS + " AS f_emp_sen, pos.name AS f_emp_pos, " +
-                "con.code AS f_emp_cont_tp, wrktp.code AS f_emp_jorn_tp, tp.code AS f_emp_pay, rcp.sal_ssc AS f_emp_sal_bc, rcp.sal, rcp.wage, ris.code AS f_emp_risk, " +
-                "IF(emp.b_uni, '" + SHrsConsts.TXT_UNI_YES + "', '" + SHrsConsts.TXT_UNI_NO + "') AS f_emp_union, " +
-                "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
-                "FROM hrs_pay_rcp AS r " +
-                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
-                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) AS f_ear, " +
-                "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
-                "FROM hrs_pay_rcp AS r " +
-                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
-                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS f_ded, " +
-                "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
-                "FROM hrs_pay_rcp AS r " +
-                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
-                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp AND rcp_ded.fk_ded IN (" + deductionsTaxRetained + ")) AS f_emp_tot_rent_ret, " +
-                "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
-                "FROM hrs_pay_rcp AS r " +
-                "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
-                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) -" +
-                "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
-                "FROM hrs_pay_rcp AS r " +
-                "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
-                "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS f_emp_tot_net, " +
-                "NOW() AS f_emp_date_edit " +
-                "FROM hrs_pay AS p " +
-                "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                "INNER JOIN hrs_pay_rcp_iss AS pei ON " +
-                "rcp.id_pay = pei.id_pay AND rcp.id_emp = pei.id_emp AND pei.b_del = 0 AND pei.id_iss = " + keyPayroll[2] + " " +
-                "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                "INNER JOIN erp.hrsu_pos AS pos ON pos.id_pos = rcp.fk_pos " +
-                "INNER JOIN erp.hrss_tp_sal AS st ON st.id_tp_sal = rcp.fk_tp_sal " +
-                "INNER JOIN erp.hrsu_tp_emp AS et ON et.id_tp_emp = rcp.fk_tp_emp " +
-                "INNER JOIN erp.hrss_tp_con AS con ON con.id_tp_con = rcp.fk_tp_con " +
-                "INNER JOIN erp.hrss_tp_rec_sche AS sch ON sch.id_tp_rec_sche = rcp.fk_tp_rec_sche " +
-                "INNER JOIN erp.hrss_tp_pos_risk AS ris ON ris.id_tp_pos_risk = rcp.fk_tp_pos_risk " +
-                "INNER JOIN erp.hrss_tp_work_day AS wrktp ON rcp.fk_tp_work_day = wrktp.id_tp_work_day " +
-                "INNER JOIN erp.hrss_tp_pay AS tp ON p.fk_tp_pay = tp.id_tp_pay " +
-                "WHERE rcp.id_pay = " + keyPayroll[0] + " AND rcp.b_del = 0 AND rcp.id_emp = " + keyPayroll[1] + " " +
-                "GROUP BY bp.bp, f_emp_map_bp, f_emp_num, f_emp_curp, f_emp_nss, f_emp_reg_tp, f_emp_dias_pag, f_emp_dep, f_emp_dep_cve, d.id_dep, f_emp_bank, f_emp_alta, f_nom_date_start, f_nom_date_end, " +
-                "f_emp_sen, f_emp_pos, f_emp_pay, f_emp_sal_bc, f_emp_risk " +
-                "ORDER BY bp.bp, f_emp_map_bp, f_emp_num, f_emp_curp, f_emp_nss, f_emp_reg_tp, f_emp_dias_pag, f_emp_dep, f_emp_dep_cve, d.id_dep, f_emp_bank, f_emp_alta, f_nom_date_start, f_nom_date_end, " +
-                "f_emp_sen, f_emp_pos, f_emp_pay, f_emp_sal_bc, f_emp_risk; ";
-        resultSet = statement.executeQuery(sql);
+                // Obtain employee company branch:
 
-        while (resultSet.next()) {
-            dAmountEarTax = 0;
-            dAmountEarExe = 0;
-            dAmountDedTax = 0;
-            dAmountDedExe = 0;
-            dTotalEar = 0;
-            dTotalDed = 0;
-            dTotalDedRet = 0;
-            dAmountMonth = 0;
-            payrollReceipt = new SHrsFormerPayrollReceipt(payroll, client);
+                sql = "SELECT bpb.id_bpb, sta.sta_code AS _sta " +
+                    "FROM erp.bpsu_bpb AS bpb " +
+                    "INNER JOIN erp.bpsu_bpb_add AS bpb_add ON bpb.id_bpb = bpb_add.id_bpb AND bpb_add.fid_tp_add = " + SDataConstantsSys.BPSS_TP_ADD_OFF + " " +
+                    "LEFT OUTER JOIN erp.locu_sta AS sta ON bpb_add.fid_sta_n = sta.id_sta " +
+                    "WHERE bpb.b_del = 0 AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND bpb.fid_bp = " + keyPayroll[1] + " ";
+                resultSetClient = statementClient.executeQuery(sql);
 
-            // Obtain employee company branch:
+                if (!resultSetClient.next()) {
+                    throw new Exception("No se encontró la sucursal del empleado con ID = " + keyPayroll[1] + ".");
+                }
+                else {
+                    payrollReceipt = new SHrsFormerPayrollReceipt(payroll, client);
+                    payrollReceipt.setPkEmpleadoId(keyPayroll[1]);
+                    payrollReceipt.setAuxEmpleadoId(keyPayroll[1]);
+                    payrollReceipt.setPkSucursalEmpleadoId(resultSetClient.getInt("bpb.id_bpb"));
+                    payrollReceipt.setRegistroPatronal(client.getSessionXXX().getParamsCompany().getRegistrySs());
+                    payrollReceipt.setNumEmpleado(SLibUtilities.textTrim(resultSet.getString("f_emp_num")));
+                    payrollReceipt.setCurp(SLibUtilities.textTrim(resultSet.getString("f_emp_curp")));
+                    payrollReceipt.setNumSeguridadSocial(SLibUtilities.textTrim(resultSet.getString("f_emp_nss")));
+                    payrollReceipt.setTipoRegimen(resultSet.getInt("f_emp_reg_tp"));
+                    payrollReceipt.setNumDiasPagados(resultSet.getDouble("f_emp_dias_pag"));
+                    payrollReceipt.setDepartamento(SLibUtilities.textTrim(resultSet.getString("f_emp_dep")));
+                    payrollReceipt.setClabe(SLibUtilities.textTrim(resultSet.getString("f_emp_bank_clabe")));
+                    payrollReceipt.setBanco(resultSet.getInt("f_emp_bank"));
+                    payrollReceipt.setFechaPago(resultSet.getDate("pri.dt_pay"));
+                    payrollReceipt.setFechaInicioRelLaboral(resultSet.getDate("f_emp_alta"));
+                    payrollReceipt.setFechaInicialPago(resultSet.getDate("f_nom_ini"));
+                    payrollReceipt.setFechaFinalPago(resultSet.getDate("f_nom_fin"));
+                    payrollReceipt.setAntiguedad(resultSet.getInt("f_emp_sen"));
+                    payrollReceipt.setPuesto(SLibUtilities.textTrim(resultSet.getString("f_emp_pos")));
+                    payrollReceipt.setTipoContrato(SLibUtilities.textTrim(resultSet.getString("f_emp_cont_tp")));
+                    payrollReceipt.setTipoJornada(SLibUtilities.textTrim(resultSet.getString("f_emp_jorn_tp")));
+                    payrollReceipt.setPeriodicidadPago(SLibUtilities.textTrim(resultSet.getString("f_emp_pay")));
+                    payrollReceipt.setSalarioBaseCotApor(resultSet.getDouble("f_emp_sal_bc"));
+                    payrollReceipt.setRiesgoPuesto(resultSet.getInt("f_emp_risk"));
+                    payrollReceipt.setSindicalizado(SLibUtilities.textTrim(resultSet.getString("f_emp_union")));
+                    payrollReceipt.setSalarioDiarioIntegrado(payrollReceipt.getSalarioBaseCotApor());
+                    payrollReceipt.setClaveEstado(SLibUtilities.textTrim(resultSetClient.getString("_sta")));
+                    payrollReceipt.setFechaEdicion(resultSet.getDate("f_emp_date_edit"));
+                    payrollReceipt.setSerie(SLibUtilities.textTrim(resultSet.getString("pri.num_ser")));
+                    payrollReceipt.setFolio(resultSet.getInt("pri.num"));
+                    payrollReceipt.setMetodoPago(resultSet.getInt("pri.fk_tp_pay_sys"));
 
-            f_emp_map_bp = resultSet.getInt("f_emp_map_bp");
+                    dAmountMonth = SLibUtils.roundAmount(nPaymentType == SModSysConsts.HRSS_TP_PAY_WEE ? (resultSet.getDouble("pr.sal") * SHrsConsts.MONTH_DAYS_FIXED) : resultSet.getDouble("pr.wage"));
+                    payrollReceipt.setAuxSueldoMensual(dAmountMonth);
 
-            sql = "SELECT bpb.id_bpb, sta.sta_code AS _sta " +
-                "FROM erp.bpsu_bpb AS bpb " +
-                "INNER JOIN erp.bpsu_bpb_add AS bpb_add ON bpb.id_bpb = bpb_add.id_bpb AND bpb_add.fid_tp_add = " + SDataConstantsSys.BPSS_TP_ADD_OFF + " " +
-                "LEFT OUTER JOIN erp.locu_sta AS sta ON bpb_add.fid_sta_n = sta.id_sta " +
-                "WHERE bpb.b_del = 0 AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND bpb.fid_bp = " + f_emp_map_bp + " ";
-            resultSetClient = statementClient.executeQuery(sql);
+                    boolean bTaxSubFound = false;
+                    double dTaxSubPayroll = SLibUtils.roundAmount(resultSet.getDouble("pr.pay_tax_sub_comp") + resultSet.getDouble("pr.pay_tax_sub_payd"));
 
-            if (!resultSetClient.next()) {
-                throw new Exception("No se encontró la sucursal del empleado '" + f_emp_map_bp + "'.");
-            }
+                    // Obtain currency key from ERP parameters:
 
-            payrollReceipt.setPkEmpleadoId(f_emp_map_bp);
-            f_emp_id = resultSet.getInt("f_emp_id");
-            payrollReceipt.setAuxEmpleadoId(f_emp_id);
-            payrollReceipt.setPkSucursalEmpleadoId(resultSetClient.getInt("bpb.id_bpb"));
-            payrollReceipt.setRegistroPatronal(cia_reg_imss);
-            payrollReceipt.setNumEmpleado(SLibUtilities.textTrim(resultSet.getString("f_emp_num")));
-            payrollReceipt.setCurp(SLibUtilities.textTrim(resultSet.getString("f_emp_curp")));
-            payrollReceipt.setNumSeguridadSocial(SLibUtilities.textTrim(resultSet.getString("f_emp_nss")));
-            payrollReceipt.setTipoRegimen(resultSet.getInt("f_emp_reg_tp"));
-            payrollReceipt.setNumDiasPagados(resultSet.getDouble("f_emp_dias_pag"));
-            payrollReceipt.setDepartamento(SLibUtilities.textTrim(resultSet.getString("f_emp_dep")));
-            payrollReceipt.setClabe(SLibUtilities.textTrim(resultSet.getString("f_emp_bank_clabe")));
-            payrollReceipt.setBanco(resultSet.getInt("f_emp_bank"));
-            payrollReceipt.setFechaPago(resultSet.getDate("pei.dt_pay"));
-            payrollReceipt.setFechaInicioRelLaboral(resultSet.getDate("f_emp_alta"));
-            payrollReceipt.setFechaInicialPago(resultSet.getDate("f_nom_date_start"));
-            payrollReceipt.setFechaFinalPago(resultSet.getDate("f_nom_date_end"));
-            payrollReceipt.setAntiguedad(resultSet.getInt("f_emp_sen"));
-            payrollReceipt.setPuesto(SLibUtilities.textTrim(resultSet.getString("f_emp_pos")));
-            payrollReceipt.setTipoContrato(SLibUtilities.textTrim(resultSet.getString("f_emp_cont_tp")));
-            payrollReceipt.setTipoJornada(SLibUtilities.textTrim(resultSet.getString("f_emp_jorn_tp")));
-            payrollReceipt.setPeriodicidadPago(SLibUtilities.textTrim(resultSet.getString("f_emp_pay")));
-            payrollReceipt.setSalarioBaseCotApor(resultSet.getDouble("f_emp_sal_bc"));
-            payrollReceipt.setRiesgoPuesto(resultSet.getInt("f_emp_risk"));
-            payrollReceipt.setSindicalizado(SLibUtilities.textTrim(resultSet.getString("f_emp_union")));
-            payrollReceipt.setSalarioDiarioIntegrado(payrollReceipt.getSalarioBaseCotApor());
-            /* XXX (2016-08-31) jbarajas It're obtained detail of earnings and deductions.
-            hrsPayrollReceipt.setTotalPercepciones(resultSet.getDouble("f_ear"));
-            hrsPayrollReceipt.setTotalDeducciones(resultSet.getDouble("f_ded"));
-            hrsPayrollReceipt.setTotalRetenciones(resultSet.getDouble("f_emp_tot_rent_ret"));
-            hrsPayrollReceipt.setTotalNeto(resultSet.getDouble("f_emp_tot_net"));
-            */
-            payrollReceipt.setClaveEstado(SLibUtilities.textTrim(resultSetClient.getString("_sta")));
-            payrollReceipt.setFechaEdicion(resultSet.getDate("f_emp_date_edit"));
-            payrollReceipt.setSerie(SLibUtilities.textTrim(resultSet.getString("pei.num_ser")));
-            payrollReceipt.setFolio(resultSet.getInt("pei.num"));
-            payrollReceipt.setMetodoPago(resultSet.getInt("pei.fk_tp_pay_sys"));
-            
-            dAmountMonth = nPaymentType == SModSysConsts.HRSS_TP_PAY_WEE ? (resultSet.getDouble("rcp.sal") * SHrsConsts.MONTH_DAYS_FIXED) : resultSet.getDouble("rcp.wage");
-            payrollReceipt.setAuxSueldoMensual(dAmountMonth);
+                    sql = "SELECT c.cur_key " +
+                        "FROM erp.cfg_param_erp AS p " +
+                        "INNER JOIN erp.cfgu_cur AS c ON " +
+                        "p.fid_cur = c.id_cur " +
+                        "WHERE p.b_del = 0 ";
+                    resultSetClient = statementClient.executeQuery(sql);
 
-            // Obtain currency key from ERP parameters:
-
-            sql = "SELECT c.cur_key " +
-                "FROM erp.cfg_param_erp AS p " +
-                "INNER JOIN erp.cfgu_cur AS c ON " +
-                "p.fid_cur = c.id_cur " +
-                "WHERE p.b_del = 0 ";
-            resultSetClient = statementClient.executeQuery(sql);
-
-            if (!resultSetClient.next()) {
-                throw new Exception("No se encontró la configuración del ERP.");
-            }
-            else {
-                payrollReceipt.setMoneda(SLibUtilities.textTrim(resultSetClient.getString("c.cur_key")));
-            }
-
-            payrollReceipt.setLugarExpedicion(client.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
-            payrollReceipt.setConfirmacion("");
-            payrollReceipt.setRegimenFiscal(client.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
-            payrollReceipt.setCfdiRelacionadosTipoRelacion("");
-            
-            payroll.getChildPayrollReceipts().add(payrollReceipt);
-
-            if (payrollReceipt != null) {
-
-                // Obtain perceptions:
-
-                sql = "SELECT ear.code AS f_conc_cve, ear.name_abbr AS f_conc, ear.fk_tp_ear AS f_conc_cfdi, ear.unt_fac, rcp_ear.fk_ear, " +
-                        "CASE WHEN ear.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " THEN CASE WHEN rcp_ear.unt >= 0 AND rcp_ear.unt < " + SHrsConsts.OVER_TIME_2X_MAX_DAY + " THEN 1 ELSE rcp_ear.unt / " + SHrsConsts.OVER_TIME_2X_MAX_DAY + " END ELSE " +
-                        "CASE WHEN rcp_ear.unt >= 0 AND rcp_ear.unt <= 1 THEN 1 ELSE rcp_ear.unt END END AS f_conc_qty, " +
-                        "CASE WHEN ear.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " THEN " +
-                        "CASE WHEN rcp_ear.unt >= 0 AND rcp_ear.unt <= 1 THEN 1 ELSE rcp_ear.unt END ELSE 0 END AS f_conc_hrs, comp.code AS f_conc_unid, " +
-                        "rcp_ear.amt_taxa AS f_conc_mont_grav, rcp_ear.amt_exem AS f_conc_mont_ext, " +
-                        "1 AS f_conc_tp, " +
-                        "CASE WHEN ear.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " AND ear.unt_fac = " + SHrsConsts.OVER_TIME_2X + " THEN " + SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1] + " ELSE " +
-                        "CASE WHEN ear.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " AND ear.unt_fac = " + SHrsConsts.OVER_TIME_3X + " THEN " + SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_TRIPLE[1] + " ELSE " + 
-                        "" + SCfdConsts.CFDI_PAYROLL_PERCEPTION_PERCEPTION[1] + " END END AS f_conc_stp " +
-                        "FROM hrs_pay AS p " +
-                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay AND rcp.b_del = 0 " +
-                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp AND rcp_ear.b_del = 0 " +
-                        "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                        "INNER JOIN erp.hrss_tp_ear_comp AS comp ON comp.id_tp_ear_comp = ear.fk_tp_ear_comp " +
-                        "WHERE p.id_pay = " + keyPayroll[0] + " AND rcp.id_emp = " + f_emp_id + "; ";
-
-                resultSetAux = statementAux.executeQuery(sql);
-                while (resultSetAux.next()) {
-                    payrollConcept = new SHrsFormerPayrollConcept();
-                    dAmountEarTax = resultSetAux.getDouble("f_conc_mont_grav");
-                    dAmountEarExe = resultSetAux.getDouble("f_conc_mont_ext");
-                    dTotalEar = SLibUtils.round((dTotalEar + dAmountEarTax + dAmountEarExe), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
-
-                    payrollConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
-                    payrollConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
-                    payrollConcept.setClaveOficial(resultSetAux.getInt("f_conc_cfdi"));
-                    claveOficial = payrollConcept.getClaveOficial();
-                    payrollConcept.setCantidad(claveOficial == SModSysConsts.HRSS_TP_EAR_OVR_TME ? Math.ceil(resultSetAux.getDouble("f_conc_qty")) : resultSetAux.getDouble("f_conc_qty"));
-                    payrollConcept.setHoras_r(resultSetAux.getInt("f_conc_hrs"));
-                    payrollConcept.setTotalGravado(dAmountEarTax);
-                    payrollConcept.setTotalExento(dAmountEarExe);
-                    payrollConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
-                    payrollConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
-
-                    if (claveOficial == SModSysConsts.HRSS_TP_EAR_OVR_TME) {
-                        payrollExtraTime = new SHrsFormerPayrollExtraTime();
-                        payrollExtraTime.setTipoHoras(resultSetAux.getInt("unt_fac") == SHrsConsts.OVER_TIME_2X ?
-                            SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE);
-                        payrollExtraTime.setDias(payrollConcept.getCantidad());
-                        payrollExtraTime.setHorasExtra(payrollConcept.getHoras_r());
-                        payrollExtraTime.setImportePagado(payrollConcept.getTotalGravado() + payrollConcept.getTotalExento());
-
-                        payrollConcept.setChildPayrollExtraTimes(payrollExtraTime);
+                    if (!resultSetClient.next()) {
+                        throw new Exception("No se encontró la configuración del ERP.");
                     }
-                    else if (claveOficial == SModSysConsts.HRSS_TP_EAR_DIS) {
-                        sql = "SELECT tpd.code " +
-                                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS ear " +
-                                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_ABS) + " AS tpa ON ear.fk_cl_abs_n = tpa.id_cl_abs AND ear.fk_tp_abs_n = tpa.id_tp_abs " +
-                                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_DIS) + " AS tpd ON tpa.fk_tp_dis_n = tpd.id_tp_dis " +
-                                "WHERE ear.id_ear = " + resultSetAux.getInt("rcp_ear.fk_ear") + " ";
+                    else {
+                        payrollReceipt.setMoneda(SLibUtilities.textTrim(resultSetClient.getString("c.cur_key")));
+                        payrollReceipt.setLugarExpedicion(client.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
+                        payrollReceipt.setConfirmacion("");
+                        payrollReceipt.setRegimenFiscal(client.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
+                        payrollReceipt.setCfdiRelacionadosTipoRelacion("");
 
-                        resultSetAuxInc = statementAuxInc.executeQuery(sql);
-                        if (resultSetAuxInc.next()) {
-                            payrollConcept.setClaveIncapacidad(resultSetAuxInc.getString("tpd.code"));
+                        // Obtain perceptions:
+
+                        sql = "SELECT e.id_ear AS f_conc_id, e.code AS f_conc_cve, e.name_abbr AS f_conc, e.fk_tp_ear AS f_conc_cfdi, e.unt_fac, pre.fk_ear, " +
+                                "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " THEN CASE WHEN pre.unt >= 0 AND pre.unt < " + SHrsConsts.OVER_TIME_2X_MAX_DAY + " THEN 1 ELSE pre.unt / " + SHrsConsts.OVER_TIME_2X_MAX_DAY + " END ELSE " +
+                                "CASE WHEN pre.unt >= 0 AND pre.unt <= 1 THEN 1 ELSE pre.unt END END AS f_conc_qty, " +
+                                "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " THEN " +
+                                "CASE WHEN pre.unt >= 0 AND pre.unt <= 1 THEN 1 ELSE pre.unt END ELSE 0 END AS f_conc_hrs, ec.code AS f_conc_unid, " +
+                                "pre.b_aut AS f_aut, pre.amt_taxa AS f_conc_mont_grav, pre.amt_exem AS f_conc_mont_ext, " +
+                                "" + SCfdConsts.CFDI_PAYROLL_PERCEPTION_PERCEPTION[0] + " AS f_conc_tp, " +
+                                "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " AND e.unt_fac = " + SHrsConsts.OVER_TIME_2X + " THEN " + SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1] + " ELSE " +
+                                "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " AND e.unt_fac = " + SHrsConsts.OVER_TIME_3X + " THEN " + SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_TRIPLE[1] + " ELSE " + 
+                                "" + SCfdConsts.CFDI_PAYROLL_PERCEPTION_PERCEPTION[1] + " END END AS f_conc_stp " +
+                                "FROM hrs_pay AS p " +
+                                "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay AND pr.b_del = 0 " +
+                                "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp AND pre.b_del = 0 " +
+                                "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear " +
+                                "INNER JOIN erp.hrss_tp_ear_comp AS ec ON ec.id_tp_ear_comp = e.fk_tp_ear_comp " +
+                                "WHERE p.id_pay = " + keyPayroll[0] + " AND pr.id_emp = " + keyPayroll[1] + "; ";
+
+                        resultSetAux = statementAux.executeQuery(sql);
+                        while (resultSetAux.next()) {
+                            // check if current earning is a dummy earning created only for acomplishing CFDI requirements:
+                            if (resultSetAux.getInt("f_conc_id") == nEarningSubCompId && resultSetAux.getBoolean("f_aut") && SLibUtils.roundAmount(resultSetAux.getDouble("f_conc_mont_grav")) == 0 && SLibUtils.roundAmount(resultSetAux.getDouble("f_conc_mont_ext")) == 0.01) {
+                                continue; // omit current earning because subsidy was totally offset against tax; anyway it will be created later in this current method!
+                            }
+                            
+                            dAmountEarTax = resultSetAux.getDouble("f_conc_mont_grav");
+                            dAmountEarExe = resultSetAux.getDouble("f_conc_mont_ext");
+                            dTotalEar = SLibUtils.roundAmount(dTotalEar + dAmountEarTax + dAmountEarExe);
+
+                            payrollConcept = new SHrsFormerPayrollConcept();
+                            payrollConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
+                            payrollConcept.setClaveOficial(resultSetAux.getInt("f_conc_cfdi"));
+                            payrollConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
+                            payrollConcept.setCantidad(payrollConcept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_OVR_TME ? Math.ceil(resultSetAux.getDouble("f_conc_qty")) : resultSetAux.getDouble("f_conc_qty"));
+                            payrollConcept.setHoras_r(resultSetAux.getInt("f_conc_hrs"));
+                            payrollConcept.setTotalGravado(dAmountEarTax);
+                            payrollConcept.setTotalExento(dAmountEarExe);
+                            payrollConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
+                            payrollConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
+
+                            switch (payrollConcept.getClaveOficial()) {
+                                case SModSysConsts.HRSS_TP_EAR_OVR_TME:
+                                    payrollExtraTime = new SHrsFormerPayrollExtraTime();
+                                    payrollExtraTime.setTipoHoras(resultSetAux.getInt("unt_fac") == SHrsConsts.OVER_TIME_2X ?
+                                        SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE);
+                                    payrollExtraTime.setDias(payrollConcept.getCantidad());
+                                    payrollExtraTime.setHorasExtra(payrollConcept.getHoras_r());
+                                    payrollExtraTime.setImportePagado(payrollConcept.getTotalImporte());
+
+                                    payrollConcept.setChildPayrollExtraTimes(payrollExtraTime);
+                                    break;
+
+                                case SModSysConsts.HRSS_TP_EAR_DIS:
+                                    sql = "SELECT tpd.code " +
+                                            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS e " +
+                                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_ABS) + " AS tpa ON e.fk_cl_abs_n = tpa.id_cl_abs AND e.fk_tp_abs_n = tpa.id_tp_abs " +
+                                            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_DIS) + " AS tpd ON tpa.fk_tp_dis_n = tpd.id_tp_dis " +
+                                            "WHERE e.id_ear = " + resultSetAux.getInt("pre.fk_ear") + " ";
+
+                                    resultSetAuxInc = statementAuxInc.executeQuery(sql);
+                                    if (resultSetAuxInc.next()) {
+                                        payrollConcept.setXtaClaveIncapacidad(resultSetAuxInc.getString("tpd.code"));
+                                    }
+                                    break;
+
+                                case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
+                                    bTaxSubFound = true;
+                                    payrollConcept.setXtaSubsidioEmpleo(dTaxSubPayroll);
+                                    break;
+
+                                default:
+                            }
+
+                            payrollReceipt.getChildPayrollConcepts().add(payrollConcept);
                         }
+
+                        // add a dummy earning only for acomplishing CFDI requirements, if it is needed:
+                        
+                        if (!bTaxSubFound && dTaxSubPayroll != 0) {
+                            payrollConcept = new SHrsFormerPayrollConcept();
+                            payrollConcept.setClaveEmpresa(sEarTaxSubsidyCode);
+                            payrollConcept.setClaveOficial(SModSysConsts.HRSS_TP_EAR_TAX_SUB);
+                            payrollConcept.setConcepto(SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY);
+                            payrollConcept.setCantidad(0);
+                            payrollConcept.setHoras_r(0);
+                            payrollConcept.setTotalGravado(0);
+                            payrollConcept.setTotalExento(0.01); // fixed value when tax subsidy is not actually paid
+                            payrollConcept.setPkTipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_TAX_SUBSIDY[0]);
+                            payrollConcept.setPkSubtipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_TAX_SUBSIDY[1]);
+                            payrollConcept.setXtaSubsidioEmpleo(dTaxSubPayroll);
+
+                            payrollReceipt.getChildPayrollConcepts().add(payrollConcept);
+                            
+                            // XXX 2019-02-22, Sergio Flores: Temporal block of code, remove this!
+                            dTotalEar = SLibUtils.roundAmount(dTotalEar + 0.01);
+                            payroll.setTotalPercepciones(SLibUtils.roundAmount(payroll.getTotalPercepciones() + 0.01));
+                            // XXX 2019-02-22, Sergio Flores: Temporal block of code, remove this!
+                        }
+
+                        // Obtain deductions:
+
+                        sql = "SELECT d.id_ded AS f_conc_id, d.code AS f_conc_cve, d.fk_tp_ded AS f_conc_cfdi, d.fk_tp_ded, " +
+                                "(CASE WHEN prd.fk_loan_emp_n IS NULL AND prd.fk_loan_loan_n IS NULL THEN d.name ELSE " +
+                                "CAST(CONCAT(d.name,'; ', tl.name, '; no. ', l.num, '; ini.: ', l.dt_sta) AS CHAR CHARACTER SET latin1) END) AS f_conc, " +
+                                "prd.unt AS f_conc_qty, 0 AS f_conc_hrs, '' AS f_conc_unid, prd.amt_r AS f_conc_mont_grav, 0 AS f_conc_mont_ext, " +
+                                "" + SCfdConsts.CFDI_PAYROLL_DEDUCTION_DEDUCTION[0] + " AS f_conc_tp, " +
+                                "" + SCfdConsts.CFDI_PAYROLL_DEDUCTION_DEDUCTION[1] + " AS f_conc_stp " +
+                                "FROM hrs_pay AS p " +
+                                "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
+                                "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
+                                "LEFT OUTER JOIN hrs_loan AS l ON l.id_emp = prd.fk_loan_emp_n AND l.id_loan = prd.fk_loan_loan_n " +
+                                "LEFT OUTER JOIN erp.hrss_tp_loan AS tl ON tl.id_tp_loan = prd.fk_tp_loan_n " +
+                                "WHERE p.id_pay = " + keyPayroll[0] + " AND pr.b_del = 0 AND prd.b_del = 0 AND pr.id_emp = " + keyPayroll[1] + "; ";
+
+                        resultSetAux = statementAux.executeQuery(sql);
+                        while (resultSetAux.next()) {
+                            dAmountDedTax = resultSetAux.getDouble("f_conc_mont_grav");
+                            dAmountDedExe = resultSetAux.getDouble("f_conc_mont_ext");
+                            dTotalDed = SLibUtils.roundAmount(dTotalDed + dAmountDedTax + dAmountDedExe);
+
+                            if (resultSetAux.getInt("d.fk_tp_ded") == SModSysConsts.HRSS_TP_DED_TAX) {
+                                dTotalDedRet = SLibUtils.roundAmount(dTotalDedRet + dAmountDedTax + dAmountDedExe);
+                            }
+
+                            payrollConcept = new SHrsFormerPayrollConcept();
+                            payrollConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
+                            payrollConcept.setClaveOficial(resultSetAux.getInt("f_conc_cfdi"));
+                            payrollConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
+                            payrollConcept.setCantidad(SLibUtils.roundAmount(resultSetAux.getDouble("f_conc_qty")));
+                            payrollConcept.setHoras_r(resultSetAux.getInt("f_conc_hrs"));
+                            payrollConcept.setTotalGravado(dAmountDedTax);
+                            payrollConcept.setTotalExento(dAmountDedExe);
+                            payrollConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
+                            payrollConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
+
+                            payrollReceipt.getChildPayrollConcepts().add(payrollConcept);
+                        }
+
+                        payrollReceipt.setTotalPercepciones(dTotalEar);
+                        payrollReceipt.setTotalDeducciones(dTotalDed);
+                        payrollReceipt.setTotalRetenciones(dTotalDedRet);
+                        payrollReceipt.setTotalNeto(SLibUtils.roundAmount(dTotalEar - dTotalDed));
+
+                        payroll.getChildPayrollReceipts().add(payrollReceipt);
                     }
-
-                    payrollReceipt.getChildPayrollConcept().add(payrollConcept);
                 }
-
-                // Obtain deductions:
-                
-                sql = "SELECT ded.code AS f_conc_cve, ded.fk_tp_ded AS f_conc_cfdi, ded.fk_tp_ded, " +
-                        "(CASE WHEN rcp_ded.fk_loan_emp_n IS NULL AND rcp_ded.fk_loan_loan_n IS NULL THEN ded.name ELSE " +
-                        "CAST(CONCAT(ded.name,'; ', ltp.name, '; no. ', l.num, '; ini.: ', l.dt_sta) AS CHAR CHARACTER SET latin1) END) AS f_conc, " +
-                        "rcp_ded.unt AS f_conc_qty, 0 AS f_conc_hrs, '' AS f_conc_unid, rcp_ded.amt_r AS f_conc_mont_grav, 0 AS f_conc_mont_ext, " +
-                        "" + SCfdConsts.CFDI_PAYROLL_DEDUCTION_DEDUCTION[0] + " AS f_conc_tp, " +
-                        "" + SCfdConsts.CFDI_PAYROLL_DEDUCTION_DEDUCTION[1] + " AS f_conc_stp " +
-                        "FROM hrs_pay AS p " +
-                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
-                        "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                        "LEFT OUTER JOIN hrs_loan AS l ON l.id_emp = rcp_ded.fk_loan_emp_n AND l.id_loan = rcp_ded.fk_loan_loan_n " +
-                        "LEFT OUTER JOIN erp.hrss_tp_loan AS ltp ON ltp.id_tp_loan = rcp_ded.fk_tp_loan_n " +
-                        "WHERE p.id_pay = " + keyPayroll[0] + " AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND rcp.id_emp = " + f_emp_id + "; ";
-
-                resultSetAux = statementAux.executeQuery(sql);
-                while (resultSetAux.next()) {
-                    payrollConcept = new SHrsFormerPayrollConcept();
-                    dAmountDedTax = resultSetAux.getDouble("f_conc_mont_grav");
-                    dAmountDedExe = resultSetAux.getDouble("f_conc_mont_ext");
-                    dTotalDed = SLibUtils.round((dTotalDed + dAmountDedTax + dAmountDedExe), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
-                    
-                    if (resultSetAux.getInt("ded.fk_tp_ded") == SModSysConsts.HRSS_TP_DED_TAX) {
-                        dTotalDedRet = SLibUtils.round((dTotalDedRet + dAmountDedTax + dAmountDedExe), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits());
-                    }
-
-                    payrollConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
-                    payrollConcept.setClaveOficial(resultSetAux.getInt("f_conc_cfdi"));
-                    payrollConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
-                    payrollConcept.setCantidad(SLibUtils.round(resultSetAux.getDouble("f_conc_qty"), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits()));
-                    payrollConcept.setHoras_r(resultSetAux.getInt("f_conc_hrs"));
-                    payrollConcept.setTotalGravado(dAmountDedTax);
-                    payrollConcept.setTotalExento(dAmountDedExe);
-                    payrollConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
-                    payrollConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
-
-                    payrollReceipt.getChildPayrollConcept().add(payrollConcept);
-                }
-                payrollReceipt.setTotalPercepciones(dTotalEar);
-                payrollReceipt.setTotalDeducciones(dTotalDed);
-                payrollReceipt.setTotalRetenciones(dTotalDedRet);
-                payrollReceipt.setTotalNeto(dTotalEar - dTotalDed);
             }
         }
 
@@ -2995,57 +3019,82 @@ public abstract class SHrsUtils {
         }
     }
     
-    public static double computeAmoutLoan(final SHrsPayrollReceipt hrsReceipt, final SDbLoan loan) throws Exception {
-        double amoutAdjustment = 0;
-        double amoutAux = 0;
-        double amoutMonth = 0;
-        double amout = 0;
+    public static double computeAmountLoan(final SHrsPayrollReceipt hrsReceipt, final SDbLoan loan) throws Exception {
+        double loanAmount = 0;
+        double loanBalance = 0;
         double adjustmentAux = 0;
         double salaryReference = 0;
-        double balanceLoan = 0;
         SHrsDaysByPeriod hrsDaysPrev = hrsReceipt.getHrsEmployee().getHrsDaysPrev();
         SHrsDaysByPeriod hrsDaysCurr = hrsReceipt.getHrsEmployee().getHrsDaysCurr();
         SHrsDaysByPeriod hrsDaysNext = hrsReceipt.getHrsEmployee().getHrsDaysNext();
         
-        amoutAdjustment = hrsReceipt.getHrsPayroll().getLoanTypeAdjustment(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd(), loan.getFkLoanTypeId());
+        // monthly payment and adjustment:
+        double monthlyPayment;
+        double monthlyAdjustment = hrsReceipt.getHrsPayroll().getLoanTypeAdjustment(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd(), loan.getFkLoanTypeId());
+        
         switch (loan.getFkLoanPaymentTypeId()) {
-            case SModSysConsts.HRSS_TP_LOAN_PAY_AMT:
-                amoutMonth = loan.getPaymentAmount() + amoutAdjustment;
-                
+            case SModSysConsts.HRSS_TP_LOAN_PAY_AMT: // Amount
                 if (SLibUtils.belongsTo(loan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOA_COM, SModSysConsts.HRSS_TP_LOAN_LOA_UNI, SModSysConsts.HRSS_TP_LOAN_LOA_TPS })) {
-                    amoutAux = amoutMonth;
-                
-                    balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsReceipt.getHrsEmployee());
-
-                    amoutAux = (amoutAux > balanceLoan ? balanceLoan : amoutAux);
+                    // is a loan:
+                    
+                    loanAmount = loan.getPaymentAmount();
+                    
+                    if (monthlyAdjustment != 0) {
+                        switch (hrsReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId()) {
+                            case SModSysConsts.HRSS_TP_PAY_WEE:
+                                loanAmount += monthlyAdjustment * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_WEEKS;
+                                break;
+                            case SModSysConsts.HRSS_TP_PAY_FOR:
+                                loanAmount += monthlyAdjustment / SHrsConsts.MONTH_FORTNIGHTS;
+                                break;
+                            default:
+                        }
+                    }
+                    
+                    // limit payment to loan balance if necessary:
+                    loanBalance = SHrsUtils.getBalanceLoan(loan, hrsReceipt.getHrsEmployee());
+                    if (loanAmount > loanBalance) {
+                        loanAmount = loanBalance;
+                    }
                 }
                 else {
-                    amoutAux += hrsDaysPrev == null ? 0 : ((amoutMonth / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
-                    amoutAux += (amoutMonth / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
-                    amoutAux += hrsDaysNext == null ? 0 : ((amoutMonth / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
+                    // is a home or consumer credit:
+                    
+                    // estimate monthly payment:
+                    monthlyPayment = loan.getPaymentAmount() + monthlyAdjustment;
+                    
+                    // compute loan amount taking into consideration days of previous or next months (only in weekly payrolls):
+                    loanAmount += hrsDaysPrev == null ? 0 : ((monthlyPayment / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
+                    loanAmount += (monthlyPayment / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
+                    loanAmount += hrsDaysNext == null ? 0 : ((monthlyPayment / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
                 }
                 break;
                 
-            case SModSysConsts.HRSS_TP_LOAN_PAY_FIX:
-                amoutMonth = loan.getPaymentFixed() * hrsReceipt.getHrsPayroll().getPayroll().getMwzReferenceWage() + amoutAdjustment;
+            case SModSysConsts.HRSS_TP_LOAN_PAY_FIX_FEE: // Fixed fee
+                // estimate monthly payment:
+                monthlyPayment = (loan.getPaymentFixedFees() * hrsReceipt.getHrsPayroll().getPayroll().getMwzReferenceWage()) + monthlyAdjustment;
                 
-                amoutAux += hrsDaysPrev == null ? 0 : ((amoutMonth / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
-                amoutAux += (amoutMonth / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
-                amoutAux += hrsDaysNext == null ? 0 : ((amoutMonth / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
+                // compute loan amount taking into consideration days of previous or next months (only in weekly payrolls):
+                loanAmount += hrsDaysPrev == null ? 0 : ((monthlyPayment / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
+                loanAmount += (monthlyPayment / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
+                loanAmount += hrsDaysNext == null ? 0 : ((monthlyPayment / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
                 break;
                 
-            case SModSysConsts.HRSS_TP_LOAN_PAY_UMA:
-                amoutMonth = (loan.getPaymentUma() * hrsReceipt.getHrsPayroll().getUma(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd())) + amoutAdjustment;
+            case SModSysConsts.HRSS_TP_LOAN_PAY_UMA: // UMA
+                // estimate monthly payment:
+                monthlyPayment = (loan.getPaymentUmas() * hrsReceipt.getHrsPayroll().getUma(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd())) + monthlyAdjustment;
                 
-                amoutAux += hrsDaysPrev == null ? 0 : ((amoutMonth / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
-                amoutAux += (amoutMonth / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
-                amoutAux += hrsDaysNext == null ? 0 : ((amoutMonth / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
+                // compute loan amount taking into consideration days of previous or next months (only in weekly payrolls):
+                loanAmount += hrsDaysPrev == null ? 0 : ((monthlyPayment / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
+                loanAmount += (monthlyPayment / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
+                loanAmount += hrsDaysNext == null ? 0 : ((monthlyPayment / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
                 break;
                 
-            case SModSysConsts.HRSS_TP_LOAN_PAY_PER:
-                adjustmentAux += hrsDaysPrev == null ? 0 : (((double) hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()) / hrsDaysPrev.getPeriodDays()) * amoutAdjustment;
-                adjustmentAux += (double) (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid()) / hrsDaysCurr.getPeriodDays() * amoutAdjustment;
-                adjustmentAux += hrsDaysNext == null ? 0 : (((double) hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()) / hrsDaysNext.getPeriodDays() * amoutAdjustment);
+            case SModSysConsts.HRSS_TP_LOAN_PAY_PER: // Percentage
+                // compute loan amount taking into consideration the days of previous or next months (only in weekly payrolls):
+                adjustmentAux += hrsDaysPrev == null ? 0 : (((double) hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()) / hrsDaysPrev.getPeriodDays()) * monthlyAdjustment;
+                adjustmentAux += (double) (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid()) / hrsDaysCurr.getPeriodDays() * monthlyAdjustment;
+                adjustmentAux += hrsDaysNext == null ? 0 : (((double) hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()) / hrsDaysNext.getPeriodDays() * monthlyAdjustment);
                 
                 if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL) {
                     salaryReference = hrsReceipt.getReceipt().getPaymentDaily();
@@ -3057,16 +3106,14 @@ public abstract class SHrsUtils {
                     salaryReference = loan.getPaymentPercentageAmount();
                 }
                 
-                amoutAux = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * salaryReference * loan.getPaymentPercentage() + adjustmentAux;
+                loanAmount = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * salaryReference * loan.getPaymentPercentage() + adjustmentAux;
                 break;
                 
             default:
-                break;
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
         
-        amout = SLibUtils.roundAmount(amoutAux);
-        
-        return amout;
+        return SLibUtils.roundAmount(loanAmount);
     }
     
     /**
@@ -3077,15 +3124,15 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax.
      * @throws Exception 
      */
-    public static double computeAmoutTax(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
+    public static double computeAmountTax(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
         double dTaxComputed = 0;
         SDbTaxTableRow dbTaxTableRow = null;
         
         for (int i = 0; i < dbTaxTable.getChildRows().size(); i++) {
             dbTaxTableRow = dbTaxTable.getChildRows().get(i);
-            if (dTaxableAmount >= SLibUtils.round(dbTaxTableRow.getLowerLimit() * fTableFactor, SUtilConsts.DECS_AMT) &&
-                    (i + 1 == dbTaxTable.getChildRows().size() || dTaxableAmount < SLibUtils.round(dbTaxTable.getChildRows().get(i + 1).getLowerLimit() * fTableFactor, SUtilConsts.DECS_AMT))) {
-                dTaxComputed = SLibUtils.round((dTaxableAmount - SLibUtils.round(dbTaxTableRow.getLowerLimit() * fTableFactor, SUtilConsts.DECS_AMT)) * dbTaxTableRow.getTaxRate() + dbTaxTableRow.getFixedFee() * fTableFactor, SUtilConsts.DECS_AMT);
+            if (dTaxableAmount >= SLibUtils.roundAmount(dbTaxTableRow.getLowerLimit() * fTableFactor) &&
+                    (i + 1 == dbTaxTable.getChildRows().size() || dTaxableAmount < SLibUtils.roundAmount(dbTaxTable.getChildRows().get(i + 1).getLowerLimit() * fTableFactor))) {
+                dTaxComputed = SLibUtils.roundAmount((dTaxableAmount - SLibUtils.roundAmount(dbTaxTableRow.getLowerLimit() * fTableFactor)) * dbTaxTableRow.getTaxRate() + dbTaxTableRow.getFixedFee() * fTableFactor);
             }
         }
         
@@ -3100,7 +3147,7 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax subsidy.
      * @throws Exception 
      */
-    public static double computeAmoutTaxSubsidy(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
+    public static double computeAmountTaxSubsidy(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double fTableFactor) throws Exception {
         double dSubsidyComputed = 0;
         SDbTaxSubsidyTableRow dbSubsidyTableRow = null;
         
@@ -3108,7 +3155,7 @@ public abstract class SHrsUtils {
             dbSubsidyTableRow = dbSubsidyTable.getChildRows().get(i);
             if (dTaxableAmount >= dbSubsidyTableRow.getLowerLimit() * fTableFactor &&
                     (i + 1 == dbSubsidyTable.getChildRows().size() || dTaxableAmount < dbSubsidyTable.getChildRows().get(i + 1).getLowerLimit() * fTableFactor)) {
-                dSubsidyComputed = SLibUtils.round(dbSubsidyTableRow.getTaxSubsidy() * fTableFactor, SUtilConsts.DECS_AMT);
+                dSubsidyComputed = SLibUtils.roundAmount(dbSubsidyTableRow.getTaxSubsidy() * fTableFactor);
             }
         }
         
@@ -3126,7 +3173,7 @@ public abstract class SHrsUtils {
      * @return double amount calculated of security social contribution.
      * @throws Exception 
      */
-    public static double computeSSContribution(final SDbSsContributionTable dbSscTable, final double dSalarySsc, final double dMwzReferenceWage, final SHrsDaysByPeriod hrsDaysPrev,
+    public static double computeAmountSSContribution(final SDbSsContributionTable dbSscTable, final double dSalarySsc, final double dMwzReferenceWage, final SHrsDaysByPeriod hrsDaysPrev,
                                                     final SHrsDaysByPeriod hrsDaysCurr, final SHrsDaysByPeriod hrsDaysNext) throws Exception {
         SDbSsContributionTableRow dbSscTableRow = null;
         double dSscComputed = 0;
@@ -3137,18 +3184,18 @@ public abstract class SHrsUtils {
             switch(dbSscTableRow.getPkRowId()) {
                 case SHrsConsts.SS_INC_MON:
                 case SHrsConsts.SS_INC_PEN:
-                    //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
-                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * dSalarySsc, SUtilConsts.DECS_AMT);
+                    //dEarningSsc = SLibUtils.roundAmount((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * moReceipt.getSalarySscBase());
+                    dEarningSsc = SLibUtils.roundAmount((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * dSalarySsc);
                     break;
                 case SHrsConsts.SS_INC_KND_SSC_LET:
-                    //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * moHrsPayroll.getPayroll().getMwzReferenceWage(), SUtilConsts.DECS_AMT);
-                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * dMwzReferenceWage, SUtilConsts.DECS_AMT);
+                    //dEarningSsc = SLibUtils.roundAmount((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * moHrsPayroll.getPayroll().getMwzReferenceWage());
+                    dEarningSsc = SLibUtils.roundAmount((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * dMwzReferenceWage);
                     break;
                 case SHrsConsts.SS_INC_KND_SSC_GT:
-                    //dEarningSsc = SLibUtils.round(moReceipt.getSalarySscBase() <= (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()) ? 0 :
+                    //dEarningSsc = SLibUtils.roundAmount(moReceipt.getSalarySscBase() <= (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()) ? 0 :
                     //       ((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysIncapacityNotPaidPayroll()) * (moReceipt.getSalarySscBase() - (dbSscTableRow.getLowerLimitMwzReference() * moHrsPayroll.getPayroll().getMwzReferenceWage()))), SUtilConsts.DECS_AMT);
-                    dEarningSsc = SLibUtils.round(dSalarySsc <= (dbSscTableRow.getLowerLimitMwzReference() * dMwzReferenceWage) ? 0 :
-                           ((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * (dSalarySsc - (dbSscTableRow.getLowerLimitMwzReference() * dMwzReferenceWage))), SUtilConsts.DECS_AMT);
+                    dEarningSsc = SLibUtils.roundAmount(dSalarySsc <= (dbSscTableRow.getLowerLimitMwzReference() * dMwzReferenceWage) ? 0 :
+                           ((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysIncapacityNotPaid() - hrsDaysCurr.getDaysIncapacityNotPaid() - hrsDaysNext.getDaysIncapacityNotPaid()) * (dSalarySsc - (dbSscTableRow.getLowerLimitMwzReference() * dMwzReferenceWage))));
                     break;
                 case SHrsConsts.SS_DIS_LIF:
                 case SHrsConsts.SS_CRE:
@@ -3156,13 +3203,13 @@ public abstract class SHrsUtils {
                 case SHrsConsts.SS_RET:
                 case SHrsConsts.SS_SEV:
                 case SHrsConsts.SS_HOM:
-                    //dEarningSsc = SLibUtils.round((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysNotWorkedNotPaid()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
-                    dEarningSsc = SLibUtils.round((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid() - hrsDaysCurr.getDaysNotWorkedNotPaid() - hrsDaysNext.getDaysNotWorkedNotPaid()) * dSalarySsc, SUtilConsts.DECS_AMT);
+                    //dEarningSsc = SLibUtils.roundAmount((moReceipt.getDaysHiredPayroll() - moReceipt.getDaysNotWorkedNotPaid()) * moReceipt.getSalarySscBase(), SUtilConsts.DECS_AMT);
+                    dEarningSsc = SLibUtils.roundAmount((hrsDaysPrev.getPeriodPayrollDays() + hrsDaysCurr.getPeriodPayrollDays() + hrsDaysNext.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid() - hrsDaysCurr.getDaysNotWorkedNotPaid() - hrsDaysNext.getDaysNotWorkedNotPaid()) * dSalarySsc);
                     break;
                 default:
                     throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
             }
-            dSscComputed += SLibUtils.round(dEarningSsc * dbSscTableRow.getWorkerPercentage(), SUtilConsts.DECS_AMT);
+            dSscComputed += SLibUtils.roundAmount(dEarningSsc * dbSscTableRow.getWorkerPercentage());
         }
         
         return dSscComputed;
@@ -3177,7 +3224,7 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax.
      * @throws Exception 
      */
-    public static double computeAmoutTaxAlt(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
+    public static double computeAmountTaxAlt(final SDbTaxTable dbTaxTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
         double amountFractionI = 0;
         double amountFractionII = 0;
         double amountFractionIII = 0;
@@ -3191,11 +3238,11 @@ public abstract class SHrsUtils {
         
         // Fraction II:
         
-        amountFractionII = computeAmoutTax(dbTaxTable, (dAmountMonth + amountFractionI), fTableFactor);
+        amountFractionII = computeAmountTax(dbTaxTable, (dAmountMonth + amountFractionI), fTableFactor);
         
         // Fraction III:
         
-        amountFractionAuxIII = computeAmoutTax(dbTaxTable, dAmountMonth, fTableFactor);
+        amountFractionAuxIII = computeAmountTax(dbTaxTable, dAmountMonth, fTableFactor);
         amountFractionIII = amountFractionAuxIII > 0 ? (amountFractionII - amountFractionAuxIII) : 0;
         
         // Fraction V:
@@ -3218,7 +3265,7 @@ public abstract class SHrsUtils {
      * @return double amount calculated of tax subsidy.
      * @throws Exception 
      */
-    public static double computeAmoutTaxSubsidyAlt(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
+    public static double computeAmountTaxSubsidyAlt(final SDbTaxSubsidyTable dbSubsidyTable, final double dTaxableAmount, final double dAmountMonth, final double fTableFactor) throws Exception {
         double amountFractionI = 0;
         double amountFractionII = 0;
         double amountFractionIII = 0;
@@ -3232,11 +3279,11 @@ public abstract class SHrsUtils {
         
         // Fraction II:
         
-        amountFractionII = computeAmoutTaxSubsidy(dbSubsidyTable, (dAmountMonth + amountFractionI), fTableFactor);
+        amountFractionII = computeAmountTaxSubsidy(dbSubsidyTable, (dAmountMonth + amountFractionI), fTableFactor);
         
         // Fraction III:
         
-        amountFractionAuxIII = computeAmoutTaxSubsidy(dbSubsidyTable, dAmountMonth, fTableFactor);
+        amountFractionAuxIII = computeAmountTaxSubsidy(dbSubsidyTable, dAmountMonth, fTableFactor);
         amountFractionIII = amountFractionAuxIII > 0 ? (amountFractionII - amountFractionAuxIII) : 0;
         
         // Fraction V:
@@ -3254,12 +3301,12 @@ public abstract class SHrsUtils {
      * Function for calculated amount net.
      * @param session User GUI session.
      * @param grossAmount amount gross.
-     * @param dateCutOff date of cut.
+     * @param dateCutoff date of cut.
      * @param dateBenefit
      * @return
      * @throws Exception 
      */
-    public static SHrsCalculatedNetGrossAmount computeNetAmountPayment(final SGuiSession session, final double grossAmount, final Date dateCutOff, final Date dateBenefit) throws Exception {
+    public static SHrsCalculatedNetGrossAmount computeAmountPaymentNet(final SGuiSession session, final double grossAmount, final Date dateCutoff, final Date dateBenefit) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;
         SDbTaxSubsidyTable dbSubsidyTable = null;
@@ -3267,32 +3314,32 @@ public abstract class SHrsUtils {
         SDbConfig config = null;
         double dSalaryDiary = 0;
         double dSalarySsc = 0;
-        double dMwzReference = 0;
+        double dMwzReferenceWage = 0;
         double dNetAmount = 0;
         double dTaxAmount = 0;
         double dTaxSubsidyAmount = 0;
         double dSsContributionAmount = 0;
         double dTableFactor = 0;
-        int year = SLibTimeUtils.digestYear(dateCutOff)[0];
-        int days = SLibTimeUtils.getMaxDayOfMonth(dateCutOff);
+        int year = SLibTimeUtils.digestYear(dateCutoff)[0];
+        int days = SLibTimeUtils.getMaxDayOfMonth(dateCutoff);
         SHrsDaysByPeriod hrsDaysPrev = new SHrsDaysByPeriod(0, 0, 0, 0);
         SHrsDaysByPeriod hrsDaysCurr = new SHrsDaysByPeriod(year, 0, days, days);
         SHrsDaysByPeriod hrsDaysNext = new SHrsDaysByPeriod(0, 0, 0, 0);
         
         dSalaryDiary = grossAmount * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
-        dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCutOff);
+        dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCutoff);
         
         config = (SDbConfig) session.readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
-        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCutOff) });
-        dbSubsidyTable = (SDbTaxSubsidyTable) session.readRegistry(SModConsts.HRS_TAX_SUB, new int[] { getRecentTaxSubsidyTable(session, dateCutOff) });
-        dbSscTable = (SDbSsContributionTable) session.readRegistry(SModConsts.HRS_SSC, new int[] { getRecentSsContributionTable(session, dateCutOff) });
-        dMwzReference = getRecentMwz(session, config.getFkMwzReferenceTypeId(), dateCutOff);
+        dbTaxTable = (SDbTaxTable) session.readRegistry(SModConsts.HRS_TAX, new int[] { getRecentTaxTable(session, dateCutoff) });
+        dbSubsidyTable = (SDbTaxSubsidyTable) session.readRegistry(SModConsts.HRS_TAX_SUB, new int[] { getRecentTaxSubsidyTable(session, dateCutoff) });
+        dbSscTable = (SDbSsContributionTable) session.readRegistry(SModConsts.HRS_SSC, new int[] { getRecentSsContributionTable(session, dateCutoff) });
+        dMwzReferenceWage = getRecentMinimumWage(session, config.getFkMwzReferenceTypeId(), dateCutoff);
         
         dTableFactor = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS) * days;
         
-        dTaxAmount = SHrsUtils.computeAmoutTax(dbTaxTable, grossAmount, dTableFactor);
-        dTaxSubsidyAmount = SHrsUtils.computeAmoutTaxSubsidy(dbSubsidyTable, grossAmount, dTableFactor);
-        dSsContributionAmount = SHrsUtils.computeSSContribution(dbSscTable, dSalarySsc, dMwzReference, hrsDaysPrev, hrsDaysCurr, hrsDaysNext);
+        dTaxAmount = SHrsUtils.computeAmountTax(dbTaxTable, grossAmount, dTableFactor);
+        dTaxSubsidyAmount = SHrsUtils.computeAmountTaxSubsidy(dbSubsidyTable, grossAmount, dTableFactor);
+        dSsContributionAmount = SHrsUtils.computeAmountSSContribution(dbSscTable, dSalarySsc, dMwzReferenceWage, hrsDaysPrev, hrsDaysCurr, hrsDaysNext);
         
         dNetAmount = grossAmount - dTaxAmount - dSsContributionAmount;
         
@@ -3314,7 +3361,7 @@ public abstract class SHrsUtils {
      * @return
      * @throws Exception 
      */
-    public static SHrsCalculatedNetGrossAmount computeGrossAmountPayment(final SGuiSession session, final double netAmount, final Date dateCutOff, final double tolerance, final Date dateBenefit) throws Exception {
+    public static SHrsCalculatedNetGrossAmount computeAmountPaymentGross(final SGuiSession session, final double netAmount, final Date dateCutOff, final double tolerance, final Date dateBenefit) throws Exception {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         SDbTaxTable dbTaxTable = null;
         SDbTaxTableRow dbTaxTableRow = null;
@@ -3337,10 +3384,10 @@ public abstract class SHrsUtils {
             for (int i = 0; i < dbTaxTable.getChildRows().size(); i++) {
                 dbTaxTableRow = dbTaxTable.getChildRows().get(i);
                 if (i == 0) {
-                    limitInf = SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT);
+                    limitInf = SLibUtils.roundAmount(dbTaxTableRow.getLowerLimit() * dTableFactor);
                 }
-                if (netAmount <= SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT)) {
-                    limitSup = SLibUtils.round(dbTaxTableRow.getLowerLimit() * dTableFactor, SUtilConsts.DECS_AMT);
+                if (netAmount <= SLibUtils.roundAmount(dbTaxTableRow.getLowerLimit() * dTableFactor)) {
+                    limitSup = SLibUtils.roundAmount(dbTaxTableRow.getLowerLimit() * dTableFactor);
                 }
                 
                 average = (limitInf + limitSup) / 2;
@@ -3348,7 +3395,7 @@ public abstract class SHrsUtils {
                 dSalaryDiary = limitSup * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
                 dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCutOff);
 
-                netGrossAmount = computeNetAmountPayment(session, average, dateCutOff, dateBenefit);
+                netGrossAmount = computeAmountPaymentNet(session, average, dateCutOff, dateBenefit);
                 
                 if (netGrossAmount.getNetAmount() > netAmount) {
                     break;
@@ -3363,7 +3410,7 @@ public abstract class SHrsUtils {
             dSalaryDiary = limitSup * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
             dSalarySsc = dSalaryDiary * getIntegrationFactorSbc(session, dateBenefit, dateCutOff);
 
-            netGrossAmount = computeNetAmountPayment(session, average, dateCutOff, dateBenefit);
+            netGrossAmount = computeAmountPaymentNet(session, average, dateCutOff, dateBenefit);
 
             if (netGrossAmount.getNetAmount() > netAmount) {
                 limitSup = average;
@@ -3371,9 +3418,9 @@ public abstract class SHrsUtils {
             else {
                 limitInf = average;
             }
-            dToleranceAux = SLibUtils.round(netAmount - netGrossAmount.getNetAmount(), SUtilConsts.DECS_AMT);
+            dToleranceAux = SLibUtils.roundAmount(netAmount - netGrossAmount.getNetAmount());
             
-            bCalculate = SLibUtils.round(limitInf, SUtilConsts.DECS_AMT) != SLibUtils.round(limitSup, SUtilConsts.DECS_AMT) && Math.abs(dToleranceAux) > tolerance;
+            bCalculate = SLibUtils.roundAmount(limitInf) != SLibUtils.roundAmount(limitSup) && Math.abs(dToleranceAux) > tolerance;
         }
         dGrossAmount = average;
         

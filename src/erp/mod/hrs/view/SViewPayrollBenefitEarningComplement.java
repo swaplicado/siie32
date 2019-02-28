@@ -20,7 +20,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewPayrollBenefitEarningComplement extends SGridPaneView {
 
@@ -106,8 +106,8 @@ public class SViewPayrollBenefitEarningComplement extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME + "_emp", "Empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "f_ben", "Tipo prestación"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt", "Fecha"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "ve.unt_all", "Días"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "ve.amt_r", "Monto $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "ve.unt_all", "Días ajuste"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "ve.amt_r", "Monto ajuste $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts", "Notas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_SYS, SGridConsts.COL_TITLE_IS_SYS));

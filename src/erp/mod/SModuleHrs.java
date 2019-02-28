@@ -151,7 +151,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SModuleHrs extends SGuiModule {
 
@@ -673,12 +673,12 @@ public class SModuleHrs extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY dt_sta, id_tax ";
                 break;
             case SModConsts.HRS_TAX_SUB:
-                settings = new SGuiCatalogueSettings("Tabla subsidio impuesto", 1);
+                settings = new SGuiCatalogueSettings("Tabla subsidio empleo", 1);
                 sql = "SELECT id_tax_sub AS " + SDbConsts.FIELD_ID + "1, CONCAT('VIGENCIA: ', dt_sta) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY dt_sta, id_tax_sub ";
                 break;
             case SModConsts.HRS_SSC:
-                settings = new SGuiCatalogueSettings("Tabla SS", 1);
+                settings = new SGuiCatalogueSettings("Tabla retención SS", 1);
                 sql = "SELECT id_ssc AS " + SDbConsts.FIELD_ID + "1, CONCAT('VIGENCIA: ', dt_sta) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY dt_sta, id_ssc ";
                 break;
@@ -774,16 +774,16 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewTaxTableRow(miClient, "Tablas impuesto (detalle)");
                 break;
             case SModConsts.HRS_TAX_SUB:
-                view = new SViewTaxSubsidyTable(miClient, "Tablas subsidio impuesto");
+                view = new SViewTaxSubsidyTable(miClient, "Tablas subsidio empleo");
                 break;
             case SModConsts.HRS_TAX_SUB_ROW:
-                view = new SViewTaxSubsidyTableRow(miClient, "Tablas subsidio impuesto (detalle)");
+                view = new SViewTaxSubsidyTableRow(miClient, "Tablas subsidio empleo (detalle)");
                 break;
             case SModConsts.HRS_SSC:
-                view = new SViewSsContributionTable(miClient, "Tablas SS");
+                view = new SViewSsContributionTable(miClient, "Tablas retención SS");
                 break;
             case SModConsts.HRS_SSC_ROW:
-                view = new SViewSsContributionTableRow(miClient, "Tablas SS (detalle)");
+                view = new SViewSsContributionTableRow(miClient, "Tablas retención SS (detalle)");
                 break;
             case SModConsts.HRS_BEN:
                 view = new SViewBenefitTable(miClient, "Tablas prestaciones");
@@ -912,7 +912,7 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_PAY_RCP_EAR:
                     switch (subtype) {
                         case SModConsts.HRS_BEN:
-                            view = new SViewPayrollBenefitEarningComplement(miClient, "Incremento prestaciones");
+                            view = new SViewPayrollBenefitEarningComplement(miClient, "Ajustes prestaciones");
                             break;
                         case SModConsts.HRS_LOAN:
                             view = new SViewPayrollLoanEarningComplement(miClient, "Incremento créditos/préstamos");
@@ -955,7 +955,7 @@ public class SModuleHrs extends SGuiModule {
     @Override
     public SGuiOptionPicker getOptionPicker(final int type, final int subtype, final SGuiParams params) {
         String sql = "";
-        ArrayList<SGridColumnForm> gridColumns = new ArrayList<SGridColumnForm>();
+        ArrayList<SGridColumnForm> gridColumns = new ArrayList<>();
         SGuiOptionPickerSettings settings = null;
         SGuiOptionPicker picker = null;
 
@@ -1005,23 +1005,23 @@ public class SModuleHrs extends SGuiModule {
 
         switch (type) {
             case SModConsts.HRSU_CL_ABS:
-                if (moFormAbsenceClass == null) moFormAbsenceClass = new SFormAbsenceClass(miClient, "Clase incidencia");
+                if (moFormAbsenceClass == null) moFormAbsenceClass = new SFormAbsenceClass(miClient, "Clase de incidencia");
                 form = moFormAbsenceClass;
                 break;
             case SModConsts.HRSU_TP_ABS:
-                if (moFormAbsenceType == null) moFormAbsenceType = new SFormAbsenceType(miClient, "Tipo incidencia");
+                if (moFormAbsenceType == null) moFormAbsenceType = new SFormAbsenceType(miClient, "Tipo de incidencia");
                 form = moFormAbsenceType;
                 break;
             case SModConsts.HRSU_TP_EMP_DIS:
-                if (moFormEmployeeDismissType == null) moFormEmployeeDismissType = new SFormEmployeeDismissType(miClient, "Tipo baja");
+                if (moFormEmployeeDismissType == null) moFormEmployeeDismissType = new SFormEmployeeDismissType(miClient, "Tipo de baja");
                 form = moFormEmployeeDismissType;
                 break;
             case SModConsts.HRSU_TP_EMP:
-                if (moFormEmployeeType == null) moFormEmployeeType = new SFormEmployeeType(miClient, "Tipo empleado");
+                if (moFormEmployeeType == null) moFormEmployeeType = new SFormEmployeeType(miClient, "Tipo de empleado");
                 form = moFormEmployeeType;
                 break;
             case SModConsts.HRSU_TP_WRK:
-                if (moFormWorkerType == null) moFormWorkerType = new SFormWorkerType(miClient, "Tipo obrero");
+                if (moFormWorkerType == null) moFormWorkerType = new SFormWorkerType(miClient, "Tipo de obrero");
                 form = moFormWorkerType;
                 break;
             case SModConsts.HRSU_TP_MWZ:
@@ -1045,7 +1045,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormConfig;
                 break;
             case SModConsts.HRS_FDY:
-                if (moFormFirstDayYear == null) moFormFirstDayYear = new SFormFirstDayYear(miClient, "Primer día año");
+                if (moFormFirstDayYear == null) moFormFirstDayYear = new SFormFirstDayYear(miClient, "Primer día del año");
                 form = moFormFirstDayYear;
                 break;
             case SModConsts.HRS_HOL:
@@ -1057,19 +1057,19 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormWorkingDaySettings;
                 break;
             case SModConsts.HRS_TAX:
-                if (moFormTaxTable == null) moFormTaxTable = new SFormTaxTable(miClient, "Tabla impuesto");
+                if (moFormTaxTable == null) moFormTaxTable = new SFormTaxTable(miClient, "Tabla de impuesto");
                 form = moFormTaxTable;
                 break;
             case SModConsts.HRS_TAX_SUB:
-                if (moFormTaxSubsidyTable == null) moFormTaxSubsidyTable = new SFormTaxSubsidyTable(miClient, "Tabla subsidio impuesto");
+                if (moFormTaxSubsidyTable == null) moFormTaxSubsidyTable = new SFormTaxSubsidyTable(miClient, "Tabla de subsidio para el empleo");
                 form = moFormTaxSubsidyTable;
                 break;
             case SModConsts.HRS_SSC:
-                if (moFormSsContributionTable == null) moFormSsContributionTable = new SFormSsContributionTable(miClient, "Tabla SS");
+                if (moFormSsContributionTable == null) moFormSsContributionTable = new SFormSsContributionTable(miClient, "Tabla de retención de SS");
                 form = moFormSsContributionTable;
                 break;
             case SModConsts.HRS_BEN:
-                if (moFormBenefitTable == null) moFormBenefitTable = new SFormBenefitTable(miClient, "Tabla prestaciones");
+                if (moFormBenefitTable == null) moFormBenefitTable = new SFormBenefitTable(miClient, "Tabla de prestaciones");
                 form = moFormBenefitTable;
                 break;
             case SModConsts.HRS_WRK_SAL:
@@ -1189,7 +1189,7 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_PAY_RCP_EAR:
                 switch (subtype) {
                     case SModConsts.HRS_BEN:
-                        if (moFormBenefitAdjustmentEarning == null) moFormBenefitAdjustmentEarning = new SFormBenefitAdjustmentEarning(miClient, "Incremento de prestación");
+                        if (moFormBenefitAdjustmentEarning == null) moFormBenefitAdjustmentEarning = new SFormBenefitAdjustmentEarning(miClient, "Ajuste a prestaciones");
                         form = moFormBenefitAdjustmentEarning;
                         break;
                     case SModConsts.HRS_LOAN:

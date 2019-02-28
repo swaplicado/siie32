@@ -93,7 +93,7 @@ public class SHrsPayrollReceiptDeduction implements SGridRow, Comparable {
                 }
                 else if (moPayrollReceiptDeduction.getFkLoanLoanId_n() != SLibConsts.UNDEFINED) {
                     SDbLoan loan = moHrsPayrollReceipt.getHrsEmployee().getLoan(moPayrollReceiptDeduction.getFkLoanLoanId_n());
-                    moPayrollReceiptDeduction.setAmountUnitary(SHrsUtils.computeAmoutLoan(moHrsPayrollReceipt, loan));
+                    moPayrollReceiptDeduction.setAmountUnitary(SHrsUtils.computeAmountLoan(moHrsPayrollReceipt, loan));
                 }
                 
                 mdXtaValue = moPayrollReceiptDeduction.getAmountUnitary();
@@ -122,9 +122,9 @@ public class SHrsPayrollReceiptDeduction implements SGridRow, Comparable {
         hrsPayrollReceiptDeduction.setXtaEmployee(this.getXtaEmployee());
         hrsPayrollReceiptDeduction.setXtaValueAlleged(this.getXtaValueAlleged());
         hrsPayrollReceiptDeduction.setXtaValue(this.getXtaValue());
+        hrsPayrollReceiptDeduction.setXtaAmount(this.getXtaAmount());
         hrsPayrollReceiptDeduction.setXtaUnit(this.getXtaUnit());
         hrsPayrollReceiptDeduction.setXtaLoan(this.getXtaLoan());
-        hrsPayrollReceiptDeduction.setXtaAmount(this.getXtaAmount());
         
         return hrsPayrollReceiptDeduction;
     }

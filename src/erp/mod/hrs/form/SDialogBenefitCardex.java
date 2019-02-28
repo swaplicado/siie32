@@ -40,7 +40,6 @@ import sa.lib.gui.bean.SBeanFormDialog;
 public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelectionListener {
     
     protected SDbEmployee moEmployee;
-    protected SDbConfig moConfig;
     protected Date mtDateCutOff;
     protected int mnAnniversary;
     protected int mnAnniversaryDays;
@@ -145,6 +144,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         jlDummy.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel10.add(jlDummy);
 
+        jlDateCut.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlDateCut.setText("Fecha corte:");
         jlDateCut.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jlDateCut);
@@ -153,18 +153,19 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         moTextDateCut.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel10.add(moTextDateCut);
 
+        jlSeniority.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlSeniority.setText("Antigüedad:");
-        jlSeniority.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlSeniority.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jlSeniority);
 
-        moIntSeniority.setPreferredSize(new java.awt.Dimension(75, 23));
+        moIntSeniority.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel10.add(moIntSeniority);
 
         jlSeniorityYear.setText("años");
         jlSeniorityYear.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jlSeniorityYear);
 
-        moIntSeniorityDays.setPreferredSize(new java.awt.Dimension(75, 23));
+        moIntSeniorityDays.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel10.add(moIntSeniorityDays);
 
         jlSeniorityDays.setText("días");
@@ -504,12 +505,10 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
     }
     
     public void setFormParams(final int employeeId, final int anniversary, final int anniversaryDays, final int benefitTableId, final Date dateCutOff) {
-        moEmployee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
-        moConfig = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
+        SDbConfig config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
         
-        mdPaymentDaily = moEmployee.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? moEmployee.getSalary() :
-                (moConfig.isFornightStandard() ? ((moEmployee.getWage() * SHrsConsts.YEAR_MONTHS) / (SHrsConsts.FORNIGHT_FIXED_DAYS * SHrsConsts.YEAR_FORNIGHTS)) :
-                ((moEmployee.getWage() * SHrsConsts.YEAR_MONTHS) / SHrsConsts.YEAR_DAYS));
+        moEmployee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
+        mdPaymentDaily = moEmployee.getEffectiveSalary(config.isFortnightStandard());
         
         mnAnniversary = anniversary;
         mnAnniversaryDays = anniversaryDays;

@@ -14,10 +14,11 @@ public class SHrsConsts {
     public static final int YEAR_DAYS_FORTNIGHTS_FIXED = 360;
     public static final int YEAR_WEEKS = 52;
     public static final int YEAR_WEEKS_EXTENDED = 54;
-    public static final int YEAR_FORNIGHTS = 24;
+    public static final int YEAR_FORTNIGHTS = 24;
     public static final int YEAR_MONTHS = 12;
+    public static final int MONTH_FORTNIGHTS = 2;
     public static final int WEEK_DAYS = 7;
-    public static final int FORNIGHT_FIXED_DAYS = 15;
+    public static final int FORTNIGHT_FIXED_DAYS = 15;
     public static final int OVER_TIME_2X = 2;
     public static final int OVER_TIME_2X_MAX_DAY = 3;
     public static final int OVER_TIME_3X = 3;
@@ -54,21 +55,9 @@ public class SHrsConsts {
     public static final int SAL_REF_SAL_SS = 2;
     public static final int SAL_REF_SAL_FIX = 3;
     
-    public static final double NUM_DAY_PAY_MIN = 0.001;
-    
-    public static final String TXT_PAY_ORD = "O";
-    public static final String TXT_PAY_EXT = "E";
-    
     public static final String TXT_SAL_REF_SAL = "SD";
     public static final String TXT_SAL_REF_SAL_SS = "SBC";
     public static final String TXT_SAL_REF_SAL_FIX = "OTRO";
     
-    public static final String TXT_UNI_NO = "No";
-    public static final String TXT_UNI_YES = "Sí";
-    
-    public static final String TXT_CON_DESC = "Pago de nómina";
-    
-    public static final String TXT_TP_PAY_OTH = "99";
-
     public static final String ERR_PERIOD_DATE_INVALID = "Fecha inválida en el período.";
 }

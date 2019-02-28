@@ -31,8 +31,8 @@ public class SDbLoan extends SDbRegistryUser {
     protected double mdCapital;
     protected double mdTotalAmount;
     protected double mdPaymentAmount;
-    protected double mdPaymentFixed;
-    protected double mdPaymentUma;
+    protected double mdPaymentFixedFees;
+    protected double mdPaymentUmas;
     protected int mnPaymentPercentageReference;
     protected double mdPaymentPercentage;
     protected double mdPaymentPercentageAmount;
@@ -65,8 +65,8 @@ public class SDbLoan extends SDbRegistryUser {
     public void setCapital(double d) { mdCapital = d; }
     public void setTotalAmount(double d) { mdTotalAmount = d; }
     public void setPaymentAmount(double d) { mdPaymentAmount = d; }
-    public void setPaymentFixed(double d) { mdPaymentFixed = d; }
-    public void setPaymentUma(double d) { mdPaymentUma = d; }
+    public void setPaymentFixedFees(double d) { mdPaymentFixedFees = d; }
+    public void setPaymentUmas(double d) { mdPaymentUmas = d; }
     public void setPaymentPercentageReference(int n) { mnPaymentPercentageReference = n; }
     public void setPaymentPercentage(double d) { mdPaymentPercentage = d; }
     public void setPaymentPercentageAmount(double d) { mdPaymentPercentageAmount = d; }
@@ -89,8 +89,8 @@ public class SDbLoan extends SDbRegistryUser {
     public double getCapital() { return mdCapital; }
     public double getTotalAmount() { return mdTotalAmount; }
     public double getPaymentAmount() { return mdPaymentAmount; }
-    public double getPaymentFixed() { return mdPaymentFixed; }
-    public double getPaymentUma() { return mdPaymentUma; }
+    public double getPaymentFixedFees() { return mdPaymentFixedFees; }
+    public double getPaymentUmas() { return mdPaymentUmas; }
     public int getPaymentPercentageReference() { return mnPaymentPercentageReference; }
     public double getPaymentPercentage() { return mdPaymentPercentage; }
     public double getPaymentPercentageAmount() { return mdPaymentPercentageAmount; }
@@ -130,8 +130,8 @@ public class SDbLoan extends SDbRegistryUser {
         mdCapital = 0;
         mdTotalAmount = 0;
         mdPaymentAmount = 0;
-        mdPaymentFixed = 0;
-        mdPaymentUma = 0;
+        mdPaymentFixedFees = 0;
+        mdPaymentUmas = 0;
         mnPaymentPercentageReference = 0;
         mdPaymentPercentage = 0;
         mdPaymentPercentageAmount = 0;
@@ -200,8 +200,8 @@ public class SDbLoan extends SDbRegistryUser {
             mdCapital = resultSet.getDouble("cap");
             mdTotalAmount = resultSet.getDouble("tot_amt");
             mdPaymentAmount = resultSet.getDouble("pay_amt");
-            mdPaymentFixed = resultSet.getDouble("pay_fix");
-            mdPaymentUma = resultSet.getDouble("pay_uma");
+            mdPaymentFixedFees = resultSet.getDouble("pay_fix");
+            mdPaymentUmas = resultSet.getDouble("pay_uma");
             mnPaymentPercentageReference = resultSet.getInt("pay_per_ref");
             mdPaymentPercentage = resultSet.getDouble("pay_per");
             mdPaymentPercentageAmount = resultSet.getDouble("pay_per_amt");
@@ -249,8 +249,8 @@ public class SDbLoan extends SDbRegistryUser {
                     mdCapital + ", " + 
                     mdTotalAmount + ", " + 
                     mdPaymentAmount + ", " + 
-                    mdPaymentFixed + ", " + 
-                    mdPaymentUma + ", " + 
+                    mdPaymentFixedFees + ", " + 
+                    mdPaymentUmas + ", " + 
                     mnPaymentPercentageReference + ", " + 
                     mdPaymentPercentage + ", " + 
                     mdPaymentPercentageAmount + ", " + 
@@ -280,8 +280,8 @@ public class SDbLoan extends SDbRegistryUser {
                     "cap = " + mdCapital + ", " +
                     "tot_amt = " + mdTotalAmount + ", " +
                     "pay_amt = " + mdPaymentAmount + ", " +
-                    "pay_fix = " + mdPaymentFixed + ", " +
-                    "pay_uma = " + mdPaymentUma + ", " +
+                    "pay_fix = " + mdPaymentFixedFees + ", " +
+                    "pay_uma = " + mdPaymentUmas + ", " +
                     "pay_per_ref = " + mnPaymentPercentageReference + ", " +
                     "pay_per = " + mdPaymentPercentage + ", " +
                     "pay_per_amt = " + mdPaymentPercentageAmount + ", " +
@@ -315,8 +315,8 @@ public class SDbLoan extends SDbRegistryUser {
         registry.setCapital(this.getCapital());
         registry.setTotalAmount(this.getTotalAmount());
         registry.setPaymentAmount(this.getPaymentAmount());
-        registry.setPaymentFixed(this.getPaymentFixed());
-        registry.setPaymentUma(this.getPaymentUma());
+        registry.setPaymentFixedFees(this.getPaymentFixedFees());
+        registry.setPaymentUmas(this.getPaymentUmas());
         registry.setPaymentPercentageReference(this.getPaymentPercentageReference());
         registry.setPaymentPercentage(this.getPaymentPercentage());
         registry.setPaymentPercentageAmount(this.getPaymentPercentageAmount());

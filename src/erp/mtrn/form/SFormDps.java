@@ -3976,12 +3976,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         if (dpsModel != null) {
             if (dps.getDateDocDelivery_n() != null && dps.getDateDocDelivery_n().before(dps.getDate())) {
-                dps.setDateDocDelivery_n(dps.getDate());   // document delivery date
+                dps.setDateDocDelivery_n(dps.getDate()); // document delivery date
             }
 
             for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
                 entry.setPkEntryId(0);
-                entry.setIsRegistryNew(true);   // force entries to be treated as new
+                entry.setIsRegistryNew(true); // force entries to be treated as new
             }
         }
         
@@ -3992,6 +3992,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 dpsCfd = new SDataDpsCfd();
                 dps.setDbmsDataDpsCfd(dpsCfd);
             }
+            
+            dpsCfd.setIsRegistryNew(true); // force entries to be treated as new
         }
 
         return dps;

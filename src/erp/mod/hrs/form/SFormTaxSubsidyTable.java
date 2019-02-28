@@ -82,7 +82,7 @@ public class SFormTaxSubsidyTable extends SBeanForm implements ActionListener {
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de la tabla:"));
         jPanel2.setLayout(new java.awt.GridLayout(1, 1, 0, 5));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Inicio vigencia:*");
         jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -98,19 +98,19 @@ public class SFormTaxSubsidyTable extends SBeanForm implements ActionListener {
 
         jPanel7.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jPanel8.setLayout(new java.awt.FlowLayout(3, 5, 0));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlLowerLimit.setText("Límite inferior:*");
         jlLowerLimit.setPreferredSize(new java.awt.Dimension(140, 23));
         jPanel8.add(jlLowerLimit);
 
-        jlTaxSubsidy.setText("Subsidio impuesto:");
+        jlTaxSubsidy.setText("Subsidio para el empleo:");
         jlTaxSubsidy.setPreferredSize(new java.awt.Dimension(140, 23));
         jPanel8.add(jlTaxSubsidy);
 
         jPanel7.add(jPanel8);
 
-        jPanel9.setLayout(new java.awt.FlowLayout(3, 5, 0));
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
         jPanel9.add(moCurLowerLimit);
         jPanel9.add(moCurTaxSubsidy);
 
@@ -201,7 +201,7 @@ public class SFormTaxSubsidyTable extends SBeanForm implements ActionListener {
 
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Límite inferior"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio impuesto"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio empleo"));
 
                 return columns;
             }

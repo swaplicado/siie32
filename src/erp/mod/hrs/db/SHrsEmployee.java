@@ -34,14 +34,15 @@ public class SHrsEmployee {
     protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductions;               // accumulated deductions in year, current payroll receipt not included (applies only for deductions)
     protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductionsByType;         // accumulated deductions in year, current payroll receipt not included (applies only for annual tax computation)
     protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductionsByTaxComputation;   // accumulated deductions in year, current payroll receipt not included (applies only for annual tax computation)
-    //protected ArrayList<SDbPayrollReceiptDay> maYearPayrollReceiptDays;                           // payroll receipt days in year, current payroll receipt not included (applies only for annual tax computation)
     protected ArrayList<SHrsBenefit> maHrsBenefit;  // payroll receipt benefit paid and applied
     protected int mnDaysHiredAnnual;    // hired days in fiscal year
     protected int mnDaysHiredPayroll;   // hired days in the period payroll
     protected int mnBusinessDays;       // business days in the period payroll
-    protected int mnSeniority;          // seniority to payroll end
+    protected int mnSeniority;          // seniority in years to payroll end
     protected double mdAccumulatedTaxableEarnings;      // taxable amount accumulated of earnigs 
     protected double mdAccumulatedTaxableEarningsAlt;   // taxable amount accumulated of earnigs configured for articule 174 the RLISR
+    protected double mdAnnualTaxCompensated;
+    protected double mdAnnualTaxSubsidyCompensated;
     protected SHrsDaysByPeriod moHrsDaysPrev;
     protected SHrsDaysByPeriod moHrsDaysCurr;
     protected SHrsDaysByPeriod moHrsDaysNext;
@@ -54,24 +55,26 @@ public class SHrsEmployee {
         mnTaxComputationType = taxComputationType;
         moEmployee = null;
         moHrsPayrollReceipt = null;
-        maLoans = new ArrayList<SDbLoan>();
-        maHrsLoanPayments = new ArrayList<SHrsLoanPayments>();
-        maAbsences = new ArrayList<SDbAbsence>();
-        maAbsencesAbsenceConsumptions = new ArrayList<SDbAbsenceConsumption>();
-        maEmployeeHireLogs = new ArrayList<SDbEmployeeHireLog>();
-        maYearHrsAccumulatedEarnigs = new ArrayList<SHrsAccumulatedEarning>();
-        maYearHrsAccumulatedEarnigsByType = new ArrayList<SHrsAccumulatedEarning>();
-        maYearHrsAccumulatedDeductions = new ArrayList<SHrsAccumulatedDeduction>();
-        maYearHrsAccumulatedEarnigsByTaxComputation = new ArrayList<SHrsAccumulatedEarning>();
-        maYearHrsAccumulatedDeductionsByTaxComputation = new ArrayList<SHrsAccumulatedDeduction>();
-        maYearHrsAccumulatedDeductionsByType = new ArrayList<SHrsAccumulatedDeduction>();
-        maHrsBenefit = new ArrayList<SHrsBenefit>();
+        maLoans = new ArrayList<>();
+        maHrsLoanPayments = new ArrayList<>();
+        maAbsences = new ArrayList<>();
+        maAbsencesAbsenceConsumptions = new ArrayList<>();
+        maEmployeeHireLogs = new ArrayList<>();
+        maYearHrsAccumulatedEarnigs = new ArrayList<>();
+        maYearHrsAccumulatedEarnigsByType = new ArrayList<>();
+        maYearHrsAccumulatedDeductions = new ArrayList<>();
+        maYearHrsAccumulatedEarnigsByTaxComputation = new ArrayList<>();
+        maYearHrsAccumulatedDeductionsByTaxComputation = new ArrayList<>();
+        maYearHrsAccumulatedDeductionsByType = new ArrayList<>();
+        maHrsBenefit = new ArrayList<>();
         mnDaysHiredAnnual = 0;
         mnDaysHiredPayroll = 0;
         mnBusinessDays = 0;
         mnSeniority = 0;
         mdAccumulatedTaxableEarnings = 0;
         mdAccumulatedTaxableEarningsAlt = 0;
+        mdAnnualTaxCompensated = 0;
+        mdAnnualTaxSubsidyCompensated = 0;
         moHrsDaysPrev = null;
         moHrsDaysCurr = null;
         moHrsDaysNext = null;
@@ -87,9 +90,12 @@ public class SHrsEmployee {
     public void setDaysHiredAnnual(int n) { mnDaysHiredAnnual = n; }
     public void setDaysHiredPayroll(int n) { mnDaysHiredPayroll = n; }
     public void setBusinessDays(int n) { mnBusinessDays = n; }
+    /** Sets seniority of employee in years. */
     public void setSeniority(int n) { mnSeniority = n; }
     public void setAccumulatedTaxableEarning(double d) { mdAccumulatedTaxableEarnings = d; }
     public void setAccumulatedTaxableEarningAlt(double d) { mdAccumulatedTaxableEarningsAlt = d; }
+    public void setAnnualTaxCompensated(double d) { mdAnnualTaxCompensated = d; }
+    public void setAnnualTaxSubsidyCompensated(double d) { mdAnnualTaxSubsidyCompensated = d; }
     public void setHrsDaysPrev(SHrsDaysByPeriod o) { moHrsDaysPrev = o; }
     public void setHrsDaysCurr(SHrsDaysByPeriod o) { moHrsDaysCurr = o; }
     public void setHrsDaysNext(SHrsDaysByPeriod o) { moHrsDaysNext = o; }
@@ -116,9 +122,12 @@ public class SHrsEmployee {
     public int getDaysHiredAnnual() { return mnDaysHiredAnnual; }
     public int getDaysHiredPayroll() { return mnDaysHiredPayroll; }
     public int getBusinessDays() { return mnBusinessDays; }
+    /** Gets seniority of employee in years. */
     public int getSeniority() { return mnSeniority; }
     public double getAccummulatedTaxableEarnings() { return mdAccumulatedTaxableEarnings; }
     public double getAccummulatedTaxableEarningsAlt() { return mdAccumulatedTaxableEarningsAlt; }
+    public double getAnnualTaxCompensated() { return mdAnnualTaxCompensated; }
+    public double getAnnualTaxSubsidyCompensated() { return mdAnnualTaxSubsidyCompensated; }
     public SHrsDaysByPeriod getHrsDaysPrev() { return moHrsDaysPrev; }
     public SHrsDaysByPeriod getHrsDaysCurr() { return moHrsDaysCurr; }
     public SHrsDaysByPeriod getHrsDaysNext() { return moHrsDaysNext; }

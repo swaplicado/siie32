@@ -21,7 +21,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos, Edwin Carmona
+ * @author Néstor Ávalos, Edwin Carmona, Sergio Flores
  */
 public class SDbPayroll extends SDbRegistryUser {
     
@@ -37,12 +37,13 @@ public class SDbPayroll extends SDbRegistryUser {
     protected int mnCalendarDays_r;
     protected int mnReceiptDays;
     protected int mnWorkingDays;
+    protected double mdUmaAmount;
     protected double mdMwzWage;
     protected double mdMwzReferenceWage;
     protected String msNotes;
     protected boolean mbTaxSubsidy;
     protected boolean mbSsContribution;
-    protected boolean mbFornightStandard;
+    protected boolean mbFortnightStandard;
     protected boolean mbAccounting;
     protected boolean mbClosed;
     //protected boolean mbDeleted;
@@ -135,12 +136,13 @@ public class SDbPayroll extends SDbRegistryUser {
     public void setCalendarDays_r(int n) { mnCalendarDays_r = n; }
     public void setReceiptDays(int n) { mnReceiptDays = n; }
     public void setWorkingDays(int n) { mnWorkingDays = n; }
+    public void setUmaAmount(double d) { mdUmaAmount = d; }
     public void setMwzWage(double d) { mdMwzWage = d; }
     public void setMwzReferenceWage(double d) { mdMwzReferenceWage = d; }
     public void setNotes(String s) { msNotes = s; }
     public void setTaxSubsidy(boolean b) { mbTaxSubsidy = b; }
     public void setSsContribution(boolean b) { mbSsContribution = b; }
-    public void setFornightStandard(boolean b) { mbFornightStandard = b; }
+    public void setFortnightStandard(boolean b) { mbFortnightStandard = b; }
     public void setAccounting(boolean b) { mbAccounting = b; }
     public void setClosed(boolean b) { mbClosed = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -169,12 +171,13 @@ public class SDbPayroll extends SDbRegistryUser {
     public int getCalendarDays_r() { return mnCalendarDays_r; }
     public int getReceiptDays() { return mnReceiptDays; }
     public int getWorkingDays() { return mnWorkingDays; }
+    public double getUmaAmount() { return mdUmaAmount; }
     public double getMwzWage() { return mdMwzWage; }
     public double getMwzReferenceWage() { return mdMwzReferenceWage; }
     public String getNotes() { return msNotes; }
     public boolean isTaxSubsidy() { return mbTaxSubsidy; }
     public boolean isSsContribution() { return mbSsContribution; }
-    public boolean isFornightStandard() { return mbFornightStandard; }
+    public boolean isFortnightStandard() { return mbFortnightStandard; }
     public boolean isAccounting() { return mbAccounting; }
     public boolean isClosed() { return mbClosed; }
     public boolean isDeleted() { return mbDeleted; }
@@ -236,12 +239,13 @@ public class SDbPayroll extends SDbRegistryUser {
         mnCalendarDays_r = 0;
         mnReceiptDays = 0;
         mnWorkingDays = 0;
+        mdUmaAmount = 0;
         mdMwzWage = 0;
         mdMwzReferenceWage = 0;
         msNotes = "";
         mbTaxSubsidy = false;
         mbSsContribution = false;
-        mbFornightStandard = false;
+        mbFortnightStandard = false;
         mbAccounting = false;
         mbClosed = false;
         mbDeleted = false;
@@ -327,12 +331,13 @@ public class SDbPayroll extends SDbRegistryUser {
             mnCalendarDays_r = resultSet.getInt("cal_day_r");
             mnReceiptDays = resultSet.getInt("p.rcp_day");
             mnWorkingDays = resultSet.getInt("p.wrk_day");
+            mdUmaAmount = resultSet.getDouble("p.uma_amt");
             mdMwzWage = resultSet.getDouble("p.mwz_wage");
             mdMwzReferenceWage = resultSet.getDouble("p.mwz_ref_wage");
             msNotes = resultSet.getString("p.nts");
             mbTaxSubsidy = resultSet.getBoolean("p.b_tax_sub");
             mbSsContribution = resultSet.getBoolean("p.b_ssc");
-            mbFornightStandard = resultSet.getBoolean("p.b_for_std");
+            mbFortnightStandard = resultSet.getBoolean("p.b_for_std");
             mbAccounting = resultSet.getBoolean("p.b_acc");
             mbClosed = resultSet.getBoolean("p.b_clo");
             mbDeleted = resultSet.getBoolean("p.b_del");
@@ -408,12 +413,13 @@ public class SDbPayroll extends SDbRegistryUser {
                     mnCalendarDays_r + ", " + 
                     mnReceiptDays + ", " +
                     mnWorkingDays + ", " +
+                    mdUmaAmount + ", " +
                     mdMwzWage + ", " +
                     mdMwzReferenceWage + ", " +
                     "'" + msNotes + "', " +
                     (mbTaxSubsidy ? 1 : 0) + ", " + 
                     (mbSsContribution ? 1 : 0) + ", " +
-                    (mbFornightStandard ? 1 : 0) + ", " + 
+                    (mbFortnightStandard ? 1 : 0) + ", " + 
                     (mbAccounting ? 1 : 0) + ", " + 
                     (mbClosed ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
@@ -447,12 +453,13 @@ public class SDbPayroll extends SDbRegistryUser {
                     "cal_day_r = " + mnCalendarDays_r + ", " +
                     "rcp_day = " + mnReceiptDays + ", " +
                     "wrk_day = " + mnWorkingDays + ", " +
+                    "uma_amt = " + mdUmaAmount + ", " +
                     "mwz_wage = " + mdMwzWage + ", " +
                     "mwz_ref_wage = " + mdMwzReferenceWage + ", " +
                     "nts = '" + msNotes + "', " +
                     "b_tax_sub = " + (mbTaxSubsidy ? 1 : 0) + ", " +
                     "b_ssc = " + (mbSsContribution ? 1 : 0) + ", " +
-                    "b_for_std = " + (mbFornightStandard ? 1 : 0) + ", " +
+                    "b_for_std = " + (mbFortnightStandard ? 1 : 0) + ", " +
                     "b_acc = " + (mbAccounting ? 1 : 0) + ", " +
                     "b_clo = " + (mbClosed ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -485,7 +492,7 @@ public class SDbPayroll extends SDbRegistryUser {
         }
         
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
-            if (payrollReceipt.getPayrollReceiptIssues() == null || !payrollReceipt.getPayrollReceiptIssues().isStamped()) {
+            if (payrollReceipt.getPayrollReceiptIssue() == null || !payrollReceipt.getPayrollReceiptIssue().isStamped()) {
             //if (!payrollReceipt.isStamped()) {
                 payrollReceipt.setRegistryNew(true);
                 payrollReceipt.setPkPayrollId(mnPkPayrollId);
@@ -511,12 +518,13 @@ public class SDbPayroll extends SDbRegistryUser {
         registry.setCalendarDays_r(this.getCalendarDays_r());
         registry.setReceiptDays(this.getReceiptDays());
         registry.setWorkingDays(this.getWorkingDays());
+        registry.setUmaAmount(this.getUmaAmount());
         registry.setMwzWage(this.getMwzWage());
         registry.setMwzReferenceWage(this.getMwzReferenceWage());
         registry.setNotes(this.getNotes());
         registry.setTaxSubsidy(this.isTaxSubsidy());
         registry.setSsContribution(this.isSsContribution());
-        registry.setFornightStandard(this.isFornightStandard());
+        registry.setFortnightStandard(this.isFortnightStandard());
         registry.setAccounting(this.isAccounting());
         registry.setClosed(this.isClosed());
         registry.setDeleted(this.isDeleted());

@@ -138,7 +138,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDaysToPaid.setText("Días:*");
+        jlDaysToPaid.setText("Días ajuste:*");
         jlDaysToPaid.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel15.add(jlDaysToPaid);
         jPanel15.add(moDecDaysToPaid);
@@ -147,7 +147,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTotalAmount.setText("Monto:");
+        jlTotalAmount.setText("Monto ajuste:");
         jlTotalAmount.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlTotalAmount);
         jPanel8.add(moCurPayment);

@@ -867,13 +867,15 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_EXEM_MWZ_GBL = 21;  // Minimum Wage Global
     public static final int HRSS_TP_EAR_EXEM_MWZ_EVT = 22;  // Minimum Wage Event
     public static final int HRSS_TP_EAR_EXEM_MWZ_SEN = 23;  // Minimum Wage Seniority
+    /* 2019-01-31, Sergio Flores: These constants are not in use by now.
     public static final int HRSS_TP_EAR_EXEM_SAL_GBL = 31;  // Salary Global
     public static final int HRSS_TP_EAR_EXEM_SAL_EVT = 32;  // Salary Event
     public static final int HRSS_TP_EAR_EXEM_SAL_SEN = 33;  // Salary Seniority
     public static final int HRSS_TP_EAR_EXEM_WCB_GBL = 41;  // Wage Contribution Base Global
     public static final int HRSS_TP_EAR_EXEM_WCB_EVT = 42;  // Wage Contribution Base Event
     public static final int HRSS_TP_EAR_EXEM_WCB_SEN = 43;  // Wage Contribution Base Seniority
-
+    */
+    
     public static final int HRSS_TP_EAR_EAR = 1;        // Earnings
     public static final int HRSS_TP_EAR_DIS = 14;       // Disability
     public static final int HRSS_TP_EAR_TAX_SUB = 17;   // Tax
@@ -884,11 +886,12 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_CMP = 25;       // Compensation
     public static final int HRSS_TP_EAR_OTH = 999;      // Other payments diferent the catalogue earnings type the SAT
 
-    public static final int HRSS_TP_OTH_PAY_TAX_REF = 1;    // Tax Refund
-    public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2;    // Tax Subsidy
-    public static final int HRSS_TP_OTH_PAY_TRV_EXP = 3;    // Travel Expenses
-    public static final int HRSS_TP_OTH_PAY_TAX_BAL = 4;    // Tax Positive Balance
-    public static final int HRSS_TP_OTH_PAY_OTH = 999;  // Other payments
+    public static final int HRSS_TP_OTH_PAY_TAX_REF_OPT = 1;    // Tax Refund of Overpayed Tax
+    public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2;        // Tax Subsidy
+    public static final int HRSS_TP_OTH_PAY_TRV_EXP = 3;        // Travel Expenses
+    public static final int HRSS_TP_OTH_PAY_TAX_BAL = 4;        // Tax Positive Balance
+    public static final int HRSS_TP_OTH_PAY_TAX_REF_OWHT = 5;   // Tax Refund of Overwithheld Tax
+    public static final int HRSS_TP_OTH_PAY_OTH = 999;          // Other payments
 
     public static final int HRSS_TP_DED_COMP_AMT = 1;           // Amount
     //public static final int HRSS_TP_DED_COMP_DAYS = 2;        // Days                 disabled 2018-07-03 because seemingly has not ever been used
@@ -918,13 +921,11 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_LOAN_HOM = 11;      // Home credit
     public static final int HRSS_TP_LOAN_CON = 12;      // Consumer credit
 
-    public static final int HRSS_TP_LOAN_PAY_AMT = 1;   // Amount
-    public static final int HRSS_TP_LOAN_PAY_FIX = 2;   // Fixed
-    public static final int HRSS_TP_LOAN_PAY_PER = 3;   // Percentage
-    public static final int HRSS_TP_LOAN_PAY_UMA = 4;   // UMA
+    public static final int HRSS_TP_LOAN_PAY_AMT = 1;       // Amount
+    public static final int HRSS_TP_LOAN_PAY_FIX_FEE = 2;   // Fixed fee
+    public static final int HRSS_TP_LOAN_PAY_PER = 3;       // Percentage
+    public static final int HRSS_TP_LOAN_PAY_UMA = 4;       // UMA
 
-    public static final int HRSS_TP_CON_TME_DET = 1;    // Contract undetermined time
-    public static final int HRSS_TP_CON_LAB_CMM = 8;    // Contract labor commission
     public static final int HRSS_TP_CON_OTH = 99;       // Other contract
     
     public static final int HRSS_TP_REC_SCHE_WAG = 2;       // Wages & salaries
@@ -937,6 +938,8 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_REC_SCHE_ASS_PRO = 9;   // Professionals
     public static final int HRSS_TP_REC_SCHE_ASS_SHA = 10;  // Shareholders
     public static final int HRSS_TP_REC_SCHE_ASS_OTH = 11;  // Other
+    public static final int HRSS_TP_REC_SCHE_RET_PEN = 12;  // Retirees or Pensioners
+    public static final int HRSS_TP_REC_SCHE_COMP = 13;     // Compensation
     public static final int HRSS_TP_REC_SCHE_OTH = 99;      // Other
 
     public static final int HRSS_TP_POS_RISK_CL1 = 1;   // Class I
@@ -944,6 +947,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_POS_RISK_CL3 = 3;   // Class III
     public static final int HRSS_TP_POS_RISK_CL4 = 4;   // Class IV
     public static final int HRSS_TP_POS_RISK_CL5 = 5;   // Class V
+    public static final int HRSS_TP_POS_RISK_NA = 99;   // Non applicable
 
     public static final int HRSS_TP_WORK_DAY_NON = 0;   // Non applicable
     public static final int HRSS_TP_WORK_DAY_DIU = 1;   // Diurnal

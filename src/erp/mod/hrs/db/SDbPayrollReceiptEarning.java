@@ -58,12 +58,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         super(SModConsts.HRS_PAY_RCP_EAR);
     }
     
-    private void calculateAmountSystem(final SGuiSession session) {
-        SDbEarning earning = null;
-        
-        earning = (SDbEarning) session.readRegistry(SModConsts.HRS_EAR, new int[] { mnFkEarningId });
-        
-        //mdAmountSystem_r = (SLibUtils.round((mdUnits * mdAmountUnitary * mdFactorAmount * earning.getUnitsFactor()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
+    private void calculateAmountSystem() {
         mdAmountSystem_r = (SLibUtils.round((mdUnits * mdAmountUnitary * mdFactorAmount), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits()));
     }
 
@@ -150,11 +145,6 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         mnPkMoveId = 0;
         mdUnitsAlleged = 0;
         mdUnits = 0;
-        mdAmountUnitary = 0;
-        mdAmountSystem_r = 0;
-        mdAmount_r = 0;
-        mdAmountExempt = 0;
-        mdAmountTaxable = 0;
         mdFactorAmount = 0;
         mdAmountUnitary = 0;
         mdAmountSystem_r = 0;
@@ -230,11 +220,6 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
             mnPkMoveId = resultSet.getInt("id_mov");
             mdUnitsAlleged = resultSet.getDouble("unt_all");
             mdUnits = resultSet.getDouble("unt");
-            mdAmountUnitary = resultSet.getDouble("amt_unt");
-            mdAmountSystem_r = resultSet.getDouble("amt_sys_r");
-            mdAmount_r = resultSet.getDouble("amt_r");
-            mdAmountExempt = resultSet.getDouble("amt_exem");
-            mdAmountTaxable = resultSet.getDouble("amt_taxa");
             mdFactorAmount = resultSet.getDouble("fac_amt");
             mdAmountUnitary = resultSet.getDouble("amt_unt");
             mdAmountSystem_r = resultSet.getDouble("amt_sys_r");
@@ -283,7 +268,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         
         SDbPayrollReceipt.checkDummyRegistry(session, mnPkEmployeeId);
         
-        calculateAmountSystem(session);
+        calculateAmountSystem();
 
         if (mbRegistryNew) {
             computePrimaryKey(session);

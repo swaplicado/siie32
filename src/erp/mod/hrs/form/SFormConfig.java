@@ -62,7 +62,7 @@ public class SFormConfig extends SBeanForm {
         jlPayrollTaxRate = new javax.swing.JLabel();
         moDecPayrollTaxRate = new sa.lib.gui.bean.SBeanFieldDecimal();
         jPanel11 = new javax.swing.JPanel();
-        moBoolFornightStandard = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolFortnightStandard = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolAutoVacationBonus = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel12 = new javax.swing.JPanel();
         moBoolTaxSubsidyEarning = new sa.lib.gui.bean.SBeanFieldBoolean();
@@ -72,23 +72,20 @@ public class SFormConfig extends SBeanForm {
         moBoolBankAccountUse = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel13 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
         jPanel17 = new javax.swing.JPanel();
         jlMwzType = new javax.swing.JLabel();
         moKeyMwzType = new sa.lib.gui.bean.SBeanFieldKey();
-        jlMwzTypeHelp = new javax.swing.JLabel();
         jPanel18 = new javax.swing.JPanel();
         jlMwzReferenceType = new javax.swing.JLabel();
         moKeyMwzReferenceType = new sa.lib.gui.bean.SBeanFieldKey();
-        jlMwzReferenceTypeHelp = new javax.swing.JLabel();
         jPanel19 = new javax.swing.JPanel();
         jlTaxComputationType = new javax.swing.JLabel();
         moKeyTaxComputationType = new sa.lib.gui.bean.SBeanFieldKey();
-        jlTaxComputationTypeHelp = new javax.swing.JLabel();
         jPanel20 = new javax.swing.JPanel();
         jlBank = new javax.swing.JLabel();
         moKeyBank = new sa.lib.gui.bean.SBeanFieldKey();
-        jlBankHelp = new javax.swing.JLabel();
         jPanel29 = new javax.swing.JPanel();
         jlBajioAffinityGroup = new javax.swing.JLabel();
         moTextBajioAffinityGroup = new sa.lib.gui.bean.SBeanFieldText();
@@ -99,39 +96,35 @@ public class SFormConfig extends SBeanForm {
         jPanel34 = new javax.swing.JPanel();
         jlSsSubbranch = new javax.swing.JLabel();
         moTextSsSubbranch = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel7 = new javax.swing.JPanel();
         jPanel16 = new javax.swing.JPanel();
         jPanel27 = new javax.swing.JPanel();
         jlEarningEarning_n = new javax.swing.JLabel();
         moKeyEarningEarning_n = new sa.lib.gui.bean.SBeanFieldKey();
-        jlEarningEarning_nHelp = new javax.swing.JLabel();
         jPanel28 = new javax.swing.JPanel();
         jlEarningVacations_n = new javax.swing.JLabel();
         moKeyEarningVacations_n = new sa.lib.gui.bean.SBeanFieldKey();
-        jlEarningVacations_nHelp = new javax.swing.JLabel();
         jPanel21 = new javax.swing.JPanel();
         jlEarningTax_n = new javax.swing.JLabel();
         moKeyEarningTax_n = new sa.lib.gui.bean.SBeanFieldKey();
-        jlEarningTax_nHelp = new javax.swing.JLabel();
         jPanel22 = new javax.swing.JPanel();
         jlEarningTaxSubsidy_n = new javax.swing.JLabel();
         moKeyEarningTaxSubsidy_n = new sa.lib.gui.bean.SBeanFieldKey();
-        jlEarningTaxSubsidy_nHelp = new javax.swing.JLabel();
+        jPanel35 = new javax.swing.JPanel();
+        jlEarningTaxSubsidyCompensated_n = new javax.swing.JLabel();
+        moKeyEarningTaxSubsidyCompensated_n = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel23 = new javax.swing.JPanel();
         jlEarningSsContribution_n = new javax.swing.JLabel();
         moKeyEarningSsContribution_n = new sa.lib.gui.bean.SBeanFieldKey();
-        jlEarningSsContribution_nHelp = new javax.swing.JLabel();
         jPanel24 = new javax.swing.JPanel();
         jlDeductionTax_n = new javax.swing.JLabel();
         moKeyDeductionTax_n = new sa.lib.gui.bean.SBeanFieldKey();
-        jlDeductionTax_nHelp = new javax.swing.JLabel();
         jPanel25 = new javax.swing.JPanel();
         jlDeductionTaxSubsidy_n = new javax.swing.JLabel();
         moKeyDeductionTaxSubsidy_n = new sa.lib.gui.bean.SBeanFieldKey();
-        jlDeductionTaxSubsidy_nHelp = new javax.swing.JLabel();
         jPanel26 = new javax.swing.JPanel();
         jlDeductionSsContribution_n = new javax.swing.JLabel();
         moKeyDeductionSsContribution_n = new sa.lib.gui.bean.SBeanFieldKey();
-        jlDeductionSsContribution_nHelp = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -188,9 +181,9 @@ public class SFormConfig extends SBeanForm {
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolFornightStandard.setText("Utilizar quincenas fijas de 15 días");
-        moBoolFornightStandard.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel11.add(moBoolFornightStandard);
+        moBoolFortnightStandard.setText("Utilizar quincenas fijas de 15 días");
+        moBoolFortnightStandard.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel11.add(moBoolFortnightStandard);
 
         moBoolAutoVacationBonus.setText("Pago automático prima vacacional en aniversario");
         moBoolAutoVacationBonus.setPreferredSize(new java.awt.Dimension(300, 23));
@@ -200,8 +193,8 @@ public class SFormConfig extends SBeanForm {
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolTaxSubsidyEarning.setText("Utilizar subsidio impuesto como percepción");
-        moBoolTaxSubsidyEarning.setPreferredSize(new java.awt.Dimension(250, 23));
+        moBoolTaxSubsidyEarning.setText("Utilizar subsidio para el empleo como percepción");
+        moBoolTaxSubsidyEarning.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel12.add(moBoolTaxSubsidyEarning);
 
         jPanel6.add(jPanel12);
@@ -209,7 +202,7 @@ public class SFormConfig extends SBeanForm {
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moBoolTaxNet.setText("Mostrar impuesto neto");
-        moBoolTaxNet.setPreferredSize(new java.awt.Dimension(250, 23));
+        moBoolTaxNet.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel31.add(moBoolTaxNet);
 
         jPanel6.add(jPanel31);
@@ -217,7 +210,7 @@ public class SFormConfig extends SBeanForm {
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moBoolBankAccountUse.setText("Agregar cuenta bancaria en XML del CFDI");
-        moBoolBankAccountUse.setPreferredSize(new java.awt.Dimension(250, 23));
+        moBoolBankAccountUse.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel32.add(moBoolBankAccountUse);
 
         jPanel6.add(jPanel32);
@@ -229,78 +222,60 @@ public class SFormConfig extends SBeanForm {
         jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración adicional:"));
         jPanel13.setLayout(new java.awt.BorderLayout());
 
-        jPanel14.setLayout(new java.awt.GridLayout(1, 2));
+        jPanel14.setLayout(new java.awt.BorderLayout());
 
-        jPanel15.setLayout(new java.awt.GridLayout(8, 0, 0, 5));
+        jPanel5.setLayout(new java.awt.BorderLayout());
+
+        jPanel15.setLayout(new java.awt.GridLayout(9, 0, 0, 5));
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlMwzType.setText("Área geo.:*");
-        jlMwzType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlMwzType.setText("Área geográfica:*");
+        jlMwzType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel17.add(jlMwzType);
 
         moKeyMwzType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel17.add(moKeyMwzType);
 
-        jlMwzTypeHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlMwzTypeHelp.setText("(Área geográfica)");
-        jlMwzTypeHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel17.add(jlMwzTypeHelp);
-
         jPanel15.add(jPanel17);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlMwzReferenceType.setText("Área geo. ref.:*");
-        jlMwzReferenceType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlMwzReferenceType.setText("Área geográfica referencia:*");
+        jlMwzReferenceType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel18.add(jlMwzReferenceType);
 
         moKeyMwzReferenceType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel18.add(moKeyMwzReferenceType);
 
-        jlMwzReferenceTypeHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlMwzReferenceTypeHelp.setText("(Área geográfica referencia)");
-        jlMwzReferenceTypeHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel18.add(jlMwzReferenceTypeHelp);
-
         jPanel15.add(jPanel18);
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlTaxComputationType.setText("Cálc. impto. def.:*");
-        jlTaxComputationType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlTaxComputationType.setText("Cálculo impuesto default:*");
+        jlTaxComputationType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel19.add(jlTaxComputationType);
 
-        moKeyTaxComputationType.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyTaxComputationType.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel19.add(moKeyTaxComputationType);
-
-        jlTaxComputationTypeHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlTaxComputationTypeHelp.setText("(Cálculo impuesto default)");
-        jlTaxComputationTypeHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel19.add(jlTaxComputationTypeHelp);
 
         jPanel15.add(jPanel19);
 
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlBank.setText("Banco def.:*");
-        jlBank.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlBank.setText("Banco default:*");
+        jlBank.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel20.add(jlBank);
 
-        moKeyBank.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyBank.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel20.add(moKeyBank);
-
-        jlBankHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlBankHelp.setText("(Banco default)");
-        jlBankHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel20.add(jlBankHelp);
 
         jPanel15.add(jPanel20);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBajioAffinityGroup.setText("Grupo afinidad:");
-        jlBajioAffinityGroup.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlBajioAffinityGroup.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel29.add(jlBajioAffinityGroup);
 
         moTextBajioAffinityGroup.setText("sBeanFieldText1");
@@ -315,8 +290,8 @@ public class SFormConfig extends SBeanForm {
 
         jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCfdiNumberSeries.setText("Serie CFDI nómina:");
-        jlCfdiNumberSeries.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlCfdiNumberSeries.setText("Serie CFDI nóminas:");
+        jlCfdiNumberSeries.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel33.add(jlCfdiNumberSeries);
 
         moTextCfdiNumberSeries.setText("sBeanFieldText1");
@@ -327,7 +302,7 @@ public class SFormConfig extends SBeanForm {
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSsSubbranch.setText("Subdelegación SS:");
-        jlSsSubbranch.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlSsSubbranch.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel34.add(jlSsSubbranch);
 
         moTextSsSubbranch.setText("sBeanFieldText1");
@@ -335,139 +310,116 @@ public class SFormConfig extends SBeanForm {
 
         jPanel15.add(jPanel34);
 
-        jPanel14.add(jPanel15);
+        jPanel5.add(jPanel15, java.awt.BorderLayout.CENTER);
 
-        jPanel16.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
+        jPanel14.add(jPanel5, java.awt.BorderLayout.CENTER);
+
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
+        jPanel16.setLayout(new java.awt.GridLayout(9, 1, 0, 5));
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlEarningEarning_n.setText("Per. normal:");
-        jlEarningEarning_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlEarningEarning_n.setText("Percep. normal:");
+        jlEarningEarning_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel27.add(jlEarningEarning_n);
 
-        moKeyEarningEarning_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyEarningEarning_n.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel27.add(moKeyEarningEarning_n);
-
-        jlEarningEarning_nHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlEarningEarning_nHelp.setText("(Percepción normal)");
-        jlEarningEarning_nHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel27.add(jlEarningEarning_nHelp);
 
         jPanel16.add(jPanel27);
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlEarningVacations_n.setText("Per. vacaciones:");
-        jlEarningVacations_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlEarningVacations_n.setText("Percep. vacaciones:");
+        jlEarningVacations_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel28.add(jlEarningVacations_n);
 
-        moKeyEarningVacations_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyEarningVacations_n.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel28.add(moKeyEarningVacations_n);
-
-        jlEarningVacations_nHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlEarningVacations_nHelp.setText("(Vacaciones)");
-        jlEarningVacations_nHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel28.add(jlEarningVacations_nHelp);
 
         jPanel16.add(jPanel28);
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlEarningTax_n.setText("Per. impto.:");
-        jlEarningTax_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlEarningTax_n.setText("Percep. impuesto:");
+        jlEarningTax_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel21.add(jlEarningTax_n);
 
-        moKeyEarningTax_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyEarningTax_n.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel21.add(moKeyEarningTax_n);
-
-        jlEarningTax_nHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlEarningTax_nHelp.setText("(Impuesto)");
-        jlEarningTax_nHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel21.add(jlEarningTax_nHelp);
 
         jPanel16.add(jPanel21);
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlEarningTaxSubsidy_n.setText("Per. sub. impto.:");
-        jlEarningTaxSubsidy_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlEarningTaxSubsidy_n.setText("Percep. subsidio empleo:");
+        jlEarningTaxSubsidy_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel22.add(jlEarningTaxSubsidy_n);
 
-        moKeyEarningTaxSubsidy_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyEarningTaxSubsidy_n.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel22.add(moKeyEarningTaxSubsidy_n);
-
-        jlEarningTaxSubsidy_nHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlEarningTaxSubsidy_nHelp.setText("(Subsidio impuesto)");
-        jlEarningTaxSubsidy_nHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel22.add(jlEarningTaxSubsidy_nHelp);
 
         jPanel16.add(jPanel22);
 
+        jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        jlEarningTaxSubsidyCompensated_n.setText("Percep. subsidio empleo comp.:");
+        jlEarningTaxSubsidyCompensated_n.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel35.add(jlEarningTaxSubsidyCompensated_n);
+
+        moKeyEarningTaxSubsidyCompensated_n.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel35.add(moKeyEarningTaxSubsidyCompensated_n);
+
+        jPanel16.add(jPanel35);
+
         jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlEarningSsContribution_n.setText("Per. ret. SS:");
-        jlEarningSsContribution_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlEarningSsContribution_n.setText("Percep. retención SS:");
+        jlEarningSsContribution_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel23.add(jlEarningSsContribution_n);
 
-        moKeyEarningSsContribution_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyEarningSsContribution_n.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel23.add(moKeyEarningSsContribution_n);
-
-        jlEarningSsContribution_nHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlEarningSsContribution_nHelp.setText("(Retención SS)");
-        jlEarningSsContribution_nHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel23.add(jlEarningSsContribution_nHelp);
 
         jPanel16.add(jPanel23);
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlDeductionTax_n.setText("Ded. impto.:");
-        jlDeductionTax_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDeductionTax_n.setText("Deduc. impuesto:");
+        jlDeductionTax_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel24.add(jlDeductionTax_n);
 
-        moKeyDeductionTax_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyDeductionTax_n.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel24.add(moKeyDeductionTax_n);
-
-        jlDeductionTax_nHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlDeductionTax_nHelp.setText("(Impuesto)");
-        jlDeductionTax_nHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel24.add(jlDeductionTax_nHelp);
 
         jPanel16.add(jPanel24);
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlDeductionTaxSubsidy_n.setText("Ded. sub. impto.:");
-        jlDeductionTaxSubsidy_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDeductionTaxSubsidy_n.setText("Deduc. subsidio empleo:");
+        jlDeductionTaxSubsidy_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel25.add(jlDeductionTaxSubsidy_n);
 
-        moKeyDeductionTaxSubsidy_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyDeductionTaxSubsidy_n.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel25.add(moKeyDeductionTaxSubsidy_n);
-
-        jlDeductionTaxSubsidy_nHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlDeductionTaxSubsidy_nHelp.setText("(Subsidio impuesto)");
-        jlDeductionTaxSubsidy_nHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel25.add(jlDeductionTaxSubsidy_nHelp);
 
         jPanel16.add(jPanel25);
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlDeductionSsContribution_n.setText("Ded. ret. SS:");
-        jlDeductionSsContribution_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDeductionSsContribution_n.setText("Deduc. retención SS:");
+        jlDeductionSsContribution_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel26.add(jlDeductionSsContribution_n);
 
-        moKeyDeductionSsContribution_n.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyDeductionSsContribution_n.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel26.add(moKeyDeductionSsContribution_n);
-
-        jlDeductionSsContribution_nHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlDeductionSsContribution_nHelp.setText("(Retención SS)");
-        jlDeductionSsContribution_nHelp.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel26.add(jlDeductionSsContribution_nHelp);
 
         jPanel16.add(jPanel26);
 
-        jPanel14.add(jPanel16);
+        jPanel7.add(jPanel16, java.awt.BorderLayout.CENTER);
+
+        jPanel14.add(jPanel7, java.awt.BorderLayout.EAST);
 
         jPanel13.add(jPanel14, java.awt.BorderLayout.PAGE_START);
 
@@ -504,45 +456,37 @@ public class SFormConfig extends SBeanForm {
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
+    private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JLabel jlBajioAffinityGroup;
     private javax.swing.JLabel jlBajioAffinityGroupHelp;
     private javax.swing.JLabel jlBank;
-    private javax.swing.JLabel jlBankHelp;
     private javax.swing.JLabel jlCfdiNumberSeries;
     private javax.swing.JLabel jlDateOperations;
     private javax.swing.JLabel jlDeductionSsContribution_n;
-    private javax.swing.JLabel jlDeductionSsContribution_nHelp;
     private javax.swing.JLabel jlDeductionTaxSubsidy_n;
-    private javax.swing.JLabel jlDeductionTaxSubsidy_nHelp;
     private javax.swing.JLabel jlDeductionTax_n;
-    private javax.swing.JLabel jlDeductionTax_nHelp;
     private javax.swing.JLabel jlEarningEarning_n;
-    private javax.swing.JLabel jlEarningEarning_nHelp;
     private javax.swing.JLabel jlEarningSsContribution_n;
-    private javax.swing.JLabel jlEarningSsContribution_nHelp;
+    private javax.swing.JLabel jlEarningTaxSubsidyCompensated_n;
     private javax.swing.JLabel jlEarningTaxSubsidy_n;
-    private javax.swing.JLabel jlEarningTaxSubsidy_nHelp;
     private javax.swing.JLabel jlEarningTax_n;
-    private javax.swing.JLabel jlEarningTax_nHelp;
     private javax.swing.JLabel jlEarningVacations_n;
-    private javax.swing.JLabel jlEarningVacations_nHelp;
     private javax.swing.JLabel jlFirstDayWeek;
     private javax.swing.JLabel jlFirstDayWeekHelp;
     private javax.swing.JLabel jlLimitMwzReference;
     private javax.swing.JLabel jlMwzReferenceType;
-    private javax.swing.JLabel jlMwzReferenceTypeHelp;
     private javax.swing.JLabel jlMwzType;
-    private javax.swing.JLabel jlMwzTypeHelp;
     private javax.swing.JLabel jlPayrollTaxRate;
     private javax.swing.JLabel jlSsSubbranch;
     private javax.swing.JLabel jlTaxComputationType;
-    private javax.swing.JLabel jlTaxComputationTypeHelp;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolAutoVacationBonus;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolBankAccountUse;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBoolFornightStandard;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolFortnightStandard;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolTaxNet;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolTaxSubsidyEarning;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateOperations;
@@ -555,6 +499,7 @@ public class SFormConfig extends SBeanForm {
     private sa.lib.gui.bean.SBeanFieldKey moKeyDeductionTax_n;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarningEarning_n;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarningSsContribution_n;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyEarningTaxSubsidyCompensated_n;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarningTaxSubsidy_n;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarningTax_n;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarningVacations_n;
@@ -577,7 +522,7 @@ public class SFormConfig extends SBeanForm {
         moIntLimitMwzReference.setMinInteger(1);
         moIntLimitMwzReference.setMaxInteger(100);
         moDecPayrollTaxRate.setDecimalSettings(SGuiUtils.getLabelName(jlPayrollTaxRate.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
-        moBoolFornightStandard.setBooleanSettings(SGuiUtils.getLabelName(moBoolFornightStandard.getText()), true);
+        moBoolFortnightStandard.setBooleanSettings(SGuiUtils.getLabelName(moBoolFortnightStandard.getText()), true);
         moBoolAutoVacationBonus.setBooleanSettings(SGuiUtils.getLabelName(moBoolAutoVacationBonus.getText()), false);
         moBoolTaxSubsidyEarning.setBooleanSettings(SGuiUtils.getLabelName(moBoolTaxSubsidyEarning.getText()), true);
         moBoolTaxNet.setBooleanSettings(SGuiUtils.getLabelName(moBoolTaxNet.getText()), false);
@@ -593,6 +538,7 @@ public class SFormConfig extends SBeanForm {
         moKeyEarningVacations_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningVacations_n), false);
         moKeyEarningTax_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningTax_n), false);
         moKeyEarningTaxSubsidy_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningTaxSubsidy_n), false);
+        moKeyEarningTaxSubsidyCompensated_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningTaxSubsidyCompensated_n), false);
         moKeyEarningSsContribution_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningSsContribution_n), false);
         moKeyDeductionTax_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeductionTax_n), false);
         moKeyDeductionTaxSubsidy_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeductionTaxSubsidy_n), false);
@@ -602,7 +548,7 @@ public class SFormConfig extends SBeanForm {
         moFields.addField(moIntFirstDayWeek);
         moFields.addField(moIntLimitMwzReference);
         moFields.addField(moDecPayrollTaxRate);
-        moFields.addField(moBoolFornightStandard);
+        moFields.addField(moBoolFortnightStandard);
         moFields.addField(moBoolAutoVacationBonus);
         moFields.addField(moBoolTaxSubsidyEarning);
         moFields.addField(moBoolTaxNet);
@@ -618,6 +564,7 @@ public class SFormConfig extends SBeanForm {
         moFields.addField(moKeyEarningVacations_n);
         moFields.addField(moKeyEarningTax_n);
         moFields.addField(moKeyEarningTaxSubsidy_n);
+        moFields.addField(moKeyEarningTaxSubsidyCompensated_n);
         moFields.addField(moKeyEarningSsContribution_n);
         moFields.addField(moKeyDeductionTax_n);
         moFields.addField(moKeyDeductionTaxSubsidy_n);
@@ -646,6 +593,7 @@ public class SFormConfig extends SBeanForm {
         miClient.getSession().populateCatalogue(moKeyEarningVacations_n, SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyEarningTax_n, SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyEarningTaxSubsidy_n, SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyEarningTaxSubsidyCompensated_n, SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyEarningSsContribution_n, SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyDeductionTax_n, SModConsts.HRS_DED, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyDeductionTaxSubsidy_n, SModConsts.HRS_DED, SLibConsts.UNDEFINED, null);
@@ -675,7 +623,7 @@ public class SFormConfig extends SBeanForm {
         moIntFirstDayWeek.setValue(moRegistry.getFirstDayWeek());
         moIntLimitMwzReference.setValue(moRegistry.getLimitMwzReference());
         moDecPayrollTaxRate.setValue(moRegistry.getPayrollTaxRate());
-        moBoolFornightStandard.setValue(moRegistry.isFornightStandard());
+        moBoolFortnightStandard.setValue(moRegistry.isFortnightStandard());
         moBoolAutoVacationBonus.setValue(moRegistry.isAutoVacationBonus());
         moBoolTaxSubsidyEarning.setValue(moRegistry.isTaxSubsidyEarning());
         moBoolTaxNet.setValue(moRegistry.isTaxNet());
@@ -691,6 +639,7 @@ public class SFormConfig extends SBeanForm {
         moKeyEarningVacations_n.setValue(new int[] { moRegistry.getFkEarningVacationsId_n() });
         moKeyEarningTax_n.setValue(new int[] { moRegistry.getFkEarningTaxId_n() });
         moKeyEarningTaxSubsidy_n.setValue(new int[] { moRegistry.getFkEarningTaxSubsidyId_n() });
+        moKeyEarningTaxSubsidyCompensated_n.setValue(new int[] { moRegistry.getFkEarningTaxSubsidyCompensatedId_n()});
         moKeyEarningSsContribution_n.setValue(new int[] { moRegistry.getFkEarningSsContributionId_n() });
         moKeyDeductionTax_n.setValue(new int[] { moRegistry.getFkDeductionTaxId_n() });
         moKeyDeductionTaxSubsidy_n.setValue(new int[] { moRegistry.getFkDeductionTaxSubsidyId_n() });
@@ -720,7 +669,7 @@ public class SFormConfig extends SBeanForm {
         registry.setSsSubbranch(moTextSsSubbranch.getValue());
         registry.setBajioAffinityGroup(moTextBajioAffinityGroup.getValue());
         registry.setPayrollTaxRate(moDecPayrollTaxRate.getValue());
-        registry.setFornightStandard(moBoolFornightStandard.getValue());
+        registry.setFortnightStandard(moBoolFortnightStandard.getValue());
         registry.setAutoVacationBonus(moBoolAutoVacationBonus.getValue());
         registry.setTaxSubsidyEarning(moBoolTaxSubsidyEarning.getValue());
         registry.setTaxNet(moBoolTaxNet.getValue());
@@ -733,6 +682,7 @@ public class SFormConfig extends SBeanForm {
         registry.setFkEarningVacationsId_n(moKeyEarningVacations_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningVacations_n.getValue()[0]);
         registry.setFkEarningTaxId_n(moKeyEarningTax_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningTax_n.getValue()[0]);
         registry.setFkEarningTaxSubsidyId_n(moKeyEarningTaxSubsidy_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningTaxSubsidy_n.getValue()[0]);
+        registry.setFkEarningTaxSubsidyCompensatedId_n(moKeyEarningTaxSubsidyCompensated_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningTaxSubsidyCompensated_n.getValue()[0]);
         registry.setFkEarningSsContributionId_n(moKeyEarningSsContribution_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningSsContribution_n.getValue()[0]);
         registry.setFkDeductionTaxId_n(moKeyDeductionTax_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyDeductionTax_n.getValue()[0]);
         registry.setFkDeductionTaxSubsidyId_n(moKeyDeductionTaxSubsidy_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyDeductionTaxSubsidy_n.getValue()[0]);
@@ -785,35 +735,44 @@ public class SFormConfig extends SBeanForm {
                                 }
                             }
                             if (validation.isValid()) {
-                                if (moKeyEarningSsContribution_n.getSelectedIndex() > 0) {
-                                    earning = (SDbEarning) miClient.getSession().readRegistry(SModConsts.HRS_EAR, moKeyEarningSsContribution_n.getValue());
-                                    if (earning.getFkEarningTypeId() != SLibConsts.UNDEFINED) {
-                                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlEarningSsContribution_n) + "'.");
-                                        validation.setComponent(moKeyEarningSsContribution_n);
+                                if (moKeyEarningTaxSubsidyCompensated_n.getSelectedIndex() > 0) {
+                                    earning = (SDbEarning) miClient.getSession().readRegistry(SModConsts.HRS_EAR, moKeyEarningTaxSubsidyCompensated_n.getValue());
+                                    if (earning.getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_OTH) {
+                                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlEarningTaxSubsidyCompensated_n) + "'.");
+                                        validation.setComponent(moKeyEarningTaxSubsidyCompensated_n);
                                     }
                                 }
                                 if (validation.isValid()) {
-                                    if (moKeyDeductionTax_n.getSelectedIndex() > 0) {
-                                        deduction = (SDbDeduction) miClient.getSession().readRegistry(SModConsts.HRS_DED, moKeyDeductionTax_n.getValue());
-                                        if (deduction.getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_TAX) {
-                                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDeductionTax_n) + "'.");
-                                            validation.setComponent(moKeyDeductionTax_n);
+                                    if (moKeyEarningSsContribution_n.getSelectedIndex() > 0) {
+                                        earning = (SDbEarning) miClient.getSession().readRegistry(SModConsts.HRS_EAR, moKeyEarningSsContribution_n.getValue());
+                                        if (earning.getFkEarningTypeId() != SLibConsts.UNDEFINED) {
+                                            validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlEarningSsContribution_n) + "'.");
+                                            validation.setComponent(moKeyEarningSsContribution_n);
                                         }
                                     }
                                     if (validation.isValid()) {
-                                        if (moKeyDeductionTaxSubsidy_n.getSelectedIndex() > 0) {
-                                            deduction = (SDbDeduction) miClient.getSession().readRegistry(SModConsts.HRS_DED, moKeyDeductionTaxSubsidy_n.getValue());
-                                            if (deduction.getFkDeductionTypeId() != SLibConsts.UNDEFINED) {
-                                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDeductionTaxSubsidy_n) + "'.");
-                                                validation.setComponent(moKeyDeductionTaxSubsidy_n);
+                                        if (moKeyDeductionTax_n.getSelectedIndex() > 0) {
+                                            deduction = (SDbDeduction) miClient.getSession().readRegistry(SModConsts.HRS_DED, moKeyDeductionTax_n.getValue());
+                                            if (deduction.getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_TAX) {
+                                                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDeductionTax_n) + "'.");
+                                                validation.setComponent(moKeyDeductionTax_n);
                                             }
                                         }
                                         if (validation.isValid()) {
-                                            if (moKeyDeductionSsContribution_n.getSelectedIndex() > 0) {
-                                                deduction = (SDbDeduction) miClient.getSession().readRegistry(SModConsts.HRS_DED, moKeyDeductionSsContribution_n.getValue());
-                                                if (deduction.getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_SSC) {
-                                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDeductionSsContribution_n) + "'.");
-                                                    validation.setComponent(moKeyDeductionSsContribution_n);
+                                            if (moKeyDeductionTaxSubsidy_n.getSelectedIndex() > 0) {
+                                                deduction = (SDbDeduction) miClient.getSession().readRegistry(SModConsts.HRS_DED, moKeyDeductionTaxSubsidy_n.getValue());
+                                                if (deduction.getFkDeductionTypeId() != SLibConsts.UNDEFINED) {
+                                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDeductionTaxSubsidy_n) + "'.");
+                                                    validation.setComponent(moKeyDeductionTaxSubsidy_n);
+                                                }
+                                            }
+                                            if (validation.isValid()) {
+                                                if (moKeyDeductionSsContribution_n.getSelectedIndex() > 0) {
+                                                    deduction = (SDbDeduction) miClient.getSession().readRegistry(SModConsts.HRS_DED, moKeyDeductionSsContribution_n.getValue());
+                                                    if (deduction.getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_SSC) {
+                                                        validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlDeductionSsContribution_n) + "'.");
+                                                        validation.setComponent(moKeyDeductionSsContribution_n);
+                                                    }
                                                 }
                                             }
                                         }

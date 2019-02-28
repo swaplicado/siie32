@@ -156,10 +156,10 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg = new JMenu("Configuración");
         jmiCfgTaxTable = new JMenuItem("Tablas de impuesto");
         jmiCfgTaxTableRow = new JMenuItem("Tablas de impuesto a detalle");
-        jmiCfgTaxSubsidyTable = new JMenuItem("Tablas de subsidio de impuesto");
-        jmiCfgTaxSubsidyTableRow = new JMenuItem("Tablas de subsidio de impuesto a detalle");
-        jmiCfgSsContributionTable = new JMenuItem("Tablas de SS");
-        jmiCfgSsContributionTableRow = new JMenuItem("Tablas de SS a detalle");
+        jmiCfgTaxSubsidyTable = new JMenuItem("Tablas de subsidio para el empleo");
+        jmiCfgTaxSubsidyTableRow = new JMenuItem("Tablas de subsidio para el empleo a detalle");
+        jmiCfgSsContributionTable = new JMenuItem("Tablas de retención de SS");
+        jmiCfgSsContributionTableRow = new JMenuItem("Tablas de retención de SS a detalle");
         jmiCfgBenefitTable = new JMenuItem("Tablas de prestaciones");
         jmiCfgBenefitTableRow = new JMenuItem("Tablas de prestaciones a detalle");
         jmiCfgFirstDayYear = new JMenuItem("Primer día del año");
@@ -303,13 +303,12 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.addSeparator();
         jmPay.add(jmiPayCalculatedAmountMonth);
         jmPay.add(jmiPayCalculatedEstimateIncomeTax);
-        
                 
         jmBenefit = new JMenu("Prestaciones");
         jmiBenefitBenefitVac = new JMenuItem("Control de vacaciones");
         jmiBenefitBenefitBonVac = new JMenuItem("Control de prima vacacional");
         jmiBenefitBenefitBonAnn = new JMenuItem("Control de gratificación anual");
-        jmiBenefitBenefitAdjustmentEarning = new JMenuItem("Incremento de prestaciones");
+        jmiBenefitBenefitAdjustmentEarning = new JMenuItem("Ajustes a prestaciones");
         jmiBenefitLoan = new JMenuItem("Control de créditos y préstamos");
         jmiBenefitLoanAdjustmentEarning = new JMenuItem("Incremento de créditos y préstamos");
         jmiBenefitLoanAdjustmentDeduction = new JMenuItem("Decremento de créditos y préstamos");

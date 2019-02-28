@@ -11,6 +11,7 @@ import erp.mhrs.data.SDataEmployeeRelatives;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsAccounting;
+import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsEmployeeHireLog;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
@@ -23,7 +24,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Date;
 import javax.imageio.ImageIO;
 import sa.gui.util.SUtilConsts;
@@ -105,34 +105,6 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected javax.swing.ImageIcon moXtaImageIconPhoto_n;
     protected javax.swing.ImageIcon moXtaImageIconSignature_n;
     
-    private void createHireLog(Connection connection) {
-        String sql = "";
-
-        try {
-            sql = "INSERT INTO hrs_emp_log_hire VALUES (" +
-                    mnPkEmployeeId + ", " +
-                    "1, " +
-                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastHire) + "', " +
-                    "'', " +
-                    "NULL, " +
-                    "'', " +
-                    (mbActive ? 1 : 0) + ", " +
-                    (mbDeleted ? 1 : 0) + ", " +
-                    SModSysConsts.HRSU_TP_EMP_DIS_NON + ", " +
-                    mnFkUserInsertId + ", " +
-                    mnFkUserUpdateId + ", " +
-                    "NOW()" + ", " +
-                    "NOW()" + " " +
-                    ")";
-
-            connection.createStatement().execute(sql);
-        }
-        catch (java.lang.Exception e) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
-            SLibUtilities.printOutException(this, e);
-        }
-    }
-
     private void createWageLog(Connection connection, Date date) {
         String sql = "";
         ResultSet resultSet = null;
@@ -209,88 +181,6 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                     ")";
 
             connection.createStatement().execute(sql);
-        }
-        catch (java.lang.Exception e) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
-            SLibUtilities.printOutException(this, e);
-        }
-    }
-
-    private void createAccountingEarningConfiguration(final Connection connection) {
-        ResultSet resultSet = null;
-        String sql = "";
-        ArrayList<String> aSql = new ArrayList<String>();
-        
-        try {
-            sql = "SELECT DISTINCT id_ear, b_del FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_EAR) + " " +
-                    "WHERE id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " ";
-
-            resultSet = connection.createStatement().executeQuery(sql);
-            while (resultSet.next()) {
-                sql = "INSERT INTO hrs_acc_ear VALUES (" +
-                        resultSet.getInt("id_ear") + ", " + 
-                        SModSysConsts.HRSS_TP_ACC_EMP + ", " + 
-                        mnPkEmployeeId + ", " + 
-                        resultSet.getInt("b_del") + ", " + 
-                        SModSysConsts.FIN_ACC_NA + ", " + 
-                        "NULL, " +
-                        "NULL, " +
-                        "NULL, " +
-                        "NULL, " +
-                        "NULL, " +
-                        mnFkUserInsertId + ", " + 
-                        mnFkUserUpdateId + ", " + 
-                        "NOW()" + ", " +
-                        "NOW()" + " " +
-                        ")";
-
-                aSql.add(sql);
-            }
-
-            for (String s : aSql) {
-                connection.createStatement().execute(s);
-            }
-        }
-        catch (java.lang.Exception e) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
-            SLibUtilities.printOutException(this, e);
-        }
-    }
-    
-    private void createAccountingDeductionConfiguration(final Connection connection) {
-        ResultSet resultSet = null;
-        String sql = "";
-        ArrayList<String> aSql = new ArrayList<String>();
-        
-        try {
-            sql = "SELECT DISTINCT id_ded, b_del FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_DED) + " " +
-                    "WHERE id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " ";
-
-            resultSet = connection.createStatement().executeQuery(sql);
-            while (resultSet.next()) {
-                sql = "INSERT INTO hrs_acc_ded VALUES (" +
-                        resultSet.getInt("id_ded") + ", " + 
-                        SModSysConsts.HRSS_TP_ACC_EMP + ", " + 
-                        mnPkEmployeeId + ", " + 
-                        resultSet.getInt("b_del") + ", " + 
-                        SModSysConsts.FIN_ACC_NA + ", " + 
-                        "NULL, " +
-                        "NULL, " +
-                        "NULL, " +
-                        "NULL, " +
-                        "NULL, " +
-                        mnFkUserInsertId + ", " + 
-                        mnFkUserUpdateId + ", " + 
-                        "NOW()" + ", " +
-                        "NOW()" + " " +
-                        ")";
-
-                aSql.add(sql);
-            }
-
-            for (String s : aSql) {
-                connection.createStatement().execute(s);
-            }
         }
         catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
@@ -426,6 +316,49 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public javax.swing.ImageIcon getXtaImageIconPhoto_n() { return moXtaImageIconPhoto_n; }
     public javax.swing.ImageIcon getXtaImageIconSignature_n() { return moXtaImageIconSignature_n; }
     
+    /**
+     * Gets effective salary.
+     * Mirrored in erp.mod.hrs.db.SDbEmployee.
+     * @param isFortnightStandard Flag that indicates if fortnights are allways fixed to 15 days.
+     * @return Effective salary.
+     */
+    public double getEffectiveSalary(boolean isFortnightStandard) {
+        double effectiveSalary;
+        
+        if (mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_WEE) {
+            effectiveSalary = mdSalary;
+        }
+        else {
+            int yearDays = isFortnightStandard ? SHrsConsts.YEAR_DAYS_FORTNIGHTS_FIXED : SHrsConsts.YEAR_DAYS;
+            effectiveSalary = SLibUtils.roundAmount((mdWage * SHrsConsts.YEAR_MONTHS) / yearDays);
+        }
+        
+        return effectiveSalary;
+    }
+    
+    /**
+     * Gets settlement salary.
+     * Mirrored in erp.mod.hrs.db.SDbEmployee.
+     * @return Settlement salary.
+     */
+    public double getSettlementSalary() {
+        double settlementSalary;
+        
+        if (mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_WEE) {
+            settlementSalary = mdSalary;
+        }
+        else {
+            settlementSalary = SLibUtils.roundAmount(mdWage / SHrsConsts.MONTH_DAYS_FIXED);
+        }
+        
+        return settlementSalary;
+    }
+    
+    /**
+     * Composes lastname.
+     * Mirrored in erp.mod.hrs.db.SDbEmployee.
+     * @return Composed lastname.
+     */    
     public String composeLastname() {
         return SLibUtils.textTrim(msLastname1 + (msLastname1.isEmpty() ? "" : " ") + msLastname2);
     }

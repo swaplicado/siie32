@@ -1241,26 +1241,19 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             jftDateBirth.setText(SLibUtils.DateFormatDate.format(employee.getDateBirth()));
             jftDateBenefits.setText(SLibUtils.DateFormatDate.format(employee.getDateBenefits()));
             jftDateLastHire.setText(SLibUtils.DateFormatDate.format(employee.getDateLastHire()));
-            if (employee.getDateLastDismiss_n() != null) {
-                jftDateLastDismiss_n.setText(SLibUtils.DateFormatDate.format(employee.getDateLastDismiss_n()));
-            }
-            else {
-                jftDateLastDismiss_n.setText(" / / ");
-            }
-            jtfSalary.setText(SLibUtils.DecimalFormatValue2D.format(employee.getSalary()) + "");
+            jftDateLastDismiss_n.setText(employee.getDateLastDismiss_n() == null ? " / / " : SLibUtils.DateFormatDate.format(employee.getDateLastDismiss_n()));
+            jtfSalary.setText(SLibUtils.DecimalFormatValue2D.format(employee.getSalary()));
             jftDateChangeSalary.setText(SLibUtils.DateFormatDate.format(employee.getDateSalary()));
-            jtfWage.setText(SLibUtils.DecimalFormatValue2D.format(employee.getWage()) + "");
+            jtfWage.setText(SLibUtils.DecimalFormatValue2D.format(employee.getWage()));
             jftDateChangeWage.setText(SLibUtils.DateFormatDate.format(employee.getDateWage()));
-            jtfSalarySscBase.setText(SLibUtils.DecimalFormatValue2D.format(employee.getSalarySscBase()) + "");
+            jtfSalarySscBase.setText(SLibUtils.DecimalFormatValue2D.format(employee.getSalarySscBase()));
             jftDateChangeSalarySscBase.setText(SLibUtils.DateFormatDate.format(employee.getDateSalarySscBase()));
-            
-            if (employee.getFkBankId_n() != SLibConsts.UNDEFINED) {
-                jtfBank.setText(miClient.getSession().readField(SModConsts.HRSS_BANK, new int[] { employee.getFkBankId_n() }, SDbRegistry.FIELD_NAME) + "");
-                jtfBank.setCaretPosition(0);
-            }
+            jtfBank.setText(employee.getFkBankId_n() == SLibConsts.UNDEFINED ? "" : (String) miClient.getSession().readField(SModConsts.HRSS_BANK, new int[] { employee.getFkBankId_n() }, SDbRegistry.FIELD_NAME));
+            jtfBank.setCaretPosition(0);
             jtfBankAccount.setText(employee.getBankAccount());
             jtfBankAccount.setCaretPosition(0);
             jtfSex.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueSexClassId(), employee.getFkCatalogueSexTypeId() }, SDbRegistry.FIELD_NAME) + "");
+            jtfSex.setCaretPosition(0);
             jtfMarital.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueMaritalStatusClassId(), employee.getFkCatalogueMaritalStatusTypeId() }, SDbRegistry.FIELD_NAME) + "");
             jtfMarital.setCaretPosition(0);
             jtfBloodType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_HRS_CAT, new int[] { employee.getFkCatalogueBloodTypeClassId(), employee.getFkCatalogueBloodTypeTypeId() }, SDbRegistry.FIELD_NAME) + "");
@@ -1269,7 +1262,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             jtfEducationType.setCaretPosition(0);
             jtfMwzType.setText(miClient.getSession().readField(SModConsts.HRSU_TP_MWZ, new int[] { employee.getFkMwzTypeId() }, SDbRegistry.FIELD_NAME) + "");
             jtfMwzType.setCaretPosition(0);
-            jtfWorkingHoursDay.setText(employee.getWorkingHoursDay() + "");
+            jtfWorkingHoursDay.setText("" + employee.getWorkingHoursDay());
             
             if (employee.getXtaImageIconPhoto_n() != null) {
                 jlImgPhoto.setIcon(employee.getXtaImageIconPhoto_n());
@@ -1304,7 +1297,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     
     private void renderBenefit(SDataEmployee employee) {
         double paymentDaily = 0;
-        double settlementPaymentDaily = 0;
+        double paymentDailySettlement = 0;
         int benefitAnniv = 0;
         Date dateCutOff = null;
         Date dateBase = null;
@@ -1327,10 +1320,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             leapYear = SLibTimeUtils.isLeapYear(SLibTimeUtils.digestYear(dateCutOff)[0]);
             
             benefitAnniv = SHrsUtils.getSeniorityEmployee(employee.getDateBenefits(), dateCutOff);
-            paymentDaily = (employee.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? employee.getSalary() :
-                (config.isFornightStandard() ? ((employee.getWage() * SHrsConsts.YEAR_MONTHS) / (SHrsConsts.FORNIGHT_FIXED_DAYS * SHrsConsts.YEAR_FORNIGHTS)) :
-                ((employee.getWage() * SHrsConsts.YEAR_MONTHS) / SHrsConsts.YEAR_DAYS)));
-            settlementPaymentDaily = (employee.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? employee.getSalary() : (employee.getWage() / SHrsConsts.MONTH_DAYS_FIXED));
+            paymentDaily = employee.getEffectiveSalary(config.isFortnightStandard());
+            paymentDailySettlement = employee.getSettlementSalary();
             
             if (employee.getDateBenefits().compareTo(SLibTimeUtils.getBeginOfYear(dateCutOff)) >= 0) {
                 dateBaseAnniv = employee.getDateBenefits();
@@ -1385,7 +1376,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             
             jtfVacationsBonusBenefit.setText(SLibUtils.DecimalFormatPercentage2D.format((benefitTableAnniversary == null ? 0 : benefitTableAnniversary.getValue())) + "");
             jtfVacationsBonusPayProp.setText(SLibUtils.DecimalFormatValue2D.format((benefitTableAnniversary == null ? 0 : (daysProportionalVacations * benefitTableAnniversary.getValue() * paymentDaily))) + "");
-            renderSettlement(Integer.parseInt(jtfSeniority.getText()), Integer.parseInt(jtfSeniorityDays.getText()), settlementPaymentDaily, config.getFkMwzReferenceTypeId());
+            renderSettlement(Integer.parseInt(jtfSeniority.getText()), Integer.parseInt(jtfSeniorityDays.getText()), paymentDailySettlement, config.getFkMwzReferenceTypeId());
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -1405,7 +1396,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         double rjdj = 0;
         double disl = 0;
         double dicl = 0;
-        double mwzReferenceWage = SHrsUtils.getRecentMwz(miClient.getSession(), mwzReferenceId, miClient.getSession().getCurrentDate());
+        double mwzReferenceWage = SHrsUtils.getRecentMinimumWage(miClient.getSession(), mwzReferenceId, miClient.getSession().getCurrentDate());
         
         settlement = 
                 Double.parseDouble(jtfAnnualBonusPayProp.getText().replaceAll(",", "")) +

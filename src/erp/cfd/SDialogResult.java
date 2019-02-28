@@ -415,6 +415,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
                             detailMessage += (receiptIssue.getNumberSeries().length() > 0 ? receiptIssue.getNumberSeries() + "-" : "") + number + "   Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                             cfdProcessedOk++;
                             break;
+                            
                         default:
                     }
                 }

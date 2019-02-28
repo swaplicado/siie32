@@ -146,6 +146,7 @@
                     </Component>
                     <Component class="javax.swing.JLabel" name="jlDateCut">
                       <Properties>
+                        <Property name="horizontalAlignment" type="int" value="0"/>
                         <Property name="text" type="java.lang.String" value="Fecha corte:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
@@ -162,16 +163,17 @@
                     </Component>
                     <Component class="javax.swing.JLabel" name="jlSeniority">
                       <Properties>
+                        <Property name="horizontalAlignment" type="int" value="0"/>
                         <Property name="text" type="java.lang.String" value="Antig&#xfc;edad:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[100, 23]"/>
+                          <Dimension value="[75, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntSeniority">
                       <Properties>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[75, 23]"/>
+                          <Dimension value="[50, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -186,7 +188,7 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntSeniorityDays">
                       <Properties>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[75, 23]"/>
+                          <Dimension value="[50, 23]"/>
                         </Property>
                       </Properties>
                     </Component>

@@ -33,7 +33,6 @@ public class SHrsFormerPayroll {
     protected double mdTotalPercepciones;
     protected double mdTotalDeducciones;
     protected double mdTotalRetenciones;
-    protected String msDescripcion;
     protected int mnEmpresaId;
     protected int mnSucursalEmpresaId;
     private String[] masRegimenFiscal;
@@ -49,12 +48,11 @@ public class SHrsFormerPayroll {
         mdTotalPercepciones = 0;
         mdTotalDeducciones = 0;
         mdTotalRetenciones = 0;
-        msDescripcion = "";
         mnEmpresaId= 0;
         mnSucursalEmpresaId= 0;
         masRegimenFiscal = null;
 
-        moChildReceipts = new ArrayList<SHrsFormerPayrollReceipt>();
+        moChildReceipts = new ArrayList<>();
     }
 
     public SHrsFormerPayroll(SClientInterface client) {
@@ -71,7 +69,6 @@ public class SHrsFormerPayroll {
     public void setTotalPercepciones(double d) { mdTotalPercepciones = d; }
     public void setTotalDeducciones(double d) { mdTotalDeducciones = d; }
     public void setTotalRetenciones(double d) { mdTotalRetenciones = d; }
-    public void setDescripcion(String s) { msDescripcion = s; }
     public void setEmpresaId(int n) { mnEmpresaId = n; }
     public void setSucursalEmpresaId(int n) { mnSucursalEmpresaId = n; }
     public void setRegimenFiscal(String[] s) { masRegimenFiscal = s; }
@@ -84,7 +81,6 @@ public class SHrsFormerPayroll {
     public double getTotalPercepciones() { return mdTotalPercepciones; }
     public double getTotalDeducciones() { return mdTotalDeducciones; }
     public double getTotalRetenciones() { return mdTotalRetenciones; }
-    public String getDescripcion() { return msDescripcion; }
     public int getEmpresaId() { return mnEmpresaId; }
     public int getSucursalEmpresaId() { return mnSucursalEmpresaId; }
     public String[] getRegimenFiscal() { return masRegimenFiscal; }
@@ -230,7 +226,7 @@ public class SHrsFormerPayroll {
                             dTotalIncome += ((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteGravado().getDouble() +
                                             ((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttImporteExento().getDouble();
 
-                            payrollReceipt.getChildPayrollConcept().add(payrollConcept);
+                            payrollReceipt.getChildPayrollConcepts().add(payrollConcept);
 
                             if (((cfd.ver3.nom11.DElementNomina) element).getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger() == SModSysConsts.HRSS_TP_EAR_OVR_TME) {
                                 payrollExtraTime = new SHrsFormerPayrollExtraTime();
@@ -288,7 +284,7 @@ public class SHrsFormerPayroll {
                             dTotalDeductions += ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteGravado().getDouble() +
                                             ((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttImporteExento().getDouble();
 
-                            payrollReceipt.getChildPayrollConcept().add(payrollConcept);
+                            payrollReceipt.getChildPayrollConcepts().add(payrollConcept);
 
                             if (SLibUtils.belongsTo(((cfd.ver3.nom11.DElementNomina) element).getEltDeducciones().getEltHijosDeduccion().get(i).getAttTipoDeduccion().getInteger(), new int[] { SModSysConsts.HRSS_TP_DED_DIS, SModSysConsts.HRSS_TP_DED_ABS })) {
                                 for (int j = 0; j < ((cfd.ver3.nom11.DElementNomina) element).getEltIncapacidades().getEltHijosIncapacidad().size(); j++) {

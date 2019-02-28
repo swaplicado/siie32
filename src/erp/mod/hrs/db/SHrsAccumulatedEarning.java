@@ -4,6 +4,8 @@
  */
 package erp.mod.hrs.db;
 
+import sa.lib.SLibUtils;
+
 /**
  *
  * @author Sergio Flores
@@ -16,8 +18,8 @@ public class SHrsAccumulatedEarning {
 
     public SHrsAccumulatedEarning(int earning, double accummulated, double taxable) {
         mnEarningId = earning;
-        mdTaxable = taxable;
         mdAcummulated = accummulated;
+        mdTaxable = taxable;
     }
 
     public void setEarningId(int n) { mnEarningId = n; }
@@ -27,5 +29,5 @@ public class SHrsAccumulatedEarning {
     public int getEarningId() { return mnEarningId; }
     public double getAcummulated() { return mdAcummulated; }
     public double getTaxable() { return mdTaxable; }
-    public double getExemption() { return mdAcummulated - mdTaxable; }
+    public double getExemption() { return SLibUtils.roundAmount(mdAcummulated - mdTaxable); }
 }

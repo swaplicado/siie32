@@ -580,51 +580,48 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     private static boolean validateReceiptsConcepts(SHrsFormerPayrollReceipt receipt, SHrsFormerPayrollReceipt receiptXml) {
-       ArrayList<SHrsFormerPayrollConcept> payrollConceptsXml = null;
-       boolean isConsistent = true;
-       boolean isFound = false;
-       int i = 0;
-
-       payrollConceptsXml = receiptXml.getChildPayrollConcept();
-
-       if (receipt.getChildPayrollConcept().size() != payrollConceptsXml.size()) {
-           isConsistent = false;
+       boolean consistent = true;
+       
+       ArrayList<SHrsFormerPayrollConcept> payrollConceptsXml = receiptXml.getChildPayrollConcepts();
+       
+       if (receipt.getChildPayrollConcepts().size() != payrollConceptsXml.size()) {
+           consistent = false;
        }
        else {
-            for (SHrsFormerPayrollConcept concept: receipt.getChildPayrollConcept()) {
-                isFound = false;
-                isConsistent = true;
-                i = 0;
+            for (SHrsFormerPayrollConcept concept: receipt.getChildPayrollConcepts()) {
+                boolean found = false;
+                int i = 0;
+                consistent = true;
 
                 for (SHrsFormerPayrollConcept conceptXml: payrollConceptsXml) {
                     if (concept.getPkTipoConcepto() == conceptXml.getPkTipoConcepto() && concept.getPkSubtipoConcepto() == conceptXml.getPkSubtipoConcepto() &&
-                            concept.getClaveOficial() == conceptXml.getClaveOficial() && concept.getClaveEmpresa().compareTo(conceptXml.getClaveEmpresa()) == 0 && !conceptXml.getExtIsFound()) {
-                        isFound = true;
-                        isConsistent = validateReceiptsIncident(concept, conceptXml) &&
+                            concept.getClaveOficial() == conceptXml.getClaveOficial() && concept.getClaveEmpresa().compareTo(conceptXml.getClaveEmpresa()) == 0 && !conceptXml.isAuxFound()) {
+                        found = true;
+                        consistent = validateReceiptsIncident(concept, conceptXml) &&
                                 concept.getConcepto().compareTo(conceptXml.getConcepto()) == 0 &&
                                 concept.getTotalGravado() == conceptXml.getTotalGravado() && concept.getTotalExento() == conceptXml.getTotalExento() &&
                                 (SLibUtils.belongsTo(concept.getPkSubtipoConcepto(), new int[] { SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1], SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_TRIPLE[1] }) ?
                                 validateReceiptsExtraTime(concept.getChildPayrollExtraTimes(), conceptXml.getChildPayrollExtraTimes()) : true);
                     }
 
-                    if (isFound && isConsistent) {
-                        payrollConceptsXml.get(i).setExtIsFound(isFound);
+                    if (found && consistent) {
+                        payrollConceptsXml.get(i).setAuxFound(found);
                         break;
                     }
                     i++;
                 }
 
-                if (!isFound) {
-                    isConsistent = false;
+                if (!found) {
+                    consistent = false;
                 }
 
-                if (!isConsistent) {
+                if (!consistent) {
                     break;
                 }
             }
        }
 
-        return isConsistent;
+        return consistent;
     }
 
     private static boolean validateReceiptsExtraTime(SHrsFormerPayrollExtraTime extraTime, SHrsFormerPayrollExtraTime extraTimeXml) {
@@ -4740,7 +4737,7 @@ public abstract class SCfdUtils implements Serializable {
                 "FROM trn_cfd " + sqlWhere;
 
         resultSet = client.getSession().getStatement().executeQuery(sql);
-        while (resultSet.next()) {
+        if (resultSet.next()) {
             cfd = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT);
         }
 

@@ -7,6 +7,9 @@ package erp.mtrn.data;
 
 import cfd.DCfdUtils;
 import cfd.DElement;
+import cfd.ver3.nom12.DElementOtroPago;
+import cfd.ver3.nom12.DElementOtrosPagos;
+import cfd.ver33.DCfdi33Catalogs;
 import cfd.ver33.DElementCfdiRelacionado;
 import cfd.ver33.DElementConcepto;
 import erp.cfd.SCfdConsts;
@@ -36,7 +39,6 @@ import erp.mod.hrs.db.SHrsUtils;
 import erp.print.SDataConstantsPrint;
 import java.io.ByteArrayInputStream;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -1035,8 +1037,6 @@ public class SCfdPrint {
 
         map = miClient.createReportParams();
 
-        SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
         switch (subtypeCfd) {
             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
                 oFormerPayroll = new SDataFormerPayroll();
@@ -1109,9 +1109,9 @@ public class SCfdPrint {
                 //map.put("TipoRegimen", SCfdConsts.RegimenMap.get(((cfd.ver3.nom11.DElementNomina) element).getAttTipoRegimen().getInteger()));
                 map.put("TipoRegimen", miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { ((cfd.ver3.nom11.DElementNomina) element).getAttTipoRegimen().getInteger() }, SDbRegistry.FIELD_NAME));
                 map.put("NumSeguridadSocial", ((cfd.ver3.nom11.DElementNomina) element).getAttNumSeguridadSocial().getString());
-                map.put("FechaPago", oSimpleDateFormat.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaPago().getDate()));
-                map.put("FechaInicialPago", oSimpleDateFormat.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaInicialPago().getDate()));
-                map.put("FechaFinalPago", oSimpleDateFormat.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaFinalPago().getDate()));
+                map.put("FechaPago", SLibUtils.DateFormatDate.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaPago().getDate()));
+                map.put("FechaInicialPago", SLibUtils.DateFormatDate.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaInicialPago().getDate()));
+                map.put("FechaFinalPago", SLibUtils.DateFormatDate.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaFinalPago().getDate()));
                 map.put("NumDiasNoLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysNotWorked() : payrollReceipt.getDaysNotWorked_r());
                 map.put("NumDiasLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysWorked() : payrollReceipt.getDaysWorked()); // XXX Optional
                 map.put("NumDiasPagar", 0d); // Calculate?, navalos (2014-03-13)
@@ -1122,7 +1122,7 @@ public class SCfdPrint {
                 if (((cfd.ver3.nom11.DElementNomina) element).getAttBanco().getInteger() > 0) {
                     map.put("Banco", miClient.getSession().readField(SModConsts.HRSS_BANK, new int[] { ((cfd.ver3.nom11.DElementNomina) element).getAttBanco().getInteger() }, SDbRegistry.FIELD_NAME));
                 }
-                map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaInicioRelLaboral().getDate()));
+                map.put("FechaInicioRelLaboral", SLibUtils.DateFormatDate.format(((cfd.ver3.nom11.DElementNomina) element).getAttFechaInicioRelLaboral().getDate()));
                 map.put("Antiguedad", ((cfd.ver3.nom11.DElementNomina) element).getAttAntiguedad().getInteger());
                 map.put("Puesto", ((cfd.ver3.nom11.DElementNomina) element).getAttPuesto().getString());
                 map.put("TipoContrato", ((cfd.ver3.nom11.DElementNomina) element).getAttTipoContrato().getString());
@@ -1332,8 +1332,6 @@ public class SCfdPrint {
 
         map = miClient.createReportParams();
 
-        SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
         switch (subtypeCfd) {
             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
                 oFormerPayroll = new SDataFormerPayroll();
@@ -1401,9 +1399,9 @@ public class SCfdPrint {
             if (element.getName().compareTo("nomina12:Nomina") == 0) {
 
                 map.put("TipoNomina", ((cfd.ver3.nom12.DElementNomina) element).getAttTipoNomina().getString());
-                map.put("FechaPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaPago().getDate()));
-                map.put("FechaInicialPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaInicialPago().getDate()));
-                map.put("FechaFinalPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaFinalPago().getDate()));
+                map.put("FechaPago", SLibUtils.DateFormatDate.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaPago().getDate()));
+                map.put("FechaInicialPago", SLibUtils.DateFormatDate.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaInicialPago().getDate()));
+                map.put("FechaFinalPago", SLibUtils.DateFormatDate.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaFinalPago().getDate()));
                 map.put("NumDiasPagados", ((cfd.ver3.nom12.DElementNomina) element).getAttNumDiasPagados().getDouble());
                 map.put("NumDiasNoLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysNotWorked() : payrollReceipt.getDaysNotWorked_r());
                 map.put("NumDiasLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysWorked() : payrollReceipt.getDaysWorked()); // XXX Optional
@@ -1426,15 +1424,15 @@ public class SCfdPrint {
                     map.put("NumSeguridadSocial", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttNumSeguridadSocial().getString());
                     
                     if (((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate() != null) {
-                        map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate()));
+                        map.put("FechaInicioRelLaboral", SLibUtils.DateFormatDate.format(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate()));
                     }
                     
                     if (!((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString().isEmpty()) {
                         antigüedad = ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString();
-                        antigüedad = antigüedad.substring(1, antigüedad.length() - 1);
+                        antigüedad = antigüedad.substring(1, antigüedad.length() - 1); // regex: /P[0-9]+W/
                     }
                     
-                    map.put("Antiguedad", SLibUtils.parseInt(antigüedad));
+                    map.put("Antiguedad", SLibUtils.parseInt(antigüedad)); // seniority in absolute months from most recent hiring date
                     map.put("TipoContrato", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoContrato().getString());
                     // Sindicalizado 
                     map.put("TipoJornada", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoJornada().getString());
@@ -1664,8 +1662,6 @@ public class SCfdPrint {
 
         map = miClient.createReportParams();
 
-        SimpleDateFormat oSimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
         switch (subtypeCfd) {
             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
                 oFormerPayroll = new SDataFormerPayroll();
@@ -1733,9 +1729,9 @@ public class SCfdPrint {
         for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
             if (element.getName().compareTo("nomina12:Nomina") == 0) {
                 map.put("TipoNomina", ((cfd.ver3.nom12.DElementNomina) element).getAttTipoNomina().getString());
-                map.put("FechaPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaPago().getDate()));
-                map.put("FechaInicialPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaInicialPago().getDate()));
-                map.put("FechaFinalPago", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaFinalPago().getDate()));
+                map.put("FechaPago", SLibUtils.DateFormatDate.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaPago().getDate()));
+                map.put("FechaInicialPago", SLibUtils.DateFormatDate.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaInicialPago().getDate()));
+                map.put("FechaFinalPago", SLibUtils.DateFormatDate.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaFinalPago().getDate()));
                 map.put("NumDiasPagados", ((cfd.ver3.nom12.DElementNomina) element).getAttNumDiasPagados().getDouble());
                 map.put("NumDiasNoLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysNotWorked() : payrollReceipt.getDaysNotWorked_r());
                 map.put("NumDiasLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysWorked() : payrollReceipt.getDaysWorked()); // XXX Optional
@@ -1758,15 +1754,15 @@ public class SCfdPrint {
                     map.put("NumSeguridadSocial", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttNumSeguridadSocial().getString());
                     
                     if (((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate() != null) {
-                        map.put("FechaInicioRelLaboral", oSimpleDateFormat.format(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate()));
+                        map.put("FechaInicioRelLaboral", SLibUtils.DateFormatDate.format(((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttFechaInicioRelLaboral().getDate()));
                     }
                     
                     if (!((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString().isEmpty()) {
                         antigüedad = ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttAntiguedad().getString();
-                        antigüedad = antigüedad.substring(1, antigüedad.length() - 1);
+                        antigüedad = antigüedad.substring(1, antigüedad.length() - 1); // regex: /P[0-9]+W/
                     }
                     
-                    map.put("Antiguedad", SLibUtils.parseInt(antigüedad));
+                    map.put("Antiguedad", SLibUtils.parseInt(antigüedad)); // seniority in absolute months from most recent hiring date
                     map.put("TipoContrato", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoContrato().getString());
                     // Sindicalizado 
                     map.put("TipoJornada", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttTipoJornada().getString());
@@ -1847,13 +1843,20 @@ public class SCfdPrint {
 
                 // Other payment:
                 
-                if (((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos() != null) {
-                    for (i = 0; i < ((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().size(); i++) {
+                DElementOtrosPagos otrosPagos = ((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos();
+                if (otrosPagos != null) {
+                    for (i = 0; i < otrosPagos.getEltHijosOtroPago().size(); i++) {
+                        DElementOtroPago otroPago = otrosPagos.getEltHijosOtroPago().get(i);
+                        
                         aPercepciones.add(""); // is blank because it is not earning
-                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().get(i).getAttClave().getString());
-                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().get(i).getAttConcepto().getString());
-                        aPercepciones.add(((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().get(i).getAttImporte().getDouble());
+                        aPercepciones.add(otroPago.getAttClave().getString());
+                        aPercepciones.add(otroPago.getAttConcepto().getString());
+                        aPercepciones.add(otroPago.getAttImporte().getDouble());
                         aPercepciones.add(null); // pending to be used, navalos (2014-03-13)
+                        
+                        if (otroPago.getAttTipoOtroPago().getString().equals(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo)) {
+                            map.put("dSubsidioCausado", otroPago.getEltSubsidioEmpleo().getAttSubsidioCausado().getDouble());
+                        }
                     }
                 }
                 
@@ -2002,7 +2005,7 @@ public class SCfdPrint {
                         payrollReceipt = new SDbPayrollReceipt();
                         payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
                         
-                        map.put("sCfdiFolio", payrollReceipt.getPayrollReceiptIssues().getPayrollReceiptIssueNumber());
+                        map.put("sCfdiFolio", payrollReceipt.getPayrollReceiptIssue().getPayrollReceiptIssueNumber());
                         break;
                         
                     default:

@@ -20,6 +20,11 @@ import sa.lib.gui.SGuiSession;
  * @author Néstor Ávalos, Sergio Flores, Juan Barajas, Sergio Flores
  */
 public class SHrsPayrollDataProvider implements SHrsDataProvider {
+    
+    private static final int TAX = 1;
+    private static final int TAX_ALT = 2; // Articule 174 RLISR
+    private static final int COMP_TAX = 1;
+    private static final int COMP_TAX_SUB = 2;
 
     private SGuiSession moSession;
 
@@ -425,7 +430,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                     hrsPayrollReceiptEarning.setReceiptEarning(payrollReceiptEarning);
                     hrsPayrollReceiptEarning.setHrsReceipt(hrsPayrollReceipt);
 
-                    hrsPayrollReceipt.getHrsEarnings().add(hrsPayrollReceiptEarning);
+                    hrsPayrollReceipt.getHrsReceiptEarnings().add(hrsPayrollReceiptEarning);
                 }
 
                 // Obtain payrollReceiptDeduction:
@@ -444,7 +449,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                     hrsPayrollReceiptDeduction.setReceiptDeduction(payrollReceiptDeduction);
                     hrsPayrollReceiptDeduction.setHrsReceipt(hrsPayrollReceipt);
 
-                    hrsPayrollReceipt.getHrsDeductions().add(hrsPayrollReceiptDeduction);
+                    hrsPayrollReceipt.getHrsReceiptDeductions().add(hrsPayrollReceiptDeduction);
                 }
 
                 // Obtain absenceConsumption:
@@ -461,7 +466,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 hrsPayrollReceipt.setReceipt(payrollReceipt);
                 //hrsPayrollReceipt.setReceipt(hrsPayroll.createPayrollReceipt(hrsEmployee)); XXX (jbarajas, 2016-08-16) slowly open payroll
                 hrsPayrollReceipt.getReceipt().setRegistryNew(payrollReceipt.isRegistryNew());
-                hrsPayrollReceipt.getReceipt().setPayrollReceiptIssue(payrollReceipt.getPayrollReceiptIssues());
+                hrsPayrollReceipt.getReceipt().setPayrollReceiptIssue(payrollReceipt.getPayrollReceiptIssue());
                 /* XXX (jbarajas, 2015-10-07) remove by new table
                 hrsPayrollReceipt.getReceipt().setDbmsDataCfd(payrollReceipt.getDbmsDataCfd());
                 hrsPayrollReceipt.getReceipt().setNumberSeries(payrollReceipt.getNumberSeries());
@@ -680,57 +685,65 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return businessdays;
     }
 
-    private double getEmployeeAccumulatedTaxableEarnings(final int payrollId, final int employeeId, final int periodYear, final Date dateEnd) throws Exception {
-        double accumulatedTaxableEarnings = 0;
-        String sql;
-        ResultSet resultSet = null;
-
-        sql = "SELECT SUM(pre.amt_taxa) AS f_taxa " +
-            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
-            "p.id_pay = pr.id_pay " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON " +
-            "pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS ear ON " + // XXX (jbarajas, 2016-04-06) articule 174 RLISR
-            "ear.id_ear = pre.fk_ear " +
-            "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND  " +
-            "p.fis_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' " +
-            "AND pre.b_alt_tax = 0 " + // XXX (jbarajas, 2016-04-06) articule 174 RLISR
-            "GROUP BY pr.id_emp " +
-            "ORDER BY pr.id_emp ";
-        resultSet = moSession.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            accumulatedTaxableEarnings = resultSet.getDouble("f_taxa");
+    private double getEmployeeAccumulatedTaxableEarnings(final int payrollId, final int employeeId, final int fiscalYear, final Date payrollDateEnd, int taxType) throws Exception {
+        double earnings = 0;
+        String sqlAltTax;
+        
+        switch (taxType) {
+            case TAX:
+                sqlAltTax = "0";
+                break;
+            case TAX_ALT:
+                sqlAltTax = "1";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        return accumulatedTaxableEarnings;
+        String sql = "SELECT SUM(pre.amt_taxa) " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS ear ON ear.id_ear = pre.fk_ear " +
+                "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND " +
+                "p.fis_year = " + fiscalYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(payrollDateEnd) + "' AND " +
+                "pre.b_alt_tax = " + sqlAltTax + " "; // Articule 174 RLISR
+        ResultSet resultSet = moSession.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            earnings = resultSet.getDouble(1);
+        }
+
+        return earnings;
     }
     
-    // XXX (jbarajas, 2016-04-06) articule 174 RLISR
-    private double getEmployeeAccumulatedTaxableEarningsAlt(final int payrollId, final int employeeId, final int periodYear, final Date dateEnd) throws Exception {
-        double accumulatedTaxableEarnings = 0;
-        String sql;
-        ResultSet resultSet = null;
-
-        sql = "SELECT SUM(pre.amt_taxa) AS f_taxa " +
-            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
-            "p.id_pay = pr.id_pay " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON " +
-            "pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS ear ON " +
-            "ear.id_ear = pre.fk_ear " +
-            "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND  " +
-            "p.fis_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' " +
-            "AND pre.b_alt_tax = 1 " +
-            "GROUP BY pr.id_emp " +
-            "ORDER BY pr.id_emp ";
-        resultSet = moSession.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            accumulatedTaxableEarnings = resultSet.getDouble("f_taxa");
+    private double getEmployeeAnnualCompensation(final int payrollId, final int employeeId, final int fiscalYear, final Date payrollDateEnd, int compensationType) throws Exception {
+        double compensation = 0;
+        String sqlCompensation;
+        
+        switch (compensationType) {
+            case COMP_TAX:
+                sqlCompensation = "pr.pay_tax_comp";
+                break;
+            case COMP_TAX_SUB:
+                sqlCompensation = "pr.pay_tax_sub_comp";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        return accumulatedTaxableEarnings;
+        String sql = "SELECT SUM(" + sqlCompensation + ") " +
+            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
+            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay " +
+            "WHERE NOT p.b_del AND NOT pr.b_del AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND " +
+            "p.fis_year = " + fiscalYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(payrollDateEnd) + "' " +
+            "GROUP BY pr.id_emp " +
+            "ORDER BY pr.id_emp ";
+        ResultSet resultSet = moSession.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            compensation = resultSet.getDouble(1);
+        }
+
+        return compensation;
     }
     
     private ArrayList<SHrsAccumulatedEarning> getEmployeeAccumulatedEarnings(final int payrollId, final int employeeId, final int periodYear, final Date dateStart, final Date dateEnd,
@@ -815,69 +828,53 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         hrsPayroll.setPayroll(payroll);
         hrsPayroll.setLastPayrollPeriod(isLastPayrollForCredits(payroll.getPkPayrollId(), payroll.getPeriodYear(), payroll.getPeriod(), payroll.getFkPaymentTypeId()));
 
-        // LoanTypeAdjustment:
-
+        // Adjustments by loan type:
         hrsPayroll.getLoanTypeAdjustment().addAll(getLoanTypeAdjustment());
 
-        // Uma:
-
+        // UMA:
         hrsPayroll.getUmas().addAll(readUmas());
         
         // Holidays:
-
         hrsPayroll.getHolidays().addAll(getHolidays());
 
         // Tax tables:
-
         hrsPayroll.getTaxTables().addAll(getTaxTables());
 
         // Tax subsidy tables:
-
         hrsPayroll.getTaxSubsidyTables().addAll(getTaxSubsidyTables());
 
         // SS Contribution tables:
-
         hrsPayroll.getSsContributionTables().addAll(getSsContributionTables());
         
         // Benefit tables:
-
         hrsPayroll.getBenefitTables().addAll(getBenefitTables());
         
         // Benefit tables:
-
         hrsPayroll.getBenefitTablesAnniversarys().addAll(getBenefitTableAnniversarys((getBenefitTables())));
 
-        // Mwz type wages:
-
+        // MWZ type wages:
         hrsPayroll.getMwzTypeWages().addAll(getMwzTypeWages());
 
         // Earnings:
-
         hrsPayroll.getEarnigs().addAll(getEarnings());
 
         // Deductions:
-
         hrsPayroll.getDeductions().addAll(getDeductions());
 
         // Automatic earnings:
-
         hrsPayroll.getAutomaticEarnings().addAll(getAutomaticEarnings(payroll.getFkPaymentTypeId()));
 
         // Automatic deductions:
-
         hrsPayroll.getAutomaticDeductions().addAll(getAutomaticDeductions(payroll.getFkPaymentTypeId()));
 
         // Employees:
-
         hrsPayroll.getEmployees().addAll(getEmployees(payroll.getFkPaymentTypeId(), payroll.getPkPayrollId()));
 
         // Receipts:
-
-        hrsPayroll.getReceipts().addAll(getHrsPayrollReceipts(hrsPayroll, payroll.getPkPayrollId(), isCopy, payroll.isRegistryNew()));
+        hrsPayroll.getHrsReceipts().addAll(getHrsPayrollReceipts(hrsPayroll, payroll.getPkPayrollId(), isCopy, payroll.isRegistryNew()));
 
         // Preserve data provider:
-
-        hrsPayroll.setPayrollDataProvider(this);
+        hrsPayroll.setHrsPayrollDataProvider(this);
 
         return hrsPayroll;
     }
@@ -898,8 +895,10 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         periodStart = SLibTimeUtils.getBeginOfYear(SLibTimeUtils.createDate(fiscalYear));
         periodEnd = SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)).compareTo(dateEnd) < 0 ? SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)) : dateEnd;
         hrsEmployee.setDaysHiredAnnual(getEmployeeHireDays(getEmployeeHireLogs(employeeId, periodStart, periodEnd), periodStart, periodEnd));
-        hrsEmployee.setAccumulatedTaxableEarning(getEmployeeAccumulatedTaxableEarnings(payrollId, employeeId, fiscalYear, periodEnd));
-        hrsEmployee.setAccumulatedTaxableEarningAlt(getEmployeeAccumulatedTaxableEarningsAlt(payrollId, employeeId, fiscalYear, periodEnd));
+        hrsEmployee.setAccumulatedTaxableEarning(getEmployeeAccumulatedTaxableEarnings(payrollId, employeeId, fiscalYear, periodEnd, TAX));
+        hrsEmployee.setAccumulatedTaxableEarningAlt(getEmployeeAccumulatedTaxableEarnings(payrollId, employeeId, fiscalYear, periodEnd, TAX_ALT));
+        hrsEmployee.setAnnualTaxCompensated(getEmployeeAnnualCompensation(payrollId, employeeId, fiscalYear, periodEnd, COMP_TAX));
+        hrsEmployee.setAnnualTaxSubsidyCompensated(getEmployeeAnnualCompensation(payrollId, employeeId, fiscalYear, periodEnd, COMP_TAX_SUB));
         
         hrsEmployee.setDaysHiredPayroll(getEmployeeHireDays(hrsEmployee.getEmployeeHireLogs(), dateStart, dateEnd));
         hrsEmployee.setBusinessDays(getEmployeeBusinessDays(hrsEmployee.getEmployeeHireLogs(), pHrsEmployee.getEmployee().getFkPaymentTypeId(), dateStart, dateEnd));
@@ -910,7 +909,6 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         hrsEmployee.getYearHrsAccumulatedDeductions().addAll(getEmployeeAccumulatedDeductions(payrollId, employeeId, payrollYear, dateStart, dateEnd, SLibConsts.UNDEFINED, false));
         hrsEmployee.getYearHrsAccumulatedDeductionsByType().addAll(getEmployeeAccumulatedDeductions(payrollId, employeeId, payrollYear, dateStart, dateEnd, taxComputationType, true));
         hrsEmployee.getYearHrsAccumulatedDeductionsByTaxComputation().addAll(getEmployeeAccumulatedDeductions(payrollId, employeeId, payrollYear, dateStart, dateEnd, taxComputationType, false));
-        //hrsEmployee.getYearPayrollReceiptDays().addAll(getYearPayrollReceiptDays(payrollId, employeeId, periodYear, dateStart, dateEnd, taxComputationType));
 
         return hrsEmployee;
     }

@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -27,7 +26,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, ActionListener, ItemListener {
 
@@ -62,7 +61,7 @@ public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, Act
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        gpbFilter = new javax.swing.ButtonGroup();
+        bgFilter = new javax.swing.ButtonGroup();
         jtbActive = new javax.swing.JToggleButton();
         jtbInactive = new javax.swing.JToggleButton();
         jtbAll = new javax.swing.JToggleButton();
@@ -73,23 +72,26 @@ public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, Act
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        gpbFilter.add(jtbActive);
-        jtbActive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif"))); // NOI18N
+        bgFilter.add(jtbActive);
+        jtbActive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif"))); // NOI18N
         jtbActive.setSelected(true);
         jtbActive.setToolTipText("Ver activos");
         jtbActive.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbActive.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif"))); // NOI18N
         add(jtbActive);
 
-        gpbFilter.add(jtbInactive);
-        jtbInactive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif"))); // NOI18N
+        bgFilter.add(jtbInactive);
+        jtbInactive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif"))); // NOI18N
         jtbInactive.setToolTipText("Ver inactivos");
         jtbInactive.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbInactive.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif"))); // NOI18N
         add(jtbInactive);
 
-        gpbFilter.add(jtbAll);
-        jtbAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
+        bgFilter.add(jtbAll);
+        jtbAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif"))); // NOI18N
         jtbAll.setToolTipText("Ver todos");
         jtbAll.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbAll.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
         add(jtbAll);
 
         moKeyFilter1.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -111,7 +113,7 @@ public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, Act
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup gpbFilter;
+    private javax.swing.ButtonGroup bgFilter;
     private javax.swing.JButton jbClearFilter1;
     private javax.swing.JButton jbClearFilter2;
     private javax.swing.JToggleButton jtbActive;
@@ -130,15 +132,12 @@ public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, Act
         
         if (jtbActive.isSelected()) {
             nFilterEmpStatus = EMP_STATUS_ACT;
-            jtbActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
         }
         else if (jtbInactive.isSelected()) {
             nFilterEmpStatus = EMP_STATUS_INA;
-            jtbInactive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif")));
         }
         else if (jtbAll.isSelected()) {
             nFilterEmpStatus = EMP_STATUS_ALL;
-            jtbAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")));
         }
         moPaneView.putFilter(EMP_STATUS, new SGridFilterValue(EMP_STATUS, SGridConsts.FILTER_DATA_TYPE_INT, nFilterEmpStatus));
         jbClearFilter1.setEnabled(moKeyFilter1.getSelectedIndex() > 0);
@@ -226,9 +225,8 @@ public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, Act
         jbClearFilter2.setEnabled(moKeyFilter2.getSelectedIndex() > 0);
         moPaneView.getFiltersMap().put(mnFilterType2, new SGridFilterValue(mnFilterType2, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, moKeyFilter2.getSelectedIndex() <= 0 ? null : key));
         
-        jtbActive.setSelected(true);
+        jtbActive.setSelected(true); // by default, allways show first active registries
         moPaneView.getFiltersMap().put(EMP_STATUS, new SGridFilterValue(EMP_STATUS, SGridConsts.FILTER_DATA_TYPE_INT, EMP_STATUS_ACT));
-        actionEmpStatusStateChange();
         
         moKeyFilter1.addItemListener(this);
         moKeyFilter2.addItemListener(this);
@@ -269,8 +267,7 @@ public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, Act
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 JToggleButton toggleButton = (JToggleButton) e.getSource();
 
-                if (toggleButton == jtbActive || toggleButton == jtbInactive ||
-                        toggleButton == jtbAll) {
+                if (toggleButton == jtbActive || toggleButton == jtbInactive || toggleButton == jtbAll) {
                     actionEmpStatusStateChange();
                 }
             }

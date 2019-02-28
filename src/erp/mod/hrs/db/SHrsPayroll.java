@@ -20,7 +20,7 @@ public class SHrsPayroll {
     protected SDbConfig moConfig;
     protected SDbWorkingDaySettings moWorkingDaySettings;
     protected SDbPayroll moPayroll;
-    protected SHrsPayrollDataProvider moPayrollDataProvider;
+    protected SHrsPayrollDataProvider moHrsPayrollDataProvider;
 
     protected ArrayList<SDbLoanTypeAdjustment> maLoanTypeAdjustment;
     protected ArrayList<SDbUma> maUmas;
@@ -36,7 +36,7 @@ public class SHrsPayroll {
     protected ArrayList<SDbAutomaticEarning> maAutomaticEarnings;
     protected ArrayList<SDbAutomaticDeduction> maAutomaticDeductions;
     protected ArrayList<SDbEmployee> maEmployees;
-    protected ArrayList<SHrsPayrollReceipt> maReceipts;
+    protected ArrayList<SHrsPayrollReceipt> maHrsReceipts;
 
     protected boolean mbIsLastPayrollPeriod;
     
@@ -44,7 +44,7 @@ public class SHrsPayroll {
         moConfig = null;
         moWorkingDaySettings = null;
         moPayroll = null;
-        moPayrollDataProvider = null;
+        moHrsPayrollDataProvider = null;
 
         maLoanTypeAdjustment = new ArrayList<>();
         maUmas = new ArrayList<>();
@@ -60,7 +60,7 @@ public class SHrsPayroll {
         maAutomaticEarnings = new ArrayList<>();
         maAutomaticDeductions = new ArrayList<>();
         maEmployees = new ArrayList<>();
-        maReceipts = new ArrayList<>();
+        maHrsReceipts = new ArrayList<>();
         mbIsLastPayrollPeriod = false;
     }
 
@@ -197,7 +197,7 @@ public class SHrsPayroll {
                 double perc = hrsBenefitTableAnniversaryVacBon == null ? 0d : hrsBenefitTableAnniversaryVacBon.getValue();
                 double benefit = hrsPayrollReceipt.calculateBenefit(dbEarning, days, perc);
                 
-                ArrayList<SHrsBenefit> hrsBenefits = SHrsUtils.readHrsBenefits(moPayrollDataProvider.getSession(), employee, SModSysConsts.HRSS_TP_BEN_VAC_BON, benefitAnniv, benefitYear, moPayroll.getPkPayrollId(), hrsBenefitTableAnniversarysVacBon, hrsBenefitTableAnniversarysVac, hrsPayrollReceipt.getReceipt().getPaymentDaily());
+                ArrayList<SHrsBenefit> hrsBenefits = SHrsUtils.readHrsBenefits(moHrsPayrollDataProvider.getSession(), employee, SModSysConsts.HRSS_TP_BEN_VAC_BON, benefitAnniv, benefitYear, moPayroll.getPkPayrollId(), hrsBenefitTableAnniversarysVacBon, hrsBenefitTableAnniversarysVac, hrsPayrollReceipt.getReceipt().getPaymentDaily());
 
                 double daysPayed = 0;
                 double benefitPayed = 0;
@@ -334,7 +334,7 @@ public class SHrsPayroll {
                             }
                         }
 
-                        amountLoan = SHrsUtils.computeAmoutLoan(hrsPayrollReceipt, loan);
+                        amountLoan = SHrsUtils.computeAmountLoan(hrsPayrollReceipt, loan);
 
                         if (SLibUtils.belongsTo(loan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOA_COM, SModSysConsts.HRSS_TP_LOAN_LOA_UNI, SModSysConsts.HRSS_TP_LOAN_LOA_TPS })) {
                             balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsPayrollReceipt.getHrsEmployee());
@@ -474,7 +474,7 @@ public class SHrsPayroll {
     public void setConfig(SDbConfig o) { moConfig = o; }
     public void setWorkingDaySettings(SDbWorkingDaySettings o) { moWorkingDaySettings = o; }
     public void setPayroll(SDbPayroll o) { moPayroll = o; }
-    public void setPayrollDataProvider(SHrsPayrollDataProvider o) { moPayrollDataProvider = o; }
+    public void setHrsPayrollDataProvider(SHrsPayrollDataProvider o) { moHrsPayrollDataProvider = o; }
     
     public void setLastPayrollPeriod(boolean b) { mbIsLastPayrollPeriod = b; }
 
@@ -496,7 +496,7 @@ public class SHrsPayroll {
     public ArrayList<SDbAutomaticEarning> getAutomaticEarnings() { return maAutomaticEarnings; }
     public ArrayList<SDbAutomaticDeduction> getAutomaticDeductions() { return maAutomaticDeductions; }
     public ArrayList<SDbEmployee> getEmployees() { return maEmployees; }
-    public ArrayList<SHrsPayrollReceipt> getReceipts() { return maReceipts; }
+    public ArrayList<SHrsPayrollReceipt> getHrsReceipts() { return maHrsReceipts; }
     
     public boolean isLastPayrollPeriod() { return mbIsLastPayrollPeriod; }
     
@@ -783,11 +783,7 @@ public class SHrsPayroll {
         payrollReceipt.setWage(hrsEmployee.getEmployee().getWage());
         payrollReceipt.setSalarySscBase(hrsEmployee.getEmployee().getSalarySscBase());
         payrollReceipt.setWorkingHoursDay(hrsEmployee.getEmployee().getWorkingHoursDay());
-        //payrollReceipt.setBankAccount(hrsEmployee.getEmployee().getBankAccount()); XXX (jbarajas, 2015-10-07) remove by new table
-        // XXX modify when payment for fornight is fijo
-        payrollReceipt.setPaymentDaily(hrsEmployee.getEmployee().getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? hrsEmployee.getEmployee().getSalary() :
-                (moConfig.isFornightStandard() ? ((hrsEmployee.getEmployee().getWage() * SHrsConsts.YEAR_MONTHS) / (SHrsConsts.FORNIGHT_FIXED_DAYS * SHrsConsts.YEAR_FORNIGHTS)) :
-                ((hrsEmployee.getEmployee().getWage() * SHrsConsts.YEAR_MONTHS) / SHrsConsts.YEAR_DAYS)));
+        payrollReceipt.setPaymentDaily(hrsEmployee.getEmployee().getEffectiveSalary(moConfig.isFortnightStandard()));
         payrollReceipt.setPaymentHourly(hrsEmployee.getEmployee().getWorkingHoursDay() > 0 ? payrollReceipt.getPaymentDaily() / hrsEmployee.getEmployee().getWorkingHoursDay() : 0);
         payrollReceipt.setFkPaymentTypeId(hrsEmployee.getEmployee().getFkPaymentTypeId());
         payrollReceipt.setFkSalaryTypeId(hrsEmployee.getEmployee().getFkSalaryTypeId());
@@ -898,7 +894,7 @@ public class SHrsPayroll {
         oHrsPayrollReceipt.setHrsPayroll(this);
         
         // Get receipt employee days:
-        oHrsEmployee = moPayrollDataProvider.createHrsEmployee(this, moPayroll.getPkPayrollId(), employeeId, payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd, taxComputationType);
+        oHrsEmployee = moHrsPayrollDataProvider.createHrsEmployee(this, moPayroll.getPkPayrollId(), employeeId, payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd, taxComputationType);
         oHrsEmployee.setHrsPayrollReceipt(oHrsPayrollReceipt);
         oHrsPayrollReceipt.setHrsEmployee(oHrsEmployee);
         
@@ -913,19 +909,19 @@ public class SHrsPayroll {
         }
         
         // Get earnings:
-        oHrsPayrollReceipt.getHrsEarnings().addAll(getPayrollReceiptEarnings(oHrsPayrollReceipt, dateStart, dateEnd));
+        oHrsPayrollReceipt.getHrsReceiptEarnings().addAll(getPayrollReceiptEarnings(oHrsPayrollReceipt, dateStart, dateEnd));
         
         // Compute days of payroll receipt:
         oHrsPayrollReceipt.computeDbPayrollReceiptDays();
 
         // Get deductions:
-        oHrsPayrollReceipt.getHrsDeductions().addAll(getPayrollReceiptDeductions(oHrsPayrollReceipt, dateStart, dateEnd));
+        oHrsPayrollReceipt.getHrsReceiptDeductions().addAll(getPayrollReceiptDeductions(oHrsPayrollReceipt, dateStart, dateEnd));
 
         // Compute payroll receipt:
         oHrsPayrollReceipt.computeReceipt();
 
         // Add new payroll receipt:
-        maReceipts.add(oHrsPayrollReceipt);
+        maHrsReceipts.add(oHrsPayrollReceipt);
         
         oHrsPayrollReceipt.renumberEarnings();
         oHrsPayrollReceipt.renumberDeductions();
@@ -936,11 +932,11 @@ public class SHrsPayroll {
     public void replaceReceipt(final int employeeId, final SHrsPayrollReceipt receipt, final boolean compute) {
         SHrsPayrollReceipt hrsPayrollReceipt = null;
 
-        for (int i = 0; i < maReceipts.size(); i++) {
-            hrsPayrollReceipt = maReceipts.get(i);
+        for (int i = 0; i < maHrsReceipts.size(); i++) {
+            hrsPayrollReceipt = maHrsReceipts.get(i);
 
             if (hrsPayrollReceipt.getReceipt().getPkEmployeeId() == employeeId) {
-                maReceipts.set(i, receipt);
+                maHrsReceipts.set(i, receipt);
                 break;
             }
         }
@@ -958,11 +954,11 @@ public class SHrsPayroll {
     public void removeReceipt(final int employeeId) {
         SHrsPayrollReceipt hrsPayrollReceipt = null;
 
-        for (int i = 0; i < maReceipts.size(); i++) {
-            hrsPayrollReceipt = maReceipts.get(i);
+        for (int i = 0; i < maHrsReceipts.size(); i++) {
+            hrsPayrollReceipt = maHrsReceipts.get(i);
 
             if (hrsPayrollReceipt.getReceipt().getPkEmployeeId() == employeeId) {
-                maReceipts.remove(i);
+                maHrsReceipts.remove(i);
                 break;
             }
         }
@@ -970,8 +966,8 @@ public class SHrsPayroll {
 
     public void computeEmployees(final boolean isCopy) {
         try {
-            for (SHrsPayrollReceipt receipt : maReceipts) {
-                receipt.setHrsEmployee(moPayrollDataProvider.computeEmployee(receipt.getHrsEmployee(), isCopy ? SLibConsts.UNDEFINED : moPayroll.getPkPayrollId(), receipt.getHrsEmployee().getEmployee().getPkEmployeeId(),
+            for (SHrsPayrollReceipt receipt : maHrsReceipts) {
+                receipt.setHrsEmployee(moHrsPayrollDataProvider.computeEmployee(receipt.getHrsEmployee(), isCopy ? SLibConsts.UNDEFINED : moPayroll.getPkPayrollId(), receipt.getHrsEmployee().getEmployee().getPkEmployeeId(),
                         moPayroll.getPeriodYear(), moPayroll.getPeriod(), moPayroll.getFiscalYear(), moPayroll.getDateStart(), moPayroll.getDateEnd(), moPayroll.getFkTaxComputationTypeId()));
             }
         }
@@ -982,7 +978,7 @@ public class SHrsPayroll {
 
     public void computeReceipts() {
         try {
-            for (SHrsPayrollReceipt receipt : maReceipts) {
+            for (SHrsPayrollReceipt receipt : maHrsReceipts) {
                 receipt.computeReceipt();
             }
         }
@@ -998,8 +994,8 @@ public class SHrsPayroll {
     public double getTotalEarnings() {
         double totalEarnings = 0;
 
-        for (SHrsPayrollReceipt hrsPayrollReceipt : maReceipts) {
-            for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarning : hrsPayrollReceipt.getHrsEarnings()) {
+        for (SHrsPayrollReceipt hrsPayrollReceipt : maHrsReceipts) {
+            for (SHrsPayrollReceiptEarning hrsPayrollReceiptEarning : hrsPayrollReceipt.getHrsReceiptEarnings()) {
 
                 totalEarnings += hrsPayrollReceiptEarning.getReceiptEarning().getAmount_r();
             }
@@ -1011,8 +1007,8 @@ public class SHrsPayroll {
     public double getTotalDeductions() {
         double totalDeductions = 0;
 
-        for (SHrsPayrollReceipt hrsPayrollReceipt : maReceipts) {
-            for (SHrsPayrollReceiptDeduction hrsPayrollReceiptDeduction : hrsPayrollReceipt.getHrsDeductions()) {
+        for (SHrsPayrollReceipt hrsPayrollReceipt : maHrsReceipts) {
+            for (SHrsPayrollReceiptDeduction hrsPayrollReceiptDeduction : hrsPayrollReceipt.getHrsReceiptDeductions()) {
 
                 totalDeductions += hrsPayrollReceiptDeduction.getReceiptDeduction().getAmount_r();
             }

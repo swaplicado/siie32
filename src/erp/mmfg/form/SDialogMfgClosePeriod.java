@@ -18,14 +18,14 @@ import erp.lib.form.SFormValidation;
 import erp.mmfg.data.SDataCostClosePeriod;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.text.SimpleDateFormat;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author  Néstor Ávalos
+ * @author  Néstor Ávalos, Sergio Flores
  */
 public class SDialogMfgClosePeriod extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -471,9 +471,8 @@ public class SDialogMfgClosePeriod extends javax.swing.JDialog implements erp.li
 
     private void actionOk() {
         SFormValidation validation = formValidate();
-        SimpleDateFormat oFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-        if (miClient.showMsgBoxConfirm("Está seguro(a) de cerrar el período '" + oFormat.format(moFieldWeekStart.getDate()) + "-" + oFormat.format(moFieldWeekEnd.getDate()) + "'.") == JOptionPane.YES_OPTION) {
+        if (miClient.showMsgBoxConfirm("Está seguro(a) de cerrar el período '" + SLibUtils.DateFormatDate.format(moFieldWeekStart.getDate()) + "-" + SLibUtils.DateFormatDate.format(moFieldWeekEnd.getDate()) + "'.") == JOptionPane.YES_OPTION) {
             if (validation.getIsError()) {
                 if (validation.getComponent() != null) {
                     validation.getComponent().requestFocus();

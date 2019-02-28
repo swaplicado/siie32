@@ -1354,7 +1354,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         moDialogPayRecordPicker = new SDialogRecordPicker(miClient, SDataConstants.FINX_REC_USER);
         moDialogRecDpsRelatedPicker = new SDialogPickerDps(miClient, SDataConstants.TRN_CFD);
-        moDialogDocDpsRelatedPicker = new SDialogPickerDps(miClient, SDataConstants.TRNX_DPS_PAY_PEND);
+        //moDialogDocDpsRelatedPicker = new SDialogPickerDps(miClient, SDataConstants.TRNX_DPS_PAY_PEND);
+        moDialogDocDpsRelatedPicker = new SDialogPickerDps(miClient, SDataConstants.TRN_DPS);
         
         // initialize payments grid:
 
@@ -2604,7 +2605,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
     private void actionPerformedDocDpsRelatedPick() {
         int year = SLibTimeUtils.digestYear(moFieldVouDate.getDate())[0];
-        Object[] filterKey = new Object[] { year, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, moFieldRecBizPartner.getKeyAsIntArray(), moDataCfdPayment == null ? 0 : moDataCfdPayment.getDbmsDataCfd().getPkCfdId() };
+        //Object[] filterKey = new Object[] { year, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, moFieldRecBizPartner.getKeyAsIntArray(), moDataCfdPayment == null ? 0 : moDataCfdPayment.getDbmsDataCfd().getPkCfdId() };
+        Object[] filterKey = new Object[] { SDataConstantsSys.TRNS_CL_DPS_SAL_DOC, moFieldRecBizPartner.getKeyAsIntArray() };
         
         moDialogDocDpsRelatedPicker.formReset();
         moDialogDocDpsRelatedPicker.setFilterKey(filterKey);

@@ -825,7 +825,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                         "Se debe eliminar mediante la eliminación del consumo de incidencia respectivo.");
                     }
                     else {
-                        for (SHrsPayrollReceiptEarning earning : moHrsPayrollReceipt.getHrsEarnings()) {
+                        for (SHrsPayrollReceiptEarning earning : moHrsPayrollReceipt.getHrsReceiptEarnings()) {
                             if (SLibUtils.compareKeys(earning.getRowPrimaryKey(), hrsReceiptEarningRow.getRowPrimaryKey())) {
                                 delete = true;
                                 moveId = earning.getPkMoveId();
@@ -886,7 +886,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 else {
                     hrsReceiptDeductionRow = (SHrsPayrollReceiptDeduction) moGridDeductionRow.getSelectedGridRow();
                     
-                    for (SHrsPayrollReceiptDeduction deduction : moHrsPayrollReceipt.getHrsDeductions()) {
+                    for (SHrsPayrollReceiptDeduction deduction : moHrsPayrollReceipt.getHrsReceiptDeductions()) {
                         if (SLibUtils.compareKeys(deduction.getRowPrimaryKey(), hrsReceiptDeductionRow.getRowPrimaryKey())) {
                             delete = true;
                             moveId = deduction.getPkMoveId();
@@ -1180,10 +1180,10 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         double earningTotal = 0;
         double deductionTotal = 0;
 
-        for (SHrsPayrollReceiptEarning hrsEarning : moHrsPayrollReceipt.getHrsEarnings()) {
+        for (SHrsPayrollReceiptEarning hrsEarning : moHrsPayrollReceipt.getHrsReceiptEarnings()) {
             earningTotal += hrsEarning.getReceiptEarning().getAmount_r();
         }
-        for (SHrsPayrollReceiptDeduction hrsDeduction : moHrsPayrollReceipt.getHrsDeductions()) {
+        for (SHrsPayrollReceiptDeduction hrsDeduction : moHrsPayrollReceipt.getHrsReceiptDeductions()) {
             deductionTotal += hrsDeduction.getReceiptDeduction().getAmount_r();
         }
 
@@ -1214,7 +1214,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 mdAmountLoan = 0;
 
                 moDeductionLoan.read(miClient.getSession(), new int[] { moKeyDeductionLoan_n.getValue()[0] , moKeyDeductionLoan_n.getValue()[1] });
-                mdAmountLoan = SHrsUtils.computeAmoutLoan(moHrsPayrollReceipt, moDeductionLoan);
+                mdAmountLoan = SHrsUtils.computeAmountLoan(moHrsPayrollReceipt, moDeductionLoan);
                 moComDeductionValue.getField().setValue(mdAmountLoan);
             }
             catch (Exception e) {
@@ -1336,7 +1336,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             // Capture allow multiple perceptions in payroll receipts:
             
             if (add) {
-                for (SHrsPayrollReceiptEarning earning : moHrsPayrollReceipt.getHrsEarnings()) {
+                for (SHrsPayrollReceiptEarning earning : moHrsPayrollReceipt.getHrsReceiptEarnings()) {
                     if (SLibUtils.compareKeys(new int[] { earning.getEarning().getPkEarningId()}, new int[] { moEarning.getPkEarningId() }) &&
                             (earning.getEarning().isDaysWorkedBasedOn() || earning.getEarning().getFkEarningExemptionTypeId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL ||
                             earning.getEarning().getFkEarningExemptionTypeYearId() == SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL)) {
@@ -1386,7 +1386,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                 }
                 
                 if (add) {
-                    for (SHrsPayrollReceiptDeduction deduction : moHrsPayrollReceipt.getHrsDeductions()) {
+                    for (SHrsPayrollReceiptDeduction deduction : moHrsPayrollReceipt.getHrsReceiptDeductions()) {
                         if (SLibUtils.compareKeys(new int[] { deduction.getDeduction().getPkDeductionId() }, new int[] { moDeduction.getPkDeductionId() })) {
                             miClient.showMsgBoxWarning("La deducción '" + moDeduction.getName() + "' no se puede agregar, ya existe en el recibo.");
                             add = false;
@@ -1506,7 +1506,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             hrsReceiptEarningRow.setEarning(moEarnigsMap.get(moEarning.getPkEarningId()));
             hrsReceiptEarningRow.setHrsReceipt(moHrsPayrollReceipt);
 
-            hrsReceiptEarningRow.setPkMoveId(moHrsPayrollReceipt.getHrsEarnings().size() + 1);
+            hrsReceiptEarningRow.setPkMoveId(moHrsPayrollReceipt.getHrsReceiptEarnings().size() + 1);
             hrsReceiptEarningRow.setXtaEmployee(moHrsPayrollReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
             
             if (moComEarningValue.getField().isEditable()) {
@@ -1549,7 +1549,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
             hrsReceiptDeductionRow.setDeduction(moDeductionsMap.get(moDeduction.getPkDeductionId()));
             hrsReceiptDeductionRow.setHrsReceipt(moHrsPayrollReceipt);
 
-            hrsReceiptDeductionRow.setPkMoveId(moHrsPayrollReceipt.getHrsDeductions().size() + 1);
+            hrsReceiptDeductionRow.setPkMoveId(moHrsPayrollReceipt.getHrsReceiptDeductions().size() + 1);
             hrsReceiptDeductionRow.setXtaEmployee(moHrsPayrollReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
             hrsReceiptDeductionRow.setXtaValue(moComDeductionValue.getField().getValue());
             hrsReceiptDeductionRow.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
@@ -1578,7 +1578,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         SHrsPayrollReceiptEarning hrsReceiptEarningRow = null;
 
         moGridEarningRow.setRowButtonsEnabled(false, true, mbEditable);
-        for (SHrsPayrollReceiptEarning hrsEarningRow : moHrsPayrollReceipt.getHrsEarnings()) {
+        for (SHrsPayrollReceiptEarning hrsEarningRow : moHrsPayrollReceipt.getHrsReceiptEarnings()) {
             hrsReceiptEarningRow = new SHrsPayrollReceiptEarning();
 
             hrsReceiptEarningRow.setEarning(hrsEarningRow.getEarning());
@@ -1609,7 +1609,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         SHrsPayrollReceiptDeduction hrsReceiptDeductionRow = null;
 
         moGridDeductionRow.setRowButtonsEnabled(false, false, mbEditable);
-        for (SHrsPayrollReceiptDeduction hrsDeductionRow : moHrsPayrollReceipt.getHrsDeductions()) {
+        for (SHrsPayrollReceiptDeduction hrsDeductionRow : moHrsPayrollReceipt.getHrsReceiptDeductions()) {
             hrsReceiptDeductionRow = new SHrsPayrollReceiptDeduction();
 
             hrsReceiptDeductionRow.setDeduction(hrsDeductionRow.getDeduction());
@@ -1663,7 +1663,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         for (SGridRow row : moGridEarningRow.getModel().getGridRows()) {
             hrsReceiptEarningRow = (SHrsPayrollReceiptEarning) row;
 
-            for (SHrsPayrollReceiptEarning earning : moHrsPayrollReceipt.getHrsEarnings()) {
+            for (SHrsPayrollReceiptEarning earning : moHrsPayrollReceipt.getHrsReceiptEarnings()) {
                 if (SLibUtils.compareKeys(earning.getRowPrimaryKey(), hrsReceiptEarningRow.getRowPrimaryKey())) {
                     if (!earning.getReceiptEarning().isAutomatic() && hrsReceiptEarningRow.getXtaValue() == 0) {
                         moHrsPayrollReceipt.removeEarning(earning.getPkMoveId());
@@ -1676,7 +1676,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         for (SGridRow row : moGridDeductionRow.getModel().getGridRows()) {
             hrsReceiptDeductionRow = (SHrsPayrollReceiptDeduction) row;
 
-            for (SHrsPayrollReceiptDeduction deduction : moHrsPayrollReceipt.getHrsDeductions()) {
+            for (SHrsPayrollReceiptDeduction deduction : moHrsPayrollReceipt.getHrsReceiptDeductions()) {
                 if (SLibUtils.compareKeys(deduction.getRowPrimaryKey(), hrsReceiptDeductionRow.getRowPrimaryKey())) {
                     if (!deduction.getReceiptDeduction().isAutomatic() && hrsReceiptDeductionRow.getXtaValue() == 0) {
                         moHrsPayrollReceipt.removeDeduction(deduction.getPkMoveId());
@@ -1749,7 +1749,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
         // Validate value the earning, according to working days:
         
         if (moHrsPayrollReceipt.getHrsPayroll().getPayroll().isNormal()) {
-            for (SHrsPayrollReceiptEarning hrsEarningRow : moHrsPayrollReceipt.getHrsEarnings()) {
+            for (SHrsPayrollReceiptEarning hrsEarningRow : moHrsPayrollReceipt.getHrsReceiptEarnings()) {
                 if (hrsEarningRow.getEarning().isDaysWorked()) {
                     daysToBePaid += hrsEarningRow.getReceiptEarning().getUnitsAlleged();
                 }

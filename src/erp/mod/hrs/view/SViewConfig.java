@@ -63,6 +63,7 @@ public class SViewConfig extends SGridPaneView {
                 + "evac.name, "
                 + "etax.name, "
                 + "etax_sub.name, "
+                + "etax_sub_comp.name, "
                 + "essc.name, "
                 + "dtax.name, "
                 + "dtax_sub.name, "
@@ -95,6 +96,8 @@ public class SViewConfig extends SGridPaneView {
                 + "v.fk_ear_tax_n = etax.id_ear "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS etax_sub ON "
                 + "v.fk_ear_tax_sub_n = etax_sub.id_ear "
+                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS etax_sub_comp ON "
+                + "v.fk_ear_tax_sub_comp_n = etax_sub_comp.id_ear "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS essc ON "
                 + "v.fk_ear_ssc_n = essc.id_ear "
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " AS dtax ON "
@@ -109,31 +112,32 @@ public class SViewConfig extends SGridPaneView {
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_ops", "Inicio operaciones"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.fst_day_wee", "1er día semana"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.lim_mwz_ref", "Tope cot SMAR"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_4D, "v.pay_tax_rate", "Imp sobre nóminas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_for_std", "Quincenas fijas 15 días"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_auto_vac_bon", "Pagao auto prima vacacional"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_tax_sub_ear", "Sub impto percepción"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_tax_net", "Impto neto"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tmwz.name", "Área geo"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tmwz_ref.name", "Área geo referencia"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ttax_comp.name", "Cálculo impto default"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.num_ser", "Serie CFDI"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_auto_vac_bon", "Pago auto prima vacacional"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_tax_sub_ear", "Subsidio empleo como percepción"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "v.b_tax_net", "Impuesto neto"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tmwz.name", "Área geográfica"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tmwz_ref.name", "Área geográfica referencia"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "ttax_comp.name", "Cálculo impuesto default"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.num_ser", "Serie CFDI nóminas"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.ss_subbra", "Subdelegación SS"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "bank.name", "Banco default"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "v.baj_aff_grp", "Grupo afinidad (BanBajío)"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "eear.name", "Percep normal"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "evac.name", "Percep vacaciones"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "etax.name", "Percep impto"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "etax_sub.name", "Percep sub impto"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "essc.name", "Percep ret SS"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "dtax.name", "Deduc impto"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "dtax_sub.name", "Deduc sub impto"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "dssc.name", "Deduc ret SS"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "etax.name", "Percep impuesto"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "etax_sub.name", "Percep subsidio empleo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "etax_sub_comp.name", "Percep subsidio empleo compensado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "essc.name", "Percep retención SS"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "dtax.name", "Deduc impuesto"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "dtax_sub.name", "Deduc subsidio empleo"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "dssc.name", "Deduc retención SS"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

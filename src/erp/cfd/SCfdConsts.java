@@ -72,6 +72,7 @@ public abstract class SCfdConsts {
     public static final int[] CFDI_PAYROLL_PERCEPTION_PERCEPTION = new int[] { 1, 1 };
     public static final int[] CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE = new int[] { 1, 101 };
     public static final int[] CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_TRIPLE = new int[] { 1, 102 };
+    public static final int[] CFDI_PAYROLL_PERCEPTION_TAX_SUBSIDY = new int[] { 1, 103 };
     public static final int[] CFDI_PAYROLL_DEDUCTION_DEDUCTION = new int[] { 2, 1 };
     public static final int[] CFDI_PAYROLL_DEDUCTION_INCAPACITY_RISK = new int[] { 2, 101 };
     public static final int[] CFDI_PAYROLL_DEDUCTION_INCAPACITY_DISEASE = new int[] { 2, 102 };
@@ -82,6 +83,8 @@ public abstract class SCfdConsts {
     
     public static final String CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE_CODE = "01";
     public static final String CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE_CODE = "02";
+
+    public static final String CFDI_OTHER_PAY_TAX_SUBSIDY = "Subsidio para el empleo (efectivamente entregado al trabajador).";
 
     public static final String PAYROLL_PER_ISR = "001";
     public static final String PAYROLL_PER_SUB_EMP = "002";

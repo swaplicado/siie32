@@ -253,6 +253,53 @@ public class SDbEmployee extends SDbRegistryUser {
         });
     }
 
+    /**
+     * Gets effective salary.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @param isFortnightStandard Flag that indicates if fortnights are allways fixed to 15 days.
+     * @return Effective salary.
+     */
+    public double getEffectiveSalary(boolean isFortnightStandard) {
+        double effectiveSalary;
+        
+        if (mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_WEE) {
+            effectiveSalary = mdSalary;
+        }
+        else {
+            int yearDays = isFortnightStandard ? SHrsConsts.YEAR_DAYS_FORTNIGHTS_FIXED : SHrsConsts.YEAR_DAYS;
+            effectiveSalary = SLibUtils.roundAmount((mdWage * SHrsConsts.YEAR_MONTHS) / yearDays);
+        }
+        
+        return effectiveSalary;
+    }
+    
+    /**
+     * Gets settlement salary.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @return Settlement salary.
+     */
+    public double getSettlementSalary() {
+        double settlementSalary;
+        
+        if (mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_WEE) {
+            settlementSalary = mdSalary;
+        }
+        else {
+            settlementSalary = SLibUtils.roundAmount(mdWage / SHrsConsts.MONTH_DAYS_FIXED);
+        }
+        
+        return settlementSalary;
+    }
+    
+    /**
+     * Composes lastname.
+     * Mirrored in erp.mbps.data.SDataEmployee.
+     * @return Composed lastname.
+     */    
+    public String composeLastname() {
+        return SLibUtils.textTrim(msLastname1 + (msLastname1.isEmpty() ? "" : " ") + msLastname2);
+    }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkEmployeeId = pk[0];

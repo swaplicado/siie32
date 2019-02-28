@@ -22,7 +22,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos, Juan Barajas
+ * @author Néstor Ávalos, Juan Barajas, Sergio Flores
  */
 public class SDbPayrollReceipt extends SDbRegistryUser {
 
@@ -58,16 +58,22 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     protected double mdPayment_r;
     protected double mdPayrollTaxableDays_r;
     protected double mdPayrollFactorTax;
-    protected double mdTaxPayrollTheorical;
-    protected double mdTaxPayrollActual;
-    protected double mdTaxSubsidyPayrollTheorical;
-    protected double mdTaxSubsidyPayrollActual;
+    protected double mdPayrollTaxAssessed;
+    protected double mdPayrollTaxCompensated;
+    protected double mdPayrollTaxPending_r;
+    protected double mdPayrollTaxPayed;
+    protected double mdPayrollTaxSubsidyAssessed;
+    protected double mdPayrollTaxSubsidyCompensated;
+    protected double mdPayrollTaxSubsidyPending_r;
+    protected double mdPayrollTaxSubsidyPayed;
     protected double mdAnnualTaxableDays_r;
     protected double mdAnnualFactorTax;
-    protected double mdTaxAnnualTheorical;
-    protected double mdTaxAnnualActual;
-    protected double mdTaxSubsidyAnnualTheorical;
-    protected double mdTaxSubsidyAnnualActual;
+    protected double mdAnnualTaxAssessed;
+    protected double mdAnnualTaxCompensated;
+    protected double mdAnnualTaxPayed;
+    protected double mdAnnualTaxSubsidyAssessed;
+    protected double mdAnnualTaxSubsidyCompensated;
+    protected double mdAnnualTaxSubsidyPayed;
     protected boolean mbActive;
     protected boolean mbDaysAdjustment;
     protected boolean mbCfdRequired;
@@ -92,11 +98,11 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     */
     
     protected Date mtAuxDateIssue;
+    protected SDbPayrollReceiptIssue moPayrollReceiptIssue;
 
     protected ArrayList<SDbPayrollReceiptEarning> maChildPayrollReceiptEarnings;
     protected ArrayList<SDbPayrollReceiptDeduction> maChildPayrollReceiptDeductions;
     protected ArrayList<SDbAbsenceConsumption> maChildAbsenceConsumptions;
-    protected SDbPayrollReceiptIssue moPayrollReceiptIssues;
     
     public SDbPayrollReceipt() {
         super(SModConsts.HRS_PAY_RCP);
@@ -197,15 +203,15 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         
         SDbPayrollReceiptIssue payrollReceiptIssues = null;
         
-        if (moPayrollReceiptIssues != null && moPayrollReceiptIssues.getFkReceiptStatusId() != SModSysConsts.TRNS_ST_DPS_ANNULED) {
-            issueId = moPayrollReceiptIssues.getPkIssueId();
-            numberSerie = moPayrollReceiptIssues.getNumberSeries();
-            number = moPayrollReceiptIssues.getNumber();
-            mtAuxDateIssue = moPayrollReceiptIssues.getDateIssue();
-            paymentSystemType = moPayrollReceiptIssues.getFkPaymentSystemTypeId();
+        if (moPayrollReceiptIssue != null && moPayrollReceiptIssue.getFkReceiptStatusId() != SModSysConsts.TRNS_ST_DPS_ANNULED) {
+            issueId = moPayrollReceiptIssue.getPkIssueId();
+            numberSerie = moPayrollReceiptIssue.getNumberSeries();
+            number = moPayrollReceiptIssue.getNumber();
+            mtAuxDateIssue = moPayrollReceiptIssue.getDateIssue();
+            paymentSystemType = moPayrollReceiptIssue.getFkPaymentSystemTypeId();
         }
         
-        if (moPayrollReceiptIssues == null || moPayrollReceiptIssues.getFkReceiptStatusId() != SModSysConsts.TRNS_ST_DPS_EMITED) {
+        if (moPayrollReceiptIssue == null || moPayrollReceiptIssue.getFkReceiptStatusId() != SModSysConsts.TRNS_ST_DPS_EMITED) {
             payrollReceiptIssues = new SDbPayrollReceiptIssue();
             
             payrollReceiptIssues.setPkPayrollId(mnPkPayrollId);
@@ -234,9 +240,9 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     }
     
     public void updateToNewStatusIssues(final SGuiSession session) throws Exception {
-        if (moPayrollReceiptIssues != null && moPayrollReceiptIssues.getFkReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_EMITED && !moPayrollReceiptIssues.isStamped()) {
-            moPayrollReceiptIssues.setFkReceiptStatusId(SModSysConsts.TRNS_ST_DPS_NEW);
-            moPayrollReceiptIssues.save(session);
+        if (moPayrollReceiptIssue != null && moPayrollReceiptIssue.getFkReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_EMITED && !moPayrollReceiptIssue.isStamped()) {
+            moPayrollReceiptIssue.setFkReceiptStatusId(SModSysConsts.TRNS_ST_DPS_NEW);
+            moPayrollReceiptIssue.save(session);
         }
     }
     
@@ -272,16 +278,22 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setPayment_r(double d) { mdPayment_r = d; }
     public void setPayrollTaxableDays_r(double d) { mdPayrollTaxableDays_r = d; }
     public void setPayrollFactorTax(double d) { mdPayrollFactorTax = d; }
-    public void setTaxPayrollTheorical(double d) { mdTaxPayrollTheorical = d; }
-    public void setTaxPayrollActual(double d) { mdTaxPayrollActual = d; }
-    public void setTaxSubsidyPayrollTheorical(double d) { mdTaxSubsidyPayrollTheorical = d; }
-    public void setTaxSubsidyPayrollActual(double d) { mdTaxSubsidyPayrollActual = d; }
+    public void setPayrollTaxAssessed(double d) { mdPayrollTaxAssessed = d; }
+    public void setPayrollTaxCompensated(double d) { mdPayrollTaxCompensated = d; }
+    public void setPayrollTaxPending_r(double d) { mdPayrollTaxPending_r = d; }
+    public void setPayrollTaxPayed(double d) { mdPayrollTaxPayed = d; }
+    public void setPayrollTaxSubsidyAssessed(double d) { mdPayrollTaxSubsidyAssessed = d; }
+    public void setPayrollTaxSubsidyCompensated(double d) { mdPayrollTaxSubsidyCompensated = d; }
+    public void setPayrollTaxSubsidyPending_r(double d) { mdPayrollTaxSubsidyPending_r = d; }
+    public void setPayrollTaxSubsidyPayed(double d) { mdPayrollTaxSubsidyPayed = d; }
     public void setAnnualTaxableDays_r(double d) { mdAnnualTaxableDays_r = d; }
     public void setAnnualFactorTax(double d) { mdAnnualFactorTax = d; }
-    public void setTaxAnnualTheorical(double d) { mdTaxAnnualTheorical = d; }
-    public void setTaxAnnualActual(double d) { mdTaxAnnualActual = d; }
-    public void setTaxSubsidyAnnualTheorical(double d) { mdTaxSubsidyAnnualTheorical = d; }
-    public void setTaxSubsidyAnnualActual(double d) { mdTaxSubsidyAnnualActual = d; }
+    public void setAnnualTaxAssessed(double d) { mdAnnualTaxAssessed = d; }
+    public void setAnnualTaxCompensated(double d) { mdAnnualTaxCompensated = d; }
+    public void setAnnualTaxPayed(double d) { mdAnnualTaxPayed = d; }
+    public void setAnnualTaxSubsidyAssessed(double d) { mdAnnualTaxSubsidyAssessed = d; }
+    public void setAnnualTaxSubsidyCompensated(double d) { mdAnnualTaxSubsidyCompensated = d; }
+    public void setAnnualTaxSubsidyPayed(double d) { mdAnnualTaxSubsidyPayed = d; }
     public void setActive(boolean b) { mbActive = b; }
     public void setDaysAdjustment(boolean b) { mbDaysAdjustment = b; }
     public void setCfdRequired(boolean b) { mbCfdRequired = b; }
@@ -304,8 +316,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
     public void setAuxDateIssue(Date t) { mtAuxDateIssue = t; }
-
-    public void setPayrollReceiptIssue(SDbPayrollReceiptIssue o) { moPayrollReceiptIssues = o; }
+    public void setPayrollReceiptIssue(SDbPayrollReceiptIssue o) { moPayrollReceiptIssue = o; }
 
     public int getPkPayrollId() { return mnPkPayrollId; }
     public int getPkEmployeeId() { return mnPkEmployeeId; }
@@ -339,16 +350,22 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public double getPayment_r() { return mdPayment_r; }
     public double getPayrollTaxableDays_r() { return mdPayrollTaxableDays_r; }
     public double getPayrollFactorTax() { return mdPayrollFactorTax; }
-    public double getTaxPayrollTheorical() { return mdTaxPayrollTheorical; }
-    public double getTaxPayrollActual() { return mdTaxPayrollActual; }
-    public double getTaxSubsidyPayrollTheorical() { return mdTaxSubsidyPayrollTheorical; }
-    public double getTaxSubsidyPayrollActual() { return mdTaxSubsidyPayrollActual; }
+    public double getPayrollTaxAssessed() { return mdPayrollTaxAssessed; }
+    public double getPayrollTaxCompensated() { return mdPayrollTaxCompensated; }
+    public double getPayrollTaxPending_r() { return mdPayrollTaxPending_r; }
+    public double getPayrollTaxPayed() { return mdPayrollTaxPayed; }
+    public double getPayrollTaxSubsidyAssessed() { return mdPayrollTaxSubsidyAssessed; }
+    public double getPayrollTaxSubsidyCompensated() { return mdPayrollTaxSubsidyCompensated; }
+    public double getPayrollTaxSubsidyPending_r() { return mdPayrollTaxSubsidyPending_r; }
+    public double getPayrollTaxSubsidyPayed() { return mdPayrollTaxSubsidyPayed; }
     public double getAnnualTaxableDays_r() { return mdAnnualTaxableDays_r; }
     public double getAnnualFactorTax() { return mdAnnualFactorTax; }
-    public double getTaxAnnualTheorical() { return mdTaxAnnualTheorical; }
-    public double getTaxAnnualActual() { return mdTaxAnnualActual; }
-    public double getTaxSubsidyAnnualTheorical() { return mdTaxSubsidyAnnualTheorical; }
-    public double getTaxSubsidyAnnualActual() { return mdTaxSubsidyAnnualActual; }
+    public double getAnnualTaxAssessed() { return mdAnnualTaxAssessed; }
+    public double getAnnualTaxCompensated() { return mdAnnualTaxCompensated; }
+    public double getAnnualTaxPayed() { return mdAnnualTaxPayed; }
+    public double getAnnualTaxSubsidyAssessed() { return mdAnnualTaxSubsidyAssessed; }
+    public double getAnnualTaxSubsidyCompensated() { return mdAnnualTaxSubsidyCompensated; }
+    public double getAnnualTaxSubsidyPayed() { return mdAnnualTaxSubsidyPayed; }
     public boolean isActive() { return mbActive; }
     public boolean isDaysAdjustment() { return mbDaysAdjustment; }
     public boolean isCfdRequired() { return mbCfdRequired; }
@@ -371,13 +388,43 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public Date getAuxDateIssue() { return mtAuxDateIssue; }
+    public SDbPayrollReceiptIssue getPayrollReceiptIssue() { return moPayrollReceiptIssue; }
 
-    //public ArrayList<SDbPayrollReceiptDay> getChildPayrollReceiptDays() { return maChildPayrollReceiptDays; }  XXX jbarajas deleted by new control schema incidents
     public ArrayList<SDbPayrollReceiptEarning> getChildPayrollReceiptEarnings() { return maChildPayrollReceiptEarnings; }
     public ArrayList<SDbPayrollReceiptDeduction> getChildPayrollReceiptDeductions() { return maChildPayrollReceiptDeductions; }
     public ArrayList<SDbAbsenceConsumption> getChildAbsenceConsumption() { return maChildAbsenceConsumptions; }
     
-    public SDbPayrollReceiptIssue getPayrollReceiptIssues() { return moPayrollReceiptIssues; }
+    /**
+     * Gets effective salary.
+     * @param isFortnightStandard Flag that indicates if fortnights are allways fixed to 15 days.
+     * @return Effective salary.
+     */
+    public double getEffectiveSalary(boolean isFortnightStandard) {
+        double effectiveSalary;
+        
+        if (mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_WEE) {
+            effectiveSalary = mdSalary;
+        }
+        else {
+            int yearDays = isFortnightStandard ? SHrsConsts.YEAR_DAYS_FORTNIGHTS_FIXED : SHrsConsts.YEAR_DAYS;
+            effectiveSalary = SLibUtils.roundAmount((mdWage * SHrsConsts.YEAR_MONTHS) / yearDays);
+        }
+        
+        return effectiveSalary;
+    }
+    
+    public double getPaymentMonthly() {
+        double paymentMonthly;
+        
+        if (mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_WEE) {
+            paymentMonthly = SLibUtils.roundAmount(mdSalary * SHrsConsts.YEAR_DAYS);
+        }
+        else {
+            paymentMonthly = mdWage;
+        }
+        
+        return paymentMonthly;
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -428,16 +475,22 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         mdPayment_r = 0;
         mdPayrollTaxableDays_r = 0;
         mdPayrollFactorTax = 0;
-        mdTaxPayrollTheorical = 0;
-        mdTaxPayrollActual = 0;
-        mdTaxSubsidyPayrollTheorical = 0;
-        mdTaxSubsidyPayrollActual = 0;
+        mdPayrollTaxAssessed = 0;
+        mdPayrollTaxCompensated = 0;
+        mdPayrollTaxPending_r = 0;
+        mdPayrollTaxPayed = 0;
+        mdPayrollTaxSubsidyAssessed = 0;
+        mdPayrollTaxSubsidyCompensated = 0;
+        mdPayrollTaxSubsidyPending_r = 0;
+        mdPayrollTaxSubsidyPayed = 0;
         mdAnnualTaxableDays_r = 0;
         mdAnnualFactorTax = 0;
-        mdTaxAnnualTheorical = 0;
-        mdTaxAnnualActual = 0;
-        mdTaxSubsidyAnnualTheorical = 0;
-        mdTaxSubsidyAnnualActual = 0;
+        mdAnnualTaxAssessed = 0;
+        mdAnnualTaxCompensated = 0;
+        mdAnnualTaxPayed = 0;
+        mdAnnualTaxSubsidyAssessed = 0;
+        mdAnnualTaxSubsidyCompensated = 0;
+        mdAnnualTaxSubsidyPayed = 0;
         mbActive = false;
         mbDaysAdjustment = false;
         mbCfdRequired = false;
@@ -461,12 +514,12 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         
         mtAuxDateIssue = null;
 
-        //maChildPayrollReceiptDays = new ArrayList<SDbPayrollReceiptDay>();  XXX jbarajas deleted by new control schema incidents
-        maChildPayrollReceiptEarnings = new ArrayList<SDbPayrollReceiptEarning>();
-        maChildPayrollReceiptDeductions = new ArrayList<SDbPayrollReceiptDeduction>();
-        maChildAbsenceConsumptions = new ArrayList<SDbAbsenceConsumption>();
+        //maChildPayrollReceiptDays = new ArrayList<>();  XXX jbarajas deleted by new control schema incidents
+        maChildPayrollReceiptEarnings = new ArrayList<>();
+        maChildPayrollReceiptDeductions = new ArrayList<>();
+        maChildAbsenceConsumptions = new ArrayList<>();
         
-        moPayrollReceiptIssues = null;
+        moPayrollReceiptIssue = null;
     }
 
     @Override
@@ -539,16 +592,22 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             mdPayment_r = resultSet.getDouble("pay_r");
             mdPayrollTaxableDays_r = resultSet.getDouble("pay_taxa_day_r");
             mdPayrollFactorTax = resultSet.getDouble("pay_fac_tax");
-            mdTaxPayrollTheorical = resultSet.getDouble("tax_pay_the");
-            mdTaxPayrollActual = resultSet.getDouble("tax_pay_act");
-            mdTaxSubsidyPayrollTheorical = resultSet.getDouble("tax_sub_pay_the");
-            mdTaxSubsidyPayrollActual = resultSet.getDouble("tax_sub_pay_act");
+            mdPayrollTaxAssessed = resultSet.getDouble("pay_tax_assd");
+            mdPayrollTaxCompensated = resultSet.getDouble("pay_tax_comp");
+            mdPayrollTaxPending_r = resultSet.getDouble("pay_tax_pend_r");
+            mdPayrollTaxPayed = resultSet.getDouble("pay_tax_payd");
+            mdPayrollTaxSubsidyAssessed = resultSet.getDouble("pay_tax_sub_assd");
+            mdPayrollTaxSubsidyCompensated = resultSet.getDouble("pay_tax_sub_comp");
+            mdPayrollTaxSubsidyPending_r = resultSet.getDouble("pay_tax_sub_pend_r");
+            mdPayrollTaxSubsidyPayed = resultSet.getDouble("pay_tax_sub_payd");
             mdAnnualTaxableDays_r = resultSet.getDouble("ann_taxa_day_r");
             mdAnnualFactorTax = resultSet.getDouble("ann_fac_tax");
-            mdTaxAnnualTheorical = resultSet.getDouble("tax_ann_the");
-            mdTaxAnnualActual = resultSet.getDouble("tax_ann_act");
-            mdTaxSubsidyAnnualTheorical = resultSet.getDouble("tax_sub_ann_the");
-            mdTaxSubsidyAnnualActual = resultSet.getDouble("tax_sub_ann_act");
+            mdAnnualTaxAssessed = resultSet.getDouble("ann_tax_assd");
+            mdAnnualTaxCompensated = resultSet.getDouble("ann_tax_comp");
+            mdAnnualTaxPayed = resultSet.getDouble("ann_tax_payd");
+            mdAnnualTaxSubsidyAssessed = resultSet.getDouble("ann_tax_sub_assd");
+            mdAnnualTaxSubsidyCompensated = resultSet.getDouble("ann_tax_sub_comp");
+            mdAnnualTaxSubsidyPayed = resultSet.getDouble("ann_tax_sub_payd");
             mbActive = resultSet.getBoolean("b_act");
             mbDaysAdjustment = resultSet.getBoolean("b_day_adj");
             mbCfdRequired = resultSet.getBoolean("b_cfd_req");
@@ -640,9 +699,9 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             
             resultSet = statement.executeQuery(msSql);
             if (resultSet.next()) {
-                moPayrollReceiptIssues = new SDbPayrollReceiptIssue();
-                moPayrollReceiptIssues.read(session, new int[] { mnPkPayrollId, mnPkEmployeeId, resultSet.getInt("id_iss") });
-                mtAuxDateIssue = moPayrollReceiptIssues.getDateIssue();
+                moPayrollReceiptIssue = new SDbPayrollReceiptIssue();
+                moPayrollReceiptIssue.read(session, new int[] { mnPkPayrollId, mnPkEmployeeId, resultSet.getInt("id_iss") });
+                mtAuxDateIssue = moPayrollReceiptIssue.getDateIssue();
             }
 
             mbRegistryNew = false;
@@ -706,16 +765,22 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     mdPayment_r + ", " + 
                     mdPayrollTaxableDays_r + ", " + 
                     mdPayrollFactorTax + ", " + 
-                    mdTaxPayrollTheorical + ", " + 
-                    mdTaxPayrollActual + ", " + 
-                    mdTaxSubsidyPayrollTheorical + ", " + 
-                    mdTaxSubsidyPayrollActual + ", " + 
+                    mdPayrollTaxAssessed + ", " + 
+                    mdPayrollTaxCompensated + ", " + 
+                    mdPayrollTaxPending_r + ", " + 
+                    mdPayrollTaxPayed + ", " + 
+                    mdPayrollTaxSubsidyAssessed + ", " + 
+                    mdPayrollTaxSubsidyCompensated + ", " + 
+                    mdPayrollTaxSubsidyPending_r + ", " + 
+                    mdPayrollTaxSubsidyPayed + ", " + 
                     mdAnnualTaxableDays_r + ", " + 
-                    mdAnnualFactorTax + ", " +  
-                    mdTaxAnnualTheorical + ", " + 
-                    mdTaxAnnualActual + ", " + 
-                    mdTaxSubsidyAnnualTheorical + ", " + 
-                    mdTaxSubsidyAnnualActual + ", " + 
+                    mdAnnualFactorTax + ", " + 
+                    mdAnnualTaxAssessed + ", " + 
+                    mdAnnualTaxCompensated + ", " + 
+                    mdAnnualTaxPayed + ", " + 
+                    mdAnnualTaxSubsidyAssessed + ", " + 
+                    mdAnnualTaxSubsidyCompensated + ", " + 
+                    mdAnnualTaxSubsidyPayed + ", " + 
                     (mbActive ? 1 : 0) + ", " + 
                     (mbDaysAdjustment ? 1 : 0) + ", " + 
                     (mbCfdRequired ? 1 : 0) + ", " + 
@@ -778,16 +843,22 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     "pay_r = " + mdPayment_r + ", " +
                     "pay_taxa_day_r = " + mdPayrollTaxableDays_r + ", " +
                     "pay_fac_tax = " + mdPayrollFactorTax + ", " +
-                    "tax_pay_the = " + mdTaxPayrollTheorical + ", " +
-                    "tax_pay_act = " + mdTaxPayrollActual + ", " +
-                    "tax_sub_pay_the = " + mdTaxSubsidyPayrollTheorical + ", " +
-                    "tax_sub_pay_act = " + mdTaxSubsidyPayrollActual + ", " +
+                    "pay_tax_assd = " + mdPayrollTaxAssessed + ", " +
+                    "pay_tax_comp = " + mdPayrollTaxCompensated + ", " +
+                    "pay_tax_pend_r = " + mdPayrollTaxPending_r + ", " +
+                    "pay_tax_payd = " + mdPayrollTaxPayed + ", " +
+                    "pay_tax_sub_assd = " + mdPayrollTaxSubsidyAssessed + ", " +
+                    "pay_tax_sub_comp = " + mdPayrollTaxSubsidyCompensated + ", " +
+                    "pay_tax_sub_pend_r = " + mdPayrollTaxSubsidyPending_r + ", " +
+                    "pay_tax_sub_payd = " + mdPayrollTaxSubsidyPayed + ", " +
                     "ann_taxa_day_r = " + mdAnnualTaxableDays_r + ", " +
                     "ann_fac_tax = " + mdAnnualFactorTax + ", " +
-                    "tax_ann_the = " + mdTaxAnnualTheorical + ", " +
-                    "tax_ann_act = " + mdTaxAnnualActual + ", " +
-                    "tax_sub_ann_the = " + mdTaxSubsidyAnnualTheorical + ", " +
-                    "tax_sub_ann_act = " + mdTaxSubsidyAnnualActual + ", " +
+                    "ann_tax_assd = " + mdAnnualTaxAssessed + ", " +
+                    "ann_tax_comp = " + mdAnnualTaxCompensated + ", " +
+                    "ann_tax_payd = " + mdAnnualTaxPayed + ", " +
+                    "ann_tax_sub_assd = " + mdAnnualTaxSubsidyAssessed + ", " +
+                    "ann_tax_sub_comp = " + mdAnnualTaxSubsidyCompensated + ", " +
+                    "ann_tax_sub_payd = " + mdAnnualTaxSubsidyPayed + ", " +
                     "b_act = " + (mbActive ? 1 : 0) + ", " +
                     "b_day_adj = " + (mbDaysAdjustment ? 1 : 0) + ", " +
                     "b_cfd_req = " + (mbCfdRequired ? 1 : 0) + ", " +
@@ -887,16 +958,22 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         registry.setPayment_r(this.getPayment_r());
         registry.setPayrollTaxableDays_r(this.getPayrollTaxableDays_r());
         registry.setPayrollFactorTax(this.getPayrollFactorTax());
-        registry.setTaxPayrollTheorical(this.getTaxPayrollTheorical());
-        registry.setTaxPayrollActual(this.getTaxPayrollActual());
-        registry.setTaxSubsidyPayrollTheorical(this.getTaxSubsidyPayrollTheorical());
-        registry.setTaxSubsidyPayrollActual(this.getTaxSubsidyPayrollActual());
+        registry.setPayrollTaxAssessed(this.getPayrollTaxAssessed());
+        registry.setPayrollTaxCompensated(this.getPayrollTaxCompensated());
+        registry.setPayrollTaxPending_r(this.getPayrollTaxPending_r());
+        registry.setPayrollTaxPayed(this.getPayrollTaxPayed());
+        registry.setPayrollTaxSubsidyAssessed(this.getPayrollTaxSubsidyAssessed());
+        registry.setPayrollTaxSubsidyCompensated(this.getPayrollTaxSubsidyCompensated());
+        registry.setPayrollTaxSubsidyPending_r(this.getPayrollTaxSubsidyPending_r());
+        registry.setPayrollTaxSubsidyPayed(this.getPayrollTaxSubsidyPayed());
         registry.setAnnualTaxableDays_r(this.getAnnualTaxableDays_r());
         registry.setAnnualFactorTax(this.getAnnualFactorTax());
-        registry.setTaxAnnualTheorical(this.getTaxAnnualTheorical());
-        registry.setTaxAnnualActual(this.getTaxAnnualActual());
-        registry.setTaxSubsidyAnnualTheorical(this.getTaxSubsidyAnnualTheorical());
-        registry.setTaxSubsidyAnnualActual(this.getTaxSubsidyAnnualActual());
+        registry.setAnnualTaxAssessed(this.getAnnualTaxAssessed());
+        registry.setAnnualTaxCompensated(this.getAnnualTaxCompensated());
+        registry.setAnnualTaxPayed(this.getAnnualTaxPayed());
+        registry.setAnnualTaxSubsidyAssessed(this.getAnnualTaxSubsidyAssessed());
+        registry.setAnnualTaxSubsidyCompensated(this.getAnnualTaxSubsidyCompensated());
+        registry.setAnnualTaxSubsidyPayed(this.getAnnualTaxSubsidyPayed());
         registry.setActive(this.isActive());
         registry.setDaysAdjustment(this.isDaysAdjustment());
         registry.setCfdRequired(this.isCfdRequired());
@@ -930,7 +1007,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             registry.getChildAbsenceConsumption().add(receiptAbsenceConsumption.clone());
         }
         
-        registry.setPayrollReceiptIssue(this.getPayrollReceiptIssues() == null ? null : this.getPayrollReceiptIssues().clone());
+        registry.setPayrollReceiptIssue(this.getPayrollReceiptIssue() == null ? null : this.getPayrollReceiptIssue().clone());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
@@ -940,12 +1017,12 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public boolean canDelete(SGuiSession session) throws SQLException, Exception {
         boolean can = super.canDelete(session);
 
-        if (can && moPayrollReceiptIssues != null) {
-            if (moPayrollReceiptIssues.isStamped()) {
+        if (can && moPayrollReceiptIssue != null) {
+            if (moPayrollReceiptIssue.isStamped()) {
                 can = false;
                 msQueryResult = "¡No es posible eliminar el recibo, está timbrado!";
             }
-            else if (moPayrollReceiptIssues.isAnnul()) {
+            else if (moPayrollReceiptIssue.isAnnul()) {
                 can = false;
                 msQueryResult = "¡No es posible eliminar el recibo, está anulado!";
             }

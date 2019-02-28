@@ -32,7 +32,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListener, ChangeListener {
 
@@ -77,8 +77,8 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         jPanel16 = new javax.swing.JPanel();
         jPanel18 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        jlDate = new javax.swing.JLabel();
-        moDateDate = new sa.lib.gui.bean.SBeanFieldDate();
+        jlDateCutoff = new javax.swing.JLabel();
+        moDateDateCutoff = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel22 = new javax.swing.JPanel();
         jlCalculateType = new javax.swing.JLabel();
         moKeyCalculateType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -115,14 +115,14 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         jlSalary = new javax.swing.JLabel();
         moCompSalary = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel11 = new javax.swing.JPanel();
-        jlSsContribution = new javax.swing.JLabel();
-        moCompSsContribution = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlTaxSubsidy = new javax.swing.JLabel();
+        moCompTaxSubsidy = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jLabel2 = new javax.swing.JLabel();
         jlSalarySscBase = new javax.swing.JLabel();
         moCompSalarySscBase = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel9 = new javax.swing.JPanel();
-        jlTaxSubsidy = new javax.swing.JLabel();
-        moCompTaxSubsidy = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlSsContribution = new javax.swing.JLabel();
+        moCompSsContribution = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel29 = new javax.swing.JPanel();
         jPanel30 = new javax.swing.JPanel();
         jlGrossAmountCalculated = new javax.swing.JLabel();
@@ -134,7 +134,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         jlNetAmountWithSubsidy = new javax.swing.JLabel();
         moCompNetAmountWithSubsidy = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del cálculo:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel4.setLayout(new java.awt.BorderLayout());
@@ -179,17 +179,17 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
 
         jPanel12.setLayout(new java.awt.BorderLayout());
 
-        jPanel16.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros para cálculo:"));
+        jPanel16.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del cálculo:"));
         jPanel16.setLayout(new java.awt.BorderLayout());
 
         jPanel18.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDate.setText("Fecha corte:*");
-        jlDate.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel5.add(jlDate);
-        jPanel5.add(moDateDate);
+        jlDateCutoff.setText("Fecha corte:*");
+        jlDateCutoff.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel5.add(jlDateCutoff);
+        jPanel5.add(moDateDateCutoff);
 
         jPanel18.add(jPanel5);
 
@@ -247,8 +247,8 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlMwzWage.setText("Salario mín. área geo.:");
-        jlMwzWage.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlMwzWage.setText("Salario mín. área geográfica:");
+        jlMwzWage.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel19.add(jlMwzWage);
 
         moCompMwzWage.setEditable(false);
@@ -258,8 +258,8 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAmountMwzWage.setText("Ingreso men. mín. área geo.:");
-        jlAmountMwzWage.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlAmountMwzWage.setText("Ingreso mensual mín. área geográfica:");
+        jlAmountMwzWage.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel24.add(jlAmountMwzWage);
 
         moCompAmountMwzWage.setEditable(false);
@@ -269,8 +269,8 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
 
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlMwzReferenceWage.setText("Salario mín. área geo. ref.:");
-        jlMwzReferenceWage.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlMwzReferenceWage.setText("Salario mín. área geográfica referencia:");
+        jlMwzReferenceWage.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel20.add(jlMwzReferenceWage);
 
         moCompMwzReferenceWage.setEditable(false);
@@ -280,8 +280,8 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAmountMwzReferenceWage.setText("Ingreso men. mín. área geo. ref.:");
-        jlAmountMwzReferenceWage.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlAmountMwzReferenceWage.setText("Ingreso mensual mín. área geográfica referencia:");
+        jlAmountMwzReferenceWage.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel25.add(jlAmountMwzReferenceWage);
 
         moCompAmountMwzReferenceWage.setEditable(false);
@@ -304,8 +304,8 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTax.setText("ISR:");
-        jlTax.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlTax.setText("Impuesto:");
+        jlTax.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel10.add(jlTax);
         jPanel10.add(moCompTax);
 
@@ -313,7 +313,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         jPanel10.add(jLabel1);
 
         jlSalary.setText("SD:");
-        jlSalary.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlSalary.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel10.add(jlSalary);
 
         moCompSalary.setEditable(false);
@@ -323,16 +323,16 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSsContribution.setText("SS:");
-        jlSsContribution.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel11.add(jlSsContribution);
-        jPanel11.add(moCompSsContribution);
+        jlTaxSubsidy.setText("Subsidio empleo:");
+        jlTaxSubsidy.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel11.add(jlTaxSubsidy);
+        jPanel11.add(moCompTaxSubsidy);
 
         jLabel2.setPreferredSize(new java.awt.Dimension(30, 23));
         jPanel11.add(jLabel2);
 
         jlSalarySscBase.setText("SBC:");
-        jlSalarySscBase.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlSalarySscBase.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlSalarySscBase);
 
         moCompSalarySscBase.setEditable(false);
@@ -342,10 +342,10 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTaxSubsidy.setText("Subsidio:");
-        jlTaxSubsidy.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel9.add(jlTaxSubsidy);
-        jPanel9.add(moCompTaxSubsidy);
+        jlSsContribution.setText("Retención SS:");
+        jlSsContribution.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlSsContribution);
+        jPanel9.add(moCompSsContribution);
 
         jPanel28.add(jPanel9);
 
@@ -373,7 +373,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNetAmountWithSubsidy.setText("Importe neto + subsidio:");
+        jlNetAmountWithSubsidy.setText("Importe neto + subsidio empleo:");
         jlNetAmountWithSubsidy.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel13.add(jlNetAmountWithSubsidy);
         jPanel13.add(moCompNetAmountWithSubsidy);
@@ -424,7 +424,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
     private javax.swing.JLabel jlAmountMwzReferenceWage;
     private javax.swing.JLabel jlAmountMwzWage;
     private javax.swing.JLabel jlCalculateType;
-    private javax.swing.JLabel jlDate;
+    private javax.swing.JLabel jlDateCutoff;
     private javax.swing.JLabel jlEmployee;
     private javax.swing.JLabel jlGrossAmount;
     private javax.swing.JLabel jlGrossAmountCalculated;
@@ -455,7 +455,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCompTax;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCompTaxSubsidy;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCompTolerance;
-    private sa.lib.gui.bean.SBeanFieldDate moDateDate;
+    private sa.lib.gui.bean.SBeanFieldDate moDateDateCutoff;
     private sa.lib.gui.bean.SBeanFieldKey moKeyCalculateType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployee;
     private sa.lib.gui.bean.SBeanFieldRadio moRadFilterWithEmployee;
@@ -481,12 +481,12 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
     public void actionEnableFields() {
         if (moRadFilterWithEmployee.isSelected()) {
             moKeyEmployee.setEnabled(true);
-            moDateDate.setEditable(true);
+            moDateDateCutoff.setEditable(true);
         }
         else if (moRadFilterWithoutEmployee.isSelected()) {
             moKeyEmployee.setSelectedIndex(0);
             moKeyEmployee.setEnabled(false);
-            moDateDate.setEditable(false);
+            moDateDateCutoff.setEditable(false);
         }
     }
     
@@ -497,8 +497,8 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         
         try {
             config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
-            dMwzWage = SHrsUtils.getRecentMwz(miClient.getSession(), config.getFkMwzTypeId(), moDateDate.getValue());
-            dMwzReferenceWage = SHrsUtils.getRecentMwz(miClient.getSession(), config.getFkMwzReferenceTypeId(), moDateDate.getValue());
+            dMwzWage = SHrsUtils.getRecentMinimumWage(miClient.getSession(), config.getFkMwzTypeId(), moDateDateCutoff.getValue());
+            dMwzReferenceWage = SHrsUtils.getRecentMinimumWage(miClient.getSession(), config.getFkMwzReferenceTypeId(), moDateDateCutoff.getValue());
             
             moCompMwzWage.getField().setValue(dMwzWage);
             moCompMwzReferenceWage.getField().setValue(dMwzReferenceWage);
@@ -509,7 +509,6 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         catch (Exception e) {
             SLibUtils.printException(this, e);
         }
-        
     }
     
     private void itemStateEmployee() {
@@ -588,14 +587,14 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
             */
             
             if (mnFormType == SHrsConsts.CAL_NET_AMT_TYPE) {
-                netGrossAmount = SHrsUtils.computeNetAmountPayment(miClient.getSession(), moCompGrossAmount.getField().getValue(), moDateDate.getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()));
+                netGrossAmount = SHrsUtils.computeAmountPaymentNet(miClient.getSession(), moCompGrossAmount.getField().getValue(), moDateDateCutoff.getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()));
 
                 moCompNetAmountCalculated.getField().setValue(netGrossAmount.getNetAmount());
                 moCompGrossAmountCalculated.getField().setValue(0d);
                 moCompNetAmountWithSubsidy.getField().setValue(netGrossAmount.getNetAmountWithSubsidy());
             }
             else if (mnFormType == SHrsConsts.CAL_GROSS_AMT_TYPE) {
-                netGrossAmount = SHrsUtils.computeGrossAmountPayment(miClient.getSession(), moCompNetAmount.getField().getValue(), moDateDate.getValue(), moCompTolerance.getField().getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()));                    
+                netGrossAmount = SHrsUtils.computeAmountPaymentGross(miClient.getSession(), moCompNetAmount.getField().getValue(), moDateDateCutoff.getValue(), moCompTolerance.getField().getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()));                    
 
                 moCompNetAmountCalculated.getField().setValue(0d);
                 moCompGrossAmountCalculated.getField().setValue(netGrossAmount.getGrossAmount());
@@ -622,7 +621,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         moRadFilterWithEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterWithEmployee.getText()), false);
         moRadFilterWithoutEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterWithoutEmployee.getText()), true);
         moKeyEmployee.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployee.getText()), true);
-        moDateDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate.getText()), true);
+        moDateDateCutoff.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCutoff.getText()), true);
         moKeyCalculateType.setKeySettings(miClient, SGuiUtils.getLabelName(jlCalculateType.getText()), true);
         moCompGrossAmount.setCompoundFieldSettings(miClient);
         moCompGrossAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlGrossAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
@@ -662,7 +661,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         moFields.addField(moRadFilterWithoutEmployee);
         */
         moFields.addField(moKeyEmployee);
-        moFields.addField(moDateDate);
+        moFields.addField(moDateDateCutoff);
         moFields.addField(moKeyCalculateType);
         moFields.addField(moCompGrossAmount.getField());
         moFields.addField(moCompNetAmount.getField());
@@ -704,7 +703,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         moRadFilterWithoutEmployee.setSelected(true);
         jtfRegistryKey.setText("");
         
-        moDateDate.setValue(miClient.getSession().getCurrentDate());
+        moDateDateCutoff.setValue(miClient.getSession().getCurrentDate());
         moCompTolerance.getField().setValue(0.10);
         computeMwzWage();
                 

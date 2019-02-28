@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -27,7 +26,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SGridFilterPanelLoan extends JPanel implements SGridFilter, ActionListener, ItemListener {
 
@@ -60,7 +59,7 @@ public class SGridFilterPanelLoan extends JPanel implements SGridFilter, ActionL
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        gpbFilter = new javax.swing.ButtonGroup();
+        bgFilter = new javax.swing.ButtonGroup();
         jtbOpen = new javax.swing.JToggleButton();
         jtbClose = new javax.swing.JToggleButton();
         jtbAll = new javax.swing.JToggleButton();
@@ -69,23 +68,26 @@ public class SGridFilterPanelLoan extends JPanel implements SGridFilter, ActionL
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        gpbFilter.add(jtbOpen);
-        jtbOpen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif"))); // NOI18N
+        bgFilter.add(jtbOpen);
+        jtbOpen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif"))); // NOI18N
         jtbOpen.setSelected(true);
         jtbOpen.setToolTipText("Ver abiertos");
         jtbOpen.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbOpen.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif"))); // NOI18N
         add(jtbOpen);
 
-        gpbFilter.add(jtbClose);
-        jtbClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif"))); // NOI18N
+        bgFilter.add(jtbClose);
+        jtbClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif"))); // NOI18N
         jtbClose.setToolTipText("Ver cerrados");
         jtbClose.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbClose.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif"))); // NOI18N
         add(jtbClose);
 
-        gpbFilter.add(jtbAll);
-        jtbAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
+        bgFilter.add(jtbAll);
+        jtbAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif"))); // NOI18N
         jtbAll.setToolTipText("Ver todos");
         jtbAll.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbAll.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
         add(jtbAll);
 
         moKeyFilter1.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -99,7 +101,7 @@ public class SGridFilterPanelLoan extends JPanel implements SGridFilter, ActionL
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup gpbFilter;
+    private javax.swing.ButtonGroup bgFilter;
     private javax.swing.JButton jbClearFilter1;
     private javax.swing.JToggleButton jtbAll;
     private javax.swing.JToggleButton jtbClose;
@@ -116,15 +118,12 @@ public class SGridFilterPanelLoan extends JPanel implements SGridFilter, ActionL
         
         if (jtbOpen.isSelected()) {
             nFilterEmpStatus = LOAN_STATUS_OPEN;
-            jtbOpen.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
         }
         else if (jtbClose.isSelected()) {
             nFilterEmpStatus = LOAN_STATUS_CLO;
-            jtbClose.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif")));
         }
         else if (jtbAll.isSelected()) {
             nFilterEmpStatus = LOAN_STATUS_ALL;
-            jtbAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")));
         }
         moPaneView.putFilter(LOAN_STATUS, new SGridFilterValue(LOAN_STATUS, SGridConsts.FILTER_DATA_TYPE_INT, nFilterEmpStatus));
         jbClearFilter1.setEnabled(moKeyFilter1.getSelectedIndex() > 0);
@@ -187,9 +186,8 @@ public class SGridFilterPanelLoan extends JPanel implements SGridFilter, ActionL
         jbClearFilter1.setEnabled(moKeyFilter1.getSelectedIndex() > 0);
         moPaneView.getFiltersMap().put(mnFilterType1, new SGridFilterValue(mnFilterType1, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, moKeyFilter1.getSelectedIndex() <= 0 ? null : key));
         
-        jtbOpen.setSelected(true);
+        jtbOpen.setSelected(true); // by default, allways show first opened registries
         moPaneView.getFiltersMap().put(LOAN_STATUS, new SGridFilterValue(LOAN_STATUS, SGridConsts.FILTER_DATA_TYPE_INT, LOAN_STATUS_OPEN));
-        actionEmpStatusStateChange();
         
         moKeyFilter1.addItemListener(this);
         jtbOpen.addItemListener(this);
@@ -223,8 +221,7 @@ public class SGridFilterPanelLoan extends JPanel implements SGridFilter, ActionL
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 JToggleButton toggleButton = (JToggleButton) e.getSource();
 
-                if (toggleButton == jtbOpen || toggleButton == jtbClose ||
-                        toggleButton == jtbAll) {
+                if (toggleButton == jtbOpen || toggleButton == jtbClose || toggleButton == jtbAll) {
                     actionEmpStatusStateChange();
                 }
             }

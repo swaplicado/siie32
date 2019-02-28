@@ -16,7 +16,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SHrsPayrollRowEmployeeAvailable implements SGridRow {
 
@@ -25,7 +25,7 @@ public class SHrsPayrollRowEmployeeAvailable implements SGridRow {
     protected String msCode;
     protected String msName;
 
-    protected ArrayList<SHrsPayrollRowEmployeeAvailable> maEmployeesAvailable;
+    protected ArrayList<SHrsPayrollRowEmployeeAvailable> maHrsEmployeesAvailable;
 
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
     public void setFkPaymentTypeId(int n) { mnFkPaymentTypeId = n; }
@@ -37,17 +37,17 @@ public class SHrsPayrollRowEmployeeAvailable implements SGridRow {
     public String getCode() { return msCode ; }
     public String getName() { return msName ; }
 
-    public ArrayList<SHrsPayrollRowEmployeeAvailable> getHrsPayrollEmployeesAvailable() { return maEmployeesAvailable; }
+    public ArrayList<SHrsPayrollRowEmployeeAvailable> getHrsPayrollEmployeesAvailable() { return maHrsEmployeesAvailable; }
 
     public SHrsPayrollRowEmployeeAvailable() {
-        maEmployeesAvailable = new ArrayList<SHrsPayrollRowEmployeeAvailable>();
+        maHrsEmployeesAvailable = new ArrayList<>();
 
         mnPkEmployeeId = 0;
         mnFkPaymentTypeId = 0;
         msCode = "";
         msName = "";
 
-        maEmployeesAvailable.clear();
+        maHrsEmployeesAvailable.clear();
     }
 
     public void obtainEmployeesAvailable(SGuiSession session, int paymentType, boolean active, Date datePayrollStart, Date datePayrollEnd, String employeesReceiptIds) throws SQLException, Exception {
@@ -66,7 +66,7 @@ public class SHrsPayrollRowEmployeeAvailable implements SGridRow {
             "ORDER BY bp.bp, e.num ";
 
         resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        maEmployeesAvailable.clear();
+        maHrsEmployeesAvailable.clear();
         while (resultSet.next()) {
             employeeId = resultSet.getInt("e.id_emp");
 
@@ -80,7 +80,7 @@ public class SHrsPayrollRowEmployeeAvailable implements SGridRow {
                 employeeAvailable.setCode(resultSet.getString("e.num"));
                 employeeAvailable.setName(resultSet.getString("bp.bp"));
 
-                maEmployeesAvailable.add(employeeAvailable);
+                maHrsEmployeesAvailable.add(employeeAvailable);
             }
         }
     }
@@ -99,7 +99,7 @@ public class SHrsPayrollRowEmployeeAvailable implements SGridRow {
             "ORDER BY bp.bp, e.num ";
 
         resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        maEmployeesAvailable.clear();
+        maHrsEmployeesAvailable.clear();
         while (resultSet.next()) {
             employeeAvailable = new SHrsPayrollRowEmployeeAvailable();
             
@@ -107,7 +107,7 @@ public class SHrsPayrollRowEmployeeAvailable implements SGridRow {
             employeeAvailable.setCode(resultSet.getString("e.num"));
             employeeAvailable.setName(resultSet.getString("bp.bp"));
 
-            maEmployeesAvailable.add(employeeAvailable);
+            maHrsEmployeesAvailable.add(employeeAvailable);
         }
     }
 

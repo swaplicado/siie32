@@ -5,10 +5,11 @@
 package erp.mod.hrs.db;
 
 import java.util.ArrayList;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SHrsFormerPayrollConcept {
 
@@ -21,9 +22,10 @@ public class SHrsFormerPayrollConcept {
     protected int mnHoras_r;
     protected double mdTotalGravado;
     protected double mdTotalExento;
-
-    protected String msClaveIncapacidad;
-    protected boolean mbExtIsFound;
+    
+    protected double mdXtaSubsidioEmpleo;
+    protected String msXtaClaveIncapacidad;
+    protected boolean mbAuxFound;
 
     protected SHrsFormerPayrollExtraTime moChildExtraTimes;
     protected ArrayList<SHrsFormerPayrollIncident> moChildIncidents;
@@ -38,12 +40,13 @@ public class SHrsFormerPayrollConcept {
         mnHoras_r = 0;
         mdTotalGravado = 0;
         mdTotalExento = 0;
-
-        msClaveIncapacidad = "";
-        mbExtIsFound = false;
+        
+        mdXtaSubsidioEmpleo = 0;
+        msXtaClaveIncapacidad = "";
+        mbAuxFound = false;
 
         moChildExtraTimes = new SHrsFormerPayrollExtraTime();
-        moChildIncidents = new ArrayList<SHrsFormerPayrollIncident>();
+        moChildIncidents = new ArrayList<>();
     }
 
     public void setPkTipoConcepto(int n) { mnPkTipoConcepto = n; }
@@ -55,10 +58,7 @@ public class SHrsFormerPayrollConcept {
     public void setHoras_r(int n) { mnHoras_r = n; }
     public void setTotalGravado(double d) { mdTotalGravado = d; }
     public void setTotalExento(double d) { mdTotalExento = d; }
-
-    public void setClaveIncapacidad(String s) { msClaveIncapacidad = s; }
-    public void setExtIsFound(boolean b) { mbExtIsFound = b; }
-
+    
     public int getPkTipoConcepto() { return mnPkTipoConcepto; }
     public int getPkSubtipoConcepto() { return mnPkSubtipoConcepto; }
     public String getClaveEmpresa() { return msClaveEmpresa; }
@@ -68,12 +68,19 @@ public class SHrsFormerPayrollConcept {
     public int getHoras_r() { return mnHoras_r; }
     public double getTotalGravado() { return mdTotalGravado; }
     public double getTotalExento() { return mdTotalExento; }
+    
+    public double getTotalImporte() { return SLibUtils.roundAmount(mdTotalGravado + mdTotalExento); }
+    
+    public void setXtaSubsidioEmpleo(double d) { mdXtaSubsidioEmpleo = d; }
+    public void setXtaClaveIncapacidad(String s) { msXtaClaveIncapacidad = s; }
+    public void setAuxFound(boolean b) { mbAuxFound = b; }
 
-    public String getClaveIncapacidad() { return msClaveIncapacidad; }
-    public boolean getExtIsFound() { return mbExtIsFound; }
+    public double getXtaSubsidioEmpleo() { return mdXtaSubsidioEmpleo; }
+    public String getXtaClaveIncapacidad() { return msXtaClaveIncapacidad; }
+    public boolean isAuxFound() { return mbAuxFound; }
 
     public void setChildPayrollExtraTimes(SHrsFormerPayrollExtraTime o) { moChildExtraTimes = o; }
+    
     public SHrsFormerPayrollExtraTime getChildPayrollExtraTimes() { return moChildExtraTimes; }
-
     public ArrayList<SHrsFormerPayrollIncident> getChildPayrollIncident() { return moChildIncidents; }
 }

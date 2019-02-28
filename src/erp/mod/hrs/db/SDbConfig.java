@@ -29,7 +29,7 @@ public class SDbConfig extends SDbRegistryUser {
     protected String msSsSubbranch;
     protected String msBajioAffinityGroup;
     protected double mdPayrollTaxRate;
-    protected boolean mbFornightStandard;
+    protected boolean mbFortnightStandard;
     protected boolean mbAutoVacationBonus;
     protected boolean mbTaxSubsidyEarning;
     protected boolean mbTaxNet;
@@ -43,6 +43,7 @@ public class SDbConfig extends SDbRegistryUser {
     protected int mnFkEarningVacationsId_n;
     protected int mnFkEarningTaxId_n;
     protected int mnFkEarningTaxSubsidyId_n;
+    protected int mnFkEarningTaxSubsidyCompensatedId_n;
     protected int mnFkEarningSsContributionId_n;
     protected int mnFkDeductionTaxId_n;
     protected int mnFkDeductionTaxSubsidyId_n;
@@ -66,7 +67,7 @@ public class SDbConfig extends SDbRegistryUser {
     public void setSsSubbranch(String s) { msSsSubbranch = s; }
     public void setBajioAffinityGroup(String s) { msBajioAffinityGroup = s; }
     public void setPayrollTaxRate(double d) { mdPayrollTaxRate = d; }
-    public void setFornightStandard(boolean b) { mbFornightStandard = b; }
+    public void setFortnightStandard(boolean b) { mbFortnightStandard = b; }
     public void setAutoVacationBonus(boolean b) { mbAutoVacationBonus = b; }
     public void setTaxSubsidyEarning(boolean b) { mbTaxSubsidyEarning = b; }
     public void setTaxNet(boolean b) { mbTaxNet = b; }
@@ -80,6 +81,7 @@ public class SDbConfig extends SDbRegistryUser {
     public void setFkEarningVacationsId_n(int n) { mnFkEarningVacationsId_n = n; }
     public void setFkEarningTaxId_n(int n) { mnFkEarningTaxId_n = n; }
     public void setFkEarningTaxSubsidyId_n(int n) { mnFkEarningTaxSubsidyId_n = n; }
+    public void setFkEarningTaxSubsidyCompensatedId_n(int n) { mnFkEarningTaxSubsidyCompensatedId_n = n; }
     public void setFkEarningSsContributionId_n(int n) { mnFkEarningSsContributionId_n = n; }
     public void setFkDeductionTaxId_n(int n) { mnFkDeductionTaxId_n = n; }
     public void setFkDeductionTaxSubsidyId_n(int n) { mnFkDeductionTaxSubsidyId_n = n; }
@@ -97,7 +99,7 @@ public class SDbConfig extends SDbRegistryUser {
     public String getSsSubbranch() { return msSsSubbranch; }
     public String getBajioAffinityGroup() { return msBajioAffinityGroup; }
     public double getPayrollTaxRate() { return mdPayrollTaxRate; }
-    public boolean isFornightStandard() { return mbFornightStandard; }
+    public boolean isFortnightStandard() { return mbFortnightStandard; }
     public boolean isAutoVacationBonus() { return mbAutoVacationBonus; }
     public boolean isTaxSubsidyEarning() { return mbTaxSubsidyEarning; }
     public boolean isTaxNet() { return mbTaxNet; }
@@ -111,6 +113,7 @@ public class SDbConfig extends SDbRegistryUser {
     public int getFkEarningVacationsId_n() { return mnFkEarningVacationsId_n; }
     public int getFkEarningTaxId_n() { return mnFkEarningTaxId_n; }
     public int getFkEarningTaxSubsidyId_n() { return mnFkEarningTaxSubsidyId_n; }
+    public int getFkEarningTaxSubsidyCompensatedId_n() { return mnFkEarningTaxSubsidyCompensatedId_n; }
     public int getFkEarningSsContributionId_n() { return mnFkEarningSsContributionId_n; }
     public int getFkDeductionTaxId_n() { return mnFkDeductionTaxId_n; }
     public int getFkDeductionTaxSubsidyId_n() { return mnFkDeductionTaxSubsidyId_n; }
@@ -142,7 +145,7 @@ public class SDbConfig extends SDbRegistryUser {
         msSsSubbranch = "";
         msBajioAffinityGroup = "";
         mdPayrollTaxRate = 0;
-        mbFornightStandard = false;
+        mbFortnightStandard = false;
         mbAutoVacationBonus = false;
         mbTaxSubsidyEarning = false;
         mbTaxNet = false;
@@ -156,6 +159,7 @@ public class SDbConfig extends SDbRegistryUser {
         mnFkEarningVacationsId_n = 0;
         mnFkEarningTaxId_n = 0;
         mnFkEarningTaxSubsidyId_n = 0;
+        mnFkEarningTaxSubsidyCompensatedId_n = 0;
         mnFkEarningSsContributionId_n = 0;
         mnFkDeductionTaxId_n = 0;
         mnFkDeductionTaxSubsidyId_n = 0;
@@ -208,7 +212,7 @@ public class SDbConfig extends SDbRegistryUser {
             msSsSubbranch = resultSet.getString("ss_subbra");
             msBajioAffinityGroup = resultSet.getString("baj_aff_grp");
             mdPayrollTaxRate = resultSet.getDouble("pay_tax_rate");
-            mbFornightStandard = resultSet.getBoolean("b_for_std");
+            mbFortnightStandard = resultSet.getBoolean("b_for_std");
             mbAutoVacationBonus = resultSet.getBoolean("b_auto_vac_bon");
             mbTaxSubsidyEarning = resultSet.getBoolean("b_tax_sub_ear");
             mbTaxNet = resultSet.getBoolean("b_tax_net");
@@ -222,6 +226,7 @@ public class SDbConfig extends SDbRegistryUser {
             mnFkEarningVacationsId_n = resultSet.getInt("fk_ear_vac_n");
             mnFkEarningTaxId_n = resultSet.getInt("fk_ear_tax_n");
             mnFkEarningTaxSubsidyId_n = resultSet.getInt("fk_ear_tax_sub_n");
+            mnFkEarningTaxSubsidyCompensatedId_n = resultSet.getInt("fk_ear_tax_sub_comp_n");
             mnFkEarningSsContributionId_n = resultSet.getInt("fk_ear_ssc_n");
             mnFkDeductionTaxId_n = resultSet.getInt("fk_ded_tax_n");
             mnFkDeductionTaxSubsidyId_n = resultSet.getInt("fk_ded_tax_sub_n");
@@ -260,7 +265,7 @@ public class SDbConfig extends SDbRegistryUser {
                     "'" + msSsSubbranch + "', " + 
                     "'" + msBajioAffinityGroup + "', " + 
                     mdPayrollTaxRate + ", " + 
-                    (mbFornightStandard ? 1 : 0) + ", " + 
+                    (mbFortnightStandard ? 1 : 0) + ", " + 
                     (mbAutoVacationBonus ? 1 : 0) + ", " + 
                     (mbTaxSubsidyEarning ? 1 : 0) + ", " +
                     (mbTaxNet ? 1 : 0) + ", " +
@@ -274,6 +279,7 @@ public class SDbConfig extends SDbRegistryUser {
                     (mnFkEarningVacationsId_n  == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningVacationsId_n) + ", " +
                     (mnFkEarningTaxId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxId_n) + ", " +
                     (mnFkEarningTaxSubsidyId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyId_n) + ", " +
+                    (mnFkEarningTaxSubsidyCompensatedId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyCompensatedId_n) + ", " +
                     (mnFkEarningSsContributionId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningSsContributionId_n) + ", " +
                     (mnFkDeductionTaxId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkDeductionTaxId_n) + ", " +
                     (mnFkDeductionTaxSubsidyId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkDeductionTaxSubsidyId_n) + ", " +
@@ -296,7 +302,7 @@ public class SDbConfig extends SDbRegistryUser {
                     "ss_subbra = '" + msSsSubbranch + "', " +
                     "baj_aff_grp = '" + msBajioAffinityGroup + "', " +
                     "pay_tax_rate = " + mdPayrollTaxRate + ", " +
-                    "b_for_std = " + (mbFornightStandard ? 1 : 0) + ", " +
+                    "b_for_std = " + (mbFortnightStandard ? 1 : 0) + ", " +
                     "b_auto_vac_bon = " + (mbAutoVacationBonus ? 1 : 0) + ", " +
                     "b_tax_sub_ear = " + (mbTaxSubsidyEarning ? 1 : 0) + ", " +
                     "b_tax_net = " + (mbTaxNet ? 1 : 0) + ", " +
@@ -310,6 +316,7 @@ public class SDbConfig extends SDbRegistryUser {
                     "fk_ear_vac_n = " + (mnFkEarningVacationsId_n  == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningVacationsId_n) + ", " +
                     "fk_ear_tax_n = " + (mnFkEarningTaxId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxId_n) + ", " +
                     "fk_ear_tax_sub_n = " + (mnFkEarningTaxSubsidyId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyId_n) + ", " +
+                    "fk_ear_tax_sub_comp_n = " + (mnFkEarningTaxSubsidyCompensatedId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyCompensatedId_n) + ", " +
                     "fk_ear_ssc_n = " + (mnFkEarningSsContributionId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningSsContributionId_n) + ", " +
                     "fk_ded_tax_n = " + (mnFkDeductionTaxId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkDeductionTaxId_n) + ", " +
                     "fk_ded_tax_sub_n = " + (mnFkDeductionTaxSubsidyId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkDeductionTaxSubsidyId_n) + ", " +
@@ -338,7 +345,7 @@ public class SDbConfig extends SDbRegistryUser {
         registry.setSsSubbranch(this.getSsSubbranch());
         registry.setBajioAffinityGroup(this.getBajioAffinityGroup());
         registry.setPayrollTaxRate(this.getPayrollTaxRate());
-        registry.setFornightStandard(this.isFornightStandard());
+        registry.setFortnightStandard(this.isFortnightStandard());
         registry.setAutoVacationBonus(this.isAutoVacationBonus());
         registry.setTaxSubsidyEarning(this.isTaxSubsidyEarning());
         registry.setTaxNet(this.isTaxNet());
@@ -352,6 +359,7 @@ public class SDbConfig extends SDbRegistryUser {
         registry.setFkEarningVacationsId_n(this.getFkEarningVacationsId_n());
         registry.setFkEarningTaxId_n(this.getFkEarningTaxId_n());
         registry.setFkEarningTaxSubsidyId_n(this.getFkEarningTaxSubsidyId_n());
+        registry.setFkEarningTaxSubsidyCompensatedId_n(this.getFkEarningTaxSubsidyCompensatedId_n());
         registry.setFkEarningSsContributionId_n(this.getFkEarningSsContributionId_n());
         registry.setFkDeductionTaxId_n(this.getFkDeductionTaxId_n());
         registry.setFkDeductionTaxSubsidyId_n(this.getFkDeductionTaxSubsidyId_n());

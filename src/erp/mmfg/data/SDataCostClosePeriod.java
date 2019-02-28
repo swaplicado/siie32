@@ -16,10 +16,11 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 
 public class SDataCostClosePeriod extends erp.lib.data.SDataRegistry implements java.io.Serializable {
@@ -63,21 +64,20 @@ public class SDataCostClosePeriod extends erp.lib.data.SDataRegistry implements 
 
         SDataRecord oRecord = null;
         SDataRecordEntry oRecordEntry = null;
-        SimpleDateFormat oFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         try {
             // 01. Create record accounting (header) by date:
 
             oRecord = new SDataRecord();
             oRecord.setPrimaryKey(new Object[] { mvDbmsPeriod[0], mvDbmsPeriod[1], mnDbmsPkBookkepingCenterId, "CP", 0 });
-            oRecord = createRecordHeader(oRecord, oCost, "DOC. LABORAL, FECHA: " + oFormat.format(oCost.getPkDateId()));
+            oRecord = createRecordHeader(oRecord, oCost, "DOC. LABORAL, FECHA: " + SLibUtils.DateFormatDate.format(oCost.getPkDateId()));
 
             // 02. Create entry record accounting with account 'fid_acc_payroll':
 
             oRecordEntry = new SDataRecordEntry();
             oRecordEntry.setPrimaryKey(new Object[] { oRecord.getPkYearId(), oRecord.getPkPeriodId(), oRecord.getPkBookkeepingCenterId(), oRecord.getPkRecordTypeId(), oRecord.getPkNumberId(), 0 });
             oRecordEntry = createRecordEntry(oRecordEntry, oCost, msDbmsFkAccountPayRoll,
-                    "DOC. LABORAL, FECHA: " + oFormat.format(oCost.getPkDateId()) +
+                    "DOC. LABORAL, FECHA: " + SLibUtils.DateFormatDate.format(oCost.getPkDateId()) +
                     "TIPO HORA: ", 1, 0, calculateTotalHours(connection, oCost, oCost.getQuantity()));
             oRecord.getDbmsRecordEntries().add(oRecordEntry);
 
@@ -86,7 +86,7 @@ public class SDataCostClosePeriod extends erp.lib.data.SDataRegistry implements 
             oRecordEntry = new SDataRecordEntry();
             oRecordEntry.setPrimaryKey(new Object[] { oRecord.getPkYearId(), oRecord.getPkPeriodId(), oRecord.getPkBookkeepingCenterId(), oRecord.getPkRecordTypeId(), oRecord.getPkNumberId(), 0 });
             oRecordEntry = createRecordEntry(oRecordEntry, oCost, msDbmsFkAccountMfgWp,
-                    "DOC. LABORAL, FECHA: " + oFormat.format(oCost.getPkDateId()) +
+                    "DOC. LABORAL, FECHA: " + SLibUtils.DateFormatDate.format(oCost.getPkDateId()) +
                     "TIPO HORA: ", 1, calculateTotalHours(connection, oCost, oCost.getQuantity()), 0);
             oRecord.getDbmsRecordEntries().add(oRecordEntry);
 

@@ -311,7 +311,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                 if (SLibUtils.compareKeys(new int[] { hrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId() }, new int[] { hrsReceiptEarningRow.getHrsReceipt().getHrsEmployee().getEmployee().getPkEmployeeId() })) { // recibo del empleado en el grid
                     hrsReceiptEarningRow.setHrsReceipt(hrsReceipt);
 
-                    for (SHrsPayrollReceiptEarning earningRow : hrsReceipt.getHrsEarnings()) { // read array list ear/ded
+                    for (SHrsPayrollReceiptEarning earningRow : hrsReceipt.getHrsReceiptEarnings()) { // read array list ear/ded
                         found = true;
 
                         if (SLibUtils.compareKeys(earningRow.getRowPrimaryKey(), hrsReceiptEarningRow.getRowPrimaryKey())) {  // exists ear/ded
@@ -377,7 +377,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
             for (SHrsPayrollReceipt hrsReceipt : maReceipts) { // read receipt
                 found = false;
 
-                for (SHrsPayrollReceiptEarning earning : hrsReceipt.getHrsEarnings()) { // read array list ear/ded
+                for (SHrsPayrollReceiptEarning earning : hrsReceipt.getHrsReceiptEarnings()) { // read array list ear/ded
                     if (SLibUtils.compareKeys(earning.getHrsReceipt().getHrsEmployee().getEmployee().getPrimaryKey(), hrsReceipt.getHrsEmployee().getEmployee().getPrimaryKey())) {
                         if (SLibUtils.compareKeys(new int[] { earning.getEarning().getPkEarningId() }, new int[] { moKeyEarning.getValue()[0] })) {  // exists ear/ded
                             hrsReceiptEarningRow = new SHrsPayrollReceiptEarning();
@@ -409,7 +409,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                         hrsReceiptEarningRow.setHrsReceipt(hrsReceipt);
 
                         hrsReceiptEarningRow.setInputMode(SHrsPayrollReceiptEarning.INPUT_BY_EAR);
-                        hrsReceiptEarningRow.setPkMoveId(hrsReceipt.getHrsEarnings().size() + 1);
+                        hrsReceiptEarningRow.setPkMoveId(hrsReceipt.getHrsReceiptEarnings().size() + 1);
                         hrsReceiptEarningRow.setXtaEmployee(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
                         hrsReceiptEarningRow.setXtaValueAlleged(0d);
                         hrsReceiptEarningRow.setXtaValue(0d);

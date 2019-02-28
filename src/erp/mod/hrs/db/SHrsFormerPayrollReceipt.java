@@ -96,7 +96,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     protected double mdAuxSueldoMensual;
 
     protected SHrsFormerPayroll moPayroll;
-    protected ArrayList<SHrsFormerPayrollConcept> moChildPayrollConcept;
+    protected ArrayList<SHrsFormerPayrollConcept> moChildPayrollConcepts;
 
     public SHrsFormerPayrollReceipt(SHrsFormerPayroll payroll, SClientInterface client) {
         miClient = client;
@@ -149,7 +149,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         mdAuxSueldoMensual = 0;
 
         moPayroll = payroll;
-        moChildPayrollConcept = new ArrayList<>();
+        moChildPayrollConcepts = new ArrayList<>();
     }
 
     public void setPkEmpleadoId(int n) { mnPkEmpleadoId = n; }
@@ -246,59 +246,64 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public double getAuxSueldoMensual() { return mdAuxSueldoMensual; }
     
     public SHrsFormerPayroll getPayroll() { return moPayroll; }
-    public ArrayList<SHrsFormerPayrollConcept> getChildPayrollConcept() { return moChildPayrollConcept; }
+    public ArrayList<SHrsFormerPayrollConcept> getChildPayrollConcepts() { return moChildPayrollConcepts; }
 
     /*
      * CFDI methods:
      */
-    
-    private boolean isTypeContractCommisionLaborLess() {
-        return msTipoContrato.compareTo((String) miClient.getSession().readField(SModConsts.HRSS_TP_CON, new int[] { SModSysConsts.HRSS_TP_CON_TME_DET }, SDbRegistry.FIELD_CODE)) >= 0 &&
-                msTipoContrato.compareTo((String) miClient.getSession().readField(SModConsts.HRSS_TP_CON, new int[] { SModSysConsts.HRSS_TP_CON_LAB_CMM }, SDbRegistry.FIELD_CODE)) <= 0;
+
+    private boolean isTypeContractForEmployment() {
+        return msTipoContrato.compareTo(DCfdi33Catalogs.ClaveTipoContratoModalidadTrabajoComision) <= 0;
     }
     
-    private boolean isRecruitmentSchemePensionersLess() {
+    private boolean isRecruitmentSchemeForEmployment() {
         String tipoRegimen = (String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { mnTipoRegimen }, SDbRegistry.FIELD_CODE);
         
-        return tipoRegimen.compareTo((String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { SModSysConsts.HRSS_TP_REC_SCHE_WAG }, SDbRegistry.FIELD_CODE)) >= 0 &&
-                tipoRegimen.compareTo((String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { SModSysConsts.HRSS_TP_REC_SCHE_PEN }, SDbRegistry.FIELD_CODE)) <= 0;
+        return tipoRegimen.equals(DCfdi33Catalogs.ClaveTipoRegimenSueldos) || 
+                tipoRegimen.equals(DCfdi33Catalogs.ClaveTipoRegimenJubilados) || 
+                tipoRegimen.equals(DCfdi33Catalogs.ClaveTipoRegimenPensionados) || 
+                tipoRegimen.equals(DCfdi33Catalogs.ClaveTipoRegimenJubiladosOPensionados);
     }
     
-    private cfd.ver3.nom12.DElementDeduccion createDeductionNode(final SHrsFormerPayrollConcept concept) {
+    private String composeKey(final String key, final int minLen) {
+        return key.length() < minLen ? SLibUtils.textRepeat("0", minLen - key.length()) + key : key;
+    }
+    
+    private cfd.ver3.nom12.DElementDeduccion createElementDeduction(final SHrsFormerPayrollConcept concept) {
         cfd.ver3.nom12.DElementDeduccion deduccion = new cfd.ver3.nom12.DElementDeduccion();
 
         deduccion.getAttTipoDeduccion().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED, new int[] { concept.getClaveOficial() }, SDbRegistry.FIELD_CODE));
-        deduccion.getAttClave().setString(DCfdVer3Utils.formatAttributeValueAsKey(concept.getClaveEmpresa().length() < 3 ? SLibUtils.textRepeat("0", 3 - concept.getClaveEmpresa().length()) + concept.getClaveEmpresa() : concept.getClaveEmpresa()));
-        deduccion.getAttConcepto().setString(DCfdVer3Utils.formatAttributeValueAsText(concept.getConcepto()));
-        deduccion.getAttImporte().setDouble(concept.getTotalGravado() + concept.getTotalExento());
+        deduccion.getAttClave().setString(DCfdVer3Utils.formatAttributeValueAsKey(composeKey(concept.getClaveEmpresa(), 3)));
+        deduccion.getAttConcepto().setString(SLibUtils.textToXml(concept.getConcepto()));
+        deduccion.getAttImporte().setDouble(concept.getTotalImporte());
         
         return deduccion;
     }
     
-    private cfd.ver3.nom12.DElementPercepcion createEarningNode(final SHrsFormerPayrollConcept concept) {
+    private cfd.ver3.nom12.DElementPercepcion createElementEarning(final SHrsFormerPayrollConcept concept) {
         cfd.ver3.nom12.DElementPercepcion percepcion = new cfd.ver3.nom12.DElementPercepcion();
 
         percepcion.getAttTipoPercepcion().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR, new int[] { concept.getClaveOficial() }, SDbRegistry.FIELD_CODE));
-        percepcion.getAttClave().setString(DCfdVer3Utils.formatAttributeValueAsKey(concept.getClaveEmpresa().length() < 3 ? SLibUtils.textRepeat("0", 3 - concept.getClaveEmpresa().length()) + concept.getClaveEmpresa() : concept.getClaveEmpresa()));
-        percepcion.getAttConcepto().setString(DCfdVer3Utils.formatAttributeValueAsText(concept.getConcepto()));
+        percepcion.getAttClave().setString(DCfdVer3Utils.formatAttributeValueAsKey(composeKey(concept.getClaveEmpresa(), 3)));
+        percepcion.getAttConcepto().setString(SLibUtils.textToXml(concept.getConcepto()));
         percepcion.getAttImporteGravado().setDouble(concept.getTotalGravado());
         percepcion.getAttImporteExento().setDouble(concept.getTotalExento());
         
         return percepcion;
     }
     
-    private cfd.ver3.nom12.DElementHorasExtra createEarningOverTimeNode(final SHrsFormerPayrollConcept concept) {
+    private cfd.ver3.nom12.DElementHorasExtra createElementEarningOverTime(final SHrsFormerPayrollConcept concept) {
         cfd.ver3.nom12.DElementHorasExtra horasExtra = new cfd.ver3.nom12.DElementHorasExtra();
 
         horasExtra.getAttDias().setInteger((int) concept.getCantidad());
         horasExtra.getAttTipoHoras().setString(concept.getPkSubtipoConcepto() == SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1] ? SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE_CODE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE_CODE);
         horasExtra.getAttHorasExtra().setInteger(concept.getHoras_r());
-        horasExtra.getAttImportePagado().setDouble(concept.getTotalGravado() + concept.getTotalExento());
+        horasExtra.getAttImportePagado().setDouble(concept.getTotalImporte());
         
         return horasExtra;
     }
     
-    private cfd.ver3.nom12.DElementSeparacionIndemnizacion createEarningSeparationNode(final double totalGravado, final double totalExento) {
+    private cfd.ver3.nom12.DElementSeparacionIndemnizacion createElementEarningSeparation(final double totalGravado, final double totalExento) {
         cfd.ver3.nom12.DElementSeparacionIndemnizacion separacionIndemnizacion = new DElementSeparacionIndemnizacion();
         
         separacionIndemnizacion.getAttTotalPagado().setDouble(totalGravado + totalExento);
@@ -310,51 +315,47 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         return separacionIndemnizacion;
     }
     
-    private cfd.ver3.nom12.DElementIncapacidad createEarningDisabilityNode(final SHrsFormerPayrollConcept concept) {
+    private cfd.ver3.nom12.DElementIncapacidad createElementEarningDisability(final SHrsFormerPayrollConcept concept) {
         cfd.ver3.nom12.DElementIncapacidad incapacidad =  new DElementIncapacidad();
         
         incapacidad.getAttDiasIncapacidad().setInteger((int) concept.getCantidad());
-        incapacidad.getAttTipoIncapacidad().setString(concept.getClaveIncapacidad());
-        incapacidad.getAttImporteMonetario().setDouble(concept.getTotalGravado() + concept.getTotalExento());
+        incapacidad.getAttTipoIncapacidad().setString(concept.getXtaClaveIncapacidad());
+        incapacidad.getAttImporteMonetario().setDouble(concept.getTotalImporte());
         
         return incapacidad;
     }
     
-    private cfd.ver3.nom12.DElementOtroPago createEarningOtherPayNode(final SHrsFormerPayrollConcept concept) {
-        String otherPaymentKey = "";
-
+    private cfd.ver3.nom12.DElementOtroPago createElementEarningOtherPay(final SHrsFormerPayrollConcept concept) {
         cfd.ver3.nom12.DElementOtroPago otroPago = null;
-        cfd.ver3.nom12.DElementSubsidioEmpleo subsidioEmpleo = null;
 
-        if (concept.getTotalGravado() > 0 || concept.getTotalExento() > 0) {
-            otroPago = new cfd.ver3.nom12.DElementOtroPago();
+        if (concept.getTotalImporte() != 0 || concept.getXtaSubsidioEmpleo() != 0) {
+            String otherPaymentKey = "";
             
-            if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
-                subsidioEmpleo = new cfd.ver3.nom12.DElementSubsidioEmpleo();
-                
-                // Obtain key for other payment type:
-
-                otherPaymentKey = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB }, SDbRegistry.FIELD_CODE);
-
-                otroPago.getAttTipoOtroPago().setString(otherPaymentKey);
-                otroPago.getAttClave().setString(DCfdVer3Utils.formatAttributeValueAsKey(concept.getClaveEmpresa().length() < 3 ? SLibUtils.textRepeat("0", 3 - concept.getClaveEmpresa().length()) + concept.getClaveEmpresa() : concept.getClaveEmpresa()));
-                otroPago.getAttConcepto().setString(DCfdVer3Utils.formatAttributeValueAsText(concept.getConcepto()));
-                otroPago.getAttImporte().setDouble(concept.getTotalGravado() + concept.getTotalExento());
-
-                subsidioEmpleo.getAttSubsidioCausado().setDouble(concept.getTotalGravado() + concept.getTotalExento());
-
-                otroPago.setEltSubsidioEmpleo(subsidioEmpleo);
-                
+            switch (concept.getClaveOficial()) {
+                case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
+                    otherPaymentKey = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB }, SDbRegistry.FIELD_CODE);
+                    break;
+                    
+                case SModSysConsts.HRSS_TP_EAR_OTH:
+                    otherPaymentKey = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_OTH }, SDbRegistry.FIELD_CODE);
+                    break;
+                    
+                default:
             }
-            else if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_OTH) {
-                // Obtain key for other payment type:
-
-                otherPaymentKey = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_OTH }, SDbRegistry.FIELD_CODE);
-
+            
+            if (!otherPaymentKey.isEmpty()) {
+                otroPago = new cfd.ver3.nom12.DElementOtroPago();
                 otroPago.getAttTipoOtroPago().setString(otherPaymentKey);
-                otroPago.getAttClave().setString(DCfdVer3Utils.formatAttributeValueAsKey(concept.getClaveEmpresa().length() < 3 ? SLibUtils.textRepeat("0", 3 - concept.getClaveEmpresa().length()) + concept.getClaveEmpresa() : concept.getClaveEmpresa()));
-                otroPago.getAttConcepto().setString(DCfdVer3Utils.formatAttributeValueAsText(concept.getConcepto()));
-                otroPago.getAttImporte().setDouble(concept.getTotalGravado() + concept.getTotalExento());
+                otroPago.getAttClave().setString(DCfdVer3Utils.formatAttributeValueAsKey(composeKey(concept.getClaveEmpresa(), 3)));
+                otroPago.getAttConcepto().setString(SLibUtils.textToXml(concept.getConcepto()));
+                otroPago.getAttImporte().setDouble(concept.getTotalImporte());
+                
+                if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
+                    cfd.ver3.nom12.DElementSubsidioEmpleo subsidioEmpleo = new cfd.ver3.nom12.DElementSubsidioEmpleo();
+                    subsidioEmpleo.getAttSubsidioCausado().setDouble(concept.getXtaSubsidioEmpleo());
+
+                    otroPago.setEltSubsidioEmpleo(subsidioEmpleo);
+                }
             }
         }
         
@@ -397,16 +398,16 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         nomina.getAttRiesgoPuesto().setInteger(mnRiesgoPuesto);
         nomina.getAttSalarioDiarioIntegrado().setDouble(mdSalarioDiarioIntegrado);
 
-        for (SHrsFormerPayrollConcept concept : moChildPayrollConcept) {
+        for (SHrsFormerPayrollConcept concept : moChildPayrollConcepts) {
             switch (concept.getPkTipoConcepto()) {
                 case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
                     cfd.ver3.nom11.DElementPercepcion percepcion = new DElementPercepcion();
 
-                    dTotalTaxedPerceptions += concept.getTotalGravado();
-                    dTotalExemptPerceptions += concept.getTotalExento();
+                    dTotalTaxedPerceptions = SLibUtils.roundAmount(dTotalTaxedPerceptions + concept.getTotalGravado());
+                    dTotalExemptPerceptions = SLibUtils.roundAmount(dTotalExemptPerceptions + concept.getTotalExento());
 
                     percepcion.getAttTipoPercepcion().setInteger(concept.getClaveOficial());
-                    percepcion.getAttClave().setString(concept.getClaveEmpresa().length() < 3 ? SLibUtils.textRepeat("0", 3 - concept.getClaveEmpresa().length()) + concept.getClaveEmpresa() : concept.getClaveEmpresa());
+                    percepcion.getAttClave().setString(composeKey(concept.getClaveEmpresa(), 3));
                     percepcion.getAttConcepto().setString(concept.getConcepto());
                     percepcion.getAttImporteGravado().setDouble(concept.getTotalGravado());
                     percepcion.getAttImporteExento().setDouble(concept.getTotalExento());
@@ -419,9 +420,9 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
                         horasExtra.getAttDias().setInteger((int) concept.getCantidad());
                         horasExtra.getAttTipoHoras().setString(concept.getPkSubtipoConcepto() == SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1] ? SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE);
                         horasExtra.getAttHorasExtra().setInteger(concept.getHoras_r());
-                        horasExtra.getAttImportePagado().setDouble(concept.getTotalGravado() + concept.getTotalExento());
+                        horasExtra.getAttImportePagado().setDouble(concept.getTotalImporte());
 
-                        dTotalExtraTime += concept.getTotalGravado() + concept.getTotalExento();
+                        dTotalExtraTime = SLibUtils.roundAmount(dTotalExtraTime + concept.getTotalImporte());
 
                         horasExtras.getEltHijosHorasExtra().add(horasExtra);
                     }
@@ -429,11 +430,11 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
                 case SCfdConsts.CFDI_PAYROLL_DEDUCTION:
                     cfd.ver3.nom11.DElementDeduccion deduccion = new DElementDeduccion();
 
-                    dTotalTaxedDeductions += concept.getTotalGravado();
-                    dTotalExemptDeductions += concept.getTotalExento();
+                    dTotalTaxedDeductions = SLibUtils.roundAmount(dTotalTaxedDeductions + concept.getTotalGravado());
+                    dTotalExemptDeductions = SLibUtils.roundAmount(dTotalExemptDeductions + concept.getTotalExento());
 
                     deduccion.getAttTipoDeduccion().setInteger(concept.getClaveOficial());
-                    deduccion.getAttClave().setString(concept.getClaveEmpresa().length() < 3 ? SLibUtils.textRepeat("0", 3 - concept.getClaveEmpresa().length()) + concept.getClaveEmpresa() : concept.getClaveEmpresa());
+                    deduccion.getAttClave().setString(composeKey(concept.getClaveEmpresa(), 3));
                     deduccion.getAttConcepto().setString(concept.getConcepto());
                     deduccion.getAttImporteGravado().setDouble(concept.getTotalGravado());
                     deduccion.getAttImporteExento().setDouble(concept.getTotalExento());
@@ -495,25 +496,25 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         cfd.ver3.nom12.DElementOtrosPagos otrosPagos = new cfd.ver3.nom12.DElementOtrosPagos();
         
         if (SLibUtils.belongsTo(moPayroll.getFkNominaTipoId(), new int[] { SModSysConsts.HRSS_TP_PAY_SHT_NOR, SModSysConsts.HRSS_TP_PAY_SHT_SPE } )) {
-            sPayrollType = SHrsConsts.TXT_PAY_ORD;
+            sPayrollType = DCfdi33Catalogs.ClaveNominaOrd;
         }
         else if (SLibUtils.belongsTo(moPayroll.getFkNominaTipoId(), new int[] { SModSysConsts.HRSS_TP_PAY_SHT_EXT } )) {
-            sPayrollType = SHrsConsts.TXT_PAY_EXT;
-            msPeriodicidadPago = SHrsConsts.TXT_TP_PAY_OTH;
+            sPayrollType = DCfdi33Catalogs.ClaveNominaExt;
+            msPeriodicidadPago = DCfdi33Catalogs.ClavePeriodicidadPagoOtra;
         }
         
         nomina.getAttTipoNomina().setString(sPayrollType);
         nomina.getAttFechaPago().setDate(mtFechaPago);
         nomina.getAttFechaInicialPago().setDate(mtFechaInicialPago);
         nomina.getAttFechaFinalPago().setDate(mtFechaFinalPago);
-        nomina.getAttNumDiasPagados().setDouble(mdNumDiasPagados == 0d ? SHrsConsts.NUM_DAY_PAY_MIN : mdNumDiasPagados);
+        nomina.getAttNumDiasPagados().setDouble(mdNumDiasPagados == 0d ? DCfdi33Catalogs.DIAS_PAG_MIN : mdNumDiasPagados);
         
         // Create node Emisor:
         
-        if (isTypeContractCommisionLaborLess()) {
-            //emisor.getAttCurp().setString(...); // not yet supported!
+        if (isTypeContractForEmployment()) {
+            //emisor.getAttCurp().setString(...); // individuals as employeer not yet supported!
             emisor.getAttRegistroPatronal().setString(DCfdVer3Utils.formatAttributeValueAsKey(msRegistroPatronal));
-            //emisor.getAttRfcPatronOrigen().setString(...); // not yet supported!
+            //emisor.getAttRfcPatronOrigen().setString(...); // labor outsourcing not yet supported!
             
             // Create node Receptor:
             
@@ -535,20 +536,18 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         }
         
         receptor.getAttNumEmpleado().setString(DCfdVer3Utils.formatAttributeValueAsKey(msNumEmpleado));
-        receptor.getAttDepartamento().setString(DCfdVer3Utils.formatAttributeValueAsText(msDepartamento));
-        receptor.getAttPuesto().setString(DCfdVer3Utils.formatAttributeValueAsText(msPuesto));
+        receptor.getAttDepartamento().setString(SLibUtils.textToXml(msDepartamento));
+        receptor.getAttPuesto().setString(SLibUtils.textToXml(msPuesto));
         receptor.getAttPeriodicidadPago().setString(msPeriodicidadPago);
         
         // Validate recruitment scheme:
         
-        if (isTypeContractCommisionLaborLess() &&
-                !isRecruitmentSchemePensionersLess()) {
-            throw new Exception("El tipo régimen no es 02, 03 ó 04.");
+        if (isTypeContractForEmployment() && !isRecruitmentSchemeForEmployment()) {
+            throw new Exception("El tipo régimen no corresponde a una relación laboral subordinada.");
         }
         
-        if (!isTypeContractCommisionLaborLess() &&
-                isRecruitmentSchemePensionersLess()) {
-            throw new Exception("El tipo régimen no está entre 05 a 99.");
+        if (!isTypeContractForEmployment() && isRecruitmentSchemeForEmployment()) {
+            throw new Exception("El tipo régimen no corresponde a un esquema insubordinado.");
         }
         
         receptor.getAttTipoRegimen().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { mnTipoRegimen }, SDbRegistry.FIELD_CODE));
@@ -570,61 +569,69 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         receptor.getAttSalarioDiarioIntegrado().setDouble(mdSalarioDiarioIntegrado);
         receptor.getAttClaveEntFed().setString(msClaveEstado);
         
-        for (SHrsFormerPayrollConcept concept : moChildPayrollConcept) {
+        for (SHrsFormerPayrollConcept concept : moChildPayrollConcepts) {
             switch (concept.getPkTipoConcepto()) {
                 case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
-                    if (concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_TAX_SUB && concept.getClaveOficial() != SModSysConsts.HRSS_TP_EAR_OTH) {
-                        if (concept.getTotalGravado() > 0 || concept.getTotalExento() > 0) {
-                            cfd.ver3.nom12.DElementPercepcion percepcion = createEarningNode(concept);
-
-                            switch (concept.getClaveOficial()) {
-                                case SModSysConsts.HRSS_TP_EAR_OVR_TME:
-                                    percepcion.getEltHijosHorasExtra().add(createEarningOverTimeNode(concept));
-                                    break;
-                                case SModSysConsts.HRSS_TP_EAR_DIS:
-                                    incapacidades.getEltHijosIncapacidad().add(createEarningDisabilityNode(concept));
-                                    break;
-                                case SModSysConsts.HRSS_TP_EAR_SEN_BON:
-                                case SModSysConsts.HRSS_TP_EAR_SET:
-                                case SModSysConsts.HRSS_TP_EAR_CMP:
-                                    dTotalSeparacionIndemnizacionGravado = SLibUtils.round((dTotalSeparacionIndemnizacionGravado + percepcion.getAttImporteGravado().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                                    dTotalSeparacionIndemnizacionExento = SLibUtils.round((dTotalSeparacionIndemnizacionExento + percepcion.getAttImporteExento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                                    break;
-                                default:
+                    switch (concept.getClaveOficial()) {
+                        case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
+                        case SModSysConsts.HRSS_TP_EAR_OTH:
+                            cfd.ver3.nom12.DElementOtroPago otroPago = createElementEarningOtherPay(concept);
+                            if (otroPago != null) {
+                                otrosPagos.getEltHijosOtroPago().add(otroPago);
                             }
+                            break;
+                            
+                        default:
+                            if (concept.getTotalImporte() != 0) {
+                                cfd.ver3.nom12.DElementPercepcion percepcion = createElementEarning(concept);
 
-                            if (!SLibUtils.belongsTo(concept.getClaveOficial(), new int[] { SModSysConsts.HRSS_TP_EAR_SEN_BON, SModSysConsts.HRSS_TP_EAR_SET, SModSysConsts.HRSS_TP_EAR_CMP })) { 
-                                dTotalSueldos = SLibUtils.round((dTotalSueldos + (percepcion.getAttImporteGravado().getDouble() + percepcion.getAttImporteExento().getDouble())), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                                switch (concept.getClaveOficial()) {
+                                    case SModSysConsts.HRSS_TP_EAR_OVR_TME:
+                                        percepcion.getEltHijosHorasExtra().add(createElementEarningOverTime(concept));
+                                        break;
+                                        
+                                    case SModSysConsts.HRSS_TP_EAR_DIS:
+                                        incapacidades.getEltHijosIncapacidad().add(createElementEarningDisability(concept));
+                                        break;
+                                        
+                                    case SModSysConsts.HRSS_TP_EAR_SEN_BON:
+                                    case SModSysConsts.HRSS_TP_EAR_SET:
+                                    case SModSysConsts.HRSS_TP_EAR_CMP:
+                                        dTotalSeparacionIndemnizacionGravado = SLibUtils.roundAmount(dTotalSeparacionIndemnizacionGravado + percepcion.getAttImporteGravado().getDouble());
+                                        dTotalSeparacionIndemnizacionExento = SLibUtils.roundAmount(dTotalSeparacionIndemnizacionExento + percepcion.getAttImporteExento().getDouble());
+                                        break;
+                                        
+                                    default:
+                                }
+
+                                if (!SLibUtils.belongsTo(concept.getClaveOficial(), new int[] { SModSysConsts.HRSS_TP_EAR_SEN_BON, SModSysConsts.HRSS_TP_EAR_SET, SModSysConsts.HRSS_TP_EAR_CMP })) { 
+                                    dTotalSueldos = SLibUtils.roundAmount(dTotalSueldos + (percepcion.getAttImporteGravado().getDouble() + percepcion.getAttImporteExento().getDouble()));
+                                }
+                                
+                                dTotalGravado = SLibUtils.roundAmount(dTotalGravado + percepcion.getAttImporteGravado().getDouble());
+                                dTotalExento = SLibUtils.roundAmount(dTotalExento + percepcion.getAttImporteExento().getDouble());
+
+                                percepciones.getEltHijosPercepcion().add(percepcion);
                             }
-                            dTotalGravado = SLibUtils.round((dTotalGravado + percepcion.getAttImporteGravado().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-                            dTotalExento = SLibUtils.round((dTotalExento + percepcion.getAttImporteExento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-
-                            percepciones.getEltHijosPercepcion().add(percepcion);
-                        }
-                    }
-                    else if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_TAX_SUB || concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_OTH) {
-                        cfd.ver3.nom12.DElementOtroPago otroPago = createEarningOtherPayNode(concept);
-                        
-                        if (otroPago != null) {
-                            otrosPagos.getEltHijosOtroPago().add(otroPago);
-                        }
                     }
                     break;
+                    
                 case SCfdConsts.CFDI_PAYROLL_DEDUCTION:
-                    if (concept.getTotalGravado() > 0 || concept.getTotalExento() > 0) {
+                    if (concept.getTotalImporte() != 0) {
                         if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_DED_TAX) {
-                            dTotalImpuestosRetenidos += concept.getTotalGravado() + concept.getTotalExento();
+                            dTotalImpuestosRetenidos = SLibUtils.roundAmount(dTotalImpuestosRetenidos + concept.getTotalImporte());
                         }
                         else {
-                            dTotalOtrasDeducciones += concept.getTotalGravado() + concept.getTotalExento();
+                            dTotalOtrasDeducciones = SLibUtils.roundAmount(dTotalOtrasDeducciones + concept.getTotalImporte());
 
                             if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_DED_DIS) {
-                                incapacidades.getEltHijosIncapacidad().add(createEarningDisabilityNode(concept));
+                                incapacidades.getEltHijosIncapacidad().add(createElementEarningDisability(concept));
                             }
                         }
-                        deducciones.getEltHijosDeduccion().add(createDeductionNode(concept));
+                        deducciones.getEltHijosDeduccion().add(createElementDeduction(concept));
                     }
                     break;
+                    
                 default:
             }
         }
@@ -633,7 +640,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         nomina.setEltReceptor(receptor);
         
         if (dTotalSeparacionIndemnizacionGravado > 0 || dTotalSeparacionIndemnizacionExento > 0) {
-            percepciones.setEltSeparacionIndemnizacion(createEarningSeparationNode(dTotalSeparacionIndemnizacionGravado, dTotalSeparacionIndemnizacionExento));
+            percepciones.setEltSeparacionIndemnizacion(createElementEarningSeparation(dTotalSeparacionIndemnizacionGravado, dTotalSeparacionIndemnizacionExento));
             dTotalSeparacionIndemnizacion = dTotalSeparacionIndemnizacionGravado + dTotalSeparacionIndemnizacionExento;
         }
         
@@ -884,7 +891,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         concepto.setCantidad(1);
         concepto.setClaveUnidad(DCfdi33Catalogs.ClaveUnidadAct);
         concepto.setUnidad("");
-        concepto.setDescripcion(DCfdi33Catalogs.ConceptoServsSueldosSalarios);
+        concepto.setDescripcion(DCfdi33Catalogs.ConceptoSueldosSalarios);
         concepto.setValorUnitario(mdTotalPercepciones);
         concepto.setImporte(mdTotalPercepciones);
         concepto.setDescuento(mdTotalDeducciones);

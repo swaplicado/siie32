@@ -50,7 +50,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
     private erp.lib.table.STablePaneGrid moTablePaneReceiptSelected;
     private final ArrayList<SHrsPayrollEmployeeReceipt> maHrsPayrollEmployeeReceipt;
     private SDbConfig moConfig;
-    public ArrayList<int[]> manPayrollEmployeeReceipts;
+    private ArrayList<int[]> manPayrollEmployeeReceipts;
 
     /** Creates new form SDialogPayrollImport
      * @param client
@@ -507,6 +507,11 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         }
     }
 
+    /**
+     * Adds a recipt to be emitted.
+     * Please note that must be public in order to be invoked by double-clicking grid of available receipts.
+     * @return 
+     */
     public boolean actionAdd() {
         int index = 0;
         boolean error = true;
@@ -554,7 +559,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         return !error;
     }
 
-    public void actionAddAll() {
+    private void actionAddAll() {
         while (moTablePaneReceiptAvailable.getTableGuiRowCount() > 0) {
             moTablePaneReceiptAvailable.setTableRowSelection(0);
             if (!actionAdd()) {
@@ -563,6 +568,11 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         }
     }
 
+    /**
+     * Removes a recipt about to be emitted.
+     * Please note that must be public in order to be invoked by double-clicking grid of selected receipts.
+     * @return 
+     */
     public boolean actionRemove() {
         int index = 0;
         boolean error = true;
@@ -591,7 +601,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         return !error;
     }
 
-    public void actionRemoveAll() {
+    private void actionRemoveAll() {
         while (moTablePaneReceiptSelected.getTableGuiRowCount() > 0) {
             moTablePaneReceiptSelected.setTableRowSelection(0);
             if (!actionRemove()) {
@@ -600,6 +610,10 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         }
     }
 
+    public ArrayList<int[]> getPayrollEmployeeReceipts() {
+        return manPayrollEmployeeReceipts;
+    }
+    
     public void actionOk() {
         Cursor cursor = null;
 

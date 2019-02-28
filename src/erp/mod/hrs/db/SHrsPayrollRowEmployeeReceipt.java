@@ -36,7 +36,7 @@ public class SHrsPayrollRowEmployeeReceipt implements SGridRow {
         mdTotalNet = 0;
 
         moHrsPayrollReceipt = null;
-        maHrsEmployeeReceipts = new ArrayList<SHrsPayrollRowEmployeeReceipt>();
+        maHrsEmployeeReceipts = new ArrayList<>();
     }
 
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
