@@ -1739,33 +1739,38 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
 
     @Override
     public SGuiValidation validateForm() {
-        String msg = "";
-        double daysToBePaidMax = 0;
-        double daysToBePaid = 0;
-        double daysAbsence = 0;
-        SHrsEmployeeDays employeeDays = null;
         SGuiValidation validation = moFields.validateFields();
 
         // Validate value the earning, according to working days:
         
         if (moHrsPayrollReceipt.getHrsPayroll().getPayroll().isNormal()) {
+            double daysToBePaid = 0;
             for (SHrsPayrollReceiptEarning hrsEarningRow : moHrsPayrollReceipt.getHrsReceiptEarnings()) {
                 if (hrsEarningRow.getEarning().isDaysWorked()) {
                     daysToBePaid += hrsEarningRow.getReceiptEarning().getUnitsAlleged();
                 }
             }
+            
+            double daysAbsence = 0;
             for (SDbAbsenceConsumption absenceConsumption : moHrsPayrollReceipt.getAbsenceConsumptions()) {
                 if (absenceConsumption.getAbsence().getFkAbsenceClassId() != SModSysConsts.HRSU_CL_ABS_VAC) {
                     daysAbsence += absenceConsumption.getEffectiveDays();
                 }
             }
-            employeeDays = moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays();
-            daysToBePaidMax = employeeDays.getWorkingDays() * employeeDays.getFactorCalendar();
             
-            if ((daysToBePaid + daysAbsence) != daysToBePaidMax) {
-                msg = "Los días a pagar '" + daysToBePaid + "' " + (daysAbsence == 0 ? "" : "más los días de incidencias '" + daysAbsence + "' ") + "son diferentes a los días laborables del empleado '" + daysToBePaidMax + "'.";
+            SHrsEmployeeDays employeeDays = moHrsPayrollReceipt.getHrsEmployee().getEmployeeDays();
+            double daysToBePaidMax = employeeDays.getWorkingDays() * employeeDays.getFactorCalendar();
+            double daysCovered = daysToBePaid + daysAbsence;
+            double daysDiff = daysToBePaidMax - daysCovered;
+            
+            if (Math.abs(daysDiff) > 0.0001) {
+                String msg = "¡ADVERTENCIA! Los días laborables del empleado (" + daysToBePaidMax + " " + (daysToBePaidMax == 1 ? "día" : "días") + ") no coinciden con\n"
+                        + "los días a pagar (" + daysToBePaid + " " + (daysToBePaid == 1 ? "día" : "días") + ")"
+                        + (daysAbsence == 0 ? "" : " más los días de incidencias (" + daysAbsence + " " + (daysAbsence == 1 ? "día" : "días") + ")" + "; esto es: "
+                        + daysToBePaidMax + " " + (daysToBePaidMax == 1 ? "día" : "días") + " vs. " + daysCovered + " " + (daysCovered == 1 ? "día" : "días")) + ".\n"
+                        + "¡SE PAGARÁ " + Math.abs(daysDiff) + " " + (Math.abs(daysDiff) == 1 ? "DÍA" : "DÍAS") + " DE " + (daysDiff > 0 ? "MENOS" : "MÁS") + " AL EMPLEADO!";
                 if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
-                    validation.setMessage(msg);
+                    validation.setMessage("Ajustarse a los días laborables del empleado (" + daysToBePaidMax + " " + (daysToBePaidMax == 1 ? "día" : "días") + ").");
                     validation.setComponent(moTextEarningCodeFind);
                 }
             }
