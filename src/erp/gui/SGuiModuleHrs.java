@@ -84,6 +84,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatMwzType;
     private javax.swing.JMenuItem jmiCatMwzTypeWage;
     private javax.swing.JMenuItem jmiCatUma;
+    private javax.swing.JMenuItem jmiCatUmi;
     private javax.swing.JMenuItem jmiCatWorkerTypeSalary;
     private javax.swing.JMenuItem jmiCatLoanTypeAdjustment;
     private javax.swing.JMenuItem jmiCatAbsenceType;
@@ -221,7 +222,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatWorkerTypeSalary = new JMenuItem("Salarios por tipo de obrero");
         jmiCatLoanTypeAdjustment = new JMenuItem("Ajuste por tipo de crédito/préstamo");
         jmiCatMwzTypeWage = new JMenuItem("Salarios mínimos de áreas geográficas");
-        jmiCatUma = new JMenuItem("Unidades de medida y actualización (UMA)");
+        jmiCatUma = new JMenuItem("Unidades de Medida y Actualización (UMA)");
+        jmiCatUmi = new JMenuItem("Unidades Mixtas INFONAVIT (UMI)");
         jmiCatAbsenceType = new JMenuItem("Tipos de incidencia");
         jmiCatAbsenceClass = new JMenuItem("Clases de incidencia");
 
@@ -248,6 +250,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatMwzType);
         jmCat.add(jmiCatMwzTypeWage);
         jmCat.add(jmiCatUma);
+        jmCat.add(jmiCatUmi);
         jmCat.add(jmiCatWorkerTypeSalary);
         jmCat.add(jmiCatLoanTypeAdjustment);
         jmCat.addSeparator();
@@ -418,6 +421,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatMwzType.addActionListener(this);
         jmiCatMwzTypeWage.addActionListener(this);
         jmiCatUma.addActionListener(this);
+        jmiCatUmi.addActionListener(this);
         jmiCatWorkerTypeSalary.addActionListener(this);
         jmiCatLoanTypeAdjustment.addActionListener(this);
         jmiCatAbsenceType.addActionListener(this);
@@ -517,6 +521,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatMwzType.setEnabled(true);
         jmiCatMwzTypeWage.setEnabled(true);
         jmiCatUma.setEnabled(true);
+        jmiCatUmi.setEnabled(true);
         jmiCatWorkerTypeSalary.setEnabled(true);
         jmiCatLoanTypeAdjustment.setEnabled(true);
         jmiCatAbsenceType.setEnabled(true);
@@ -866,6 +871,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCatUma) {
                 miClient.getSession().showView(SModConsts.HRS_UMA, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCatUmi) {
+                miClient.getSession().showView(SModConsts.HRS_UMI, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatWorkerTypeSalary) {
                 miClient.getSession().showView(SModConsts.HRS_WRK_SAL, SLibConsts.UNDEFINED, null);

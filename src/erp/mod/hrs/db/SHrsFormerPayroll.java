@@ -194,7 +194,7 @@ public class SHrsFormerPayroll {
                     payrollReceipt.setFechaFinalPago(((cfd.ver3.nom11.DElementNomina) element).getAttFechaFinalPago().getDate());
                     payrollReceipt.setNumDiasPagados(((cfd.ver3.nom11.DElementNomina) element).getAttNumDiasPagados().getDouble());
                     payrollReceipt.setDepartamento(((cfd.ver3.nom11.DElementNomina) element).getAttDepartamento().getString());
-                    payrollReceipt.setClabe(((cfd.ver3.nom11.DElementNomina) element).getAttClabe().getString());
+                    payrollReceipt.setCuentaBancaria(((cfd.ver3.nom11.DElementNomina) element).getAttClabe().getString());
                     payrollReceipt.setBanco(((cfd.ver3.nom11.DElementNomina) element).getAttBanco().getInteger());
                     payrollReceipt.setFechaInicioRelLaboral(((cfd.ver3.nom11.DElementNomina) element).getAttFechaInicioRelLaboral().getDate());
                     payrollReceipt.setAntiguedad(((cfd.ver3.nom11.DElementNomina) element).getAttAntiguedad().getInteger());

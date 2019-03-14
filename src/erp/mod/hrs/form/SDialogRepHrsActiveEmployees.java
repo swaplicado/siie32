@@ -156,6 +156,7 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
         else if (moRadOrderByNameDepartament.isSelected()) {
             orderBy += "dep.name, dep.id_dep, ";
         }
+        
         orderBy += "l.dt_hire, l.dt_dis_n; ";
         
         return orderBy;

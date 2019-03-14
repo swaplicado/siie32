@@ -4,13 +4,14 @@
  */
 package erp.mhrs.form;
 
+import cfd.ver3.DCfdVer3Consts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
+import erp.data.SDataUtilities;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
@@ -21,6 +22,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
+import erp.mtrn.data.SDataCfd;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -28,34 +30,38 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Vector;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import sa.gui.util.SUtilConsts;
 
 /**
  *
  * @author Sergio Flores, Juan Barajas
  */
-public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener {
+public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListSelectionListener {
 
     private int mnFormResult;
     private boolean mbFirstTime;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
 
     private final erp.client.SClientInterface miClient;
-    private erp.lib.form.SFormField moFieldFkPaymentSystemTypeId;
-    private erp.lib.form.SFormField moFieldDate;
+    private erp.lib.form.SFormField moFieldDateIssue;
     private erp.lib.form.SFormField moFieldDatePayment;
+    private erp.lib.form.SFormField moFieldCfdiRelatedUuid;
     private erp.lib.table.STablePaneGrid moTablePaneReceiptAvailable;
     private erp.lib.table.STablePaneGrid moTablePaneReceiptSelected;
     private final ArrayList<SHrsPayrollEmployeeReceipt> maHrsPayrollEmployeeReceipt;
-    private SDbConfig moConfig;
-    private ArrayList<int[]> manPayrollEmployeeReceipts;
+    private erp.mod.hrs.db.SDbConfig moConfig;
+    private java.util.ArrayList<int[]> manPayrollEmployeeReceipts;
+    private erp.mhrs.form.SDialogPayrollCfdiPicker moPayrollCfdiPicker;
 
-    /** Creates new form SDialogPayrollImport
+    /** Creates new form SDialogPayrollCfdi
      * @param client
      * @param hrsPayrollEmployeeReceipt */
-    public SDialogPayrollReceiptCfdi(erp.client.SClientInterface client, ArrayList<SHrsPayrollEmployeeReceipt> hrsPayrollEmployeeReceipt) {
+    public SDialogPayrollCfdi(erp.client.SClientInterface client, ArrayList<SHrsPayrollEmployeeReceipt> hrsPayrollEmployeeReceipt) {
         super(client.getFrame(), true);
         miClient = client;
         maHrsPayrollEmployeeReceipt = hrsPayrollEmployeeReceipt;
@@ -88,17 +94,17 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jPanel4 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jpAccountingRecord = new javax.swing.JPanel();
-        jlFkPaymentSystemTypeId = new javax.swing.JLabel();
-        jcbFkPaymentSystemTypeId = new javax.swing.JComboBox();
-        jlDummy3 = new javax.swing.JLabel();
-        jlDate = new javax.swing.JLabel();
-        jtfDate = new javax.swing.JFormattedTextField();
-        jbDate = new javax.swing.JButton();
+        jlDateIssue = new javax.swing.JLabel();
+        jtfDateIssue = new javax.swing.JFormattedTextField();
+        jbDateIssue = new javax.swing.JButton();
         jpPaymentType = new javax.swing.JPanel();
-        jlDummy2 = new javax.swing.JLabel();
         jlDatePayment = new javax.swing.JLabel();
         jtfDatePayment = new javax.swing.JFormattedTextField();
         jbDatePayment = new javax.swing.JButton();
+        jlCfdiRelatedUuid = new javax.swing.JLabel();
+        jtfCfdiRelatedUuid = new javax.swing.JTextField();
+        jbCfdiRelatedPick = new javax.swing.JButton();
+        jlCfdiRelatedHint = new javax.swing.JLabel();
         jpEmployeesAvailable = new javax.swing.JPanel();
         jlTotalAvailables = new javax.swing.JLabel();
         jpEmployeesSelected = new javax.swing.JPanel();
@@ -184,36 +190,23 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
         jpAccountingRecord.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkPaymentSystemTypeId.setText("Método de pago:");
-        jlFkPaymentSystemTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpAccountingRecord.add(jlFkPaymentSystemTypeId);
+        jlDateIssue.setText("Fecha emisión:*");
+        jlDateIssue.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpAccountingRecord.add(jlDateIssue);
 
-        jcbFkPaymentSystemTypeId.setPreferredSize(new java.awt.Dimension(215, 23));
-        jpAccountingRecord.add(jcbFkPaymentSystemTypeId);
+        jtfDateIssue.setText("dd/mm/yyyy");
+        jtfDateIssue.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpAccountingRecord.add(jtfDateIssue);
 
-        jlDummy3.setPreferredSize(new java.awt.Dimension(122, 23));
-        jpAccountingRecord.add(jlDummy3);
-
-        jlDate.setText("Fecha emisión:*");
-        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpAccountingRecord.add(jlDate);
-
-        jtfDate.setText("dd/mm/yyyy");
-        jtfDate.setPreferredSize(new java.awt.Dimension(75, 23));
-        jpAccountingRecord.add(jtfDate);
-
-        jbDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
-        jbDate.setToolTipText("Seleccionar fecha");
-        jbDate.setFocusable(false);
-        jbDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jpAccountingRecord.add(jbDate);
+        jbDateIssue.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbDateIssue.setToolTipText("Seleccionar fecha");
+        jbDateIssue.setFocusable(false);
+        jbDateIssue.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpAccountingRecord.add(jbDateIssue);
 
         jPanel8.add(jpAccountingRecord);
 
         jpPaymentType.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDummy2.setPreferredSize(new java.awt.Dimension(447, 23));
-        jpPaymentType.add(jlDummy2);
 
         jlDatePayment.setText("Fecha pago:*");
         jlDatePayment.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -229,6 +222,26 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jbDatePayment.setPreferredSize(new java.awt.Dimension(23, 23));
         jpPaymentType.add(jbDatePayment);
 
+        jlCfdiRelatedUuid.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlCfdiRelatedUuid.setText("CFDI relacionado:");
+        jlCfdiRelatedUuid.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpPaymentType.add(jlCfdiRelatedUuid);
+
+        jtfCfdiRelatedUuid.setText("402A8A38-B980-412A-9485-29222D7095C4");
+        jtfCfdiRelatedUuid.setToolTipText("UUID");
+        jtfCfdiRelatedUuid.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpPaymentType.add(jtfCfdiRelatedUuid);
+
+        jbCfdiRelatedPick.setText("...");
+        jbCfdiRelatedPick.setToolTipText("Seleccionar CFDI relacionado");
+        jbCfdiRelatedPick.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpPaymentType.add(jbCfdiRelatedPick);
+
+        jlCfdiRelatedHint.setForeground(java.awt.Color.gray);
+        jlCfdiRelatedHint.setText("(Para la sustitución de CFDI previos)");
+        jlCfdiRelatedHint.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpPaymentType.add(jlCfdiRelatedHint);
+
         jPanel8.add(jpPaymentType);
 
         jPanel4.add(jPanel8, java.awt.BorderLayout.NORTH);
@@ -238,6 +251,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jpEmployeesAvailable.setLayout(new java.awt.BorderLayout());
 
         jlTotalAvailables.setText("n");
+        jlTotalAvailables.setPreferredSize(new java.awt.Dimension(100, 20));
         jpEmployeesAvailable.add(jlTotalAvailables, java.awt.BorderLayout.SOUTH);
 
         jPanel4.add(jpEmployeesAvailable, java.awt.BorderLayout.LINE_START);
@@ -247,6 +261,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jpEmployeesSelected.setLayout(new java.awt.BorderLayout());
 
         jlTotalSelected.setText("n");
+        jlTotalSelected.setPreferredSize(new java.awt.Dimension(100, 20));
         jpEmployeesSelected.add(jlTotalSelected, java.awt.BorderLayout.PAGE_END);
 
         jPanel4.add(jpEmployeesSelected, java.awt.BorderLayout.LINE_END);
@@ -323,37 +338,22 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         actionCancel();
     }//GEN-LAST:event_jbCancelActionPerformed
     
-    private void computeTotals() {
-        int countAvailables = 0;
-        int countSelected = 0;
-        
-        for (int i = 0; i < moTablePaneReceiptAvailable.getTableGuiRowCount(); i++) {
-            countAvailables++;
-        }
-        for (int i = 0; i < moTablePaneReceiptSelected.getTableGuiRowCount(); i++) {
-            countSelected++;
-        }
-        
-        jlTotalAvailables.setText(" " + countAvailables + " recibos disponibles.");
-        jlTotalSelected.setText(" " + countSelected + " recibos seleccionados.");
-    }
-    
     private void initComponentsExtra() {
         int i = 0;
         STableColumnForm[] aoTableColumns = null;
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         moConfig = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
 
-        moFieldFkPaymentSystemTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkPaymentSystemTypeId, jlFkPaymentSystemTypeId);
-        moFieldDate = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfDate, jlDate);
-        moFieldDate.setPickerButton(jbDate);
+        moFieldDateIssue = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfDateIssue, jlDateIssue);
+        moFieldDateIssue.setPickerButton(jbDateIssue);
         moFieldDatePayment = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jtfDatePayment, jlDatePayment);
         moFieldDatePayment.setPickerButton(jbDatePayment);
+        moFieldCfdiRelatedUuid = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdiRelatedUuid, jlCfdiRelatedUuid);
 
-        mvFields.add(moFieldFkPaymentSystemTypeId);
-        mvFields.add(moFieldDate);
+        mvFields.add(moFieldDateIssue);
         mvFields.add(moFieldDatePayment);
+        mvFields.add(moFieldCfdiRelatedUuid);
 
         moTablePaneReceiptAvailable = new STablePaneGrid(miClient);
         moTablePaneReceiptAvailable.setDoubleClickAction(this, "actionAdd");
@@ -374,16 +374,16 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total neto $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Número serie", 75);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha emisión", 75);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha pago", 75);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Método pago", 75);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha emisión", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha pago", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Método pago", 100);
         
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePaneReceiptAvailable.addTableColumn(aoTableColumns[i]);
         }
 
         i = 0;
-        aoTableColumns = new STableColumnForm[9];
+        aoTableColumns = new STableColumnForm[10];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empleado", 150);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", 75);
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total percepciones $", STableConstants.WIDTH_VALUE);
@@ -393,9 +393,10 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Total neto $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Número serie", 75);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha emisión", 75);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha pago", 75);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Método pago", 75);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha emisión", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE, "Fecha pago", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Método pago", 100);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "CFDI relacionado", 150);
 
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePaneReceiptSelected.addTableColumn(aoTableColumns[i]);
@@ -405,19 +406,14 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jbAddAll.addActionListener(this);
         jbRemove.addActionListener(this);
         jbRemoveAll.addActionListener(this);
-        jbDate.addActionListener(this);
+        jbDateIssue.addActionListener(this);
         jbDatePayment.addActionListener(this);
+        jbCfdiRelatedPick.addActionListener(this);
+        
+        moPayrollCfdiPicker = new SDialogPayrollCfdiPicker(miClient);
 
         SFormUtilities.createActionMap(rootPane, this, "actionOk", "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionCancel", "cancel", KeyEvent.VK_ESCAPE, 0);
-    }
-
-    private void actionDate() {
-        miClient.getGuiDatePickerXXX().pickDate(moFieldDate.getDate(), moFieldDate);
-    }
-
-    private void actionDatePayment() {
-        miClient.getGuiDatePickerXXX().pickDate(moFieldDatePayment.getDate(), moFieldDatePayment);
     }
 
     private void windowActivated() {
@@ -441,9 +437,51 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         }
     }
 
+    private void computeTotals() {
+        int countAvailables = 0;
+        int countSelected = 0;
+        
+        for (int i = 0; i < moTablePaneReceiptAvailable.getTableGuiRowCount(); i++) {
+            countAvailables++;
+        }
+        for (int i = 0; i < moTablePaneReceiptSelected.getTableGuiRowCount(); i++) {
+            countSelected++;
+        }
+        
+        jlTotalAvailables.setText(" " + countAvailables + " recibos disponibles.");
+        jlTotalSelected.setText(" " + countSelected + " recibos seleccionados.");
+    }
+    
+    private void actionDateIssue() {
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateIssue.getDate(), moFieldDateIssue);
+    }
+
+    private void actionDatePayment() {
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDatePayment.getDate(), moFieldDatePayment);
+    }
+
+    private void actionCfdiRelatedPick() {
+        int index = moTablePaneReceiptAvailable.getTable().getSelectedRow();
+
+        if (index != -1) {
+            SHrsPayrollEmployeeReceipt employeeReceipt = (SHrsPayrollEmployeeReceipt) moTablePaneReceiptAvailable.getSelectedTableRow();
+            
+            moPayrollCfdiPicker.formReset();
+            moPayrollCfdiPicker.setFilterKey(new Object[] { employeeReceipt.getPkEmployeeId(), SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SDataConstantsSys.TRNS_ST_DPS_ANNULED });
+            moPayrollCfdiPicker.formRefreshOptionPane();
+            moPayrollCfdiPicker.setFormVisible(true);
+
+            if (moPayrollCfdiPicker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_CFD, moPayrollCfdiPicker.getSelectedPrimaryKey(), SLibConstants.EXEC_MODE_VERBOSE);
+                jtfCfdiRelatedUuid.setText(cfd.getUuid());
+                jtfCfdiRelatedUuid.setCaretPosition(0);
+                jtfCfdiRelatedUuid.requestFocusInWindow();
+            }
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     private void populatePayroll() {
-        Object field = null;
         ArrayList<SHrsPayrollEmployeeReceipt> rowsSelected = null;
         
         if (!maHrsPayrollEmployeeReceipt.isEmpty()) {
@@ -459,14 +497,15 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
             jtfPayrollNotes.setCaretPosition(0);
 
             try {
-                rowsSelected = new ArrayList<SHrsPayrollEmployeeReceipt>();
+                rowsSelected = new ArrayList<>();
+                
                 for (SHrsPayrollEmployeeReceipt row : maHrsPayrollEmployeeReceipt) {
                     row.prepareTableRow();
-                    field = SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { row.getPaymentTypeSysId() }, SLibConstants.FIELD_TYPE_TEXT);
+                    Object field = SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { row.getPaymentTypeSysId() }, SLibConstants.FIELD_TYPE_TEXT);
 
                     row.setPaymentTypeSys((String) field);
                     if (row.getPaymentTypeSysId() == SDataConstantsSys.TRNU_TP_PAY_SYS_NA) {
-                        moTablePaneReceiptAvailable.addTableRow(row);   // receipt has not been added yet
+                        moTablePaneReceiptAvailable.addTableRow(row);   // receipt has not been added yet (2019-03-12, Sergio Flores: WTF! A bizarre solution!)
                     }
                     else {
                         rowsSelected.add(row);                          // receipt had been added already
@@ -503,6 +542,7 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
             receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_DATE_ISSUE, receipt.getDateIssue());
             receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_DATE_PAYMENT, receipt.getDatePayment());
             receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_TYPE_PAYMENT_SYS, receipt.getPaymentTypeSysId());
+            receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_TYPE_UUID_RELATED, receipt.getUuidToSubstitute());
             manPayrollEmployeeReceipts.add(receiptKey);
         }
     }
@@ -513,52 +553,68 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
      * @return 
      */
     public boolean actionAdd() {
-        int index = 0;
         boolean error = true;
-        Object field = null;
         SHrsPayrollEmployeeReceipt row = null;
 
-        if (jcbFkPaymentSystemTypeId.getSelectedIndex() == 0) {
-            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkPaymentSystemTypeId.getText() + "'.");
-            jcbFkPaymentSystemTypeId.requestFocus();
-        }
-        else if (moFieldDate.getDate() == null) {
-            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDate.getText() + "'.");
-            jtfDate.requestFocus();
+        if (moFieldDateIssue.getDate() == null) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDateIssue.getText() + "'.");
+            jtfDateIssue.requestFocusInWindow();
         }
         else if (moFieldDatePayment.getDate() == null) {
             miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDatePayment.getText() + "'.");
-            jtfDatePayment.requestFocus();
+            jtfDatePayment.requestFocusInWindow();
+        }
+        else if (!moFieldCfdiRelatedUuid.getString().isEmpty() && moFieldCfdiRelatedUuid.getString().length() != DCfdVer3Consts.LEN_UUID) {
+            miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiRelatedUuid.getText() + "':\n"
+                    + "debe ser de " + DCfdVer3Consts.LEN_UUID + " caracteres.");
+            jtfCfdiRelatedUuid.requestFocusInWindow();
         }
         else {
-            index = moTablePaneReceiptAvailable.getTable().getSelectedRow();
+            int index = moTablePaneReceiptAvailable.getTable().getSelectedRow();
+            
             if (index != -1) {
+                int xmlType = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
+                int paymentType = 0;
+
+                if (xmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_32) {
+                    paymentType = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
+                }
+                else if (xmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
+                    paymentType = SDataConstantsSys.TRNU_TP_PAY_SYS_OTHER;
+                }
+                
+                Object field = SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { paymentType }, SLibConstants.FIELD_TYPE_TEXT);
+                
                 row = (SHrsPayrollEmployeeReceipt) moTablePaneReceiptAvailable.getSelectedTableRow();
                 row.setNumberSeries(moConfig.getNumberSeries());
-                row.setDateIssue(moFieldDate.getDate());
+                row.setDateIssue(moFieldDateIssue.getDate());
                 row.setDatePayment(moFieldDatePayment.getDate());
-                row.setPaymentTypeSysId(moFieldFkPaymentSystemTypeId.getKeyAsIntArray()[0]);
-                field = SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { row.getPaymentTypeSysId() }, SLibConstants.FIELD_TYPE_TEXT);
-                
+                row.setPaymentTypeSysId(paymentType);
                 row.setPaymentTypeSys((String) field);
+                row.setUuidToSubstitute(moFieldCfdiRelatedUuid.getString());
+                row.prepareTableRow();
 
                 moTablePaneReceiptAvailable.removeTableRow(index);
                 moTablePaneReceiptAvailable.renderTableRows();
                 moTablePaneReceiptAvailable.setTableRowSelection(index < moTablePaneReceiptAvailable.getTableGuiRowCount() ? index : moTablePaneReceiptAvailable.getTableGuiRowCount() - 1);
 
-                row.prepareTableRow();
                 moTablePaneReceiptSelected.addTableRow(row);
                 moTablePaneReceiptSelected.renderTableRows();
                 moTablePaneReceiptSelected.setTableRowSelection(moTablePaneReceiptSelected.getTableGuiRowCount() - 1);
 
                 error = false;
             }
+            
             computeTotals();
         }
 
         return !error;
     }
 
+    /**
+     * Adds all recipts to be emitted.
+     * @return 
+     */
     private void actionAddAll() {
         while (moTablePaneReceiptAvailable.getTableGuiRowCount() > 0) {
             moTablePaneReceiptAvailable.setTableRowSelection(0);
@@ -574,11 +630,11 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
      * @return 
      */
     public boolean actionRemove() {
-        int index = 0;
         boolean error = true;
         SHrsPayrollEmployeeReceipt row = null;
 
-        index = moTablePaneReceiptSelected.getTable().getSelectedRow();
+        int index = moTablePaneReceiptSelected.getTable().getSelectedRow();
+        
         if (index != -1) {
             row = (SHrsPayrollEmployeeReceipt) moTablePaneReceiptSelected.getSelectedTableRow();
             for (int i = 1; i <= 5; i++) {
@@ -596,11 +652,16 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
             error = false;
         }
+        
         computeTotals();
 
         return !error;
     }
 
+    /**
+     * Removes all recipts about to be emitted.
+     * @return 
+     */
     private void actionRemoveAll() {
         while (moTablePaneReceiptSelected.getTableGuiRowCount() > 0) {
             moTablePaneReceiptSelected.setTableRowSelection(0);
@@ -609,17 +670,13 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
             }
         }
     }
-
-    public ArrayList<int[]> getPayrollEmployeeReceipts() {
-        return manPayrollEmployeeReceipts;
-    }
     
     public void actionOk() {
         Cursor cursor = null;
 
         if (moTablePaneReceiptSelected.getTableGuiRowCount() == 0) {
             miClient.showMsgBoxWarning("No hay empleados seleccionados.");
-            moTablePaneReceiptAvailable.requestFocus();
+            moTablePaneReceiptAvailable.requestFocusInWindow();
         }
         else {
             try {
@@ -657,18 +714,17 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
     private javax.swing.JButton jbAdd;
     private javax.swing.JButton jbAddAll;
     private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbDate;
+    private javax.swing.JButton jbCfdiRelatedPick;
+    private javax.swing.JButton jbDateIssue;
     private javax.swing.JButton jbDatePayment;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbRemove;
     private javax.swing.JButton jbRemoveAll;
-    private javax.swing.JComboBox jcbFkPaymentSystemTypeId;
-    private javax.swing.JLabel jlDate;
+    private javax.swing.JLabel jlCfdiRelatedHint;
+    private javax.swing.JLabel jlCfdiRelatedUuid;
+    private javax.swing.JLabel jlDateIssue;
     private javax.swing.JLabel jlDatePayment;
     private javax.swing.JLabel jlDummy01;
-    private javax.swing.JLabel jlDummy2;
-    private javax.swing.JLabel jlDummy3;
-    private javax.swing.JLabel jlFkPaymentSystemTypeId;
     private javax.swing.JLabel jlPayroll;
     private javax.swing.JLabel jlPayrollDates;
     private javax.swing.JLabel jlPayrollNotes;
@@ -680,7 +736,8 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
     private javax.swing.JPanel jpEmployeesSelected;
     private javax.swing.JPanel jpGrid;
     private javax.swing.JPanel jpPaymentType;
-    private javax.swing.JFormattedTextField jtfDate;
+    private javax.swing.JTextField jtfCfdiRelatedUuid;
+    private javax.swing.JFormattedTextField jtfDateIssue;
     private javax.swing.JFormattedTextField jtfDatePayment;
     private javax.swing.JTextField jtfPayrollDates;
     private javax.swing.JTextField jtfPayrollNotes;
@@ -697,21 +754,11 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
         jtfPayrollDates.setText("");
         jtfPayrollNotes.setText("");
 
-        int nXmlType = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
-        
-        SFormUtilities.populateComboBox(miClient, jcbFkPaymentSystemTypeId, SDataConstants.TRNU_TP_PAY_SYS);
-        
-        if (nXmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_32) {
-            moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNU_TP_PAY_SYS_NA });
-        }
-        else if (nXmlType == SDataConstantsSys.TRNS_TP_XML_CFDI_33) {
-            moFieldFkPaymentSystemTypeId.setFieldValue(new int[] { SDataConstantsSys.TRNU_TP_PAY_SYS_OTHER });
-        }
-        jcbFkPaymentSystemTypeId.setEnabled(false);
-        moFieldDate.setDate(miClient.getSession().getCurrentDate());
+        moFieldDateIssue.setDate(miClient.getSession().getCurrentDate());
         moFieldDatePayment.setDate(null);
+        moFieldCfdiRelatedUuid.setString("");
 
-        moTablePaneReceiptAvailable.createTable();
+        moTablePaneReceiptAvailable.createTable(this);
         moTablePaneReceiptAvailable.clearTableRows();
         moTablePaneReceiptSelected.createTable();
         moTablePaneReceiptSelected.clearTableRows();
@@ -719,6 +766,10 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
 
     public int getFormResult() {
         return mnFormResult;
+    }
+
+    public ArrayList<int[]> getPayrollEmployeeReceipts() {
+        return manPayrollEmployeeReceipts;
     }
 
     @Override
@@ -738,12 +789,22 @@ public class SDialogPayrollReceiptCfdi extends JDialog implements ActionListener
             else if (button == jbRemoveAll) {
                 actionRemoveAll();
             }
-            else if (button == jbDate) {
-                actionDate();
+            else if (button == jbDateIssue) {
+                actionDateIssue();
             }
             else if (button == jbDatePayment) {
                 actionDatePayment();
             }
+            else if (button == jbCfdiRelatedPick) {
+                actionCfdiRelatedPick();
+            }
+        }
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (e.getSource() instanceof DefaultListSelectionModel) {
+            jtfCfdiRelatedUuid.setText("");
         }
     }
 }

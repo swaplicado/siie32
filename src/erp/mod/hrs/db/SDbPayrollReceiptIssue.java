@@ -4,6 +4,7 @@
  */
 package erp.mod.hrs.db;
 
+import cfd.ver3.DCfdVer3Consts;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
@@ -30,6 +31,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     public static final int FIELD_DATE_ISSUE = FIELD_BASE + 3;
     public static final int FIELD_DATE_PAYMENT = FIELD_BASE + 4;
     public static final int FIELD_TYPE_PAYMENT_SYS = FIELD_BASE + 5;
+    public static final int FIELD_TYPE_UUID_RELATED = FIELD_BASE + 6;
     
     protected int mnPkPayrollId;
     protected int mnPkEmployeeId;
@@ -39,6 +41,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     protected Date mtDateIssue;
     protected Date mtDatePayment;
     protected String msBankAccount;
+    protected String msUuidRelated;
     protected double mdEarnings_r;
     protected double mdDeductions_r;
     protected double mdPayment_r;
@@ -67,6 +70,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     public void setDateIssue(Date t) { mtDateIssue = t; }
     public void setDatePayment(Date t) { mtDatePayment = t; }
     public void setBankAccount(String s) { msBankAccount = s; }
+    public void setUuidRelated(String s) { msUuidRelated = s; }
     public void setEarnings_r(double d) { mdEarnings_r = d; }
     public void setDeductions_r(double d) { mdDeductions_r = d; }
     public void setPayment_r(double d) { mdPayment_r = d; }
@@ -89,6 +93,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     public Date getDateIssue() { return mtDateIssue; }
     public Date getDatePayment() { return mtDatePayment; }
     public String getBankAccount() { return msBankAccount; }
+    public String getUuidRelated() { return msUuidRelated; }
     public double getEarnings_r() { return mdEarnings_r; }
     public double getDeductions_r() { return mdDeductions_r; }
     public double getPayment_r() { return mdPayment_r; }
@@ -145,6 +150,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
         mtDateIssue = null;
         mtDatePayment = null;
         msBankAccount = "";
+        msUuidRelated = "";
         mdEarnings_r = 0;
         mdDeductions_r = 0;
         mdPayment_r = 0;
@@ -210,6 +216,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
             mtDateIssue = resultSet.getDate("dt_iss");
             mtDatePayment = resultSet.getDate("dt_pay");
             msBankAccount = resultSet.getString("bank_acc");
+            msUuidRelated = resultSet.getString("uuid_rel");
             mdEarnings_r = resultSet.getDouble("ear_r");
             mdDeductions_r = resultSet.getDouble("ded_r");
             mdPayment_r = resultSet.getDouble("pay_r");
@@ -265,6 +272,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateIssue) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDatePayment) + "', " + 
                     "'" + msBankAccount + "', " + 
+                    "'" + msUuidRelated + "', " + 
                     mdEarnings_r + ", " + 
                     mdDeductions_r + ", " + 
                     mdPayment_r + ", " + 
@@ -292,6 +300,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
                     "dt_iss = '" + SLibUtils.DbmsDateFormatDate.format(mtDateIssue) + "', " +
                     "dt_pay = '" + SLibUtils.DbmsDateFormatDate.format(mtDatePayment) + "', " +
                     "bank_acc = '" + msBankAccount + "', " +
+                    "uuid_rel = '" + msUuidRelated + "', " +
                     "ear_r = " + mdEarnings_r + ", " +
                     "ded_r = " + mdDeductions_r + ", " +
                     "pay_r = " + mdPayment_r + ", " +
@@ -323,6 +332,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
         registry.setDateIssue(this.getDateIssue());
         registry.setDatePayment(this.getDatePayment());
         registry.setBankAccount(this.getBankAccount());
+        registry.setUuidRelated(this.getUuidRelated());
         registry.setEarnings_r(this.getEarnings_r());
         registry.setDeductions_r(this.getDeductions_r());
         registry.setPayment_r(this.getPayment_r());
@@ -403,6 +413,13 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
                 break;
             case FIELD_TYPE_PAYMENT_SYS:
                 msSql += "fk_tp_pay_sys = " + (int) value + " ";
+                break;
+            case FIELD_TYPE_UUID_RELATED:
+                String uuid = (String) value;
+                if (!uuid.isEmpty() && uuid.length() != DCfdVer3Consts.LEN_UUID) {
+                    throw new Exception("El UUID '" + uuid + "' debe ser de 36 caracteres.");
+                }
+                msSql += "uuid_rel = '" + uuid + "' ";
                 break;
 
             default:

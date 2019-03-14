@@ -32,8 +32,9 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     protected String msNumberSeries;
     protected Date mtDateIssue;
     protected Date mtDatePayment;
-    protected String msPaymentTypeSys;
     protected int mnPaymentTypeSysId;
+    protected String msPaymentTypeSys;
+    protected String msUuidToSubstitute;
 
     public SHrsPayrollEmployeeReceipt() {
         mnPkPayrollId = 0;
@@ -54,8 +55,9 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
         msNumberSeries = "";
         mtDateIssue = null;
         mtDatePayment = null;
-        msPaymentTypeSys = "";
         mnPaymentTypeSysId = 0;
+        msPaymentTypeSys = "";
+        msUuidToSubstitute = "";
     }
 
     @Override
@@ -70,6 +72,7 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
         mvValues.add(mtDateIssue);
         mvValues.add(mtDatePayment);
         mvValues.add(msPaymentTypeSys);
+        mvValues.add(msUuidToSubstitute);
     }
 
     public void setPkPayrollId(int n) { mnPkPayrollId = n; }
@@ -90,8 +93,9 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public void setNumberSeries(String s) { msNumberSeries = s; }
     public void setDateIssue(Date t) { mtDateIssue = t; }
     public void setDatePayment(Date t) { mtDatePayment = t; }
-    public void setPaymentTypeSys(String s) { msPaymentTypeSys = s; }
     public void setPaymentTypeSysId(int n) { mnPaymentTypeSysId = n; }
+    public void setPaymentTypeSys(String s) { msPaymentTypeSys = s; }
+    public void setUuidToSubstitute(String s) { msUuidToSubstitute = s; }
 
     public int getPkPayrollId() { return mnPkPayrollId; }
     public int getPkEmployeeId() { return mnPkEmployeeId; }
@@ -111,8 +115,9 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public String getNumberSeries() { return msNumberSeries ; }
     public Date getDateIssue() { return mtDateIssue; }
     public Date getDatePayment() { return mtDatePayment; }
-    public String getPaymentTypeSys() { return msPaymentTypeSys ; }
     public int getPaymentTypeSysId() { return mnPaymentTypeSysId; }
+    public String getPaymentTypeSys() { return msPaymentTypeSys ; }
+    public String getUuidToSubstitute() { return msUuidToSubstitute; }
     
     @Override
     public int[] getRowPrimaryKey() {

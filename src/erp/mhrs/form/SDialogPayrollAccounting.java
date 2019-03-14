@@ -5,6 +5,7 @@
 package erp.mhrs.form;
 
 import erp.SClient;
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -47,11 +48,11 @@ import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.srv.SSrvConsts;
 
@@ -59,7 +60,7 @@ import sa.lib.srv.SSrvConsts;
  *
  * @author Sergio Flores, Juan Barajas
  */
-public class SDialogPayrollImport extends JDialog implements ActionListener {
+public class SDialogPayrollAccounting extends JDialog implements ActionListener {
 
     private int mnFormResult;
     private boolean mbFirstTime;
@@ -72,7 +73,6 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
     private int mnPayrollId;
     private java.lang.String msPayType;
     private java.lang.String msPayTypeAbbr;
-    private erp.mhrs.form.SDialogPayrollPicker moPayrollPicker;
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
     private erp.mfin.data.SDataRecord moCurrentRecord;
     private erp.mhrs.data.SDataFormerPayroll moFormerPayroll;
@@ -80,10 +80,12 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
     
     private SDbPayroll moPayroll;
     private SDbAccountingPayroll moAccountingPayroll;
-    private ArrayList<SDbAccountingPayrollEmployee> maAccountingPayrollEmployees;
 
-    /** Creates new form SDialogPayrollImport */
-    public SDialogPayrollImport(erp.client.SClientInterface client, SDbPayroll payroll) {
+    /** Creates new form SDialogPayrollAccounting
+     * @param client
+     * @param payroll
+     */
+    public SDialogPayrollAccounting(SClientInterface client, SDbPayroll payroll) {
         super(client.getFrame(), true);
         miClient = client;
         moPayroll = payroll;
@@ -164,7 +166,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
         jtfPayrollPeriod.setEditable(false);
         jtfPayrollPeriod.setText("2001-01");
         jtfPayrollPeriod.setFocusable(false);
-        jtfPayrollPeriod.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfPayrollPeriod.setPreferredSize(new java.awt.Dimension(70, 23));
         jPanel3.add(jtfPayrollPeriod);
 
         jtfPayrollNumber.setEditable(false);
@@ -184,7 +186,7 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
         jtfPayrollDates.setEditable(false);
         jtfPayrollDates.setText("01/01/2001 - 01/01/2001");
         jtfPayrollDates.setFocusable(false);
-        jtfPayrollDates.setPreferredSize(new java.awt.Dimension(152, 23));
+        jtfPayrollDates.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jtfPayrollDates);
 
         jlPayrollNet.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -406,11 +408,10 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
         mnPayrollId = 0;
         msPayType = "";
         msPayTypeAbbr = "";
-        moPayrollPicker = new SDialogPayrollPicker(miClient);
         moDialogRecordPicker = new SDialogRecordPicker(miClient, SDataConstants.FINX_REC_USER);
         moFormerPayroll = null;
         moCurrentRecord = null;
-        mvRecords = new Vector<Object[]>();
+        mvRecords = new Vector<>();
 
         i = 0;
         aoTableColumns = new STableColumnForm[7];
@@ -471,22 +472,8 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
             }
             else {
                 try {
-                    if (moPayroll == null) {
-                        moPayrollPicker.resetForm();
-                        moPayrollPicker.setVisible(true);
-
-                        if (moPayrollPicker.getFormResult() != SLibConstants.FORM_RESULT_OK) {
-                            actionCancel();
-                        }
-                        else {
-                            populatePayroll();
-                            jbPickRecord.requestFocus();
-                        }
-                    }
-                    else {
-                        populatePayroll();
-                        jbPickRecord.requestFocus();
-                    }
+                    populatePayroll();
+                    jbPickRecord.requestFocus();
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -524,25 +511,13 @@ public class SDialogPayrollImport extends JDialog implements ActionListener {
 
         // Display payroll:
 
-        if (moPayroll == null ) {
-            mnPayrollId = moPayrollPicker.getPayrollKey()[0];
+        mnPayrollId = moPayroll.getPkPayrollId();
 
-            jtfPayrollPeriod.setText(moPayrollPicker.getPayrollPeriod());
-            jtfPayrollNumber.setText(moPayrollPicker.getPayrollNumber());
-            jtfPayrollDates.setText(moPayrollPicker.getPayrollDates());
-            jtfPayrollNotes.setText(moPayrollPicker.getPayrollNotes());
-            jtfPayrollNet.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(moPayrollPicker.getPayrollNet()));
-        }
-        else {
-            mnPayrollId = moPayroll.getPkPayrollId();
-
-            jtfPayrollPeriod.setText(moPayroll.getPeriodYear() + "-" + (moPayroll.getPeriod() >= 10 ? "" : "0" ) + moPayroll.getPeriod());
-            jtfPayrollNumber.setText((moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? "SEM " : "QNA " ) + moPayroll.getNumber());
-            jtfPayrollDates.setText(miClient.getSessionXXX().getFormatters().getDateFormat().format(moPayroll.getDateStart()) + " - " +
-                    miClient.getSessionXXX().getFormatters().getDateFormat().format(moPayroll.getDateEnd()));
-            jtfPayrollNotes.setText(moPayroll.getNotes());
-            jtfPayrollNet.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(moPayroll.getAuxTotalNet()));
-        }
+        jtfPayrollPeriod.setText(moPayroll.getPeriodYear() + "-" + SLibUtils.DecimalFormatCalendarMonth.format(moPayroll.getPeriod()));
+        jtfPayrollNumber.setText((moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? "SEM " : "QNA " ) + moPayroll.getNumber());
+        jtfPayrollDates.setText(SLibUtils.DateFormatDate.format(moPayroll.getDateStart()) + " - " + SLibUtils.DateFormatDate.format(moPayroll.getDateEnd()));
+        jtfPayrollNotes.setText(moPayroll.getNotes());
+        jtfPayrollNet.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(moPayroll.getAuxTotalNet()));
 
         jtfPayrollPeriod.setCaretPosition(0);
         jtfPayrollNumber.setCaretPosition(0);

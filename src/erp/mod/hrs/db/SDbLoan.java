@@ -33,6 +33,7 @@ public class SDbLoan extends SDbRegistryUser {
     protected double mdPaymentAmount;
     protected double mdPaymentFixedFees;
     protected double mdPaymentUmas;
+    protected double mdPaymentUmis;
     protected int mnPaymentPercentageReference;
     protected double mdPaymentPercentage;
     protected double mdPaymentPercentageAmount;
@@ -67,6 +68,7 @@ public class SDbLoan extends SDbRegistryUser {
     public void setPaymentAmount(double d) { mdPaymentAmount = d; }
     public void setPaymentFixedFees(double d) { mdPaymentFixedFees = d; }
     public void setPaymentUmas(double d) { mdPaymentUmas = d; }
+    public void setPaymentUmis(double d) { mdPaymentUmis = d; }
     public void setPaymentPercentageReference(int n) { mnPaymentPercentageReference = n; }
     public void setPaymentPercentage(double d) { mdPaymentPercentage = d; }
     public void setPaymentPercentageAmount(double d) { mdPaymentPercentageAmount = d; }
@@ -91,6 +93,7 @@ public class SDbLoan extends SDbRegistryUser {
     public double getPaymentAmount() { return mdPaymentAmount; }
     public double getPaymentFixedFees() { return mdPaymentFixedFees; }
     public double getPaymentUmas() { return mdPaymentUmas; }
+    public double getPaymentUmis() { return mdPaymentUmis; }
     public int getPaymentPercentageReference() { return mnPaymentPercentageReference; }
     public double getPaymentPercentage() { return mdPaymentPercentage; }
     public double getPaymentPercentageAmount() { return mdPaymentPercentageAmount; }
@@ -132,6 +135,7 @@ public class SDbLoan extends SDbRegistryUser {
         mdPaymentAmount = 0;
         mdPaymentFixedFees = 0;
         mdPaymentUmas = 0;
+        mdPaymentUmis = 0;
         mnPaymentPercentageReference = 0;
         mdPaymentPercentage = 0;
         mdPaymentPercentageAmount = 0;
@@ -202,6 +206,7 @@ public class SDbLoan extends SDbRegistryUser {
             mdPaymentAmount = resultSet.getDouble("pay_amt");
             mdPaymentFixedFees = resultSet.getDouble("pay_fix");
             mdPaymentUmas = resultSet.getDouble("pay_uma");
+            mdPaymentUmis = resultSet.getDouble("pay_umi");
             mnPaymentPercentageReference = resultSet.getInt("pay_per_ref");
             mdPaymentPercentage = resultSet.getDouble("pay_per");
             mdPaymentPercentageAmount = resultSet.getDouble("pay_per_amt");
@@ -251,6 +256,7 @@ public class SDbLoan extends SDbRegistryUser {
                     mdPaymentAmount + ", " + 
                     mdPaymentFixedFees + ", " + 
                     mdPaymentUmas + ", " + 
+                    mdPaymentUmis + ", " + 
                     mnPaymentPercentageReference + ", " + 
                     mdPaymentPercentage + ", " + 
                     mdPaymentPercentageAmount + ", " + 
@@ -282,6 +288,7 @@ public class SDbLoan extends SDbRegistryUser {
                     "pay_amt = " + mdPaymentAmount + ", " +
                     "pay_fix = " + mdPaymentFixedFees + ", " +
                     "pay_uma = " + mdPaymentUmas + ", " +
+                    "pay_umi = " + mdPaymentUmis + ", " +
                     "pay_per_ref = " + mnPaymentPercentageReference + ", " +
                     "pay_per = " + mdPaymentPercentage + ", " +
                     "pay_per_amt = " + mdPaymentPercentageAmount + ", " +
@@ -317,6 +324,7 @@ public class SDbLoan extends SDbRegistryUser {
         registry.setPaymentAmount(this.getPaymentAmount());
         registry.setPaymentFixedFees(this.getPaymentFixedFees());
         registry.setPaymentUmas(this.getPaymentUmas());
+        registry.setPaymentUmis(this.getPaymentUmis());
         registry.setPaymentPercentageReference(this.getPaymentPercentageReference());
         registry.setPaymentPercentage(this.getPaymentPercentage());
         registry.setPaymentPercentageAmount(this.getPaymentPercentageAmount());

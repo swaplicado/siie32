@@ -60,7 +60,7 @@ public abstract class SCfdConsts {
     public static final int PROC_REQ_STAMP_AND_SND = 6;
     public static final int PROC_REQ_ANNUL_AND_SND = 7;
     public static final int PROC_REQ_VERIFY = 8;
-    public static final int PROC_REQ_SND_RCP = 9;
+    public static final int PROC_REQ_SEND_CFD_PAYROLL = 9;
     public static final int PROC_PRT_DOCS = 10;
     
     public static final int CFDI_PAYROLL_PERCEPTION = 1;

@@ -38,6 +38,7 @@ public class SDbPayroll extends SDbRegistryUser {
     protected int mnReceiptDays;
     protected int mnWorkingDays;
     protected double mdUmaAmount;
+    protected double mdUmiAmount;
     protected double mdMwzWage;
     protected double mdMwzReferenceWage;
     protected String msNotes;
@@ -137,6 +138,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public void setReceiptDays(int n) { mnReceiptDays = n; }
     public void setWorkingDays(int n) { mnWorkingDays = n; }
     public void setUmaAmount(double d) { mdUmaAmount = d; }
+    public void setUmiAmount(double d) { mdUmiAmount = d; }
     public void setMwzWage(double d) { mdMwzWage = d; }
     public void setMwzReferenceWage(double d) { mdMwzReferenceWage = d; }
     public void setNotes(String s) { msNotes = s; }
@@ -172,6 +174,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public int getReceiptDays() { return mnReceiptDays; }
     public int getWorkingDays() { return mnWorkingDays; }
     public double getUmaAmount() { return mdUmaAmount; }
+    public double getUmiAmount() { return mdUmiAmount; }
     public double getMwzWage() { return mdMwzWage; }
     public double getMwzReferenceWage() { return mdMwzReferenceWage; }
     public String getNotes() { return msNotes; }
@@ -240,6 +243,7 @@ public class SDbPayroll extends SDbRegistryUser {
         mnReceiptDays = 0;
         mnWorkingDays = 0;
         mdUmaAmount = 0;
+        mdUmiAmount = 0;
         mdMwzWage = 0;
         mdMwzReferenceWage = 0;
         msNotes = "";
@@ -332,6 +336,7 @@ public class SDbPayroll extends SDbRegistryUser {
             mnReceiptDays = resultSet.getInt("p.rcp_day");
             mnWorkingDays = resultSet.getInt("p.wrk_day");
             mdUmaAmount = resultSet.getDouble("p.uma_amt");
+            mdUmiAmount = resultSet.getDouble("p.umi_amt");
             mdMwzWage = resultSet.getDouble("p.mwz_wage");
             mdMwzReferenceWage = resultSet.getDouble("p.mwz_ref_wage");
             msNotes = resultSet.getString("p.nts");
@@ -414,6 +419,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     mnReceiptDays + ", " +
                     mnWorkingDays + ", " +
                     mdUmaAmount + ", " +
+                    mdUmiAmount + ", " +
                     mdMwzWage + ", " +
                     mdMwzReferenceWage + ", " +
                     "'" + msNotes + "', " +
@@ -454,6 +460,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     "rcp_day = " + mnReceiptDays + ", " +
                     "wrk_day = " + mnWorkingDays + ", " +
                     "uma_amt = " + mdUmaAmount + ", " +
+                    "umi_amt = " + mdUmiAmount + ", " +
                     "mwz_wage = " + mdMwzWage + ", " +
                     "mwz_ref_wage = " + mdMwzReferenceWage + ", " +
                     "nts = '" + msNotes + "', " +
@@ -519,6 +526,7 @@ public class SDbPayroll extends SDbRegistryUser {
         registry.setReceiptDays(this.getReceiptDays());
         registry.setWorkingDays(this.getWorkingDays());
         registry.setUmaAmount(this.getUmaAmount());
+        registry.setUmiAmount(this.getUmiAmount());
         registry.setMwzWage(this.getMwzWage());
         registry.setMwzReferenceWage(this.getMwzReferenceWage());
         registry.setNotes(this.getNotes());

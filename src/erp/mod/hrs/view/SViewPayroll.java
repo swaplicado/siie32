@@ -5,13 +5,13 @@
 package erp.mod.hrs.view;
 
 import erp.cfd.SCfdConsts;
-import erp.cfd.SDialogResult;
+import erp.cfd.SDialogCfdProcessing;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
-import erp.mhrs.form.SDialogPayrollImport;
-import erp.mhrs.form.SDialogPayrollReceiptCfdi;
+import erp.mhrs.form.SDialogPayrollAccounting;
+import erp.mhrs.form.SDialogPayrollCfdi;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbPayroll;
@@ -71,7 +71,6 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     private JButton jbLayout;
 
     private SDialogAnnulCfdi moDialogAnnulCfdi;
-    private SDialogPayrollImport moDialogFormerPayrollImport;
     private SDialogLayoutPayroll moDialogLayoutPayroll;
 
     public SViewPayroll(SGuiClient client, String title, int subtype) {
@@ -155,15 +154,15 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                     int payroll = gridRow.getRowPrimaryKey()[0];
                     
                     if (SHrsCfdUtils.canGenetareCfdReceipts(miClient.getSession(), payroll)) {
-                        SDialogPayrollReceiptCfdi receiptCfdi = new SDialogPayrollReceiptCfdi((SClientInterface) miClient, SHrsCfdUtils.getReceiptsPendig(miClient.getSession(), payroll));
-                        receiptCfdi.resetForm();
-                        receiptCfdi.setVisible(true);
+                        SDialogPayrollCfdi payrollCfdi = new SDialogPayrollCfdi((SClientInterface) miClient, SHrsCfdUtils.getReceiptsPendig(miClient.getSession(), payroll));
+                        payrollCfdi.resetForm();
+                        payrollCfdi.setVisible(true);
 
-                        if (receiptCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        if (payrollCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                             int stampsAvailable = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, miClient.getSession().getCurrentDate(), SLibConsts.UNDEFINED);
-                            SDialogResult dialogResult = new SDialogResult(miClient, "Resultados de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
-                            dialogResult.setFormParams((SClientInterface) miClient, null, receiptCfdi.getPayrollEmployeeReceipts(), stampsAvailable, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
-                            dialogResult.setVisible(true);
+                            SDialogCfdProcessing dialog = new SDialogCfdProcessing(miClient, "Procesamiento de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
+                            dialog.setFormParams((SClientInterface) miClient, null, payrollCfdi.getPayrollEmployeeReceipts(), stampsAvailable, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                            dialog.setVisible(true);
                         }
                     }
                 }
@@ -442,11 +441,11 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                         }
                         else {
                             if (miClient.showMsgBoxConfirm("¿Desea contabilizar la nómina?") == JOptionPane.YES_OPTION) {
-                                moDialogFormerPayrollImport = new SDialogPayrollImport((SClientInterface) miClient, payroll);
-                                moDialogFormerPayrollImport.resetForm();
-                                moDialogFormerPayrollImport.setVisible(true);
+                                SDialogPayrollAccounting dialog = new SDialogPayrollAccounting((SClientInterface) miClient, payroll);
+                                dialog.resetForm();
+                                dialog.setVisible(true);
 
-                                if (moDialogFormerPayrollImport.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                                if (dialog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                     close = true; // Close payroll
                                     canClose = true;
                                 }

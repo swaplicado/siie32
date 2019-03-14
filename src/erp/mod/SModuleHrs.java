@@ -47,6 +47,7 @@ import erp.mod.hrs.db.SDbTaxSubsidyTableRow;
 import erp.mod.hrs.db.SDbTaxTable;
 import erp.mod.hrs.db.SDbTaxTableRow;
 import erp.mod.hrs.db.SDbUma;
+import erp.mod.hrs.db.SDbUmi;
 import erp.mod.hrs.db.SDbWorkerType;
 import erp.mod.hrs.db.SDbWorkerTypeSalary;
 import erp.mod.hrs.db.SDbWorkingDaySettings;
@@ -81,6 +82,7 @@ import erp.mod.hrs.form.SFormSsContributionTable;
 import erp.mod.hrs.form.SFormTaxSubsidyTable;
 import erp.mod.hrs.form.SFormTaxTable;
 import erp.mod.hrs.form.SFormUma;
+import erp.mod.hrs.form.SFormUmi;
 import erp.mod.hrs.form.SFormWorkerType;
 import erp.mod.hrs.form.SFormWorkerTypeSalary;
 import erp.mod.hrs.form.SFormWorkingDaySettings;
@@ -126,6 +128,7 @@ import erp.mod.hrs.view.SViewTaxSubsidyTableRow;
 import erp.mod.hrs.view.SViewTaxTable;
 import erp.mod.hrs.view.SViewTaxTableRow;
 import erp.mod.hrs.view.SViewUma;
+import erp.mod.hrs.view.SViewUmi;
 import erp.mod.hrs.view.SViewWorkerType;
 import erp.mod.hrs.view.SViewWorkerTypeSalary;
 import erp.mod.hrs.view.SViewWorkingDaySettings;
@@ -175,6 +178,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormWorkerTypeSalary moFormWorkerTypeSalary;
     private SFormMwzTypeWage moFormMwzTypeWage;
     private SFormUma moFormUma;
+    private SFormUmi moFormUmi;
     private SFormLoanTypeAdjustment moFormLoanTypeAdjustment;
     private SFormLoan moFormLoan;
     private SFormAbsence moFormAbsence;
@@ -429,6 +433,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_UMA:
                 registry = new SDbUma();
+                break;
+            case SModConsts.HRS_UMI:
+                registry = new SDbUmi();
                 break;
             case SModConsts.HRS_TP_LOAN_ADJ:
                 registry = new SDbLoanTypeAdjustment();
@@ -800,6 +807,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_UMA:
                 view = new SViewUma(miClient, "UMA");
                 break;
+            case SModConsts.HRS_UMI:
+                view = new SViewUmi(miClient, "UMI");
+                break;
             case SModConsts.HRS_TP_LOAN_ADJ:
                 view = new SViewLoanTypeAdjustment(miClient, "Ajuste tipo crédito/préstamo");
                 break;
@@ -1083,6 +1093,10 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_UMA:
                 if (moFormUma == null) moFormUma = new SFormUma(miClient, "UMA");
                 form = moFormUma;
+                break;
+            case SModConsts.HRS_UMI:
+                if (moFormUmi == null) moFormUmi = new SFormUmi(miClient, "UMI");
+                form = moFormUmi;
                 break;
             case SModConsts.HRS_TP_LOAN_ADJ:
                 if (moFormLoanTypeAdjustment == null) moFormLoanTypeAdjustment = new SFormLoanTypeAdjustment(miClient, "Ajuste por tipo de crédito/préstamo");

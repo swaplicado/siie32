@@ -925,6 +925,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_LOAN_PAY_FIX_FEE = 2;   // Fixed fee
     public static final int HRSS_TP_LOAN_PAY_PER = 3;       // Percentage
     public static final int HRSS_TP_LOAN_PAY_UMA = 4;       // UMA
+    public static final int HRSS_TP_LOAN_PAY_UMI = 5; // UMI
 
     public static final int HRSS_TP_CON_OTH = 99;       // Other contract
     

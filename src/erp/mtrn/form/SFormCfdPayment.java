@@ -3519,76 +3519,140 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                         moPaneGridPayments.setTableRowSelection(index);
                         break;
                     }
-                    else if (paymentEntry.AuxTotalPayments > paymentEntry.Amount) {
-                        validation.setMessage("En el pago #" + paymentEntry.Number + " "
-                                + "la suma de importes pagados en la moneda del pago $ "
-                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + paymentEntry.CurrencyKey + "\n"
-                                + "es mayor que el monto del pago $ "
-                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + paymentEntry.CurrencyKey + " "
-                                + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.AuxTotalPayments - paymentEntry.Amount) + ".");
-                        validation.setComponent(moPaneGridPayments.getTable());
-                        moPaneGridPayments.setTableRowSelection(index);
-                        break;
-                    }
-                    else if (paymentEntry.AuxTotalPayments < paymentEntry.Amount && miClient.showMsgBoxConfirm(
-                            "En el pago #" + paymentEntry.Number + " "
-                            + "la suma de importes pagados en la moneda del pago $ "
-                            + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + paymentEntry.CurrencyKey + "\n"
-                            + "es menor que el monto del pago $ "
-                            + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + paymentEntry.CurrencyKey + " "
-                            + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.Amount - paymentEntry.AuxTotalPayments) + ".\n"
-                            + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
-                        validation.setMessage("Ajustar y corregir los importes pagados a los documentos relacionados del pago #" + paymentEntry.Number + ".");
-                        validation.setComponent(moPaneGridPayments.getTable());
-                        moPaneGridPayments.setTableRowSelection(index);
-                        break;
-                    }
                     else {
-                        /*
-                        Check that there is not differences in local currency with payment received and payments applied.
-                        Note that if payment and all related documents are both in local currency, no differences are allowed.
-                        */
+                        String currency;
+                        String message;
+                        String confirm;
                         
-                        boolean areAllLocal = miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { paymentEntry.CurrencyId });
+                        paymentEntry.resetAllowances();
                         
-                        if (areAllLocal) {
-                            for (SCfdPaymentEntryDoc doc : paymentEntry.PaymentEntryDocs) {
-                                if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { doc.DataDps.getFkCurrencyId() })) {
-                                    areAllLocal = false;
+                        if (!SLibUtils.compareAmount(paymentEntry.AuxTotalPayments, paymentEntry.Amount)) {
+                            currency = paymentEntry.CurrencyKey;
+
+                            if (paymentEntry.AuxTotalPayments > paymentEntry.Amount) {
+                                /*
+                                The sum of aplication of individual payments to documents CANNOT be greater than the amount of payment.
+                                Note that due to the validations in each individual payment, this case should not happen never!
+                                */
+
+                                message = "En el pago #" + paymentEntry.Number + " "
+                                        + "la suma de los importes pagados en la moneda propia DEL PAGO $ "
+                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + currency + "\n"
+                                        + "es MAYOR que el monto del pago en la moneda propia DEL PAGO $ "
+                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + currency + " "
+                                        + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPayments - paymentEntry.Amount)) + " " + currency + ".";
+
+                                validation.setMessage(message);
+                                validation.setComponent(moPaneGridPayments.getTable());
+                                moPaneGridPayments.setTableRowSelection(index);
+                                break;
+                            }
+                            else if (paymentEntry.AuxTotalPayments < paymentEntry.Amount) {
+                                /*
+                                The sum of aplication of individual payments to documents CAN be less than the amount of payment, only if approved.
+                                */
+
+                                confirm = "En el pago #" + paymentEntry.Number + " "
+                                        + "la suma de los importes pagados en la moneda propia DEL PAGO $ "
+                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + currency + "\n"
+                                        + "es MENOR que el monto del pago en la moneda propia DEL PAGO $ "
+                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + currency + " "
+                                        + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPayments - paymentEntry.Amount)) + " " + currency + ".\n"
+                                        + "¡ADVERTENCIA: Será necesario cuadrar manualmente la contabilización de este pago!\n"
+                                        + SLibConstants.MSG_CNF_MSG_CONT;
+
+                                if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                                    paymentEntry.AuxAllowTotalPaymentsLessThanAmount = true;
+                                }
+                                else {
+                                    message = "Modificar los importes pagados en la moneda propia DEL PAGO (" + currency + ") a los documentos relacionados del pago #" + paymentEntry.Number + ".";
+
+                                    validation.setMessage(message);
+                                    validation.setComponent(moPaneGridPayments.getTable());
+                                    moPaneGridPayments.setTableRowSelection(index);
                                     break;
                                 }
                             }
                         }
                         
-                        String message;
-                        
-                        if (paymentEntry.AuxTotalPaymentsLocal > paymentEntry.AmountLocal) {
-                            message = "En el pago #" + paymentEntry.Number + " "
-                                    + "la suma de importes pagados en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "\n"
-                                    + "es mayor al monto del pago en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + " "
-                                    + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal) + ".";
+                        if (!validation.getIsError()) {
+                            boolean isPaymentCompletelyLocal = miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { paymentEntry.CurrencyId });
 
-                            if (areAllLocal || miClient.showMsgBoxConfirm(message + (paymentEntry.isAmountTotallyApplied() ? "\n¡IMPORTANTE: Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n" : "")
-                                + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
-                                validation.setMessage(areAllLocal ? message : "Ajustar y corregir los importes pagados a los documentos relacionados del pago #" + paymentEntry.Number + ".");
-                                validation.setComponent(moPaneGridPayments.getTable());
-                                moPaneGridPayments.setTableRowSelection(index);
-                                break;
+                            if (isPaymentCompletelyLocal) {
+                                for (SCfdPaymentEntryDoc doc : paymentEntry.PaymentEntryDocs) {
+                                    if (!miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { doc.DataDps.getFkCurrencyId() })) {
+                                        isPaymentCompletelyLocal = false;
+                                        break;
+                                    }
+                                }
                             }
-                        }
-                        
-                        if (paymentEntry.AuxTotalPaymentsLocal < paymentEntry.AmountLocal) {
-                            message = "En el pago #" + paymentEntry.Number + " "
-                                    + "la suma de importes pagados en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + "\n"
-                                    + "es menor al monto del pago en moneda local $ " + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode() + " "
-                                    + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(paymentEntry.AmountLocal - paymentEntry.AuxTotalPaymentsLocal) + ".";
+                            
+                            if (!isPaymentCompletelyLocal) {
+                                if (!SLibUtils.compareAmount(paymentEntry.AuxTotalPaymentsLocal, paymentEntry.AmountLocal)) {
+                                    // check if payment and related documents are all in local currency:
 
-                            if (areAllLocal || miClient.showMsgBoxConfirm(message + (paymentEntry.isAmountTotallyApplied() ? "\n¡IMPORTANTE: Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n" : "")
-                                + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
-                                validation.setMessage(areAllLocal ? message : "Ajustar y corregir los importes pagados a los documentos relacionados del pago #" + paymentEntry.Number + ".");
-                                validation.setComponent(moPaneGridPayments.getTable());
-                                moPaneGridPayments.setTableRowSelection(index);
-                                break;
+                                    currency = miClient.getSession().getSessionCustom().getLocalCurrencyCode();
+
+                                    if (paymentEntry.AuxTotalPaymentsLocal > paymentEntry.AmountLocal) {
+                                        /*
+                                        if payment IS completely local, then the sum of aplication of individual payments to documents CANNOT be greater than the amount of payment:
+                                        if payment IS NOT completely local, then the sum of aplication of individual payments to documents CAN be greater than the amount of payment, only if approved:
+                                        */
+
+                                        confirm = "En el pago #" + paymentEntry.Number + " "
+                                                + "la suma de importes pagados en la moneda LOCAL $ "
+                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + currency + "\n"
+                                                + "es MAYOR que el monto del pago en la moneda LOCAL $ "
+                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + currency + " "
+                                                + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal)) + " " + currency + "\n."
+                                                + "!ADVERTENCIA: "
+                                                + (paymentEntry.isAmountTotallyApplied() ?
+                                                    "Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n" :
+                                                    "Será necesario cuadrar manualmente la contabilización de este pago!\n")
+                                                + SLibConstants.MSG_CNF_MSG_CONT;
+
+                                        if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                                            paymentEntry.AuxAllowTotalPaymentsLocalGreaterThanAmountLocal = true;
+                                        }
+                                        else {
+                                            message = "Modificar los importes pagados en la moneda LOCAL (" + currency + ") a los documentos relacionados del pago #" + paymentEntry.Number + ".";
+
+                                            validation.setMessage(message);
+                                            validation.setComponent(moPaneGridPayments.getTable());
+                                            moPaneGridPayments.setTableRowSelection(index);
+                                            break;
+                                        }
+                                    }
+                                    else if (paymentEntry.AuxTotalPaymentsLocal < paymentEntry.AmountLocal) {
+                                        /*
+                                        The sum of aplication of individual payments to documents CAN be less than the amount of payment, only if approved.
+                                        */
+
+                                        confirm = "En el pago #" + paymentEntry.Number + " "
+                                                + "la suma de importes pagados en la moneda LOCAL $ "
+                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + currency + "\n"
+                                                + "es MENOR que el monto del pago en la moneda LOCAL $ "
+                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + currency + " "
+                                                + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal)) + " " + currency + "\n."
+                                                + "!ADVERTENCIA: "
+                                                + (paymentEntry.isAmountTotallyApplied() ?
+                                                    "Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n" :
+                                                    "Será necesario cuadrar manualmente la contabilización de este pago!\n")
+                                                + SLibConstants.MSG_CNF_MSG_CONT;
+
+                                        if (miClient.showMsgBoxConfirm(confirm) == JOptionPane.YES_OPTION) {
+                                            paymentEntry.AuxAllowTotalPaymentsLocalLessThanAmountLocal = true;
+                                        }
+                                        else {
+                                            message = "Modificar los importes pagados en la moneda LOCAL (" + currency + ") a los documentos relacionados del pago #" + paymentEntry.Number + ".";
+
+                                            validation.setMessage(message);
+                                            validation.setComponent(moPaneGridPayments.getTable());
+                                            moPaneGridPayments.setTableRowSelection(index);
+                                            break;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -3614,8 +3678,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         
         if (!validation.getIsError() && moDataCfdPayment != null && !moDataCfdPayment.getIsRegistryNew()) {
-            if (miClient.showMsgBoxConfirm("La contabilización actual del CFDI será descartada y reemplazada de acuerdo a sus valores actuales.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                validation.setMessage("Favor de verificar si los valores actuales del CFDI son correctos.");
+            if (miClient.showMsgBoxConfirm("La contabilización actual del CFDI será descartada y reemplazada de acuerdo a sus datos actuales.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                validation.setMessage("Favor de verificar si los datos actuales del CFDI son correctos.");
                 validation.setComponent(jbCancel);
             }
         }

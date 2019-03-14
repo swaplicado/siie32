@@ -39,12 +39,12 @@ import sa.lib.gui.SGuiValidation;
  *
  * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
-public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
-
+public class SDialogCfdProcessing extends sa.lib.gui.bean.SBeanFormDialog {
+    
     protected SClientInterface miClient;
     
     protected ArrayList<SDataCfd> maCfds;
-    protected ArrayList<int[]> maPayrollReceiptIds;
+    protected ArrayList<int[]> maPayrollReceiptKeys;
     protected ArrayList<SDbPayrollReceipt> maPayrollReceipts;
     protected int mnStampsAvailable;
     protected Date mtAnnulmentDate;
@@ -57,8 +57,11 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     
     /**
      * Creates new form SDialogResult
+     * @param client
+     * @param title
+     * @param subtype
      */
-    public SDialogResult(SGuiClient client, String title, int subtype) {
+    public SDialogCfdProcessing(SGuiClient client, String title, int subtype) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.TRN_CFD, subtype, title);
         initComponents();
         initComponentsCustom();
@@ -326,12 +329,12 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
     private void process() throws Exception {
         jtfWarningMessage.setText("");
         
-        if (mnFormSubtype == SCfdConsts.PROC_REQ_SND_RCP) {
-            processReceipts();
+        if (mnFormSubtype == SCfdConsts.PROC_REQ_SEND_CFD_PAYROLL) {
+            sendPayrollReceipts();
         }
         else { 
-            if (maPayrollReceiptIds != null) {
-                processPayroll();
+            if (maPayrollReceiptKeys != null) {
+                processPayrollReceipts();
             }
             else if (maCfds != null) {
                 processCfd();            
@@ -339,7 +342,7 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         }
     }
     
-    private void processReceipts() throws Exception {
+    private void sendPayrollReceipts() throws Exception {
         boolean isSent = false;
         int cfdProcessed = 0;
         int cfdProcessedOk = 0;
@@ -384,15 +387,17 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
         }
     }
     
-    private void processPayroll() {
+    private void processPayrollReceipts() {
         int cfdProcessed = 0;
         int cfdProcessedOk = 0;
         int cfdProcessedWrong = 0;
         String detailMessage = "";
         String warningMessage = "";
         
-        if (maPayrollReceiptIds != null) {
-            for (int[] key : maPayrollReceiptIds) {
+        if (maPayrollReceiptKeys != null) {
+            moIntCfdToProcess.setValue(maPayrollReceiptKeys.size());
+        
+            for (int[] key : maPayrollReceiptKeys) {
                 int number = 0;
                 cfdProcessed++;
                 
@@ -604,12 +609,12 @@ public class SDialogResult extends sa.lib.gui.bean.SBeanFormDialog {
      * Public methods:
      */
     
-    public void setFormParams(final SClientInterface client, final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceiptIds, final int stampsAvailable, Date annulmentDate, final boolean validateStamp, final int cfdSubtype, final int dpsAnnulmentType) {
+    public void setFormParams(final SClientInterface client, final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceiptKeys, final int stampsAvailable, Date annulmentDate, final boolean validateStamp, final int cfdSubtype, final int dpsAnnulmentType) {
         mbFirstTime = true;
         
         miClient = client;
         maCfds = cfds;
-        maPayrollReceiptIds = payrollReceiptIds;
+        maPayrollReceiptKeys = payrollReceiptKeys;
         mnStampsAvailable = stampsAvailable;
         mtAnnulmentDate = annulmentDate;
         mbValidateStamp = validateStamp;

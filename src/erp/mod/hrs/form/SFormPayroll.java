@@ -202,6 +202,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel34 = new javax.swing.JPanel();
         jlUmaAmount = new javax.swing.JLabel();
         moDecUmaAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jPanel46 = new javax.swing.JPanel();
+        jlUmiAmount = new javax.swing.JLabel();
+        moDecUmiAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
         jPanel44 = new javax.swing.JPanel();
         moBoolClosed = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel20 = new javax.swing.JPanel();
@@ -562,6 +565,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel21.add(jPanel34);
 
+        jPanel46.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlUmiAmount.setText("Monto UMI:");
+        jlUmiAmount.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel46.add(jlUmiAmount);
+
+        moDecUmiAmount.setEditable(false);
+        jPanel46.add(moDecUmiAmount);
+
+        jPanel21.add(jPanel46);
+
         jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moBoolClosed.setText("Es nómina cerrada");
@@ -767,6 +781,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel43;
     private javax.swing.JPanel jPanel44;
     private javax.swing.JPanel jPanel45;
+    private javax.swing.JPanel jPanel46;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
@@ -812,6 +827,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlTotalNet;
     private javax.swing.JLabel jlTotalSelected;
     private javax.swing.JLabel jlUmaAmount;
+    private javax.swing.JLabel jlUmiAmount;
     private javax.swing.JLabel jlWorkingDays;
     private javax.swing.JLabel jlYear;
     private javax.swing.JPanel jpAvailableEmployees;
@@ -833,6 +849,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moDecTotalEarnings;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moDecTotalNet;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moDecUmaAmount;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moDecUmiAmount;
     private sa.lib.gui.bean.SBeanFieldInteger moIntFiscalYear;
     private sa.lib.gui.bean.SBeanFieldInteger moIntNumber;
     private sa.lib.gui.bean.SBeanFieldInteger moIntPayrollDays;
@@ -898,6 +915,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecMwzReferenceWage.getField().setDecimalSettings(SGuiUtils.getLabelName(jlMwzReferenceWage.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moDecUmaAmount.setCompoundFieldSettings(miClient);
         moDecUmaAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlUmaAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moDecUmiAmount.setCompoundFieldSettings(miClient);
+        moDecUmiAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlUmiAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moBoolClosed.setBooleanSettings(SGuiUtils.getLabelName(moBoolClosed.getText()), false);
         moDecTotalEarnings.setCompoundFieldSettings(miClient);
         moDecTotalEarnings.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTotalEarnings.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
@@ -929,6 +948,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moKeyMwzReferenceType);
         moFields.addField(moDecMwzReferenceWage.getField()); // is read-only
         moFields.addField(moDecUmaAmount.getField()); // is read-only
+        moFields.addField(moDecUmiAmount.getField()); // is read-only
         moFields.addField(moBoolClosed); // is read-only
         moFields.setFormButton(jbSave);
 
@@ -1189,6 +1209,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moRegistry.setReceiptDays(moIntPayrollDays.getValue());
         moRegistry.setWorkingDays(moIntWorkingDays.getValue());
         moRegistry.setUmaAmount(moDecUmaAmount.getField().getValue());
+        moRegistry.setUmiAmount(moDecUmiAmount.getField().getValue());
         moRegistry.setMwzWage(moDecMwzWage.getField().getValue());
         moRegistry.setMwzReferenceWage(moDecMwzReferenceWage.getField().getValue());
         moRegistry.setNotes(moTextNotes.getValue());
@@ -1271,8 +1292,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecMwzReferenceWage.getField().setValue(moKeyMwzReferenceType.getSelectedIndex() <= 0 ? 0d : SHrsUtils.getRecentMinimumWage(miClient.getSession(), moKeyMwzReferenceType.getValue()[0], moDateDateEnd.getValue()));
     }
 
-    private void resetUmaAmount() throws Exception {
+    private void resetUmaUmiAmounts() throws Exception {
         moDecUmaAmount.getField().setValue(SHrsUtils.getRecentUma(miClient.getSession(), moDateDateEnd.getValue()));
+        moDecUmiAmount.getField().setValue(SHrsUtils.getRecentUmi(miClient.getSession(), moDateDateEnd.getValue()));
     }
 
     private void resetWithholdingTables() throws Exception {
@@ -1328,7 +1350,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private void triggerResets() throws Exception {
         resetDays();
         resetSalaries();
-        resetUmaAmount();
+        resetUmaUmiAmounts();
         resetWithholdingTables();
         populateEmployeesAvailable(false);
     }
@@ -1952,6 +1974,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 
                 // Set UMA:
                 moDecUmaAmount.getField().setValue(moRegistry.getUmaAmount());
+
+                // Set UMI:
+                moDecUmiAmount.getField().setValue(moRegistry.getUmiAmount());
 
                 // Set withholding tables:
                 moKeyTax.setValue(new int[] { moRegistry.getFkTaxId() });

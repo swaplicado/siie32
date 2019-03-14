@@ -61,8 +61,8 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     protected Date mtFechaFinalPago;
     protected double mdNumDiasPagados;
     protected String msDepartamento;
-    protected String msCuentaBancaria;
     protected int mnBanco;
+    protected String msCuentaBancaria;
     protected Date mtFechaInicioRelLaboral;
     protected int mnAntiguedad;
     protected String msPuesto;
@@ -114,8 +114,8 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         mtFechaFinalPago = null;
         mdNumDiasPagados = 0;
         msDepartamento = "";
-        msCuentaBancaria = "";
         mnBanco = 0;
+        msCuentaBancaria = "";
         mtFechaInicioRelLaboral = null;
         mnAntiguedad = 0;
         msPuesto = "";
@@ -165,8 +165,8 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public void setFechaFinalPago(Date t) { mtFechaFinalPago = t; }
     public void setNumDiasPagados(double d) { mdNumDiasPagados = d; }
     public void setDepartamento(String s) { msDepartamento = s; }
-    public void setClabe(String s) { msCuentaBancaria = s; }
     public void setBanco(int n) { mnBanco = n; }
+    public void setCuentaBancaria(String s) { msCuentaBancaria = s; }
     public void setFechaInicioRelLaboral(Date t) { mtFechaInicioRelLaboral = t; }
     public void setAntiguedad(int n) { mnAntiguedad = n; }
     public void setPuesto(String s) { msPuesto = s; }
@@ -212,8 +212,8 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public Date getFechaFinalPago() { return mtFechaFinalPago; }
     public double getNumDiasPagados() { return mdNumDiasPagados; }
     public String getDepartamento() { return msDepartamento; }
-    public String getClabe() { return msCuentaBancaria; }
     public int getBanco() { return mnBanco; }
+    public String getCuentaBancaria() { return msCuentaBancaria; }
     public Date getFechaInicioRelLaboral() { return mtFechaInicioRelLaboral; }
     public int getAntiguedad() { return mnAntiguedad; }
     public String getPuesto() { return msPuesto; }

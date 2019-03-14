@@ -1,4 +1,18 @@
 ================================================================================
+2019-03-14, 3.2 133.1
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a consulta para la obtención de recibos de nómina a emitir.
+
+================================================================================
+2019-03-14, 3.2 133.0
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación UMI en nóminas.
+2) Implementación CFDI relacionado en CFDI nóminas.
+3) Implementación mejora en captura CFDI recepción de pagos cuando la suma de aplicación de pagos es menor al monto del pago.
+
+================================================================================
 2019-03-04, 3.2 131.3
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

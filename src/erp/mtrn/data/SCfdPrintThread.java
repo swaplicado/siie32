@@ -5,7 +5,7 @@
  */
 package erp.mtrn.data;
 
-import erp.cfd.SDialogResult;
+import erp.cfd.SDialogCfdProcessing;
 import erp.client.SClientInterface;
 import sa.lib.SLibUtils;
 
@@ -24,15 +24,15 @@ public class SCfdPrintThread extends Thread {
     protected int mnCfdSubtype;
     protected int mnPrintMode;
     protected int mnNumberCopies;
-    protected SDialogResult moDialogResult;
+    protected SDialogCfdProcessing moDialogCfdProcessing;
     
-    public SCfdPrintThread(final SClientInterface client, final SDataCfd cfd, final int cfdSubtype, final int printMode, final int numberCopies, final SDialogResult dialogResult) {
+    public SCfdPrintThread(final SClientInterface client, final SDataCfd cfd, final int cfdSubtype, final int printMode, final int numberCopies, final SDialogCfdProcessing dialogCfdProcessing) {
         miClient = client;
         moCfd = cfd;
         mnCfdSubtype = cfdSubtype;
         mnPrintMode = printMode;
         mnNumberCopies = numberCopies;
-        moDialogResult = dialogResult;
+        moDialogCfdProcessing = dialogCfdProcessing;
     }
 
     public void startThread() {

@@ -223,7 +223,7 @@ public abstract class SHrsFormerUtils {
             hrsPayrollReceipt.setTipoRegimen(resultSet.getInt("f_emp_reg_tp"));
             hrsPayrollReceipt.setNumDiasPagados(resultSet.getDouble("f_emp_dias_pag"));
             hrsPayrollReceipt.setDepartamento(SLibUtilities.textTrim(resultSet.getString("f_emp_dep")));
-            hrsPayrollReceipt.setClabe(SLibUtilities.textTrim(resultSet.getString("f_emp_bank_clabe")));
+            hrsPayrollReceipt.setCuentaBancaria(SLibUtilities.textTrim(resultSet.getString("f_emp_bank_clabe")));
             hrsPayrollReceipt.setBanco(resultSet.getInt("f_emp_bank"));
             hrsPayrollReceipt.setFechaPago(tPayrollDatePayment);
             hrsPayrollReceipt.setFechaInicioRelLaboral(dateFormat.parse(SLibUtilities.textTrim(resultSet.getString("f_emp_alta"))));

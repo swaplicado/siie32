@@ -1918,9 +1918,10 @@ public abstract class SDataReadTableRows {
                 break;
 
             case SDataConstants.TRN_CFD:
-                /* Parameter filterKey is an Object array of 2 elements:
-                 * 1. CFD type ID as an Integer, i.e., invoice, receipt of payments, payroll.
+                /* Parameter filterKey is an Object array of 2 or 3 elements:
+                 * 1. CFD type ID as an Integer, i.e., TRNS_TP_CFD: invoice, receipt of payments, payroll.
                  * 2. fiscal ID of receiver as a String.
+                 * 3. CFD status ID as an Integer (optional!), i.e., TRNS_ST_DPS: new, issued, cancelled.
                  */
 
                 aoPkFields = new STableField[1];
@@ -1937,11 +1938,15 @@ public abstract class SDataReadTableRows {
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_DOUBLE, "cfd.xml_tot");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "cfd.xml_mon");
 
-                int typeCfd = SLibConstants.UNDEFINED;
+                int cfdType = 0;
                 String rfcRec = "";
+                int cfdStatus = SDataConstantsSys.TRNS_ST_DPS_EMITED;
                 if (filterKey instanceof Object[]) {
-                    typeCfd = (int) ((Object[]) filterKey)[0];
+                    cfdType = (int) ((Object[]) filterKey)[0];
                     rfcRec = (String) ((Object[]) filterKey)[1];
+                    if (((Object[]) filterKey).length >= 3) {
+                        cfdStatus = (int) ((Object[]) filterKey)[2];
+                    }
                 }
 
                 sSql = "SELECT cfd.id_cfd, cfd.ts, cfd.uuid, cfd.xml_rfc_rec, cfd.xml_tot, cfd.xml_mon, cfdtp.tp_cfd, xmltp.tp_xml, " +
@@ -1950,8 +1955,8 @@ public abstract class SDataReadTableRows {
                         "INNER JOIN erp.trns_tp_cfd AS cfdtp ON cfd.fid_tp_cfd = cfdtp.id_tp_cfd " +
                         "INNER JOIN erp.trns_tp_xml AS xmltp ON cfd.fid_tp_xml = xmltp.id_tp_xml " +
                         "LEFT OUTER JOIN trn_dps AS d ON cfd.fid_dps_year_n = d.id_year AND cfd.fid_dps_doc_n = d.id_doc " +
-                        "WHERE cfd.fid_tp_cfd = " + typeCfd + " AND cfd.xml_rfc_rec = '" + rfcRec + "' AND " +
-                        "cfd.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
+                        "WHERE cfd.fid_tp_cfd = " + cfdType + " AND cfd.xml_rfc_rec = '" + rfcRec + "' AND " +
+                        "cfd.fid_st_xml = " + cfdStatus + " " +
                         "ORDER BY cfd.ts ";
                 break;
 

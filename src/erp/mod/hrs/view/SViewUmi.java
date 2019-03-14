@@ -16,12 +16,12 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Sergio Flores
  */
-public class SViewUma extends SGridPaneView {
+public class SViewUmi extends SGridPaneView {
 
-    public SViewUma(SGuiClient client, String title) {
-        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_UMA, SLibConsts.UNDEFINED, title);
+    public SViewUmi(SGuiClient client, String title) {
+        super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_UMI, SLibConsts.UNDEFINED, title);
         setRowButtonsEnabled(true, true, true, false, true);
     }
 
@@ -40,7 +40,7 @@ public class SViewUma extends SGridPaneView {
         }
 
         msSql = "SELECT "
-                + "v.id_uma AS " + SDbConsts.FIELD_ID + "1, "
+                + "v.id_umi AS " + SDbConsts.FIELD_ID + "1, "
                 + "'' AS " + SDbConsts.FIELD_CODE + ", "
                 + "'' AS " + SDbConsts.FIELD_NAME + ", "
                 + "v.dt_sta, "
@@ -52,13 +52,13 @@ public class SViewUma extends SGridPaneView {
                 + "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_UMA) + " AS v "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_UMI) + " AS v "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
                 + "v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY v.dt_sta, v.id_uma ";
+                + "ORDER BY v.dt_sta, v.id_umi ";
     }
 
     @Override
@@ -66,7 +66,7 @@ public class SViewUma extends SGridPaneView {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sta", "Inicio vigencia"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.amt", "Valor UMA $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.amt", "Valor UMI $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));

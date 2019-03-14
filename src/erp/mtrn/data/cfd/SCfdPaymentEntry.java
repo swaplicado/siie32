@@ -81,6 +81,9 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
     public double AuxTotalPaymentsLocal;
     public double AuxTotalLimMin;
     public double AuxTotalLimMax;
+    public boolean AuxAllowTotalPaymentsLessThanAmount;
+    public boolean AuxAllowTotalPaymentsLocalLessThanAmountLocal;
+    public boolean AuxAllowTotalPaymentsLocalGreaterThanAmountLocal;
     public ArrayList<SDataRecordEntry> AuxDbmsRecordEntries;
     
     public SCfdPaymentEntry(int number, int type, Date date, String paymentWay, int currencyId, String currencyKey, double amount, double exchangeRate, SDataRecord dataRecord, SDataCfdPayment parentPayment) {
@@ -110,8 +113,18 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
         AuxFactoringBankFiscalId = "";
         AuxDbmsRecordEntries = new ArrayList<>();
         
+        resetAllowances();
         computeAmountLocal();
         computeTotalPayments();
+    }
+    
+    /**
+     * Resets allowances.
+     */
+    public void resetAllowances() {
+        AuxAllowTotalPaymentsLessThanAmount = false;
+        AuxAllowTotalPaymentsLocalLessThanAmountLocal = false;
+        AuxAllowTotalPaymentsLocalGreaterThanAmountLocal = false;
     }
     
     /**
@@ -177,7 +190,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
      * @return 
      */
     public boolean isAmountTotallyApplied() {
-        return Math.abs(Amount - AuxTotalPayments) < 0.01;
+        return SLibUtils.compareAmount(Amount, AuxTotalPayments);
     }
 
     private erp.mfin.data.SDataRecordEntry createRecordEntryAccountCash(final SGuiSession session, final SDataAccountCash accountCash, 

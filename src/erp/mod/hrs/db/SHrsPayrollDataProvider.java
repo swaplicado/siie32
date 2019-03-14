@@ -78,6 +78,26 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return umas;
     }
     
+    private ArrayList<SDbUmi> readUmis() throws Exception {
+        SDbUmi umi = null;
+        ArrayList<SDbUmi> umis = new ArrayList<>();
+        String sql;
+        ResultSet resultSet = null;
+
+        sql = "SELECT id_umi "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_UMI) + " "
+                + "ORDER BY dt_sta DESC, id_umi ";
+
+        resultSet = moSession.getDatabase().getConnection().createStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            umi = new SDbUmi();
+            umi.read(moSession, new int[] { resultSet.getInt("id_umi") });
+            umis.add(umi);
+        }
+
+        return umis;
+    }
+    
     private ArrayList<SDbHoliday> getHolidays() throws Exception {
         String sql;
         SDbHoliday holiday = null;
@@ -833,6 +853,9 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
         // UMA:
         hrsPayroll.getUmas().addAll(readUmas());
+        
+        // UMI:
+        hrsPayroll.getUmis().addAll(readUmis());
         
         // Holidays:
         hrsPayroll.getHolidays().addAll(getHolidays());

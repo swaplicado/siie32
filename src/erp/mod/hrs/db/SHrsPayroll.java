@@ -24,6 +24,7 @@ public class SHrsPayroll {
 
     protected ArrayList<SDbLoanTypeAdjustment> maLoanTypeAdjustment;
     protected ArrayList<SDbUma> maUmas;
+    protected ArrayList<SDbUmi> maUmis;
     protected ArrayList<SDbHoliday> maHolidays;
     protected ArrayList<SDbTaxTable> maTaxTables;
     protected ArrayList<SDbTaxSubsidyTable> maTaxSubsidyTables;
@@ -48,6 +49,7 @@ public class SHrsPayroll {
 
         maLoanTypeAdjustment = new ArrayList<>();
         maUmas = new ArrayList<>();
+        maUmis = new ArrayList<>();
         maHolidays = new ArrayList<>();
         maTaxTables = new ArrayList<>();
         maTaxSubsidyTables = new ArrayList<>();
@@ -484,6 +486,7 @@ public class SHrsPayroll {
 
     public ArrayList<SDbLoanTypeAdjustment> getLoanTypeAdjustment() { return maLoanTypeAdjustment; }
     public ArrayList<SDbUma> getUmas() { return maUmas; }
+    public ArrayList<SDbUmi> getUmis() { return maUmis; }
     public ArrayList<SDbHoliday> getHolidays() { return maHolidays; }
     public ArrayList<SDbTaxTable> getTaxTables() { return maTaxTables; }
     public ArrayList<SDbTaxSubsidyTable> getTaxSubsidyTables() { return maTaxSubsidyTables; }
@@ -521,9 +524,27 @@ public class SHrsPayroll {
     public double getUma(final Date date) {
         double amount = 0;
 
-        for (SDbUma adjustment : maUmas) {
-            if (!date.before(adjustment.getDateStart())) {
-                amount = adjustment.getAmount();
+        for (SDbUma uma : maUmas) {
+            if (!date.before(uma.getDateStart())) {
+                amount = uma.getAmount();
+                break;
+            }
+        }
+
+        return amount;
+    }
+    
+    /**
+     * Obtain amount UMI most appropriate for date indicated.
+     * @param date Date for required UMI.
+     * @return 
+     */
+    public double getUmi(final Date date) {
+        double amount = 0;
+
+        for (SDbUmi umi : maUmis) {
+            if (!date.before(umi.getDateStart())) {
+                amount = umi.getAmount();
                 break;
             }
         }

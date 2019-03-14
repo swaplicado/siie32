@@ -5,7 +5,7 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
-import erp.mod.hrs.db.SDbUma;
+import erp.mod.hrs.db.SDbUmi;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -17,19 +17,19 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Sergio Flores
  */
-public class SFormUma extends SBeanForm {
+public class SFormUmi extends SBeanForm {
 
-    private SDbUma moRegistry;
+    private SDbUmi moRegistry;
 
     /**
-     * Creates new form SFormUma
+     * Creates new form SFormUmi
      * @param client
      * @param title
      */
-    public SFormUma(SGuiClient client, String title) {
-        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_UMA, SLibConsts.UNDEFINED, title);
+    public SFormUmi(SGuiClient client, String title) {
+        setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_UMI, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
     }
@@ -69,7 +69,7 @@ public class SFormUma extends SBeanForm {
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAmount.setText("Valor UMA:*");
+        jlAmount.setText("Valor UMI:*");
         jlAmount.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlAmount);
         jPanel6.add(moCurAmount);
@@ -121,7 +121,7 @@ public class SFormUma extends SBeanForm {
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        moRegistry = (SDbUma) registry;
+        moRegistry = (SDbUmi) registry;
 
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
@@ -148,7 +148,7 @@ public class SFormUma extends SBeanForm {
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbUma registry = moRegistry.clone();
+        SDbUmi registry = moRegistry.clone();
 
         registry.setDateStart(moDateDateStart.getValue());
         registry.setAmount(moCurAmount.getField().getValue());
