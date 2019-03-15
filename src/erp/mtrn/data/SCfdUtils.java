@@ -267,16 +267,15 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     private static boolean canObtainXml(final SDataCfd cfd) throws Exception {
-        if (!(cfd.isCfd() || cfd.isCfdi())) {
+        if (cfd.isOwnCfd() && !cfd.isCfd() && !cfd.isCfdi()) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de comprobante fiscal desconocido.");
         }
         else if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_NEW) {
-            throw new Exception("El comprobante fiscal no ha sido emitido.");
+            throw new Exception("El comprobante fiscal no está emitido.");
         }
         else if (cfd.isCfdi()) {
-            // CFDI:
             if (!cfd.isStamped()) {
-                throw new Exception("El CFDI no ha sido timbrado aún.");
+                throw new Exception("El CFDI no está timbrado.");
             }
             else if (cfd.getIsProcessingWebService()) {
                 throw new Exception(SCfdConsts.ERR_MSG_PROCESS_WS_PAC);
@@ -290,21 +289,21 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     private static boolean canObtainAcknowledgmentCancellation(final SClientInterface client, final SDataCfd cfd) throws Exception {
-        if (!(cfd.isCfd() || cfd.isCfdi())) {
+        if (!cfd.isCfd() && !cfd.isCfdi()) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de comprobante fiscal desconocido.");
         }
         else {
             if (cfd.isCfd()) {
                 // CFD:
-                throw new Exception("Los CFD por definición no tienen acuse de cancelación.");
+                throw new Exception("Los CFD no tienen acuse de cancelación.");
             }
             else {
                 // CFDI:
                 if (cfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                    throw new Exception("El CFDI no ha sido cancelado.");
+                    throw new Exception("El CFDI no está cancelado.");
                 }
                 else if (!cfd.isStamped()) {
-                    throw new Exception("El CFDI no ha sido timbrado aún.");
+                    throw new Exception("El CFDI no está timbrado.");
                 }
                 else if (cfd.getIsProcessingWebService()) {
                     throw new Exception(SCfdConsts.ERR_MSG_PROCESS_WS_PAC);
@@ -335,26 +334,7 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     private static boolean canSend(final SDataCfd cfd) throws Exception {
-        if (!(cfd.isCfd() || cfd.isCfdi())) {
-            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nTipo de comprobante fiscal desconocido.");
-        }
-        else if (cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_NEW) {
-            throw new Exception("El comprobante fiscal no ha sido emitido.");
-        }
-        else if (cfd.isCfdi()) {
-            // CFDI:
-            if (!cfd.isStamped()) {
-                throw new Exception("El CFDI no ha sido timbrado aún.");
-            }
-            else if (cfd.getIsProcessingWebService()) {
-                throw new Exception(SCfdConsts.ERR_MSG_PROCESS_WS_PAC);
-            }
-            else if (cfd.getIsProcessingStorageXml()) {
-                throw new Exception(SCfdConsts.ERR_MSG_PROCESS_XML_STORAGE);
-            }
-        }
-
-        return true;
+        return cfd.isOwnCfd() && canObtainXml(cfd);
     }
     
     private static boolean existsCfdiEmitInconsist(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {

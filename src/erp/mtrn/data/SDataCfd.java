@@ -339,19 +339,27 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     /**
-     * Check if CFD is actually a CFD.
-     * @return True if CFD is a CFD.
+     * Check if CFD is an own CFD.
+     * @return True if CFD is an own CFD.
      */
-    public boolean isCfd() {
-        return mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFD;
+    public boolean isOwnCfd() {
+        return !msCertNumber.isEmpty();
     }
 
     /**
-     * Check if CFD is actually a CFDI 3.2 or 3.3.
-     * @return True if CFD is a CFDI.
+     * Check if CFD is an own CFD and is actually a CFD (prior to CFDI).
+     * @return True if CFD is an own CFD and a CFD (prior to CFDI).
+     */
+    public boolean isCfd() {
+        return isOwnCfd() && mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFD;
+    }
+
+    /**
+     * Check if CFD is an own CFD and is actually a CFDI 3.2 or 3.3.
+     * @return True if CFD is an own CFD and a CFDI.
      */
     public boolean isCfdi() {
-        return SLibUtils.belongsTo(mnFkXmlTypeId, new int[] { SDataConstantsSys.TRNS_TP_XML_CFDI_32, SDataConstantsSys.TRNS_TP_XML_CFDI_33 });
+        return isOwnCfd() && (mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFDI_32 || mnFkXmlTypeId == SDataConstantsSys.TRNS_TP_XML_CFDI_33);
     }
 
     /**
