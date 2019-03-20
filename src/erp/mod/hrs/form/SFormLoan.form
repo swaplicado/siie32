@@ -476,7 +476,7 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadSd">
+                <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadPaymentPercentageRefSd">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="moRadGroupSalaryType"/>
@@ -485,7 +485,7 @@
                     <Property name="toolTipText" type="java.lang.String" value="salario diario"/>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadSbc">
+                <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadPaymentPercentageRefSbc">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="moRadGroupSalaryType"/>
@@ -494,7 +494,7 @@
                     <Property name="toolTipText" type="java.lang.String" value="salario base de cotizaci&#xf3;n"/>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOtherSalary">
+                <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadPaymentPercentageRefOtro">
                   <Properties>
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="moRadGroupSalaryType"/>
@@ -512,7 +512,7 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlSalaryOther">
+                <Component class="javax.swing.JLabel" name="jlRadPaymentPercentageAmount">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Otro salario:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -520,9 +520,9 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecSalaryOther">
+                <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecRadPaymentPercentageAmount">
                 </Component>
-                <Component class="javax.swing.JLabel" name="jlSalaryOtherHelpHint">
+                <Component class="javax.swing.JLabel" name="jlRadPaymentPercentageAmountHint">
                   <Properties>
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="6d" green="6d" red="6d" type="rgb"/>
@@ -537,7 +537,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JLabel" name="jlSalaryOtherHelp">
+                <Component class="javax.swing.JLabel" name="jlRadPaymentPercentageAmountHelp">
                   <Properties>
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="80" green="80" id="gray" palette="1" red="80" type="palette"/>

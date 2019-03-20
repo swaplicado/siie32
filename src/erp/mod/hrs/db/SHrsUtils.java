@@ -1689,11 +1689,8 @@ public abstract class SHrsUtils {
             SDbBenefitTableRow tableRow = null; // current benefit-table row
             
             for (int year = 1; year <= 100; year++) {
-                if (tableRow == null || (year * SLibTimeConsts.MONTHS) >= tableRow.getMonths()) {
-                    if (currIndex + 1 >= table.getChildRows().size()) {
-                        benefit = 0;
-                    }
-                    else {
+                if (tableRow == null || (year * SLibTimeConsts.MONTHS) > tableRow.getMonths()) {
+                    if (currIndex + 1 < table.getChildRows().size()) {
                         ++currIndex;
                         tableRow = table.getChildRows().get(currIndex);
                         benefit = table.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? tableRow.getBenefitBonusPercentage() : tableRow.getBenefitDays();
@@ -2247,18 +2244,18 @@ public abstract class SHrsUtils {
     
     public static double getIntegrationFactorSbc(final SGuiSession session, final Date dateBenefits, final Date dateCutoff) throws Exception {
         int seniority = 0;
-        int daysTableVacation = 0;
         int daysTableAnnualBonus = 0;
+        int daysTableVacation = 0;
         double percentageTableVacationBonus = 0;
         double salaryUnit = 1;
         double integrationFactorSbc = 0;
         SHrsBenefitTableAnniversary benefitTableAnniversary = null;
-        ArrayList<SDbBenefitTable> benefitTableVacation = new ArrayList<>();
         ArrayList<SDbBenefitTable> benefitTableAnnualBonus = new ArrayList<>();
+        ArrayList<SDbBenefitTable> benefitTableVacation = new ArrayList<>();
         ArrayList<SDbBenefitTable> benefitTableVacationBonus = new ArrayList<>();
         
-        benefitTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutoff) }));
         benefitTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, SLibConsts.UNDEFINED, dateCutoff) }));
+        benefitTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutoff) }));
         benefitTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, SLibConsts.UNDEFINED, dateCutoff) }));
         
         if (dateBenefits != null) {
@@ -2268,16 +2265,9 @@ public abstract class SHrsUtils {
             seniority = 1;
         }
         
-        ArrayList<SHrsBenefitTableAnniversary> benefitTableVacationAnniversarys = createBenefitTablesAnniversarys(benefitTableVacation);
         ArrayList<SHrsBenefitTableAnniversary> benefitTableAnnualBonusAnniversarys = createBenefitTablesAnniversarys(benefitTableAnnualBonus);
+        ArrayList<SHrsBenefitTableAnniversary> benefitTableVacationAnniversarys = createBenefitTablesAnniversarys(benefitTableVacation);
         ArrayList<SHrsBenefitTableAnniversary> benefitTableVacationBonusAnniversarys = createBenefitTablesAnniversarys(benefitTableVacationBonus);
-        
-        for (SHrsBenefitTableAnniversary anniversary : benefitTableVacationAnniversarys) {
-            if (anniversary.getBenefitAnn() <= seniority) {
-                benefitTableAnniversary = anniversary;
-            }
-        }
-        daysTableVacation = benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue();
         
         for (SHrsBenefitTableAnniversary anniversary : benefitTableAnnualBonusAnniversarys) {
             if (anniversary.getBenefitAnn() <= seniority) {
@@ -2285,6 +2275,13 @@ public abstract class SHrsUtils {
             }
         }
         daysTableAnnualBonus = benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue();
+        
+        for (SHrsBenefitTableAnniversary anniversary : benefitTableVacationAnniversarys) {
+            if (anniversary.getBenefitAnn() <= seniority) {
+                benefitTableAnniversary = anniversary;
+            }
+        }
+        daysTableVacation = benefitTableAnniversary == null ? 0 : (int) benefitTableAnniversary.getValue();
         
         for (SHrsBenefitTableAnniversary anniversary : benefitTableVacationBonusAnniversarys) {
             if (anniversary.getBenefitAnn() <= seniority) {
@@ -3050,110 +3047,97 @@ public abstract class SHrsUtils {
     }
     
     public static double computeAmountLoan(final SHrsPayrollReceipt hrsReceipt, final SDbLoan loan) throws Exception {
-        double loanAmount = 0;
-        double loanBalance = 0;
-        double adjustmentAux = 0;
-        double salaryReference = 0;
-        SHrsDaysByPeriod hrsDaysPrev = hrsReceipt.getHrsEmployee().getHrsDaysPrev();
-        SHrsDaysByPeriod hrsDaysCurr = hrsReceipt.getHrsEmployee().getHrsDaysCurr();
-        SHrsDaysByPeriod hrsDaysNext = hrsReceipt.getHrsEmployee().getHrsDaysNext();
+        double loanAmt = 0;
+        double monthlyAdj = hrsReceipt.getHrsPayroll().getLoanTypeAdjustment(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd(), loan.getFkLoanTypeId());
         
-        // monthly payment and adjustment:
-        double monthlyPayment;
-        double monthlyAdjustment = hrsReceipt.getHrsPayroll().getLoanTypeAdjustment(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd(), loan.getFkLoanTypeId());
-        
-        switch (loan.getFkLoanPaymentTypeId()) {
-            case SModSysConsts.HRSS_TP_LOAN_PAY_AMT: // Amount
-                if (SLibUtils.belongsTo(loan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOA_COM, SModSysConsts.HRSS_TP_LOAN_LOA_UNI, SModSysConsts.HRSS_TP_LOAN_LOA_TPS })) {
-                    // is a loan:
-                    
-                    loanAmount = loan.getPaymentAmount();
-                    
-                    if (monthlyAdjustment != 0) {
-                        switch (hrsReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId()) {
-                            case SModSysConsts.HRSS_TP_PAY_WEE:
-                                loanAmount += monthlyAdjustment * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_WEEKS;
-                                break;
-                            case SModSysConsts.HRSS_TP_PAY_FOR:
-                                loanAmount += monthlyAdjustment / SHrsConsts.MONTH_FORTNIGHTS;
-                                break;
-                            default:
-                        }
-                    }
-                    
-                    // limit payment to loan balance if necessary:
-                    loanBalance = SHrsUtils.getBalanceLoan(loan, hrsReceipt.getHrsEmployee());
-                    if (loanAmount > loanBalance) {
-                        loanAmount = loanBalance;
-                    }
+        if (SLibUtils.belongsTo(loan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOAN_COM, SModSysConsts.HRSS_TP_LOAN_LOAN_UNI, SModSysConsts.HRSS_TP_LOAN_LOAN_3RD })) {
+            // it is a loan:
+
+            loanAmt = loan.getPaymentAmount();
+
+            if (monthlyAdj != 0) {
+                switch (hrsReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId()) {
+                    case SModSysConsts.HRSS_TP_PAY_WEE:
+                        loanAmt += monthlyAdj * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_WEEKS;
+                        break;
+                    case SModSysConsts.HRSS_TP_PAY_FOR:
+                        loanAmt += monthlyAdj / SHrsConsts.MONTH_FORTNIGHTS;
+                        break;
+                    default:
                 }
-                else {
-                    // is a home or consumer credit:
-                    
-                    // estimate monthly payment:
-                    monthlyPayment = loan.getPaymentAmount() + monthlyAdjustment;
-                    
-                    // compute loan amount taking into consideration days of previous or next months (only in weekly payrolls):
-                    loanAmount += hrsDaysPrev == null ? 0 : ((monthlyPayment / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
-                    loanAmount += (monthlyPayment / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
-                    loanAmount += hrsDaysNext == null ? 0 : ((monthlyPayment / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
-                }
-                break;
+            }
+
+            // limit payment to loan's balance if necessary:
+            double loanBal = SHrsUtils.getBalanceLoan(loan, hrsReceipt.getHrsEmployee());
+            if (loanAmt > loanBal) {
+                loanAmt = loanBal;
+            }
+        }
+        else {
+            // it is a home or consumer credit:
+            
+            // compute loan amount considering also the days of previous or next months (only in weekly payrolls):
+            
+            SHrsDaysByPeriod hrsDaysPrev = hrsReceipt.getHrsEmployee().getHrsDaysPrev();
+            SHrsDaysByPeriod hrsDaysCurr = hrsReceipt.getHrsEmployee().getHrsDaysCurr();
+            SHrsDaysByPeriod hrsDaysNext = hrsReceipt.getHrsEmployee().getHrsDaysNext();
+            double propPrev = hrsDaysPrev == null ? 0d : ((double) hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()) / hrsDaysPrev.getPeriodDays();
+            double propCurr = hrsDaysCurr == null ? 0d : ((double) hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid()) / hrsDaysCurr.getPeriodDays();
+            double propNext = hrsDaysNext == null ? 0d : ((double) hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()) / hrsDaysNext.getPeriodDays();
+            
+            if (loan.getFkLoanPaymentTypeId() == SModSysConsts.HRSS_TP_LOAN_PAY_PCT) {
+                double salary = 0;
+                double loanAdj = 0;
                 
-            case SModSysConsts.HRSS_TP_LOAN_PAY_FIX_FEE: // Fixed fee
-                // estimate monthly payment:
-                monthlyPayment = (loan.getPaymentFixedFees() * hrsReceipt.getHrsPayroll().getPayroll().getMwzReferenceWage()) + monthlyAdjustment;
-                
-                // compute loan amount taking into consideration days of previous or next months (only in weekly payrolls):
-                loanAmount += hrsDaysPrev == null ? 0 : ((monthlyPayment / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
-                loanAmount += (monthlyPayment / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
-                loanAmount += hrsDaysNext == null ? 0 : ((monthlyPayment / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
-                break;
-                
-            case SModSysConsts.HRSS_TP_LOAN_PAY_UMA: // UMA
-                // estimate monthly payment:
-                monthlyPayment = (loan.getPaymentUmas() * hrsReceipt.getHrsPayroll().getUma(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd())) + monthlyAdjustment;
-                
-                // compute loan amount taking into consideration days of previous or next months (only in weekly payrolls):
-                loanAmount += hrsDaysPrev == null ? 0 : ((monthlyPayment / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
-                loanAmount += (monthlyPayment / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
-                loanAmount += hrsDaysNext == null ? 0 : ((monthlyPayment / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
-                break;
-                
-            case SModSysConsts.HRSS_TP_LOAN_PAY_UMI: // UMI
-                // estimate monthly payment:
-                monthlyPayment = (loan.getPaymentUmis() * hrsReceipt.getHrsPayroll().getUmi(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd())) + monthlyAdjustment;
-                
-                // compute loan amount taking into consideration days of previous or next months (only in weekly payrolls):
-                loanAmount += hrsDaysPrev == null ? 0 : ((monthlyPayment / hrsDaysPrev.getPeriodDays()) * (hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()));
-                loanAmount += (monthlyPayment / hrsDaysCurr.getPeriodDays()) * (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid());
-                loanAmount += hrsDaysNext == null ? 0 : ((monthlyPayment / hrsDaysNext.getPeriodDays()) * (hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()));
-                break;
-                
-            case SModSysConsts.HRSS_TP_LOAN_PAY_PER: // Percentage
-                // compute loan amount taking into consideration the days of previous or next months (only in weekly payrolls):
-                adjustmentAux += hrsDaysPrev == null ? 0 : (((double) hrsDaysPrev.getPeriodPayrollDays() - hrsDaysPrev.getDaysNotWorkedNotPaid()) / hrsDaysPrev.getPeriodDays()) * monthlyAdjustment;
-                adjustmentAux += (double) (hrsDaysCurr.getPeriodPayrollDays() - hrsDaysCurr.getDaysNotWorkedNotPaid()) / hrsDaysCurr.getPeriodDays() * monthlyAdjustment;
-                adjustmentAux += hrsDaysNext == null ? 0 : (((double) hrsDaysNext.getPeriodPayrollDays() - hrsDaysNext.getDaysNotWorkedNotPaid()) / hrsDaysNext.getPeriodDays() * monthlyAdjustment);
-                
-                if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL) {
-                    salaryReference = hrsReceipt.getReceipt().getPaymentDaily();
-                }
-                else if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL_SS) {
-                    salaryReference = hrsReceipt.getReceipt().getSalarySscBase();
-                }
-                else if (loan.getPaymentPercentageReference() == SHrsConsts.SAL_REF_SAL_FIX) {
-                    salaryReference = loan.getPaymentPercentageAmount();
+                switch (loan.getPaymentPercentageReference()) {
+                    case SHrsConsts.PAY_PER_REF_SD:
+                        salary = hrsReceipt.getReceipt().getPaymentDaily();
+                        break;
+                    case SHrsConsts.PAY_PER_REF_SBC:
+                        salary = hrsReceipt.getReceipt().getSalarySscBase();
+                        break;
+                    case SHrsConsts.PAY_PER_REF_OTRO:
+                        salary = loan.getPaymentPercentageAmount();
+                        break;
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
                 
-                loanAmount = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * salaryReference * loan.getPaymentPercentage() + adjustmentAux;
-                break;
+                loanAdj +=  propPrev * monthlyAdj;
+                loanAdj +=  propCurr * monthlyAdj;
+                loanAdj +=  propNext * monthlyAdj;
+
+                loanAmt = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * salary * loan.getPaymentPercentage() + loanAdj;
+            }
+            else {
+                double monthlyPay;
                 
-            default:
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                switch (loan.getFkLoanPaymentTypeId()) {
+                    case SModSysConsts.HRSS_TP_LOAN_PAY_AMT: // Amount
+                        monthlyPay = loan.getPaymentAmount();
+                        break;
+                    case SModSysConsts.HRSS_TP_LOAN_PAY_FACT_SAL: // Factor Salary
+                        monthlyPay = loan.getPaymentFixedFees() * hrsReceipt.getHrsPayroll().getPayroll().getMwzReferenceWage();
+                        break;
+                    case SModSysConsts.HRSS_TP_LOAN_PAY_FACT_UMA: // Factor UMA
+                        monthlyPay = loan.getPaymentUmas() * hrsReceipt.getHrsPayroll().getUma(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd());
+                        break;
+                    case SModSysConsts.HRSS_TP_LOAN_PAY_FACT_UMI: // Factor UMI
+                        monthlyPay = loan.getPaymentUmis() * hrsReceipt.getHrsPayroll().getUmi(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd());
+                        break;
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                
+                monthlyPay += monthlyAdj;
+                
+                loanAmt += propPrev * monthlyPay;
+                loanAmt += propCurr * monthlyPay;
+                loanAmt += propNext * monthlyPay;
+            }
         }
         
-        return SLibUtils.roundAmount(loanAmount);
+        return SLibUtils.roundAmount(loanAmt);
     }
     
     /**

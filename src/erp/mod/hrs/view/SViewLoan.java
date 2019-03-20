@@ -194,10 +194,10 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
         filter = ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS))== null ? null : ((SGridFilterValue) moFiltersMap.get(SGridFilterPanelLoan.LOAN_STATUS)).getValue();
         if (filter != null && ((int) filter) != SLibConsts.UNDEFINED) {
             if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_OPEN) {
-                sqlHaving = "HAVING (v.b_clo = 0 AND v.fk_tp_loan NOT IN(" + SModSysConsts.HRSS_TP_LOAN_HOM + ", " + SModSysConsts.HRSS_TP_LOAN_CON + ") AND _bal <> 0) OR (v.b_clo = 0 AND v.fk_tp_loan IN(" + SModSysConsts.HRSS_TP_LOAN_HOM + ", " + SModSysConsts.HRSS_TP_LOAN_CON + ")) ";
+                sqlHaving = "HAVING (v.b_clo = 0 AND v.fk_tp_loan NOT IN(" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ") AND _bal <> 0) OR (v.b_clo = 0 AND v.fk_tp_loan IN(" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ")) ";
             }
             else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_CLO) {
-                sqlHaving = "HAVING (_bal = 0 AND v.fk_tp_loan NOT IN(" + SModSysConsts.HRSS_TP_LOAN_HOM + ", " + SModSysConsts.HRSS_TP_LOAN_CON + ")) OR v.b_clo = 1 ";
+                sqlHaving = "HAVING (_bal = 0 AND v.fk_tp_loan NOT IN(" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + ")) OR v.b_clo = 1 ";
             }
             else if ((int)filter == SGridFilterPanelLoan.LOAN_STATUS_ALL) {
                 sqlHaving = "";
@@ -216,16 +216,16 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
                 + "COALESCE(incs._inc, 0.0) AS _inc, "
                 + "COALESCE(decs._dec, 0.0) AS _dec, "
                 + "decs._last_move, "
-                + "IF(v.fk_tp_loan IN(" + SModSysConsts.HRSS_TP_LOAN_HOM + ", " + SModSysConsts.HRSS_TP_LOAN_CON + "), 0, (v.tot_amt + "
+                + "IF(v.fk_tp_loan IN(" + SModSysConsts.HRSS_TP_LOAN_HOME + ", " + SModSysConsts.HRSS_TP_LOAN_CONS + "), 0, (v.tot_amt + "
                 + "COALESCE(incs._inc, 0.0) - COALESCE(decs._dec, 0.0))) AS _bal, "
                 + "v.pay_amt, "
                 + "v.pay_fix, "
                 + "v.pay_uma, "
                 + "v.pay_umi, "
                 + "v.fk_tp_loan, "
-                 + "IF(v.pay_per_ref = " + SHrsConsts.SAL_REF_SAL  + ", '" + SHrsConsts.TXT_SAL_REF_SAL + "',"
-                 + "IF(v.pay_per_ref = " + SHrsConsts.SAL_REF_SAL_SS  + ", '" + SHrsConsts.TXT_SAL_REF_SAL_SS + "',"
-                 + "IF(v.pay_per_ref = " + SHrsConsts.SAL_REF_SAL_FIX  + ", '" + SHrsConsts.TXT_SAL_REF_SAL_FIX + "', ''))) AS f_sal_ref, "
+                 + "IF(v.pay_per_ref = " + SHrsConsts.PAY_PER_REF_SD  + ", '" + SHrsConsts.TXT_PAY_PER_REF_SD + "',"
+                 + "IF(v.pay_per_ref = " + SHrsConsts.PAY_PER_REF_SBC  + ", '" + SHrsConsts.TXT_PAY_PER_REF_SBC + "',"
+                 + "IF(v.pay_per_ref = " + SHrsConsts.PAY_PER_REF_OTRO  + ", '" + SHrsConsts.TXT_PAY_PER_REF_OTRO + "', ''))) AS f_sal_ref, "
                 + "v.pay_per, "
                 + "v.pay_per_amt, "
                 + "v.fk_tp_loan, "

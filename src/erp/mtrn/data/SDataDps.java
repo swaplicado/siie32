@@ -4740,7 +4740,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
      */
 
     @Override
-    public int getCfdType() {
+    public int getCfdType() { // CFDI 3.2 & 3.3
         return SDataConstantsSys.TRNS_TP_CFD_INV;
     }
 
@@ -4750,17 +4750,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public String getComprobanteSerie() {
+    public String getComprobanteSerie() { // CFDI 3.2 & 3.3
         return msNumberSeries;
     }
 
     @Override
-    public String getComprobanteFolio() {
+    public String getComprobanteFolio() { // CFDI 3.2 & 3.3
         return msNumber;
     }
 
     @Override
-    public Date getComprobanteFecha() {
+    public Date getComprobanteFecha() { // CFDI 3.2 & 3.3
         int[] creation = SLibTimeUtilities.digestDate(mtDate);
         int[] modification = SLibTimeUtilities.digestDate(mtUserEditTs);
         java.util.Date date = null;
@@ -4783,17 +4783,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public int getComprobanteFormaDePagoPagos() {   // CFDI 3.2
+    public int getComprobanteFormaDePagoPagos() { // CFDI 3.2
         return mnPayments;
     }
 
     @Override
-    public String getComprobanteFormaPago() {   // CFDI 3.3
+    public String getComprobanteFormaPago() { // CFDI 3.3
         return moDbmsDataDpsCfd.getPaymentWay();
     }
 
     @Override
-    public int getComprobanteCondicionesDePago() {  // CFDI 3.2
+    public int getComprobanteCondicionesDePago() { // CFDI 3.2
         return mnFkPaymentTypeId == SDataConstantsSys.TRNS_TP_PAY_CASH ? DAttributeOptionCondicionesPago.CFD_CONTADO : DAttributeOptionCondicionesPago.CFD_CREDITO;
     }
 
@@ -4803,12 +4803,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public double getComprobanteSubtotal() {
+    public double getComprobanteSubtotal() { // CFDI 3.2 & 3.3
         return mdSubtotalProvisionalCy_r;
     }
 
     @Override
-    public double getComprobanteDescuento() {
+    public double getComprobanteDescuento() { // CFDI 3.2 & 3.3
         return mdDiscountDocCy_r;
     }
 
@@ -4818,22 +4818,22 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public String getComprobanteMoneda() {
+    public String getComprobanteMoneda() { // CFDI 3.2 & 3.3
         return msDbmsCurrencyKey;
     }
 
     @Override
-    public double getComprobanteTipoCambio() {
+    public double getComprobanteTipoCambio() { // CFDI 3.2 & 3.3
         return mdExchangeRate;
     }
 
     @Override
-    public double getComprobanteTotal() {
+    public double getComprobanteTotal() { // CFDI 3.2 & 3.3
         return mdTotalCy_r;
     }
 
     @Override
-    public int getComprobanteTipoDeComprobante() {  // CFDI 3.2
+    public int getComprobanteTipoDeComprobante() { // CFDI 3.2
         return isDocument() ? DAttributeOptionTipoDeComprobante.CFD_INGRESO : DAttributeOptionTipoDeComprobante.CFD_EGRESO;
     }
 
@@ -4848,12 +4848,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public String getComprobanteMetodoPago() {  // CFDI 3.3
+    public String getComprobanteMetodoPago() { // CFDI 3.3
         return moDbmsDataDpsCfd.getPaymentMethod();
     }
 
     @Override
-    public String getComprobanteNumCtaPago() {  // CFDI 3.2
+    public String getComprobanteNumCtaPago() { // CFDI 3.2
         return msPaymentAccount;
     }
 
@@ -4863,32 +4863,32 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public String getComprobanteConfirmacion() {    // CFDI 3.3
+    public String getComprobanteConfirmacion() { // CFDI 3.3
         return moDbmsDataDpsCfd.getConfirmation();
     }
 
     @Override
-    public String getCfdiRelacionadosTipoRelacion() {   // CFDI 3.3
+    public String getCfdiRelacionadosTipoRelacion() { // CFDI 3.3
         return moDbmsDataDpsCfd.getCfdiRelacionadosTipoRelacion();
     }
     
     @Override
-    public ArrayList<String> getCfdiRelacionados() {    // CFDI 3.3
+    public ArrayList<String> getCfdiRelacionados() { // CFDI 3.3
         return moDbmsDataDpsCfd.getCfdiRelacionados();
     }
 
     @Override
-    public int getEmisorId() {
+    public int getEmisorId() { // CFDI 3.2 & 3.3
         return moAuxCfdParams.getEmisor().getPkBizPartnerId();
     }
 
     @Override
-    public int getEmisorSucursalId() {
+    public int getEmisorSucursalId() { // CFDI 3.2 & 3.3
         return mnFkCompanyBranchId;
     }
 
     @Override
-    public ArrayList<DElement> getElementsEmisorRegimenFiscal() {   // CFDI 3.2
+    public ArrayList<DElement> getElementsEmisorRegimenFiscal() { // CFDI 3.2
         ArrayList<DElement> regimes = null;
         DElement regimen = null;
 
@@ -4904,54 +4904,54 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     @Override
-    public String getEmisorRegimenFiscal() {    // CFDI 3.3
+    public String getEmisorRegimenFiscal() { // CFDI 3.3
         return moDbmsDataDpsCfd.getTaxRegime();
     }
 
     @Override
-    public int getReceptorId() {
+    public int getReceptorId() { // CFDI 3.2 & 3.3
         return mnFkBizPartnerId_r;
     }
 
     @Override
-    public int getReceptorSucursalId() {
+    public int getReceptorSucursalId() { // CFDI 3.2 & 3.3
         return mnFkBizPartnerBranchId;
     }
     
     @Override
-    public String getReceptorResidenciaFiscal() {   // CFDI 3.3
+    public String getReceptorResidenciaFiscal() { // CFDI 3.3
         // Implement ASAP! (Sergio Flores, 2017-08-10)
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public String getReceptorNumRegIdTrib() {   // CFDI 3.3
+    public String getReceptorNumRegIdTrib() { // CFDI 3.3
         // Implement ASAP! (Sergio Flores, 2017-08-10)
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public String getReceptorUsoCFDI() {    // CFDI 3.3
+    public String getReceptorUsoCFDI() { // CFDI 3.3
         return moDbmsDataDpsCfd.getCfdiUsage();
     }
 
     @Override
-    public int getDestinatarioId() {
+    public int getDestinatarioId() { // CFDI 3.2 & 3.3
         return mnFkAddresseeBizPartnerId_nr;
     }
 
     @Override
-    public int getDestinatarioSucursalId() {
+    public int getDestinatarioSucursalId() { // CFDI 3.2 & 3.3
         return mnFkAddresseeBizPartnerBranchId_n;
     }
 
     @Override
-    public int getDestinatarioDomicilioId() {
+    public int getDestinatarioDomicilioId() { // CFDI 3.2 & 3.3
         return mnFkAddresseeBizPartnerBranchAddressId_n;
     }
     
     @Override
-    public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception {
+    public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception { // CFDI 3.2 & 3.3
         double price = 0;
         String descripcion = "";
         SCfdDataConcepto concepto = null;
@@ -5025,7 +5025,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     @Override
-    public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float cfdiVersion) {
+    public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float cfdiVersion) { // CFDI 3.2 & 3.3
         ArrayList<SCfdDataImpuesto> cfdDataImpuestos = null;
         
         if (cfdiVersion == DCfdConsts.CFDI_VER_32) {
@@ -5039,7 +5039,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
 
     @Override
-    public DElement getElementComplemento() throws Exception {
+    public DElement getElementComplemento() throws Exception { // CFDI 3.2 & 3.3
         DElement complemento = null;
         
         if (generateIntCommerceComplement()) {
@@ -5051,7 +5051,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     @Override
-    public DElement getElementAddenda() {
+    public DElement getElementAddenda() { // CFDI 3.2 & 3.3
         DElement addenda = null;
 
         // Create custom addendas when needed:

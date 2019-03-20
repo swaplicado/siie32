@@ -679,7 +679,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
      */
 
     @Override
-    public int getCfdType() {
+    public int getCfdType() { // CFDI 3.2 & 3.3
         return SDataConstantsSys.TRNS_TP_CFD_PAYROLL;
     }
 
@@ -689,17 +689,17 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
 
     @Override
-    public String getComprobanteSerie() {
+    public String getComprobanteSerie() { // CFDI 3.2 & 3.3
         return msSerie;
     }
 
     @Override
-    public String getComprobanteFolio() {
+    public String getComprobanteFolio() { // CFDI 3.2 & 3.3
         return "" + mnFolio;
     }
 
     @Override
-    public Date getComprobanteFecha() {
+    public Date getComprobanteFecha() { // CFDI 3.2 & 3.3
         Date datetime = new Date();
         long ellapsedMilliseconds = datetime.getTime() - SLibTimeUtils.convertToDateOnly(datetime).getTime();
 
@@ -710,17 +710,17 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
 
     @Override
-    public int getComprobanteFormaDePagoPagos() {   // CFDI 3.2
+    public int getComprobanteFormaDePagoPagos() { // CFDI 3.2
         return DAttributeOptionFormaDePago.CFD_UNA_EXHIBICION;
     }
 
     @Override
-    public String getComprobanteFormaPago() {   // CFDI 3.3
+    public String getComprobanteFormaPago() { // CFDI 3.3
         return SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99;
     }
 
     @Override
-    public int getComprobanteCondicionesDePago() {  // CFDI 3.2
+    public int getComprobanteCondicionesDePago() { // CFDI 3.2
         return DAttributeOptionCondicionesPago.CFD_CONTADO;
     }
 
@@ -730,12 +730,12 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
 
     @Override
-    public double getComprobanteSubtotal() {
+    public double getComprobanteSubtotal() { // CFDI 3.2 & 3.3
         return mdTotalPercepciones;
     }
 
     @Override
-    public double getComprobanteDescuento() {
+    public double getComprobanteDescuento() { // CFDI 3.2 & 3.3
         return mdTotalDeducciones;
     }
 
@@ -745,17 +745,17 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
 
     @Override
-    public String getComprobanteMoneda() {
+    public String getComprobanteMoneda() { // CFDI 3.2 & 3.3
         return msMoneda;
     }
 
     @Override
-    public double getComprobanteTipoCambio() {
+    public double getComprobanteTipoCambio() { // CFDI 3.2 & 3.3
         return 0;   // not required in payroll
     }
 
     @Override
-    public double getComprobanteTotal() {
+    public double getComprobanteTotal() { // CFDI 3.2 & 3.3
         return mdTotalNeto;
     }
 
@@ -784,12 +784,12 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
 
     @Override
-    public String getComprobanteMetodoPago() {  // CFDI 3.3
+    public String getComprobanteMetodoPago() { // CFDI 3.3
         return SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE;
     }
 
     @Override
-    public String getComprobanteNumCtaPago() {  // CFDI 3.2
+    public String getComprobanteNumCtaPago() { // CFDI 3.2
         return "";
     }
 
@@ -799,37 +799,36 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
 
     @Override
-    public String getComprobanteConfirmacion() {    // CFDI 3.3
+    public String getComprobanteConfirmacion() { // CFDI 3.3
         return msConfirmacion;
     }
 
     @Override
-    public String getCfdiRelacionadosTipoRelacion() {   // CFDI 3.3
+    public String getCfdiRelacionadosTipoRelacion() { // CFDI 3.3
         return msCfdiRelacionadosTipoRelacion;
     }
     
     @Override
-    public ArrayList<String> getCfdiRelacionados() {    // CFDI 3.3
+    public ArrayList<String> getCfdiRelacionados() { // CFDI 3.3
         return maCrdiRelacionados;
     }
 
     @Override
-    public int getEmisorId() {
+    public int getEmisorId() { // CFDI 3.2 & 3.3
         return moPayroll.getEmpresaId();
     }
 
     @Override
-    public int getEmisorSucursalId() {
+    public int getEmisorSucursalId() { // CFDI 3.2 & 3.3
         return moPayroll.getSucursalEmpresaId();
     }
 
     @Override
-    public ArrayList<DElement> getElementsEmisorRegimenFiscal() {   // CFDI 3.2
-        ArrayList<DElement> regimes = new ArrayList<DElement>();
-        DElement regimen = null;
+    public ArrayList<DElement> getElementsEmisorRegimenFiscal() { // CFDI 3.2
+        ArrayList<DElement> regimes = new ArrayList<>();
 
         for (int i = 0; i < moPayroll.getRegimenFiscal().length; i++) {
-            regimen = new cfd.ver32.DElementRegimenFiscal();
+            DElement regimen = new cfd.ver32.DElementRegimenFiscal();
 
             ((cfd.ver32.DElementRegimenFiscal) regimen).getAttRegimen().setString(moPayroll.getRegimenFiscal()[i]);
             regimes.add(regimen);
@@ -839,52 +838,52 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
 
     @Override
-    public String getEmisorRegimenFiscal() {    // CFDI 3.3
+    public String getEmisorRegimenFiscal() { // CFDI 3.3
         return msRegimenFiscal;
     }
 
     @Override
-    public int getReceptorId() {
+    public int getReceptorId() { // CFDI 3.2 & 3.3
         return mnPkEmpleadoId;
     }
 
     @Override
-    public int getReceptorSucursalId() {
+    public int getReceptorSucursalId() { // CFDI 3.2 & 3.3
         return mnPkSucursalEmpleadoId;
     }
 
     @Override
-    public String getReceptorResidenciaFiscal() {   // CFDI 3.3
+    public String getReceptorResidenciaFiscal() { // CFDI 3.3
         return "";  // not required in payroll
     }
 
     @Override
-    public String getReceptorNumRegIdTrib() {   // CFDI 3.3
+    public String getReceptorNumRegIdTrib() { // CFDI 3.3
         return "";  // not required in payroll
     }
 
     @Override
-    public String getReceptorUsoCFDI() {    // CFDI 3.3
+    public String getReceptorUsoCFDI() { // CFDI 3.3
         return SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01;
     }
 
     @Override
-    public int getDestinatarioId() {
+    public int getDestinatarioId() { // CFDI 3.2 & 3.3
         return SLibConstants.UNDEFINED;
     }
 
     @Override
-    public int getDestinatarioSucursalId() {
+    public int getDestinatarioSucursalId() { // CFDI 3.2 & 3.3
         return SLibConstants.UNDEFINED;
     }
 
     @Override
-    public int getDestinatarioDomicilioId() {
+    public int getDestinatarioDomicilioId() { // CFDI 3.2 & 3.3
         return SLibConstants.UNDEFINED;
     }
     
     @Override
-    public ArrayList<SCfdDataConcepto> getElementsConcepto() {
+    public ArrayList<SCfdDataConcepto> getElementsConcepto() { // CFDI 3.2 & 3.3
         SCfdDataConcepto concepto = new SCfdDataConcepto();
         concepto.setClaveProdServ(DCfdi33Catalogs.ClaveProdServServsSueldosSalarios);
         concepto.setNoIdentificacion("");
@@ -904,12 +903,12 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
 
     @Override
-    public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float xmlVersion) {
+    public ArrayList<SCfdDataImpuesto> getElementsImpuestos(float xmlVersion) { // CFDI 3.2 & 3.3
         return null;
     }
     
     @Override
-    public DElement getElementComplemento() throws Exception {
+    public DElement getElementComplemento() throws Exception { // CFDI 3.2 & 3.3
         DElement complemento = new cfd.ver33.DElementComplemento();
 
         ((cfd.ver33.DElementComplemento) complemento).getElements().add(createCfdiElementNomina12());
@@ -918,7 +917,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
 
     @Override
-    public DElement getElementAddenda() {
+    public DElement getElementAddenda() { // CFDI 3.2 & 3.3
         return null;
     }
 }

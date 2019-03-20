@@ -465,8 +465,8 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                             SDialogPrintOrderPayroll dialogPrintOrderPayroll = new SDialogPrintOrderPayroll(miClient, gridRow.getRowPrimaryKey() ,"Ordenamiento de impresión");
                             dialogPrintOrderPayroll.setVisible(true);
 
-                            ArrayList<SDataCfd> cfdsAvailable = new ArrayList<SDataCfd>();
-                            ArrayList<SDataCfd> cfdsPrintable = new ArrayList<SDataCfd>();
+                            ArrayList<SDataCfd> cfdsAvailable = new ArrayList<>();
+                            ArrayList<SDataCfd> cfdsPrintable = new ArrayList<>();
 
                             if (dialogPrintOrderPayroll.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                                 int orderBy = (int) dialogPrintOrderPayroll.getValue(SGuiConsts.PARAM_KEY);

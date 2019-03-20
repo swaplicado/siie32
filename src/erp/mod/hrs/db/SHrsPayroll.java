@@ -187,11 +187,17 @@ public class SHrsPayroll {
                     if (anniversary.getBenefitAnn() <= benefitAnniv) {
                         hrsBenefitTableAnniversaryVacBon = anniversary;
                     }
+                    else {
+                        break;
+                    }
                 }
         
                 for (SHrsBenefitTableAnniversary anniversary : hrsBenefitTableAnniversarysVac) {
                     if (anniversary.getBenefitAnn() <= benefitAnniv) {
                         hrsBenefitTableAnniversaryVac = anniversary;
+                    }
+                    else {
+                        break;
                     }
                 }
         
@@ -338,7 +344,7 @@ public class SHrsPayroll {
 
                         amountLoan = SHrsUtils.computeAmountLoan(hrsPayrollReceipt, loan);
 
-                        if (SLibUtils.belongsTo(loan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOA_COM, SModSysConsts.HRSS_TP_LOAN_LOA_UNI, SModSysConsts.HRSS_TP_LOAN_LOA_TPS })) {
+                        if (SLibUtils.belongsTo(loan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOAN_COM, SModSysConsts.HRSS_TP_LOAN_LOAN_UNI, SModSysConsts.HRSS_TP_LOAN_LOAN_3RD })) {
                             balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsPayrollReceipt.getHrsEmployee());
 
                             amountLoan = (amountLoan > balanceLoan ? balanceLoan : amountLoan);
@@ -819,6 +825,7 @@ public class SHrsPayroll {
         payrollReceipt.setFkPositionRiskTypeId(hrsEmployee.getEmployee().getFkPositionRiskTypeId());
         payrollReceipt.setFkWorkingDayTypeId(hrsEmployee.getEmployee().getFkWorkingDayTypeId());
         payrollReceipt.setActive(hrsEmployee.getEmployee().isActive());
+        
         hrsEmployee.getHrsPayrollReceipt().setReceipt(payrollReceipt);
         hrsEmployee.getHrsPayrollReceipt().setHrsPayroll(this);
 

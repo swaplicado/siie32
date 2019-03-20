@@ -51,13 +51,13 @@ public class SHrsConsts {
     public static final int YEAR_MIN_BIRTH = 1900;
     public static final int YEAR_MAX_BIRTH = 2000;
     
-    public static final int SAL_REF_SAL = 1;
-    public static final int SAL_REF_SAL_SS = 2;
-    public static final int SAL_REF_SAL_FIX = 3;
+    public static final int PAY_PER_REF_SD = 1;
+    public static final int PAY_PER_REF_SBC = 2;
+    public static final int PAY_PER_REF_OTRO = 9;
     
-    public static final String TXT_SAL_REF_SAL = "SD";
-    public static final String TXT_SAL_REF_SAL_SS = "SBC";
-    public static final String TXT_SAL_REF_SAL_FIX = "OTRO";
+    public static final String TXT_PAY_PER_REF_SD = "SD";
+    public static final String TXT_PAY_PER_REF_SBC = "SBC";
+    public static final String TXT_PAY_PER_REF_OTRO = "OTRO";
     
     public static final String ERR_PERIOD_DATE_INVALID = "Fecha inválida en el período.";
 }

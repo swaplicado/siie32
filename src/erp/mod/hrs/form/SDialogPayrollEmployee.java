@@ -1367,7 +1367,7 @@ public class SDialogPayrollEmployee extends SBeanFormDialog implements SGridPane
                         moKeyDeductionLoan_n.requestFocus();
                     }
                     else {
-                        if (SLibUtils.belongsTo(moDeductionLoan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOA_COM, SModSysConsts.HRSS_TP_LOAN_LOA_UNI, SModSysConsts.HRSS_TP_LOAN_LOA_TPS })) {
+                        if (SLibUtils.belongsTo(moDeductionLoan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOAN_COM, SModSysConsts.HRSS_TP_LOAN_LOAN_UNI, SModSysConsts.HRSS_TP_LOAN_LOAN_3RD })) {
                             balanceLoan = SHrsUtils.getBalanceLoan(moDeductionLoan, moHrsPayrollReceipt.getHrsEmployee());
 
                             if (balanceLoan <= 0) {

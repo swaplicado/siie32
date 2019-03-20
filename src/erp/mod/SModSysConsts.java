@@ -907,7 +907,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_DED_SSC = 1;    // Social Security
     public static final int HRSS_TP_DED_TAX = 2;    // Tax
     public static final int HRSS_TP_DED_DIS = 6;    // Disability
-    public static final int HRSS_TP_DED_ABS = 20;    // Absenteeism
+    public static final int HRSS_TP_DED_ABS = 20;   // Absenteeism
 
     public static final int HRSS_TP_BEN_NON = 1;        // Non applicable
     public static final int HRSS_TP_BEN_ANN_BON = 11;   // Annual bonus
@@ -915,19 +915,19 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_BEN_VAC_BON = 22;   // Home credit
 
     public static final int HRSS_TP_LOAN_NON = 1;       // Non applicable
-    public static final int HRSS_TP_LOAN_LOA_COM = 2;   // Company loans
-    public static final int HRSS_TP_LOAN_LOA_UNI = 3;   // Union loans
-    public static final int HRSS_TP_LOAN_LOA_TPS = 4;   // Third parties loans
-    public static final int HRSS_TP_LOAN_HOM = 11;      // Home credit
-    public static final int HRSS_TP_LOAN_CON = 12;      // Consumer credit
+    public static final int HRSS_TP_LOAN_LOAN_COM = 2;  // Company loans
+    public static final int HRSS_TP_LOAN_LOAN_UNI = 3;  // Union loans
+    public static final int HRSS_TP_LOAN_LOAN_3RD = 4;  // Third parties loans
+    public static final int HRSS_TP_LOAN_HOME = 11;     // Home credit
+    public static final int HRSS_TP_LOAN_CONS = 12;     // Consumer credit
 
     public static final int HRSS_TP_LOAN_PAY_AMT = 1;       // Amount
-    public static final int HRSS_TP_LOAN_PAY_FIX_FEE = 2;   // Fixed fee
-    public static final int HRSS_TP_LOAN_PAY_PER = 3;       // Percentage
-    public static final int HRSS_TP_LOAN_PAY_UMA = 4;       // UMA
-    public static final int HRSS_TP_LOAN_PAY_UMI = 5; // UMI
+    public static final int HRSS_TP_LOAN_PAY_FACT_SAL = 2;  // Factor Salary
+    public static final int HRSS_TP_LOAN_PAY_PCT = 3;       // Percentage
+    public static final int HRSS_TP_LOAN_PAY_FACT_UMA = 4;  // Factor UMA
+    public static final int HRSS_TP_LOAN_PAY_FACT_UMI = 5;  // Factor UMI
 
-    public static final int HRSS_TP_CON_OTH = 99;       // Other contract
+    public static final int HRSS_TP_CON_OTH = 99; // Other contract
     
     public static final int HRSS_TP_REC_SCHE_WAG = 2;       // Wages & salaries
     public static final int HRSS_TP_REC_SCHE_RET = 3;       // Retirees

@@ -890,7 +890,7 @@ public class SCfdPrint {
             for (DElementCfdiRelacionado cfdiRelacionado : comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados()) {
                 uuids += (uuids.isEmpty() ? "" : "\n") + cfdiRelacionado.getAttUuid().getString();
             }
-            paramsMap.put("sCfdiUUIDsRelacionados", uuids);
+            paramsMap.put("sCfdiUUIDsRelacionados", uuids.toUpperCase());
         }
         
         // adds product/service and unit keys from XML:
@@ -940,7 +940,8 @@ public class SCfdPrint {
         
         if (comprobante.getEltOpcCfdiRelacionados() != null) {
             if (!comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().isEmpty()) {
-                params.put("sCfdiRelUUID", comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().get(0).getAttUuid().getString());
+                // if any, there must be only one related CFDI:
+                params.put("sCfdiRelUUID", comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().get(0).getAttUuid().getString().toUpperCase());
             }
         }
         
@@ -1393,7 +1394,7 @@ public class SCfdPrint {
         map.put("sCfdConceptoDescripcion", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttDescripcion().getString());
         map.put("dCfdConceptoValorUnitario", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttValorUnitario().getDouble());
         map.put("dCfdConceptoImporte", comprobante.getEltConceptos().getEltHijosConcepto().get(0).getAttImporte().getDouble());
-
+        
         for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
 
             if (element.getName().compareTo("nomina12:Nomina") == 0) {
@@ -1721,6 +1722,15 @@ public class SCfdPrint {
         map.put("sCfdConceptoDescripcion", comprobante.getEltConceptos().getEltConceptos().get(0).getAttDescripcion().getString());
         map.put("dCfdConceptoValorUnitario", comprobante.getEltConceptos().getEltConceptos().get(0).getAttValorUnitario().getDouble());
         map.put("dCfdConceptoImporte", comprobante.getEltConceptos().getEltConceptos().get(0).getAttImporte().getDouble());
+
+        // adds related CFDI's:
+        if (comprobante.getEltOpcCfdiRelacionados() != null) {
+            if (!comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().isEmpty()) {
+                // if any, there must be only one related CFDI:
+                map.put("sCfdiRelacionadoTipoRelacion", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_REL_TP, comprobante.getEltOpcCfdiRelacionados().getAttTipoRelacion().getString()));
+                map.put("sCfdiRelacionadoUuid", comprobante.getEltOpcCfdiRelacionados().getEltCfdiRelacionados().get(0).getAttUuid().getString().toUpperCase());
+            }
+        }
 
         String sSelloCFD = "";
         

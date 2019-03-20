@@ -1,4 +1,11 @@
 ================================================================================
+2019-03-20, 3.2 134.0
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión y refactorización a métodos relacionados con el cálculo de amortizaciones de créditos y préstamos.
+2) Corrección a determinación de días y porcentajes de prestaciones en función de años de antigüedad en límites del detalle de las tablas de prestaciones.
+
+================================================================================
 2019-03-14, 3.2 133.2
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
