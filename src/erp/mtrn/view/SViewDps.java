@@ -219,12 +219,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbCopy.setPreferredSize(new Dimension(23, 23));
         jbCopy.addActionListener(this);
         jbCopy.setToolTipText("Copiar documento");
-        
+
         jbChangeDeliveryAddress = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_loc.gif")));
         jbChangeDeliveryAddress.setPreferredSize(new Dimension(23, 23));
         jbChangeDeliveryAddress.addActionListener(this);
         jbChangeDeliveryAddress.setToolTipText("Cambiar domicilio de la operación");
-                
+
         jbChangeAgentSupervisor = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bp_pay_cash.gif")));
         jbChangeAgentSupervisor.setPreferredSize(new Dimension(23, 23));
         jbChangeAgentSupervisor.addActionListener(this);
@@ -234,7 +234,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbSetDeliveryDate.setPreferredSize(new Dimension(23, 23));
         jbSetDeliveryDate.addActionListener(this);
         jbSetDeliveryDate.setToolTipText("Actualizar fechas de entrega del documento");
-        
+
         jbSetReferenceCommissions = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money_in.gif")));
         jbSetReferenceCommissions.setPreferredSize(new Dimension(23, 23));
         jbSetReferenceCommissions.addActionListener(this);
@@ -274,7 +274,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbPrint.setPreferredSize(new Dimension(23, 23));
         jbPrint.addActionListener(this);
         jbPrint.setToolTipText("Imprimir documento");
-        
+
         jbPrintByRange = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_print_many.gif")));
         jbPrintByRange.setPreferredSize(new Dimension(23, 23));
         jbPrintByRange.addActionListener(this);
@@ -324,12 +324,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbValidateCfdi.setPreferredSize(new Dimension(23, 23));
         jbValidateCfdi.addActionListener(this);
         jbValidateCfdi.setToolTipText("Validar timbrado o cancelación del CFDI");
-        
+
         jbGetCfdiCancelStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
         jbGetCfdiCancelStatus.setPreferredSize(new Dimension(23, 23));
         jbGetCfdiCancelStatus.addActionListener(this);
         jbGetCfdiCancelStatus.setToolTipText("Checar estatus cancelación CFDI");
-        
+
         jbSendCfdi = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
         jbSendCfdi.setPreferredSize(new Dimension(23, 23));
         jbSendCfdi.addActionListener(this);

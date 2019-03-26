@@ -30,6 +30,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.util.ArrayList;
 import java.util.Date;
+import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -570,54 +571,52 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         receptor.getAttClaveEntFed().setString(msClaveEstado);
         
         for (SHrsFormerPayrollConcept concept : moChildPayrollConcepts) {
-            switch (concept.getPkTipoConcepto()) {
-                case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
-                    switch (concept.getClaveOficial()) {
-                        case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
-                        case SModSysConsts.HRSS_TP_EAR_OTH:
-                            cfd.ver3.nom12.DElementOtroPago otroPago = createElementEarningOtherPay(concept);
-                            if (otroPago != null) {
-                                otrosPagos.getEltHijosOtroPago().add(otroPago);
-                            }
-                            break;
-                            
-                        default:
-                            if (concept.getTotalImporte() != 0) {
+            if (concept.getTotalImporte() != 0) {
+                switch (concept.getPkTipoConcepto()) {
+                    case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
+                        switch (concept.getClaveOficial()) {
+                            case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
+                            case SModSysConsts.HRSS_TP_EAR_OTH:
+                                cfd.ver3.nom12.DElementOtroPago otroPago = createElementEarningOtherPay(concept);
+                                if (otroPago != null) {
+                                    otrosPagos.getEltHijosOtroPago().add(otroPago);
+                                }
+                                break;
+
+                            default:
                                 cfd.ver3.nom12.DElementPercepcion percepcion = createElementEarning(concept);
 
                                 switch (concept.getClaveOficial()) {
                                     case SModSysConsts.HRSS_TP_EAR_OVR_TME:
                                         percepcion.getEltHijosHorasExtra().add(createElementEarningOverTime(concept));
                                         break;
-                                        
+
                                     case SModSysConsts.HRSS_TP_EAR_DIS:
                                         incapacidades.getEltHijosIncapacidad().add(createElementEarningDisability(concept));
                                         break;
-                                        
+
                                     case SModSysConsts.HRSS_TP_EAR_SEN_BON:
                                     case SModSysConsts.HRSS_TP_EAR_SET:
                                     case SModSysConsts.HRSS_TP_EAR_CMP:
                                         dTotalSeparacionIndemnizacionGravado = SLibUtils.roundAmount(dTotalSeparacionIndemnizacionGravado + percepcion.getAttImporteGravado().getDouble());
                                         dTotalSeparacionIndemnizacionExento = SLibUtils.roundAmount(dTotalSeparacionIndemnizacionExento + percepcion.getAttImporteExento().getDouble());
                                         break;
-                                        
+
                                     default:
                                 }
 
                                 if (!SLibUtils.belongsTo(concept.getClaveOficial(), new int[] { SModSysConsts.HRSS_TP_EAR_SEN_BON, SModSysConsts.HRSS_TP_EAR_SET, SModSysConsts.HRSS_TP_EAR_CMP })) { 
                                     dTotalSueldos = SLibUtils.roundAmount(dTotalSueldos + (percepcion.getAttImporteGravado().getDouble() + percepcion.getAttImporteExento().getDouble()));
                                 }
-                                
+
                                 dTotalGravado = SLibUtils.roundAmount(dTotalGravado + percepcion.getAttImporteGravado().getDouble());
                                 dTotalExento = SLibUtils.roundAmount(dTotalExento + percepcion.getAttImporteExento().getDouble());
 
                                 percepciones.getEltHijosPercepcion().add(percepcion);
-                            }
-                    }
-                    break;
-                    
-                case SCfdConsts.CFDI_PAYROLL_DEDUCTION:
-                    if (concept.getTotalImporte() != 0) {
+                        }
+                        break;
+
+                    case SCfdConsts.CFDI_PAYROLL_DEDUCTION:
                         if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_DED_TAX) {
                             dTotalImpuestosRetenidos = SLibUtils.roundAmount(dTotalImpuestosRetenidos + concept.getTotalImporte());
                         }
@@ -629,10 +628,11 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
                             }
                         }
                         deducciones.getEltHijosDeduccion().add(createElementDeduction(concept));
-                    }
-                    break;
-                    
-                default:
+                        break;
+
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
             }
         }
 

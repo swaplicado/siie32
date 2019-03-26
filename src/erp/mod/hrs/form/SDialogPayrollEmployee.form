@@ -85,14 +85,17 @@
                           <Font name="Tahoma" size="11" style="1"/>
                         </Property>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[280, 23]"/>
+                          <Dimension value="[300, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextNumber">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
-                        <Property name="toolTipText" type="java.lang.String" value="clave"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Clave"/>
+                        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                          <Font name="Tahoma" size="11" style="1"/>
+                        </Property>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
                         </Property>
@@ -118,6 +121,9 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextPaymentType">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[85, 23]"/>
+                        </Property>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JLabel" name="jlDateBirth">
@@ -148,7 +154,7 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[150, 23]"/>
+                          <Dimension value="[175, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -176,6 +182,9 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextFiscalId">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="XAXX010101000"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[105, 23]"/>
+                        </Property>
                       </Properties>
                     </Component>
                   </SubComponents>
@@ -198,6 +207,9 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecSalary">
                       <Properties>
                         <Property name="focusable" type="boolean" value="false"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[85, 23]"/>
+                        </Property>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JLabel" name="jlDateBenefits">
@@ -229,7 +241,7 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[150, 23]"/>
+                          <Dimension value="[175, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -258,7 +270,7 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="XAXX010101XXXXXX00"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[150, 23]"/>
+                          <Dimension value="[140, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -283,6 +295,9 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="0"/>
                         <Property name="focusable" type="boolean" value="false"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[85, 23]"/>
+                        </Property>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JLabel" name="jlDateLastHire">
@@ -313,7 +328,7 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[150, 23]"/>
+                          <Dimension value="[175, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -342,7 +357,7 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="00000000000"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[75, 23]"/>
+                          <Dimension value="[85, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -366,6 +381,9 @@
                     <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecSalarySscBase">
                       <Properties>
                         <Property name="focusable" type="boolean" value="false"/>
+                        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[85, 23]"/>
+                        </Property>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JLabel" name="jlDateLastDismiss_n">
@@ -402,7 +420,7 @@
                     <Component class="javax.swing.JLabel" name="jLabel1">
                       <Properties>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[95, 23]"/>
+                          <Dimension value="[120, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
