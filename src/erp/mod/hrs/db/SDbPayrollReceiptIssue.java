@@ -8,6 +8,7 @@ import cfd.ver3.DCfdVer3Consts;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
+import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataCfd;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -83,8 +84,6 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
-    public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
-
     public int getPkPayrollId() { return mnPkPayrollId; }
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public int getPkIssueId() { return mnPkIssueId; }
@@ -106,6 +105,8 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
+    public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
+
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
     
     public boolean isStamped() {
@@ -123,7 +124,7 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     }
     
     public java.lang.String getPayrollReceiptIssueNumber() {
-        return (msNumberSeries.isEmpty() ? "" : msNumberSeries + "-") + mnNumber;
+        return STrnUtils.formatDocNumber(msNumberSeries, "" + mnNumber);
     }
 
     @Override

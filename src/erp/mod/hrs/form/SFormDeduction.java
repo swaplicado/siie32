@@ -7,11 +7,8 @@ package erp.mod.hrs.form;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbDeduction;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.swing.JCheckBox;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -20,6 +17,7 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiFieldKeyGroup;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldBoolean;
 import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanForm;
 
@@ -27,13 +25,15 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SFormDeduction extends SBeanForm implements ActionListener, ItemListener {
+public class SFormDeduction extends SBeanForm implements ItemListener {
 
     private SDbDeduction moRegistry;
     private SGuiFieldKeyGroup moFieldKeyGroup;
 
     /**
-     * Creates new form SFormDeduction
+     * Creates new form SFormDeduction.
+     * @param client
+     * @param title 
      */
     public SFormDeduction(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRS_DED, SLibConsts.UNDEFINED, title);
@@ -62,9 +62,6 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
         jlNameAbbreviated = new javax.swing.JLabel();
         moTextNameAbbreviated = new sa.lib.gui.bean.SBeanFieldText();
         jlNameAbbreviatedHelp = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
-        jlDeductionType = new javax.swing.JLabel();
-        moKeyDeductionType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel8 = new javax.swing.JPanel();
         jlDeductionComputationType = new javax.swing.JLabel();
         moKeyDeductionComputationType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -74,10 +71,13 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
         moDecRetPercentage = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlRetPercentageHelp = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        moBoolWithholding = new sa.lib.gui.bean.SBeanFieldBoolean();
-        moBoolPayrollTax = new sa.lib.gui.bean.SBeanFieldBoolean();
-        jPanel9 = new javax.swing.JPanel();
         moBoolLoan = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel10 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jPanel13 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jlDeductionType = new javax.swing.JLabel();
+        moKeyDeductionType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel7 = new javax.swing.JPanel();
         jlLoanType = new javax.swing.JLabel();
         moKeyLoanType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -93,17 +93,24 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
         jlAccountingRecordType = new javax.swing.JLabel();
         moKeyAccountingRecordType = new sa.lib.gui.bean.SBeanFieldKey();
         jlAccountingRecordTypeHelp = new javax.swing.JLabel();
+        jPanel12 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
         jlAbsenceClass = new javax.swing.JLabel();
         moKeyAbsenceClass = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel20 = new javax.swing.JPanel();
         jlAbsenceType = new javax.swing.JLabel();
         moKeyAbsenceType = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel15 = new javax.swing.JPanel();
+        moBoolWithholding = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel16 = new javax.swing.JPanel();
+        moBoolPayrollTax = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel24 = new javax.swing.JPanel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -147,17 +154,6 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
 
         jPanel2.add(jPanel22);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlDeductionType.setText("Tipo deducción:*");
-        jlDeductionType.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel5.add(jlDeductionType);
-
-        moKeyDeductionType.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel5.add(moKeyDeductionType);
-
-        jPanel2.add(jPanel5);
-
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDeductionComputationType.setText("Tipo cálculo deducción:*");
@@ -194,34 +190,41 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        moBoolWithholding.setText("Es retención de ley");
-        moBoolWithholding.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel3.add(moBoolWithholding);
-
-        moBoolPayrollTax.setText("Aplica para impto. sobre nóminas");
-        moBoolPayrollTax.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel3.add(moBoolPayrollTax);
+        moBoolLoan.setText("Es crédito/préstamo");
+        moBoolLoan.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel3.add(moBoolLoan);
 
         jPanel2.add(jPanel3);
 
-        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        moBoolLoan.setText("Es crédito/préstamo");
-        moBoolLoan.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel9.add(moBoolLoan);
+        jPanel10.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.add(jPanel9);
+        jPanel11.setLayout(new java.awt.BorderLayout());
+
+        jPanel13.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlDeductionType.setText("Tipo deducción:*");
+        jlDeductionType.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel5.add(jlDeductionType);
+
+        moKeyDeductionType.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel5.add(moKeyDeductionType);
+
+        jPanel13.add(jPanel5);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlLoanType.setText("Tipo crédito/préstamo:");
+        jlLoanType.setText("Tipo crédito/préstamo:*");
         jlLoanType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel7.add(jlLoanType);
 
         moKeyLoanType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel7.add(moKeyLoanType);
 
-        jPanel2.add(jPanel7);
+        jPanel13.add(jPanel7);
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -235,7 +238,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
         jlBenefitTypeHelp.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel19.add(jlBenefitTypeHelp);
 
-        jPanel2.add(jPanel19);
+        jPanel13.add(jPanel19);
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -248,10 +251,10 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
 
         jlAccountingConfigurationTypeHelp.setForeground(java.awt.Color.gray);
         jlAccountingConfigurationTypeHelp.setText("para configurar cuentas contables");
-        jlAccountingConfigurationTypeHelp.setPreferredSize(new java.awt.Dimension(300, 23));
+        jlAccountingConfigurationTypeHelp.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel17.add(jlAccountingConfigurationTypeHelp);
 
-        jPanel2.add(jPanel17);
+        jPanel13.add(jPanel17);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -263,41 +266,79 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
         jPanel18.add(moKeyAccountingRecordType);
 
         jlAccountingRecordTypeHelp.setForeground(java.awt.Color.gray);
-        jlAccountingRecordTypeHelp.setText("para agrupar asientos contables al cerrar nóminas");
-        jlAccountingRecordTypeHelp.setPreferredSize(new java.awt.Dimension(300, 23));
+        jlAccountingRecordTypeHelp.setText("para agrupar asientos contables");
+        jlAccountingRecordTypeHelp.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel18.add(jlAccountingRecordTypeHelp);
 
-        jPanel2.add(jPanel18);
+        jPanel13.add(jPanel18);
+
+        jPanel11.add(jPanel13, java.awt.BorderLayout.NORTH);
+
+        jPanel10.add(jPanel11, java.awt.BorderLayout.CENTER);
+
+        jPanel12.setLayout(new java.awt.BorderLayout());
+
+        jPanel14.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAbsenceClass.setText("Clase incidencia:");
-        jlAbsenceClass.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlAbsenceClass.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel21.add(jlAbsenceClass);
 
-        moKeyAbsenceClass.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyAbsenceClass.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel21.add(moKeyAbsenceClass);
 
-        jPanel2.add(jPanel21);
+        jPanel14.add(jPanel21);
 
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAbsenceType.setText("Tipo incidencia:");
-        jlAbsenceType.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlAbsenceType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel20.add(jlAbsenceType);
 
-        moKeyAbsenceType.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyAbsenceType.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel20.add(moKeyAbsenceType);
 
-        jPanel2.add(jPanel20);
+        jPanel14.add(jPanel20);
 
-        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moBoolWithholding.setText("Es retención de ley");
+        moBoolWithholding.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel15.add(moBoolWithholding);
+
+        jPanel14.add(jPanel15);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moBoolPayrollTax.setText("Aplica para impto. sobre nóminas");
+        moBoolPayrollTax.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel16.add(moBoolPayrollTax);
+
+        jPanel14.add(jPanel16);
+
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel14.add(jPanel24);
+
+        jPanel12.add(jPanel14, java.awt.BorderLayout.NORTH);
+
+        jPanel10.add(jPanel12, java.awt.BorderLayout.EAST);
+
+        jPanel1.add(jPanel10, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
@@ -306,13 +347,13 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel23;
+    private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JLabel jlAbsenceClass;
     private javax.swing.JLabel jlAbsenceType;
     private javax.swing.JLabel jlAccountingConfigurationType;
@@ -349,7 +390,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 800, 500);
+        SGuiUtils.setWindowBounds(this, 960, 600);
 
         moFieldKeyGroup = new SGuiFieldKeyGroup(miClient);
         moFieldKeyGroup.addFieldKey(moKeyAbsenceClass, SModConsts.HRSU_CL_ABS, SLibConsts.UNDEFINED, null);
@@ -364,7 +405,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
         moBoolWithholding.setBooleanSettings(SGuiUtils.getLabelName(moBoolWithholding.getText()), false);
         moBoolPayrollTax.setBooleanSettings(SGuiUtils.getLabelName(moBoolPayrollTax.getText()), false);
         moBoolLoan.setBooleanSettings(SGuiUtils.getLabelName(moBoolLoan.getText()), false);
-        moKeyLoanType.setKeySettings(miClient, SGuiUtils.getLabelName(jlLoanType.getText()), false);
+        moKeyLoanType.setKeySettings(miClient, SGuiUtils.getLabelName(jlLoanType.getText()), true);
         moKeyBenefitType.setKeySettings(miClient, SGuiUtils.getLabelName(jlBenefitType.getText()), true);
         moKeyAccountingConfigurationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountingConfigurationType.getText()), true);
         moKeyAccountingRecordType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountingRecordType.getText()), true);
@@ -390,10 +431,6 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
         moFields.setFormButton(jbSave);
     }
 
-    private void actionPerformedLoan() {
-        moKeyLoanType.setEnabled(moBoolLoan.getValue());
-    }
-
     private void showDeductionComputationTypeHelp() {
         if (moKeyDeductionComputationType.getSelectedIndex() <= 0) {
             jlDeductionComputationTypeHelp.setText(SGuiConsts.TXT_BTN_SELECT + " " + SGuiUtils.getLabelName(jlDeductionComputationType).toLowerCase() + "...");
@@ -409,6 +446,14 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
                 default:
                     jlDeductionComputationTypeHelp.setText("?");
             }
+        }
+    }
+
+    private void itemStateChangedLoan() {
+        boolean enable = moBoolLoan.getValue();
+        moKeyLoanType.setEnabled(enable);
+        if (!enable) {
+            moKeyLoanType.setValue(new int[] { SModSysConsts.HRSS_TP_LOAN_NON });
         }
     }
 
@@ -429,13 +474,13 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
 
     @Override
     public void addAllListeners() {
-        moBoolLoan.addActionListener(this);
+        moBoolLoan.addItemListener(this);
         moKeyDeductionComputationType.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        moBoolLoan.removeActionListener(this);
+        moBoolLoan.removeItemListener(this);
         moKeyDeductionComputationType.removeItemListener(this);
     }
 
@@ -461,12 +506,15 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
         reloadCatalogues();
 
         if (moRegistry.isRegistryNew()) {
+            boolean isBeingCopied = moRegistry.getPkDeductionId() != 0;
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
-            
-            moRegistry.setFkDeductionComputationTypeId(SModSysConsts.HRSS_TP_DED_COMP_AMT);
-            moRegistry.setFkBenefitTypeId(SModSysConsts.HRSS_TP_BEN_NON);
-            moRegistry.setAuxAccountingConfigurationTypeId(SLibConsts.UNDEFINED);
+
+            if (!isBeingCopied) {
+                moRegistry.setFkDeductionComputationTypeId(SModSysConsts.HRSS_TP_DED_COMP_AMT);
+                moRegistry.setFkLoanTypeId(SModSysConsts.HRSS_TP_LOAN_NON);
+                moRegistry.setFkBenefitTypeId(SModSysConsts.HRSS_TP_BEN_NON);
+            }
         }
         else {
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
@@ -480,8 +528,8 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
         moDecRetPercentage.setValue(moRegistry.getRetPercentage());
         moBoolWithholding.setValue(moRegistry.isWithholding());
         moBoolPayrollTax.setValue(moRegistry.isPayrollTax());
-        moBoolLoan.setValue(moRegistry.getFkLoanTypeId() > SModSysConsts.HRSS_TP_LOAN_NON);
-        moKeyLoanType.setValue(moRegistry.isRegistryNew() ? new int[] { SModSysConsts.HRSS_TP_LOAN_NON } : new int[] { moRegistry.getFkLoanTypeId() });
+        moBoolLoan.setValue(moRegistry.isLoan());
+        moKeyLoanType.setValue(new int[] { moRegistry.getFkLoanTypeId() });
         moKeyBenefitType.setValue(new int[] { moRegistry.getFkBenefitTypeId() });
         moKeyAccountingConfigurationType.setValue(new int[] { moRegistry.getFkAccountingConfigurationTypeId() });
         moKeyAccountingRecordType.setValue(new int[] { moRegistry.getFkAccountingRecordTypeId() });
@@ -490,11 +538,12 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
 
         setFormEditable(true);
         moBoolPayrollTax.setEditable(false);
-        
+
         if (moRegistry.isRegistryNew()) {
+
         }
-        
-        actionPerformedLoan();
+
+        itemStateChangedLoan();
         itemStateChangedDeductionComputationType();
 
         addAllListeners();
@@ -514,7 +563,7 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
         registry.setFkDeductionComputationTypeId(moKeyDeductionComputationType.getValue()[0]);
         registry.setWithholding(moBoolWithholding.getValue());
         registry.setPayrollTax(moBoolPayrollTax.getValue());
-        registry.setFkLoanTypeId(moBoolLoan.getValue() ? moKeyLoanType.getValue()[0] : SModSysConsts.HRSS_TP_LOAN_NON);
+        registry.setFkLoanTypeId(moKeyLoanType.getValue()[0]);
         registry.setFkBenefitTypeId(moKeyBenefitType.getValue()[0]);
         registry.setFkAccountingConfigurationTypeId(moKeyAccountingConfigurationType.getValue()[0]);
         registry.setFkAccountingRecordTypeId(moKeyAccountingRecordType.getValue()[0]);
@@ -529,50 +578,43 @@ public class SFormDeduction extends SBeanForm implements ActionListener, ItemLis
         SGuiValidation validation = moFields.validateFields();
 
         if (validation.isValid()) {
-            if (moBoolLoan.getValue() && moKeyLoanType.getValue()[0] <= SModSysConsts.HRSS_TP_LOAN_NON) {
+            if (moBoolLoan.getValue() && moKeyLoanType.getValue()[0] <= SModSysConsts.HRSS_TP_LOAN_NON) { // should not be less, just in case
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlLoanType) + "'.");
                 validation.setComponent(moKeyLoanType);
             }
-            
-            if (validation.isValid()) {
-                if (moKeyAccountingConfigurationType.getValue()[0] == SModSysConsts.HRSS_TP_ACC_GBL &&
-                        !SLibUtils.belongsTo(moKeyAccountingRecordType.getValue()[0], new int[] { SModSysConsts.HRSS_TP_ACC_GBL, SModSysConsts.HRSS_TP_ACC_DEP, SModSysConsts.HRSS_TP_ACC_EMP })) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlAccountingRecordType.getText()) + "'.");
-                    validation.setComponent(moKeyAccountingRecordType);
-                }
-                else if (moKeyAccountingConfigurationType.getValue()[0] == SModSysConsts.HRSS_TP_ACC_DEP &&
-                        !SLibUtils.belongsTo(moKeyAccountingRecordType.getValue()[0], new int[] { SModSysConsts.HRSS_TP_ACC_DEP, SModSysConsts.HRSS_TP_ACC_EMP })) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlAccountingRecordType.getText()) + "'.");
-                    validation.setComponent(moKeyAccountingRecordType);
-                }
-                else if (moKeyAccountingConfigurationType.getValue()[0] == SModSysConsts.HRSS_TP_ACC_EMP &&
-                        !SLibUtils.belongsTo(moKeyAccountingRecordType.getValue()[0], new int[] { SModSysConsts.HRSS_TP_ACC_EMP })) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlAccountingRecordType.getText()) + "'.");
-                    validation.setComponent(moKeyAccountingRecordType);
-                }
+            else if (moKeyAccountingConfigurationType.getValue()[0] == SModSysConsts.HRSS_TP_ACC_GBL &&
+                    !SLibUtils.belongsTo(moKeyAccountingRecordType.getValue()[0], new int[] { SModSysConsts.HRSS_TP_ACC_GBL, SModSysConsts.HRSS_TP_ACC_DEP, SModSysConsts.HRSS_TP_ACC_EMP })) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlAccountingRecordType.getText()) + "'.");
+                validation.setComponent(moKeyAccountingRecordType);
+            }
+            else if (moKeyAccountingConfigurationType.getValue()[0] == SModSysConsts.HRSS_TP_ACC_DEP &&
+                    !SLibUtils.belongsTo(moKeyAccountingRecordType.getValue()[0], new int[] { SModSysConsts.HRSS_TP_ACC_DEP, SModSysConsts.HRSS_TP_ACC_EMP })) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlAccountingRecordType.getText()) + "'.");
+                validation.setComponent(moKeyAccountingRecordType);
+            }
+            else if (moKeyAccountingConfigurationType.getValue()[0] == SModSysConsts.HRSS_TP_ACC_EMP &&
+                    !SLibUtils.belongsTo(moKeyAccountingRecordType.getValue()[0], new int[] { SModSysConsts.HRSS_TP_ACC_EMP })) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlAccountingRecordType.getText()) + "'.");
+                validation.setComponent(moKeyAccountingRecordType);
             }
         }
         return validation;
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() instanceof JCheckBox) {
-            JCheckBox checkBox = (JCheckBox)  e.getSource();
-
-            if (checkBox == moBoolLoan) {
-                actionPerformedLoan();
-            }
-        }
-    }
-
-    @Override
     public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() instanceof SBeanFieldKey) {
+        if (e.getSource() instanceof SBeanFieldKey && e.getStateChange() == ItemEvent.SELECTED) {
             SBeanFieldKey field = (SBeanFieldKey) e.getSource();
             
             if (field == moKeyDeductionComputationType) {
                 itemStateChangedDeductionComputationType();
+            }
+        }
+        else if (e.getSource() instanceof SBeanFieldBoolean && e.getStateChange() == ItemEvent.SELECTED) {
+            SBeanFieldBoolean field = (SBeanFieldBoolean) e.getSource();
+
+            if (field == moBoolLoan) {
+                itemStateChangedLoan();
             }
         }
     }

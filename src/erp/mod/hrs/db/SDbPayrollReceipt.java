@@ -46,7 +46,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     protected double mdDaysHiredAnnual;
     protected double mdDaysIncapacityNotPaidPayroll;
     protected double mdDaysIncapacityNotPaidAnnual;
-    protected double mdDaysNotWorkedPaid;
+    protected double mdDaysNotWorkedButPaid;
     protected double mdDaysNotWorkedNotPaid;
     protected double mdDaysNotWorked_r;
     protected double mdDaysToBePaid_r;
@@ -98,8 +98,8 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     */
     
     protected Date mtAuxDateIssue;
-    protected SDbPayrollReceiptIssue moPayrollReceiptIssue;
-
+    
+    protected SDbPayrollReceiptIssue moChildPayrollReceiptIssue;
     protected ArrayList<SDbPayrollReceiptEarning> maChildPayrollReceiptEarnings;
     protected ArrayList<SDbPayrollReceiptDeduction> maChildPayrollReceiptDeductions;
     protected ArrayList<SDbAbsenceConsumption> maChildAbsenceConsumptions;
@@ -118,29 +118,29 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         mdEarnings_r = 0;
         mdDeductions_r = 0;
         
-        for (SDbPayrollReceiptEarning earning : maChildPayrollReceiptEarnings) {
-            mdEarningsExemption_r += earning.getAmountExempt();
-            mdEarningsTaxable_r += earning.getAmountTaxable();
-            mdEarnings_r += earning.getAmount_r();
+        for (SDbPayrollReceiptEarning child : maChildPayrollReceiptEarnings) {
+            mdEarningsExemption_r += child.getAmountExempt();
+            mdEarningsTaxable_r += child.getAmountTaxable();
+            mdEarnings_r += child.getAmount_r();
         }
         
-        for (SDbPayrollReceiptDeduction deduction : maChildPayrollReceiptDeductions) {
-            mdDeductions_r += deduction.getAmount_r();
+        for (SDbPayrollReceiptDeduction payrollReceiptDeduction : maChildPayrollReceiptDeductions) {
+            mdDeductions_r += payrollReceiptDeduction.getAmount_r();
         }
         mdPayment_r = mdEarnings_r - mdDeductions_r;
     }
     
     private void requiredCfd() {
-        for (SDbPayrollReceiptEarning earning : maChildPayrollReceiptEarnings) {
-            if (earning.getAmount_r() != 0) {
+        for (SDbPayrollReceiptEarning child : maChildPayrollReceiptEarnings) {
+            if (child.getAmount_r() != 0) {
                 mbCfdRequired = true;
                 break;
             }
         }
         
         if (!mbCfdRequired) {
-            for (SDbPayrollReceiptDeduction deduction : maChildPayrollReceiptDeductions) {
-                if (deduction.getAmount_r() != 0) {
+            for (SDbPayrollReceiptDeduction payrollReceiptDeduction : maChildPayrollReceiptDeductions) {
+                if (payrollReceiptDeduction.getAmount_r() != 0) {
                     mbCfdRequired = true;
                     break;
                 }
@@ -152,99 +152,25 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         }
     }
 
-    private void deleteDependentRegistries(final SGuiSession session, final boolean isEdit, final boolean isDeleted) throws SQLException {
-        Statement statement = null;
-
-        statement = session.getDatabase().getConnection().createStatement();
-
-        if (!isEdit) {
-            // Update to deleted deductions from receipts:
-
-            msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " SET b_del = " + (isDeleted ? mbDeleted : true) + " WHERE id_pay = " + mnPkPayrollId;
-            statement.executeUpdate(msSql);
-
-            // Update to deleted earnings from receipts:
-
-            msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " SET b_del = " + (isDeleted ? mbDeleted : true) + " WHERE id_pay = " + mnPkPayrollId;
-            statement.executeUpdate(msSql);
-
-            // Update to deleted absence consumption from receipts:
-
-            msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " SET b_del = " + (isDeleted ? mbDeleted : true) + " WHERE fk_rcp_pay = " + mnPkPayrollId;
-            statement.executeUpdate(msSql);
-        }
-        else {
-            // Delete deductions from receipts:
-
-            msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId;
-            statement.executeUpdate(msSql);
-
-            // Delete earnings from receipts:
-
-            msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId;
-            statement.executeUpdate(msSql);
-
-            // Delete absence consumption from receipts:
-
-            msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " WHERE fk_rcp_pay = " + mnPkPayrollId + " AND fk_rcp_emp = " + mnPkEmployeeId;
-            statement.executeUpdate(msSql);
+    private void deleteDependentRegistries(final SGuiSession session) throws SQLException {
+        String[] sentences = new String [] {
+            "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED_CMP) + " WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + ";",
+            "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + ";",
+            "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR_CMP) + " WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + ";",
+            "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + ";",
+            "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " WHERE fk_rcp_pay = " + mnPkPayrollId + " AND fk_rcp_emp = " + mnPkEmployeeId + ";"
+            };
+        
+        try (Statement statement = session.getDatabase().getConnection().createStatement()) {
+            for (String sql : sentences) {
+                statement.execute(msSql = sql);
+            }
         }
     }   
 
     /*
      * Public methods
      */
-    
-    public void createIssues(final SGuiSession session) throws Exception {
-        int issueId = 0;
-        String numberSerie = "";
-        int number = 0;
-        int paymentSystemType = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
-        
-        SDbPayrollReceiptIssue payrollReceiptIssues = null;
-        
-        if (moPayrollReceiptIssue != null && moPayrollReceiptIssue.getFkReceiptStatusId() != SModSysConsts.TRNS_ST_DPS_ANNULED) {
-            issueId = moPayrollReceiptIssue.getPkIssueId();
-            numberSerie = moPayrollReceiptIssue.getNumberSeries();
-            number = moPayrollReceiptIssue.getNumber();
-            mtAuxDateIssue = moPayrollReceiptIssue.getDateIssue();
-            paymentSystemType = moPayrollReceiptIssue.getFkPaymentSystemTypeId();
-        }
-        
-        if (moPayrollReceiptIssue == null || moPayrollReceiptIssue.getFkReceiptStatusId() != SModSysConsts.TRNS_ST_DPS_EMITED) {
-            payrollReceiptIssues = new SDbPayrollReceiptIssue();
-            
-            payrollReceiptIssues.setPkPayrollId(mnPkPayrollId);
-            payrollReceiptIssues.setPkEmployeeId(mnPkEmployeeId);
-            payrollReceiptIssues.setPkIssueId(issueId);
-            payrollReceiptIssues.setNumberSeries(numberSerie); // Update when generate the CFDI.
-            payrollReceiptIssues.setNumber(number); // Update when generate the CFDI.
-            payrollReceiptIssues.setDateIssue(mtAuxDateIssue); // Update when generate the CFDI.
-            payrollReceiptIssues.setDatePayment(mtAuxDateIssue); // Update when generate the CFDI.
-            payrollReceiptIssues.setBankAccount(""); // Update when generate the CFDI.
-            payrollReceiptIssues.setEarnings_r(mdEarnings_r);
-            payrollReceiptIssues.setDeductions_r(mdDeductions_r);
-            payrollReceiptIssues.setPayment_r(mdPayment_r);
-            payrollReceiptIssues.setDeleted(false);
-            payrollReceiptIssues.setFkReceiptStatusId(SModSysConsts.TRNS_ST_DPS_EMITED);
-            payrollReceiptIssues.setFkBankId_n(SLibConsts.UNDEFINED); // Update when generate the CFDI.
-            payrollReceiptIssues.setFkPaymentSystemTypeId(paymentSystemType); // Update when generate the CFDI.
-            /* Update when save the registry.
-            payrollReceiptIssues.setFkUserInsertId(0);
-            payrollReceiptIssues.setFkUserUpdateId(0);
-            payrollReceiptIssues.setTsUserInsert(null);
-            payrollReceiptIssues.setTsUserUpdate(null);
-            */
-            payrollReceiptIssues.save(session);
-        }
-    }
-    
-    public void updateToNewStatusIssues(final SGuiSession session) throws Exception {
-        if (moPayrollReceiptIssue != null && moPayrollReceiptIssue.getFkReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_EMITED && !moPayrollReceiptIssue.isStamped()) {
-            moPayrollReceiptIssue.setFkReceiptStatusId(SModSysConsts.TRNS_ST_DPS_NEW);
-            moPayrollReceiptIssue.save(session);
-        }
-    }
     
     public void setPkPayrollId(int n) { mnPkPayrollId = n; }
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
@@ -266,7 +192,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setDaysHiredAnnual(double d) { mdDaysHiredAnnual = d; }
     public void setDaysIncapacityNotPaidPayroll(double d) { mdDaysIncapacityNotPaidPayroll = d; }
     public void setDaysIncapacityNotPaidAnnual(double d) { mdDaysIncapacityNotPaidAnnual = d; }
-    public void setDaysNotWorkedPaid(double d) { mdDaysNotWorkedPaid = d; }
+    public void setDaysNotWorkedButPaid(double d) { mdDaysNotWorkedButPaid = d; }
     public void setDaysNotWorkedNotPaid(double d) { mdDaysNotWorkedNotPaid = d; }
     public void setDaysNotWorked_r(double d) { mdDaysNotWorked_r = d; }
     public void setDaysToBePaid_r(double d) { mdDaysToBePaid_r = d; }
@@ -315,9 +241,6 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
-    public void setAuxDateIssue(Date t) { mtAuxDateIssue = t; }
-    public void setPayrollReceiptIssue(SDbPayrollReceiptIssue o) { moPayrollReceiptIssue = o; }
-
     public int getPkPayrollId() { return mnPkPayrollId; }
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public Date getDateBenefits() { return mtDateBenefits; }
@@ -338,7 +261,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public double getDaysHiredAnnual() { return mdDaysHiredAnnual; }
     public double getDaysIncapacityNotPaidPayroll() { return mdDaysIncapacityNotPaidPayroll; }
     public double getDaysIncapacityNotPaidAnnual() { return mdDaysIncapacityNotPaidAnnual; }
-    public double getDaysNotWorkedPaid() { return mdDaysNotWorkedPaid; }
+    public double getDaysNotWorkedButPaid() { return mdDaysNotWorkedButPaid; }
     public double getDaysNotWorkedNotPaid() { return mdDaysNotWorkedNotPaid; }
     public double getDaysNotWorked_r() { return mdDaysNotWorked_r; }
     public double getDaysToBePaid_r() { return mdDaysToBePaid_r; }
@@ -387,13 +310,72 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
-    public Date getAuxDateIssue() { return mtAuxDateIssue; }
-    public SDbPayrollReceiptIssue getPayrollReceiptIssue() { return moPayrollReceiptIssue; }
+    public void setAuxDateIssue(Date t) { mtAuxDateIssue = t; }
 
+    public Date getAuxDateIssue() { return mtAuxDateIssue; }
+    
+    public void setChildPayrollReceiptIssue(SDbPayrollReceiptIssue o) { moChildPayrollReceiptIssue = o; }
+
+    public SDbPayrollReceiptIssue getChildPayrollReceiptIssue() { return moChildPayrollReceiptIssue; }
     public ArrayList<SDbPayrollReceiptEarning> getChildPayrollReceiptEarnings() { return maChildPayrollReceiptEarnings; }
     public ArrayList<SDbPayrollReceiptDeduction> getChildPayrollReceiptDeductions() { return maChildPayrollReceiptDeductions; }
     public ArrayList<SDbAbsenceConsumption> getChildAbsenceConsumption() { return maChildAbsenceConsumptions; }
     
+    public void createIssues(final SGuiSession session) throws Exception {
+        int issueId = 0;
+        String numberSerie = "";
+        int number = 0;
+        int paymentSystemType = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
+        
+        SDbPayrollReceiptIssue payrollReceiptIssues = null;
+        
+        if (moChildPayrollReceiptIssue != null && moChildPayrollReceiptIssue.getFkReceiptStatusId() != SModSysConsts.TRNS_ST_DPS_ANNULED) {
+            issueId = moChildPayrollReceiptIssue.getPkIssueId();
+            numberSerie = moChildPayrollReceiptIssue.getNumberSeries();
+            number = moChildPayrollReceiptIssue.getNumber();
+            mtAuxDateIssue = moChildPayrollReceiptIssue.getDateIssue();
+            paymentSystemType = moChildPayrollReceiptIssue.getFkPaymentSystemTypeId();
+        }
+        
+        if (moChildPayrollReceiptIssue == null || moChildPayrollReceiptIssue.getFkReceiptStatusId() != SModSysConsts.TRNS_ST_DPS_EMITED) {
+            payrollReceiptIssues = new SDbPayrollReceiptIssue();
+            
+            payrollReceiptIssues.setPkPayrollId(mnPkPayrollId);
+            payrollReceiptIssues.setPkEmployeeId(mnPkEmployeeId);
+            payrollReceiptIssues.setPkIssueId(issueId);
+            payrollReceiptIssues.setNumberSeries(numberSerie); // update when generate CFDI
+            payrollReceiptIssues.setNumber(number); // update when generate CFDI
+            payrollReceiptIssues.setDateIssue(mtAuxDateIssue); // update when generate CFDI
+            payrollReceiptIssues.setDatePayment(mtAuxDateIssue); // update when generate CFDI
+            payrollReceiptIssues.setBankAccount(""); // update when generate CFDI
+            payrollReceiptIssues.setEarnings_r(mdEarnings_r);
+            payrollReceiptIssues.setDeductions_r(mdDeductions_r);
+            payrollReceiptIssues.setPayment_r(mdPayment_r);
+            payrollReceiptIssues.setDeleted(false);
+            payrollReceiptIssues.setFkReceiptStatusId(SModSysConsts.TRNS_ST_DPS_EMITED);
+            payrollReceiptIssues.setFkBankId_n(SLibConsts.UNDEFINED); // update when generate CFDI
+            payrollReceiptIssues.setFkPaymentSystemTypeId(paymentSystemType); // update when generate CFDI
+            /* Update when save the registry.
+            payrollReceiptIssues.setFkUserInsertId(0);
+            payrollReceiptIssues.setFkUserUpdateId(0);
+            payrollReceiptIssues.setTsUserInsert(null);
+            payrollReceiptIssues.setTsUserUpdate(null);
+            */
+            payrollReceiptIssues.save(session);
+        }
+    }
+    
+    public void updateToNewStatusIssues(final SGuiSession session) throws Exception {
+        if (moChildPayrollReceiptIssue != null && moChildPayrollReceiptIssue.getFkReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_EMITED && !moChildPayrollReceiptIssue.isStamped()) {
+            moChildPayrollReceiptIssue.setFkReceiptStatusId(SModSysConsts.TRNS_ST_DPS_NEW);
+            moChildPayrollReceiptIssue.save(session);
+        }
+    }
+    
+    public String getIssueNumber() {
+        return moChildPayrollReceiptIssue == null ? "" : moChildPayrollReceiptIssue.getPayrollReceiptIssueNumber();
+    }
+
     /**
      * Gets effective salary.
      * @param isFortnightStandard Flag that indicates if fortnights are allways fixed to 15 days.
@@ -425,7 +407,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         
         return paymentMonthly;
     }
-
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkPayrollId = pk[0];
@@ -463,7 +445,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         mdDaysHiredAnnual = 0;
         mdDaysIncapacityNotPaidPayroll = 0;
         mdDaysIncapacityNotPaidAnnual = 0;
-        mdDaysNotWorkedPaid = 0;
+        mdDaysNotWorkedButPaid = 0;
         mdDaysNotWorkedNotPaid = 0;
         mdDaysNotWorked_r = 0;
         mdDaysToBePaid_r = 0;
@@ -514,12 +496,11 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         
         mtAuxDateIssue = null;
 
-        //maChildPayrollReceiptDays = new ArrayList<>();  XXX jbarajas deleted by new control schema incidents
         maChildPayrollReceiptEarnings = new ArrayList<>();
         maChildPayrollReceiptDeductions = new ArrayList<>();
         maChildAbsenceConsumptions = new ArrayList<>();
         
-        moPayrollReceiptIssue = null;
+        moChildPayrollReceiptIssue = null;
     }
 
     @Override
@@ -544,11 +525,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
-        Statement statement = null;
         ResultSet resultSet = null;
-        SDbPayrollReceiptEarning payrollReceiptEarning = null;
-        SDbPayrollReceiptDeduction payrollReceiptDeduction = null;
-        SDbAbsenceConsumption absenceConsumption = null;
 
         initRegistry();
         initQueryMembers();
@@ -580,7 +557,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             mdDaysHiredAnnual = resultSet.getDouble("day_hire_ann");
             mdDaysIncapacityNotPaidPayroll = resultSet.getDouble("day_inc_not_pad_pay");
             mdDaysIncapacityNotPaidAnnual = resultSet.getDouble("day_inc_not_pad_ann");
-            mdDaysNotWorkedPaid = resultSet.getDouble("day_not_wrk_pad");
+            mdDaysNotWorkedButPaid = resultSet.getDouble("day_not_wrk_pad");
             mdDaysNotWorkedNotPaid = resultSet.getDouble("day_not_wrk_not_pad");
             mdDaysNotWorked_r = resultSet.getDouble("day_not_wrk_r");
             mdDaysToBePaid_r = resultSet.getDouble("day_tob_pad_r");
@@ -628,80 +605,55 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
-
-            // Read payrollReceiptEarnings:
-
-            msSql = "SELECT pre.id_pay, pre.id_emp, pre.id_mov " +
-                    "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
-                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
-                    "p.id_pay = pr.id_pay " +
-                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON " +
-                    "pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp " +
-                    "WHERE pre.id_pay = " + mnPkPayrollId + " AND pre.id_emp = " + mnPkEmployeeId + " " +
-                    "ORDER BY pre.id_pay, pre.id_emp, pre.id_mov; ";
-            statement = session.getDatabase().getConnection().createStatement();
             
-            resultSet = statement.executeQuery(msSql);
-            while (resultSet.next()) {
-
-                payrollReceiptEarning = new SDbPayrollReceiptEarning();
-                payrollReceiptEarning.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
-                maChildPayrollReceiptEarnings.add(payrollReceiptEarning);
-            }
-
-            // Read payrollReceiptDeductions:
-
-            msSql = "SELECT prd.id_pay, prd.id_emp, prd.id_mov " +
-                    "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
-                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
-                    "p.id_pay = pr.id_pay " +
-                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON " +
-                    "pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp " +
-                    "WHERE prd.id_pay = " + mnPkPayrollId + " AND prd.id_emp = " + mnPkEmployeeId + " " +
-                    "ORDER BY prd.id_pay, prd.id_emp, prd.id_mov; ";
-            statement = session.getDatabase().getConnection().createStatement();
+            // read as well dependent registries:
             
-            resultSet = statement.executeQuery(msSql);
-            while (resultSet.next()) {
-
-                payrollReceiptDeduction = new SDbPayrollReceiptDeduction();
-                payrollReceiptDeduction.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
-                maChildPayrollReceiptDeductions.add(payrollReceiptDeduction);
-            }
-            
-            // Read absenceConsumption:
-
-            msSql = "SELECT ac.id_emp, ac.id_abs, ac.id_cns " +
-                    "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
-                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
-                    "p.id_pay = pr.id_pay " +
-                    "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " AS ac ON " +
-                    "pr.id_pay = ac.fk_rcp_pay AND pr.id_emp = ac.fk_rcp_emp " +
-                    "WHERE ac.b_del = 0 AND ac.fk_rcp_pay = " + mnPkPayrollId + " AND ac.fk_rcp_emp = " + mnPkEmployeeId + " " +
-                    "ORDER BY ac.id_emp, ac.id_abs, ac.id_cns; ";
-            statement = session.getDatabase().getConnection().createStatement();
-            
-            resultSet = statement.executeQuery(msSql);
-            while (resultSet.next()) {
-
-                absenceConsumption = new SDbAbsenceConsumption();
-                absenceConsumption.read(session, new int[] { resultSet.getInt("ac.id_emp"), resultSet.getInt("ac.id_abs"), resultSet.getInt("ac.id_cns") });
-                maChildAbsenceConsumptions.add(absenceConsumption);
-            }
-
-            // Read Issue last:
-
-            msSql = "SELECT id_iss "
-                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " "
-                    + "WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + " "
-                    + "ORDER BY id_iss DESC LIMIT 1";
-            statement = session.getDatabase().getConnection().createStatement();
-            
-            resultSet = statement.executeQuery(msSql);
-            if (resultSet.next()) {
-                moPayrollReceiptIssue = new SDbPayrollReceiptIssue();
-                moPayrollReceiptIssue.read(session, new int[] { mnPkPayrollId, mnPkEmployeeId, resultSet.getInt("id_iss") });
-                mtAuxDateIssue = moPayrollReceiptIssue.getDateIssue();
+            try (Statement statement = session.getDatabase().getConnection().createStatement()) {
+                msSql = "SELECT id_mov " +
+                        "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " " +
+                        "WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + " " +
+                        "ORDER BY id_mov;";
+                resultSet = statement.executeQuery(msSql);
+                while (resultSet.next()) {
+                    SDbPayrollReceiptEarning child = new SDbPayrollReceiptEarning();
+                    child.read(session, new int[] { mnPkPayrollId, mnPkEmployeeId, resultSet.getInt(1) });
+                    maChildPayrollReceiptEarnings.add(child);
+                }
+                
+                msSql = "SELECT id_mov " +
+                        "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " " +
+                        "WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + " " +
+                        "ORDER BY id_mov;";
+                resultSet = statement.executeQuery(msSql);
+                while (resultSet.next()) {
+                    SDbPayrollReceiptDeduction child = new SDbPayrollReceiptDeduction();
+                    child.read(session, new int[] { mnPkPayrollId, mnPkEmployeeId, resultSet.getInt(1) });
+                    maChildPayrollReceiptDeductions.add(child);
+                }
+                
+                msSql = "SELECT id_emp, id_abs, id_cns " +
+                        "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " " +
+                        "WHERE fk_rcp_pay = " + mnPkPayrollId + " AND fk_rcp_emp = " + mnPkEmployeeId + " " +
+                        "ORDER BY id_emp, id_abs, id_cns;";
+                resultSet = statement.executeQuery(msSql);
+                while (resultSet.next()) {
+                    SDbAbsenceConsumption child = new SDbAbsenceConsumption();
+                    child.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) }); // employee ID, then absence ID, finally consumption ID
+                    maChildAbsenceConsumptions.add(child);
+                }
+                
+                // read last issue:
+                
+                msSql = "SELECT id_iss "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " "
+                        + "WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + " "
+                        + "ORDER BY id_iss DESC LIMIT 1";
+                resultSet = statement.executeQuery(msSql);
+                if (resultSet.next()) {
+                    moChildPayrollReceiptIssue = new SDbPayrollReceiptIssue();
+                    moChildPayrollReceiptIssue.read(session, new int[] { mnPkPayrollId, mnPkEmployeeId, resultSet.getInt(1) });
+                    mtAuxDateIssue = moChildPayrollReceiptIssue.getDateIssue();
+                }
             }
 
             mbRegistryNew = false;
@@ -753,7 +705,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     mdDaysHiredAnnual + ", " + 
                     mdDaysIncapacityNotPaidPayroll + ", " + 
                     mdDaysIncapacityNotPaidAnnual + ", " + 
-                    mdDaysNotWorkedPaid + ", " + 
+                    mdDaysNotWorkedButPaid + ", " + 
                     mdDaysNotWorkedNotPaid + ", " + 
                     mdDaysNotWorked_r + ", " + 
                     mdDaysToBePaid_r + ", " + 
@@ -831,7 +783,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     "day_hire_ann = " + mdDaysHiredAnnual + ", " +
                     "day_inc_not_pad_pay = " + mdDaysIncapacityNotPaidPayroll + ", " +
                     "day_inc_not_pad_ann = " + mdDaysIncapacityNotPaidAnnual + ", " +
-                    "day_not_wrk_pad = " + mdDaysNotWorkedPaid + ", " +
+                    "day_not_wrk_pad = " + mdDaysNotWorkedButPaid + ", " +
                     "day_not_wrk_not_pad = " + mdDaysNotWorkedNotPaid + ", " +
                     "day_not_wrk_r = " + mdDaysNotWorked_r + ", " +
                     "day_tob_pad_r = " + mdDaysToBePaid_r + ", " +
@@ -883,40 +835,36 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         }
 
         session.getStatement().execute(msSql);
-
-        // Delete registries dependent:
         
-        deleteDependentRegistries(session, true, false);
+        // save as well dependent registries:
 
-        // Save payrollEarnings:
-
-        for (SDbPayrollReceiptEarning payrollReceiptEarning : maChildPayrollReceiptEarnings) {
-            payrollReceiptEarning.setRegistryNew(true);
-            payrollReceiptEarning.setDeleted(mbDeleted);
-            payrollReceiptEarning.setPkPayrollId(mnPkPayrollId);
-            payrollReceiptEarning.setPkEmployeeId(mnPkEmployeeId);
-            payrollReceiptEarning.save(session);
+        deleteDependentRegistries(session);
+        
+        for (SDbPayrollReceiptEarning child : maChildPayrollReceiptEarnings) {
+            child.setRegistryNew(true); // treat child as new
+            child.setDeleted(mbDeleted);
+            child.setPkPayrollId(mnPkPayrollId);
+            child.setPkEmployeeId(mnPkEmployeeId);
+            child.save(session);
         }
 
-        // Save payrollDeductions:
+        for (SDbPayrollReceiptDeduction child : maChildPayrollReceiptDeductions) {
+            child.setRegistryNew(true); // treat child as new
+            child.setDeleted(mbDeleted);
+            child.setPkPayrollId(mnPkPayrollId);
+            child.setPkEmployeeId(mnPkEmployeeId);
+            child.save(session);
+        }
 
-        for (SDbPayrollReceiptDeduction payrollReceiptDeduction : maChildPayrollReceiptDeductions) {
-            payrollReceiptDeduction.setRegistryNew(true);
-            payrollReceiptDeduction.setDeleted(mbDeleted);
-            payrollReceiptDeduction.setPkPayrollId(mnPkPayrollId);
-            payrollReceiptDeduction.setPkEmployeeId(mnPkEmployeeId);
-            payrollReceiptDeduction.save(session);
+        for (SDbAbsenceConsumption child : maChildAbsenceConsumptions) {
+            child.setRegistryNew(true); // treat child as new
+            child.setDeleted(mbDeleted);
+            child.setFkReceiptPayrollId(mnPkPayrollId);
+            child.setFkReceiptEmployeeId(mnPkEmployeeId);
+            child.save(session);
         }
         
-        // Save absenceConsumption:
-
-        for (SDbAbsenceConsumption absenceConsumption : maChildAbsenceConsumptions) {
-            absenceConsumption.setRegistryNew(true);
-            absenceConsumption.setDeleted(mbDeleted);
-            absenceConsumption.setFkReceiptPayrollId(mnPkPayrollId);
-            absenceConsumption.setFkReceiptEmployeeId(mnPkEmployeeId);
-            absenceConsumption.save(session);
-        }
+        // XXX 2019-04-23, Sergio Flores: check that member moChildPayrollReceiptIssue is not saved, just as is supposed to be!
 
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
@@ -946,7 +894,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         registry.setDaysHiredAnnual(this.getDaysHiredAnnual());
         registry.setDaysIncapacityNotPaidPayroll(this.getDaysIncapacityNotPaidPayroll());
         registry.setDaysIncapacityNotPaidAnnual(this.getDaysIncapacityNotPaidAnnual());
-        registry.setDaysNotWorkedPaid(this.getDaysNotWorkedPaid());
+        registry.setDaysNotWorkedButPaid(this.getDaysNotWorkedButPaid());
         registry.setDaysNotWorkedNotPaid(this.getDaysNotWorkedNotPaid());
         registry.setDaysNotWorked_r(this.getDaysNotWorked_r());
         registry.setDaysToBePaid_r(this.getDaysToBePaid_r());
@@ -995,19 +943,19 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
-        for (SDbPayrollReceiptEarning receiptEarning : this.getChildPayrollReceiptEarnings()) {
-            registry.getChildPayrollReceiptEarnings().add(receiptEarning.clone());
+        for (SDbPayrollReceiptEarning child : this.getChildPayrollReceiptEarnings()) {
+            registry.getChildPayrollReceiptEarnings().add(child.clone());
         }
 
-        for (SDbPayrollReceiptDeduction receiptDeduction : this.getChildPayrollReceiptDeductions()) {
-            registry.getChildPayrollReceiptDeductions().add(receiptDeduction.clone());
+        for (SDbPayrollReceiptDeduction child : this.getChildPayrollReceiptDeductions()) {
+            registry.getChildPayrollReceiptDeductions().add(child.clone());
         }
         
-        for (SDbAbsenceConsumption receiptAbsenceConsumption : this.getChildAbsenceConsumption()) {
-            registry.getChildAbsenceConsumption().add(receiptAbsenceConsumption.clone());
+        for (SDbAbsenceConsumption child : this.getChildAbsenceConsumption()) {
+            registry.getChildAbsenceConsumption().add(child.clone());
         }
         
-        registry.setPayrollReceiptIssue(this.getPayrollReceiptIssue() == null ? null : this.getPayrollReceiptIssue().clone());
+        registry.setChildPayrollReceiptIssue(this.getChildPayrollReceiptIssue() == null ? null : this.getChildPayrollReceiptIssue().clone());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
@@ -1017,12 +965,12 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public boolean canDelete(SGuiSession session) throws SQLException, Exception {
         boolean can = super.canDelete(session);
 
-        if (can && moPayrollReceiptIssue != null) {
-            if (moPayrollReceiptIssue.isStamped()) {
+        if (can && moChildPayrollReceiptIssue != null) {
+            if (moChildPayrollReceiptIssue.isStamped()) {
                 can = false;
                 msQueryResult = "¡No es posible eliminar el recibo, está timbrado!";
             }
-            else if (moPayrollReceiptIssue.isAnnul()) {
+            else if (moChildPayrollReceiptIssue.isAnnul()) {
                 can = false;
                 msQueryResult = "¡No es posible eliminar el recibo, está anulado!";
             }
@@ -1032,6 +980,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
 
     @Override
     public void delete(final SGuiSession session) throws SQLException, Exception {
+        initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
         mbDeleted = !mbDeleted;
@@ -1044,51 +993,40 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                 getSqlWhere();
         session.getStatement().execute(msSql);
 
-        if (!msQueryResult.isEmpty()) {
-            throw new Exception(msQueryResult);
-        }
-        
-        // Delete registries dependent:
+        deleteDependentRegistries(session);
 
-        deleteDependentRegistries(session, false, true);
-
-        mnQueryResultId = msQueryResult.isEmpty() ? SDbConsts.SAVE_OK : SDbConsts.SAVE_ERROR;
+        mnQueryResultId = SDbConsts.SAVE_OK;
     }
 
     public static void checkDummyRegistry(final SGuiSession session, final int employeeId) throws Exception {
-        String sql = "";
-        ResultSet resultSet = null;
-        SDbPayrollReceipt registryDummy = null;
-
         SDbPayroll.checkDummyRegistry(session);
         
-        sql = "SELECT COUNT(*) "
+        String sql = "SELECT COUNT(*) "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " "
             + "WHERE id_pay = " + SLibConsts.UNDEFINED + " AND id_emp = " + employeeId;
         
-        resultSet = session.getStatement().executeQuery(sql);
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next() && resultSet.getInt(1) == 0) {
-            // Create dbReceipt:
+            SDbPayrollReceipt dummy = new SDbPayrollReceipt();
+            
+            dummy.setPkPayrollId(0);
+            dummy.setPkEmployeeId(employeeId);
+            dummy.setDateBenefits(SLibTimeUtils.createDate(2000, 1, 1));
+            dummy.setDateLastHire(SLibTimeUtils.createDate(2000, 1, 1));
+            dummy.setFkPaymentTypeId(SModSysConsts.HRSS_TP_PAY_WEE);
+            dummy.setFkSalaryTypeId(SModSysConsts.HRSS_TP_SAL_FIX);
+            dummy.setFkEmployeeTypeId(SModSysConsts.HRSU_TP_EMP_NON);
+            dummy.setFkWorkerTypeId(SModSysConsts.HRSU_TP_WRK_NON);
+            dummy.setFkMwzTypeId(SModSysConsts.HRSU_TP_MWZ_DEF);
+            dummy.setFkDepartmentId(SModSysConsts.HRSU_DEP_NON);
+            dummy.setFkPositionId(SModSysConsts.HRSU_POS_NON);
+            dummy.setFkShiftId(SModSysConsts.HRSU_SHT_NON);
+            dummy.setFkContractTypeId(SModSysConsts.HRSS_TP_CON_OTH);
+            dummy.setFkRecruitmentSchemeTypeId(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
+            dummy.setFkPositionRiskTypeId(SModSysConsts.HRSS_TP_POS_RISK_CL1);
+            dummy.setFkWorkingDayTypeId(SModSysConsts.HRSS_TP_WORK_DAY_DIU);
 
-            registryDummy = new SDbPayrollReceipt();
-            registryDummy.setPkPayrollId(SLibConsts.UNDEFINED);
-            registryDummy.setPkEmployeeId(employeeId);
-            registryDummy.setDateBenefits(SLibTimeUtils.createDate(2000, 1, 1));
-            registryDummy.setDateLastHire(SLibTimeUtils.createDate(2000, 1, 1));
-            registryDummy.setFkPaymentTypeId(1);
-            registryDummy.setFkSalaryTypeId(SModSysConsts.HRSS_TP_SAL_FIX);
-            registryDummy.setFkEmployeeTypeId(SModSysConsts.HRSU_TP_EMP_NON);
-            registryDummy.setFkWorkerTypeId(SModSysConsts.HRSU_TP_WRK_NON);
-            registryDummy.setFkMwzTypeId(SModSysConsts.HRSU_TP_MWZ_DEF);
-            registryDummy.setFkDepartmentId(SModSysConsts.HRSU_DEP_NON);
-            registryDummy.setFkPositionId(SModSysConsts.HRSU_POS_NON);
-            registryDummy.setFkShiftId(SModSysConsts.HRSU_SHT_NON);
-            registryDummy.setFkContractTypeId(SModSysConsts.HRSS_TP_CON_OTH);
-            registryDummy.setFkRecruitmentSchemeTypeId(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
-            registryDummy.setFkPositionRiskTypeId(SModSysConsts.HRSS_TP_POS_RISK_CL1);
-            registryDummy.setFkWorkingDayTypeId(SModSysConsts.HRSS_TP_WORK_DAY_DIU);
-
-            registryDummy.save(session);
+            dummy.save(session);
         }
     }
 }

@@ -2,18 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package erp.mod.hrs.db;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
+import sa.lib.SLibUtils;
 import sa.lib.grid.SGridRow;
 
 /**
  *
  * @author Néstor Ávalos, Sergio Flores
  */
-public class SHrsPayrollRowEmployeeReceipt implements SGridRow {
+public class SRowPayrollEmployee implements SGridRow {
 
     protected int mnPkEmployeeId;
     protected int mnFkPaymentTypeId;
@@ -21,22 +19,29 @@ public class SHrsPayrollRowEmployeeReceipt implements SGridRow {
     protected String msName;
     protected double mdTotalEarnings;
     protected double mdTotalDeductions;
-    protected double mdTotalNet;
 
-    protected SHrsPayrollReceipt moHrsPayrollReceipt;
-    protected ArrayList<SHrsPayrollRowEmployeeReceipt> maHrsEmployeeReceipts;
+    protected SHrsReceipt moHrsReceipt;
 
-    public SHrsPayrollRowEmployeeReceipt() {
+    public SRowPayrollEmployee() {
         mnPkEmployeeId = 0;
         mnFkPaymentTypeId = 0;
         msCode = "";
         msName = "";
         mdTotalEarnings = 0;
         mdTotalDeductions = 0;
-        mdTotalNet = 0;
 
-        moHrsPayrollReceipt = null;
-        maHrsEmployeeReceipts = new ArrayList<>();
+        moHrsReceipt = null;
+    }
+    
+    public SRowPayrollEmployee(SRowPayrollEmployee row) {
+        mnPkEmployeeId = row.getPkEmployeeId();
+        mnFkPaymentTypeId = row.getFkPaymentTypeId();
+        msCode = row.getCode();
+        msName = row.getName();
+        mdTotalEarnings = 0;
+        mdTotalDeductions = 0;
+
+        moHrsReceipt = null;
     }
 
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
@@ -45,7 +50,6 @@ public class SHrsPayrollRowEmployeeReceipt implements SGridRow {
     public void setName(String s) { msName = s; }
     public void setTotalEarnings(double d) { mdTotalEarnings = d; }
     public void setTotalDeductions(double d) { mdTotalDeductions = d; }
-    public void setTotalNet(double d) { mdTotalNet = d; }
 
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public int getFkPaymentTypeId() { return mnFkPaymentTypeId; }
@@ -53,47 +57,25 @@ public class SHrsPayrollRowEmployeeReceipt implements SGridRow {
     public String getName() { return msName ; }
     public double getTotalEarnings() { return mdTotalEarnings ; }
     public double getTotalDeductions() { return mdTotalDeductions ; }
-    public double getTotalNet() { return mdTotalNet ; }
+    public double getTotalNet() { return SLibUtils.roundAmount(mdTotalEarnings - mdTotalDeductions); }
 
-    public void setHrsPayrollReceipt(SHrsPayrollReceipt o) { moHrsPayrollReceipt = o; }
+    public void setHrsReceipt(SHrsReceipt o) { moHrsReceipt = o; }
 
-    public SHrsPayrollReceipt getHrsPayrollReceipt() { return moHrsPayrollReceipt; }
-    public ArrayList<SHrsPayrollRowEmployeeReceipt> getHrsPayrollEmployeesReceipt() { return maHrsEmployeeReceipts; }
-
-    public void setEmployeeReceipts(ArrayList<SHrsPayrollReceipt> aHrsPayrollReceipt) throws SQLException, Exception {
-        SHrsPayrollRowEmployeeReceipt employeeReceipt = null;
-
-        maHrsEmployeeReceipts.clear();
-        for (SHrsPayrollReceipt hrsPayrollReceipt : aHrsPayrollReceipt) {
-
-            employeeReceipt = new SHrsPayrollRowEmployeeReceipt();
-
-            employeeReceipt.setPkEmployeeId(hrsPayrollReceipt.getHrsEmployee().getEmployee().getPkEmployeeId());
-            employeeReceipt.setFkPaymentTypeId(hrsPayrollReceipt.getHrsEmployee().getEmployee().getFkPaymentTypeId());
-            employeeReceipt.setCode(hrsPayrollReceipt.getHrsEmployee().getEmployee().getNumber());
-            employeeReceipt.setName(hrsPayrollReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
-            employeeReceipt.setTotalEarnings(hrsPayrollReceipt.getTotalEarnings());
-            employeeReceipt.setTotalDeductions(hrsPayrollReceipt.getTotalDeductions());
-            employeeReceipt.setTotalNet(hrsPayrollReceipt.getTotalEarnings() - hrsPayrollReceipt.getTotalDeductions());
-            employeeReceipt.setHrsPayrollReceipt(hrsPayrollReceipt);
-
-            maHrsEmployeeReceipts.add(employeeReceipt);
-        }
-    }
+    public SHrsReceipt getHrsReceipt() { return moHrsReceipt; }
 
     @Override
     public int[] getRowPrimaryKey() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new int[] { mnPkEmployeeId };
     }
 
     @Override
     public String getRowCode() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return getCode();
     }
 
     @Override
     public String getRowName() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return getName();
     }
 
     @Override
@@ -134,7 +116,7 @@ public class SHrsPayrollRowEmployeeReceipt implements SGridRow {
                 value = mdTotalDeductions;
                 break;
             case 4:
-                value = mdTotalNet;
+                value = getTotalNet();
                 break;
             default:
         }

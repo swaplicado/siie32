@@ -703,7 +703,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
 
         if (validation.isValid()) {
             if (moDateDateEnd_n.getValue() != null) {
-                validation = SGuiUtils.validateDateRange(moDateDateStart, moDateDateEnd_n);
+                validation = SGuiUtils.validateDateRangeIgnoreYears(moDateDateStart, moDateDateEnd_n);
             }
         }
         

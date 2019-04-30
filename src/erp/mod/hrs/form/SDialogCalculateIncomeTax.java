@@ -377,9 +377,11 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
         SHrsAmountEarning amountEarnings = null;
         ResultSet resultSet = null;
         Statement statement = null;
+        Statement statementAux = null;
         
         try {
             statement = miClient.getSession().getDatabase().getConnection().createStatement();
+            statementAux = miClient.getSession().getDatabase().getConnection().createStatement();
             
             mtDateStart = SLibTimeUtils.createDate(moCalYear.getValue(), 1, 1);
             mtDateEnd = moDateDateCutoff.getValue();
@@ -405,8 +407,8 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
                 SRowCalculateIncomeTax row = new SRowCalculateIncomeTax();
                 employeeId = resultSet.getInt("e.id_emp");
                 
-                dDaysHired = SHrsUtils.getEmployeeHireDays(SHrsUtils.getEmployeeHireLogs(miClient.getSession(), employeeId, mtDateStart, mtDateEnd), mtDateStart, mtDateEnd);
-                dDaysIncapacityNotPay = SHrsUtils.getEmployeeIncapacityNotPayed(SHrsUtils.getEmployeeAbsencesConsumption(miClient.getSession(), SHrsUtils.getEmployeeAbsences(miClient.getSession(), employeeId), SLibConsts.UNDEFINED), mtDateStart, mtDateEnd);
+                dDaysHired = SHrsUtils.getEmployeeHireDays(SHrsUtils.getEmployeeHireLogs(miClient.getSession(), statementAux, employeeId, mtDateStart, mtDateEnd), mtDateStart, mtDateEnd);
+                dDaysIncapacityNotPay = SHrsUtils.getEmployeeIncapacityNotPayed(SHrsUtils.getEmployeeAbsencesConsumptions(miClient.getSession(), SHrsUtils.getEmployeeAbsences(miClient.getSession(), employeeId), 0), mtDateStart, mtDateEnd);
                 dDaysTaxable = dDaysHired - dDaysIncapacityNotPay;
                 
                 amountEarnings = SHrsUtils.getAmountEarningsByEmployee(miClient.getSession(), employeeId, periodYear, mtDateEnd);

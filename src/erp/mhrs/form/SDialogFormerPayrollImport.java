@@ -629,8 +629,8 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
                         msPayTypeAbbr = SHrsFormerConsts.PAY_WEE_ABB;
                         break;
                     case 2:
-                        msPayType = SHrsFormerConsts.PAY_BIW;
-                        msPayTypeAbbr = SHrsFormerConsts.PAY_BIW_ABB;
+                        msPayType = SHrsFormerConsts.PAY_FOR;
+                        msPayTypeAbbr = SHrsFormerConsts.PAY_FOR_ABB;
                         break;
                     case 3:
                         msPayType = SHrsFormerConsts.PAY_MON;

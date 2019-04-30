@@ -33,13 +33,13 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewAbsence extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
     private JButton jbCloseAbsence;
-    private JButton jbCardex;
+    private JButton jbShowCardex;
     private SGridFilterPanelEmployee moFilterEmployee;
     private SGridFilterPanel moFilterAbsenceClass;
     private SGridFilterPanel moFilterBusinessPartner;
@@ -61,7 +61,7 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         
         jbCloseAbsence = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Cerrar incidencia", this);
-        jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
+        jbShowCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         
         moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
         moFilterEmployee.initFilter(null);
@@ -76,7 +76,7 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseAbsence);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowCardex);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterAbsenceClass);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterBusinessPartner);
@@ -95,8 +95,6 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
      */
 
     private void actionCloseAbsence() {
-        SDbAbsence absence = null;
-
         if (jbCloseAbsence.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
@@ -104,10 +102,9 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
             else {
                 try {
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                    SDbAbsence absence = (SDbAbsence) miClient.getSession().readRegistry(SModConsts.HRS_ABS, gridRow.getRowPrimaryKey());
 
-                    absence = (SDbAbsence) miClient.getSession().readRegistry(SModConsts.HRS_ABS, gridRow.getRowPrimaryKey());
-
-                    if (miClient.showMsgBoxConfirm("Está por cerrar la incidencia '" + absence.getNumber() + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                    if (miClient.showMsgBoxConfirm("Está por cerrar la incidencia '" + absence.composeAbsenceDescription() + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         absence.setClosed(!absence.isClosed());
                         absence.setFkUserClosedId(miClient.getSession().getUser().getPkUserId());
                         if (absence.canSave(miClient.getSession())) {
@@ -131,24 +128,16 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
     }
 
     private void actionShowCardex() {
-        SDbAbsence absence = null;
-        
-        if (jbCardex.isEnabled()) {
+        if (jbShowCardex.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
             else {
                 SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                SDbAbsence absence = (SDbAbsence) miClient.getSession().readRegistry(SModConsts.HRS_ABS, gridRow.getRowPrimaryKey());
 
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else {
-                    absence = (SDbAbsence) miClient.getSession().readRegistry(SModConsts.HRS_ABS, (int[]) gridRow.getRowPrimaryKey());
-                    
-                    moDialogAbsenceMovesCardex.setValue(SModConsts.HRS_ABS, absence);
-                    moDialogAbsenceMovesCardex.setVisible(true);
-                }
+                moDialogAbsenceMovesCardex.setValue(SModConsts.HRS_ABS, absence);
+                moDialogAbsenceMovesCardex.setVisible(true);
             }
         }
     }
@@ -212,7 +201,11 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
                 + "v.dt_sta, "
                 + "v.dt_end, "
                 + "v.eff_day, "
-                + "(SELECT COALESCE(SUM(eff_day), 0) FROM hrs_abs_cns WHERE b_del = 0 AND id_emp = v.id_emp AND id_abs = v.id_abs) AS f_app_days, "
+                + "(SELECT COALESCE(SUM(eff_day), 0) "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " AS ac "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON ac.fk_rcp_pay = pr.id_pay AND ac.fk_rcp_emp = pr.id_emp "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p ON pr.id_pay AND p.id_pay "
+                + " WHERE NOT ac.b_del AND NOT pr.b_del AND NOT p.b_del AND ac.id_emp = v.id_emp AND ac.id_abs = v.id_abs) AS f_app_days, "
                 + "v.ben_ann, "
                 + "v.ben_year, "
                 + "v.nts, "
@@ -290,7 +283,7 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
             if (button == jbCloseAbsence) {
                 actionCloseAbsence();
             }
-            else if (button == jbCardex) {
+            else if (button == jbShowCardex) {
                 actionShowCardex();
             }
         }

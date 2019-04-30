@@ -39,25 +39,25 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
-public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog implements ActionListener, ListSelectionListener, CellEditorListener  {
+public class SDialogPayrollReceiptSsc extends SBeanFormDialog implements ActionListener, ListSelectionListener, CellEditorListener  {
 
     protected static final int COL_AMT = 2;
 
     protected SGridPaneForm moGridEmployeesRow;
     protected SGridPaneForm moGridEarnigsRow;
-    protected int mnDaysPeriod;
+    protected int mnPeriodDays;
     
     private JButton jbSelectAll;
     private JButton jbCleanAll;
     
     /**
-     * Creates new form SDialogPayrollEmployeeSsContributionUpdate
+     * Creates new form SDialogPayrollReceiptSsContribution
      * @param client
      * @param title
      */
-    public SDialogPayrollEmployeeSsContributionUpdate(SGuiClient client, String title) {
+    public SDialogPayrollReceiptSsc(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_SSC_UPD, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -384,8 +384,8 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                SGridColumnForm columnForm = null;
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                SGridColumnForm columnForm;
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave empleado"));
@@ -400,8 +400,8 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
                 
-                moGridEmployeesRow.getTable().getDefaultEditor(Boolean.class).addCellEditorListener(SDialogPayrollEmployeeSsContributionUpdate.this);
-                moGridEmployeesRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(SDialogPayrollEmployeeSsContributionUpdate.this);
+                moGridEmployeesRow.getTable().getDefaultEditor(Boolean.class).addCellEditorListener(SDialogPayrollReceiptSsc.this);
+                moGridEmployeesRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(SDialogPayrollReceiptSsc.this);
                 
                 return gridColumnsForm;
             }
@@ -433,7 +433,7 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
                 
-                moGridEarnigsRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(SDialogPayrollEmployeeSsContributionUpdate.this);
+                moGridEarnigsRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(SDialogPayrollReceiptSsc.this);
                 
                 return gridColumnsForm;
             }
@@ -546,7 +546,7 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
         mtDateStart = SLibTimeUtils.getBeginOfMonth(SLibTimeUtils.createDate(moIntPeriodYear.getValue(), moIntPeriodStart.getValue()));
         mtDateEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(moIntPeriodYear.getValue(), moIntPeriodEnd.getValue()));
         
-        mnDaysPeriod = (int) SLibTimeUtils.getDaysDiff(mtDateEnd, mtDateStart) + 1;
+        mnPeriodDays = SLibTimeUtils.countPeriodDays(mtDateStart, mtDateEnd);
         try {
             statement = miClient.getSession().getDatabase().getConnection().createStatement();
             statementAux = miClient.getSession().getDatabase().getConnection().createStatement();
@@ -572,7 +572,7 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
                 employeeSsContributionUpdate.setNameDepartament(resultSet.getString("name"));
                 employeeSsContributionUpdate.setSalaryDaily(resultSet.getDouble("_sd"));
                 employeeSsContributionUpdate.setSalarySscBase(resultSet.getDouble("sal_ssc"));
-                employeeSsContributionUpdate.setDaysPeriod(mnDaysPeriod);
+                employeeSsContributionUpdate.setDaysPeriod(mnPeriodDays);
 
                 sql = "SELECT a.fk_cl_abs, ac.eff_day "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " AS a "
@@ -689,7 +689,7 @@ public class SDialogPayrollEmployeeSsContributionUpdate extends SBeanFormDialog 
             
             populateEarnings(employeeSsContributionUpdate);
             
-            moIntDaysPeriod.setValue(mnDaysPeriod);
+            moIntDaysPeriod.setValue(mnPeriodDays);
             moIntDaysIncapacity.setValue(employeeSsContributionUpdate.getDaysIncapacity());
             moIntDaysAbsenteeism.setValue(employeeSsContributionUpdate.getDaysAbsenteeism());
             moIntDaysSuspension.setValue(employeeSsContributionUpdate.getDaysSuspension());

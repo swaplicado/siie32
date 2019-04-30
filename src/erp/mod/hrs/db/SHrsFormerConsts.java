@@ -51,14 +51,14 @@ public abstract class SHrsFormerConsts {
     public static final String PAY_WEE = "SEMANAL";
 
     /**
-     * Biweekly payroll abbreviated.
+     * Fornightly (biweekly) payroll abbreviated.
      */
-    public static final String PAY_BIW_ABB = "QNA";
+    public static final String PAY_FOR_ABB = "QNA";
 
     /**
-     * Biweekly payroll.
+     * Fornightly (biweekly) payroll.
      */
-    public static final String PAY_BIW = "QUINCENAL";
+    public static final String PAY_FOR = "QUINCENAL";
 
     /**
      * Monthly payroll abbreviated.

@@ -6,6 +6,7 @@
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -108,7 +109,13 @@ public class SDbLoan extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
-    public String getLoanIdentificator() { return msXtaLoanType + ", " + msNumber; }
+    public String composeLoanDescription() {
+        return msXtaLoanType + ", " + msNumber;
+    }
+    
+    public boolean isPlainLoan() {
+        return SLibUtils.belongsTo(mnFkLoanTypeId, new int[] { SModSysConsts.HRSS_TP_LOAN_LOAN_COM, SModSysConsts.HRSS_TP_LOAN_LOAN_UNI, SModSysConsts.HRSS_TP_LOAN_LOAN_3RD });
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {

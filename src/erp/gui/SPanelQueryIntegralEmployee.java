@@ -1333,9 +1333,9 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             dateBase = SLibTimeUtils.addDate(employee.getDateBenefits(), benefitAnniv, 0, 0);
             
             jtfSeniority.setText(benefitAnniv + "");
-            jtfSeniorityDays.setText(((int) SLibTimeUtils.getDaysDiff(dateCutOff, SLibTimeUtils.addDate(employee.getDateBenefits(), benefitAnniv, 0, 0))) + "");
-            daysElapsed = ((int) SLibTimeUtils.getDaysDiff(dateCutOff, dateBase) + 1);
-            daysElapsedAnn = ((int) SLibTimeUtils.getDaysDiff(dateCutOff, dateBaseAnniv) + 1);
+            jtfSeniorityDays.setText(SLibUtils.DecimalFormatInteger.format(SLibTimeUtils.getDaysDiff(dateCutOff, SLibTimeUtils.addDate(employee.getDateBenefits(), benefitAnniv, 0, 0))));
+            daysElapsed = SLibTimeUtils.countPeriodDays(dateBase, dateCutOff);
+            daysElapsedAnn = SLibTimeUtils.countPeriodDays(dateBaseAnniv, dateCutOff);
             benefitAnniv = benefitAnniv == 0 ? 1 : benefitAnniv;
             
             // Calculate annual bonus:

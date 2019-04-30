@@ -7,8 +7,10 @@ package erp.mod.hrs.db;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
@@ -46,10 +48,11 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     protected Date mtTsUserUpdate;
     */
     
-    protected boolean mbAuxIsAbsencePayable;
+    protected String msXtaAbsenceClass;
+    protected String msXtaAbsenceType;
+    protected boolean mbXtaAbsenceTypePayable;
+    
     protected int mnAuxPendingDays;
-    protected String msAuxAbsenceClass;
-    protected String msAuxAbsenceType;
 
     private boolean testDelete(SGuiSession session) throws Exception {
         ResultSet resultSet = null;
@@ -91,11 +94,6 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
-    public void setAuxIsAbsencePayable(boolean b) { mbAuxIsAbsencePayable = b; }
-    public void setAuxPendingDays(int n) { mnAuxPendingDays = n; }
-    public void setAuxAbsenceClass(String s) { msAuxAbsenceClass = s; }
-    public void setAuxAbsenceType(String s) { msAuxAbsenceType = s; }
-    
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public int getPkAbsenceId() { return mnPkAbsenceId; }
     public String getNumber() { return msNumber; }
@@ -117,11 +115,113 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
-    public boolean IsAuxAbsencePayable() { return mbAuxIsAbsencePayable; }
+    public void setXtaAbsenceClass(String s) { msXtaAbsenceClass = s; }
+    public void setXtaAbsenceType(String s) { msXtaAbsenceType = s; }
+    public void setXtaAbsenceTypePayable(boolean b) { mbXtaAbsenceTypePayable = b; }
+    
+    public String getXtaAbsenceClass() { return msXtaAbsenceClass; }
+    public String getXtaAbsenceType() { return msXtaAbsenceType; }
+    public boolean isXtaAbsenceTypePayable() { return mbXtaAbsenceTypePayable; }
+    
+    public void setAuxPendingDays(int n) { mnAuxPendingDays = n; }
     public int getAuxPendingDays() { return mnAuxPendingDays; }
-    public String getAuxAbsenceClass() { return msAuxAbsenceClass; }
-    public String getAuxAbsenceType() { return msAuxAbsenceType; }
+    
+    public int[] getAbsenceClassKey() { return new int[] { mnFkAbsenceClassId }; }
+    public int[] getAbsenceTypeKey() { return new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId }; }
 
+    public int getCalendarDays() {
+        return SLibTimeUtils.countPeriodDays(mtDateStart, mtDateEnd);
+    }
+    
+    public boolean isDisability() {
+        return SDbAbsenceClass.isDisability(mnFkAbsenceClassId);
+    }
+
+    public boolean isVacation() {
+        return SDbAbsenceClass.isVacation(mnFkAbsenceClassId);
+    }
+    
+    public String composeAbsenceDescription() {
+        return msXtaAbsenceType + ", " + msNumber + " (" + SLibUtils.DateFormatDate.format(mtDateStart) + " - " + SLibUtils.DateFormatDate.format(mtDateEnd) + ")";
+    }
+
+    /**
+     * Checks if this absence consumes calendar days (e.g., disabilities). Other absences consume instead only business days (e.g., vacation, absenteeism).
+     * @return 
+     */
+    public boolean consumesCalendarDays() {
+        return SDbAbsenceClass.consumesCalendarDays(mnFkAbsenceClassId);
+    }
+    
+    /**
+     * Gets the actual consumed days. Not just the ones previously storaged.
+     * @param hrsEmployee
+     * @return Actual consumed days.
+     */
+    public int getActualConsumedDays(final SHrsEmployee hrsEmployee) {
+        int consumedDays = 0;
+        
+        // create a pack of previous and actual consumptions:
+        ArrayList<ArrayList<SDbAbsenceConsumption>> absenceConsumptionsPack = new ArrayList<>();
+        absenceConsumptionsPack.add(hrsEmployee.getAbsenceConsumptions());
+        absenceConsumptionsPack.add(hrsEmployee.getHrsReceipt().getAbsenceConsumptions());
+        
+        // process pack of consumptions:
+        for (ArrayList<SDbAbsenceConsumption> absenceConsumptions : absenceConsumptionsPack) {
+            for (SDbAbsenceConsumption absenceConsumption : absenceConsumptions) {
+                if (SLibUtils.compareKeys(getPrimaryKey(), absenceConsumption.getAbsenceKey())) {
+                    consumedDays += absenceConsumption.getEffectiveDays();
+                }
+            }
+        }
+        
+        return consumedDays;
+    }
+    
+    /**
+     * Gets the actual last day of consumption.
+     * @param hrsEmployee
+     * @return Actual last day of consumption if any, otherwise <code>null</code>.
+     */
+    public Date getActualLastConsumptionDate(final SHrsEmployee hrsEmployee) {
+        Date lastConsumptionDate = null;
+        
+        // create a pack of previous and actual consumptions:
+        ArrayList<ArrayList<SDbAbsenceConsumption>> consumptionsPack = new ArrayList<>();
+        consumptionsPack.add(hrsEmployee.getAbsenceConsumptions());
+        consumptionsPack.add(hrsEmployee.getHrsReceipt().getAbsenceConsumptions());
+        
+        // process pack of consumptions:
+        for (ArrayList<SDbAbsenceConsumption> consumptions : consumptionsPack) {
+            for (SDbAbsenceConsumption consumption : consumptions) {
+                if (SLibUtils.compareKeys(getPrimaryKey(), consumption.getAbsenceKey())) {
+                    if (lastConsumptionDate == null || lastConsumptionDate.before(consumption.getDateEnd())) {
+                        lastConsumptionDate = consumption.getDateEnd();
+                    }
+                }
+            }
+        }
+        
+        return lastConsumptionDate;
+    }
+    
+    /**
+     * Gets the actual next consumption ID.
+     * @param hrsEmployee
+     * @return Actual next consumption ID.
+     */
+    public int getActualNextConsumptionId(final SHrsEmployee hrsEmployee) {
+        int nextConsumptionId = 0;
+        
+        for (SDbAbsenceConsumption consumption : hrsEmployee.getHrsReceipt().getAbsenceConsumptions()) {
+            if (SLibUtils.compareKeys(getPrimaryKey(), consumption.getAbsenceKey())) {
+                nextConsumptionId = consumption.getPkConsumptionId();
+            }
+        }
+        
+        return nextConsumptionId + 1;
+    }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkEmployeeId = pk[0];
@@ -158,10 +258,11 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
-        mbAuxIsAbsencePayable = false;
+        msXtaAbsenceClass = "";
+        msXtaAbsenceType = "";
+        mbXtaAbsenceTypePayable = false;
+        
         mnAuxPendingDays = 0;
-        msAuxAbsenceClass = "";
-        msAuxAbsenceType = "";
     }
 
     @Override
@@ -234,11 +335,11 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
             // Read Absence type:
             
             absenceType = (SDbAbsenceType) session.readRegistry(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId });
-            msAuxAbsenceClass = (String) session.readField(SModConsts.HRSU_CL_ABS, new int[] { mnFkAbsenceClassId }, SDbAbsenceClass.FIELD_NAME);
-            msAuxAbsenceType = (String) session.readField(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId }, SDbAbsenceType.FIELD_NAME);
+            msXtaAbsenceClass = (String) session.readField(SModConsts.HRSU_CL_ABS, new int[] { mnFkAbsenceClassId }, SDbAbsenceClass.FIELD_NAME);
+            msXtaAbsenceType = (String) session.readField(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId }, SDbAbsenceType.FIELD_NAME);
             
             if (absenceType != null) {
-                mbAuxIsAbsencePayable = absenceType.isPayable();
+                mbXtaAbsenceTypePayable = absenceType.isPayable();
             }
 
             mbRegistryNew = false;
@@ -341,6 +442,12 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
+        registry.setXtaAbsenceClass(this.getXtaAbsenceClass());
+        registry.setXtaAbsenceType(this.getXtaAbsenceType());
+        registry.setXtaAbsenceTypePayable(this.isXtaAbsenceTypePayable());
+
+        registry.setAuxPendingDays(this.getAuxPendingDays());
+    
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
@@ -399,10 +506,10 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
 
         switch (row) {
             case 0:
-                value = msAuxAbsenceClass;
+                value = msXtaAbsenceClass;
                 break;
             case 1:
-                value = msAuxAbsenceType;
+                value = msXtaAbsenceType;
                 break;
             case 2:
                 value = msNumber;
@@ -420,7 +527,6 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                 value = mnAuxPendingDays;
                 break;
             default:
-                break;
         }
         
         return value;
@@ -438,7 +544,6 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
             case 6:
                 break;
             default:
-                break;
         }
     }
 }

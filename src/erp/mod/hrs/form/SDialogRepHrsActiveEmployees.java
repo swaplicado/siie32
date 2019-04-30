@@ -199,7 +199,7 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
         moParamsMap = miClient.createReportParams();
         
         moParamsMap.put("sTitle", "REPORTE DE EMPLEADOS ACTIVOS POR PERIODO");
-        moParamsMap.put("nDaysPassed", SLibTimeUtils.getDaysDiff(moDateDateEnd.getValue(), moDateDateStart.getValue()) + 1);
+        moParamsMap.put("nDaysPassed", SLibTimeUtils.countPeriodDays(moDateDateStart.getValue(), moDateDateEnd.getValue()));
         moParamsMap.put("tDateStart", moDateDateStart.getValue());
         moParamsMap.put("tDateEnd", moDateDateEnd.getValue());
         moParamsMap.put("sSqlOrderBy", getOrderBy());

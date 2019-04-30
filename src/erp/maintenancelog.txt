@@ -1,4 +1,14 @@
 ================================================================================
+2019-04-30, 3.2 135.0
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mantenimiento mayor al Módulo Recursos Humanos:
+ - refactorización de clases y métodos;
+ - revisión y mejora de control y consumo de ausencias;
+ - mejora a lectura de nóminas y recibos de nóminas;
+ - corrección a impresion de ingreso diario para nóminas quincenales de días fijos.
+
+================================================================================
 2019-03-26, 3.2 134.1
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

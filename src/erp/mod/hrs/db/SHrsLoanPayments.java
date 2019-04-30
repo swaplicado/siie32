@@ -8,20 +8,20 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SHrsLoanPayments {
 
     protected SDbLoan moLoan;
-    protected ArrayList<SDbPayrollReceiptEarning> maReceiptEarnings;
-    protected ArrayList<SDbPayrollReceiptDeduction> maReceiptDeductions;
+    protected ArrayList<SDbPayrollReceiptEarning> maPayrollReceiptEarnings;
+    protected ArrayList<SDbPayrollReceiptDeduction> maPayrollReceiptDeductions;
     protected double mdDaysPeriod = 0;
     protected double mdAmountPeriod = 0;
 
     public SHrsLoanPayments() {
         moLoan = new SDbLoan();
-        maReceiptEarnings = new ArrayList<SDbPayrollReceiptEarning>();
-        maReceiptDeductions = new ArrayList<SDbPayrollReceiptDeduction>();
+        maPayrollReceiptEarnings = new ArrayList<>();
+        maPayrollReceiptDeductions = new ArrayList<>();
     }
 
     public void setLoan(SDbLoan o) { moLoan = o; }
@@ -32,14 +32,14 @@ public class SHrsLoanPayments {
     public double getAmountPeriod() { return mdAmountPeriod; }
     public double getDaysPeriod() { return mdDaysPeriod; }
     
-    public ArrayList<SDbPayrollReceiptEarning> getReceiptEarnings() { return maReceiptEarnings; }
-    public ArrayList<SDbPayrollReceiptDeduction> getReceiptDeductions() { return maReceiptDeductions; }
+    public ArrayList<SDbPayrollReceiptEarning> getPayrollReceiptEarnings() { return maPayrollReceiptEarnings; }
+    public ArrayList<SDbPayrollReceiptDeduction> getPayrollReceiptDeductions() { return maPayrollReceiptDeductions; }
     
     public double getTotalEarnings() {
         double amount = 0;
         
-        for (SDbPayrollReceiptEarning earning : maReceiptEarnings) {
-            amount += earning.getAmount_r();
+        for (SDbPayrollReceiptEarning payrollReceiptEarning : maPayrollReceiptEarnings) {
+            amount += payrollReceiptEarning.getAmount_r();
         }
         
         return amount;
@@ -48,8 +48,8 @@ public class SHrsLoanPayments {
     public double getTotalPayment() {
         double payment = 0;
         
-        for (SDbPayrollReceiptDeduction deduction : maReceiptDeductions) {
-            payment += deduction.getAmount_r();
+        for (SDbPayrollReceiptDeduction payrollReceiptDeduction : maPayrollReceiptDeductions) {
+            payment += payrollReceiptDeduction.getAmount_r();
         }
         
         return payment;

@@ -550,17 +550,13 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 b_clo = resultSet.getBoolean("b_clo");
 
                 switch (fk_tp_pay) {
-                    case 1:
+                    case SModSysConsts.HRSS_TP_PAY_WEE:
                         msPayType = SHrsFormerConsts.PAY_WEE;
                         msPayTypeAbbr = SHrsFormerConsts.PAY_WEE_ABB;
                         break;
-                    case 2:
-                        msPayType = SHrsFormerConsts.PAY_BIW;
-                        msPayTypeAbbr = SHrsFormerConsts.PAY_BIW_ABB;
-                        break;
-                    case 3:
-                        msPayType = SHrsFormerConsts.PAY_MON;
-                        msPayTypeAbbr = SHrsFormerConsts.PAY_MON_ABB;
+                    case SModSysConsts.HRSS_TP_PAY_FOR:
+                        msPayType = SHrsFormerConsts.PAY_FOR;
+                        msPayTypeAbbr = SHrsFormerConsts.PAY_FOR_ABB;
                         break;
                     default:
                 }

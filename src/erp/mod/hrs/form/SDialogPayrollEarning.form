@@ -83,7 +83,7 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlUnitAlleged">
+                <Component class="javax.swing.JLabel" name="jlUnitsAlleged">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Valor:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -91,7 +91,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanCompoundField" name="moCompUnitAlleged">
+                <Component class="sa.lib.gui.bean.SBeanCompoundField" name="moCompUnitsAlleged">
                 </Component>
               </SubComponents>
             </Container>
@@ -102,7 +102,7 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlUnit">
+                <Component class="javax.swing.JLabel" name="jlUnits">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Valor ajustado:*"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -110,7 +110,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanCompoundField" name="moCompUnit">
+                <Component class="sa.lib.gui.bean.SBeanCompoundField" name="moCompUnits">
                 </Component>
               </SubComponents>
             </Container>
@@ -121,7 +121,7 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlAmountUnt">
+                <Component class="javax.swing.JLabel" name="jlAmountUnit">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Monto unitario:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -129,7 +129,7 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurAmountUnt">
+                <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurAmountUnit">
                 </Component>
               </SubComponents>
             </Container>

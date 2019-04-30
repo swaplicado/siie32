@@ -15,7 +15,6 @@ import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
-import sa.lib.db.SDbRegistryUser;
 import sa.lib.grid.SGridColumnForm;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneForm;
@@ -37,6 +36,8 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
 
     /**
      * Creates new form SDialogAbsenceMovesCardex
+     * @param client
+     * @param title
      */
     public SDialogAbsenceMovesCardex(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_ABS_MOV, SLibConsts.UNDEFINED, title);
@@ -326,7 +327,8 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON rcp_abs.fk_usr_ins = ui.id_usr " +
                     "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON rcp_abs.fk_usr_upd = uu.id_usr " +
-                    "WHERE p.b_del = 0 AND rcp.b_del = 0 AND abs.id_abs = " + moAbsence.getPkAbsenceId() + " AND abs.id_emp = " + moAbsence.getPkEmployeeId() + " " +
+                    "WHERE NOT p.b_del AND NOT rcp.b_del AND NOT rcp_abs.b_del AND " +
+                    "abs.id_abs = " + moAbsence.getPkAbsenceId() + " AND abs.id_emp = " + moAbsence.getPkEmployeeId() + " " +
                     "ORDER BY per_year, f_period, f_tp_pay, f_num, dt_sta, dt_end, id_bp, bp ";
 
             resultSet = miClient.getSession().getStatement().executeQuery(sql);
@@ -365,15 +367,13 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
     }
     
     private void initAbsence() {
-        SDbEmployee employee = null;
-        
-        employee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { moAbsence.getPkEmployeeId() });
+        SDbEmployee employee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { moAbsence.getPkEmployeeId() });
         
         moTextEmployeeName.setValue(employee.getAuxEmployee());
-        moTextAbsenceClass.setValue(miClient.getSession().readField(SModConsts.HRSU_CL_ABS, new int[] { moAbsence.getFkAbsenceClassId() }, SDbRegistryUser.FIELD_NAME));
-        moTextAbsenceType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_ABS, new int[] { moAbsence.getFkAbsenceClassId(), moAbsence.getFkAbsenceTypeId() }, SDbRegistryUser.FIELD_NAME));
+        moTextAbsenceClass.setValue(moAbsence.getXtaAbsenceClass());
+        moTextAbsenceType.setValue(moAbsence.getXtaAbsenceType());
         moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moAbsence.getDateStart()));
-        moTextDateEnd.setValue(moAbsence.getDateEnd() == null ? " / / / " : SLibUtils.DateFormatDate.format(moAbsence.getDateEnd()));
+        moTextDateEnd.setValue(moAbsence.getDateEnd() == null ? "" : SLibUtils.DateFormatDate.format(moAbsence.getDateEnd()));
         moIntEffectiveDays.setValue(mnEffectiveDays = moAbsence.getEffectiveDays());
         
         showAbsenceMoves();

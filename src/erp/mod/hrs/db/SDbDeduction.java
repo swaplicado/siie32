@@ -2,17 +2,16 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -77,8 +76,6 @@ public class SDbDeduction extends SDbRegistryUser {
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
-    public void setAuxAccountingConfigurationTypeId(int n) { mnAuxAccountingConfigurationTypeId = n; }
-
     public int getPkDeductionId() { return mnPkDeductionId; }
     public String getCode() { return msCode; }
     public String getName() { return msName; }
@@ -101,14 +98,31 @@ public class SDbDeduction extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
+    public void setAuxAccountingConfigurationTypeId(int n) { mnAuxAccountingConfigurationTypeId = n; }
+
     public int getAuxAccountingConfigurationTypeId() { return mnAuxAccountingConfigurationTypeId; }
 
-    public boolean areUnitsModifiable() {
-        boolean isNotBasedOnUnits = mnFkDeductionComputationTypeId != SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME;
-        boolean isNotAbsence = mnFkAbsenceClassId_n == 0 && mnFkAbsenceTypeId_n == 0;
-        
-        return isNotBasedOnUnits && isNotAbsence;
+    public boolean isComputedByPercentage() {
+        return SLibUtils.belongsTo(mnFkDeductionComputationTypeId, new int[] { SModSysConsts.HRSS_TP_DED_COMP_PCT_INCOME } );
     }
+    
+    public boolean isBasedOnDaysWorked() {
+        return mnFkDeductionComputationTypeId == SModSysConsts.HRSS_TP_DED_COMP_PCT_INCOME;
+    }
+    
+    public boolean isBasedOnUnits() {
+        return mnFkDeductionComputationTypeId != SModSysConsts.HRSS_TP_DED_COMP_AMT;
+    }
+    
+    public boolean areUnitsModifiable() {
+        return isBasedOnUnits() && !isAbsence();
+    }
+
+    public int[] getAbsenceTypeKey() { return new int[] { mnFkAbsenceClassId_n, mnFkAbsenceTypeId_n }; }
+    
+    public boolean isLoan() { return mnFkLoanTypeId != 0 && mnFkLoanTypeId != SModSysConsts.HRSS_TP_LOAN_NON; }
+    public boolean isBenefit() { return mnFkBenefitTypeId != 0 && mnFkBenefitTypeId != SModSysConsts.HRSS_TP_BEN_NON; }
+    public boolean isAbsence() { return mnFkAbsenceClassId_n != 0 && mnFkAbsenceTypeId_n != 0; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -147,7 +161,6 @@ public class SDbDeduction extends SDbRegistryUser {
         mtTsUserUpdate = null;
         
         mnAuxAccountingConfigurationTypeId = 0;
-        //maAccountingDeduction = new ArrayList<SDbAccountingDeduction>();
     }
 
     @Override
@@ -180,9 +193,7 @@ public class SDbDeduction extends SDbRegistryUser {
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
-        Statement statement = null;
         ResultSet resultSet = null;
-        SDbAccountingDeduction accountingDeduction = null;
 
         initRegistry();
         initQueryMembers();
@@ -217,21 +228,6 @@ public class SDbDeduction extends SDbRegistryUser {
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
             mnAuxAccountingConfigurationTypeId = mnFkAccountingConfigurationTypeId;
-
-            /*
-            statement = session.getStatement().getConnection().createStatement();
-
-            msSql = "SELECT id_ref " +
-                    "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_DED) + " " +
-                    "WHERE b_del = 0 AND id_ded = " + mnPkDeductionId + " AND id_tp_acc = " + mnFkAccountingConfigurationTypeId + " ";
-            resultSet = statement.executeQuery(msSql);
-            while (resultSet.next()) {
-
-                accountingDeduction = new SDbAccountingDeduction();
-                accountingDeduction.read(session, new int[] { mnPkDeductionId, mnFkAccountingConfigurationTypeId, resultSet.getInt(1) });
-                maAccountingDeduction.add(accountingDeduction);
-            }
-            */
 
             mbRegistryNew = false;
         }
@@ -312,21 +308,6 @@ public class SDbDeduction extends SDbRegistryUser {
         
         SHrsUtils.createAccountingDeductionConfiguration(session, mnPkDeductionId, mnFkAccountingConfigurationTypeId, mnAuxAccountingConfigurationTypeId, mbRegistryNew);
         
-        /*
-        if (mnAuxAccountingConfigurationTypeId != SLibConsts.UNDEFINED &&
-                mnAuxAccountingConfigurationTypeId != mnFkAccountingConfigurationTypeId) {
-            for (SDbAccountingDeduction dbAccountingDeduction : maAccountingDeduction) {
-                dbAccountingDeduction.setDeleted(true);
-                dbAccountingDeduction.save(session);
-            }
-        }
-        createAccountingConfiguration(session);
-        
-        for (SDbAccountingDeduction dbAccountingDeduction : maAccountingDeduction) {
-            dbAccountingDeduction.save(session);
-        }
-        */
-        
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -358,7 +339,6 @@ public class SDbDeduction extends SDbRegistryUser {
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
         registry.setAuxAccountingConfigurationTypeId(this.getAuxAccountingConfigurationTypeId());
-        //registry.getAccountingDeduction().addAll(this.getAccountingDeduction());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

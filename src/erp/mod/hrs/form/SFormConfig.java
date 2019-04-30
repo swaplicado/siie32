@@ -636,7 +636,7 @@ public class SFormConfig extends SBeanForm {
         moTextCfdiNumberSeries.setValue(moRegistry.getNumberSeries());
         moTextSsSubbranch.setValue(moRegistry.getSsSubbranch());
         moKeyEarningEarning_n.setValue(new int[] { moRegistry.getFkEarningEarningId_n() });
-        moKeyEarningVacations_n.setValue(new int[] { moRegistry.getFkEarningVacationsId_n() });
+        moKeyEarningVacations_n.setValue(new int[] { moRegistry.getFkEarningVacationId_n() });
         moKeyEarningTax_n.setValue(new int[] { moRegistry.getFkEarningTaxId_n() });
         moKeyEarningTaxSubsidy_n.setValue(new int[] { moRegistry.getFkEarningTaxSubsidyId_n() });
         moKeyEarningTaxSubsidyCompensated_n.setValue(new int[] { moRegistry.getFkEarningTaxSubsidyCompensatedId_n()});
@@ -679,7 +679,7 @@ public class SFormConfig extends SBeanForm {
         registry.setFkTaxComputationTypeId(moKeyTaxComputationType.getValue()[0]);
         registry.setFkBankId(moKeyBank.getValue()[0]);
         registry.setFkEarningEarningId_n(moKeyEarningEarning_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningEarning_n.getValue()[0]);
-        registry.setFkEarningVacationsId_n(moKeyEarningVacations_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningVacations_n.getValue()[0]);
+        registry.setFkEarningVacationId_n(moKeyEarningVacations_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningVacations_n.getValue()[0]);
         registry.setFkEarningTaxId_n(moKeyEarningTax_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningTax_n.getValue()[0]);
         registry.setFkEarningTaxSubsidyId_n(moKeyEarningTaxSubsidy_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningTaxSubsidy_n.getValue()[0]);
         registry.setFkEarningTaxSubsidyCompensatedId_n(moKeyEarningTaxSubsidyCompensated_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningTaxSubsidyCompensated_n.getValue()[0]);

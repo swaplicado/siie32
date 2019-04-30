@@ -499,7 +499,6 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         moTextDateCut.setValue(SLibUtils.DateFormatDate.format(mtDateCutOff));
         moIntSeniority.setValue(mnAnniversary);
         moIntSeniorityDays.setValue(mnAnniversaryDays);
-        //moIntSeniorityDays.setValue(mn);
         
         showBenefitsMoves();
     }

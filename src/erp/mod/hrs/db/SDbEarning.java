@@ -2,14 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -41,6 +39,7 @@ public class SDbEarning extends SDbRegistryUser {
     protected boolean mbDaysAdjustment;
     protected boolean mbDaysAbsence;
     protected boolean mbDaysWorked;
+    @Deprecated
     protected boolean mbDaysWorkedBasedOn;
     protected boolean mbWithholding;
     protected boolean mbAlternativeTaxCalculation;
@@ -88,6 +87,7 @@ public class SDbEarning extends SDbRegistryUser {
     public void setDaysAdjustment(boolean b) { mbDaysAdjustment = b; }
     public void setDaysAbsence(boolean b) { mbDaysAbsence = b; }
     public void setDaysWorked(boolean b) { mbDaysWorked = b; }
+    @Deprecated
     public void setDaysWorkedBasedOn(boolean b) { mbDaysWorkedBasedOn = b; }
     public void setWithholding(boolean b) { mbWithholding = b; }
     public void setAlternativeTaxCalculation(boolean b) { mbAlternativeTaxCalculation = b; }
@@ -109,8 +109,6 @@ public class SDbEarning extends SDbRegistryUser {
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
 
-    public void setAuxAccountingConfigurationTypeId(int n) { mnAuxAccountingConfigurationTypeId = n; }
-
     public int getPkEarningId() { return mnPkEarningId; }
     public String getCode() { return msCode; }
     public String getName() { return msName; }
@@ -128,6 +126,7 @@ public class SDbEarning extends SDbRegistryUser {
     public boolean isDaysAdjustment() { return mbDaysAdjustment; }
     public boolean isDaysAbsence() { return mbDaysAbsence; }
     public boolean isDaysWorked() { return mbDaysWorked; }
+    @Deprecated
     public boolean isDaysWorkedBasedOn() { return mbDaysWorkedBasedOn; }
     public boolean isWithholding() { return mbWithholding; }
     public boolean isAlternativeTaxCalculation() { return mbAlternativeTaxCalculation; }
@@ -149,15 +148,32 @@ public class SDbEarning extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
+    public void setAuxAccountingConfigurationTypeId(int n) { mnAuxAccountingConfigurationTypeId = n; }
+
     public int getAuxAccountingConfigurationTypeId() { return mnAuxAccountingConfigurationTypeId; }
     
-    public boolean areUnitsModifiable() {
-        boolean isNotBasedOnDaysWorked = !mbDaysWorkedBasedOn;
-        boolean isNotBasedOnUnits = !SLibUtils.belongsTo(mnFkEarningComputationTypeId, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_AMT, SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME });
-        boolean isNotAbsence = mnFkAbsenceClassId_n == 0 && mnFkAbsenceTypeId_n == 0;
-        
-        return isNotBasedOnDaysWorked && isNotBasedOnUnits && isNotAbsence;
+    public boolean isComputedByPercentage() {
+        return SLibUtils.belongsTo(mnFkEarningComputationTypeId, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_PCT_DAY, SModSysConsts.HRSS_TP_EAR_COMP_PCT_HR, SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME } );
     }
+    
+    public boolean isBasedOnDaysWorked() {
+        return mnFkEarningComputationTypeId == SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME;
+    }
+    
+    public boolean isBasedOnUnits() {
+        return mnFkEarningComputationTypeId != SModSysConsts.HRSS_TP_EAR_COMP_AMT;
+    }
+    
+    public boolean areUnitsModifiable() {
+        return isBasedOnUnits() && !isAbsence();
+    }
+    
+    public int[] getAbsenceClassKey() { return new int[] { mnFkAbsenceClassId_n }; }
+    public int[] getAbsenceTypeKey() { return new int[] { mnFkAbsenceClassId_n, mnFkAbsenceTypeId_n }; }
+    
+    public boolean isLoan() { return mnFkLoanTypeId != 0 && mnFkLoanTypeId != SModSysConsts.HRSS_TP_LOAN_NON; }
+    public boolean isBenefit() { return mnFkBenefitTypeId != 0 && mnFkBenefitTypeId != SModSysConsts.HRSS_TP_BEN_NON; }
+    public boolean isAbsence() { return mnFkAbsenceClassId_n != 0 && mnFkAbsenceTypeId_n != 0; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -244,9 +260,7 @@ public class SDbEarning extends SDbRegistryUser {
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
-        Statement statement = null;
         ResultSet resultSet = null;
-        //SDbAccountingEarning accountingEarning = null; XXX (jbarajas, 2016-08-05) slowly open payroll
 
         initRegistry();
         initQueryMembers();

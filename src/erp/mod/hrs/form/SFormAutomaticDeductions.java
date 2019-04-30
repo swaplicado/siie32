@@ -23,6 +23,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.grid.SGridColumnForm;
@@ -73,11 +74,13 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         jPanel13 = new javax.swing.JPanel();
         jlEmployee = new javax.swing.JLabel();
         moKeyEmployee = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel1 = new javax.swing.JPanel();
+        jlWarning = new javax.swing.JLabel();
         jpRow = new javax.swing.JPanel();
         jPanel25 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        moTextCodeFind = new sa.lib.gui.bean.SBeanFieldText();
-        jbCodeFind = new javax.swing.JButton();
+        moTextCode = new sa.lib.gui.bean.SBeanFieldText();
+        jbPick = new javax.swing.JButton();
         jlDummy = new javax.swing.JLabel();
         jlLoan_n = new javax.swing.JLabel();
         jlValue = new javax.swing.JLabel();
@@ -120,6 +123,15 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
 
         jPanel2.add(jPanel13);
 
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlWarning.setForeground(java.awt.Color.red);
+        jlWarning.setText("[ADVERTENCIA]");
+        jlWarning.setPreferredSize(new java.awt.Dimension(1000, 23));
+        jPanel1.add(jlWarning);
+
+        jPanel2.add(jPanel1);
+
         jPanel7.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
         jPanel9.add(jPanel7, java.awt.BorderLayout.CENTER);
@@ -133,24 +145,26 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
 
-        moTextCodeFind.setText("sBeanFieldText1");
-        moTextCodeFind.addKeyListener(new java.awt.event.KeyAdapter() {
+        moTextCode.setText("sBeanFieldText1");
+        moTextCode.setToolTipText("Deducción");
+        moTextCode.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                moTextCodeFindKeyPressed(evt);
+                moTextCodeKeyPressed(evt);
             }
         });
-        jPanel5.add(moTextCodeFind);
+        jPanel5.add(moTextCode);
 
-        jbCodeFind.setText("...");
-        jbCodeFind.setFocusable(false);
-        jbCodeFind.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel5.add(jbCodeFind);
+        jbPick.setText("...");
+        jbPick.setToolTipText("Seleccionar deducción");
+        jbPick.setFocusable(false);
+        jbPick.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel5.add(jbPick);
 
-        jlDummy.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlDummy.setPreferredSize(new java.awt.Dimension(67, 23));
         jPanel5.add(jlDummy);
 
-        jlLoan_n.setText("Crédito/Préstamo:*");
-        jlLoan_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlLoan_n.setText("Crédito/préstamo:*");
+        jlLoan_n.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel5.add(jlLoan_n);
 
         jlValue.setText("Valor:");
@@ -175,7 +189,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel24.add(moTextName);
 
-        moKeyLoan_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        moKeyLoan_n.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel24.add(moKeyLoan_n);
 
         moComValue.setPreferredSize(new java.awt.Dimension(125, 23));
@@ -192,17 +206,17 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
 
         buttonGroup1.add(moRadNormal);
-        moRadNormal.setText("Es nómina normal");
+        moRadNormal.setText("Para nóminas normales");
         moRadNormal.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel26.add(moRadNormal);
 
         buttonGroup1.add(moRadSpecial);
-        moRadSpecial.setText("Es nómina especial");
+        moRadSpecial.setText("Para nóminas especiales");
         moRadSpecial.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel26.add(moRadSpecial);
 
         buttonGroup1.add(moRadExOrd);
-        moRadExOrd.setText("Es nómina extraordinaria");
+        moRadExOrd.setText("Para nóminas extraordinarias");
         moRadExOrd.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel26.add(moRadExOrd);
 
@@ -223,14 +237,15 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         super.windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void moTextCodeFindKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_moTextCodeFindKeyPressed
+    private void moTextCodeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_moTextCodeKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_F5) {
-            jbCodeFind.doClick();
+            jbPick.doClick();
         }
-    }//GEN-LAST:event_moTextCodeFindKeyPressed
+    }//GEN-LAST:event_moTextCodeKeyPressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel24;
@@ -240,13 +255,14 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbAdd;
-    private javax.swing.JButton jbCodeFind;
+    private javax.swing.JButton jbPick;
     private javax.swing.JLabel jlDateEnd_n;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlDummy;
     private javax.swing.JLabel jlEmployee;
     private javax.swing.JLabel jlLoan_n;
     private javax.swing.JLabel jlValue;
+    private javax.swing.JLabel jlWarning;
     private javax.swing.JPanel jpRow;
     private javax.swing.JPanel jpRows;
     private sa.lib.gui.bean.SBeanCompoundField moComValue;
@@ -257,7 +273,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
     private sa.lib.gui.bean.SBeanFieldRadio moRadExOrd;
     private sa.lib.gui.bean.SBeanFieldRadio moRadNormal;
     private sa.lib.gui.bean.SBeanFieldRadio moRadSpecial;
-    private sa.lib.gui.bean.SBeanFieldText moTextCodeFind;
+    private sa.lib.gui.bean.SBeanFieldText moTextCode;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     // End of variables declaration//GEN-END:variables
 
@@ -265,7 +281,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         SGuiUtils.setWindowBounds(this, 1024, 640);
 
         moKeyEmployee.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployee.getText()), true);
-        moTextCodeFind.setTextSettings(SGuiUtils.getLabelName(""), 10, 0);
+        moTextCode.setTextSettings(SGuiUtils.getLabelName(""), 10, 0);
         moTextName.setTextSettings(SGuiUtils.getLabelName(""), 100, 0);
         moComValue.setCompoundFieldSettings(miClient);
         moComValue.getField().setDecimalSettings(SGuiUtils.getLabelName(jlValue), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false);
@@ -277,7 +293,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         moRadExOrd.setBooleanSettings(SGuiUtils.getLabelName(moRadExOrd.getText()), false);
 
         moFields.addField(moKeyEmployee);
-        moFields.addField(moTextCodeFind);
+        moFields.addField(moTextCode);
         //moFields.addField(moTextName);
         moFields.addField(moKeyLoan_n);
         moFields.addField(moComValue.getField());
@@ -297,12 +313,13 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Código deducción"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Deducción"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Unidades"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha inicial"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Fecha final"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/Préstamo"));
@@ -314,51 +331,46 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
 
         moGridAutomaticRow.setForm(null);
         moGridAutomaticRow.setPaneFormOwner(this);
-        //mvFormGrids.add(moGridAutomaticRow);
 
         jpRow.add(moGridAutomaticRow, BorderLayout.CENTER);
+        
+        switch (mnFormSubtype) {
+            case SModSysConsts.HRS_AUT_EMP:
+                jlWarning.setText("ADVERTENCIA: ¡Las deducciones configuradas a nivel de empleado reemplazarán a las deducciones configuradas a nivel global!");
+                break;
+            default:
+                jlWarning.setText("");
+        }
     }
 
-    private void itemStateEmployee() {
+    private void itemStateChangedEmployee() {
         resetLoan();
     }
 
     private void resetLoan() {
-        if (moDeduction != null) {
-            if (moDeduction.getFkLoanTypeId() != SModSysConsts.HRSS_TP_LOAN_NON && mnFormSubtype == SModSysConsts.HRS_AUT_EMP) {
-                if (moKeyEmployee.getValue().length > 0) {
-                    miClient.getSession().populateCatalogue(moKeyLoan_n, SModConsts.HRS_LOAN, SLibConsts.UNDEFINED, new SGuiParams(new int[] { moKeyEmployee.getValue()[0], moDeduction.getFkLoanTypeId()}));
-                    moKeyLoan_n.setEnabled(true);
-                    moComValue.getField().setEnabled(false);
-                }
-            }
-            else {
-                moComValue.getField().setEnabled(true);
-                moKeyLoan_n.setSelectedIndex(0);
-                moKeyLoan_n.setEnabled(false);
-            }
+        if (mnFormSubtype == SModSysConsts.HRS_AUT_EMP && moKeyEmployee.getSelectedIndex() > 0 && moDeduction != null && moDeduction.isLoan()) {
+            miClient.getSession().populateCatalogue(moKeyLoan_n, SModConsts.HRS_LOAN, SLibConsts.UNDEFINED, new SGuiParams(new int[] { moKeyEmployee.getValue()[0], moDeduction.getFkLoanTypeId() }));
+            moKeyLoan_n.setEnabled(true);
+            moComValue.getField().setEnabled(false);
         }
         else {
-            moComValue.getField().setEnabled(true);
-            moKeyLoan_n.setSelectedIndex(0);
+            moKeyLoan_n.removeAllItems();
             moKeyLoan_n.setEnabled(false);
+            moComValue.getField().setEnabled(true);
         }
     }
 
     private void updateRows() {
-        boolean applyUnits = false; // all deductions are not function of countable units
-        boolean applyAmount = moDeduction.getFkDeductionComputationTypeId() == SModSysConsts.HRSS_TP_DED_COMP_AMT;
-        
         SDbAutomaticDeduction automaticRow = new SDbAutomaticDeduction();
         automaticRow.setPkDeductionId(moDeduction.getPkDeductionId());
-        automaticRow.setUnits(!applyUnits ? 1 : moComValue.getField().getValue()); // by now, units will be allways 1!
-        automaticRow.setAmountUnitary(!applyAmount ? 1 : moComValue.getField().getValue());
+        automaticRow.setUnits(moDeduction.isBasedOnUnits() ? moComValue.getField().getValue() : 1);
+        automaticRow.setAmountUnitary(!moDeduction.isBasedOnUnits() ? moComValue.getField().getValue() : 0); // when necessary, amount unit will be provided by system
         automaticRow.setAmount_r(SLibUtils.roundAmount(automaticRow.getUnits() * automaticRow.getAmountUnitary()));
         automaticRow.setDateStart(moDateDateStart.getValue());
         automaticRow.setDateEnd_n(moDateDateEnd_n.getValue());
         automaticRow.setFkPaysheetTypeId(getPaysheetTypeId());
         automaticRow.setFkDeductionTypeId(moDeduction.getFkDeductionTypeId());
-        automaticRow.setFkEmployeeId_n(mnFormSubtype != SModSysConsts.HRS_AUT_EMP ? SLibConsts.UNDEFINED : moKeyEmployee.getValue()[0]);
+        automaticRow.setFkEmployeeId_n(mnFormSubtype != SModSysConsts.HRS_AUT_EMP ? 0 : moKeyEmployee.getValue()[0]);
         
         if (moKeyLoan_n.isEnabled() && moKeyLoan_n.getValue().length > 0) {
             automaticRow.setFkLoanEmployeeId_n(moKeyLoan_n.getValue()[0]);
@@ -372,7 +384,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         
         if (moKeyLoan_n.isEnabled() && moKeyLoan_n.getValue().length > 0) {
             SDbLoan loan = (SDbLoan) miClient.getSession().readRegistry(SModConsts.HRS_LOAN, new int[] { moKeyLoan_n.getValue()[0], moKeyLoan_n.getValue()[1] });
-            automaticRow.setXtaLoan(loan.getLoanIdentificator());
+            automaticRow.setXtaLoan(loan.composeLoanDescription());
         }
 
         SGridRow gridRow = (SGridRow) automaticRow;
@@ -393,9 +405,10 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
             row.setXtaDeduction((String) miClient.getSession().readField(SModConsts.HRS_DED, new int[] { row.getPkDeductionId() }, SDbRegistry.FIELD_NAME));
             row.setXtaUnit((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { deduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
             row.setXtaPaysheetType((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY_SHT, new int[] { row.getFkPaysheetTypeId() }, SDbRegistry.FIELD_NAME));
+            
             if (row.getFkLoanEmployeeId_n() != SLibConsts.UNDEFINED) {
                 SDbLoan loan = (SDbLoan) miClient.getSession().readRegistry(SModConsts.HRS_LOAN, new int[] { row.getFkLoanEmployeeId_n(), row.getFkLoanLoanId_n() });
-                row.setXtaLoan(loan.getLoanIdentificator());
+                row.setXtaLoan(loan.composeLoanDescription());
             }
 
             if (!row.isDeleted()) {
@@ -409,7 +422,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
     }
 
     private void enableFields() {
-        if (mnFormSubtype == SModSysConsts.HRS_AUT_EMP && moGridAutomaticRow.getModel().getRowCount() == 0) {
+        if (mnFormSubtype == SModSysConsts.HRS_AUT_EMP && moGridAutomaticRow.getTable().getRowCount() == 0) {
             moKeyEmployee.setEnabled(true);
         }
         else {
@@ -418,18 +431,17 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
     }
 
     private void resetFields() {
-        moTextCodeFind.setText("");
-        moTextName.setText("");
-        moComValue.getField().setValue(0d);
-        moComValue.getField().setEnabled(false);
+        moTextCode.resetField();
+        moTextName.resetField();
+        moComValue.getField().resetField();
         moComValue.setCompoundText("");
-        moDateDateStart.setValue(miClient.getSession().getCurrentDate());
-        moDateDateEnd_n.setValue(null);
-        moKeyLoan_n.setSelectedIndex(0);
+        moDateDateStart.setValue(SLibTimeUtils.getBeginOfMonth(miClient.getSession().getCurrentDate()));
+        moDateDateEnd_n.resetField();
+        moKeyLoan_n.resetField();
         moKeyLoan_n.setEnabled(false);
         moRadNormal.setSelected(true);
 
-        moTextCodeFind.requestFocus();
+        moTextCode.requestFocusInWindow();
     }
     
     private int getPaysheetTypeId() {
@@ -448,105 +460,96 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         return type;
     }
 
-    private void actionAdd() {
-        boolean add = true;
-
-        if (moTextName.getValue().length() > 0) {
-            if (mnFormSubtype == SModSysConsts.HRS_AUT_EMP && moKeyEmployee.getSelectedIndex() <= 0) {
-                miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEmployee.getText()) + "'. ");
-                add = false;
-                moKeyEmployee.requestFocus();
-            }
-            if (moDateDateEnd_n.getValue() != null) {
-                if (moDateDateEnd_n.getValue().before(moDateDateStart.getValue())) {
-                    miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateEnd_n.getText()) + "' " +
-                            SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + SGuiConsts.ERR_MSG_FIELD_DATE_.toLowerCase() + " '" + SGuiUtils.getLabelName(jlDateStart.getText()) + "'.");
-                    add = false;
-                    moDateDateEnd_n.requestFocus();
-                }
-            }
-
-            if (moDateDateStart.getValue() == null) {
-                miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlDateStart.getText()) + "'. ");
-                add = false;
-                moDateDateStart.requestFocus();
-            }
-
-            if (moDeduction.getFkLoanTypeId() != SModSysConsts.HRSS_TP_LOAN_NON) {
-                if (moKeyLoan_n.getSelectedIndex() <= 0) {
-                    miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlLoan_n.getText()) + "'. ");
-                    add = false;
-                    moKeyLoan_n.requestFocus();
-                }
-            }
-
-            if (add) {
-                updateRows();
-                resetFields();
-                enableFields();
-            }
-        }
-    }
-    
-    private void actionPickDeduction() {
-        miClient.getSession().showOptionPicker(SModConsts.HRS_DED, SLibConsts.UNDEFINED, null, moTextCodeFind);
-        actionLoadDeduction();
+    private void actionPick() {
+        miClient.getSession().showOptionPicker(SModConsts.HRS_DED, SLibConsts.UNDEFINED, null, moTextCode);
+        actionCode();
     }
 
-    private void actionLoadDeduction() {
-        boolean load = true;
-
+    private void actionCode() {
         try {
-            moDeduction = SHrsUtils.getDeduction(miClient, SLibUtils.textTrim(moTextCodeFind.getText()));
+            moDeduction = SHrsUtils.getDeduction(miClient, SLibUtils.textTrim(moTextCode.getText()));
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
         }
 
         if (moDeduction == null) {
-            miClient.showMsgBoxWarning("No se encontró ninguna deducción con código '" + moTextCodeFind.getText() + "'.");
-            moTextCodeFind.requestFocus();
+            miClient.showMsgBoxWarning("No se encontró ninguna deducción con el código '" + moTextCode.getText() + "'.");
+            moTextCode.requestFocusInWindow();
         }
         else {
-            if ((moDeduction.getFkAbsenceClassId_n() != SLibConsts.UNDEFINED && moDeduction.getFkAbsenceTypeId_n() != SLibConsts.UNDEFINED) || moDeduction.getFkBenefitTypeId() != SModSysConsts.HRSS_TP_BEN_NON) {
-                miClient.showMsgBoxWarning("No se pueden agregar deducciones de tipo incidencia ni prestación.");
-                load = false;
-                moTextCodeFind.requestFocus();
+            if (moDeduction.isBenefit()) {
+                miClient.showMsgBoxWarning("No se pueden agregar deducciones automáticas de tipo prestación.");
+                moTextCode.requestFocusInWindow();
             }
-            
-            if (moDeduction.getFkLoanTypeId() != SModSysConsts.HRSS_TP_LOAN_NON) {
-                if (mnFormSubtype == SModSysConsts.HRS_AUT_GBL) {
-                    miClient.showMsgBoxWarning("No se pueden agregar deducciones de tipo crédito/préstamo.");
-                    load = false;
-                    moTextCodeFind.requestFocus();
-                }
+            else if (moDeduction.isAbsence()) {
+                miClient.showMsgBoxWarning("No se pueden agregar deducciones automáticas de tipo incidencia.");
+                moTextCode.requestFocusInWindow();
             }
-
-            if (load) {
+            else if (moDeduction.isLoan() && mnFormSubtype == SModSysConsts.HRS_AUT_GBL) {
+                miClient.showMsgBoxWarning("No se pueden agregar deducciones automáticas de tipo crédito/préstamo de forma global.");
+                moTextCode.requestFocusInWindow();
+            }
+            else {
                 moTextName.setValue(moDeduction.getName());
-                moComValue.getField().setEditable(moDeduction.getFkDeductionComputationTypeId() == SModSysConsts.HRSS_TP_DED_COMP_AMT);
                 moComValue.setCompoundText((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED_COMP, new int[] { moDeduction.getFkDeductionComputationTypeId() }, SDbRegistry.FIELD_CODE));
-                moComValue.getField().getComponent().requestFocus();
+                moComValue.getField().getComponent().requestFocusInWindow();
+                if (moDeduction.isComputedByPercentage()) {
+                    moComValue.getField().setValue(moDeduction.getRetPercentage());
+                }
 
                 resetLoan();
             }
         }
     }
 
+    private void actionAdd() {
+        if (moDeduction == null) {
+            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(moTextCode.getToolTipText()) + "'. ");
+            moTextCode.requestFocusInWindow();
+        }
+        else if (mnFormSubtype == SModSysConsts.HRS_AUT_GBL && moDeduction.isLoan()) {
+            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(moTextCode.getToolTipText()) + "'. ");
+            moTextCode.requestFocusInWindow();
+        }
+        else if (mnFormSubtype == SModSysConsts.HRS_AUT_EMP && moDeduction.isLoan() && moKeyLoan_n.getSelectedIndex() <= 0) {
+            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlLoan_n.getText()) + "'. ");
+            moKeyLoan_n.requestFocusInWindow();
+        }
+        else if (mnFormSubtype == SModSysConsts.HRS_AUT_EMP && moKeyEmployee.getSelectedIndex() <= 0) {
+            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEmployee.getText()) + "'. ");
+            moKeyEmployee.requestFocusInWindow();
+        }
+        else if (moDateDateStart.getValue() == null) {
+            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlDateStart.getText()) + "'. ");
+            moDateDateStart.requestFocusInWindow();
+        }
+        else if (moDateDateEnd_n.getValue() != null && moDateDateEnd_n.getValue().before(moDateDateStart.getValue())) {
+            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateEnd_n.getText()) + "' " +
+                    SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + SGuiConsts.ERR_MSG_FIELD_DATE_.toLowerCase() + " '" + SGuiUtils.getLabelName(jlDateStart.getText()) + "'.");
+            moDateDateEnd_n.requestFocusInWindow();
+        }
+        else {
+            updateRows();
+            resetFields();
+            enableFields();
+        }
+    }
+    
     @Override
     public void addAllListeners() {
-        moKeyEmployee.addItemListener(this);
-        moTextCodeFind.addActionListener(this);
-        jbCodeFind.addActionListener(this);
+        moTextCode.addActionListener(this);
+        jbPick.addActionListener(this);
         jbAdd.addActionListener(this);
+        moKeyEmployee.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        moKeyEmployee.removeItemListener(this);
-        moTextCodeFind.removeActionListener(this);
-        jbCodeFind.removeActionListener(this);
+        moTextCode.removeActionListener(this);
+        jbPick.removeActionListener(this);
         jbAdd.removeActionListener(this);
+        moKeyEmployee.removeItemListener(this);
     }
 
     @Override
@@ -565,7 +568,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         moRegistry = (SDbAutomaticDeductionsAux) registry;
 
         moDeduction = null;
-        maAutomaticDeductions = new ArrayList<SDbAutomaticDeduction>();
+        maAutomaticDeductions = new ArrayList<>();
 
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
@@ -644,18 +647,18 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbAdd) {
-                actionAdd();
+            if (button == jbPick) {
+                actionPick();
             }
-            else if (button == jbCodeFind) {
-                actionPickDeduction();
+            else if (button == jbAdd) {
+                actionAdd();
             }
         }
         else if (e.getSource() instanceof JTextField) {
             JTextField textField = (JTextField) e.getSource();
 
-            if (textField == moTextCodeFind) {
-                actionLoadDeduction();
+            if (textField == moTextCode) {
+                actionCode();
             }
         }
     }
@@ -666,7 +669,7 @@ public class SFormAutomaticDeductions extends SBeanForm implements SGridPaneForm
             JComboBox comboBox = (JComboBox)  e.getSource();
 
             if (comboBox == moKeyEmployee) {
-                itemStateEmployee();
+                itemStateChangedEmployee();
             }
         }
     }

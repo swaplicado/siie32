@@ -40,7 +40,7 @@ public class SDbConfig extends SDbRegistryUser {
     protected int mnFkTaxComputationTypeId;
     protected int mnFkBankId;
     protected int mnFkEarningEarningId_n;
-    protected int mnFkEarningVacationsId_n;
+    protected int mnFkEarningVacationId_n;
     protected int mnFkEarningTaxId_n;
     protected int mnFkEarningTaxSubsidyId_n;
     protected int mnFkEarningTaxSubsidyCompensatedId_n;
@@ -78,7 +78,7 @@ public class SDbConfig extends SDbRegistryUser {
     public void setFkTaxComputationTypeId(int n) { mnFkTaxComputationTypeId = n; }
     public void setFkBankId(int n) { mnFkBankId = n; }
     public void setFkEarningEarningId_n(int n) { mnFkEarningEarningId_n = n; }
-    public void setFkEarningVacationsId_n(int n) { mnFkEarningVacationsId_n = n; }
+    public void setFkEarningVacationId_n(int n) { mnFkEarningVacationId_n = n; }
     public void setFkEarningTaxId_n(int n) { mnFkEarningTaxId_n = n; }
     public void setFkEarningTaxSubsidyId_n(int n) { mnFkEarningTaxSubsidyId_n = n; }
     public void setFkEarningTaxSubsidyCompensatedId_n(int n) { mnFkEarningTaxSubsidyCompensatedId_n = n; }
@@ -110,7 +110,7 @@ public class SDbConfig extends SDbRegistryUser {
     public int getFkTaxComputationTypeId() { return mnFkTaxComputationTypeId; }
     public int getFkBankId() { return mnFkBankId; }
     public int getFkEarningEarningId_n() { return mnFkEarningEarningId_n; }
-    public int getFkEarningVacationsId_n() { return mnFkEarningVacationsId_n; }
+    public int getFkEarningVacationId_n() { return mnFkEarningVacationId_n; }
     public int getFkEarningTaxId_n() { return mnFkEarningTaxId_n; }
     public int getFkEarningTaxSubsidyId_n() { return mnFkEarningTaxSubsidyId_n; }
     public int getFkEarningTaxSubsidyCompensatedId_n() { return mnFkEarningTaxSubsidyCompensatedId_n; }
@@ -156,7 +156,7 @@ public class SDbConfig extends SDbRegistryUser {
         mnFkTaxComputationTypeId = 0;
         mnFkBankId = 0;
         mnFkEarningEarningId_n = 0;
-        mnFkEarningVacationsId_n = 0;
+        mnFkEarningVacationId_n = 0;
         mnFkEarningTaxId_n = 0;
         mnFkEarningTaxSubsidyId_n = 0;
         mnFkEarningTaxSubsidyCompensatedId_n = 0;
@@ -223,7 +223,7 @@ public class SDbConfig extends SDbRegistryUser {
             mnFkTaxComputationTypeId = resultSet.getInt("fk_tp_tax_comp");
             mnFkBankId = resultSet.getInt("fk_bank");
             mnFkEarningEarningId_n = resultSet.getInt("fk_ear_ear_n");
-            mnFkEarningVacationsId_n = resultSet.getInt("fk_ear_vac_n");
+            mnFkEarningVacationId_n = resultSet.getInt("fk_ear_vac_n");
             mnFkEarningTaxId_n = resultSet.getInt("fk_ear_tax_n");
             mnFkEarningTaxSubsidyId_n = resultSet.getInt("fk_ear_tax_sub_n");
             mnFkEarningTaxSubsidyCompensatedId_n = resultSet.getInt("fk_ear_tax_sub_comp_n");
@@ -276,7 +276,7 @@ public class SDbConfig extends SDbRegistryUser {
                     mnFkTaxComputationTypeId + ", " +
                     mnFkBankId + ", " +
                     (mnFkEarningEarningId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningEarningId_n) + ", " +
-                    (mnFkEarningVacationsId_n  == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningVacationsId_n) + ", " +
+                    (mnFkEarningVacationId_n  == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningVacationId_n) + ", " +
                     (mnFkEarningTaxId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxId_n) + ", " +
                     (mnFkEarningTaxSubsidyId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyId_n) + ", " +
                     (mnFkEarningTaxSubsidyCompensatedId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyCompensatedId_n) + ", " +
@@ -313,7 +313,7 @@ public class SDbConfig extends SDbRegistryUser {
                     "fk_tp_tax_comp = " + mnFkTaxComputationTypeId + ", " +
                     "fk_bank = " + mnFkBankId + ", " +
                     "fk_ear_ear_n = " + (mnFkEarningEarningId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningEarningId_n) + ", " +
-                    "fk_ear_vac_n = " + (mnFkEarningVacationsId_n  == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningVacationsId_n) + ", " +
+                    "fk_ear_vac_n = " + (mnFkEarningVacationId_n  == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningVacationId_n) + ", " +
                     "fk_ear_tax_n = " + (mnFkEarningTaxId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxId_n) + ", " +
                     "fk_ear_tax_sub_n = " + (mnFkEarningTaxSubsidyId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyId_n) + ", " +
                     "fk_ear_tax_sub_comp_n = " + (mnFkEarningTaxSubsidyCompensatedId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyCompensatedId_n) + ", " +
@@ -356,7 +356,7 @@ public class SDbConfig extends SDbRegistryUser {
         registry.setFkTaxComputationTypeId(this.getFkTaxComputationTypeId());
         registry.setFkBankId(this.getFkBankId());
         registry.setFkEarningEarningId_n(this.getFkEarningEarningId_n());
-        registry.setFkEarningVacationsId_n(this.getFkEarningVacationsId_n());
+        registry.setFkEarningVacationId_n(this.getFkEarningVacationId_n());
         registry.setFkEarningTaxId_n(this.getFkEarningTaxId_n());
         registry.setFkEarningTaxSubsidyId_n(this.getFkEarningTaxSubsidyId_n());
         registry.setFkEarningTaxSubsidyCompensatedId_n(this.getFkEarningTaxSubsidyCompensatedId_n());

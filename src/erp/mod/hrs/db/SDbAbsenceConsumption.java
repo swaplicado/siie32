@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
@@ -17,7 +18,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
 
@@ -42,7 +43,7 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
     protected Date mtAuxDateEnd;
     protected int mnAuxEffectiveDays;
     
-    protected SDbAbsence moAbsence;
+    protected SDbAbsence moParentAbsence;
 
     public SDbAbsenceConsumption() {
         super(SModConsts.HRS_ABS_CNS);
@@ -62,13 +63,6 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
-    public void setAuxNumber(String s) { msAuxNumber = s; }
-    public void setAuxDateStart(Date t) { mtAuxDateStart = t; }
-    public void setAuxDateEnd(Date t) { mtAuxDateEnd = t; }
-    public void setAuxEffectiveDays(int n) { mnAuxEffectiveDays = n; }
-    
-    public void setAbsence(SDbAbsence o) { moAbsence = o; }
-
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public int getPkAbsenceId() { return mnPkAbsenceId; }
     public int getPkConsumptionId() { return mnPkConsumptionId; }
@@ -83,18 +77,31 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
+    public void setAuxNumber(String s) { msAuxNumber = s; }
+    public void setAuxDateStart(Date t) { mtAuxDateStart = t; }
+    public void setAuxDateEnd(Date t) { mtAuxDateEnd = t; }
+    public void setAuxEffectiveDays(int n) { mnAuxEffectiveDays = n; }
+    
     public String getAuxNumber() { return msAuxNumber; }
     public Date getAuxDateStart() { return mtAuxDateStart; }
     public Date getAuxDateEnd() { return mtAuxDateEnd; }
     public int getAuxEffectiveDays() { return mnAuxEffectiveDays; }
     
-    public SDbAbsence getAbsence() { return moAbsence; }
+    public void setParentAbsence(SDbAbsence o) { moParentAbsence = o; }
+    
+    public SDbAbsence getParentAbsence() { return moParentAbsence; }
+    
+    public int[] getAbsenceKey() { return new int[] { mnPkEmployeeId, mnPkAbsenceId }; }
+    
+    public int getCalendarDays() {
+        return SLibTimeUtils.countPeriodDays(mtDateStart, mtDateEnd);
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkEmployeeId = pk[0];
         mnPkAbsenceId = pk[1];
-        mnPkConsumptionId = pk[1];
+        mnPkConsumptionId = pk[2];
     }
 
     @Override
@@ -125,7 +132,7 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
         mtAuxDateEnd = null;
         mnAuxEffectiveDays = 0;
         
-        moAbsence = null;
+        moParentAbsence = null;
     }
 
     @Override
@@ -190,9 +197,9 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
-            // Read Absence class:
+            // Read parent registry:
             
-            moAbsence = (SDbAbsence) session.readRegistry(SModConsts.HRS_ABS, new int[] { mnPkEmployeeId, mnPkAbsenceId });
+            moParentAbsence = (SDbAbsence) session.readRegistry(SModConsts.HRS_ABS, new int[] { mnPkEmployeeId, mnPkAbsenceId });
             
             mbRegistryNew = false;
         }
@@ -277,7 +284,7 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
         registry.setAuxDateEnd(this.getAuxDateEnd());
         registry.setAuxEffectiveDays(this.getAuxEffectiveDays());
         
-        registry.setAbsence(this.getAbsence());
+        registry.setParentAbsence(this.getParentAbsence());
         
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
@@ -324,10 +331,10 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
 
         switch (row) {
             case 0:
-                value = moAbsence.getAuxAbsenceClass();
+                value = moParentAbsence.getXtaAbsenceClass();
                 break;
             case 1:
-                value = moAbsence.getAuxAbsenceType();
+                value = moParentAbsence.getXtaAbsenceType();
                 break;
             case 2:
                 value = msAuxNumber;
@@ -351,7 +358,6 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
                 value = mnEffectiveDays;
                 break;
             default:
-                break;
         }
         
         return value;
@@ -371,7 +377,6 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
             case 8:
                 break;
             default:
-                break;
         }
     }
 }

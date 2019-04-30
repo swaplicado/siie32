@@ -27,7 +27,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Claudio Peña
+ * @author Claudio Peña, Sergio Flores
  */
 public class SDialogLayoutEmployee extends SBeanFormDialog implements FocusListener, ActionListener {
 

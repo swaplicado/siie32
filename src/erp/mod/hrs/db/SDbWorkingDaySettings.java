@@ -7,6 +7,7 @@ package erp.mod.hrs.db;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
@@ -15,7 +16,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbWorkingDaySettings extends SDbRegistryUser {
 
@@ -81,6 +82,98 @@ public class SDbWorkingDaySettings extends SDbRegistryUser {
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
+    
+    public int countWorkingDays() {
+        int workingDays = 0;
+        
+        if (mbWeekdaySettingSunday) {
+            workingDays++;
+        }
+        if (mbWeekdaySettingMonday) {
+            workingDays++;
+        }
+        if (mbWeekdaySettingTuesday) {
+            workingDays++;
+        }
+        if (mbWeekdaySettingWednesday) {
+            workingDays++;
+        }
+        if (mbWeekdaySettingThursday) {
+            workingDays++;
+        }
+        if (mbWeekdaySettingFriday) {
+            workingDays++;
+        }
+        if (mbWeekdaySettingSaturday) {
+            workingDays++;
+        }
+        
+        return workingDays;
+    }
+    
+    public int countNonWorkingDays() {
+        int nonWorkingDays = 0;
+        
+        if (!mbWeekdaySettingSunday) {
+            nonWorkingDays++;
+        }
+        if (!mbWeekdaySettingMonday) {
+            nonWorkingDays++;
+        }
+        if (!mbWeekdaySettingTuesday) {
+            nonWorkingDays++;
+        }
+        if (!mbWeekdaySettingWednesday) {
+            nonWorkingDays++;
+        }
+        if (!mbWeekdaySettingThursday) {
+            nonWorkingDays++;
+        }
+        if (!mbWeekdaySettingFriday) {
+            nonWorkingDays++;
+        }
+        if (!mbWeekdaySettingSaturday) {
+            nonWorkingDays++;
+        }
+        
+        return nonWorkingDays;
+    }
+    
+    /**
+     * Checks if supplied day of week is a working day.
+     * @param dayOfWeek Calendar.DAY_OF_WEEK.
+     * @return <code>true</code> if supplied day of week is a working day.
+     */
+    public boolean isWorkingDay(final int dayOfWeek) {
+        boolean isWorkingDay = false;
+        
+        switch (dayOfWeek) {
+            case Calendar.SUNDAY:
+                isWorkingDay = mbWeekdaySettingSunday;
+                break;
+            case Calendar.MONDAY:
+                isWorkingDay = mbWeekdaySettingMonday;
+                break;
+            case Calendar.TUESDAY:
+                isWorkingDay = mbWeekdaySettingTuesday;
+                break;
+            case Calendar.WEDNESDAY:
+                isWorkingDay = mbWeekdaySettingWednesday;
+                break;
+            case Calendar.THURSDAY:
+                isWorkingDay = mbWeekdaySettingThursday;
+                break;
+            case Calendar.FRIDAY:
+                isWorkingDay = mbWeekdaySettingFriday;
+                break;
+            case Calendar.SATURDAY:
+                isWorkingDay = mbWeekdaySettingSaturday;
+                break;
+            default:
+        }
+        
+        return isWorkingDay;
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {

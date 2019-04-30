@@ -36,7 +36,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog implements ChangeListener {
    
@@ -305,25 +305,22 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     }
 
     private ArrayList<SDbEarning> getEarnings() throws Exception {
-        String sql = "";
-        SDbEarning earning = null;
-        ArrayList<SDbEarning> aEarnings = new ArrayList<SDbEarning>();
-        ResultSet resultSet = null;
-        Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
+        ArrayList<SDbEarning> earnings = new ArrayList<>();
 
-        sql = "SELECT * "
+        String sql = "SELECT * "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " "
                 + "WHERE b_del = 0 "
                 + "ORDER BY CONCAT(code, ' - ', name), id_ear ";
 
-        resultSet = statement.executeQuery(sql);
+        Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
+        ResultSet resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
-            earning = new SDbEarning();
+            SDbEarning earning = new SDbEarning();
             earning.read(miClient.getSession(), new int[] { resultSet.getInt("id_ear") });
-            aEarnings.add(earning);
+            earnings.add(earning);
         }
 
-        return aEarnings;
+        return earnings;
     }
     
     private double[] getAmountDeductions(final int employeeId, final String sqlStatusPay) throws Exception {
@@ -387,7 +384,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         double dTotalAmountNet = 0;
         double adAmountDeductions[];
         Cursor cursor = getCursor();
-        ArrayList<SDbEarning> aEarnings = new ArrayList<SDbEarning>();
+        ArrayList<SDbEarning> earnings = new ArrayList<>();
         int payrollStatus = (int) moPanelHrsFilterPayrollStatus.getValue(SLibConsts.UNDEFINED);
 
         try {
@@ -398,13 +395,13 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                 File file = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
                 BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 
-                aEarnings = getEarnings();
+                earnings = getEarnings();
                 
                 // Construir gravado y exento:
                 
                 sEarningHeader += ", , , ,";
                 
-                for (SDbEarning earning : aEarnings) {
+                for (SDbEarning earning : earnings) {
                     sEarningHeader += "\"" + (earning.getCode() + " " + earning.getName()) + "\", ,";
                     sTaxExentHeader += "\"GRAVADO\",\"EXCENTO\",";
                 }
@@ -487,7 +484,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                     buffer += "\"" + resulSetEmployee.getString("d.code").replace("\"", "'") + "\",";
                     buffer += "\"" + resulSetEmployee.getString("d.name").replace("\"", "'") + "\",";
                     
-                    for (SDbEarning earning : aEarnings) {
+                    for (SDbEarning earning : earnings) {
                         sql = "SELECT SUM(pre.amt_exem) AS f_exem, SUM(pre.amt_taxa) AS f_tax " +
                                 "FROM hrs_pay AS p " +
                                 "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +

@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -68,6 +69,10 @@ import sa.lib.gui.SGuiSession;
  */
 public abstract class SHrsUtils {
     
+    private static void showTotal(final SGuiClient client, final double total) {
+        client.showMsgBoxInformation("Total a dispersar: $ " + SLibUtils.getDecimalFormatAmount().format(total));
+    }
+    
     /**
      * Creates layout to payroll with Banamex
      * @param client
@@ -98,8 +103,8 @@ public abstract class SHrsUtils {
         String sDescription = "";
         String sCompany = "";
         String employeesId = "";
-        double mdBalance = 0;
-        double mdBalanceTotal = 0;
+        double balance = 0;
+        double total = 0;
         int nBankKey = 0;
         int n = 0;
         int nMoveNumTotal = 0;
@@ -109,7 +114,7 @@ public abstract class SHrsUtils {
         moConfig = (SDbConfig) client.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
         oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BP, new int[] { bankId }, SLibConstants.EXEC_MODE_SILENT);
         moPayroll = (SDbPayroll)  client.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { payrollId }, SDbConsts.MODE_STEALTH);
-        sDescription = (moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? SHrsFormerConsts.PAY_WEE_ABB : SHrsFormerConsts.PAY_BIW_ABB ) + moPayroll.getNumber() + " " + formatDateData.format(dateApplication);
+        sDescription = (moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? SHrsFormerConsts.PAY_WEE_ABB : SHrsFormerConsts.PAY_FOR_ABB ) + moPayroll.getNumber() + " " + formatDateData.format(dateApplication);
         sCompany = SLibUtilities.textToAlphanumeric(((SClientInterface) client).getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner());
         employeesId = SLibUtils.textImplode(employees, ",");
         
@@ -156,7 +161,7 @@ public abstract class SHrsUtils {
                 
                 resultSetHeader = client.getSession().getStatement().executeQuery(sql);
                 while (resultSetHeader.next()) {
-                    mdBalanceTotal += resultSetHeader.getDouble("pay_net");
+                    total += resultSetHeader.getDouble("pay_net");
                     nMoveNumTotal++;
                 }
                 
@@ -164,7 +169,7 @@ public abstract class SHrsUtils {
                 buffer += "2"; //type of registry
                 buffer += "1"; //type of operation
                 buffer += "001"; //currency key
-                buffer += formatDescTotal.format(mdBalanceTotal).replace(".", ""); //amount to be debit
+                buffer += formatDescTotal.format(total).replace(".", ""); //amount to be debit
                 buffer += "01"; //account type
                 buffer += SLibUtilities.textRepeat("0", 20 - sAccountDebit.length()).concat(sAccountDebit); //account number
                 buffer += SLibUtilities.textRepeat("0", 6 - ("" + nMoveNumTotal).length()).concat("" + nMoveNumTotal); //total credits
@@ -195,10 +200,10 @@ public abstract class SHrsUtils {
                     buffer = "";
                     
                     sAccountCredit = SLibUtilities.textTrim(resultSetDetail.getString("emp.bank_acc"));
-                    mdBalance = resultSetDetail.getDouble("pay_net");
+                    balance = resultSetDetail.getDouble("pay_net");
                     sBizPartner = SFinUtilities.getBizPartnerForBanamex(client.getSession(), resultSetDetail.getInt("rcp.id_emp"));
                     nEmployeeBankAuxId = resultSetDetail.getInt("_bank_id");
-                    nEmployeeBankId = nEmployeeBankAuxId == SLibConsts.UNDEFINED ? moConfig.getFkBankId() : nEmployeeBankAuxId;
+                    nEmployeeBankId = nEmployeeBankAuxId == 0 ? moConfig.getFkBankId() : nEmployeeBankAuxId;
                     
                     if (nEmployeeBankId != oBizPartner.getFkFiscalBankId()) {
                         nBankKey = SLibUtilities.parseInt((sAccountCredit.length() > 10 ? sAccountCredit.substring(0, 3) : "000"));
@@ -211,7 +216,7 @@ public abstract class SHrsUtils {
                     buffer += (nEmployeeBankId != oBizPartner.getFkFiscalBankId() ? "002" : "001"); //payment method
                     buffer += "01"; //payment type
                     buffer += "001"; //currency key
-                    buffer += formatDescTotal.format(mdBalance).replace(".", ""); //amount
+                    buffer += formatDescTotal.format(balance).replace(".", ""); //amount
                     buffer += (nEmployeeBankId != oBizPartner.getFkFiscalBankId() ? "40" : "03"); //type of account credit
                     buffer += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(sAccountCredit); //Credit account
                     buffer += (nEmployeeBankId != oBizPartner.getFkFiscalBankId() ? formatDateData.format(dateApplication).concat((SLibUtilities.textRepeat(" ", (formatDateData.format(dateApplication).length() == 16 ? 0 : 16 - formatDateData.format(dateApplication).length())))) : sDescription.concat(sDescription.length() > 16 ? sDescription.substring(0,15) : (SLibUtilities.textRepeat(" ", (sDescription.length() == 16 ? 0 : 16 - sDescription.length()))))); //payment reference
@@ -237,15 +242,16 @@ public abstract class SHrsUtils {
                 buffer += "4";//type of registry
                 buffer += "001";//currency key
                 buffer += SLibUtilities.textRepeat("0", 6 - (nMoveNumTotal + "").length()).concat(nMoveNumTotal + ""); //number of credits
-                buffer += formatDescTotal.format(mdBalanceTotal).replace(".", ""); //total amount of credits
+                buffer += formatDescTotal.format(total).replace(".", ""); //total amount of credits
                 buffer += SLibUtilities.textRepeat("0", 5).concat("1"); //number of debit
-                buffer += formatDescTotal.format(mdBalanceTotal).replace(".", ""); //total amount of debit
+                buffer += formatDescTotal.format(total).replace(".", ""); //total amount of debit
 
                 bw.write(buffer);
                 bw.newLine();
                 bw.flush();
                 bw.close();
 
+                showTotal(client, total);
                 if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
                     SLibUtilities.launchFile(file.getPath());
                 }
@@ -285,8 +291,8 @@ public abstract class SHrsUtils {
         DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
         DecimalFormat formatDescTotal = new DecimalFormat("0000000000000000.00");
         SimpleDateFormat formatDate = new SimpleDateFormat("yyyyMMdd");
-        double mdBalance = 0;
-        double mdBalanceTotal = 0;
+        double balance = 0;
+        double total = 0;
         SDbConfig config = null;
         
         config = (SDbConfig) client.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
@@ -343,8 +349,8 @@ public abstract class SHrsUtils {
                     sAccountCredit = SLibUtilities.textTrim(resultSet.getString("emp.bank_acc"));
                     leyend = "DEPOSITO DE NOMINA";
                     employeeId = resultSet.getInt("rcp.id_emp");
-                    mdBalance = resultSet.getDouble("_pay_net");
-                    mdBalanceTotal += mdBalance;
+                    balance = resultSet.getDouble("_pay_net");
+                    total += balance;
 
                     n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
                     m = (int) (Math.floor(Math.log10(employeeId)) + 1);
@@ -355,7 +361,7 @@ public abstract class SHrsUtils {
                     buffer += formatDate.format(dateApplication);
                     buffer += SLibUtilities.textRepeat("0", 3); // FILLER
                     buffer += "030";
-                    buffer += formatDesc.format(mdBalance).replace(".", "");
+                    buffer += formatDesc.format(balance).replace(".", "");
                     buffer += formatDate.format(dateApplication);
                     buffer += SLibUtilities.textRepeat("0", 2); // FILLER
                     buffer += SLibUtilities.textRepeat("0", (sAccountDebit.length() >= 20 ? 0 : 20 - sAccountDebit.length())).concat(SLibUtilities.textLeft(sAccountDebit, 20)); // Debit acccount
@@ -384,7 +390,7 @@ public abstract class SHrsUtils {
                 buffer += SLibUtilities.textRepeat("0", 7 - n).concat(nMoveNum + "");
                 buffer += "90";
                 buffer += SLibUtilities.textRepeat("0", 7 - m).concat(nMoveNumTotal + "");
-                buffer += formatDescTotal.format(mdBalanceTotal).replace(".", "");
+                buffer += formatDescTotal.format(total).replace(".", "");
                 buffer += SLibUtilities.textRepeat(" ", 145); // FILLER USE FUTURE BANK
 
                 bw.write(buffer);
@@ -392,6 +398,7 @@ public abstract class SHrsUtils {
                 bw.flush();
                 bw.close();
 
+                showTotal(client, total);
                 if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
                     SLibUtilities.launchFile(file.getPath());
                 }
@@ -403,7 +410,7 @@ public abstract class SHrsUtils {
     }
     
     /**
-    * Creates layout to payroll with BBVA 
+    * Creates layout to payroll with BBVA Bancomer
     *@param client
     *@param payrollId
     *@param dateApplication
@@ -419,12 +426,12 @@ public abstract class SHrsUtils {
         String employeesId = "";
         int nMoveNum = 1;
         int n = 0;
-        java.lang.String sAccountCredit = "";
-        java.lang.String buffer = "";
+        String sAccountCredit = "";
+        String buffer = "";
         DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
         SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
-        double mdBalance = 0;
-        double auxTotal = 0;
+        double balance = 0;
+        double total = 0;
         
         fileName = formatDateTitle.format(new Date()).concat(" bbva nom.txt");
         
@@ -460,7 +467,7 @@ public abstract class SHrsUtils {
                     buffer = "";
                     
                     sAccountCredit = SLibUtilities.textTrim(resulSet.getString("emp.bank_acc"));
-                    mdBalance = resulSet.getDouble("_pay_net");
+                    balance = resulSet.getDouble("_pay_net");
                     sBizPartner = SLibUtilities.textToAlphanumeric(SLibUtilities.textTrim(resulSet.getString("b.bp")));
                   
                     n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
@@ -469,20 +476,20 @@ public abstract class SHrsUtils {
                     buffer += SLibUtilities.textRepeat(" ", 16); // Blank
                     buffer += "99";
                     buffer += sAccountCredit.concat(sAccountCredit.length() > 20 ? sAccountCredit.substring(0,20) : (SLibUtilities.textRepeat(" ", (sAccountCredit.length() == 20 ? 0 : 20 - sAccountCredit.length())))); 
-                    buffer += formatDesc.format(mdBalance).replace(".", "");
+                    buffer += formatDesc.format(balance).replace(".", "");
                     buffer += sBizPartner.concat(sBizPartner.length() > 40 ? sBizPartner.substring(0,40) : (SLibUtilities.textRepeat(" ", (sBizPartner.length() == 40 ? 0 : 40 - sBizPartner.length())))); //beneficiary
                     buffer += "001";
                     buffer += "001";
                     
                     bw.write(buffer);
-                    auxTotal += mdBalance;
+                    total += balance;
                     bw.newLine();
                 }
 
                 bw.flush();
                 bw.close();
-                client.showMsgBoxInformation("Total: " + SLibUtils.getDecimalFormatAmount().format(auxTotal));
                 
+                showTotal(client, total);
                 if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
                     SLibUtilities.launchFile(file.getPath());
                 }
@@ -515,8 +522,8 @@ public abstract class SHrsUtils {
         StringBuilder bodyLayout = new StringBuilder();
         int nCont = 0;
         int type = 0;
-        double mdBalanceTot = 0.0;
-        double dTotalBalance = 0.0;
+        double balance = 0;
+        double total = 0;
         
         sAccountCredit = SLibUtilities.textTrim(accountDebit);
 
@@ -558,11 +565,11 @@ public abstract class SHrsUtils {
                     sNameEmploy = resulSet.getString("bp");
                     String[] parts = sNameEmploy.split(",");
                     sNameEmploy = parts[1] + " " + parts[0];
-                    mdBalanceTot = resulSet.getDouble("_pay_net");
-                    dTotalBalance = SLibUtils.roundAmount(dTotalBalance + mdBalanceTot);
+                    balance = resulSet.getDouble("_pay_net");
+                    total = SLibUtils.roundAmount(total + balance);
                     sNameEmploy = removeSpecialChar(sNameEmploy);
                     bodyLayout.append(SLibUtilities.textTrim(resulSet.getString("emp.bank_acc"))).append(',');
-                    bodyLayout.append(mdBalanceTot).append(',');
+                    bodyLayout.append(balance).append(',');
                     bodyLayout.append("PAGO NOMINA").append(',');
                     bodyLayout.append(sNameEmploy.substring(1,sNameEmploy.length() <= 35 ? sNameEmploy.length() : 35)).append(",,,,");
                     bodyLayout.append("\r\n");
@@ -571,7 +578,7 @@ public abstract class SHrsUtils {
                 headerLayout.append("MXPRLF").append(',');
                 headerLayout.append("F").append(",");
                 headerLayout.append(sAccountCredit).append(',');
-                headerLayout.append(dTotalBalance).append(',');
+                headerLayout.append(total).append(',');
                 headerLayout.append(nCont).append(',');
                 headerLayout.append(formatDate.format(new Date())).append(',');
                 headerLayout.append("").append(',');
@@ -589,6 +596,8 @@ public abstract class SHrsUtils {
                 catch (FileNotFoundException ex) {
                     Logger.getLogger(SHrsUtils.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
+                showTotal(client, total);
                 if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
                     SLibUtilities.launchFile(file.getPath());
                 }
@@ -1260,69 +1269,44 @@ public abstract class SHrsUtils {
      * @throws Exception 
      */
     public static boolean validatePayroll(final SGuiSession session, final SDbConfig config, final SDbWorkingDaySettings workingDaySettings) throws Exception {
-        SDbDeduction deduction = null;
-        String sql = "";
-        Statement statement = null;
-        ResultSet resultSet = null;
-        
         if (config == null) {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + " (Configuración del módulo)");
         }
         else if (workingDaySettings == null) {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + " (Configuración de días laborables)");
         }
-        else if (config.getFkEarningEarningId_n() == SLibConsts.UNDEFINED) {
+        else if (workingDaySettings.countWorkingDays() == 0) {
+            throw new Exception(SLibConsts.ERR_MSG_UTILS_QTY_INVALID + " (Configuración de días laborables inválida)");
+        }
+        else if (config.getFkEarningEarningId_n() == 0) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de percepción normal)");
         }
-        else if (config.getFkEarningVacationsId_n() == SLibConsts.UNDEFINED) {
+        else if (config.getFkEarningVacationId_n() == 0) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de percepción vacaciones)");
         }
         /* 2019-02-07, Sergio Flores: Not implemented yet! Even not in form of payroll configuration!
-        else if (config.getFkEarningTaxId_n() == SLibConsts.UNDEFINED) {
+        else if (config.getFkEarningTaxId_n() == 0) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de percepción impuesto)");
         }
         */
-        else if (config.getFkEarningTaxSubsidyId_n() == SLibConsts.UNDEFINED) {
+        else if (config.getFkEarningTaxSubsidyId_n() == 0) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de percepción subsidio para el empleo)");
         }
         /* 2019-02-07, Sergio Flores: Not implemented yet! Even not in form of payroll configuration!
-        else if (config.getFkEarningSsContributionId_n()== SLibConsts.UNDEFINED) {
+        else if (config.getFkEarningSsContributionId_n()== 0) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de percepción retención de SS)");
         }
         */
-        else if (config.getFkDeductionTaxId_n() == SLibConsts.UNDEFINED) {
+        else if (config.getFkDeductionTaxId_n() == 0) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de deducción impuesto)");
         }
         /* 2019-02-07, Sergio Flores: Not implemented yet! Even not in form of payroll configuration!
-        else if (config.getFkDeductionTaxSubsidyId_n()== SLibConsts.UNDEFINED) {
+        else if (config.getFkDeductionTaxSubsidyId_n()== 0) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de deducción subsidio para el empleo)");
         }
         */
-        else if (config.getFkDeductionSsContributionId_n() == SLibConsts.UNDEFINED) {
+        else if (config.getFkDeductionSsContributionId_n() == 0) {
             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Configuración de deducción retención de SS)");
-        }
-        
-        statement = session.getStatement().getConnection().createStatement();
-        sql = "SELECT * "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " "
-                + "WHERE b_del = 0 AND fk_tp_loan <> " + SModSysConsts.HRSS_TP_LOAN_NON + " "
-                + "ORDER BY CONCAT(code, ' - ', name), id_ded ";
-
-        resultSet = statement.executeQuery(sql);
-        if (resultSet.next()) {
-            deduction = new SDbDeduction();
-            deduction.read(session, new int[] { resultSet.getInt("id_ded") });
-        }
-        
-        sql = "SELECT id_emp, id_loan " +
-            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_LOAN) + " " +
-            "WHERE b_del = 0 AND b_clo = 0;";
-        
-        resultSet = statement.executeQuery(sql);
-        if (resultSet.next()) {
-            if (deduction == null) {
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Deducción tipo crédito/préstamo)");
-            }
         }
         
         return true;
@@ -1401,14 +1385,12 @@ public abstract class SHrsUtils {
      */
     public static SDbWorkingDaySettings getPayrollWorkingDaySettings(final SGuiSession session, final int paymentType) throws Exception {
         SDbWorkingDaySettings workingDaySettings = null;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT id_wds "
+        String sql = "SELECT id_wds "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_WDS) + " "
-                + "WHERE b_del = 0 AND fk_tp_pay = " + paymentType + " ";
+                + "WHERE NOT b_del AND fk_tp_pay = " + paymentType + " ";
 
-        resultSet = session.getStatement().executeQuery(sql);
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             workingDaySettings = (SDbWorkingDaySettings) session.readRegistry(SModConsts.HRS_WDS, new int[] { resultSet.getInt(1) });
         }
@@ -1417,73 +1399,70 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * 
-     * @param dateStart
-     * @param dateEnd
-     * @param aHolidays
-     * @param workingDaySettings
-     * @return
-     * @throws Exception 
+     * Counts business days in supplied time span.
+     * @param dateStart Start of time span.
+     * @param dateEnd End of time span.
+     * @param workingDaySettings Working day settings applying.
+     * @param holidays Holidays available.
+     * @return Number of business days in supplied time span.
      */
-    public static int getEmployeeBusinessDays(final Date dateStart, final Date dateEnd, final ArrayList<SDbHoliday> aHolidays, final  SDbWorkingDaySettings workingDaySettings) throws Exception {
+    public static int countBusinessDays(final Date dateStart, final Date dateEnd, final SDbWorkingDaySettings workingDaySettings, final ArrayList<SDbHoliday> holidays) {
         int businessDays = 0;
-        int difDays = 0;
-        boolean dayWorked = false;
-        Date dateReference = null;
+        int periodDays = SLibTimeUtils.countPeriodDays(dateStart, dateEnd);
         Calendar calendar = Calendar.getInstance();
         
-        difDays = (int) SLibTimeUtils.getDaysDiff(dateEnd, dateStart);
+        SPAN:
+        for (int day = 0; day < periodDays; day++) {
+            Date date = SLibTimeUtils.addDate(dateStart, 0, 0, day);
+            calendar.setTime(date);
             
-        for (int i = 0; i <= difDays; i++) {
-            dateReference = SLibTimeUtils.addDate(dateStart, 0, 0, i);
-            dayWorked = true;
-
-            // Is working day:
-
-            calendar.setTime(dateReference);
-
-            switch (calendar.get(Calendar.DAY_OF_WEEK)) {
-                case 1:
-                    dayWorked = workingDaySettings.isWeekdaySettingSunday();
-                    break;
-                case 2:
-                    dayWorked = workingDaySettings.isWeekdaySettingMonday();
-                    break;
-                case 3:
-                    dayWorked = workingDaySettings.isWeekdaySettingTuesday();
-                    break;
-                case 4:
-                    dayWorked = workingDaySettings.isWeekdaySettingWednesday();
-                    break;
-                case 5:
-                    dayWorked = workingDaySettings.isWeekdaySettingThursday();
-                    break;
-                case 6:
-                    dayWorked = workingDaySettings.isWeekdaySettingFriday();
-                    break;
-                case 7:
-                    dayWorked = workingDaySettings.isWeekdaySettingSaturday();
-                    break;
-                default:
+            if (!workingDaySettings.isWorkingDay(calendar.get(Calendar.DAY_OF_WEEK))) {
+                continue;
             }
-
-            // Is holiday:
-
-            if (dayWorked) {
-                for (SDbHoliday holiday : aHolidays) {
-                    if (holiday.getDate().compareTo(dateReference) == 0) {
-                        dayWorked = false;
-                        break;
-                    }
+                    
+            for (SDbHoliday holiday : holidays) {
+                if (holiday.getDate().compareTo(date) == 0) {
+                    continue SPAN;
                 }
             }
-
-            if (dayWorked) {
-                businessDays ++;
-            }
+            
+            businessDays++;
         }
             
         return businessDays;
+    }
+
+    /**
+     * Counts true holidays in supplied time span. Holidays that match a non-working day are omitted.
+     * @param dateStart Start of time span.
+     * @param dateEnd End of time span.
+     * @param workingDaySettings Working day settings applying.
+     * @param holidays Holidays available.
+     * @return Number of business days in supplied time span.
+     */
+    public static int countTrueHolidays(final Date dateStart, final Date dateEnd, final SDbWorkingDaySettings workingDaySettings, final ArrayList<SDbHoliday> holidays) {
+        int trueHolydays = 0;
+        int periodDays = SLibTimeUtils.countPeriodDays(dateStart, dateEnd);
+        Calendar calendar = Calendar.getInstance();
+        
+        SPAN:
+        for (int day = 0; day < periodDays; day++) {
+            Date date = SLibTimeUtils.addDate(dateStart, 0, 0, day);
+            calendar.setTime(date);
+            
+            if (!workingDaySettings.isWorkingDay(calendar.get(Calendar.DAY_OF_WEEK))) {
+                continue;
+            }
+                    
+            for (SDbHoliday holiday : holidays) {
+                if (holiday.getDate().compareTo(date) == 0) {
+                    trueHolydays++;
+                    continue SPAN;
+                }
+            }
+        }
+            
+        return trueHolydays;
     }
 
     /**
@@ -1787,7 +1766,7 @@ public abstract class SHrsUtils {
         sql = "SELECT id_ben "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
             + "WHERE b_del = 0 AND fk_tp_ben = " + benefitType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "' "
-            + (paymentType == SLibConsts.UNDEFINED ? "AND fk_tp_pay_n IS NULL" : "AND (fk_tp_pay_n IS NULL OR fk_tp_pay_n = " + paymentType + ")") + " "
+            + (paymentType == 0 ? "AND fk_tp_pay_n IS NULL" : "AND (fk_tp_pay_n IS NULL OR fk_tp_pay_n = " + paymentType + ")") + " "
             + "ORDER BY dt_sta DESC, id_ben "
             + "LIMIT 1;";
         resultSet = session.getStatement().executeQuery(sql);
@@ -1868,7 +1847,7 @@ public abstract class SHrsUtils {
         return wage;
     }
 
-    public static HashMap<String, Object> getMapPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
+    public static HashMap<String, Object> createPayrollReceiptMap(final SGuiClient client, final int[] payrollKey, final int pnPrintMode) throws java.lang.Exception {
         double dTotalPercepciones = 0;
         double dTotalDeducciones = 0;
         SDbLoan loan = null;
@@ -1916,7 +1895,7 @@ public abstract class SHrsUtils {
         map.put("NumSeguridadSocial", bizPartnerEmployee.getDbmsDataEmployee().getSocialSecurityNumber());
         map.put("FechaInicialPago", SLibUtils.DateFormatDate.format(payroll.getDateStart()));
         map.put("FechaFinalPago", SLibUtils.DateFormatDate.format(payroll.getDateEnd()));
-        map.put("NumDiasNoLaborados", payrollReceipt.getDaysNotWorkedPaid() + payrollReceipt.getDaysNotWorkedNotPaid());
+        map.put("NumDiasNoLaborados", payrollReceipt.getDaysNotWorked_r());
         map.put("NumDiasLaborados", payrollReceipt.getDaysWorked());
         map.put("NumDiasPagados", payrollReceipt.getDaysPaid());
         map.put("Departamento", (String) client.getSession().readField(SModConsts.HRSU_DEP, new int[] { bizPartnerEmployee.getDbmsDataEmployee().getFkDepartmentId() }, SDbRegistry.FIELD_NAME));
@@ -1942,27 +1921,27 @@ public abstract class SHrsUtils {
 
         // Earnings:
 
-        for (SDbPayrollReceiptEarning receiptEarning : payrollReceipt.getChildPayrollReceiptEarnings()) {
+        for (SDbPayrollReceiptEarning payrollReceiptEarning : payrollReceipt.getChildPayrollReceiptEarnings()) {
             SDbEarning earning = new SDbEarning();
             loan = null;
 
-            earning.read(client.getSession(),  new int[] { receiptEarning.getFkEarningId() });
+            earning.read(client.getSession(),  new int[] { payrollReceiptEarning.getFkEarningId() });
 
-            if (receiptEarning.getFkLoanEmployeeId_n() != SLibConsts.UNDEFINED) {
+            if (payrollReceiptEarning.getFkLoanEmployeeId_n() != 0) {
                 loan = new SDbLoan();
 
-                loan.read(client.getSession(), new int[] { receiptEarning.getFkLoanEmployeeId_n(), receiptEarning.getFkLoanLoanId_n() });
+                loan.read(client.getSession(), new int[] { payrollReceiptEarning.getFkLoanEmployeeId_n(), payrollReceiptEarning.getFkLoanLoanId_n() });
             }
 
             aPercepciones.add(earning.getCode());
             aPercepciones.add(earning.getCode());
-            aPercepciones.add(earning.getName() + (loan == null ? "" : " (" + loan.getLoanIdentificator() + ") "));
-            aPercepciones.add(earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT ? null : receiptEarning.getUnits());
-            aPercepciones.add(earning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT ? null : (String) client.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { earning.getFkEarningComputationTypeId() }, SDbRegistry.FIELD_CODE));
-            aPercepciones.add(receiptEarning.getAmount_r());
+            aPercepciones.add(earning.getName() + (loan == null ? "" : " (" + loan.composeLoanDescription() + ") "));
+            aPercepciones.add(!earning.isBasedOnUnits() ? null : payrollReceiptEarning.getUnits());
+            aPercepciones.add(!earning.isBasedOnUnits() ? null : (String) client.getSession().readField(SModConsts.HRSS_TP_EAR_COMP, new int[] { earning.getFkEarningComputationTypeId() }, SDbRegistry.FIELD_CODE));
+            aPercepciones.add(payrollReceiptEarning.getAmount_r());
             aPercepciones.add(null);
 
-            dTotalPercepciones += receiptEarning.getAmount_r();
+            dTotalPercepciones += payrollReceiptEarning.getAmount_r();
         }
 
         for (int j = payrollReceipt.getChildPayrollReceiptEarnings().size(); j < 10; j++) {
@@ -1977,25 +1956,25 @@ public abstract class SHrsUtils {
 
         // Deductions:
 
-        for (SDbPayrollReceiptDeduction receiptDeduction : payrollReceipt.getChildPayrollReceiptDeductions()) {
+        for (SDbPayrollReceiptDeduction payrollReceiptDeduction : payrollReceipt.getChildPayrollReceiptDeductions()) {
             SDbDeduction deduction = new SDbDeduction();
             loan = null;
 
-            deduction.read(client.getSession(),  new int[] { receiptDeduction.getFkDeductionId() });
+            deduction.read(client.getSession(),  new int[] { payrollReceiptDeduction.getFkDeductionId() });
 
-            if (receiptDeduction.getFkLoanEmployeeId_n() != SLibConsts.UNDEFINED) {
+            if (payrollReceiptDeduction.getFkLoanEmployeeId_n() != 0) {
                 loan = new SDbLoan();
 
-                loan.read(client.getSession(), new int[] { receiptDeduction.getFkLoanEmployeeId_n(), receiptDeduction.getFkLoanLoanId_n() });
+                loan.read(client.getSession(), new int[] { payrollReceiptDeduction.getFkLoanEmployeeId_n(), payrollReceiptDeduction.getFkLoanLoanId_n() });
             }
 
             aDeducciones.add(deduction.getCode());
             aDeducciones.add(deduction.getCode());
-            aDeducciones.add(deduction.getName() + (loan == null ? "" : " (" + loan.getLoanIdentificator() + ") "));
-            aDeducciones.add(receiptDeduction.getAmount_r());
+            aDeducciones.add(deduction.getName() + (loan == null ? "" : " (" + loan.composeLoanDescription() + ") "));
+            aDeducciones.add(payrollReceiptDeduction.getAmount_r());
             aDeducciones.add(null);
 
-            dTotalDeducciones += receiptDeduction.getAmount_r();
+            dTotalDeducciones += payrollReceiptDeduction.getAmount_r();
         }
 
         for (int j = payrollReceipt.getChildPayrollReceiptDeductions().size(); j < 10; j++) {
@@ -2024,11 +2003,11 @@ public abstract class SHrsUtils {
      */
     public static void printPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
         HashMap<String, Object> map = new HashMap<>();
-        map = getMapPayrollReceipt(client, pnPrintMode, payrollKey);
+        map = createPayrollReceiptMap(client, payrollKey, pnPrintMode);
         
         switch (pnPrintMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
-                client.getSession().printReport(SModConsts.HRSR_PAY_RCP, SLibConsts.UNDEFINED, null, map);
+                client.getSession().printReport(SModConsts.HRSR_PAY_RCP, 0, null, map);
                 break;
             case SDataConstantsPrint.PRINT_MODE_PDF_FILE:
                 break;
@@ -2045,8 +2024,8 @@ public abstract class SHrsUtils {
         File pdf = null;
         STreasuryBankLayoutRequest layoutRequest = new STreasuryBankLayoutRequest(client, null);
         
-        map = getMapPayrollReceipt(client, pnPrintMode, payrollKey);
-        pdf = createPayrollReceipt(map, client);
+        map = createPayrollReceiptMap(client, payrollKey, pnPrintMode);
+        pdf = createPayrollReceipt(client, map);
         
         SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BP, new int[] { (Integer)map.get("nEmployeeId") }, SLibConstants.EXEC_MODE_SILENT);
         String mail = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
@@ -2063,19 +2042,19 @@ public abstract class SHrsUtils {
     }
     
     public static void sendPayrollReceipts(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
-        ArrayList<SDbPayrollReceipt> actives = new ArrayList<SDbPayrollReceipt>();
+        ArrayList<SDbPayrollReceipt> payrollReceipts = new ArrayList<>();
         SDbPayroll payroll = new SDbPayroll();
         payroll.read(client.getSession(), new int[] { payrollKey[0] });
         
-        for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) {
-            if (!receipt.isDeleted()) {
-                actives.add(receipt);
+        for (SDbPayrollReceipt payrollReceipt : payroll.getChildPayrollReceipts()) {
+            if (!payrollReceipt.isDeleted()) {
+                payrollReceipts.add(payrollReceipt);
             }
         }
         
         SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de envío", SCfdConsts.PROC_REQ_SEND_CFD_PAYROLL);
-        dialog.setFormParams((SClientInterface) client, null, null, 0, null, true, SLibConsts.UNDEFINED, SModSysConsts.TRNU_TP_DPS_ANN_NA);
-        dialog.setReceipts(actives);
+        dialog.setFormParams((SClientInterface) client, null, null, 0, null, true, 0, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+        dialog.setPayrollReceipts(payrollReceipts);
         dialog.setVisible(true);
     }
     
@@ -2085,7 +2064,7 @@ public abstract class SHrsUtils {
      * @param client interface Client
      * @return Object file payroll receipt
      */
-    public static File createPayrollReceipt(HashMap<String, Object> map, SGuiClient client) {
+    public static File createPayrollReceipt(SGuiClient client, HashMap<String, Object> map) {
         JasperPrint jasperPrint = null;
         byte[] reportBytes = null;
         File file = null;
@@ -2129,80 +2108,7 @@ public abstract class SHrsUtils {
         map.put("RegistroPatronal", ((SClientInterface) client).getSessionXXX().getParamsCompany().getRegistrySs());
         map.put("sEmiRfc", bizPartnerCompany.getFiscalId());
         
-        client.getSession().printReport(SModConsts.HRSR_PRE_PAY, SLibConsts.UNDEFINED, null, map);
-    }
-    
-    /**
-     * Obtain consumption days in payrolls previous
-     * @param absence Absence registry consumption
-     * @param hrsEmployee Object the employee
-     * @return int; consumption days in payrolls previous
-     */
-    public static int getConsumptionPreviousDays(final SDbAbsence absence, final SHrsEmployee hrsEmployee) {
-        int consumptionPreviousDays = 0;
-        
-        for (SDbAbsenceConsumption absenceConsumptionAux : hrsEmployee.getAbsencesConsumptions()) {
-            if (absence.getPkAbsenceId() == absenceConsumptionAux.getPkAbsenceId() &&
-                    absence.getPkEmployeeId() == absenceConsumptionAux.getPkEmployeeId()) {
-                consumptionPreviousDays += absenceConsumptionAux.getEffectiveDays();
-            }
-        }
-        
-        for (SDbAbsenceConsumption absenceConsumptionAux : hrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptions()) {
-            if (absence.getPkAbsenceId() == absenceConsumptionAux.getPkAbsenceId() &&
-                    absence.getPkEmployeeId() == absenceConsumptionAux.getPkEmployeeId()) {
-                consumptionPreviousDays += absenceConsumptionAux.getEffectiveDays();
-            }
-        }
-        
-        return consumptionPreviousDays;
-    }
-    
-    /**
-     * Obtain last date consumption
-     * @param absence Absence registry consumption
-     * @param hrsEmployee Object the employee
-     * @return Date; last date consumption
-     */
-    public static Date getConsumptionDateLast(final SDbAbsence absence, final SHrsEmployee hrsEmployee) {
-        Date dateConsumptionLast = null;
-        
-        for (SDbAbsenceConsumption absenceConsumptionAux : hrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptions()) {
-            if (absence.getPkAbsenceId() == absenceConsumptionAux.getPkAbsenceId() &&
-                    absence.getPkEmployeeId() == absenceConsumptionAux.getPkEmployeeId()) {
-                dateConsumptionLast = absenceConsumptionAux.getDateEnd();
-            }
-        }
-        
-        if (dateConsumptionLast == null) {
-            for (SDbAbsenceConsumption absenceConsumptionAux : hrsEmployee.getAbsencesConsumptions()) {
-                if (absence.getPkAbsenceId() == absenceConsumptionAux.getPkAbsenceId() &&
-                        absence.getPkEmployeeId() == absenceConsumptionAux.getPkEmployeeId()) {
-                    dateConsumptionLast = absenceConsumptionAux.getDateEnd();
-                }
-            }
-        }
-        
-        return dateConsumptionLast;
-    }
-    
-    /**
-     * Obtain ID next of consumption
-     * @param absence Absence registry consumption
-     * @param hrsEmployee Object the employee
-     * @return int; ID next of consumption
-     */
-    public static int getConsumptionNextId(final SDbAbsence absence, final SHrsEmployee hrsEmployee) {
-        int consumptionLast = 0;
-        
-        for (SDbAbsenceConsumption absenceConsumptionAux : hrsEmployee.getHrsPayrollReceipt().getAbsenceConsumptions()) {
-            if (absence.getPkAbsenceId() == absenceConsumptionAux.getPkAbsenceId() &&
-                    absence.getPkEmployeeId() == absenceConsumptionAux.getPkEmployeeId()) {
-                consumptionLast = absenceConsumptionAux.getPkConsumptionId();
-            }
-        }
-        
-        return consumptionLast + 1;
+        client.getSession().printReport(SModConsts.HRSR_PRE_PAY, 0, null, map);
     }
     
     /**
@@ -2217,25 +2123,25 @@ public abstract class SHrsUtils {
         
         balance = loan.getTotalAmount();
         
-        if (hrsEmployee.getLoanPayment(loan.getPkLoanId()) != null) {
-            balance += hrsEmployee.getLoanPayment(loan.getPkLoanId()).getTotalEarnings();
+        if (hrsEmployee.getHrsLoanPayments(loan.getPkLoanId()) != null) {
+            balance += hrsEmployee.getHrsLoanPayments(loan.getPkLoanId()).getTotalEarnings();
         }
         
-        if (hrsEmployee.getLoanPayment(loan.getPkLoanId()) != null) {
-            balance -= hrsEmployee.getLoanPayment(loan.getPkLoanId()).getTotalPayment();
+        if (hrsEmployee.getHrsLoanPayments(loan.getPkLoanId()) != null) {
+            balance -= hrsEmployee.getHrsLoanPayments(loan.getPkLoanId()).getTotalPayment();
         }
         
-        for (SHrsPayrollReceiptEarning earning : hrsEmployee.getHrsPayrollReceipt().getHrsReceiptEarnings()) {
-            if (SLibUtils.compareKeys(new int[] { earning.getReceiptEarning().getFkLoanEmployeeId_n(), earning.getReceiptEarning().getFkLoanLoanId_n()}, 
-                    loan.getPrimaryKey()) && earning.getReceiptEarning().isUserEdited()) {
-                balance += earning.getReceiptEarning().getAmount_r();
+        for (SHrsReceiptEarning hrsReceiptEarning : hrsEmployee.getHrsReceipt().getHrsReceiptEarnings()) {
+            if (SLibUtils.compareKeys(new int[] { hrsReceiptEarning.getPayrollReceiptEarning().getFkLoanEmployeeId_n(), hrsReceiptEarning.getPayrollReceiptEarning().getFkLoanLoanId_n()}, 
+                    loan.getPrimaryKey()) && hrsReceiptEarning.getPayrollReceiptEarning().isUserEdited()) {
+                balance += hrsReceiptEarning.getPayrollReceiptEarning().getAmount_r();
             }
         }
         
-        for (SHrsPayrollReceiptDeduction deduction : hrsEmployee.getHrsPayrollReceipt().getHrsReceiptDeductions()) {
-            if (SLibUtils.compareKeys(new int[] { deduction.getReceiptDeduction().getFkLoanEmployeeId_n(), deduction.getReceiptDeduction().getFkLoanLoanId_n()}, 
-                    loan.getPrimaryKey()) && deduction.getReceiptDeduction().isUserEdited()) {
-                balance -= deduction.getReceiptDeduction().getAmount_r();
+        for (SHrsReceiptDeduction hrsReceiptDeduction : hrsEmployee.getHrsReceipt().getHrsReceiptDeductions()) {
+            if (SLibUtils.compareKeys(new int[] { hrsReceiptDeduction.getPayrollReceiptDeduction().getFkLoanEmployeeId_n(), hrsReceiptDeduction.getPayrollReceiptDeduction().getFkLoanLoanId_n()}, 
+                    loan.getPrimaryKey()) && hrsReceiptDeduction.getPayrollReceiptDeduction().isUserEdited()) {
+                balance -= hrsReceiptDeduction.getPayrollReceiptDeduction().getAmount_r();
             }
         }
         
@@ -2254,9 +2160,9 @@ public abstract class SHrsUtils {
         ArrayList<SDbBenefitTable> benefitTableVacation = new ArrayList<>();
         ArrayList<SDbBenefitTable> benefitTableVacationBonus = new ArrayList<>();
         
-        benefitTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, SLibConsts.UNDEFINED, dateCutoff) }));
-        benefitTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutoff) }));
-        benefitTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, SLibConsts.UNDEFINED, dateCutoff) }));
+        benefitTableAnnualBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_ANN_BON, 0, dateCutoff) }));
+        benefitTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, 0, dateCutoff) }));
+        benefitTableVacationBonus.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC_BON, 0, dateCutoff) }));
         
         if (dateBenefits != null) {
             seniority = getSeniorityEmployee(dateBenefits, dateCutoff);
@@ -2342,7 +2248,7 @@ public abstract class SHrsUtils {
         ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<SDbBenefitTable>();
         ArrayList<SHrsBenefitTableAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableAnniversary>();
         
-        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, SLibConsts.UNDEFINED, dateCutoff) }));
+        aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, 0, dateCutoff) }));
         
         aTableVacationByAnniversary = createBenefitTablesAnniversarys(aTableVacation);
         
@@ -2355,27 +2261,22 @@ public abstract class SHrsUtils {
         return daysTableVacation;
     }
 
-    public static ArrayList<SDbEmployeeHireLog> getEmployeeHireLogs(final SGuiSession session, final int employeeId, final Date dateStart, final Date dateEnd) throws Exception {
-        ArrayList<SDbEmployeeHireLog> aEmployeeHireLogs = new ArrayList<SDbEmployeeHireLog>();
-        SDbEmployeeHireLog employeeHireLog = null;
-        String sql = "";
+    public static ArrayList<SDbEmployeeHireLog> getEmployeeHireLogs(final SGuiSession session, final Statement resultSetStatement, final int employeeId, final Date dateStart, final Date dateEnd) throws Exception {
+        ArrayList<SDbEmployeeHireLog> employeeHireLogs = new ArrayList<>();
 
-        ResultSet resultSet = null;
-        Statement statement = session.getDatabase().getConnection().createStatement();
-
-        sql = "SELECT id_emp, id_log " +
-            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-            "WHERE b_del = 0 AND id_emp = " + employeeId + " AND (dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' AND " +
-            "(dt_dis_n IS NULL OR dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "')) ";
+        String sql = "SELECT id_emp, id_log " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
+                "WHERE b_del = 0 AND id_emp = " + employeeId + " AND dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' AND " +
+                "(dt_dis_n IS NULL OR dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "') ";
         
-        resultSet = statement.executeQuery(sql);
+        ResultSet resultSet = resultSetStatement.executeQuery(sql);
         while (resultSet.next()) {
-            employeeHireLog = new SDbEmployeeHireLog();
+            SDbEmployeeHireLog employeeHireLog = new SDbEmployeeHireLog();
             employeeHireLog.read(session, new int[] { resultSet.getInt("id_emp"), resultSet.getInt("id_log") });
-            aEmployeeHireLogs.add(employeeHireLog);
+            employeeHireLogs.add(employeeHireLog);
         }
 
-        return aEmployeeHireLogs;
+        return employeeHireLogs;
     }
     
     public static SDbEmployeeHireLog getEmployeeLastHired(final SGuiSession session, final int employeeId, final int logId, final String table) throws Exception {
@@ -2423,10 +2324,14 @@ public abstract class SHrsUtils {
         
         for (SDbEmployeeHireLog hireLog : aEmployeeHireLogs) {
             if (hireLog.getDateHire().compareTo(dateStart) <= 0) {
-                daysHired += SLibTimeUtils.getDaysDiff(hireLog.getDateDismissed_n() == null ? dateEnd : hireLog.getDateDismissed_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissed_n(), dateStart) + 1;
+                daysHired += SLibTimeUtils.countPeriodDays(
+                        dateStart, 
+                        hireLog.getDateDismissed_n() == null ? dateEnd : hireLog.getDateDismissed_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissed_n());
             }
             else if (hireLog.getDateHire().compareTo(dateStart) >= 0) {
-                daysHired += SLibTimeUtils.getDaysDiff(hireLog.getDateDismissed_n() == null ? dateEnd : hireLog.getDateDismissed_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissed_n(), hireLog.getDateHire()) + 1;
+                daysHired += SLibTimeUtils.countPeriodDays(
+                        hireLog.getDateHire(),
+                        hireLog.getDateDismissed_n() == null ? dateEnd : hireLog.getDateDismissed_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissed_n());
             }
         }
         
@@ -2437,8 +2342,8 @@ public abstract class SHrsUtils {
         int daysIncapacityNotPaidAnnual = 0;
         
         for (SDbAbsenceConsumption absenceConsumption : aAbsenceConsumptions) {
-            if (SLibTimeUtils.isBelongingToPeriod(absenceConsumption.getDateStart(), dateStart, dateEnd) && 
-                    absenceConsumption.getAbsence().getFkAbsenceClassId() == SModSysConsts.HRSU_CL_ABS_DIS && !absenceConsumption.getAbsence().IsAuxAbsencePayable()) {
+            if (!absenceConsumption.getParentAbsence().isXtaAbsenceTypePayable() && absenceConsumption.getParentAbsence().isDisability() && 
+                    SLibTimeUtils.isBelongingToPeriod(absenceConsumption.getDateStart(), dateStart, dateEnd)) {
                 daysIncapacityNotPaidAnnual += absenceConsumption.getEffectiveDays();
             }
         }
@@ -2446,94 +2351,87 @@ public abstract class SHrsUtils {
         return daysIncapacityNotPaidAnnual;
     }
     
-    public static ArrayList<SDbAbsenceConsumption> getEmployeeAbsencesConsumption(final SGuiSession session, final ArrayList<SDbAbsence> aAbsences, final int payrollId) throws Exception {
-        ArrayList<SDbAbsenceConsumption> aAbsencesConsumptions = new ArrayList<SDbAbsenceConsumption>();
-        SDbAbsenceConsumption absenceConsumption = null;
-        String sql = "";
-        ResultSet resultSet = null;
-        Statement statement = session.getDatabase().getConnection().createStatement();
-
-        for (SDbAbsence absence : aAbsences) {
-            sql = "SELECT id_cns " +
-            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " " +
-            "WHERE b_del = 0 AND id_emp = " + absence.getPkEmployeeId() + " AND id_abs = " + absence.getPkAbsenceId() + " AND fk_rcp_pay <> " + payrollId + " " +
-            "ORDER BY id_emp, id_abs, id_cns ";
-
-            resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                absenceConsumption = new SDbAbsenceConsumption();
-                absenceConsumption.read(session, new int[] { absence.getPkEmployeeId(), absence.getPkAbsenceId(), resultSet.getInt("id_cns") });
-                aAbsencesConsumptions.add(absenceConsumption);
-            }
-        }
-        
-        return aAbsencesConsumptions;
-    }
-    
     public static ArrayList<SDbAbsence> getEmployeeAbsences(final SGuiSession session, final int employeeId) throws Exception {
-        ArrayList<SDbAbsence> aAbsences = new ArrayList<SDbAbsence>();
-        SDbAbsence absence = null;
-        String sql = "";
-        ResultSet resultSet = null;
-        Statement statement = session.getDatabase().getConnection().createStatement();
+        ArrayList<SDbAbsence> aAbsences = new ArrayList<>();
 
-        sql = "SELECT id_emp, id_abs, eff_day " +
+        String sql = "SELECT id_emp, id_abs " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " " +
-            "WHERE b_del = 0 AND b_clo = 0 AND id_emp = " + employeeId + " " +
-            "ORDER BY dt_sta, id_emp, id_abs ";
+            "WHERE id_emp = " + employeeId + " AND NOT b_del AND NOT b_clo " +
+            "ORDER BY dt_sta, id_emp, id_abs;";
 
-        resultSet = statement.executeQuery(sql);
-        while (resultSet.next()) {
-            absence = new SDbAbsence();
-            absence.read(session, new int[] { resultSet.getInt("id_emp"), resultSet.getInt("id_abs") });
-            aAbsences.add(absence);
+        try (ResultSet resultSet = session.getDatabase().getConnection().createStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbAbsence absence = new SDbAbsence();
+                absence.read(session, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                aAbsences.add(absence);
+            }
         }
         
         return aAbsences;
     }
     
-    public static boolean isFirtsHire(final SGuiSession session, final int employeeId, final int logId, final String table) throws Exception {
-        String sql = "";
-        ResultSet resultSet = null;
-        boolean isFirts = false;
-        SDbEmployeeHireLog employeeHireLog = null;
+    public static ArrayList<SDbAbsenceConsumption> getEmployeeAbsencesConsumptions(final SGuiSession session, final ArrayList<SDbAbsence> absences, final int payrollId) throws Exception {
+        ArrayList<SDbAbsenceConsumption> absencesConsumptions = new ArrayList<>();
+
+        String sql = "SELECT ac.id_cns "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " AS ac "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON ac.fk_rcp_pay = pr.id_pay AND ac.fk_rcp_emp = pr.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p ON pr.id_pay = p.id_pay "
+                + "WHERE ac.id_emp = ? AND ac.id_abs = ? AND ac.fk_rcp_pay <> " + payrollId + " AND NOT ac.b_del AND NOT pr.b_del AND NOT p.b_del "
+                + "ORDER BY ac.id_emp, ac.id_abs, ac.id_cns;";
+
+        try (PreparedStatement preparedStatement = session.getDatabase().getConnection().prepareStatement(sql)) {
+            for (SDbAbsence absence : absences) {
+                preparedStatement.setInt(1, absence.getPkEmployeeId());
+                preparedStatement.setInt(2, absence.getPkAbsenceId());
+                
+                try (ResultSet resultSet = preparedStatement.executeQuery(sql)) {
+                    while (resultSet.next()) {
+                        SDbAbsenceConsumption absenceConsumption = new SDbAbsenceConsumption();
+                        absenceConsumption.read(session, new int[] { absence.getPkEmployeeId(), absence.getPkAbsenceId(), resultSet.getInt(1) });
+                        absencesConsumptions.add(absenceConsumption);
+                    }
+                }
+            }
+        }
         
-        sql = "SELECT COUNT(*) AS f_count, id_log " +
+        return absencesConsumptions;
+    }
+    
+    public static boolean isFirtsHire(final SGuiSession session, final int employeeId, final int logId, final String table) throws Exception {
+        boolean isFirtsHire = false;
+        
+        String sql = "SELECT COUNT(*) AS f_count, id_log " +
             "FROM " + (table.isEmpty() ? "" : (table + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
             "WHERE b_del = 0 AND id_emp = " + employeeId + " ";
         
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next() && resultSet.getInt("f_count") == 1) {
-            employeeHireLog = new SDbEmployeeHireLog();
-            employeeHireLog.read(session, new int[] { employeeId, resultSet.getInt("id_log") });
-            isFirts = employeeHireLog.getDateDismissed_n() == null;
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next() && resultSet.getInt("f_count") == 1) {
+                SDbEmployeeHireLog employeeHireLog = new SDbEmployeeHireLog();
+                employeeHireLog.read(session, new int[] { employeeId, resultSet.getInt("id_log") });
+                isFirtsHire = employeeHireLog.getDateDismissed_n() == null;
+            }
         }
         
-        return isFirts;
+        return isFirtsHire;
     }
     
     public static boolean deleteHireLog(final SGuiSession session, final int employeeId) throws Exception {
-        SDbEmployee employee = null;
-        SDbEmployeeHireLog employeeHireLog;
-        SHrsEmployeeHireLog hrsEmployeeHireLog;
-        
-        employee = new SDbEmployee();
-        employeeHireLog = new SDbEmployeeHireLog();
-        hrsEmployeeHireLog = new SHrsEmployeeHireLog(null,session);
-                
-        employee.read(session, new int[] { employeeId });
-
-        if (SHrsUtils.isFirtsHire(session, employee.getPkEmployeeId(), SLibConsts.UNDEFINED, "")) {
+        if (SHrsUtils.isFirtsHire(session, employeeId, 0, "")) {
             throw new Exception("El registro no se puede eliminar, es el único registro en la bitácora de alts/bajas.");
         }
         else {
+            SDbEmployee employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
+            SDbEmployeeHireLog employeeHireLog;
+            
             if (employee.isActive()) {
-                employeeHireLog = SHrsUtils.getEmployeeLastHired(session, employee.getPkEmployeeId(), SLibConsts.UNDEFINED, "");
+                employeeHireLog = SHrsUtils.getEmployeeLastHired(session, employeeId, 0, "");
             }
             else {
-                employeeHireLog = SHrsUtils.getEmployeeLastDismiss(session, employee.getPkEmployeeId(), SLibConsts.UNDEFINED, "");
+                employeeHireLog = SHrsUtils.getEmployeeLastDismiss(session, employeeId, 0, "");
             }
 
+            SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(null, session);
             hrsEmployeeHireLog.setPkEmployeeId(employeeHireLog.getPkEmployeeId());
             hrsEmployeeHireLog.setDateLastHire(employeeHireLog.getDateHire());
             hrsEmployeeHireLog.setIsHire(!employee.isActive());
@@ -2557,6 +2455,7 @@ public abstract class SHrsUtils {
                 hrsEmployeeHireLog.setNotesDismissed("");
                 hrsEmployeeHireLog.setFkDismissedType(SModSysConsts.HRSU_TP_EMP_DIS_NON); 
             }
+            
             hrsEmployeeHireLog.save();
         }
         
@@ -2671,7 +2570,7 @@ public abstract class SHrsUtils {
         return scheduledDays;
     }
     
-    public static SHrsFormerPayroll readPayroll(final SClientInterface client, final int[] keyPayroll) throws SQLException, Exception {
+    public static SHrsFormerPayroll readPayrollForReceipt(final SClientInterface client, final int[] keyReceipt) throws SQLException, Exception {
         int nPaymentType = 0;
         int nBankDefaultId = 0;
         int nEarningSubCompId = 0;
@@ -2741,7 +2640,7 @@ public abstract class SHrsUtils {
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp " +
                 "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pri.b_del AND " +
-                "pri.id_pay = " + keyPayroll[0] + " AND pri.id_emp = " + keyPayroll[1] + " AND pri.id_iss = " + keyPayroll[2] + "; ";
+                "pri.id_pay = " + keyReceipt[0] + " AND pri.id_emp = " + keyReceipt[1] + " AND pri.id_iss = " + keyReceipt[2] + "; ";
         
         resultSet = statement.executeQuery(sql);
         if (!resultSet.next()) {
@@ -2749,7 +2648,7 @@ public abstract class SHrsUtils {
         }
         else {
             payroll = new SHrsFormerPayroll(client);
-            payroll.setPkNominaId(keyPayroll[0]);
+            payroll.setPkNominaId(keyReceipt[0]);
             payroll.setFecha(resultSet.getDate("pri.dt_iss"));
             payroll.setFechaInicial(resultSet.getDate("p.dt_sta"));
             payroll.setFechaFinal(resultSet.getDate("p.dt_end"));
@@ -2789,7 +2688,7 @@ public abstract class SHrsUtils {
                     "INNER JOIN erp.hrss_tp_work_day AS twkd ON pr.fk_tp_work_day = twkd.id_tp_work_day " +
                     "INNER JOIN erp.hrss_tp_pay AS tpay ON p.fk_tp_pay = tpay.id_tp_pay " +
                     "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pri.b_del AND " +
-                    "pri.id_pay = " + keyPayroll[0] + " AND pri.id_emp = " + keyPayroll[1] + " AND pri.id_iss = " + keyPayroll[2] + "; ";
+                    "pri.id_pay = " + keyReceipt[0] + " AND pri.id_emp = " + keyReceipt[1] + " AND pri.id_iss = " + keyReceipt[2] + "; ";
             resultSet = statement.executeQuery(sql);
 
             while (resultSet.next()) {
@@ -2808,16 +2707,16 @@ public abstract class SHrsUtils {
                     "FROM erp.bpsu_bpb AS bpb " +
                     "INNER JOIN erp.bpsu_bpb_add AS bpb_add ON bpb.id_bpb = bpb_add.id_bpb AND bpb_add.fid_tp_add = " + SDataConstantsSys.BPSS_TP_ADD_OFF + " " +
                     "LEFT OUTER JOIN erp.locu_sta AS sta ON bpb_add.fid_sta_n = sta.id_sta " +
-                    "WHERE bpb.b_del = 0 AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND bpb.fid_bp = " + keyPayroll[1] + " ";
+                    "WHERE bpb.b_del = 0 AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND bpb.fid_bp = " + keyReceipt[1] + " ";
                 resultSetClient = statementClient.executeQuery(sql);
 
                 if (!resultSetClient.next()) {
-                    throw new Exception("No se encontró la sucursal del empleado con ID = " + keyPayroll[1] + ".");
+                    throw new Exception("No se encontró la sucursal del empleado con ID = " + keyReceipt[1] + ".");
                 }
                 else {
                     payrollReceipt = new SHrsFormerPayrollReceipt(payroll, client);
-                    payrollReceipt.setPkEmpleadoId(keyPayroll[1]);
-                    payrollReceipt.setAuxEmpleadoId(keyPayroll[1]);
+                    payrollReceipt.setPkEmpleadoId(keyReceipt[1]);
+                    payrollReceipt.setAuxEmpleadoId(keyReceipt[1]);
                     payrollReceipt.setPkSucursalEmpleadoId(resultSetClient.getInt("bpb.id_bpb"));
                     payrollReceipt.setRegistroPatronal(client.getSessionXXX().getParamsCompany().getRegistrySs());
                     payrollReceipt.setNumEmpleado(SLibUtilities.textTrim(resultSet.getString("f_emp_num")));
@@ -2874,9 +2773,9 @@ public abstract class SHrsUtils {
                     else {
                         payrollReceipt.setMoneda(SLibUtilities.textTrim(resultSetClient.getString("c.cur_key")));
                         payrollReceipt.setLugarExpedicion(client.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
-                        payrollReceipt.setConfirmacion("");
                         payrollReceipt.setRegimenFiscal(client.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
-                        payrollReceipt.setCfdiRelacionadosTipoRelacion("");
+                        //payrollReceipt.setConfirmacion(""); XXX WTF!
+                        //payrollReceipt.setCfdiRelacionadosTipoRelacion(""); XXX WTF!
 
                         // Obtain perceptions:
 
@@ -2895,7 +2794,7 @@ public abstract class SHrsUtils {
                                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp AND pre.b_del = 0 " +
                                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS e ON e.id_ear = pre.fk_ear " +
                                 "INNER JOIN erp.hrss_tp_ear_comp AS ec ON ec.id_tp_ear_comp = e.fk_tp_ear_comp " +
-                                "WHERE p.id_pay = " + keyPayroll[0] + " AND pr.id_emp = " + keyPayroll[1] + "; ";
+                                "WHERE p.id_pay = " + keyReceipt[0] + " AND pr.id_emp = " + keyReceipt[1] + "; ";
 
                         resultSetAux = statementAux.executeQuery(sql);
                         while (resultSetAux.next()) {
@@ -2993,7 +2892,7 @@ public abstract class SHrsUtils {
                                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " AS d ON d.id_ded = prd.fk_ded " +
                                 "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_LOAN) + " AS l ON l.id_emp = prd.fk_loan_emp_n AND l.id_loan = prd.fk_loan_loan_n " +
                                 "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_LOAN) + " AS tl ON tl.id_tp_loan = prd.fk_tp_loan_n " +
-                                "WHERE p.id_pay = " + keyPayroll[0] + " AND pr.b_del = 0 AND prd.b_del = 0 AND pr.id_emp = " + keyPayroll[1] + "; ";
+                                "WHERE p.id_pay = " + keyReceipt[0] + " AND pr.b_del = 0 AND prd.b_del = 0 AND pr.id_emp = " + keyReceipt[1] + "; ";
 
                         resultSetAux = statementAux.executeQuery(sql);
                         while (resultSetAux.next()) {
@@ -3034,23 +2933,23 @@ public abstract class SHrsUtils {
     }
     
     public static void createPayrollReceiptIssues(final SGuiSession session, final SDbPayroll payroll) throws Exception {
-        for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) {
-            receipt.setAuxDateIssue(payroll.getDateEnd());
-            receipt.createIssues(session);
+        for (SDbPayrollReceipt payrollReceipt : payroll.getChildPayrollReceipts()) {
+            payrollReceipt.setAuxDateIssue(payroll.getDateEnd());
+            payrollReceipt.createIssues(session);
         }
     }
     
     public static void updateToNewStatusPayrollReceiptIssues(final SGuiSession session, final SDbPayroll payroll) throws Exception {
-        for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) {
-            receipt.updateToNewStatusIssues(session);
+        for (SDbPayrollReceipt payrollReceipt : payroll.getChildPayrollReceipts()) {
+            payrollReceipt.updateToNewStatusIssues(session);
         }
     }
     
-    public static double computeAmountLoan(final SHrsPayrollReceipt hrsReceipt, final SDbLoan loan) throws Exception {
+    public static double computeAmountLoan(final SHrsReceipt hrsReceipt, final SDbLoan loan) throws Exception {
         double loanAmt = 0;
         double monthlyAdj = hrsReceipt.getHrsPayroll().getLoanTypeAdjustment(hrsReceipt.getHrsPayroll().getPayroll().getDateEnd(), loan.getFkLoanTypeId());
         
-        if (SLibUtils.belongsTo(loan.getFkLoanTypeId(), new int[] { SModSysConsts.HRSS_TP_LOAN_LOAN_COM, SModSysConsts.HRSS_TP_LOAN_LOAN_UNI, SModSysConsts.HRSS_TP_LOAN_LOAN_3RD })) {
+        if (loan.isPlainLoan()) {
             // it is a loan:
 
             loanAmt = loan.getPaymentAmount();
@@ -3091,10 +2990,10 @@ public abstract class SHrsUtils {
                 
                 switch (loan.getPaymentPercentageReference()) {
                     case SHrsConsts.PAY_PER_REF_SD:
-                        salary = hrsReceipt.getReceipt().getPaymentDaily();
+                        salary = hrsReceipt.getPayrollReceipt().getPaymentDaily();
                         break;
                     case SHrsConsts.PAY_PER_REF_SBC:
-                        salary = hrsReceipt.getReceipt().getSalarySscBase();
+                        salary = hrsReceipt.getPayrollReceipt().getSalarySscBase();
                         break;
                     case SHrsConsts.PAY_PER_REF_OTRO:
                         salary = loan.getPaymentPercentageAmount();
@@ -3107,7 +3006,7 @@ public abstract class SHrsUtils {
                 loanAdj +=  propCurr * monthlyAdj;
                 loanAdj +=  propNext * monthlyAdj;
 
-                loanAmt = (hrsReceipt.getReceipt().getDaysHiredPayroll() - hrsReceipt.getReceipt().getDaysNotWorkedNotPaid()) * salary * loan.getPaymentPercentage() + loanAdj;
+                loanAmt = (hrsReceipt.getPayrollReceipt().getDaysHiredPayroll() - hrsReceipt.getPayrollReceipt().getDaysNotWorkedNotPaid()) * salary * loan.getPaymentPercentage() + loanAdj;
             }
             else {
                 double monthlyPay;
@@ -3469,7 +3368,7 @@ public abstract class SHrsUtils {
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON " +
             "pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp " +
             "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND pr.id_emp = " + employeeId + 
-            (earningTypeId == SLibConsts.UNDEFINED ? "" : " AND pre.fk_tp_ear = " + earningTypeId) + " AND " +
+            (earningTypeId == 0 ? "" : " AND pre.fk_tp_ear = " + earningTypeId) + " AND " +
             "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "'";
         
         resultSet = statement.executeQuery(sql);
@@ -3497,7 +3396,7 @@ public abstract class SHrsUtils {
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON " +
             "pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp " +
             "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND pr.id_emp = " + employeeId + 
-            (deductionTypeId == SLibConsts.UNDEFINED ? "" : " AND prd.fk_tp_ded = " + deductionTypeId) + " AND " +
+            (deductionTypeId == 0 ? "" : " AND prd.fk_tp_ded = " + deductionTypeId) + " AND " +
             "p.per_year = " + periodYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff) + "'";
         
         resultSet = statement.executeQuery(sql);
@@ -3509,7 +3408,7 @@ public abstract class SHrsUtils {
     }
     
     public static SHrsAmountEarning getAmountEarningsByEmployee(final SGuiSession session, final int employeeId, final int periodYear, final Date dateCutOff) throws Exception {
-        return getAmountEarningByEmployee(session, employeeId, SLibConsts.UNDEFINED, periodYear, dateCutOff);
+        return getAmountEarningByEmployee(session, employeeId, 0, periodYear, dateCutOff);
     }
     
     /**
@@ -3578,11 +3477,11 @@ public abstract class SHrsUtils {
         accountingEarning = new SDbAccountingEarning();
             
         accountingEarning.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-        accountingEarning.setFkCostCenterId_n(SLibConsts.UNDEFINED);
-        accountingEarning.setFkItemId_n(SLibConsts.UNDEFINED);
-        accountingEarning.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
-        accountingEarning.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
-        accountingEarning.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
+        accountingEarning.setFkCostCenterId_n(0);
+        accountingEarning.setFkItemId_n(0);
+        accountingEarning.setFkBizPartnerId_n(0);
+        accountingEarning.setFkTaxBasicId_n(0);
+        accountingEarning.setFkTaxTaxId_n(0);
         /*
         accountingEarning.setFkUserInsertId();
         accountingEarning.setFkUserUpdateId();
@@ -3604,11 +3503,11 @@ public abstract class SHrsUtils {
         accountingDeduction = new SDbAccountingDeduction();
             
         accountingDeduction.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-        accountingDeduction.setFkCostCenterId_n(SLibConsts.UNDEFINED);
-        accountingDeduction.setFkItemId_n(SLibConsts.UNDEFINED);
-        accountingDeduction.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
-        accountingDeduction.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
-        accountingDeduction.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
+        accountingDeduction.setFkCostCenterId_n(0);
+        accountingDeduction.setFkItemId_n(0);
+        accountingDeduction.setFkBizPartnerId_n(0);
+        accountingDeduction.setFkTaxBasicId_n(0);
+        accountingDeduction.setFkTaxTaxId_n(0);
         /*
         accountingDeduction.setFkUserInsertId();
         accountingDeduction.setFkUserUpdateId();
@@ -3687,7 +3586,7 @@ public abstract class SHrsUtils {
         SDbEmployee employee = null;
         ArrayList<SDbAccountingEarning> maAccountingEarning = getAccountingEarning(session, nEarningId, nAccountingConfigurationTypeOldId);
         
-        if (bIsRegistryNew || (nAccountingConfigurationTypeOldId != SLibConsts.UNDEFINED &&
+        if (bIsRegistryNew || (nAccountingConfigurationTypeOldId != 0 &&
                 nAccountingConfigurationTypeOldId != nAccountingConfigurationTypeNewId)) {
             for (SDbAccountingEarning dbAccountingEarning : maAccountingEarning) {
                 if (SLibUtils.compareKeys(new int[] { dbAccountingEarning.getPkEarningId() }, new int[] { nEarningId })) {
@@ -3704,7 +3603,7 @@ public abstract class SHrsUtils {
             
                     accountingEarning.setPkEarningId(nEarningId);
                     accountingEarning.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_GBL);
-                    accountingEarning.setPkReferenceId(SLibConsts.UNDEFINED);
+                    accountingEarning.setPkReferenceId(0);
                     accountingEarning.setDeleted(false);
 
                     aAccountingEarning.add(accountingEarning);
@@ -3719,7 +3618,7 @@ public abstract class SHrsUtils {
                     }
                     
                     for (SDbDepartment dbDepartment : departments) {
-                        if (nAccountingConfigurationTypeNewId != SLibConsts.UNDEFINED &&
+                        if (nAccountingConfigurationTypeNewId != 0 &&
                                 nAccountingConfigurationTypeNewId < nAccountingConfigurationTypeOldId && !maAccountingEarning.isEmpty()) {
                             accountingEarning = maAccountingEarning.get(0).clone();
                         }
@@ -3745,7 +3644,7 @@ public abstract class SHrsUtils {
                     }
                     
                     for (SDbEmployee dbEmployee : employees) {
-                        if (nAccountingConfigurationTypeNewId != SLibConsts.UNDEFINED &&
+                        if (nAccountingConfigurationTypeNewId != 0 &&
                                 nAccountingConfigurationTypeNewId < nAccountingConfigurationTypeOldId) {
                             if (nAccountingConfigurationTypeNewId == SModSysConsts.HRSS_TP_ACC_GBL && !maAccountingEarning.isEmpty()) {
                                 accountingEarning = maAccountingEarning.get(0).clone();
@@ -3800,7 +3699,7 @@ public abstract class SHrsUtils {
         SDbEmployee employee = null;
         ArrayList<SDbAccountingDeduction> maAccountingDeduction = getAccountingDeduction(session, nDeductionId, nAccountingConfigurationTypeOldId);
         
-        if (bIsRegistryNew || (nAccountingConfigurationTypeOldId != SLibConsts.UNDEFINED &&
+        if (bIsRegistryNew || (nAccountingConfigurationTypeOldId != 0 &&
                 nAccountingConfigurationTypeOldId != nAccountingConfigurationTypeNewId)) {
             for (SDbAccountingDeduction dbAccountingDeduction : maAccountingDeduction) {
                 dbAccountingDeduction.setDeleted(true);
@@ -3815,7 +3714,7 @@ public abstract class SHrsUtils {
             
                     accountingDeduction.setPkDeductionId(nDeductionId);
                     accountingDeduction.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_GBL);
-                    accountingDeduction.setPkReferenceId(SLibConsts.UNDEFINED);
+                    accountingDeduction.setPkReferenceId(0);
                     accountingDeduction.setDeleted(false);
                     
                     aAccountingDeduction.add(accountingDeduction);
@@ -3830,7 +3729,7 @@ public abstract class SHrsUtils {
                     }
                     
                     for (SDbDepartment dbDepartment : departments) {
-                        if (nAccountingConfigurationTypeNewId != SLibConsts.UNDEFINED &&
+                        if (nAccountingConfigurationTypeNewId != 0 &&
                                 nAccountingConfigurationTypeNewId < nAccountingConfigurationTypeOldId && !maAccountingDeduction.isEmpty()) {
                             accountingDeduction = maAccountingDeduction.get(0).clone();
                         }
@@ -3856,7 +3755,7 @@ public abstract class SHrsUtils {
                     }
                     
                     for (SDbEmployee dbEmployee : employees) {
-                        if (nAccountingConfigurationTypeNewId != SLibConsts.UNDEFINED &&
+                        if (nAccountingConfigurationTypeNewId != 0 &&
                                 nAccountingConfigurationTypeNewId < nAccountingConfigurationTypeOldId) {
                             if (nAccountingConfigurationTypeNewId == SModSysConsts.HRSS_TP_ACC_GBL && !maAccountingDeduction.isEmpty()) {
                                 accountingDeduction = maAccountingDeduction.get(0).clone();

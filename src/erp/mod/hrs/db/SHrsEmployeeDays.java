@@ -4,8 +4,10 @@
  */
 package erp.mod.hrs.db;
 
+import erp.mod.SModSysConsts;
 import java.util.Date;
 import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -13,75 +15,61 @@ import sa.lib.SLibTimeUtils;
  */
 public class SHrsEmployeeDays {
 
-    protected int mnYear;                       // for accumulated earnings & deductions
-    protected int mnPeriod;                       // for accumulated earnings & deductions
-    protected Date mtPeriodStart;               // analyzed period start date
-    protected Date mtPeriodEnd;                 // analyzed period end date
-    protected int mnPeriodDays;
+    protected int mnYear;       // for accumulated earnings & deductions
+    protected int mnPeriod;     // for accumulated earnings & deductions
+    protected Date mtPeriodStart;   // analyzed period start
+    protected Date mtPeriodEnd;     // analyzed period end
+    protected int mnPeriodDays;     // analyzed period days
     
     protected double mdFactorCalendar;
     protected double mdFactorDaysPaid;
     protected double mdReceiptDays;
     protected double mdWorkingDays;
-    protected double mdBusinessDays;
     protected double mdDaysWorked;
     protected double mdDaysHiredPayroll;
     protected double mdDaysHiredAnnual;
-    protected double mdDaysIncapacityNotPaidPayroll;
-    protected double mdDaysIncapacityNotPaidAnnual;
-    protected double mdDaysNotWorkedPaid;
+    protected double mdDaysDisabilityNotPaidPayroll;
+    protected double mdDaysDisabilityNotPaidAnnual;
+    protected double mdDaysNotWorkedButPaid;
     protected double mdDaysNotWorkedNotPaid;
-    protected double mdDaysNotWorked_r;
-    protected double mdDaysToBePaid_r;
-    protected double mdDaysPaid;
     
-
-    public SHrsEmployeeDays(int year, int period, Date periodStart, Date periodEnd) throws Exception {
+    protected double mdBusinessDays;
+    
+    public SHrsEmployeeDays(int year, int period, Date periodStart, Date periodEnd) {
         mnYear = year;
         mnPeriod = period;
         mtPeriodStart = periodStart;
         mtPeriodEnd = periodEnd;
-        mnPeriodDays = (int) SLibTimeUtils.getDaysDiff(mtPeriodEnd, mtPeriodStart) + 1;
+        mnPeriodDays = SLibTimeUtils.countPeriodDays(mtPeriodStart, mtPeriodEnd);
         
         mdFactorCalendar = 0;
         mdFactorDaysPaid = 0;
         mdReceiptDays = 0;
         mdWorkingDays = 0;
-        mdBusinessDays = 0;
         mdDaysWorked = 0;
         mdDaysHiredPayroll = 0;
         mdDaysHiredAnnual = 0;
-        mdDaysIncapacityNotPaidPayroll = 0;
-        mdDaysIncapacityNotPaidAnnual = 0;
-        mdDaysNotWorkedPaid = 0;
+        mdDaysDisabilityNotPaidPayroll = 0;
+        mdDaysDisabilityNotPaidAnnual = 0;
+        mdDaysNotWorkedButPaid = 0;
         mdDaysNotWorkedNotPaid = 0;
-        mdDaysNotWorked_r = 0;
-        mdDaysToBePaid_r = 0;
-        mdDaysPaid = 0;
-        mdDaysPaid = 0;
+        
+        mdBusinessDays = 0;
     }
-
-    public void setYear(final int n) { mnYear = n; }
-    public void setPeriod(final int n) { mnPeriod = n; }
-    public void setPeriodStart(final Date t) { mtPeriodStart = t; }
-    public void setPeriodEnd(final Date t) { mtPeriodEnd = t; }
-    public void setPeriodDays(int n) { mnPeriodDays = n; }
     
     public void setFactorCalendar(double d) { mdFactorCalendar = d; }
     public void setFactorDaysPaid(double d) { mdFactorDaysPaid = d; }
     public void setReceiptDays(double d) { mdReceiptDays = d; }
     public void setWorkingDays(double d) { mdWorkingDays = d; }
-    public void setBusinessDays(double d) { mdBusinessDays = d; }
     public void setDaysWorked(double d) { mdDaysWorked = d; }
     public void setDaysHiredPayroll(double d) { mdDaysHiredPayroll = d; }
     public void setDaysHiredAnnual(double d) { mdDaysHiredAnnual = d; }
-    public void setDaysIncapacityNotPaidPayroll(double d) { mdDaysIncapacityNotPaidPayroll = d; }
-    public void setDaysIncapacityNotPaidAnnual(double d) { mdDaysIncapacityNotPaidAnnual = d; }
-    public void setDaysNotWorkedPaid(double d) { mdDaysNotWorkedPaid = d; }
+    public void setDaysDisabilityNotPaidPayroll(double d) { mdDaysDisabilityNotPaidPayroll = d; }
+    public void setDaysDisabilityNotPaidAnnual(double d) { mdDaysDisabilityNotPaidAnnual = d; }
+    public void setDaysNotWorkedButPaid(double d) { mdDaysNotWorkedButPaid = d; }
     public void setDaysNotWorkedNotPaid(double d) { mdDaysNotWorkedNotPaid = d; }
-    public void setDaysNotWorked_r(double d) { mdDaysNotWorked_r = d; }
-    public void setDaysToBePaid_r(double d) { mdDaysToBePaid_r = d; }
-    public void setDaysPaid(double d) { mdDaysPaid = d; }
+    
+    public void setBusinessDays(double d) { mdBusinessDays = d; }
 
     public int getYear() { return mnYear; }
     public int getPeriod() { return mnPeriod; }
@@ -93,27 +81,60 @@ public class SHrsEmployeeDays {
     public double getFactorDaysPaid() { return mdFactorDaysPaid; }
     public double getReceiptDays() { return mdReceiptDays; }
     public double getWorkingDays() { return mdWorkingDays; }
-    public double getBusinessDays() { return mdBusinessDays; }
     public double getDaysWorked() { return mdDaysWorked; }
     public double getDaysHiredPayroll() { return mdDaysHiredPayroll; }
     public double getDaysHiredAnnual() { return mdDaysHiredAnnual; }
-    public double getDaysIncapacityNotPaidPayroll() { return mdDaysIncapacityNotPaidPayroll; }
-    public double getDaysIncapacityNotPaidAnnual() { return mdDaysIncapacityNotPaidAnnual; }
-    public double getDaysNotWorkedPaid() { return mdDaysNotWorkedPaid; }
+    public double getDaysIncapacityNotPaidPayroll() { return mdDaysDisabilityNotPaidPayroll; }
+    public double getDaysIncapacityNotPaidAnnual() { return mdDaysDisabilityNotPaidAnnual; }
+    public double getDaysNotWorkedButPaid() { return mdDaysNotWorkedButPaid; }
     public double getDaysNotWorkedNotPaid() { return mdDaysNotWorkedNotPaid; }
-    public double getDaysNotWorked_r() { return mdDaysNotWorked_r; }
-    public double getDaysToBePaid_r() { return mdDaysToBePaid_r; }
-    public double getDaysPaid() { return mdDaysPaid; }
+    
+    public double getBusinessDays() { return mdBusinessDays; }
 
-    /**
-     * Gets employee's taxable days in current period.
-     * @return Days active - days of disability.
-     */
-    public double getPayrollTaxableDays_r() { return mdDaysHiredPayroll - mdDaysIncapacityNotPaidPayroll; }
+    public double getDaysNotWorked_r() { return mdDaysNotWorkedButPaid + mdDaysNotWorkedNotPaid; }
+    public double getDaysToBePaid_r() { return (mdDaysWorked + mdDaysNotWorkedButPaid) * mdFactorCalendar; }
+    public double getDaysPaid() { return getDaysToBePaid_r() * mdFactorDaysPaid; }
     
     /**
-     * Gets employee's taxable days accumulated.
-     * @return Days active - days of disability.
+     * Gets employee's taxable days in current payroll.
+     * @return Days hired - days of disability.
      */
-    public double getAnnualTaxableDays_r() { return mdDaysHiredAnnual - mdDaysIncapacityNotPaidAnnual; }
+    public double getTaxableDaysPayroll() { return mdDaysHiredPayroll - mdDaysDisabilityNotPaidPayroll; }
+    
+    /**
+     * Gets employee's taxable days in current year.
+     * @return Days hired - days of disability.
+     */
+    public double getTaxableDaysAnnual() { return mdDaysHiredAnnual - mdDaysDisabilityNotPaidAnnual; }
+
+    /**
+     * Computes earning units.
+     * @param unitsAlleged
+     * @param earning
+     * @return 
+     */
+    public double computeEarningUnits(final double unitsAlleged, final SDbEarning earning) {
+        double units;
+        
+        switch (earning.getFkEarningComputationTypeId()) {
+            case SModSysConsts.HRSS_TP_EAR_COMP_DAYS:
+                units = unitsAlleged * mdFactorCalendar * (earning.isDaysAdjustment() ? mdFactorDaysPaid : 1d);
+                break;
+            default:
+                units = unitsAlleged;
+        }
+        
+        return SLibUtils.round(units, SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits());
+    }
+    
+    /**
+     * Computes earning amount.
+     * @param units
+     * @param amountUnit
+     * @param earning
+     * @return 
+     */
+    public static double computeEarningAmount(final double units, final double amountUnit, final SDbEarning earning) {
+        return SLibUtils.roundAmount(units * amountUnit * earning.getUnitsFactor());
+    }
 }

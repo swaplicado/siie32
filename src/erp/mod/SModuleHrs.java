@@ -680,7 +680,7 @@ public class SModuleHrs extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY dt_sta, id_tax ";
                 break;
             case SModConsts.HRS_TAX_SUB:
-                settings = new SGuiCatalogueSettings("Tabla subsidio empleo", 1);
+                settings = new SGuiCatalogueSettings("Tabla Subsidio empleo", 1);
                 sql = "SELECT id_tax_sub AS " + SDbConsts.FIELD_ID + "1, CONCAT('VIGENCIA: ', dt_sta) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY dt_sta, id_tax_sub ";
                 break;
@@ -732,7 +732,7 @@ public class SModuleHrs extends SGuiModule {
     @Override
     public SGridPaneView getView(final int type, final int subtype, final SGuiParams params) {
         SGridPaneView view = null;
-        String title = "";
+        String title;
 
         switch (type) {
             case SModConsts.HRSU_CL_ABS:
@@ -781,10 +781,10 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewTaxTableRow(miClient, "Tablas impuesto (detalle)");
                 break;
             case SModConsts.HRS_TAX_SUB:
-                view = new SViewTaxSubsidyTable(miClient, "Tablas subsidio empleo");
+                view = new SViewTaxSubsidyTable(miClient, "Tablas Subsidio empleo");
                 break;
             case SModConsts.HRS_TAX_SUB_ROW:
-                view = new SViewTaxSubsidyTableRow(miClient, "Tablas subsidio empleo (detalle)");
+                view = new SViewTaxSubsidyTableRow(miClient, "Tablas Subsidio empleo (detalle)");
                 break;
             case SModConsts.HRS_SSC:
                 view = new SViewSsContributionTable(miClient, "Tablas retención SS");
@@ -837,14 +837,14 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSX_AUT_EAR:
                 switch (subtype) {
                     case SModSysConsts.HRS_AUT_GBL:
-                        view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones automáticas globales");
+                        view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones auto. globales");
                         break;
                     case SModSysConsts.HRS_AUT_EMP:
                         if (params == null) {
-                            view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones automáticas empleado");
+                            view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones auto. empleado");
                         }
                         else {
-                            view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones automáticas empleado (detalle)", params);
+                            view = new SViewAutomaticEarnings(miClient, subtype, "Percepciones auto. empleado (detalle)", params);
                         }
                         break;
                     default:
@@ -854,14 +854,14 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSX_AUT_DED:
                 switch (subtype) {
                     case SModSysConsts.HRS_AUT_GBL:
-                        view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones automáticas globales");
+                        view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones auto. globales");
                         break;
                     case SModSysConsts.HRS_AUT_EMP:
                         if (params == null) {
-                            view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones automáticas empleado");
+                            view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones auto. empleado");
                         }
                         else {
-                            view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones automáticas empleado (detalle)", params);
+                            view = new SViewAutomaticDeductions(miClient, subtype, "Deducciones auto. empleado (detalle)", params);
                         }
                         break;
                     default:
@@ -889,7 +889,7 @@ public class SModuleHrs extends SGuiModule {
                             view = new SViewAccountingEarning(miClient, subtype, "Config. contab. percepciones globales");
                             break;
                         case SModSysConsts.HRSS_TP_ACC_DEP:
-                            view = new SViewAccountingEarning(miClient, subtype, "Config. contab. percepciones departamento");
+                            view = new SViewAccountingEarning(miClient, subtype, "Config. contab. percepciones depto.");
                             break;
                         case SModSysConsts.HRSS_TP_ACC_EMP:
                             view = new SViewAccountingEarning(miClient, subtype, "Config. contab. percepciones empleado");
@@ -904,7 +904,7 @@ public class SModuleHrs extends SGuiModule {
                             view = new SViewAccountingDeduction(miClient, subtype, "Config. contab. deducciones globales");
                             break;
                         case SModSysConsts.HRSS_TP_ACC_DEP:
-                            view = new SViewAccountingDeduction(miClient, subtype, "Config. contab. deducciones departamento");
+                            view = new SViewAccountingDeduction(miClient, subtype, "Config. contab. deducciones depto.");
                             break;
                         case SModSysConsts.HRSS_TP_ACC_EMP:
                             view = new SViewAccountingDeduction(miClient, subtype, "Config. contab. deducciones empleado");
@@ -1071,7 +1071,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormTaxTable;
                 break;
             case SModConsts.HRS_TAX_SUB:
-                if (moFormTaxSubsidyTable == null) moFormTaxSubsidyTable = new SFormTaxSubsidyTable(miClient, "Tabla de subsidio para el empleo");
+                if (moFormTaxSubsidyTable == null) moFormTaxSubsidyTable = new SFormTaxSubsidyTable(miClient, "Tabla de Subsidio para el empleo");
                 form = moFormTaxSubsidyTable;
                 break;
             case SModConsts.HRS_SSC:

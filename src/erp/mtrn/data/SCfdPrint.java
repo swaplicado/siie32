@@ -32,6 +32,7 @@ import erp.mhrs.data.SDataFormerPayroll;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SHrsConsts;
@@ -51,6 +52,7 @@ import net.sf.jasperreports.view.JasperViewer;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -1081,7 +1083,7 @@ public class SCfdPrint {
         map.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
         map.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sDocTotalConLetra", SLibUtilities.translateValueToText(comprobante.getAttTotal().getDouble(), miClient.getSessionXXX().getParamsErp().getDecimalsValue(), miClient.getSessionXXX().getParamsErp().getFkCurrencyId(),
+        map.put("sDocTotalConLetra", SLibUtilities.translateValueToText(comprobante.getAttTotal().getDouble(), miClient.getSessionXXX().getParamsErp().getDecimalsValue(), miClient.getSessionXXX().getParamsErp().getFkLanguageId(),
                 cur.getTextSingular(), cur.getTextPlural(), cur.getTextPrefix(), cur.getTextSuffix()));
         map.put("sCfdMoneda", comprobante.getAttMoneda().getString());
         map.put("dCfdTipoCambio", comprobante.getAttTipoCambio().getDouble());
@@ -1376,7 +1378,7 @@ public class SCfdPrint {
         map.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
         map.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sDocTotalConLetra", SLibUtilities.translateValueToText(comprobante.getAttTotal().getDouble(), miClient.getSessionXXX().getParamsErp().getDecimalsValue(), miClient.getSessionXXX().getParamsErp().getFkCurrencyId(),
+        map.put("sDocTotalConLetra", SLibUtilities.translateValueToText(comprobante.getAttTotal().getDouble(), miClient.getSessionXXX().getParamsErp().getDecimalsValue(), miClient.getSessionXXX().getParamsErp().getFkLanguageId(),
                 cur.getTextSingular(), cur.getTextPlural(), cur.getTextPrefix(), cur.getTextSuffix()));
         map.put("sCfdMoneda", comprobante.getAttMoneda().getString());
         map.put("dCfdTipoCambio", comprobante.getAttTipoCambio().getDouble());
@@ -1642,11 +1644,10 @@ public class SCfdPrint {
         String sCodeDisability = "";
         String sSql = "";
 
-        SDataFormerPayroll oFormerPayroll = null;
-        SDataFormerPayrollEmp oFormerPayrollEmployee = null;
+        SDataFormerPayroll formerPayroll = null;
+        SDataFormerPayrollEmp formerPayrollEmployee = null;
         SDbPayroll payroll = null;
         SDbPayrollReceipt payrollReceipt = null;
-        SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { miClient.getSessionXXX().getParamsErp().getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
 
         cfd.ver33.DElementComprobante comprobante = null;
         HashMap<String, Object> map = null;
@@ -1656,20 +1657,19 @@ public class SCfdPrint {
         ArrayList aTiempoExtra = null;
         ArrayList aIncapacidades = null;
 
-        DecimalFormat oFixedFormat = new DecimalFormat(SLibUtils.textRepeat("0", 3));
-        DecimalFormat oFixedFormatAux = new DecimalFormat(SLibUtils.textRepeat("0", 2));
+        DecimalFormat decimalFormat2Decs = new DecimalFormat(SLibUtils.textRepeat("0", 2));
 
         map = miClient.createReportParams();
 
         switch (subtypeCfd) {
             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
-                oFormerPayroll = new SDataFormerPayroll();
-                oFormerPayroll.read(new int[] { cfd.getFkPayrollPayrollId_n() }, miClient.getSession().getStatement());
+                formerPayroll = new SDataFormerPayroll();
+                formerPayroll.read(new int[] { cfd.getFkPayrollPayrollId_n() }, miClient.getSession().getStatement());
                 
-                oFormerPayrollEmployee = new SDataFormerPayrollEmp();
-                oFormerPayrollEmployee.read(new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, miClient.getSession().getStatement());
+                formerPayrollEmployee = new SDataFormerPayrollEmp();
+                formerPayrollEmployee.read(new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, miClient.getSession().getStatement());
                 
-                sSql = "SELECT id_pay, pay_note AS f_pay_nts FROM hrs_sie_pay WHERE id_pay = " + oFormerPayroll.getPkPayrollId();
+                sSql = "SELECT id_pay, pay_note AS f_pay_nts FROM hrs_sie_pay WHERE id_pay = " + formerPayroll.getPkPayrollId();
                 break;
             case SCfdConsts.CFDI_PAYROLL_VER_CUR:
                 payroll = new SDbPayroll();
@@ -1704,14 +1704,15 @@ public class SCfdPrint {
         map.put("sEmiRfc", comprobante.getEltEmisor().getAttRfc().getString());
         map.put("sRecRfc", comprobante.getEltReceptor().getAttRfc().getString());
         map.put("dCfdTotal", comprobante.getAttTotal().getDouble());
-        map.put("sDocTotalConLetra", SLibUtilities.translateValueToText(comprobante.getAttTotal().getDouble(), miClient.getSessionXXX().getParamsErp().getDecimalsValue(), miClient.getSessionXXX().getParamsErp().getFkCurrencyId(),
+        SDataCurrency cur = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { miClient.getSessionXXX().getParamsErp().getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
+        map.put("sDocTotalConLetra", SLibUtilities.translateValueToText(comprobante.getAttTotal().getDouble(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits(), miClient.getSessionXXX().getParamsErp().getFkLanguageId(),
                 cur.getTextSingular(), cur.getTextPlural(), cur.getTextPrefix(), cur.getTextSuffix()));
         map.put("sCfdMoneda", comprobante.getAttMoneda().getString());
         map.put("dCfdTipoCambio", comprobante.getAttTipoCambio().getDouble());
         map.put("ReceptorNombre", comprobante.getEltReceptor().getAttNombre().getString());
         map.put("bIsAnnulled", cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED);
-        map.put("nPkPayrollId", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayroll.getPkPayrollId() : payroll.getPkPayrollId());
-        map.put("NominaNumTipo", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (oFormerPayroll.getNumber() + " " + oFormerPayroll.getType()) : (payroll.getNumber() + " " + payroll.getAuxPaymentType()));
+        map.put("nPkPayrollId", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayroll.getPkPayrollId() : payroll.getPkPayrollId());
+        map.put("NominaNumTipo", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (formerPayroll.getNumber() + " " + formerPayroll.getType()) : (payroll.getNumber() + " " + payroll.getAuxPaymentType()));
         map.put("NominaFolio", comprobante.getAttSerie().getString() + "-" + comprobante.getAttFolio().getString());
         map.put("sXmlBaseDir", miClient.getSessionXXX().getParamsCompany().getXmlBaseDirectory());
         map.put("sCfdVersion", "" + comprobante.getVersion());
@@ -1741,8 +1742,8 @@ public class SCfdPrint {
                 map.put("FechaInicialPago", SLibUtils.DateFormatDate.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaInicialPago().getDate()));
                 map.put("FechaFinalPago", SLibUtils.DateFormatDate.format(((cfd.ver3.nom12.DElementNomina) element).getAttFechaFinalPago().getDate()));
                 map.put("NumDiasPagados", ((cfd.ver3.nom12.DElementNomina) element).getAttNumDiasPagados().getDouble());
-                map.put("NumDiasNoLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysNotWorked() : payrollReceipt.getDaysNotWorked_r());
-                map.put("NumDiasLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getDaysWorked() : payrollReceipt.getDaysWorked()); // XXX Optional
+                map.put("NumDiasNoLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayrollEmployee.getDaysNotWorked() : payrollReceipt.getDaysNotWorked_r());
+                map.put("NumDiasLaborados", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayrollEmployee.getDaysWorked() : payrollReceipt.getDaysWorked()); // XXX Optional
                 map.put("NumDiasPagar", 0d); // Calculate?, navalos (2014-03-13)
                 
                 // Emisor:
@@ -1793,28 +1794,38 @@ public class SCfdPrint {
                     map.put("SalarioDiarioIntegrado", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttSalarioDiarioIntegrado().getDouble());
                     map.put("ClaveEstado", ((cfd.ver3.nom12.DElementNomina) element).getEltReceptor().getAttClaveEntFed().getString());
                     map.put("TipoPago", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? SModSysConsts.HRSS_TP_PAY_FOR : payrollReceipt.getFkPaymentTypeId());
-                    map.put("TipoEmpleado", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getEmployeeType() : miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { payrollReceipt.getFkEmployeeTypeId() }, SDbRegistry.FIELD_CODE));
-                    map.put("Categoria", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getEmployeeCategory() : miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { payrollReceipt.getFkWorkerTypeId() }, SDbRegistry.FIELD_CODE));
-                    map.put("TipoSalario", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalaryType() : miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { payrollReceipt.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
-                    map.put("Ejercicio", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (oFormerPayroll.getYear() + "-" + oFixedFormatAux.format(oFormerPayroll.getPeriod())) : (payroll.getPeriodYear() + "-" + oFixedFormatAux.format(payroll.getPeriod())));
+                    map.put("TipoEmpleado", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayrollEmployee.getEmployeeType() : miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { payrollReceipt.getFkEmployeeTypeId() }, SDbRegistry.FIELD_CODE));
+                    map.put("Categoria", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayrollEmployee.getEmployeeCategory() : miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { payrollReceipt.getFkWorkerTypeId() }, SDbRegistry.FIELD_CODE));
+                    map.put("TipoSalario", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayrollEmployee.getSalaryType() : miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { payrollReceipt.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
+                    map.put("Ejercicio", subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? (formerPayroll.getYear() + "-" + decimalFormat2Decs.format(formerPayroll.getPeriod())) : (payroll.getPeriodYear() + "-" + decimalFormat2Decs.format(payroll.getPeriod())));
                     
                     double dSueldo;
                     double dSalario;
+                    
                     switch (payrollReceipt.getFkPaymentTypeId()) {
                         case SModSysConsts.HRSS_TP_PAY_WEE:
                             dSueldo = 0;
-                            dSalario = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getSalary();
+                            dSalario = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayrollEmployee.getSalary() : payrollReceipt.getSalary();
                             map.put("Sueldo", dSueldo);
                             map.put("Salario", dSalario);
                             map.put("IngresoDiario", dSalario);
                             break;
+                            
                         case SModSysConsts.HRSS_TP_PAY_FOR:
-                            dSueldo = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? oFormerPayrollEmployee.getSalary() : payrollReceipt.getWage();
-                            dSalario = dSueldo * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
+                            SDbConfig config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
+                            
+                            dSueldo = subtypeCfd == SCfdConsts.CFDI_PAYROLL_VER_OLD ? formerPayrollEmployee.getSalary() : payrollReceipt.getWage();
+                            if (config.isFortnightStandard()) {
+                                dSalario = SLibUtils.roundAmount(dSueldo / (SHrsConsts.YEAR_DAYS_FORTNIGHTS_FIXED / SHrsConsts.YEAR_MONTHS));
+                            }
+                            else {
+                                dSalario = SLibUtils.roundAmount(dSueldo * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS);
+                            }
                             map.put("Sueldo", dSueldo);
                             map.put("Salario", dSalario);
                             map.put("IngresoDiario", dSalario);
                             break;
+                            
                         default:
                     }
                 }
@@ -2026,7 +2037,7 @@ public class SCfdPrint {
                         payrollReceipt = new SDbPayrollReceipt();
                         payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
                         
-                        map.put("sCfdiFolio", payrollReceipt.getPayrollReceiptIssue().getPayrollReceiptIssueNumber());
+                        map.put("sCfdiFolio", payrollReceipt.getChildPayrollReceiptIssue().getPayrollReceiptIssueNumber());
                         break;
                         
                     default:

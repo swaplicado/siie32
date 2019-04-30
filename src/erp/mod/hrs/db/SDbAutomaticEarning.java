@@ -1,9 +1,7 @@
-
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
@@ -356,21 +354,24 @@ public class SDbAutomaticEarning extends SDbRegistryUser implements SGridRow {
                 value = msXtaEarning;
                 break;
             case 2:
-                value = mdAmount_r;
+                value = mdUnits;
                 break;
             case 3:
                 value = msXtaUnit;
                 break;
             case 4:
-                value = mtDateStart;
+                value = mdAmount_r;
                 break;
             case 5:
-                value = mtDateEnd_n;
+                value = mtDateStart;
                 break;
             case 6:
-                value = msXtaLoan;
+                value = mtDateEnd_n;
                 break;
             case 7:
+                value = msXtaLoan;
+                break;
+            case 8:
                 value = msXtaTypeSht;
                 break;
             default:
@@ -389,21 +390,24 @@ public class SDbAutomaticEarning extends SDbRegistryUser implements SGridRow {
                 msXtaEarning = (String) value;
                 break;
             case 2:
-                mdAmount_r = (double) value;
+                mdUnits = (double) value;
                 break;
             case 3:
                 msXtaUnit = (String) value;
                 break;
             case 4:
-                mtDateStart = (Date) value;
+                mdAmount_r = (double) value;
                 break;
             case 5:
-                mtDateEnd_n = (Date) value;
+                mtDateStart = (Date) value;
                 break;
             case 6:
-                msXtaLoan = (String) value;
+                mtDateEnd_n = (Date) value;
                 break;
             case 7:
+                msXtaLoan = (String) value;
+                break;
+            case 8:
                 msXtaTypeSht = (String) value;
                 break;
             default:

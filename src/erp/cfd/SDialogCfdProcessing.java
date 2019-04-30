@@ -357,12 +357,12 @@ public class SDialogCfdProcessing extends sa.lib.gui.bean.SBeanFormDialog {
         
         moIntCfdToProcess.setValue(maPayrollReceipts.size());
         
-        for (SDbPayrollReceipt receipt : maPayrollReceipts) {
-            bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { receipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
+        for (SDbPayrollReceipt payrollReceipt : maPayrollReceipts) {
+            bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { payrollReceipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
             mail = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
             
-            map = SHrsUtils.getMapPayrollReceipt((SGuiClient) miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, receipt.getPrimaryKey());
-            pdf = SHrsUtils.createPayrollReceipt(map, (SGuiClient) miClient);
+            map = SHrsUtils.createPayrollReceiptMap((SGuiClient) miClient, payrollReceipt.getPrimaryKey(), SDataConstantsPrint.PRINT_MODE_PDF_FILE);
+            pdf = SHrsUtils.createPayrollReceipt((SGuiClient) miClient, map);
             cfdProcessed++;
         
             if (pdf != null) {
@@ -622,8 +622,8 @@ public class SDialogCfdProcessing extends sa.lib.gui.bean.SBeanFormDialog {
         mnDpsAnnulmentType = dpsAnnulmentType;
     }
     
-    public void setReceipts(final ArrayList<SDbPayrollReceipt> actives) {
-       maPayrollReceipts = actives;
+    public void setPayrollReceipts(final ArrayList<SDbPayrollReceipt> payrollReceipts) {
+       maPayrollReceipts = payrollReceipts;
     }
     
     public void setNumberCopies(final int numberCopies) {

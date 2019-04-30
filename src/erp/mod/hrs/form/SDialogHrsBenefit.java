@@ -12,7 +12,8 @@ import erp.mod.hrs.db.SHrsBenefit;
 import erp.mod.hrs.db.SHrsBenefitParams;
 import erp.mod.hrs.db.SHrsBenefitTableAnniversary;
 import erp.mod.hrs.db.SHrsConsts;
-import erp.mod.hrs.db.SHrsPayrollReceipt;
+import erp.mod.hrs.db.SHrsEmployeeDays;
+import erp.mod.hrs.db.SHrsReceipt;
 import erp.mod.hrs.db.SHrsUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -44,7 +45,8 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener, ChangeListener, FocusListener {
 
-    protected SHrsPayrollReceipt moHrsPayrollReceipt;
+    protected SHrsReceipt moHrsReceipt;
+    protected SHrsEmployeeDays moHrsEmployeeDays;
     protected SDbEarning moEarning;
     protected SDbEmployee moEmployee;
     protected SDbBenefitTable moBenefitTable;
@@ -473,7 +475,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
         if (benefitTable == null) {
             moBenefitTable = SHrsUtils.getBenefitTableByEarning(miClient.getSession(), 
                     moEarning.getPkEarningId(), 
-                    moHrsPayrollReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId(), 
+                    moHrsReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId(), 
                     mtDateCutoff);
         }
         else {
@@ -486,9 +488,9 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
         if (benefitTableAux == null && mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
             int tableAuxId = SHrsUtils.getRecentBenefitTable(miClient.getSession(), 
                     SModSysConsts.HRSS_TP_BEN_VAC, 
-                    moHrsPayrollReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId(), 
+                    moHrsReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId(), 
                     mtDateCutoff);
-            moBenefitTableAux = moHrsPayrollReceipt.getHrsPayroll().getBenefitTable(tableAuxId);
+            moBenefitTableAux = moHrsReceipt.getHrsPayroll().getBenefitTable(tableAuxId);
         }
         else {
             moBenefitTableAux = benefitTableAux;
@@ -498,10 +500,10 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
             throw new Exception("No existe tabla de prestaciones adecuada para la fecha de corte.");
         }
         
-        maBenefitTableAnniversarys = moHrsPayrollReceipt.getHrsPayroll().getBenefitTableAnniversary(moBenefitTable.getPkBenefitId());
+        maBenefitTableAnniversarys = moHrsReceipt.getHrsPayroll().getBenefitTableAnniversary(moBenefitTable.getPkBenefitId());
         
         if (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-            maBenefitTableAnniversarysAux = moHrsPayrollReceipt.getHrsPayroll().getBenefitTableAnniversary(moBenefitTableAux.getPkBenefitId());
+            maBenefitTableAnniversarysAux = moHrsReceipt.getHrsPayroll().getBenefitTableAnniversary(moBenefitTableAux.getPkBenefitId());
         }
     }
     
@@ -564,11 +566,11 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     }
     
     private double getCalculatedBenefit() {
-        return moHrsPayrollReceipt.calculateBenefit(moEarning, moDecDaysToPay.getValue(), moDecBenefitTableBonusPercentage.getValue());
+        return moHrsReceipt.calculateBenefit(moEarning, moHrsEmployeeDays, moDecDaysToPay.getValue(), moDecBenefitTableBonusPercentage.getValue());
     }
     
     private void computeBenefitPayable() {
-        moCurAmountPayable.getField().setValue(moHrsPayrollReceipt.calculateBenefit(moEarning, moIntBenefitTableDaysToPay.getValue(), moDecBenefitTableBonusPercentage.getValue()));
+        moCurAmountPayable.getField().setValue(moHrsReceipt.calculateBenefit(moEarning, moHrsEmployeeDays, moIntBenefitTableDaysToPay.getValue(), moDecBenefitTableBonusPercentage.getValue()));
         
         computeBenefitPending();
     }
@@ -647,7 +649,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
             
             // Read benefits accumulated by benefit type:
             
-            maHrsBenefits = SHrsUtils.readHrsBenefits(miClient.getSession(), moEmployee, mnFormType, seniority, mnBenefitYear, moHrsPayrollReceipt.getHrsPayroll().getPayroll().getPkPayrollId(), maBenefitTableAnniversarys, maBenefitTableAnniversarysAux, moHrsPayrollReceipt.getReceipt().getPaymentDaily());
+            maHrsBenefits = SHrsUtils.readHrsBenefits(miClient.getSession(), moEmployee, mnFormType, seniority, mnBenefitYear, moHrsReceipt.getHrsPayroll().getPayroll().getPkPayrollId(), maBenefitTableAnniversarys, maBenefitTableAnniversarysAux, moHrsReceipt.getPayrollReceipt().getPaymentDaily());
             
             // Obtain benefit table row more appropiate for seniority:
             if (moBenefitTable != null) {
@@ -671,8 +673,8 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
             }
             
             for (SHrsBenefit hrsBenefit : maHrsBenefits) {  // XXX Sergio Flores, 2018-07-11: It is not necessary to iterate this array, allways has only one element, if any!
-                hrsBenefit.setValuePayedReceipt(moHrsPayrollReceipt.getBenefitValue(mnFormType, hrsBenefit.getBenefitAnn(), hrsBenefit.getBenefitYear()));
-                hrsBenefit.setAmountPayedReceipt(moHrsPayrollReceipt.getBenefitAmount(mnFormType, hrsBenefit.getBenefitAnn(), hrsBenefit.getBenefitYear()));
+                hrsBenefit.setValuePayedReceipt(moHrsReceipt.getBenefitValue(mnFormType, hrsBenefit.getBenefitAnn(), hrsBenefit.getBenefitYear()));
+                hrsBenefit.setAmountPayedReceipt(moHrsReceipt.getBenefitAmount(mnFormType, hrsBenefit.getBenefitAnn(), hrsBenefit.getBenefitYear()));
             }
             
             if (mnFormType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
@@ -754,7 +756,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
                     validation.setComponent(((JSpinner.NumberEditor) jsAnniversary.getEditor()).getTextField());
                 }
                 
-                if (validation.isValid() && moEarning.getFkEarningComputationTypeId() != SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
+                if (validation.isValid() && moEarning.isBasedOnUnits()) {
                     msg = moHrsBenefit.validate(SHrsBenefit.VALID_DAYS_TO_PAY, SHrsBenefit.VALIDATION_BENEFIT_TYPE);
                     
                     if (!msg.isEmpty()) {
@@ -785,7 +787,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
                     }
                 }
 
-                if (validation.isValid() && (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT || moDecDaysToPay.getValue() != 0)) {
+                if (validation.isValid() && (!moEarning.isBasedOnUnits() || moDecDaysToPay.getValue() != 0)) {
                     msg = moHrsBenefit.validate(SHrsBenefit.VALID_AMOUNT_TO_PAY, 0);
                     
                     if (!msg.isEmpty()) {
@@ -794,7 +796,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
                     }
                 }
                 
-                if (validation.isValid() && (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_AMT || moDecDaysToPay.getValue() != 0)) {
+                if (validation.isValid() && (!moEarning.isBasedOnUnits() || moDecDaysToPay.getValue() != 0)) {
                     msg = moHrsBenefit.validate(SHrsBenefit.VALID_AMOUNT_TO_PAY_TOTAL, 0);
                     
                     if (!msg.isEmpty()) {
@@ -864,9 +866,10 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
         switch (type) {
             case SGuiConsts.PARAM_ROWS:
                 SHrsBenefitParams params = (SHrsBenefitParams) value;
-                moHrsPayrollReceipt = params.getHrsPayrollReceipt();
+                moHrsReceipt = params.getHrsReceipt();
+                moHrsEmployeeDays = moHrsReceipt.getHrsEmployee().createEmployeeDays();
                 moEarning = params.getEarning();
-                moEmployee = params.getHrsPayrollReceipt().getHrsEmployee().getEmployee();
+                moEmployee = params.getHrsReceipt().getHrsEmployee().getEmployee();
                 moBenefitTable = params.getBenefitTable();
                 moBenefitTableAux = params.getBenefitTableAux();
                 mtDateCutoff = params.getDateCutOff();

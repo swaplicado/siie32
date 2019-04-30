@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package erp.mtrn.data;
 
 import cfd.DAttributeOptionImpuestoTraslado;
@@ -487,9 +486,9 @@ public abstract class SCfdUtils implements Serializable {
                     payrollReceipt.setFechaEdicion(client.getSession().getCurrentDate());
                     payrollReceipt.setMoneda(client.getSession().getSessionCustom().getLocalCurrencyCode());
                     payrollReceipt.setLugarExpedicion(client.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
-                    payrollReceipt.setConfirmacion("");
                     payrollReceipt.setRegimenFiscal(client.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
-                    payrollReceipt.setCfdiRelacionadosTipoRelacion("");
+                    //payrollReceipt.setConfirmacion(""); XXX WTF!
+                    //payrollReceipt.setCfdiRelacionadosTipoRelacion(""); XXX WTF!
                     
                     // Generate CFDI:
 
@@ -3033,7 +3032,7 @@ public abstract class SCfdUtils implements Serializable {
         client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
         if (formerPayroll.isValidPayroll()) {
-            formerPayrollCfdsEmited = new ArrayList<SDataCfd>();
+            formerPayrollCfdsEmited = new ArrayList<>();
 
             formerPayrollCfds = getPayrollCfds(client, SCfdConsts.CFDI_PAYROLL_VER_OLD, new int[] { formerPayroll.getPkNominaId() });
 

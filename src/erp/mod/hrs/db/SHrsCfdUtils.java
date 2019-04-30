@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package erp.mod.hrs.db;
 
 import cfd.DCfdUtils;
@@ -39,11 +38,8 @@ import sa.lib.srv.SSrvConsts;
 public abstract class SHrsCfdUtils {
     
     public static boolean canGenetareCfdReceipts(final SGuiSession session,  final int payrollId) throws Exception {
-        String sql  = "";
-        ResultSet resultSet = null;
-        
-        sql = "SELECT b_clo, b_del FROM hrs_pay WHERE id_pay = " + payrollId + "; ";
-        resultSet = session.getStatement().executeQuery(sql);
+        String sql = "SELECT b_clo, b_del FROM hrs_pay WHERE id_pay = " + payrollId + "; ";
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
         if (resultSet.next()) {
             if(!resultSet.getBoolean("b_clo")) {
                 throw new Exception("No se pueden generar CFDI, la nómina no está cerrada.");
@@ -57,12 +53,9 @@ public abstract class SHrsCfdUtils {
     }
     
     public static ArrayList<SHrsPayrollEmployeeReceipt> getReceiptsPendig(final SGuiSession session,  final int payrollId) throws Exception {
-        String sql  = "";
-        SHrsPayrollEmployeeReceipt receipt;
-        ArrayList<SHrsPayrollEmployeeReceipt> receipts = new ArrayList<SHrsPayrollEmployeeReceipt>();
-        ResultSet resultSet = null;
+        ArrayList<SHrsPayrollEmployeeReceipt> receipts = new ArrayList<>();
         
-        sql = "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, pr.id_emp, bp.bp, emp.num AS f_emp_num, "
+        String sql = "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, pr.id_emp, bp.bp, emp.num AS f_emp_num, "
                 + "@ear := (SELECT COALESCE(SUM(rcp_ear.amt_r), 0) "
                 + "FROM hrs_pay_rcp AS r "
                 + "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp "
@@ -107,10 +100,10 @@ public abstract class SHrsCfdUtils {
                 + "WHERE p.id_pay = " + payrollId + " AND p.b_del = 0 AND pr.b_del = 0 "
                 + "ORDER BY id_pay, per_year, per, num, dt_sta, dt_end, nts, fk_tp_pay, bp, id_emp, f_emp_num, f_ear, f_ded, id_iss, num_ser, f_net, fk_tp_pay_sys, dt_iss, dt_pay ";
         
-        resultSet = session.getStatement().executeQuery(sql);
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
         
         while (resultSet.next()) {
-            receipt = new SHrsPayrollEmployeeReceipt();
+            SHrsPayrollEmployeeReceipt receipt = new SHrsPayrollEmployeeReceipt();
             
             receipt.setPkPayrollId(resultSet.getInt("id_pay"));
             receipt.setPkEmployeeId(resultSet.getInt("id_emp"));
@@ -141,11 +134,8 @@ public abstract class SHrsCfdUtils {
     }
     
     public static boolean validateReceiptsPendingCfdi( final SGuiSession session,  final int payrollId) throws Exception {
-        ArrayList<SDataCfd> cfds = null;
-        
-        cfds = SCfdUtils.getPayrollCfds((SClientInterface) session.getClient(), SCfdConsts.CFDI_PAYROLL_VER_CUR, new int[] { payrollId });
+        ArrayList<SDataCfd> cfds = SCfdUtils.getPayrollCfds((SClientInterface) session.getClient(), SCfdConsts.CFDI_PAYROLL_VER_CUR, new int[] { payrollId });
         SCfdUtils.existsCfdiPending((SClientInterface) session.getClient(), cfds);
-        
         return true;
     }
     
@@ -262,15 +252,17 @@ public abstract class SHrsCfdUtils {
         SHrsFormerPayroll payroll = null;
         SHrsFormerPayrollReceipt payrollReceipt = null;
         
-        payroll = SHrsUtils.readPayroll((SClientInterface) session.getClient(), keyReceipt);
+        payroll = SHrsUtils.readPayrollForReceipt((SClientInterface) session.getClient(), keyReceipt);
+        
         payrollReceipt = payroll.getChildPayrollReceipts().get(0);
+        
         payrollReceipt.setPayroll(payroll);
         payrollReceipt.setFechaEdicion(session.getCurrentDate());
         payrollReceipt.setMoneda(session.getSessionCustom().getLocalCurrencyCode()); 
         payrollReceipt.setLugarExpedicion(((SClientInterface) session.getClient()).getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().getZipCode());
-        payrollReceipt.setConfirmacion("");
         payrollReceipt.setRegimenFiscal(((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdRegimenFiscal());
-        payrollReceipt.setCfdiRelacionadosTipoRelacion("");
+        //payrollReceipt.setConfirmacion(""); XXX WTF!
+        //payrollReceipt.setCfdiRelacionadosTipoRelacion(""); XXX WTF!
         
         cfd = computeCfdi(session, payrollReceipt, keyReceipt[2], true);
         if (cfd == null) {

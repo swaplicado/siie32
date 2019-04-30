@@ -5,7 +5,7 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SDbAbsenceClass;
 import erp.mod.hrs.db.SDbAbsenceType;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -167,7 +167,7 @@ public class SFormAbsenceType extends SBeanForm implements ItemListener {
             moKeyDisabilityType.setEnabled(false);
             moKeyDisabilityType.setSelectedIndex(0);
         }
-        else if (moKeyAbsenceClass.getValue()[0] == SModSysConsts.HRSU_CL_ABS_DIS) {
+        else if (SDbAbsenceClass.isDisability(moKeyAbsenceClass.getValue()[0])) {
             moKeyDisabilityType.setEnabled(true);
         }
         else {
@@ -234,7 +234,7 @@ public class SFormAbsenceType extends SBeanForm implements ItemListener {
             moKeyAbsenceClass.setEnabled(false);
         }
 
-        moKeyDisabilityType.setEnabled(moKeyAbsenceClass.getSelectedIndex() > 0 && moKeyAbsenceClass.getValue()[0] == SModSysConsts.HRSU_CL_ABS_DIS);
+        moKeyDisabilityType.setEnabled(moKeyAbsenceClass.getSelectedIndex() > 0 && SDbAbsenceClass.isDisability(moKeyAbsenceClass.getValue()[0]));
 
         addAllListeners();
     }
@@ -249,7 +249,7 @@ public class SFormAbsenceType extends SBeanForm implements ItemListener {
 
         registry.setName(moTextName.getValue());
         registry.setCode(moTextCode.getValue());
-        registry.setFkDisabilityTypeId_n(moKeyAbsenceClass.getValue()[0] == SModSysConsts.HRSU_CL_ABS_DIS ? moKeyDisabilityType.getValue()[0] : SLibConsts.UNDEFINED);
+        registry.setFkDisabilityTypeId_n(SDbAbsenceClass.isDisability(moKeyAbsenceClass.getValue()[0]) ? moKeyDisabilityType.getValue()[0] : 0);
         registry.setPayable(moBoolPayable.getValue());
 
         return registry;

@@ -42,7 +42,7 @@ public class SViewVacations extends SGridPaneView implements ActionListener {
 
     private SGridFilterPanelEmployee moFilterEmployee;
     private SGridFilterDate moFilterDate;
-    private JButton jbCardex;
+    private JButton jbShowCardex;
     private Date mtDateCut;
     
     private SDialogBenefitCardex moDialogBenefitCardex;
@@ -71,19 +71,19 @@ public class SViewVacations extends SGridPaneView implements ActionListener {
             moFilterDate.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_YEAR, miClient.getSession().getCurrentDate().getTime()));
         }
         moFilterEmployee.initFilter(null);
-        jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
+        jbShowCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         
         moDialogBenefitCardex = new SDialogBenefitCardex(miClient, mnGridSubtype, "Control de la prestación");
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDate);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowCardex);
     }
 
     private void actionShowCardex() {
         int[] key = null;
         
-        if (jbCardex.isEnabled()) {
+        if (jbShowCardex.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -305,7 +305,7 @@ public class SViewVacations extends SGridPaneView implements ActionListener {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbCardex) {
+            if (button == jbShowCardex) {
                 actionShowCardex();
             }
         }

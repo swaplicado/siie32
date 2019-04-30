@@ -5,6 +5,7 @@
 package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
@@ -18,6 +19,10 @@ import sa.lib.gui.SGuiSession;
  * @author Sergio Flores
  */
 public class SDbAbsenceClass extends SDbRegistryUser {
+    
+    public static final String CALENDAR = "CALENDARIO";
+    public static final String BUSINESS = "LABORABLES";
+    public static final String EFFECTIVE = "EFECTIVOS";
 
     protected int mnPkAbsenceClassId;
     protected String msCode;
@@ -34,7 +39,7 @@ public class SDbAbsenceClass extends SDbRegistryUser {
     public SDbAbsenceClass() {
         super(SModConsts.HRSU_CL_ABS);
     }
-
+    
     public void setPkAbsenceClassId(int n) { mnPkAbsenceClassId = n; }
     public void setCode(String s) { msCode = s; }
     public void setName(String s) { msName = s; }
@@ -54,6 +59,30 @@ public class SDbAbsenceClass extends SDbRegistryUser {
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
+
+    public static boolean isDisability(final int absenceClass) {
+        return absenceClass == SModSysConsts.HRSU_CL_ABS_DIS;
+    }
+
+    public static boolean isVacation(final int absenceClass) {
+        return absenceClass == SModSysConsts.HRSU_CL_ABS_VAC;
+    }
+
+    public static boolean consumesCalendarDays(final int absenceClass) {
+        return absenceClass == SModSysConsts.HRSU_CL_ABS_DIS;
+    }
+    
+    public boolean isVacation() {
+        return isVacation(mnPkAbsenceClassId);
+    }
+    
+    public boolean isDisability() {
+        return isDisability(mnPkAbsenceClassId);
+    }
+    
+    public boolean consumesCalendarDays() {
+        return consumesCalendarDays(mnPkAbsenceClassId);
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {

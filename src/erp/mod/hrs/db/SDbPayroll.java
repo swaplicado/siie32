@@ -73,7 +73,7 @@ public class SDbPayroll extends SDbRegistryUser {
     protected boolean mbAuxIsDummy;
 
     protected ArrayList<SDbPayrollReceipt> maChildPayrollReceipts;
-    protected ArrayList<SDbPayrollReceipt> maChildPayrollReceiptsDelete;
+    protected ArrayList<SDbPayrollReceipt> maChildPayrollReceiptsToDelete;
 
     public SDbPayroll() {
         super(SModConsts.HRS_PAY);
@@ -214,7 +214,34 @@ public class SDbPayroll extends SDbRegistryUser {
     public boolean isNormal() { return mnFkPaysheetTypeId == SModSysConsts.HRSS_TP_PAY_SHT_NOR; }
 
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceipts() { return maChildPayrollReceipts; }
-    public ArrayList<SDbPayrollReceipt> getChildPayrollReceiptsDelete() { return maChildPayrollReceiptsDelete; }
+    public ArrayList<SDbPayrollReceipt> getChildPayrollReceiptsToDelete() { return maChildPayrollReceiptsToDelete; }
+
+    // XXX replace sentences for email subject with payroll receipt number data:
+    public static String composePayrollNumber(final SGuiSession session, final int payrollId) throws Exception {
+        String payrollNumber = "";
+        
+        String sql = "SELECT per_year, per, num, fk_tp_pay "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
+                + "WHERE id_pay = " + payrollId + ";";
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            payrollNumber += resultSet.getInt("per_year");
+            
+            switch (resultSet.getInt("fk_tp_pay")) {
+                case SModSysConsts.HRSS_TP_PAY_WEE:
+                    payrollNumber += " " + SHrsFormerConsts.PAY_WEE_ABB;
+                    break;
+                case SModSysConsts.HRSS_TP_PAY_FOR:
+                    payrollNumber += " " + SHrsFormerConsts.PAY_FOR_ABB;
+                    break;
+                default:
+            }
+            
+            payrollNumber += " " + SLibUtils.DecimalFormatCalendarDay.format(resultSet.getInt("num"));
+        }
+        
+        return payrollNumber;
+    }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -273,8 +300,8 @@ public class SDbPayroll extends SDbRegistryUser {
         mdAuxTotalDeductions = 0;
         mbAuxIsDummy = false;
 
-        maChildPayrollReceipts = new ArrayList<SDbPayrollReceipt>();
-        maChildPayrollReceiptsDelete = new ArrayList<SDbPayrollReceipt>();
+        maChildPayrollReceipts = new ArrayList<>();
+        maChildPayrollReceiptsToDelete = new ArrayList<>();
     }
 
     @Override
@@ -489,9 +516,9 @@ public class SDbPayroll extends SDbRegistryUser {
 
         session.getStatement().execute(msSql);
 
-        // Save payrollReceips:
+        // Save payroll receips:
 
-        for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceiptsDelete) {
+        for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceiptsToDelete) {
             payrollReceipt.setDeleted(true);
             payrollReceipt.setPkPayrollId(mnPkPayrollId);
             payrollReceipt.setAuxDateIssue(mtDateEnd);
@@ -499,8 +526,7 @@ public class SDbPayroll extends SDbRegistryUser {
         }
         
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
-            if (payrollReceipt.getPayrollReceiptIssue() == null || !payrollReceipt.getPayrollReceiptIssue().isStamped()) {
-            //if (!payrollReceipt.isStamped()) {
+            if (payrollReceipt.getChildPayrollReceiptIssue() == null || !payrollReceipt.getChildPayrollReceiptIssue().isStamped()) {
                 payrollReceipt.setRegistryNew(true);
                 payrollReceipt.setPkPayrollId(mnPkPayrollId);
                 payrollReceipt.save(session);
@@ -555,8 +581,8 @@ public class SDbPayroll extends SDbRegistryUser {
         registry.setAuxTotalEarnings(this.getAuxTotalEarnings());
         registry.setAuxTotalDeductions(this.getAuxTotalDeductions());
 
-        for (SDbPayrollReceipt receipt : this.getChildPayrollReceipts()) {
-            registry.getChildPayrollReceipts().add(receipt.clone());
+        for (SDbPayrollReceipt child : this.getChildPayrollReceipts()) {
+            registry.getChildPayrollReceipts().add(child.clone());
         }
 
         registry.setRegistryNew(this.isRegistryNew());
@@ -613,7 +639,7 @@ public class SDbPayroll extends SDbRegistryUser {
             throw new Exception(msQueryResult);
         }
 
-        // Delete registries dependent:
+        // Delete dependent registries:
 
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
             payrollReceipt.delete(session);

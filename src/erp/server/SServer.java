@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.Vector;
+import sa.lib.SLibUtils;
 import sa.lib.srv.SSrvConsts;
 
 /**
@@ -653,7 +654,7 @@ public class SServer extends UnicastRemoteObject implements SServerRemote, Runna
                     processCommandHelp(values);
                 }
                 else {
-                    renderMessageLn(SSrvConsts.MSG_ERR_COMMAND_UNKNOWN);
+                    renderMessageLn(SSrvConsts.MSG_ERR_COMMAND_UNKNOWN + " [" + SLibUtils.textImplode(values, " ") + "]");
                 }
             }
             catch (Exception e) {

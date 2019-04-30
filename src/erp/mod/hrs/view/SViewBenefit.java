@@ -41,7 +41,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
     private Date mtDateCutOff;
     private SGridFilterDate moFilterDate;
     private SGridFilterPanelEmployee moFilterEmployee;
-    private JButton jbCardex;
+    private JButton jbShowCardex;
     private SDialogBenefitCardex moDialogBenefitCardex;
     
     public SViewBenefit(SGuiClient client, int gridSubtype, String title) {
@@ -69,17 +69,17 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
         moFilterEmployee.initFilter(null);
         
-        jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
+        jbShowCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver movimientos", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDate);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbShowCardex);
         
         moDialogBenefitCardex = new SDialogBenefitCardex(miClient, mnGridSubtype, "Control de la prestación");
     }
 
     private void actionShowCardex() {
-        if (jbCardex.isEnabled()) {
+        if (jbShowCardex.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -341,6 +341,20 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
                 + "WHERE e.b_act AND e.dt_ben <= " + pDateCutOff + " " + (sql.isEmpty() ? "" : "AND " + sql)
                 + " "
                 + "ORDER BY bp.bp, bp.id_bp ";
+
+        try {
+            /*
+            IMPORTANT!:
+            Probably due to de SQL session variables created on the fly,
+            this SQL query works fine only after the second time it is executed consecutively.
+            So, this execution is needed, trior to the very moment this view is about to be displayed!
+            WEIRD BUT TRUE!
+            */
+            miClient.getSession().getStatement().execute(msSql); // only this way this view's query works properly!
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
     }
 
     @Override
@@ -432,7 +446,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbCardex) {
+            if (button == jbShowCardex) {
                 actionShowCardex();
             }
         }

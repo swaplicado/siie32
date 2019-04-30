@@ -19,7 +19,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.form.SDialogCalculateIncomeTax;
-import erp.mod.hrs.form.SDialogPayrollEmployeeSsContributionUpdate;
+import erp.mod.hrs.form.SDialogPayrollReceiptSsc;
 import erp.mod.hrs.form.SDialogRepHrsActiveEmployees;
 import erp.mod.hrs.form.SDialogRepHrsAuxPayroll;
 import erp.mod.hrs.form.SDialogRepHrsEarDed;
@@ -103,9 +103,11 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiPayCfdiStampSign;
     private javax.swing.JMenuItem jmiPayCfdiStampSignPending;
     private javax.swing.JMenuItem jmiPayCfdiSendingLog;
+    private javax.swing.JMenu jmPayAutoEarnings;
     private javax.swing.JMenuItem jmiPayAutoEarningsGlobal;
     private javax.swing.JMenuItem jmiPayAutoEarningsByEmployee;
     private javax.swing.JMenuItem jmiPayAutoEarningsByEmployeeDet;
+    private javax.swing.JMenu jmPayAutoDeductions;
     private javax.swing.JMenuItem jmiPayAutoDeductionsGlobal;
     private javax.swing.JMenuItem jmiPayAutoDeductionsByEmployee;
     private javax.swing.JMenuItem jmiPayAutoDeductionsByEmployeeDet;
@@ -157,8 +159,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg = new JMenu("Configuración");
         jmiCfgTaxTable = new JMenuItem("Tablas de impuesto");
         jmiCfgTaxTableRow = new JMenuItem("Tablas de impuesto a detalle");
-        jmiCfgTaxSubsidyTable = new JMenuItem("Tablas de subsidio para el empleo");
-        jmiCfgTaxSubsidyTableRow = new JMenuItem("Tablas de subsidio para el empleo a detalle");
+        jmiCfgTaxSubsidyTable = new JMenuItem("Tablas de Subsidio para el empleo");
+        jmiCfgTaxSubsidyTableRow = new JMenuItem("Tablas de Subsidio para el empleo a detalle");
         jmiCfgSsContributionTable = new JMenuItem("Tablas de retención de SS");
         jmiCfgSsContributionTableRow = new JMenuItem("Tablas de retención de SS a detalle");
         jmiCfgBenefitTable = new JMenuItem("Tablas de prestaciones");
@@ -270,12 +272,14 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayCfdiStampSign = new JMenuItem("CFDI de nóminas timbrados");
         jmiPayCfdiStampSignPending = new JMenuItem("CFDI de nóminas por timbrar");
         jmiPayCfdiSendingLog = new JMenuItem("Bitácora de envíos de CFDI de nóminas");
-        jmiPayAutoEarningsGlobal = new JMenuItem("Percepciones automáticas globales");
-        jmiPayAutoEarningsByEmployee = new JMenuItem("Percepciones automáticas por empleado");
-        jmiPayAutoEarningsByEmployeeDet = new JMenuItem("Percepciones automáticas por empleado a detalle");
-        jmiPayAutoDeductionsGlobal = new JMenuItem("Deducciones automáticas globales");
-        jmiPayAutoDeductionsByEmployee = new JMenuItem("Deducciones automáticas por empleado");
-        jmiPayAutoDeductionsByEmployeeDet = new JMenuItem("Deducciones automáticas por empleado a detalle");
+        jmPayAutoEarnings = new JMenu("Percepciones automáticas");
+        jmiPayAutoEarningsGlobal = new JMenuItem("Globales");
+        jmiPayAutoEarningsByEmployee = new JMenuItem("Por empleado");
+        jmiPayAutoEarningsByEmployeeDet = new JMenuItem("Por empleado a detalle");
+        jmPayAutoDeductions = new JMenu("Deducciones automáticas");
+        jmiPayAutoDeductionsGlobal = new JMenuItem("Globales");
+        jmiPayAutoDeductionsByEmployee = new JMenuItem("Por empleado");
+        jmiPayAutoDeductionsByEmployeeDet = new JMenuItem("Por empleado a detalle");
         jmiPayCalculatedAmountMonth = new JMenuItem("Calcular ingreso mensual");
         jmiPayCalculatedEstimateIncomeTax = new JMenuItem("Calcular impuesto acumulado");
 
@@ -296,13 +300,14 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPayCfdi.add(jmiPayCfdiSendingLog);
         jmPay.add(jmPayCfdi);
         jmPay.addSeparator();
-        jmPay.add(jmiPayAutoEarningsGlobal);
-        jmPay.add(jmiPayAutoEarningsByEmployee);
-        jmPay.add(jmiPayAutoEarningsByEmployeeDet);
-        jmPay.add(jmiPayAutoDeductionsGlobal);
-        jmPay.add(jmiPayAutoDeductionsByEmployee);
-        jmPay.add(jmiPayAutoDeductionsByEmployeeDet);
-        
+        jmPayAutoEarnings.add(jmiPayAutoEarningsGlobal);
+        jmPayAutoEarnings.add(jmiPayAutoEarningsByEmployee);
+        jmPayAutoEarnings.add(jmiPayAutoEarningsByEmployeeDet);
+        jmPay.add(jmPayAutoEarnings);
+        jmPayAutoDeductions.add(jmiPayAutoDeductionsGlobal);
+        jmPayAutoDeductions.add(jmiPayAutoDeductionsByEmployee);
+        jmPayAutoDeductions.add(jmiPayAutoDeductionsByEmployeeDet);
+        jmPay.add(jmPayAutoDeductions);
         jmPay.addSeparator();
         jmPay.add(jmiPayCalculatedAmountMonth);
         jmPay.add(jmiPayCalculatedEstimateIncomeTax);
@@ -837,7 +842,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.HRS_EMP_LOG_SAL_SSC, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatEmployeeSscBaseUpdate) {
-               new SDialogPayrollEmployeeSsContributionUpdate((SGuiClient) miClient, "Actualización de salario base cotización").setVisible(true);
+               new SDialogPayrollReceiptSsc((SGuiClient) miClient, "Actualización de salario base cotización").setVisible(true);
             }
             else if (item == jmiCatEarnings) {
                 miClient.getSession().showView(SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
