@@ -11,7 +11,6 @@ import erp.mod.SModSysConsts;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.swing.ImageIcon;
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -256,9 +255,10 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moKeyEmployee.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel13.add(moKeyEmployee);
 
-        jtbEmployeeActive.setIcon(new javax.swing.ImageIcon("C:\\Users\\JBarajas\\Documents\\NetBeansProjects_8\\sa-lib-10\\src\\sa\\lib\\img\\swi_filter_on.gif")); // NOI18N
+        jtbEmployeeActive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif"))); // NOI18N
         jtbEmployeeActive.setToolTipText("Filtrar eliminados");
         jtbEmployeeActive.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbEmployeeActive.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
         jPanel13.add(jtbEmployeeActive);
 
         jPanel5.add(jPanel13);
@@ -488,12 +488,6 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     // End of variables declaration//GEN-END:variables
 
     private void actionEmpStatusStateChange() {
-        if (jtbEmployeeActive.isSelected()) {
-            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_off.gif")));
-        }
-        else {
-            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_on.gif")));
-        }
         populateEmployee();
     }
     
@@ -726,6 +720,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moRadShowEar.addChangeListener(this);
         moRadShowDed.addChangeListener(this);
         
+        jtbEmployeeActive.setSelected(true); // prevent trigger event selecting toggle button before adding listener
         jtbEmployeeActive.addItemListener(this);
         
         moRadReportTypeEarDed.setSelected(true);
@@ -734,7 +729,6 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moRadOrderByNameEmployee.setSelected(true);
         moRadOrderByNameDepartament.setSelected(true);
         
-        jtbEmployeeActive.setSelected(false);
         moRadIsSummary.setSelected(true);
         
         moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
@@ -750,10 +744,10 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
 
     private void populateEmployee() {
         if (jtbEmployeeActive.isSelected()) {
-            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, new SGuiParams(SGuiConsts.PARAM_REGS_ACT));
+            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
         }
         else {
-            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
+            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, new SGuiParams(SGuiConsts.PARAM_REGS_ACT));
         }
     }
 
