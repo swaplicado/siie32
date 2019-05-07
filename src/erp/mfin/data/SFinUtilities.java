@@ -16,6 +16,7 @@ import erp.mod.fin.db.SDbAccount;
 import erp.mod.fin.db.SFinUtils;
 import erp.mod.fin.db.SLayoutBankPaymentTxt;
 import erp.mod.fin.db.SLayoutBankRow;
+import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,6 +30,7 @@ import java.util.Date;
 import java.util.Vector;
 import javax.swing.JFileChooser;
 import sa.lib.SLibUtils;
+import sa.lib.db.SDbConsts;
 import sa.lib.gui.SGuiSession;
 import sa.lib.prt.SPrtConsts;
 import sa.lib.prt.SPrtUtils;
@@ -1385,59 +1387,78 @@ public abstract class SFinUtilities {
         return costCenter;
     }
     
-    public static boolean updateAccountCostCenterForDpsEntry(final SClientInterface client, int[] dpsEntryPk, String account, String costCenter, double quantity, double total) throws Exception {
-        int accountPk = 0;
-        int costCenterPk = 0;
-        int numberOfRows = 0;
-        ResultSet resultSet = null;
-        String sql = "";
-        Object[] key = null;
-        SDataDpsEntry entry = null;
+    public static boolean updateAccountCostCenterForDpsEntry(final SClientInterface client, final int[] dpsEntryKey, final String account, final String costCenter, final double originalQuantity, final double subTotal) throws Exception {
         
-        entry = (SDataDpsEntry) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS_ETY, dpsEntryPk, SLibConstants.EXEC_MODE_VERBOSE);
-        accountPk = SFinUtils.getAccountId(client.getSession(), account);
-        costCenterPk = SFinUtils.getCostCenterId(client.getSession(), costCenter);
+        /* Debido a que no es posible determinar con precisión cuál es el movimiento contable generado por la partida deseada del docto.,
+         * se infiere cuál es aquél por el ID de los renglones contables generados por el docto.
+         */
         
-        sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety, re.units, re.credit, re.debit, COUNT(*) AS n_rows " +
-                "FROM trn_dps_rec AS dr " +
-                "INNER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
+        SDataDpsEntry dpsEntry = (SDataDpsEntry) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS_ETY, dpsEntryKey, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        if (dpsEntry == null || dpsEntry.getIsDeleted()) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nLa partida del documento deseada"
+                    + (dpsEntry.getIsDeleted() ? " está eliminada" : "") + ".");
+        }
+        
+        int count = 0; // número de partidas similares del docto. a la partida deseada del docto.
+        int position = 0; // posición de la partida deseada del docto. entre las partidas similares del docto.
+        SDataDps dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsEntryKey, SLibConstants.EXEC_MODE_VERBOSE);
+        
+        for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+            if (!entry.getIsDeleted()) {
+                if (entry.getFkItemId() == dpsEntry.getFkItemId() && entry.getFkItemRefId_n() == dpsEntry.getFkItemRefId_n() && 
+                        (int) entry.getOriginalQuantity() * 100000000 == (int) dpsEntry.getOriginalQuantity() * 100000000 && SLibUtils.compareAmount(entry.getSubtotal_r(), dpsEntry.getSubtotal_r())) {
+                    count++;
+
+                    if (SLibUtils.compareKeys(entry.getPrimaryKey(), dpsEntry.getPrimaryKey())) {
+                        position = count;
+                    }
+                }
+            }
+        }
+        
+        if (count == 0 || position == 0) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nEl número de partidas similares del docto. (= " + count + ") "
+                    + "y/o la posición de la partida deseada del docto. entre las partidas similares del docto (= " + position + ").");
+        }
+        
+        // contar renglones similares al renglón de documento deseado:
+        
+        String sql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety " +
+                "FROM fin_rec AS r " +
                 "INNER JOIN fin_rec_ety AS re ON re.id_year = r.id_year AND re.id_per = r.id_per AND re.id_bkc = r.id_bkc AND re.id_tp_rec = r.id_tp_rec AND re.id_num = r.id_num " +
-                "WHERE dr.id_dps_year = " + dpsEntryPk[0] + " AND dr.id_dps_doc = " + dpsEntryPk[1] + " AND re.b_del = 0 AND re.fid_item_n = " + entry.getFkItemId() + " AND " + 
-                "re.units = " + quantity + " AND (re.credit = " + total + " OR re.debit = " + total + ") ";
-        resultSet = client.getSession().getStatement().executeQuery(sql);
+                "WHERE re.fid_dps_year_n = " + dpsEntryKey[0] + " AND re.fid_dps_doc_n = " + dpsEntryKey[1] + " AND re.fid_item_n = " + dpsEntry.getFkItemId() + " AND " +
+                "re.units = " + originalQuantity + " AND (re.credit = " + subTotal + " OR re.debit = " + subTotal + ") AND NOT r.b_del AND NOT re.b_del;";
+        ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
+        
+        ArrayList<Object[]> entries = new ArrayList<>();
         
         while (resultSet.next()) {
-            key = new Object[8];
-            
-            key[0] = resultSet.getInt("re.id_year");
-            key[1] = resultSet.getInt("re.id_per"); 
-            key[2] = resultSet.getInt("re.id_bkc"); 
-            key[3] = resultSet.getString("re.id_tp_rec"); 
-            key[4] = resultSet.getInt("re.id_num"); 
-            key[5] = resultSet.getInt("re.id_ety");
-            key[6] = resultSet.getDouble("re.units"); //added to filter the query
-            key[7] = resultSet.getDouble("re.credit") != 0 ? resultSet.getDouble("re.credit") : resultSet.getDouble("re.debit"); //added to filter the query
-            
-            numberOfRows = resultSet.getInt("n_rows"); //If n_rows is > 1, then doesn't update because there are 2 or more identical entries
+            entries.add(new Object[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getString(4), resultSet.getInt(5), resultSet.getInt(6) });
         }
         
-        if (numberOfRows == 1) { //if there's only 1 entry whith same cost center, unit, item, and credit
-             sql = "UPDATE fin_rec_ety SET fid_acc = '" + account + "', fk_acc = " + accountPk + ", " + 
-                    (costCenter.isEmpty() ? "fid_cc_n = NULL, fk_cc_n = 0" : "fid_cc_n = '" + costCenter + "', fk_cc_n = " + costCenterPk) + ", " +
-                    "fid_usr_edit = " + client.getSession().getUser().getPkUserId() + ", ts_edit = NOW() " +
-                    "WHERE id_year = " + key[0] + " AND id_per = " + key[1] + " AND id_bkc = " + key[2] + " AND id_tp_rec = '" + key[3] + "' AND id_num = " + key[4] + " AND " +
-                    "id_ety = " + key[5] + " AND units = " + key[6] + " AND (credit = " + key[7] + " OR debit = " + key[7] +");";
-            client.getSession().getStatement().execute(sql);
+        if (entries.isEmpty() || count != entries.size()) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nEl número de renglones contables generados por el docto. (" + entries.size() + ") compatibles con la partida deseada del docto"
+                    + (count != entries.size() ? ". vs.\nel número de partidas similares del docto. (" + count + ")" : "") + ".");
+        }
+        
+        Object[] entryKey = entries.get(position - 1); // el renglón contable que con mucha certeza es el correspondiente al de la partida deseada del docto.
+        
+        int accountPk = SFinUtils.getAccountId(client.getSession(), account);
+        int costCenterPk = SFinUtils.getCostCenterId(client.getSession(), costCenter);
 
-            sql = "UPDATE trn_dps_ety " +
-                    "SET " + (costCenter.isEmpty() ? "fid_cc_n = NULL " : "fid_cc_n = '" + costCenter + "' ") + ", " +
-                    "fid_usr_edit = " + client.getSession().getUser().getPkUserId() + ", " + "ts_edit = NOW() " +
-                    "WHERE id_year = " + dpsEntryPk[0] + " AND id_doc = " + dpsEntryPk[1] + " AND id_ety = " + dpsEntryPk[2] + ";";
-            client.getSession().getStatement().execute(sql);
-        }
-        else {
-            throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_MANY);
-        }
+         sql = "UPDATE fin_rec_ety " +
+                "SET fid_acc = '" + account + "', fk_acc = " + accountPk + ", " +
+                (costCenter == null || costCenter.isEmpty() ? "fid_cc_n = NULL, fk_cc_n = 0" : "fid_cc_n = '" + costCenter + "', fk_cc_n = " + costCenterPk) + ", " +
+                "fid_usr_edit = " + client.getSession().getUser().getPkUserId() + ", ts_edit = NOW() " +
+                "WHERE id_year = " + entryKey[0] + " AND id_per = " + entryKey[1] + " AND id_bkc = " + entryKey[2] + " AND id_tp_rec = '" + entryKey[3] + "' AND id_num = " + entryKey[4] + " AND id_ety = " + entryKey[5] + ";";
+        client.getSession().getStatement().execute(sql);
+
+        sql = "UPDATE trn_dps_ety " +
+                "SET " + (costCenter == null || costCenter.isEmpty() ? "fid_cc_n = NULL " : "fid_cc_n = '" + costCenter + "' ") + ", " +
+                "fid_usr_edit = " + client.getSession().getUser().getPkUserId() + ", " + "ts_edit = NOW() " +
+                "WHERE id_year = " + dpsEntryKey[0] + " AND id_doc = " + dpsEntryKey[1] + " AND id_ety = " + dpsEntryKey[2] + ";";
+        client.getSession().getStatement().execute(sql);
         
         return true;
     }

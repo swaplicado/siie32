@@ -1,4 +1,14 @@
 ================================================================================
+2019-05-03, 3.2 135.1
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a consulta de obtención de empleados de nómina para generación de archivo de dispersión de nómina.
+2) Mejora a la modificación extemporal de cuenta contable y centro de costo de contabilización de documentos cuando se encuentran múltiples partidas de documento similares.
+3) Corrección de adición manual de incidencias en captura de recibos de nóminas. Estaba invertida la instrucción de habilitación de los campos de captura correspondientes.
+4) Estandarización de texto de ayuda de botones para el envío vía mail de CFDI.
+5) Cambio y estandarización de textos en etiquetas relacionadas con UMA exentas en forma de captura y vista de percepciones.
+
+================================================================================
 2019-04-30, 3.2 135.0
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

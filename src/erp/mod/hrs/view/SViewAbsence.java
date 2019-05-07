@@ -69,7 +69,7 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
         moFilterAbsenceClass = new SGridFilterPanel(miClient, this, SModConsts.HRSU_CL_ABS, SLibConsts.UNDEFINED);
         moFilterAbsenceClass.initFilter(null);
         
-        moFilterBusinessPartner = new SGridFilterPanel(miClient, this, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED);
+        moFilterBusinessPartner = new SGridFilterPanel(miClient, this, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, 250);
         moFilterBusinessPartner.initFilter(null);
         
         moDialogAbsenceMovesCardex = new SDialogAbsenceMovesCardex(miClient, "Movimientos de la incidencia");

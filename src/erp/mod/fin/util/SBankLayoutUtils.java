@@ -44,7 +44,7 @@ import sa.lib.xml.SXmlElement;
  *
  * @author Edwin Carmona, Alfredo Pérez, Sergio Flores
  */
-public class SFinUtils {
+public class SBankLayoutUtils {
     
     public static SDbBankLayout loadPaymentsXml(SGuiClient client, SDbBankLayout bankLayout) {
         String sReferenceRecord = "";
@@ -183,7 +183,7 @@ public class SFinUtils {
         }
         catch (Exception e) {
             oLayout = null;
-            SLibUtils.showException(SFinUtils.class, e);
+            SLibUtils.showException(SBankLayoutUtils.class, e);
         }
         
         return oLayout;
@@ -225,7 +225,7 @@ public class SFinUtils {
             params.setIsDifferentCurrency(dataAccountCash.getFkCurrencyId() != layout.getFkDpsCurrencyId());
         }
         catch (Exception e) {
-            SLibUtils.showException(SFinUtils.class, e);
+            SLibUtils.showException(SBankLayoutUtils.class, e);
         }
         
         return params;
@@ -316,7 +316,7 @@ public class SFinUtils {
             }
         }
         catch (Exception e) {
-            SLibUtils.showException(SFinUtils.class, e);
+            SLibUtils.showException(SBankLayoutUtils.class, e);
         }
         finally {
             SSrvUtils.releaseLock(client.getSession(), lock);
@@ -340,7 +340,7 @@ public class SFinUtils {
             }
         }
         catch (Exception e) {
-            SLibUtils.showException(SFinUtils.class, e);
+            SLibUtils.showException(SBankLayoutUtils.class, e);
         }
         finally {
             SSrvUtils.releaseLock(client.getSession(), lock);

@@ -763,6 +763,11 @@ public class SHrsPayroll {
         return oMwzTypeWage;
     }
 
+    /**
+     * Gets the requested earning by ID.
+     * @param earningId
+     * @return 
+     */
     public SDbEarning getEarning(final int earningId) {
         SDbEarning earning = null;
 
@@ -776,6 +781,11 @@ public class SHrsPayroll {
         return earning;
     }
 
+    /**
+     * Gets the requested first-found earning by earning type.
+     * @param earningType
+     * @return 
+     */
     public SDbEarning getEarningByType(final int earningType) {
         SDbEarning earning = null;
 
@@ -789,6 +799,11 @@ public class SHrsPayroll {
         return earning;
     }
 
+    /**
+     * Gets the requested deduction by ID.
+     * @param deductionId
+     * @return 
+     */
     public SDbDeduction getDeduction(final int deductionId) {
         SDbDeduction deduction = null;
 
@@ -801,7 +816,12 @@ public class SHrsPayroll {
 
         return deduction;
     }
-
+    
+    /**
+     * Gets the requested first-found deduction by deduction type.
+     * @param deductionType
+     * @return 
+     */
     public SDbDeduction getDeductionByType(final int deductionType) {
         SDbDeduction deduction = null;
 

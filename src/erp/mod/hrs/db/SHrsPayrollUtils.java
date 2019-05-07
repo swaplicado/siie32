@@ -7,7 +7,6 @@ package erp.mod.hrs.db;
 
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibUtils;
@@ -27,18 +26,18 @@ public abstract class SHrsPayrollUtils {
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON pr.id_emp = e.id_emp " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON e.id_emp = b.id_bp " +
-            "WHERE NOT p.id_pay = " + idPayroll + " AND pr.b_del " +
-            "ORDER BY b.bp, e.num, e.id_emp ";
-
-        Statement statement = session.getStatement().getConnection().createStatement();
-        ResultSet resultSet = statement.executeQuery(sql);
-        while (resultSet.next()) {
-            SRowPayrollEmployee row = new SRowPayrollEmployee();
-            row.setPkEmployeeId(resultSet.getInt("e.id_emp"));
-            row.setCode(resultSet.getString("e.num"));
-            row.setName(resultSet.getString("bp.bp"));
-
-            rows.add(row);
+            "WHERE p.id_pay = " + idPayroll + " AND NOT pr.b_del " +
+            "ORDER BY b.bp, e.num, e.id_emp;";
+        
+        try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                SRowPayrollEmployee row = new SRowPayrollEmployee();
+                row.setPkEmployeeId(resultSet.getInt("e.id_emp"));
+                row.setCode(resultSet.getString("e.num"));
+                row.setName(resultSet.getString("b.bp"));
+                
+                rows.add(row);
+            }
         }
         
         return rows;
@@ -58,16 +57,17 @@ public abstract class SHrsPayrollUtils {
                 "WHERE NOT e.b_del AND NOT b.b_del AND e.fk_tp_pay = " + paymentType + " " +
                 (!activeOnly ? "" : "AND e.b_act = 1 AND e.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(payrollEnd) + "' ") +
                 (selectedEmployees.isEmpty() ? "" : "AND e.id_emp NOT IN (" + SLibUtils.textImplode(employees, ", ") + ") ") +
-                "ORDER BY b.bp, e.num, e.id_emp ";
-        Statement statement = session.getStatement().getConnection().createStatement();
-        ResultSet resultSet = statement.executeQuery(sql);
-        while (resultSet.next()) {
-            SRowPayrollEmployee row = new SRowPayrollEmployee();
-            row.setPkEmployeeId(resultSet.getInt("e.id_emp"));
-            row.setFkPaymentTypeId(paymentType);
-            row.setCode(resultSet.getString("e.num"));
-            row.setName(resultSet.getString("b.bp"));
-            rows.add(row);
+                "ORDER BY b.bp, e.num, e.id_emp;";
+        
+        try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                SRowPayrollEmployee row = new SRowPayrollEmployee();
+                row.setPkEmployeeId(resultSet.getInt("e.id_emp"));
+                row.setFkPaymentTypeId(paymentType);
+                row.setCode(resultSet.getString("e.num"));
+                row.setName(resultSet.getString("b.bp"));
+                rows.add(row);
+            }
         }
         
         return rows;

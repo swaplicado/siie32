@@ -28,7 +28,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Juan Barajas, Daniel López
+ * @author Juan Barajas, Daniel López, Sergio Flores
  */
 public class SDialogUpdateDpsAccountCenterCost extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 

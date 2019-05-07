@@ -938,10 +938,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             
             @Override
             public void actionRowNew() {
-                SDialogPayrollReceiptAbsence dlgAbsence;
-                
-                dlgAbsence = new SDialogPayrollReceiptAbsence(miClient, "Consumo de incidencias");
-
+                SDialogPayrollReceiptAbsence dlgAbsence = new SDialogPayrollReceiptAbsence(miClient, "Consumo de incidencias");
                 dlgAbsence.setValue(SModConsts.HRS_PAY_RCP, moHrsReceipt);
                 dlgAbsence.setFormVisible(true);
 

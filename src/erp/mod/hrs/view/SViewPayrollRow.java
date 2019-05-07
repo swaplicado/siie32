@@ -4,28 +4,15 @@
  */
 package erp.mod.hrs.view;
 
-import erp.cfd.SCfdConsts;
-import erp.client.SClientInterface;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.lib.SLibConstants;
-import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
-import erp.mod.hrs.db.SDbPayroll;
-import erp.mod.hrs.db.SDbPayrollReceiptIssue;
-import erp.mod.hrs.db.SHrsPayrollAnnul;
 import erp.mod.hrs.db.SHrsUtils;
-import erp.mtrn.data.SCfdUtils;
-import erp.mtrn.data.SDataCfd;
-import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.print.SDataConstantsPrint;
-import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import sa.lib.SLibConsts;
+import javax.swing.JOptionPane;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibRpnArgumentType;
 import sa.lib.SLibRpnOperator;
@@ -51,18 +38,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
     private SGridFilterDatePeriod moFilterDatePeriod;
 
     private JButton jbPrintReceipt;
-    private JButton jbSignXml;
-    private JButton jbAnnul;
-    private JButton jbGetXml;
-    private JButton jbGetAcknowledgmentCancellation;
-    private JButton jbPrint;
-    private JButton jbPrintAcknowledgmentCancellation;
-    private JButton jbSend;
-    private JButton jbSendPayrollReceipt;
-    private JButton jbVerifyCfdi;
-    private JButton jbDiactivatePac;
-
-    private SDialogAnnulCfdi moDialogAnnulCfdi;
+    private JButton jbSendReceipt;
 
     public SViewPayrollRow(SGuiClient client, String title, int subtype) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_PAY_RCP, subtype, title);
@@ -80,45 +56,11 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         
         jbPrintReceipt = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_print.gif")), "Imprimir recibo nómina", this);
-        jbSignXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN), "Timbrar CFDI", this);
-        jbAnnul = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL), "Anular recibo nómina", this);
-        jbGetXml = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML), "Obtener XML del comprobante", this);
-        jbGetAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_CANCEL), "Obtener XML del acuse de cancelación del CFDI", this);
-        jbPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir CFDI recibo nómina", this);
-        jbPrintAcknowledgmentCancellation = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT_ACK_CAN), "Imprimir acuse de cancelación", this);
-        jbSend = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar comprobante", this);
-        jbSendPayrollReceipt = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar recibo de nómina", this);
-        jbVerifyCfdi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), "Verificar timbrado o cancelación del CFDI", this);
-        jbDiactivatePac = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")), "Limpiar inconsistencias de timbrado o cancelación del CFDI", this);
-        
-        moDialogAnnulCfdi = new SDialogAnnulCfdi((SClientInterface) miClient);
+        jbSendReceipt = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar recibo nómina vía mail", this);
 
-        /* XXX (jbarajas, 2016-08-16) slowly open payroll
-        jbSignXml.setEnabled(true);
-        jbAnnul.setEnabled(true);
-        jbGetXml.setEnabled(true);
-        jbGetAcknowledgmentCancellation.setEnabled(true);
-        jbPrint.setEnabled(true);
-        jbPrintAcknowledgmentCancellation.setEnabled(true);
-        jbSend.setEnabled(true);
-        jbVerifyCfdi.setEnabled(true);
-        jbDiactivatePac.setEnabled(true);
-        */
-        
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintReceipt);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSendPayrollReceipt);
-        /* XXX (jbarajas, 2016-08-16) slowly open payroll
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSignXml);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbAnnul);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetXml);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetAcknowledgmentCancellation);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrint);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintAcknowledgmentCancellation);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSend);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbVerifyCfdi);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDiactivatePac);
-        */
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSendReceipt);
     }
 
     /*
@@ -148,12 +90,8 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
         }
     }
 
-    private void actionSignPayroll() {
-        boolean needUpdate = false;
-        SDataCfd cfd = null;
-        SDbPayrollReceiptIssue receiptIssue = null;
-        
-        if (jbSignXml.isEnabled()) {
+    private void actionSendReceipt() {
+        if (jbSendReceipt.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -163,374 +101,7 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
                 if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
                     miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
                 }
-                else if (gridRow.isRowSystem()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                }
-                else if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    receiptIssue = new SDbPayrollReceiptIssue();
-                    try {
-                        cfd = SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
-                        if (cfd != null) {
-                            receiptIssue.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getFkPayrollReceiptIssueId_n() });
-                        }
-                        
-                        if (receiptIssue.getPkIssueId() == SLibConsts.UNDEFINED) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n El recibo no ha sido emitido.");
-                        }
-                        else {
-                            if (receiptIssue.isDeleted()) {
-                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getPayrollReceiptIssueNumber() + "' está eliminado.");
-                            }
-                            else if (receiptIssue.getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                                miClient.showMsgBoxWarning("El recibo '" + receiptIssue.getPayrollReceiptIssueNumber() + "' está anulado.");
-                            }
-                            else if (!SDataUtilities.isPeriodOpen((SClientInterface) miClient, receiptIssue.getDateIssue())) {
-                                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
-                            }
-                            else {
-                                /* XXX jbarajas 04/02/2016 sign and sending CFDI
-                                    needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR);
-                                */
-                                if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                                    needUpdate = SCfdUtils.signAndSendCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, true, true);
-                                }
-                                else {
-                                    needUpdate = SCfdUtils.signCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR);
-                                }
-                            }
-                        }
-                                
-                        if (needUpdate) {
-                            miClient.getSession().notifySuscriptors(mnGridType);
-                        }
-                    }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-            }
-        }
-    }
-
-    private void actionAnnulPayroll() {
-        boolean needUpdate = false;
-        SDataCfd cfd = null;
-        SDataPayrollReceiptIssue receiptIssue = null;
-        SHrsPayrollAnnul payrollAnnul = null;
-        ArrayList<SDataCfd> cfds = null;
-        ArrayList<SDataPayrollReceiptIssue> receiptIssues = null;
-        SDbPayroll payroll = null;
-
-        if (jbAnnul.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (gridRow.isRowSystem()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                }
-                else if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    try {
-                        payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { gridRow.getRowPrimaryKey()[0] });
-                        
-                        if (payroll.isClosed()) {
-                            miClient.showMsgBoxWarning("La nómina debe estar abierta.");
-                        }
-                        else {
-                            cfds = new ArrayList<SDataCfd>();
-                            receiptIssues = new ArrayList<SDataPayrollReceiptIssue>();
-
-                            cfd = SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
-                            if (cfd != null) {
-                                cfds.add(cfd);
-                            }
-
-                            receiptIssue = new SDataPayrollReceiptIssue();
-
-                            if (receiptIssue.read(new int[] { gridRow.getRowPrimaryKey()[0], gridRow.getRowPrimaryKey()[1], gridRow.getRowPrimaryKey()[2] }, miClient.getSession().getStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n El recibo no ha sido emitido.");
-                            }
-                            receiptIssues.add(receiptIssue);
-                            
-                            moDialogAnnulCfdi.formReset();
-                            moDialogAnnulCfdi.formRefreshCatalogues();
-                            moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, (cfds.isEmpty() ? miClient.getSession().getCurrentDate() : cfds.get(0).getTimestamp()));
-                            moDialogAnnulCfdi.setValue(SModConsts.TRNS_TP_CFD, (cfds == null || cfds.isEmpty() ? cfd == null ? SLibConstants.UNDEFINED : cfd.getFkCfdTypeId() : cfds.get(0).getFkCfdTypeId()));
-                            moDialogAnnulCfdi.setVisible(true);
-
-                            if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                payrollAnnul = new SHrsPayrollAnnul((SClientInterface) miClient, cfds, receiptIssues, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat(), moDialogAnnulCfdi.getDpsAnnulationType());
-                                needUpdate = payrollAnnul.annulPayroll();
-                            }
-
-                            if (needUpdate) {
-                                miClient.getSession().notifySuscriptors(mnGridType);
-                            }
-
-                            /*
-                            if (cfd == null) {
-                                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
-                            }
-                            else {
-                                moDialogAnnulCfdi.formReset();
-                                moDialogAnnulCfdi.formRefreshCatalogues();
-                                moDialogAnnulCfdi.setValue(SGuiConsts.PARAM_DATE, cfd.getTimestamp());
-                                moDialogAnnulCfdi.setVisible(true);
-
-                                if (moDialogAnnulCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                    needUpdate = SCfdUtils.cancelCfdi((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, moDialogAnnulCfdi.getDate(), moDialogAnnulCfdi.getAnnulSat());
-                                }
-
-                                if (needUpdate) {
-                                    miClient.getSession().notifySuscriptors(mnGridType);
-                                }
-                            }
-                            */
-                        }
-                    }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-            }
-        }
-    }
-
-    private void actionGetXml() {
-        if (jbGetXml.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (gridRow.isRowSystem()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                }
-                else if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    try {
-                        SCfdUtils.getXmlCfd((SClientInterface) miClient, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()));
-                    }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-            }
-        }
-    }
-
-    private void actionGetAcknowledgmentCancellation() {
-        if (jbGetAcknowledgmentCancellation.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (gridRow.isRowSystem()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                }
-                else if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    try {
-                        SCfdUtils.getAcknowledgmentCancellationCfd((SClientInterface) miClient, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()));
-                    }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-            }
-        }
-    }
-
-    private void actionPrint() {
-        if (jbPrint.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (gridRow.isRowSystem()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                }
-                else if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    try {
-                        SDataCfd cfd = SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey());
-                        SCfdUtils.printCfd((SClientInterface) miClient, cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, SDataConstantsPrint.PRINT_MODE_VIEWER, 1, false);
-                    }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-            }
-        }
-    }
-
-    private void actionPrintAcknowledgmentCancellation() {
-        if (jbPrintAcknowledgmentCancellation.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (gridRow.isRowSystem()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                }
-                else if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    try {
-                        SCfdUtils.printAcknowledgmentCancellationCfd((SClientInterface) miClient, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR);
-                    }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-            }
-        }
-    }
-
-    private void actionSendMail() {
-        if (jbSend.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (gridRow.isRowSystem()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                }
-                else if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    try {
-                        SCfdUtils.sendCfd((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
-                    }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-            }
-        }
-    }
-
-    private void actionVerifyCfdi() {
-        boolean needUpdate = false;
-
-        if (jbVerifyCfdi.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (gridRow.isRowSystem()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                }
-                else if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    try {
-                        needUpdate = SCfdUtils.validateCfdi((SClientInterface) miClient, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()), SCfdConsts.CFDI_PAYROLL_VER_CUR, true);
-
-                        if (needUpdate) {
-                            miClient.getSession().notifySuscriptors(mnGridType);
-                        }
-                    }
-                    catch (Exception e) {
-                        miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                        SLibUtils.showException(this, e);
-                    }
-                }
-            }
-        }
-    }
-    
-    private void actionCfdiDiactivateFlags() {
-        if (jbVerifyCfdi.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else if (gridRow.isRowSystem()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
-                }
-                else if (!gridRow.isUpdatable()) {
-                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
-                }
-                else {
-                    try {
-                        SCfdUtils.resetCfdiDeactivateFlags((SClientInterface) miClient, SCfdUtils.getPayrollReceiptLastCfd((SClientInterface) miClient, SCfdConsts.CFDI_PAYROLL_VER_CUR, gridRow.getRowPrimaryKey()));
-                        miClient.getSession().notifySuscriptors(mnGridType);
-                    }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-            }
-        }
-    }
-    
-    private void actionSendPayrollReceipt() {
-        if (jbSendPayrollReceipt.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else {
+                else if (miClient.showMsgBoxConfirm("¿Está seguro que desea enviar vía mail el recibo de nómina?") == JOptionPane.YES_OPTION) {
                     try {
                         SHrsUtils.sendPayrollReceipt(miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, gridRow.getRowPrimaryKey());
                     }
@@ -683,35 +254,8 @@ public class SViewPayrollRow extends SGridPaneView implements ActionListener {
             if (button == jbPrintReceipt) {
                 actionPrintReceipt();
             }
-            else if (button == jbSignXml) {
-                actionSignPayroll();
-            }
-            else if (button == jbAnnul) {
-                actionAnnulPayroll();
-            }
-            else if (button == jbGetXml) {
-                actionGetXml();
-            }
-            else if (button == jbGetAcknowledgmentCancellation) {
-                actionGetAcknowledgmentCancellation();
-            }
-            else if (button == jbPrint) {
-                actionPrint();
-            }
-            else if (button == jbPrintAcknowledgmentCancellation) {
-                actionPrintAcknowledgmentCancellation();
-            }
-            else if (button == jbSend) {
-                actionSendMail();
-            }
-            else if (button == jbVerifyCfdi) {
-                actionVerifyCfdi();
-            }
-            else if (button == jbDiactivatePac) {
-                actionCfdiDiactivateFlags();
-            }
-            else if (button == jbSendPayrollReceipt) {
-                actionSendPayrollReceipt();
+            else if (button == jbSendReceipt) {
+                actionSendReceipt();
             }
         }
     }

@@ -38,18 +38,21 @@ public class SViewAccountingEarning extends SGridPaneView implements ActionListe
     private void initComponentsCustom() {
         setRowButtonsEnabled(false, false, true, false, false);
         
-        moFilterDual = new SGridFilterPanel(miClient, this, (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_DEP ? SModConsts.HRSU_DEP : SModConsts.HRSU_EMP), SLibConsts.UNDEFINED);
-        moFilterDual.initFilter(null);
-        
-        moFilterEarning = new SGridFilterPanel(miClient, this, SModConsts.HRS_EAR, SLibConsts.UNDEFINED);
+        moFilterEarning = new SGridFilterPanel(miClient, this, SModConsts.HRS_EAR, SLibConsts.UNDEFINED, 250);
         moFilterEarning.initFilter(null);
-        
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterEarning);
+        
         switch (mnGridSubtype) {
+            case SModSysConsts.HRSS_TP_ACC_GBL:
+                break;
+                
             case SModSysConsts.HRSS_TP_ACC_DEP:
             case SModSysConsts.HRSS_TP_ACC_EMP:
+                moFilterDual = new SGridFilterPanel(miClient, this, (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_DEP ? SModConsts.HRSU_DEP : SModConsts.HRSU_EMP), SLibConsts.UNDEFINED, 250);
+                moFilterDual.initFilter(null);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDual);
                 break;
+                
             default:
         }
     }

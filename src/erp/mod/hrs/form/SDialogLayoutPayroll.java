@@ -364,7 +364,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     }
     
     private void populateLayoutBank() {
-        Vector<SGuiItem> items = new Vector<SGuiItem>();
+        Vector<SGuiItem> items = new Vector<>();
 
         items.add(new SGuiItem(new int[] { SLibConsts.UNDEFINED }, "(" + SUtilConsts.TXT_SELECT + " layout)"));
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BANBAJIO }, SFinConsts.TXT_LAY_BANK_BANBAJIO));

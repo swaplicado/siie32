@@ -377,19 +377,20 @@ public class SDialogPayrollReceiptAbsence extends SBeanFormDialog implements Act
     
     private void populateAbsence() {
         Vector<SGridRow> rows = new Vector<>();
-        int pendingDays = 0;
 
         for (SDbAbsence absence : moHrsReceipt.getHrsEmployee().getAbsences()) {
-            pendingDays = absence.getEffectiveDays() - absence.getActualConsumedDays(moHrsReceipt.getHrsEmployee());
-            
-            if (pendingDays > 0 && !absence.isClosed()) {
-                absence.setAuxPendingDays(pendingDays);
-                rows.add(absence);
+            if (!absence.isClosed()) {
+                int absenceConsumedDays = absence.getActualConsumedDays(moHrsReceipt.getHrsEmployee());
+                int absenceRemainingDays = absence.getEffectiveDays() - absenceConsumedDays;
+
+                if (absenceRemainingDays > 0) {
+                    absence.setAuxPendingDays(absenceRemainingDays);
+                    rows.add(absence);
+                }
             }
         }
         
         moGridAbsences.populateGrid(rows, this);
-        moGridAbsences.clearSortKeys();
         moGridAbsences.setSelectedGridRow(0);
         moGridAbsences.getTable().requestFocus();
     }
@@ -401,6 +402,9 @@ public class SDialogPayrollReceiptAbsence extends SBeanFormDialog implements Act
         }
         else {
             moAbsence = (SDbAbsence) moGridAbsences.getSelectedGridRow();
+            
+            moDateDateEnd.resetField();
+            moIntEffectiveDays.resetField();
             
             /*
              * START of algorithm #ABS001. IMPORTANT: Please find in proyect this code to sync up any changes!
@@ -419,7 +423,7 @@ public class SDialogPayrollReceiptAbsence extends SBeanFormDialog implements Act
                 
                 if (!moAbsence.consumesCalendarDays() && absenceConsumedDays > 0) { // preserve original absence start-date when there aren't previous consumptions
                     while (moHrsReceipt.getHrsPayroll().isNonWorkingDay(consumptionStart)) {
-                            consumptionStart = SLibTimeUtils.addDate(consumptionStart, 0, 0, 1); // move to next day
+                        consumptionStart = SLibTimeUtils.addDate(consumptionStart, 0, 0, 1); // move to next day
                     }
                 }
 
@@ -430,19 +434,23 @@ public class SDialogPayrollReceiptAbsence extends SBeanFormDialog implements Act
                 moDateLastConsumption.setValue(lastConsumptionDate);
                 moDateDateStart.setValue(consumptionStart);
                 
-                moDateDateEnd.setEnabled(false);
-                moIntEffectiveDays.setEnabled(false);
+                moDateDateEnd.setEditable(true);
+                moIntEffectiveDays.setEditable(true);
+                
+                if (absenceRemainingDays == 1) {
+                    moDateDateEnd.setValue(moAbsence.getDateEnd());
+                    moIntEffectiveDays.setValue(1);
+                }
+                
+                moDateDateEnd.requestFocusInWindow();
             }
             else {
                 moDateLastConsumption.resetField();
                 moDateDateStart.resetField();
                 
-                moDateDateEnd.setEnabled(true);
-                moIntEffectiveDays.setEnabled(true);
+                moDateDateEnd.setEditable(false);
+                moIntEffectiveDays.setEditable(false);
             }
-            
-            moDateDateEnd.resetField();
-            moIntEffectiveDays.resetField();
             
             if (moAbsence.isVacation()) {
                 readHrsBenefitAcummulate(moAbsence.getBenefitsAnniversary(), moAbsence.getBenefitsYear());

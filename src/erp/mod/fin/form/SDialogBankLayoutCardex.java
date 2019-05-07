@@ -21,7 +21,7 @@ import erp.mod.fin.db.SLayoutBankCardextRow;
 import erp.mod.fin.db.SLayoutBankPaymentRow;
 import erp.mod.fin.db.SLayoutBankXmlRow;
 import erp.mod.fin.db.SMoney;
-import erp.mod.fin.util.SFinUtils;
+import erp.mod.fin.util.SBankLayoutUtils;
 import erp.mtrn.data.SDataDps;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -299,7 +299,7 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         
         jtfRows.setText("0/0");
         
-        SDbBankLayout bankLayout = SFinUtils.loadPaymentsXml(miClient, moBankLayout);
+        SDbBankLayout bankLayout = SBankLayoutUtils.loadPaymentsXml(miClient, moBankLayout);
         
         jtfRegistryKey.setText(SLibUtils.textKey(moBankLayout.getPrimaryKey()));
         jtfDate.setText(((SClientInterface) miClient).getSessionXXX().getFormatters().getDateFormat().format(moBankLayout.getDateLayout()));

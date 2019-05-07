@@ -1029,7 +1029,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     
                     msAccountCredit = resultSet.getString("b.acc_num");                    
                     msAgreement = agreement;
-                    mhAgreeAgreeRef.put(agreement, erp.mod.fin.util.SFinUtils.getAgreementReferences(miClient, nBizPartnerBranch, agreement));
+                    mhAgreeAgreeRef.put(agreement, erp.mod.fin.util.SBankLayoutUtils.getAgreementReferences(miClient, nBizPartnerBranch, agreement));
                     
                     accountCredit = mnBankPaymentType != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? resultSet.getString("b.acc_num_std") : resultSet.getString("b.acc_num");
                     oAgree.add(agreement);

@@ -27,7 +27,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -292,7 +292,6 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
             if (button == jbAccountCostCenter) {
                 actionAccountCostCenter();
             }
-
         }
     }
 }

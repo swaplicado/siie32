@@ -98,7 +98,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbGetAcknowledgmentCancellation;
     private javax.swing.JButton jbSignXml;
     private javax.swing.JButton jbValidateCfdi;
-    private javax.swing.JButton jbGetCfdiCancelStatus;
+    private javax.swing.JButton jbGetCfdiStatus;
     private javax.swing.JButton jbSendCfdi;
     private javax.swing.JButton jbResetPacFlags;
     private javax.swing.JButton jbRestoreSignXml;
@@ -325,15 +325,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbValidateCfdi.addActionListener(this);
         jbValidateCfdi.setToolTipText("Validar timbrado o cancelación del CFDI");
 
-        jbGetCfdiCancelStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
-        jbGetCfdiCancelStatus.setPreferredSize(new Dimension(23, 23));
-        jbGetCfdiCancelStatus.addActionListener(this);
-        jbGetCfdiCancelStatus.setToolTipText("Checar estatus cancelación CFDI");
+        jbGetCfdiStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
+        jbGetCfdiStatus.setPreferredSize(new Dimension(23, 23));
+        jbGetCfdiStatus.addActionListener(this);
+        jbGetCfdiStatus.setToolTipText("Checar estatus cancelación del CFDI");
 
         jbSendCfdi = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
         jbSendCfdi.setPreferredSize(new Dimension(23, 23));
         jbSendCfdi.addActionListener(this);
-        jbSendCfdi.setToolTipText("Enviar comprobante");
+        jbSendCfdi.setToolTipText("Enviar comprobante vía mail");
 
         jbRestoreSignXml = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")));
         jbRestoreSignXml.setPreferredSize(new Dimension(23, 23));
@@ -412,7 +412,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbGetAcknowledgmentCancellation);
         addTaskBarLowerComponent(jbSignXml);
         addTaskBarLowerComponent(jbValidateCfdi);
-        addTaskBarLowerComponent(jbGetCfdiCancelStatus);
+        addTaskBarLowerComponent(jbGetCfdiStatus);
         addTaskBarLowerComponent(jbSendCfdi);
         addTaskBarLowerComponent(jbRestoreSignXml);
         addTaskBarLowerComponent(jbRestoreAckCancellation);
@@ -450,7 +450,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbGetCfdiCancelStatus.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbGetCfdiStatus.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSendCfdi.setEnabled((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj)));
         jbRestoreSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbRestoreAckCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
@@ -1835,8 +1835,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
-    private void actionGetCfdiCancelStatus() throws Exception {
-        if (jbGetCfdiCancelStatus.isEnabled()) {
+    private void actionGetCfdiStatus() throws Exception {
+        if (jbGetCfdiStatus.isEnabled()) {
            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -2183,8 +2183,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbValidateCfdi) {
                     actionValidateCfdi();
                 }
-                else if (button == jbGetCfdiCancelStatus) {
-                    actionGetCfdiCancelStatus();
+                else if (button == jbGetCfdiStatus) {
+                    actionGetCfdiStatus();
                 }
                 else if (button == jbSendCfdi) {
                     actionSendCfdi();

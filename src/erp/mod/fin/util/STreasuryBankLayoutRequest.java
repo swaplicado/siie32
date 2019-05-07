@@ -53,11 +53,11 @@ public class STreasuryBankLayoutRequest {
             moBankLayout.setAuthorizationRequests(moBankLayout.getAuthorizationRequests() + 1);
             comment = dialogComments.getComment();
             
-            SDbBankLayout bankLayout = SFinUtils.loadPaymentsXml(miClient, moBankLayout);
+            SDbBankLayout bankLayout = SBankLayoutUtils.loadPaymentsXml(miClient, moBankLayout);
             
             if (moBankLayout != null) {
-                params = SFinUtils.getBankLayoutParams(miClient, bankLayout);
-                pdf = STreasuryBankLayoutFile.createDocument(miClient, params ,SFinUtils.populateRows(miClient, bankLayout.getLayoutBankPaymentRows(), bankLayout.getLayoutBankXmlRows(), bankLayout.getXtaBankPaymentType()));
+                params = SBankLayoutUtils.getBankLayoutParams(miClient, bankLayout);
+                pdf = STreasuryBankLayoutFile.createDocument(miClient, params ,SBankLayoutUtils.populateRows(miClient, bankLayout.getLayoutBankPaymentRows(), bankLayout.getLayoutBankXmlRows(), bankLayout.getXtaBankPaymentType()));
 
                 if (pdf != null) {
                     isSent = sendMail(params, comment, pdf, null);
@@ -65,9 +65,9 @@ public class STreasuryBankLayoutRequest {
                     if (isSent) {
                         try {
                             if (bankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_NEW_ST) {
-                                SFinUtils.changeLayoutStatus(miClient, bankLayout, SFinConsts.LAY_BANK_APPROVED_ST);
+                                SBankLayoutUtils.changeLayoutStatus(miClient, bankLayout, SFinConsts.LAY_BANK_APPROVED_ST);
                             }
-                            SFinUtils.increaseLayoutRequest(miClient, bankLayout);
+                            SBankLayoutUtils.increaseLayoutRequest(miClient, bankLayout);
                         }
                         catch (Exception e) {
                             SLibUtils.printException(this, e);

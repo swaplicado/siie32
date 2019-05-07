@@ -102,7 +102,7 @@ public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, Act
         jbClearFilter1.setPreferredSize(new java.awt.Dimension(23, 23));
         add(jbClearFilter1);
 
-        moKeyFilter2.setPreferredSize(new java.awt.Dimension(125, 23));
+        moKeyFilter2.setPreferredSize(new java.awt.Dimension(250, 23));
         add(moKeyFilter2);
 
         jbClearFilter2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif"))); // NOI18N

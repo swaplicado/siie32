@@ -23,6 +23,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SCfdPaymentUtils;
 import erp.mtrn.data.SCfdUtils;
+import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.print.SDataConstantsPrint;
@@ -48,10 +49,11 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
     private javax.swing.JButton jbGetXmlCancelAck;
     private javax.swing.JButton jbSignXml;
     private javax.swing.JButton jbVerifyCfdi;
+    private javax.swing.JButton jbGetCfdiStatus;
     private javax.swing.JButton jbSendCfdi;
-    private javax.swing.JButton jbDeactivateFlags;
     private javax.swing.JButton jbRestoreSignedXml;
     private javax.swing.JButton jbRestoreSignedXmlCancelAck;
+    private javax.swing.JButton jbDeactivateFlags;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
@@ -70,12 +72,12 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         jbAnnul = new JButton(miClient.getImageIcon(SLibConstants.ICON_ANNUL));
         jbAnnul.setPreferredSize(new Dimension(23, 23));
         jbAnnul.addActionListener(this);
-        jbAnnul.setToolTipText("Anular documento");
+        jbAnnul.setToolTipText("Anular comprobante");
 
         jbPrint = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT));
         jbPrint.setPreferredSize(new Dimension(23, 23));
         jbPrint.addActionListener(this);
-        jbPrint.setToolTipText("Imprimir documento");
+        jbPrint.setToolTipText("Imprimir comprobante");
         
         jbPrintCancelAck = new JButton(miClient.getImageIcon(SLibConstants.ICON_PRINT_ACK_CAN));
         jbPrintCancelAck.setPreferredSize(new Dimension(23, 23));
@@ -102,10 +104,15 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         jbVerifyCfdi.addActionListener(this);
         jbVerifyCfdi.setToolTipText("Verificar timbrado o cancelación del CFDI");
         
+        jbGetCfdiStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
+        jbGetCfdiStatus.setPreferredSize(new Dimension(23, 23));
+        jbGetCfdiStatus.addActionListener(this);
+        jbGetCfdiStatus.setToolTipText("Checar estatus cancelación del CFDI");
+        
         jbSendCfdi = new JButton(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")));
         jbSendCfdi.setPreferredSize(new Dimension(23, 23));
         jbSendCfdi.addActionListener(this);
-        jbSendCfdi.setToolTipText("Enviar comprobante");
+        jbSendCfdi.setToolTipText("Enviar comprobante vía mail");
 
         jbRestoreSignedXml = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")));
         jbRestoreSignedXml.setPreferredSize(new Dimension(23, 23));
@@ -136,6 +143,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         addTaskBarLowerComponent(jbGetXmlCancelAck);
         addTaskBarLowerComponent(jbSignXml);
         addTaskBarLowerComponent(jbVerifyCfdi);
+        addTaskBarLowerComponent(jbGetCfdiStatus);
         addTaskBarLowerComponent(jbSendCfdi);
         addTaskBarLowerComponent(jbRestoreSignedXml);
         addTaskBarLowerComponent(jbRestoreSignedXmlCancelAck);
@@ -151,6 +159,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         jbGetXmlCancelAck.setEnabled(true);
         jbSignXml.setEnabled(true);
         jbVerifyCfdi.setEnabled(true);
+        jbGetCfdiStatus.setEnabled(true);
         jbSendCfdi.setEnabled(true);
         jbRestoreSignedXml.setEnabled(true);
         jbRestoreSignedXmlCancelAck.setEnabled(true);
@@ -386,6 +395,23 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         }
     }
 
+    private void actionGetCfdiStatus() throws Exception {
+        if (jbGetCfdiStatus.isEnabled()) {
+           if (moTablePane.getSelectedTableRow() == null) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                try {
+                    SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                    miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfd).composeMessage());
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
+            }
+        }
+    }
+
     private void actionSendCfdi() {
         if (jbSendCfdi.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null) {
@@ -535,6 +561,9 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                 }
                 else if (button == jbVerifyCfdi) {
                     actionVerifyCfdi();
+                }
+                else if (button == jbGetCfdiStatus) {
+                    actionGetCfdiStatus();
                 }
                 else if (button == jbSendCfdi) {
                     actionSendCfdi();

@@ -12,7 +12,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbBankLayout;
 import erp.mod.fin.db.SFinConsts;
 import erp.mod.fin.form.SDialogBankLayoutCardex;
-import erp.mod.fin.util.SFinUtils;
+import erp.mod.fin.util.SBankLayoutUtils;
 import erp.mod.fin.util.STreasuryBankLayoutRequest;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -226,7 +226,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         if (bankLayout != null) {
             try {
                 if (bankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_APPROVED_ST) {
-                    SFinUtils.changeLayoutStatus(miClient, bankLayout, SFinConsts.LAY_BANK_NEW_ST);
+                    SBankLayoutUtils.changeLayoutStatus(miClient, bankLayout, SFinConsts.LAY_BANK_NEW_ST);
                     miClient.getSession().notifySuscriptors(mnGridType);
                 }
             }

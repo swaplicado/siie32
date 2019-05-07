@@ -38,7 +38,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 import sa.lib.SLibConsts;
-
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
@@ -47,7 +46,7 @@ import sa.lib.xml.SXmlElement;
 /**
  * Processing and utilities of the importation of payments bancomer CIE
  * 
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SImportPayments {
     
@@ -185,7 +184,7 @@ public class SImportPayments {
             }
         }
         catch (Exception e) {
-            SLibUtils.printException(SFinUtils.class.getName(), e);
+            SLibUtils.printException(SBankLayoutUtils.class.getName(), e);
         }
 
         return key;

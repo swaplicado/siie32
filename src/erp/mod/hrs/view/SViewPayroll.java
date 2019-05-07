@@ -53,10 +53,10 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     private SGridFilterDatePeriod moFilterDatePeriod;
     
     private JButton jbCloseOpen;
-    private JButton jbGenerateSign;
+    private JButton jbGenerateSignCfdi;
     private JButton jbPrintReports;
-    private JButton jbGenerateLayout;
-    private JButton jbSendReceipts;
+    private JButton jbSendCfdi;
+    private JButton jbGenerateBankLayout;
     
     public SViewPayroll(SGuiClient client, String title, int subtype) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_PAY, subtype, title);
@@ -73,17 +73,17 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         jbCloseOpen = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_lock.gif")), "Cerrar/abrir nómina", this);
-        jbGenerateSign = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT), "Generar y timbrar CFDI", this);
+        jbGenerateSignCfdi = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT), "Generar y timbrar recibos nómina", this);
         jbPrintReports = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir reportes nómina", this);
-        jbGenerateLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Generar layout dispersión nómina", this);
-        jbSendReceipts = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar recibos nómina", this);
+        jbSendCfdi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar recibos nómina vía mail", this);
+        jbGenerateBankLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Generar layout dispersión nómina", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseOpen);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGenerateSign);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGenerateSignCfdi);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintReports);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGenerateLayout);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSendReceipts);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSendCfdi);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGenerateBankLayout);
     }
 
     @Override
@@ -162,8 +162,8 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         }
     }
 
-    private void actionGenerateSign() {
-        if (jbGenerateSign.isEnabled()) {
+    private void actionGenerateSignCfdi() {
+        if (jbGenerateSignCfdi.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -228,8 +228,31 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         }
     }
     
-    private void actionGenerateLayout() {
-        if (jbGenerateLayout.isEnabled()) {
+    private void actionSendCfdi() {
+        if (jbSendCfdi.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (miClient.showMsgBoxConfirm("¿Está seguro que desea enviar vía mail los recibos de nómina?") == JOptionPane.YES_OPTION) {
+                    try {
+                        SHrsUtils.sendPayrollReceipts(miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, gridRow.getRowPrimaryKey());
+                    } 
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+            }
+        }
+    }
+ 
+    private void actionGenerateBankLayout() {
+        if (jbGenerateBankLayout.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -257,29 +280,6 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         }
     }
 
-    private void actionSendReceipts() {
-        if (jbSendReceipts.isEnabled()) {
-            if (jtTable.getSelectedRowCount() != 1) {
-                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-            }
-            else {
-                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
-
-                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
-                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
-                }
-                else {
-                    try {
-                        SHrsUtils.sendPayrollReceipts(miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, gridRow.getRowPrimaryKey());
-                    } 
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-            }
-        }
-    }
- 
     /*
      * Public methods
      */
@@ -422,17 +422,17 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             if (button == jbCloseOpen) {
                 actionCloseOpen();
             }
-            else if (button == jbGenerateSign) {
-                actionGenerateSign();
+            else if (button == jbGenerateSignCfdi) {
+                actionGenerateSignCfdi();
             }
             else if (button == jbPrintReports) {
                 actionPrintReports();
             }
-            else if (button == jbGenerateLayout) {
-                actionGenerateLayout();
+            else if (button == jbSendCfdi) {
+                actionSendCfdi();
             }
-            else if (button == jbSendReceipts) {
-                actionSendReceipts();
+            else if (button == jbGenerateBankLayout) {
+                actionGenerateBankLayout();
             }
         }
     }

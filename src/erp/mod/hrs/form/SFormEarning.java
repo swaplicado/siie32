@@ -248,7 +248,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlExemptionMwz.setText("Salarios mínimos exentos:");
+        jlExemptionMwz.setText("UMA exentas (antes SM):");
         jlExemptionMwz.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel8.add(jlExemptionMwz);
         jPanel8.add(moDecExemptionMwz);
@@ -259,23 +259,23 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jlExemptionMwzHelp.setForeground(java.awt.Color.gray);
         jlExemptionMwzHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionMwzHelp.setText("(Monto exento expresado en número de salarios mínimos del área geográfica)");
+        jlExemptionMwzHelp.setText("(Monto exento en número de UMA, antes salarios mínimos del área geográfica)");
         jlExemptionMwzHelp.setToolTipText("");
-        jlExemptionMwzHelp.setPreferredSize(new java.awt.Dimension(400, 23));
+        jlExemptionMwzHelp.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel8.add(jlExemptionMwzHelp);
 
         jPanel2.add(jPanel8);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlExemptionSalaryEqualsMwzPercentage.setText("Porcentaje exención si SB = SMA:");
+        jlExemptionSalaryEqualsMwzPercentage.setText("% exención si SB = SMA:");
         jlExemptionSalaryEqualsMwzPercentage.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel9.add(jlExemptionSalaryEqualsMwzPercentage);
         jPanel9.add(moDecExemptionSalaryEqualsMwzPercentage);
 
         jlExemptionSalaryEqualsMwzPercentageHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryEqualsMwzPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryEqualsMwzPercentageHelp.setText("(Porcentaje exención cuando el empleado gana el salario mínimo)");
+        jlExemptionSalaryEqualsMwzPercentageHelp.setText("(Porcentaje de exención si el empleado gana el salario mínimo)");
         jlExemptionSalaryEqualsMwzPercentageHelp.setToolTipText("");
         jlExemptionSalaryEqualsMwzPercentageHelp.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel9.add(jlExemptionSalaryEqualsMwzPercentageHelp);
@@ -291,7 +291,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jlExemptionSalaryEqualsMwzLimitHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryEqualsMwzLimitHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryEqualsMwzLimitHelp.setText("(Tope exención expresado en número de salarios mínimos del área geográfica, cuando el empleado gana el salario mínimo)");
+        jlExemptionSalaryEqualsMwzLimitHelp.setText("(Tope exención en número de UMA, antes salarios mínimos del área geográfica, si el empleado gana el salario mínimo)");
         jlExemptionSalaryEqualsMwzLimitHelp.setToolTipText("");
         jlExemptionSalaryEqualsMwzLimitHelp.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel10.add(jlExemptionSalaryEqualsMwzLimitHelp);
@@ -300,14 +300,14 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlExemptionSalaryGreaterMwzPercentage.setText("Porcentaje exención si SB > SMA:");
+        jlExemptionSalaryGreaterMwzPercentage.setText("% exención si SB > SMA:");
         jlExemptionSalaryGreaterMwzPercentage.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel11.add(jlExemptionSalaryGreaterMwzPercentage);
         jPanel11.add(moDecExemptionSalaryGreaterMwzPercentage);
 
         jlExemptionSalaryGreaterMwzPercentageHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryGreaterMwzPercentageHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryGreaterMwzPercentageHelp.setText("(Porcentaje exención cuando el empleado gana más del salario mínimo)");
+        jlExemptionSalaryGreaterMwzPercentageHelp.setText("(Porcentaje de exención si el empleado gana más del salario mínimo)");
         jlExemptionSalaryGreaterMwzPercentageHelp.setToolTipText("");
         jlExemptionSalaryGreaterMwzPercentageHelp.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel11.add(jlExemptionSalaryGreaterMwzPercentageHelp);
@@ -323,7 +323,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jlExemptionSalaryGreaterMwzLimitHelp.setForeground(java.awt.Color.gray);
         jlExemptionSalaryGreaterMwzLimitHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlExemptionSalaryGreaterMwzLimitHelp.setText("(Tope exención expresado en número de salarios mínimos del área geográfica, cuando el empleado gana más del salario mínimo)");
+        jlExemptionSalaryGreaterMwzLimitHelp.setText("(Tope exención en número de UMA, antes salarios mínimos del área geográfica, si el empleado gana más del salario mínimo)");
         jlExemptionSalaryGreaterMwzLimitHelp.setToolTipText("Exención límite expresado en número de salarios mínimos del área geográfica, cuando el empleado gana más del salario mínimo");
         jlExemptionSalaryGreaterMwzLimitHelp.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel12.add(jlExemptionSalaryGreaterMwzLimitHelp);
@@ -348,14 +348,14 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlUnitsMaximumWeek.setText("Unidades máximas:");
+        jlUnitsMaximumWeek.setText("No. unidades máximas:");
         jlUnitsMaximumWeek.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel13.add(jlUnitsMaximumWeek);
         jPanel13.add(moDecUnitsMaximumWeek);
 
         jlUnitsMaximumWeekHelp.setForeground(java.awt.Color.gray);
         jlUnitsMaximumWeekHelp.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlUnitsMaximumWeekHelp.setText("(Número máximo de unidades permitido por semana)");
+        jlUnitsMaximumWeekHelp.setText("(Número máximo de unidades permitido por semana, por quincena = 2x)");
         jlUnitsMaximumWeekHelp.setToolTipText("");
         jlUnitsMaximumWeekHelp.setPreferredSize(new java.awt.Dimension(650, 23));
         jPanel13.add(jlUnitsMaximumWeekHelp);

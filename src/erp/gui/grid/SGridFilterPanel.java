@@ -5,6 +5,7 @@
  */
 package erp.gui.grid;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -24,7 +25,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SGridFilterPanel extends JPanel implements SGridFilter, ActionListener, ItemListener {
 
@@ -32,19 +33,33 @@ public class SGridFilterPanel extends JPanel implements SGridFilter, ActionListe
     private SGridPaneView moPaneView;
     private int mnFilterType;
     private int mnFilterSubype;
+    private int mnFilterWidth;
     
     /**
-     * Creates new form SGridFilterProject
+     * Creates new form SGridFilterPanel
      * @param client
      * @param paneView
      * @param type
      * @param subtype
      */
     public SGridFilterPanel(SGuiClient client, SGridPaneView paneView, int type, int subtype) {
+        this(client, paneView, type, subtype, 0);
+    }
+
+    /**
+     * Creates new form SGridFilterPanel
+     * @param client
+     * @param paneView
+     * @param type
+     * @param subtype
+     * @param filterWidth Filter control width in pixels.
+     */
+    public SGridFilterPanel(SGuiClient client, SGridPaneView paneView, int type, int subtype, int filterWidth) {
         miClient = client;
         moPaneView = paneView;
         mnFilterType = type;
         mnFilterSubype = subtype;
+        mnFilterWidth = filterWidth;
         initComponents();
         initComponentsCustom();
     }
@@ -84,6 +99,10 @@ public class SGridFilterPanel extends JPanel implements SGridFilter, ActionListe
      */
     
     private void initComponentsCustom() {
+        if (mnFilterWidth != 0) {
+            jcbFilter.setPreferredSize(new Dimension(mnFilterWidth, 23));
+        }
+        
         jbClearFilter.addActionListener(this);
         updateOptions();
     }
