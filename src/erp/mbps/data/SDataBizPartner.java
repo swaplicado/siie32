@@ -21,7 +21,7 @@ import java.sql.Statement;
 import java.util.Vector;
 
 /**
- *
+ * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
  * @author Sergio Flores
  */
 public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.io.Serializable {

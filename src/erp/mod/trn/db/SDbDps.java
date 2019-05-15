@@ -25,7 +25,7 @@ import sa.lib.gui.SGuiSession;
  */
 
 /**
- *
+ * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
  * @author Juan Barajas, Sergio Flores
  */
 public class SDbDps extends SDbRegistryUser {

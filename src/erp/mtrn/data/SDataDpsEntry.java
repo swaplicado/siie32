@@ -19,8 +19,14 @@ import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mod.trn.db.SDbDpsEntry
+ * All of them also make raw SQL insertions.
+ */
+
 /**
- *
+ * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
  * @author Sergio Flores, Alfonso Flores, Uriel Castañeda, Juan Barajas, Daniel López
  */
 public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
@@ -74,6 +80,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected double mdSurface;
     protected double mdVolume;
     protected double mdMass;
+    protected double mdWeightPackagingExtra;
     protected double mdWeightGross;
     protected double mdWeightDelivery;
     protected double mdSurplusPercentage;    
@@ -246,6 +253,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setSurface(double d) { mdSurface = d; }
     public void setVolume(double d) { mdVolume = d; }
     public void setMass(double d) { mdMass = d; }
+    public void setWeightPackagingExtra(double d) { mdWeightPackagingExtra = d; }
     public void setWeightGross(double d) { mdWeightGross = d; }
     public void setWeightDelivery(double d) { mdWeightDelivery = d; }
     public void setSurplusPercentage(double d) { mdSurplusPercentage = d; }
@@ -339,6 +347,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public double getSurface() { return mdSurface; }
     public double getVolume() { return mdVolume; }
     public double getMass() { return mdMass; }
+    public double getWeightPackagingExtra() { return mdWeightPackagingExtra; }
     public double getWeightGross() { return mdWeightGross; }
     public double getWeightDelivery() { return mdWeightDelivery; }
     public double getSurplusPercentage() { return mdSurplusPercentage; }
@@ -551,6 +560,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mdSurface = 0;
         mdVolume = 0;
         mdMass = 0;
+        mdWeightPackagingExtra = 0;
         mdWeightGross = 0;
         mdWeightDelivery = 0;
         mdSurplusPercentage = 0;
@@ -741,6 +751,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mdSurface = resultSet.getDouble("de.surf");
                 mdVolume = resultSet.getDouble("de.vol");
                 mdMass = resultSet.getDouble("de.mass");
+                mdWeightPackagingExtra = resultSet.getDouble("de.weight_pack_extra");
                 mdWeightGross = resultSet.getDouble("de.weight_gross");
                 mdWeightDelivery = resultSet.getDouble("de.weight_delivery");
                 mdSurplusPercentage = resultSet.getDouble("de.surplus_per");
@@ -1070,7 +1081,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " + 
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -1120,6 +1132,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             callableStatement.setDouble(nParam++, mdSurface);
             callableStatement.setDouble(nParam++, mdVolume);
             callableStatement.setDouble(nParam++, mdMass);
+            callableStatement.setDouble(nParam++, mdWeightPackagingExtra);
             callableStatement.setDouble(nParam++, mdWeightGross);
             callableStatement.setDouble(nParam++, mdWeightDelivery);
             callableStatement.setDouble(nParam++, mdSurplusPercentage);
@@ -1594,6 +1607,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mdSurface = 0;
         mdVolume = 0;
         mdMass = 0;
+        mdWeightPackagingExtra = 0;
         mdWeightGross = 0;
         mdWeightDelivery = 0;
 
@@ -1670,6 +1684,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setSurface(mdSurface);
         clone.setVolume(mdVolume);
         clone.setMass(mdMass);
+        clone.setWeightPackagingExtra(mdWeightPackagingExtra);
         clone.setWeightGross(mdWeightGross);
         clone.setWeightDelivery(mdWeightDelivery);
         clone.setSurplusPercentage(mdSurplusPercentage);

@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 import java.util.Date;
 
 /**
- *
+ * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
  * @author Néstor Ávalos
  */
 public class SDataCustomerConfig extends erp.lib.data.SDataRegistry implements java.io.Serializable {

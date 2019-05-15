@@ -497,6 +497,7 @@ public class SFormRequisition extends javax.swing.JDialog implements erp.lib.for
                 moDpsEntry.setSurface(moItem.getSurface());
                 moDpsEntry.setVolume(moItem.getVolume());
                 moDpsEntry.setMass(moItem.getMass());
+                moDpsEntry.setWeightPackagingExtra(0);
                 moDpsEntry.setWeightGross(moItem.getWeightGross());
                 moDpsEntry.setWeightDelivery(moItem.getWeightDelivery());
                 moDpsEntry.setSurplusPercentage(0);

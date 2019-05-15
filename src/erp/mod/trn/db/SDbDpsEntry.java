@@ -18,12 +18,12 @@ import sa.lib.gui.SGuiSession;
 
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
- * - erp.mtrn.data.SDataDps
+ * - erp.mtrn.data.SDataDpsEntry
  * All of them also make raw SQL insertions.
  */
 
 /**
- *
+ * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
  * @author Juan Barajas, Sergio Flores
  */
 public class SDbDpsEntry extends SDbRegistryUser {
@@ -33,7 +33,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected int mnPkEntryId;
     protected String msConceptKey;
     protected String msConcept;
-    protected java.lang.String msReference;
+    protected String msReference;
     protected double mdQuantity;
     protected boolean mbIsDiscountDocApplying;
     protected boolean mbIsDiscountUnitaryPercentage;
@@ -77,6 +77,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected double mdSurface;
     protected double mdVolume;
     protected double mdMass;
+    protected double mdWeightPackagingExtra;
     protected double mdWeightGross;
     protected double mdWeightDelivery;
     protected double mdSurplusPercentage;    
@@ -110,6 +111,8 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected int mnFkDpsAdjustmentSubtypeId;
     protected int mnFkDpsEntryTypeId;
     protected int mnFkVehicleTypeId_n;
+    protected int mnFkCashCompanyBranchId_n;
+    protected int mnFkCashAccountId_n;
     protected String msFkCostCenterId_n;
     protected int mnFkItemRefId_n;
     protected int mnFkUserNewId;
@@ -178,6 +181,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public void setSurface(double d) { mdSurface = d; }
     public void setVolume(double d) { mdVolume = d; }
     public void setMass(double d) { mdMass = d; }
+    public void setWeightPackagingExtra(double d) { mdWeightPackagingExtra = d; }
     public void setWeightGross(double d) { mdWeightGross = d; }
     public void setWeightDelivery(double d) { mdWeightDelivery = d; }
     public void setSurplusPercentage(double d) { mdSurplusPercentage = d; }
@@ -211,6 +215,8 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public void setFkDpsAdjustmentSubtypeId(int n) { mnFkDpsAdjustmentSubtypeId = n; }
     public void setFkDpsEntryTypeId(int n) { mnFkDpsEntryTypeId = n; }
     public void setFkVehicleTypeId_n(int n) { mnFkVehicleTypeId_n = n; }
+    public void setFkCashCompanyBranchId_n(int n) { mnFkCashCompanyBranchId_n = n; }
+    public void setFkCashAccountId_n(int n) { mnFkCashAccountId_n = n; }
     public void setFkCostCenterId_n(String s) { msFkCostCenterId_n = s; }
     public void setFkItemRefId_n(int n) { mnFkItemRefId_n = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
@@ -269,6 +275,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public double getSurface() { return mdSurface; }
     public double getVolume() { return mdVolume; }
     public double getMass() { return mdMass; }
+    public double getWeightPackagingExtra() { return mdWeightPackagingExtra; }
     public double getWeightGross() { return mdWeightGross; }
     public double getWeightDelivery() { return mdWeightDelivery; }
     public double getSurplusPercentage() { return mdSurplusPercentage; }
@@ -302,6 +309,8 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public int getFkDpsAdjustmentSubtypeId() { return mnFkDpsAdjustmentSubtypeId; }
     public int getFkDpsEntryTypeId() { return mnFkDpsEntryTypeId; }
     public int getFkVehicleTypeId_n() { return mnFkVehicleTypeId_n; }
+    public int getFkCashCompanyBranchId_n() { return mnFkCashCompanyBranchId_n; }
+    public int getFkCashAccountId_n() { return mnFkCashAccountId_n; }
     public String getFkCostCenterId_n() { return msFkCostCenterId_n; }
     public int getFkItemRefId_n() { return mnFkItemRefId_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
@@ -380,6 +389,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
         mdSurface = 0;
         mdVolume = 0;
         mdMass = 0;
+        mdWeightPackagingExtra = 0;
         mdWeightGross = 0;
         mdWeightDelivery = 0;
         mdSurplusPercentage = 0;
@@ -413,6 +423,8 @@ public class SDbDpsEntry extends SDbRegistryUser {
         mnFkDpsAdjustmentSubtypeId = 0;
         mnFkDpsEntryTypeId = 0;
         mnFkVehicleTypeId_n = 0;
+        mnFkCashCompanyBranchId_n = 0;
+        mnFkCashAccountId_n = 0;
         msFkCostCenterId_n = "";
         mnFkItemRefId_n = 0;
         mnFkUserNewId = 0;
@@ -515,6 +527,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
             mdSurface = resultSet.getDouble("surf");
             mdVolume = resultSet.getDouble("vol");
             mdMass = resultSet.getDouble("mass");
+            mdWeightPackagingExtra = resultSet.getDouble("weight_pack_extra");
             mdWeightGross = resultSet.getDouble("weight_gross");
             mdWeightDelivery = resultSet.getDouble("weight_delivery");
             mdSurplusPercentage = resultSet.getDouble("surplus_per");
@@ -548,6 +561,8 @@ public class SDbDpsEntry extends SDbRegistryUser {
             mnFkDpsAdjustmentSubtypeId = resultSet.getInt("fid_stp_dps_adj");
             mnFkDpsEntryTypeId = resultSet.getInt("fid_tp_dps_ety");
             mnFkVehicleTypeId_n = resultSet.getInt("fid_tp_veh_n");
+            mnFkCashCompanyBranchId_n = resultSet.getInt("fid_cash_cob_n");
+            mnFkCashAccountId_n = resultSet.getInt("fid_cash_acc_n");
             msFkCostCenterId_n = resultSet.getString("fid_cc_n");
             if (resultSet.wasNull()) {
                 msFkCostCenterId_n = "";

@@ -387,20 +387,18 @@ public class SDbShipment extends SDbRegistryUser {
 
     private boolean getRegistryPurchaseOrder(SGuiSession session) throws SQLException, Exception {
         boolean b = true;
-        String item = "";
         ArrayList<Object[]> vDpsEntries = null;
 
         SDataDpsEntry oDpsOrderEntry = null;
 
         try {
             // Obtain dpsEntries with information of cfg_param_erp:
-
             vDpsEntries = obtainDpsEntriesIdsForShipment(session);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             SLibUtilities.renderException(this, e);
         }
 
-        //moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moDestinationEntry != null ? new int[] { moDestinationEntry.getFkCarrierId() } : 0, SLibConstants.EXEC_MODE_VERBOSE);
         moBizPartner = new SDataBizPartner();
         moBizPartner.read(new int[] { mnFkCarrierId }, session.getStatement());
         if (moBizPartner == null) {
@@ -511,21 +509,6 @@ public class SDbShipment extends SDbRegistryUser {
                         moDpsOrderEntry.setFkItemId(((Number) oLogEntry[0]).intValue());
 
                         // Item concept:
-                        /*
-                         * XXX No required
-                        if (moDps.getFkLanguajeId() != ((SDataParamsErp) session.getConfigSystem()).getFkLanguageId()) {
-                            for (SDataItemForeignLanguage description : moItem.getDbmsItemForeignLanguageDescriptions()) {
-                                if (moDps.getFkLanguajeId() == description.getPkLanguageId()) {
-                                    item = description.getItemShort();
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (item.length() == 0) {
-                            item = moItem.getItemShort();
-                        }
-                        */
 
                         moDpsOrderEntry.setConceptKey(moItem.getKey());
                         moDpsOrderEntry.setConcept(moItem.getItem());
@@ -533,6 +516,7 @@ public class SDbShipment extends SDbRegistryUser {
                         moDpsOrderEntry.setSurface(moItem.getSurface());
                         moDpsOrderEntry.setVolume(moItem.getVolume());
                         moDpsOrderEntry.setMass(moItem.getMass());
+                        moDpsOrderEntry.setWeightPackagingExtra(0);
                         moDpsOrderEntry.setWeightGross(moItem.getWeightGross());
                         moDpsOrderEntry.setWeightDelivery(moItem.getWeightDelivery());
                         moDpsOrderEntry.setSurplusPercentage(0);

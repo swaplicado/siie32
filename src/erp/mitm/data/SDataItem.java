@@ -1,4 +1,4 @@
- /*
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -15,7 +15,7 @@ import java.sql.Statement;
 import java.util.Vector;
 
 /**
- *
+ * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
  * @author Alfonso Flores, Sergio Flores, Juan Barajas, Cesar Orozco
  */
 public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Serializable {

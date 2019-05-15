@@ -140,6 +140,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.form.SFormField moFieldSurface;
     private erp.lib.form.SFormField moFieldVolume;
     private erp.lib.form.SFormField moFieldMass;
+    private erp.lib.form.SFormField moFieldWeightPackagingExtra;
     private erp.lib.form.SFormField moFieldWeightGross;
     private erp.lib.form.SFormField moFieldWeightDelivery;
     private erp.lib.form.SFormField moFieldIsPrepayment;
@@ -198,6 +199,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private double mdQuantitySrcOrig;
     private double mdQuantityDesOrig;
     private double mdQuantityPrc;
+    private double mdWeightGross;
     private boolean mbIsLastPrc;
     private erp.mmkt.data.SParamsItemPriceList moParamsItemPriceList;
     
@@ -458,14 +460,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlMass = new javax.swing.JLabel();
         jtfMass = new javax.swing.JTextField();
         jtfMassUnitSymbolRo = new javax.swing.JTextField();
+        jPanel66 = new javax.swing.JPanel();
+        jlWeightPackagingExtra = new javax.swing.JLabel();
+        jtfWeightPackagingExtra = new javax.swing.JTextField();
+        jtfWeightPackagingExtraUnitSymbolRo = new javax.swing.JTextField();
         jPanel31 = new javax.swing.JPanel();
-        jlWeigthGross = new javax.swing.JLabel();
-        jtfWeigthGrossRo = new javax.swing.JTextField();
-        jtfWeigthGrossUnitSymbolRo = new javax.swing.JTextField();
+        jlWeightGross = new javax.swing.JLabel();
+        jtfWeightGrossRo = new javax.swing.JTextField();
+        jtfWeightGrossUnitSymbolRo = new javax.swing.JTextField();
         jPanel32 = new javax.swing.JPanel();
-        jlWeigthDelivery = new javax.swing.JLabel();
-        jtfWeigthDeliveryRo = new javax.swing.JTextField();
-        jtfWeigthDeliveryUnitSymbolRo = new javax.swing.JTextField();
+        jlWeightDelivery = new javax.swing.JLabel();
+        jtfWeightDeliveryRo = new javax.swing.JTextField();
+        jtfWeightDeliveryUnitSymbolRo = new javax.swing.JTextField();
         jpExtraDataOther = new javax.swing.JPanel();
         jpExtraDataOtherNorth = new javax.swing.JPanel();
         jpExtraDataOtherFillment = new javax.swing.JPanel();
@@ -1568,12 +1574,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jpExtraDataUnits.setBorder(javax.swing.BorderFactory.createTitledBorder("Unidades físicas de la partida:"));
         jpExtraDataUnits.setLayout(new java.awt.BorderLayout());
 
-        jpExtraDataUnitsNorth.setLayout(new java.awt.GridLayout(6, 1, 0, 1));
+        jpExtraDataUnitsNorth.setLayout(new java.awt.GridLayout(7, 1, 0, 1));
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLength.setText("Longitud: *");
-        jlLength.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlLength.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel27.add(jlLength);
 
         jtfLength.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -1592,7 +1598,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSurface.setText("Superficie: *");
-        jlSurface.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlSurface.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel28.add(jlSurface);
 
         jtfSurface.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -1611,7 +1617,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlVolume.setText("Volumen: *");
-        jlVolume.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlVolume.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel29.add(jlVolume);
 
         jtfVolume.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -1630,7 +1636,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlMass.setText("Masa: *");
-        jlMass.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlMass.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel30.add(jlMass);
 
         jtfMass.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -1646,45 +1652,64 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jpExtraDataUnitsNorth.add(jPanel30);
 
+        jPanel66.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlWeightPackagingExtra.setText("Peso empaque:");
+        jlWeightPackagingExtra.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel66.add(jlWeightPackagingExtra);
+
+        jtfWeightPackagingExtra.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfWeightPackagingExtra.setText("0.0000");
+        jtfWeightPackagingExtra.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel66.add(jtfWeightPackagingExtra);
+
+        jtfWeightPackagingExtraUnitSymbolRo.setEditable(false);
+        jtfWeightPackagingExtraUnitSymbolRo.setText("UN");
+        jtfWeightPackagingExtraUnitSymbolRo.setFocusable(false);
+        jtfWeightPackagingExtraUnitSymbolRo.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel66.add(jtfWeightPackagingExtraUnitSymbolRo);
+
+        jpExtraDataUnitsNorth.add(jPanel66);
+
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlWeigthGross.setText("Peso bruto:");
-        jlWeigthGross.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel31.add(jlWeigthGross);
+        jlWeightGross.setText("Peso bruto:");
+        jlWeightGross.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel31.add(jlWeightGross);
 
-        jtfWeigthGrossRo.setEditable(false);
-        jtfWeigthGrossRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfWeigthGrossRo.setText("0.0000");
-        jtfWeigthGrossRo.setFocusable(false);
-        jtfWeigthGrossRo.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel31.add(jtfWeigthGrossRo);
+        jtfWeightGrossRo.setEditable(false);
+        jtfWeightGrossRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfWeightGrossRo.setText("0.0000");
+        jtfWeightGrossRo.setFocusable(false);
+        jtfWeightGrossRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel31.add(jtfWeightGrossRo);
 
-        jtfWeigthGrossUnitSymbolRo.setEditable(false);
-        jtfWeigthGrossUnitSymbolRo.setText("UN");
-        jtfWeigthGrossUnitSymbolRo.setFocusable(false);
-        jtfWeigthGrossUnitSymbolRo.setPreferredSize(new java.awt.Dimension(25, 23));
-        jPanel31.add(jtfWeigthGrossUnitSymbolRo);
+        jtfWeightGrossUnitSymbolRo.setEditable(false);
+        jtfWeightGrossUnitSymbolRo.setText("UN");
+        jtfWeightGrossUnitSymbolRo.setFocusable(false);
+        jtfWeightGrossUnitSymbolRo.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel31.add(jtfWeightGrossUnitSymbolRo);
 
         jpExtraDataUnitsNorth.add(jPanel31);
 
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlWeigthDelivery.setText("Peso flete:");
-        jlWeigthDelivery.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel32.add(jlWeigthDelivery);
+        jlWeightDelivery.setText("Peso flete:");
+        jlWeightDelivery.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel32.add(jlWeightDelivery);
 
-        jtfWeigthDeliveryRo.setEditable(false);
-        jtfWeigthDeliveryRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfWeigthDeliveryRo.setText("0.0000");
-        jtfWeigthDeliveryRo.setFocusable(false);
-        jtfWeigthDeliveryRo.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel32.add(jtfWeigthDeliveryRo);
+        jtfWeightDeliveryRo.setEditable(false);
+        jtfWeightDeliveryRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfWeightDeliveryRo.setText("0.0000");
+        jtfWeightDeliveryRo.setFocusable(false);
+        jtfWeightDeliveryRo.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel32.add(jtfWeightDeliveryRo);
 
-        jtfWeigthDeliveryUnitSymbolRo.setEditable(false);
-        jtfWeigthDeliveryUnitSymbolRo.setText("UN");
-        jtfWeigthDeliveryUnitSymbolRo.setFocusable(false);
-        jtfWeigthDeliveryUnitSymbolRo.setPreferredSize(new java.awt.Dimension(25, 23));
-        jPanel32.add(jtfWeigthDeliveryUnitSymbolRo);
+        jtfWeightDeliveryUnitSymbolRo.setEditable(false);
+        jtfWeightDeliveryUnitSymbolRo.setText("UN");
+        jtfWeightDeliveryUnitSymbolRo.setFocusable(false);
+        jtfWeightDeliveryUnitSymbolRo.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel32.add(jtfWeightDeliveryUnitSymbolRo);
 
         jpExtraDataUnitsNorth.add(jPanel32);
 
@@ -2149,9 +2174,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldVolume.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsVolumeFormat());
         moFieldMass = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfMass, jlMass);
         moFieldMass.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsMassFormat());
-        moFieldWeightGross = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfWeigthGrossRo, jlWeigthGross);
+        moFieldWeightPackagingExtra = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfWeightPackagingExtra, jlWeightPackagingExtra);
+        moFieldWeightPackagingExtra.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsWeigthGrossFormat());
+        moFieldWeightGross = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfWeightGrossRo, jlWeightGross);
         moFieldWeightGross.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsWeigthGrossFormat());
-        moFieldWeightDelivery = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfWeigthDeliveryRo, jlWeigthDelivery);
+        moFieldWeightDelivery = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfWeightDeliveryRo, jlWeightDelivery);
         moFieldWeightDelivery.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsWeightDeliveryFormat());
         moFieldIsPrepayment = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsPrepayment);
         moFieldIsDiscountRetailChain = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDiscountRetailChain);
@@ -2247,6 +2274,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields.add(moFieldSurface);
         mvFields.add(moFieldVolume);
         mvFields.add(moFieldMass);
+        mvFields.add(moFieldWeightPackagingExtra);
         mvFields.add(moFieldWeightGross);
         mvFields.add(moFieldWeightDelivery);
         mvFields.add(moFieldIsPrepayment);
@@ -2426,6 +2454,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfOriginalDiscountUnitaryCy.addFocusListener(this);
         jtfDiscountEntryCy.addFocusListener(this);
         jtfDiscountDocCy.addFocusListener(this);
+        jtfWeightPackagingExtra.addFocusListener(this);
         jtfContractBase.addFocusListener(this);
         jtfContractFuture.addFocusListener(this);
         jtfContractFactor.addFocusListener(this);
@@ -2648,8 +2677,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldSurface.setFieldValue(0d);
             moFieldVolume.setFieldValue(0d);
             moFieldMass.setFieldValue(0d);
-            moFieldWeightGross.setFieldValue(0d);
+            // weight gross set in method renderWeightGross()
             moFieldWeightDelivery.setFieldValue(0d);
+            
+            moFieldWeightPackagingExtra.setFieldValue(0d);
         }
         else {
             if (moItem.getDbmsDataItemGeneric().getIsLengthApplying() && (moFieldLength.getDouble() == 0 || (!moItem.getIsLengthVariable() && !moItem.getDbmsDataItemGeneric().getIsLengthVariable()))) {
@@ -2664,19 +2695,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             if (moItem.getDbmsDataItemGeneric().getIsMassApplying() && (moFieldMass.getDouble() == 0 || (!moItem.getIsMassVariable() && !moItem.getDbmsDataItemGeneric().getIsMassVariable()))) {
                 moFieldMass.setFieldValue(moDpsEntry.getQuantity() * moItem.getMass());
             }
-            if (moItem.getDbmsDataItemGeneric().getIsWeightGrossApplying()) {
-                moFieldWeightGross.setFieldValue(moDpsEntry.getQuantity() * moItem.getWeightGross());
-            }
+            // weight gross set in method renderWeightGross()
             if (moItem.getDbmsDataItemGeneric().getIsWeightDeliveryApplying()) {
                 moFieldWeightDelivery.setFieldValue(moDpsEntry.getQuantity() * moItem.getWeightDelivery());
             }
         }
 
         renderDpsEntryValue();
+        renderWeightGross();
     }
 
     private void renderBasicSettings() {
-        SDataUnitType type = new SDataUnitType();
+        SDataUnitType type;
 
         jtfCurrencySystemKeyRo.setText(miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
 
@@ -2690,12 +2720,21 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfVolumeUnitSymbolRo.setText(type == null ? "?" : type.getUnitBase());
 
         type = (SDataUnitType) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_TP_UNIT, new int[] { SDataConstantsSys.ITMU_TP_UNIT_MASS }, SLibConstants.EXEC_MODE_VERBOSE);
-        jtfMassUnitSymbolRo.setText(type == null ? "?" : type.getUnitBase());
-
-        jtfWeigthGrossUnitSymbolRo.setText(type == null ? "?" : type.getUnitBase());
-        jtfWeigthDeliveryUnitSymbolRo.setText(type == null ? "?" : type.getUnitBase());
+        if (type == null) {
+            jtfMassUnitSymbolRo.setText("?");
+            jtfWeightPackagingExtraUnitSymbolRo.setText("?");
+            jtfWeightGrossUnitSymbolRo.setText("?");
+            jtfWeightDeliveryUnitSymbolRo.setText("?");
+        }
+        else {
+            jtfMassUnitSymbolRo.setText(type.getUnitBase());
+            jtfWeightPackagingExtraUnitSymbolRo.setText(type.getUnitBase());
+            jtfWeightGrossUnitSymbolRo.setText(type.getUnitBase());
+            jtfWeightDeliveryUnitSymbolRo.setText(type.getUnitBase());
+        }
+        
     }
-
+    
     private void renderDpsEntryValue() {
         DecimalFormat format = miClient.getSessionXXX().getFormatters().getDecimalsValueFormat();
         DecimalFormat formatUnitary = miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat();
@@ -2736,6 +2775,17 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfTotal_rRo.setText(format.format(moDpsEntry.getTotal_r()));
             jtfPriceUnitaryReal_rRo.setText(formatUnitary.format(moDpsEntry.getPriceUnitaryReal_r()));
         }
+    }
+
+    private void renderWeightGross() {
+        if (moItem == null || mnParamAdjustmentTypeId == SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC) {
+            mdWeightGross = 0;
+        }
+        else {
+            mdWeightGross = moDpsEntry.getQuantity() * moItem.getWeightGross();
+        }
+        
+        moFieldWeightGross.setFieldValue(mdWeightGross + moFieldWeightPackagingExtra.getDouble());
     }
 
     private void renderItem(boolean preserveFields, boolean calculate) {
@@ -2838,6 +2888,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSurface.setEnabled(false);
             jtfVolume.setEnabled(false);
             jtfMass.setEnabled(false);
+            jtfWeightPackagingExtra.setEnabled(false);
 
             jckIsSurplusPercentageApplying.setEnabled(false);
             jtfSurplusPercentage.setEditable(false);
@@ -3184,6 +3235,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSurface.setEnabled(moItem.getDbmsDataItemGeneric().getIsSurfaceApplying() && (moItem.getIsSurfaceVariable() || moItem.getDbmsDataItemGeneric().getIsSurfaceVariable()));
             jtfVolume.setEnabled(moItem.getDbmsDataItemGeneric().getIsVolumeApplying() && (moItem.getIsVolumeVariable() || moItem.getDbmsDataItemGeneric().getIsVolumeVariable()));
             jtfMass.setEnabled(moItem.getDbmsDataItemGeneric().getIsMassApplying() && (moItem.getIsMassVariable() || moItem.getDbmsDataItemGeneric().getIsMassVariable()));
+            jtfWeightPackagingExtra.setEnabled(moItem.getDbmsDataItemGeneric().getIsWeightGrossApplying());
             
             enableFieldsAccount(true);
             
@@ -3390,6 +3442,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSurface.setEnabled(false);
             jtfVolume.setEnabled(false);
             jtfMass.setEnabled(false);
+            jtfWeightPackagingExtra.setEnabled(false);
 
             jckIsSurplusPercentageApplying.setEnabled(false);
             jtfSurplusPercentage.setEditable(false);
@@ -4196,6 +4249,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JPanel jPanel63;
     private javax.swing.JPanel jPanel64;
     private javax.swing.JPanel jPanel65;
+    private javax.swing.JPanel jPanel66;
     private javax.swing.JPanel jPanel67;
     private javax.swing.JPanel jPanel68;
     private javax.swing.JPanel jPanel69;
@@ -4336,8 +4390,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlVehicleNumber;
     private javax.swing.JLabel jlVgm;
     private javax.swing.JLabel jlVolume;
-    private javax.swing.JLabel jlWeigthDelivery;
-    private javax.swing.JLabel jlWeigthGross;
+    private javax.swing.JLabel jlWeightDelivery;
+    private javax.swing.JLabel jlWeightGross;
+    private javax.swing.JLabel jlWeightPackagingExtra;
     private javax.swing.JPanel jpCfdAddenda;
     private javax.swing.JPanel jpCfdComplement;
     private javax.swing.JPanel jpCommissions;
@@ -4440,10 +4495,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JTextField jtfVgm;
     private javax.swing.JTextField jtfVolume;
     private javax.swing.JTextField jtfVolumeUnitSymbolRo;
-    private javax.swing.JTextField jtfWeigthDeliveryRo;
-    private javax.swing.JTextField jtfWeigthDeliveryUnitSymbolRo;
-    private javax.swing.JTextField jtfWeigthGrossRo;
-    private javax.swing.JTextField jtfWeigthGrossUnitSymbolRo;
+    private javax.swing.JTextField jtfWeightDeliveryRo;
+    private javax.swing.JTextField jtfWeightDeliveryUnitSymbolRo;
+    private javax.swing.JTextField jtfWeightGrossRo;
+    private javax.swing.JTextField jtfWeightGrossUnitSymbolRo;
+    private javax.swing.JTextField jtfWeightPackagingExtra;
+    private javax.swing.JTextField jtfWeightPackagingExtraUnitSymbolRo;
     // End of variables declaration//GEN-END:variables
 
     /*
@@ -4501,6 +4558,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfSurface.setEnabled(false);
         jtfVolume.setEnabled(false);
         jtfMass.setEnabled(false);
+        jtfWeightPackagingExtra.setEnabled(false);
     }
 
     public void hasDpsAdjustmentsAsAdjButIsEditable() {
@@ -4558,6 +4616,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfSurface.setEnabled(false);
         jtfVolume.setEnabled(false);
         jtfMass.setEnabled(false);
+        jtfWeightPackagingExtra.setEnabled(false);
     }
     
     public void enablePriceContractFields (boolean enabled) {
@@ -5216,6 +5275,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldSurface.setFieldValue(moDpsEntry.getSurface());
         moFieldVolume.setFieldValue(moDpsEntry.getVolume());
         moFieldMass.setFieldValue(moDpsEntry.getMass());
+        moFieldWeightPackagingExtra.setFieldValue(moDpsEntry.getWeightPackagingExtra());
         moFieldWeightGross.setFieldValue(moDpsEntry.getWeightGross());
         moFieldWeightDelivery.setFieldValue(moDpsEntry.getWeightDelivery());
         moFieldSurplusPercentage.setFieldValue(moDpsEntry.getSurplusPercentage());
@@ -5335,6 +5395,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moDpsEntry.setSurface(moFieldSurface.getDouble());
         moDpsEntry.setVolume(moFieldVolume.getDouble());
         moDpsEntry.setMass(moFieldMass.getDouble());
+        moDpsEntry.setWeightPackagingExtra(moFieldWeightPackagingExtra.getDouble());
         moDpsEntry.setWeightGross(moFieldWeightGross.getDouble());
         moDpsEntry.setWeightDelivery(moFieldWeightDelivery.getDouble());
         moDpsEntry.setSurplusPercentage(moFieldSurplusPercentage.getDouble());
@@ -5645,6 +5706,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     calculateTotal(); // calculate total only if value has changed
                 }
                 mdAuxCurrentValue = 0;
+            }
+            else if (textField == jtfWeightPackagingExtra) {
+                renderWeightGross();
             }
             else if (textField == jtfContractBase || textField == jtfContractFuture || textField == jtfContractFactor) {
                 calculateEntryPrice();

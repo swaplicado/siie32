@@ -12,7 +12,7 @@ import java.sql.CallableStatement;
 import java.sql.ResultSet;
 
 /**
- *
+ * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
  * @author Alfonso Flores, Sergio Flores
  */
 public class SDataBizPartnerBranchContact extends erp.lib.data.SDataRegistry implements java.io.Serializable {

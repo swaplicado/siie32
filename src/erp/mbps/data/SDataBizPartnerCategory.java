@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 import sa.lib.SLibConsts;
 
 /**
- *
+ * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
  * @author Sergio Flores, Edwin Carmona
  */
 public class SDataBizPartnerCategory extends erp.lib.data.SDataRegistry implements java.io.Serializable {
