@@ -355,7 +355,6 @@ public class SDialogPayrollReceiptAbsence extends SBeanFormDialog implements Act
     }
     
     private void createHrsBenefit() {
-        double amountSys = 0;
         moHrsBenefit = new SHrsBenefit(mnFormType,  moIntBenefitAnniversary.getValue(), moIntBenefitYear.getValue());
         
         for (SHrsBenefit hrsBenefit : maHrsBenefits) {
@@ -366,13 +365,12 @@ public class SDialogPayrollReceiptAbsence extends SBeanFormDialog implements Act
                 moHrsBenefit.setAmountPayed(hrsBenefit.getAmountPayed());
             }
         }
-        amountSys = SLibUtils.round(moIntEffectiveDays.getValue() * moHrsReceipt.getPayrollReceipt().getPaymentDaily(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
         
-        moHrsBenefit.setFactorAmount(0d);
-        moHrsBenefit.setEditAmount(false);
+        double amount = SLibUtils.roundAmount(moIntEffectiveDays.getValue() * moHrsReceipt.getPayrollReceipt().getPaymentDaily());
+        
         moHrsBenefit.setValuePayedReceipt(moIntEffectiveDays.getValue());
-        moHrsBenefit.setAmountPayedReceipt(amountSys);
-        moHrsBenefit.setAmountPayedReceiptSys(amountSys);
+        moHrsBenefit.setAmountPayedReceipt(amount);
+        moHrsBenefit.setAmountPayedReceiptSys(amount);
     }
     
     private void populateAbsence() {
@@ -392,7 +390,7 @@ public class SDialogPayrollReceiptAbsence extends SBeanFormDialog implements Act
         
         moGridAbsences.populateGrid(rows, this);
         moGridAbsences.setSelectedGridRow(0);
-        moGridAbsences.getTable().requestFocus();
+        moGridAbsences.getTable().requestFocusInWindow();
     }
     
     private void loadAbsenceSelected() {

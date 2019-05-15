@@ -429,7 +429,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jlEarningLoan_n.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel2.add(jlEarningLoan_n);
 
-        jlEarningValue.setText("Valor:");
+        jlEarningValue.setText("Cantidad/monto:");
         jlEarningValue.setToolTipText("");
         jlEarningValue.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel2.add(jlEarningValue);
@@ -489,7 +489,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jlDeductionLoan_n.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel3.add(jlDeductionLoan_n);
 
-        jlDeductionValue.setText("Valor:");
+        jlDeductionValue.setText("Cantidad/monto:");
         jlDeductionValue.setToolTipText("");
         jlDeductionValue.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel3.add(jlDeductionValue);
@@ -778,15 +778,15 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#", 20));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Percepción", 125));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor", 50);
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cantidad", 55);
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 45));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Monto unitario $", 100);
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto unitario $", 80);
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 75));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor ajustado", 60));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 80));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cantidad ajustada", 55));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 45));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/préstamo"));
                 
@@ -864,14 +864,14 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#", 20));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Deducción", 125));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor", 50);
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cantidad", 55);
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 45));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Monto unitario $", 100);
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto unitario $", 80);
                 columnForm.setEditable(mbEditable);
                 gridColumnsForm.add(columnForm);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 75));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 80));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/préstamo"));
 
                 moGridReceiptDeductions.getTable().getDefaultEditor(Double.class).addCellEditorListener(SDialogPayrollReceipt.this);
@@ -1015,44 +1015,48 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     }
 
     private SDbPayrollReceiptEarning createPayrollReceipEarning(SHrsReceipt hrsReceipt, SHrsReceiptEarning hrsReceiptEarning, SHrsEmployeeDays hrsEmployeeDays) {
-        double units = 1;
-        double amountUnit = 0;
+        double unitsAlleged;
+        double amountUnitAlleged;
         int[] loanKey = moKeyEarningLoan_n.getSelectedIndex() <= 0 ? new int[] { 0, 0 } : moKeyEarningLoan_n.getValue();
         
         if (moHrsBenefit == null) {
             if (moEarning.isBasedOnUnits()) {
-                units = moCompEarningValue.getField().getValue();
+                unitsAlleged = moCompEarningValue.getField().getValue();
+                amountUnitAlleged = 0;
             }
             else {
-                amountUnit = moCompEarningValue.getField().getValue();
+                unitsAlleged = 1;
+                amountUnitAlleged = moCompEarningValue.getField().getValue();
             }
         }
         else {
-            units = moHrsBenefit.getValuePayedReceipt();
-            amountUnit = moHrsBenefit.getAmountPayedReceipt();
+            unitsAlleged = moHrsBenefit.getValuePayedReceipt();
+            amountUnitAlleged = moHrsBenefit.getAmountPayedReceipt();
         }
 
         return hrsReceipt.getHrsPayroll().createPayrollReceiptEarning(
                 hrsReceipt, moEarning, hrsEmployeeDays, moHrsBenefit, 
-                units, amountUnit, moHrsBenefit != null, 
+                unitsAlleged, amountUnitAlleged, false, 
                 loanKey[0], loanKey[1], moGridReceiptEarnings.getTable().getRowCount() + 1);
     }
 
     private SDbPayrollReceiptDeduction createPayrollReceipDeduction(SHrsReceipt hrsReceipt, SHrsReceiptDeduction hrsReceiptDeduction) {
-        double units = 1;
-        double amountUnit = 0;
+        double unitsAlleged;
+        double amountUnitAlleged;
         int[] loanKey = moKeyDeductionLoan_n.getSelectedIndex() <= 0 ? new int[] { 0, 0 } : moKeyDeductionLoan_n.getValue();
         
         if (moDeduction.isBasedOnUnits()) {
-            units = moCompDeductionValue.getField().getValue();
+            unitsAlleged = moCompDeductionValue.getField().getValue();
+            amountUnitAlleged = 0;
         }
         else {
-            amountUnit = moCompDeductionValue.getField().getValue();
+            unitsAlleged = 1;
+            amountUnitAlleged = moCompDeductionValue.getField().getValue();
         }
         
         return hrsReceipt.getHrsPayroll().createPayrollReceiptDeduction(
                 hrsReceipt, moDeduction, 
-                units, amountUnit, false, 
+                unitsAlleged, amountUnitAlleged, false, 
                 loanKey[0], loanKey[1], moGridReceiptDeductions.getTable().getRowCount() + 1);
     }
     
@@ -1062,7 +1066,6 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         SDbBenefitTable benefitTable = null;
         SDbBenefitTable benefitTableAux = null;
         SHrsBenefitParams benefitParams = null;
-        SDialogHrsBenefit dialogHrsBenefit = null;
         
         benefitTable = SHrsUtils.getBenefitTableByEarning(miClient.getSession(), 
                 earning.getPkEarningId(), 
@@ -1108,12 +1111,12 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         // Create benefit params:
         benefitParams = new SHrsBenefitParams(earning, benefitTable, benefitTableAux, moHrsReceipt, dateCutOff);
         
-        dialogHrsBenefit = new SDialogHrsBenefit(miClient, benefitType, "Agregar prestación");
-        dialogHrsBenefit.setValue(SGuiConsts.PARAM_ROWS, benefitParams);
-        dialogHrsBenefit.setVisible(true);
+        SDialogPayrollBenefit dlgBenefit = new SDialogPayrollBenefit(miClient, benefitType, "Agregar prestación");
+        dlgBenefit.setValue(SGuiConsts.PARAM_ROWS, benefitParams);
+        dlgBenefit.setVisible(true);
         
-        if (dialogHrsBenefit.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-            moHrsBenefit = (SHrsBenefit) dialogHrsBenefit.getValue(SGuiConsts.PARAM_ROWS);
+        if (dlgBenefit.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+            moHrsBenefit = (SHrsBenefit) dlgBenefit.getValue(SGuiConsts.PARAM_ROWS);
             moCompEarningValue.getField().setValue(moHrsBenefit.getValuePayedReceipt());
             actionAddEarning();
         }
@@ -1196,7 +1199,6 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         if (moEarning != null) {
             SHrsEmployeeDays hrsEmployeeDays = moHrsReceipt.getHrsEmployee().createEmployeeDays();
             SHrsReceiptEarning hrsReceiptEarning = new SHrsReceiptEarning();
-
             hrsReceiptEarning.setHrsReceipt(moHrsReceipt);
             hrsReceiptEarning.setEarning(moEarnigsMap.get(moEarning.getPkEarningId()));
             hrsReceiptEarning.setPayrollReceiptEarning(createPayrollReceipEarning(moHrsReceipt, hrsReceiptEarning, hrsEmployeeDays));
@@ -1221,7 +1223,6 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private void addHrsReceiptDeduction() {
         if (moDeduction != null) {
             SHrsReceiptDeduction hrsReceiptDeduction = new SHrsReceiptDeduction();
-
             hrsReceiptDeduction.setHrsReceipt(moHrsReceipt);
             hrsReceiptDeduction.setDeduction(moDeductionsMap.get(moDeduction.getPkDeductionId()));
             hrsReceiptDeduction.setPayrollReceiptDeduction(createPayrollReceipDeduction(moHrsReceipt, hrsReceiptDeduction));
@@ -1254,7 +1255,6 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moGridReceiptEarnings.setRowButtonsEnabled(false, mbEditable, mbEditable);
         for (SHrsReceiptEarning hrsReceiptEarning : moHrsReceipt.getHrsReceiptEarnings()) {
             SHrsReceiptEarning hrsReceiptEarningNew = new SHrsReceiptEarning();
-
             hrsReceiptEarningNew.setHrsReceipt(moHrsReceipt);
             hrsReceiptEarningNew.setEarning(hrsReceiptEarning.getEarning());
             hrsReceiptEarningNew.setPayrollReceiptEarning(hrsReceiptEarning.getPayrollReceiptEarning());
@@ -1274,7 +1274,6 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moGridReceiptDeductions.setRowButtonsEnabled(false, false, mbEditable);
         for (SHrsReceiptDeduction hrsReceiptDeduction : moHrsReceipt.getHrsReceiptDeductions()) {
             SHrsReceiptDeduction hrsReceiptDeductionNew = new SHrsReceiptDeduction();
-
             hrsReceiptDeductionNew.setHrsReceipt(moHrsReceipt);
             hrsReceiptDeductionNew.setDeduction(hrsReceiptDeduction.getDeduction());
             hrsReceiptDeductionNew.setPayrollReceiptDeduction(hrsReceiptDeduction.getPayrollReceiptDeduction());
@@ -1304,7 +1303,6 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         }
         
         moGridAbsenceConsumptions.populateGrid(rows);
-        moGridAbsenceConsumptions.clearSortKeys();
         moGridAbsenceConsumptions.setSelectedGridRow(0);
     }
     
@@ -1466,7 +1464,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             
             if (add && moEarning.isBenefit() && moHrsBenefit == null) {
                 add = false;
-                miClient.showMsgBoxWarning("Se debe capturar el valor de la prestación.");
+                miClient.showMsgBoxWarning("Se debe capturar la cantidad o monto de la prestación '" + moEarning.getName() + "'.");
                 moTextEarningCode.requestFocus();
             }
             
@@ -1570,7 +1568,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         }
     }
     
-    private void validateCellEditionEarning() {
+    private void processCellEditionEarning() {
         boolean refresh = false;
         SHrsReceiptEarning hrsReceiptEarning = (SHrsReceiptEarning) moGridReceiptEarnings.getSelectedGridRow();
         
@@ -1581,7 +1579,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                         refresh = true;
                     }
                     else {
-                        miClient.showMsgBoxWarning("No se puede modificar el 'Valor' de la percepción '" + hrsReceiptEarning.getEarning().getName() + "'.");
+                        miClient.showMsgBoxWarning("No se puede modificar la 'Cantidad' de la percepción '" + hrsReceiptEarning.getEarning().getName() + "'.");
                     }
                     break;
                 case COL_AMT_UNT:
@@ -1611,7 +1609,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         }
     }
 
-    private void validateCellEditionDeduction() {
+    private void processCellEditionDeduction() {
         boolean refresh = false;
         SHrsReceiptDeduction hrsReceiptDeduction = (SHrsReceiptDeduction) moGridReceiptDeductions.getSelectedGridRow();
         
@@ -1622,7 +1620,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                         refresh = true;
                     }
                     else {
-                        miClient.showMsgBoxWarning("No se puede modificar el 'Valor' de la deducción '" + hrsReceiptDeduction.getDeduction().getName() + "'.");
+                        miClient.showMsgBoxWarning("No se puede modificar la 'Cantidad' de la deducción '" + hrsReceiptDeduction.getDeduction().getName() + "'.");
                     }
                     break;
                 case COL_AMT_UNT:
@@ -1857,10 +1855,10 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     @Override
     public void editingStopped(ChangeEvent e) {
         if (moGridReceiptEarnings.getTable().getDefaultEditor(Double.class).equals(e.getSource())) {
-            validateCellEditionEarning();
+            processCellEditionEarning();
         }
         else if (moGridReceiptDeductions.getTable().getDefaultEditor(Double.class).equals(e.getSource())) {
-            validateCellEditionDeduction();
+            processCellEditionDeduction();
         }
     }
 

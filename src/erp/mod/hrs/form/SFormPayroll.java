@@ -1018,7 +1018,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         SDialogPayrollReceipt dlgPayrollReceipt = new SDialogPayrollReceipt(miClient, "Recibo de nómina");
                         dlgPayrollReceipt.setValue(SGuiConsts.PARAM_REQ_PAY, editable);
                         dlgPayrollReceipt.setValue(SModConsts.HRS_PAY_RCP, hrsReceipt);
-                        dlgPayrollReceipt.setValue(SModConsts.HRS_EAR, moHrsPayroll.getEarnigs());
+                        dlgPayrollReceipt.setValue(SModConsts.HRS_EAR, moHrsPayroll.getEarnings());
                         dlgPayrollReceipt.setValue(SModConsts.HRS_DED, moHrsPayroll.getDeductions());
                         dlgPayrollReceipt.setFormVisible(true);
 
@@ -1532,6 +1532,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 
                 if (mnFormSubtype == rowEmployeeReceipt.getFkPaymentTypeId()) {
                     SRowPayrollEmployee rowEmployeeAvailable = new SRowPayrollEmployee(rowEmployeeReceipt);
+                    rowEmployeeAvailable.clearReceipt();
 
                     moGridPaneEmployeesAvailable.addGridRow(rowEmployeeAvailable);
                     moGridPaneEmployeesAvailable.renderGridRows();

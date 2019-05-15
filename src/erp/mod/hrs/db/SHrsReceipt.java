@@ -600,7 +600,7 @@ public class SHrsReceipt {
         SHrsReceiptEarning hrsReceiptEarningSubOld = null;
         
         for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
-            SDbPayrollReceiptEarning payrollReceiptEarning = hrsReceiptEarning.getPayrollReceiptEarning();
+            SDbPayrollReceiptEarning payrollReceiptEarning = hrsReceiptEarning.getPayrollReceiptEarning(); // convenience variable
             
             if (payrollReceiptEarning.getFkEarningTypeId() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
                 if (++countSub > 1) {
@@ -1230,6 +1230,10 @@ public class SHrsReceipt {
     }
     
     public SDbAbsenceConsumption createAbsenceConsumption(final SDbAbsence absence, final Date dateStart, final Date dateEnd, final int effectiveDays) throws Exception {
+        if (absence.getPkEmployeeId() != moHrsEmployee.getEmployee().getPkEmployeeId()) {
+            throw new Exception("El empleado de la ausencia (ID = " + absence.getPkEmployeeId() + ") no es el empleado del recibo (" + moHrsEmployee.getEmployee().getPkEmployeeId() + ").");
+        }
+        
         SDbAbsenceConsumption absenceConsumption = new SDbAbsenceConsumption();
 
         absenceConsumption.setPkEmployeeId(absence.getPkEmployeeId());
@@ -1238,13 +1242,13 @@ public class SHrsReceipt {
         absenceConsumption.setDateStart(dateStart);
         absenceConsumption.setDateEnd(dateEnd);
         absenceConsumption.setEffectiveDays(effectiveDays);
-        //absenceConsumption.setDeleted();
-        //absenceConsumption.setFkReceiptPayrollId();
+        //absenceConsumption.setDeleted(...);
+        absenceConsumption.setFkReceiptPayrollId(moHrsPayroll.getPayroll().getPkPayrollId());
         absenceConsumption.setFkReceiptEmployeeId(absence.getPkEmployeeId());
-        //absenceConsumption.setFkUserInsertId();
-        //absenceConsumption.setFkUserUpdateId();
-        //absenceConsumption.setTsUserInsert();
-        //absenceConsumption.setTsUserUpdate();
+        //absenceConsumption.setFkUserInsertId(...);
+        //absenceConsumption.setFkUserUpdateId(...);
+        //absenceConsumption.setTsUserInsert(...);
+        //absenceConsumption.setTsUserUpdate(...);
         
         absenceConsumption.setParentAbsence(absence);
         
@@ -1257,7 +1261,7 @@ public class SHrsReceipt {
         if (absenceConsumption.getParentAbsence().isXtaAbsenceTypePayable()) {
             boolean found = false;
             
-            for (SDbEarning earning : moHrsPayroll.getEarnigs()) {
+            for (SDbEarning earning : moHrsPayroll.getEarnings()) {
                 if (SLibUtils.compareKeys(earning.getAbsenceTypeKey(), absenceConsumption.getParentAbsence().getAbsenceTypeKey())) {
                     found = true;
                     break;
@@ -1354,13 +1358,13 @@ public class SHrsReceipt {
     }
     
     private void removeAbsenceConsumption(final SDbAbsenceConsumption absenceConsumptionToRemove) throws Exception {
-        // make sure that consumptions are removed in reverse:
+        // make sure that consumptions of the same absence are removed in reverse:
         
-        int consumptionsCount = 0;
-        int maxConsumptionId = 0;
+        int consumptionsCount = 0; // consumption count of the same absence
+        int maxConsumptionId = 0;  // maximum consumption ID of the same absence
 
         for (SDbAbsenceConsumption absenceConsumption : maAbsenceConsumptions) {
-            if (SLibUtils.compareKeys(absenceConsumption.getAbsenceKey(), absenceConsumptionToRemove.getAbsenceKey())) {
+            if (SLibUtils.compareKeys(absenceConsumption.getAbsenceKey(), absenceConsumptionToRemove.getAbsenceKey())) { // key: employee ID & absence ID
                 consumptionsCount++;
                 if (absenceConsumption.getPkConsumptionId() > maxConsumptionId) {
                     maxConsumptionId = absenceConsumption.getPkConsumptionId();
@@ -1368,11 +1372,11 @@ public class SHrsReceipt {
             }
         }
         
-        // remove consumption:
+        // remove consumption and exit loop:
         
         if (consumptionsCount > 0) {
             for (int i = 0; i < maAbsenceConsumptions.size(); i++) {
-                if (SLibUtils.compareKeys(maAbsenceConsumptions.get(i).getPrimaryKey(), absenceConsumptionToRemove.getPrimaryKey())) {
+                if (SLibUtils.compareKeys(maAbsenceConsumptions.get(i).getPrimaryKey(), absenceConsumptionToRemove.getPrimaryKey())) { // key: employee ID & absence ID & consumption ID
                     if (consumptionsCount > 1 && maAbsenceConsumptions.get(i).getPkConsumptionId() != maxConsumptionId) {
                         throw new Exception("Los consumos de la misma ausencia deben ser removidos en orden inverso.");
                     }
@@ -1384,6 +1388,12 @@ public class SHrsReceipt {
         }
     }
     
+    /**
+     * Adds or removes absence consumption.
+     * @param absenceConsumption Absence consumption to add or remove.
+     * @param add Indicator to add (<code>true</code>) or remove (<code>false</code>) absence consumption.
+     * @throws Exception 
+     */
     public void updateHrsReceiptEarningAbsence(SDbAbsenceConsumption absenceConsumption, boolean add) throws Exception {
         // update control of absence consumptions:
         
@@ -1451,13 +1461,6 @@ public class SHrsReceipt {
                     removeHrsReceiptEarning(hrsReceiptEarning.getPayrollReceiptEarning().getPkMoveId());
                 }
                 else {
-                    /*
-                    units = SLibUtils.round(!earningNormal.isDaysAdjustment() ?
-                            unitsAlleged * hrsEmployeeDays.getFactorCalendar() :
-                            unitsAlleged * hrsEmployeeDays.getFactorCalendar() * hrsEmployeeDays.getFactorDaysPaid(),
-                            SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()); // unit needs rounding to 8 decimals
-                    amount = SLibUtils.roundAmount(units * earning.getPayrollReceiptEarning().getAmountUnitary() * earningNormal.getUnitsFactor());
-                    */
                     double units = hrsEmployeeDays.computeEarningUnits(daysToBePaid, earningNormal);
                     double amount = SHrsEmployeeDays.computeEarningAmount(units, hrsReceiptEarning.getPayrollReceiptEarning().getAmountUnitary(), earningNormal);
 
@@ -1602,7 +1605,7 @@ public class SHrsReceipt {
     
     public double calculateBenefit(final SDbEarning earningBenefit, SHrsEmployeeDays hrsEmployeeDays, final double days, final double percentage) {
         double units = hrsEmployeeDays.computeEarningUnits(days, earningBenefit);
-        return SLibUtils.roundAmount(units * getPayrollReceipt().getPaymentDaily() * (earningBenefit.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? percentage : 1d));
+        return SLibUtils.roundAmount(units * moPayrollReceipt.getPaymentDaily() * (earningBenefit.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? percentage : 1d));
     }
     
     public SHrsReceipt clone() throws CloneNotSupportedException {

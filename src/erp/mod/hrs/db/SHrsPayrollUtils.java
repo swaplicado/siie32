@@ -21,7 +21,7 @@ public abstract class SHrsPayrollUtils {
     public static ArrayList<SRowPayrollEmployee> obtainRowPayrollEmployeesAvailable(SGuiSession session, int idPayroll) throws Exception {
         ArrayList<SRowPayrollEmployee> rows = new ArrayList<>();
 
-        String sql = "SELECT b.bp, e.num, e.id_emp " +
+        String sql = "SELECT b.bp, e.num, e.id_emp, pr.ear_r, pr.ded_r " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON pr.id_emp = e.id_emp " +
@@ -32,9 +32,12 @@ public abstract class SHrsPayrollUtils {
         try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
             while (resultSet.next()) {
                 SRowPayrollEmployee row = new SRowPayrollEmployee();
+                
                 row.setPkEmployeeId(resultSet.getInt("e.id_emp"));
                 row.setCode(resultSet.getString("e.num"));
                 row.setName(resultSet.getString("b.bp"));
+                row.setTotalEarnings(resultSet.getDouble("pr.ear_r"));
+                row.setTotalDeductions(resultSet.getDouble("pr.ded_r"));
                 
                 rows.add(row);
             }

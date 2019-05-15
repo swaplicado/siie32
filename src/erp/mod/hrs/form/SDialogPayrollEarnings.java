@@ -45,14 +45,15 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPaneFormOwner, ItemListener, ActionListener, CellEditorListener {
 
-    protected static final int COL_UNITS_ALLEGED = 1;
-    protected static final int COL_AMOUNT = 4;
-    protected static final int COL_SET_FLAG = 7;
+    private static final int COL_VAL = 1;
+    private static final int COL_AMT_UNT = 3;
+    private static final int COL_SET_FLAG = 7;
     
-    protected SHrsPayroll moHrsPayroll;
-    protected ArrayList<SHrsReceipt> maHrsReceipts;
-    protected HashMap<Integer, SDbEarning> moEarnigsMap;
-    protected SGridPaneForm moGridEmployeeRow;
+    private SHrsPayroll moHrsPayroll;
+    private ArrayList<SHrsReceipt> maHrsReceipts;
+    private SDbEarning moEarning;
+    private HashMap<Integer, SDbEarning> moEarningsMap;
+    private SGridPaneForm moGridEmployeeRow;
 
     /**
      * Creates new form SDialogPayrollEarnings
@@ -73,8 +74,8 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jPanel12 = new javax.swing.JPanel();
+        jpMain = new javax.swing.JPanel();
+        jpEarning = new javax.swing.JPanel();
         jlEarning = new javax.swing.JLabel();
         moKeyEarning = new sa.lib.gui.bean.SBeanFieldKey();
         jpEmployee = new javax.swing.JPanel();
@@ -82,26 +83,30 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         jPanel2 = new javax.swing.JPanel();
         jlValue = new javax.swing.JLabel();
         moCompValue = new sa.lib.gui.bean.SBeanCompoundField();
-        jbAdd = new javax.swing.JButton();
+        jbSetAll = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        jbClean = new javax.swing.JButton();
-        jbCleanAll = new javax.swing.JButton();
+        jbClear = new javax.swing.JButton();
+        jbClearAll = new javax.swing.JButton();
+        jpTotal = new javax.swing.JPanel();
+        jlTotal = new javax.swing.JLabel();
+        moCurTotal = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlTotalHelp = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jpMain.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpMain.setLayout(new java.awt.BorderLayout());
 
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+        jpEarning.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlEarning.setText("Percepción:");
-        jlEarning.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel12.add(jlEarning);
+        jlEarning.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpEarning.add(jlEarning);
 
-        moKeyEarning.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel12.add(moKeyEarning);
+        moKeyEarning.setPreferredSize(new java.awt.Dimension(300, 23));
+        jpEarning.add(moKeyEarning);
 
-        jPanel1.add(jPanel12, java.awt.BorderLayout.NORTH);
+        jpMain.add(jpEarning, java.awt.BorderLayout.NORTH);
 
         jpEmployee.setLayout(new java.awt.BorderLayout());
 
@@ -109,71 +114,97 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlValue.setText("Valor:");
-        jlValue.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlValue.setText("Cantidad/monto:");
+        jlValue.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel2.add(jlValue);
 
         moCompValue.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel2.add(moCompValue);
 
-        jbAdd.setText("Agregar");
-        jPanel2.add(jbAdd);
+        jbSetAll.setText("Asignar a todos");
+        jbSetAll.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jbSetAll.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel2.add(jbSetAll);
 
         jPanel4.add(jPanel2, java.awt.BorderLayout.WEST);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jbClean.setText("Limpiar");
-        jbClean.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbClean.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel3.add(jbClean);
+        jbClear.setText("Limpiar");
+        jbClear.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbClear.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel3.add(jbClear);
 
-        jbCleanAll.setText("Limpiar todo");
-        jbCleanAll.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbCleanAll.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel3.add(jbCleanAll);
+        jbClearAll.setText("Limpiar todo");
+        jbClearAll.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jbClearAll.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel3.add(jbClearAll);
 
         jPanel4.add(jPanel3, java.awt.BorderLayout.EAST);
 
         jpEmployee.add(jPanel4, java.awt.BorderLayout.NORTH);
 
-        jPanel1.add(jpEmployee, java.awt.BorderLayout.CENTER);
+        jpMain.add(jpEmployee, java.awt.BorderLayout.CENTER);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        jpTotal.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlTotal.setText("Total asignado:");
+        jlTotal.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpTotal.add(jlTotal);
+
+        moCurTotal.setEditable(false);
+        jpTotal.add(moCurTotal);
+
+        jlTotalHelp.setForeground(java.awt.Color.gray);
+        jlTotalHelp.setText("(monto total de la percepción actual en esta nómina)");
+        jlTotalHelp.setPreferredSize(new java.awt.Dimension(300, 23));
+        jpTotal.add(jlTotalHelp);
+
+        jpMain.add(jpTotal, java.awt.BorderLayout.SOUTH);
+
+        getContentPane().add(jpMain, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JButton jbAdd;
-    private javax.swing.JButton jbClean;
-    private javax.swing.JButton jbCleanAll;
+    private javax.swing.JButton jbClear;
+    private javax.swing.JButton jbClearAll;
+    private javax.swing.JButton jbSetAll;
     private javax.swing.JLabel jlEarning;
+    private javax.swing.JLabel jlTotal;
+    private javax.swing.JLabel jlTotalHelp;
     private javax.swing.JLabel jlValue;
+    private javax.swing.JPanel jpEarning;
     private javax.swing.JPanel jpEmployee;
+    private javax.swing.JPanel jpMain;
+    private javax.swing.JPanel jpTotal;
     private sa.lib.gui.bean.SBeanCompoundField moCompValue;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurTotal;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarning;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 560, 350);
+        SGuiUtils.setWindowBounds(this, 640, 400);
         
-        jbSave.setText("Aceptar");
+        jbSave.setText("Cerrar");
+        jbCancel.setEnabled(false);
 
-        moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarning.getText()), false);
+        moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarning.getText()), true);
         moCompValue.setCompoundFieldSettings(miClient);
-        moCompValue.getField().setDecimalSettings(SGuiUtils.getLabelName(jlValue), SGuiConsts.GUI_TYPE_DEC_QTY, false);
-        moCompValue.getField().setNextButton(jbAdd);
-        moCompValue.setCompoundText("");
+        moCompValue.getField().setDecimalSettings(SGuiUtils.getLabelName(jlValue), SGuiConsts.GUI_TYPE_DEC_QTY, true);
+        moCompValue.getField().setNextButton(jbSetAll);
         
         moFields.addField(moKeyEarning);
-        
+        moFields.addField(moCompValue.getField());
         moFields.setFormButton(jbSave);
+
+        // read-only field:
+        moCurTotal.setCompoundFieldSettings(miClient);
+        moCurTotal.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTotal), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         
         moGridEmployeeRow = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_EAR, SLibConsts.UNDEFINED, "Empleados") {
             @Override
@@ -187,23 +218,20 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Empleado"));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor", 50);
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cantidad", 55);
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 45));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Monto unitario $", 100);
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto unitario $", 80);
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 75));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor ajustado", 60));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 80));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cantidad ajustada", 55));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 45));
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago");
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/préstamo"));
-                
-                moGridEmployeeRow.getTable().getDefaultEditor(Boolean.class).addCellEditorListener(SDialogPayrollEarnings.this);
-                moGridEmployeeRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(SDialogPayrollEarnings.this);
                 
                 return gridColumnsForm;
             }
@@ -219,275 +247,310 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         enableFields(false);
     }
     
-    private void validateCellEditor() {
-        if (moKeyEarning.getSelectedIndex() > 0) {
-            if (!moEarnigsMap.get(moKeyEarning.getValue()[0]).areUnitsModifiable()) {
-                miClient.showMsgBoxWarning("No se puede modificar el campo 'Valor' para la percepción '" + moEarnigsMap.get(moKeyEarning.getValue()[0]).getName() + "', solo el campo 'Monto $'");
+    private void setPayroll(SHrsPayroll payroll) {
+        moHrsPayroll = payroll;
+
+        // populate map of earnings & combo box at the same time:
+        
+        moEarningsMap = new HashMap<>();
+        
+        moKeyEarning.removeAllItems();
+        moKeyEarning.addItem(new SGuiItem(new int[] { 0 }, "- Percepción -"));
+
+        for (SDbEarning earning : moHrsPayroll.getEarnings()) {
+            if (earning.isMassAsignable()) {
+                moEarningsMap.put(earning.getPkEarningId(), earning);
+                
+                moKeyEarning.addItem(new SGuiItem(earning.getPrimaryKey(), (earning.getCode() + " - " + earning.getName()), earning.getFkEarningComputationTypeId()));
             }
         }
     }
     
     private void enableFields(final boolean enable) {
         moCompValue.getField().setEditable(enable);
-        jbAdd.setEnabled(enable);
-    }
-    
-    private void processEdition() {
-        itemStateChangedEarning();
-        moGridEmployeeRow.renderGridRows();
-        moGridEmployeeRow.setSelectedGridRow(0);
+        jbSetAll.setEnabled(enable);
     }
     
     private SDbPayrollReceiptEarning createPayrollReceipEarning(final SHrsReceipt hrsReceipt, final SHrsReceiptEarning hrsReceiptEarning, final SHrsEmployeeDays hrsEmployeeDays) {
-        double units = 1;
-        double amountUnit = 0;
+        double unitsAlleged;
+        double amountUnitAlleged;
+        int moveId;
         
-        if (hrsReceiptEarning.getEarning().isBasedOnUnits()) {
-            units = hrsReceiptEarning.getPayrollReceiptEarning().getUnitsAlleged();
+        if (hrsReceiptEarning.getPayrollReceiptEarning() != null) {
+            unitsAlleged = hrsReceiptEarning.getPayrollReceiptEarning().getUnitsAlleged();
+            amountUnitAlleged = hrsReceiptEarning.getPayrollReceiptEarning().getAmountUnitary();
+            moveId = hrsReceiptEarning.getPayrollReceiptEarning().getPkMoveId();
         }
         else {
-            amountUnit = hrsReceiptEarning.getPayrollReceiptEarning().getAmountUnitary();
+            if (hrsReceiptEarning.getEarning().isBasedOnUnits()) {
+                unitsAlleged = 0;
+                amountUnitAlleged = 0;
+            }
+            else {
+                unitsAlleged = 1;
+                amountUnitAlleged = 0;
+            }
+            moveId = hrsReceipt.getHrsReceiptEarnings().size() + 1;
         }
 
         return hrsReceipt.getHrsPayroll().createPayrollReceiptEarning(
                 hrsReceipt, hrsReceiptEarning.getEarning(), hrsEmployeeDays, null, 
-                units, amountUnit, false, 
-                0, 0, hrsReceiptEarning.getPayrollReceiptEarning().getPkMoveId());
+                unitsAlleged, amountUnitAlleged, false, 
+                0, 0, moveId);
     }
     
-    private void initEmployee() {
-        for (SGridRow row : moGridEmployeeRow.getModel().getGridRows()) { // process grid
-            SHrsReceiptEarning hrsReceiptEarning = (SHrsReceiptEarning) row;
-            
-            hrsReceiptEarning.setApplying(false);
-            
-            if (!hrsReceiptEarning.getEarning().isBasedOnUnits()) {
-                hrsReceiptEarning.getPayrollReceiptEarning().setAmountUnitary(0);
+    private void refreshGridRows() {
+        int row = moGridEmployeeRow.getTable().getSelectedRow();
+        moGridEmployeeRow.renderGridRows();
+        moGridEmployeeRow.setSelectedGridRow(row);
+        computeTotal();
+    }
+    
+    private void computeTotal() {
+        double total = 0;
+        
+        if (moKeyEarning.getSelectedIndex() > 0) {
+            for (SHrsReceipt hrsReceipt : maHrsReceipts) {
+                for (SHrsReceiptEarning hrsReceiptEarning : hrsReceipt.getHrsReceiptEarnings()) {
+                    if (hrsReceiptEarning.getEarning().getPkEarningId() == moEarning.getPkEarningId()) {
+                        total = SLibUtils.roundAmount(total + hrsReceiptEarning.getPayrollReceiptEarning().getAmount_r());
+                    }
+                }
+            }
+        }
+        
+        moCurTotal.getField().setValue(total);
+    }
+    
+    private void computeSetAll() throws Exception {
+        double unitsAlleged;
+        double amountUnitAlleged;
+        
+        if (moKeyEarning.getSelectedIndex() > 0) {
+            if (moEarning.isBasedOnUnits()) {
+                unitsAlleged = moCompValue.getField().getValue();
+                amountUnitAlleged = 0;
             }
             else {
-                hrsReceiptEarning.getPayrollReceiptEarning().setUnitsAlleged(0);
-                hrsReceiptEarning.getPayrollReceiptEarning().setUnits(0);
+                unitsAlleged = 1;
+                amountUnitAlleged = moCompValue.getField().getValue();
             }
             
-            hrsReceiptEarning.getPayrollReceiptEarning().setAmountSystem_r(0);
-            hrsReceiptEarning.getPayrollReceiptEarning().setAmount_r(0);
-                
-            hrsReceiptEarning.getPayrollReceiptEarning().setFkLoanEmployeeId_n(0);
-            hrsReceiptEarning.getPayrollReceiptEarning().setFkLoanLoanId_n(0);
-            hrsReceiptEarning.getPayrollReceiptEarning().setFkLoanTypeId_n(0);
-        }
-    }
-    
-    private void updateReceiptsEarningRows(final boolean addAll) {
-        for (SGridRow row : moGridEmployeeRow.getModel().getGridRows()) { // process grid
-            SHrsReceiptEarning hrsReceiptEarning = (SHrsReceiptEarning) row;
-            
-            hrsReceiptEarning.setEarning(moEarnigsMap.get(hrsReceiptEarning.getRowPrimaryKey()[0]));
-            
-            for (SHrsReceipt hrsReceipt : maHrsReceipts) { // process receipt
+            for (SGridRow gridRow : moGridEmployeeRow.getModel().getGridRows()) { // process grid
+                SHrsReceiptEarning hrsReceiptEarningCopy = (SHrsReceiptEarning) gridRow;
+                SHrsReceipt hrsReceipt = hrsReceiptEarningCopy.getHrsReceipt();
                 SHrsEmployeeDays hrsEmployeeDays = hrsReceipt.getHrsEmployee().createEmployeeDays();
                 
-                if (addAll) {
-                    double unitsAlleged = 0;
-                    
-                    if (moCompValue.getField().isEditable()) {
-                        unitsAlleged = moCompValue.getField().getValue();
-                    }
-                    else {
-                        unitsAlleged = 1;
-                    }
-                    
-                    hrsReceiptEarning.getPayrollReceiptEarning().setUnitsAlleged(unitsAlleged);
-                    hrsReceiptEarning.getPayrollReceiptEarning().setUnits(hrsEmployeeDays.computeEarningUnits(unitsAlleged, hrsReceiptEarning.getEarning()));
-                }
-                
-                if (hrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId() == hrsReceiptEarning.getHrsReceipt().getHrsEmployee().getEmployee().getPkEmployeeId()) {
-                    boolean found = false;
-                    
-                    hrsReceiptEarning.setHrsReceipt(hrsReceipt);
+                double units = hrsEmployeeDays.computeEarningUnits(unitsAlleged, moEarning);
+                hrsReceiptEarningCopy.getPayrollReceiptEarning().setUnitsAlleged(unitsAlleged);
+                hrsReceiptEarningCopy.getPayrollReceiptEarning().setUnits(units);
 
-                    for (SHrsReceiptEarning hrsReceiptEarningExisting : hrsReceipt.getHrsReceiptEarnings()) { // read array list ear/ded
-                        if (SLibUtils.compareKeys(hrsReceiptEarningExisting.getRowPrimaryKey(), hrsReceiptEarning.getRowPrimaryKey())) {  // exists ear/ded
-                            found = true;
-                            hrsReceiptEarningExisting.setApplying(hrsReceiptEarning.isApplying());
-                            
-                            if (addAll) {
-                                if (!hrsReceiptEarning.getEarning().isBasedOnUnits()) {
-                                    hrsReceiptEarningExisting.getPayrollReceiptEarning().setAmountUnitary(hrsReceiptEarning.getPayrollReceiptEarning().getAmountUnitary());
-                                }
-                                else {
-                                    hrsReceiptEarningExisting.getPayrollReceiptEarning().setUnitsAlleged(hrsReceiptEarning.getPayrollReceiptEarning().getUnitsAlleged());
-                                    hrsReceiptEarningExisting.getPayrollReceiptEarning().setUnits(hrsReceiptEarning.getPayrollReceiptEarning().getUnits());
-                                }
-                                
-                                double amount = SHrsEmployeeDays.computeEarningAmount(hrsReceiptEarningExisting.getPayrollReceiptEarning().getUnits(), hrsReceiptEarningExisting.getPayrollReceiptEarning().getAmountUnitary(), hrsReceiptEarningExisting.getEarning());
-                                hrsReceiptEarningExisting.getPayrollReceiptEarning().setAmountSystem_r(amount);
-                                hrsReceiptEarningExisting.getPayrollReceiptEarning().setAmount_r(amount);
-                            }
-
-                            hrsReceipt.replaceHrsReceiptEarning(hrsReceiptEarningExisting.getPayrollReceiptEarning().getPkMoveId(), hrsReceiptEarning);
-
-                            if (!hrsReceiptEarningExisting.getPayrollReceiptEarning().isAutomatic() && hrsReceiptEarningExisting.getPayrollReceiptEarning().getUnits() == 0) { 
-                                hrsReceipt.removeHrsReceiptEarning(hrsReceiptEarningExisting.getPayrollReceiptEarning().getPkMoveId());
-                            }
-                            break;
-                        }
-                    }
-
-                    if (!found) { // not exists
-                        if ((hrsReceiptEarning.getEarning().isBasedOnUnits() && hrsReceiptEarning.getPayrollReceiptEarning().getUnitsAlleged() != 0) ||
-                                (!hrsReceiptEarning.getEarning().isBasedOnUnits() && (addAll ? hrsReceiptEarning.getPayrollReceiptEarning().getUnitsAlleged() != 0 : hrsReceiptEarning.getPayrollReceiptEarning().getAmountUnitary() != 0))) {  // not is 0 o nulo
-                            if (addAll) {
-                                hrsReceiptEarning.setPayrollReceiptEarning(createPayrollReceipEarning(hrsReceipt, hrsReceiptEarning, hrsEmployeeDays));
-                            }
-                            hrsReceipt.addHrsReceiptEarning(hrsReceiptEarning); // add ear/ded to array list
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    private void itemStateChangedEarning() {
-        Vector<SGridRow> rows = new Vector<>();
-        
-        updateReceiptsEarningRows(false);
-
-        /* XXX Sergio Flores, 2019-04-10: Remover este bloque si no se necesita!
-        moGridEmployeeRow.getModel().clearGridRows();
-        moGridEmployeeRow.getModel().clearGrid();
-        */
-
-        if (moKeyEarning.getSelectedIndex() > 0) {
-            moCompValue.setCompoundText(moHrsPayroll.getEarningComputationTypesMap().get((int) moKeyEarning.getSelectedItem().getComplement()));
-            
-            
-            for (SHrsReceipt hrsReceipt : maHrsReceipts) { // read receipt
-                boolean found = false;
-                SHrsEmployeeDays hrsEmployeeDays = hrsReceipt.getHrsEmployee().createEmployeeDays();
-
-                for (SHrsReceiptEarning hrsReceiptEarning : hrsReceipt.getHrsReceiptEarnings()) { // read array list ear/ded
-                    if (SLibUtils.compareKeys(hrsReceiptEarning.getHrsReceipt().getHrsEmployee().getEmployee().getPrimaryKey(), hrsReceipt.getHrsEmployee().getEmployee().getPrimaryKey())) {
-                        if (SLibUtils.compareKeys(new int[] { hrsReceiptEarning.getEarning().getPkEarningId() }, new int[] { moKeyEarning.getValue()[0] })) {  // exists ear/ded
-                            SHrsReceiptEarning hrsReceiptEarningNew = new SHrsReceiptEarning(SHrsReceiptEarning.INPUT_BY_EAR);
-                            hrsReceiptEarningNew.setHrsReceipt(hrsReceipt);
-                            hrsReceiptEarningNew.setEarning(hrsReceiptEarning.getEarning());
-                            hrsReceiptEarningNew.setPayrollReceiptEarning(hrsReceiptEarning.getPayrollReceiptEarning());
-                            
-                            rows.add(hrsReceiptEarningNew);
-                            found = true;
-                        }
-                    }
-                }
-
-                if (!found) {
-                    if (!moEarnigsMap.get(moKeyEarning.getValue()[0]).isLoan()) {
-                        SHrsReceiptEarning hrsReceiptEarningNew = new SHrsReceiptEarning(SHrsReceiptEarning.INPUT_BY_EAR);
-                        hrsReceiptEarningNew.setHrsReceipt(hrsReceipt);
-                        hrsReceiptEarningNew.setEarning(moEarnigsMap.get(moKeyEarning.getValue()[0]));
-                        hrsReceiptEarningNew.setPayrollReceiptEarning(createPayrollReceipEarning(hrsReceipt, hrsReceiptEarningNew, hrsEmployeeDays));
-
-                        rows.add(hrsReceiptEarningNew);
-                    }
-                }
-            }
-        }
-        
-        enableFields(!rows.isEmpty() && !moEarnigsMap.get(moKeyEarning.getValue()[0]).isBasedOnDaysWorked());
-        
-        moGridEmployeeRow.populateGrid(rows);
-        moGridEmployeeRow.clearSortKeys();
-        moGridEmployeeRow.setSelectedGridRow(0);
-    }
-    
-    private void actionAdd() {
-        if (moCompValue.getField().getValue() <= 0) {
-            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlValue) + "'.");
-            moCompValue.getField().getComponent().requestFocus();
-        }
-        else {
-            updateReceiptsEarningRows(true);
-            itemStateChangedEarning();
-            moCompValue.getField().setValue(0);            
-        }
-    }
-    
-    public void actionClean() {
-        if (jbClean.isEnabled()) {
-            if (moGridEmployeeRow.getTable().getSelectedRowCount() == 1) {
-                SHrsReceiptEarning hrsReceiptEarning = (SHrsReceiptEarning) moGridEmployeeRow.getSelectedGridRow();
-                
-                hrsReceiptEarning.setApplying(false);
-                if (!hrsReceiptEarning.getEarning().isBasedOnUnits()) {
-                    hrsReceiptEarning.getPayrollReceiptEarning().setAmountUnitary(0);
+                double amount;
+                if (moEarning.isBasedOnUnits()) {
+                    amount = SHrsEmployeeDays.computeEarningAmount(units, hrsReceiptEarningCopy.getPayrollReceiptEarning().getAmountUnitary(), moEarning);
                 }
                 else {
-                    hrsReceiptEarning.getPayrollReceiptEarning().setUnitsAlleged(0);
-                    hrsReceiptEarning.getPayrollReceiptEarning().setUnits(0);
+                    hrsReceiptEarningCopy.getPayrollReceiptEarning().setAmountUnitary(amountUnitAlleged);
+                    amount = SHrsEmployeeDays.computeEarningAmount(units, amountUnitAlleged, moEarning);
                 }
-                hrsReceiptEarning.getPayrollReceiptEarning().setAmountSystem_r(0);
-                hrsReceiptEarning.getPayrollReceiptEarning().setAmount_r(0);
                 
-                hrsReceiptEarning.getPayrollReceiptEarning().setFkLoanEmployeeId_n(0);
-                hrsReceiptEarning.getPayrollReceiptEarning().setFkLoanLoanId_n(0);
-                hrsReceiptEarning.getPayrollReceiptEarning().setFkLoanTypeId_n(0);
+                hrsReceiptEarningCopy.getPayrollReceiptEarning().setAmountSystem_r(amount);
+                hrsReceiptEarningCopy.getPayrollReceiptEarning().setAmount_r(amount);
+
+                hrsReceiptEarningCopy.getPayrollReceiptEarning().setUserEdited(false);
+                hrsReceiptEarningCopy.getPayrollReceiptEarning().setAutomatic(false);
                 
-                moGridEmployeeRow.renderGridRows();
-                moGridEmployeeRow.setSelectedGridRow(moGridEmployeeRow.getModel().getGridRows().indexOf(hrsReceiptEarning));
-            }
-        }
-    }
-
-    public void actionCleanAll() {
-        if (jbCleanAll.isEnabled()) {
-            if (moGridEmployeeRow.getTable().getRowCount() > 0) {
-                if (miClient.showMsgBoxConfirm("¿Está seguro que desea limpiar todas las capturas?") == JOptionPane.YES_OPTION) {
-                    initEmployee();
-
-                    moGridEmployeeRow.renderGridRows();
-                    moGridEmployeeRow.getTable().requestFocus();
-                    moGridEmployeeRow.setSelectedGridRow(0);
+                if (hrsReceipt.getHrsReceiptEarning(hrsReceiptEarningCopy.getPayrollReceiptEarning().getPkMoveId()) == null) {
+                    hrsReceipt.addHrsReceiptEarning(hrsReceiptEarningCopy);
+                }
+                else {
+                    hrsReceipt.replaceHrsReceiptEarning(hrsReceiptEarningCopy.getPayrollReceiptEarning().getPkMoveId(), hrsReceiptEarningCopy);
                 }
             }
+            
+            refreshGridRows();
         }
     }
     
-    private void populateEarnings(ArrayList<SDbEarning> earnings) {
-        Vector<SGuiItem> items = new Vector<>();
-        
+    private void actionPerformedSetAll() {
         try {
-            items.add(new SGuiItem(new int[] { 0 }, "- Percepción -"));
-            
-            for (SDbEarning earning : earnings) {
-                if (!earning.isBenefit() && !earning.isAbsence()) {
-                    items.add(new SGuiItem(earning.getPrimaryKey(), (earning.getCode() + " - " + earning.getName()), earning.getFkEarningComputationTypeId()));
-                }
+            SGuiValidation validation = moFields.validateFields();
+            if (!SGuiUtils.computeValidation(miClient, validation)) {
+                return;
             }
-            
-            moKeyEarning.removeAllItems();
-            for (SGuiItem item : items) {
-                moKeyEarning.addItem(item);
-            }
+
+            computeSetAll();
+
+            moCompValue.getField().resetField();
+            moKeyEarning.requestFocusInWindow();
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
     }
     
+    private void actionPerformedClear() {
+        SHrsReceiptEarning hrsReceiptEarningCopy = (SHrsReceiptEarning) moGridEmployeeRow.getSelectedGridRow();
+
+        if (hrsReceiptEarningCopy != null) {
+            hrsReceiptEarningCopy.clearAmount();
+            
+            SHrsReceipt hrsReceipt = hrsReceiptEarningCopy.getHrsReceipt();
+            hrsReceipt.replaceHrsReceiptEarning(hrsReceiptEarningCopy.getPayrollReceiptEarning().getPkMoveId(), hrsReceiptEarningCopy);
+
+            refreshGridRows();
+        }
+    }
+
+    private void actionPerformedClearAll() {
+        if (miClient.showMsgBoxConfirm("¿Está seguro que desea limpiar todas las capturas?") == JOptionPane.YES_OPTION) {
+            for (SGridRow gridRow : moGridEmployeeRow.getModel().getGridRows()) { // process grid
+                SHrsReceiptEarning hrsReceiptEarningCopy = (SHrsReceiptEarning) gridRow;
+                
+                hrsReceiptEarningCopy.clearAmount();
+
+                SHrsReceipt hrsReceipt = hrsReceiptEarningCopy.getHrsReceipt();
+                hrsReceipt.replaceHrsReceiptEarning(hrsReceiptEarningCopy.getPayrollReceiptEarning().getPkMoveId(), hrsReceiptEarningCopy);
+            }
+            
+            refreshGridRows();
+        }
+    }
+    
+    private void itemStateChangedEarning() {
+        Vector<SGridRow> rows = new Vector<>();
+        
+        if (moKeyEarning.getSelectedIndex() <= 0) {
+            moEarning = null;
+        }
+        else {
+            moEarning = moEarningsMap.get(moKeyEarning.getValue()[0]);
+            moCompValue.setCompoundText(moHrsPayroll.getEarningComputationTypesMap().get(moEarning.getFkEarningComputationTypeId()));
+            
+            // prepare grid rows:
+            
+            for (SHrsReceipt hrsReceipt : maHrsReceipts) {
+                SDbPayrollReceiptEarning payrollReceiptEarning = null;
+
+                for (SHrsReceiptEarning hrsReceiptEarning : hrsReceipt.getHrsReceiptEarnings()) {
+                    if (hrsReceiptEarning.getEarning().getPkEarningId() == moEarning.getPkEarningId()) {
+                        payrollReceiptEarning = hrsReceiptEarning.getPayrollReceiptEarning();
+                        break;
+                    }
+                }
+
+                // add HRS receipt earning as a copy:
+                
+                SHrsReceiptEarning hrsReceiptEarningCopy = new SHrsReceiptEarning(SHrsReceiptEarning.INPUT_BY_EAR);
+                hrsReceiptEarningCopy.setHrsReceipt(hrsReceipt);
+                hrsReceiptEarningCopy.setEarning(moEarning);
+                
+                if (payrollReceiptEarning != null) {
+                    hrsReceiptEarningCopy.setPayrollReceiptEarning(payrollReceiptEarning);
+                }
+                else {
+                    SHrsEmployeeDays hrsEmployeeDays = hrsReceipt.getHrsEmployee().createEmployeeDays();
+                    hrsReceiptEarningCopy.setPayrollReceiptEarning(createPayrollReceipEarning(hrsReceipt, hrsReceiptEarningCopy, hrsEmployeeDays));
+                }
+
+                rows.add(hrsReceiptEarningCopy);
+            }
+        }
+        
+        enableFields(!rows.isEmpty());
+        
+        moGridEmployeeRow.populateGrid(rows);
+        moGridEmployeeRow.getTable().getDefaultEditor(Boolean.class).addCellEditorListener(this);
+        moGridEmployeeRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(this);
+        moGridEmployeeRow.setSelectedGridRow(0);
+        computeTotal();
+    }
+    
+    private void processCellEdition() {
+        boolean refresh = false;
+        SHrsReceiptEarning hrsReceiptEarningCopy = (SHrsReceiptEarning) moGridEmployeeRow.getSelectedGridRow(); // get copy of HRS receipt earning
+        
+        if (hrsReceiptEarningCopy != null) {
+            switch (moGridEmployeeRow.getTable().getSelectedColumn()) {
+                case COL_VAL:
+                    if (hrsReceiptEarningCopy.isEditableValueAlleged()) {
+                        refresh = true;
+                    }
+                    else {
+                        miClient.showMsgBoxWarning("No se puede modificar la 'Cantidad' de la percepción '" + hrsReceiptEarningCopy.getEarning().getName() + "'.");
+                    }
+                    break;
+                case COL_AMT_UNT:
+                    if (hrsReceiptEarningCopy.isEditableAmountUnitary(hrsReceiptEarningCopy.getAmountBeingEdited())) {
+                        refresh = true;
+                    }
+                    else {
+                        miClient.showMsgBoxWarning("No se puede modificar el 'Monto unitario' de la percepción '" + hrsReceiptEarningCopy.getEarning().getName() + "'."
+                                + (!hrsReceiptEarningCopy.getEarning().isBenefit() ? "" : "El monto capturado no puede ser menor que " + SLibUtils.getDecimalFormatAmount().format(hrsReceiptEarningCopy.getAmountOriginal()) + "."));
+                    }
+                    break;
+                case COL_SET_FLAG:
+                    refresh = true;
+                    break;
+                default:
+            }
+            
+            if (refresh) {
+                SHrsReceipt hrsReceipt = hrsReceiptEarningCopy.getHrsReceipt(); // convenience variable
+                
+                if (hrsReceipt.getHrsReceiptEarning(hrsReceiptEarningCopy.getPayrollReceiptEarning().getPkMoveId()) == null) {
+                    hrsReceipt.addHrsReceiptEarning(hrsReceiptEarningCopy);
+                }
+                else {
+                    hrsReceipt.replaceHrsReceiptEarning(hrsReceiptEarningCopy.getPayrollReceiptEarning().getPkMoveId(), hrsReceiptEarningCopy);
+                }
+                
+                refreshGridRows();
+            }
+        }
+    }
+    
+    @Override
+    public void actionSave() {
+        // remove unused earnings:
+
+        for (SHrsReceipt receipt : maHrsReceipts) {
+            ArrayList<SHrsReceiptEarning> removableHrsReceiptEarnings = new ArrayList<>();
+            
+            for (SHrsReceiptEarning receiptEarning : receipt.getHrsReceiptEarnings()) {
+                if (!receiptEarning.isApplying()) {
+                    removableHrsReceiptEarnings.add(receiptEarning);
+                }
+            }
+            
+            for (SHrsReceiptEarning removableHrsReceiptEarning : removableHrsReceiptEarnings) {
+                receipt.removeHrsReceiptEarning(removableHrsReceiptEarning.getPayrollReceiptEarning().getPkMoveId());
+            }
+        }
+        
+        super.actionSave();
+    }
+
+    @Override
+    public void actionCancel() {
+        mnFormResult = SGuiConsts.FORM_RESULT_CANCEL;
+        dispose();
+    }
+    
     @Override
     public void addAllListeners() {
         moKeyEarning.addItemListener(this);
-        jbAdd.addActionListener(this);
-        jbClean.addActionListener(this);
-        jbCleanAll.addActionListener(this);
+        jbSetAll.addActionListener(this);
+        jbClear.addActionListener(this);
+        jbClearAll.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
         moKeyEarning.removeItemListener(this);
-        jbAdd.removeActionListener(this);
-        jbClean.removeActionListener(this);
-        jbCleanAll.removeActionListener(this);
+        jbSetAll.removeActionListener(this);
+        jbClear.removeActionListener(this);
+        jbClearAll.removeActionListener(this);
     }
 
     @Override
@@ -507,9 +570,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
 
     @Override
     public SGuiValidation validateForm() {
-        SGuiValidation validation = moFields.validateFields();
-        
-        return validation;
+        return new SGuiValidation();
     }
 
     @Override
@@ -517,19 +578,11 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         try {
             switch (type) {
                 case SModConsts.HRS_PAY:
-                    moHrsPayroll = (SHrsPayroll) value;
-                    populateEarnings(moHrsPayroll.getEarnigs());
-
-                    moEarnigsMap = new HashMap<>();
-                    for (SDbEarning earning : moHrsPayroll.getEarnigs()) {
-                        moEarnigsMap.put(earning.getPkEarningId(), earning);
-                    }
+                    setPayroll((SHrsPayroll) value);
                     break;
-                    
                 case SModConsts.HRS_PAY_RCP:
                     maHrsReceipts = (ArrayList<SHrsReceipt>) value;
                     break;
-                    
                 default:
             }
         }
@@ -553,12 +606,6 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
     }
     
     @Override
-    public void actionSave() {
-        updateReceiptsEarningRows(false);
-        super.actionSave();
-    }
-
-    @Override
     public void notifyRowNew(int gridType, int gridSubtype, int row, SGridRow gridRow) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -578,14 +625,14 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbAdd) {
-                actionAdd();
+            if (button == jbSetAll) {
+                actionPerformedSetAll();
             }
-            else if (button == jbClean) {
-                actionClean();
+            else if (button == jbClear) {
+                actionPerformedClear();
             }
-            else if (button == jbCleanAll) {
-                actionCleanAll();
+            else if (button == jbClearAll) {
+                actionPerformedClearAll();
             }
         }
     }
@@ -603,17 +650,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
 
     @Override
     public void editingStopped(ChangeEvent e) {
-        switch (moGridEmployeeRow.getTable().getSelectedColumn()) {
-            case COL_UNITS_ALLEGED:
-                validateCellEditor();
-                processEdition();
-                break;
-            case COL_AMOUNT:
-            case COL_SET_FLAG:
-                processEdition();
-                break;
-            default:
-        }
+        processCellEdition();
     }
 
     @Override

@@ -19,7 +19,6 @@ public class SRowPayrollEmployee implements SGridRow {
     protected String msName;
     protected double mdTotalEarnings;
     protected double mdTotalDeductions;
-
     protected SHrsReceipt moHrsReceipt;
 
     public SRowPayrollEmployee() {
@@ -29,7 +28,6 @@ public class SRowPayrollEmployee implements SGridRow {
         msName = "";
         mdTotalEarnings = 0;
         mdTotalDeductions = 0;
-
         moHrsReceipt = null;
     }
     
@@ -38,10 +36,9 @@ public class SRowPayrollEmployee implements SGridRow {
         mnFkPaymentTypeId = row.getFkPaymentTypeId();
         msCode = row.getCode();
         msName = row.getName();
-        mdTotalEarnings = 0;
-        mdTotalDeductions = 0;
-
-        moHrsReceipt = null;
+        mdTotalEarnings = row.getTotalEarnings();
+        mdTotalDeductions = row.getTotalDeductions();
+        moHrsReceipt = row.getHrsReceipt();
     }
 
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
@@ -50,6 +47,7 @@ public class SRowPayrollEmployee implements SGridRow {
     public void setName(String s) { msName = s; }
     public void setTotalEarnings(double d) { mdTotalEarnings = d; }
     public void setTotalDeductions(double d) { mdTotalDeductions = d; }
+    public void setHrsReceipt(SHrsReceipt o) { moHrsReceipt = o; }
 
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public int getFkPaymentTypeId() { return mnFkPaymentTypeId; }
@@ -57,12 +55,18 @@ public class SRowPayrollEmployee implements SGridRow {
     public String getName() { return msName ; }
     public double getTotalEarnings() { return mdTotalEarnings ; }
     public double getTotalDeductions() { return mdTotalDeductions ; }
-    public double getTotalNet() { return SLibUtils.roundAmount(mdTotalEarnings - mdTotalDeductions); }
-
-    public void setHrsReceipt(SHrsReceipt o) { moHrsReceipt = o; }
-
     public SHrsReceipt getHrsReceipt() { return moHrsReceipt; }
 
+    public double getTotalNet() {
+        return SLibUtils.roundAmount(mdTotalEarnings - mdTotalDeductions);
+    }
+    
+    public void clearReceipt() {
+        mdTotalEarnings = 0;
+        mdTotalDeductions = 0;
+        moHrsReceipt = null;
+    }
+    
     @Override
     public int[] getRowPrimaryKey() {
         return new int[] { mnPkEmployeeId };

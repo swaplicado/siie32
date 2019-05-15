@@ -438,18 +438,8 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
     }
 
     private void computeTotals() {
-        int countAvailables = 0;
-        int countSelected = 0;
-        
-        for (int i = 0; i < moTablePaneReceiptAvailable.getTableGuiRowCount(); i++) {
-            countAvailables++;
-        }
-        for (int i = 0; i < moTablePaneReceiptSelected.getTableGuiRowCount(); i++) {
-            countSelected++;
-        }
-        
-        jlTotalAvailables.setText(" " + countAvailables + " recibos disponibles.");
-        jlTotalSelected.setText(" " + countSelected + " recibos seleccionados.");
+        jlTotalAvailables.setText("Recibos disponibles: " + moTablePaneReceiptAvailable.getTableGuiRowCount());
+        jlTotalSelected.setText("Recibos seleccionados: " + moTablePaneReceiptSelected.getTableGuiRowCount());
     }
     
     private void actionDateIssue() {

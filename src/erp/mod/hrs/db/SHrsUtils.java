@@ -2494,19 +2494,19 @@ public abstract class SHrsUtils {
         SHrsBenefit hrsBenefit = null;
         SHrsBenefitTableAnniversary benefitTableAnniversary = null;
         SHrsBenefitTableAnniversary benefitTableAnniversaryAux = null;
-        String sql = "";
-        ResultSet resultSet = null;
         
-        sql = "SELECT fk_tp_ben, ben_ann, ben_year, SUM(unt_all) AS f_val_payed, SUM(amt_r) AS f_amt_payed " +
+        String sql = "SELECT ben_ann, ben_year, SUM(unt_all) AS _val_payed, SUM(amt_r) AS _amt_payed " +
                 "FROM hrs_pay_rcp_ear " +
-                "WHERE b_del = 0 AND id_emp = " + employee.getPkEmployeeId() + " AND id_pay <> " + payrrollId + " AND fk_tp_ben = " + benefitType + " AND ben_ann <= " + anniversaryLimit + " " +
-                "GROUP BY fk_tp_ben, ben_ann, ben_year ";
-        resultSet = session.getStatement().executeQuery(sql);
+                "WHERE id_emp = " + employee.getPkEmployeeId() + " AND id_pay <> " + payrrollId + " AND fk_tp_ben = " + benefitType + " AND ben_ann <= " + anniversaryLimit + " AND NOT b_del " +
+                "GROUP BY ben_ann, ben_year " +
+                "ORDER BY ben_ann, ben_year;";
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        
         while (resultSet.next()) {
             hrsBenefit = new SHrsBenefit(benefitType, resultSet.getInt("ben_ann"), resultSet.getInt("ben_year"));
             
-            hrsBenefit.setValuePayed(resultSet.getDouble("f_val_payed"));
-            hrsBenefit.setAmountPayed(resultSet.getDouble("f_amt_payed"));
+            hrsBenefit.setValuePayed(resultSet.getDouble("_val_payed"));
+            hrsBenefit.setAmountPayed(resultSet.getDouble("_amt_payed"));
             
             hrsBenefits.add(hrsBenefit);
         }
@@ -2525,16 +2525,16 @@ public abstract class SHrsUtils {
         // To complete benefits registries accumulated by benefit type:
         
         for (SHrsBenefit benefit : hrsBenefits) {
-            for (SHrsBenefitTableAnniversary anniversary : benefitTableAnniversarys) {
+            for (SHrsBenefitTableAnniversary anniversary : benefitTableAnniversarys) { // lookup requested benefit
                 if (anniversary.getBenefitAnn() <= benefit.getBenefitAnn()) {
                     benefitTableAnniversary = anniversary;
                 }
             }
 
             if (benefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                for (SHrsBenefitTableAnniversary anniversary : benefitTableAnniversarysAux) {
-                    if (anniversary.getBenefitAnn() <= benefit.getBenefitAnn()) {
-                        benefitTableAnniversaryAux = anniversary;
+                for (SHrsBenefitTableAnniversary anniversaryAux : benefitTableAnniversarysAux) { // lookup vacations benefit
+                    if (anniversaryAux.getBenefitAnn() <= benefit.getBenefitAnn()) {
+                        benefitTableAnniversaryAux = anniversaryAux;
                     }
                 }
             }
@@ -2545,7 +2545,7 @@ public abstract class SHrsUtils {
             }
             else {
                 benefit.setValue(benefitTableAnniversary == null ? 0d : benefitTableAnniversary.getValue());
-                benefit.setAmount(benefitTableAnniversary == null ? 0d : benefitTableAnniversary.getValue() * SLibUtils.roundAmount(paymentDaily));
+                benefit.setAmount(benefitTableAnniversary == null ? 0d : SLibUtils.roundAmount(benefitTableAnniversary.getValue() * paymentDaily));
             }
         }
 

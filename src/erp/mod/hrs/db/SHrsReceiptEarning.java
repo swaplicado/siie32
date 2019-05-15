@@ -41,8 +41,7 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
 
     public void setHrsReceipt(SHrsReceipt o) { moHrsReceipt = o; }
     public void setEarning(SDbEarning o) { moEarning = o; }
-    public void setPayrollReceiptEarning(SDbPayrollReceiptEarning o) { moPayrollReceiptEarning = o; mdAmountOriginal = o.getAmount_r(); }
-    public void setApplying(boolean b) { mbApplying = b; }
+    public void setPayrollReceiptEarning(SDbPayrollReceiptEarning o) { moPayrollReceiptEarning = o; mdAmountOriginal = o.getAmount_r(); evaluateApplying(); }
 
     public int getInputMode() { return mnInputMode; }
     public SHrsReceipt getHrsReceipt() { return moHrsReceipt; }
@@ -96,21 +95,21 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
             computeAmount();
         }
     }
-    
+
     private void updateAmountUnitary(final double amountUnitary) {
         mdAmountBeingEdited = amountUnitary;
-        
+
         if (isEditableAmountUnitary(amountUnitary)) {
             if (!moPayrollReceiptEarning.isUserEdited() && amountUnitary != moPayrollReceiptEarning.getAmountUnitary()) {
                 moPayrollReceiptEarning.setUserEdited(true);
             }
 
             moPayrollReceiptEarning.setAmountUnitary(amountUnitary);
-            
+
             computeAmount();
         }
     }
-    
+
     private void updateApplying(final boolean applying) {
         mbApplying = applying;
 
@@ -127,7 +126,11 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
             }
         }
     }
-
+    
+    public void clearAmount() {
+        updateApplying(false);
+    }
+    
     @Override
     public SHrsReceiptEarning clone() throws CloneNotSupportedException {
         SHrsReceiptEarning clone = new SHrsReceiptEarning(this.getInputMode());
@@ -135,7 +138,6 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
         clone.setHrsReceipt(this.getHrsReceipt()); // just pass the same object!
         clone.setEarning(this.getEarning()); // immutable object, there is no need to clone it
         clone.setPayrollReceiptEarning(this.getPayrollReceiptEarning().clone());
-        clone.setApplying(this.isApplying());
         
         return clone;
     }

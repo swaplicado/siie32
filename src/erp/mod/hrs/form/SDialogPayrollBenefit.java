@@ -43,7 +43,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener, ChangeListener, FocusListener {
+public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionListener, ChangeListener, FocusListener {
 
     protected SHrsReceipt moHrsReceipt;
     protected SHrsEmployeeDays moHrsEmployeeDays;
@@ -60,7 +60,6 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     protected int mnBenefitAnnivLimit;
     protected int mnBenefitDaysAnniv;
     protected int mnBenefitYear;
-    protected boolean mbIsEditAmount;
 
     /**
      * Creates new form SDialogHrsBenefit
@@ -68,7 +67,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
      * @param formType
      * @param title
      */
-    public SDialogHrsBenefit(SGuiClient client, int formType, String title) {
+    public SDialogPayrollBenefit(SGuiClient client, int formType, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, formType, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -711,7 +710,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
     }
     
     private void createHrsBenefit() {
-        moHrsBenefit = new SHrsBenefit(mnFormType, (Integer) jsAnniversary.getValue(), mnBenefitYear);
+        moHrsBenefit = new SHrsBenefit(mnFormType, (Integer) jsAnniversary.getValue(), mnBenefitYear, moDecBenefitTableBonusPercentage.getValue());
         
         for (SHrsBenefit hrsBenefit : maHrsBenefits) {
             if (SLibUtils.compareKeys(hrsBenefit.getBenefitKey(), new int[] { mnFormType, (Integer) jsAnniversary.getValue(), mnBenefitYear })) {
@@ -719,11 +718,10 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
                 moHrsBenefit.setValuePayed(hrsBenefit.getValuePayed());
                 moHrsBenefit.setAmount(hrsBenefit.getAmount());
                 moHrsBenefit.setAmountPayed(hrsBenefit.getAmountPayed());
+                break;
             }
         }
         
-        moHrsBenefit.setFactorAmount(moDecBenefitTableBonusPercentage.getValue());
-        moHrsBenefit.setEditAmount(mbIsEditAmount);
         moHrsBenefit.setValuePayedReceipt(moDecDaysToPay.getValue());
         moHrsBenefit.setAmountPayedReceipt(moCurAmountToPay.getField().getValue());
         moHrsBenefit.setAmountPayedReceiptSys(getCalculatedBenefit());
@@ -731,11 +729,11 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
 
     @Override
     public void reloadCatalogues() {
+        
     }
 
     @Override
     public SGuiValidation validateForm() {
-        mbIsEditAmount = false;
         String msg = "";
         SGuiValidation validation = moFields.validateFields();
 
@@ -808,7 +806,6 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
                 }
                 
                 if (validation.isValid()) {
-                    mbIsEditAmount = true;
                     msg = moHrsBenefit.validate(SHrsBenefit.VALID_AMOUNT_TO_PAID_AMOUNT_SYS, 0);
 
                     if (!msg.isEmpty()) {
@@ -882,6 +879,7 @@ public class SDialogHrsBenefit extends SBeanFormDialog implements ActionListener
                     SLibUtils.showException(this, e);
                 }
                 break;
+                
             default:
         }
     }

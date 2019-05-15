@@ -12,7 +12,7 @@ import sa.lib.gui.SGuiConsts;
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SHrsBenefit {
+public class SHrsBenefit extends SHrsBenefitBase {
     
     public static final int VALIDATION_BENEFIT_TYPE = 1;
     public static final int VALIDATION_ABSENCE_TYPE = 2;
@@ -24,24 +24,20 @@ public class SHrsBenefit {
     public static final int VALID_AMOUNT_TO_PAY_TOTAL = 50;
     public static final int VALID_AMOUNT_TO_PAID_AMOUNT_SYS = 60;
 
-    protected int mnBenefitTypeId;
-    protected int mnBenefitAnn;
-    protected int mnBenefitYear;
     protected double mdValue;
     protected double mdValuePayed;
     protected double mdValuePayedReceipt;
     protected double mdAmount;
     protected double mdAmountPayed;
     protected double mdAmountPayedReceipt;
-    
     protected double mdAmountPayedReceiptSys;
-    protected double mdFactorAmount;
-    protected boolean mbIsEditAmount;
 
     public SHrsBenefit(int benefitType, int benefitAnn, int benefitYear) {
-        mnBenefitTypeId = benefitType;
-        mnBenefitAnn = benefitAnn;
-        mnBenefitYear = benefitYear;
+        this(benefitType, benefitAnn, benefitYear, 1);
+    }
+
+    public SHrsBenefit(int benefitType, int benefitAnn, int benefitYear, double factorAmount) {
+        super(benefitType, benefitAnn, benefitYear, factorAmount);
         
         mdValue = 0;
         mdValuePayed = 0;
@@ -49,45 +45,24 @@ public class SHrsBenefit {
         mdAmount = 0;
         mdAmountPayed = 0;
         mdAmountPayedReceipt = 0;
-        
         mdAmountPayedReceiptSys = 0;
-        mdFactorAmount = 0;
-        mbIsEditAmount = false;
     }
 
-    public void setBenefitTypeId(int n) { mnBenefitTypeId = n; }
-    public void setBenefitAnn(int n) { mnBenefitAnn = n; }
-    public void setBenefitYear(int n) { mnBenefitYear = n; }
     public void setValue(double d) { mdValue = d; }
     public void setValuePayed(double d) { mdValuePayed = d; }
     public void setValuePayedReceipt(double d) { mdValuePayedReceipt = d; }
     public void setAmount(double d) { mdAmount = d; }
     public void setAmountPayed(double d) { mdAmountPayed = d; }
     public void setAmountPayedReceipt(double d) { mdAmountPayedReceipt = d; }
-    
     public void setAmountPayedReceiptSys(double d) { mdAmountPayedReceiptSys = d; }
-    public void setFactorAmount(double d) { mdFactorAmount = d; }
-    public void setEditAmount(boolean b) { mbIsEditAmount = b; }
 
-    /**
-     * Get benefit key.
-     * @return Array of int containing: ID of benefit type, benefit anniversary and benefit year.
-     */
-    public int[] getBenefitKey() { return new int[] { mnBenefitTypeId, mnBenefitAnn, mnBenefitYear }; } 
-    
-    public int getBenefitTypeId() { return mnBenefitTypeId; }
-    public int getBenefitAnn() { return mnBenefitAnn; }
-    public int getBenefitYear() { return mnBenefitYear; }
     public double getValue() { return mdValue; }
     public double getValuePayed() { return mdValuePayed; }
     public double getValuePayedReceipt() { return mdValuePayedReceipt; }
     public double getAmount() { return mdAmount; }
     public double getAmountPayed() { return mdAmountPayed; }
     public double getAmountPayedReceipt() { return mdAmountPayedReceipt; }
-    
     public double getAmountPayedReceiptSys() { return mdAmountPayedReceiptSys; }
-    public double getFactorAmount() { return mdFactorAmount; }
-    public boolean isEditAmount() { return mbIsEditAmount; }
     
     public double getValuePending() { return SLibUtils.round(mdValue - mdValuePayed - mdValuePayedReceipt, SLibUtils.DecimalFormatValue8D.getMaximumFractionDigits()) ; }
     public double getAmountPending() { return SLibUtils.roundAmount(mdAmount - mdAmountPayed - mdAmountPayedReceipt); }
@@ -133,23 +108,18 @@ public class SHrsBenefit {
         return msg;
     }
     
+    @Override
     public SHrsBenefit clone() throws CloneNotSupportedException {
-        SHrsBenefit hrsBenefit = new SHrsBenefit(SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED);
+        SHrsBenefit clone = new SHrsBenefit(this.getBenefitTypeId(), this.getBenefitAnn(), this.getBenefitYear(), this.getFactorAmount());
         
-        hrsBenefit.setBenefitTypeId(this.getBenefitTypeId());
-        hrsBenefit.setBenefitAnn(this.getBenefitAnn());
-        hrsBenefit.setBenefitYear(this.getBenefitYear());
-        hrsBenefit.setValue(this.getValue());
-        hrsBenefit.setValuePayed(this.getValuePayed());
-        hrsBenefit.setValuePayedReceipt(this.getValuePayedReceipt());
-        hrsBenefit.setAmount(this.getAmount());
-        hrsBenefit.setAmountPayed(this.getAmountPayed());
-        hrsBenefit.setAmountPayedReceipt(this.getAmountPayedReceipt());
-
-        hrsBenefit.setAmountPayedReceiptSys(this.getAmountPayedReceiptSys());
-        hrsBenefit.setFactorAmount(this.getFactorAmount());
-        hrsBenefit.setEditAmount(this.isEditAmount());
+        clone.setValue(this.getValue());
+        clone.setValuePayed(this.getValuePayed());
+        clone.setValuePayedReceipt(this.getValuePayedReceipt());
+        clone.setAmount(this.getAmount());
+        clone.setAmountPayed(this.getAmountPayed());
+        clone.setAmountPayedReceipt(this.getAmountPayedReceipt());
+        clone.setAmountPayedReceiptSys(this.getAmountPayedReceiptSys());
         
-        return hrsBenefit;
+        return clone;
     }
 }

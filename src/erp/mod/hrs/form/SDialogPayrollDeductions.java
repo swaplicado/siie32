@@ -44,13 +44,15 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPaneFormOwner, ItemListener, ActionListener, CellEditorListener {
 
-    protected static final int COL_AMOUNT_UNIT = 1;
-    protected static final int COL_SET_FLAG = 4;
+    private static final int COL_VAL = 1;
+    private static final int COL_AMT_UNT = 3;
+    private static final int COL_SET_FLAG = 5;
     
-    protected SHrsPayroll moHrsPayroll;
-    protected ArrayList<SHrsReceipt> maHrsReceipts;
-    protected HashMap<Integer, SDbDeduction> moDeductionsMap;
-    protected SGridPaneForm moGridEmployeeRow;
+    private SHrsPayroll moHrsPayroll;
+    private ArrayList<SHrsReceipt> maHrsReceipts;
+    private SDbDeduction moDeduction;
+    private HashMap<Integer, SDbDeduction> moDeductionsMap;
+    private SGridPaneForm moGridEmployeeRow;
 
     /**
      * Creates new form SDialogPayrollDeductions
@@ -71,8 +73,8 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jPanel12 = new javax.swing.JPanel();
+        jpMain = new javax.swing.JPanel();
+        jpDeduction = new javax.swing.JPanel();
         jlDeduction = new javax.swing.JLabel();
         moKeyDeduction = new sa.lib.gui.bean.SBeanFieldKey();
         jpEmployee = new javax.swing.JPanel();
@@ -80,26 +82,30 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
         jPanel2 = new javax.swing.JPanel();
         jlValue = new javax.swing.JLabel();
         moCompValue = new sa.lib.gui.bean.SBeanCompoundField();
-        jbAdd = new javax.swing.JButton();
+        jbSetAll = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        jbClean = new javax.swing.JButton();
-        jbCleanAll = new javax.swing.JButton();
+        jbClear = new javax.swing.JButton();
+        jbClearAll = new javax.swing.JButton();
+        jpTotal = new javax.swing.JPanel();
+        jlTotal = new javax.swing.JLabel();
+        moCurTotal = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlTotalHelp = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jpMain.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpMain.setLayout(new java.awt.BorderLayout());
 
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+        jpDeduction.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlDeduction.setText("Deducción:");
-        jlDeduction.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel12.add(jlDeduction);
+        jlDeduction.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpDeduction.add(jlDeduction);
 
-        moKeyDeduction.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel12.add(moKeyDeduction);
+        moKeyDeduction.setPreferredSize(new java.awt.Dimension(300, 23));
+        jpDeduction.add(moKeyDeduction);
 
-        jPanel1.add(jPanel12, java.awt.BorderLayout.NORTH);
+        jpMain.add(jpDeduction, java.awt.BorderLayout.NORTH);
 
         jpEmployee.setLayout(new java.awt.BorderLayout());
 
@@ -107,71 +113,97 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jlValue.setText("Valor:");
-        jlValue.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlValue.setText("Cantidad/monto:");
+        jlValue.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel2.add(jlValue);
 
         moCompValue.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel2.add(moCompValue);
 
-        jbAdd.setText("Agregar");
-        jPanel2.add(jbAdd);
+        jbSetAll.setText("Asignar a todos");
+        jbSetAll.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jbSetAll.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel2.add(jbSetAll);
 
         jPanel4.add(jPanel2, java.awt.BorderLayout.WEST);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jbClean.setText("Limpiar");
-        jbClean.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbClean.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel3.add(jbClean);
+        jbClear.setText("Limpiar");
+        jbClear.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbClear.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel3.add(jbClear);
 
-        jbCleanAll.setText("Limpiar todo");
-        jbCleanAll.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbCleanAll.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel3.add(jbCleanAll);
+        jbClearAll.setText("Limpiar todo");
+        jbClearAll.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jbClearAll.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel3.add(jbClearAll);
 
         jPanel4.add(jPanel3, java.awt.BorderLayout.EAST);
 
         jpEmployee.add(jPanel4, java.awt.BorderLayout.NORTH);
 
-        jPanel1.add(jpEmployee, java.awt.BorderLayout.CENTER);
+        jpMain.add(jpEmployee, java.awt.BorderLayout.CENTER);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        jpTotal.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlTotal.setText("Total asignado:");
+        jlTotal.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpTotal.add(jlTotal);
+
+        moCurTotal.setEditable(false);
+        jpTotal.add(moCurTotal);
+
+        jlTotalHelp.setForeground(java.awt.Color.gray);
+        jlTotalHelp.setText("(monto total de la deducción actual en esta nómina)");
+        jlTotalHelp.setPreferredSize(new java.awt.Dimension(300, 23));
+        jpTotal.add(jlTotalHelp);
+
+        jpMain.add(jpTotal, java.awt.BorderLayout.SOUTH);
+
+        getContentPane().add(jpMain, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JButton jbAdd;
-    private javax.swing.JButton jbClean;
-    private javax.swing.JButton jbCleanAll;
+    private javax.swing.JButton jbClear;
+    private javax.swing.JButton jbClearAll;
+    private javax.swing.JButton jbSetAll;
     private javax.swing.JLabel jlDeduction;
+    private javax.swing.JLabel jlTotal;
+    private javax.swing.JLabel jlTotalHelp;
     private javax.swing.JLabel jlValue;
+    private javax.swing.JPanel jpDeduction;
     private javax.swing.JPanel jpEmployee;
+    private javax.swing.JPanel jpMain;
+    private javax.swing.JPanel jpTotal;
     private sa.lib.gui.bean.SBeanCompoundField moCompValue;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurTotal;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDeduction;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 560, 350);
+        SGuiUtils.setWindowBounds(this, 640, 400);
         
-        jbSave.setText("Aceptar");
+        jbSave.setText("Cerrar");
+        jbCancel.setEnabled(false);
 
-        moKeyDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeduction.getText()), false);
+        moKeyDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeduction.getText()), true);
         moCompValue.setCompoundFieldSettings(miClient);
-        moCompValue.getField().setDecimalSettings(SGuiUtils.getLabelName(jlValue), SGuiConsts.GUI_TYPE_DEC_QTY, false);
-        moCompValue.getField().setNextButton(jbAdd);
-        moCompValue.setCompoundText("");
+        moCompValue.getField().setDecimalSettings(SGuiUtils.getLabelName(jlValue), SGuiConsts.GUI_TYPE_DEC_QTY, true);
+        moCompValue.getField().setNextButton(jbSetAll);
         
         moFields.addField(moKeyDeduction);
-        
+        moFields.addField(moCompValue.getField());
         moFields.setFormButton(jbSave);
+        
+        // read-only field:
+        moCurTotal.setCompoundFieldSettings(miClient);
+        moCurTotal.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTotal), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         
         moGridEmployeeRow = new SGridPaneForm(miClient, SModConsts.HRSX_PAY_REC_DED, SLibConsts.UNDEFINED, "Empleados") {
             @Override
@@ -185,14 +217,14 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Empleado"));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Valor", 50);
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_QTY, "Cantidad", 55);
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Unidad", 45));
-                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT_UNIT, "Monto unitario $", 100);
+                columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto unitario $", 80);
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 75));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $", 80));
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago");
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
@@ -215,219 +247,309 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
         enableFields(false);
     }
     
-    private void enableFields(final boolean enable) {
-        moCompValue.getField().setEditable(enable);
-        jbAdd.setEnabled(enable);
+    private void setPayroll(SHrsPayroll payroll) {
+        moHrsPayroll = payroll;
+
+        // populate map of deductions & combo box at the same time:
+        
+        moDeductionsMap = new HashMap<>();
+        
+        moKeyDeduction.removeAllItems();
+        moKeyDeduction.addItem(new SGuiItem(new int[] { 0 }, "- Deducción -"));
+
+        for (SDbDeduction deduction : moHrsPayroll.getDeductions()) {
+            if (deduction.isMassAsignable()) {
+                moDeductionsMap.put(deduction.getPkDeductionId(), deduction);
+                
+                moKeyDeduction.addItem(new SGuiItem(deduction.getPrimaryKey(), (deduction.getCode() + " - " + deduction.getName()), deduction.getFkDeductionComputationTypeId()));
+            }
+        }
     }
     
-    private void processEdition() {
-        itemStateChangedDeduction();
-        moGridEmployeeRow.renderGridRows();
-        moGridEmployeeRow.setSelectedGridRow(0);
+    private void enableFields(final boolean enable) {
+        moCompValue.getField().setEditable(enable);
+        jbSetAll.setEnabled(enable);
     }
     
     private SDbPayrollReceiptDeduction createPayrollReceipDeduction(SHrsReceipt hrsReceipt, SHrsReceiptDeduction hrsReceiptDeduction) {
-        double units = hrsReceiptDeduction.getPayrollReceiptDeduction().getUnitsAlleged();
-        double amountUnit = hrsReceiptDeduction.getPayrollReceiptDeduction().getAmountUnitary();
+        double unitsAlleged;
+        double amountUnitAlleged;
+        int moveId;
+        
+        if (hrsReceiptDeduction.getPayrollReceiptDeduction() != null) {
+            unitsAlleged = hrsReceiptDeduction.getPayrollReceiptDeduction().getUnitsAlleged();
+            amountUnitAlleged = hrsReceiptDeduction.getPayrollReceiptDeduction().getAmountUnitary();
+            moveId = hrsReceiptDeduction.getPayrollReceiptDeduction().getPkMoveId();
+        }
+        else {
+            if (hrsReceiptDeduction.getDeduction().isBasedOnUnits()) {
+                unitsAlleged = 0;
+                amountUnitAlleged = 0;
+            }
+            else {
+                unitsAlleged = 1;
+                amountUnitAlleged = 0;
+            }
+            moveId = hrsReceipt.getHrsReceiptDeductions().size() + 1;
+        }
         
         return hrsReceipt.getHrsPayroll().createPayrollReceiptDeduction(
                 hrsReceipt, hrsReceiptDeduction.getDeduction(), 
-                units, amountUnit, false, 
-                0, 0, hrsReceiptDeduction.getPayrollReceiptDeduction().getPkMoveId());
+                unitsAlleged, amountUnitAlleged, false, 
+                0, 0, moveId);
     }
     
-    private void initEmployee() {
-        for (SGridRow row : moGridEmployeeRow.getModel().getGridRows()) { // process grid
-            SHrsReceiptDeduction hrsReceiptDeduction = (SHrsReceiptDeduction) row;
-            
-            hrsReceiptDeduction.setApplying(false);
-            hrsReceiptDeduction.getPayrollReceiptDeduction().setAmountUnitary(0);
-            hrsReceiptDeduction.computeDeduction();
-            hrsReceiptDeduction.getPayrollReceiptDeduction().setFkLoanEmployeeId_n(0);
-            hrsReceiptDeduction.getPayrollReceiptDeduction().setFkLoanLoanId_n(0);
-            hrsReceiptDeduction.getPayrollReceiptDeduction().setFkLoanTypeId_n(0);
-        }
-    }
-
-    private void updateReceiptsDeductionRows(final boolean addAll) {
-        for (SGridRow row : moGridEmployeeRow.getModel().getGridRows()) { // process grid
-            SHrsReceiptDeduction hrsReceiptDeduction = (SHrsReceiptDeduction) row;
-            
-            hrsReceiptDeduction.setDeduction(moDeductionsMap.get(hrsReceiptDeduction.getRowPrimaryKey()[0]));
-            
-            for (SHrsReceipt hrsReceipt : maHrsReceipts) { // process receipt
-                if (addAll) {
-                    hrsReceiptDeduction.getPayrollReceiptDeduction().setAmountUnitary(moCompValue.getField().getValue());
-                }
-                
-                if (hrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId() == hrsReceiptDeduction.getHrsReceipt().getHrsEmployee().getEmployee().getPkEmployeeId()) {
-                    boolean found = false;
-                    
-                    hrsReceiptDeduction.setHrsReceipt(hrsReceipt);
-
-                    for (SHrsReceiptDeduction hrsReceiptDeductionExisting : hrsReceipt.getHrsReceiptDeductions()) { // read array list ear/ded
-                        if (SLibUtils.compareKeys(hrsReceiptDeductionExisting.getRowPrimaryKey(), hrsReceiptDeduction.getRowPrimaryKey())) {  // exists ear/ded
-                            found = true;
-                            hrsReceiptDeductionExisting.setApplying(hrsReceiptDeduction.isApplying());
-                            
-                            if (addAll) {
-                                hrsReceiptDeductionExisting.getPayrollReceiptDeduction().setAmountUnitary(hrsReceiptDeduction.getPayrollReceiptDeduction().getAmountUnitary());
-                                hrsReceiptDeductionExisting.getPayrollReceiptDeduction().setAmount_r(hrsReceiptDeduction.getPayrollReceiptDeduction().getAmountUnitary());
-                            }
-                            
-                            hrsReceipt.replaceHrsReceiptDeduction(hrsReceiptDeductionExisting.getPayrollReceiptDeduction().getPkMoveId(), hrsReceiptDeduction);
-                            
-                            if (!hrsReceiptDeductionExisting.getPayrollReceiptDeduction().isAutomatic() && hrsReceiptDeductionExisting.getPayrollReceiptDeduction().getAmountUnitary() == 0) {
-                                hrsReceipt.removeHrsReceiptDeduction(hrsReceiptDeductionExisting.getPayrollReceiptDeduction().getPkMoveId());
-                            }
-                            break;
-                        }
-                    }
-
-                    if (!found) { // not exists
-                        if (hrsReceiptDeduction.getPayrollReceiptDeduction().getAmountUnitary() != 0) {  // not is 0 o nulo
-                            if (addAll) {
-                                hrsReceiptDeduction.setPayrollReceiptDeduction(createPayrollReceipDeduction(hrsReceipt, hrsReceiptDeduction));
-                            }
-                            hrsReceipt.addHrsReceiptDeduction(hrsReceiptDeduction); // add ear/ded to array list
-                        }
-                    }
-                }
-            }
-        }
+    private void refreshGridRows() {
+        int row = moGridEmployeeRow.getTable().getSelectedRow();
+        moGridEmployeeRow.renderGridRows();
+        moGridEmployeeRow.setSelectedGridRow(row);
+        computeTotal();
     }
     
-    private void itemStateChangedDeduction() {
-        Vector<SGridRow> rows = new Vector<>();
-
-        updateReceiptsDeductionRows(false);
-
-        /* XXX Sergio Flores, 2019-04-10: Remover este bloque si no se necesita!
-        moGridEmployeeRow.getModel().clearGridRows();
-        moGridEmployeeRow.getModel().clearGrid();
-        */
+    private void computeTotal() {
+        double total = 0;
         
         if (moKeyDeduction.getSelectedIndex() > 0) {
-            moCompValue.setCompoundText(moHrsPayroll.getDeductionComputationTypesMap().get((int) moKeyDeduction.getSelectedItem().getComplement()));
-
-            for (SHrsReceipt hrsReceipt : maHrsReceipts) { // read receipt
-                boolean found = false;
-
-                for (SHrsReceiptDeduction hrsReceiptDeduction : hrsReceipt.getHrsReceiptDeductions()) { // read array list ear/ded
-                    if (SLibUtils.compareKeys(hrsReceiptDeduction.getHrsReceipt().getHrsEmployee().getEmployee().getPrimaryKey(), hrsReceipt.getHrsEmployee().getEmployee().getPrimaryKey())) {
-                        if (SLibUtils.compareKeys(new int[] { hrsReceiptDeduction.getDeduction().getPkDeductionId() }, new int[] { moKeyDeduction.getValue()[0] })) {  // exists ear/ded
-                            SHrsReceiptDeduction hrsReceiptDeductionNew = new SHrsReceiptDeduction(SHrsReceiptDeduction.INPUT_BY_DED);
-                            hrsReceiptDeductionNew.setHrsReceipt(hrsReceipt);
-                            hrsReceiptDeductionNew.setDeduction(hrsReceiptDeduction.getDeduction());
-                            hrsReceiptDeductionNew.setPayrollReceiptDeduction(hrsReceiptDeduction.getPayrollReceiptDeduction());
-                            
-                            rows.add(hrsReceiptDeductionNew);
-                            found = true;
-                        }
-                    }
-                }
-
-                if (!found) {
-                    if (!moDeductionsMap.get(moKeyDeduction.getValue()[0]).isLoan()) {
-                        SHrsReceiptDeduction hrsReceiptDeductionNew = new SHrsReceiptDeduction(SHrsReceiptDeduction.INPUT_BY_DED);
-                        hrsReceiptDeductionNew.setHrsReceipt(hrsReceipt);
-                        hrsReceiptDeductionNew.setDeduction(moDeductionsMap.get(moKeyDeduction.getValue()[0]));
-                        hrsReceiptDeductionNew.setPayrollReceiptDeduction(createPayrollReceipDeduction(hrsReceipt, hrsReceiptDeductionNew));
-
-                        rows.add(hrsReceiptDeductionNew);
+            for (SHrsReceipt hrsReceipt : maHrsReceipts) {
+                for (SHrsReceiptDeduction hrsReceiptDeduction : hrsReceipt.getHrsReceiptDeductions()) {
+                    if (hrsReceiptDeduction.getDeduction().getPkDeductionId() == moDeduction.getPkDeductionId()) {
+                        total = SLibUtils.roundAmount(total + hrsReceiptDeduction.getPayrollReceiptDeduction().getAmount_r());
                     }
                 }
             }
         }
         
-        enableFields(!rows.isEmpty() && !moDeductionsMap.get(moKeyDeduction.getValue()[0]).isBasedOnDaysWorked());
+        moCurTotal.getField().setValue(total);
+    }
+    
+    private void computeSetAll() throws Exception {
+        double unitsAlleged;
+        double amountUnitAlleged;
         
-        moGridEmployeeRow.populateGrid(rows);
-        moGridEmployeeRow.clearSortKeys();
-        moGridEmployeeRow.setSelectedGridRow(0);
-    }
-    
-    private void actionAdd() {
-        if (moCompValue.getField().getValue() <= 0) {
-            miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlValue) + "'.");
-            moCompValue.getField().getComponent().requestFocus();
-        }
-        else {
-            updateReceiptsDeductionRows(true);
-            itemStateChangedDeduction();
-            moCompValue.getField().setValue(0);
-        }
-    }
-    
-    public void actionClean() {
-        if (jbClean.isEnabled()) {
-            if (moGridEmployeeRow.getTable().getSelectedRowCount() == 1) {
-                SHrsReceiptDeduction hrsReceiptDeduction = (SHrsReceiptDeduction) moGridEmployeeRow.getSelectedGridRow();
-                
-                hrsReceiptDeduction.setApplying(false);
-                hrsReceiptDeduction.getPayrollReceiptDeduction().setAmountUnitary(0);
-                
-                hrsReceiptDeduction.getPayrollReceiptDeduction().setFkLoanEmployeeId_n(0);
-                hrsReceiptDeduction.getPayrollReceiptDeduction().setFkLoanLoanId_n(0);
-                hrsReceiptDeduction.getPayrollReceiptDeduction().setFkLoanTypeId_n(0);
-                
-                hrsReceiptDeduction.computeDeduction();
-                
-                moGridEmployeeRow.renderGridRows();
-                moGridEmployeeRow.setSelectedGridRow(moGridEmployeeRow.getModel().getGridRows().indexOf(hrsReceiptDeduction));
+        if (moKeyDeduction.getSelectedIndex() > 0) {
+            if (moDeduction.isBasedOnUnits()) {
+                unitsAlleged = moCompValue.getField().getValue();
+                amountUnitAlleged = 0;
             }
-        }
-    }
-
-    public void actionCleanAll() {
-        if (jbCleanAll.isEnabled()) {
-            if (moGridEmployeeRow.getTable().getRowCount() > 0) {
-                if (miClient.showMsgBoxConfirm("¿Está seguro que desea limpiar todas las capturas?") == JOptionPane.YES_OPTION) {
-                    initEmployee();
-
-                    moGridEmployeeRow.renderGridRows();
-                    moGridEmployeeRow.getTable().requestFocus();
-                    moGridEmployeeRow.setSelectedGridRow(0);
-                }
-            }
-        }
-    }
-    
-    private void populateDeductions(ArrayList<SDbDeduction> deductions) {
-        Vector<SGuiItem> items = new Vector<>();
-        
-        try {
-            items.add(new SGuiItem(new int[] { 0 }, "- Deducción -"));
-
-            for (SDbDeduction deduction : deductions) {
-                items.add(new SGuiItem(deduction.getPrimaryKey(), (deduction.getCode() + " - " + deduction.getName()), deduction.getFkDeductionComputationTypeId()));
+            else {
+                unitsAlleged = 1;
+                amountUnitAlleged = moCompValue.getField().getValue();
             }
             
-            moKeyDeduction.removeAllItems();
-            for (SGuiItem item : items) {
-                moKeyDeduction.addItem(item);
+            for (SGridRow gridRow : moGridEmployeeRow.getModel().getGridRows()) { // process grid
+                SHrsReceiptDeduction hrsReceiptDeductionCopy = (SHrsReceiptDeduction) gridRow;
+                SHrsReceipt hrsReceipt = hrsReceiptDeductionCopy.getHrsReceipt();
+                
+                double units = unitsAlleged;
+                hrsReceiptDeductionCopy.getPayrollReceiptDeduction().setUnitsAlleged(unitsAlleged);
+                hrsReceiptDeductionCopy.getPayrollReceiptDeduction().setUnits(units);
+
+                double amount;
+                if (moDeduction.isBasedOnUnits()) {
+                    amount = SLibUtils.roundAmount(amountUnitAlleged * units);
+                }
+                else {
+                    hrsReceiptDeductionCopy.getPayrollReceiptDeduction().setAmountUnitary(amountUnitAlleged);
+                    amount = amountUnitAlleged;
+                }
+                
+                hrsReceiptDeductionCopy.getPayrollReceiptDeduction().setAmountSystem_r(amount);
+                hrsReceiptDeductionCopy.getPayrollReceiptDeduction().setAmount_r(amount);
+
+                hrsReceiptDeductionCopy.getPayrollReceiptDeduction().setUserEdited(false);
+                hrsReceiptDeductionCopy.getPayrollReceiptDeduction().setAutomatic(false);
+                
+                if (hrsReceipt.getHrsReceiptDeduction(hrsReceiptDeductionCopy.getPayrollReceiptDeduction().getPkMoveId()) == null) {
+                    hrsReceipt.addHrsReceiptDeduction(hrsReceiptDeductionCopy);
+                }
+                else {
+                    hrsReceipt.replaceHrsReceiptDeduction(hrsReceiptDeductionCopy.getPayrollReceiptDeduction().getPkMoveId(), hrsReceiptDeductionCopy);
+                }
             }
+            
+            refreshGridRows();
+        }
+    }
+    
+    private void actionPerformedSetAll() {
+        try {
+            SGuiValidation validation = moFields.validateFields();
+            if (!SGuiUtils.computeValidation(miClient, validation)) {
+                return;
+            }
+
+            computeSetAll();
+
+            moCompValue.getField().resetField();
+            moKeyDeduction.requestFocusInWindow();
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
+    }
+    
+    private void actionPerformedClear() {
+        SHrsReceiptDeduction hrsReceiptDeductionCopy = (SHrsReceiptDeduction) moGridEmployeeRow.getSelectedGridRow();
+
+        if (hrsReceiptDeductionCopy != null) {
+            hrsReceiptDeductionCopy.clearAmount();
+            
+            SHrsReceipt hrsReceipt = hrsReceiptDeductionCopy.getHrsReceipt();
+            hrsReceipt.replaceHrsReceiptDeduction(hrsReceiptDeductionCopy.getPayrollReceiptDeduction().getPkMoveId(), hrsReceiptDeductionCopy);
+
+            refreshGridRows();
+        }
+    }
+
+    private void actionPerformedClearAll() {
+        if (miClient.showMsgBoxConfirm("¿Está seguro que desea limpiar todas las capturas?") == JOptionPane.YES_OPTION) {
+            for (SGridRow gridRow : moGridEmployeeRow.getModel().getGridRows()) { // process grid
+                SHrsReceiptDeduction hrsReceiptDeductionCopy = (SHrsReceiptDeduction) gridRow;
+                
+                hrsReceiptDeductionCopy.clearAmount();
+
+                SHrsReceipt hrsReceipt = hrsReceiptDeductionCopy.getHrsReceipt();
+                hrsReceipt.replaceHrsReceiptDeduction(hrsReceiptDeductionCopy.getPayrollReceiptDeduction().getPkMoveId(), hrsReceiptDeductionCopy);
+            }
+            
+            refreshGridRows();
+        }
+    }
+    
+    
+    private void itemStateChangedDeduction() {
+        Vector<SGridRow> rows = new Vector<>();
         
+        if (moKeyDeduction.getSelectedIndex() <= 0) {
+            moDeduction = null;
+        }
+        else {
+            moDeduction = moDeductionsMap.get(moKeyDeduction.getValue()[0]);
+            moCompValue.setCompoundText(moHrsPayroll.getDeductionComputationTypesMap().get(moDeduction.getFkDeductionComputationTypeId()));
+            
+            // prepare grid rows:
+            
+            for (SHrsReceipt hrsReceipt : maHrsReceipts) {
+                SDbPayrollReceiptDeduction payrollReceiptDeduction = null;
+
+                for (SHrsReceiptDeduction hrsReceiptDeduction : hrsReceipt.getHrsReceiptDeductions()) {
+                    if (hrsReceiptDeduction.getDeduction().getPkDeductionId() == moDeduction.getPkDeductionId()) {
+                        payrollReceiptDeduction = hrsReceiptDeduction.getPayrollReceiptDeduction();
+                        break;
+                    }
+                }
+
+                // add HRS receipt deduction as a copy:
+                
+                SHrsReceiptDeduction hrsReceiptDeductionCopy = new SHrsReceiptDeduction(SHrsReceiptDeduction.INPUT_BY_DED);
+                hrsReceiptDeductionCopy.setHrsReceipt(hrsReceipt);
+                hrsReceiptDeductionCopy.setDeduction(moDeduction);
+                
+                if (payrollReceiptDeduction != null) {
+                    hrsReceiptDeductionCopy.setPayrollReceiptDeduction(payrollReceiptDeduction);
+                }
+                else {
+                    hrsReceiptDeductionCopy.setPayrollReceiptDeduction(createPayrollReceipDeduction(hrsReceipt, hrsReceiptDeductionCopy));
+                }
+
+                rows.add(hrsReceiptDeductionCopy);
+            }
+        }
+        
+        enableFields(!rows.isEmpty());
+        
+        moGridEmployeeRow.populateGrid(rows);
+        moGridEmployeeRow.getTable().getDefaultEditor(Boolean.class).addCellEditorListener(this);
+        moGridEmployeeRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(this);
+        moGridEmployeeRow.setSelectedGridRow(0);
+        computeTotal();
+    }
+    
+    private void processCellEdition() {
+        boolean refresh = false;
+        SHrsReceiptDeduction hrsReceiptDeductionCopy = (SHrsReceiptDeduction) moGridEmployeeRow.getSelectedGridRow(); // get copy of HRS receipt deduction
+        
+        if (hrsReceiptDeductionCopy != null) {
+            switch (moGridEmployeeRow.getTable().getSelectedColumn()) {
+                case COL_VAL:
+                    if (hrsReceiptDeductionCopy.isEditableValueAlleged()) {
+                        refresh = true;
+                    }
+                    else {
+                        miClient.showMsgBoxWarning("No se puede modificar la 'Cantidad' de la deducción '" + hrsReceiptDeductionCopy.getDeduction().getName() + "'.");
+                    }
+                    break;
+                case COL_AMT_UNT:
+                    if (hrsReceiptDeductionCopy.isEditableAmountUnitary(hrsReceiptDeductionCopy.getAmountBeingEdited())) {
+                        refresh = true;
+                    }
+                    else {
+                        miClient.showMsgBoxWarning("No se puede modificar el 'Monto unitario' de la deducción '" + hrsReceiptDeductionCopy.getDeduction().getName() + "'."
+                                + (!hrsReceiptDeductionCopy.getDeduction().isBenefit() ? "" : "El monto capturado no puede ser menor que " + SLibUtils.getDecimalFormatAmount().format(hrsReceiptDeductionCopy.getAmountOriginal()) + "."));
+                    }
+                    break;
+                case COL_SET_FLAG:
+                    refresh = true;
+                    break;
+                default:
+            }
+            
+            if (refresh) {
+                SHrsReceipt hrsReceipt = hrsReceiptDeductionCopy.getHrsReceipt(); // convenience variable
+                
+                if (hrsReceipt.getHrsReceiptDeduction(hrsReceiptDeductionCopy.getPayrollReceiptDeduction().getPkMoveId()) == null) {
+                    hrsReceipt.addHrsReceiptDeduction(hrsReceiptDeductionCopy);
+                }
+                else {
+                    hrsReceipt.replaceHrsReceiptDeduction(hrsReceiptDeductionCopy.getPayrollReceiptDeduction().getPkMoveId(), hrsReceiptDeductionCopy);
+                }
+                
+                refreshGridRows();
+            }
+        }
+    }
+    
+    @Override
+    public void actionSave() {
+        // remove unused deductions:
+
+        for (SHrsReceipt receipt : maHrsReceipts) {
+            ArrayList<SHrsReceiptDeduction> removableHrsReceiptDeductions = new ArrayList<>();
+            
+            for (SHrsReceiptDeduction receiptDeduction : receipt.getHrsReceiptDeductions()) {
+                if (!receiptDeduction.isApplying()) {
+                    removableHrsReceiptDeductions.add(receiptDeduction);
+                }
+            }
+            
+            for (SHrsReceiptDeduction removableHrsReceiptDeduction : removableHrsReceiptDeductions) {
+                receipt.removeHrsReceiptDeduction(removableHrsReceiptDeduction.getPayrollReceiptDeduction().getPkMoveId());
+            }
+        }
+        
+        super.actionSave();
+    }
+
+    @Override
+    public void actionCancel() {
+        mnFormResult = SGuiConsts.FORM_RESULT_CANCEL;
+        dispose();
     }
     
     @Override
     public void addAllListeners() {
         moKeyDeduction.addItemListener(this);
-        jbAdd.addActionListener(this);
-        jbClean.addActionListener(this);
-        jbCleanAll.addActionListener(this);
+        jbSetAll.addActionListener(this);
+        jbClear.addActionListener(this);
+        jbClearAll.addActionListener(this);
     }
 
     @Override
     public void removeAllListeners() {
         moKeyDeduction.removeItemListener(this);
-        jbAdd.removeActionListener(this);
-        jbClean.removeActionListener(this);
-        jbCleanAll.removeActionListener(this);
+        jbSetAll.removeActionListener(this);
+        jbClear.removeActionListener(this);
+        jbClearAll.removeActionListener(this);
     }
 
     @Override
@@ -447,9 +569,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
 
     @Override
     public SGuiValidation validateForm() {
-        SGuiValidation validation = moFields.validateFields();
-
-        return validation;
+        return new SGuiValidation();
     }
 
     @Override
@@ -457,19 +577,11 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
         try {
             switch (type) {
                 case SModConsts.HRS_PAY:
-                    moHrsPayroll = (SHrsPayroll) value;
-                    populateDeductions(moHrsPayroll.getDeductions());
-
-                    moDeductionsMap = new HashMap<>();
-                    for (SDbDeduction deduction : moHrsPayroll.getDeductions()) {
-                        moDeductionsMap.put(deduction.getPkDeductionId(), deduction);
-                    }
+                    setPayroll((SHrsPayroll) value);
                     break;
-                    
                 case SModConsts.HRS_PAY_RCP:
                     maHrsReceipts = (ArrayList<SHrsReceipt>) value;
                     break;
-                    
                 default:
             }
         }
@@ -493,12 +605,6 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
     }
     
     @Override
-    public void actionSave() {
-        updateReceiptsDeductionRows(false);
-        super.actionSave();
-    }
-
-    @Override
     public void notifyRowNew(int gridType, int gridSubtype, int row, SGridRow gridRow) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -518,14 +624,14 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbAdd) {
-                actionAdd();
+            if (button == jbSetAll) {
+                actionPerformedSetAll();
             }
-            else if (button == jbClean) {
-                actionClean();
+            else if (button == jbClear) {
+                actionPerformedClear();
             }
-            else if (button == jbCleanAll) {
-                actionCleanAll();
+            else if (button == jbClearAll) {
+                actionPerformedClearAll();
             }
         }
     }
@@ -543,13 +649,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
 
     @Override
     public void editingStopped(ChangeEvent e) {
-        switch (moGridEmployeeRow.getTable().getSelectedColumn()) {
-            case COL_AMOUNT_UNIT:
-            case COL_SET_FLAG:
-                processEdition();
-                break;
-            default:
-        }
+        processCellEdition();
     }
 
     @Override

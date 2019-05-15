@@ -387,7 +387,6 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 for (SDbPayrollReceiptEarning payrollReceiptEarning : payrollReceipt.getChildPayrollReceiptEarnings()) {
                     if (!payrollReceiptEarning.isDeleted()) {
                         SHrsReceiptEarning hrsReceiptEarning = new SHrsReceiptEarning();
-
                         hrsReceiptEarning.setHrsReceipt(hrsReceipt);
                         hrsReceiptEarning.setEarning(hrsPayroll.getEarning(payrollReceiptEarning.getFkEarningId()));
                         hrsReceiptEarning.setPayrollReceiptEarning(payrollReceiptEarning);
@@ -401,7 +400,6 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 for (SDbPayrollReceiptDeduction payrollReceiptDeduction : payrollReceipt.getChildPayrollReceiptDeductions()) {
                     if (!payrollReceiptDeduction.isDeleted()) {
                         SHrsReceiptDeduction hrsReceiptDeduction = new SHrsReceiptDeduction();
-
                         hrsReceiptDeduction.setHrsReceipt(hrsReceipt);
                         hrsReceiptDeduction.setDeduction(hrsPayroll.getDeduction(payrollReceiptDeduction.getFkDeductionId()));
                         hrsReceiptDeduction.setPayrollReceiptDeduction(payrollReceiptDeduction);
@@ -875,7 +873,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         hrsPayroll.getMwzTypeWages().addAll(getMwzTypeWages());
 
         // Earnings:
-        hrsPayroll.getEarnigs().addAll(getEarnings());
+        hrsPayroll.getEarnings().addAll(getEarnings());
 
         // Deductions:
         hrsPayroll.getDeductions().addAll(getDeductions());

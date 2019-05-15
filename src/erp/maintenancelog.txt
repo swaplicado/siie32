@@ -1,4 +1,11 @@
 ================================================================================
+2019-05-15, 3.2 135.2
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Refactorización a captura masiva de percepciones y deducciones.
+2) Corrección al cálculo de monto a pagar en captura de percepciones de prestaciones.
+
+================================================================================
 2019-05-07, 3.2 135.1
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

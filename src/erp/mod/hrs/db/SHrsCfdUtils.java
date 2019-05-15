@@ -141,7 +141,7 @@ public abstract class SHrsCfdUtils {
     
     public static SDataCfd computeCfdi(final SGuiSession session, final SHrsFormerPayrollReceipt receipt, final int receiptIssue, final boolean cfdiPendingSigned) throws Exception {
         boolean add = true;
-        int cfdId = SLibConsts.UNDEFINED;
+        int cfdId = 0;
         String docXmlUuid = "";
         
         String sql = "SELECT id_cfd, doc_xml_uuid, fid_st_xml " 
@@ -170,10 +170,10 @@ public abstract class SHrsCfdUtils {
             
             SCfdPacket packet = new SCfdPacket();
             packet.setCfdId(cfdId);
-            packet.setIsCfdConsistent(cfdId == SLibConstants.UNDEFINED);
+            packet.setIsCfdConsistent(cfdId == 0);
         
             int xmlType = ((SSessionCustom) session.getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
-            float cfdVersion = SLibConsts.UNDEFINED;
+            float cfdVersion = 0f;
             
             switch (xmlType) {
                 case SDataConstantsSys.TRNS_TP_XML_CFDI_32:

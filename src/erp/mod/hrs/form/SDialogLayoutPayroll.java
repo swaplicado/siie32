@@ -94,7 +94,9 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         moIntConsecutiveDay = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel9 = new javax.swing.JPanel();
         jpEmployeesAvailable = new javax.swing.JPanel();
-        jlTotalAvailables = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jlAvailableCount = new javax.swing.JLabel();
+        jlAvailableTotal = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -104,7 +106,9 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         jbRemove = new javax.swing.JButton();
         jbRemoveAll = new javax.swing.JButton();
         jpReceiptSelect = new javax.swing.JPanel();
-        jlTotalSelected = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        jlSelectedCount = new javax.swing.JLabel();
+        jlSelectedTotal = new javax.swing.JLabel();
 
         setTitle("Layout para pagos de nóminas");
 
@@ -168,10 +172,19 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         jpEmployeesAvailable.setPreferredSize(new java.awt.Dimension(400, 100));
         jpEmployeesAvailable.setLayout(new java.awt.BorderLayout());
 
-        jlTotalAvailables.setText("n");
-        jlTotalAvailables.setPreferredSize(new java.awt.Dimension(350, 23));
-        jlTotalAvailables.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jpEmployeesAvailable.add(jlTotalAvailables, java.awt.BorderLayout.PAGE_END);
+        jPanel3.setLayout(new java.awt.GridLayout(2, 1));
+
+        jlAvailableCount.setText("n");
+        jlAvailableCount.setPreferredSize(new java.awt.Dimension(350, 20));
+        jlAvailableCount.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jPanel3.add(jlAvailableCount);
+
+        jlAvailableTotal.setText("$");
+        jlAvailableTotal.setPreferredSize(new java.awt.Dimension(350, 20));
+        jlAvailableTotal.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jPanel3.add(jlAvailableTotal);
+
+        jpEmployeesAvailable.add(jPanel3, java.awt.BorderLayout.SOUTH);
 
         jPanel9.add(jpEmployeesAvailable, java.awt.BorderLayout.WEST);
 
@@ -205,10 +218,19 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         jpReceiptSelect.setPreferredSize(new java.awt.Dimension(400, 100));
         jpReceiptSelect.setLayout(new java.awt.BorderLayout());
 
-        jlTotalSelected.setText("n");
-        jlTotalSelected.setPreferredSize(new java.awt.Dimension(350, 23));
-        jlTotalSelected.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jpReceiptSelect.add(jlTotalSelected, java.awt.BorderLayout.PAGE_END);
+        jPanel4.setLayout(new java.awt.GridLayout(2, 1));
+
+        jlSelectedCount.setText("n");
+        jlSelectedCount.setPreferredSize(new java.awt.Dimension(350, 20));
+        jlSelectedCount.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jPanel4.add(jlSelectedCount);
+
+        jlSelectedTotal.setText("$");
+        jlSelectedTotal.setPreferredSize(new java.awt.Dimension(350, 20));
+        jlSelectedTotal.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jPanel4.add(jlSelectedTotal);
+
+        jpReceiptSelect.add(jPanel4, java.awt.BorderLayout.SOUTH);
 
         jPanel9.add(jpReceiptSelect, java.awt.BorderLayout.EAST);
 
@@ -234,6 +256,8 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbAdd;
@@ -241,11 +265,13 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     private javax.swing.JButton jbRemove;
     private javax.swing.JButton jbRemoveAll;
     private javax.swing.JLabel jlAccountDebit;
+    private javax.swing.JLabel jlAvailableCount;
+    private javax.swing.JLabel jlAvailableTotal;
     private javax.swing.JLabel jlConsecutiveDay;
     private javax.swing.JLabel jlDateEmission;
     private javax.swing.JLabel jlPkLayouId;
-    private javax.swing.JLabel jlTotalAvailables;
-    private javax.swing.JLabel jlTotalSelected;
+    private javax.swing.JLabel jlSelectedCount;
+    private javax.swing.JLabel jlSelectedTotal;
     private javax.swing.JPanel jpEmployeesAvailable;
     private javax.swing.JPanel jpReceiptSelect;
     private sa.lib.gui.bean.SBeanFieldDate moDateEmission;
@@ -292,22 +318,18 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
             public ArrayList<SGridColumnForm> createGridColumns() {
                 int col = 0;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
-                SGridColumnForm[] columns = new SGridColumnForm[2];
+                SGridColumnForm[] columns = new SGridColumnForm[5];
 
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Deducciones $");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Alcance neto $");
 
                 gridColumnsForm.addAll(Arrays.asList((SGridColumnForm[]) columns));
 
                 return gridColumnsForm;
             }
-            
-            /* XXX jbarajas 09/03/2016 Eliminate confusing for users.
-            @Override
-            public void actionMouseClicked() {
-                SFormPayroll.this.actionReceiptAdd();
-            }
-            */
         };
 
         moGridPaneEmployeesAvailable.setForm(null);
@@ -324,10 +346,13 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
             public ArrayList<SGridColumnForm> createGridColumns() {
                 int col = 0;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
-                SGridColumnForm[] columns = new SGridColumnForm[2];
+                SGridColumnForm[] columns = new SGridColumnForm[5];
 
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Deducciones $");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Alcance neto $");
 
                 gridColumnsForm.addAll(Arrays.asList((SGridColumnForm[]) columns));
 
@@ -366,7 +391,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     private void populateLayoutBank() {
         Vector<SGuiItem> items = new Vector<>();
 
-        items.add(new SGuiItem(new int[] { SLibConsts.UNDEFINED }, "(" + SUtilConsts.TXT_SELECT + " layout)"));
+        items.add(new SGuiItem(new int[] { SLibConsts.UNDEFINED }, "- " + SUtilConsts.TXT_SELECT + " layout -"));
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BANBAJIO }, SFinConsts.TXT_LAY_BANK_BANBAJIO));
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BANAMEX }, SFinConsts.TXT_LAY_BANK_BANAMEX));
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BBVA }, SFinConsts.TXT_LAY_BANK_BBVA));
@@ -379,40 +404,28 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     }
 
      private void populateEmployees() {
-        Vector<SGridRow> rowsAvailable = new Vector<>();
-        Vector<SGridRow> rowsSelected = new Vector<>();
-        
-        try {
-            for (SRowPayrollEmployee row : maPayrollEmployeesAvailable) {
-                rowsAvailable.add(row);
-            }
-            for (SRowPayrollEmployee row : maPayrollEmployeesSelected) {
-                rowsSelected.add(row);
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-        
-        moGridPaneEmployeesAvailable.populateGrid(rowsAvailable);
-        moGridPaneEmployeesSelected.populateGrid(rowsSelected);
+        moGridPaneEmployeesAvailable.populateGrid(new Vector<>(maPayrollEmployeesAvailable));
+        moGridPaneEmployeesSelected.populateGrid(new Vector<>(maPayrollEmployeesSelected));
         
         computeTotals();
     }
     
     private void computeTotals() {
-        int countAvailables = 0;
-        int countSelected = 0;
+        double totalAvailable = 0;
+        double totalSelected = 0;
         
-        for (int i = 0; i < moGridPaneEmployeesAvailable.getModel().getRowCount(); i++) {
-            countAvailables++;
-        }
-        for (int i = 0; i < moGridPaneEmployeesSelected.getModel().getRowCount(); i++) {
-            countSelected++;
+        for (SGridRow row : moGridPaneEmployeesAvailable.getModel().getGridRows()) {
+            totalAvailable = SLibUtils.roundAmount(totalAvailable + ((SRowPayrollEmployee) row).getTotalNet());
         }
         
-        jlTotalAvailables.setText(" " + countAvailables + " recibos de nómina disponibles.");
-        jlTotalSelected.setText(" " + countSelected + " recibos de nomina.");
+        for (SGridRow row : moGridPaneEmployeesSelected.getModel().getGridRows()) {
+            totalAvailable = SLibUtils.roundAmount(totalAvailable + ((SRowPayrollEmployee) row).getTotalNet());
+        }
+        
+        jlAvailableTotal.setText("Total recibos disponibles: $ " + SLibUtils.getDecimalFormatAmount().format(totalAvailable));
+        jlSelectedTotal.setText("Total recibos seleccionados: $ " + SLibUtils.getDecimalFormatAmount().format(totalSelected));
+        jlAvailableCount.setText("Recibos disponibles: " + moGridPaneEmployeesAvailable.getModel().getRowCount());
+        jlSelectedCount.setText("Recibos seleccionados: " + moGridPaneEmployeesSelected.getModel().getRowCount());
     }
 
     private void itemStateChangedAccountDebit() {
@@ -431,7 +444,6 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
             jbAdd.requestFocus();
         }
         else {
-
             try {
                 int index = moGridPaneEmployeesAvailable.getTable().getSelectedRow();
                 SRowPayrollEmployee rowAvailable = (SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow();
@@ -547,7 +559,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
             if (validation.isValid()) {
                 if (maPayrollEmployeesSelected.isEmpty()) {
                     validation.setValid(false);
-                    validation.setMessage("Debe seleccionar al menos un recibo para crear el layout");
+                    validation.setMessage("Debe seleccionar al menos un recibo para crear el layout.");
                     validation.setComponent(jpReceiptSelect);
                 }
             }

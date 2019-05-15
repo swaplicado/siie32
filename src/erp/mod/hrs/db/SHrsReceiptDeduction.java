@@ -41,8 +41,7 @@ public class SHrsReceiptDeduction implements SGridRow, Comparable {
 
     public void setHrsReceipt(SHrsReceipt o) { moHrsReceipt = o; }
     public void setDeduction(SDbDeduction o) { moDeduction = o; }
-    public void setPayrollReceiptDeduction(SDbPayrollReceiptDeduction o) { moPayrollReceiptDeduction = o; mdAmountOriginal = o.getAmount_r(); }
-    public void setApplying(boolean b) { mbApplying = b; }
+    public void setPayrollReceiptDeduction(SDbPayrollReceiptDeduction o) { moPayrollReceiptDeduction = o; mdAmountOriginal = o.getAmount_r(); evaluateApplying(); }
 
     public int getInputMode() { return mnInputMode; }
     public SHrsReceipt getHrsReceipt() { return moHrsReceipt; }
@@ -57,7 +56,7 @@ public class SHrsReceiptDeduction implements SGridRow, Comparable {
     }
 
     private void computeAmount() {
-        double amount = SLibUtils.roundAmount(moPayrollReceiptDeduction.getUnits() * moPayrollReceiptDeduction.getAmountUnitary());
+        double amount = SLibUtils.roundAmount(moPayrollReceiptDeduction.getAmountUnitary() * moPayrollReceiptDeduction.getUnits());
         moPayrollReceiptDeduction.setAmountSystem_r(amount);
         moPayrollReceiptDeduction.setAmount_r(amount);
         
@@ -134,17 +133,19 @@ public class SHrsReceiptDeduction implements SGridRow, Comparable {
                 updateAmountUnitary(0);
             }
         }
-
-        computeAmount();
     }
     
+    public void clearAmount() {
+        updateApplying(false);
+    }
+    
+    @Override
     public SHrsReceiptDeduction clone() throws CloneNotSupportedException {
         SHrsReceiptDeduction clone = new SHrsReceiptDeduction(this.getInputMode());
         
         clone.setHrsReceipt(this.getHrsReceipt()); // just pass the same object!
         clone.setDeduction(this.getDeduction()); // immutable object, there is no need to clone it
         clone.setPayrollReceiptDeduction(this.getPayrollReceiptDeduction().clone());
-        clone.setApplying(this.isApplying());
         
         return clone;
     }
