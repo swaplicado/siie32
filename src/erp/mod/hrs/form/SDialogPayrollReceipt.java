@@ -1030,8 +1030,14 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             }
         }
         else {
-            unitsAlleged = moHrsBenefit.getValuePayedReceipt();
-            amountUnitAlleged = moHrsBenefit.getAmountPayedReceipt();
+            if (moEarning.isBasedOnUnits()) {
+                unitsAlleged = moHrsBenefit.getValuePayedReceipt();
+                amountUnitAlleged = 0;
+            }
+            else {
+                unitsAlleged = 1;
+                amountUnitAlleged = moHrsBenefit.getAmountPayedReceipt();
+            }
         }
 
         return hrsReceipt.getHrsPayroll().createPayrollReceiptEarning(
@@ -1117,7 +1123,13 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         
         if (dlgBenefit.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
             moHrsBenefit = (SHrsBenefit) dlgBenefit.getValue(SGuiConsts.PARAM_ROWS);
-            moCompEarningValue.getField().setValue(moHrsBenefit.getValuePayedReceipt());
+            if (moEarning.isBasedOnUnits()) {
+                moCompEarningValue.getField().setValue(moHrsBenefit.getValuePayedReceipt());
+            }
+            else {
+                moCompEarningValue.getField().setValue(moHrsBenefit.getAmountPayedReceipt());
+            }
+            
             actionAddEarning();
         }
     }
@@ -1200,7 +1212,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             SHrsEmployeeDays hrsEmployeeDays = moHrsReceipt.getHrsEmployee().createEmployeeDays();
             SHrsReceiptEarning hrsReceiptEarning = new SHrsReceiptEarning();
             hrsReceiptEarning.setHrsReceipt(moHrsReceipt);
-            hrsReceiptEarning.setEarning(moEarnigsMap.get(moEarning.getPkEarningId()));
+            hrsReceiptEarning.setEarning(moEarning);
             hrsReceiptEarning.setPayrollReceiptEarning(createPayrollReceipEarning(moHrsReceipt, hrsReceiptEarning, hrsEmployeeDays));
 
             try {

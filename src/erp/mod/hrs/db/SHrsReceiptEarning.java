@@ -79,7 +79,7 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
     }
     
     public boolean isEditableAmountUnitary(final double amountUnitary) {
-        return !moEarning.isBasedOnUnits() && (!moEarning.isBenefit() || amountUnitary > mdAmountOriginal);
+        return !moEarning.isBasedOnUnits() && (!moEarning.isBenefit() || amountUnitary < mdAmountOriginal || SLibUtils.compareAmount(amountUnitary, mdAmountOriginal));
     }
     
     private void updateValueAlleged(final double valueAlleged) {
