@@ -208,7 +208,13 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
                     case 7: // unit of measure
                         value = moHrsReceipt.getHrsPayroll().getEarningComputationTypesMap().get(moEarning.getFkEarningComputationTypeId());
                         break;
-                    case 8: // loan description
+                    case 8: // amount exempt
+                        value = moPayrollReceiptEarning.getAmountExempt();
+                        break;
+                    case 9: // amount taxable
+                        value = moPayrollReceiptEarning.getAmountTaxable();
+                        break;
+                    case 10: // loan description
                         value = moHrsReceipt.getHrsEmployee().getLoanDescription(moPayrollReceiptEarning.getFkLoanLoanId_n());
                         break;
                     default:
@@ -241,7 +247,13 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
                     case 7: // is-paid editable flag, EDITABLE!
                         value = mbApplying;
                         break;
-                    case 8: // loan description
+                    case 8: // amount exempt
+                        value = moPayrollReceiptEarning.getAmountExempt();
+                        break;
+                    case 9: // amount taxable
+                        value = moPayrollReceiptEarning.getAmountTaxable();
+                        break;
+                    case 10: // loan description
                         value = moHrsReceipt.getHrsEmployee().getLoanDescription(moPayrollReceiptEarning.getFkLoanLoanId_n());
                         break;
                     default:

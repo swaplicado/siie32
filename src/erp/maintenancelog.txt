@@ -1,4 +1,11 @@
 ================================================================================
+2019-05-17, 3.2 136.2
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la consulta de ausencias en el año del empleado en clase erp.mod.hrs.db.SHrsUtils.getEmployeeAbsencesConsumptions().
+2) Implementación de visualización de partes exenta y gravada de percepciones en captura de recibos de nómina en clase erp.mod.hrs.form.SDialogPayrollReceipt.
+
+================================================================================
 2019-05-16, 3.2 136.1
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

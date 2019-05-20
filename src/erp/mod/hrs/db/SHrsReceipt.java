@@ -97,7 +97,7 @@ public class SHrsReceipt {
         // Process all receipt earnings:
 
         for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
-            int earningId = hrsReceiptEarning.getEarning().getPkEarningId();
+            int earningId = hrsReceiptEarning.getEarning().getPkEarningId(); // convenience variable
             ArrayList<SHrsReceiptEarning> hrsReceiptEarnings = hrsReceiptEarningsMap.get(earningId);
             
             if (hrsReceiptEarnings == null) {
@@ -161,18 +161,18 @@ public class SHrsReceipt {
 
             // compute exemption:
             if (applyExemptionStd) {
-                double exemptionProp = 0;
+                double exemptionProposed = 0;
                 double exemptionLimit = 0;
                 
                 switch (earning.getFkEarningExemptionTypeId()) {
                     case SModSysConsts.HRSS_TP_EAR_EXEM_PER: // Percentage
                         // estimate exemption proposed and exemption limit:
                         if (moPayrollReceipt.getEffectiveSalary(moHrsPayroll.getPayroll().isFortnightStandard()) <= moHrsPayroll.getPayroll().getMwzWage()) { // salary cannot never be less than minimum wage, but just in case
-                            exemptionProp = SLibUtils.roundAmount(earning.getExemptionSalaryEqualsMwzPercentage() * payrollReceiptEarning.getAmount_r());
+                            exemptionProposed = SLibUtils.roundAmount(earning.getExemptionSalaryEqualsMwzPercentage() * payrollReceiptEarning.getAmount_r());
                             exemptionLimit = SLibUtils.roundAmount(earning.getExemptionSalaryEqualsMwzLimit() * moHrsPayroll.getPayroll().getUmaAmount()); // formerly minimum wage was used
                         }
                         else {
-                            exemptionProp = SLibUtils.roundAmount(earning.getExemptionSalaryGreaterMwzPercentage() * payrollReceiptEarning.getAmount_r());
+                            exemptionProposed = SLibUtils.roundAmount(earning.getExemptionSalaryGreaterMwzPercentage() * payrollReceiptEarning.getAmount_r());
                             exemptionLimit = SLibUtils.roundAmount(earning.getExemptionSalaryGreaterMwzLimit() * moHrsPayroll.getPayroll().getUmaAmount()); // formerly minimum wage was used
                         }
                         break;
@@ -180,8 +180,8 @@ public class SHrsReceipt {
                     case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL: // Minimum Wage Global
                     case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_EVT: // Minimum Wage Event
                         // estimate exemption proposed and exemption limit:
-                        exemptionProp = SLibUtils.roundAmount(earning.getExemptionMwz() * moHrsPayroll.getPayroll().getUmaAmount()); // formerly minimum wage was used
-                        exemptionLimit = exemptionProp;
+                        exemptionProposed = SLibUtils.roundAmount(earning.getExemptionMwz() * moHrsPayroll.getPayroll().getUmaAmount()); // formerly minimum wage was used
+                        exemptionLimit = exemptionProposed;
                         break;
 
                     case SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_SEN: // Minimum Wage Seniority
@@ -191,8 +191,8 @@ public class SHrsReceipt {
                         double seniority = (double) years + ((double) yearDays / SHrsConsts.YEAR_DAYS);
 
                         // estimate exemption proposed and exemption limit:
-                        exemptionProp = SLibUtils.roundAmount(earning.getExemptionMwz() * moHrsPayroll.getPayroll().getUmaAmount() * seniority); // formerly minimum wage was used
-                        exemptionLimit = exemptionProp;
+                        exemptionProposed = SLibUtils.roundAmount(earning.getExemptionMwz() * moHrsPayroll.getPayroll().getUmaAmount() * seniority); // formerly minimum wage was used
+                        exemptionLimit = exemptionProposed;
                         break;
 
                     default:
@@ -201,7 +201,7 @@ public class SHrsReceipt {
 
                 // adjust exemption:
 
-                exemption = SLibUtils.roundAmount(exemptionProp - exemptionPayroll - exemptionGlobal);
+                exemption = SLibUtils.roundAmount(exemptionProposed - exemptionPayroll - exemptionGlobal);
 
                 if (exemption < 0) {
                     exemption = 0;

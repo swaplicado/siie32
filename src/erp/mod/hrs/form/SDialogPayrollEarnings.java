@@ -231,6 +231,8 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Pago");
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Parte exenta $", 80));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Parte gravada $", 80));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Crédito/préstamo"));
                 
                 return gridColumnsForm;

@@ -2385,7 +2385,7 @@ public abstract class SHrsUtils {
                 preparedStatement.setInt(1, absence.getPkEmployeeId());
                 preparedStatement.setInt(2, absence.getPkAbsenceId());
                 
-                try (ResultSet resultSet = preparedStatement.executeQuery(sql)) {
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
                         SDbAbsenceConsumption absenceConsumption = new SDbAbsenceConsumption();
                         absenceConsumption.read(session, new int[] { absence.getPkEmployeeId(), absence.getPkAbsenceId(), resultSet.getInt(1) });
