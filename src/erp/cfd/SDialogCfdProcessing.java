@@ -406,18 +406,16 @@ public class SDialogCfdProcessing extends sa.lib.gui.bean.SBeanFormDialog {
                         case SCfdConsts.PROC_REQ_STAMP:
                             SDbPayrollReceiptIssue receiptIssue = (SDbPayrollReceiptIssue) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP_ISS, key);
 
-                            if (receiptIssue.getPkIssueId() != SLibConsts.UNDEFINED) {
-                                if (receiptIssue.getNumber() != 0) {
-                                    number = receiptIssue.getNumber();
-                                }
-                                else {
-                                    number = SHrsUtils.getPayrollReceiptNextNumber(miClient.getSession(), receiptIssue.getNumberSeries());
-                                    receiptIssue.saveField(miClient.getSession().getStatement(), key, SDbPayrollReceiptIssue.FIELD_NUMBER, number);
-                                }
+                            if (receiptIssue.getNumber() != 0) {
+                                number = receiptIssue.getNumber();
+                            }
+                            else {
+                                number = SHrsUtils.getPayrollReceiptNextNumber(miClient.getSession(), receiptIssue.getNumberSeries());
+                                receiptIssue.saveField(miClient.getSession().getStatement(), key, SDbPayrollReceiptIssue.FIELD_NUMBER, number);
                             }
 
                             SHrsCfdUtils.computeSignCfdi(miClient.getSession(), key);
-                            detailMessage += (receiptIssue.getNumberSeries().length() > 0 ? receiptIssue.getNumberSeries() + "-" : "") + number + "   Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
+                            detailMessage += receiptIssue.getPayrollReceiptIssueNumber() + ": Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                             cfdProcessedOk++;
                             break;
                             
