@@ -1,4 +1,11 @@
 ================================================================================
+2019-05-29, 3.2 136.4
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la búsqueda de deducciones y percepciones en captura de percepcinoes y deducciones automáticas:
+    no se excluían los registros eliminados.
+
+================================================================================
 2019-05-29, 3.2 136.3
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

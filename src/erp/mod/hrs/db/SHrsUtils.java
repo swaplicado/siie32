@@ -1475,9 +1475,10 @@ public abstract class SHrsUtils {
         String sql = "";
         ResultSet resultSet = null;
 
-        sql = "SELECT id_ear " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " " +
-                "WHERE code = '" + codeToFind + "' ORDER BY code, id_ear LIMIT 1 ";
+        sql = "SELECT id_ear "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " "
+                + "WHERE code = '" + codeToFind + "' AND NOT b_del "
+                + "ORDER BY code, id_ear;";
         resultSet = client.getSession().getStatement().executeQuery(sql);
         if (resultSet.next()) {
             earning = new SDbEarning();
@@ -1499,9 +1500,10 @@ public abstract class SHrsUtils {
         String sql = "";
         ResultSet resultSet = null;
 
-        sql = "SELECT id_ded " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " " +
-                "WHERE code = '" + codeToFind + "' ORDER BY code, id_ded LIMIT 1 ";
+        sql = "SELECT id_ded "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " "
+                + "WHERE code = '" + codeToFind + "' AND NOT b_del "
+                + "ORDER BY code, id_ded;";
         resultSet = client.getSession().getStatement().executeQuery(sql);
         if (resultSet.next()) {
             deduction = new SDbDeduction();
