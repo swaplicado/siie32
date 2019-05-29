@@ -21,13 +21,14 @@ public abstract class SHrsPayrollUtils {
     public static ArrayList<SRowPayrollEmployee> obtainRowPayrollEmployeesAvailable(SGuiSession session, int idPayroll) throws Exception {
         ArrayList<SRowPayrollEmployee> rows = new ArrayList<>();
 
-        String sql = "SELECT b.bp, e.num, e.id_emp, pr.ear_r, pr.ded_r " +
-            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON pr.id_emp = e.id_emp " +
-            "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON e.id_emp = b.id_bp " +
-            "WHERE p.id_pay = " + idPayroll + " AND NOT pr.b_del " +
-            "ORDER BY b.bp, e.num, e.id_emp;";
+        String sql = "SELECT b.bp, e.num, e.id_emp, e.bank_acc, pr.ear_r, pr.ded_r, COALESCE(bank.name, '') AS _bank " +
+                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON pr.id_emp = e.id_emp " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON e.id_emp = b.id_bp " +
+                "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_BANK) + " AS bank ON e.fk_bank_n = bank.id_bank " +
+                "WHERE p.id_pay = " + idPayroll + " AND NOT pr.b_del " +
+                "ORDER BY b.bp, e.num, e.id_emp;";
         
         try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
             while (resultSet.next()) {
@@ -38,6 +39,8 @@ public abstract class SHrsPayrollUtils {
                 row.setName(resultSet.getString("b.bp"));
                 row.setTotalEarnings(resultSet.getDouble("pr.ear_r"));
                 row.setTotalDeductions(resultSet.getDouble("pr.ded_r"));
+                row.setBank(resultSet.getString("_bank"));
+                row.setBankAccount(resultSet.getString("e.bank_acc"));
                 
                 rows.add(row);
             }

@@ -1,4 +1,11 @@
 ================================================================================
+2019-05-29, 3.2 136.3
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al total a dispersar seleccionado en el diálogo de layouts para dispersión de nóminas, y 
+    mejoramiento para validar empleados seleccionados sin banco ni cuenta bancaria, o empleados de distintos bancos a la vez.
+
+================================================================================
 2019-05-17, 3.2 136.2
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

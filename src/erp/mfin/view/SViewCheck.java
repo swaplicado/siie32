@@ -12,7 +12,6 @@ import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.lib.data.SDataRegistry;
 import erp.lib.data.SDataSqlUtilities;
 import erp.lib.form.SFormUtilities;
 import erp.lib.print.SPrintConstants;
@@ -35,18 +34,21 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.awt.print.*;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.view.*;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SViewCheck extends erp.lib.table.STableTab implements java.awt.event.ActionListener, Printable {
 
@@ -222,7 +224,7 @@ public class SViewCheck extends erp.lib.table.STableTab implements java.awt.even
                     miClient.showMsgBoxWarning("El registro seleccionado ya esta anulado");
                 }
                 else {
-                    if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
+                    if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_ANNUL) == JOptionPane.YES_OPTION) {
                         params.clear();
 
                         params.add(moCheck.getPkCheckWalletId());
@@ -249,7 +251,7 @@ public class SViewCheck extends erp.lib.table.STableTab implements java.awt.even
         SDataAccountCash oAccCash = null;
         SDataBizPartnerBranch  oBranch = null;
         SDataCurrency oCurrency = null;
-        Vector<Object> params = new Vector<Object>();
+        Vector<Object> params = new Vector<>();
 
         if (moTablePane.getSelectedTableRow() != null) {
             moCheck = (SDataCheck) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_CHECK, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
@@ -260,7 +262,6 @@ public class SViewCheck extends erp.lib.table.STableTab implements java.awt.even
 
                 if (oAccCash.getFkCheckFormatId_n() > 0) {
                     oPrint = new SPrintCheck(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
-                    //oPrint.preparePrinting();
                     oPrint.setPrintPreview(bPrintPreview);
                     oPrint.printDocument();
                 }
@@ -327,7 +328,7 @@ public class SViewCheck extends erp.lib.table.STableTab implements java.awt.even
         SDataBizPartnerBranchBankAccount oBankAccount = null;
         SDataCheckWallet oWallet = null;
         SDataAccountCash oAccCash = null;
-        Vector<erp.lib.data.SDataRegistry> vAccount = new Vector<SDataRegistry>();
+        Vector<erp.lib.data.SDataRegistry> vAccount = new Vector<>();
 
         if (moTablePane.getSelectedTableRow() != null) {
             moCheck = (SDataCheck) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_CHECK, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
@@ -421,7 +422,6 @@ public class SViewCheck extends erp.lib.table.STableTab implements java.awt.even
 
     @Override
     public int print(Graphics g, PageFormat pf, int page) throws PrinterException {
-
         return PAGE_EXISTS;
     }
 }

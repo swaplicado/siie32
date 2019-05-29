@@ -20,8 +20,11 @@ import erp.mod.hrs.db.SRowPayrollEmployee;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
@@ -37,23 +40,20 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListener {
+public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListener, ItemListener {
 
-    private erp.mfin.data.SDataAccountCash moDataAccountCash;
     private erp.mbps.data.SDataBizPartnerBranchBankAccount moDataBizPartnerBranchBankAccount;
-    private ArrayList<SRowPayrollEmployee> maPayrollEmployeesAvailable;
-    private ArrayList<SRowPayrollEmployee> maPayrollEmployeesSelected;
+    private ArrayList<SRowPayrollEmployee> maRowPayrollEmployeesAvailable;
+    private ArrayList<SRowPayrollEmployee> maRowPayrollEmployeesSelected;
     
-    private int mnFkLayoutBankId;
-    private String msAccountDebit;
     private final int mnPayrollId;
-    
     private SGridPaneForm moGridPaneEmployeesAvailable;
     private SGridPaneForm moGridPaneEmployeesSelected;
 
@@ -84,8 +84,8 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         jlDateEmission = new javax.swing.JLabel();
         moDateEmission = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel7 = new javax.swing.JPanel();
-        jlPkLayouId = new javax.swing.JLabel();
-        moKeyLayoutId = new sa.lib.gui.bean.SBeanFieldKey();
+        jlPkLayout = new javax.swing.JLabel();
+        moKeyLayout = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel13 = new javax.swing.JPanel();
         jlAccountDebit = new javax.swing.JLabel();
         moKeyAccountDebit = new sa.lib.gui.bean.SBeanFieldKey();
@@ -130,12 +130,12 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPkLayouId.setText("Layout: *");
-        jlPkLayouId.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel7.add(jlPkLayouId);
+        jlPkLayout.setText("Layout: *");
+        jlPkLayout.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlPkLayout);
 
-        moKeyLayoutId.setPreferredSize(new java.awt.Dimension(320, 23));
-        jPanel7.add(moKeyLayoutId);
+        moKeyLayout.setPreferredSize(new java.awt.Dimension(320, 23));
+        jPanel7.add(moKeyLayout);
 
         jPanel16.add(jPanel7);
 
@@ -146,11 +146,6 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         jPanel13.add(jlAccountDebit);
 
         moKeyAccountDebit.setPreferredSize(new java.awt.Dimension(320, 23));
-        moKeyAccountDebit.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                moKeyAccountDebitItemStateChanged(evt);
-            }
-        });
         jPanel13.add(moKeyAccountDebit);
 
         jPanel16.add(jPanel13);
@@ -241,10 +236,6 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void moKeyAccountDebitItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_moKeyAccountDebitItemStateChanged
-       itemStateChangedAccountDebit();
-    }//GEN-LAST:event_moKeyAccountDebitItemStateChanged
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -269,7 +260,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     private javax.swing.JLabel jlAvailableTotal;
     private javax.swing.JLabel jlConsecutiveDay;
     private javax.swing.JLabel jlDateEmission;
-    private javax.swing.JLabel jlPkLayouId;
+    private javax.swing.JLabel jlPkLayout;
     private javax.swing.JLabel jlSelectedCount;
     private javax.swing.JLabel jlSelectedTotal;
     private javax.swing.JPanel jpEmployeesAvailable;
@@ -277,30 +268,30 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     private sa.lib.gui.bean.SBeanFieldDate moDateEmission;
     private sa.lib.gui.bean.SBeanFieldInteger moIntConsecutiveDay;
     private sa.lib.gui.bean.SBeanFieldKey moKeyAccountDebit;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyLayoutId;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyLayout;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 960, 600);
 
         try {
-            maPayrollEmployeesAvailable = SHrsPayrollUtils.obtainRowPayrollEmployeesAvailable(miClient.getSession(), mnPayrollId);
+            maRowPayrollEmployeesAvailable = SHrsPayrollUtils.obtainRowPayrollEmployeesAvailable(miClient.getSession(), mnPayrollId);
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
 
-        maPayrollEmployeesSelected = new ArrayList<>();
+        maRowPayrollEmployeesSelected = new ArrayList<>();
         
         jbSave.setText("Aceptar");
 
         moDateEmission.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEmission.getText()), true);
-        moKeyLayoutId.setKeySettings(miClient, SGuiUtils.getLabelName(jlPkLayouId.getText()), true);
+        moKeyLayout.setKeySettings(miClient, SGuiUtils.getLabelName(jlPkLayout.getText()), true);
         moKeyAccountDebit.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountDebit.getText()), true);
-        moIntConsecutiveDay.setIntegerSettings(SGuiUtils.getLabelName(jlConsecutiveDay), SGuiConsts.GUI_TYPE_INT, false);
+        moIntConsecutiveDay.setIntegerSettings(SGuiUtils.getLabelName(jlConsecutiveDay), SGuiConsts.GUI_TYPE_INT, true);
 
         moFields.addField(moDateEmission);
-        moFields.addField(moKeyLayoutId);
+        moFields.addField(moKeyLayout);
         moFields.addField(moKeyAccountDebit);
         moFields.addField(moIntConsecutiveDay);
 
@@ -318,13 +309,15 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
             public ArrayList<SGridColumnForm> createGridColumns() {
                 int col = 0;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
-                SGridColumnForm[] columns = new SGridColumnForm[5];
+                SGridColumnForm[] columns = new SGridColumnForm[7];
 
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Deducciones $");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Alcance neto $");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Banco");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Cuenta bancaria");
 
                 gridColumnsForm.addAll(Arrays.asList((SGridColumnForm[]) columns));
 
@@ -346,13 +339,15 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
             public ArrayList<SGridColumnForm> createGridColumns() {
                 int col = 0;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
-                SGridColumnForm[] columns = new SGridColumnForm[5];
+                SGridColumnForm[] columns = new SGridColumnForm[7];
 
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Deducciones $");
                 columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Alcance neto $");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Banco");
+                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Cuenta bancaria");
 
                 gridColumnsForm.addAll(Arrays.asList((SGridColumnForm[]) columns));
 
@@ -364,30 +359,20 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         moGridPaneEmployeesSelected.setPaneFormOwner(null);
         jpReceiptSelect.add(moGridPaneEmployeesSelected, BorderLayout.CENTER);
         
+        /* 2019-05-29, Sergio Flores: Prevent from preserving user preferences of grids in this dialog.
         mvFormGrids.add(moGridPaneEmployeesAvailable);
         mvFormGrids.add(moGridPaneEmployeesSelected);
-
+        */
+        
         populateEmployees();
 
         removeAllListeners();
         reloadCatalogues();
         addAllListeners();
+        
+        itemStateChangedLayout();
     }
 
-    private void renderAccountSettings() {
-        if (moKeyAccountDebit.getSelectedIndex() > 0) {
-            if (moKeyAccountDebit.getValue()[0] > 0) {
-                moDataAccountCash = (SDataAccountCash) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC_CASH, moKeyAccountDebit.getValue(), SLibConstants.EXEC_MODE_SILENT);
-
-                moDataBizPartnerBranchBankAccount = (SDataBizPartnerBranchBankAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BANK_ACC, new int[] { moDataAccountCash.getFkBizPartnerBranchId_n(), moDataAccountCash.getFkBankAccountId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                msAccountDebit = moDataBizPartnerBranchBankAccount.getBankAccountNumber();
-            }
-            else {
-                moDataBizPartnerBranchBankAccount = null;
-            }
-        }
-    }
-    
     private void populateLayoutBank() {
         Vector<SGuiItem> items = new Vector<>();
 
@@ -397,51 +382,69 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BBVA }, SFinConsts.TXT_LAY_BANK_BBVA));
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_HSBC }, SFinConsts.TXT_LAY_BANK_HSBC));
 
-        moKeyLayoutId.removeAllItems();
+        moKeyLayout.removeAllItems();
         for (SGuiItem item : items) {
-            moKeyLayoutId.addItem(item);
+            moKeyLayout.addItem(item);
         }
     }
 
-     private void populateEmployees() {
-        moGridPaneEmployeesAvailable.populateGrid(new Vector<>(maPayrollEmployeesAvailable));
-        moGridPaneEmployeesSelected.populateGrid(new Vector<>(maPayrollEmployeesSelected));
+    private void populateEmployees() {
+        moGridPaneEmployeesAvailable.populateGrid(new Vector<>(maRowPayrollEmployeesAvailable));
+        moGridPaneEmployeesSelected.populateGrid(new Vector<>(maRowPayrollEmployeesSelected));
         
         computeTotals();
     }
     
     private void computeTotals() {
-        double totalAvailable = 0;
-        double totalSelected = 0;
+        int availableWithoutBank = 0;
+        int availableWithoutBankAccount = 0;
+        double availableTotal = 0;
         
         for (SGridRow row : moGridPaneEmployeesAvailable.getModel().getGridRows()) {
-            totalAvailable = SLibUtils.roundAmount(totalAvailable + ((SRowPayrollEmployee) row).getTotalNet());
+            availableTotal = SLibUtils.roundAmount(availableTotal + ((SRowPayrollEmployee) row).getTotalNet());
+            
+            if (((SRowPayrollEmployee) row).getBank().isEmpty()) {
+                availableWithoutBank++;
+            }
+            if (((SRowPayrollEmployee) row).getBankAccount().isEmpty()) {
+                availableWithoutBankAccount++;
+            }
         }
+        
+        int selectedWithoutBank = 0;
+        int selectedWithoutBankAccount = 0;
+        double selectedTotal = 0;
         
         for (SGridRow row : moGridPaneEmployeesSelected.getModel().getGridRows()) {
-            totalAvailable = SLibUtils.roundAmount(totalAvailable + ((SRowPayrollEmployee) row).getTotalNet());
+            selectedTotal = SLibUtils.roundAmount(selectedTotal + ((SRowPayrollEmployee) row).getTotalNet());
+            
+            if (((SRowPayrollEmployee) row).getBank().isEmpty()) {
+                selectedWithoutBank++;
+            }
+            if (((SRowPayrollEmployee) row).getBankAccount().isEmpty()) {
+                selectedWithoutBankAccount++;
+            }
         }
         
-        jlAvailableTotal.setText("Total recibos disponibles: $ " + SLibUtils.getDecimalFormatAmount().format(totalAvailable));
-        jlSelectedTotal.setText("Total recibos seleccionados: $ " + SLibUtils.getDecimalFormatAmount().format(totalSelected));
-        jlAvailableCount.setText("Recibos disponibles: " + moGridPaneEmployeesAvailable.getModel().getRowCount());
-        jlSelectedCount.setText("Recibos seleccionados: " + moGridPaneEmployeesSelected.getModel().getRowCount());
+        jlAvailableTotal.setText("Total recibos disponibles: $ " + SLibUtils.getDecimalFormatAmount().format(availableTotal));
+        jlAvailableCount.setText("Recibos disponibles: " + moGridPaneEmployeesAvailable.getModel().getRowCount() + 
+                "; sin banco: " + availableWithoutBank + "; sin cuenta bancaria: " + availableWithoutBankAccount);
+        
+        jlSelectedTotal.setText("Total recibos seleccionados: $ " + SLibUtils.getDecimalFormatAmount().format(selectedTotal));
+        jlSelectedCount.setText("Recibos seleccionados: " + moGridPaneEmployeesSelected.getModel().getRowCount() + 
+                "; sin banco: " + selectedWithoutBank + "; sin cuenta bancaria: " + selectedWithoutBankAccount);
     }
 
-    private void itemStateChangedAccountDebit() {
-        renderAccountSettings();
-    }
-
-    public void setFormReset() {
+    private void setFormReset() {
         moDateEmission.setValue(miClient.getSession().getCurrentDate());
     }
     
-    public boolean actionAdd() {
+    private boolean actionPerformedAdd() {
         boolean added = true;
 
         if (moGridPaneEmployeesAvailable.getSelectedGridRow() == null) {
             miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_ROW);
-            jbAdd.requestFocus();
+            moGridPaneEmployeesAvailable.getTable().requestFocusInWindow();
         }
         else {
             try {
@@ -454,7 +457,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
                 SRowPayrollEmployee rowSelected = new SRowPayrollEmployee(rowAvailable);
                 
-                maPayrollEmployeesSelected.add(maPayrollEmployeesAvailable.remove(index));
+                maRowPayrollEmployeesSelected.add(maRowPayrollEmployeesAvailable.remove(index));
                 
                 moGridPaneEmployeesSelected.addGridRow(rowSelected);
                 moGridPaneEmployeesSelected.renderGridRows();
@@ -472,24 +475,24 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
     }
 
-    public void actionAddAll() {
+    private void actionPerformedAddAll() {
         int from = 0;
         int rows = moGridPaneEmployeesAvailable.getTable().getRowCount();
 
         for (int row = 0; row < rows; row++) {
             moGridPaneEmployeesAvailable.setSelectedGridRow(from);
-            if (!actionAdd()) {
+            if (!actionPerformedAdd()) {
                 from++;
             }
         }
     }
 
-    public boolean actionRemove() {
+    private boolean actionPerformedRemove() {
         boolean removed = true;
         
         if (moGridPaneEmployeesSelected.getSelectedGridRow() == null) {
             miClient.showMsgBoxWarning("Se debe seleccionar un registro.");
-            jbRemove.requestFocus();
+            moGridPaneEmployeesSelected.getTable().requestFocusInWindow();
         }
         else {
             try {
@@ -502,7 +505,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
                 SRowPayrollEmployee rowAvailable = new SRowPayrollEmployee(rowSelected);
                 
-                maPayrollEmployeesAvailable.add(maPayrollEmployeesSelected.remove(index));
+                maRowPayrollEmployeesAvailable.add(maRowPayrollEmployeesSelected.remove(index));
 
                 moGridPaneEmployeesAvailable.addGridRow(rowAvailable);
                 moGridPaneEmployeesAvailable.renderGridRows();
@@ -519,14 +522,36 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         return removed;
     }
 
-    public void actionRemoveAll() {
+    private void actionPerformedRemoveAll() {
         moGridPaneEmployeesSelected.setSelectedGridRow(0);
 
         while (moGridPaneEmployeesSelected.getSelectedGridRow() != null) {
-            if (!actionRemove()) {
+            if (!actionPerformedRemove()) {
                 break;
             }
             moGridPaneEmployeesSelected.setSelectedGridRow(0);
+        }
+    }
+    
+    private void itemStateChangedLayout() {
+        moIntConsecutiveDay.resetField();
+        
+        if (moKeyLayout.getSelectedIndex() <= 0) {
+            moIntConsecutiveDay.setEditable(false);
+        }
+        else {
+            switch (moKeyLayout.getValue()[0]) {
+                case SFinConsts.LAY_BANK_BANBAJIO:
+                case SFinConsts.LAY_BANK_BANAMEX:
+                    moIntConsecutiveDay.setEditable(true);
+                    break;
+                case SFinConsts.LAY_BANK_BBVA:
+                case SFinConsts.LAY_BANK_HSBC:
+                    moIntConsecutiveDay.setEditable(false);
+                    break;
+                default:
+                    miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+            }
         }
     }
 
@@ -538,29 +563,59 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
     @Override
     public SGuiValidation validateForm() {
-        SDbBizPartner bizPartner = null;
         SGuiValidation validation = moFields.validateFields();
         
-        bizPartner = new SDbBizPartner();
-        mnFkLayoutBankId = SFinUtils.getLayoutBankId(miClient.getSession(), moKeyLayoutId.getValue()[0]);
-        
         if (validation.isValid()) {
-            if (mnFkLayoutBankId != moDataBizPartnerBranchBankAccount.getFkBankId()) {
+            int layoutBankId = SFinUtils.getLayoutBankId(miClient.getSession(), moKeyLayout.getValue()[0]);
+            SDataAccountCash accountCash = (SDataAccountCash) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.FIN_ACC_CASH, moKeyAccountDebit.getValue(), SLibConstants.EXEC_MODE_VERBOSE);
+            moDataBizPartnerBranchBankAccount = (SDataBizPartnerBranchBankAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BANK_ACC, accountCash.getBizPartnerBranchBankAccountKey(), SLibConstants.EXEC_MODE_VERBOSE);
+            
+            if (layoutBankId != moDataBizPartnerBranchBankAccount.getFkBankId()) {
                 try {
-                    validation.setValid(false);
-                    validation.setMessage("El valor para el campo '" + jlAccountDebit.getText() + "', debe pertenecer al banco '" +
-                            bizPartner.readField(miClient.getSession().getStatement(), new int[] { mnFkLayoutBankId }, SDbBizPartner.FIELD_NAME) + "'.");
+                    validation.setMessage("El valor del campo '" + jlAccountDebit.getText() + "', debe pertenecer al banco "
+                            + "'" + miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { layoutBankId }, SDbBizPartner.FIELD_NAME) + "'.");
                     validation.setComponent(moKeyAccountDebit);
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
                 }
             }
+            
             if (validation.isValid()) {
-                if (maPayrollEmployeesSelected.isEmpty()) {
-                    validation.setValid(false);
-                    validation.setMessage("Debe seleccionar al menos un recibo para crear el layout.");
-                    validation.setComponent(jpReceiptSelect);
+                if (maRowPayrollEmployeesSelected.isEmpty()) {
+                    validation.setMessage("Debe seleccionar al menos un recibo para generar el layout.");
+                    validation.setComponent(moGridPaneEmployeesAvailable.getTable());
+                }
+                else {
+                    int withoutBank = 0;
+                    int withoutBankAccount = 0;
+                    HashSet<String> banksSet = new HashSet<>();
+                    
+                    for (SRowPayrollEmployee row : maRowPayrollEmployeesSelected) {
+                        if (row.getBank().isEmpty()) {
+                            withoutBank++;
+                        }
+                        else {
+                            banksSet.add(row.getBank());
+                        }
+                        
+                        if (row.getBankAccount().isEmpty()) {
+                            withoutBankAccount++;
+                        }
+                    }
+                    
+                    if (banksSet.size() > 1) {
+                        validation.setMessage("Todas las cuentas bancarias de los empleados seleccionados deben ser del mismo banco.");
+                        validation.setComponent(moGridPaneEmployeesSelected.getTable());
+                    }
+                    else if (withoutBank > 0) {
+                        validation.setMessage("Hay " + withoutBank + " " + (withoutBank == 1 ? "empleado selecionado" : "empleados seleccionados") + " sin banco.");
+                        validation.setComponent(moGridPaneEmployeesSelected.getTable());
+                    }
+                    else if (withoutBankAccount > 0) {
+                        validation.setMessage("Hay " + withoutBankAccount + " " + (withoutBankAccount == 1 ? "empleado selecionado" : "empleados seleccionados") + " sin cuenta bancaria.");
+                        validation.setComponent(moGridPaneEmployeesSelected.getTable());
+                    }
                 }
             }
         }
@@ -570,30 +625,26 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     
     @Override
     public void actionSave() {
-        String[] employeesId = null;
-        int indexEmployee = 0;
-        
         if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
-                employeesId = new String[maPayrollEmployeesSelected.size()];
+                String[] employeeIds = new String[maRowPayrollEmployeesSelected.size()];
                 
-                for (SRowPayrollEmployee row : maPayrollEmployeesSelected) {
-                    employeesId[indexEmployee] = "" + row.getPkEmployeeId();
-                    indexEmployee++;
+                for (int index = 0; index < maRowPayrollEmployeesSelected.size(); index++) {
+                    employeeIds[index] = "" + maRowPayrollEmployeesSelected.get(index).getPkEmployeeId();
                 }
                 
-                switch (moKeyLayoutId.getValue()[0]) {
+                switch (moKeyLayout.getValue()[0]) {
                     case SFinConsts.LAY_BANK_BANBAJIO:
-                        SHrsUtils.createLayoutBanBajioPayroll(miClient, mnPayrollId, moKeyLayoutId.getSelectedItem().getItem(), moDateEmission.getValue(), msAccountDebit, moIntConsecutiveDay.getValue(), employeesId);
+                        SHrsUtils.createLayoutBanBajioPayroll(miClient, mnPayrollId, moKeyLayout.getSelectedItem().getItem(), moDateEmission.getValue(), moDataBizPartnerBranchBankAccount.getBankAccountNumber(), moIntConsecutiveDay.getValue(), employeeIds);
                         break;
                     case SFinConsts.LAY_BANK_BANAMEX:
-                        SHrsUtils.createLayoutBanamexPayroll(miClient, mnPayrollId, moKeyLayoutId.getSelectedItem().getItem(), moDateEmission.getValue(), msAccountDebit, moIntConsecutiveDay.getValue(), moDataBizPartnerBranchBankAccount.getFkBankId(), employeesId);
+                        SHrsUtils.createLayoutBanamexPayroll(miClient, mnPayrollId, moKeyLayout.getSelectedItem().getItem(), moDateEmission.getValue(), moDataBizPartnerBranchBankAccount.getBankAccountNumber(), moIntConsecutiveDay.getValue(), employeeIds, moDataBizPartnerBranchBankAccount.getFkBankId());
                         break;
                     case SFinConsts.LAY_BANK_BBVA:
-                        SHrsUtils.createLayoutBancomerPayroll(miClient, mnPayrollId, miClient.getSession().getCurrentDate(), moIntConsecutiveDay.getValue(), employeesId);
+                        SHrsUtils.createLayoutBancomerPayroll(miClient, mnPayrollId, miClient.getSession().getCurrentDate(), employeeIds);
                         break;
                     case SFinConsts.LAY_BANK_HSBC:
-                        SHrsUtils.createLayoutHsbcPayroll(miClient, mnPayrollId, miClient.getSession().getCurrentDate(), moIntConsecutiveDay.getValue(), employeesId, msAccountDebit);
+                        SHrsUtils.createLayoutHsbcPayroll(miClient, mnPayrollId, miClient.getSession().getCurrentDate(), employeeIds, moDataBizPartnerBranchBankAccount.getBankAccountNumber());
                         break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -611,6 +662,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         jbAddAll.addActionListener(this);
         jbRemove.addActionListener(this);
         jbRemoveAll.addActionListener(this);
+        moKeyLayout.addItemListener(this);
     }
 
     @Override
@@ -619,6 +671,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         jbAddAll.removeActionListener(this);
         jbRemove.removeActionListener(this);
         jbRemoveAll.removeActionListener(this);
+        moKeyLayout.removeItemListener(this);
     }
 
     @Override
@@ -637,16 +690,27 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
             JButton button = (JButton) e.getSource();
             
             if (button == jbAdd) {
-                actionAdd();
+                actionPerformedAdd();
             }
             else if (button == jbAddAll) {
-                actionAddAll();
+                actionPerformedAddAll();
             }
             else if (button == jbRemove) {
-                actionRemove();
+                actionPerformedRemove();
             }
             else if (button == jbRemoveAll) {
-                actionRemoveAll();
+                actionPerformedRemoveAll();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof SBeanFieldKey) {
+            SBeanFieldKey field = (SBeanFieldKey) e.getSource();
+            
+            if (field == moKeyLayout) {
+                itemStateChangedLayout();
             }
         }
     }

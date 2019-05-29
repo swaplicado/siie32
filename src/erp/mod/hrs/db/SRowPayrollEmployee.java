@@ -19,6 +19,8 @@ public class SRowPayrollEmployee implements SGridRow {
     protected String msName;
     protected double mdTotalEarnings;
     protected double mdTotalDeductions;
+    protected String msBank; // name of bank from banks catalog of SAT
+    protected String msBankAccount; // number of bank account
     protected SHrsReceipt moHrsReceipt;
 
     public SRowPayrollEmployee() {
@@ -28,6 +30,8 @@ public class SRowPayrollEmployee implements SGridRow {
         msName = "";
         mdTotalEarnings = 0;
         mdTotalDeductions = 0;
+        msBank = "";
+        msBankAccount = "";
         moHrsReceipt = null;
     }
     
@@ -38,6 +42,8 @@ public class SRowPayrollEmployee implements SGridRow {
         msName = row.getName();
         mdTotalEarnings = row.getTotalEarnings();
         mdTotalDeductions = row.getTotalDeductions();
+        msBank = row.getBank();
+        msBankAccount = row.getBankAccount();
         moHrsReceipt = row.getHrsReceipt();
     }
 
@@ -47,6 +53,8 @@ public class SRowPayrollEmployee implements SGridRow {
     public void setName(String s) { msName = s; }
     public void setTotalEarnings(double d) { mdTotalEarnings = d; }
     public void setTotalDeductions(double d) { mdTotalDeductions = d; }
+    public void setBank(String s) { msBank = s; }
+    public void setBankAccount(String s) { msBankAccount = s; }
     public void setHrsReceipt(SHrsReceipt o) { moHrsReceipt = o; }
 
     public int getPkEmployeeId() { return mnPkEmployeeId; }
@@ -55,6 +63,8 @@ public class SRowPayrollEmployee implements SGridRow {
     public String getName() { return msName ; }
     public double getTotalEarnings() { return mdTotalEarnings ; }
     public double getTotalDeductions() { return mdTotalDeductions ; }
+    public String getBank() { return msBank; }
+    public String getBankAccount() { return msBankAccount; }
     public SHrsReceipt getHrsReceipt() { return moHrsReceipt; }
 
     public double getTotalNet() {
@@ -121,6 +131,12 @@ public class SRowPayrollEmployee implements SGridRow {
                 break;
             case 4:
                 value = getTotalNet();
+                break;
+            case 5:
+                value = msBank;
+                break;
+            case 6:
+                value = msBankAccount;
                 break;
             default:
         }

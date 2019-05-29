@@ -94,6 +94,8 @@ public class SDataAccountCash extends erp.lib.data.SDataRegistry implements java
     
     public erp.mcfg.data.SDataCompanyBranchEntity getDbmsCompanyBranchEntity() { return moDbmsCompanyBranchEntity; }
     public erp.mbps.data.SDataBizPartnerBranchBankAccount getDbmsBizPartnerBranchBankAccount() { return moDbmsBizPartnerBranchBankAccount; }
+    
+    public int[] getBizPartnerBranchBankAccountKey() { return new int[] { mnFkBizPartnerBranchId_n, mnFkBankAccountId_n }; }
 
     public void setAuxFkCompanyId(int n) { mnAuxFkCompanyId = n; }
     public void setAuxEntity(java.lang.String s) { msAuxEntity = s; }

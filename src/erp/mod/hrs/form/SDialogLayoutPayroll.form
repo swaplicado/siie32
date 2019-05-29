@@ -87,7 +87,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JLabel" name="jlPkLayouId">
+                    <Component class="javax.swing.JLabel" name="jlPkLayout">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Layout: *"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -95,7 +95,7 @@
                         </Property>
                       </Properties>
                     </Component>
-                    <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyLayoutId">
+                    <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyLayout">
                       <Properties>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[320, 23]"/>
@@ -125,9 +125,6 @@
                           <Dimension value="[320, 23]"/>
                         </Property>
                       </Properties>
-                      <Events>
-                        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="moKeyAccountDebitItemStateChanged"/>
-                      </Events>
                     </Component>
                   </SubComponents>
                 </Container>

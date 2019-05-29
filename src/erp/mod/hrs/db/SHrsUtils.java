@@ -81,10 +81,10 @@ public abstract class SHrsUtils {
      * @param dateApplication
      * @param accountDebit
      * @param consecutiveDay
-     * @param bankId ID the bank to payment
-     * @param employees employees ids
+     * @param employees Employees IDs.
+     * @param bankId ID ob the bank of payment.
      */
-    public static void createLayoutBanamexPayroll(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay, int bankId, String[] employees) {
+    public static void createLayoutBanamexPayroll(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay, String[] employees, int bankId) {
         ResultSet resultSetHeader = null;
         ResultSet resultSetDetail = null;
         BufferedWriter bw = null;
@@ -270,7 +270,7 @@ public abstract class SHrsUtils {
      * @param dateApplication
      * @param accountDebit
      * @param consecutiveDay
-     * @param employees employees ids
+     * @param employees Employees IDs.
      */
     public static void createLayoutBanBajioPayroll(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay, String[] employees) {
         ResultSet resultSet = null;
@@ -410,14 +410,13 @@ public abstract class SHrsUtils {
     }
     
     /**
-    * Creates layout to payroll with BBVA Bancomer
-    *@param client
-    *@param payrollId
-    *@param dateApplication
-    *@param consecutiveDay
-    *@param employees employees ids
+     * Creates layout to payroll with BBVA Bancomer
+     * @param client
+     * @param payrollId
+     * @param dateApplication
+     * @param employees Employees IDs.
     */
-     public static void createLayoutBancomerPayroll(SGuiClient client, int payrollId, Date dateApplication, int consecutiveDay, String[] employees) {
+     public static void createLayoutBancomerPayroll(SGuiClient client, int payrollId, Date dateApplication, String[] employees) {
         ResultSet resulSet = null;
         Statement statement = null;
         String sql = "";
@@ -501,15 +500,14 @@ public abstract class SHrsUtils {
     }
     
     /**
-    * Creates layout CSV of payroll with HSBC.
-    * @param client
-    * @param payrollId
-    * @param dateApplication
-    * @param consecutiveDay
-    * @param employees employees ids
-    * @param accountDebit
-    */
-     public static void createLayoutHsbcPayroll(SGuiClient client, int payrollId, Date dateApplication, int consecutiveDay, String[] employees, String accountDebit) {
+     * Creates layout CSV of payroll with HSBC.
+     * @param client
+     * @param payrollId
+     * @param dateApplication
+     * @param employees Employees IDs.
+     * @param accountDebit
+     */
+     public static void createLayoutHsbcPayroll(SGuiClient client, int payrollId, Date dateApplication, String[] employees, String accountDebit) {
         ResultSet resulSet = null;
         Statement statement = null;
         String sql = "";
