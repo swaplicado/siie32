@@ -1,4 +1,10 @@
 ================================================================================
+2019-06-06, 3.2 136.5
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la habilitacion de peso bruto extra (empaque) en partidas de documentos con vinculos a otros documentos y ajustes de documentos.
+
+================================================================================
 2019-05-29, 3.2 136.4
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

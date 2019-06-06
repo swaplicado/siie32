@@ -3259,6 +3259,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jradAccCashAccount.setEnabled(false);
             jradAccAdvanceBilled.setEnabled(false);
         }
+        
         renderAccOptions();
     }
 
@@ -4558,7 +4559,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfSurface.setEnabled(false);
         jtfVolume.setEnabled(false);
         jtfMass.setEnabled(false);
-        jtfWeightPackagingExtra.setEnabled(false);
+        jtfWeightPackagingExtra.setEnabled(moItem != null && moItem.getDbmsDataItemGeneric().getIsWeightGrossApplying());
     }
 
     public void hasDpsAdjustmentsAsAdjButIsEditable() {
@@ -4566,9 +4567,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbFkItemId.setEnabled(false);
         jbSetPrepayment.setEnabled(false);
         /*
-        jtfKey.setEditable(false);
-        jtfKey.setFocusable(false);
-        jbKey.setEnabled(false);
+        jtConceptfKey.setEditable(false);
+        jtConceptfKey.setFocusable(false);
+        jbConceptKey.setEnabled(false);
         jtfConcept.setEditable(false);
         jtfConcept.setFocusable(false);
         jbConcept.setEnabled(false);
@@ -4616,7 +4617,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfSurface.setEnabled(false);
         jtfVolume.setEnabled(false);
         jtfMass.setEnabled(false);
-        jtfWeightPackagingExtra.setEnabled(false);
+        jtfWeightPackagingExtra.setEnabled(moItem != null && moItem.getDbmsDataItemGeneric().getIsWeightGrossApplying());
     }
     
     public void enablePriceContractFields (boolean enabled) {
