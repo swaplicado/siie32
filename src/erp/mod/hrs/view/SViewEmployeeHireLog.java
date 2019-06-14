@@ -26,7 +26,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas, Claudio Peña
+ * @author Juan Barajas, Claudio Peña, Sergio Flores
  */
 public class SViewEmployeeHireLog extends SGridPaneView implements ActionListener {
     

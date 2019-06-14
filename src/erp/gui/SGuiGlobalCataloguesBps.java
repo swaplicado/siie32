@@ -29,7 +29,7 @@ import javax.swing.JMenuItem;
 
 /**
  *
- * @author Sergio Flores, Alfonso Flores
+ * @author Sergio Flores, Alfonso Flores, Sergio Flores
  */
 public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
