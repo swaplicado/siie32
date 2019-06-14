@@ -1,4 +1,15 @@
 ================================================================================
+2019-06-13, 3.2 136.6
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento de vistas de empleados para mostrar cuáles tienen foto y/o firma.
+2) Revisión a la compensación de Subsidio para el empleo pagado en exceso contra ISR.
+3) Estandarización de columnas en vistas de nóminas y recibos de nóminas.
+4) Corrección a modificación de créditos/préstamos, que la información de capital y cantidad total a pagar se borraban al abrir le forma de captura.
+5) Mejoramiento a la creación automática de registros para la configuración de contabilización de percepciones y deducciones, y corrección al crearlas mediante copia.
+6) Corrección y mejoramiento a las rutinas relacionadas con la creación, modificación y revertimiento de altas y bajas de empleados.
+
+================================================================================
 2019-06-06, 3.2 136.5
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

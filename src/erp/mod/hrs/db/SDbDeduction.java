@@ -48,7 +48,7 @@ public class SDbDeduction extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
     
-    protected int mnAuxAccountingConfigurationTypeId;
+    protected int mnOldAccountingConfigurationTypeId;
     
     public SDbDeduction() {
         super(SModConsts.HRS_DED);
@@ -98,9 +98,9 @@ public class SDbDeduction extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
-    public void setAuxAccountingConfigurationTypeId(int n) { mnAuxAccountingConfigurationTypeId = n; }
+    public void setOldAccountingConfigurationTypeId(int n) { mnOldAccountingConfigurationTypeId = n; }
 
-    public int getAuxAccountingConfigurationTypeId() { return mnAuxAccountingConfigurationTypeId; }
+    public int getOldAccountingConfigurationTypeId() { return mnOldAccountingConfigurationTypeId; }
 
     public boolean isComputedByPercentage() {
         return SLibUtils.belongsTo(mnFkDeductionComputationTypeId, new int[] { SModSysConsts.HRSS_TP_DED_COMP_PCT_INCOME } );
@@ -162,7 +162,7 @@ public class SDbDeduction extends SDbRegistryUser {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
-        mnAuxAccountingConfigurationTypeId = 0;
+        mnOldAccountingConfigurationTypeId = 0;
     }
 
     @Override
@@ -229,7 +229,7 @@ public class SDbDeduction extends SDbRegistryUser {
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
             
-            mnAuxAccountingConfigurationTypeId = mnFkAccountingConfigurationTypeId;
+            mnOldAccountingConfigurationTypeId = mnFkAccountingConfigurationTypeId;
 
             mbRegistryNew = false;
         }
@@ -308,7 +308,7 @@ public class SDbDeduction extends SDbRegistryUser {
 
         session.getStatement().execute(msSql);
         
-        SHrsUtils.createAccountingDeductionConfiguration(session, mnPkDeductionId, mnFkAccountingConfigurationTypeId, mnAuxAccountingConfigurationTypeId, mbRegistryNew);
+        SHrsUtils.createAccountingDeductionConfiguration(session, mnPkDeductionId, mnFkAccountingConfigurationTypeId, mnOldAccountingConfigurationTypeId);
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
@@ -340,7 +340,7 @@ public class SDbDeduction extends SDbRegistryUser {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
         
-        registry.setAuxAccountingConfigurationTypeId(this.getAuxAccountingConfigurationTypeId());
+        registry.setOldAccountingConfigurationTypeId(this.getOldAccountingConfigurationTypeId());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

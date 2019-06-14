@@ -2203,15 +2203,14 @@ public abstract class SHrsUtils {
     
     public static String getEmployeeNextNumber(Connection connection) throws Exception {
         String nextNumber = "";
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT COALESCE(MAX(CAST(num AS UNSIGNED INTEGER)), 0) + 1 "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + "; ";
+        String sql = "SELECT COALESCE(MAX(CAST(num AS UNSIGNED INTEGER)), 0) + 1 "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + ";";
 
-        resultSet = connection.createStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            nextNumber = resultSet.getInt(1) + "";
+        try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                nextNumber = resultSet.getInt(1) + "";
+            }
         }
 
         return nextNumber;
@@ -2226,27 +2225,27 @@ public abstract class SHrsUtils {
     }
     
     public static int getPaymentVacationsByEmployee(final SGuiSession session, final int employeeId, final int benefitAnn, final int benefitYear) throws Exception {
-        int seniority = 0;
-        String sql = "";
-        ResultSet resultSet = null;
+        int days = 0;
         
-        sql = "SELECT COALESCE(SUM(e.unt_all), 0) AS f_payed_unt " +
-                "FROM hrs_pay_rcp AS rcp " +
-                "INNER JOIN hrs_pay_rcp_ear AS e ON e.id_pay = rcp.id_pay AND e.id_emp = rcp.id_emp " +
-                "WHERE rcp.id_emp = " + employeeId + " AND rcp.b_del = 0 AND e.b_del = 0 AND e.fk_tp_ben = 21 AND e.ben_ann = " + benefitAnn + 
-                " AND e.ben_year = " + benefitYear + " ";
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            seniority = resultSet.getInt(1);
+        String sql = "SELECT COALESCE(SUM(pre.unt_all), 0) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                + "WHERE pr.id_emp = " + employeeId + " AND NOT pr.b_del AND NOT pre.b_del AND pre.fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND "
+                + "pre.ben_ann = " + benefitAnn + " AND pre.ben_year = " + benefitYear + ";";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                days = resultSet.getInt(1);
+            }
         }
         
-        return seniority;
+        return days;
     }
     
     public static int getDaysVacationsAll(final SGuiSession session, final int benefitAnn, final Date dateCutoff) throws Exception {
         int daysTableVacation = 0;
-        ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<SDbBenefitTable>();
-        ArrayList<SHrsBenefitTableAnniversary> aTableVacationByAnniversary = new ArrayList<SHrsBenefitTableAnniversary>();
+        ArrayList<SDbBenefitTable> aTableVacation = new ArrayList<>();
+        ArrayList<SHrsBenefitTableAnniversary> aTableVacationByAnniversary = new ArrayList<>();
         
         aTableVacation.add((SDbBenefitTable) session.readRegistry(SModConsts.HRS_BEN, new int[] { getRecentBenefitTable(session, SModSysConsts.HRSS_TP_BEN_VAC, 0, dateCutoff) }));
         
@@ -2266,54 +2265,53 @@ public abstract class SHrsUtils {
 
         String sql = "SELECT id_emp, id_log " +
                 "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-                "WHERE b_del = 0 AND id_emp = " + employeeId + " AND dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' AND " +
-                "(dt_dis_n IS NULL OR dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "') ";
+                "WHERE NOT b_del AND id_emp = " + employeeId + " AND dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' AND " +
+                "(dt_dis_n IS NULL OR dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "');";
         
-        ResultSet resultSet = resultSetStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbEmployeeHireLog employeeHireLog = new SDbEmployeeHireLog();
-            employeeHireLog.read(session, new int[] { resultSet.getInt("id_emp"), resultSet.getInt("id_log") });
-            employeeHireLogs.add(employeeHireLog);
+        try (ResultSet resultSet = resultSetStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbEmployeeHireLog employeeHireLog = new SDbEmployeeHireLog();
+                employeeHireLog.read(session, new int[] { resultSet.getInt("id_emp"), resultSet.getInt("id_log") });
+                employeeHireLogs.add(employeeHireLog);
+            }
         }
 
         return employeeHireLogs;
     }
     
-    public static SDbEmployeeHireLog getEmployeeLastHired(final SGuiSession session, final int employeeId, final int logId, final String table) throws Exception {
-        String sql = "";
-        ResultSet resultSet = null;
+    public static SDbEmployeeHireLog getEmployeeLastHired(final SGuiSession session, final int employeeId, final int logId, final String schema) throws Exception {
         SDbEmployeeHireLog employeeHireLog = null;
         
-        sql = "SELECT id_emp, id_log " +
-            "FROM " + (table.isEmpty() ? "" : (table + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-            "WHERE b_del = 0 AND id_emp = " + employeeId + " AND dt_dis_n IS NULL AND id_log <> " + logId + " " +
-            "ORDER BY dt_hire DESC, id_emp, id_log " +
-            "LIMIT 1 ";
+        String sql = "SELECT id_log, dt_hire " +
+            "FROM " + (schema.isEmpty() ? "" : (schema + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
+            "WHERE NOT b_del AND id_emp = " + employeeId + " AND dt_dis_n IS NULL AND id_log <> " + logId + " " +
+            "ORDER BY dt_hire DESC, id_log " +
+            "LIMIT 1;";
         
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            employeeHireLog = new SDbEmployeeHireLog();
-            employeeHireLog.read(session, new int[] { resultSet.getInt("id_emp"), resultSet.getInt("id_log") });
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                employeeHireLog = new SDbEmployeeHireLog();
+                employeeHireLog.read(session, new int[] { employeeId, resultSet.getInt("id_log") });
+            }
         }
         
         return employeeHireLog;
     }
     
-    public static SDbEmployeeHireLog getEmployeeLastDismiss(final SGuiSession session, final int employeeId, final int logId, final String table) throws Exception {
-        String sql = "";
-        ResultSet resultSet = null;
+    public static SDbEmployeeHireLog getEmployeeLastDismiss(final SGuiSession session, final int employeeId, final int logId, final String schema) throws Exception {
         SDbEmployeeHireLog employeeHireLog = null;
         
-        sql = "SELECT id_emp, id_log " +
-            "FROM " + (table.isEmpty() ? "" : (table + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-            "WHERE b_del = 0 AND id_emp = " + employeeId + " AND dt_dis_n IS NOT NULL AND id_log <> " + logId + " " +
-            "ORDER BY dt_dis_n DESC, id_emp, id_log " +
-            "LIMIT 1 ";
+        String sql = "SELECT id_log, dt_dis_n " +
+            "FROM " + (schema.isEmpty() ? "" : (schema + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
+            "WHERE NOT b_del AND id_emp = " + employeeId + " AND dt_dis_n IS NOT NULL AND id_log <> " + logId + " " +
+            "ORDER BY dt_dis_n DESC, id_log " +
+            "LIMIT 1;";
         
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            employeeHireLog = new SDbEmployeeHireLog();
-            employeeHireLog.read(session, new int[] { resultSet.getInt("id_emp"), resultSet.getInt("id_log") });
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                employeeHireLog = new SDbEmployeeHireLog();
+                employeeHireLog.read(session, new int[] { employeeId, resultSet.getInt("id_log") });
+            }
         }
         
         return employeeHireLog;
@@ -2398,17 +2396,16 @@ public abstract class SHrsUtils {
         return absencesConsumptions;
     }
     
-    public static boolean isFirtsHire(final SGuiSession session, final int employeeId, final int logId, final String table) throws Exception {
+    private static boolean isFirstHire(final SGuiSession session, final int employeeId) throws Exception {
         boolean isFirtsHire = false;
         
-        String sql = "SELECT COUNT(*) AS f_count, id_log " +
-            "FROM " + (table.isEmpty() ? "" : (table + ".")) + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-            "WHERE b_del = 0 AND id_emp = " + employeeId + " ";
+        String sql = "SELECT COUNT(*) AS _count, MAX(id_log) AS _max_id_log " +
+            "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
+            "WHERE NOT b_del AND id_emp = " + employeeId + ";";
         
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
-            if (resultSet.next() && resultSet.getInt("f_count") == 1) {
-                SDbEmployeeHireLog employeeHireLog = new SDbEmployeeHireLog();
-                employeeHireLog.read(session, new int[] { employeeId, resultSet.getInt("id_log") });
+            if (resultSet.next() && resultSet.getInt("_count") == 1) {
+                SDbEmployeeHireLog employeeHireLog = (SDbEmployeeHireLog) session.readRegistry(SModConsts.HRS_EMP_LOG_HIRE, new int[] { employeeId, resultSet.getInt("_max_id_log") }, SDbConsts.MODE_STEALTH);
                 isFirtsHire = employeeHireLog.getDateDismissed_n() == null;
             }
         }
@@ -2417,18 +2414,18 @@ public abstract class SHrsUtils {
     }
     
     public static boolean deleteHireLog(final SGuiSession session, final int employeeId) throws Exception {
-        if (SHrsUtils.isFirtsHire(session, employeeId, 0, "")) {
-            throw new Exception("El registro no se puede eliminar, es el único registro en la bitácora de alts/bajas.");
+        if (SHrsUtils.isFirstHire(session, employeeId)) {
+            throw new Exception("El empleado no tiene registros adicionales a su única alta en la bitácora altas y bajas.");
         }
         else {
-            SDbEmployee employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
             SDbEmployeeHireLog employeeHireLog;
+            SDbEmployee employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { employeeId });
             
             if (employee.isActive()) {
-                employeeHireLog = SHrsUtils.getEmployeeLastHired(session, employeeId, 0, "");
+                employeeHireLog = getEmployeeLastHired(session, employeeId, 0, "");
             }
             else {
-                employeeHireLog = SHrsUtils.getEmployeeLastDismiss(session, employeeId, 0, "");
+                employeeHireLog = getEmployeeLastDismiss(session, employeeId, 0, "");
             }
 
             SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(null, session);
@@ -3414,81 +3411,69 @@ public abstract class SHrsUtils {
     /**
      * Gets the accounting setup for a earning and a type of accounting specific configuration.
      * @param session User GUI session.
-     * @param nEarningId earning Id.
-     * @param nAuxAccountingConfigurationTypeId accounting settings type.
+     * @param earningId earning Id.
+     * @param accountingType accounting settings type.
      * @return Object of type SDbAccountingEarning
      * @throws Exception 
      */
-    private static ArrayList<SDbAccountingEarning> getAccountingEarning(final SGuiSession session, final int nEarningId, final int nAuxAccountingConfigurationTypeId) throws Exception {
-        String sql = "";
-        ResultSet resultSet = null;
-        SDbAccountingEarning accountingEarning = null;
-        ArrayList<SDbAccountingEarning> aAccountingEarning = new ArrayList<SDbAccountingEarning>();
+    private static ArrayList<SDbAccountingEarning> getAccountingEarnings(final SGuiSession session, final int earningId, final int accountingType) throws Exception {
+        ArrayList<SDbAccountingEarning> accountingEarnings = new ArrayList<>();
         
-        sql = "SELECT id_ref " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_EAR) + " " +
-                "WHERE b_del = 0 AND id_ear = " + nEarningId + " AND id_tp_acc = " + nAuxAccountingConfigurationTypeId + " ";
-        resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        while (resultSet.next()) {
-
-            accountingEarning = new SDbAccountingEarning();
-            accountingEarning.read(session, new int[] { nEarningId, nAuxAccountingConfigurationTypeId, resultSet.getInt(1) });
-            aAccountingEarning.add(accountingEarning);
+        String sql = "SELECT id_ref "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_EAR) + " "
+                + "WHERE NOT b_del AND id_ear = " + earningId + " AND id_tp_acc = " + accountingType + " "
+                + "ORDER BY id_ref;";
+        
+        try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbAccountingEarning accountingEarning = new SDbAccountingEarning();
+                accountingEarning.read(session, new int[] { earningId, accountingType, resultSet.getInt(1) });
+                accountingEarnings.add(accountingEarning);
+            }
         }
         
-        return aAccountingEarning;
+        return accountingEarnings;
     }
     
     /**
      * Gets the accounting setup for a deducction and a type of accounting specific configuration.
      * @param session User GUI session.
-     * @param nDeductionId deducction Id.
-     * @param nAuxAccountingConfigurationTypeId accounting settings type.
+     * @param deductionId deducction Id.
+     * @param accountingType accounting settings type.
      * @return Object of type SDbAccountingDeduction
      * @throws Exception 
      */
-    public static ArrayList<SDbAccountingDeduction> getAccountingDeduction(final SGuiSession session, final int nDeductionId, final int nAuxAccountingConfigurationTypeId) throws Exception {
-        String sql = "";
-        ResultSet resultSet = null;
-        SDbAccountingDeduction accountingDeduction = null;
-        ArrayList<SDbAccountingDeduction> aAccountingDeduction = new ArrayList<SDbAccountingDeduction>();
+    private static ArrayList<SDbAccountingDeduction> getAccountingDeductions(final SGuiSession session, final int deductionId, final int accountingType) throws Exception {
+        ArrayList<SDbAccountingDeduction> accountingDeductions = new ArrayList<>();
         
-        sql = "SELECT id_ref " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_DED) + " " +
-                "WHERE b_del = 0 AND id_ded = " + nDeductionId + " AND id_tp_acc = " + nAuxAccountingConfigurationTypeId + " ";
-        resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        while (resultSet.next()) {
-
-            accountingDeduction = new SDbAccountingDeduction();
-            accountingDeduction.read(session, new int[] { nDeductionId, nAuxAccountingConfigurationTypeId, resultSet.getInt(1) });
-            aAccountingDeduction.add(accountingDeduction);
+        String sql = "SELECT id_ref "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_DED) + " "
+                + "WHERE NOT b_del AND id_ded = " + deductionId + " AND id_tp_acc = " + accountingType + " "
+                + "ORDER BY id_ref;";
+        
+        try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbAccountingDeduction accountingDeduction = new SDbAccountingDeduction();
+                accountingDeduction.read(session, new int[] { deductionId, accountingType, resultSet.getInt(1) });
+                accountingDeductions.add(accountingDeduction);
+            }
         }
         
-        return aAccountingDeduction;
+        return accountingDeductions;
     }
     
     /**
      * Create accounting settings by default for earning.
      * @return 
      */
-    private static SDbAccountingEarning createAccountingEarning() {
-        SDbAccountingEarning accountingEarning = null;
+    private static SDbAccountingEarning createAccountingEarning(final int earningId, final int accountingType, final int referenceId) {
+        SDbAccountingEarning accountingEarning = new SDbAccountingEarning();
         
-        accountingEarning = new SDbAccountingEarning();
-            
+        accountingEarning.setPkEarningId(earningId);
+        accountingEarning.setPkAccountingTypeId(accountingType);
+        accountingEarning.setPkReferenceId(referenceId);
+        //...
         accountingEarning.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-        accountingEarning.setFkCostCenterId_n(0);
-        accountingEarning.setFkItemId_n(0);
-        accountingEarning.setFkBizPartnerId_n(0);
-        accountingEarning.setFkTaxBasicId_n(0);
-        accountingEarning.setFkTaxTaxId_n(0);
-        /*
-        accountingEarning.setFkUserInsertId();
-        accountingEarning.setFkUserUpdateId();
-        accountingEarning.setTsUserInsert();
-        accountingEarning.setTsUserUpdate();
-        */
-        
         
         return accountingEarning;
     }
@@ -3497,296 +3482,329 @@ public abstract class SHrsUtils {
      * Create accounting settings by default for deduction.
      * @return 
      */
-    private static SDbAccountingDeduction createAccountingDeduction() {
-        SDbAccountingDeduction accountingDeduction = null;
-        
-        accountingDeduction = new SDbAccountingDeduction();
+    private static SDbAccountingDeduction createAccountingDeduction(final int deductionId, final int accountingType, final int referenceId) {
+        SDbAccountingDeduction accountingDeduction = new SDbAccountingDeduction();
             
+        accountingDeduction.setPkDeductionId(deductionId);
+        accountingDeduction.setPkAccountingTypeId(accountingType);
+        accountingDeduction.setPkReferenceId(referenceId);
+        //...
         accountingDeduction.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-        accountingDeduction.setFkCostCenterId_n(0);
-        accountingDeduction.setFkItemId_n(0);
-        accountingDeduction.setFkBizPartnerId_n(0);
-        accountingDeduction.setFkTaxBasicId_n(0);
-        accountingDeduction.setFkTaxTaxId_n(0);
-        /*
-        accountingDeduction.setFkUserInsertId();
-        accountingDeduction.setFkUserUpdateId();
-        accountingDeduction.setTsUserInsert();
-        accountingDeduction.setTsUserUpdate();
-        */
         
         return accountingDeduction;
     }
     
     /**
-     * Obtain accounting settings earning type for one departament.
-     * @param maAccountingEarning Array objects of SDbAccountingEarning type.
+     * Creates accounting earning settings for departament.
+     * @param accountingEarnings Array objects of SDbAccountingEarning type.
      * @param departamentId departament Id.
      * @return
      * @throws Exception 
      */
-    private static SDbAccountingEarning getAccountingEarningConfigurationDepartament(final ArrayList<SDbAccountingEarning> maAccountingEarning, final int departamentId) throws Exception {
+    private static SDbAccountingEarning createAccountingEarningForDepartament(final int earningId, final ArrayList<SDbAccountingEarning> accountingEarnings, final int departamentId) throws Exception {
         SDbAccountingEarning accountingEarning = null;
         
-        for (SDbAccountingEarning dbAccountingEarning : maAccountingEarning) {
-            if (dbAccountingEarning.getPkReferenceId() == departamentId) {
-                accountingEarning = dbAccountingEarning.clone();
+        for (SDbAccountingEarning o : accountingEarnings) {
+            if (o.getPkReferenceId() == departamentId) {
+                accountingEarning = o.clone(); // create it!
                 break;
             }
         }
         
         if (accountingEarning == null) {
-            accountingEarning = createAccountingEarning();
+            accountingEarning = createAccountingEarning(earningId, SModSysConsts.HRSS_TP_ACC_DEP, departamentId);
         }
         
         return accountingEarning;
     }
     
     /**
-     * Obtain accounting settings deduction type for one departament.
-     * @param maAccountingDeduction Array objects of SDbAccountingDeduction type.
+     * Creates accounting deduction settings for departament.
+     * @param accountingDeductions Array objects of SDbAccountingDeduction type.
      * @param departamentId departament Id.
      * @return
      * @throws Exception 
      */
-    private static SDbAccountingDeduction getAccountingDeductionConfigurationDepartament(final ArrayList<SDbAccountingDeduction> maAccountingDeduction, final int departamentId) throws Exception {
+    private static SDbAccountingDeduction createAccountingDeductionForDepartament(final int deductionId, final ArrayList<SDbAccountingDeduction> accountingDeductions, final int departamentId) throws Exception {
         SDbAccountingDeduction accountingDeduction = null;
         
-        for (SDbAccountingDeduction dbAccountingDeduction : maAccountingDeduction) {
-            if (dbAccountingDeduction.getPkReferenceId() == departamentId) {
-                accountingDeduction = dbAccountingDeduction.clone();
+        for (SDbAccountingDeduction o : accountingDeductions) {
+            if (o.getPkReferenceId() == departamentId) {
+                accountingDeduction = o.clone(); // create it!
                 break;
             }
         }
         
         if (accountingDeduction == null) {
-            accountingDeduction = createAccountingDeduction();
+            accountingDeduction = createAccountingDeduction(deductionId, SModSysConsts.HRSS_TP_ACC_DEP, departamentId);
         }
         
         return accountingDeduction;
     }
     
     /**
-     * Create accounting settings for earning.
+     * Creates accounting settings for earning.
      * @param session User GUI session.
-     * @param nEarningId earning Id.
-     * @param nAccountingConfigurationTypeNewId accounting settings type new.
-     * @param nAccountingConfigurationTypeOldId accounting settings type old.
-     * @param bIsRegistryNew is registry new?.
+     * @param earningId Earning ID.
+     * @param newAccountingType New accounting settings type.
+     * @param oldAccountingType Old accounting settings type.
      * @throws Exception 
      */
-    public static void createAccountingEarningConfiguration(final SGuiSession session, final int nEarningId, final int nAccountingConfigurationTypeNewId, final int nAccountingConfigurationTypeOldId, final boolean bIsRegistryNew) throws Exception {
-        ResultSet resultSet = null;
-        String sql = "";
-        ArrayList<SDbAccountingEarning> aAccountingEarning = new ArrayList<SDbAccountingEarning>();
-        ArrayList<SDbDepartment> departments = new ArrayList<SDbDepartment>();
-        ArrayList<SDbEmployee> employees = new ArrayList<SDbEmployee>();
-        SDbAccountingEarning accountingEarning = null;
-        SDbDepartment department = null;
-        SDbEmployee employee = null;
-        ArrayList<SDbAccountingEarning> maAccountingEarning = getAccountingEarning(session, nEarningId, nAccountingConfigurationTypeOldId);
+    public static void createAccountingEarningConfiguration(final SGuiSession session, final int earningId, final int newAccountingType, final int oldAccountingType) throws Exception {
+        ArrayList<SDbAccountingEarning> oldAccountingEarnings = null;
         
-        if (bIsRegistryNew || (nAccountingConfigurationTypeOldId != 0 &&
-                nAccountingConfigurationTypeOldId != nAccountingConfigurationTypeNewId)) {
-            for (SDbAccountingEarning dbAccountingEarning : maAccountingEarning) {
-                if (SLibUtils.compareKeys(new int[] { dbAccountingEarning.getPkEarningId() }, new int[] { nEarningId })) {
-                    dbAccountingEarning.setDeleted(true);
-                    dbAccountingEarning.save(session);
-                }
-            }
+        if (oldAccountingType != 0 && oldAccountingType != newAccountingType) {
+            oldAccountingEarnings = getAccountingEarnings(session, earningId, oldAccountingType);
         }
         
-        if (nAccountingConfigurationTypeNewId != nAccountingConfigurationTypeOldId) {
-            switch (nAccountingConfigurationTypeNewId) {
+        if (oldAccountingType != newAccountingType) {
+            String sql;
+            SDbAccountingEarning accountingEarning;
+            ArrayList<SDbAccountingEarning> newAccountingEarnings = new ArrayList<>();
+
+            switch (newAccountingType) {
                 case SModSysConsts.HRSS_TP_ACC_GBL:
-                    accountingEarning = createAccountingEarning();
-            
-                    accountingEarning.setPkEarningId(nEarningId);
-                    accountingEarning.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_GBL);
-                    accountingEarning.setPkReferenceId(0);
-                    accountingEarning.setDeleted(false);
+                    // attempt to recover existing registry (if any, it would have been deleted):
+                    accountingEarning = (SDbAccountingEarning) session.readRegistry(SModConsts.HRS_ACC_EAR, new int[] { earningId, newAccountingType, 0 });
 
-                    aAccountingEarning.add(accountingEarning);
+                    // create new registry if needed:
+                    if (accountingEarning.getQueryResultId() != SDbConsts.READ_OK) {
+                        accountingEarning = createAccountingEarning(earningId, newAccountingType, 0);
+                    }
+
+                    accountingEarning.setDeleted(false); // force restoration
+
+                    newAccountingEarnings.add(accountingEarning);
                     break;
+                    
                 case SModSysConsts.HRSS_TP_ACC_DEP:
-                    sql = "SELECT id_dep FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " ";
+                    // process all departments:
                     
-                    resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-                    while (resultSet.next()) {
-                        department = (SDbDepartment) session.readRegistry(SModConsts.HRSU_DEP, new int[] { resultSet.getInt(1) });
-                        departments.add(department);
-                    }
-                    
-                    for (SDbDepartment dbDepartment : departments) {
-                        if (nAccountingConfigurationTypeNewId != 0 &&
-                                nAccountingConfigurationTypeNewId < nAccountingConfigurationTypeOldId && !maAccountingEarning.isEmpty()) {
-                            accountingEarning = maAccountingEarning.get(0).clone();
-                        }
-                        else {
-                            accountingEarning = createAccountingEarning();
-                        }
-                        accountingEarning.setDeleted(false);
-                        accountingEarning.setPkEarningId(nEarningId);
-                        accountingEarning.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_DEP);
-                        accountingEarning.setPkReferenceId(dbDepartment.getPkDepartmentId());
-
-                        aAccountingEarning.add(accountingEarning);
-                    }
-                    
-                    break;
-                case SModSysConsts.HRSS_TP_ACC_EMP:
-                    sql = "SELECT id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " ";
-                    
-                    resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-                    while (resultSet.next()) {
-                        employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { resultSet.getInt(1) });
-                        employees.add(employee);
-                    }
-                    
-                    for (SDbEmployee dbEmployee : employees) {
-                        if (nAccountingConfigurationTypeNewId != 0 &&
-                                nAccountingConfigurationTypeNewId < nAccountingConfigurationTypeOldId) {
-                            if (nAccountingConfigurationTypeNewId == SModSysConsts.HRSS_TP_ACC_GBL && !maAccountingEarning.isEmpty()) {
-                                accountingEarning = maAccountingEarning.get(0).clone();
+                    sql = "SELECT id_dep FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " ORDER BY id_dep;";
+                    try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
+                        while (resultSet.next()) {
+                            accountingEarning = null;
+                            
+                            if (oldAccountingEarnings != null && !oldAccountingEarnings.isEmpty()) {
+                                switch (oldAccountingType) {
+                                    case SModSysConsts.HRSS_TP_ACC_GBL:
+                                        accountingEarning = oldAccountingEarnings.get(0).clone(); // the very one setting
+                                        break;
+                                        
+                                    default:
+                                }
+                            }
+                            
+                            if (accountingEarning != null) {
+                                accountingEarning.setPkAccountingTypeId(newAccountingType);
+                                accountingEarning.setPkReferenceId(resultSet.getInt("id_dep"));
                             }
                             else {
-                                accountingEarning = getAccountingEarningConfigurationDepartament(maAccountingEarning, dbEmployee.getFkDepartmentId());
+                                // attempt to recover existing registry (if any, it would have been deleted):
+                                accountingEarning = (SDbAccountingEarning) session.readRegistry(SModConsts.HRS_ACC_EAR, new int[] { earningId, newAccountingType, resultSet.getInt("id_dep") });
+                                
+                                // create new registry if needed:
+                                if (accountingEarning.getQueryResultId() != SDbConsts.READ_OK) {
+                                    accountingEarning = createAccountingEarning(earningId, newAccountingType, resultSet.getInt("id_dep"));
+                                }
                             }
+                            
+                            accountingEarning.setDeleted(false); // force restoration
+                            
+                            newAccountingEarnings.add(accountingEarning);
                         }
-                        else {
-                            accountingEarning = createAccountingEarning();
-                        }
-                        accountingEarning.setDeleted(false);
-                        accountingEarning.setPkEarningId(nEarningId);
-                        accountingEarning.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_EMP);
-                        accountingEarning.setPkReferenceId(dbEmployee.getPkEmployeeId());
-
-                        aAccountingEarning.add(accountingEarning);
                     }
                     break;
-                default:
+                    
+                case SModSysConsts.HRSS_TP_ACC_EMP:
+                    // process all employees:
+                    
+                    sql = "SELECT id_emp, fk_dep FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " ORDER BY id_emp;";
+                    try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
+                        while (resultSet.next()) {
+                            accountingEarning = null;
+                            
+                            if (oldAccountingEarnings != null && !oldAccountingEarnings.isEmpty()) {
+                                switch (oldAccountingType) {
+                                    case SModSysConsts.HRSS_TP_ACC_GBL:
+                                        accountingEarning = oldAccountingEarnings.get(0).clone(); // the very one setting
+                                        break;
+                                        
+                                    case SModSysConsts.HRSS_TP_ACC_DEP:
+                                        accountingEarning = createAccountingEarningForDepartament(earningId, oldAccountingEarnings, resultSet.getInt("fk_dep"));
+                                        break;
+                                        
+                                    default:
+                                }
+                            }
+                            
+                            if (accountingEarning != null) {
+                                accountingEarning.setPkAccountingTypeId(newAccountingType);
+                                accountingEarning.setPkReferenceId(resultSet.getInt("id_emp"));
+                            }
+                            else {
+                                // attempt to recover existing registry (if any, it would have been deleted):
+                                accountingEarning = (SDbAccountingEarning) session.readRegistry(SModConsts.HRS_ACC_EAR, new int[] { earningId, newAccountingType, resultSet.getInt("id_emp") });
+                                
+                                // create new registry if needed:
+                                if (accountingEarning.getQueryResultId() != SDbConsts.READ_OK) {
+                                    accountingEarning = createAccountingEarning(earningId, newAccountingType, resultSet.getInt("id_emp"));
+                                }
+                            }
+                            
+                            accountingEarning.setDeleted(false); // force restoration
+                            
+                            newAccountingEarnings.add(accountingEarning);
+                        }
+                    }
                     break;
+                    
+                default:
             }
-        }
-        
-        if (!aAccountingEarning.isEmpty()) {
-            maAccountingEarning.clear();
-            maAccountingEarning.addAll(aAccountingEarning);
-        }
-        
-        for (SDbAccountingEarning dbAccountingEarning : maAccountingEarning) {
-            dbAccountingEarning.save(session);
+            
+            for (SDbAccountingEarning o : newAccountingEarnings) {
+                o.save(session);
+            }
+            
+            if (oldAccountingEarnings != null) {
+                for (SDbAccountingEarning o : oldAccountingEarnings) {
+                    o.setDeleted(true);
+                    o.save(session);
+                }
+            }
         }
     }
     
     /**
-     * Create accounting settings for deduction.
+     * Creates accounting settings for deduction.
      * @param session User GUI session.
-     * @param nDeductionId deduction Id.
-     * @param nAccountingConfigurationTypeNewId accounting settings type new.
-     * @param nAccountingConfigurationTypeOldId accounting settings type old.
-     * @param bIsRegistryNew is registry new?.
+     * @param deductionId Deduction ID.
+     * @param newAccountingType New accounting settings type.
+     * @param oldAccountingType Old accounting settings type.
      * @throws Exception 
      */
-    public static void createAccountingDeductionConfiguration(final SGuiSession session, final int nDeductionId, final int nAccountingConfigurationTypeNewId, final int nAccountingConfigurationTypeOldId, final boolean bIsRegistryNew) throws Exception {
-        ResultSet resultSet = null;
-        String sql = "";
-        ArrayList<SDbAccountingDeduction> aAccountingDeduction = new ArrayList<SDbAccountingDeduction>();
-        ArrayList<SDbDepartment> departments = new ArrayList<SDbDepartment>();
-        ArrayList<SDbEmployee> employees = new ArrayList<SDbEmployee>();
-        SDbAccountingDeduction accountingDeduction = null;
-        SDbDepartment department = null;
-        SDbEmployee employee = null;
-        ArrayList<SDbAccountingDeduction> maAccountingDeduction = getAccountingDeduction(session, nDeductionId, nAccountingConfigurationTypeOldId);
+    public static void createAccountingDeductionConfiguration(final SGuiSession session, final int deductionId, final int newAccountingType, final int oldAccountingType) throws Exception {
+        ArrayList<SDbAccountingDeduction> oldAccountingDeductions = null;
         
-        if (bIsRegistryNew || (nAccountingConfigurationTypeOldId != 0 &&
-                nAccountingConfigurationTypeOldId != nAccountingConfigurationTypeNewId)) {
-            for (SDbAccountingDeduction dbAccountingDeduction : maAccountingDeduction) {
-                dbAccountingDeduction.setDeleted(true);
-                dbAccountingDeduction.save(session);
-            }
+        if (oldAccountingType != 0 && oldAccountingType != newAccountingType) {
+            oldAccountingDeductions = getAccountingDeductions(session, deductionId, oldAccountingType);
         }
         
-        if (nAccountingConfigurationTypeNewId != nAccountingConfigurationTypeOldId) {
-            switch (nAccountingConfigurationTypeNewId) {
-                case SModSysConsts.HRSS_TP_ACC_GBL:
-                    accountingDeduction = createAccountingDeduction();
-            
-                    accountingDeduction.setPkDeductionId(nDeductionId);
-                    accountingDeduction.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_GBL);
-                    accountingDeduction.setPkReferenceId(0);
-                    accountingDeduction.setDeleted(false);
-                    
-                    aAccountingDeduction.add(accountingDeduction);
-                    break;
-                case SModSysConsts.HRSS_TP_ACC_DEP:
-                    sql = "SELECT id_dep FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " ";
-                    
-                    resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-                    while (resultSet.next()) {
-                        department = (SDbDepartment) session.readRegistry(SModConsts.HRSU_DEP, new int[] { resultSet.getInt(1) });
-                        departments.add(department);
-                    }
-                    
-                    for (SDbDepartment dbDepartment : departments) {
-                        if (nAccountingConfigurationTypeNewId != 0 &&
-                                nAccountingConfigurationTypeNewId < nAccountingConfigurationTypeOldId && !maAccountingDeduction.isEmpty()) {
-                            accountingDeduction = maAccountingDeduction.get(0).clone();
-                        }
-                        else {
-                            accountingDeduction = createAccountingDeduction();
-                        }
-                        accountingDeduction.setDeleted(false);
-                        accountingDeduction.setPkDeductionId(nDeductionId);
-                        accountingDeduction.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_DEP);
-                        accountingDeduction.setPkReferenceId(dbDepartment.getPkDepartmentId());
+        if (oldAccountingType != newAccountingType) {
+            String sql;
+            SDbAccountingDeduction accountingDeduction;
+            ArrayList<SDbAccountingDeduction> newAccountingDeductions = new ArrayList<>();
 
-                        aAccountingDeduction.add(accountingDeduction);
+            switch (newAccountingType) {
+                case SModSysConsts.HRSS_TP_ACC_GBL:
+                    // attempt to recover existing registry (if any, it would have been deleted):
+                    accountingDeduction = (SDbAccountingDeduction) session.readRegistry(SModConsts.HRS_ACC_DED, new int[] { deductionId, newAccountingType, 0 });
+                    
+                    // create new registry if needed:
+                    if (accountingDeduction.getQueryResultId() != SDbConsts.READ_OK) {
+                        accountingDeduction = createAccountingDeduction(deductionId, newAccountingType, 0);
                     }
                     
+                    accountingDeduction.setDeleted(false); // force restoration
+                    
+                    newAccountingDeductions.add(accountingDeduction);
                     break;
-                case SModSysConsts.HRSS_TP_ACC_EMP:
-                    sql = "SELECT id_emp FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " ";
                     
-                    resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-                    while (resultSet.next()) {
-                        employee = (SDbEmployee) session.readRegistry(SModConsts.HRSU_EMP, new int[] { resultSet.getInt(1) });
-                        employees.add(employee);
-                    }
+                case SModSysConsts.HRSS_TP_ACC_DEP:
+                    // process all departments:
                     
-                    for (SDbEmployee dbEmployee : employees) {
-                        if (nAccountingConfigurationTypeNewId != 0 &&
-                                nAccountingConfigurationTypeNewId < nAccountingConfigurationTypeOldId) {
-                            if (nAccountingConfigurationTypeNewId == SModSysConsts.HRSS_TP_ACC_GBL && !maAccountingDeduction.isEmpty()) {
-                                accountingDeduction = maAccountingDeduction.get(0).clone();
+                    sql = "SELECT id_dep FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " ORDER BY id_dep;";
+                    try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
+                        while (resultSet.next()) {
+                            accountingDeduction = null;
+                            
+                            if (oldAccountingDeductions != null && !oldAccountingDeductions.isEmpty()) {
+                                switch (oldAccountingType) {
+                                    case SModSysConsts.HRSS_TP_ACC_GBL:
+                                        accountingDeduction = oldAccountingDeductions.get(0).clone(); // the very one setting
+                                        break;
+                                        
+                                    default:
+                                }
+                            }
+                            
+                            if (accountingDeduction != null) {
+                                accountingDeduction.setPkAccountingTypeId(newAccountingType);
+                                accountingDeduction.setPkReferenceId(resultSet.getInt("id_dep"));
                             }
                             else {
-                                accountingDeduction = getAccountingDeductionConfigurationDepartament(maAccountingDeduction, dbEmployee.getFkDepartmentId());
+                                // attempt to recover existing registry (if any, it would have been deleted):
+                                accountingDeduction = (SDbAccountingDeduction) session.readRegistry(SModConsts.HRS_ACC_DED, new int[] { deductionId, newAccountingType, resultSet.getInt("id_dep") });
+                                
+                                // create new registry if needed:
+                                if (accountingDeduction.getQueryResultId() != SDbConsts.READ_OK) {
+                                    accountingDeduction = createAccountingDeduction(deductionId, newAccountingType, resultSet.getInt("id_dep"));
+                                }
                             }
+                            
+                            accountingDeduction.setDeleted(false); // force restoration
+                            
+                            newAccountingDeductions.add(accountingDeduction);
                         }
-                        else {
-                            accountingDeduction = createAccountingDeduction();
-                        }
-                        accountingDeduction.setDeleted(false);
-                        accountingDeduction.setPkDeductionId(nDeductionId);
-                        accountingDeduction.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_EMP);
-                        accountingDeduction.setPkReferenceId(dbEmployee.getPkEmployeeId());
-
-                        aAccountingDeduction.add(accountingDeduction);
                     }
                     break;
-                default:
+                    
+                case SModSysConsts.HRSS_TP_ACC_EMP:
+                    // process all employees:
+                    
+                    sql = "SELECT id_emp, fk_dep FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " ORDER BY id_emp;";
+                    try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
+                        while (resultSet.next()) {
+                            accountingDeduction = null;
+                            
+                            if (oldAccountingDeductions != null && !oldAccountingDeductions.isEmpty()) {
+                                switch (oldAccountingType) {
+                                    case SModSysConsts.HRSS_TP_ACC_GBL:
+                                        accountingDeduction = oldAccountingDeductions.get(0).clone(); // the very one setting
+                                        break;
+                                        
+                                    case SModSysConsts.HRSS_TP_ACC_DEP:
+                                        accountingDeduction = createAccountingDeductionForDepartament(deductionId, oldAccountingDeductions, resultSet.getInt("fk_dep"));
+                                        break;
+                                        
+                                    default:
+                                }
+                            }
+                            
+                            if (accountingDeduction != null) {
+                                accountingDeduction.setPkAccountingTypeId(newAccountingType);
+                                accountingDeduction.setPkReferenceId(resultSet.getInt("id_emp"));
+                            }
+                            else {
+                                // attempt to recover existing registry (if any, it would have been deleted):
+                                accountingDeduction = (SDbAccountingDeduction) session.readRegistry(SModConsts.HRS_ACC_DED, new int[] { deductionId, newAccountingType, resultSet.getInt("id_emp") });
+                                
+                                // create new registry if needed:
+                                if (accountingDeduction.getQueryResultId() != SDbConsts.READ_OK) {
+                                    accountingDeduction = createAccountingDeduction(deductionId, newAccountingType, resultSet.getInt("id_emp"));
+                                }
+                            }
+                            
+                            accountingDeduction.setDeleted(false); // force restoration
+                            
+                            newAccountingDeductions.add(accountingDeduction);
+                        }
+                    }
                     break;
+                    
+                default:
             }
-        }
-        
-        if (!aAccountingDeduction.isEmpty()) {
-            maAccountingDeduction.clear();
-            maAccountingDeduction.addAll(aAccountingDeduction);
-        }
-        
-        for (SDbAccountingDeduction dbAccountingDeduction : maAccountingDeduction) {
-            dbAccountingDeduction.save(session);
+            
+            for (SDbAccountingDeduction o : newAccountingDeductions) {
+                o.save(session);
+            }
+            
+            if (oldAccountingDeductions != null) {
+                for (SDbAccountingDeduction o : oldAccountingDeductions) {
+                    o.setDeleted(true);
+                    o.save(session);
+                }
+            }
         }
     }
 }

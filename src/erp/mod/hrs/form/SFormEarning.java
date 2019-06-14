@@ -872,9 +872,14 @@ public class SFormEarning extends SBeanForm implements ItemListener {
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
             
-            if (!isBeingCopied) {
+            if (isBeingCopied) {
+                moRegistry.setOldAccountingConfigurationTypeId(0); // to trigger creation of proper accounting settings on save
+            }
+            else {
                 moRegistry.setFkLoanTypeId(SModSysConsts.HRSS_TP_LOAN_NON);
                 moRegistry.setFkBenefitTypeId(SModSysConsts.HRSS_TP_BEN_NON);
+                
+                moRegistry.setUnitsFactor(1);
             }
         }
         else {

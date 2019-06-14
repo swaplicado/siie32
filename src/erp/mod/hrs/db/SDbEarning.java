@@ -64,7 +64,8 @@ public class SDbEarning extends SDbRegistryUser {
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
-    protected int mnAuxAccountingConfigurationTypeId;
+    
+    protected int mnOldAccountingConfigurationTypeId;
     
     public SDbEarning() {
         super(SModConsts.HRS_EAR);
@@ -148,9 +149,9 @@ public class SDbEarning extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
-    public void setAuxAccountingConfigurationTypeId(int n) { mnAuxAccountingConfigurationTypeId = n; }
+    public void setOldAccountingConfigurationTypeId(int n) { mnOldAccountingConfigurationTypeId = n; }
 
-    public int getAuxAccountingConfigurationTypeId() { return mnAuxAccountingConfigurationTypeId; }
+    public int getOldAccountingConfigurationTypeId() { return mnOldAccountingConfigurationTypeId; }
     
     public boolean isComputedByPercentage() {
         return SLibUtils.belongsTo(mnFkEarningComputationTypeId, new int[] { SModSysConsts.HRSS_TP_EAR_COMP_PCT_DAY, SModSysConsts.HRSS_TP_EAR_COMP_PCT_HR, SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME } );
@@ -229,7 +230,7 @@ public class SDbEarning extends SDbRegistryUser {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
-        mnAuxAccountingConfigurationTypeId = 0;
+        mnOldAccountingConfigurationTypeId = 0;
     }
 
     @Override
@@ -312,7 +313,7 @@ public class SDbEarning extends SDbRegistryUser {
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
 
-            mnAuxAccountingConfigurationTypeId = mnFkAccountingConfigurationTypeId;
+            mnOldAccountingConfigurationTypeId = mnFkAccountingConfigurationTypeId;
 
             mbRegistryNew = false;
         }
@@ -423,8 +424,7 @@ public class SDbEarning extends SDbRegistryUser {
 
         session.getStatement().execute(msSql);
         
-        
-        SHrsUtils.createAccountingEarningConfiguration(session, mnPkEarningId, mnFkAccountingConfigurationTypeId, mnAuxAccountingConfigurationTypeId, mbRegistryNew);
+        SHrsUtils.createAccountingEarningConfiguration(session, mnPkEarningId, mnFkAccountingConfigurationTypeId, mnOldAccountingConfigurationTypeId);
         
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
@@ -472,7 +472,7 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
 
-        registry.setAuxAccountingConfigurationTypeId(this.getAuxAccountingConfigurationTypeId());
+        registry.setOldAccountingConfigurationTypeId(this.getOldAccountingConfigurationTypeId());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

@@ -23,7 +23,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewAccountingDeduction extends SGridPaneView implements ActionListener {
 
@@ -88,7 +88,7 @@ public class SViewAccountingDeduction extends SGridPaneView implements ActionLis
                 + "v.id_ded AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.id_tp_acc AS " + SDbConsts.FIELD_ID + "2, "
                 + "v.id_ref AS " + SDbConsts.FIELD_ID + "3, "
-                + "ded.name AS " + SDbConsts.FIELD_CODE + ", "
+                + "ded.code AS " + SDbConsts.FIELD_CODE + ", "
                 + "ded.name AS " + SDbConsts.FIELD_NAME + ", "
                 + "vt.name, "
                 + (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_DEP ? "ref.name" : mnGridSubtype == SModSysConsts.HRSS_TP_ACC_EMP ? "ref.bp" : "''") + " AS f_ref, "
@@ -135,13 +135,14 @@ public class SViewAccountingDeduction extends SGridPaneView implements ActionLis
                 + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FINU_TAX) + " AS tax ON "
                 + "v.fk_tax_bas_n = tax.id_tax_bas AND v.fk_tax_tax_n = tax.id_tax "
                 + "WHERE v.id_tp_acc = " + mnGridSubtype + (sql.isEmpty() ? "" : " AND " + sql) + " "
-                + "ORDER BY ded.name, v.id_ded, v.id_tp_acc ";
+                + "ORDER BY ded.code, ded.name, f_ref, v.id_ded, v.id_tp_acc ";
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_NAME, "Código deducción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, "Deducción"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "vt.name", "Tipo configuración contable"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "f_ref", "Referencia"));

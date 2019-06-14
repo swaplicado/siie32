@@ -234,9 +234,7 @@ public class SDbAccountingEarning extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
 
-        if (mbRegistryNew) {
-            verifyRegistryNew(session);
-        }
+        verifyRegistryNew(session);
 
         if (mbRegistryNew) {
             computePrimaryKey(session);

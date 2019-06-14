@@ -86,8 +86,8 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         moDecPaymentAmount = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlPaymentAmountHelpHint = new javax.swing.JLabel();
         jlPaymentAmountHelp = new javax.swing.JLabel();
-        jlPaymentsNumber = new javax.swing.JLabel();
-        moDecPaymentsNumber = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlPayments = new javax.swing.JLabel();
+        jtfPayments = new javax.swing.JTextField();
         jPanel10 = new javax.swing.JPanel();
         jlPaymentFixedFees = new javax.swing.JLabel();
         moDecPaymentFixedFees = new sa.lib.gui.bean.SBeanFieldDecimal();
@@ -113,10 +113,10 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         moRadPaymentPercentageRefSbc = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadPaymentPercentageRefOtro = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel15 = new javax.swing.JPanel();
-        jlRadPaymentPercentageAmount = new javax.swing.JLabel();
-        moDecRadPaymentPercentageAmount = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jlRadPaymentPercentageAmountHint = new javax.swing.JLabel();
-        jlRadPaymentPercentageAmountHelp = new javax.swing.JLabel();
+        jlPaymentPercentageAmount = new javax.swing.JLabel();
+        moDecPaymentPercentageAmount = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlPaymentPercentageAmountHint = new javax.swing.JLabel();
+        jlPaymentPercentageAmountHelp = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -227,10 +227,15 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         jlPaymentAmountHelp.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jlPaymentAmountHelp);
 
-        jlPaymentsNumber.setText("Número de pagos:");
-        jlPaymentsNumber.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel9.add(jlPaymentsNumber);
-        jPanel9.add(moDecPaymentsNumber);
+        jlPayments.setText("Número de pagos:");
+        jlPayments.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlPayments);
+
+        jtfPayments.setEditable(false);
+        jtfPayments.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfPayments.setText("0.000");
+        jtfPayments.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel9.add(jtfPayments);
 
         jPanel2.add(jPanel9);
 
@@ -339,22 +344,22 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlRadPaymentPercentageAmount.setText("Otro salario:*");
-        jlRadPaymentPercentageAmount.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel15.add(jlRadPaymentPercentageAmount);
-        jPanel15.add(moDecRadPaymentPercentageAmount);
+        jlPaymentPercentageAmount.setText("Otro salario:*");
+        jlPaymentPercentageAmount.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel15.add(jlPaymentPercentageAmount);
+        jPanel15.add(moDecPaymentPercentageAmount);
 
-        jlRadPaymentPercentageAmountHint.setForeground(new java.awt.Color(109, 109, 109));
-        jlRadPaymentPercentageAmountHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlRadPaymentPercentageAmountHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlRadPaymentPercentageAmountHint.setToolTipText("Otro salario × días laborados para cálculo de pago mediante porcentaje");
-        jlRadPaymentPercentageAmountHint.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel15.add(jlRadPaymentPercentageAmountHint);
+        jlPaymentPercentageAmountHint.setForeground(new java.awt.Color(109, 109, 109));
+        jlPaymentPercentageAmountHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlPaymentPercentageAmountHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlPaymentPercentageAmountHint.setToolTipText("Otro salario × días laborados para cálculo de pago mediante porcentaje");
+        jlPaymentPercentageAmountHint.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel15.add(jlPaymentPercentageAmountHint);
 
-        jlRadPaymentPercentageAmountHelp.setForeground(java.awt.Color.gray);
-        jlRadPaymentPercentageAmountHelp.setText("(× días laborados)");
-        jlRadPaymentPercentageAmountHelp.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel15.add(jlRadPaymentPercentageAmountHelp);
+        jlPaymentPercentageAmountHelp.setForeground(java.awt.Color.gray);
+        jlPaymentPercentageAmountHelp.setText("(× días laborados)");
+        jlPaymentPercentageAmountHelp.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel15.add(jlPaymentPercentageAmountHelp);
 
         jPanel2.add(jPanel15);
 
@@ -395,6 +400,9 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
     private javax.swing.JLabel jlPaymentFixedFeesHelp;
     private javax.swing.JLabel jlPaymentFixedFeesHelpHint;
     private javax.swing.JLabel jlPaymentPercentage;
+    private javax.swing.JLabel jlPaymentPercentageAmount;
+    private javax.swing.JLabel jlPaymentPercentageAmountHelp;
+    private javax.swing.JLabel jlPaymentPercentageAmountHint;
     private javax.swing.JLabel jlPaymentPercentageHelp;
     private javax.swing.JLabel jlPaymentPercentageHelpHint;
     private javax.swing.JLabel jlPaymentUmas;
@@ -403,21 +411,18 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
     private javax.swing.JLabel jlPaymentUmis;
     private javax.swing.JLabel jlPaymentUmisHelp;
     private javax.swing.JLabel jlPaymentUmisHelpHint;
-    private javax.swing.JLabel jlPaymentsNumber;
-    private javax.swing.JLabel jlRadPaymentPercentageAmount;
-    private javax.swing.JLabel jlRadPaymentPercentageAmountHelp;
-    private javax.swing.JLabel jlRadPaymentPercentageAmountHint;
+    private javax.swing.JLabel jlPayments;
     private javax.swing.JLabel jlTotalAmount;
+    private javax.swing.JTextField jtfPayments;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd_n;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecCapital;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentAmount;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentFixedFees;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentPercentage;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentPercentageAmount;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentUmas;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentUmis;
-    private sa.lib.gui.bean.SBeanFieldDecimal moDecPaymentsNumber;
-    private sa.lib.gui.bean.SBeanFieldDecimal moDecRadPaymentPercentageAmount;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecTotalAmount;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployee;
     private sa.lib.gui.bean.SBeanFieldKey moKeyLoanPaymentType;
@@ -441,7 +446,6 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         moDecCapital.setDecimalSettings(SGuiUtils.getLabelName(jlCapital.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moDecTotalAmount.setDecimalSettings(SGuiUtils.getLabelName(jlTotalAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
         moDecPaymentAmount.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
-        moDecPaymentsNumber.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentsNumber.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, false);
         moDecPaymentFixedFees.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentFixedFees.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
         moDecPaymentUmas.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentUmas.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
         moDecPaymentUmis.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentUmis.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
@@ -449,7 +453,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         moRadPaymentPercentageRefSd.setBooleanSettings(SGuiUtils.getLabelName(moRadPaymentPercentageRefSd.getText()), false);
         moRadPaymentPercentageRefSbc.setBooleanSettings(SGuiUtils.getLabelName(moRadPaymentPercentageRefSbc.getText()), false);
         moRadPaymentPercentageRefOtro.setBooleanSettings(SGuiUtils.getLabelName(moRadPaymentPercentageRefOtro.getText()), false);
-        moDecRadPaymentPercentageAmount.setDecimalSettings(SGuiUtils.getLabelName(jlRadPaymentPercentageAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
+        moDecPaymentPercentageAmount.setDecimalSettings(SGuiUtils.getLabelName(jlPaymentPercentageAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
 
         moFields.addField(moKeyEmployee);
         moFields.addField(moKeyLoanType);
@@ -460,7 +464,6 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         moFields.addField(moDecCapital);
         moFields.addField(moDecTotalAmount);
         moFields.addField(moDecPaymentAmount);
-        moFields.addField(moDecPaymentsNumber);
         moFields.addField(moDecPaymentFixedFees);
         moFields.addField(moDecPaymentUmas);
         moFields.addField(moDecPaymentUmis);
@@ -468,19 +471,21 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         moFields.addField(moRadPaymentPercentageRefSd);
         moFields.addField(moRadPaymentPercentageRefSbc);
         moFields.addField(moRadPaymentPercentageRefOtro);
-        moFields.addField(moDecRadPaymentPercentageAmount);
+        moFields.addField(moDecPaymentPercentageAmount);
 
         moFields.setFormButton(jbSave);
     }
     
     private void computePaymentsNumber() {
-        moDecPaymentsNumber.setValue(moDecPaymentAmount.getValue() == 0 ? 0d : moDecTotalAmount.getValue() / moDecPaymentAmount.getValue());
+        jtfPayments.setText(SLibUtils.getDecimalFormatQuantity().format(moDecPaymentAmount.getValue() == 0 ? 0 : moDecTotalAmount.getValue() / moDecPaymentAmount.getValue()));
     }
 
     private void itemStateKeyLoanType() {
         jlPaymentAmountHelp.setText("");
+        
         moDecCapital.setEditable(false);
         moDecTotalAmount.setEditable(false);
+        
         moDecCapital.setValue(0d);
         moDecTotalAmount.setValue(0d);
         
@@ -490,13 +495,16 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
                 case SModSysConsts.HRSS_TP_LOAN_LOAN_UNI:
                 case SModSysConsts.HRSS_TP_LOAN_LOAN_3RD:
                     jlPaymentAmountHelp.setText("(por nómina)");
+                    
                     moDecCapital.setEditable(true);
                     moDecTotalAmount.setEditable(true);
                     break;
+                    
                 case SModSysConsts.HRSS_TP_LOAN_HOME:
                 case SModSysConsts.HRSS_TP_LOAN_CONS:
                     jlPaymentAmountHelp.setText("(por mes)");
                     break;
+                    
                 default:
             }
         }
@@ -508,35 +516,46 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         moDecPaymentUmas.setEditable(false);
         moDecPaymentUmis.setEditable(false);
         moDecPaymentPercentage.setEditable(false);
+        
         moDecPaymentAmount.setValue(0d);
         moDecPaymentFixedFees.setValue(0d);
         moDecPaymentUmas.setValue(0d);
         moDecPaymentUmis.setValue(0d);
         moDecPaymentPercentage.setValue(0d);
+        
         moRadPaymentPercentageRefSd.setEnabled(false);
         moRadPaymentPercentageRefSbc.setEnabled(false);
         moRadPaymentPercentageRefOtro.setEnabled(false);
+        moRadGroupSalaryType.clearSelection();
         
         if (moKeyLoanPaymentType.getSelectedIndex() > 0) {
             switch (moKeyLoanPaymentType.getValue()[0]) {
                 case SModSysConsts.HRSS_TP_LOAN_PAY_AMT:
                     moDecPaymentAmount.setEditable(true);
                     break;
+                    
                 case SModSysConsts.HRSS_TP_LOAN_PAY_FACT_SAL:
                     moDecPaymentFixedFees.setEditable(true);
                     break;
+                    
                 case SModSysConsts.HRSS_TP_LOAN_PAY_FACT_UMA:
                     moDecPaymentUmas.setEditable(true);
                     break;
+                    
                 case SModSysConsts.HRSS_TP_LOAN_PAY_FACT_UMI:
                     moDecPaymentUmis.setEditable(true);
                     break;
+                    
                 case SModSysConsts.HRSS_TP_LOAN_PAY_PCT:
                     moDecPaymentPercentage.setEditable(true);
+                    
+                    moRadPaymentPercentageRefSbc.setSelected(true);
+                    
                     moRadPaymentPercentageRefSd.setEnabled(true);
                     moRadPaymentPercentageRefSbc.setEnabled(true);
                     moRadPaymentPercentageRefOtro.setEnabled(true);
                     break;
+                    
                 default:
             }
         }
@@ -545,11 +564,12 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
     }
     
     private void stateChangedOtherSalary() {
-        moDecRadPaymentPercentageAmount.setEditable(false);
-        moDecRadPaymentPercentageAmount.setValue(0d);
+        moDecPaymentPercentageAmount.setEditable(false);
+        
+        moDecPaymentPercentageAmount.setValue(0d);
         
         if (moRadPaymentPercentageRefOtro.isEnabled() && moRadPaymentPercentageRefOtro.isSelected()) {
-            moDecRadPaymentPercentageAmount.setEditable(true);
+            moDecPaymentPercentageAmount.setEditable(true);
         }
     }
     
@@ -609,52 +629,57 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
             jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
 
+        setFormEditable(true);
+        
         moKeyEmployee.setValue(new int[] { idEmployee });
+        
+        moKeyLoanType.setValue(new int[] { moRegistry.getFkLoanTypeId() });
+        itemStateKeyLoanType();
+        
+        moKeyLoanPaymentType.setValue(new int[] { moRegistry.getFkLoanPaymentTypeId() });
+        itemStateKeyLoanPaymentType();
+        
         moTextNumber.setValue(moRegistry.getNumber());
         moDateDateStart.setValue(moRegistry.getDateStart());
         moDateDateEnd_n.setValue(moRegistry.getDateEnd_n());
         moDecCapital.setValue(moRegistry.getCapital());
         moDecTotalAmount.setValue(moRegistry.getTotalAmount());
-        moKeyLoanType.setValue(new int[] { moRegistry.getFkLoanTypeId() });
-        moKeyLoanPaymentType.setValue(new int[] { moRegistry.getFkLoanPaymentTypeId() });
-        
-        switch (moRegistry.getPaymentPercentageReference()) {
-            case SHrsConsts.PAY_PER_REF_SD:
-                moRadPaymentPercentageRefSd.setSelected(true);
-                break;
-            case SHrsConsts.PAY_PER_REF_SBC:
-                moRadPaymentPercentageRefSbc.setSelected(true);
-                break;
-            case SHrsConsts.PAY_PER_REF_OTRO:
-                moRadPaymentPercentageRefOtro.setSelected(true);
-                break;
-            default:
-                moRadPaymentPercentageRefSbc.setSelected(true); // default option when no other available
-        }
-        
-        setFormEditable(true);
-        
-        moDecPaymentsNumber.setEnabled(false);
-        
-        if (moRegistry.isRegistryNew()) {
-            moRadPaymentPercentageRefSbc.setSelected(true);
-        }
-        else {
-            moKeyEmployee.setEnabled(false);
-        }
-        
-        itemStateKeyLoanType();
-        itemStateKeyLoanPaymentType();
-        stateChangedOtherSalary();
         
         moDecPaymentAmount.setValue(moRegistry.getPaymentAmount());
         moDecPaymentFixedFees.setValue(moRegistry.getPaymentFixedFees());
         moDecPaymentUmas.setValue(moRegistry.getPaymentUmas());
         moDecPaymentUmis.setValue(moRegistry.getPaymentUmis());
         moDecPaymentPercentage.setValue(moRegistry.getPaymentPercentage());
-        moDecRadPaymentPercentageAmount.setValue(moRegistry.getPaymentPercentageAmount());
         
         computePaymentsNumber();
+        
+        switch (moRegistry.getPaymentPercentageReference()) {
+            case SHrsConsts.PAY_PER_REF_SD:
+                moRadPaymentPercentageRefSd.setSelected(true);
+                break;
+                
+            case SHrsConsts.PAY_PER_REF_SBC:
+                moRadPaymentPercentageRefSbc.setSelected(true);
+                break;
+                
+            case SHrsConsts.PAY_PER_REF_OTRO:
+                moRadPaymentPercentageRefOtro.setSelected(true);
+                break;
+                
+            default:
+                moRadPaymentPercentageRefSbc.setSelected(true); // default option when no other available
+        }
+        
+        stateChangedOtherSalary();
+        
+        moDecPaymentPercentageAmount.setValue(moRegistry.getPaymentPercentageAmount());
+        
+        if (moRegistry.isRegistryNew()) {
+            // nothing to do by now...
+        }
+        else {
+            moKeyEmployee.setEnabled(false);
+        }
 
         addAllListeners();
     }
@@ -677,7 +702,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         registry.setPaymentUmas(moDecPaymentUmas.getValue());
         registry.setPaymentUmis(moDecPaymentUmis.getValue());
         registry.setPaymentPercentage(moDecPaymentPercentage.getValue());
-        registry.setPaymentPercentageAmount(moDecRadPaymentPercentageAmount.getValue());
+        registry.setPaymentPercentageAmount(moDecPaymentPercentageAmount.getValue());
         registry.setFkLoanTypeId(moKeyLoanType.getValue()[0]);
         registry.setFkLoanPaymentTypeId(moKeyLoanPaymentType.getValue()[0]);
         

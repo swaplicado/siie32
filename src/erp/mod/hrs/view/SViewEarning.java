@@ -20,9 +20,9 @@ import sa.lib.gui.SGuiClient;
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SViewEarnings extends SGridPaneView implements ActionListener {
+public class SViewEarning extends SGridPaneView implements ActionListener {
 
-    public SViewEarnings(SGuiClient client, String title) {
+    public SViewEarning(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_EAR, SLibConsts.UNDEFINED, title);
         setRowButtonsEnabled(true, true, true, false, true);
     }

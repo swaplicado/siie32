@@ -302,73 +302,50 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt_end", (SGuiDate) filter);
 
         msSql = "SELECT "
-            + "v.id_pay AS " + SDbConsts.FIELD_ID + "1, "
-            + "v.num AS " + SDbConsts.FIELD_CODE + ", "
-            + "'' AS " + SDbConsts.FIELD_NAME + ", "
-            + "v.per_year, "
-            + "v.per, "
-            + "v.dt_sta, "
-            + "v.dt_end, "
-            + "v.rcp_day, "
-            + "v.wrk_day, "
-            + "v.mwz_wage, "
-            + "v.mwz_ref_wage, "
-            + "v.nts, "
-            + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " WHERE id_tp_pay_sht = v.fk_tp_pay_sht) AS tp_pay_sht, "
-            + "v.b_ssc, "
-            + "v.b_clo, "
-            + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
-            + "v.fk_tp_pay, "
-            + "v.fk_tp_mwz, "
-            + "v.fk_tp_mwz_ref, "
-            + "v.fk_tp_tax_comp, "
-            + "v.fk_tax, "
-            + "v.fk_tax_sub, "
-            + "v.fk_ssc, "
-            + "v.fk_usr_clo, "
-            + "v.ts_usr_clo, "
-            + "(SELECT t.code FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS t WHERE v.fk_tp_pay = t.id_tp_pay) AS f_pay_code, "
-            + "(SELECT tm.code FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_MWZ) + " AS tm WHERE v.fk_tp_mwz_ref = tm.id_tp_mwz) AS f_mwz_code, "
-            + "(SELECT tr.code FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_MWZ) + " AS tr WHERE v.fk_tp_mwz_ref = tr.id_tp_mwz) AS f_mwz_ref_code, "
-            + "(SELECT tc.code FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_TAX_COMP) + " AS tc WHERE v.fk_tp_tax_comp = tc.id_tp_tax_comp) AS f_tax_comp, "
-            + "(SELECT COUNT(DISTINCT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num) "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
-            + "WHERE re.fid_pay_n = v.id_pay AND r.b_del = 0 AND re.b_del = 0) AS f_is_record, "
-            + "uc.usr AS f_usr_close, "
-            + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
-            + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
-            + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
-            + "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
-            + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
-            + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + ", "
-            + "COALESCE((SELECT SUM(pe.amt_r) "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON "
-            + "p.id_pay = pr.id_pay AND pr.b_del = 0 "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pe ON "
-            + "pr.id_pay = pe.id_pay AND pr.id_emp = pe.id_emp AND pe.b_del = 0 "
-            + "WHERE p.id_pay = v.id_pay "
-            + "GROUP BY p.id_pay), 0) AS f_debit, "
-            + "COALESCE((SELECT SUM(pd.amt_r) "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON "
-            + "p.id_pay = pr.id_pay AND pr.b_del = 0 "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS pd ON "
-            + "pr.id_pay = pd.id_pay AND pr.id_emp = pd.id_emp AND pd.b_del = 0 "
-            + "WHERE p.id_pay = v.id_pay "
-            + "GROUP BY p.id_pay), 0) AS f_credit, "
-            + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " WHERE b_del = 0 AND id_pay = v.id_pay GROUP BY id_pay) AS f_tot "
-            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS v "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON "
-            + "v.fk_usr_clo = uc.id_usr "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON "
-            + "v.fk_usr_ins = ui.id_usr "
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
-            + "v.fk_usr_upd = uu.id_usr "
-            + (sql.isEmpty() ? "" : "WHERE " + sql)
-            + "GROUP BY v.num, v.id_pay "
-            + "ORDER BY v.num, v.id_pay ";
+                + "v.id_pay AS " + SDbConsts.FIELD_ID + "1, "
+                + "v.num AS " + SDbConsts.FIELD_CODE + ", "
+                + "v.num AS " + SDbConsts.FIELD_NAME + ", "
+                + "v.num, "
+                + "v.dt_sta, "
+                + "v.dt_end, "
+                + "v.nts, "
+                + "(SELECT COUNT(*) "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON "
+                + " r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
+                + " WHERE re.fid_pay_n = v.id_pay AND NOT r.b_del AND NOT re.b_del) AS _posted, "
+                + "tps.name, "
+                + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
+                + "v.b_clo, "
+                + "v.fk_usr_clo, "
+                + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
+                + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
+                + "v.ts_usr_clo, "
+                + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
+                + "v.ts_usr_upd AS " + SDbConsts.FIELD_USER_UPD_TS + ", "
+                + "uc.usr AS _usr_close, "
+                + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
+                + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + ", "
+                + "COALESCE((SELECT SUM(pre.amt_r) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp "
+                + "WHERE p.id_pay = v.id_pay AND NOT pr.b_del AND NOT pre.b_del), 0.0) AS _sum_ears, "
+                + "COALESCE((SELECT SUM(prd.amt_r) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp "
+                + "WHERE p.id_pay = v.id_pay AND NOT pr.b_del AND NOT prd.b_del), 0.0) AS _sum_deds, "
+                + "(SELECT COUNT(*) "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr "
+                + " WHERE NOT pr.b_del AND pr.id_pay = v.id_pay) AS _count_rcps "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS v "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " AS tps ON v.fk_tp_pay_sht = tps.id_tp_pay_sht "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON v.fk_usr_clo = uc.id_usr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON v.fk_usr_ins = ui.id_usr "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON v.fk_usr_upd = uu.id_usr "
+                + (sql.isEmpty() ? "" : "WHERE " + sql)
+                + "ORDER BY v.num, tps.name, v.id_pay ";
     }
 
     @Override
@@ -376,26 +353,26 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         SGridColumnView column = null;
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, SDbConsts.FIELD_CODE, "Número"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sta", "F inicial"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_end", "F final"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "f_debit", "Percepciones $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "f_credit", "Deducciones $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.num", "Número nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sta", "F inicial nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_end", "F final nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tps.name", "Tipo nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_sum_ears", "Percepciones $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_sum_deds", "Deducciones $"));
         
         column = new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "", "Alcance neto $");
-        column.getRpnArguments().add(new SLibRpnArgument("f_debit", SLibRpnArgumentType.OPERAND));
-        column.getRpnArguments().add(new SLibRpnArgument("f_credit", SLibRpnArgumentType.OPERAND));
+        column.getRpnArguments().add(new SLibRpnArgument("_sum_ears", SLibRpnArgumentType.OPERAND));
+        column.getRpnArguments().add(new SLibRpnArgument("_sum_deds", SLibRpnArgumentType.OPERAND));
         column.getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
         gridColumnsViews.add(column);
         
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "tp_pay_sht", "Tipo nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts", "Notas nómina", 200));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_count_rcps", "Recibos nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_clo", "Cerrada"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "f_is_record", "Contabilizada"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts", "Notas"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_tot", "Recibos totales", 100));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "f_usr_close", "Usr cierre"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_posted", "Contabilizada"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "_usr_close", "Usr cierre"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, "v.ts_usr_clo", "Usr TS cierre"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE_DATETIME, SDbConsts.FIELD_USER_INS_TS, SGridConsts.COL_TITLE_USER_INS_TS));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_UPD_NAME, SGridConsts.COL_TITLE_USER_UPD_NAME));

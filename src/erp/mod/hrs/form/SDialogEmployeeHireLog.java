@@ -21,7 +21,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogEmployeeHireLog extends SBeanFormDialog {
 
@@ -51,6 +51,9 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jlAction = new javax.swing.JLabel();
+        jtfAction = new javax.swing.JTextField();
         jPanel11 = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
         moDateDate = new sa.lib.gui.bean.SBeanFieldDate();
@@ -64,12 +67,25 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAction.setText("Acción:");
+        jlAction.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel3.add(jlAction);
+
+        jtfAction.setEditable(false);
+        jtfAction.setFocusable(false);
+        jtfAction.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel3.add(jtfAction);
+
+        jPanel2.add(jPanel3);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDate.setText("Fecha:*");
-        jlDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlDate);
         jPanel11.add(moDateDate);
 
@@ -77,11 +93,11 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlEmployeeDismissType.setText("Motivo baja:");
-        jlEmployeeDismissType.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlEmployeeDismissType.setText("Motivo baja:*");
+        jlEmployeeDismissType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel12.add(jlEmployeeDismissType);
 
-        moKeyEmployeeDismissType.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyEmployeeDismissType.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel12.add(moKeyEmployeeDismissType);
 
         jPanel2.add(jPanel12);
@@ -89,10 +105,9 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNotes.setText("Notas:");
-        jlNotes.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlNotes.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlNotes);
 
-        moTextNotes.setText("sBeanFieldText1");
         moTextNotes.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel13.add(moTextNotes);
 
@@ -109,9 +124,12 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JLabel jlAction;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlEmployeeDismissType;
     private javax.swing.JLabel jlNotes;
+    private javax.swing.JTextField jtfAction;
     private sa.lib.gui.bean.SBeanFieldDate moDateDate;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployeeDismissType;
     private sa.lib.gui.bean.SBeanFieldText moTextNotes;
@@ -146,13 +164,31 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
         
         try {
             readEmployee(employeeId);
+            
+            if (mbIsEdit) {
+                if (moEmployee.isActive()) {
+                    jtfAction.setText("Modificación última alta");
+                }
+                else {
+                    jtfAction.setText("Modificación última baja");
+                }
+            }
+            else {
+                if (moEmployee.isActive()) {
+                    jtfAction.setText("Baja");
+                }
+                else {
+                    jtfAction.setText("Alta");
+                }
+            }
 
             if (moEmployee.isActive()) {
-                moEmployeeHireLog = SHrsUtils.getEmployeeLastHired(miClient.getSession(), moEmployee.getPkEmployeeId(), SLibConsts.UNDEFINED, "");
+                moEmployeeHireLog = SHrsUtils.getEmployeeLastHired(miClient.getSession(), moEmployee.getPkEmployeeId(), 0, "");
             }
             else if (mbIsEdit) {
-                moEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(miClient.getSession(), moEmployee.getPkEmployeeId(), SLibConsts.UNDEFINED, "");
+                moEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(miClient.getSession(), moEmployee.getPkEmployeeId(), 0, "");
             }
+            
             moKeyEmployeeDismissType.setEnabled((moEmployee.isActive() && !mbIsEdit) || (!moEmployee.isActive() && mbIsEdit));
             
             if (mbIsEdit) {
@@ -203,18 +239,22 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
 
-        try {
-            if (!mbIsEdit) {
-                if (validation.isValid()) {
+        if (validation.isValid()) {
+            if (moKeyEmployeeDismissType.isEnabled() && moKeyEmployeeDismissType.getValue()[0] == SModSysConsts.HRSU_TP_EMP_DIS_NON) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlEmployeeDismissType) + "'.");
+                validation.setComponent(moKeyEmployeeDismissType);
+            }
+            else if (!mbIsEdit) {
+                try {
                     validateDate();
                     SHrsUtils.validateHireDismissedEmployee(miClient.getSession(), moEmployee.getPkEmployeeId(), !moEmployee.isActive());
                 }
+                catch (Exception e) {
+                    SLibUtils.printException(this, e);
+                    validation.setMessage(e.getMessage());
+                    validation.setComponent(moDateDate);
+                }
             }
-        }
-        catch (Exception e) {
-            SLibUtils.printException(this, e);
-            validation.setMessage(e.getMessage());
-            validation.setComponent(moDateDate);
         }
         
         return validation;
@@ -269,6 +309,7 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
                 moEmployee.setXtaNotes(moTextNotes.getValue());
                 moEmployee.setActive(!moEmployee.isActive());
                 break;
+                
             case SGuiConsts.PARAM_KEY:
                 if (!moKeyEmployeeDismissType.isEnabled()) {
                     moEmployeeHireLog.setFkEmployeeDismissTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NON);
@@ -280,8 +321,9 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
                     moEmployeeHireLog.setDateDismissed_n(moDateDate.getValue());
                     moEmployeeHireLog.setNotesDismissed(moTextNotes.getValue());                    
                 }
-            default:
                 break;
+                
+            default:
         }
 
         return type == SGuiConsts.PARAM_BPR ? moEmployee : moEmployeeHireLog;

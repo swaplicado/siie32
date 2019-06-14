@@ -260,7 +260,7 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
         jbCancel.setText(SGuiConsts.TXT_BTN_CLOSE);
         jbSave.setText(SGuiConsts.TXT_BTN_OK);
         jbSave.setEnabled(false);   // button not needed
-
+        
         moDateDateCutoff.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCutoff.getText()), true);
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
         
@@ -277,35 +277,32 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave empleado"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto ingresos $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto gravado $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Período pago actual"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Parte gravada $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días activo"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días incap"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días incapacidad"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días gravados"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_8D, "Factor"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_8D, "Factor", 75));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "ISR causado $"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "ISR retenido $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "ISR diferencia $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "ISR diferencia $: (+) a cargo, (-) a favor"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio causado $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio entregado $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio diferencia $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Diferencia neta $"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Status actual"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Últ. alta"));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Últ. baja"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio pagado $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Subsidio diferencia $: (+) a cargo, (-) a favor"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Diferencia neta $: (+) a cargo, (-) a favor"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Activo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Última alta"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Última baja"));
                 
                 return gridColumnsForm;
             }
         };
 
-        /*
-        moGridEmployeesRow.setForm(null);
-        moGridEmployeesRow.setPaneFormOwner(null);
-        */
         jpEmployee.add(moGridEmployeesRow, BorderLayout.CENTER);
         //mvFormGrids.add(moGridEmployeesRow);
         
@@ -390,9 +387,10 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
             dbTaxTable = (SDbTaxTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX, new int[] { SHrsUtils.getRecentTaxTable(miClient.getSession(), mtDateEnd) });
             dbSubsidyTable = (SDbTaxSubsidyTable) miClient.getSession().readRegistry(SModConsts.HRS_TAX_SUB, new int[] { SHrsUtils.getRecentTaxSubsidyTable(miClient.getSession(), mtDateEnd) });
             
-            sql = "SELECT e.num, e.id_emp, b.bp, e.b_act, e.dt_hire, e.dt_dis_n "
+            sql = "SELECT b.bp, e.id_emp, e.num, e.b_act, e.dt_hire, e.dt_dis_n, UPPER(LEFT(tp.name, 3)) AS _tp_name "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = e.id_emp "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON e.fk_tp_pay = tp.id_tp_pay "
                     + "WHERE e.id_emp IN ("
                     + "SELECT DISTINCT id_emp "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
@@ -418,6 +416,7 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
                 row.setEmployeeId(employeeId);
                 row.setNameEmployee(resultSet.getString("b.bp"));
                 row.setCodeEmployee(resultSet.getString("e.num"));
+                row.setCodePaymentType(resultSet.getString("_tp_name"));
                 row.setAmountTaxable(amountEarnings.getAmountTaxable());
                 row.setAmountIncome(amountEarnings.getAmount());
                 row.setDaysHire(dDaysHired);

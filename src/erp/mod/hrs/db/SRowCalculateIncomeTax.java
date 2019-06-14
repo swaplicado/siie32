@@ -17,6 +17,7 @@ public class SRowCalculateIncomeTax implements SGridRow {
     protected int mnEmployeeId;
     protected String msNameEmployee;
     protected String msCodeEmployee;
+    protected String msCodePaymentType;
     protected double mdAmountIncome;
     protected double mdAmountTaxable;
     protected double mdDaysHire;
@@ -35,6 +36,7 @@ public class SRowCalculateIncomeTax implements SGridRow {
         mnEmployeeId = 0;
         msNameEmployee = "";
         msCodeEmployee = "";
+        msCodePaymentType = "";
         mdAmountIncome = 0;
         mdAmountTaxable = 0;
         mdDaysHire = 0;
@@ -53,6 +55,7 @@ public class SRowCalculateIncomeTax implements SGridRow {
     public void setEmployeeId(int n) { mnEmployeeId = n; }
     public void setNameEmployee(String s) { msNameEmployee = s; }
     public void setCodeEmployee(String s) { msCodeEmployee = s; }
+    public void setCodePaymentType(String s) { msCodePaymentType = s; }
     public void setAmountIncome(double d) { mdAmountIncome = d; }
     public void setAmountTaxable(double d) { mdAmountTaxable = d; }
     public void setDaysHire(double n) { mdDaysHire = n; }
@@ -70,6 +73,7 @@ public class SRowCalculateIncomeTax implements SGridRow {
     public int getEmployeeId() { return mnEmployeeId; }
     public String getNameEmployee() { return msNameEmployee; }
     public String getCodeEmployee() { return msCodeEmployee; }
+    public String getCodePaymentType() { return msCodePaymentType; }
     public double getAmountIncome() { return mdAmountIncome; }
     public double getAmountTaxable() { return mdAmountTaxable; }
     public double getDaysHire() { return mdDaysHire; }
@@ -137,51 +141,54 @@ public class SRowCalculateIncomeTax implements SGridRow {
                 value = msCodeEmployee;
                 break;
             case 2:
-                value = mdAmountIncome;
+                value = msCodePaymentType;
                 break;
             case 3:
-                value = mdAmountTaxable;
+                value = mdAmountIncome;
                 break;
             case 4:
-                value = mdDaysHire;
+                value = mdAmountTaxable;
                 break;
             case 5:
-                value = mdDaysIncapacity;
+                value = mdDaysHire;
                 break;
             case 6:
-                value = mdDaysTaxable;
+                value = mdDaysIncapacity;
                 break;
             case 7:
-                value = mdFactor;
+                value = mdDaysTaxable;
                 break;
             case 8:
-                value = mdCalculatedTax;
+                value = mdFactor;
                 break;
             case 9:
-                value = mdRetainedTax;
+                value = mdCalculatedTax;
                 break;
             case 10:
-                value = getDiferenceTax();
+                value = mdRetainedTax;
                 break;
             case 11:
-                value = mdCalculatedSubsidy;
+                value = getDiferenceTax();
                 break;
             case 12:
-                value = mdGivenSubsidy;
+                value = mdCalculatedSubsidy;
                 break;
             case 13:
-                value = getDiferenceSubsidy();
+                value = mdGivenSubsidy;
                 break;
             case 14:
-                value = getDiferenceNet();
+                value = getDiferenceSubsidy();
                 break;
             case 15:
-               value = mbStatus;
+                value = getDiferenceNet();
                 break;
             case 16:
-               value = mtDateHire;
+               value = mbStatus;
                 break;
             case 17:
+               value = mtDateHire;
+                break;
+            case 18:
                value = mtDateDismisss_n;
                 break;
             default:
@@ -192,41 +199,6 @@ public class SRowCalculateIncomeTax implements SGridRow {
 
     @Override
     public void setRowValueAt(Object value, int row) {
-        switch (row) {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-            case 5:
-                break;
-            case 6:
-                break;
-            case 7:
-                break;
-            case 8:
-                break;
-            case 9:
-                break;
-            case 10:
-                break;
-            case 11:
-                break;
-            case 12:
-                break;
-            case 13:
-                break;
-            case 14:
-                break;
-            case 15:
-                break;
-            default:
-                break;
-        }
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

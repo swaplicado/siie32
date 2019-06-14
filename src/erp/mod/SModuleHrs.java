@@ -101,7 +101,7 @@ import erp.mod.hrs.view.SViewCfdiPayroll;
 import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
-import erp.mod.hrs.view.SViewEarnings;
+import erp.mod.hrs.view.SViewEarning;
 import erp.mod.hrs.view.SViewEmployeeDismissType;
 import erp.mod.hrs.view.SViewEmployeeHireLog;
 import erp.mod.hrs.view.SViewEmployeeType;
@@ -829,7 +829,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewLoan(miClient, "Control créditos/préstamos");
                 break;
             case SModConsts.HRS_EAR:
-                view = new SViewEarnings(miClient, "Percepciones");
+                view = new SViewEarning(miClient, "Percepciones");
                 break;
             case SModConsts.HRS_DED:
                 view = new SViewDeduction(miClient, "Deducciones");

@@ -783,158 +783,163 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         msSql = "";
         for (int i = 0; i < sqlLenght; i++) {
             msSql += "SELECT "
-                    + (mnGridSubtype == SModConsts.VIEW_SC_DET ? "COALESCE(id_cfd, 0) AS " : "f_id_pay AS ") + SDbConsts.FIELD_ID + "1, "
+                    + (mnGridSubtype == SModConsts.VIEW_SC_DET ? "COALESCE(id_cfd, 0) AS " : "id_pay AS ") + SDbConsts.FIELD_ID + "1, "
                     + "pay_num AS " + SDbConsts.FIELD_CODE + ", "
                     + "pay_num AS " + SDbConsts.FIELD_NAME + ", "
-                    + "pay_year AS f_pay_year, "
-                    + "pay_per AS f_pay_per, "
-                    + "pay_type AS f_pay_type, "
-                    + "dt_beg, "
-                    + "dt_end, "
-                    + "f_debit, "
-                    + "f_credit, "
-                    + "f_balance, "
-                    + "f_tot, ";
-                    if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
-                        msSql += "b.bp AS f_bp, num_ser, f_rcp_num, f_id_pay, b.id_bp AS f_id_bp, "
-                                + "f_dt_iss, f_dt_pay, f_tp_pay_sys, ";
-                    }
-                    if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
-                        msSql += "CONCAT(num_ser, IF(LENGTH(num_ser) = 0, '', '-'), erp.lib_fix_int(f_rcp_num, " + SDataConstantsSys.NUM_LEN_DPS + ")) AS f_num, "
-                                + "IF(" + (isCfdiPayrollVersionOld() ? "c.fid_st_xml = " : "fk_st_rcp = ") + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + SGridConsts.ICON_ANNUL + ", " + SGridConsts.ICON_NULL + ") AS f_ico, "
-                                + "IF(c.fid_st_xml IS NULL, " + SGridConsts.ICON_NULL + ", " /* not have CFDI associated */
-                                + "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(c.uuid) = 0, " + SGridConsts.ICON_XML_PEND + ", "  /* CFDI pending sign */
-                                + "IF(LENGTH(c.ack_can_xml) = 0 AND c.ack_can_pdf_n IS NULL, " + SGridConsts.ICON_XML_ISSU + ", " /* CFDI signed, canceled only SIIE */
-                                + "IF(LENGTH(c.ack_can_xml) != 0, " + SGridConsts.ICON_XML_ANNUL_XML + ", " /* CFDI canceled with cancellation acknowledgment in XML format */
-                                + "IF(c.ack_can_pdf_n IS NOT NULL, " + SGridConsts.ICON_XML_ANNUL_PDF + ", " /* CFDI canceled with cancellation acknowledgment in PDF format */
-                                + SGridConsts.ICON_XML_ISSU + " " /* CFDI signed, canceled only SIIE */
-                                + "))))) AS f_ico_xml, "
-                                + "!c.b_con AS f_con, c.b_prc_ws, c.b_prc_sto_xml, c.b_prc_sto_pdf ";
-                    }
-                    else {
-                        msSql += "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                                + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
-                                + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " ")
-                                + "WHERE b_con = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS f_sign, "
-                                + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                                + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
-                                + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp <> "  + SModSysConsts.TRNS_ST_DPS_ANNULED + " ")
-                                + "WHERE b_con = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_NEW + ") AS f_new, "
-                                + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                                + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
-                                + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " ")
-                                + "WHERE b_con = 0 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS f_incon, "
-                                + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                                + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
-                                + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 ")
-                                + "WHERE b_prc_ws = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS f_prc_ws, "
-                                + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                                + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
-                                + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 ")
-                                + "WHERE b_prc_sto_xml = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS f_prc_sto_xml, "
-                                + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
-                                + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
-                                + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 ")
-                                + "WHERE b_prc_sto_pdf = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS f_prc_sto_pdf ";
-                    }
+                    + "pay_num, "
+                    + "pay_year, pay_per, "
+                    + "pay_type, pay_sht_type, "
+                    + "dt_beg, dt_end, pay_notes, "
+                    + "f_debit, f_credit, f_balance, "
+                    + "count_rcps, ";
+            
+            if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
+                msSql += "b.bp AS f_bp, b.id_bp AS f_id_bp, e.num AS emp_num, id_pay, "
+                        + "f_dt_iss, f_dt_pay, f_tp_pay_sys, ";
+            }
+            
+            if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
+                msSql += "CONCAT(rcp_num_ser, IF(LENGTH(rcp_num_ser) = 0, '', '-'), erp.lib_fix_int(rcp_num, " + SDataConstantsSys.NUM_LEN_DPS + ")) AS rcp_num, "
+                        + "IF(" + (isCfdiPayrollVersionOld() ? "c.fid_st_xml = " : "fk_st_rcp = ") + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + SGridConsts.ICON_ANNUL + ", " + SGridConsts.ICON_NULL + ") AS _ico, "
+                        + "IF(c.fid_st_xml IS NULL, " + SGridConsts.ICON_NULL + ", " /* not have CFDI associated */
+                        + "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(c.uuid) = 0, " + SGridConsts.ICON_XML_PEND + ", " /* CFDI pending sign */
+                        + "IF(LENGTH(c.ack_can_xml) = 0 AND c.ack_can_pdf_n IS NULL, " + SGridConsts.ICON_XML_ISSU + ", " /* CFDI signed, canceled only SIIE */
+                        + "IF(LENGTH(c.ack_can_xml) != 0, " + SGridConsts.ICON_XML_ANNUL_XML + ", " /* CFDI canceled with cancellation acknowledgment in XML format */
+                        + "IF(c.ack_can_pdf_n IS NOT NULL, " + SGridConsts.ICON_XML_ANNUL_PDF + ", " /* CFDI canceled with cancellation acknowledgment in PDF format */
+                        + SGridConsts.ICON_XML_ISSU + " " /* CFDI signed, canceled only SIIE */
+                        + "))))) AS _ico_xml, "
+                        + "!c.b_con AS _inconsistent, c.b_prc_ws, c.b_prc_sto_xml, c.b_prc_sto_pdf ";
+            }
+            else {
+                msSql += "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
+                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " ")
+                        + "WHERE b_con = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS count_sign, "
+                        + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
+                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp <> "  + SModSysConsts.TRNS_ST_DPS_ANNULED + " ")
+                        + "WHERE b_con = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_NEW + ") AS count_to_sign, "
+                        + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
+                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " ")
+                        + "WHERE b_con = 0 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + " AND fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS count_inconsistent, "
+                        + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
+                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 ")
+                        + "WHERE b_prc_ws = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS count_wrong_ws, "
+                        + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
+                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 ")
+                        + "WHERE b_prc_sto_xml = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS count_wrong_sto_xml, "
+                        + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c1 "
+                        + (isCfdiPayrollVersionOld() ? "" : "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
+                        + "c1.fid_pay_rcp_pay_n = pei.id_pay AND c1.fid_pay_rcp_emp_n = pei.id_emp AND c1.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 ")
+                        + "WHERE b_prc_sto_pdf = 1 AND " + (isCfdiPayrollVersionOld() ? "fid_pay_pay_n = c.fid_pay_pay_n" : "fid_pay_rcp_pay_n = c.fid_pay_rcp_pay_n") + ") AS count_wrong_sto_pdf ";
+            }
 
-                    if (isCfdiPayrollVersionOld()) {
-                        msSql += "FROM( "
-                                + "SELECT v.id_pay AS f_id_pay, v.pay_num, v.pay_num AS f_name, v.pay_year, v.pay_per, v.pay_type AS pay_type, v.dt_beg, v.dt_end, fid_bpr_n, pe.id_emp, pe.num_ser, pe.num AS f_rcp_num, "
-                                + "'' AS f_dt_iss, "
-                                + "'' AS f_dt_pay, "
-                                + "'' AS f_tp_pay_sys, "
-                                + "SUM(pe.debit) AS f_debit, "
-                                + "SUM(pe.credit) AS f_credit, "
-                                + "SUM(pe.debit - pe.credit) AS f_balance, "
-                                + "(SELECT COUNT(*) FROM hrs_sie_pay_emp WHERE b_del = 0 AND id_pay = v.id_pay GROUP BY id_pay ) AS f_tot "
-                                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_SIE_PAY) + " AS v "
-                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_SIE_PAY_EMP) + " AS pe ON "
-                                + "v.id_pay = pe.id_pay AND pe.b_del = FALSE "
-                                + "WHERE " + (sqlLenght == 2 && i == 0 ? "pe.b_del = 0 " : "") + (sql.isEmpty() ? "" : (sqlLenght == 2 && i == 0 ? "AND " : "") + sql)
-                                + "GROUP BY v.id_pay, v.pay_year, v.pay_per, v.pay_num, v.pay_type, v.dt_beg, v.dt_end " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pe.fid_bpr_n " : "")
-                                + "ORDER BY v.pay_year, v.pay_per, v.pay_type, v.pay_num, v.id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pe.fid_bpr_n " : "")
-                                + ") AS t ";
-                    }
-                    else {
-                        msSql += "FROM( "
-                                + "SELECT v.id_pay AS f_id_pay, v.num AS pay_num, v.num AS f_name, v.per_year AS pay_year, v.per AS pay_per, v.dt_sta AS dt_beg, v.dt_end, pe.id_emp, pei.id_iss, pei.fk_st_rcp, pei.num_ser, pei.num AS f_rcp_num, "
-                                + "pei.dt_iss AS f_dt_iss, "
-                                + "pei.dt_pay AS f_dt_pay, "
-                                + "(SELECT tp_pay_sys FROM " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_PAY_SYS) + " WHERE id_tp_pay_sys = pei.fk_tp_pay_sys) AS f_tp_pay_sys, "
-                                + "SUM(pei.ear_r) AS f_debit, "
-                                + "SUM(pei.ded_r) AS f_credit, "
-                                + "SUM(pei.pay_r) AS f_balance, "
-                                + "(SELECT t.name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS t WHERE v.fk_tp_pay = t.id_tp_pay) AS pay_type, "
-                                + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " WHERE b_del = 0 AND id_pay = v.id_pay GROUP BY id_pay ) AS f_tot "
-                                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS v "
-                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pe ON "
-                                + "v.id_pay = pe.id_pay AND pe.b_del = 0 "
-                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
-                                + "pe.id_pay = pei.id_pay AND pe.id_emp = pei.id_emp AND pei.b_del = 0 " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? "" : " AND pei.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ")
-                                + "WHERE v.b_del = 0 " + (sql.isEmpty() ? "" : "AND " + sql)
-                                + "GROUP BY v.id_pay, v.per_year, v.per, v.num, pay_type, v.dt_sta, v.dt_end " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pei.id_iss " : "")
-                                + "ORDER BY v.per_year, v.per, pay_type ,v.num, v.id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pei.id_iss " : "")
-                                + ") AS t ";
-                    }
+            if (isCfdiPayrollVersionOld()) {
+                msSql += "FROM ( "
+                        + "SELECT v.id_pay AS id_pay, v.pay_num, v.pay_year, v.pay_per, "
+                        + "v.pay_type AS pay_type, IF(v.b_reg, 'NORMAL', 'ESPECIAL') AS pay_sht_type, v.dt_beg, v.dt_end, '' AS pay_notes, "
+                        + "pe.id_emp, pe.num_ser AS rcp_num_ser, pe.num AS rcp_num, "
+                        + "'' AS f_dt_iss, "
+                        + "'' AS f_dt_pay, "
+                        + "'' AS f_tp_pay_sys, "
+                        + "SUM(pe.debit) AS f_debit, "
+                        + "SUM(pe.credit) AS f_credit, "
+                        + "SUM(pe.debit - pe.credit) AS f_balance, "
+                        + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_SIE_PAY_EMP) + " AS spe WHERE NOT spe.b_del AND spe.id_pay = v.id_pay) AS count_rcps "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_SIE_PAY) + " AS v "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_SIE_PAY_EMP) + " AS pe ON v.id_pay = pe.id_pay AND NOT pe.b_del "
+                        + "WHERE " + (sqlLenght == 2 && i == 0 ? "NOT pe.b_del " : "") + (sql.isEmpty() ? "" : (sqlLenght == 2 && i == 0 ? "AND " : "") + sql)
+                        + "GROUP BY v.id_pay, v.pay_year, v.pay_per, v.pay_num, v.pay_type, v.dt_beg, v.dt_end " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp " : "")
+                        + "ORDER BY v.pay_year, v.pay_per, v.pay_type, v.pay_num, v.id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp " : "")
+                        + ") AS t ";
+            }
+            else {
+                msSql += "FROM ( "
+                        + "SELECT v.id_pay AS id_pay, v.num AS pay_num, v.per_year AS pay_year, v.per AS pay_per, "
+                        + "tp.name AS pay_type, v.dt_sta AS dt_beg, v.dt_end, v.nts AS pay_notes, tpsht.name AS pay_sht_type, "
+                        + "pe.id_emp, pei.id_iss, pei.num_ser AS rcp_num_ser, pei.num AS rcp_num, pei.fk_st_rcp, "
+                        + "pei.dt_iss AS f_dt_iss, "
+                        + "pei.dt_pay AS f_dt_pay, "
+                        + "tpsys.tp_pay_sys AS f_tp_pay_sys, "
+                        + "SUM(pei.ear_r) AS f_debit, "
+                        + "SUM(pei.ded_r) AS f_credit, "
+                        + "SUM(pei.pay_r) AS f_balance, "
+                        + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " WHERE b_del = 0 AND id_pay = v.id_pay GROUP BY id_pay ) AS count_rcps "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS v "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON v.fk_tp_pay = tp.id_tp_pay "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " AS tpsht ON v.fk_tp_pay_sht = tpsht.id_tp_pay_sht "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pe ON v.id_pay = pe.id_pay AND pe.b_del = 0 "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON pe.id_pay = pei.id_pay AND pe.id_emp = pei.id_emp AND pei.b_del = 0 " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? "" : " AND pei.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ")
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_PAY_SYS) + " AS tpsys ON pei.fk_tp_pay_sys = tpsys.id_tp_pay_sys "
+                        + "WHERE v.b_del = 0 " + (sql.isEmpty() ? "" : "AND " + sql)
+                        + "GROUP BY v.id_pay, v.per_year, v.per, v.num, pay_type, v.dt_sta, v.dt_end " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pei.id_iss " : "")
+                        + "ORDER BY v.per_year, v.per, pay_type ,v.num, v.id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pei.id_iss " : "")
+                        + ") AS t ";
+            }
 
-                    msSql += (mnGridSubtype == SModConsts.VIEW_SC_DET ? "INNER JOIN " : "LEFT OUTER JOIN ") + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON "
-                            + (isCfdiPayrollVersionOld() ? "t.f_id_pay = c.fid_pay_pay_n AND t.id_emp = c.fid_pay_emp_n " : "t.f_id_pay = c.fid_pay_rcp_pay_n AND t.id_emp = c.fid_pay_rcp_emp_n AND t.id_iss = c.fid_pay_rcp_iss_n ")
-                            + "AND NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) ";
-                    /*
-                            + (mnGridSubtype == SModConsts.VIEW_SC_DET ? "INNER JOIN " : "LEFT OUTER JOIN ") + SModConsts.TablesMap.get(SModConsts.TRNS_ST_DPS) + " AS st ON "
-                            + "c.fid_st_xml = st.id_st_dps ";*/
-                    if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
-                        msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON "
-                                + (isCfdiPayrollVersionOld() ? "t.fid_bpr_n = b.id_bp " : "t.id_emp = b.id_bp ");
-                    }
+            msSql += (mnGridSubtype == SModConsts.VIEW_SC_DET ? "INNER JOIN " : "LEFT OUTER JOIN ") + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON "
+                    + (isCfdiPayrollVersionOld() ? "t.id_pay = c.fid_pay_pay_n AND t.id_emp = c.fid_pay_emp_n " : "t.id_pay = c.fid_pay_rcp_pay_n AND t.id_emp = c.fid_pay_rcp_emp_n AND t.id_iss = c.fid_pay_rcp_iss_n ")
+                    + "AND NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) ";
 
-                    if (sqlLenght == 2 && i == 0) {
-                        msSql += " UNION ";
-                    }
+            if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
+                msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON " + (isCfdiPayrollVersionOld() ? "t.fid_bpr_n = b.id_bp " : "t.id_emp = b.id_bp ") + 
+                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON b.id_bp = e.id_emp ";
+            }
+
+            if (sqlLenght == 2 && i == 0) {
+                msSql += " UNION ";
+            }
         }
-        msSql += "GROUP BY f_id_pay, f_pay_year, f_pay_per, t.f_name, f_pay_type, t.dt_beg, t.dt_end " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", t.id_emp, f_id_bp, c.id_cfd " : "")
-        + "ORDER BY f_pay_year, f_pay_per, f_pay_type, f_name, f_id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", f_num, f_bp, f_id_bp " : "");
+        
+        msSql += "GROUP BY id_pay, pay_year, pay_per, pay_type, pay_sht_type, t.dt_beg, t.dt_end " +
+                (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", t.id_emp, f_id_bp, c.id_cfd " : "") +
+                "ORDER BY pay_year, pay_per, pay_type, pay_num, pay_sht_type, id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", rcp_num, f_bp, f_id_bp " : "");
     }
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "f_pay_year", "Ejercicio", 50));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_MONTH, "f_pay_per", "Período", 50));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "f_pay_type", "Tipo nómina", 75));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, SDbConsts.FIELD_NAME, "No. nómina", 50));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_beg", "F. inicial"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end", "F. final"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "pay_year", "Ejercicio"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_MONTH, "pay_per", "Período"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "pay_type", "Período pago nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "pay_num", "Número nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_beg", "F. inicial nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end", "F. final nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "pay_sht_type", "Tipo nómina"));
         if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "f_ico", "Estatus"));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "f_ico_xml", "CFD"));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_num", "Folio recibo", 75));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ico", "Estatus CFD"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ico_xml", "CFD"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "rcp_num", "Folio CFD", 75));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "f_bp", "Empleado"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "emp_num", "Clave"));
         }
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "f_debit", "Percepciones $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "f_credit", "Deducciones $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "f_balance", "Alcance neto $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "pay_notes", "Notas nómina", 200));
         if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
             if (!isCfdiPayrollVersionOld()) {
                 gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_dt_iss", "F emisión"));
                 gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "f_dt_pay", "F pago"));
                 gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_tp_pay_sys", "Método pago"));
             }
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "f_con", "Iconsistente"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_inconsistent", "Iconsistente"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "b_prc_ws", "Incorrecto PAC"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "b_prc_sto_xml", "Incorrecto XML disco"));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "b_prc_sto_pdf", "Incorrecto PDF disco"));
         }
         else {
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_tot", "Recibos totales", 100));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_sign", "CFDI timbrados", 100));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_new", "CFDI x timbrar", 100));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_incon", "CFDI inconsistentes", 100));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_prc_ws", "CFDI incorrectos PAC", 100));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_prc_sto_xml", "CFDI incorrectos XML disco", 100));
-            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_0D, "f_prc_sto_pdf", "CFDI incorrectos PDF disco", 100));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "count_rcps", "Recibos"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_8B, "count_sign", "CFDI timbrados"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_8B, "count_to_sign", "CFDI x timbrar"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_8B, "count_inconsistent", "CFDI inconsistentes"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_8B, "count_wrong_ws", "CFDI incorrectos PAC"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_8B, "count_wrong_sto_xml", "CFDI incorrectos XML disco"));
+            gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_8B, "count_wrong_sto_pdf", "CFDI incorrectos PDF disco"));
         }
 
         return gridColumnsViews;

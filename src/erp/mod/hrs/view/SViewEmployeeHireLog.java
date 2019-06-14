@@ -4,6 +4,7 @@
  */
 package erp.mod.hrs.view;
 
+import erp.data.SDataConstants;
 import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.mod.SModConsts;
 import erp.mod.hrs.form.SDialogLayoutEmployee;
@@ -164,7 +165,7 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
         moSuscriptionsSet.add(SModConsts.HRSU_TP_EMP_DIS);
-        moSuscriptionsSet.add(SModConsts.BPSU_BP);
+        moSuscriptionsSet.add(SDataConstants.BPSX_BP_EMP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
 

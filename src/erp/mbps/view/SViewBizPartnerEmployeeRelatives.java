@@ -118,7 +118,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         }
 
         int column = 0;
-        STableColumn[] aoTableColumns = new STableColumn[61];
+        STableColumn[] aoTableColumns = new STableColumn[63];
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Empleado", 250);
         aoTableColumns[column] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Clave", 50);
         aoTableColumns[column++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
@@ -144,6 +144,8 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_rel_pty", "Parte relacionada", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "csex.name", "Sexo empleado", 75);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cblo.name", "Grupo sanguíneo empleado", 50);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_with_img_pho", "Foto", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_with_img_sig", "Firma", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "er.mate", "Cónyuge", 200);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "er.mate_dt_bir_n", "Cónyuge nacimiento", STableConstants.WIDTH_DATE);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_FLOAT, "_mate_age", "Cónyuge edad", STableConstants.WIDTH_NUM_SMALLINT);
@@ -340,6 +342,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
 
         msSql = "SELECT bp.id_bp, bp.bp, bp.fiscal_id, bp.alt_id, bp.b_att_par_shh, bp.b_att_rel_pty, bp.b_del, " +
                 "CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.ssn, e.dt_bir, e.dt_ben, e.dt_hire, e.dt_dis_n, e.b_act, e.b_mfg_ope, e.b_uni, " +
+                "img_pho_n IS NOT NULL AS _with_img_pho, img_sig_n IS NOT NULL AS _with_img_sig, " +
                 "bp.fid_usr_new, bp.fid_usr_edit, bp.fid_usr_del, bp.ts_new, bp.ts_edit, bp.ts_del, un.usr, ue.usr, ud.usr, " +
                 "pay.name, emp.name, wrk.name, dep.name, pos.name, csex.name, cblo.name, " +
                 "er.mate, er.mate_dt_bir_n, er.b_mate_dec, cmate.name, " +

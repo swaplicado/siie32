@@ -10,19 +10,18 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
-import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SHrsEmployeeHireLog {
 
-    protected ArrayList<String> msCompanies;
     protected Connection moConnection;
     protected SGuiSession moSession;
+    protected ArrayList<String> maSchemas;
     protected int mnPkEmployeeHireLogId;
     protected int mnPkEmployeeId;
     protected Date mtDateLastHire;
@@ -56,7 +55,7 @@ public class SHrsEmployeeHireLog {
             }
             
             while (resultSet.next()) {
-                msCompanies.add(resultSet.getString(1));
+                maSchemas.add(resultSet.getString(1));
             }
         }
         catch (java.lang.Exception e) {
@@ -67,7 +66,7 @@ public class SHrsEmployeeHireLog {
     public SHrsEmployeeHireLog(final Connection connection, final SGuiSession session) {
         moConnection = connection;
         moSession = session;
-        msCompanies = new ArrayList<String>();
+        maSchemas = new ArrayList<>();
         
         mtDateLastHire = null;
         msNotesHire = "";
@@ -122,9 +121,9 @@ public class SHrsEmployeeHireLog {
         SDbEmployeeHireLog employeeHireLogAux = null;
         String sql = "";
         
-        for (String tableName : msCompanies) {
+        for (String schema : maSchemas) {
             if (mbIsFirtsHire) {
-                sql = "INSERT INTO " + tableName + "." + "hrs_emp_log_hire VALUES (" +
+                sql = "INSERT INTO " + schema + "." + "hrs_emp_log_hire VALUES (" +
                         mnPkEmployeeId + ", " +
                         "1, " +
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastHire) + "', " +
@@ -147,10 +146,10 @@ public class SHrsEmployeeHireLog {
                     moXtaEmployeeHireLog = null;
                     
                     if (mbIsHire) {
-                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastHired(moSession, mnPkEmployeeId, SLibConsts.UNDEFINED, tableName);
+                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastHired(moSession, mnPkEmployeeId, 0, schema);
                     }
                     else {
-                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, SLibConsts.UNDEFINED, tableName);
+                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, 0, schema);
                     }
                     
                     if (moXtaEmployeeHireLog == null) {
@@ -171,7 +170,7 @@ public class SHrsEmployeeHireLog {
                     employeeHireLog.setHired(mbIsHire);
                     employeeHireLog.setDeleted(mbDeleted);
                     employeeHireLog.setFkEmployeeDismissTypeId(mnFkDismissedType);
-                    employeeHireLog.setAuxTable(tableName);
+                    employeeHireLog.setAuxTable(schema);
                     
                     employeeHireLog.save(moSession);
                     
@@ -188,10 +187,10 @@ public class SHrsEmployeeHireLog {
                     moXtaEmployeeHireLog = null;
 
                     if (!mbIsHire) {
-                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastHired(moSession, mnPkEmployeeId, SLibConsts.UNDEFINED, tableName);
+                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastHired(moSession, mnPkEmployeeId, 0, schema);
                     }
                     else if (mbIsCorrection) {
-                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, SLibConsts.UNDEFINED, tableName);
+                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, 0, schema);
                     }
 
                     if (moXtaEmployeeHireLog == null) {
@@ -220,7 +219,7 @@ public class SHrsEmployeeHireLog {
                     employeeHireLog.setHired(mbIsHire);
                     employeeHireLog.setDeleted(mbDeleted);
                     employeeHireLog.setFkEmployeeDismissTypeId(mnFkDismissedType);
-                    employeeHireLog.setAuxTable(tableName);
+                    employeeHireLog.setAuxTable(schema);
 
                     employeeHireLog.save(moSession);
 
@@ -230,7 +229,7 @@ public class SHrsEmployeeHireLog {
                         employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_ACTIVE, mbIsHire);
 
                         if (!mbIsHire) {
-                            employeeHireLogAux = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, employeeHireLog.getPkLogId(), tableName);
+                            employeeHireLogAux = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, employeeHireLog.getPkLogId(), schema);
                         }
 
                         if (mbIsHire) {
@@ -241,7 +240,7 @@ public class SHrsEmployeeHireLog {
                             employee.saveField(moSession.getStatement(), new int[] { mnPkEmployeeId }, SDbEmployee.FIELD_DATE_LAST_HIRE, employeeHireLogAux.getDateHire());
                         }
                     }
-            }
+                }
             }
         }
     }

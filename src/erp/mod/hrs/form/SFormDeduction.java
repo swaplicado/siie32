@@ -510,10 +510,14 @@ public class SFormDeduction extends SBeanForm implements ItemListener {
             moRegistry.initPrimaryKey();
             jtfRegistryKey.setText("");
 
-            if (!isBeingCopied) {
-                moRegistry.setFkDeductionComputationTypeId(SModSysConsts.HRSS_TP_DED_COMP_AMT);
+            if (isBeingCopied) {
+                moRegistry.setOldAccountingConfigurationTypeId(0); // to trigger creation of proper accounting settings on save
+            }
+            else {
                 moRegistry.setFkLoanTypeId(SModSysConsts.HRSS_TP_LOAN_NON);
                 moRegistry.setFkBenefitTypeId(SModSysConsts.HRSS_TP_BEN_NON);
+                
+                moRegistry.setFkDeductionComputationTypeId(SModSysConsts.HRSS_TP_DED_COMP_AMT); // the only one option, by now
             }
         }
         else {

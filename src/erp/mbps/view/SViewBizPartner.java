@@ -28,6 +28,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JToggleButton;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -99,9 +100,9 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             
             jbClearFilterDepartament = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif")), "Quitar filtro departamento", this);
             
-            jbStatusEmployeeChange = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_switch.gif")), "Cambiar estatus alta/baja", this);
-            jbStatusEmployeeModify = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_edit.gif")), "Modificar estatus alta/baja", this);
-            jbStatusEmployeeDelete = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif")), "Eliminar estatus alta/baja", this);
+            jbStatusEmployeeChange = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_switch.gif")), "Cambiar estatus alta-baja", this);
+            jbStatusEmployeeModify = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_edit.gif")), "Modificar última alta o baja", this);
+            jbStatusEmployeeDelete = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif")), "Revertir última alta o baja", this);
                         
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(jcbFilterDepartament);
@@ -112,7 +113,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             
             bgViewEmployee = new ButtonGroup();
 
-            jtbViewEmployeeActive = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif")));
+            jtbViewEmployeeActive = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
             jtbViewEmployeeActive.setPreferredSize(new Dimension(23, 23));
             jtbViewEmployeeActive.addActionListener(this);
             jtbViewEmployeeActive.setToolTipText("Ver activos");
@@ -120,13 +121,13 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
             jtbViewEmployeeActive.setSelected(true);
 
-            jtbViewEmployeeInactive = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif")));
+            jtbViewEmployeeInactive = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif")));
             jtbViewEmployeeInactive.setPreferredSize(new Dimension(23, 23));
             jtbViewEmployeeInactive.addActionListener(this);
             jtbViewEmployeeInactive.setToolTipText("Ver inactivos");
             bgViewEmployee.add(jtbViewEmployeeInactive);
 
-            jtbViewEmployeeAll = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif")));
+            jtbViewEmployeeAll = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")));
             jtbViewEmployeeAll.setPreferredSize(new Dimension(23, 23));
             jtbViewEmployeeAll.addActionListener(this);
             jtbViewEmployeeAll.setToolTipText("Ver todos");
@@ -170,7 +171,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 aoTableColumns = new STableColumn[26];
                 break;
             case SDataConstants.BPSX_BP_EMP:
-                aoTableColumns = new STableColumn[55];
+                aoTableColumns = new STableColumn[57];
                 break;
             default:
         }
@@ -286,6 +287,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
             case SDataConstants.BPSX_BP_EMP:
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Asociado negocios", 250);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_emp_num", "Clave", 50);
                 msOrderKey = "bp.bp, bp.id_bp ";
 
                 levelRightEditCategory = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).Level;
@@ -296,8 +298,6 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         }
 
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP) {
-            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Clave", 50);
-            aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_act", "Activo", STableConstants.WIDTH_BOOLEAN_2X);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pay.name", "Período pago", 100);
         }
@@ -341,6 +341,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bank.name", "Banco", 100);
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.bank_acc", "Cuenta bancaria", 100);
             aoTableColumns[i++].setApostropheOnCsvRequired(true);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_with_img_pho", "Foto", STableConstants.WIDTH_BOOLEAN);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_with_img_sig", "Firma", STableConstants.WIDTH_BOOLEAN);
         }
 
         if (mnTabTypeAux01 != SDataConstants.BPSU_BP && mnTabTypeAux01 != SDataConstants.BPSX_BP_ATT_SAL_AGT && mnTabTypeAux01 != SDataConstants.BPSX_BP_EMP &&
@@ -382,7 +384,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_cdr", "Acreedor div.", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_bank", "Banco", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_car", "Transportista", STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_sal_agt", "Agente ventas", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_sal_agt", "Agente ventas", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_emp", "Empleado", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_par_shh", "Socio/accionista", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_rel_pty", "Parte relacionada", STableConstants.WIDTH_BOOLEAN_2X);
@@ -474,15 +476,15 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         else {
             if (jtbViewEmployeeActive.isSelected()) {
                 mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ACT;
-                jtbViewEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
+                jtbViewEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif")));
             }
             else if (jtbViewEmployeeInactive.isSelected()) {
                 mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_INA;
-                jtbViewEmployeeInactive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif")));
+                jtbViewEmployeeInactive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif")));
             }
             else if (jtbViewEmployeeAll.isSelected()) {
                 mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ALL;
-                jtbViewEmployeeAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")));
+                jtbViewEmployeeAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif")));
             }
         }
         populateTable();
@@ -580,19 +582,15 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     }
 
     public void actionStatusEmployeeChange() {
-        SDbEmployee employee = null;
-
         if (jbStatusEmployeeChange.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-                moDialogEmployeeHireLog = new SDialogEmployeeHireLog((SGuiClient) miClient, "Cambiar estatus del empleado");
-
+                moDialogEmployeeHireLog = new SDialogEmployeeHireLog((SGuiClient) miClient, "Cambiar estatus alta-baja del empleado");
                 moDialogEmployeeHireLog.setValue(SGuiConsts.PARAM_BPR, moTablePane.getSelectedTableRow().getPrimaryKey());
                 moDialogEmployeeHireLog.setFormVisible(true);
 
                 if (moDialogEmployeeHireLog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    employee = (SDbEmployee)  moDialogEmployeeHireLog.getValue(SGuiConsts.PARAM_BPR);
-
                     try {
+                        SDbEmployee employee = (SDbEmployee) moDialogEmployeeHireLog.getValue(SGuiConsts.PARAM_BPR);
                         employee.save(miClient.getSession());
                     }
                     catch (Exception e) {
@@ -606,22 +604,19 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     }
     
     public void actionStatusEmployeeModify() {
-        SDbEmployeeHireLog employeeHireLog = null;
-    
         if (jbStatusEmployeeChange.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-                moDialogEmployeeHireLog = new SDialogEmployeeHireLog((SGuiClient) miClient, "Modificar estatus del empleado");
-
+                moDialogEmployeeHireLog = new SDialogEmployeeHireLog((SGuiClient) miClient, "Modificar última alta o baja del empleado");
                 moDialogEmployeeHireLog.setValue(SGuiConsts.PARAM_KEY, moTablePane.getSelectedTableRow().getPrimaryKey());
                 moDialogEmployeeHireLog.setFormVisible(true);
 
                 if (moDialogEmployeeHireLog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     try {
-                    employeeHireLog = (SDbEmployeeHireLog)  moDialogEmployeeHireLog.getValue(SGuiConsts.PARAM_KEY);
+                        SDbEmployeeHireLog employeeHireLog = (SDbEmployeeHireLog)  moDialogEmployeeHireLog.getValue(SGuiConsts.PARAM_KEY);
+                        
                         if (SHrsUtils.editHireLog(miClient.getSession(), employeeHireLog)) {
                             miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
                         }
-                        //employeeHireLog.save(miClient.getSession());
                     }
                     catch (Exception e) {
                         SLibUtilities.renderException(this, e);
@@ -635,8 +630,10 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         if (jbStatusEmployeeDelete.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
                 try {
-                    if (SHrsUtils.deleteHireLog(miClient.getSession(), ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0])) {
-                        miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                    if (miClient.showMsgBoxConfirm("¿Está seguro que desea revertir la última alta o baja del empleado?\nEsta acción no se puede deshacer.") == JOptionPane.YES_OPTION) {
+                        if (SHrsUtils.deleteHireLog(miClient.getSession(), ((int[]) moTablePane.getSelectedTableRow().getPrimaryKey())[0])) {
+                            miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                        }
                     }
                 }
                 catch (Exception e) {
@@ -711,7 +708,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "IF(" + mbHasRightEmpWage + ", e.dt_wage, NULL) AS f_dt_wage, IF(" + mbHasRightEmpWage + ", e.sal_ssc, 0) AS f_sal_ssc, IF(" + mbHasRightEmpWage + ", e.dt_sal_ssc, NULL) AS f_dt_sal_ssc, e.wrk_hrs_day, e.bank_acc, e.b_mfg_ope, e.b_act, e.b_uni, " +
                 "pay.name, sal.name, emp.name, wrk.name, wrktp.name, mwz.name, dep.name, pos.name, sht.name, con.name, rshe.name, risk.name, bank.name, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_bir, '%Y%m')) / " + SLibTimeConsts.MONTHS + " AS _e_age, " +
-                "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_ben, '%Y%m')) / " + SLibTimeConsts.MONTHS + " AS _e_sen, ") +
+                "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_ben, '%Y%m')) / " + SLibTimeConsts.MONTHS + " AS _e_sen, " +
+                "img_pho_n IS NOT NULL AS _with_img_pho, img_sig_n IS NOT NULL AS _with_img_sig, ") +
                 "bp.fid_usr_new, bp.fid_usr_edit, bp.fid_usr_del, bp.ts_new, bp.ts_edit, bp.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM erp.bpsu_bp AS bp " +
                 "INNER JOIN erp.bpss_tp_bp_idy AS tp_bp ON " +

@@ -703,7 +703,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        String sql = "SELECT SUM(pre.amt_taxa) "
+        String sql = "SELECT COALESCE(SUM(pre.amt_taxa), 0.0) "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp "
@@ -723,20 +723,20 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     
     private double getEmployeeAnnualCompensation(final int payrollId, final int employeeId, final int fiscalYear, final Date payrollDateEnd, int compensationType) throws Exception {
         double compensation = 0;
-        String sqlCompensation;
+        String sqlColumn;
         
         switch (compensationType) {
             case COMP_TAX:
-                sqlCompensation = "pr.pay_tax_comp";
+                sqlColumn = "pr.pay_tax_comp";
                 break;
             case COMP_TAX_SUB:
-                sqlCompensation = "pr.pay_tax_sub_comp";
+                sqlColumn = "pr.pay_tax_sub_comp";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        String sql = "SELECT SUM(" + sqlCompensation + ") "
+        String sql = "SELECT COALESCE(SUM(" + sqlColumn + "), 0.0) "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "WHERE NOT p.b_del AND NOT pr.b_del AND "

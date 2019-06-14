@@ -6,7 +6,6 @@
 
 package erp.mod.hrs.db;
 
-import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.sql.Blob;
@@ -100,12 +99,6 @@ public class SDbEmployee extends SDbRegistryUser {
     protected Date mtXtaDate;
     protected int mnXtaEmployeeDismissTypeId;
     protected String msXtaNotes;
-    
-    protected byte[] moAuxImagePhoto_n;
-    protected byte[] moAuxImageSignature_n;
-
-    protected javax.swing.ImageIcon moXtaImageIconPhoto_n;
-    protected javax.swing.ImageIcon moXtaImageIconSignature_n;
     
     public SDbEmployee() {
         super(SModConsts.HRSU_EMP);
@@ -220,12 +213,6 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setXtaEmployeeDismissTypeId(int n) { mnXtaEmployeeDismissTypeId = n; }
     public void setXtaNotes(String s) { msXtaNotes = s; }
     
-    public void setAuxImagePhoto_n(byte[] o) { moAuxImagePhoto_n = o; }
-    public void setAuxImageSignature_n(byte[] o) { moAuxImageSignature_n = o; }
-    
-    public void setXtaImageIconPhoto_n(javax.swing.ImageIcon o) { moXtaImageIconPhoto_n = o; }
-    public void setXtaImageIconSignature_n(javax.swing.ImageIcon o) { moXtaImageIconSignature_n = o; }
-    
     public boolean isAuxActive() { return mbAuxActive; }
     public String getAuxEmployee() { return msAuxEmployee; }
     public String getAuxFiscalId() { return msAuxFiscalId; }
@@ -234,12 +221,6 @@ public class SDbEmployee extends SDbRegistryUser {
     public Date getXtaDate() { return mtXtaDate; }
     public int getXtaEmployeeDismissTypeId() { return mnXtaEmployeeDismissTypeId; }
     public String getXtaNotes() { return msXtaNotes; }
-    
-    public byte[] getAuxImagePhoto_n() { return moAuxImagePhoto_n; }
-    public byte[] getAuxImageSignature_n() { return moAuxImageSignature_n; }
-    
-    public javax.swing.ImageIcon getXtaImageIconPhoto_n() { return moXtaImageIconPhoto_n; }
-    public javax.swing.ImageIcon getXtaImageIconSignature_n() { return moXtaImageIconSignature_n; }
     
     public boolean isAssimilable() {
         return SLibUtils.belongsTo(mnFkRecruitmentSchemeTypeId, new int[] { 
@@ -372,12 +353,6 @@ public class SDbEmployee extends SDbRegistryUser {
         mtXtaDate = null;
         mnXtaEmployeeDismissTypeId = 0;
         msXtaNotes = "";
-        
-        moAuxImagePhoto_n = null;
-        moAuxImageSignature_n = null;
-        
-        moXtaImageIconPhoto_n = null;
-        moXtaImageIconSignature_n = null;
     }
 
     @Override
@@ -471,13 +446,6 @@ public class SDbEmployee extends SDbRegistryUser {
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
 
             mbAuxActive = mbActive;
-            
-            if (oPhoto_n != null) {
-                moXtaImageIconPhoto_n = SLibUtilities.convertBlobToImageIcon(oPhoto_n);
-            }
-            if (oSignature_n != null) {
-                moXtaImageIconSignature_n = SLibUtilities.convertBlobToImageIcon(oSignature_n);
-            }
             
             msSql = "SELECT bp, fiscal_id, alt_id FROM erp.bpsu_bp WHERE id_bp = " + mnPkEmployeeId;
             resultSet = session.getStatement().executeQuery(msSql);
@@ -625,22 +593,6 @@ public class SDbEmployee extends SDbRegistryUser {
         }
         
         session.getStatement().execute(msSql);
-
-        if (moAuxImagePhoto_n != null) {
-            msSql = "UPDATE erp.hrsu_emp SET img_pho_n = ? WHERE id_emp = " + mnPkEmployeeId + " ";
-
-            preparedStatementmagePhoto_n = session.getStatement().getConnection().prepareStatement(msSql);
-            preparedStatementmagePhoto_n.setBytes(1, moAuxImagePhoto_n);
-            preparedStatementmagePhoto_n.execute();
-        }
-
-        if (moAuxImageSignature_n != null) {
-            msSql = "UPDATE erp.hrsu_emp SET img_sig_n = ? WHERE id_emp = " + mnPkEmployeeId + " ";
-
-            preparedStatementmageSignature_n = session.getStatement().getConnection().prepareStatement(msSql);
-            preparedStatementmageSignature_n.setBytes(1, moAuxImageSignature_n);
-            preparedStatementmageSignature_n.execute();
-        }
 
         if (mbRegistryNew || mbActive != mbAuxActive) {
             //createHireLog(session);
