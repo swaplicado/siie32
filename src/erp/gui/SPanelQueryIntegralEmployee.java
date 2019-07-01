@@ -1319,7 +1319,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             dateCutOff = miClient.getSession().getCurrentDate();
             leapYear = SLibTimeUtils.isLeapYear(SLibTimeUtils.digestYear(dateCutOff)[0]);
             
-            benefitAnniv = SHrsUtils.getSeniorityEmployee(employee.getDateBenefits(), dateCutOff);
+            benefitAnniv = SHrsUtils.getEmployeeSeniority(employee.getDateBenefits(), dateCutOff);
             paymentDaily = employee.getEffectiveSalary(config.isFortnightStandard());
             paymentDailySettlement = employee.getSettlementSalary();
             

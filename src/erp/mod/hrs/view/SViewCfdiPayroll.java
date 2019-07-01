@@ -148,8 +148,8 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
     }
 
     private void actionReemitPayroll() {
-        SDataFormerPayroll oFormerPayroll = null;
-        SHrsFormerPayroll payroll = null;
+        SDataFormerPayroll formerPayroll = null;
+        SHrsFormerPayroll hrsFormerPayroll = null;
         
         if (jbReemitPayroll.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
@@ -173,20 +173,20 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                         moDialogFormerPayrollDate.setVisible(true);
 
                         if (moDialogFormerPayrollDate.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                            payroll = SHrsFormerUtils.readFormerPayroll((SClientInterface) miClient, miClient.getSession().getStatement(),
+                            hrsFormerPayroll = SHrsFormerUtils.readHrsFormerPayroll((SClientInterface) miClient, miClient.getSession().getStatement(),
                                     ((int []) gridRow.getRowPrimaryKey())[0], miClient.getSession().getConfigCompany().getCompanyId(), moDialogFormerPayrollDate.getDateEmission(), moDialogFormerPayrollDate.getDatePayment());
-                            SCfdUtils.computeCfdiPayroll((SClientInterface) miClient, payroll, moDialogFormerPayrollDate.isRegenerateOnlyNonStampedCfdi());
+                            SCfdUtils.computeCfdiPayroll((SClientInterface) miClient, hrsFormerPayroll, moDialogFormerPayrollDate.isRegenerateOnlyNonStampedCfdi());
 
                             // Update date of payment:
 
-                            oFormerPayroll = new SDataFormerPayroll();
-                            oFormerPayroll.read(new int[] { ((int []) gridRow.getRowPrimaryKey())[0] }, miClient.getSession().getStatement());
+                            formerPayroll = new SDataFormerPayroll();
+                            formerPayroll.read(new int[] { ((int []) gridRow.getRowPrimaryKey())[0] }, miClient.getSession().getStatement());
 
-                            if (oFormerPayroll != null) {
-                                oFormerPayroll.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-                                oFormerPayroll.setDatePayment(moDialogFormerPayrollDate.getDatePayment());
+                            if (formerPayroll != null) {
+                                formerPayroll.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+                                formerPayroll.setDatePayment(moDialogFormerPayrollDate.getDatePayment());
 
-                                if (oFormerPayroll.saveField((miClient.getSession().getDatabase().getConnection()), new int[] { ((int []) gridRow.getRowPrimaryKey())[0] }) != SLibConstants.DB_ACTION_SAVE_OK) {
+                                if (formerPayroll.saveField((miClient.getSession().getDatabase().getConnection()), new int[] { ((int []) gridRow.getRowPrimaryKey())[0] }) != SLibConstants.DB_ACTION_SAVE_OK) {
                                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE + "\n- No se pudo actualizar la fecha de pago.");
                                 }
                             }

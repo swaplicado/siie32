@@ -1469,6 +1469,8 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         }
         else {
             if (moEarning.isLoan()) {
+                // validate loan refund:
+                
                 if (moKeyEarningLoan_n.getSelectedIndex() <= 0) {
                     add = false;
                     miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlEarningLoan_n.getText()) + "'. ");
@@ -1483,10 +1485,13 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             }
             
             if (add) {
+                // confirm multiple earnings of same type:
+                
                 for (SHrsReceiptEarning hrsReceiptEarning : moHrsReceipt.getHrsReceiptEarnings()) {
-                    if (hrsReceiptEarning.getEarning().getPkEarningId() == moEarning.getPkEarningId() && !moEarning.isLoan()) {
+                    if (hrsReceiptEarning.getEarning().getPkEarningId() == moEarning.getPkEarningId() && !moEarning.isLoan() && 
+                                miClient.showMsgBoxConfirm("La percepción '" + moEarning.getName() + "' ya existe en el recibo.\n"
+                                        + "¿Está seguro que desea agregarla otra vez?") != JOptionPane.YES_OPTION) {
                         add = false;
-                        miClient.showMsgBoxWarning("La percepción '" + moEarning.getName() + "' no se puede agregar, ya existe en el recibo.");
                         moTextEarningCode.requestFocus();
                     }
                 }
@@ -1504,7 +1509,6 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     }
 
     private void actionAddDeduction() {
-        double balanceLoan = 0;
         boolean add = true;
 
         try {
@@ -1514,6 +1518,8 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             }
             else {
                 if (moDeduction.isLoan()) {
+                    // validate loan refund:
+                
                     if (moKeyDeductionLoan_n.getSelectedIndex() <= 0) {
                         add = false;
                         miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlDeductionLoan_n.getText()) + "'. ");
@@ -1522,16 +1528,18 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                     else {
                         SDbLoan loan = moHrsReceipt.getHrsEmployee().getLoan(moKeyDeductionLoan_n.getValue()[1]);
                         if (loan.isPlainLoan()) {
-                            balanceLoan = SHrsUtils.getBalanceLoan(loan, moHrsReceipt.getHrsEmployee());
+                            double loanBalance = SHrsUtils.getLoanBalance(loan, moHrsReceipt, null, null);
 
-                            if (balanceLoan <= 0) {
+                            if (loanBalance <= 0) {
                                 add = false;
-                                miClient.showMsgBoxWarning("El préstamo '" + loan.composeLoanDescription() + "' está saldado.");
+                                miClient.showMsgBoxWarning("El préstamo '" + loan.composeLoanDescription() + "' " + 
+                                        (loanBalance == 0 ? "está saldado" : "tiene un saldo negativo de $" + SLibUtils.getDecimalFormatAmount().format(loanBalance)) + ".");
                                 moCompDeductionValue.getField().getComponent().requestFocus();
                             }
-                            else if (moCompDeductionValue.getField().getValue() > balanceLoan) {
+                            else if (moCompDeductionValue.getField().getValue() > loanBalance) {
                                 add = false;
-                                miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlDeductionValue.getText()) + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + balanceLoan + ".");
+                                miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlDeductionValue.getText()) + "'" + 
+                                        SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + "$" + SLibUtils.getDecimalFormatAmount().format(loanBalance) + ".");
                                 moCompDeductionValue.getField().getComponent().requestFocus();
                             }
                         }
@@ -1539,10 +1547,13 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                 }
                 
                 if (add) {
+                    // confirm multiple deductions of same type:
+                
                     for (SHrsReceiptDeduction hrsReceiptDeduction : moHrsReceipt.getHrsReceiptDeductions()) {
-                        if (hrsReceiptDeduction.getDeduction().getPkDeductionId() == moDeduction.getPkDeductionId() && !moDeduction.isLoan()) {
+                        if (hrsReceiptDeduction.getDeduction().getPkDeductionId() == moDeduction.getPkDeductionId() && !moDeduction.isLoan() && 
+                                miClient.showMsgBoxConfirm("La deducción '" + moDeduction.getName() + "' ya existe en el recibo.\n"
+                                        + "¿Está seguro que desea agregarla otra vez?") != JOptionPane.YES_OPTION) {
                             add = false;
-                            miClient.showMsgBoxWarning("La deducción '" + moDeduction.getName() + "' no se puede agregar, ya existe en el recibo.");
                             moTextDeductionCode.requestFocus();
                         }
                     }
@@ -1574,7 +1585,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         else {
             try {
                 SDbLoan loan = moHrsReceipt.getHrsEmployee().getLoan(moKeyDeductionLoan_n.getValue()[1]);
-                moCompDeductionValue.getField().setValue(SHrsUtils.computeAmountLoan(moHrsReceipt, loan));
+                moCompDeductionValue.getField().setValue(SHrsUtils.computeLoanAmount(loan, moHrsReceipt, null, null));
             }
             catch (Exception e) {
                 SLibUtils.printException(this, e);

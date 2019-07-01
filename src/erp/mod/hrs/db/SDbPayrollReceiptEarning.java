@@ -123,6 +123,8 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public SDbPayrollReceiptEarningComplement getChildEarningComplement() { return moChildEarningComplement; }
+    
+    public int[] getLoanKey() { return new int[] { mnFkLoanEmployeeId_n, mnFkLoanLoanId_n }; }
 
     @Override
     public void setPrimaryKey(int[] pk) {

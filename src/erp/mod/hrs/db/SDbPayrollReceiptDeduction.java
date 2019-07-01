@@ -110,6 +110,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     
     public SDbPayrollReceiptDeductionComplement getChildDeductionComplement() { return moChildDeductionComplement; }
 
+    public int[] getLoanKey() { return new int[] { mnFkLoanEmployeeId_n, mnFkLoanLoanId_n }; }
+
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkPayrollId = pk[0];

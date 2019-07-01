@@ -293,12 +293,12 @@ public class SDialogRepMovsFileCvs extends SBeanFormDialog implements ActionList
 
                     bw.write(SLibUtilities.textToAscii(buffer));
                     
-                    sql = "SELECT fid_cty FROM erp.cfg_param_erp";
+                    sql = "SELECT fid_cty FROM erp.cfg_param_erp WHERE id_erp = 1;";
 
                     resulSet = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
 
                     if (resulSet.next()) {
-                        countryLocalId = resulSet.getInt("fid_cty");
+                        countryLocalId = resulSet.getInt(1);
                     }
                  
                     sql = "SELECT YEAR(r.dt) AS f_year, MONTH(r.dt) AS f_month, cb.bp_key, b.bp, bb.bpb, bba.street, bba.street_num_ext, bba.neighborhood, bba.zip_code, " +

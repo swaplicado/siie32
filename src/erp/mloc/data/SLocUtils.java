@@ -7,33 +7,35 @@ package erp.mloc.data;
 
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
-import sa.lib.SLibUtils;
+import java.sql.SQLException;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public abstract class SLocUtils {
     
-    public static boolean hasAssociateStates(final SGuiSession session, final int idCountry) {
-        String sql = "";
-        ResultSet resultSet = null;
-        boolean has = false;
+    /**
+     * Check if given country has states.
+     * @param session GUI user session.
+     * @param idCountry Country ID.
+     * @return <code>true</code> if country has states, otherwise <code>false</code>.
+     * @throws SQLException 
+     */
+    public static boolean hasStates(final SGuiSession session, final int idCountry) throws SQLException {
+        boolean hasStates = false;
         
-        try {
-            sql = "SELECT count(*) "
-                    + "FROM " + SModConsts.TablesMap.get(SModConsts.LOCU_STA) + " "
-                    + "WHERE fid_cty = " + idCountry + " ";
-            resultSet = session.getStatement().executeQuery(sql);
+        String sql = "SELECT COUNT(*) "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.LOCU_STA) + " "
+                + "WHERE fid_cty = " + idCountry + " AND NOT b_del;";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
             if (resultSet.next() && resultSet.getInt(1) > 0) {
-                has = true;
+                hasStates = true;
             }
         }
-        catch (Exception e) {
-            SLibUtils.printException(SLocUtils.class, e);
-        }
         
-        return has;
+        return hasStates;
     }
 }

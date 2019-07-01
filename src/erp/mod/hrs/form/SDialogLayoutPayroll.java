@@ -635,16 +635,16 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
                 
                 switch (moKeyLayout.getValue()[0]) {
                     case SFinConsts.LAY_BANK_BANBAJIO:
-                        SHrsUtils.createLayoutBanBajioPayroll(miClient, mnPayrollId, moKeyLayout.getSelectedItem().getItem(), moDateEmission.getValue(), moDataBizPartnerBranchBankAccount.getBankAccountNumber(), moIntConsecutiveDay.getValue(), employeeIds);
+                        SHrsUtils.createPayrollLayoutBanBajio(miClient, mnPayrollId, moKeyLayout.getSelectedItem().getItem(), moDateEmission.getValue(), moDataBizPartnerBranchBankAccount.getBankAccountNumber(), moIntConsecutiveDay.getValue(), employeeIds);
                         break;
                     case SFinConsts.LAY_BANK_BANAMEX:
-                        SHrsUtils.createLayoutBanamexPayroll(miClient, mnPayrollId, moKeyLayout.getSelectedItem().getItem(), moDateEmission.getValue(), moDataBizPartnerBranchBankAccount.getBankAccountNumber(), moIntConsecutiveDay.getValue(), employeeIds, moDataBizPartnerBranchBankAccount.getFkBankId());
+                        SHrsUtils.createPayrollLayoutBanamex(miClient, mnPayrollId, moKeyLayout.getSelectedItem().getItem(), moDateEmission.getValue(), moDataBizPartnerBranchBankAccount.getBankAccountNumber(), moIntConsecutiveDay.getValue(), employeeIds, moDataBizPartnerBranchBankAccount.getFkBankId());
                         break;
                     case SFinConsts.LAY_BANK_BBVA:
-                        SHrsUtils.createLayoutBancomerPayroll(miClient, mnPayrollId, miClient.getSession().getCurrentDate(), employeeIds);
+                        SHrsUtils.createPayrollLayoutBbva(miClient, mnPayrollId, miClient.getSession().getCurrentDate(), employeeIds);
                         break;
                     case SFinConsts.LAY_BANK_HSBC:
-                        SHrsUtils.createLayoutHsbcPayroll(miClient, mnPayrollId, miClient.getSession().getCurrentDate(), employeeIds, moDataBizPartnerBranchBankAccount.getBankAccountNumber());
+                        SHrsUtils.createPayrollLayoutHsbc(miClient, mnPayrollId, miClient.getSession().getCurrentDate(), employeeIds, moDataBizPartnerBranchBankAccount.getBankAccountNumber());
                         break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

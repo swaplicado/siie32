@@ -1,4 +1,14 @@
 ================================================================================
+2019-07-01, 3.2 138.0
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementacion de catálogo de destinatarios para Complemento Comercio Exterior del CFDI.
+2) Mejora a la captura de ajustes de prestaciones, para permitir valores negativos en el número de días (p. ej., para disminuir vacaciones pagadas indebidamente).
+3) Mejora a los mensajes de usuario de la validación de consumos de incidencias, para una mejor identificación de las incidencias en conflicto.
+4) Corrección para la inclusión de ajustes a préstamos (Payroll ID = 0) al crear nóminas, y refactorización del cálculo de saldos de préstamos.
+5) Corrección a la generación de CFDI con saldo negativo del Subsidio para el empleo pagado en exceso.
+
+================================================================================
 2019-06-14, 3.2 136.6
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

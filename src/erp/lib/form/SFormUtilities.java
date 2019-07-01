@@ -222,7 +222,7 @@ public abstract class SFormUtilities {
      * @param comboBox Visual control (javax.swing.JComboBox object).
      * @param dataType Constant defined in erp.data.SDataConstants.
      */
-    public static void populateComboBox(erp.client.SClientInterface client, javax.swing.JComboBox comboBox, int dataType) {
+    public static void populateComboBox(erp.client.SClientInterface client, javax.swing.JComboBox<SFormComponentItem> comboBox, int dataType) {
         populateComboBox(client, comboBox, dataType, null);
     }
 

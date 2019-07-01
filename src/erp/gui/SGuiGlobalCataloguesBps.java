@@ -12,11 +12,13 @@ import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.mbps.data.SDataBizPartner;
+import erp.mbps.data.SDataBizPartnerAddressee;
 import erp.mbps.data.SDataBizPartnerBizAreaCatalogue;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
 import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mbps.data.SDataBizPartnerType;
 import erp.mbps.form.SFormBizPartner;
+import erp.mbps.form.SFormBizPartnerAddressee;
 import erp.mbps.form.SFormBizPartnerAttribute;
 import erp.mbps.form.SFormBizPartnerBizArea;
 import erp.mbps.form.SFormBizPartnerBranchBankAccount;
@@ -38,6 +40,7 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenu jmMenuBranchAddress;
     private javax.swing.JMenu jmMenuBranchContact;
     private javax.swing.JMenu jmMenuBranchBankAccount;
+    private javax.swing.JMenu jmMenuAddressee;
     private javax.swing.JMenuItem jmiBizPartner;
     private javax.swing.JMenuItem jmiBizPartnerCustomer;
     private javax.swing.JMenuItem jmiBizPartnerSupplier;
@@ -71,6 +74,7 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenuItem jmiBizPartnerBranchBankAccountDebtor;
     private javax.swing.JMenuItem jmiBizPartnerBranchBankAccountCreditor;
     private javax.swing.JMenuItem jmiBizPartnerBranchBankAccountEmployee;
+    private javax.swing.JMenuItem jmiBizPartnerAddresseeCustomer;
     private javax.swing.JMenuItem jmiBizPartnerType;
     private javax.swing.JMenuItem jmiBizPartnerBizArea;
 
@@ -80,6 +84,7 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
     private erp.mbps.form.SFormBizPartnerEmployee moFormBizPartnerEmployee;
     private erp.mbps.form.SFormBizPartnerBranchContact moFormBizPartnerBranchContact;
     private erp.mbps.form.SFormBizPartnerBranchBankAccount moFormBizPartnerBranchBankAccount;
+    private erp.mbps.form.SFormBizPartnerAddressee moFormBizPartnerAddresseeCustomer;
     private erp.mbps.form.SFormBizPartnerType moFormBizPartnerType;
     private erp.mbps.form.SFormBizPartnerBizArea moFormBizPartnerBizArea;
 
@@ -173,6 +178,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmiBizPartnerBranchBankAccountDebtor = new JMenuItem("Cuentas bancarias de deudores diversos");
         jmiBizPartnerBranchBankAccountCreditor = new JMenuItem("Cuentas bancarias de acreedores diversos");
         jmiBizPartnerBranchBankAccountEmployee = new JMenuItem("Cuentas bancarias de empleados");
+        jmMenuAddressee = new JMenu("Destinatarios");
+        jmiBizPartnerAddresseeCustomer = new JMenuItem("Destinatarios de clientes");
         jmiBizPartnerType = new JMenuItem("Tipos de asociados de negocios");
         jmiBizPartnerBizArea = new JMenuItem("Áreas de negocios");
 
@@ -221,6 +228,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmMenuBranchBankAccount.addSeparator();
         jmMenuBranchBankAccount.add(jmiBizPartnerBranchBankAccountEmployee);
         jmMenuBizPartner.add(jmMenuBranchBankAccount);
+        jmMenuAddressee.add(jmiBizPartnerAddresseeCustomer);
+        jmMenuBizPartner.add(jmMenuAddressee);
 
         jmMenuBizPartner.addSeparator();
         jmMenuBizPartner.add(jmiBizPartnerType);
@@ -259,6 +268,7 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmiBizPartnerBranchBankAccountCreditor.addActionListener(this);
         jmiBizPartnerBranchBankAccountDebtor.addActionListener(this);
         jmiBizPartnerBranchBankAccountEmployee.addActionListener(this);
+        jmiBizPartnerAddresseeCustomer.addActionListener(this);
         jmiBizPartnerType.addActionListener(this);
         jmiBizPartnerBizArea.addActionListener(this);
 
@@ -266,6 +276,7 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         moFormBizPartnerSimple = null;
         moFormBizPartnerBranchContact = null;
         moFormBizPartnerBranchBankAccount = null;
+        moFormBizPartnerAddresseeCustomer = null;
         moFormBizPartnerType = null;
         moFormBizPartnerBizArea = null;
 
@@ -358,6 +369,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmiBizPartnerBranchBankAccountCreditor.setEnabled(hasRightBizPartnerBranchBankAccountCreditor);
         jmiBizPartnerBranchBankAccountDebtor.setEnabled(hasRightBizPartnerBranchBankAccountDebtor);
         jmiBizPartnerBranchBankAccountEmployee.setEnabled(hasRightBizPartnerBranchBankAccountEmployee);
+        jmMenuAddressee.setEnabled(hasRightBizPartner || hasRightBizPartnerCustomer || hasRightBizPartnerBranchAddressCustomer);
+        jmiBizPartnerAddresseeCustomer.setEnabled(hasRightBizPartnerCustomer || hasRightBizPartnerBranchAddressCustomer);
         jmiBizPartnerType.setEnabled(hasRightBizPartnerType);
         jmiBizPartnerBizArea.setEnabled(hasRightBizPartnerBizArea);
     }
@@ -445,6 +458,21 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                     }
                     miForm = moFormBizPartnerBranchBankAccount;
                     miForm.setValue(1, new int[] { formType });
+                    break;
+                case SDataConstants.BPSU_BP_ADDEE:
+                    switch (auxType) {
+                        case SDataConstants.BPSX_BP_CUS:
+                            if (moFormBizPartnerAddresseeCustomer == null) {
+                                moFormBizPartnerAddresseeCustomer = new SFormBizPartnerAddressee(miClient, auxType);
+                            }
+                            if (pk != null) {
+                                moRegistry = new SDataBizPartnerAddressee();
+                            }
+                            miForm = moFormBizPartnerAddresseeCustomer;
+                            break;
+                        default:
+                            throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_FORM);
+                    }
                     break;
                 case SDataConstants.BPSU_TP_BP:
                     if (moFormBizPartnerType == null) {
@@ -672,6 +700,15 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                         default:
                     }
                     auxType01 = viewType;
+                    break;
+                case SDataConstants.BPSU_BP_ADDEE:
+                    oViewClass = erp.mbps.view.SViewBizPartnerAddressee.class;
+                    switch (auxType01) {
+                        case SDataConstants.BPSX_BP_CUS:
+                            sViewTitle = "Destinatarios clientes";
+                            break;
+                        default:
+                    }
                     break;
                 case SDataConstants.BPSU_TP_BP:
                     oViewClass = erp.mbps.view.SViewBizPartnerType.class;
@@ -917,6 +954,9 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
             }
             else if (item == jmiBizPartnerBranchBankAccountEmployee) {
                 showView(SDataConstants.BPSX_BANK_ACC_EMP);
+            }
+            else if (item == jmiBizPartnerAddresseeCustomer) {
+                showView(SDataConstants.BPSU_BP_ADDEE, SDataConstants.BPSX_BP_CUS);
             }
             else if (item == jmiBizPartnerType) {
                 showView(SDataConstants.BPSU_TP_BP);

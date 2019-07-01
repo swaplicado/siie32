@@ -301,7 +301,7 @@ public class SCfdDataBizPartner {
                 emisor.getAttCurp().setString(msBizPartnerCurp);
             }
         }
-        
+
         return emisor;
     }
 
@@ -325,7 +325,7 @@ public class SCfdDataBizPartner {
                     throw new Exception("El ID fiscal del receptor no existe, y es requerido.");
                 }
             }
-            
+
             cfd.ver33.DElementReceptor receptor = new cfd.ver33.DElementReceptor();
 
             receptor.getAttRfc().setString(msBizPartnerRfc);
@@ -335,9 +335,9 @@ public class SCfdDataBizPartner {
                 receptor.getAttResidenciaFiscal().setString(msBizPartnerCountryCode);
                 receptor.getAttNumRegIdTrib().setString(msBizPartnerFiscalForeing);
             }
-            
+
             //receptor.getAttUsoCFDI().setString(...
-            
+
             element = receptor;
         }
         else if (mfVersion == DCfdConsts.CFDI_VER_32) {
@@ -348,7 +348,7 @@ public class SCfdDataBizPartner {
             }
 
             cfd.ver32.DElementReceptor receptor = new cfd.ver32.DElementReceptor();
-            
+
             receptor.getAttRfc().setString(msBizPartnerRfc);
             receptor.getAttNombre().setString(msBizPartnerName);
 
@@ -367,7 +367,7 @@ public class SCfdDataBizPartner {
                 receptor.getEltDomicilio().getAttCodigoPostal().setString(msBizPartnerZipCode);
                 receptor.getEltDomicilio().getAttPais().setString(mbIsCfdiWithIntCommerce ? msBizPartnerCountryCode : msBizPartnerCountryName);
             }
-            
+
             element = receptor;
         }
         else {
@@ -385,14 +385,14 @@ public class SCfdDataBizPartner {
             receptor.getEltDomicilio().getAttEstado().setString(msBizPartnerStateName);
             receptor.getEltDomicilio().getAttCodigoPostal().setString(msBizPartnerZipCode);
             receptor.getEltDomicilio().getAttPais().setString(msBizPartnerCountryName);
-            
+
             element = receptor;
         }
 
         return element;
     }
-    
-     /**
+
+    /**
      * Creates element root for International Commerce receptor for business partner indicated.
      * @return cfd.ver3.cce11.DElementReceptor node for International Commerce receptor.
      * @throws java.lang.Exception 
@@ -402,7 +402,7 @@ public class SCfdDataBizPartner {
 
         if (mfVersion == DCfdConsts.CFDI_VER_33) {
             receptor = new cfd.ver3.cce11.DElementReceptor();
-            
+
             receptor.setEltDomicilio(new DElementTipoDomicilioInt());
             receptor.getEltDomicilio().getAttCalle().setString(msBizPartnerStreet);
             receptor.getEltDomicilio().getAttNoExterior().setString(msBizPartnerStreetNumberExt);
@@ -420,11 +420,11 @@ public class SCfdDataBizPartner {
 
             receptor.getAttNumRegIdTrib().setString(msBizPartnerFiscalForeing);
         }
-        
+
         return receptor;
     }
-    
-     /**
+
+    /**
      * Creates element root for International Commerce addressee for business partner indicated.
      * @return cfd.ver3.cce11.DElementDestinatario node for International Commerce receptor.
      * @throws java.lang.Exception 
@@ -434,10 +434,10 @@ public class SCfdDataBizPartner {
 
         if (mfVersion == DCfdConsts.CFDI_VER_33) {
             destinatario = new cfd.ver3.cce11.DElementDestinatario();
-            
+
             destinatario.getAttNumRegIdTrib().setString(msBizPartnerFiscalForeing);
             destinatario.getAttNombre().setString(msBizPartnerName);
-            
+
             destinatario.getEltDomicilio().getAttCalle().setString(msBizPartnerStreet);
             destinatario.getEltDomicilio().getAttNoExterior().setString(msBizPartnerStreetNumberExt);
             destinatario.getEltDomicilio().getAttNoInterior().setString(msBizPartnerStreetNumberInt);
@@ -452,10 +452,10 @@ public class SCfdDataBizPartner {
         else if (mfVersion == DCfdConsts.CFDI_VER_32) {
             throw new UnsupportedOperationException("Not supported yet.");
         }
-        
+
         return destinatario;
     }
-    
+
     /**
      * Gets issue place for CFD 2.0, 2.2 and CFDI 3.2.
      * @return 

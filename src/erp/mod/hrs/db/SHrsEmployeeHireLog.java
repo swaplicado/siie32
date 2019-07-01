@@ -146,7 +146,7 @@ public class SHrsEmployeeHireLog {
                     moXtaEmployeeHireLog = null;
                     
                     if (mbIsHire) {
-                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastHired(moSession, mnPkEmployeeId, 0, schema);
+                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastHire(moSession, mnPkEmployeeId, 0, schema);
                     }
                     else {
                         moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, 0, schema);
@@ -187,7 +187,7 @@ public class SHrsEmployeeHireLog {
                     moXtaEmployeeHireLog = null;
 
                     if (!mbIsHire) {
-                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastHired(moSession, mnPkEmployeeId, 0, schema);
+                        moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastHire(moSession, mnPkEmployeeId, 0, schema);
                     }
                     else if (mbIsCorrection) {
                         moXtaEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(moSession, mnPkEmployeeId, 0, schema);

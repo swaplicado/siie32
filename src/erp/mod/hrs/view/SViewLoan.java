@@ -316,6 +316,9 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_EAR);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_DED);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
 

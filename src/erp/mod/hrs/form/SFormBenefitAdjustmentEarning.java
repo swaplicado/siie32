@@ -10,6 +10,7 @@ import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptEarningComplement;
+import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -73,8 +74,8 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
         jlDate = new javax.swing.JLabel();
         moDateDate = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel15 = new javax.swing.JPanel();
-        jlDaysToPaid = new javax.swing.JLabel();
-        moDecDaysToPaid = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlDaysToPay = new javax.swing.JLabel();
+        moDecDaysToPay = new sa.lib.gui.bean.SBeanFieldDecimal();
         jPanel8 = new javax.swing.JPanel();
         jlTotalAmount = new javax.swing.JLabel();
         moCurPayment = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
@@ -138,10 +139,10 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDaysToPaid.setText("Días ajuste:*");
-        jlDaysToPaid.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel15.add(jlDaysToPaid);
-        jPanel15.add(moDecDaysToPaid);
+        jlDaysToPay.setText("Días ajuste:*");
+        jlDaysToPay.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel15.add(jlDaysToPay);
+        jPanel15.add(moDecDaysToPay);
 
         jPanel2.add(jPanel15);
 
@@ -184,14 +185,14 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
     private javax.swing.JLabel jlBenefitAnniversary;
     private javax.swing.JLabel jlBenefitType;
     private javax.swing.JLabel jlDate;
-    private javax.swing.JLabel jlDaysToPaid;
+    private javax.swing.JLabel jlDaysToPay;
     private javax.swing.JLabel jlEmployee;
     private javax.swing.JLabel jlNotes;
     private javax.swing.JLabel jlTotalAmount;
     private javax.swing.JSpinner jsAnniversary;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurPayment;
     private sa.lib.gui.bean.SBeanFieldDate moDateDate;
-    private sa.lib.gui.bean.SBeanFieldDecimal moDecDaysToPaid;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecDaysToPay;
     private sa.lib.gui.bean.SBeanFieldInteger moIntBenefitYear;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBenefitType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEmployee;
@@ -206,7 +207,8 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
         jsAnniversary.setModel(new SpinnerNumberModel(1, 1, 100, 1));
         moIntBenefitYear.setIntegerSettings(SGuiUtils.getLabelName(jlBenefitAnniversary.getText()), SGuiConsts.GUI_TYPE_INT_CAL_YEAR, true);
         moDateDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate.getText()), true);
-        moDecDaysToPaid.setDecimalSettings(SGuiUtils.getLabelName(jlDaysToPaid.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, true);
+        moDecDaysToPay.setDecimalSettings(SGuiUtils.getLabelName(jlDaysToPay.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, true);
+        moDecDaysToPay.setMinDouble(-SHrsConsts.YEAR_DAYS);
         moCurPayment.setCompoundFieldSettings(miClient);
         moCurPayment.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTotalAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moTextNotes.setTextSettings(SGuiUtils.getLabelName(jlTotalAmount.getText()), 255, 0);
@@ -215,7 +217,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
         moFields.addField(moKeyBenefitType);
         moFields.addField(moIntBenefitYear);
         moFields.addField(moDateDate);
-        moFields.addField(moDecDaysToPaid);
+        moFields.addField(moDecDaysToPay);
         moFields.addField(moCurPayment.getField());
         moFields.addField(moTextNotes);
 
@@ -297,7 +299,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
         jsAnniversary.setValue((Integer) moRegistry.getBenefitAnniversary() == 0 ? (Integer) 1 : (Integer) moRegistry.getBenefitAnniversary());
         moIntBenefitYear.setValue(moRegistry.getBenefitYear());
         moDateDate.setValue(earningComplement.getDate());
-        moDecDaysToPaid.setValue(moRegistry.getUnitsAlleged());
+        moDecDaysToPay.setValue(moRegistry.getUnitsAlleged());
         moCurPayment.getField().setValue(moRegistry.getAmount_r());
         moTextNotes.setValue(earningComplement.getNotes());
 
@@ -320,12 +322,12 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
 
         registry.setPkPayrollId(SLibConsts.UNDEFINED);
         registry.setPkEmployeeId(moKeyEmployee.getValue()[0]);
-        registry.setUnitsAlleged(moDecDaysToPaid.getValue());
-        registry.setUnits(moDecDaysToPaid.getValue());
+        registry.setUnitsAlleged(moDecDaysToPay.getValue());
+        registry.setUnits(moDecDaysToPay.getValue());
         registry.setAmountUnitary(moCurPayment.getField().getValue());
         registry.setAmount_r(moCurPayment.getField().getValue());
         registry.setAutomatic(true);
-        registry.setAlternativeTaxCalculation(earning.isAlternativeTaxCalculation());// XXX (jbarajas, 2016-04-06) articule 174 RLISR
+        registry.setAlternativeTaxCalculation(earning.isAlternativeTaxCalculation());
         registry.setBenefitAnniversary((Integer) jsAnniversary.getValue());
         registry.setBenefitYear(moIntBenefitYear.getValue());
         registry.setFkEarningTypeId(earning.getFkEarningTypeId());

@@ -183,7 +183,7 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
             }
 
             if (moEmployee.isActive()) {
-                moEmployeeHireLog = SHrsUtils.getEmployeeLastHired(miClient.getSession(), moEmployee.getPkEmployeeId(), 0, "");
+                moEmployeeHireLog = SHrsUtils.getEmployeeLastHire(miClient.getSession(), moEmployee.getPkEmployeeId(), 0, "");
             }
             else if (mbIsEdit) {
                 moEmployeeHireLog = SHrsUtils.getEmployeeLastDismiss(miClient.getSession(), moEmployee.getPkEmployeeId(), 0, "");
@@ -247,7 +247,7 @@ public class SDialogEmployeeHireLog extends SBeanFormDialog {
             else if (!mbIsEdit) {
                 try {
                     validateDate();
-                    SHrsUtils.validateHireDismissedEmployee(miClient.getSession(), moEmployee.getPkEmployeeId(), !moEmployee.isActive());
+                    SHrsUtils.validateEmployeeHireLog(miClient.getSession(), moEmployee.getPkEmployeeId(), !moEmployee.isActive());
                 }
                 catch (Exception e) {
                     SLibUtils.printException(this, e);

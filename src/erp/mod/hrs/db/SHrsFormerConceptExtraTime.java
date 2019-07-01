@@ -8,14 +8,14 @@ package erp.mod.hrs.db;
  *
  * @author Juan Barajas
  */
-public class SHrsFormerPayrollExtraTime {
+public class SHrsFormerConceptExtraTime {
 
     protected double mdDias;
     protected String msTipoHoras;
     protected int mnHorasExtra;
     protected double mdImportePagado;
 
-    public SHrsFormerPayrollExtraTime() {
+    public SHrsFormerConceptExtraTime() {
         mdDias = 0;
         msTipoHoras = "";
         mnHorasExtra = 0;

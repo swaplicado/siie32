@@ -70,9 +70,10 @@ public class SHrsReceiptDeduction implements SGridRow, Comparable {
                     // update amount unit with current income in receipt; units alleged contains % to apply:
                     moPayrollReceiptDeduction.setAmountUnitary(SLibUtils.round(moHrsReceipt.getTotalEarningsDependentsDaysWorked(), SLibUtils.getDecimalFormatAmountUnitary().getMaximumFractionDigits()));
                 }
-                else if (moDeduction.isLoan()) {
+                else if (moDeduction.isLoan() && !moPayrollReceiptDeduction.isUserEdited()) {
+                    // update amount unit with current persistent loan balance, thus excluding the amount of this receipt deduction:
                     SDbLoan loan = moHrsReceipt.getHrsEmployee().getLoan(moPayrollReceiptDeduction.getFkLoanLoanId_n());
-                    moPayrollReceiptDeduction.setAmountUnitary(SHrsUtils.computeAmountLoan(moHrsReceipt, loan));
+                    moPayrollReceiptDeduction.setAmountUnitary(SHrsUtils.computeLoanAmount(loan, moHrsReceipt, null, this));
                 }
                     
                 computeAmount();

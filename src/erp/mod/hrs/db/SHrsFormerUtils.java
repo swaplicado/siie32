@@ -40,7 +40,7 @@ public abstract class SHrsFormerUtils {
      * @throws Exception 
      */
     @Deprecated
-    public static SHrsFormerPayroll readFormerPayroll(final SClientInterface client, final Statement statementClient, final int payrollId, final int nPkCompanyId, final java.util.Date tPayrollDate, final java.util.Date tPayrollDatePayment) throws SQLException, Exception {
+    public static SHrsFormerPayroll readHrsFormerPayroll(final SClientInterface client, final Statement statementClient, final int payrollId, final int nPkCompanyId, final java.util.Date tPayrollDate, final java.util.Date tPayrollDatePayment) throws SQLException, Exception {
         int f_emp_map_bp = 0;
         int f_emp_id = 0;
         int claveEmpresa = 0;
@@ -51,10 +51,10 @@ public abstract class SHrsFormerUtils {
         Connection connectionOdbc = getConnectionOdbc(client);
         Connection connectionOdbcAux = getConnectionOdbc(client);
 
-        SHrsFormerPayroll hrsPayroll = null;
-        SHrsFormerPayrollReceipt hrsPayrollReceipt = null;
-        SHrsFormerPayrollConcept hrsPayrollConcept = null;
-        SHrsFormerPayrollExtraTime hrsPayrollExtraTime = null;
+        SHrsFormerPayroll hrsFormerPayroll = null;
+        SHrsFormerReceipt hrsFormerReceipt = null;
+        SHrsFormerReceiptConcept hrsFormerReceiptConcept = null;
+        SHrsFormerConceptExtraTime hrsFormerConceptExtraTime = null;
 
         Statement statement = connectionOdbc.createStatement();
         Statement statementAux = connectionOdbcAux.createStatement();
@@ -107,19 +107,19 @@ public abstract class SHrsFormerUtils {
                 throw new Exception("No se encontró la configuración de la empresa.");
             }
 
-            hrsPayroll = new SHrsFormerPayroll(client);
+            hrsFormerPayroll = new SHrsFormerPayroll(client);
 
-            hrsPayroll.setPkNominaId(resultSet.getInt("id_nomina"));
-            hrsPayroll.setFecha(tPayrollDate);
-            hrsPayroll.setFechaInicial(dateFormat.parse(SLibUtilities.textTrim(resultSet.getString("fecha_ini"))));
-            hrsPayroll.setFechaFinal(dateFormat.parse(SLibUtilities.textTrim(resultSet.getString("fecha_fin"))));
-            hrsPayroll.setTotalPercepciones(resultSet.getDouble("f_per"));
-            hrsPayroll.setTotalDeducciones(resultSet.getDouble("f_ded"));
-            hrsPayroll.setTotalRetenciones(resultSet.getDouble("f_rent_ret"));
+            hrsFormerPayroll.setPkNominaId(resultSet.getInt("id_nomina"));
+            hrsFormerPayroll.setFecha(tPayrollDate);
+            hrsFormerPayroll.setFechaInicial(dateFormat.parse(SLibUtilities.textTrim(resultSet.getString("fecha_ini"))));
+            hrsFormerPayroll.setFechaFinal(dateFormat.parse(SLibUtilities.textTrim(resultSet.getString("fecha_fin"))));
+            hrsFormerPayroll.setTotalPercepciones(resultSet.getDouble("f_per"));
+            hrsFormerPayroll.setTotalDeducciones(resultSet.getDouble("f_ded"));
+            hrsFormerPayroll.setTotalRetenciones(resultSet.getDouble("f_rent_ret"));
             //hrsPayroll.setDescripcion(SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("f_descrip")), 100)); // 100 = pay_note column width
-            hrsPayroll.setEmpresaId(resultSetClient.getInt("p.id_co"));
-            hrsPayroll.setSucursalEmpresaId(resultSetClient.getInt("bpb.id_bpb"));
-            hrsPayroll.setRegimenFiscal(new String[] { SLibUtilities.textTrim(resultSetClient.getString("p.fiscal_settings")) });
+            hrsFormerPayroll.setEmpresaId(resultSetClient.getInt("p.id_co"));
+            hrsFormerPayroll.setSucursalEmpresaId(resultSetClient.getInt("bpb.id_bpb"));
+            hrsFormerPayroll.setRegimenFiscal(new String[] { SLibUtilities.textTrim(resultSetClient.getString("p.fiscal_settings")) });
         }
 
         resultSet.close();
@@ -197,7 +197,7 @@ public abstract class SHrsFormerUtils {
         resultSet = statement.executeQuery(sql);
 
         while (resultSet.next()) {
-            hrsPayrollReceipt = new SHrsFormerPayrollReceipt(hrsPayroll, client);
+            hrsFormerReceipt = new SHrsFormerReceipt(client, hrsFormerPayroll);
 
             // Obtain employee company branch:
 
@@ -212,36 +212,36 @@ public abstract class SHrsFormerUtils {
                 throw new Exception("No se encontró la sucursal del empleado '" + f_emp_map_bp + "'.");
             }
 
-            hrsPayrollReceipt.setPkEmpleadoId(f_emp_map_bp);
+            hrsFormerReceipt.setPkEmpleadoId(f_emp_map_bp);
             f_emp_id = resultSet.getInt("f_emp_id");
-            hrsPayrollReceipt.setAuxEmpleadoId(f_emp_id);
-            hrsPayrollReceipt.setPkSucursalEmpleadoId(resultSetClient.getInt("bpb.id_bpb"));
-            hrsPayrollReceipt.setRegistroPatronal(cia_reg_imss);
-            hrsPayrollReceipt.setNumEmpleado(SLibUtilities.textTrim(resultSet.getString("f_emp_num")));
-            hrsPayrollReceipt.setCurp(SLibUtilities.textTrim(resultSet.getString("f_emp_curp")));
-            hrsPayrollReceipt.setNumSeguridadSocial(SLibUtilities.textTrim(resultSet.getString("f_emp_nss")));
-            hrsPayrollReceipt.setTipoRegimen(resultSet.getInt("f_emp_reg_tp"));
-            hrsPayrollReceipt.setNumDiasPagados(resultSet.getDouble("f_emp_dias_pag"));
-            hrsPayrollReceipt.setDepartamento(SLibUtilities.textTrim(resultSet.getString("f_emp_dep")));
-            hrsPayrollReceipt.setCuentaBancaria(SLibUtilities.textTrim(resultSet.getString("f_emp_bank_clabe")));
-            hrsPayrollReceipt.setBanco(resultSet.getInt("f_emp_bank"));
-            hrsPayrollReceipt.setFechaPago(tPayrollDatePayment);
-            hrsPayrollReceipt.setFechaInicioRelLaboral(dateFormat.parse(SLibUtilities.textTrim(resultSet.getString("f_emp_alta"))));
-            hrsPayrollReceipt.setFechaInicialPago(dateFormat.parse(SLibUtilities.textTrim(resultSet.getString("f_nom_date_start"))));
-            hrsPayrollReceipt.setFechaFinalPago(dateFormat.parse(SLibUtilities.textTrim(resultSet.getString("f_nom_date_end"))));
-            hrsPayrollReceipt.setAntiguedad(resultSet.getInt("f_emp_sen"));
-            hrsPayrollReceipt.setPuesto(SLibUtilities.textTrim(resultSet.getString("f_emp_emp")));
-            hrsPayrollReceipt.setTipoContrato(SLibUtilities.textTrim(resultSet.getString("f_emp_cont_tp")));
-            hrsPayrollReceipt.setTipoJornada(SLibUtilities.textTrim(resultSet.getString("f_emp_jorn_tp")));
-            hrsPayrollReceipt.setPeriodicidadPago(SLibUtilities.textTrim(resultSet.getString("f_emp_pay")));
-            hrsPayrollReceipt.setSalarioBaseCotApor(resultSet.getDouble("f_emp_sal_bc"));
-            hrsPayrollReceipt.setRiesgoPuesto(resultSet.getInt("f_emp_risk"));
-            hrsPayrollReceipt.setSalarioDiarioIntegrado(hrsPayrollReceipt.getSalarioBaseCotApor());
-            hrsPayrollReceipt.setTotalPercepciones(resultSet.getDouble("f_emp_tot_per"));
-            hrsPayrollReceipt.setTotalDeducciones(resultSet.getDouble("f_emp_tot_ded"));
-            hrsPayrollReceipt.setTotalRetenciones(resultSet.getDouble("f_emp_tot_rent_ret"));
-            hrsPayrollReceipt.setTotalNeto(resultSet.getDouble("f_emp_tot_net"));
-            hrsPayrollReceipt.setFechaEdicion(resultSet.getDate("f_emp_date_edit"));
+            hrsFormerReceipt.setAuxEmpleadoId(f_emp_id);
+            hrsFormerReceipt.setPkSucursalEmpleadoId(resultSetClient.getInt("bpb.id_bpb"));
+            hrsFormerReceipt.setRegistroPatronal(cia_reg_imss);
+            hrsFormerReceipt.setNumEmpleado(SLibUtilities.textTrim(resultSet.getString("f_emp_num")));
+            hrsFormerReceipt.setCurp(SLibUtilities.textTrim(resultSet.getString("f_emp_curp")));
+            hrsFormerReceipt.setNumSeguridadSocial(SLibUtilities.textTrim(resultSet.getString("f_emp_nss")));
+            hrsFormerReceipt.setTipoRegimen(resultSet.getInt("f_emp_reg_tp"));
+            hrsFormerReceipt.setNumDiasPagados(resultSet.getDouble("f_emp_dias_pag"));
+            hrsFormerReceipt.setDepartamento(SLibUtilities.textTrim(resultSet.getString("f_emp_dep")));
+            hrsFormerReceipt.setCuentaBancaria(SLibUtilities.textTrim(resultSet.getString("f_emp_bank_clabe")));
+            hrsFormerReceipt.setBanco(resultSet.getInt("f_emp_bank"));
+            hrsFormerReceipt.setFechaPago(tPayrollDatePayment);
+            hrsFormerReceipt.setFechaInicioRelLaboral(dateFormat.parse(SLibUtilities.textTrim(resultSet.getString("f_emp_alta"))));
+            hrsFormerReceipt.setFechaInicialPago(dateFormat.parse(SLibUtilities.textTrim(resultSet.getString("f_nom_date_start"))));
+            hrsFormerReceipt.setFechaFinalPago(dateFormat.parse(SLibUtilities.textTrim(resultSet.getString("f_nom_date_end"))));
+            hrsFormerReceipt.setAntiguedad(resultSet.getInt("f_emp_sen"));
+            hrsFormerReceipt.setPuesto(SLibUtilities.textTrim(resultSet.getString("f_emp_emp")));
+            hrsFormerReceipt.setTipoContrato(SLibUtilities.textTrim(resultSet.getString("f_emp_cont_tp")));
+            hrsFormerReceipt.setTipoJornada(SLibUtilities.textTrim(resultSet.getString("f_emp_jorn_tp")));
+            hrsFormerReceipt.setPeriodicidadPago(SLibUtilities.textTrim(resultSet.getString("f_emp_pay")));
+            hrsFormerReceipt.setSalarioBaseCotApor(resultSet.getDouble("f_emp_sal_bc"));
+            hrsFormerReceipt.setRiesgoPuesto(resultSet.getInt("f_emp_risk"));
+            hrsFormerReceipt.setSalarioDiarioIntegrado(hrsFormerReceipt.getSalarioBaseCotApor());
+            hrsFormerReceipt.setTotalPercepciones(resultSet.getDouble("f_emp_tot_per"));
+            hrsFormerReceipt.setTotalDeducciones(resultSet.getDouble("f_emp_tot_ded"));
+            hrsFormerReceipt.setTotalRetenciones(resultSet.getDouble("f_emp_tot_rent_ret"));
+            hrsFormerReceipt.setTotalNeto(resultSet.getDouble("f_emp_tot_net"));
+            hrsFormerReceipt.setFechaEdicion(resultSet.getDate("f_emp_date_edit"));
 
             // Obtain 'num_ser', 'num', 'fid_tp_pay_sys' from 'hrs_sie_pay_emp' table:
 
@@ -256,9 +256,9 @@ public abstract class SHrsFormerUtils {
                 throw new Exception("No se encontró el folio del empleado '" + SLibUtilities.textTrim(resultSet.getString("f_emp_num")) + "'.");
             }
             else {
-                hrsPayrollReceipt.setSerie(SLibUtilities.textTrim(resultSetClient.getString("pe.num_ser")));
-                hrsPayrollReceipt.setFolio(resultSetClient.getInt("pe.num"));
-                hrsPayrollReceipt.setMetodoPago(resultSetClient.getInt("pe.fid_tp_pay_sys"));
+                hrsFormerReceipt.setSerie(SLibUtilities.textTrim(resultSetClient.getString("pe.num_ser")));
+                hrsFormerReceipt.setFolio(resultSetClient.getInt("pe.num"));
+                hrsFormerReceipt.setMetodoPago(resultSetClient.getInt("pe.fid_tp_pay_sys"));
             }
 
             // Obtain currency key from ERP parameters:
@@ -274,12 +274,12 @@ public abstract class SHrsFormerUtils {
                 throw new Exception("No se encontró la configuración del ERP.");
             }
             else {
-                hrsPayrollReceipt.setMoneda(SLibUtilities.textTrim(resultSetClient.getString("c.cur_key")));
+                hrsFormerReceipt.setMoneda(SLibUtilities.textTrim(resultSetClient.getString("c.cur_key")));
             }
 
-            hrsPayroll.getChildPayrollReceipts().add(hrsPayrollReceipt);
+            hrsFormerPayroll.getChildReceipts().add(hrsFormerReceipt);
 
-            if (hrsPayrollReceipt != null) {
+            if (hrsFormerReceipt != null) {
 
                 // Obtain perceptions:
 
@@ -308,36 +308,36 @@ public abstract class SHrsFormerUtils {
                 resultSetAux = statementAux.executeQuery(sql);
                 while (resultSetAux.next()) {
 
-                    hrsPayrollConcept = new SHrsFormerPayrollConcept();
+                    hrsFormerReceiptConcept = new SHrsFormerReceiptConcept();
 
-                    hrsPayrollConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
-                    hrsPayrollConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
-                    hrsPayrollConcept.setClaveOficial(resultSetAux.getInt("f_conc_cfdi"));
-                    claveEmpresa = SLibUtils.parseInt(hrsPayrollConcept.getClaveEmpresa());
-                    hrsPayrollConcept.setCantidad(claveEmpresa == SHrsFormerConsts.FPS_PER_OVT ||
+                    hrsFormerReceiptConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
+                    hrsFormerReceiptConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
+                    hrsFormerReceiptConcept.setClaveOficial(resultSetAux.getInt("f_conc_cfdi"));
+                    claveEmpresa = SLibUtils.parseInt(hrsFormerReceiptConcept.getClaveEmpresa());
+                    hrsFormerReceiptConcept.setCantidad(claveEmpresa == SHrsFormerConsts.FPS_PER_OVT ||
                         claveEmpresa == SHrsFormerConsts.FPS_PER_OVT_DBL ||
                         claveEmpresa == SHrsFormerConsts.FPS_PER_OVT_TRP ? Math.ceil(resultSetAux.getDouble("f_conc_qty")) : resultSetAux.getDouble("f_conc_qty"));
-                    hrsPayrollConcept.setHoras_r(resultSetAux.getInt("f_conc_hrs"));
-                    hrsPayrollConcept.setTotalGravado(resultSetAux.getDouble("f_conc_mont_grav"));
-                    hrsPayrollConcept.setTotalExento(resultSetAux.getDouble("f_conc_mont_ext"));
-                    hrsPayrollConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
-                    hrsPayrollConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
+                    hrsFormerReceiptConcept.setHoras_r(resultSetAux.getInt("f_conc_hrs"));
+                    hrsFormerReceiptConcept.setTotalGravado(resultSetAux.getDouble("f_conc_mont_grav"));
+                    hrsFormerReceiptConcept.setTotalExento(resultSetAux.getDouble("f_conc_mont_ext"));
+                    hrsFormerReceiptConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
+                    hrsFormerReceiptConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
 
                     if (claveEmpresa == SHrsFormerConsts.FPS_PER_OVT ||
                         claveEmpresa == SHrsFormerConsts.FPS_PER_OVT_DBL ||
                         claveEmpresa == SHrsFormerConsts.FPS_PER_OVT_TRP) {
 
-                        hrsPayrollExtraTime = new SHrsFormerPayrollExtraTime();
-                        hrsPayrollExtraTime.setTipoHoras(claveEmpresa == SHrsFormerConsts.FPS_PER_OVT || claveEmpresa == SHrsFormerConsts.FPS_PER_OVT_DBL ?
+                        hrsFormerConceptExtraTime = new SHrsFormerConceptExtraTime();
+                        hrsFormerConceptExtraTime.setTipoHoras(claveEmpresa == SHrsFormerConsts.FPS_PER_OVT || claveEmpresa == SHrsFormerConsts.FPS_PER_OVT_DBL ?
                             SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE);
-                        hrsPayrollExtraTime.setDias(hrsPayrollConcept.getCantidad());
-                        hrsPayrollExtraTime.setHorasExtra(hrsPayrollConcept.getHoras_r());
-                        hrsPayrollExtraTime.setImportePagado(hrsPayrollConcept.getTotalImporte());
+                        hrsFormerConceptExtraTime.setDias(hrsFormerReceiptConcept.getCantidad());
+                        hrsFormerConceptExtraTime.setHorasExtra(hrsFormerReceiptConcept.getHoras_r());
+                        hrsFormerConceptExtraTime.setImportePagado(hrsFormerReceiptConcept.getTotalImporte());
 
-                        hrsPayrollConcept.setChildPayrollExtraTimes(hrsPayrollExtraTime);
+                        hrsFormerReceiptConcept.setChildExtraTime(hrsFormerConceptExtraTime);
                     }
 
-                    hrsPayrollReceipt.getChildPayrollConcepts().add(hrsPayrollConcept);
+                    hrsFormerReceipt.getChildConcepts().add(hrsFormerReceiptConcept);
                 }
 
                 resultSetAux.close();
@@ -375,19 +375,19 @@ public abstract class SHrsFormerUtils {
                 resultSetAux = statementAux.executeQuery(sql);
                 while (resultSetAux.next()) {
 
-                    hrsPayrollConcept = new SHrsFormerPayrollConcept();
+                    hrsFormerReceiptConcept = new SHrsFormerReceiptConcept();
 
-                    hrsPayrollConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
-                    hrsPayrollConcept.setClaveOficial(resultSetAux.getInt("f_conc_cfdi"));
-                    hrsPayrollConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
-                    hrsPayrollConcept.setCantidad(SLibUtils.round(resultSetAux.getDouble("f_conc_qty"), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits()));
-                    hrsPayrollConcept.setHoras_r(resultSetAux.getInt("f_conc_hrs"));
-                    hrsPayrollConcept.setTotalGravado(resultSetAux.getDouble("f_conc_mont_grav"));
-                    hrsPayrollConcept.setTotalExento(resultSetAux.getDouble("f_conc_mont_ext"));
-                    hrsPayrollConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
-                    hrsPayrollConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
+                    hrsFormerReceiptConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
+                    hrsFormerReceiptConcept.setClaveOficial(resultSetAux.getInt("f_conc_cfdi"));
+                    hrsFormerReceiptConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
+                    hrsFormerReceiptConcept.setCantidad(SLibUtils.round(resultSetAux.getDouble("f_conc_qty"), SLibUtils.DecimalFormatPercentage2D.getMaximumFractionDigits()));
+                    hrsFormerReceiptConcept.setHoras_r(resultSetAux.getInt("f_conc_hrs"));
+                    hrsFormerReceiptConcept.setTotalGravado(resultSetAux.getDouble("f_conc_mont_grav"));
+                    hrsFormerReceiptConcept.setTotalExento(resultSetAux.getDouble("f_conc_mont_ext"));
+                    hrsFormerReceiptConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
+                    hrsFormerReceiptConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
 
-                    hrsPayrollReceipt.getChildPayrollConcepts().add(hrsPayrollConcept);
+                    hrsFormerReceipt.getChildConcepts().add(hrsFormerReceiptConcept);
                 }
 
                 resultSetAux.close();
@@ -397,7 +397,7 @@ public abstract class SHrsFormerUtils {
         connectionOdbc.close();
         connectionOdbcAux.close();
 
-        return hrsPayroll;
+        return hrsFormerPayroll;
     }
 
     // XXX improve this!, this method should not exist, use instead other technique, such as erp.data.SDataReadDescriptions (Sergio Flores, 2017-08-10).

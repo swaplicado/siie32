@@ -570,8 +570,8 @@ public class SFormBizPartnerAttribute extends javax.swing.JDialog implements erp
         address.setIsDefault(true);
         address.setIsDeleted(false);
         address.setFkAddressTypeId(SModSysConsts.BPSS_TP_ADD_OFF);
-        address.setFkCountryId_n(SLibConsts.UNDEFINED);
-        address.setFkStateId_n(SLibConsts.UNDEFINED);
+        address.setFkCountryId_n(0);
+        address.setFkStateId_n(0);
         address.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
 
         branch.getDbmsBizPartnerBranchAddresses().add(address);

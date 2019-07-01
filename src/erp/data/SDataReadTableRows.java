@@ -1883,7 +1883,7 @@ public abstract class SDataReadTableRows {
                 break;
 
             case SDataConstants.TRN_DPS:
-                /* Parameter filterKey is an Object array of 1 or 2 dimensions, wich can contain 2 int arrays:
+                /* Parameter filterKey is an Object array of 1 or 2 dimensions, which can contain 2 int arrays:
                  * 1. int array of document class primary key.
                  * 2. int array of business partner primary key (optional).
                  */
@@ -2123,7 +2123,7 @@ public abstract class SDataReadTableRows {
                 break;
 
             case SDataConstants.TRNX_DPS_PAY_PEND:
-                /* Parameter filterKey is an Object array of 2 or 3 dimensions, wich contain the following:
+                /* Parameter filterKey is an Object array of 2 or 3 dimensions, which contain the following:
                  * 1. int representing fiscal year.
                  * 2. int array of document class primary key.
                  * 3. int array of business partner primary key (optional).
@@ -2174,7 +2174,7 @@ public abstract class SDataReadTableRows {
                 break;
 
             case SDataConstants.TRNX_DPS_PEND_LINK:
-                /* Parameter filterKey is an Object array of 1 or 2 dimensions, wich can contain 2 int arrays:
+                /* Parameter filterKey is an Object array of 1 or 2 dimensions, which can contain 2 int arrays:
                  * 1. int array of document class primary key.
                  * 2. int array of business partner primary key (optional).
                  */
@@ -2224,7 +2224,7 @@ public abstract class SDataReadTableRows {
                 break;
 
             case SDataConstants.TRNX_DPS_PEND_ADJ:
-                /* Parameter filterKey is an Object array of 1 or 2 dimensions, wich can contain 2 int arrays:
+                /* Parameter filterKey is an Object array of 1 or 2 dimensions, which can contain 2 int arrays:
                  * 1. int array of document class primary key.
                  * 2. int array of business partner primary key (optional).
                  */

@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Claudio Peña
+ * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Claudio Peña, Sergio Flores
  */
 public abstract class SModConsts {
 
@@ -158,6 +158,7 @@ public abstract class SModConsts {
     public static final int BPSU_BANK_ACC_NTS = 1042014;
     public static final int BPSU_TP_BP = 1042015;
     public static final int BPSU_BA = 1042016;
+    public static final int BPSU_BP_ADDEE = 1042031;
 
     public static final int BPSX_BP_ATT_BANK = 1044001;
     public static final int BPSX_BP_ATT_CARR = 1044002;
@@ -795,6 +796,7 @@ public abstract class SModConsts {
         TablesMap.put(BPSU_BANK_ACC_NTS, "erp.bpsu_bank_acc_nts");
         TablesMap.put(BPSU_TP_BP, "erp.bpsu_tp_bp");
         TablesMap.put(BPSU_BA, "erp.bpsu_ba");
+        TablesMap.put(BPSU_BP_ADDEE, "erp.bpsu_bp_addee");
 
         TablesMap.put(ITMS_CT_ITEM, "erp.itms_ct_item");
         TablesMap.put(ITMS_CL_ITEM, "erp.itms_cl_item");

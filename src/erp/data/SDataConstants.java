@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores
  */
 public abstract class SDataConstants {
 
@@ -164,6 +164,7 @@ public abstract class SDataConstants {
     public static final int BPSU_BANK_ACC_LAY_BANK = 204025;
     public static final int BPSU_TP_BP = 204026;
     public static final int BPSU_BA = 204027;
+    public static final int BPSU_BP_ADDEE = 204031;
 
     public static final int BPSX_TP_BP_CO = 204501;
     public static final int BPSX_TP_BP_SUP = 204502;
@@ -749,6 +750,7 @@ public abstract class SDataConstants {
         TablesMap.put(BPSU_BANK_ACC_NTS, "erp.bpsu_bank_acc_nts");
         TablesMap.put(BPSU_TP_BP, "erp.bpsu_tp_bp");
         TablesMap.put(BPSU_BA, "erp.bpsu_ba");
+        TablesMap.put(BPSU_BP_ADDEE, "erp.bpsu_bp_addee");
 
         TablesMap.put(ITMS_CT_ITEM, "erp.itms_ct_item");
         TablesMap.put(ITMS_CL_ITEM, "erp.itms_cl_item");

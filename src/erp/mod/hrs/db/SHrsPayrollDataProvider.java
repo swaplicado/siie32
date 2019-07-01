@@ -498,54 +498,41 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return loans;
     }
     
-    private ArrayList<SHrsLoanPayments> getEmployeeLoanPayments(final ArrayList<SDbLoan> loans, final int payrollId, final int payrollYear, final int payrollPeriod) throws Exception {
+    private ArrayList<SHrsLoan> getEmployeeHrsLoans(final ArrayList<SDbLoan> loans, final int excludePayrollId) throws Exception {
         String sql;
-        ArrayList<SHrsLoanPayments> registries = new ArrayList<>();
+        ArrayList<SHrsLoan> hrsLoans = new ArrayList<>();
         
-        sql = "SELECT rcp_ear.id_pay, rcp_ear.id_emp, rcp_ear.id_mov "
+        /* Get loan refunds:
+         * NOTE: please remember that loan adjustments are stored in payroll with ID = 0, 
+         *  so make sure that these rows are allways included!
+         */
+        
+        sql = "SELECT pre.id_pay, pre.id_emp, pre.id_mov "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS rcp ON rcp.id_pay = p.id_pay "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp "
-                + "WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT rcp.b_del AND NOT rcp_ear.b_del AND "
-                + "p.id_pay <> " + payrollId + " AND rcp_ear.fk_loan_emp_n = ? AND rcp_ear.fk_loan_loan_n = ?;";
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                + "WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT pr.b_del AND NOT pre.b_del AND "
+                + (excludePayrollId == 0 ? "" : "p.id_pay <> " + excludePayrollId + " AND ") // do not exclude loan adjustments!
+                + "pre.fk_loan_emp_n = ? AND pre.fk_loan_loan_n = ?;";
         PreparedStatement psEarnings = miStatement.getConnection().prepareStatement(sql);
         
-        sql = "SELECT rcp_ded.id_pay, rcp_ded.id_emp, rcp_ded.id_mov "
+        /* Get loan payments:
+         * NOTE: please remember that loan adjustments are stored in payroll with ID = 0, 
+         *  so make sure that these rows are allways included!
+         */
+        
+        sql = "SELECT prd.id_pay, prd.id_emp, prd.id_mov "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS rcp ON rcp.id_pay = p.id_pay "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp "
-                + "WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT rcp.b_del AND NOT rcp_ded.b_del AND "
-                + "p.id_pay <> " + payrollId + " AND rcp_ded.fk_loan_emp_n = ? AND rcp_ded.fk_loan_loan_n = ?;";
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                + "WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT pr.b_del AND NOT prd.b_del AND "
+                + (excludePayrollId == 0 ? "" : "p.id_pay <> " + excludePayrollId + " AND ") // do not exclude loan adjustments!
+                + "prd.fk_loan_emp_n = ? AND prd.fk_loan_loan_n = ?;";
         PreparedStatement psDeductions = miStatement.getConnection().prepareStatement(sql);
-        
-        sql = "SELECT COALESCE(SUM(rd.amt_r), 0.0) "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS r ON r.id_pay = p.id_pay "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS rd ON rd.id_pay = r.id_pay AND rd.id_emp = r.id_emp "
-                + "WHERE NOT p.b_del AND NOT r.b_del AND NOT rd.b_del AND "
-                + "p.id_pay <> " + payrollId + " AND p.per_year = " + payrollYear + " AND p.per = " + payrollPeriod + " AND r.id_emp = ? AND "
-                + "rd.fk_loan_emp_n = ? AND rd.fk_loan_loan_n = ? AND rd.fk_tp_loan_n = ?;";
-        PreparedStatement psAmountDeductions = miStatement.getConnection().prepareStatement(sql);
-        
-        sql = "SELECT COALESCE(SUM(re.amt_r), 0.0) "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS r ON r.id_pay = p.id_pay "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS re ON re.id_pay = r.id_pay AND re.id_emp = r.id_emp "
-                + "WHERE NOT p.b_del AND NOT r.b_del AND NOT re.b_del AND "
-                + "p.id_pay <> " + payrollId + " AND p.per_year = " + payrollYear + " AND p.per = " + payrollPeriod + " AND r.id_emp = ? AND "
-                + "re.fk_loan_emp_n = ? AND re.fk_loan_loan_n = ? AND re.fk_tp_loan_n = ?;";
-        PreparedStatement psAmountEarnings = miStatement.getConnection().prepareStatement(sql);
-        
-        sql = "SELECT COALESCE(SUM(r.day_hire_pay - r.day_inc_not_pad_pay - r.day_not_wrk_not_pad), 0.0) "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS r ON r.id_pay = p.id_pay "
-                + "WHERE NOT p.b_del AND NOT r.b_del AND "
-                + "p.id_pay <> " + payrollId + " AND p.per_year = " + payrollYear + " AND p.per = " + payrollPeriod + " AND r.id_emp = ?;";
-        PreparedStatement psDays = miStatement.getConnection().prepareStatement(sql);
         
         for (SDbLoan loan : loans) {
             ResultSet resultSet;
-            SHrsLoanPayments hrsLoanPayments = new SHrsLoanPayments();
+            SHrsLoan hrsLoan = new SHrsLoan();
             
             psEarnings.setInt(1, loan.getPkEmployeeId());
             psEarnings.setInt(2, loan.getPkLoanId());
@@ -554,7 +541,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
             while (resultSet.next()) {
                 SDbPayrollReceiptEarning payrollReceiptEarning = new SDbPayrollReceiptEarning();
                 payrollReceiptEarning.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
-                hrsLoanPayments.getPayrollReceiptEarnings().add(payrollReceiptEarning);
+                hrsLoan.getPayrollReceiptEarnings().add(payrollReceiptEarning);
             }
             resultSet.close();
             
@@ -565,63 +552,20 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
             while (resultSet.next()) {
                 SDbPayrollReceiptDeduction payrollReceiptDeduction = new SDbPayrollReceiptDeduction();
                 payrollReceiptDeduction.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
-                hrsLoanPayments.getPayrollReceiptDeductions().add(payrollReceiptDeduction);
+                hrsLoan.getPayrollReceiptDeductions().add(payrollReceiptDeduction);
             }
             resultSet.close();
             
-            // loan amount already paid:
-            
-            double amount = 0;
-            
-            psAmountDeductions.setInt(1, loan.getPkEmployeeId());
-            psAmountDeductions.setInt(2, loan.getPkEmployeeId());
-            psAmountDeductions.setInt(3, loan.getPkLoanId());
-            psAmountDeductions.setInt(4, loan.getFkLoanTypeId());
-            
-            resultSet = psAmountDeductions.executeQuery();
-            if (resultSet.next()) {
-                amount = resultSet.getDouble(1);
-            }
-            resultSet.close();
-            
-            psAmountEarnings.setInt(1, loan.getPkEmployeeId());
-            psAmountEarnings.setInt(2, loan.getPkEmployeeId());
-            psAmountEarnings.setInt(3, loan.getPkLoanId());
-            psAmountEarnings.setInt(4, loan.getFkLoanTypeId());
-        
-            resultSet = psAmountEarnings.executeQuery();
-            if (resultSet.next()) {
-                amount = SLibUtils.roundAmount(amount - resultSet.getDouble(1));
-            }
-            resultSet.close();
-            
-            // days active in period year for employee:
-            
-            double days = 0;
-            
-            psDays.setInt(1, loan.getPkEmployeeId());
-        
-            resultSet = psDays.executeQuery();
-            if (resultSet.next()) {
-                days = resultSet.getDouble(1);
-            }
-            resultSet.close();
-            
-            if (!hrsLoanPayments.getPayrollReceiptDeductions().isEmpty()) {
-                hrsLoanPayments.setLoan(loan);
-                hrsLoanPayments.setAmountPeriod(amount);
-                hrsLoanPayments.setDaysPeriod(days);
-                registries.add(hrsLoanPayments);
+            if (!hrsLoan.getPayrollReceiptDeductions().isEmpty()) {
+                hrsLoan.setLoan(loan);
+                hrsLoans.add(hrsLoan);
             }
         }
         
         psEarnings.close();
         psDeductions.close();
-        psAmountDeductions.close();
-        psAmountEarnings.close();
-        psDays.close();
 
-        return registries;
+        return hrsLoans;
     }
 
     private ArrayList<SDbAbsence> getEmployeeAbsences(final int employeeId) throws Exception {
@@ -643,14 +587,15 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return absences;
     }
     
-    private ArrayList<SDbAbsenceConsumption> getEmployeeAbsencesConsumptions(final ArrayList<SDbAbsence> absences, final int payrollId) throws Exception {
+    private ArrayList<SDbAbsenceConsumption> getEmployeeAbsencesConsumptions(final ArrayList<SDbAbsence> absences, final int excludePayrollId) throws Exception {
         ArrayList<SDbAbsenceConsumption> absencesConsumptions = new ArrayList<>();
 
         String sql = "SELECT ac.id_cns "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " AS ac "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON ac.fk_rcp_pay = pr.id_pay AND ac.fk_rcp_emp = pr.id_emp "
-                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p ON pr.id_pay = p.id_pay "
-                + "WHERE ac.id_emp = ? AND ac.id_abs = ? AND ac.fk_rcp_pay <> " + payrollId + " AND NOT ac.b_del AND NOT pr.b_del AND NOT p.b_del "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_ABS_CNS) + " AS ac ON ac.fk_rcp_pay = pr.id_pay AND ac.fk_rcp_emp = pr.id_emp "
+                + "WHERE p.id_pay <> " + excludePayrollId + " AND NOT p.b_del AND NOT pr.b_del AND "
+                + "ac.id_emp = ? AND ac.id_abs = ? AND NOT ac.b_del "
                 + "ORDER BY ac.id_cns;";
         PreparedStatement psConsumptions = miStatement.getConnection().prepareStatement(sql);
         
@@ -688,7 +633,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return hiredDays;
     }
     
-    private double getEmployeeAccumulatedTaxableEarnings(final int payrollId, final int employeeId, final int fiscalYear, final Date payrollDateEnd, int taxType) throws Exception {
+    private double getEmployeeAccumulatedTaxableEarnings(final int employeeId, final int fiscalYear, final Date payrollDateEnd, int taxType, final int excludePayrollId) throws Exception {
         double earnings = 0;
         String sqlAltTax;
         
@@ -709,7 +654,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS ear ON ear.id_ear = pre.fk_ear "
                 + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND "
-                + "p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND "
+                + "p.id_pay <> " + excludePayrollId + " AND pr.id_emp = " + employeeId + " AND "
                 + "p.fis_year = " + fiscalYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(payrollDateEnd) + "' AND "
                 + "pre.b_alt_tax = " + sqlAltTax + ";"; // Articule 174 RLISR
         ResultSet resultSet = miStatement.executeQuery(sql);
@@ -721,7 +666,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return earnings;
     }
     
-    private double getEmployeeAnnualCompensation(final int payrollId, final int employeeId, final int fiscalYear, final Date payrollDateEnd, int compensationType) throws Exception {
+    private double getEmployeeAnnualCompensation(final int employeeId, final int fiscalYear, final Date payrollDateEnd, int compensationType, final int excludePayrollId) throws Exception {
         double compensation = 0;
         String sqlColumn;
         
@@ -740,7 +685,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "WHERE NOT p.b_del AND NOT pr.b_del AND "
-                + "p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND "
+                + "p.id_pay <> " + excludePayrollId + " AND pr.id_emp = " + employeeId + " AND "
                 + "p.fis_year = " + fiscalYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(payrollDateEnd) + "' "
                 + "GROUP BY pr.id_emp "
                 + "ORDER BY pr.id_emp ";
@@ -768,8 +713,8 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return businessDays;
     }
 
-    private ArrayList<SHrsAccumulatedEarning> getEmployeeAccumulatedEarnings(final int payrollId, final int employeeId, final int periodYear, 
-            final Date dateStart, final Date dateEnd, final int taxComputationType, final boolean byType) throws Exception {
+    private ArrayList<SHrsAccumulatedEarning> getEmployeeAccumulatedEarnings(final int employeeId, final int periodYear, 
+            final Date dateStart, final Date dateEnd, final int taxComputationType, final boolean byType, final int excludePayrollId) throws Exception {
         ArrayList<SHrsAccumulatedEarning> hrsAccumulatedEarnings = new ArrayList<>();
 
         String sql = "SELECT pre.id_pay, pre.id_emp, p.per_year, " + (!byType ? "pre.fk_ear" : "pre.fk_tp_ear") + " AS f_ear, "
@@ -777,7 +722,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pr.id_pay = pre.id_pay AND pr.id_emp = pre.id_emp "
-                + "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND "
+                + "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 AND p.id_pay <> " + excludePayrollId + " AND pr.id_emp = " + employeeId + " AND "
                 + "p.per_year = " + periodYear + " AND " + ((taxComputationType == SModSysConsts.HRSS_TP_TAX_COMP_ANN ||
                     taxComputationType == 0) ?
                     "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "'" :
@@ -796,8 +741,8 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return hrsAccumulatedEarnings;
     }
 
-    private ArrayList<SHrsAccumulatedDeduction> getEmployeeAccumulatedDeductions(final int payrollId, final int employeeId, final int periodYear, 
-            final Date dateStart, final Date dateEnd, final int taxComputationType, final boolean byType) throws Exception {
+    private ArrayList<SHrsAccumulatedDeduction> getEmployeeAccumulatedDeductions(final int employeeId, final int periodYear, 
+            final Date dateStart, final Date dateEnd, final int taxComputationType, final boolean byType, final int excludePayrollId) throws Exception {
         ArrayList<SHrsAccumulatedDeduction> hrsAccumulatedDeductions = new ArrayList<>();
 
         String sql = "SELECT prd.id_pay, prd.id_emp, p.per_year, " + (!byType ? "prd.fk_ded" : "prd.fk_tp_ded") + " AS f_ded, " +
@@ -807,7 +752,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
             "p.id_pay = pr.id_pay " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON " +
             "pr.id_pay = prd.id_pay AND pr.id_emp = prd.id_emp " +
-            "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND p.id_pay <> " + payrollId + " AND pr.id_emp = " + employeeId + " AND " +
+            "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 AND p.id_pay <> " + excludePayrollId + " AND pr.id_emp = " + employeeId + " AND " +
             "p.per_year = " + periodYear + " AND " + ((taxComputationType == SModSysConsts.HRSS_TP_TAX_COMP_ANN ||
                 taxComputationType == 0) ?
                 "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "'" :
@@ -905,7 +850,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         hrsEmployee.setEmployee(pHrsEmployee.getEmployee());
         hrsEmployee.setHrsReceipt(pHrsEmployee.getHrsReceipt());
         hrsEmployee.getLoans().addAll(getEmployeeLoans(employeeId));
-        hrsEmployee.getLoanPayments().addAll(getEmployeeLoanPayments(hrsEmployee.getLoans(), payrollId, payrollYear, payrollYearPeriod));
+        hrsEmployee.getHrsLoans().addAll(getEmployeeHrsLoans(hrsEmployee.getLoans(), payrollId));
         hrsEmployee.getAbsences().addAll(getEmployeeAbsences(employeeId));
         hrsEmployee.getAbsenceConsumptions().addAll(getEmployeeAbsencesConsumptions(hrsEmployee.getAbsences(), payrollId));
         hrsEmployee.getEmployeeHireLogs().addAll(getEmployeeHireLogs(employeeId, dateStart, dateEnd));
@@ -914,20 +859,20 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         Date periodEnd = SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)).compareTo(dateEnd) < 0 ? SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)) : dateEnd;
         
         hrsEmployee.setDaysHiredAnnual(getEmployeeHiredDays(getEmployeeHireLogs(employeeId, periodStart, periodEnd), periodStart, periodEnd));
-        hrsEmployee.setAccumulatedTaxableEarning(getEmployeeAccumulatedTaxableEarnings(payrollId, employeeId, fiscalYear, periodEnd, TAX));
-        hrsEmployee.setAccumulatedTaxableEarningAlt(getEmployeeAccumulatedTaxableEarnings(payrollId, employeeId, fiscalYear, periodEnd, TAX_ALT));
-        hrsEmployee.setAnnualTaxCompensated(getEmployeeAnnualCompensation(payrollId, employeeId, fiscalYear, periodEnd, COMP_TAX));
-        hrsEmployee.setAnnualTaxSubsidyCompensated(getEmployeeAnnualCompensation(payrollId, employeeId, fiscalYear, periodEnd, COMP_TAX_SUB));
+        hrsEmployee.setAccumulatedTaxableEarning(getEmployeeAccumulatedTaxableEarnings(employeeId, fiscalYear, periodEnd, TAX, payrollId));
+        hrsEmployee.setAccumulatedTaxableEarningAlt(getEmployeeAccumulatedTaxableEarnings(employeeId, fiscalYear, periodEnd, TAX_ALT, payrollId));
+        hrsEmployee.setAnnualTaxCompensated(getEmployeeAnnualCompensation(employeeId, fiscalYear, periodEnd, COMP_TAX, payrollId));
+        hrsEmployee.setAnnualTaxSubsidyCompensated(getEmployeeAnnualCompensation(employeeId, fiscalYear, periodEnd, COMP_TAX_SUB, payrollId));
         
         hrsEmployee.setDaysHiredPayroll(getEmployeeHiredDays(hrsEmployee.getEmployeeHireLogs(), dateStart, dateEnd));
         hrsEmployee.setBusinessDays(getEmployeeBusinessDays(hrsEmployee.getEmployeeHireLogs(), pHrsEmployee.getEmployee().getFkPaymentTypeId(), dateStart, dateEnd));
-        hrsEmployee.setSeniority(SHrsUtils.getSeniorityEmployee(pHrsEmployee.getEmployee().getDateBenefits(), dateEnd));
-        hrsEmployee.getYearHrsAccumulatedEarnigs().addAll(getEmployeeAccumulatedEarnings(payrollId, employeeId, payrollYear, dateStart, dateEnd, 0, false));
-        hrsEmployee.getYearHrsAccumulatedEarnigsByType().addAll(getEmployeeAccumulatedEarnings(payrollId, employeeId, payrollYear, dateStart, dateEnd, taxComputationType, true));
-        hrsEmployee.getYearHrsAccumulatedEarnigsByTaxComputation().addAll(getEmployeeAccumulatedEarnings(payrollId, employeeId, payrollYear, dateStart, dateEnd, taxComputationType, false));
-        hrsEmployee.getYearHrsAccumulatedDeductions().addAll(getEmployeeAccumulatedDeductions(payrollId, employeeId, payrollYear, dateStart, dateEnd, 0, false));
-        hrsEmployee.getYearHrsAccumulatedDeductionsByType().addAll(getEmployeeAccumulatedDeductions(payrollId, employeeId, payrollYear, dateStart, dateEnd, taxComputationType, true));
-        hrsEmployee.getYearHrsAccumulatedDeductionsByTaxComputation().addAll(getEmployeeAccumulatedDeductions(payrollId, employeeId, payrollYear, dateStart, dateEnd, taxComputationType, false));
+        hrsEmployee.setSeniority(SHrsUtils.getEmployeeSeniority(pHrsEmployee.getEmployee().getDateBenefits(), dateEnd));
+        hrsEmployee.getYearHrsAccumulatedEarnigs().addAll(getEmployeeAccumulatedEarnings(employeeId, payrollYear, dateStart, dateEnd, 0, false, payrollId));
+        hrsEmployee.getYearHrsAccumulatedEarnigsByType().addAll(getEmployeeAccumulatedEarnings(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, true, payrollId));
+        hrsEmployee.getYearHrsAccumulatedEarnigsByTaxComputation().addAll(getEmployeeAccumulatedEarnings(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, false, payrollId));
+        hrsEmployee.getYearHrsAccumulatedDeductions().addAll(getEmployeeAccumulatedDeductions(employeeId, payrollYear, dateStart, dateEnd, 0, false, payrollId));
+        hrsEmployee.getYearHrsAccumulatedDeductionsByType().addAll(getEmployeeAccumulatedDeductions(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, true, payrollId));
+        hrsEmployee.getYearHrsAccumulatedDeductionsByTaxComputation().addAll(getEmployeeAccumulatedDeductions(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, false, payrollId));
 
         return hrsEmployee;
     }

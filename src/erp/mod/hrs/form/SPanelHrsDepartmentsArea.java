@@ -107,7 +107,7 @@ public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
                 SGridColumnForm columnForm = null;
-                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<SGridColumnForm>();
+                ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Código departamento", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Departamento", 350));
@@ -192,8 +192,7 @@ public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener
 
                 department.setDepartamentCode(resultSet.getString("code"));
                 department.setDepartamentName(resultSet.getString("name"));                
-                department.setNumNom(SHrsCfdUtils.getDepType(miClient, payrollKeyNum[0] ,resultSet.getInt("id_dep")));
-                
+                department.setNumNom(SHrsCfdUtils.getCfdCountByDepartment(miClient.getSession(), payrollKeyNum[0], resultSet.getInt("id_dep")));
 
                 rows.add(department);
             }

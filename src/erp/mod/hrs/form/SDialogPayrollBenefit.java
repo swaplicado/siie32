@@ -529,7 +529,7 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
             throw new Exception(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'.");
         }
         else {
-            int benefitAnniv = SHrsUtils.getSeniorityEmployee(moEmployee.getDateBenefits(), mtDateCutoff);
+            int benefitAnniv = SHrsUtils.getEmployeeSeniority(moEmployee.getDateBenefits(), mtDateCutoff);
 
             setDateBaseDate(mtDateCutoff, benefitAnniv);
 
@@ -603,7 +603,7 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
     }
     
     private void readHrsBenefit() {
-        int benefitAnniv = SHrsUtils.getSeniorityEmployee(moEmployee.getDateBenefits(), mtDateCutoff);
+        int benefitAnniv = SHrsUtils.getEmployeeSeniority(moEmployee.getDateBenefits(), mtDateCutoff);
 
         if (!moEmployee.isActive()) {
             if (mtDateCutoff.compareTo(SLibTimeUtils.addDate(moEmployee.getDateBenefits(), benefitAnniv, 0, 0)) > 0) {

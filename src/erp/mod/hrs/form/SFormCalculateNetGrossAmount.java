@@ -569,32 +569,23 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
         }
     }
     
-    private void actionCalculated() {
-        double dSalaryDiary = 0;
-        double dSalarySscBase = 0;
+    /**
+     * Computes the requested amount: net or gross monthly payment.
+     * TODO: Include as well Social Security Contribution!
+     */
+    private void actionEstimate() {
         SHrsCalculatedNetGrossAmount netGrossAmount = null;
         
         try {
-            /*
             if (mnFormType == SHrsConsts.CAL_NET_AMT_TYPE) {
-                dSalaryDiary = moCompGrossAmount.getField().getValue() * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS;
-            }
-            else if (mnFormType == SHrsConsts.CAL_GROSS_AMT_TYPE) {
-                dSalaryDiary = moCompNetAmount.getField().getValue() * SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS; // XXX el calculo del SD es incorrecto
-            }
-            dSalarySscBase = dSalaryDiary * SHrsUtils.getIntegrationFactorSbc(miClient.getSession(), (moEmployee == null ? null : moEmployee.getDateBenefits()), moDateDate.getValue());
-            moCompSalarySscBase.getField().setValue(dSalarySscBase);
-            */
-            
-            if (mnFormType == SHrsConsts.CAL_NET_AMT_TYPE) {
-                netGrossAmount = SHrsUtils.computeAmountPaymentNet(miClient.getSession(), moCompGrossAmount.getField().getValue(), moDateDateCutoff.getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()));
+                netGrossAmount = SHrsUtils.estimateMonthlyPaymentNet(miClient.getSession(), moCompGrossAmount.getField().getValue(), moDateDateCutoff.getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()));
 
                 moCompNetAmountCalculated.getField().setValue(netGrossAmount.getNetAmount());
                 moCompGrossAmountCalculated.getField().setValue(0d);
                 moCompNetAmountWithSubsidy.getField().setValue(netGrossAmount.getNetAmountWithSubsidy());
             }
             else if (mnFormType == SHrsConsts.CAL_GROSS_AMT_TYPE) {
-                netGrossAmount = SHrsUtils.computeAmountPaymentGross(miClient.getSession(), moCompNetAmount.getField().getValue(), moDateDateCutoff.getValue(), moCompTolerance.getField().getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()));                    
+                netGrossAmount = SHrsUtils.estimateMonthlyPaymentGross(miClient.getSession(), moCompNetAmount.getField().getValue(), moDateDateCutoff.getValue(), (moEmployee == null ? null : moEmployee.getDateBenefits()), moCompTolerance.getField().getValue());
 
                 moCompNetAmountCalculated.getField().setValue(0d);
                 moCompGrossAmountCalculated.getField().setValue(netGrossAmount.getGrossAmount());
@@ -765,7 +756,7 @@ public class SFormCalculateNetGrossAmount extends SBeanForm implements ItemListe
     public void actionSave() {
         if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
-                actionCalculated();
+                actionEstimate();
             }
         }
     }

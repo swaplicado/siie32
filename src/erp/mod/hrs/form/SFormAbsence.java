@@ -661,7 +661,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
                 // reset spinner:
                 try {
                     prepareBenefitTableOfVacations();
-                    int seniority = SHrsUtils.getSeniorityEmployee(moEmployee.getDateBenefits(), moDateDateEnd.getValue());
+                    int seniority = SHrsUtils.getEmployeeSeniority(moEmployee.getDateBenefits(), moDateDateEnd.getValue());
                     jsAnniversary.setValue(seniority == 0 ? 1 : seniority);
                 }
                 catch (Exception e) {

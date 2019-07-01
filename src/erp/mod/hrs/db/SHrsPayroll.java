@@ -319,7 +319,7 @@ public class SHrsPayroll {
                 ArrayList<SHrsBenefitTableAnniversary> hrsBenefitTableAnniversarysVac = getBenefitTableAnniversary(deBenefitTableVac.getPkBenefitId());
                 SHrsBenefitTableAnniversary hrsBenefitTableAnniversaryVacBon = null;
                 SHrsBenefitTableAnniversary hrsBenefitTableAnniversaryVac = null;
-                int benefitAnniv = SHrsUtils.getSeniorityEmployee(employee.getDateBenefits(), dateCutOff);
+                int benefitAnniv = SHrsUtils.getEmployeeSeniority(employee.getDateBenefits(), dateCutOff);
                 int benefitYear = SLibTimeUtils.digestDate(dateCutOff)[0] - 1;
                 
                 for (SHrsBenefitTableAnniversary anniversary : hrsBenefitTableAnniversarysVacBon) {
@@ -395,7 +395,7 @@ public class SHrsPayroll {
         ArrayList<SHrsReceiptDeduction> hrsReceiptDeductions = new ArrayList<>();
 
         if (moPayroll.isNormal()) {
-            // Get earnings of withholding:
+            // Get deductions that are withholding ones (deductions by law):
             
             for (SDbDeduction deduction : maDeductions) {
                 if (deduction.isWithholding()) {
@@ -445,14 +445,9 @@ public class SHrsPayroll {
 
             for (SDbLoan loan : hrsReceipt.getHrsEmployee().getLoans()) {
                 if (SLibTimeUtils.isBelongingToPeriod(loan.getDateStart(), loan.getDateEnd_n() == null ? dateEnd : loan.getDateEnd_n(), dateStart, dateEnd)) {
-                    double amountLoan = SHrsUtils.computeAmountLoan(hrsReceipt, loan);
+                    double loanAmount = SHrsUtils.computeLoanAmount(loan, hrsReceipt, null, null);
 
-                    if (loan.isPlainLoan()) {
-                        double balanceLoan = SHrsUtils.getBalanceLoan(loan, hrsReceipt.getHrsEmployee());
-                        amountLoan = (amountLoan > balanceLoan ? balanceLoan : amountLoan);
-                    }
-
-                    if (amountLoan > 0) {
+                    if (loanAmount > 0) {
                         SDbDeduction deductionLoan = null;
 
                         for (SDbDeduction deduction : maDeductions) {
@@ -468,7 +463,7 @@ public class SHrsPayroll {
                         else {
                             SDbPayrollReceiptDeduction payrollReceiptDeduction = createPayrollReceiptDeduction(
                                     hrsReceipt, deductionLoan, 
-                                    1, amountLoan, true,
+                                    1, loanAmount, true,
                                     loan.getPkEmployeeId(), loan.getPkLoanId(), ++moveId);
 
                             SHrsReceiptDeduction hrsReceiptDeduction = new SHrsReceiptDeduction();
@@ -517,17 +512,36 @@ public class SHrsPayroll {
     public HashMap<Integer, String> getEarningComputationTypesMap() { return moEarningComputationTypesMap; }
     public HashMap<Integer, String> getDeductionComputationTypesMap() { return moDeductionComputationTypesMap; }
     
-    public double getLoanTypeAdjustment(final Date date, final int loanType) {
-        double amount = 0;
+    public double getLoanTypeMonthlyAdjustment(final Date date, final int loanType) {
+        double monthlyAdjustment = 0;
+        ArrayList<SDbLoanTypeAdjustment> matchingAdjustments = new ArrayList<>();
+        
+        // first, filter only matching adjustments:
 
         for (SDbLoanTypeAdjustment adjustment : maLoanTypeAdjustments) {
-            if (!date.before(adjustment.getDateStart()) && adjustment.getPkLoanTypeId() == loanType) {
-                amount = adjustment.getAdjustment();
-                break;
+            if (adjustment.getPkLoanTypeId() == loanType && !date.before(adjustment.getDateStart())) {
+                matchingAdjustments.add(adjustment);
             }
         }
+        
+        // find the more recent matching adjustment, to take from it the requested monthly adjustment:
+        
+        SDbLoanTypeAdjustment moreRecentAdjustment = null;
+        
+        for (SDbLoanTypeAdjustment adjustment : matchingAdjustments) {
+            if (moreRecentAdjustment == null) {
+                moreRecentAdjustment = adjustment;
+            }
+            else if (adjustment.getDateStart().compareTo(moreRecentAdjustment.getDateStart()) >= 0) {
+                moreRecentAdjustment = adjustment;
+            }
+        }
+        
+        if (moreRecentAdjustment != null) {
+            monthlyAdjustment = moreRecentAdjustment.getAdjustment();
+        }
 
-        return amount;
+        return monthlyAdjustment;
     }
     
     /**
@@ -924,7 +938,7 @@ public class SHrsPayroll {
         Date payrollDateEnd = hrsReceipt.getHrsPayroll().getPayroll().getDateEnd();
         SHrsEmployeeDays hrsEmployeeDays = hrsReceipt.getHrsEmployee().createEmployeeDays(); // calendar and business days available for this receipt
 
-        // go through all absences for current employee to check wich ones are elegible to be added to this receipt:
+        // go through all absences for current employee to check which ones are elegible to be added to this receipt:
         
         for (SDbAbsence absence : hrsReceipt.getHrsEmployee().getAbsences()) {
             if (!absence.isClosed() && !absence.getDateStart().after(payrollDateEnd)) { // is current absence elegible?

@@ -478,7 +478,7 @@ public abstract class STableUtilities {
      * (4 + 2) / 3 in RPN: 4 2 + 3 /
      *
      * @param paRpnArguments RPN arguments, operands (STableField objects) and operators (Character objects, i.e. '+', '-', '*' and '/').
-     * @param poResultSet Database resultet wich from operands are taken.
+     * @param poResultSet Database resultet which from operands are taken.
      */
     public static double calculateRpn(java.util.ArrayList<sa.lib.SLibRpnArgument> paRpnArguments, java.sql.ResultSet poResultSet) {
         double a = 0;

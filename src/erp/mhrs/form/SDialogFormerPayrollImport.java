@@ -76,7 +76,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
     private erp.mfin.data.SDataRecord moCurrentRecord;
     private erp.mhrs.data.SDataFormerPayroll moFormerPayroll;
-    private SHrsFormerPayroll moPayroll;
+    private SHrsFormerPayroll moHrsFormerPayroll;
     private java.util.Vector<java.lang.Object[]> mvRecords; // idx 0: record registry (SDataRecord); idx 1: selected employees (Vector<Integer>)
 
     /** Creates new form SDialogFormerPayrollPicker
@@ -1293,8 +1293,8 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
         // Obtain payroll structure:
 
-        moPayroll = SHrsFormerUtils.readFormerPayroll((SClientInterface) miClient, miClient.getSession().getStatement(), mnPayrollId, miClient.getSession().getConfigCompany().getCompanyId(), moFieldDate.getDate(), moFieldDatePayment.getDate());
-        SCfdUtils.computeCfdiPayroll(miClient, moPayroll, false); // generate all CFDI
+        moHrsFormerPayroll = SHrsFormerUtils.readHrsFormerPayroll((SClientInterface) miClient, miClient.getSession().getStatement(), mnPayrollId, miClient.getSession().getConfigCompany().getCompanyId(), moFieldDate.getDate(), moFieldDatePayment.getDate());
+        SCfdUtils.computeCfdiPayroll(miClient, moHrsFormerPayroll, false); // generate all CFDI
 
         miClient.getGuiModule(SDataConstants.MOD_FIN).refreshCatalogues(SDataConstants.FIN_REC);
         miClient.getGuiModule(SDataConstants.MOD_HRS).refreshCatalogues(SDataConstants.HRS_SIE_PAY);

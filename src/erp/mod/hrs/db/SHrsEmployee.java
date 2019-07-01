@@ -18,29 +18,29 @@ public class SHrsEmployee {
 
     protected int mnYear;   // for accumulated earnings & deductions
     protected int mnPeriod; // for accumulated earnings & deductions
-    protected Date mtPeriodStart;   // analyzed period start date
-    protected Date mtPeriodEnd;     // analyzed period end date
+    protected Date mtPeriodStart; // analyzed period start date
+    protected Date mtPeriodEnd;   // analyzed period end date
     protected int mnTaxComputationType; // current tax computation type
     protected SDbEmployee moEmployee;
-    protected SHrsReceipt moHrsReceipt;     // current receipt
-    protected ArrayList<SDbLoan> maLoans;   // all employee loans
-    protected ArrayList<SHrsLoanPayments> maHrsLoanPayments;    // all employee loan payments
-    protected ArrayList<SDbAbsence> maAbsences;                 // all employee absences
-    protected ArrayList<SDbAbsenceConsumption> maAbsenceConsumptions;   // all employee absences consumptions
-    protected ArrayList<SDbEmployeeHireLog> maEmployeeHireLogs;         // all hire log entries
-    protected ArrayList<SHrsAccumulatedEarning> maYearHrsAccumulatedEarnigs;        // accumulated earnings in year, current payroll receipt not included (applies only for earnings exempt computation)
-    protected ArrayList<SHrsAccumulatedEarning> maYearHrsAccumulatedEarnigsByType;  // accumulated earnings in year, current payroll receipt not included (applies only for annual tax computation)
-    protected ArrayList<SHrsAccumulatedEarning> maYearHrsAccumulatedEarnigsByTaxComputation;    // accumulated earnings in year, current payroll receipt not included (applies only for annual tax computation)
-    protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductions;               // accumulated deductions in year, current payroll receipt not included (applies only for deductions)
-    protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductionsByType;         // accumulated deductions in year, current payroll receipt not included (applies only for annual tax computation)
-    protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductionsByTaxComputation;   // accumulated deductions in year, current payroll receipt not included (applies only for annual tax computation)
-    protected ArrayList<SHrsBenefit> maHrsBenefit;  // payroll receipt benefit paid and applied
-    protected int mnDaysHiredAnnual;    // hired days in fiscal year
-    protected int mnDaysHiredPayroll;   // hired days in the period payroll
-    protected int mnBusinessDays;   // business days in the period payroll
-    protected int mnSeniority;      // seniority in years to payroll end
-    protected double mdAccumulatedTaxableEarnings;      // taxable amount accumulated of earnigs 
-    protected double mdAccumulatedTaxableEarningsAlt;   // taxable amount accumulated of earnigs configured for articule 174 the RLISR
+    protected SHrsReceipt moHrsReceipt; // current receipt
+    protected ArrayList<SDbLoan> maLoans;       // all employee loans
+    protected ArrayList<SHrsLoan> maHrsLoans;   // all employee loans
+    protected ArrayList<SDbAbsence> maAbsences; // all employee absences
+    protected ArrayList<SDbAbsenceConsumption> maAbsenceConsumptions; // all employee absences consumptions
+    protected ArrayList<SDbEmployeeHireLog> maEmployeeHireLogs;       // all hire log entries
+    protected ArrayList<SHrsAccumulatedEarning> maYearHrsAccumulatedEarnigs;       // accumulated earnings in year, current payroll receipt not included (applies only for earnings exempt computation)
+    protected ArrayList<SHrsAccumulatedEarning> maYearHrsAccumulatedEarnigsByType; // accumulated earnings in year, current payroll receipt not included (applies only for annual tax computation)
+    protected ArrayList<SHrsAccumulatedEarning> maYearHrsAccumulatedEarnigsByTaxComputation; // accumulated earnings in year, current payroll receipt not included (applies only for annual tax computation)
+    protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductions;       // accumulated deductions in year, current payroll receipt not included (applies only for deductions)
+    protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductionsByType; // accumulated deductions in year, current payroll receipt not included (applies only for annual tax computation)
+    protected ArrayList<SHrsAccumulatedDeduction> maYearHrsAccumulatedDeductionsByTaxComputation; // accumulated deductions in year, current payroll receipt not included (applies only for annual tax computation)
+    protected ArrayList<SHrsBenefit> maHrsBenefit; // payroll receipt benefit paid and applied
+    protected int mnDaysHiredAnnual;  // hired days in fiscal year
+    protected int mnDaysHiredPayroll; // hired days in the period payroll
+    protected int mnBusinessDays; // business days in the period payroll
+    protected int mnSeniority;    // seniority in years to payroll end
+    protected double mdAccumulatedTaxableEarnings;    // taxable amount accumulated of earnigs 
+    protected double mdAccumulatedTaxableEarningsAlt; // taxable amount accumulated of earnigs configured for articule 174 the RLISR
     protected double mdAnnualTaxCompensated;
     protected double mdAnnualTaxSubsidyCompensated;
     protected SHrsDaysByPeriod moHrsDaysPrev;
@@ -56,7 +56,7 @@ public class SHrsEmployee {
         moEmployee = null;
         moHrsReceipt = null;
         maLoans = new ArrayList<>();
-        maHrsLoanPayments = new ArrayList<>();
+        maHrsLoans = new ArrayList<>();
         maAbsences = new ArrayList<>();
         maAbsenceConsumptions = new ArrayList<>();
         maEmployeeHireLogs = new ArrayList<>();
@@ -108,7 +108,7 @@ public class SHrsEmployee {
     public SDbEmployee getEmployee() { return moEmployee; }
     public SHrsReceipt getHrsReceipt() { return moHrsReceipt; }
     public ArrayList<SDbLoan> getLoans() { return maLoans; }
-    public ArrayList<SHrsLoanPayments> getLoanPayments() { return maHrsLoanPayments; }
+    public ArrayList<SHrsLoan> getHrsLoans() { return maHrsLoans; }
     public ArrayList<SDbAbsence> getAbsences() { return maAbsences; };
     public ArrayList<SDbAbsenceConsumption> getAbsenceConsumptions() { return maAbsenceConsumptions; };
     public ArrayList<SDbEmployeeHireLog> getEmployeeHireLogs() { return maEmployeeHireLogs; }
@@ -153,18 +153,18 @@ public class SHrsEmployee {
         return loan == null ? "" : loan.composeLoanDescription();
     }
     
-    public SHrsLoanPayments getHrsLoanPayments(final int loanId) {
-        SHrsLoanPayments hrsLoanPayments = null;
+    public SHrsLoan getHrsLoan(final int loanId) {
+        SHrsLoan hrsLoan = null;
         SDbLoan loan = getLoan(loanId);
         
-        for (SHrsLoanPayments payments : maHrsLoanPayments) {
-            if (SLibUtils.compareKeys(loan.getPrimaryKey(), payments.getLoan().getPrimaryKey())) {
-                hrsLoanPayments = payments;
+        for (SHrsLoan hl : maHrsLoans) {
+            if (SLibUtils.compareKeys(loan.getPrimaryKey(), hl.getLoan().getPrimaryKey())) {
+                hrsLoan = hl;
                 break;
             }
         }
         
-        return hrsLoanPayments;
+        return hrsLoan;
     }
 
     public SHrsAccumulatedEarning getHrsAccumulatedEarning(final int earningId) {

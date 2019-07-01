@@ -411,7 +411,8 @@ public class SDialogCfdProcessing extends sa.lib.gui.bean.SBeanFormDialog {
                             }
                             else {
                                 number = SHrsUtils.getPayrollReceiptNextNumber(miClient.getSession(), receiptIssue.getNumberSeries());
-                                receiptIssue.saveField(miClient.getSession().getStatement(), key, SDbPayrollReceiptIssue.FIELD_NUMBER, number);
+                                receiptIssue.setNumber(number); // update memory
+                                receiptIssue.saveField(miClient.getSession().getStatement(), key, SDbPayrollReceiptIssue.FIELD_NUMBER, number); // update persistent storage as well
                             }
 
                             SHrsCfdUtils.computeSignCfdi(miClient.getSession(), key);

@@ -211,7 +211,7 @@ public class SDialogLayoutEmployee extends SBeanFormDialog implements FocusListe
                         SHrsUtils.createLayoutEmployeeModification(miClient ,mnLayoutSua ,moDateStart.getValue() ,moDateEnd.getValue());
                         break;
                     case SModConsts.HRSX_LAYOUT_SUA_DISMISS:
-                        SHrsUtils.createLayoutEmployeeDelete(miClient ,mnLayoutSua ,moDateStart.getValue() ,moDateEnd.getValue());
+                        SHrsUtils.createLayoutEmployeeDeletion(miClient ,mnLayoutSua ,moDateStart.getValue() ,moDateEnd.getValue());
                         break;
                     default :
                 }

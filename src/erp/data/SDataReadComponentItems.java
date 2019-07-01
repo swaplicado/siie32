@@ -285,6 +285,7 @@ public abstract class SDataReadComponentItems {
         int lenFk = 0;
         boolean isPkOnlyInts = true;
         boolean isFkOnlyInts = true;
+        boolean isComplementApplying = false;
         java.lang.String sql = "";
         java.lang.String text = "";
 
@@ -292,29 +293,32 @@ public abstract class SDataReadComponentItems {
             case SDataConstants.LOCU_CTY:
                 lenPk = 1;
                 sql = "SELECT id_cty AS f_id_1, " +
-                        (!paramsErp.getIsKeyLocalityApplying() ? "cty" :
+                        (!paramsErp.getIsKeyLocalityApplying() ? "CONCAT(cty, ' - ', cty_code)" :
                             (paramsErp.getFkSortingLocalityTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "CONCAT(cty_key, ' - ', cty)" : "CONCAT(cty, ' - ', cty_key)")) +
                             " AS f_item " +
                         "FROM erp.locu_cty WHERE b_del = 0 " +
                         "ORDER BY " + (paramsErp.getFkSortingLocalityTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "cty_key, cty, " : "cty, cty_key, ") + "id_cty ";
                 text = "país";
                 break;
+                
             case SDataConstants.LOCU_STA:
                 lenPk = 1;
+                isComplementApplying = true;
                 sql = "SELECT id_sta AS f_id_1, " +
-                        (!paramsErp.getIsKeyLocalityApplying() ? "sta" :
-                            (paramsErp.getFkSortingLocalityTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "CONCAT(sta_code, ' - ', sta)" : "CONCAT(sta, ' - ', sta_code)")) +
-                            " AS f_item " +
+                        (!paramsErp.getIsKeyLocalityApplying() ? "CONCAT(sta_lan, ' - ', sta_code)" :
+                            (paramsErp.getFkSortingLocalityTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "CONCAT(sta_code, ' - ', sta_lan)" : "CONCAT(sta_lan, ' - ', sta_code)")) +
+                            " AS f_item, " +
+                            "sta_lan AS f_comp " +
                         "FROM erp.locu_sta " +
                         "WHERE b_del = 0 " + (pk == null ? "" : " AND fid_cty = " + ((int[]) pk)[0] + " ") +
-                        "ORDER BY " + (paramsErp.getFkSortingLocalityTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "sta_code, sta, " : "sta, sta_code, ") + "id_sta ";
+                        "ORDER BY " + (paramsErp.getFkSortingLocalityTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "sta_code, sta_lan, " : "sta_lan, sta_code, ") + "id_sta ";
                 text = "estado";
                 break;
+                
             default:
-                break;
         }
 
-        return new Object[] { lenPk, isPkOnlyInts, lenFk, isFkOnlyInts, sql, text, false };
+        return new Object[] { lenPk, isPkOnlyInts, lenFk, isFkOnlyInts, sql, text, isComplementApplying };
     }
 
     private static java.lang.Object[] getSettingsCatBps(int catalogue, erp.mcfg.data.SDataParamsErp paramsErp, java.lang.Object pk) {
@@ -450,7 +454,7 @@ public abstract class SDataReadComponentItems {
                     default:
                 }
 
-                sql = "SELECT bp.id_bp AS f_id_1, " + (!isKeyApplying ? "bp.bp " :
+                sql = "SELECT DISTINCT bp.id_bp AS f_id_1, " + (!isKeyApplying ? "bp.bp " :
                         (sortingType == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ||sortingType == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME_COMM ? "CONCAT(ct.bp_key, ' - ', bp.bp) " : "CONCAT(bp.bp, ' - ', ct.bp_key) ")) + "AS f_item " +
                         "FROM erp.bpsu_bp AS bp " +
                         (catalogue == SDataConstants.BPSX_BP_EMP ? "WHERE bp.b_del = 0 AND bp.b_att_emp = 1 " :
@@ -555,6 +559,15 @@ public abstract class SDataReadComponentItems {
                         "WHERE b_del = 0 " +
                         "ORDER BY id_bpb, id_bank_acc, card_num, holder, id_card ";
                 text = "tarjeta de cuenta bancaria";
+                break;
+            case SDataConstants.BPSU_BP_ADDEE:
+                lenPk = 1;
+                sql = "SELECT id_bp_addee AS f_id_1, " +
+                        "CONCAT(name, ' - ', address) AS f_item " +
+                        "FROM erp.bpsu_bp_addee " +
+                        "WHERE NOT b_del AND fid_bp = " + ((int[]) pk)[0] + " " +
+                        "ORDER BY name, address, id_bp_addee ";
+                text = "destinatario";
                 break;
             case SDataConstants.BPSU_TP_BP:
                 lenPk = 2;

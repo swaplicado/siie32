@@ -6,7 +6,7 @@ package erp.cfd;
 
 /**
  * Class from management of address form company.
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SCceEmisorAddressAux implements java.io.Serializable {
 

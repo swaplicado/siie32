@@ -121,7 +121,7 @@ public class SViewBizPartnerBranchAddress extends erp.lib.table.STableTab implem
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.bpb", "Sucursal asociado", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tp.tp_add", "Tipo domicilio", 100);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ad.bpb_add", "Domicilio", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ad.bpb_add", "Id. domicilio", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ad.street", "Calle", 150);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ad.street_num_ext", "Número ext.", 50);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ad.street_num_int", "Número int.", 50);

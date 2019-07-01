@@ -81,6 +81,7 @@ public class SDbDeduction extends SDbRegistryUser {
     public String getName() { return msName; }
     public String getNameAbbreviated() { return msNameAbbreviated; }
     public double getRetPercentage() { return mdRetPercentage; }
+    /** Is deduction by law. */
     public boolean isWithholding() { return mbWithholding; }
     public boolean isPayrollTax() { return mbPayrollTax; }
     public boolean isDeleted() { return mbDeleted; }

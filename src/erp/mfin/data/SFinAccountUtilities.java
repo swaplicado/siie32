@@ -45,7 +45,7 @@ public abstract class SFinAccountUtilities {
     
     /**
      * Obtains the ledger account of provided account.
-     * @param account Provided account from wich its ledger account will be obtained.
+     * @param account Provided account from which its ledger account will be obtained.
      * @param accountFormat Account format from ERP configuration.
      * @return Ledger account.
      */
@@ -58,7 +58,7 @@ public abstract class SFinAccountUtilities {
     /**
      * Gets the system-account type of provided account.
      * @param connection Database connection.
-     * @param account Provided account from wich its system-account type will be get.
+     * @param account Provided account from which its system-account type will be get.
      * @return System-account type.
      * @throws SQLException
      * @throws Exception 

@@ -409,8 +409,8 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
                 dDaysIncapacityNotPay = SHrsUtils.getEmployeeIncapacityNotPayed(SHrsUtils.getEmployeeAbsencesConsumptions(miClient.getSession(), SHrsUtils.getEmployeeAbsences(miClient.getSession(), employeeId), 0), mtDateStart, mtDateEnd);
                 dDaysTaxable = dDaysHired - dDaysIncapacityNotPay;
                 
-                amountEarnings = SHrsUtils.getAmountEarningsByEmployee(miClient.getSession(), employeeId, periodYear, mtDateEnd);
-                amountEarningSubsidy = SHrsUtils.getAmountEarningByEmployee(miClient.getSession(), employeeId, SModSysConsts.HRSS_TP_EAR_TAX_SUB, periodYear, mtDateEnd);
+                amountEarnings = SHrsUtils.getAmountEarningByEmployee(miClient.getSession(), employeeId, periodYear, mtDateEnd, 0);
+                amountEarningSubsidy = SHrsUtils.getAmountEarningByEmployee(miClient.getSession(), employeeId, periodYear, mtDateEnd, SModSysConsts.HRSS_TP_EAR_TAX_SUB);
                 dTableFactor = ((double) SHrsConsts.YEAR_MONTHS / (SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(periodYear) ? 1d : 0d))) * dDaysTaxable;
 
                 row.setEmployeeId(employeeId);
@@ -423,9 +423,9 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
                 row.setDaysIncapacity(dDaysIncapacityNotPay);
                 row.setDaysTaxable(dDaysTaxable);
                 row.setFactor(dTableFactor);
-                row.setCalculatedTax(SHrsUtils.computeAmountTax(dbTaxTable, amountEarnings.getAmountTaxable(), dTableFactor));
-                row.setRetainedTax(SHrsUtils.getAmountDeductionByEmployee(miClient.getSession(), employeeId, SModSysConsts.HRSS_TP_DED_TAX, periodYear, mtDateEnd));
-                row.setCalculatedSubsidy(SHrsUtils.computeAmountTaxSubsidy(dbSubsidyTable, amountEarnings.getAmountTaxable(), dTableFactor));
+                row.setCalculatedTax(SHrsUtils.computeTax(dbTaxTable, amountEarnings.getAmountTaxable(), dTableFactor));
+                row.setRetainedTax(SHrsUtils.getAmountDeductionByEmployee(miClient.getSession(), employeeId, periodYear, mtDateEnd, SModSysConsts.HRSS_TP_DED_TAX));
+                row.setCalculatedSubsidy(SHrsUtils.computeTaxSubsidy(dbSubsidyTable, amountEarnings.getAmountTaxable(), dTableFactor));
                 row.setGivenSubsidy(amountEarningSubsidy.getAmount());
                 row.setIsStatus(resultSet.getBoolean("e.b_act"));
                 row.setDateHire(resultSet.getDate("e.dt_hire"));

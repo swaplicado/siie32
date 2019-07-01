@@ -44,7 +44,7 @@ import sa.lib.db.SDbRegistry;
  * 2018-01-02, Sergio Flores:
  *  Implementation of payroll into CFDI 3.3.
  */
-public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
+public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
 
     protected SClientInterface miClient;
 
@@ -95,10 +95,10 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     protected int mnAuxEmpleadoId;
     protected double mdAuxSueldoMensual;
 
-    protected SHrsFormerPayroll moPayroll;
-    protected ArrayList<SHrsFormerPayrollConcept> moChildPayrollConcepts;
+    protected SHrsFormerPayroll moParentPayroll;
+    protected ArrayList<SHrsFormerReceiptConcept> moChildConcepts;
 
-    public SHrsFormerPayrollReceipt(SHrsFormerPayroll payroll, SClientInterface client) {
+    public SHrsFormerReceipt(SClientInterface client, SHrsFormerPayroll parentPayroll) {
         miClient = client;
 
         mnPkEmpleadoId = 0;
@@ -148,8 +148,8 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         mnAuxEmpleadoId = 0;
         mdAuxSueldoMensual = 0;
 
-        moPayroll = payroll;
-        moChildPayrollConcepts = new ArrayList<>();
+        moParentPayroll = parentPayroll;
+        moChildConcepts = new ArrayList<>();
     }
 
     public void setPkEmpleadoId(int n) { mnPkEmpleadoId = n; }
@@ -198,7 +198,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public void setAuxEmpleadoId(int n) { mnAuxEmpleadoId = n; }
     public void setAuxSueldoMensual(double d) { mdAuxSueldoMensual = d; }
 
-    public void setPayroll(SHrsFormerPayroll o) { moPayroll = o; }
+    public void setParentPayroll(SHrsFormerPayroll o) { moParentPayroll = o; }
 
     public int getPkEmpleadoId() { return mnPkEmpleadoId; }
     public int getPkSucursalEmpleadoId() { return mnPkSucursalEmpleadoId; }
@@ -245,8 +245,8 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public int getAuxEmpleadoId() { return mnAuxEmpleadoId; }
     public double getAuxSueldoMensual() { return mdAuxSueldoMensual; }
     
-    public SHrsFormerPayroll getPayroll() { return moPayroll; }
-    public ArrayList<SHrsFormerPayrollConcept> getChildPayrollConcepts() { return moChildPayrollConcepts; }
+    public SHrsFormerPayroll getParentPayroll() { return moParentPayroll; }
+    public ArrayList<SHrsFormerReceiptConcept> getChildConcepts() { return moChildConcepts; }
 
     /*
      * CFDI methods:
@@ -269,7 +269,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         return key.length() < minLen ? SLibUtils.textRepeat("0", minLen - key.length()) + key : key;
     }
     
-    private cfd.ver3.nom12.DElementDeduccion createElementDeduction(final SHrsFormerPayrollConcept concept) {
+    private cfd.ver3.nom12.DElementDeduccion createElementDeduction(final SHrsFormerReceiptConcept concept) {
         cfd.ver3.nom12.DElementDeduccion deduccion = new cfd.ver3.nom12.DElementDeduccion();
 
         deduccion.getAttTipoDeduccion().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_DED, new int[] { concept.getClaveOficial() }, SDbRegistry.FIELD_CODE));
@@ -280,7 +280,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         return deduccion;
     }
     
-    private cfd.ver3.nom12.DElementPercepcion createElementEarning(final SHrsFormerPayrollConcept concept) {
+    private cfd.ver3.nom12.DElementPercepcion createElementEarning(final SHrsFormerReceiptConcept concept) {
         cfd.ver3.nom12.DElementPercepcion percepcion = new cfd.ver3.nom12.DElementPercepcion();
 
         percepcion.getAttTipoPercepcion().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_EAR, new int[] { concept.getClaveOficial() }, SDbRegistry.FIELD_CODE));
@@ -292,7 +292,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         return percepcion;
     }
     
-    private cfd.ver3.nom12.DElementHorasExtra createElementEarningOverTime(final SHrsFormerPayrollConcept concept) {
+    private cfd.ver3.nom12.DElementHorasExtra createElementEarningOverTime(final SHrsFormerReceiptConcept concept) {
         cfd.ver3.nom12.DElementHorasExtra horasExtra = new cfd.ver3.nom12.DElementHorasExtra();
 
         horasExtra.getAttDias().setInteger((int) concept.getCantidad());
@@ -315,7 +315,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         return separacionIndemnizacion;
     }
     
-    private cfd.ver3.nom12.DElementIncapacidad createElementEarningDisability(final SHrsFormerPayrollConcept concept) {
+    private cfd.ver3.nom12.DElementIncapacidad createElementEarningDisability(final SHrsFormerReceiptConcept concept) {
         cfd.ver3.nom12.DElementIncapacidad incapacidad =  new DElementIncapacidad();
         
         incapacidad.getAttDiasIncapacidad().setInteger((int) concept.getCantidad());
@@ -325,7 +325,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         return incapacidad;
     }
     
-    private cfd.ver3.nom12.DElementOtroPago createElementEarningOtherPay(final SHrsFormerPayrollConcept concept) {
+    private cfd.ver3.nom12.DElementOtroPago createElementEarningOtherPay(final SHrsFormerReceiptConcept concept) {
         cfd.ver3.nom12.DElementOtroPago otroPago = null;
 
         if (concept.getTotalImporte() != 0 || concept.getXtaSubsidioEmpleo() != 0) {
@@ -401,7 +401,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         nomina.getAttRiesgoPuesto().setInteger(mnRiesgoPuesto);
         nomina.getAttSalarioDiarioIntegrado().setDouble(mdSalarioDiarioIntegrado);
 
-        for (SHrsFormerPayrollConcept concept : moChildPayrollConcepts) {
+        for (SHrsFormerReceiptConcept concept : moChildConcepts) {
             switch (concept.getPkTipoConcepto()) {
                 case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
                     cfd.ver3.nom11.DElementPercepcion percepcion = new DElementPercepcion();
@@ -498,10 +498,10 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         cfd.ver3.nom12.DElementIncapacidades incapacidades = new cfd.ver3.nom12.DElementIncapacidades();
         cfd.ver3.nom12.DElementOtrosPagos otrosPagos = new cfd.ver3.nom12.DElementOtrosPagos();
         
-        if (SLibUtils.belongsTo(moPayroll.getFkNominaTipoId(), new int[] { SModSysConsts.HRSS_TP_PAY_SHT_NOR, SModSysConsts.HRSS_TP_PAY_SHT_SPE } )) {
+        if (SLibUtils.belongsTo(moParentPayroll.getFkNominaTipoId(), new int[] { SModSysConsts.HRSS_TP_PAY_SHT_NOR, SModSysConsts.HRSS_TP_PAY_SHT_SPE } )) {
             sPayrollType = DCfdi33Catalogs.ClaveNominaOrd;
         }
-        else if (SLibUtils.belongsTo(moPayroll.getFkNominaTipoId(), new int[] { SModSysConsts.HRSS_TP_PAY_SHT_EXT } )) {
+        else if (SLibUtils.belongsTo(moParentPayroll.getFkNominaTipoId(), new int[] { SModSysConsts.HRSS_TP_PAY_SHT_EXT } )) {
             sPayrollType = DCfdi33Catalogs.ClaveNominaExt;
             msPeriodicidadPago = DCfdi33Catalogs.ClavePeriodicidadPagoOtra;
         }
@@ -572,7 +572,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         receptor.getAttSalarioDiarioIntegrado().setDouble(mdSalarioDiarioIntegrado);
         receptor.getAttClaveEntFed().setString(msClaveEstado);
         
-        for (SHrsFormerPayrollConcept concept : moChildPayrollConcepts) {
+        for (SHrsFormerReceiptConcept concept : moChildConcepts) {
             if (concept.getTotalImporte() != 0) {
                 switch (concept.getPkTipoConcepto()) {
                     case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
@@ -706,7 +706,7 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         long ellapsedMilliseconds = datetime.getTime() - SLibTimeUtils.convertToDateOnly(datetime).getTime();
 
         Date date = new Date();
-        date.setTime(moPayroll.getFecha().getTime() + ellapsedMilliseconds);
+        date.setTime(moParentPayroll.getFecha().getTime() + ellapsedMilliseconds);
 
         return date;
     }
@@ -817,22 +817,22 @@ public class SHrsFormerPayrollReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
 
     @Override
     public int getEmisorId() { // CFDI 3.2 & 3.3
-        return moPayroll.getEmpresaId();
+        return moParentPayroll.getEmpresaId();
     }
 
     @Override
     public int getEmisorSucursalId() { // CFDI 3.2 & 3.3
-        return moPayroll.getSucursalEmpresaId();
+        return moParentPayroll.getSucursalEmpresaId();
     }
 
     @Override
     public ArrayList<DElement> getElementsEmisorRegimenFiscal() { // CFDI 3.2
         ArrayList<DElement> regimes = new ArrayList<>();
 
-        for (int i = 0; i < moPayroll.getRegimenFiscal().length; i++) {
+        for (int i = 0; i < moParentPayroll.getRegimenFiscal().length; i++) {
             DElement regimen = new cfd.ver32.DElementRegimenFiscal();
 
-            ((cfd.ver32.DElementRegimenFiscal) regimen).getAttRegimen().setString(moPayroll.getRegimenFiscal()[i]);
+            ((cfd.ver32.DElementRegimenFiscal) regimen).getAttRegimen().setString(moParentPayroll.getRegimenFiscal()[i]);
             regimes.add(regimen);
         }
 

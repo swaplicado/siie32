@@ -18,8 +18,8 @@ import sa.lib.db.SDbConsts;
 /**
  *
  * @author Néstor Ávalos, Juan Barajas, Sergio Flores
- * 2019-01-29 Sergio Flores: Corrección al cálculo de parte exenta en percepciones. Debe estar en en función de UMA desde 2017.
- * 2019-06-07 Sergio Flores: Implementación compensación Subsidio para el empleo pagado en exceso contra ISR.
+ * 2019-01-29, Sergio Flores: Corrección al cálculo de parte exenta en percepciones. Debe estar en en función de UMA desde 2017.
+ * 2019-06-07, Sergio Flores: Implementación compensación Subsidio para el empleo pagado en exceso contra ISR.
  *  Al implementarse el dato informativo en CFDI de Subsdio para el empleo causado, la conmensación del pago en exceso dejó de hacerse contra ISR.
  */
 public class SHrsReceipt {
@@ -47,7 +47,7 @@ public class SHrsReceipt {
      */
 
     /**
-     * Get amount total taxed amount of earnings of standard calculation of income tax.
+     * Gets amount total taxed amount of earnings of standard calculation of income tax.
      * @return Total amount of earnings of standard calculation of income tax.
      */
     private double getTaxedEarningsStd() {
@@ -63,7 +63,7 @@ public class SHrsReceipt {
     }
     
     /**
-     * Get amount total taxed amount of earnings configured based on articule 174 RLISR.
+     * Gets amount total taxed amount of earnings configured based on articule 174 RLISR.
      * @return Total amount of earnings configured based on articule 174 RLISR.
      */
     private double getTaxedEarningsArt174() {
@@ -79,7 +79,7 @@ public class SHrsReceipt {
     }
     
     /**
-     * Compute all earnings of this receipt.
+     * Computes all earnings of this receipt.
      */
     private void computeEarnings() {
         for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
@@ -88,7 +88,7 @@ public class SHrsReceipt {
     }
 
     /**
-     * Compute exemption of all earnings of this receipt by grouping them in blocks of arrays.
+     * Computes exemption of all earnings of this receipt by grouping them in blocks of arrays.
      * @throws Exception 
      */
     private void computeEarningsExemption() throws Exception {
@@ -118,7 +118,7 @@ public class SHrsReceipt {
     }
 
     /**
-     * Compute altogether the hrsReceiptEarnings of the given array of earnings as a group.
+     * Computes altogether the hrsReceiptEarnings of the given array of earnings as a group.
      * @param hrsReceiptEarnings Array of earnings. At least one earning is expected.
      * @throws Exception 
      */
@@ -229,6 +229,9 @@ public class SHrsReceipt {
         }
     }
     
+    /**
+     * Computes all deductions of this receipt.
+     */
     private void computeDeductions() {
         for (SHrsReceiptDeduction hrsReceiptDeduction : maHrsReceiptDeductions) {
             hrsReceiptDeduction.computeDeduction();
@@ -315,9 +318,9 @@ public class SHrsReceipt {
         double annualSubCompensated = 0; // sumatory excluding subsidy compensated in current payroll
         double annualSubPayed = 0;       // actually payed to employee: sumatory excluding subsidy payed in current payroll
         double taxAssessed = 0;
-        double taxAssessedToPay = 0;
         double subAssessed = 0;
-        double subAssessedToPay = 0;
+        double payrollTaxAssessed = 0;
+        double payrollSubAssessed = 0;
         
         SHrsReceiptEarning hrsReceiptEarningSubNew = null;
         SHrsReceiptDeduction hrsReceiptDeductionTaxNew = null;
@@ -350,8 +353,8 @@ public class SHrsReceipt {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Tabla de impuesto)");
             }
 
-            SDbTaxTable dbTaxTable = moHrsPayroll.getTaxTable(moHrsPayroll.getPayroll().getFkTaxId());
-            if (dbTaxTable == null)  {
+            SDbTaxTable taxTable = moHrsPayroll.getTaxTable(moHrsPayroll.getPayroll().getFkTaxId());
+            if (taxTable == null)  {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + " (Tabla de impuesto)");
             }
 
@@ -374,8 +377,8 @@ public class SHrsReceipt {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + " (Tabla de subsidio para el empleo)");
             }
 
-            SDbTaxSubsidyTable dbSubTable = moHrsPayroll.getTaxSubsidyTable(moHrsPayroll.getPayroll().getFkTaxSubsidyId());
-            if (dbSubTable == null)  {
+            SDbTaxSubsidyTable subsidyTable = moHrsPayroll.getTaxSubsidyTable(moHrsPayroll.getPayroll().getFkTaxSubsidyId());
+            if (subsidyTable == null)  {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + " (Tabla de subsidio para el empleo)");
             }
 
@@ -458,10 +461,10 @@ public class SHrsReceipt {
             // Compute assessed and payable tax (payroll or annual, the one required):
             
             if (earningsTaxableStd > 0) {
-                for (int row = 0; row < dbTaxTable.getChildRows().size(); row++) {
-                    SDbTaxTableRow taxTableRow = dbTaxTable.getChildRows().get(row);
+                for (int row = 0; row < taxTable.getChildRows().size(); row++) {
+                    SDbTaxTableRow taxTableRow = taxTable.getChildRows().get(row);
                     if (earningsTaxableStd >= SLibUtils.roundAmount(taxTableRow.getLowerLimit() * tableFactor) &&
-                            (row + 1 == dbTaxTable.getChildRows().size() || earningsTaxableStd < SLibUtils.roundAmount(dbTaxTable.getChildRows().get(row + 1).getLowerLimit() * tableFactor))) {
+                            (row + 1 == taxTable.getChildRows().size() || earningsTaxableStd < SLibUtils.roundAmount(taxTable.getChildRows().get(row + 1).getLowerLimit() * tableFactor))) {
                         taxAssessed = SLibUtils.roundAmount((earningsTaxableStd - SLibUtils.roundAmount(taxTableRow.getLowerLimit() * tableFactor)) * taxTableRow.getTaxRate() + taxTableRow.getFixedFee() * tableFactor);
                         break;
                     }
@@ -469,17 +472,16 @@ public class SHrsReceipt {
             }
 
             if (earningsTaxableArt174 > 0) {
-                double taxAssessedAlt = SHrsUtils.computeAmountTaxAlt(dbTaxTable, earningsTaxableArt174, moPayrollReceipt.getPaymentMonthly(), tableFactor);
+                double taxAssessedAlt = SHrsUtils.computeTaxAlt(taxTable, earningsTaxableArt174, moPayrollReceipt.getPaymentMonthly(), tableFactor);
                 taxAssessed = SLibUtils.roundAmount(taxAssessed + taxAssessedAlt); // update assessed tax
             }
 
-            //if (taxAssessed != 0 && taxAssessed > (annualTaxCompensated + annualTaxPayed)) { // 2019-06-12, Sergio Flores: evaluating if this conditional is still needed, seemingly not!
-            taxAssessedToPay = SLibUtils.roundAmount(taxAssessed - (annualTaxCompensated + annualTaxPayed));
+            payrollTaxAssessed = SLibUtils.roundAmount(taxAssessed - (annualTaxCompensated + annualTaxPayed));
 
-            if (taxAssessedToPay > 0) {
+            if (payrollTaxAssessed > 0) {
                 SDbPayrollReceiptDeduction payrollReceiptDeductionTax = moHrsPayroll.createPayrollReceiptDeduction(
                         this, deductionTax, 
-                        1, taxAssessedToPay, true, 
+                        1, payrollTaxAssessed, true, 
                         0, 0, maHrsReceiptDeductions.size() + 1);
 
                 hrsReceiptDeductionTaxNew = new SHrsReceiptDeduction();
@@ -487,16 +489,15 @@ public class SHrsReceipt {
                 hrsReceiptDeductionTaxNew.setDeduction(deductionTax);
                 hrsReceiptDeductionTaxNew.setPayrollReceiptDeduction(payrollReceiptDeductionTax);
             }
-            //}
 
             if (computeSub) {
                 // Compute assessed and payable subsidy (payroll or annual, the one required):
                 
                 if (earningsTaxableStd > 0) {
-                    for (int row = 0; row < dbSubTable.getChildRows().size(); row++) {
-                        SDbTaxSubsidyTableRow subsidyTableRow = dbSubTable.getChildRows().get(row);
+                    for (int row = 0; row < subsidyTable.getChildRows().size(); row++) {
+                        SDbTaxSubsidyTableRow subsidyTableRow = subsidyTable.getChildRows().get(row);
                         if (earningsTaxableStd >= subsidyTableRow.getLowerLimit() * tableFactor &&
-                                (row + 1 == dbSubTable.getChildRows().size() || earningsTaxableStd < dbSubTable.getChildRows().get(row + 1).getLowerLimit() * tableFactor)) {
+                                (row + 1 == subsidyTable.getChildRows().size() || earningsTaxableStd < subsidyTable.getChildRows().get(row + 1).getLowerLimit() * tableFactor)) {
                             subAssessed = SLibUtils.roundAmount(subsidyTableRow.getTaxSubsidy() * tableFactor);
                             break;
                         }
@@ -504,20 +505,19 @@ public class SHrsReceipt {
                 }
 
                 if (earningsTaxableArt174 > 0) {
-                    double subsidyComputedAlt = SHrsUtils.computeAmountTaxSubsidyAlt(dbSubTable, earningsTaxableArt174, moPayrollReceipt.getPaymentMonthly(), tableFactor);
+                    double subsidyComputedAlt = SHrsUtils.computeTaxSubsidyAlt(subsidyTable, earningsTaxableArt174, moPayrollReceipt.getPaymentMonthly(), tableFactor);
                     subAssessed = SLibUtils.roundAmount(subAssessed + subsidyComputedAlt); // update assessed subsidy
                 }
                 
-                //if (subAssessed != 0 && subAssessed > (annualSubCompensated + annualSubPayed)) { // 2019-06-12, Sergio Flores: evaluating if this conditional is still needed, seemingly not!
-                subAssessedToPay = SLibUtils.roundAmount(subAssessed - (annualSubCompensated + annualSubPayed));
+                payrollSubAssessed = SLibUtils.roundAmount(subAssessed - (annualSubCompensated + annualSubPayed));
 
-                if (subAssessedToPay > 0) {
+                if (payrollSubAssessed > 0) {
                     SDbPayrollReceiptEarning payrollReceiptEarningSub = moHrsPayroll.createPayrollReceiptEarning(
                             this, earningSub, hrsEmployeeDays, null, 
-                            1, subAssessedToPay, true, 
+                            1, payrollSubAssessed, true, 
                             0, 0, maHrsReceiptEarnings.size() + 1);
 
-                    payrollReceiptEarningSub.setAmountExempt(subAssessedToPay); // subsidy is exempt
+                    payrollReceiptEarningSub.setAmountExempt(payrollSubAssessed); // subsidy is exempt
                     payrollReceiptEarningSub.setAmountTaxable(0);
 
                     hrsReceiptEarningSubNew = new SHrsReceiptEarning();
@@ -525,16 +525,30 @@ public class SHrsReceipt {
                     hrsReceiptEarningSubNew.setEarning(earningSub);
                     hrsReceiptEarningSubNew.setPayrollReceiptEarning(payrollReceiptEarningSub);
                 }
-                //}
             }
         }
         
         // Add tax and subsidy to payroll
         
-        // Prepare net tax, when needed:
+        // Prepare tax:
+        
+        /* Consider that:
+         * In payroll tax computation, tax cannot be negative.
+         * In annual tax computation, tax can be negative.
+         * If assesed tax is negative (i.e., tax excessively withheld), it will not be refund to employee.
+         * If assesed subsidy is negative (i.e., subsidy excessively paid), it will be recovered from employee as tax.
+         */
+        
+        if (payrollTaxAssessed < 0) {
+            // tax cannot be negative:
+            
+            payrollTaxAssessed = 0;
+        }
+        
+        // Prepare net tax: if positive = tax; if negative = subsidy:
         
         boolean isTaxNet = moHrsPayroll.getConfig().isTaxNet();
-        double taxNet = isTaxNet ? SLibUtils.roundAmount(taxAssessedToPay - subAssessedToPay) : 0; // when positive: tax; when negative: subsidy
+        double taxNet = isTaxNet ? SLibUtils.roundAmount(payrollTaxAssessed - payrollSubAssessed) : 0;
         
         // Prepare removal or update of previous tax receipt deduction, if any:
 
@@ -567,10 +581,10 @@ public class SHrsReceipt {
         double payrollTax;
         
         if (isTaxNet) {
-            payrollTax = taxNet > 0 ? taxNet : 0;
+            payrollTax = taxNet > 0 ? taxNet : 0; // net tax: if positive = tax; if negative = subsidy
         }
         else {
-            double payrollTaxCompensated = SLibUtils.roundAmount(taxAssessedToPay + (subAssessedToPay < 0 ? -subAssessedToPay : 0));
+            double payrollTaxCompensated = SLibUtils.roundAmount(payrollTaxAssessed - (payrollSubAssessed > 0 ? payrollSubAssessed : 0));
             payrollTax = payrollTaxCompensated > 0 ? payrollTaxCompensated : 0;
         }
         
@@ -641,10 +655,10 @@ public class SHrsReceipt {
         double payrollSub;
         
         if (isTaxNet) {
-            payrollSub = taxNet < 0 ? -taxNet : 0;
+            payrollSub = taxNet < 0 ? -taxNet : 0; // net tax: if positive = tax; if negative = subsidy
         }
         else {
-            payrollSub = subAssessedToPay > 0 ? subAssessedToPay : 0;
+            payrollSub = payrollSubAssessed > 0 ? payrollSubAssessed : 0;
         }
         
         if (hrsReceiptEarningSubOld != null || hrsReceiptEarningSubNew != null) {
@@ -693,7 +707,7 @@ public class SHrsReceipt {
         }
         
         // create other earning to inform subsidy assessed in receipt, if needed:
-        boolean isSubOffsetTotally = isTaxNet && subAssessedToPay > 0 && taxAssessedToPay > subAssessedToPay; // convenience variable
+        boolean isSubOffsetTotally = isTaxNet && payrollSubAssessed > 0 && payrollTaxAssessed > payrollSubAssessed; // convenience variable
         computeEarningOther(isSubOffsetTotally, earningOther, moHrsEmployee.createEmployeeDays());
         
         // Set tax and subsidy current calculations:
@@ -701,26 +715,25 @@ public class SHrsReceipt {
         if (computeTax) {
             double payrollTaxCompensated = 0;
             double payrollSubCompensated = 0;
-            boolean computeTaxByPayroll = moHrsPayroll.getPayroll().getFkTaxComputationTypeId() == SModSysConsts.HRSS_TP_TAX_COMP_PAY;
 
             if (isTaxNet) {
                 // compensate tax and subsidy between each other:
                 
-                if (taxAssessedToPay > subAssessedToPay) {
-                    payrollTaxCompensated = subAssessedToPay;
-                    payrollSubCompensated = subAssessedToPay;
+                if (payrollTaxAssessed > payrollSubAssessed) {
+                    payrollTaxCompensated = payrollSubAssessed;
+                    payrollSubCompensated = payrollSubAssessed;
                 }
                 else {
-                    payrollTaxCompensated = taxAssessedToPay;
-                    payrollSubCompensated = taxAssessedToPay;
+                    payrollTaxCompensated = payrollTaxAssessed;
+                    payrollSubCompensated = payrollTaxAssessed;
                 }
             }
 
-            moPayrollReceipt.setPayrollTaxAssessed(computeTaxByPayroll ? taxAssessed : taxAssessedToPay);
+            moPayrollReceipt.setPayrollTaxAssessed(payrollTaxAssessed);
             moPayrollReceipt.setPayrollTaxCompensated(payrollTaxCompensated);
             moPayrollReceipt.setPayrollTaxPending_r(payrollTax);
             moPayrollReceipt.setPayrollTaxPayed(isUserTax ? userTax : payrollTax);
-            moPayrollReceipt.setPayrollTaxSubsidyAssessed(computeTaxByPayroll ? subAssessed : subAssessedToPay);
+            moPayrollReceipt.setPayrollTaxSubsidyAssessed(payrollSubAssessed);
             moPayrollReceipt.setPayrollTaxSubsidyCompensated(payrollSubCompensated);
             moPayrollReceipt.setPayrollTaxSubsidyPending_r(payrollSub);
             moPayrollReceipt.setPayrollTaxSubsidyPayed(isUserSub ? userSub : payrollSub);
@@ -1115,62 +1128,6 @@ public class SHrsReceipt {
         }
     }
     
-    public void updateBenefits() {
-        SDbBenefitTable benefitTable = null;
-        SDbBenefitTable benefitTableAux = null;
-        SDbBenefitTableRow benefitTableRow = null;
-        SDbBenefitTableRow benefitTableRowAux = null;
-        
-        try {
-            for (SHrsBenefit benefit : maHrsBenefits) {
-                for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
-                    if (SLibUtils.compareKeys(benefit.getBenefitKey(), new int[] { hrsReceiptEarning.getPayrollReceiptEarning().getFkBenefitTypeId(), 
-                        hrsReceiptEarning.getPayrollReceiptEarning().getBenefitAnniversary(), hrsReceiptEarning.getPayrollReceiptEarning().getBenefitYear() })) {
-
-                        benefit.setValuePayedReceipt(0d);
-                        benefit.setAmountPayedReceipt(0d);
-
-                        // Obtain benefit table row more appropiate for seniority:
-
-                        benefitTable = moHrsPayroll.getBenefitTable(hrsReceiptEarning.getPayrollReceiptEarning().getFkBenefitTypeId(), moHrsPayroll.getPayroll().getDateEnd(), moHrsPayroll.getPayroll().getFkPaymentTypeId());
-
-                        for (SDbBenefitTableRow row : benefitTable.getChildRows()) {
-                            if (row.getMonths() >= (hrsReceiptEarning.getPayrollReceiptEarning().getBenefitAnniversary() * SHrsConsts.YEAR_MONTHS)) {
-                                benefitTableRow = row;
-                                break;
-                            }
-                        }
-
-                        // Obtain benefit table row more appropiate for seniority, it's for vacation bonus:
-
-                        if (hrsReceiptEarning.getPayrollReceiptEarning().getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                            benefitTableAux = moHrsPayroll.getBenefitTable(SModSysConsts.HRSS_TP_BEN_VAC, moHrsPayroll.getPayroll().getDateEnd(), moHrsPayroll.getPayroll().getFkPaymentTypeId());
-                            
-                            for (SDbBenefitTableRow row : benefitTableAux.getChildRows()) {
-                                if (row.getMonths() >= (hrsReceiptEarning.getPayrollReceiptEarning().getBenefitAnniversary() * SHrsConsts.YEAR_MONTHS)) {
-                                    benefitTableRowAux = row;
-                                    break;
-                                }
-                            }
-                        }
-                        if (hrsReceiptEarning.getPayrollReceiptEarning().getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
-                            benefit.setValue(benefitTableRow.getBenefitBonusPercentage());
-                            benefit.setAmount(benefitTableRowAux.getBenefitDays() * moPayrollReceipt.getPaymentDaily() * benefitTableRow.getBenefitBonusPercentage());
-                        }
-                        else {
-                            benefit.setValue(benefitTableRow.getBenefitDays());
-                            benefit.setAmount(benefitTableRow.getBenefitDays() * moPayrollReceipt.getPaymentDaily());
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        catch (Exception e) {
-            SLibUtils.printException(this, e);
-        }
-    }
-    
     public void computeReceipt() throws Exception {
         computeEarnings();
         computePayrollReceiptDays();
@@ -1266,6 +1223,11 @@ public class SHrsReceipt {
         return amount;
     }
     
+    public double calculateBenefit(final SDbEarning earningBenefit, SHrsEmployeeDays hrsEmployeeDays, final double days, final double percentage) {
+        double units = hrsEmployeeDays.computeEarningUnits(days, earningBenefit);
+        return SLibUtils.roundAmount(units * moPayrollReceipt.getPaymentDaily() * (earningBenefit.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? percentage : 1d));
+    }
+    
     public SDbAbsenceConsumption createAbsenceConsumption(final SDbAbsence absence, final Date dateStart, final Date dateEnd, final int effectiveDays) throws Exception {
         if (absence.getPkEmployeeId() != moHrsEmployee.getEmployee().getPkEmployeeId()) {
             throw new Exception("El empleado de la ausencia (ID = " + absence.getPkEmployeeId() + ") no es el empleado del recibo (" + moHrsEmployee.getEmployee().getPkEmployeeId() + ").");
@@ -1306,7 +1268,8 @@ public class SHrsReceipt {
             }
             
             if (!found) {
-                throw new Exception("No existen percepciones correspondientes a la incidencia tipo '" + absenceConsumption.getParentAbsence().getXtaAbsenceType() + "', clase '" + absenceConsumption.getParentAbsence().getXtaAbsenceClass() + "', la cual es pagable.");
+                throw new Exception("No existen percepciones configuradas para la incidencia tipo '" + absenceConsumption.getParentAbsence().getXtaAbsenceType() + "', "
+                        + "clase '" + absenceConsumption.getParentAbsence().getXtaAbsenceClass() + "', que es pagable.");
             }
         }
         
@@ -1315,16 +1278,15 @@ public class SHrsReceipt {
         SDbAbsence absence = absenceConsumption.getParentAbsence();
         
         if (absenceConsumption.getEffectiveDays() > absenceConsumption.getCalendarDays()) {
-            throw new Exception("Los días " + SDbAbsenceClass.EFFECTIVE + " a consumir de la incidencia '" + absence.getXtaAbsenceType() + "' (" + absenceConsumption.getEffectiveDays() + ")\n"
-                    + "son mayores a los días " + SDbAbsenceClass.CALENDAR + " (" + absenceConsumption.getCalendarDays()+ ") del consumo.");
+            throw new Exception("Los " + absenceConsumption.getEffectiveDays() + " días " + SDbAbsenceClass.EFFECTIVE + " a consumir de la incidencia '" + absence.composeAbsenceDescription() + "'\n"
+                    + "son mayores a los " + absenceConsumption.getCalendarDays()+ " días " + SDbAbsenceClass.CALENDAR + " del consumo.");
         }
 
         int consumptionConsumedDays = absence.getActualConsumedDays(moHrsEmployee);
         int consumptionRemainingDays = absence.getEffectiveDays() - consumptionConsumedDays;
         
         if (consumptionRemainingDays <= 0) {
-            throw new Exception("Todos los días " + SDbAbsenceClass.EFFECTIVE + " de la incidencia '" + absence.getXtaAbsenceType() + "' (" + absenceConsumption.getEffectiveDays() + ") "
-                    + "ya están consumidos (" + consumptionConsumedDays + ").");
+            throw new Exception("Se han consumido ya " + consumptionConsumedDays + " de los " + absence.getEffectiveDays() + " días " + SDbAbsenceClass.EFFECTIVE + " de la incidencia '" + absence.composeAbsenceDescription() + "'.");
         }
         
         // validate absence consumption:
@@ -1339,27 +1301,27 @@ public class SHrsReceipt {
             if (absence.consumesCalendarDays()) {
                 // validate calendar days:
                 if (employeeWorkableCalendarDays <= 0) {
-                    throw new Exception("El recibo de nómina no tiene días " + SDbAbsenceClass.CALENDAR + " disponibles (" + employeeWorkableCalendarDays + ")\n"
-                            + "para asignar la incidencia '" + absence.getXtaAbsenceType() + "'.");
+                    throw new Exception("El recibo de nómina tiene " + employeeWorkableCalendarDays + " días " + SDbAbsenceClass.CALENDAR + " disponibles "
+                            + "para consumir la incidencia '" + absence.composeAbsenceDescription() + "'.");
                 }
                 else if (absenceConsumption.getEffectiveDays() > employeeWorkableCalendarDays) {
-                    throw new Exception("Los días " + SDbAbsenceClass.EFFECTIVE + " a consumir de la incidencia '" + absence.getXtaAbsenceType() + "' (" + absenceConsumption.getEffectiveDays() + ")\n"
-                            + "son mayores a los días " + SDbAbsenceClass.CALENDAR + " disponibles (" + employeeWorkableCalendarDays + ") del recibo de nómina.");
+                    throw new Exception("Los " + absenceConsumption.getEffectiveDays() + " días " + SDbAbsenceClass.EFFECTIVE + " a consumir de la incidencia '" + absence.composeAbsenceDescription() + "'\n"
+                            + "son mayores a los " + employeeWorkableCalendarDays + " días " + SDbAbsenceClass.CALENDAR + " disponibles del recibo de nómina.");
                 }
             }
             else {
                 // validate instead business days:
                 if (employeeWorkableBusinessDays <= 0) {
-                    throw new Exception("El recibo de nómina no tiene días " + SDbAbsenceClass.BUSINESS + " disponibles (" + employeeWorkableBusinessDays + ")\n"
-                            + "para asignar la incidencia '" + absence.getXtaAbsenceType() + "'.");
+                    throw new Exception("El recibo de nómina tiene " + employeeWorkableBusinessDays + " días " + SDbAbsenceClass.BUSINESS + " disponibles "
+                            + "para consumir la incidencia '" + absence.composeAbsenceDescription() + "'.");
                 }
                 else if (consumptionActualBusinessDays > employeeWorkableBusinessDays) {
-                    throw new Exception("Los días " + SDbAbsenceClass.BUSINESS + " a consumir de la incidencia '" + absence.getXtaAbsenceType() + "' (" + consumptionActualBusinessDays + ")\n"
-                            + "son mayores a los días " + SDbAbsenceClass.BUSINESS + " disponibles (" + employeeWorkableBusinessDays + ") del recibo de nómina.");
+                    throw new Exception("Los " + consumptionActualBusinessDays + " días " + SDbAbsenceClass.BUSINESS + " a consumir de la incidencia '" + absence.composeAbsenceDescription() + "'\n"
+                            + "son mayores a los " + employeeWorkableBusinessDays + " días " + SDbAbsenceClass.BUSINESS + " disponibles del recibo de nómina.");
                 }
                 else if (absenceConsumption.getEffectiveDays() > employeeWorkableBusinessDays) {
-                    throw new Exception("Los días " + SDbAbsenceClass.EFFECTIVE + " a consumir de la incidencia '" + absence.getXtaAbsenceType() + "' (" + absenceConsumption.getEffectiveDays() + ")\n"
-                            + "son mayores a los días " + SDbAbsenceClass.BUSINESS + " disponibles (" + employeeWorkableBusinessDays + ") del recibo de nómina.");
+                    throw new Exception("Los días " + absenceConsumption.getEffectiveDays() + " " + SDbAbsenceClass.EFFECTIVE + " a consumir de la incidencia '" + absence.composeAbsenceDescription() + "'\n"
+                            + "son mayores a los " + employeeWorkableBusinessDays + " días " + SDbAbsenceClass.BUSINESS + " disponibles del recibo de nómina.");
                 }
             }
             
@@ -1374,8 +1336,8 @@ public class SHrsReceipt {
             totalEffectiveDays += absenceConsumption.getEffectiveDays();
             
             if (totalEffectiveDays > receiptCalendarDays) {
-                throw new Exception("El total de días " + SDbAbsenceClass.CALENDAR + " consumidos de todas las ausencias (" + totalEffectiveDays + ") "
-                        + "son mayores a los días " + SDbAbsenceClass.CALENDAR + " (" + receiptCalendarDays + ") del recibo de nómina.");
+                throw new Exception("Los " + totalEffectiveDays + " días " + SDbAbsenceClass.CALENDAR + " consumidos de todas las ausencias "
+                        + "son mayores a los " + receiptCalendarDays + " días " + SDbAbsenceClass.CALENDAR + " del recibo de nómina.");
             }
         }
 
@@ -1533,29 +1495,24 @@ public class SHrsReceipt {
         }
     }
     
-    public void computePayrollReceiptDays() throws Exception {
-        // Compute dbPayrollReceipt values referent to days:
+    private SHrsDaysByPeriod createHrsDaysByPeriod(final int year, final int periodYear) {
+        int daysPeriod = SLibTimeUtils.digestDate(SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(year, periodYear)))[2];
+        int daysPeriodPayroll = 0;
         
-        SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays();
+        for (SDbEmployeeHireLog hireLog : moHrsEmployee.getEmployeeHireLogs()) {
+            Date dateStart = hireLog.getDateHire().compareTo(moHrsEmployee.getPeriodStart()) <= 0 ? moHrsEmployee.getPeriodStart() : hireLog.getDateHire();
+            Date dateEnd = hireLog.getDateDismissed_n() == null ? moHrsEmployee.getPeriodEnd() : hireLog.getDateDismissed_n().compareTo(moHrsEmployee.getPeriodEnd()) >= 0 ? moHrsEmployee.getPeriodEnd() : hireLog.getDateDismissed_n();
+            
+            int periodDays = (int) SLibTimeUtils.getDaysDiff(dateEnd, dateStart);
+            
+            for (int i = 0; i <= periodDays; i++) {
+                if (SLibTimeUtils.isBelongingToPeriod(SLibTimeUtils.addDate(dateStart, 0, 0, i), year, periodYear)) {
+                    daysPeriodPayroll++;
+                }
+            }
+        }
         
-        moPayrollReceipt.setFactorCalendar(hrsEmployeeDays.getFactorCalendar());
-        moPayrollReceipt.setFactorDaysPaid(hrsEmployeeDays.getFactorDaysPaid());
-        moPayrollReceipt.setReceiptDays(hrsEmployeeDays.getReceiptDays());
-        moPayrollReceipt.setWorkingDays(hrsEmployeeDays.getWorkingDays());
-        moPayrollReceipt.setDaysWorked(hrsEmployeeDays.getDaysWorked());
-        moPayrollReceipt.setDaysHiredPayroll(hrsEmployeeDays.getDaysHiredPayroll());
-        moPayrollReceipt.setDaysHiredAnnual(hrsEmployeeDays.getDaysHiredAnnual());
-        moPayrollReceipt.setDaysIncapacityNotPaidPayroll(hrsEmployeeDays.getDaysIncapacityNotPaidPayroll());
-        moPayrollReceipt.setDaysIncapacityNotPaidAnnual(hrsEmployeeDays.getDaysIncapacityNotPaidAnnual());
-        moPayrollReceipt.setDaysNotWorkedButPaid(hrsEmployeeDays.getDaysNotWorkedButPaid());
-        moPayrollReceipt.setDaysNotWorkedNotPaid(hrsEmployeeDays.getDaysNotWorkedNotPaid());
-        moPayrollReceipt.setDaysNotWorked_r(hrsEmployeeDays.getDaysNotWorked_r());
-        moPayrollReceipt.setDaysToBePaid_r(computeDaysToBePaid(maHrsReceiptEarnings));
-        moPayrollReceipt.setDaysPaid(computeDaysPaid(maHrsReceiptEarnings));
-        moPayrollReceipt.setPayrollTaxableDays_r(hrsEmployeeDays.getTaxableDaysPayroll());
-        moPayrollReceipt.setAnnualTaxableDays_r(hrsEmployeeDays.getTaxableDaysAnnual());
-        
-        computeHrsDaysByPeriod(hrsEmployeeDays);
+        return new SHrsDaysByPeriod(year, periodYear, daysPeriod, daysPeriodPayroll);
     }
     
     private void computeHrsDaysByPeriod(SHrsEmployeeDays hrsEmployeeDays) throws Exception {
@@ -1620,29 +1577,29 @@ public class SHrsReceipt {
         moHrsEmployee.setHrsDaysNext(hrsDaysNext);
     }
     
-    private SHrsDaysByPeriod createHrsDaysByPeriod(final int year, final int periodYear) {
-        int daysPeriod = SLibTimeUtils.digestDate(SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(year, periodYear)))[2];
-        int daysPeriodPayroll = 0;
+    public void computePayrollReceiptDays() throws Exception {
+        // Compute dbPayrollReceipt values referent to days:
         
-        for (SDbEmployeeHireLog hireLog : moHrsEmployee.getEmployeeHireLogs()) {
-            Date dateStart = hireLog.getDateHire().compareTo(moHrsEmployee.getPeriodStart()) <= 0 ? moHrsEmployee.getPeriodStart() : hireLog.getDateHire();
-            Date dateEnd = hireLog.getDateDismissed_n() == null ? moHrsEmployee.getPeriodEnd() : hireLog.getDateDismissed_n().compareTo(moHrsEmployee.getPeriodEnd()) >= 0 ? moHrsEmployee.getPeriodEnd() : hireLog.getDateDismissed_n();
-            
-            int periodDays = (int) SLibTimeUtils.getDaysDiff(dateEnd, dateStart);
-            
-            for (int i = 0; i <= periodDays; i++) {
-                if (SLibTimeUtils.isBelongingToPeriod(SLibTimeUtils.addDate(dateStart, 0, 0, i), year, periodYear)) {
-                    daysPeriodPayroll++;
-                }
-            }
-        }
+        SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays();
         
-        return new SHrsDaysByPeriod(year, periodYear, daysPeriod, daysPeriodPayroll);
-    }
-    
-    public double calculateBenefit(final SDbEarning earningBenefit, SHrsEmployeeDays hrsEmployeeDays, final double days, final double percentage) {
-        double units = hrsEmployeeDays.computeEarningUnits(days, earningBenefit);
-        return SLibUtils.roundAmount(units * moPayrollReceipt.getPaymentDaily() * (earningBenefit.getFkBenefitTypeId() == SModSysConsts.HRSS_TP_BEN_VAC_BON ? percentage : 1d));
+        moPayrollReceipt.setFactorCalendar(hrsEmployeeDays.getFactorCalendar());
+        moPayrollReceipt.setFactorDaysPaid(hrsEmployeeDays.getFactorDaysPaid());
+        moPayrollReceipt.setReceiptDays(hrsEmployeeDays.getReceiptDays());
+        moPayrollReceipt.setWorkingDays(hrsEmployeeDays.getWorkingDays());
+        moPayrollReceipt.setDaysWorked(hrsEmployeeDays.getDaysWorked());
+        moPayrollReceipt.setDaysHiredPayroll(hrsEmployeeDays.getDaysHiredPayroll());
+        moPayrollReceipt.setDaysHiredAnnual(hrsEmployeeDays.getDaysHiredAnnual());
+        moPayrollReceipt.setDaysIncapacityNotPaidPayroll(hrsEmployeeDays.getDaysIncapacityNotPaidPayroll());
+        moPayrollReceipt.setDaysIncapacityNotPaidAnnual(hrsEmployeeDays.getDaysIncapacityNotPaidAnnual());
+        moPayrollReceipt.setDaysNotWorkedButPaid(hrsEmployeeDays.getDaysNotWorkedButPaid());
+        moPayrollReceipt.setDaysNotWorkedNotPaid(hrsEmployeeDays.getDaysNotWorkedNotPaid());
+        moPayrollReceipt.setDaysNotWorked_r(hrsEmployeeDays.getDaysNotWorked_r());
+        moPayrollReceipt.setDaysToBePaid_r(computeDaysToBePaid(maHrsReceiptEarnings));
+        moPayrollReceipt.setDaysPaid(computeDaysPaid(maHrsReceiptEarnings));
+        moPayrollReceipt.setPayrollTaxableDays_r(hrsEmployeeDays.getTaxableDaysPayroll());
+        moPayrollReceipt.setAnnualTaxableDays_r(hrsEmployeeDays.getTaxableDaysAnnual());
+        
+        computeHrsDaysByPeriod(hrsEmployeeDays);
     }
     
     public SHrsReceipt clone() throws CloneNotSupportedException {

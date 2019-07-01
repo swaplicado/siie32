@@ -156,7 +156,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     private String msTempPaymentAccount;
     private int mnTempFkPaymentSystemTypeId;
 
-    /** Creates new form SFormBizPartner */
+    /** Creates new form SFormBizPartner
+     * @param client GUI client.
+     */
     public SFormBizPartner(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient =  client;
@@ -1608,16 +1610,16 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
     }
 
     private void actionOk() {
-        erp.lib.form.SFormValidation validation = formValidate();
+        SFormValidation validation = formValidate();
 
         if (validation.getIsError()) {
             if (validation.getTabbedPaneIndex() >= 0) {
                 jTabbedPane1.setSelectedIndex(validation.getTabbedPaneIndex());
             }
             if (validation.getComponent() != null) {
-                validation.getComponent().requestFocus();
+                validation.getComponent().requestFocusInWindow();
             }
-            if (validation.getMessage().length() > 0) {
+            if (!validation.getMessage().isEmpty()) {
                 miClient.showMsgBoxWarning(validation.getMessage());
             }
         }

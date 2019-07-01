@@ -438,6 +438,9 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         moSuscriptionsSet.add(mnGridType);
         moSuscriptionsSet.add(SModConsts.HRS_EAR);
         moSuscriptionsSet.add(SModConsts.HRS_DED);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_EAR);
+        moSuscriptionsSet.add(SModConsts.HRS_PAY_RCP_DED);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
 

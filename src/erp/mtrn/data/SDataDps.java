@@ -200,6 +200,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected int mnFkBizPartnerAltId_r;
     protected int mnFkBizPartnerBranchAltId;
     protected int mnFkBizPartnerBranchAddressAltId;
+    protected int mnFkBizPartnerAddresseeId_n;
     protected int mnFkAddresseeBizPartnerId_nr;
     protected int mnFkAddresseeBizPartnerBranchId_n;
     protected int mnFkAddresseeBizPartnerBranchAddressId_n;
@@ -1634,6 +1635,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setFkBizPartnerAltId_r(int n) { mnFkBizPartnerAltId_r = n; }
     public void setFkBizPartnerBranchAltId(int n) { mnFkBizPartnerBranchAltId = n; }
     public void setFkBizPartnerBranchAddressAltId(int n) { mnFkBizPartnerBranchAddressAltId = n; }
+    public void setFkBizPartnerAddresseeId_n(int n) { mnFkBizPartnerAddresseeId_n = n; }
     public void setFkAddresseeBizPartnerId_nr(int n) { mnFkAddresseeBizPartnerId_nr = n; }
     public void setFkAddresseeBizPartnerBranchId_n(int n) { mnFkAddresseeBizPartnerBranchId_n = n; }
     public void setFkAddresseeBizPartnerBranchAddressId_n(int n) { mnFkAddresseeBizPartnerBranchAddressId_n = n; }
@@ -1755,6 +1757,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int getFkBizPartnerAltId_r() { return mnFkBizPartnerAltId_r; }
     public int getFkBizPartnerBranchAltId() { return mnFkBizPartnerBranchAltId; }
     public int getFkBizPartnerBranchAddressAltId() { return mnFkBizPartnerBranchAddressAltId; }
+    public int getFkBizPartnerAddresseeId_n() { return mnFkBizPartnerAddresseeId_n; }
     public int getFkAddresseeBizPartnerId_nr() { return mnFkAddresseeBizPartnerId_nr; }
     public int getFkAddresseeBizPartnerBranchId_n() { return mnFkAddresseeBizPartnerBranchId_n; }
     public int getFkAddresseeBizPartnerBranchAddressId_n() { return mnFkAddresseeBizPartnerBranchAddressId_n; }
@@ -1968,6 +1971,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnFkBizPartnerAltId_r = 0;
         mnFkBizPartnerBranchAltId = 0;
         mnFkBizPartnerBranchAddressAltId = 0;
+        mnFkBizPartnerAddresseeId_n = 0;
         mnFkAddresseeBizPartnerId_nr = 0;
         mnFkAddresseeBizPartnerBranchId_n = 0;
         mnFkAddresseeBizPartnerBranchAddressId_n = 0;
@@ -2136,6 +2140,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mnFkBizPartnerAltId_r = oResultSet.getInt("d.fid_bp_alt_r");
                 mnFkBizPartnerBranchAltId = oResultSet.getInt("d.fid_bpb_alt");
                 mnFkBizPartnerBranchAddressAltId = oResultSet.getInt("d.fid_add_alt");
+                mnFkBizPartnerAddresseeId_n = oResultSet.getInt("d.fid_bp_addee_n");
                 mnFkAddresseeBizPartnerId_nr = oResultSet.getInt("d.fid_add_bp_nr");
                 mnFkAddresseeBizPartnerBranchId_n = oResultSet.getInt("d.fid_add_bpb_n");
                 mnFkAddresseeBizPartnerBranchAddressId_n = oResultSet.getInt("d.fid_add_add_n");
@@ -2412,7 +2417,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?) }");
+                    "?, ?) }");
             oCallableStatement.setInt(nParam++, mnPkYearId);
             oCallableStatement.setInt(nParam++, mnPkDocId);
             oCallableStatement.setDate(nParam++, new java.sql.Date(mtDate.getTime()));
@@ -2488,6 +2493,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             oCallableStatement.setInt(nParam++, mnFkBizPartnerAltId_r);
             oCallableStatement.setInt(nParam++, mnFkBizPartnerBranchAltId);
             oCallableStatement.setInt(nParam++, mnFkBizPartnerBranchAddressAltId);
+            if (mnFkBizPartnerAddresseeId_n > 0) oCallableStatement.setInt(nParam++, mnFkBizPartnerAddresseeId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkAddresseeBizPartnerId_nr > 0) oCallableStatement.setInt(nParam++, mnFkAddresseeBizPartnerId_nr); else oCallableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkAddresseeBizPartnerBranchId_n > 0) oCallableStatement.setInt(nParam++, mnFkAddresseeBizPartnerBranchId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             if (mnFkAddresseeBizPartnerBranchAddressId_n > 0) oCallableStatement.setInt(nParam++, mnFkAddresseeBizPartnerBranchAddressId_n); else oCallableStatement.setNull(nParam++, java.sql.Types.SMALLINT);
@@ -4937,7 +4943,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public int getDestinatarioId() { // CFDI 3.2 & 3.3
-        return mnFkAddresseeBizPartnerId_nr;
+        return mnFkBizPartnerAddresseeId_n != 0 ? mnFkBizPartnerAddresseeId_n : mnFkAddresseeBizPartnerId_nr;
     }
 
     @Override
@@ -4955,7 +4961,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         double price = 0;
         String descripcion = "";
         SCfdDataConcepto concepto = null;
-        ArrayList<SCfdDataConcepto> conceptos = new ArrayList<SCfdDataConcepto>();
+        ArrayList<SCfdDataConcepto> conceptos = new ArrayList<>();
         
         for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
             if (dpsEntry.isAccountable()) {

@@ -10,7 +10,7 @@ import java.util.Date;
  *
  * @author Juan Barajas
  */
-public class SHrsFormerPayrollIncident {
+public class SHrsFormerConceptIncident {
 
     protected int mnPkTipo;
     protected int mnPkSubtipo;
@@ -18,7 +18,7 @@ public class SHrsFormerPayrollIncident {
     protected Date mtFechaInicial;
     protected Date mtFechaFinal;
 
-    public SHrsFormerPayrollIncident() {
+    public SHrsFormerConceptIncident() {
         mnPkTipo = 0;
         mnPkSubtipo = 0;
         mtFecha = null;

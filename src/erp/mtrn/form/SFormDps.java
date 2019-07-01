@@ -34,6 +34,7 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STablePaneGrid;
 import erp.lib.table.STableRow;
 import erp.mbps.data.SDataBizPartner;
+import erp.mbps.data.SDataBizPartnerAddressee;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchContact;
@@ -104,7 +105,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author  Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas
+ * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, erp.lib.form.SFormExtendedInterface {
     
@@ -208,6 +209,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldCfdCceSubdivision;
     private erp.lib.form.SFormField moFieldCfdCceExchangeRateUsd;
     private erp.lib.form.SFormField moFieldCfdCceTotalUsd;
+    private erp.lib.form.SFormField moFieldCfdCceBizPartnerAddressee;
     private erp.lib.form.SFormField moFieldCfdCceAddresseeBizPartner;
     private erp.lib.form.SFormField moFieldCfdCceAddresseeBizPartnerBranch;
     private erp.lib.form.SFormField moFieldCfdCceAddresseeBizPartnerBranchAddress;
@@ -671,15 +673,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlCfdCceTotalUsd = new javax.swing.JLabel();
         jtfCfdCceTotalUsd = new javax.swing.JTextField();
         jPanel106 = new javax.swing.JPanel();
+        jPanel121 = new javax.swing.JPanel();
+        jlCfdCceFkBizPartnerAddressee = new javax.swing.JLabel();
+        jcbCfdCceFkBizPartnerAddressee = new javax.swing.JComboBox();
+        jPanel122 = new javax.swing.JPanel();
+        jlCfdCceAddresseeBizPartner = new javax.swing.JLabel();
         jPanel107 = new javax.swing.JPanel();
-        jlFkAddresseeBizPartner = new javax.swing.JLabel();
-        jcbFkAddresseeBizPartner = new javax.swing.JComboBox();
+        jlCfdCceFkAddresseeBizPartner = new javax.swing.JLabel();
+        jcbCfdCceFkAddresseeBizPartner = new javax.swing.JComboBox();
         jPanel112 = new javax.swing.JPanel();
-        jlFkAddresseeBizPartnerBranch = new javax.swing.JLabel();
-        jcbFkAddresseeBizPartnerBranch = new javax.swing.JComboBox();
+        jlCfdCceFkAddresseeBizPartnerBranch = new javax.swing.JLabel();
+        jcbCfdCceFkAddresseeBizPartnerBranch = new javax.swing.JComboBox();
         jPanel113 = new javax.swing.JPanel();
-        jlFkAddresseeBizPartnerBranchAddress = new javax.swing.JLabel();
-        jcbFkAddresseeBizPartnerBranchAddress = new javax.swing.JComboBox();
+        jlCfdCceFkAddresseeBizPartnerBranchAddress = new javax.swing.JLabel();
+        jcbCfdCceFkAddresseeBizPartnerBranchAddress = new javax.swing.JComboBox();
         jpControls = new javax.swing.JPanel();
         jpControlsRecord = new javax.swing.JPanel();
         jpControlsButtons = new javax.swing.JPanel();
@@ -2371,7 +2378,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel110.setLayout(new java.awt.BorderLayout());
 
-        jPanel96.setLayout(new java.awt.GridLayout(6, 1, 0, 2));
+        jPanel96.setLayout(new java.awt.GridLayout(8, 1, 0, 2));
 
         jPanel103.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel103.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
@@ -2404,36 +2411,55 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel106.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
         jPanel96.add(jPanel106);
 
+        jPanel121.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCfdCceFkBizPartnerAddressee.setText("Destinatario propio:");
+        jlCfdCceFkBizPartnerAddressee.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel121.add(jlCfdCceFkBizPartnerAddressee);
+
+        jcbCfdCceFkBizPartnerAddressee.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel121.add(jcbCfdCceFkBizPartnerAddressee);
+
+        jPanel96.add(jPanel121);
+
+        jPanel122.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCfdCceAddresseeBizPartner.setText("Otro asociado de negocios como destinatario:");
+        jlCfdCceAddresseeBizPartner.setPreferredSize(new java.awt.Dimension(375, 23));
+        jPanel122.add(jlCfdCceAddresseeBizPartner);
+
+        jPanel96.add(jPanel122);
+
         jPanel107.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkAddresseeBizPartner.setText("Destinatario:");
-        jlFkAddresseeBizPartner.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel107.add(jlFkAddresseeBizPartner);
+        jlCfdCceFkAddresseeBizPartner.setText("Destinatario:");
+        jlCfdCceFkAddresseeBizPartner.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel107.add(jlCfdCceFkAddresseeBizPartner);
 
-        jcbFkAddresseeBizPartner.setPreferredSize(new java.awt.Dimension(350, 23));
-        jPanel107.add(jcbFkAddresseeBizPartner);
+        jcbCfdCceFkAddresseeBizPartner.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel107.add(jcbCfdCceFkAddresseeBizPartner);
 
         jPanel96.add(jPanel107);
 
         jPanel112.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkAddresseeBizPartnerBranch.setText("Sucursal destinatario:");
-        jlFkAddresseeBizPartnerBranch.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel112.add(jlFkAddresseeBizPartnerBranch);
+        jlCfdCceFkAddresseeBizPartnerBranch.setText("Sucursal destinatario:");
+        jlCfdCceFkAddresseeBizPartnerBranch.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel112.add(jlCfdCceFkAddresseeBizPartnerBranch);
 
-        jcbFkAddresseeBizPartnerBranch.setPreferredSize(new java.awt.Dimension(350, 23));
-        jPanel112.add(jcbFkAddresseeBizPartnerBranch);
+        jcbCfdCceFkAddresseeBizPartnerBranch.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel112.add(jcbCfdCceFkAddresseeBizPartnerBranch);
 
         jPanel96.add(jPanel112);
 
         jPanel113.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkAddresseeBizPartnerBranchAddress.setText("Domicilio destinatario:");
-        jlFkAddresseeBizPartnerBranchAddress.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel113.add(jlFkAddresseeBizPartnerBranchAddress);
+        jlCfdCceFkAddresseeBizPartnerBranchAddress.setText("Domicilio destinatario:");
+        jlCfdCceFkAddresseeBizPartnerBranchAddress.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel113.add(jlCfdCceFkAddresseeBizPartnerBranchAddress);
 
-        jcbFkAddresseeBizPartnerBranchAddress.setPreferredSize(new java.awt.Dimension(350, 23));
-        jPanel113.add(jcbFkAddresseeBizPartnerBranchAddress);
+        jcbCfdCceFkAddresseeBizPartnerBranchAddress.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel113.add(jcbCfdCceFkAddresseeBizPartnerBranchAddress);
 
         jPanel96.add(jPanel113);
 
@@ -2509,7 +2535,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         int i = 0;
         STableColumnForm[] aoTableColumns = null;
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         
         // document header fields:
 
@@ -2677,11 +2703,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdCceExchangeRateUsd.setTabbedPaneIndex(TAB_CFD_INT, jTabbedPane);
         moFieldCfdCceTotalUsd = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfCfdCceTotalUsd, jlCfdCceTotalUsd);
         moFieldCfdCceTotalUsd.setTabbedPaneIndex(TAB_CFD_INT, jTabbedPane);
-        moFieldCfdCceAddresseeBizPartner = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkAddresseeBizPartner, jlFkAddresseeBizPartner);
+        moFieldCfdCceBizPartnerAddressee = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceFkBizPartnerAddressee, jlCfdCceFkBizPartnerAddressee);
+        moFieldCfdCceBizPartnerAddressee.setTabbedPaneIndex(TAB_CFD_INT, jTabbedPane);
+        moFieldCfdCceAddresseeBizPartner = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceFkAddresseeBizPartner, jlCfdCceFkAddresseeBizPartner);
         moFieldCfdCceAddresseeBizPartner.setTabbedPaneIndex(TAB_CFD_INT, jTabbedPane);
-        moFieldCfdCceAddresseeBizPartnerBranch = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkAddresseeBizPartnerBranch, jlFkAddresseeBizPartnerBranch);
+        moFieldCfdCceAddresseeBizPartnerBranch = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceFkAddresseeBizPartnerBranch, jlCfdCceFkAddresseeBizPartnerBranch);
         moFieldCfdCceAddresseeBizPartnerBranch.setTabbedPaneIndex(TAB_CFD_INT, jTabbedPane);
-        moFieldCfdCceAddresseeBizPartnerBranchAddress = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkAddresseeBizPartnerBranchAddress, jlFkAddresseeBizPartnerBranchAddress);
+        moFieldCfdCceAddresseeBizPartnerBranchAddress = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdCceFkAddresseeBizPartnerBranchAddress, jlCfdCceFkAddresseeBizPartnerBranchAddress);
         moFieldCfdCceAddresseeBizPartnerBranchAddress.setTabbedPaneIndex(TAB_CFD_INT, jTabbedPane);
 
         mvFields.add(moFieldDate);
@@ -2760,6 +2788,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldCfdCceSubdivision);
         mvFields.add(moFieldCfdCceExchangeRateUsd);
         mvFields.add(moFieldCfdCceTotalUsd);
+        mvFields.add(moFieldCfdCceBizPartnerAddressee);
         mvFields.add(moFieldCfdCceAddresseeBizPartner);
         mvFields.add(moFieldCfdCceAddresseeBizPartnerBranch);
         mvFields.add(moFieldCfdCceAddresseeBizPartnerBranchAddress);
@@ -3182,9 +3211,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfCfdCceExchangeRateUsd.setFocusable(enableFields && !isCurrencyUsd);
         jtfCfdCceTotalUsd.setEnabled(enableFields && !isCurrencyUsd);
         jtfCfdCceTotalUsd.setFocusable(enableFields && !isCurrencyUsd);
-        jcbFkAddresseeBizPartner.setEnabled(enableFields);
-        jcbFkAddresseeBizPartnerBranch.setEnabled(enableFields && jcbFkAddresseeBizPartnerBranch.getSelectedIndex() > 0);
-        jcbFkAddresseeBizPartnerBranchAddress.setEnabled(enableFields && jcbFkAddresseeBizPartnerBranchAddress.getSelectedIndex() > 0);
+        jcbCfdCceFkBizPartnerAddressee.setEnabled(enableFields);
+        jcbCfdCceFkAddresseeBizPartner.setEnabled(enableFields);
+        jcbCfdCceFkAddresseeBizPartnerBranch.setEnabled(enableFields && jcbCfdCceFkAddresseeBizPartnerBranch.getSelectedIndex() > 0);
+        jcbCfdCceFkAddresseeBizPartnerBranchAddress.setEnabled(enableFields && jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() > 0);
     }
     
     /**
@@ -3586,6 +3616,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     jcbFkContactId_n.addItem(new SFormComponentItem(contact.getPrimaryKey(), contact.getContact() + " (" + contact.getDbmsContactType() + ")"));
                 }
             }
+        }
+        
+        jcbCfdCceFkBizPartnerAddressee.removeAllItems();
+        
+        if (isCfdIntCommerceRequired()) {
+            SFormUtilities.populateComboBox(miClient, jcbCfdCceFkBizPartnerAddressee, SDataConstants.BPSU_BP_ADDEE, new int[] { moBizPartner.getPkBizPartnerId() });
         }
     }
     
@@ -7009,12 +7045,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         int[] filterTypeSpot = null;
 
         if (jcbFkIncotermId.getSelectedIndex() <= 0 || moFieldFkIncotermId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_INC_NA) {
+            jcbFkSpotSrcId_n.setEnabled(false);
             jcbFkSpotDesId_n.setEnabled(false);
 
             jcbFkSpotSrcId_n.removeAllItems();
             jcbFkSpotDesId_n.removeAllItems();
         }
         else {
+            jcbFkSpotSrcId_n.setEnabled(true);
             jcbFkSpotDesId_n.setEnabled(true);
 
             switch (moFieldFkIncotermId.getKeyAsIntArray()[0]) {
@@ -7357,6 +7395,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel119;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel120;
+    private javax.swing.JPanel jPanel121;
+    private javax.swing.JPanel jPanel122;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
@@ -7490,6 +7530,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbTaxRegionId;
     private javax.swing.JComboBox<SFormComponentItem> jcbAdjustmentSubtypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdAddendaSubtype;
+    private javax.swing.JComboBox jcbCfdCceFkAddresseeBizPartner;
+    private javax.swing.JComboBox jcbCfdCceFkAddresseeBizPartnerBranch;
+    private javax.swing.JComboBox jcbCfdCceFkAddresseeBizPartnerBranchAddress;
+    private javax.swing.JComboBox jcbCfdCceFkBizPartnerAddressee;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdCceMoveReason;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdCceOperationType;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdCceRequestKey;
@@ -7499,9 +7543,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdiRelationType;
     private javax.swing.JComboBox<SFormComponentItem> jcbCfdiTaxRegime;
     private javax.swing.JComboBox jcbDriver;
-    private javax.swing.JComboBox jcbFkAddresseeBizPartner;
-    private javax.swing.JComboBox jcbFkAddresseeBizPartnerBranch;
-    private javax.swing.JComboBox jcbFkAddresseeBizPartnerBranchAddress;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCarrierId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCarrierTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkContactId_n;
@@ -7558,8 +7599,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlBulkQuantity;
     private javax.swing.JLabel jlBulkType;
     private javax.swing.JLabel jlCfdAddendaSubtype;
+    private javax.swing.JLabel jlCfdCceAddresseeBizPartner;
     private javax.swing.JLabel jlCfdCceCertificateOrigin;
     private javax.swing.JLabel jlCfdCceExchangeRateUsd;
+    private javax.swing.JLabel jlCfdCceFkAddresseeBizPartner;
+    private javax.swing.JLabel jlCfdCceFkAddresseeBizPartnerBranch;
+    private javax.swing.JLabel jlCfdCceFkAddresseeBizPartnerBranchAddress;
+    private javax.swing.JLabel jlCfdCceFkBizPartnerAddressee;
     private javax.swing.JLabel jlCfdCceMoveReason;
     private javax.swing.JLabel jlCfdCceNumberCertificateOrigin;
     private javax.swing.JLabel jlCfdCceOperationType;
@@ -7589,9 +7635,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlExchangeRate;
     private javax.swing.JLabel jlExchangeRateSystem;
     private javax.swing.JLabel jlFileXml;
-    private javax.swing.JLabel jlFkAddresseeBizPartner;
-    private javax.swing.JLabel jlFkAddresseeBizPartnerBranch;
-    private javax.swing.JLabel jlFkAddresseeBizPartnerBranchAddress;
     private javax.swing.JLabel jlFkCarrierId_n;
     private javax.swing.JLabel jlFkCarrierTypeId;
     private javax.swing.JLabel jlFkCfdAddendaTypeId;
@@ -7979,9 +8022,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         catalogs.populateComboBox(jcbCfdCceRequestKey, SDataConstantsSys.TRNS_CFD_CAT_INT_REQ_KEY, miClient.getSession().getSystemDate());
         
         moComboBoxGroupCfdCceGroupAddressee.clear();
-        moComboBoxGroupCfdCceGroupAddressee.addComboBox(mbIsSales ? SDataConstants.BPSX_BP_INT_CUS : SDataConstants.BPSX_BP_INT_SUP, jcbFkAddresseeBizPartner);
-        moComboBoxGroupCfdCceGroupAddressee.addComboBox(SDataConstants.BPSU_BPB, jcbFkAddresseeBizPartnerBranch);
-        moComboBoxGroupCfdCceGroupAddressee.addComboBox(SDataConstants.BPSU_BPB_ADD, jcbFkAddresseeBizPartnerBranchAddress);
+        moComboBoxGroupCfdCceGroupAddressee.addComboBox(mbIsSales ? SDataConstants.BPSX_BP_INT_CUS : SDataConstants.BPSX_BP_INT_SUP, jcbCfdCceFkAddresseeBizPartner);
+        moComboBoxGroupCfdCceGroupAddressee.addComboBox(SDataConstants.BPSU_BPB, jcbCfdCceFkAddresseeBizPartnerBranch);
+        moComboBoxGroupCfdCceGroupAddressee.addComboBox(SDataConstants.BPSU_BPB_ADD, jcbCfdCceFkAddresseeBizPartnerBranchAddress);
         
         mbResetingForm = false;
     }
@@ -8164,12 +8207,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else {
                     // validate shipping information if Incoterm has been set:
                     if (moFieldFkIncotermId.getKeyAsIntArray()[0] != SModSysConsts.LOGS_INC_NA) {
-                        if (jcbFkSpotSrcId_n.getSelectedIndex() <= 0) {
+                        if (jcbFkSpotSrcId_n.isEnabled() && jcbFkSpotSrcId_n.getSelectedIndex() <= 0) {
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSpotSrcId_n.getText() + "'.");
                             validation.setComponent(jcbFkSpotSrcId_n);
                             jTabbedPane.setSelectedIndex(TAB_MKT);
                         }
-                        else if (jcbFkSpotDesId_n.getSelectedIndex() <= 0) {
+                        else if (jcbFkSpotDesId_n.isEnabled() && jcbFkSpotDesId_n.getSelectedIndex() <= 0) {
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSpotDesId_n.getText() + "'.");
                             validation.setComponent(jcbFkSpotDesId_n);
                             jTabbedPane.setSelectedIndex(TAB_MKT);
@@ -8503,16 +8546,46 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                     validation.setComponent(jtfCfdCceNumberCertificateOrigin);
                                     jTabbedPane.setSelectedIndex(TAB_CFD_INT);
                                 }
-                                else if ((jcbFkAddresseeBizPartner.getSelectedIndex() > 0 || jcbFkAddresseeBizPartnerBranch.getSelectedIndex() > 0 || jcbFkAddresseeBizPartnerBranchAddress.getSelectedIndex() > 0) && 
-                                        (jcbFkAddresseeBizPartner.getSelectedIndex() <= 0 || jcbFkAddresseeBizPartnerBranch.getSelectedIndex() <= 0 || jcbFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0)) {
-                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkAddresseeBizPartner.getText() + "', '" + jlFkAddresseeBizPartnerBranch.getText() + "', '" + jlFkAddresseeBizPartnerBranchAddress.getText() + "'.");
-                                    validation.setComponent(jcbFkAddresseeBizPartner);
+                                else if (jcbCfdCceFkBizPartnerAddressee.getSelectedIndex() > 0 && jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() > 0) {
+                                    validation.setMessage("Se puede especificar un valor para el campo '" + jlCfdCceFkBizPartnerAddressee.getText() + "' o para el campo '" + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "', pero no para ambos a la vez.");
+                                    validation.setComponent(jcbCfdCceFkBizPartnerAddressee);
                                     jTabbedPane.setSelectedIndex(TAB_CFD_INT);
                                 }
-                                else if (jcbFkAddresseeBizPartner.getSelectedIndex() > 0 && moFieldCfdCceAddresseeBizPartner.getKeyAsIntArray()[0] == moBizPartner.getPkBizPartnerId()) {
-                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkAddresseeBizPartner.getText() + "'.");
-                                    validation.setComponent(jcbFkAddresseeBizPartner);
+                                else if ((jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() > 0 || jcbCfdCceFkAddresseeBizPartnerBranch.getSelectedIndex() > 0 || jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() > 0) && 
+                                        (jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() <= 0 || jcbCfdCceFkAddresseeBizPartnerBranch.getSelectedIndex() <= 0 || jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0)) {
+                                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "', '" + jlCfdCceFkAddresseeBizPartnerBranch.getText() + "' y '" + jlCfdCceFkAddresseeBizPartnerBranchAddress.getText() + "'.");
+                                    validation.setComponent(jcbCfdCceFkAddresseeBizPartner);
                                     jTabbedPane.setSelectedIndex(TAB_CFD_INT);
+                                }
+                                else {
+                                    // validate addressee:
+                                    
+                                    if (jcbCfdCceFkBizPartnerAddressee.getSelectedIndex() > 0) {
+                                        SDataBizPartnerAddressee addressee = (SDataBizPartnerAddressee) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP_ADDEE, moFieldCfdCceBizPartnerAddressee.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+                                        if (addressee.getFkCountryId_n() == 0 || addressee.getFkCountryId_n() == miClient.getSessionXXX().getParamsErp().getFkCountryId()) {
+                                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdCceFkBizPartnerAddressee.getText() + "':\n"
+                                                    + "el destinatario debe ser del extranjero.");
+                                            validation.setComponent(jcbCfdCceFkBizPartnerAddressee);
+                                            jTabbedPane.setSelectedIndex(TAB_CFD_INT);
+                                        }
+                                    }
+                                    else if (jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() > 0) {
+                                        if (moFieldCfdCceAddresseeBizPartner.getKeyAsIntArray()[0] == moBizPartner.getPkBizPartnerId()) {
+                                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "':\n"
+                                                    + "el destinatario debe ser distinto al receptor del comprobante.");
+                                            validation.setComponent(jcbCfdCceFkAddresseeBizPartner);
+                                            jTabbedPane.setSelectedIndex(TAB_CFD_INT);
+                                        }
+                                        else {
+                                            SDataBizPartnerBranchAddress address = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, moFieldCfdCceAddresseeBizPartnerBranchAddress.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+                                            if (address.getFkCountryId_n() == 0 || address.getFkCountryId_n() == miClient.getSessionXXX().getParamsErp().getFkCountryId()) {
+                                                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdCceFkAddresseeBizPartner.getText() + "':\n"
+                                                        + "el destinatario debe ser del extranjero.");
+                                                validation.setComponent(jcbCfdCceFkAddresseeBizPartner);
+                                                jTabbedPane.setSelectedIndex(TAB_CFD_INT);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             
@@ -8785,6 +8858,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     moFieldCfdCceExchangeRateUsd.setFieldValue(SLibUtils.parseDouble(moDps.getDbmsDataDpsCfd().getCfdCceTipoCambioUSD()));
                     moFieldCfdCceTotalUsd.setFieldValue(SLibUtils.parseDouble(moDps.getDbmsDataDpsCfd().getCfdCceTotalUSD()));
                     
+                    moFieldCfdCceBizPartnerAddressee.setFieldValue(new int[] { moDps.getFkBizPartnerAddresseeId_n() });
                     moFieldCfdCceAddresseeBizPartner.setFieldValue(new int[] { moDps.getFkAddresseeBizPartnerId_nr() });
                     moFieldCfdCceAddresseeBizPartnerBranch.setFieldValue(new int[] { moDps.getFkAddresseeBizPartnerBranchId_n() });
                     moFieldCfdCceAddresseeBizPartnerBranchAddress.setFieldValue(new int[] { moDps.getFkAddresseeBizPartnerBranchId_n(), moDps.getFkAddresseeBizPartnerBranchAddressId_n() });
@@ -9033,9 +9107,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 dpsCfd.setCfdCceIncoterm(jcbFkIncotermId.getSelectedIndex() <= 0 ? "" : ((SFormComponentItem) jcbFkIncotermId.getSelectedItem()).getComplement().toString());
                 
-                moDps.setFkAddresseeBizPartnerId_nr(jcbFkAddresseeBizPartner.getSelectedIndex() <= 0 ? 0 : moFieldCfdCceAddresseeBizPartner.getKeyAsIntArray()[0]);
-                moDps.setFkAddresseeBizPartnerBranchId_n(jcbFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0 ? 0 : moFieldCfdCceAddresseeBizPartnerBranchAddress.getKeyAsIntArray()[0]);
-                moDps.setFkAddresseeBizPartnerBranchAddressId_n(jcbFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0 ? 0 : moFieldCfdCceAddresseeBizPartnerBranchAddress.getKeyAsIntArray()[1]);
+                moDps.setFkBizPartnerAddresseeId_n(jcbCfdCceFkBizPartnerAddressee.getSelectedIndex() <= 0 ? 0 : moFieldCfdCceBizPartnerAddressee.getKeyAsIntArray()[0]);
+                moDps.setFkAddresseeBizPartnerId_nr(jcbCfdCceFkAddresseeBizPartner.getSelectedIndex() <= 0 ? 0 : moFieldCfdCceAddresseeBizPartner.getKeyAsIntArray()[0]);
+                moDps.setFkAddresseeBizPartnerBranchId_n(jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0 ? 0 : moFieldCfdCceAddresseeBizPartnerBranchAddress.getKeyAsIntArray()[0]);
+                moDps.setFkAddresseeBizPartnerBranchAddressId_n(jcbCfdCceFkAddresseeBizPartnerBranchAddress.getSelectedIndex() <= 0 ? 0 : moFieldCfdCceAddresseeBizPartnerBranchAddress.getKeyAsIntArray()[1]);
             }
 
             moDps.setDbmsDataDpsCfd(dpsCfd);

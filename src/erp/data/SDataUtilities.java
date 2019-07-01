@@ -11,9 +11,11 @@ import erp.lib.SLibUtilities;
 import erp.lib.data.SDataProcedure;
 import erp.lib.data.SDataRegistry;
 import erp.mbps.data.SDataBizPartner;
+import erp.mbps.data.SDataBizPartnerAddressee;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
+import erp.mbps.data.SDataBizPartnerBranchContact;
 import erp.mbps.data.SProcBizPartnerBizAreaVal;
 import erp.mbps.data.SProcBizPartnerBranchAddressVal;
 import erp.mbps.data.SProcBizPartnerFiscalIdVal;
@@ -587,10 +589,11 @@ public abstract class SDataUtilities {
     }
 
     /**
+     * Reads the requested registry.
      * @param client ERP Client interface.
-     * @param dataType Data type. Constants defined in erp.data.SDataConstants.
-     * @param pk Primary key.
-     * @param executionMode  Execution mode. Constants defined in erp.lib.SLibConstants.
+     * @param dataType Data type (constants defined in erp.data.SDataConstants).
+     * @param pk Primary key of desired registry.
+     * @param executionMode  Execution mode (constants defined in SLibConstants.EXEC_MODE_...).
      */
     public static erp.lib.data.SDataRegistry readRegistry(erp.client.SClientInterface client, int dataType, java.lang.Object pk, int executionMode) {
         SServerRequest request = null;
@@ -617,8 +620,14 @@ public abstract class SDataUtilities {
             case SDataConstants.BPSU_BPB_ADD:
                 registry = new SDataBizPartnerBranchAddress();
                 break;
+            case SDataConstants.BPSU_BPB_CON:
+                registry = new SDataBizPartnerBranchContact();
+                break;
             case SDataConstants.BPSU_BANK_ACC:
                 registry = new SDataBizPartnerBranchBankAccount();
+                break;
+            case SDataConstants.BPSU_BP_ADDEE:
+                registry = new SDataBizPartnerAddressee();
                 break;
 
             case SDataConstants.ITMU_CFG_ITEM_BP:

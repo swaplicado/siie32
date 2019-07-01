@@ -508,6 +508,7 @@ public class SFormField implements SFormFieldInterface {
         }
         else {
             ((JTextComponent) mjComponent).setText(processString(((JTextComponent) mjComponent).getText()));
+            ((JTextComponent) mjComponent).setCaretPosition(0);
         }
     }
 
