@@ -231,7 +231,10 @@ public class SDialogUtilFiscalYearClosing extends javax.swing.JDialog implements
                 if (!SDataUtilities.isPeriodOpen(miClient, new int[] { moFieldYear.getInteger(), 12 })) {
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_PER_CLOSE + "\nPeríodo cerrado: " + moFieldYear.getInteger() + "-12.");
                 }
-                else if (mnFkAccountTypeId_r == SDataConstantsSys.FINS_TP_ACC_BAL) {
+                else if (mnFkAccountTypeId_r != SDataConstantsSys.FINS_TP_ACC_BAL) {
+                    miClient.showMsgBoxWarning("La cuenta debe ser de balance y capital contable.");
+                }
+                else {
                     try {
                         cursor = getCursor();
                         setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -268,9 +271,6 @@ public class SDialogUtilFiscalYearClosing extends javax.swing.JDialog implements
                     finally {
                         setCursor(cursor);
                     }
-                }
-                else {
-                    miClient.showMsgBoxWarning("La cuenta debe ser de balance y capital contable.");
                 }
             }
         }

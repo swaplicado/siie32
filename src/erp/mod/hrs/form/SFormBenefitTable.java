@@ -152,6 +152,7 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlBenefitType.setForeground(new java.awt.Color(0, 0, 255));
         jlBenefitType.setText("Tipo prestación:*");
         jlBenefitType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel18.add(jlBenefitType);
@@ -198,19 +199,19 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Renglones de la tabla:"));
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalle de la tabla:"));
         jPanel6.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel7.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlMonths.setText("Meses tope:*");
-        jlMonths.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlMonths.setText("Meses tope (hasta):*");
+        jlMonths.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel8.add(jlMonths);
 
         jlBenefitDays.setText("Días prestación:*");
-        jlBenefitDays.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlBenefitDays.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel8.add(jlBenefitDays);
 
         jlBenefitBonusPercentage.setText("Prima prestación:*");
@@ -220,7 +221,11 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
         jPanel7.add(jPanel8);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        moIntMonths.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel9.add(moIntMonths);
+
+        moIntBenefitDays.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel9.add(moIntBenefitDays);
 
         moDecBenefitBonusPercentage.setPreferredSize(new java.awt.Dimension(115, 23));
@@ -346,8 +351,8 @@ public class SFormBenefitTable extends SBeanForm implements ActionListener, Item
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "#"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_4B, "Meses tope"));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_4B, "Años tope equivalentes"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_4B, "Meses tope (hasta)"));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Años tope equivalentes (hasta)"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_4B, "Días prestación"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_DISC, "Prima prestación"));
 

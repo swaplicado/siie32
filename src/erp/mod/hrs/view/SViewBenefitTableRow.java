@@ -85,8 +85,8 @@ public class SViewBenefitTableRow extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " prestación"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " prestación"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "vr.id_row", "#"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "vr.mon", "Meses tope"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_year", "Años tope equivalentes"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "vr.mon", "Meses tope (hasta)"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_year", "Años tope equivalentes (hasta)"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_4B, "vr.ben_day", "Días prestación"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_PER_DISC, "vr.ben_bon_per", "Prima prestación"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));

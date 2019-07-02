@@ -1719,13 +1719,9 @@ public abstract class STrnUtilities {
     }
     
     public static void sendMailDpsSummaryByPeriod(final SClientInterface client, final int[] dpsTypeKey, final Date start, final Date end,  ArrayList<String> recipientsTo, ArrayList<String> recipientsCc, ArrayList<String> recipientsBcc) {
-        String mail = "";
-        String sql = "";
-        ResultSet resultSet = null;
-        Statement statement = null;
         try {
-            statement = client.getSession().getDatabase().getConnection().createStatement();
-            sql = "SELECT "
+            String body = "";
+            String sql = "SELECT "
                 + "CONCAT(sd.num_ser, IF(LENGTH(sd.num_ser) = 0, '', '-'), sd.num) AS f_num, "
                 + "bp.bp as bp, "
                 + "sde.concept AS f_cpt, "
@@ -1752,34 +1748,37 @@ public abstract class STrnUtilities {
                 + "WHERE dd.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(start) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(end) + "' AND dd.fid_ct_dps = " + dpsTypeKey[0] + " AND dd.fid_cl_dps = " + dpsTypeKey[1] + " AND dd.fid_tp_dps = " + dpsTypeKey[2] + " "
                 + "GROUP BY src.id_src_year, src.id_src_doc, src.id_src_ety;";
 
-            resultSet = statement.executeQuery(sql);
-            while (resultSet.next()) {
-                mail += "<tr>";
-                mail += "<td style=\"min-width: 8em; max-width: 10em;\"> " + SLibUtils.textToHtml(resultSet.getString("f_num")) + "</td> ";
-                mail += "<td style=\"min-width: 16em; max-width: 18em;\"> " + SLibUtils.textToHtml(resultSet.getString("bp")) + "</td> ";
-                mail += "<td style=\"min-width: 16em; max-width: 18em;\"> " + SLibUtils.textToHtml(resultSet.getString("f_cpt")) + "</td> ";
-                mail += "<td id=\"number\" style=\"min-width: 10em; max-width: 10em;\"> " + SLibUtils.DecimalFormatValue2D.format(resultSet.getDouble("orig_qty")) + "</td> ";
-                mail += "<td id=\"number\" style=\"min-width: 10em; max-width: 10em;\"> " + SLibUtils.DecimalFormatValue2D.format(resultSet.getDouble("src_orig_qty")) + "</td> ";
-                mail += "<td id=\"number\" style=\"min-width: 10em; max-width: 10em;\"> " + SLibUtils.DecimalFormatValue2D.format(resultSet.getDouble("des_orig_qty")) + "</td> ";
-                mail += "<td id=\"number\" style=\"min-width: 10em; max-width: 10em;\"> " + SLibUtils.DecimalFormatValue2D.format(resultSet.getDouble("balance")) + "</td> ";
-                mail += "</tr>";
+            try (ResultSet resultSet = client.getSession().getDatabase().getConnection().createStatement().executeQuery(sql)) {
+                while (resultSet.next()) {
+                    body += "<tr>";
+                    body += "<td style=\"min-width: 8em; max-width: 10em;\"> " + SLibUtils.textToHtml(resultSet.getString("f_num")) + "</td> ";
+                    body += "<td style=\"min-width: 16em; max-width: 18em;\"> " + SLibUtils.textToHtml(resultSet.getString("bp")) + "</td> ";
+                    body += "<td style=\"min-width: 16em; max-width: 18em;\"> " + SLibUtils.textToHtml(resultSet.getString("f_cpt")) + "</td> ";
+                    body += "<td id=\"number\" style=\"min-width: 10em; max-width: 10em;\"> " + SLibUtils.DecimalFormatValue2D.format(resultSet.getDouble("orig_qty")) + "</td> ";
+                    body += "<td id=\"number\" style=\"min-width: 10em; max-width: 10em;\"> " + SLibUtils.DecimalFormatValue2D.format(resultSet.getDouble("src_orig_qty")) + "</td> ";
+                    body += "<td id=\"number\" style=\"min-width: 10em; max-width: 10em;\"> " + SLibUtils.DecimalFormatValue2D.format(resultSet.getDouble("des_orig_qty")) + "</td> ";
+                    body += "<td id=\"number\" style=\"min-width: 10em; max-width: 10em;\"> " + SLibUtils.DecimalFormatValue2D.format(resultSet.getDouble("balance")) + "</td> ";
+                    body += "</tr>";
+                }
             }
             
-            if (!mail.isEmpty()) {
-                mail = computeMailHeader(client.getSessionXXX().getCompany().getCompany())
-                    + "<p style = \"font-weight: bold; font-size: 1em;\">Resumen de status de contratos por " + (end.compareTo(start) == 0 ?  SLibUtils.textToHtml("día") + " (" + SLibUtils.DateFormatDate.format(start) + ")</p> " : "rango de fechas (del " + SLibUtils.DateFormatDate.format(start) + " al " + SLibUtils.DateFormatDate.format(end) + ")</p> ")
-                    + "<table style = \"width = 980px\">"
-                    + "<tr>"
-                    + "<th style=\"min-width: 8em; max-width: 10em;\">Id doc.</th> "
-                    + "<th style=\"min-width: 16em; max-width: 18em;\">Cliente</th> "
-                    + "<th style=\"min-width: 16em; max-width: 18em;\">Producto</th> "
-                    + "<th id=\"number\" style=\"min-width: 10em; max-width: 10em;\">Cantidad original</th> "
-                    + "<th id=\"number\" style=\"min-width: 10em; max-width: 10em;\">Cantidad procesada por pedidos</th> "
-                    + "<th id=\"number\" style=\"min-width: 10em; max-width: 10em;\">Cantidad procesada por contratos</th> "
-                    + "<th id=\"number\" style=\"min-width: 10em; max-width: 10em;\">Saldo</th> "
-                    + "</tr> "
-                    + mail + computeMailFooterEndTable(SClient.APP_NAME , SClient.APP_COPYRIGHT, SClient.APP_PROVIDER, SClient.VENDOR_WEBSITE , SClient.APP_RELEASE);
-                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, recipientsTo, recipientsCc, recipientsBcc, mail);
+            if (!body.isEmpty()) {
+                body = computeMailHeader(client.getSessionXXX().getCompany().getCompany())
+                        + "<p style = \"font-weight: bold; font-size: 1em;\">Resumen de status de contratos por " + (end.compareTo(start) == 0 ?  SLibUtils.textToHtml("día") + " (" + SLibUtils.DateFormatDate.format(start) + ")</p> " : "rango de fechas (del " + SLibUtils.DateFormatDate.format(start) + " al " + SLibUtils.DateFormatDate.format(end) + ")</p> ")
+                        + "<table style = \"width = 980px\">"
+                        + "<tr>"
+                        + "<th style=\"min-width: 8em; max-width: 10em;\">Id doc.</th> "
+                        + "<th style=\"min-width: 16em; max-width: 18em;\">Cliente</th> "
+                        + "<th style=\"min-width: 16em; max-width: 18em;\">Producto</th> "
+                        + "<th id=\"number\" style=\"min-width: 10em; max-width: 10em;\">Cantidad original</th> "
+                        + "<th id=\"number\" style=\"min-width: 10em; max-width: 10em;\">Cantidad procesada por pedidos</th> "
+                        + "<th id=\"number\" style=\"min-width: 10em; max-width: 10em;\">Cantidad procesada por contratos</th> "
+                        + "<th id=\"number\" style=\"min-width: 10em; max-width: 10em;\">Saldo</th> "
+                        + "</tr> "
+                        + body 
+                        + computeMailFooterEndTable(SClient.APP_NAME , SClient.APP_COPYRIGHT, SClient.APP_PROVIDER, SClient.VENDOR_WEBSITE , SClient.APP_RELEASE);
+                
+                sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc);
             }
             else {
                 throw new Exception("No existe información para el periodo seleccionado.");
@@ -2611,7 +2610,7 @@ public abstract class STrnUtilities {
         return result;
     }
     
-    public static int[] readMmsConfigurationByLinkType(final SClientInterface client, final int mmsTypeId, final int itemId) throws SQLException {
+    public static int[] readMmsConfigurationByLinkType(final SClientInterface client, final int mmsType, final int itemId) throws SQLException {
         String sql = "";
         int[] configKey = null;
         ArrayList<int[]> linkTypes = new ArrayList<>();
@@ -2627,7 +2626,7 @@ public abstract class STrnUtilities {
                 + "FROM trn_mms_cfg AS tmc " 
                 + "INNER JOIN erp.cfgs_tp_mms AS tm ON tm.id_tp_mms = tmc.id_tp_mms " 
                 + "INNER JOIN cfg_mms AS cm ON cm.fk_tp_mms = tm.id_tp_mms " 
-                + "WHERE tmc.b_del = 0 AND tm.id_tp_mms = " + mmsTypeId + " " 
+                + "WHERE tmc.b_del = 0 AND tm.id_tp_mms = " + mmsType + " " 
                 + "ORDER BY tmc.fk_tp_link ASC; ";
         resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
@@ -2644,40 +2643,40 @@ public abstract class STrnUtilities {
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c "
                             + "INNER JOIN erp.itmu_item AS i ON c.fk_ref = i.id_item "
-                            + "WHERE c.b_del = 0 AND i.id_item = " + itemId + " AND c.id_tp_mms = " + mmsTypeId + "; ";
+                            + "WHERE c.b_del = 0 AND i.id_item = " + itemId + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
 
                 case SDataConstantsSys.TRNS_TP_LINK_MFR:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c, erp.itmu_mfr AS mfr "
                             + "INNER JOIN erp.itmu_item AS i ON mfr.id_mfr = i.fid_mfr "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_mfr = " + linkType[1] + " AND c.id_tp_mms = " + mmsTypeId + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_mfr = " + linkType[1] + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
 
                 case SDataConstantsSys.TRNS_TP_LINK_BRD:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c, erp.itmu_brd AS brd "
                             + "INNER JOIN erp.itmu_item AS i ON brd.id_brd = i.fid_brd "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_brd = " + linkType[1] + " AND c.id_tp_mms = " + mmsTypeId + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_brd = " + linkType[1] + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_LINE:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c, erp.itmu_line AS l "
                             + "INNER JOIN erp.itmu_item AS i ON l.id_line = i.fid_line_n "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_line_n = " + linkType[1] + " AND c.id_tp_mms = " + mmsTypeId + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_line_n = " + linkType[1] + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_IGEN:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c, erp.itmu_igen AS g "
                             + "INNER JOIN erp.itmu_item AS i ON g.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_igen = " + linkType[1] + " AND c.id_tp_mms = " + mmsTypeId + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_igen = " + linkType[1] + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_IGRP:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c, erp.itmu_igrp AS grp "
                             + "INNER JOIN erp.itmu_igen AS gen ON grp.id_igrp = gen.fid_igrp "
                             + "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_igrp = " + linkType[1] + " AND c.id_tp_mms = " + mmsTypeId + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_igrp = " + linkType[1] + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_IFAM:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
@@ -2685,28 +2684,28 @@ public abstract class STrnUtilities {
                             + "INNER JOIN erp.itmu_igrp AS grp ON fam.id_ifam = grp.fid_ifam "
                             + "INNER JOIN erp.itmu_igen AS gen ON gen.fid_igrp = grp.id_igrp "
                             + "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND grp.fid_ifam = " + linkType[1] + " AND c.id_tp_mms = " + mmsTypeId + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND grp.fid_ifam = " + linkType[1] + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_TP_ITEM:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c, erp.itms_tp_item AS tp "
                             + "INNER JOIN erp.itmu_igen AS gen ON gen.fid_tp_item = tp.id_tp_item "
                             + "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_tp_item = " + linkType[1] + " AND c.id_tp_mms = " + mmsTypeId + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_tp_item = " + linkType[1] + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_CL_ITEM:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c, erp.itms_cl_item AS cl "
                             + "INNER JOIN erp.itmu_igen AS gen ON gen.fid_cl_item = cl.id_cl_item "
                             + "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_cl_item = " + linkType[1] + " AND c.id_tp_mms = " + mmsTypeId + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_cl_item = " + linkType[1] + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_CT_ITEM:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c, erp.itms_ct_item AS ct "
                             + "INNER JOIN erp.itmu_igen AS gen ON gen.fid_ct_item = ct.id_ct_item "
                             + "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen "
-                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_ct_item = " + linkType[1] + " AND c.id_tp_mms = " + mmsTypeId + "; ";
+                            + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_ct_item = " + linkType[1] + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
 
                 case SDataConstantsSys.TRNS_TP_LINK_ALL:
@@ -2993,86 +2992,67 @@ public abstract class STrnUtilities {
     
     /**
      * Send mail with information of contracts specificated.
-     * @param client ERP Client interface.
-     * @param mmsTypeId Mail Messaging Service type.
-     * @param recipientsTo Recipients for mail.
-     * @param recipientsCc Recipients carbon copy for mail.
-     * @param recipientsBcc Recipients blind carbon copy for mail.
-     * @param message Mail message.
+     * @param client ERP client interface.
+     * @param mmsType Mail Messaging Service type.
+     * @param requestedRecipientsTo Recipients for mail.
+     * @param requestedRecipientsCc Recipients carbon copy for mail.
+     * @param requestedRecipientsBcc Recipients blind carbon copy for mail.
+     * @param body Mail body.
+     * @param subjectComplement Mail subject complement. Can be null or empty.
      * @throws java.lang.Exception
      */
-    public static void sendMail(final SClientInterface client, final int mmsTypeId, final ArrayList<String> recipientsTo, final ArrayList<String> recipientsCc, final ArrayList<String> recipientsBcc, final String message) throws Exception {
-        SMailSender sender = null;
-        SMail mail = null;
-        ArrayList<String> toRecipients = null;
-        ArrayList<String> ccRecipients = null;
-        ArrayList<String> bccRecipients = null;
-        SDbMms mms = null;
-        
+    public static void sendMail(final SClientInterface client, final int mmsType, final String body, final String subjectComplement, 
+            final ArrayList<String> requestedRecipientsTo, final ArrayList<String> requestedRecipientsCc, final ArrayList<String> requestedRecipientsBcc) throws Exception {
         client.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        mms = getMms(client, mmsTypeId);
+        
+        SDbMms mms = getMms(client, mmsType);
         
         if (mms.getQueryResultId() != SDbConsts.READ_OK) {
-            throw new Exception("No existe ningún correo-e configurado para envío de movimientos de pedidos.");
+            throw new Exception("No pudo encontrarse la configuración de servicio de mensajería por correo-e para el tipo " + mmsType + ".");
         }
         else {
-            toRecipients = new ArrayList<>();
-            ccRecipients = new ArrayList<>();
-            bccRecipients = new ArrayList<>();
+            ArrayList<String> recipientsTo = new ArrayList<>();
+            ArrayList<String> recipientsCc = new ArrayList<>();
+            ArrayList<String> recipientsBcc = new ArrayList<>();
             
-            if (recipientsTo != null || recipientsCc != null || recipientsBcc != null) {
-                if (recipientsTo != null && !recipientsTo.isEmpty()) {
-                    for(String emailTo : recipientsTo) {
-                        toRecipients.addAll(Arrays.asList(SLibUtilities.textExplode(emailTo, ";")));
+            if (requestedRecipientsTo != null && !requestedRecipientsTo.isEmpty()) {
+                for(String recipient : requestedRecipientsTo) {
+                    recipientsTo.addAll(Arrays.asList(SLibUtils.textExplode(recipient, ";")));
+                }
+                
+                if (requestedRecipientsCc != null && !requestedRecipientsCc.isEmpty()) {
+                    for(String recipient: recipientsCc) {
+                        recipientsCc.addAll(Arrays.asList(SLibUtils.textExplode(recipient, ";")));
                     }
                 }
-                if (recipientsCc != null && !recipientsCc.isEmpty()) {
-                    for(String emailToCc: ccRecipients) {
-                        ccRecipients.addAll(Arrays.asList(SLibUtilities.textExplode(emailToCc, ";")));
-                    }
-                }
-                if (recipientsBcc != null && !recipientsBcc.isEmpty()) {
-                    for(String emailToBcc: recipientsBcc) {
-                        bccRecipients.addAll(Arrays.asList(SLibUtilities.textExplode(emailToBcc, ";")));
+                
+                if (requestedRecipientsBcc != null && !requestedRecipientsBcc.isEmpty()) {
+                    for(String recipient: requestedRecipientsBcc) {
+                        recipientsBcc.addAll(Arrays.asList(SLibUtils.textExplode(recipient, ";")));
                     }
                 }
             }
             else {
-                if (!mms.getRecipientTo().isEmpty()) {
-                    toRecipients.addAll(Arrays.asList(SLibUtilities.textExplode(mms.getRecipientTo(), ";")));
-                }
-                if (!mms.getRecipientCarbonCopy().isEmpty()) {
-                    ccRecipients.addAll(Arrays.asList(SLibUtilities.textExplode(mms.getRecipientCarbonCopy(), ";")));
-                }
-                 if (!mms.getRecipientBlindCarbonCopy().isEmpty()) {
-                    bccRecipients.addAll(Arrays.asList(SLibUtilities.textExplode(mms.getRecipientBlindCarbonCopy(), ";")));
-                }
+                recipientsTo.addAll(Arrays.asList(SLibUtils.textExplode(mms.getRecipientTo(), ";")));
+                recipientsCc.addAll(Arrays.asList(SLibUtils.textExplode(mms.getRecipientCarbonCopy(), ";")));
+                recipientsBcc.addAll(Arrays.asList(SLibUtils.textExplode(mms.getRecipientBlindCarbonCopy(), ";")));
             }
             
-            if (toRecipients.isEmpty()) {
-                throw new Exception("No existe ningún correo-e destinatario configurado.");
+            if (recipientsTo.isEmpty()) {
+                throw new Exception("No se ha configurado ningún correo-e destinatario.");
             }
-            try {
-                sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
-                
-                if (ccRecipients.isEmpty() && bccRecipients.isEmpty()) {
-                    mail = new SMail(sender, mms.getTextSubject(), message, toRecipients);
+            else {
+                try {
+                    SMailSender sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+                    String subject = mms.getTextSubject() + (subjectComplement != null && !subjectComplement.isEmpty() ? " " + SLibUtils.textTrim(subjectComplement) : "");
+                    new SMail(sender, subject, body, SMailConsts.CONT_TP_TEXT_HTML, recipientsTo, recipientsCc, recipientsBcc).send();
+                } 
+                catch (Exception e) {
+                    SLibUtilities.renderException(STrnUtilities.class.getName(), e);
                 }
-                else if (!ccRecipients.isEmpty() && bccRecipients.isEmpty()) {
-                    mail = new SMail(sender, mms.getTextSubject(), message, toRecipients, ccRecipients);
+                finally {
+                    client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
-                else {
-                    mail = new SMail(sender, mms.getTextSubject(), message, toRecipients, ccRecipients, bccRecipients);
-                }
-                
-                mail.setContentType(SMailConsts.CONT_TP_TEXT_HTML);
-                mail.send();
-            } 
-            catch (Exception e) {
-                SLibUtilities.renderException(STrnUtilities.class.getName(), e);
-            }
-            finally {
-                client.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         }    
     }

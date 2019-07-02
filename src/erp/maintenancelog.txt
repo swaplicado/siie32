@@ -1,4 +1,11 @@
 ================================================================================
+2019-07-02, 3.2 138.1
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejora a notificación mail al crear o modificar pedidos, incorporando folio del pedido en cuestión.
+2) Mejora a etiquetas de configuración de prestaciones para meses y años tope (hasta).
+
+================================================================================
 2019-07-01, 3.2 138.0
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

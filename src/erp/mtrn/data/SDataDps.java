@@ -3745,41 +3745,41 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     /**
      * Send this document by mail.
-     * This method is invoked indirectly by getClass().getMethod() in SFormDps.getPostSaveMethod().
+     * WARNING: This method is invoked indirectly by getClass().getMethod() in SFormDps.getPostSaveMethod().
      * @param client GUI client.
-     * @param keyDps Type of Document of Purchases & Sales (DPS).
-     * @param typeMms Type of Mail Messaging Service (MMS).
+     * @param dpsKey Document of Purchases & Sales (DPS).
+     * @param mmsType Type of Mail Messaging Service (MMS).
      */
-    public void sendMail(SClientInterface client, Object keyDps, int typeMms) {
+    public void sendMail(SClientInterface client, Object dpsKey, int mmsType) {
         int[] mmsConfigKey = null;
         String msg = "";
         String companyName = "";
         String bpName = "";
         ArrayList<String> toRecipients = null;
-        HashSet<String> setCfgEmail = new HashSet<>();
+        HashSet<String> emailsSet = new HashSet<>();
         SDbMmsConfig mmsConfig = null;
-        SDataDpsType moDpsType = null;
+        SDataDpsType dpsType = null;
         boolean isEdited = false;
         boolean send = true;
         
-        read(keyDps, client.getSession().getStatement());
+        read(dpsKey, client.getSession().getStatement());
         
         isEdited = mtUserNewTs.compareTo(mtUserEditTs) != 0;
         
         companyName = client.getSessionXXX().getCompany().getCompany();
         bpName = SDataReadDescriptions.getCatalogueDescription(client, SDataConstants.BPSU_BP, new int[] { mnFkBizPartnerId_r }, SLibConstants.DESCRIPTION_NAME);
-        moDpsType = (SDataDpsType) SDataUtilities.readRegistry(client, SDataConstants.TRNU_TP_DPS, getDpsTypeKey(), SLibConstants.EXEC_MODE_VERBOSE);
+        dpsType = (SDataDpsType) SDataUtilities.readRegistry(client, SDataConstants.TRNU_TP_DPS, getDpsTypeKey(), SLibConstants.EXEC_MODE_VERBOSE);
         toRecipients = new ArrayList<>();
         
-        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
+        for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
             try {
-                mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, typeMms, entry.getFkItemId());
+                mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, dpsEntry.getFkItemId());
                 
                 if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
                     mmsConfig = new SDbMmsConfig();
                     mmsConfig.read(client.getSession(), mmsConfigKey);
                     
-                    setCfgEmail.add(mmsConfig.getEmail());
+                    emailsSet.add(mmsConfig.getEmail());
                 }
             }
             catch (java.lang.Exception e) {
@@ -3787,11 +3787,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             }
         }
         
-        if (!setCfgEmail.isEmpty()) {
-            msg = "Se enviará correo-e de notificación a los siguientes destinatarios:";
+        if (!emailsSet.isEmpty()) {
+            msg = "Se enviará un correo-e de notificación a los siguientes destinatarios:";
             
-            for (String email : setCfgEmail) {
-                msg += "\n" + email;
+            for (String emailList : emailsSet) {
+                msg += "\n" + emailList;
             }
             client.showMsgBoxInformation(msg);
         }
@@ -3800,18 +3800,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         
         if (send) {
-            for (String cfgEmail : setCfgEmail) {
+            for (String emailList : emailsSet) {
                 try {
-                    msg = STrnUtilities.computeMailHeaderBeginTable(companyName, moDpsType.getDpsType(), getDpsNumber(), bpName, mtDate, (isEdited ? mtUserEditTs : mtUserNewTs), isEdited, mbIsRebill);
+                    String body = STrnUtilities.computeMailHeaderBeginTable(companyName, dpsType.getDpsType(), getDpsNumber(), bpName, mtDate, (isEdited ? mtUserEditTs : mtUserNewTs), isEdited, mbIsRebill);
 
-                    for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-                        mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, typeMms, entry.getFkItemId());
+                    for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
+                        mmsConfigKey = STrnUtilities.readMmsConfigurationByLinkType(client, mmsType, dpsEntry.getFkItemId());
 
                         if (mmsConfigKey[0] != SLibConsts.UNDEFINED) {
                             mmsConfig = new SDbMmsConfig();
                             mmsConfig.read(client.getSession(), mmsConfigKey);
 
-                            if (cfgEmail.compareTo(mmsConfig.getEmail()) == 0) {
+                            if (emailList.compareTo(mmsConfig.getEmail()) == 0) {
                                 SDataDps dpsSource = null;
                                 String dpsSourceDpsNumber = "";
                                 int dpsSourceYearId = 0;
@@ -3820,29 +3820,30 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 int dpsContractPriceYear = 0;
                                 int dpsContractPriceMonth = 0;
                                 
-                                if (entry.getDbmsDpsLinksAsDestiny()!= null && !entry.getDbmsDpsLinksAsDestiny().isEmpty()) {
-                                    dpsSource = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, entry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_STEALTH);
+                                if (dpsEntry.getDbmsDpsLinksAsDestiny()!= null && !dpsEntry.getDbmsDpsLinksAsDestiny().isEmpty()) {
+                                    dpsSource = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsEntry.getDbmsDpsLinksAsDestiny().get(0).getDbmsSourceDpsKey(), SLibConstants.EXEC_MODE_STEALTH);
                                     dpsSourceDpsNumber = dpsSource.getDpsNumber();
                                     dpsSourceYearId = dpsSource.getPkYearId();
                                     dpsSourceDocId = dpsSource.getPkDocId();
                                     dpsSourceMonths = SGuiUtilities.getPeriodMonths(mtDateDocDelivery_n, mtDateDocLapsing_n);
-                                    dpsContractPriceYear = entry.getContractPriceYear();
-                                    dpsContractPriceMonth = entry.getContractPriceMonth();
+                                    dpsContractPriceYear = dpsEntry.getContractPriceYear();
+                                    dpsContractPriceMonth = dpsEntry.getContractPriceMonth();
                                 }
 
-                                msg += STrnUtilities.computeMailItem(client, entry.getFkItemId(), entry.getFkOriginalUnitId(), entry.getConceptKey(), entry.getConcept(), 
+                                body += STrnUtilities.computeMailItem(client, dpsEntry.getFkItemId(), dpsEntry.getFkOriginalUnitId(), dpsEntry.getConceptKey(), dpsEntry.getConcept(), 
                                         dpsSourceDpsNumber.isEmpty() ? "N/D" : dpsSourceDpsNumber, dpsSourceYearId, dpsSourceDocId, dpsSourceMonths, dpsContractPriceYear, dpsContractPriceMonth, 
                                         msNumberSeries, msNumber, msNumberReference.isEmpty() ? "N/D" : msNumberReference, 
-                                        entry.getOriginalQuantity(), entry.getDbmsOriginalUnitSymbol(), mtDate, 
+                                        dpsEntry.getOriginalQuantity(), dpsEntry.getDbmsOriginalUnitSymbol(), mtDate, 
                                         getDpsTypeKey(), isEdited, mbIsRebill);
                             }
                         }
                     }
 
-                    msg += STrnUtilities.computeMailFooterEndTable(SClient.APP_NAME , SClient.APP_COPYRIGHT, SClient.APP_PROVIDER, SClient.VENDOR_WEBSITE , SClient.APP_RELEASE);
-                    toRecipients.add(cfgEmail);
+                    body += STrnUtilities.computeMailFooterEndTable(SClient.APP_NAME , SClient.APP_COPYRIGHT, SClient.APP_PROVIDER, SClient.VENDOR_WEBSITE , SClient.APP_RELEASE);
+                    
+                    toRecipients.add(emailList);
 
-                    STrnUtilities.sendMail(client, typeMms, toRecipients, null, null, msg);
+                    STrnUtilities.sendMail(client, mmsType, body, "Folio: " + getDpsNumber(), toRecipients, null, null);
                     toRecipients.clear();
                 }
                 catch (java.lang.Exception e) {
