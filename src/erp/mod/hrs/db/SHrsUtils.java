@@ -2183,7 +2183,7 @@ public abstract class SHrsUtils {
         return daysTableVacation;
     }
 
-    public static ArrayList<SDbEmployeeHireLog> getEmployeeHireLogs(final SGuiSession session, final Statement resultSetStatement, final int employeeId, final Date dateStart, final Date dateEnd) throws Exception {
+    public static ArrayList<SDbEmployeeHireLog> readEmployeeHireLogs(final SGuiSession session, final Statement resultSetStatement, final int employeeId, final Date dateStart, final Date dateEnd) throws Exception {
         ArrayList<SDbEmployeeHireLog> employeeHireLogs = new ArrayList<>();
 
         String sql = "SELECT id_emp, id_log " +
@@ -2567,7 +2567,7 @@ public abstract class SHrsUtils {
      */
     public static double getLoanBalance(final SDbLoan loan, final SHrsReceipt hrsReceipt, final SHrsReceiptEarning hrsReceiptEarningBeingEdited, final SHrsReceiptDeduction hrsReceiptDeductionBeingEdited) throws Exception {
         if (!loan.isPlainLoan()) {
-            throw new Exception("Solamente los préstamos tienen saldo.");
+            throw new Exception(SDbLoan.ONLY_PLAIN_LOANS_HAVE_BALANCE);
         }
         
         double loanBalance = 0;
@@ -2575,7 +2575,11 @@ public abstract class SHrsUtils {
         // get loan balance excluding current payroll receipt:
         
         SHrsLoan hrsLoan = hrsReceipt.getHrsEmployee().getHrsLoan(loan.getPkLoanId());
-        if (hrsLoan != null) {
+        if (hrsLoan == null) {
+            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\n"
+                    + SHrsLoan.class.getName() + ": " + loan.composeLoanDescription() + ".");
+        }
+        else {
             loanBalance = hrsLoan.getLoanBalance();
         }
         

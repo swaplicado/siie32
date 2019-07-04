@@ -23,6 +23,8 @@ import sa.lib.gui.SGuiSession;
  * @author Juan Barajas, Sergio Flores
  */
 public class SDbLoan extends SDbRegistryUser {
+    
+    public static final String ONLY_PLAIN_LOANS_HAVE_BALANCE = "Solamente los préstamos tienen saldo.";
 
     protected int mnPkEmployeeId;
     protected int mnPkLoanId;

@@ -1,4 +1,11 @@
 ================================================================================
+2019-07-04, 3.2 138.2
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Estandarización de tamaño de filtros de vistas configuración contable de percepciones y deducciones.
+2) Corrección a obtención de saldo de préstamos cuando son nuevos.
+
+================================================================================
 2019-07-02, 3.2 138.1
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

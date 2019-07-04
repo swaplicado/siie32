@@ -405,7 +405,7 @@ public class SDialogCalculateIncomeTax extends SBeanFormDialog implements Action
                 SRowCalculateIncomeTax row = new SRowCalculateIncomeTax();
                 employeeId = resultSet.getInt("e.id_emp");
                 
-                dDaysHired = SHrsUtils.getEmployeeHireDays(SHrsUtils.getEmployeeHireLogs(miClient.getSession(), statementAux, employeeId, mtDateStart, mtDateEnd), mtDateStart, mtDateEnd);
+                dDaysHired = SHrsUtils.getEmployeeHireDays(SHrsUtils.readEmployeeHireLogs(miClient.getSession(), statementAux, employeeId, mtDateStart, mtDateEnd), mtDateStart, mtDateEnd);
                 dDaysIncapacityNotPay = SHrsUtils.getEmployeeIncapacityNotPayed(SHrsUtils.getEmployeeAbsencesConsumptions(miClient.getSession(), SHrsUtils.getEmployeeAbsences(miClient.getSession(), employeeId), 0), mtDateStart, mtDateEnd);
                 dDaysTaxable = dDaysHired - dDaysIncapacityNotPay;
                 

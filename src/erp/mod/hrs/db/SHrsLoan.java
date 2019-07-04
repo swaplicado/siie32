@@ -17,16 +17,13 @@ public class SHrsLoan {
     protected ArrayList<SDbPayrollReceiptEarning> maPayrollReceiptEarnings;     // contains all earnings, except for current payroll receipt
     protected ArrayList<SDbPayrollReceiptDeduction> maPayrollReceiptDeductions; // contains all earnings, except for current payroll receipt
 
-    public SHrsLoan() {
-        moLoan = new SDbLoan();
+    public SHrsLoan(SDbLoan loan) {
+        moLoan = loan;
         maPayrollReceiptEarnings = new ArrayList<>();
         maPayrollReceiptDeductions = new ArrayList<>();
     }
 
-    public void setLoan(SDbLoan o) { moLoan = o; }
-    
     public SDbLoan getLoan() { return moLoan; }
-    
     public ArrayList<SDbPayrollReceiptEarning> getPayrollReceiptEarnings() { return maPayrollReceiptEarnings; }
     public ArrayList<SDbPayrollReceiptDeduction> getPayrollReceiptDeductions() { return maPayrollReceiptDeductions; }
     
@@ -50,7 +47,11 @@ public class SHrsLoan {
         return payments;
     }
     
-    public double getLoanBalance() {
+    public double getLoanBalance() throws Exception {
+        if (!moLoan.isPlainLoan()) {
+            throw new Exception(SDbLoan.ONLY_PLAIN_LOANS_HAVE_BALANCE);
+        }
+        
         return SLibUtils.roundAmount(moLoan.getTotalAmount() + getRefunds() - getPayments());
     }
 }

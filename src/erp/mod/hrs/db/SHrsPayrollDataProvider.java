@@ -46,7 +46,11 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
      * Private methods
      */
 
-    private ArrayList<SDbLoanTypeAdjustment> getLoanTypeAdjustment() throws Exception {
+    /*
+     * Specific methods for a payroll
+     */
+
+    private ArrayList<SDbLoanTypeAdjustment> readLoanTypeAdjustment() throws Exception {
         ArrayList<SDbLoanTypeAdjustment> registries = new ArrayList<>();
 
         String sql = "SELECT id_tp_loan, id_adj "
@@ -54,13 +58,13 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del "
                 + "ORDER BY dt_sta DESC, id_tp_loan, id_adj DESC;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbLoanTypeAdjustment registry = new SDbLoanTypeAdjustment();
-            registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbLoanTypeAdjustment registry = new SDbLoanTypeAdjustment();
+                registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
@@ -73,13 +77,13 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del "
                 + "ORDER BY dt_sta DESC, id_uma;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbUma registry = new SDbUma();
-            registry.read(moSession, new int[] { resultSet.getInt(1) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbUma registry = new SDbUma();
+                registry.read(moSession, new int[] { resultSet.getInt(1) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
@@ -92,28 +96,28 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del "
                 + "ORDER BY dt_sta DESC, id_umi;";
 
-        ResultSet resultSet = moSession.getDatabase().getConnection().createStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            SDbUmi registry = new SDbUmi();
-            registry.read(moSession, new int[] { resultSet.getInt(1) });
-            registries.add(registry);
+        try (ResultSet resultSet = moSession.getDatabase().getConnection().createStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbUmi registry = new SDbUmi();
+                registry.read(moSession, new int[] { resultSet.getInt(1) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
     
-    private ArrayList<SDbHoliday> getHolidays(final int year) throws Exception {
+    private ArrayList<SDbHoliday> readHolidays(final int year) throws Exception {
         // 7 days back from end of year of previous year:
         Date dateStart = SLibTimeUtils.addDate(SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(year - 1, SLibTimeConsts.MONTH_MAX)), 0, 0, -SHrsConsts.WEEK_DAYS);
         
         // 7 days forward from beginning of year of next year:
         Date dateEnd = SLibTimeUtils.addDate(SLibTimeUtils.getBeginOfYear(SLibTimeUtils.createDate(year + 1, SLibTimeConsts.MONTH_MIN)), 0, 0, SHrsConsts.WEEK_DAYS);
         
-        return getHolidays(dateStart, dateEnd);
+        return readHolidays(dateStart, dateEnd);
     }
     
-    private ArrayList<SDbHoliday> getHolidays(final Date dateStart, final Date dateEnd) throws Exception {
+    private ArrayList<SDbHoliday> readHolidays(final Date dateStart, final Date dateEnd) throws Exception {
         ArrayList<SDbHoliday> registries = new ArrayList<>();
 
         String sql = "SELECT id_hdy, id_hol "
@@ -122,18 +126,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' "
                 + "ORDER BY dt, id_hol;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbHoliday registry = new SDbHoliday();
-            registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbHoliday registry = new SDbHoliday();
+                registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
 
-    private ArrayList<SDbTaxTable> getTaxTables() throws Exception {
+    private ArrayList<SDbTaxTable> readTaxTables() throws Exception {
         ArrayList<SDbTaxTable> registries = new ArrayList<>();
 
         String sql = "SELECT id_tax "
@@ -141,18 +145,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del "
                 + "ORDER BY dt_sta, id_tax;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbTaxTable registry = new SDbTaxTable();
-            registry.read(moSession, new int[] { resultSet.getInt(1) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbTaxTable registry = new SDbTaxTable();
+                registry.read(moSession, new int[] { resultSet.getInt(1) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
 
-    private ArrayList<SDbTaxSubsidyTable> getTaxSubsidyTables() throws Exception {
+    private ArrayList<SDbTaxSubsidyTable> readTaxSubsidyTables() throws Exception {
         ArrayList<SDbTaxSubsidyTable> registries = new ArrayList<>();
 
         String sql = "SELECT id_tax_sub "
@@ -160,18 +164,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del "
                 + "ORDER BY dt_sta, id_tax_sub;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbTaxSubsidyTable registry = new SDbTaxSubsidyTable();
-            registry.read(moSession, new int[] { resultSet.getInt(1) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbTaxSubsidyTable registry = new SDbTaxSubsidyTable();
+                registry.read(moSession, new int[] { resultSet.getInt(1) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
 
-    private ArrayList<SDbSsContributionTable> getSsContributionTables() throws Exception {
+    private ArrayList<SDbSsContributionTable> readSsContributionTables() throws Exception {
         ArrayList<SDbSsContributionTable> registries = new ArrayList<>();
 
         String sql = "SELECT id_ssc "
@@ -179,18 +183,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del "
                 + "ORDER BY dt_sta, id_ssc;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbSsContributionTable registry = new SDbSsContributionTable();
-            registry.read(moSession, new int[] { resultSet.getInt(1) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbSsContributionTable registry = new SDbSsContributionTable();
+                registry.read(moSession, new int[] { resultSet.getInt(1) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
     
-    private ArrayList<SDbBenefitTable> getBenefitTables() throws Exception {
+    private ArrayList<SDbBenefitTable> readBenefitTables() throws Exception {
         ArrayList<SDbBenefitTable> registries = new ArrayList<>();
 
         String sql = "SELECT id_ben "
@@ -198,22 +202,22 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del "
                 + "ORDER BY dt_sta DESC, id_ben;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbBenefitTable registry = new SDbBenefitTable();
-            registry.read(moSession, new int[] { resultSet.getInt(1) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbBenefitTable registry = new SDbBenefitTable();
+                registry.read(moSession, new int[] { resultSet.getInt(1) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
     
-    private ArrayList<SHrsBenefitTableAnniversary> getBenefitTableAnniversarys(ArrayList<SDbBenefitTable> benefitTables) throws Exception {
+    private ArrayList<SHrsBenefitTableAnniversary> createBenefitTableAnniversarys(ArrayList<SDbBenefitTable> benefitTables) throws Exception {
         return SHrsUtils.createBenefitTablesAnniversarys(benefitTables);
     }
 
-    private ArrayList<SDbMwzTypeWage> getMwzTypeWages() throws Exception {
+    private ArrayList<SDbMwzTypeWage> readMwzTypeWages() throws Exception {
         ArrayList<SDbMwzTypeWage> registries = new ArrayList<>();
 
         String sql = "SELECT id_tp_mwz, id_wage "
@@ -221,18 +225,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del "
                 + "ORDER BY dt_sta, id_tp_mwz, id_wage;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbMwzTypeWage registry = new SDbMwzTypeWage();
-            registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbMwzTypeWage registry = new SDbMwzTypeWage();
+                registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
 
-    private ArrayList<SDbEarning> getEarnings() throws Exception {
+    private ArrayList<SDbEarning> readEarnings() throws Exception {
         ArrayList<SDbEarning> registries = new ArrayList<>();
 
         String sql = "SELECT id_ear "
@@ -240,18 +244,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del "
                 + "ORDER BY CONCAT(code, ' - ', name), id_ear;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbEarning registry = new SDbEarning();
-            registry.read(moSession, new int[] { resultSet.getInt(1) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbEarning registry = new SDbEarning();
+                registry.read(moSession, new int[] { resultSet.getInt(1) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
 
-    private ArrayList<SDbDeduction> getDeductions() throws Exception {
+    private ArrayList<SDbDeduction> readDeductions() throws Exception {
         ArrayList<SDbDeduction> registries = new ArrayList<>();
 
         String sql = "SELECT id_ded "
@@ -259,18 +263,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del "
                 + "ORDER BY CONCAT(code, ' - ', name), id_ded;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbDeduction deduction = new SDbDeduction();
-            deduction.read(moSession, new int[] { resultSet.getInt(1) });
-            registries.add(deduction);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbDeduction deduction = new SDbDeduction();
+                deduction.read(moSession, new int[] { resultSet.getInt(1) });
+                registries.add(deduction);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
 
-    private ArrayList<SDbAutomaticEarning> getAutomaticEarnings(final int paymentType) throws Exception {
+    private ArrayList<SDbAutomaticEarning> readAutomaticEarnings(final int paymentType) throws Exception {
         ArrayList<SDbAutomaticEarning> registries = new ArrayList<>();
 
         // employee automatic earnings (mayor precedence, can hide global automatic earnings):
@@ -281,13 +285,13 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT ae.b_del AND e.fk_tp_pay = " + paymentType + " "
                 + "ORDER BY ae.id_ear, ae.id_aut;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbAutomaticEarning registry = new SDbAutomaticEarning();
-            registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbAutomaticEarning registry = new SDbAutomaticEarning();
+                registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         // global automatic earnings (minor precedence):
 
@@ -296,18 +300,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del AND fk_emp_n IS NULL "
                 + "ORDER BY id_ear, id_aut;";
 
-        resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbAutomaticEarning registry = new SDbAutomaticEarning();
-            registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbAutomaticEarning registry = new SDbAutomaticEarning();
+                registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
 
-    private ArrayList<SDbAutomaticDeduction> getAutomaticDeductions(final int paymentType) throws Exception {
+    private ArrayList<SDbAutomaticDeduction> readAutomaticDeductions(final int paymentType) throws Exception {
         ArrayList<SDbAutomaticDeduction> registries = new ArrayList<>();
 
         // employee automatic deductions (mayor precedence, can hide global automatic deductions):
@@ -318,13 +322,13 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT ad.b_del AND e.fk_tp_pay = " + paymentType + " "
                 + "ORDER BY ad.id_ded, ad.id_aut;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbAutomaticDeduction registry = new SDbAutomaticDeduction();
-            registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbAutomaticDeduction registry = new SDbAutomaticDeduction();
+                registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         // global automatic deductions (minor precedence):
 
@@ -333,18 +337,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE NOT b_del AND fk_emp_n IS NULL "
                 + "ORDER BY id_ded, id_aut;";
 
-        resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbAutomaticDeduction registry = new SDbAutomaticDeduction();
-            registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            registries.add(registry);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbAutomaticDeduction registry = new SDbAutomaticDeduction();
+                registry.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
 
-    private ArrayList<SDbEmployee> getEmployees(final int paymentType, final int payrollId) throws Exception {
+    private ArrayList<SDbEmployee> readEmployees(final int paymentType, final int payrollId) throws Exception {
         ArrayList<SDbEmployee> registries = new ArrayList<>();
         
         String sql = "SELECT e.id_emp "
@@ -356,16 +360,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + " WHERE p.id_pay = " + payrollId + " AND NOT pr.b_del)") + ") "
                 + "ORDER BY e.id_emp;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            registries.add((SDbEmployee) moSession.readRegistry(SModConsts.HRSU_EMP, new int[] { resultSet.getInt(1) }));
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbEmployee registry = new SDbEmployee();
+                registry.read(moSession, new int[] { resultSet.getInt(1) });
+                registries.add(registry);
+            }
         }
-        resultSet.close();
 
         return registries;
     }
 
-    private ArrayList<SHrsReceipt> getHrsReceipts(final SHrsPayroll hrsPayroll, final int payrollId, final boolean isCopy, final boolean isNew) throws Exception {
+    private ArrayList<SHrsReceipt> createHrsReceipts(final SHrsPayroll hrsPayroll, final int payrollId, final boolean isCopy, final boolean isNew) throws Exception {
         ArrayList<SHrsReceipt> hrsReceipts = new ArrayList<>();
 
         if (!isNew) {
@@ -374,60 +380,60 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                     "WHERE id_pay = " + payrollId + " AND NOT b_del " +
                     "ORDER BY id_emp;";
 
-            ResultSet resultSet = moSession.getStatement().getConnection().createStatement().executeQuery(sql);
-            while (resultSet.next()) {
-                SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
-                payrollReceipt.read(moSession, new int[] { payrollId, resultSet.getInt(1) });
-
-                SHrsReceipt hrsReceipt = new SHrsReceipt();
-                hrsReceipt.setHrsPayroll(hrsPayroll);
-
-                // Obtain payroll receipt earnings:
-
-                for (SDbPayrollReceiptEarning payrollReceiptEarning : payrollReceipt.getChildPayrollReceiptEarnings()) {
-                    if (!payrollReceiptEarning.isDeleted()) {
-                        SHrsReceiptEarning hrsReceiptEarning = new SHrsReceiptEarning();
-                        hrsReceiptEarning.setHrsReceipt(hrsReceipt);
-                        hrsReceiptEarning.setEarning(hrsPayroll.getEarning(payrollReceiptEarning.getFkEarningId()));
-                        hrsReceiptEarning.setPayrollReceiptEarning(payrollReceiptEarning);
-
-                        hrsReceipt.getHrsReceiptEarnings().add(hrsReceiptEarning);
+            try (ResultSet resultSet = moSession.getStatement().getConnection().createStatement().executeQuery(sql)) {
+                while (resultSet.next()) {
+                    SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
+                    payrollReceipt.read(moSession, new int[] { payrollId, resultSet.getInt(1) });
+                    
+                    SHrsReceipt hrsReceipt = new SHrsReceipt();
+                    hrsReceipt.setHrsPayroll(hrsPayroll);
+                    
+                    // Obtain payroll receipt earnings:
+                    
+                    for (SDbPayrollReceiptEarning payrollReceiptEarning : payrollReceipt.getChildPayrollReceiptEarnings()) {
+                        if (!payrollReceiptEarning.isDeleted()) {
+                            SHrsReceiptEarning hrsReceiptEarning = new SHrsReceiptEarning();
+                            hrsReceiptEarning.setHrsReceipt(hrsReceipt);
+                            hrsReceiptEarning.setEarning(hrsPayroll.getEarning(payrollReceiptEarning.getFkEarningId()));
+                            hrsReceiptEarning.setPayrollReceiptEarning(payrollReceiptEarning);
+                            
+                            hrsReceipt.getHrsReceiptEarnings().add(hrsReceiptEarning);
+                        }
                     }
-                }
-
-                // Obtain payroll receipt deductions:
-
-                for (SDbPayrollReceiptDeduction payrollReceiptDeduction : payrollReceipt.getChildPayrollReceiptDeductions()) {
-                    if (!payrollReceiptDeduction.isDeleted()) {
-                        SHrsReceiptDeduction hrsReceiptDeduction = new SHrsReceiptDeduction();
-                        hrsReceiptDeduction.setHrsReceipt(hrsReceipt);
-                        hrsReceiptDeduction.setDeduction(hrsPayroll.getDeduction(payrollReceiptDeduction.getFkDeductionId()));
-                        hrsReceiptDeduction.setPayrollReceiptDeduction(payrollReceiptDeduction);
-
-                        hrsReceipt.getHrsReceiptDeductions().add(hrsReceiptDeduction);
+                    
+                    // Obtain payroll receipt deductions:
+                    
+                    for (SDbPayrollReceiptDeduction payrollReceiptDeduction : payrollReceipt.getChildPayrollReceiptDeductions()) {
+                        if (!payrollReceiptDeduction.isDeleted()) {
+                            SHrsReceiptDeduction hrsReceiptDeduction = new SHrsReceiptDeduction();
+                            hrsReceiptDeduction.setHrsReceipt(hrsReceipt);
+                            hrsReceiptDeduction.setDeduction(hrsPayroll.getDeduction(payrollReceiptDeduction.getFkDeductionId()));
+                            hrsReceiptDeduction.setPayrollReceiptDeduction(payrollReceiptDeduction);
+                            
+                            hrsReceipt.getHrsReceiptDeductions().add(hrsReceiptDeduction);
+                        }
                     }
-                }
-
-                // Obtain absence consumptions:
-                
-                for (SDbAbsenceConsumption absenceConsumption : payrollReceipt.getChildAbsenceConsumption()) {
-                    if (!absenceConsumption.isDeleted()) {
-                        hrsReceipt.getAbsenceConsumptions().add(absenceConsumption);
+                    
+                    // Obtain absence consumptions:
+                    
+                    for (SDbAbsenceConsumption absenceConsumption : payrollReceipt.getChildAbsenceConsumption()) {
+                        if (!absenceConsumption.isDeleted()) {
+                            hrsReceipt.getAbsenceConsumptions().add(absenceConsumption);
+                        }
                     }
+                    
+                    // Create employee:
+                    
+                    SHrsEmployee hrsEmployee = createHrsEmployee(hrsPayroll, isCopy ? 0 : hrsPayroll.getPayroll().getPkPayrollId(), payrollReceipt.getPkEmployeeId(),
+                            hrsPayroll.getPayroll().getPeriodYear(), hrsPayroll.getPayroll().getPeriod(), hrsPayroll.getPayroll().getFiscalYear(),
+                            hrsPayroll.getPayroll().getDateStart(), hrsPayroll.getPayroll().getDateEnd(), hrsPayroll.getPayroll().getFkTaxComputationTypeId());
+                    hrsEmployee.setHrsReceipt(hrsReceipt);
+                    hrsReceipt.setHrsEmployee(hrsEmployee);
+                    hrsReceipt.setPayrollReceipt(payrollReceipt);
+                    
+                    hrsReceipts.add(hrsReceipt);
                 }
-                
-                // Create employee:
-
-                SHrsEmployee hrsEmployee = createHrsEmployee(hrsPayroll, isCopy ? 0 : hrsPayroll.getPayroll().getPkPayrollId(), payrollReceipt.getPkEmployeeId(), 
-                        hrsPayroll.getPayroll().getPeriodYear(), hrsPayroll.getPayroll().getPeriod(), hrsPayroll.getPayroll().getFiscalYear(),
-                        hrsPayroll.getPayroll().getDateStart(), hrsPayroll.getPayroll().getDateEnd(), hrsPayroll.getPayroll().getFkTaxComputationTypeId());
-                hrsEmployee.setHrsReceipt(hrsReceipt);
-                hrsReceipt.setHrsEmployee(hrsEmployee);
-                hrsReceipt.setPayrollReceipt(payrollReceipt);
-
-                hrsReceipts.add(hrsReceipt);
             }
-            resultSet.close();
         }
 
         return hrsReceipts;
@@ -472,14 +478,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "FROM " + SModConsts.TablesMap.get(type) + " "
                 + "WHERE NOT b_del "
                 + "ORDER BY " + id + ";";
-        ResultSet resultSet = moSession.getStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            map.put(resultSet.getInt(1), resultSet.getString(2));
+        try (ResultSet resultSet = moSession.getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                map.put(resultSet.getInt(1), resultSet.getString(2));
+            }
         }
-        resultSet.close();
     }
+    
+    /*
+     * Specific methods for an individual employee
+     */
 
-    private ArrayList<SDbLoan> getEmployeeLoans(final int employeeId) throws Exception {
+    private ArrayList<SDbLoan> readEmployeeLoans(final int employeeId) throws Exception {
         ArrayList<SDbLoan> loans = new ArrayList<>();
 
         String sql = "SELECT id_emp, id_loan "
@@ -487,18 +497,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE id_emp = " + employeeId + " AND NOT b_del AND NOT b_clo "
                 + "ORDER BY id_loan;";
         
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbLoan loan = new SDbLoan();
-            loan.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            loans.add(loan);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbLoan loan = new SDbLoan();
+                loan.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                loans.add(loan);
+            }
         }
-        resultSet.close();
 
         return loans;
     }
     
-    private ArrayList<SHrsLoan> getEmployeeHrsLoans(final ArrayList<SDbLoan> loans, final int excludePayrollId) throws Exception {
+    private ArrayList<SHrsLoan> createEmployeeHrsLoans(final ArrayList<SDbLoan> loans, final int excludePayrollId) throws Exception {
         String sql;
         ArrayList<SHrsLoan> hrsLoans = new ArrayList<>();
         
@@ -531,35 +541,31 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         PreparedStatement psDeductions = miStatement.getConnection().prepareStatement(sql);
         
         for (SDbLoan loan : loans) {
-            ResultSet resultSet;
-            SHrsLoan hrsLoan = new SHrsLoan();
+            SHrsLoan hrsLoan = new SHrsLoan(loan);
             
             psEarnings.setInt(1, loan.getPkEmployeeId());
             psEarnings.setInt(2, loan.getPkLoanId());
 
-            resultSet = psEarnings.executeQuery();
-            while (resultSet.next()) {
-                SDbPayrollReceiptEarning payrollReceiptEarning = new SDbPayrollReceiptEarning();
-                payrollReceiptEarning.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
-                hrsLoan.getPayrollReceiptEarnings().add(payrollReceiptEarning);
+            try (ResultSet resultSet = psEarnings.executeQuery()) {
+                while (resultSet.next()) {
+                    SDbPayrollReceiptEarning payrollReceiptEarning = new SDbPayrollReceiptEarning();
+                    payrollReceiptEarning.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
+                    hrsLoan.getPayrollReceiptEarnings().add(payrollReceiptEarning);
+                }
             }
-            resultSet.close();
             
             psDeductions.setInt(1, loan.getPkEmployeeId());
             psDeductions.setInt(2, loan.getPkLoanId());
 
-            resultSet = psDeductions.executeQuery();
-            while (resultSet.next()) {
-                SDbPayrollReceiptDeduction payrollReceiptDeduction = new SDbPayrollReceiptDeduction();
-                payrollReceiptDeduction.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
-                hrsLoan.getPayrollReceiptDeductions().add(payrollReceiptDeduction);
+            try (ResultSet resultSet = psDeductions.executeQuery()) {
+                while (resultSet.next()) {
+                    SDbPayrollReceiptDeduction payrollReceiptDeduction = new SDbPayrollReceiptDeduction();
+                    payrollReceiptDeduction.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3) });
+                    hrsLoan.getPayrollReceiptDeductions().add(payrollReceiptDeduction);
+                }
             }
-            resultSet.close();
             
-            if (!hrsLoan.getPayrollReceiptDeductions().isEmpty()) {
-                hrsLoan.setLoan(loan);
-                hrsLoans.add(hrsLoan);
-            }
+            hrsLoans.add(hrsLoan);
         }
         
         psEarnings.close();
@@ -568,7 +574,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return hrsLoans;
     }
 
-    private ArrayList<SDbAbsence> getEmployeeAbsences(final int employeeId) throws Exception {
+    private ArrayList<SDbAbsence> readEmployeeAbsences(final int employeeId) throws Exception {
         ArrayList<SDbAbsence> absences = new ArrayList<>();
 
         String sql = "SELECT id_emp, id_abs " +
@@ -576,18 +582,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
             "WHERE id_emp = " + employeeId + " AND NOT b_del AND NOT b_clo " +
             "ORDER BY dt_sta, id_emp, id_abs;";
 
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SDbAbsence absence = new SDbAbsence();
-            absence.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
-            absences.add(absence);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDbAbsence absence = new SDbAbsence();
+                absence.read(moSession, new int[] { resultSet.getInt(1), resultSet.getInt(2) });
+                absences.add(absence);
+            }
         }
-        resultSet.close();
         
         return absences;
     }
     
-    private ArrayList<SDbAbsenceConsumption> getEmployeeAbsencesConsumptions(final ArrayList<SDbAbsence> absences, final int excludePayrollId) throws Exception {
+    private ArrayList<SDbAbsenceConsumption> readEmployeeAbsencesConsumptions(final ArrayList<SDbAbsence> absences, final int excludePayrollId) throws Exception {
         ArrayList<SDbAbsenceConsumption> absencesConsumptions = new ArrayList<>();
 
         String sql = "SELECT ac.id_cns "
@@ -597,28 +603,27 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "WHERE p.id_pay <> " + excludePayrollId + " AND NOT p.b_del AND NOT pr.b_del AND "
                 + "ac.id_emp = ? AND ac.id_abs = ? AND NOT ac.b_del "
                 + "ORDER BY ac.id_cns;";
-        PreparedStatement psConsumptions = miStatement.getConnection().prepareStatement(sql);
         
-        for (SDbAbsence absence : absences) {
-            psConsumptions.setInt(1, absence.getPkEmployeeId());
-            psConsumptions.setInt(2, absence.getPkAbsenceId());
-
-            ResultSet resultSet = psConsumptions.executeQuery();
-            while (resultSet.next()) {
-                SDbAbsenceConsumption absenceConsumption = new SDbAbsenceConsumption();
-                absenceConsumption.read(moSession, new int[] { absence.getPkEmployeeId(), absence.getPkAbsenceId(), resultSet.getInt(1) });
-                absencesConsumptions.add(absenceConsumption);
+        try (PreparedStatement psConsumptions = miStatement.getConnection().prepareStatement(sql)) {
+            for (SDbAbsence absence : absences) {
+                psConsumptions.setInt(1, absence.getPkEmployeeId());
+                psConsumptions.setInt(2, absence.getPkAbsenceId());
+                
+                try (ResultSet resultSet = psConsumptions.executeQuery()) {
+                    while (resultSet.next()) {
+                        SDbAbsenceConsumption absenceConsumption = new SDbAbsenceConsumption();
+                        absenceConsumption.read(moSession, new int[] { absence.getPkEmployeeId(), absence.getPkAbsenceId(), resultSet.getInt(1) });
+                        absencesConsumptions.add(absenceConsumption);
+                    }
+                }
             }
-            resultSet.close();
         }
-        
-        psConsumptions.close();
         
         return absencesConsumptions;
     }
 
-    private ArrayList<SDbEmployeeHireLog> getEmployeeHireLogs(final int employeeId, final Date dateStart, final Date dateEnd)  throws Exception {
-        return SHrsUtils.getEmployeeHireLogs(moSession, miStatement, employeeId, dateStart, dateEnd);
+    private ArrayList<SDbEmployeeHireLog> readEmployeeHireLogs(final int employeeId, final Date dateStart, final Date dateEnd)  throws Exception {
+        return SHrsUtils.readEmployeeHireLogs(moSession, miStatement, employeeId, dateStart, dateEnd);
     }
     
     private int getEmployeeHiredDays(final ArrayList<SDbEmployeeHireLog> employeeHireLogs, final Date dateStart, final Date dateEnd) throws Exception {
@@ -657,11 +662,11 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "p.id_pay <> " + excludePayrollId + " AND pr.id_emp = " + employeeId + " AND "
                 + "p.fis_year = " + fiscalYear + " AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(payrollDateEnd) + "' AND "
                 + "pre.b_alt_tax = " + sqlAltTax + ";"; // Articule 174 RLISR
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        if (resultSet.next()) {
-            earnings = resultSet.getDouble(1);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                earnings = resultSet.getDouble(1);
+            }
         }
-        resultSet.close();
 
         return earnings;
     }
@@ -690,11 +695,11 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "GROUP BY pr.id_emp "
                 + "ORDER BY pr.id_emp ";
         
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        if (resultSet.next()) {
-            compensation = resultSet.getDouble(1);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                compensation = resultSet.getDouble(1);
+            }
         }
-        resultSet.close();
 
         return compensation;
     }
@@ -707,13 +712,13 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                     entry.getDateHire().compareTo(dateStart) <= 0 ? dateStart : entry.getDateHire(), 
                     entry.getDateDismissed_n() == null || entry.getDateDismissed_n().compareTo(dateEnd) >= 0 ? dateEnd : entry.getDateDismissed_n(), 
                     moWorkingDaySettingsMap.get(paymentType), 
-                    getHolidays(dateStart, dateEnd));
+                    readHolidays(dateStart, dateEnd));
         }
         
         return businessDays;
     }
 
-    private ArrayList<SHrsAccumulatedEarning> getEmployeeAccumulatedEarnings(final int employeeId, final int periodYear, 
+    private ArrayList<SHrsAccumulatedEarning> createEmployeeAccumulatedEarnings(final int employeeId, final int periodYear, 
             final Date dateStart, final Date dateEnd, final int taxComputationType, final boolean byType, final int excludePayrollId) throws Exception {
         ArrayList<SHrsAccumulatedEarning> hrsAccumulatedEarnings = new ArrayList<>();
 
@@ -731,17 +736,17 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 + "GROUP BY " + (!byType ? "pre.fk_ear" : "pre.fk_tp_ear") + " "
                 + "ORDER BY " + (!byType ? "pre.fk_ear" : "pre.fk_tp_ear") + ";";
         
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SHrsAccumulatedEarning hrsAccumulatedEarning = new SHrsAccumulatedEarning(resultSet.getInt("f_ear"), resultSet.getDouble("f_amount"), resultSet.getDouble("f_taxa"));
-            hrsAccumulatedEarnings.add(hrsAccumulatedEarning);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SHrsAccumulatedEarning hrsAccumulatedEarning = new SHrsAccumulatedEarning(resultSet.getInt("f_ear"), resultSet.getDouble("f_amount"), resultSet.getDouble("f_taxa"));
+                hrsAccumulatedEarnings.add(hrsAccumulatedEarning);
+            }
         }
-        resultSet.close();
 
         return hrsAccumulatedEarnings;
     }
 
-    private ArrayList<SHrsAccumulatedDeduction> getEmployeeAccumulatedDeductions(final int employeeId, final int periodYear, 
+    private ArrayList<SHrsAccumulatedDeduction> createEmployeeAccumulatedDeductions(final int employeeId, final int periodYear, 
             final Date dateStart, final Date dateEnd, final int taxComputationType, final boolean byType, final int excludePayrollId) throws Exception {
         ArrayList<SHrsAccumulatedDeduction> hrsAccumulatedDeductions = new ArrayList<>();
 
@@ -761,12 +766,12 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
             "GROUP BY " + (!byType ? "prd.fk_ded" : "prd.fk_tp_ded") + " " +
             "ORDER BY " + (!byType ? "prd.fk_ded" : "prd.fk_tp_ded") + " ";
         
-        ResultSet resultSet = miStatement.executeQuery(sql);
-        while (resultSet.next()) {
-            SHrsAccumulatedDeduction hrsAccumulatedDeduction = new SHrsAccumulatedDeduction(resultSet.getInt("f_ded"), resultSet.getDouble("f_amount"));
-            hrsAccumulatedDeductions.add(hrsAccumulatedDeduction);
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                SHrsAccumulatedDeduction hrsAccumulatedDeduction = new SHrsAccumulatedDeduction(resultSet.getInt("f_ded"), resultSet.getDouble("f_amount"));
+                hrsAccumulatedDeductions.add(hrsAccumulatedDeduction);
+            }
         }
-        resultSet.close();
 
         return hrsAccumulatedDeductions;
     }
@@ -788,7 +793,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         hrsPayroll.setPayroll(payroll);
 
         // Adjustments by loan type:
-        hrsPayroll.getLoanTypeAdjustments().addAll(getLoanTypeAdjustment());
+        hrsPayroll.getLoanTypeAdjustments().addAll(readLoanTypeAdjustment());
 
         // UMA:
         hrsPayroll.getUmas().addAll(readUmas());
@@ -797,43 +802,43 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         hrsPayroll.getUmis().addAll(readUmis());
         
         // Holidays:
-        hrsPayroll.getHolidays().addAll(getHolidays(payroll.getPeriodYear()));
+        hrsPayroll.getHolidays().addAll(readHolidays(payroll.getPeriodYear()));
 
         // Tax tables:
-        hrsPayroll.getTaxTables().addAll(getTaxTables());
+        hrsPayroll.getTaxTables().addAll(readTaxTables());
 
         // Tax subsidy tables:
-        hrsPayroll.getTaxSubsidyTables().addAll(getTaxSubsidyTables());
+        hrsPayroll.getTaxSubsidyTables().addAll(readTaxSubsidyTables());
 
         // SS Contribution tables:
-        hrsPayroll.getSsContributionTables().addAll(getSsContributionTables());
+        hrsPayroll.getSsContributionTables().addAll(readSsContributionTables());
         
         // Benefit tables:
-        hrsPayroll.getBenefitTables().addAll(getBenefitTables());
+        hrsPayroll.getBenefitTables().addAll(readBenefitTables());
         
         // Benefit tables:
-        hrsPayroll.getHrsBenefitTablesAnniversarys().addAll(getBenefitTableAnniversarys((getBenefitTables())));
+        hrsPayroll.getHrsBenefitTablesAnniversarys().addAll(createBenefitTableAnniversarys((readBenefitTables())));
 
         // MWZ type wages:
-        hrsPayroll.getMwzTypeWages().addAll(getMwzTypeWages());
+        hrsPayroll.getMwzTypeWages().addAll(readMwzTypeWages());
 
         // Earnings:
-        hrsPayroll.getEarnings().addAll(getEarnings());
+        hrsPayroll.getEarnings().addAll(readEarnings());
 
         // Deductions:
-        hrsPayroll.getDeductions().addAll(getDeductions());
+        hrsPayroll.getDeductions().addAll(readDeductions());
 
         // Automatic earnings:
-        hrsPayroll.getAutomaticEarnings().addAll(getAutomaticEarnings(payroll.getFkPaymentTypeId()));
+        hrsPayroll.getAutomaticEarnings().addAll(readAutomaticEarnings(payroll.getFkPaymentTypeId()));
 
         // Automatic deductions:
-        hrsPayroll.getAutomaticDeductions().addAll(getAutomaticDeductions(payroll.getFkPaymentTypeId()));
+        hrsPayroll.getAutomaticDeductions().addAll(readAutomaticDeductions(payroll.getFkPaymentTypeId()));
 
         // Employees:
-        hrsPayroll.getEmployees().addAll(getEmployees(payroll.getFkPaymentTypeId(), payroll.getPkPayrollId()));
+        hrsPayroll.getEmployees().addAll(readEmployees(payroll.getFkPaymentTypeId(), payroll.getPkPayrollId()));
 
         // Receipts:
-        hrsPayroll.getHrsReceipts().addAll(getHrsReceipts(hrsPayroll, payroll.getPkPayrollId(), isCopy, payroll.isRegistryNew()));
+        hrsPayroll.getHrsReceipts().addAll(createHrsReceipts(hrsPayroll, payroll.getPkPayrollId(), isCopy, payroll.isRegistryNew()));
         
         // Earning computation types:
         populateDescriptionsMap(SModConsts.HRSS_TP_EAR_COMP, SDbRegistry.FIELD_CODE, hrsPayroll.getEarningComputationTypesMap());
@@ -849,16 +854,16 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
         hrsEmployee.setEmployee(pHrsEmployee.getEmployee());
         hrsEmployee.setHrsReceipt(pHrsEmployee.getHrsReceipt());
-        hrsEmployee.getLoans().addAll(getEmployeeLoans(employeeId));
-        hrsEmployee.getHrsLoans().addAll(getEmployeeHrsLoans(hrsEmployee.getLoans(), payrollId));
-        hrsEmployee.getAbsences().addAll(getEmployeeAbsences(employeeId));
-        hrsEmployee.getAbsenceConsumptions().addAll(getEmployeeAbsencesConsumptions(hrsEmployee.getAbsences(), payrollId));
-        hrsEmployee.getEmployeeHireLogs().addAll(getEmployeeHireLogs(employeeId, dateStart, dateEnd));
+        hrsEmployee.getLoans().addAll(readEmployeeLoans(employeeId));
+        hrsEmployee.getHrsLoans().addAll(createEmployeeHrsLoans(hrsEmployee.getLoans(), payrollId));
+        hrsEmployee.getAbsences().addAll(readEmployeeAbsences(employeeId));
+        hrsEmployee.getAbsenceConsumptions().addAll(readEmployeeAbsencesConsumptions(hrsEmployee.getAbsences(), payrollId));
+        hrsEmployee.getEmployeeHireLogs().addAll(readEmployeeHireLogs(employeeId, dateStart, dateEnd));
         
         Date periodStart = SLibTimeUtils.getBeginOfYear(SLibTimeUtils.createDate(fiscalYear));
         Date periodEnd = SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)).compareTo(dateEnd) < 0 ? SLibTimeUtils.getEndOfYear(SLibTimeUtils.createDate(fiscalYear)) : dateEnd;
         
-        hrsEmployee.setDaysHiredAnnual(getEmployeeHiredDays(getEmployeeHireLogs(employeeId, periodStart, periodEnd), periodStart, periodEnd));
+        hrsEmployee.setDaysHiredAnnual(getEmployeeHiredDays(readEmployeeHireLogs(employeeId, periodStart, periodEnd), periodStart, periodEnd));
         hrsEmployee.setAccumulatedTaxableEarning(getEmployeeAccumulatedTaxableEarnings(employeeId, fiscalYear, periodEnd, TAX, payrollId));
         hrsEmployee.setAccumulatedTaxableEarningAlt(getEmployeeAccumulatedTaxableEarnings(employeeId, fiscalYear, periodEnd, TAX_ALT, payrollId));
         hrsEmployee.setAnnualTaxCompensated(getEmployeeAnnualCompensation(employeeId, fiscalYear, periodEnd, COMP_TAX, payrollId));
@@ -867,12 +872,12 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         hrsEmployee.setDaysHiredPayroll(getEmployeeHiredDays(hrsEmployee.getEmployeeHireLogs(), dateStart, dateEnd));
         hrsEmployee.setBusinessDays(getEmployeeBusinessDays(hrsEmployee.getEmployeeHireLogs(), pHrsEmployee.getEmployee().getFkPaymentTypeId(), dateStart, dateEnd));
         hrsEmployee.setSeniority(SHrsUtils.getEmployeeSeniority(pHrsEmployee.getEmployee().getDateBenefits(), dateEnd));
-        hrsEmployee.getYearHrsAccumulatedEarnigs().addAll(getEmployeeAccumulatedEarnings(employeeId, payrollYear, dateStart, dateEnd, 0, false, payrollId));
-        hrsEmployee.getYearHrsAccumulatedEarnigsByType().addAll(getEmployeeAccumulatedEarnings(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, true, payrollId));
-        hrsEmployee.getYearHrsAccumulatedEarnigsByTaxComputation().addAll(getEmployeeAccumulatedEarnings(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, false, payrollId));
-        hrsEmployee.getYearHrsAccumulatedDeductions().addAll(getEmployeeAccumulatedDeductions(employeeId, payrollYear, dateStart, dateEnd, 0, false, payrollId));
-        hrsEmployee.getYearHrsAccumulatedDeductionsByType().addAll(getEmployeeAccumulatedDeductions(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, true, payrollId));
-        hrsEmployee.getYearHrsAccumulatedDeductionsByTaxComputation().addAll(getEmployeeAccumulatedDeductions(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, false, payrollId));
+        hrsEmployee.getYearHrsAccumulatedEarnigs().addAll(createEmployeeAccumulatedEarnings(employeeId, payrollYear, dateStart, dateEnd, 0, false, payrollId));
+        hrsEmployee.getYearHrsAccumulatedEarnigsByType().addAll(createEmployeeAccumulatedEarnings(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, true, payrollId));
+        hrsEmployee.getYearHrsAccumulatedEarnigsByTaxComputation().addAll(createEmployeeAccumulatedEarnings(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, false, payrollId));
+        hrsEmployee.getYearHrsAccumulatedDeductions().addAll(createEmployeeAccumulatedDeductions(employeeId, payrollYear, dateStart, dateEnd, 0, false, payrollId));
+        hrsEmployee.getYearHrsAccumulatedDeductionsByType().addAll(createEmployeeAccumulatedDeductions(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, true, payrollId));
+        hrsEmployee.getYearHrsAccumulatedDeductionsByTaxComputation().addAll(createEmployeeAccumulatedDeductions(employeeId, payrollYear, dateStart, dateEnd, taxComputationType, false, payrollId));
 
         return hrsEmployee;
     }

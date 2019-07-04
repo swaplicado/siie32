@@ -38,18 +38,21 @@ public class SViewAccountingDeduction extends SGridPaneView implements ActionLis
     private void initComponentsCustom() {
         setRowButtonsEnabled(false, false, true, false, false);
         
-        moFilterDual = new SGridFilterPanel(miClient, this, (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_DEP ? SModConsts.HRSU_DEP : SModConsts.HRSU_EMP), SLibConsts.UNDEFINED);
-        moFilterDual.initFilter(null);
-        
-        moFilterDeduction = new SGridFilterPanel(miClient, this, SModConsts.HRS_DED, SLibConsts.UNDEFINED);
+        moFilterDeduction = new SGridFilterPanel(miClient, this, SModConsts.HRS_DED, SLibConsts.UNDEFINED, 250);
         moFilterDeduction.initFilter(null);
-
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDeduction);
+        
         switch (mnGridSubtype) {
+            case SModSysConsts.HRSS_TP_ACC_GBL:
+                break;
+                
             case SModSysConsts.HRSS_TP_ACC_DEP:
             case SModSysConsts.HRSS_TP_ACC_EMP:
+                moFilterDual = new SGridFilterPanel(miClient, this, (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_DEP ? SModConsts.HRSU_DEP : SModConsts.HRSU_EMP), SLibConsts.UNDEFINED, 250);
+                moFilterDual.initFilter(null);
                 getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDual);
                 break;
+                
             default:
         }
     }
