@@ -12,7 +12,8 @@ import java.util.HashMap;
 import sa.lib.SLibUtils;
 
 /**
- * GUI data structure for input of individual document's payment in payments for CFDI of Payments.
+ * GUI data structure for input of an individual document payment of a payment for CFDI of Payments.
+ * Represents the XML element pago10:DoctoRelacionado, child of the element pago10:Pago.
  * @author Sergio Flores
  */
 public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
@@ -76,9 +77,9 @@ public final class SCfdPaymentEntryDoc extends erp.lib.table.STableRow {
     }
     
     /**
-     * Gets entry type.
+     * Gets description of current type.
      */
-    public String getType() {
+    public String getTypeDescription() {
         return Types.get(Type);
     }
 

@@ -395,7 +395,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                         if (config.size() > 0) {
                             oDsmEntry.setDbmsAccountOp(config.get(0).getAccountId());
                         }
-                        oDsm.getDbmsEntry().add(oDsmEntry);
+                        oDsm.getDbmsEntries().add(oDsmEntry);
 
                         oDsm.setDbmsPkRecordTypeId(SDataConstantsSys.FINU_TP_REC_SUBSYS_SUP);
 
@@ -423,7 +423,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                             recordEntrys.add(entry);
                         }
                         
-                        oDsm.getDbmsEntry().clear();
+                        oDsm.getDbmsEntries().clear();
                     }
                     for (int i = 0; i < aReference.size(); i++) {
                         referenceBank += (referenceBank.isEmpty() ? "" : (i == aReference.size() ? "" : ", ")) + aReference.get(i);

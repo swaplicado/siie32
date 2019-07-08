@@ -4,6 +4,7 @@
  */
 package erp.mod.fin.form;
 
+import erp.SErpConsts;
 import erp.data.SDataConstantsSys;
 import erp.gui.account.SAccountConsts;
 import erp.gui.session.SSessionCustom;
@@ -545,7 +546,7 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
         moTextCheckBeneficiary.setFieldButton(jbPickCheckBeneficiary);
         moTextCheckBeneficiaryAccount.setTextSettings(SGuiUtils.getLabelName(jlCheckBeneficiaryAccount), 100, 0);
         moBoolCheckForBeneficiaryAccount.setBooleanSettings(SGuiUtils.getLabelName(moBoolCheckForBeneficiaryAccount.getText()), true);
-        moTextConcept.setTextSettings(SGuiUtils.getLabelName(jlConcept), 100);
+        moTextConcept.setTextSettings(SGuiUtils.getLabelName(jlConcept), SDataRecordEntry.LEN_CONCEPT);
         moKeyTransferCash.setKeySettings(miClient, SGuiUtils.getLabelName(jlTransferCash), true);
         moCurTransferMoveCy.setCompoundFieldSettings(miClient);
         moCurTransferMoveCy.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTransferMoveCy), SGuiConsts.GUI_TYPE_DEC_AMT, true);
@@ -701,7 +702,7 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
      * @return Concept text. If text length exceds maximum allowed, then text is truncated and "..." concatenated at the end indicating it.
      */
     private String formatConcept(String concept) {
-        return concept.length() < moTextConcept.getMaxLength() ? concept : concept.substring(0, moTextConcept.getMaxLength() - 3) + "...";
+        return concept.length() < SDataRecordEntry.LEN_CONCEPT ? concept : concept.substring(0, SDataRecordEntry.LEN_CONCEPT - SErpConsts.ELLIPSIS.length()) + SErpConsts.ELLIPSIS;
     }
 
     private String composeConceptCash() {

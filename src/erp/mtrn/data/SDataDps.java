@@ -2676,10 +2676,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             sConcept += "; " + sConceptEntry;
                         }
 
-                        if (sConcept.length() > 100) {
-                            sConcept = sConcept.substring(0, 100 - 3).trim() + "...";
-                        }
-
                         // 4.2.2 Save journal voucher:
                         
                         nSortingPosition = 0;
@@ -3024,9 +3020,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                             }
 
                                             sConceptEntryAux += (entry.getConcept().length() <= 0 ? "" : "; " + entry.getConcept());
-                                            if (sConceptEntryAux.length() > 100) {
-                                                sConceptEntryAux = sConceptEntryAux.substring(0, 100 - 3).trim() + "...";
-                                            }
 
                                             oRecordEntry.setConcept(sConceptEntryAux);
                                             oRecordEntry.setSortingPosition(++nSortingPosition);
@@ -4959,9 +4952,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     
     @Override
     public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception { // CFDI 3.2 & 3.3
-        double price = 0;
-        String descripcion = "";
-        SCfdDataConcepto concepto = null;
         ArrayList<SCfdDataConcepto> conceptos = new ArrayList<>();
         
         for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
@@ -4975,33 +4965,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 else if (generateIntCommerceComplement() && dpsEntry.getDbmsCustomsUnitSymbol().isEmpty() && dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
                     throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene código de unidad aduana.");
                 }
-                    
-                descripcion = dpsEntry.getConcept();
                 
-                for (SDataDpsEntryNotes dpsEntryNotes : dpsEntry.getDbmsEntryNotes()) {
-                    if (dpsEntryNotes.getIsCfd()) {
-                        descripcion += " - " + dpsEntryNotes.getNotes();
-                    }
-                }
-                
-                // XXX refactor this, this validation does not belong to here!:
-                descripcion = descripcion.replaceAll("\n", " ");
-                if (descripcion.length() > 1000) {
-                    descripcion = descripcion.substring(0, 1000);
-                }
-                // XXX
-                
-                if (dpsEntry.getSubtotalProvisionalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
-                    price = dpsEntry.getOriginalPriceUnitaryCy();
-                }
-                else {
-                    price = dpsEntry.getSubtotalProvisionalCy_r() / dpsEntry.getOriginalQuantity();
-                }
-                
-                concepto = new SCfdDataConcepto();
+                SCfdDataConcepto concepto = new SCfdDataConcepto();
                 
                 if (dpsEntry.getDbmsComplement() == null) {
                     //use original data of current document entry:
+                    
+                    String descripcion = dpsEntry.getConcept();
+                    for (SDataDpsEntryNotes dpsEntryNotes : dpsEntry.getDbmsEntryNotes()) {
+                        if (dpsEntryNotes.getIsCfd()) {
+                            descripcion += " - " + dpsEntryNotes.getNotes();
+                        }
+                    }
+                    
                     concepto.setClaveProdServ(dpsEntry.getDbmsItemClaveProdServ());
                     concepto.setNoIdentificacion(dpsEntry.getConceptKey());
                     concepto.setClaveUnidad(dpsEntry.getDbmsOriginalUnidadClave());
@@ -5010,11 +4986,20 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
                 else {
                     //use custom (user defined) data of current document entry:
+                    
                     concepto.setClaveProdServ(dpsEntry.getDbmsComplement().getCfdProdServ());
                     concepto.setNoIdentificacion(dpsEntry.getDbmsComplement().getConceptKey());
                     concepto.setClaveUnidad(dpsEntry.getDbmsComplement().getCfdUnit());
                     concepto.setUnidad("");
                     concepto.setDescripcion(dpsEntry.getDbmsComplement().getConcept());
+                }
+                
+                double price;
+                if (dpsEntry.getSubtotalProvisionalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
+                    price = dpsEntry.getOriginalPriceUnitaryCy();
+                }
+                else {
+                    price = dpsEntry.getSubtotalProvisionalCy_r() / dpsEntry.getOriginalQuantity();
                 }
                 
                 concepto.setCantidad(dpsEntry.getOriginalQuantity());

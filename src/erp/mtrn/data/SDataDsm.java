@@ -23,7 +23,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -65,8 +65,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected java.lang.Object moDbmsRecordKey;
 
     protected java.util.Vector<erp.mtrn.data.SDataDsmNotes> mvDbmsDsmNotes;
-    protected java.util.Vector<erp.mtrn.data.SDataDsmEntry> mvDbmsDsmEntry;
-    protected java.util.Vector<java.lang.Object> mvBalanceDps;
+    protected java.util.Vector<erp.mtrn.data.SDataDsmEntry> mvDbmsDsmEntries;
 
     protected erp.mfin.data.SDataRecord moDbmsRecord;
     protected int mnParamPkCheckWalletId;
@@ -75,9 +74,8 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
     public SDataDsm() {
         super(SDataConstants.TRN_DSM);
 
-        mvDbmsDsmNotes = new Vector<SDataDsmNotes>();
-        mvDbmsDsmEntry = new Vector<SDataDsmEntry>();
-        mvBalanceDps = new Vector<Object>();
+        mvDbmsDsmNotes = new Vector<>();
+        mvDbmsDsmEntries = new Vector<>();
         reset();
     }
 
@@ -172,8 +170,8 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         try {
             nSortPos = 1;
-            for (int m = 0; m < mvDbmsDsmEntry.size(); m++) {
-                oDsmEntry = (SDataDsmEntry) mvDbmsDsmEntry.get(m);
+            for (int m = 0; m < mvDbmsDsmEntries.size(); m++) {
+                oDsmEntry = (SDataDsmEntry) mvDbmsDsmEntries.get(m);
                 if (oDsmEntry != null) {
 
                     // Render concept for the entry:
@@ -1721,7 +1719,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
     public java.util.Vector<SDataDsmNotes> getDbmsNotes() { return mvDbmsDsmNotes; }
-    public java.util.Vector<SDataDsmEntry> getDbmsEntry() { return mvDbmsDsmEntry; }
+    public java.util.Vector<SDataDsmEntry> getDbmsEntries() { return mvDbmsDsmEntries; }
 
     public erp.mfin.data.SDataRecord getDbmsRecord() { return moDbmsRecord; }
 
@@ -1776,7 +1774,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         msDbmsSubsystemTypeBiz = "";
 
         mvDbmsDsmNotes.clear();
-        mvDbmsDsmEntry.clear();
+        mvDbmsDsmEntries.clear();
 
         mbAuxIsRecordAutomatic = false;
         moAuxRecordUserKey = null;
@@ -1891,7 +1889,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                 // Read dsm entries:
 
                 statementAux = statement.getConnection().createStatement();
-                mvDbmsDsmEntry.removeAllElements();
+                mvDbmsDsmEntries.removeAllElements();
                 sql = "SELECT * FROM trn_dsm_ety " +
                     "WHERE id_year = " + key[0] +
                     " AND id_doc = " + key[1] +
@@ -1903,7 +1901,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
-                        mvDbmsDsmEntry.add(oDsmEntry);
+                        mvDbmsDsmEntries.add(oDsmEntry);
                     }
                 }
 
@@ -1992,8 +1990,8 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 // Save DSM Entry:
 
-                for (int m = 0; m < mvDbmsDsmEntry.size(); m++) {
-                    dataDsmEntry = (SDataDsmEntry) mvDbmsDsmEntry.get(m);
+                for (int m = 0; m < mvDbmsDsmEntries.size(); m++) {
+                    dataDsmEntry = (SDataDsmEntry) mvDbmsDsmEntries.get(m);
 
                     if (dataDsmEntry != null) {
                         dataDsmEntry.setPkYearId(mnPkYearId);
@@ -2007,7 +2005,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 // Save record if there is DSM Entry:
 
-                if (mvDbmsDsmEntry.size() > 0) {
+                if (mvDbmsDsmEntries.size() > 0) {
                     // 4. Save aswell accounting record if document class requires one:
 
                     // 4.1 Prepare accounting record:2

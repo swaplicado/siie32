@@ -16,7 +16,6 @@ import erp.mfin.data.SDataAccountCash;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbBankLayout;
-import erp.mod.fin.db.SFinConsts;
 import erp.mod.fin.db.SLayoutBankCardextRow;
 import erp.mod.fin.db.SLayoutBankPaymentRow;
 import erp.mod.fin.db.SLayoutBankXmlRow;
@@ -322,9 +321,9 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
             dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, new int[] {row.getDpsYear(), row.getDpsDoc() }, SLibConstants.EXEC_MODE_SILENT);
             
             auxRow.setBizPartnerBranchCob(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.DESCRIPTION_CODE));
-            auxRow.setTypeDps(dps.isDocumentPur() || dps.isDocumentSal() ? SFinConsts.TXT_INVOICE : "");
-            auxRow.setNumberSer(dps.getDpsNumber());
-            auxRow.setDate(dps.getDate());
+            auxRow.setDpsType(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.TRNU_TP_DPS, dps.getDpsTypeKey(), SLibConstants.DESCRIPTION_CODE));
+            auxRow.setDpsNumber(dps.getDpsNumber());
+            auxRow.setDpsDate(dps.getDate());
             auxRow.setBalanceTot(new SMoney(row.getAmountPayed(), row.getCurrencyId(), row.getExchangeRate(), row.getCurrencyId()));
             auxRow.setObservation(row.getObservations());
             

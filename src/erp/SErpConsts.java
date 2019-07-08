@@ -12,4 +12,5 @@ package erp;
 public abstract class SErpConsts {
     
     public static final int IMG_MAX_SIZE = 1024 * 512;
+    public static final String ELLIPSIS = "...";
 }

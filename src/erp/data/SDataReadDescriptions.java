@@ -240,14 +240,14 @@ public abstract class SDataReadDescriptions {
             case SDataConstants.TRNS_TP_CFD:
                 sql = "SELECT tp_cfd AS descrip FROM erp.trns_tp_cfd WHERE id_tp_cfd = " + ((int[]) pk)[0] + " ";
                 break;
-            case SDataConstants.TRNU_DPS_NAT:
-                sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "dps_nat") + " AS descrip FROM erp.trnu_dps_nat WHERE id_dps_nat = " + ((int[]) pk)[0] + " ";
+            case SDataConstants.TRNS_TP_IOG:
+                sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "tp_iog") + " AS descrip FROM erp.trns_tp_iog WHERE id_ct_iog = " + ((int[]) pk)[0] + " AND id_cl_iog = " + ((int[]) pk)[1] + " AND id_tp_iog = " + ((int[]) pk)[2] + " ";
                 break;
             case SDataConstants.TRNU_TP_DPS:
                 sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "tp_dps") + " AS descrip FROM erp.trnu_tp_dps WHERE id_ct_dps = " + ((int[]) pk)[0] + " AND id_cl_dps = " + ((int[]) pk)[1] + " AND id_tp_dps = " + ((int[]) pk)[2] + " ";
                 break;
-            case SDataConstants.TRNS_TP_IOG:
-                sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "tp_iog") + " AS descrip FROM erp.trns_tp_iog WHERE id_ct_iog = " + ((int[]) pk)[0] + " AND id_cl_iog = " + ((int[]) pk)[1] + " AND id_tp_iog = " + ((int[]) pk)[2] + " ";
+            case SDataConstants.TRNU_DPS_NAT:
+                sql = "SELECT " + (descriptionType == SLibConstants.DESCRIPTION_CODE ? "code" : "dps_nat") + " AS descrip FROM erp.trnu_dps_nat WHERE id_dps_nat = " + ((int[]) pk)[0] + " ";
                 break;
             case SDataConstants.TRN_DPS:
                 sql = "SELECT CONCAT(td.code,' ',CONCAT(num_ser, IF(length(num_ser) = 0, '', '-'), num)) AS descrip FROM trn_dps AS d INNER JOIN erp.TRNU_TP_DPS AS td ON d.fid_ct_dps = td.id_ct_dps " +

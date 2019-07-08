@@ -29,9 +29,9 @@ public class SLayoutBankCardextRow implements SGridRow {
     protected java.lang.String msBizPartnerKey;
     protected java.lang.String msBizPartnerBranch;
     protected java.lang.String msSantanderBankCode;
-    protected java.lang.String msTypeDps;
-    protected java.lang.String msNumberSer;
-    protected java.util.Date mtDate;
+    protected java.lang.String msDpsType;
+    protected java.lang.String msDpsNumber;
+    protected java.util.Date mtDpsDate;
     protected java.lang.String msBizPartnerBranchCob;
     protected SMoney moBalanceTot;
     protected double mdBalanceTotByBizPartner;
@@ -66,9 +66,9 @@ public class SLayoutBankCardextRow implements SGridRow {
         msBizPartnerKey = "";
         msBizPartnerBranch = "";
         msSantanderBankCode = "";
-        msTypeDps = "";
-        msNumberSer = "";
-        mtDate = null;
+        msDpsType = "";
+        msDpsNumber = "";
+        mtDpsDate = null;
         msBizPartnerBranchCob = "";
         moBalanceTot = null;
         mdBalanceTotByBizPartner = 0;
@@ -98,9 +98,9 @@ public class SLayoutBankCardextRow implements SGridRow {
     public void setBizPartnerKey(java.lang.String s) { msBizPartnerKey = s; }
     public void setBizPartnerBranch(String s) { msBizPartnerBranch = s; }
     public void setSantanderBankCode(String s) { msSantanderBankCode = s; }
-    public void setTypeDps(String s) { msTypeDps = s; }
-    public void setNumberSer(String s) { msNumberSer = s; }
-    public void setDate(java.util.Date t) { mtDate = t; }
+    public void setDpsType(String s) { msDpsType = s; }
+    public void setDpsNumber(String s) { msDpsNumber = s; }
+    public void setDpsDate(java.util.Date t) { mtDpsDate = t; }
     public void setBizPartnerBranchCob(String s) { msBizPartnerBranchCob = s; }
     public void setBalanceTot(SMoney o) { moBalanceTot = o; }
     public void setBalanceTotByBizPartner(double d) { mdBalanceTotByBizPartner = d; }
@@ -142,9 +142,9 @@ public class SLayoutBankCardextRow implements SGridRow {
     public java.lang.String getBizPartnerKey() { return msBizPartnerKey; }
     public java.lang.String getBizPartnerBranch() { return msBizPartnerBranch; }
     public java.lang.String getSantanderBankCode() { return msSantanderBankCode; }
-    public java.lang.String getTypeDps() { return msTypeDps; }
-    public java.lang.String getNumberSer() { return msNumberSer; }
-    public java.util.Date getDate() { return mtDate; }
+    public java.lang.String getDpsType() { return msDpsType; }
+    public java.lang.String getDpsNumber() { return msDpsNumber; }
+    public java.util.Date getDpsDate() { return mtDpsDate; }
     public SMoney getBalanceTot() { return moBalanceTot; }
     public double getBalanceTotByBizPartner() { return mdBalanceTotByBizPartner; }
     public double getBalancePayed() { return mdBalancePayed; }
@@ -214,13 +214,13 @@ public class SLayoutBankCardextRow implements SGridRow {
                 value = msBizPartnerKey;
                 break;
             case 2:
-                value = msTypeDps;
+                value = msDpsType;
                 break;
             case 3:
-                value = msNumberSer;
+                value = msDpsNumber;
                 break;
             case 4:
-                value = mtDate;
+                value = mtDpsDate;
                 break;
             case 5:
                 value = msBizPartnerBranchCob;

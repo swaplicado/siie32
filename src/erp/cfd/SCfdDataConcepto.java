@@ -19,6 +19,8 @@ import sa.lib.SLibUtils;
  */
 public class SCfdDataConcepto {
     
+    public static final int LEN_DESCRIPCION = 1000;
+    
     protected String msClaveProdServ;
     protected String msNoIdentificacion;
     protected double mdCantidad;
@@ -52,7 +54,7 @@ public class SCfdDataConcepto {
     public void setCantidad(double d) { mdCantidad = d; }
     public void setClaveUnidad(String s) { msClaveUnidad = s; }
     public void setUnidad(String s) { msUnidad = s; }
-    public void setDescripcion(String s) { msDescripcion = s; }
+    public void setDescripcion(String s) { String descripcion = s.replaceAll("\n", " "); if (descripcion.length() > LEN_DESCRIPCION) { descripcion = descripcion.substring(0, LEN_DESCRIPCION); } msDescripcion = descripcion; }
     public void setValorUnitario(double d) { mdValorUnitario = d; }
     public void setImporte(double d) { mdImporte = d; }
     public void setDescuento(double d) { mdDescuento = d; }

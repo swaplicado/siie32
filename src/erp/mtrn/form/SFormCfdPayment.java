@@ -79,6 +79,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     
     private static final int MODE_DPS_PICK_PEND = 1;
     private static final int MODE_DPS_PICK_ALL = 2;
+    private static final String CONCEPT_DOCS = "Documentos concepto contable";
     
     private final int mnFormType;
     private int mnFormResult;
@@ -87,7 +88,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private boolean mbIsFormReady;
     private boolean mbIsFormReadOnly;
     private boolean mbIsFormReseting;
-    private boolean mbEditingVoucher;           // payment voucher, that is, the very header of registry
+    private boolean mbEditingVoucher; // payment voucher, that is, the very header of registry
     private boolean mbEditingPaymentEntry;
     private boolean mbEditingPaymentEntryDoc;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
@@ -102,12 +103,13 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private java.text.DecimalFormat moExchangeRateFormat;
     
     private erp.mfin.data.SDataRecord moDataPayRecord;
-    private erp.mfin.data.SDataAccountCash moDataPayAccountCash;
+    private erp.mfin.data.SDataAccountCash moDataPayAccountCashDest;
     private erp.mtrn.data.SDataDps moDataDocDpsRelated;
     private erp.mtrn.data.cfd.SCfdPaymentEntry moPaymentEntry;
     private erp.mtrn.data.cfd.SCfdPaymentEntryDoc moPaymentEntryDoc;
 
     private java.lang.String msXmlRelationType;
+    private java.awt.Color moBackgroundDefaultColor;
     private java.util.HashMap<java.lang.String, sa.lib.srv.SSrvLock> moRecordLocksMap;  // key: record's primary key as string; value: corresponding gained lock
     private erp.mfin.form.SDialogRecordPicker moDialogPayRecordPicker;
     private erp.mtrn.form.SDialogPickerDps moDialogRecDpsRelatedPicker;
@@ -139,9 +141,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private erp.lib.form.SFormField moFieldPayAccountSrcFiscalId;
     private erp.lib.form.SFormField moFieldPayAccountSrcNumber;
     private erp.lib.form.SFormField moFieldPayAccountSrcEntity;
-    private erp.lib.form.SFormField moFieldPayAccountDesFiscalId;
-    private erp.lib.form.SFormField moFieldPayAccountDesNumber;
-    private erp.lib.form.SFormField moFieldPayAccountDes;
+    private erp.lib.form.SFormField moFieldPayAccountDestFiscalId;
+    private erp.lib.form.SFormField moFieldPayAccountDestNumber;
+    private erp.lib.form.SFormField moFieldPayAccountDest;
     
     // current payment document:
     private erp.lib.form.SFormField moFieldDocInstallment;
@@ -170,9 +172,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void initComponents() {
 
         bgFactoring = new javax.swing.ButtonGroup();
+        jpDialog = new javax.swing.JPanel();
         jpRegistry = new javax.swing.JPanel();
-        jpRegistryHead = new javax.swing.JPanel();
-        jpRegistryHeadRec = new javax.swing.JPanel();
+        jpRegistryReceptor = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jlRecBizPartner = new javax.swing.JLabel();
         jcbRecBizPartner = new javax.swing.JComboBox();
@@ -196,7 +198,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfRecRelationTypeRo = new javax.swing.JTextField();
         jbRecCfdRelatedAdd = new javax.swing.JButton();
         jbRecCfdRelatedDelete = new javax.swing.JButton();
-        jpRegistryHeadVou = new javax.swing.JPanel();
+        jpRegistryVoucher = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jlVouNumber = new javax.swing.JLabel();
         jtfVouNumberRo = new javax.swing.JTextField();
@@ -224,9 +226,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbVouNext = new javax.swing.JButton();
         jbVouResume = new javax.swing.JButton();
         jpRegistryRows = new javax.swing.JPanel();
-        jpRegistryRowsPays = new javax.swing.JPanel();
-        jpPays = new javax.swing.JPanel();
-        jPanel24 = new javax.swing.JPanel();
+        jpPayments = new javax.swing.JPanel();
+        jpPayment = new javax.swing.JPanel();
         jPanel25 = new javax.swing.JPanel();
         jlPayDate = new javax.swing.JLabel();
         jftPayDate = new javax.swing.JFormattedTextField();
@@ -264,7 +265,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbPayRecordPick = new javax.swing.JButton();
         jbPayRecordView = new javax.swing.JButton();
         jPanel40 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        jlPayAccount = new javax.swing.JLabel();
         jlPayAccountFiscalId = new javax.swing.JLabel();
         jlPayAccountNumber = new javax.swing.JLabel();
         jlPayAccountEntity = new javax.swing.JLabel();
@@ -275,26 +276,27 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfPayAccountSrcEntity = new javax.swing.JTextField();
         jbPayAccountSrcPick = new javax.swing.JButton();
         jPanel32 = new javax.swing.JPanel();
-        jlPayAccountDes = new javax.swing.JLabel();
-        jtfPayAccountDesFiscalId = new javax.swing.JTextField();
-        jtfPayAccountDesNumber = new javax.swing.JTextField();
-        jcbPayAccountDes = new javax.swing.JComboBox<SFormComponentItem>();
-        jbPayAccountDesPick = new javax.swing.JButton();
+        jlPayAccountDest = new javax.swing.JLabel();
+        jtfPayAccountDestFiscalId = new javax.swing.JTextField();
+        jtfPayAccountDestNumber = new javax.swing.JTextField();
+        jcbPayAccountDest = new javax.swing.JComboBox<SFormComponentItem>();
+        jbPayAccountDestPick = new javax.swing.JButton();
         jPanel33 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
         jbPayPaymentEntryAdd = new javax.swing.JButton();
         jbPayPaymentEntryModify = new javax.swing.JButton();
+        jbPayPaymentEntryDelete = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
         jbPayPaymentEntryOk = new javax.swing.JButton();
         jbPayPaymentEntryCancel = new javax.swing.JButton();
-        jbPayPaymentEntryDelete = new javax.swing.JButton();
-        jpPaysTotals = new javax.swing.JPanel();
+        jpVoucherTotals = new javax.swing.JPanel();
         jlVouTotal = new javax.swing.JLabel();
         jtfVouTotalRo = new javax.swing.JTextField();
         jtfVouTotalCurRo = new javax.swing.JTextField();
         jtfVouTotalLocalRo = new javax.swing.JTextField();
         jtfVouTotalLocalCurRo = new javax.swing.JTextField();
-        jpRegistryRowsDocs = new javax.swing.JPanel();
-        jpDocs = new javax.swing.JPanel();
-        jPanel8 = new javax.swing.JPanel();
+        jpDocuments = new javax.swing.JPanel();
+        jpDocument = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jlDocDpsRelated = new javax.swing.JLabel();
         jtfDocDpsRelatedNumberRo = new javax.swing.JTextField();
@@ -339,17 +341,23 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jlDocPaymentType = new javax.swing.JLabel();
         jtfDocPaymentTypeRo = new javax.swing.JTextField();
         jPanel39 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
         jbDocPaymentEntryDocAdd = new javax.swing.JButton();
         jbDocPaymentEntryDocModify = new javax.swing.JButton();
+        jbDocPaymentEntryDocDelete = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
         jbDocPaymentEntryDocOk = new javax.swing.JButton();
         jbDocPaymentEntryDocCancel = new javax.swing.JButton();
-        jbDocPaymentEntryDocDelete = new javax.swing.JButton();
-        jpDocsTotals = new javax.swing.JPanel();
+        jpPaymentTotals = new javax.swing.JPanel();
         jlPayTotalPayments = new javax.swing.JLabel();
         jtfPayTotalPaymentsRo = new javax.swing.JTextField();
         jtfPayTotalPaymentsCurRo = new javax.swing.JTextField();
         jtfPayTotalPaymentsLocalRo = new javax.swing.JTextField();
         jtfPayTotalPaymentsLocalCurRo = new javax.swing.JTextField();
+        jpAccountingConcept = new javax.swing.JPanel();
+        jtfAccConceptPrefixRo = new javax.swing.JTextField();
+        jtfAccConceptDocsRo = new javax.swing.JTextField();
+        jbAccConceptDocsEdit = new javax.swing.JButton();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -367,12 +375,12 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
         });
 
-        jpRegistry.setLayout(new java.awt.BorderLayout());
+        jpDialog.setLayout(new java.awt.BorderLayout());
 
-        jpRegistryHead.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
+        jpRegistry.setLayout(new java.awt.BorderLayout(5, 0));
 
-        jpRegistryHeadRec.setBorder(javax.swing.BorderFactory.createTitledBorder("Deudor:"));
-        jpRegistryHeadRec.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jpRegistryReceptor.setBorder(javax.swing.BorderFactory.createTitledBorder("Deudor:"));
+        jpRegistryReceptor.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -389,7 +397,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbRecBizPartnerPick.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jbRecBizPartnerPick);
 
-        jpRegistryHeadRec.add(jPanel11);
+        jpRegistryReceptor.add(jPanel11);
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -418,7 +426,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfRecForeignFiscalIdRo.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel12.add(jtfRecForeignFiscalIdRo);
 
-        jpRegistryHeadRec.add(jPanel12);
+        jpRegistryReceptor.add(jPanel12);
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -430,7 +438,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jcbRecCfdiUsage.setPreferredSize(new java.awt.Dimension(360, 23));
         jPanel15.add(jcbRecCfdiUsage);
 
-        jpRegistryHeadRec.add(jPanel15);
+        jpRegistryReceptor.add(jPanel15);
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -462,7 +470,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbRecCfdRelatedPick.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel17.add(jbRecCfdRelatedPick);
 
-        jpRegistryHeadRec.add(jPanel17);
+        jpRegistryReceptor.add(jPanel17);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -484,12 +492,13 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbRecCfdRelatedDelete.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel16.add(jbRecCfdRelatedDelete);
 
-        jpRegistryHeadRec.add(jPanel16);
+        jpRegistryReceptor.add(jPanel16);
 
-        jpRegistryHead.add(jpRegistryHeadRec);
+        jpRegistry.add(jpRegistryReceptor, java.awt.BorderLayout.CENTER);
 
-        jpRegistryHeadVou.setBorder(javax.swing.BorderFactory.createTitledBorder("Comprobante:"));
-        jpRegistryHeadVou.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jpRegistryVoucher.setBorder(javax.swing.BorderFactory.createTitledBorder("Comprobante:"));
+        jpRegistryVoucher.setPreferredSize(new java.awt.Dimension(525, 1));
+        jpRegistryVoucher.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -518,7 +527,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfVouVersionRo.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel5.add(jtfVouVersionRo);
 
-        jpRegistryHeadVou.add(jPanel5);
+        jpRegistryVoucher.add(jPanel5);
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -550,7 +559,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfVouStatusRo.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel6.add(jtfVouStatusRo);
 
-        jpRegistryHeadVou.add(jPanel6);
+        jpRegistryVoucher.add(jPanel6);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -579,7 +588,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfVouPlaceIssueRo.setPreferredSize(new java.awt.Dimension(78, 23));
         jPanel7.add(jtfVouPlaceIssueRo);
 
-        jpRegistryHeadVou.add(jPanel7);
+        jpRegistryVoucher.add(jPanel7);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -591,7 +600,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jcbVouTaxRegime.setPreferredSize(new java.awt.Dimension(363, 23));
         jPanel9.add(jcbVouTaxRegime);
 
-        jpRegistryHeadVou.add(jPanel9);
+        jpRegistryVoucher.add(jPanel9);
 
         jPanel41.setLayout(new java.awt.GridLayout(1, 2));
 
@@ -621,20 +630,18 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jPanel41.add(jPanel42);
 
-        jpRegistryHeadVou.add(jPanel41);
+        jpRegistryVoucher.add(jPanel41);
 
-        jpRegistryHead.add(jpRegistryHeadVou);
+        jpRegistry.add(jpRegistryVoucher, java.awt.BorderLayout.EAST);
 
-        jpRegistry.add(jpRegistryHead, java.awt.BorderLayout.NORTH);
+        jpDialog.add(jpRegistry, java.awt.BorderLayout.NORTH);
 
-        jpRegistryRows.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
+        jpRegistryRows.setLayout(new java.awt.BorderLayout(5, 0));
 
-        jpRegistryRowsPays.setBorder(javax.swing.BorderFactory.createTitledBorder("Pagos:"));
-        jpRegistryRowsPays.setLayout(new java.awt.BorderLayout(0, 5));
+        jpPayments.setBorder(javax.swing.BorderFactory.createTitledBorder("Pagos:"));
+        jpPayments.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jpPays.setLayout(new java.awt.BorderLayout(0, 5));
-
-        jPanel24.setLayout(new java.awt.GridLayout(10, 1, 0, 5));
+        jpPayment.setLayout(new java.awt.GridLayout(10, 1, 0, 5));
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -669,7 +676,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jLabel2.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel25.add(jLabel2);
 
-        jPanel24.add(jPanel25);
+        jpPayment.add(jPanel25);
 
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -685,7 +692,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jckPayFactoring.setPreferredSize(new java.awt.Dimension(205, 23));
         jPanel26.add(jckPayFactoring);
 
-        jPanel24.add(jPanel26);
+        jpPayment.add(jPanel26);
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -711,7 +718,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jrbPayFactoringFee.setPreferredSize(new java.awt.Dimension(145, 23));
         jPanel28.add(jrbPayFactoringFee);
 
-        jPanel24.add(jPanel28);
+        jpPayment.add(jPanel28);
 
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -725,14 +732,14 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         jlPayFactoringBank.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlPayFactoringBank.setText("Banco:");
-        jlPayFactoringBank.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlPayFactoringBank.setPreferredSize(new java.awt.Dimension(55, 23));
         jPanel30.add(jlPayFactoringBank);
 
         jcbPayFactoringBank.setToolTipText("Banco factoraje");
-        jcbPayFactoringBank.setPreferredSize(new java.awt.Dimension(150, 23));
+        jcbPayFactoringBank.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel30.add(jcbPayFactoringBank);
 
-        jPanel24.add(jPanel30);
+        jpPayment.add(jPanel30);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -769,7 +776,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfPayAmountLocalRo.setText("999,999,999.99");
         jtfPayAmountLocalRo.setToolTipText("Monto de pago");
         jtfPayAmountLocalRo.setFocusable(false);
-        jtfPayAmountLocalRo.setPreferredSize(new java.awt.Dimension(102, 23));
+        jtfPayAmountLocalRo.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel29.add(jtfPayAmountLocalRo);
 
         jtfPayAmountLocalCurRo.setEditable(false);
@@ -779,7 +786,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfPayAmountLocalCurRo.setPreferredSize(new java.awt.Dimension(30, 23));
         jPanel29.add(jtfPayAmountLocalCurRo);
 
-        jPanel24.add(jPanel29);
+        jpPayment.add(jPanel29);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -818,14 +825,14 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbPayRecordView.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel27.add(jbPayRecordView);
 
-        jPanel24.add(jPanel27);
+        jpPayment.add(jPanel27);
 
         jPanel40.setBackground(java.awt.SystemColor.controlHighlight);
         jPanel40.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jLabel1.setText("Cta. bancaria:");
-        jLabel1.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel40.add(jLabel1);
+        jlPayAccount.setText("Cta. bancaria:");
+        jlPayAccount.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel40.add(jlPayAccount);
 
         jlPayAccountFiscalId.setText("RFC banco:");
         jlPayAccountFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -839,7 +846,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jlPayAccountEntity.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel40.add(jlPayAccountEntity);
 
-        jPanel24.add(jPanel40);
+        jpPayment.add(jPanel40);
 
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -856,7 +863,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jPanel31.add(jtfPayAccountSrcNumber);
 
         jtfPayAccountSrcEntity.setText("TEXT");
-        jtfPayAccountSrcEntity.setPreferredSize(new java.awt.Dimension(150, 23));
+        jtfPayAccountSrcEntity.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel31.add(jtfPayAccountSrcEntity);
 
         jbPayAccountSrcPick.setText("...");
@@ -864,107 +871,112 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbPayAccountSrcPick.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel31.add(jbPayAccountSrcPick);
 
-        jPanel24.add(jPanel31);
+        jpPayment.add(jPanel31);
 
         jPanel32.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPayAccountDes.setText("Beneficiaria:*");
-        jlPayAccountDes.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel32.add(jlPayAccountDes);
+        jlPayAccountDest.setText("Beneficiaria:*");
+        jlPayAccountDest.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel32.add(jlPayAccountDest);
 
-        jtfPayAccountDesFiscalId.setEditable(false);
-        jtfPayAccountDesFiscalId.setText("XAXX010101000");
-        jtfPayAccountDesFiscalId.setFocusable(false);
-        jtfPayAccountDesFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel32.add(jtfPayAccountDesFiscalId);
+        jtfPayAccountDestFiscalId.setEditable(false);
+        jtfPayAccountDestFiscalId.setText("XAXX010101000");
+        jtfPayAccountDestFiscalId.setFocusable(false);
+        jtfPayAccountDestFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel32.add(jtfPayAccountDestFiscalId);
 
-        jtfPayAccountDesNumber.setEditable(false);
-        jtfPayAccountDesNumber.setText("072470001837637520");
-        jtfPayAccountDesNumber.setFocusable(false);
-        jtfPayAccountDesNumber.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel32.add(jtfPayAccountDesNumber);
+        jtfPayAccountDestNumber.setEditable(false);
+        jtfPayAccountDestNumber.setText("072470001837637520");
+        jtfPayAccountDestNumber.setFocusable(false);
+        jtfPayAccountDestNumber.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel32.add(jtfPayAccountDestNumber);
 
-        jcbPayAccountDes.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel32.add(jcbPayAccountDes);
+        jcbPayAccountDest.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel32.add(jcbPayAccountDest);
 
-        jbPayAccountDesPick.setText("...");
-        jbPayAccountDesPick.setToolTipText("Seleccionar cuenta beneficiaria");
-        jbPayAccountDesPick.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel32.add(jbPayAccountDesPick);
+        jbPayAccountDestPick.setText("...");
+        jbPayAccountDestPick.setToolTipText("Seleccionar cuenta beneficiaria");
+        jbPayAccountDestPick.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel32.add(jbPayAccountDestPick);
 
-        jPanel24.add(jPanel32);
+        jpPayment.add(jPanel32);
 
-        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel33.setLayout(new java.awt.BorderLayout());
+
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbPayPaymentEntryAdd.setText("Agregar");
         jbPayPaymentEntryAdd.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel33.add(jbPayPaymentEntryAdd);
+        jPanel1.add(jbPayPaymentEntryAdd);
 
         jbPayPaymentEntryModify.setText("Modificar");
-        jPanel33.add(jbPayPaymentEntryModify);
+        jPanel1.add(jbPayPaymentEntryModify);
+
+        jbPayPaymentEntryDelete.setText("Eliminar");
+        jbPayPaymentEntryDelete.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel1.add(jbPayPaymentEntryDelete);
+
+        jPanel33.add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
         jbPayPaymentEntryOk.setText("Aceptar"); // NOI18N
         jbPayPaymentEntryOk.setToolTipText("[Ctrl + Enter]");
         jbPayPaymentEntryOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel33.add(jbPayPaymentEntryOk);
+        jPanel3.add(jbPayPaymentEntryOk);
 
         jbPayPaymentEntryCancel.setText("Cancelar"); // NOI18N
         jbPayPaymentEntryCancel.setToolTipText("[Escape]");
-        jPanel33.add(jbPayPaymentEntryCancel);
+        jPanel3.add(jbPayPaymentEntryCancel);
 
-        jbPayPaymentEntryDelete.setText("Eliminar");
-        jbPayPaymentEntryDelete.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel33.add(jbPayPaymentEntryDelete);
+        jPanel33.add(jPanel3, java.awt.BorderLayout.EAST);
 
-        jPanel24.add(jPanel33);
+        jpPayment.add(jPanel33);
 
-        jpPays.add(jPanel24, java.awt.BorderLayout.NORTH);
+        jpPayments.add(jpPayment, java.awt.BorderLayout.NORTH);
 
-        jpRegistryRowsPays.add(jpPays, java.awt.BorderLayout.CENTER);
+        jpVoucherTotals.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jpPaysTotals.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlVouTotal.setText("Total comprobante:");
-        jlVouTotal.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpPaysTotals.add(jlVouTotal);
+        jlVouTotal.setText("Total:");
+        jlVouTotal.setPreferredSize(new java.awt.Dimension(50, 23));
+        jpVoucherTotals.add(jlVouTotal);
 
         jtfVouTotalRo.setEditable(false);
         jtfVouTotalRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfVouTotalRo.setText("999,999,999.99");
         jtfVouTotalRo.setFocusable(false);
         jtfVouTotalRo.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpPaysTotals.add(jtfVouTotalRo);
+        jpVoucherTotals.add(jtfVouTotalRo);
 
         jtfVouTotalCurRo.setEditable(false);
         jtfVouTotalCurRo.setText("XXX");
         jtfVouTotalCurRo.setFocusable(false);
         jtfVouTotalCurRo.setPreferredSize(new java.awt.Dimension(30, 23));
-        jpPaysTotals.add(jtfVouTotalCurRo);
+        jpVoucherTotals.add(jtfVouTotalCurRo);
 
         jtfVouTotalLocalRo.setEditable(false);
         jtfVouTotalLocalRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfVouTotalLocalRo.setText("999,999,999.99");
         jtfVouTotalLocalRo.setFocusable(false);
         jtfVouTotalLocalRo.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpPaysTotals.add(jtfVouTotalLocalRo);
+        jpVoucherTotals.add(jtfVouTotalLocalRo);
 
         jtfVouTotalLocalCurRo.setEditable(false);
         jtfVouTotalLocalCurRo.setBackground(new java.awt.Color(255, 204, 204));
         jtfVouTotalLocalCurRo.setText("LOC");
         jtfVouTotalLocalCurRo.setFocusable(false);
         jtfVouTotalLocalCurRo.setPreferredSize(new java.awt.Dimension(30, 23));
-        jpPaysTotals.add(jtfVouTotalLocalCurRo);
+        jpVoucherTotals.add(jtfVouTotalLocalCurRo);
 
-        jpRegistryRowsPays.add(jpPaysTotals, java.awt.BorderLayout.SOUTH);
+        jpPayments.add(jpVoucherTotals, java.awt.BorderLayout.SOUTH);
 
-        jpRegistryRows.add(jpRegistryRowsPays);
+        jpRegistryRows.add(jpPayments, java.awt.BorderLayout.CENTER);
 
-        jpRegistryRowsDocs.setBorder(javax.swing.BorderFactory.createTitledBorder("Documentos relacionados del pago:"));
-        jpRegistryRowsDocs.setLayout(new java.awt.BorderLayout(0, 5));
+        jpDocuments.setBorder(javax.swing.BorderFactory.createTitledBorder("Documentos relacionados del pago:"));
+        jpDocuments.setPreferredSize(new java.awt.Dimension(525, 1));
+        jpDocuments.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jpDocs.setLayout(new java.awt.BorderLayout(0, 5));
-
-        jPanel8.setLayout(new java.awt.GridLayout(10, 1, 0, 5));
+        jpDocument.setLayout(new java.awt.GridLayout(10, 1, 0, 5));
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1003,7 +1015,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbDocDpsRelatedPickAll.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel14.add(jbDocDpsRelatedPickAll);
 
-        jPanel8.add(jPanel14);
+        jpDocument.add(jPanel14);
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1017,7 +1029,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocPaymentMethodRo.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel21.add(jtfDocPaymentMethodRo);
 
-        jPanel8.add(jPanel21);
+        jpDocument.add(jPanel21);
 
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1033,7 +1045,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocCurrencyRo.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel22.add(jtfDocCurrencyRo);
 
-        jPanel8.add(jPanel22);
+        jpDocument.add(jPanel22);
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1046,7 +1058,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocInstallment.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel34.add(jtfDocInstallment);
 
-        jPanel8.add(jPanel34);
+        jpDocument.add(jPanel34);
 
         jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1071,7 +1083,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbDocExchangeRateInvert.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel35.add(jbDocExchangeRateInvert);
 
-        jPanel8.add(jPanel35);
+        jpDocument.add(jPanel35);
 
         jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1105,7 +1117,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocPayBalancePrevCurRo.setPreferredSize(new java.awt.Dimension(30, 23));
         jPanel36.add(jtfDocPayBalancePrevCurRo);
 
-        jPanel8.add(jPanel36);
+        jpDocument.add(jPanel36);
 
         jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1144,7 +1156,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbDocPaymentCompute.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel37.add(jbDocPaymentCompute);
 
-        jPanel8.add(jPanel37);
+        jpDocument.add(jPanel37);
 
         jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1180,7 +1192,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocPayBalancePendCurRo.setPreferredSize(new java.awt.Dimension(30, 23));
         jPanel38.add(jtfDocPayBalancePendCurRo);
 
-        jPanel8.add(jPanel38);
+        jpDocument.add(jPanel38);
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -1194,77 +1206,104 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocPaymentTypeRo.setPreferredSize(new java.awt.Dimension(275, 23));
         jPanel13.add(jtfDocPaymentTypeRo);
 
-        jPanel8.add(jPanel13);
+        jpDocument.add(jPanel13);
 
-        jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel39.setLayout(new java.awt.BorderLayout());
+
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbDocPaymentEntryDocAdd.setText("Agregar");
         jbDocPaymentEntryDocAdd.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel39.add(jbDocPaymentEntryDocAdd);
+        jPanel2.add(jbDocPaymentEntryDocAdd);
 
         jbDocPaymentEntryDocModify.setText("Modificar");
-        jPanel39.add(jbDocPaymentEntryDocModify);
+        jPanel2.add(jbDocPaymentEntryDocModify);
+
+        jbDocPaymentEntryDocDelete.setText("Eliminar");
+        jbDocPaymentEntryDocDelete.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel2.add(jbDocPaymentEntryDocDelete);
+
+        jPanel39.add(jPanel2, java.awt.BorderLayout.CENTER);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
         jbDocPaymentEntryDocOk.setText("Aceptar"); // NOI18N
         jbDocPaymentEntryDocOk.setToolTipText("[Ctrl + Enter]");
         jbDocPaymentEntryDocOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel39.add(jbDocPaymentEntryDocOk);
+        jPanel4.add(jbDocPaymentEntryDocOk);
 
         jbDocPaymentEntryDocCancel.setText("Cancelar"); // NOI18N
         jbDocPaymentEntryDocCancel.setToolTipText("[Escape]");
-        jPanel39.add(jbDocPaymentEntryDocCancel);
+        jPanel4.add(jbDocPaymentEntryDocCancel);
 
-        jbDocPaymentEntryDocDelete.setText("Eliminar");
-        jbDocPaymentEntryDocDelete.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel39.add(jbDocPaymentEntryDocDelete);
+        jPanel39.add(jPanel4, java.awt.BorderLayout.EAST);
 
-        jPanel8.add(jPanel39);
+        jpDocument.add(jPanel39);
 
-        jpDocs.add(jPanel8, java.awt.BorderLayout.NORTH);
+        jpDocuments.add(jpDocument, java.awt.BorderLayout.NORTH);
 
-        jpRegistryRowsDocs.add(jpDocs, java.awt.BorderLayout.CENTER);
+        jpPaymentTotals.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jpDocsTotals.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlPayTotalPayments.setText("Total pagos:");
-        jlPayTotalPayments.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpDocsTotals.add(jlPayTotalPayments);
+        jlPayTotalPayments.setText("Pagos:");
+        jlPayTotalPayments.setPreferredSize(new java.awt.Dimension(50, 23));
+        jpPaymentTotals.add(jlPayTotalPayments);
 
         jtfPayTotalPaymentsRo.setEditable(false);
         jtfPayTotalPaymentsRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPayTotalPaymentsRo.setText("999,999,999.99");
         jtfPayTotalPaymentsRo.setFocusable(false);
         jtfPayTotalPaymentsRo.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpDocsTotals.add(jtfPayTotalPaymentsRo);
+        jpPaymentTotals.add(jtfPayTotalPaymentsRo);
 
         jtfPayTotalPaymentsCurRo.setEditable(false);
         jtfPayTotalPaymentsCurRo.setBackground(new java.awt.Color(204, 255, 204));
         jtfPayTotalPaymentsCurRo.setText("PAY");
         jtfPayTotalPaymentsCurRo.setFocusable(false);
         jtfPayTotalPaymentsCurRo.setPreferredSize(new java.awt.Dimension(30, 23));
-        jpDocsTotals.add(jtfPayTotalPaymentsCurRo);
+        jpPaymentTotals.add(jtfPayTotalPaymentsCurRo);
 
         jtfPayTotalPaymentsLocalRo.setEditable(false);
         jtfPayTotalPaymentsLocalRo.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfPayTotalPaymentsLocalRo.setText("999,999,999.99");
         jtfPayTotalPaymentsLocalRo.setFocusable(false);
         jtfPayTotalPaymentsLocalRo.setPreferredSize(new java.awt.Dimension(100, 23));
-        jpDocsTotals.add(jtfPayTotalPaymentsLocalRo);
+        jpPaymentTotals.add(jtfPayTotalPaymentsLocalRo);
 
         jtfPayTotalPaymentsLocalCurRo.setEditable(false);
         jtfPayTotalPaymentsLocalCurRo.setBackground(new java.awt.Color(255, 204, 204));
         jtfPayTotalPaymentsLocalCurRo.setText("LOC");
         jtfPayTotalPaymentsLocalCurRo.setFocusable(false);
         jtfPayTotalPaymentsLocalCurRo.setPreferredSize(new java.awt.Dimension(30, 23));
-        jpDocsTotals.add(jtfPayTotalPaymentsLocalCurRo);
+        jpPaymentTotals.add(jtfPayTotalPaymentsLocalCurRo);
 
-        jpRegistryRowsDocs.add(jpDocsTotals, java.awt.BorderLayout.SOUTH);
+        jpAccountingConcept.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 0, 0));
 
-        jpRegistryRows.add(jpRegistryRowsDocs);
+        jtfAccConceptPrefixRo.setEditable(false);
+        jtfAccConceptPrefixRo.setText("F");
+        jtfAccConceptPrefixRo.setToolTipText("Prefijo documentos concepto contable");
+        jtfAccConceptPrefixRo.setFocusable(false);
+        jtfAccConceptPrefixRo.setPreferredSize(new java.awt.Dimension(15, 23));
+        jpAccountingConcept.add(jtfAccConceptPrefixRo);
 
-        jpRegistry.add(jpRegistryRows, java.awt.BorderLayout.CENTER);
+        jtfAccConceptDocsRo.setEditable(false);
+        jtfAccConceptDocsRo.setText("TEXT");
+        jtfAccConceptDocsRo.setToolTipText("<computed>");
+        jtfAccConceptDocsRo.setFocusable(false);
+        jtfAccConceptDocsRo.setPreferredSize(new java.awt.Dimension(125, 23));
+        jpAccountingConcept.add(jtfAccConceptDocsRo);
 
-        getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
+        jpPaymentTotals.add(jpAccountingConcept);
+
+        jbAccConceptDocsEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbAccConceptDocsEdit.setToolTipText("Personalizar documentos concepto contable");
+        jbAccConceptDocsEdit.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpPaymentTotals.add(jbAccConceptDocsEdit);
+
+        jpDocuments.add(jpPaymentTotals, java.awt.BorderLayout.SOUTH);
+
+        jpRegistryRows.add(jpDocuments, java.awt.BorderLayout.EAST);
+
+        jpDialog.add(jpRegistryRows, java.awt.BorderLayout.CENTER);
 
         jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
@@ -1277,9 +1316,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbCancel.setToolTipText("[Escape]");
         jpControls.add(jbCancel);
 
-        getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
+        jpDialog.add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(1056, 689));
+        getContentPane().add(jpDialog, java.awt.BorderLayout.CENTER);
+
+        setSize(new java.awt.Dimension(1116, 689));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1326,8 +1367,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldPayOperation = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayOperation, jlPayOperation);
         moFieldPayOperation.setLengthMax(100);
         moFieldPayAccountSrcFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountSrcFiscalId, jlPayAccountFiscalId);
-        moFieldPayAccountSrcFiscalId.setLengthMin(SFinConsts.RFC_COM_LEN);
-        moFieldPayAccountSrcFiscalId.setLengthMax(SFinConsts.RFC_PER_LEN);
+        moFieldPayAccountSrcFiscalId.setLengthMin(SFinConsts.LEN_RFC_ORG);
+        moFieldPayAccountSrcFiscalId.setLengthMax(SFinConsts.LEN_RFC_PER);
         moFieldPayAccountSrcFiscalId.setPickerButton(jbPayAccountSrcPick);
         moFieldPayAccountSrcNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountSrcNumber, jlPayAccountNumber);
         moFieldPayAccountSrcNumber.setLengthMin(10);
@@ -1335,16 +1376,16 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldPayAccountSrcNumber.setPickerButton(jbPayAccountSrcPick);
         moFieldPayAccountSrcEntity = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountSrcEntity, jlPayAccountEntity);
         moFieldPayAccountSrcEntity.setLengthMax(300);
-        moFieldPayAccountDesFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountDesFiscalId, jlPayAccountFiscalId);
-        moFieldPayAccountDesFiscalId.setLengthMin(SFinConsts.RFC_COM_LEN);
-        moFieldPayAccountDesFiscalId.setLengthMax(SFinConsts.RFC_PER_LEN);
-        moFieldPayAccountDesFiscalId.setPickerButton(jbPayAccountDesPick);
-        moFieldPayAccountDesNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountDesNumber, jlPayAccountNumber);
-        moFieldPayAccountDesNumber.setLengthMin(10);
-        moFieldPayAccountDesNumber.setLengthMax(50);
-        moFieldPayAccountDesNumber.setPickerButton(jbPayAccountDesPick);
-        moFieldPayAccountDes = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPayAccountDes, jlPayAccountDes);
-        moFieldPayAccountDes.setPickerButton(jbPayAccountDesPick);
+        moFieldPayAccountDestFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountDestFiscalId, jlPayAccountFiscalId);
+        moFieldPayAccountDestFiscalId.setLengthMin(SFinConsts.LEN_RFC_ORG);
+        moFieldPayAccountDestFiscalId.setLengthMax(SFinConsts.LEN_RFC_PER);
+        moFieldPayAccountDestFiscalId.setPickerButton(jbPayAccountDestPick);
+        moFieldPayAccountDestNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountDestNumber, jlPayAccountNumber);
+        moFieldPayAccountDestNumber.setLengthMin(10);
+        moFieldPayAccountDestNumber.setLengthMax(50);
+        moFieldPayAccountDestNumber.setPickerButton(jbPayAccountDestPick);
+        moFieldPayAccountDest = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbPayAccountDest, jlPayAccountDest);
+        moFieldPayAccountDest.setPickerButton(jbPayAccountDestPick);
         moFieldDocInstallment = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfDocInstallment, jlDocInstallment);
         moFieldDocExchangeRate = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfDocExchangeRate, jlDocExchangeRate);
         moFieldDocExchangeRate.setDecimalFormat(moExchangeRateFormat);
@@ -1372,10 +1413,10 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         moPaneGridPayments = new STablePaneGrid(miClient);
         moPaneGridPayments.setDoubleClickAction(this, "actionPerformedPayPaymentEntryModify");
-        jpPays.add(moPaneGridPayments, BorderLayout.CENTER);
+        jpPayments.add(moPaneGridPayments, BorderLayout.CENTER);
 
         int colPayment = 0;
-        STableColumnForm[] colsPayments = new STableColumnForm[15];
+        STableColumnForm[] colsPayments = new STableColumnForm[16];
         colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "# pago", STableConstants.WIDTH_NUM_TINYINT);
         colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Fecha-hora pago", STableConstants.WIDTH_DATE_TIME);
         colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Forma pago", 50);
@@ -1393,6 +1434,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta beneficiaria", 125);
         colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo pago", 150);
         colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "RFC banco factoraje", 100);
+        colsPayments[colPayment++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Documentos concepto contable", 150);
 
         for (colPayment = 0; colPayment < colsPayments.length; colPayment++) {
             moPaneGridPayments.addTableColumn(colsPayments[colPayment]);
@@ -1402,7 +1444,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
         moPaneGridPaymentDocs = new STablePaneGrid(miClient);
         moPaneGridPaymentDocs.setDoubleClickAction(this, "actionPerformedDocPaymentEntryDocModify");
-        jpDocs.add(moPaneGridPaymentDocs, BorderLayout.CENTER);
+        jpDocuments.add(moPaneGridPaymentDocs, BorderLayout.CENTER);
 
         int colPaymentDoc = 0;
         STableColumnForm[] colsPaymentDocs = new STableColumnForm[12];
@@ -1446,31 +1488,32 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbRecCfdRelatedDelete.addActionListener(this);
         jbRecCfdRelatedPick.addActionListener(this);
         jbPayDatePick.addActionListener(this);
+        jbPayExchangeRatePick.addActionListener(this);
         jbPayRecordPick.addActionListener(this);
         jbPayRecordView.addActionListener(this);
-        jbPayExchangeRatePick.addActionListener(this);
         jbPayAccountSrcPick.addActionListener(this);
-        jbPayAccountDesPick.addActionListener(this);
+        jbPayAccountDestPick.addActionListener(this);
         jbPayPaymentEntryAdd.addActionListener(this);
         jbPayPaymentEntryModify.addActionListener(this);
+        jbPayPaymentEntryDelete.addActionListener(this);
         jbPayPaymentEntryOk.addActionListener(this);
         jbPayPaymentEntryCancel.addActionListener(this);
-        jbPayPaymentEntryDelete.addActionListener(this);
         jbDocDpsRelatedPickPend.addActionListener(this);
         jbDocDpsRelatedPickAll.addActionListener(this);
         jbDocExchangeRateInvert.addActionListener(this);
         jbDocPaymentCompute.addActionListener(this);
         jbDocPaymentEntryDocAdd.addActionListener(this);
         jbDocPaymentEntryDocModify.addActionListener(this);
+        jbDocPaymentEntryDocDelete.addActionListener(this);
         jbDocPaymentEntryDocOk.addActionListener(this);
         jbDocPaymentEntryDocCancel.addActionListener(this);
-        jbDocPaymentEntryDocDelete.addActionListener(this);
+        jbAccConceptDocsEdit.addActionListener(this);
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
         
         jcbPayPaymentWay.addItemListener(this);
         jcbPayCurrency.addItemListener(this);
-        jcbPayAccountDes.addItemListener(this);
+        jcbPayAccountDest.addItemListener(this);
         jcbRecBizPartner.addItemListener(this);
         jckPayFactoring.addItemListener(this);
         
@@ -1481,6 +1524,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfDocDocBalancePrev.addFocusListener(this);
         jtfDocDocPayment.addFocusListener(this);
         
+        jtfAccConceptPrefixRo.setText(SFinConsts.TXT_INVOICE);
         jtfPayAmountLocalCurRo.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
         jtfVouTotalLocalCurRo.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
         jtfPayTotalPaymentsLocalCurRo.setText(miClient.getSession().getSessionCustom().getLocalCurrencyCode());
@@ -1611,10 +1655,10 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
     /**
      * Reads and locks desired record.
-     * @param primaryKey Primary key of desired record.
+     * @param recordKey Primary key of desired record.
      * @return 
      */
-    private void setPayRecord(java.lang.Object primaryKey) throws Exception {
+    private void setPayRecord(final java.lang.Object recordKey) throws Exception {
         if (moDataPayRecord != null) {
             releaseRecordLock(moDataPayRecord);
             moDataPayRecord = null;
@@ -1624,7 +1668,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             throw new Exception(SLibConstants.MSG_ERR_GUI_PER_CLOSE);
         }
         else {
-            SDataRecord record = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, primaryKey, SLibConstants.EXEC_MODE_VERBOSE);
+            SDataRecord record = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, recordKey, SLibConstants.EXEC_MODE_VERBOSE);
             
             if (record.getIsSystem()) {
                 throw new Exception("No se puede seleccionar esta póliza contable porque es de sistema.");
@@ -1642,7 +1686,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         renderPayRecord();
     }
-
+    
     /**
      * Renders company-branch info. Session's when registry is new, CFD's when registriy is being modified.
      * When registry is new should not be called in method formReset(), instead in method windowActivated().
@@ -1650,7 +1694,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private void renderComBranch() {
         if (moDataCfdPayment == null) {
             moDataComBranch = miClient.getSessionXXX().getCurrentCompanyBranch();
-            SFormUtilities.populateComboBox(miClient, jcbPayAccountDes, SDataConstants.FIN_ACC_CASH, new int[] { moDataComBranch.getPkBizPartnerBranchId() });
+            SFormUtilities.populateComboBox(miClient, jcbPayAccountDest, SDataConstants.FIN_ACC_CASH, new int[] { moDataComBranch.getPkBizPartnerBranchId() });
         }
         
         jtfVouBranchNameRo.setText(moDataComBranch.getBizPartnerBranch());
@@ -1693,13 +1737,14 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             moFieldPayOperation.resetField();
             moDataPayRecord = null;
             renderPayRecord();
+            renderAccConceptDocs(null);
             
             moFieldPayAccountSrcFiscalId.resetField();
             moFieldPayAccountSrcNumber.resetField();
             moFieldPayAccountSrcEntity.resetField();
-            moFieldPayAccountDesFiscalId.resetField();
-            moFieldPayAccountDesNumber.resetField();
-            moFieldPayAccountDes.resetField();
+            moFieldPayAccountDestFiscalId.resetField();
+            moFieldPayAccountDestNumber.resetField();
+            moFieldPayAccountDest.resetField();
             
             jckPayFactoring.setSelected(false);
             itemStateChangedPayFactoring();
@@ -1718,17 +1763,18 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             moFieldPayOperation.setFieldValue(moPaymentEntry.Operation);
             moDataPayRecord = moPaymentEntry.DataRecord;
             renderPayRecord();
+            renderAccConceptDocs(moPaymentEntry);
             
             moFieldPayAccountSrcFiscalId.setFieldValue(moPaymentEntry.AccountSrcFiscalId);
             moFieldPayAccountSrcNumber.setFieldValue(moPaymentEntry.AccountSrcNumber);
             moFieldPayAccountSrcEntity.setFieldValue(moPaymentEntry.AccountSrcEntity);
-            moFieldPayAccountDesFiscalId.setFieldValue(moPaymentEntry.AccountDesFiscalId);
-            moFieldPayAccountDesNumber.setFieldValue(moPaymentEntry.AccountDesNumber);
-            moFieldPayAccountDes.setFieldValue(moPaymentEntry.AccountDesKey);
+            moFieldPayAccountDestFiscalId.setFieldValue(moPaymentEntry.AccountDestFiscalId);
+            moFieldPayAccountDestNumber.setFieldValue(moPaymentEntry.AccountDestNumber);
+            moFieldPayAccountDest.setFieldValue(moPaymentEntry.AccountDestKey);
             
             jckPayFactoring.setSelected(moPaymentEntry.isFactoring());
             itemStateChangedPayFactoring();
-            jrbPayFactoringPay.setSelected(!moPaymentEntry.isFactoring() || moPaymentEntry.Type == SCfdPaymentEntry.TYPE_FACTORING_PAY);
+            jrbPayFactoringPay.setSelected(moPaymentEntry.Type == SCfdPaymentEntry.TYPE_FACTORING_PAY);
         }
     }
 
@@ -1761,7 +1807,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jtfDocPayPaymentRo.setText(SLibUtils.getDecimalFormatAmount().format(moPaymentEntryDoc.PayPayment));
             jtfDocPayBalancePendRo.setText(SLibUtils.getDecimalFormatAmount().format(moPaymentEntryDoc.PayBalancePend));
             
-            jtfDocPaymentTypeRo.setText(moPaymentEntryDoc.getType());
+            jtfDocPaymentTypeRo.setText(moPaymentEntryDoc.getTypeDescription());
         }
         
         SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
@@ -1869,6 +1915,31 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
     }
     
+    private void renderAccConceptDocs(final erp.mtrn.data.cfd.SCfdPaymentEntry paymentEntry) {
+        boolean reset;
+        
+        if (paymentEntry == null) {
+            reset = true;
+            jtfAccConceptDocsRo.setText("");
+        }
+        else {
+            if (!paymentEntry.AuxConceptDocsCustom.isEmpty() && !paymentEntry.AuxConceptDocsCustom.equals(paymentEntry.AuxConceptDocs)) {
+                reset = false;
+                jtfAccConceptDocsRo.setText(paymentEntry.AuxConceptDocsCustom);
+            }
+            else {
+                reset = true;
+                jtfAccConceptDocsRo.setText(paymentEntry.AuxConceptDocs);
+                
+                paymentEntry.AuxConceptDocsCustom = "";
+            }
+        }
+        
+        jtfAccConceptDocsRo.setCaretPosition(0);
+        jtfAccConceptDocsRo.setBackground(reset ? moBackgroundDefaultColor : java.awt.Color.cyan);
+        jtfAccConceptDocsRo.setToolTipText(jtfAccConceptDocsRo.getText().isEmpty() ? CONCEPT_DOCS: jtfAccConceptDocsRo.getText());
+    }
+
     private void computePayAmountLocal() {
         jtfPayAmountLocalRo.setText(SLibUtils.getDecimalFormatAmount().format(moFieldPayAmount.getDouble() * moFieldPayExchangeRate.getDouble()));
     }
@@ -1892,6 +1963,28 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         
         computePayTotalPayments();
+    }
+    
+    private void computePayTotalPayments() {
+        double total = 0;
+        double totalLocal = 0;
+        
+        SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
+        
+        if (paymentEntry != null) {
+            paymentEntry.computeTotalPayments();
+            total = paymentEntry.AuxTotalPayments;
+            totalLocal = paymentEntry.AuxTotalPaymentsLocal;
+        }
+        
+        // payment's original currency:
+        jtfPayTotalPaymentsRo.setText(SLibUtils.getDecimalFormatAmount().format(total));
+        
+        // local currency:
+        jtfPayTotalPaymentsLocalRo.setText(SLibUtils.getDecimalFormatAmount().format(totalLocal));
+        
+        // accounting documents:
+        renderAccConceptDocs(paymentEntry);
     }
     
     private void computeVouTotal() {
@@ -1922,23 +2015,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfVouTotalLocalRo.setText(SLibUtils.getDecimalFormatAmount().format(totalLocal));
     }
 
-    private void computePayTotalPayments() {
-        double total = 0;
-        double totalLocal = 0;
-        
-        SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
-        
-        if (paymentEntry != null) {
-            paymentEntry.computeTotalPayments();
-            total = paymentEntry.AuxTotalPayments;
-            totalLocal = paymentEntry.AuxTotalPaymentsLocal;
-        }
-        
-        // payment's original currency:
-        jtfPayTotalPaymentsRo.setText(SLibUtils.getDecimalFormatAmount().format(total));
-        
-        // local currency:
-        jtfPayTotalPaymentsLocalRo.setText(SLibUtils.getDecimalFormatAmount().format(totalLocal));
+    private boolean isPayerForeign() {
+        return moDataRecBizPartner != null && moDataRecBizPartner.getFiscalId().equals(DCfdConsts.RFC_GEN_INT);
     }
 
     private void enableVouFields(final boolean enable) {
@@ -2004,43 +2082,78 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfPayOperation.setFocusable(enable);
         jbPayRecordPick.setEnabled(enable);
         jbPayRecordView.setEnabled(enable);
-        jtfPayAccountSrcFiscalId.setEditable(enable);
-        jtfPayAccountSrcFiscalId.setFocusable(enable);
-        jtfPayAccountSrcNumber.setEditable(enable);
-        jtfPayAccountSrcNumber.setFocusable(enable);
-        jtfPayAccountSrcEntity.setEditable(enable);
-        jtfPayAccountSrcEntity.setFocusable(enable);
-        jbPayAccountSrcPick.setEnabled(enable);
-        jtfPayAccountDesFiscalId.setEditable(false);
-        jtfPayAccountDesFiscalId.setFocusable(false);
-        jtfPayAccountDesNumber.setEditable(false);
-        jtfPayAccountDesNumber.setFocusable(false);
-        jcbPayAccountDes.setEnabled(enable);
-        jbPayAccountDesPick.setEnabled(enable);
         
+        updatePayPaymentWayFields();
         updatePayFactoringFields();
         updatePayCurrencyFields();
     }
     
+    private void updatePayPaymentWayFields() {
+        boolean enableSrc;
+        boolean enableSrcEntity;
+        boolean enableDest;
+        
+        if (!jcbPayPaymentWay.isEnabled() || jcbPayPaymentWay.getSelectedIndex() <= 0) {
+            enableSrc = false;
+            enableSrcEntity = false;
+            enableDest = false;
+        }
+        else {
+            String paymentWayCode = moFieldPayPaymentWay.getFieldValue().toString(); // convenience variable
+            enableSrc = !DCfdi33Utils.notRequiredAccountPayer(paymentWayCode);
+            enableSrcEntity = !DCfdi33Utils.notRequiredBankPayer(paymentWayCode) || isPayerForeign();
+            enableDest = !DCfdi33Utils.notRequiredAccountReceipt(paymentWayCode);
+        }
+        
+        jtfPayAccountSrcFiscalId.setEditable(enableSrc);
+        jtfPayAccountSrcFiscalId.setFocusable(enableSrc);
+        jtfPayAccountSrcNumber.setEditable(enableSrc);
+        jtfPayAccountSrcNumber.setFocusable(enableSrc);
+        jtfPayAccountSrcEntity.setEditable(enableSrcEntity);
+        jtfPayAccountSrcEntity.setFocusable(enableSrcEntity);
+        jbPayAccountSrcPick.setEnabled(enableSrc);
+        jtfPayAccountDestFiscalId.setEditable(false);
+        jtfPayAccountDestFiscalId.setFocusable(false);
+        jtfPayAccountDestNumber.setEditable(false);
+        jtfPayAccountDestNumber.setFocusable(false);
+        jcbPayAccountDest.setEnabled(enableDest);
+        jbPayAccountDestPick.setEnabled(enableDest);
+        
+        if (!enableSrc) {
+            moFieldPayAccountSrcFiscalId.resetField();
+            moFieldPayAccountSrcNumber.resetField();
+        }
+        
+        if (!enableSrcEntity) {
+            moFieldPayAccountSrcEntity.resetField();
+        }
+        
+        if (!enableDest) {
+            moFieldPayAccountDestFiscalId.resetField();
+            moFieldPayAccountDestNumber.resetField();
+            moFieldPayAccountDest.resetField();
+        }
+    }
+    
     private void updatePayFactoringFields() {
-        boolean activate = jckPayFactoring.isSelected() && jckPayFactoring.isEnabled();
+        boolean enable = jckPayFactoring.isEnabled() && jckPayFactoring.isSelected();
         
-        jcbPayFactoringBank.setEnabled(activate);
-        jrbPayFactoringPay.setEnabled(activate);
-        jrbPayFactoringFee.setEnabled(activate);
+        jcbPayFactoringBank.setEnabled(enable);
+        jrbPayFactoringPay.setEnabled(enable);
+        jrbPayFactoringFee.setEnabled(enable);
         
-        if (!activate) {
+        if (!enable) {
             jrbPayFactoringPay.setSelected(true);
             moFieldPayFactoringBank.resetField();
         }
     }
     
     private void updatePayCurrencyFields() {
-        boolean activate = jcbPayCurrency.isEnabled() && jcbPayCurrency.getSelectedIndex() > 0 && !miClient.getSession().getSessionCustom().isLocalCurrency(moFieldPayCurrency.getKeyAsIntArray());
+        boolean enable = jcbPayCurrency.isEnabled() && jcbPayCurrency.getSelectedIndex() > 0 && !miClient.getSession().getSessionCustom().isLocalCurrency(moFieldPayCurrency.getKeyAsIntArray());
         
-        jtfPayExchangeRate.setEditable(activate);
-        jtfPayExchangeRate.setFocusable(activate);
-        jbPayExchangeRatePick.setEnabled(activate);
+        jtfPayExchangeRate.setEditable(enable);
+        jtfPayExchangeRate.setFocusable(enable);
+        jbPayExchangeRatePick.setEnabled(enable);
     }
     
     private void enablePayControls(final boolean enable) {
@@ -2072,6 +2185,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbDocPaymentEntryDocOk.setEnabled(false);
         jbDocPaymentEntryDocCancel.setEnabled(false);
         jbDocPaymentEntryDocDelete.setEnabled(enable);
+        jbAccConceptDocsEdit.setEnabled(enable);
     }
     
     private void clearPayPayment(final boolean enableFields, final boolean enableControls) {
@@ -2226,6 +2340,15 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         miClient.getGuiDatePickerXXX().pickDate(moFieldPayDate.getDate(), moFieldPayDate);
     }
 
+    private void actionPerformedPayExchangeRatePick() {
+        double rate = miClient.pickExchangeRate(moFieldPayCurrency.getKeyAsIntArray()[0], moFieldPayDate.getDate());
+
+        if (rate != 0d) {
+            moFieldPayExchangeRate.setFieldValue(rate);
+            jtfPayExchangeRate.requestFocusInWindow();
+        }
+    }
+
     private void actionPerformedPayRecordPick() {
         moDialogPayRecordPicker.formReset();
         moDialogPayRecordPicker.setFilterKey(moFieldPayDate.getDate());
@@ -2251,16 +2374,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             miClient.getGuiModule(SDataConstants.MOD_FIN).showForm(SDataConstants.FINX_REC_RO, moDataPayRecord.getPrimaryKey());
         }
     }
-
-    private void actionPerformedPayExchangeRatePick() {
-        double rate = miClient.pickExchangeRate(moFieldPayCurrency.getKeyAsIntArray()[0], moFieldPayDate.getDate());
-
-        if (rate != 0d) {
-            moFieldPayExchangeRate.setFieldValue(rate);
-            jtfPayExchangeRate.requestFocusInWindow();
-        }
-    }
-
+    
     /**
      * Pick a bank account of headquarters of receiver.
      */
@@ -2281,12 +2395,17 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             moFieldPayAccountSrcNumber.setString(!bankAccount.getBankAccountNumberStd().isEmpty() ? bankAccount.getBankAccountNumberStd() : SLibUtils.textTrim(bankAccount.getBankAccountBranchNumber() + " " + bankAccount.getBankAccountNumber()));
             
             if (miClient.getSession().getSessionCustom().isLocalCountry(new int[] { bank.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getPkCountryId() })) {
-                moFieldPayAccountSrcEntity.resetField();
-                jtfPayAccountSrcNumber.requestFocusInWindow();
+                moFieldPayAccountSrcEntity.resetField(); // not required for local banks
             }
             else {
-                moFieldPayAccountSrcEntity.setString(bank.getBizPartner());
+                moFieldPayAccountSrcEntity.setString(bank.getBizPartner()); // required for foreign banks
+            }
+            
+            if (jtfPayAccountSrcEntity.isEditable()) {
                 jtfPayAccountSrcEntity.requestFocusInWindow();
+            }
+            else {
+                jtfPayAccountSrcNumber.requestFocusInWindow();
             }
         }
     }
@@ -2294,18 +2413,18 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     /**
      * Pick a bank account of current company branch of this CFDI.
      */
-    private void actionPerformedPayAccountDesPick() {
+    private void actionPerformedPayAccountDestPick() {
         SFormOptionPickerInterface picker = miClient.getOptionPicker(SDataConstants.FIN_ACC_CASH);
 
         picker.formReset();
         picker.setFilterKey(moDataComBranch.getPrimaryKey());
         picker.formRefreshOptionPane();
-        picker.setSelectedPrimaryKey(moFieldPayAccountDes.getKey());
+        picker.setSelectedPrimaryKey(moFieldPayAccountDest.getKey());
         picker.setFormVisible(true);
 
         if (picker.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            moFieldPayAccountDes.setKey(picker.getSelectedPrimaryKey());    // will throw an item-state-changed event
-            jcbPayAccountDes.requestFocusInWindow();
+            moFieldPayAccountDest.setKey(picker.getSelectedPrimaryKey());    // will throw an item-state-changed event
+            jcbPayAccountDest.requestFocusInWindow();
         }
     }
 
@@ -2321,12 +2440,16 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         // default date: session's current date:
         moFieldPayDate.setFieldValue(miClient.getSession().getCurrentDate());
+        
         // default hour: 12:00:
         moFieldPayTime.setFieldValue(new Date(miClient.getSession().getCurrentDate().getTime() + (1000 * 60 * 60 * 12)));
+        
         // customer's default payment way, if any:
         if (!moDataRecBizPartner.getDbmsCategorySettingsCus().getCfdiPaymentWay().equals(DCfdi33Catalogs.FDP_POR_DEF)) {
             moFieldPayPaymentWay.setFieldValue(moDataRecBizPartner.getDbmsCategorySettingsCus().getCfdiPaymentWay());
+            itemStateChangedPayPaymentWay();
         }
+        
         // customer/s default currency, if any:
         int currency = moDataRecBizPartner.getDbmsCategorySettingsCus().getFkCurrencyId_n();
         moFieldPayCurrency.setFieldValue(currency != SLibConstants.UNDEFINED ? new int[] { currency } : miClient.getSession().getSessionCustom().getLocalCurrencyKey());
@@ -2346,7 +2469,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 moPaneGridPayments.getTable().requestFocusInWindow();
             }
             else if (!paymentEntry.PaymentEntryDocs.isEmpty()) {
-                miClient.showMsgBoxWarning("El pago #" + paymentEntry.Number + " no debe tener aplicaciones para poderlo modificar.");
+                miClient.showMsgBoxWarning("El pago #" + paymentEntry.Number + " no debe tener documentos relacionados para poderlo modificar.");
                 moPaneGridPaymentDocs.getTable().requestFocusInWindow();
             }
             else {
@@ -2354,6 +2477,43 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 moPaymentEntry = paymentEntry;
                 moPaymentEntry.AuxGridIndex = moPaneGridPayments.getTable().getSelectedRow();
                 renderPayPaymentEntry();
+            }
+        }
+    }
+
+    private void actionPerformedPayPaymentEntryDelete() {
+        if (moPaneGridPayments.getSelectedTableRow() == null) {
+            miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_ROW);
+            moPaneGridPayments.getTable().requestFocusInWindow();
+        }
+        else if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
+            int index = moPaneGridPayments.getTable().getSelectedRow();
+            
+            try {
+                // remove current payment from grid of payments:
+                SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.removeTableRow(index);
+                releaseRecordLock(paymentEntry.DataRecord);
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+            finally {
+                // renumber all payments:
+                int number = 0;
+                for (STableRow row : moPaneGridPayments.getGridRows()) {
+                    SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) row;
+                    paymentEntry.Number = ++number;
+                    paymentEntry.prepareTableRow();
+                }
+                
+                // update grid of payments:
+                moPaneGridPayments.renderTableRows();
+                if (index >= moPaneGridPayments.getTableGuiRowCount()) {
+                    index = moPaneGridPayments.getTableGuiRowCount() - 1;
+                }
+                moPaneGridPayments.setTableRowSelection(index);
+                
+                computeVouTotal();
             }
         }
     }
@@ -2373,9 +2533,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         fields.add(moFieldPayAccountSrcFiscalId);
         fields.add(moFieldPayAccountSrcNumber);
         fields.add(moFieldPayAccountSrcEntity);
-        fields.add(moFieldPayAccountDesFiscalId);
-        fields.add(moFieldPayAccountDesNumber);
-        fields.add(moFieldPayAccountDes);
+        fields.add(moFieldPayAccountDestFiscalId);
+        fields.add(moFieldPayAccountDestNumber);
+        fields.add(moFieldPayAccountDest);
         
         for (SFormField field : fields) {
             if (!field.validateField()) {
@@ -2385,10 +2545,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
         }
         
+        String paymentWayCode = moFieldPayPaymentWay.getFieldValue().toString(); // convenience variable
+        int paymentCurrencyId = moFieldPayCurrency.getKeyAsIntArray()[0]; // convenience variable
+        
         if (valid) {
-            boolean isReceptorInt = moDataRecBizPartner.getFiscalId().equals(DCfdConsts.RFC_GEN_INT);
-            
-            if (moFieldPayPaymentWay.getFieldValue().toString().equals(DCfdi33Catalogs.FDP_POR_DEF)) {
+            if (paymentWayCode.equals(DCfdi33Catalogs.FDP_POR_DEF)) {
                 valid = false;
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlPayPaymentWay.getText() + "'.");
                 jcbPayPaymentWay.requestFocusInWindow();
@@ -2398,10 +2559,10 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jcbPayFactoringBank.getToolTipText() + "'.");
                 jcbPayFactoringBank.requestFocusInWindow();
             }
-            else if (jckPayFactoring.isSelected() && jrbPayFactoringFee.isSelected() && !moFieldPayPaymentWay.getFieldValue().toString().equals(DCfdi33Catalogs.FDP_COMPENSACION)) {
+            else if (jckPayFactoring.isSelected() && jrbPayFactoringFee.isSelected() && !paymentWayCode.equals(DCfdi33Catalogs.FDP_COMPENSACION)) {
                 valid = false;
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlPayPaymentWay.getText() + "'.\n"
-                        + "Se debe elegir la forma de pago '" + DCfdi33Catalogs.FDP_COMPENSACION + "'");
+                        + "Se debe elegir la opción '" + ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs().composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, DCfdi33Catalogs.FDP_COMPENSACION) + "'");
                 jcbPayPaymentWay.requestFocusInWindow();
             }
             else if (moDataPayRecord == null) {
@@ -2409,31 +2570,35 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlPayRecord.getText() + "'.");
                 jbPayRecordPick.requestFocusInWindow();
             }
-            else if (!moFieldPayAccountSrcFiscalId.getString().isEmpty() && moFieldPayAccountSrcFiscalId.getString().length() != SFinConsts.RFC_COM_LEN && !moFieldPayAccountSrcFiscalId.getString().equals(DCfdConsts.RFC_GEN_INT)) {
+            else if (!moFieldPayAccountSrcFiscalId.getString().isEmpty() && moFieldPayAccountSrcFiscalId.getString().length() != SFinConsts.LEN_RFC_ORG && !moFieldPayAccountSrcFiscalId.getString().equals(DCfdConsts.RFC_GEN_INT)) {
                 valid = false;
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + SGuiUtils.getLabelName(jlPayAccountFiscalId) + ", " + SGuiUtils.getLabelName(jlPayAccountSrc) + "':\n"
-                        + "debe ser de longitud " + SFinConsts.RFC_COM_LEN + " o '" + DCfdConsts.RFC_GEN_INT + "'.");
+                        + "debe ser de longitud " + SFinConsts.LEN_RFC_ORG + " o contener el valor '" + DCfdConsts.RFC_GEN_INT + "'.");
                 jtfPayAccountSrcFiscalId.requestFocusInWindow();
             }
-            else if (isReceptorInt && moFieldPayAccountSrcEntity.getString().isEmpty()) {
+            else if (isPayerForeign() && moFieldPayAccountSrcEntity.getString().isEmpty()) {
                 valid = false;
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlPayAccountEntity.getText() + "'.");
                 jtfPayAccountSrcEntity.requestFocusInWindow();
             }
-            else if (moDataPayAccountCash == null) {
+            else if (jcbPayAccountDest.isEnabled() && moDataPayAccountCashDest == null) {
                 valid = false;
-                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlPayAccountDes.getText() + "'.");
-                jcbPayAccountDes.requestFocusInWindow();
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlPayAccountDest.getText() + "'.");
+                jcbPayAccountDest.requestFocusInWindow();
             }
-            else if (moFieldPayCurrency.getKeyAsIntArray()[0] != moDataPayAccountCash.getFkCurrencyId() && miClient.showMsgBoxConfirm(
-                    "La moneda del pago no corresponde a la moneda de la cuenta beneficiaria.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+            else if (moDataPayAccountCashDest != null && moDataPayAccountCashDest.getFkCurrencyId() != paymentCurrencyId && miClient.showMsgBoxConfirm( "La moneda del pago ("
+                    + miClient.getSession().getSessionCustom().getCurrency(new int[] { paymentCurrencyId }) + ") "
+                    + "no corresponde a la moneda de la cuenta beneficiaria ("
+                    + miClient.getSession().getSessionCustom().getCurrency(new int[] { moDataPayAccountCashDest.getFkCurrencyId() }) + ").\n"
+                    + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
                 valid = false;
-                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlPayAccountDes.getText() + "'.");
-                jcbPayAccountDes.requestFocusInWindow();
+                miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlPayAccountDest.getText() + "'.");
+                jcbPayAccountDest.requestFocusInWindow();
             }
             else {
                 if (jckPayFactoring.isSelected()) {
                     factoringBank = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldPayFactoringBank.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+                    
                     if (factoringBank == null) {
                         valid = false;
                         miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "'" + jcbPayFactoringBank.getToolTipText() + "'.\n");
@@ -2444,9 +2609,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                         miClient.showMsgBoxWarning("El RFC de " + jcbPayFactoringBank.getToolTipText() + " está vacio.");
                         jcbPayFactoringBank.requestFocusInWindow();
                     }
-                    else if (factoringBank.getFiscalId().length() != SFinConsts.RFC_COM_LEN) {
+                    else if (factoringBank.getFiscalId().length() != SFinConsts.LEN_RFC_ORG) {
                         valid = false;
-                        miClient.showMsgBoxWarning("El RFC de " + jcbPayFactoringBank.getToolTipText() + " (" + factoringBank.getFiscalId() + ") debe ser de longitud " + SFinConsts.RFC_COM_LEN + ".");
+                        miClient.showMsgBoxWarning("El RFC de " + jcbPayFactoringBank.getToolTipText() + " (" + factoringBank.getFiscalId() + ") debe ser de longitud " + SFinConsts.LEN_RFC_ORG + ".");
                         jcbPayFactoringBank.requestFocusInWindow();
                     }
                 }
@@ -2464,28 +2629,29 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             gcDate.add(Calendar.MINUTE, gcHour.get(Calendar.MINUTE));
             gcDate.add(Calendar.SECOND, gcHour.get(Calendar.SECOND));
             
-            int type;
+            int paymentEntryType;
             
-            if (!jckPayFactoring.isSelected()) {
-                type = SCfdPaymentEntry.TYPE_STANDARD;
-            }
-            else {
+            if (jckPayFactoring.isSelected()) {
                 if (jrbPayFactoringPay.isSelected()) {
-                    type = SCfdPaymentEntry.TYPE_FACTORING_PAY;
+                    paymentEntryType = SCfdPaymentEntry.TYPE_FACTORING_PAY;
                 }
                 else {
-                    type = SCfdPaymentEntry.TYPE_FACTORING_FEE;
+                    paymentEntryType = SCfdPaymentEntry.TYPE_FACTORING_FEE;
                 }
+            }
+            else {
+                paymentEntryType = SCfdPaymentEntry.TYPE_STANDARD;
             }
             
             if (isNew) {
                 // adding payment...
+                
                 moPaymentEntry = new SCfdPaymentEntry(
                         moPaneGridPayments.getTable().getRowCount() + 1, 
-                        type, 
+                        paymentEntryType, 
                         gcDate.getTime(), 
-                        moFieldPayPaymentWay.getFieldValue().toString(), 
-                        moFieldPayCurrency.getKeyAsIntArray()[0], 
+                        paymentWayCode, 
+                        paymentCurrencyId, 
                         ((SFormComponentItem) jcbPayCurrency.getSelectedItem()).getComplement().toString(), 
                         moFieldPayAmount.getDouble(), 
                         moFieldPayExchangeRate.getDouble(), 
@@ -2494,11 +2660,12 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
             else {
                 // modifying payment...
+                
                 //moPaymentEntry.Number
-                moPaymentEntry.Type = type;
+                moPaymentEntry.Type = paymentEntryType;
                 moPaymentEntry.Date = gcDate.getTime();
-                moPaymentEntry.PaymentWay = moFieldPayPaymentWay.getFieldValue().toString();
-                moPaymentEntry.CurrencyId = moFieldPayCurrency.getKeyAsIntArray()[0];
+                moPaymentEntry.PaymentWay = paymentWayCode;
+                moPaymentEntry.CurrencyId = paymentCurrencyId;
                 moPaymentEntry.CurrencyKey = ((SFormComponentItem) jcbPayCurrency.getSelectedItem()).getComplement().toString();
                 moPaymentEntry.Amount = moFieldPayAmount.getDouble();
                 moPaymentEntry.ExchangeRate = moFieldPayExchangeRate.getDouble();
@@ -2530,15 +2697,15 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
             
             if (DCfdi33Utils.notRequiredAccountReceipt(moPaymentEntry.PaymentWay)) {
-                moPaymentEntry.AccountDesFiscalId = "";
-                moPaymentEntry.AccountDesNumber = "";
+                moPaymentEntry.AccountDestFiscalId = "";
+                moPaymentEntry.AccountDestNumber = "";
+                moPaymentEntry.AccountDestKey = null;
             }
             else {
-                moPaymentEntry.AccountDesFiscalId = moFieldPayAccountDesFiscalId.getString().length() != SFinConsts.RFC_COM_LEN ? "" : moFieldPayAccountDesFiscalId.getString();
-                moPaymentEntry.AccountDesNumber = moFieldPayAccountDesNumber.getString();
+                moPaymentEntry.AccountDestFiscalId = moFieldPayAccountDestFiscalId.getString().length() != SFinConsts.LEN_RFC_ORG ? "" : moFieldPayAccountDestFiscalId.getString();
+                moPaymentEntry.AccountDestNumber = moFieldPayAccountDestNumber.getString();
+                moPaymentEntry.AccountDestKey = moFieldPayAccountDest.getKeyAsIntArray();
             }
-            
-            moPaymentEntry.AccountDesKey = moFieldPayAccountDes.getKeyAsIntArray();
             
             if (factoringBank == null) {
                 moPaymentEntry.AuxFactoringBankId = 0;
@@ -2577,43 +2744,6 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbPayPaymentEntryAdd.requestFocusInWindow();
         
         valueChangedPayments(); // to force showing of currency of payment in doc fields
-    }
-
-    private void actionPerformedPayPaymentEntryDelete() {
-        if (moPaneGridPayments.getSelectedTableRow() == null) {
-            miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_ROW);
-            moPaneGridPayments.getTable().requestFocusInWindow();
-        }
-        else if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
-            int index = moPaneGridPayments.getTable().getSelectedRow();
-            
-            try {
-                // remove current payment from grid of payments:
-                SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.removeTableRow(index);
-                releaseRecordLock(paymentEntry.DataRecord);
-            }
-            catch (Exception e) {
-                SLibUtils.showException(this, e);
-            }
-            finally {
-                // renumber all payments:
-                int number = 0;
-                for (STableRow row : moPaneGridPayments.getGridRows()) {
-                    SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) row;
-                    paymentEntry.Number = ++number;
-                    paymentEntry.prepareTableRow();
-                }
-                
-                // update grid of payments:
-                moPaneGridPayments.renderTableRows();
-                if (index >= moPaneGridPayments.getTableGuiRowCount()) {
-                    index = moPaneGridPayments.getTableGuiRowCount() - 1;
-                }
-                moPaneGridPayments.setTableRowSelection(index);
-                
-                computeVouTotal();
-            }
-        }
     }
 
     /**
@@ -2809,6 +2939,44 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
     }
 
+    private void actionPerformedDocPaymentEntryDocDelete() {
+        if (jbDocPaymentEntryDocDelete.isEnabled()) {
+            SCfdPaymentEntryDoc paymentEntryDoc = (SCfdPaymentEntryDoc) moPaneGridPaymentDocs.getSelectedTableRow();
+            
+            if (paymentEntryDoc == null) {
+                miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_ROW);
+                moPaneGridPaymentDocs.getTable().requestFocusInWindow();
+            }
+            else if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
+                int index = moPaneGridPaymentDocs.getTable().getSelectedRow();
+
+                // remove current doc from grid of docs:
+                moPaneGridPaymentDocs.removeTableRow(index);
+
+                // remove current doc from current payment:
+                SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
+                paymentEntry.PaymentEntryDocs.remove(paymentEntryDoc);
+
+                // renumber all docs:
+                int number = 0;
+                for (STableRow row : moPaneGridPaymentDocs.getGridRows()) {
+                    SCfdPaymentEntryDoc doc = (SCfdPaymentEntryDoc) row;
+                    doc.Number = ++number;
+                    doc.prepareTableRow();
+                }
+
+                // update grid of docs:
+                moPaneGridPaymentDocs.renderTableRows();
+                if (index >= moPaneGridPaymentDocs.getTable().getRowCount()) {
+                    index = moPaneGridPaymentDocs.getTable().getRowCount() - 1;
+                }
+                moPaneGridPaymentDocs.setTableRowSelection(index);
+
+                computePayTotalPayments();
+            }
+        }
+    }
+
     private void actionPerformedDocPaymentEntryDocOk() {
         boolean valid = true;
         
@@ -2914,6 +3082,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 paymentEntry.PaymentEntryDocs.set(moPaymentEntryDoc.AuxGridIndex, moPaymentEntryDoc);
             }
             
+            paymentEntry.AuxConceptDocsCustom = ""; // reset customized document numbers
+            
             computePayTotalPayments();
             actionPerformedDocPaymentEntryDocCancel();
         }
@@ -2930,40 +3100,33 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jbDocPaymentEntryDocAdd.requestFocusInWindow();
     }
 
-    private void actionPerformedDocPaymentEntryDocDelete() {
-        if (jbDocPaymentEntryDocDelete.isEnabled()) {
-            SCfdPaymentEntryDoc paymentEntryDoc = (SCfdPaymentEntryDoc) moPaneGridPaymentDocs.getSelectedTableRow();
+    private void actionPerformedAccConceptDocsEdit() {
+        if (jbAccConceptDocsEdit.isEnabled()) {
+            SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
             
-            if (paymentEntryDoc == null) {
+            if (paymentEntry == null) {
                 miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_ROW);
-                moPaneGridPaymentDocs.getTable().requestFocusInWindow();
+                moPaneGridPayments.getTable().requestFocusInWindow();
             }
-            else if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
-                int index = moPaneGridPaymentDocs.getTable().getSelectedRow();
+            else {
+                String old = paymentEntry.AuxConceptDocsCustom;
+                
+                Object option = JOptionPane.showInputDialog(rootPane, 
+                            "Especificar folios de " + CONCEPT_DOCS.toLowerCase() + ":\n(Dejar en blanco para restaurar valor predeterminado)", CONCEPT_DOCS, 
+                            JOptionPane.PLAIN_MESSAGE, null, null, paymentEntry.getConceptDocs());
+                
+                if (option != null) {
+                    paymentEntry.AuxConceptDocsCustom = option.toString().toUpperCase();
 
-                // remove current doc from grid of docs:
-                moPaneGridPaymentDocs.removeTableRow(index);
+                    renderAccConceptDocs(paymentEntry);
 
-                // remove current doc from current payment:
-                SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) moPaneGridPayments.getSelectedTableRow();
-                paymentEntry.PaymentEntryDocs.remove(paymentEntryDoc);
-
-                // renumber all docs:
-                int number = 0;
-                for (STableRow row : moPaneGridPaymentDocs.getGridRows()) {
-                    SCfdPaymentEntryDoc doc = (SCfdPaymentEntryDoc) row;
-                    doc.Number = ++number;
-                    doc.prepareTableRow();
+                    if (!old.equals(paymentEntry.AuxConceptDocsCustom)) {
+                        paymentEntry.prepareTableRow();
+                        int index = moPaneGridPayments.getTable().getSelectedRow();
+                        moPaneGridPayments.renderTableRows(); // show edition
+                        moPaneGridPayments.setTableRowSelection(index);
+                    }
                 }
-
-                // update grid of docs:
-                moPaneGridPaymentDocs.renderTableRows();
-                if (index >= moPaneGridPaymentDocs.getTable().getRowCount()) {
-                    index = moPaneGridPaymentDocs.getTable().getRowCount() - 1;
-                }
-                moPaneGridPaymentDocs.setTableRowSelection(index);
-
-                computePayTotalPayments();
             }
         }
     }
@@ -3038,7 +3201,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     }
 
     private void itemStateChangedPayPaymentWay() {
-        
+        updatePayPaymentWayFields();
     }
 
     private void itemStateChangedPayCurrency() {
@@ -3066,27 +3229,27 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
         }
         
-        jtfDocExchangeRateCurRo.setText(""); // allways clear doc exchange rate when payment currency is  changing
+        jtfDocExchangeRateCurRo.setText(""); // allways clear doc exchange rate when payment currency is changing
         
         updatePayCurrencyFields();
         computePayAmountLocal();
     }
 
-    private void itemStateChangedPayAccountDes() {
-        if (jcbPayAccountDes.getSelectedIndex() <= 0) {
-            moDataPayAccountCash = null;
+    private void itemStateChangedPayAccountDest() {
+        if (jcbPayAccountDest.getSelectedIndex() <= 0) {
+            moDataPayAccountCashDest = null;
             
-            moFieldPayAccountDesFiscalId.resetField();
-            moFieldPayAccountDesNumber.resetField();
+            moFieldPayAccountDestFiscalId.resetField();
+            moFieldPayAccountDestNumber.resetField();
         }
         else {
-            moDataPayAccountCash = (SDataAccountCash) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC_CASH, moFieldPayAccountDes.getKey(), SLibConstants.EXEC_MODE_VERBOSE);
+            moDataPayAccountCashDest = (SDataAccountCash) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC_CASH, moFieldPayAccountDest.getKey(), SLibConstants.EXEC_MODE_VERBOSE);
             String fiscalId = "";
             String number = "";
             
-            if (moDataPayAccountCash.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_BANK) {
+            if (moDataPayAccountCashDest.getFkAccountCashCategoryId() == SDataConstantsSys.FINS_CT_ACC_CASH_BANK) {
                 SDataBizPartnerBranchBankAccount bankAccount = (SDataBizPartnerBranchBankAccount) SDataUtilities.readRegistry(
-                        miClient, SDataConstants.BPSU_BANK_ACC, new int[] { moDataPayAccountCash.getFkBizPartnerBranchId_n(), moDataPayAccountCash.getFkBankAccountId_n() }, SLibConstants.EXEC_MODE_VERBOSE);
+                        miClient, SDataConstants.BPSU_BANK_ACC, new int[] { moDataPayAccountCashDest.getFkBizPartnerBranchId_n(), moDataPayAccountCashDest.getFkBankAccountId_n() }, SLibConstants.EXEC_MODE_VERBOSE);
                 SDataBizPartner bank = (SDataBizPartner) SDataUtilities.readRegistry(
                         miClient, SDataConstants.BPSU_BP, new int[] { bankAccount.getFkBankId() }, SLibConstants.EXEC_MODE_VERBOSE);
                 
@@ -3094,8 +3257,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 number = !bankAccount.getBankAccountNumberStd().isEmpty() ? bankAccount.getBankAccountNumberStd() : SLibUtils.textTrim(bankAccount.getBankAccountBranchNumber() + " " + bankAccount.getBankAccountNumber());
             }
             
-            moFieldPayAccountDesFiscalId.setString(fiscalId);
-            moFieldPayAccountDesNumber.setString(number);
+            moFieldPayAccountDestFiscalId.setString(fiscalId);
+            moFieldPayAccountDestNumber.setString(number);
         }
     }
     
@@ -3149,8 +3312,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgFactoring;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -3159,14 +3322,15 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
-    private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel29;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
@@ -3177,14 +3341,15 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel39;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel40;
     private javax.swing.JPanel jPanel41;
     private javax.swing.JPanel jPanel42;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JButton jbAccConceptDocsEdit;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbDocDpsRelatedPickAll;
     private javax.swing.JButton jbDocDpsRelatedPickPend;
@@ -3196,7 +3361,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JButton jbDocPaymentEntryDocModify;
     private javax.swing.JButton jbDocPaymentEntryDocOk;
     private javax.swing.JButton jbOk;
-    private javax.swing.JButton jbPayAccountDesPick;
+    private javax.swing.JButton jbPayAccountDestPick;
     private javax.swing.JButton jbPayAccountSrcPick;
     private javax.swing.JButton jbPayDatePick;
     private javax.swing.JButton jbPayExchangeRatePick;
@@ -3214,7 +3379,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JButton jbVouDatePick;
     private javax.swing.JButton jbVouNext;
     private javax.swing.JButton jbVouResume;
-    private javax.swing.JComboBox<SFormComponentItem> jcbPayAccountDes;
+    private javax.swing.JComboBox<SFormComponentItem> jcbPayAccountDest;
     private javax.swing.JComboBox jcbPayCurrency;
     private javax.swing.JComboBox<SFormComponentItem> jcbPayFactoringBank;
     private javax.swing.JComboBox jcbPayPaymentWay;
@@ -3234,7 +3399,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlDocPayment;
     private javax.swing.JLabel jlDocPaymentMethod;
     private javax.swing.JLabel jlDocPaymentType;
-    private javax.swing.JLabel jlPayAccountDes;
+    private javax.swing.JLabel jlPayAccount;
+    private javax.swing.JLabel jlPayAccountDest;
     private javax.swing.JLabel jlPayAccountEntity;
     private javax.swing.JLabel jlPayAccountFiscalId;
     private javax.swing.JLabel jlPayAccountNumber;
@@ -3259,20 +3425,23 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JLabel jlVouNumber;
     private javax.swing.JLabel jlVouTaxRegime;
     private javax.swing.JLabel jlVouTotal;
+    private javax.swing.JPanel jpAccountingConcept;
     private javax.swing.JPanel jpControls;
-    private javax.swing.JPanel jpDocs;
-    private javax.swing.JPanel jpDocsTotals;
-    private javax.swing.JPanel jpPays;
-    private javax.swing.JPanel jpPaysTotals;
+    private javax.swing.JPanel jpDialog;
+    private javax.swing.JPanel jpDocument;
+    private javax.swing.JPanel jpDocuments;
+    private javax.swing.JPanel jpPayment;
+    private javax.swing.JPanel jpPaymentTotals;
+    private javax.swing.JPanel jpPayments;
     private javax.swing.JPanel jpRegistry;
-    private javax.swing.JPanel jpRegistryHead;
-    private javax.swing.JPanel jpRegistryHeadRec;
-    private javax.swing.JPanel jpRegistryHeadVou;
+    private javax.swing.JPanel jpRegistryReceptor;
     private javax.swing.JPanel jpRegistryRows;
-    private javax.swing.JPanel jpRegistryRowsDocs;
-    private javax.swing.JPanel jpRegistryRowsPays;
+    private javax.swing.JPanel jpRegistryVoucher;
+    private javax.swing.JPanel jpVoucherTotals;
     private javax.swing.JRadioButton jrbPayFactoringFee;
     private javax.swing.JRadioButton jrbPayFactoringPay;
+    private javax.swing.JTextField jtfAccConceptDocsRo;
+    private javax.swing.JTextField jtfAccConceptPrefixRo;
     private javax.swing.JTextField jtfDocCurrencyRo;
     private javax.swing.JTextField jtfDocDocBalancePend;
     private javax.swing.JTextField jtfDocDocBalancePendCurRo;
@@ -3294,8 +3463,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     private javax.swing.JTextField jtfDocPayPaymentRo;
     private javax.swing.JTextField jtfDocPaymentMethodRo;
     private javax.swing.JTextField jtfDocPaymentTypeRo;
-    private javax.swing.JTextField jtfPayAccountDesFiscalId;
-    private javax.swing.JTextField jtfPayAccountDesNumber;
+    private javax.swing.JTextField jtfPayAccountDestFiscalId;
+    private javax.swing.JTextField jtfPayAccountDestNumber;
     private javax.swing.JTextField jtfPayAccountSrcEntity;
     private javax.swing.JTextField jtfPayAccountSrcFiscalId;
     private javax.swing.JTextField jtfPayAccountSrcNumber;
@@ -3386,7 +3555,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         msRecCfdRelatedUuidOnFocusGained = "";
         
         moDataPayRecord = null;
-        moDataPayAccountCash = null;
+        moDataPayAccountCashDest = null;
         moDataDocDpsRelated = null;
         moPaymentEntry = null;
         moPaymentEntryDoc = null;
@@ -3397,6 +3566,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moPaneGridPaymentDocs.clearTableRows();
         
         msXmlRelationType = "";
+        moBackgroundDefaultColor = jtfAccConceptDocsRo.getBackground();
         moRecordLocksMap = new HashMap<>();
 
         for (int i = 0; i < mvFields.size(); i++) {
@@ -3445,11 +3615,13 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         if (!validation.getIsError()) {
             if (mbEditingPaymentEntry) {
-                validation.setMessage("La captura de un pago está en proceso, se debe aceptar o cancelar.");
+                validation.setMessage("La captura de un pago está en proceso.\n"
+                        + "Se debe aceptar o cancelar antes de guardar este comprobante.");
                 validation.setComponent(jbPayPaymentEntryCancel);
             }
             else if (mbEditingPaymentEntryDoc) {
-                validation.setMessage("La captura de un pago a un documento está en proceso, se debe aceptar o cancelar.");
+                validation.setMessage("La captura de un pago a un documento relacionado está en proceso.\n"
+                        + "Se debe aceptar o cancelar antes de guardar este comprobante.");
                 validation.setComponent(jbDocPaymentEntryDocCancel);
             }
             else if (!SDataUtilities.isPeriodOpen(miClient, moFieldVouDate.getDate())) {
@@ -3457,9 +3629,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 validation.setComponent(jftVouDate.isEditable() ? jftVouDate : jbVouResume);
             }
             else if (moPaneGridPayments.getTable().getRowCount() == 0 && miClient.showMsgBoxConfirm(
-                    "El comprobante no tiene pagos.\n"
+                    "El comprobante no tiene pagos a documentos relacionados.\n"
                     + SLibConstants.MSG_CNF_MSG_CONT) != JOptionPane.YES_OPTION) {
-                validation.setMessage("El comprobante debe tener pagos.");
+                validation.setMessage("El comprobante debe tener pagos a documentos relacionados.");
                 validation.setComponent(moPaneGridPayments.getTable());
             }
             else {
@@ -3481,8 +3653,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                             moPaneGridPayments.setTableRowSelection(index);
                             break;
                         }
-                        else if (paymentEntry.AuxFactoringBankFiscalId.length() != SFinConsts.RFC_COM_LEN) {
-                            validation.setMessage("En el pago #" + paymentEntry.Number + " el RFC de " + jcbPayFactoringBank.getToolTipText() + " (" + paymentEntry.AuxFactoringBankFiscalId + ") debe ser de longitud " + SFinConsts.RFC_COM_LEN + ".");
+                        else if (paymentEntry.AuxFactoringBankFiscalId.length() != SFinConsts.LEN_RFC_ORG) {
+                            validation.setMessage("En el pago #" + paymentEntry.Number + " el RFC de " + jcbPayFactoringBank.getToolTipText() + " (" + paymentEntry.AuxFactoringBankFiscalId + ") debe ser de longitud " + SFinConsts.LEN_RFC_ORG + ".");
                             validation.setComponent(jcbPayFactoringBank);
                             moPaneGridPayments.setTableRowSelection(index);
                             break;
@@ -3536,11 +3708,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                 */
 
                                 message = "En el pago #" + paymentEntry.Number + " "
-                                        + "la suma de los importes pagados en la moneda propia DEL PAGO $ "
-                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + currency + "\n"
-                                        + "es MAYOR que el monto del pago en la moneda propia DEL PAGO $ "
+                                        + "el total de pagos a documentos relacionados en la moneda del pago (" + currency + "), $"
+                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + currency + ",\n"
+                                        + "es MAYOR que el monto del pago mismo $"
                                         + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + currency + " "
-                                        + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPayments - paymentEntry.Amount)) + " " + currency + ".";
+                                        + "por $" + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPayments - paymentEntry.Amount)) + " " + currency + ".";
 
                                 validation.setMessage(message);
                                 validation.setComponent(moPaneGridPayments.getTable());
@@ -3553,11 +3725,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                 */
 
                                 confirm = "En el pago #" + paymentEntry.Number + " "
-                                        + "la suma de los importes pagados en la moneda propia DEL PAGO $ "
-                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + currency + "\n"
-                                        + "es MENOR que el monto del pago en la moneda propia DEL PAGO $ "
+                                        + "el total de pagos a documentos relacionados en la moneda del pago (" + currency + "), $"
+                                        + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPayments) + " " + currency + ",\n"
+                                        + "es MENOR que el monto del pago mismo en la moneda del pago $"
                                         + SLibUtils.getDecimalFormatAmount().format(paymentEntry.Amount) + " " + currency + " "
-                                        + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPayments - paymentEntry.Amount)) + " " + currency + ".\n"
+                                        + "por $" + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPayments - paymentEntry.Amount)) + " " + currency + ".\n"
                                         + "¡ADVERTENCIA: Será necesario cuadrar manualmente la contabilización de este pago!\n"
                                         + SLibConstants.MSG_CNF_MSG_CONT;
 
@@ -3565,7 +3737,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                     paymentEntry.AuxAllowTotalPaymentsLessThanAmount = true;
                                 }
                                 else {
-                                    message = "Modificar los importes pagados en la moneda propia DEL PAGO (" + currency + ") a los documentos relacionados del pago #" + paymentEntry.Number + ".";
+                                    message = "Modificar los pagos a los documentos relacionados del pago #" + paymentEntry.Number + " en la moneda del pago (" + currency + ").";
 
                                     validation.setMessage(message);
                                     validation.setComponent(moPaneGridPayments.getTable());
@@ -3600,11 +3772,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                         */
 
                                         confirm = "En el pago #" + paymentEntry.Number + " "
-                                                + "la suma de importes pagados en la moneda LOCAL $ "
-                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + currency + "\n"
-                                                + "es MAYOR que el monto del pago en la moneda LOCAL $ "
+                                                + "el total de pagos a documentos relacionados en la moneda local (" + currency + "), $"
+                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + currency + ",\n"
+                                                + "es MAYOR que el monto del pago mismo en la moneda local $"
                                                 + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + currency + " "
-                                                + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal)) + " " + currency + "\n."
+                                                + "por $" + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal)) + " " + currency + "\n."
                                                 + "!ADVERTENCIA: "
                                                 + (paymentEntry.isAmountTotallyApplied() ?
                                                     "Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n" :
@@ -3615,7 +3787,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                             paymentEntry.AuxAllowTotalPaymentsLocalGreaterThanAmountLocal = true;
                                         }
                                         else {
-                                            message = "Modificar los importes pagados en la moneda LOCAL (" + currency + ") a los documentos relacionados del pago #" + paymentEntry.Number + ".";
+                                            message = "Modificar los pagos a los documentos relacionados del pago #" + paymentEntry.Number + " en la moneda local (" + currency + ").";
 
                                             validation.setMessage(message);
                                             validation.setComponent(moPaneGridPayments.getTable());
@@ -3629,11 +3801,11 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                         */
 
                                         confirm = "En el pago #" + paymentEntry.Number + " "
-                                                + "la suma de importes pagados en la moneda LOCAL $ "
-                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + currency + "\n"
-                                                + "es MENOR que el monto del pago en la moneda LOCAL $ "
+                                                + "el total de pagos a documentos relacionados en la moneda local (" + currency + "), $"
+                                                + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AuxTotalPaymentsLocal) + " " + currency + ",\n"
+                                                + "es MENOR que el monto del pago mismo en la moneda local $"
                                                 + SLibUtils.getDecimalFormatAmount().format(paymentEntry.AmountLocal) + " " + currency + " "
-                                                + "por $ " + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal)) + " " + currency + "\n."
+                                                + "por $" + SLibUtils.getDecimalFormatAmountUnitary().format(Math.abs(paymentEntry.AuxTotalPaymentsLocal - paymentEntry.AmountLocal)) + " " + currency + "\n."
                                                 + "!ADVERTENCIA: "
                                                 + (paymentEntry.isAmountTotallyApplied() ?
                                                     "Se agregará un ajuste contable para compensar esta diferencia cambiaria!\n" :
@@ -3644,7 +3816,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                             paymentEntry.AuxAllowTotalPaymentsLocalLessThanAmountLocal = true;
                                         }
                                         else {
-                                            message = "Modificar los importes pagados en la moneda LOCAL (" + currency + ") a los documentos relacionados del pago #" + paymentEntry.Number + ".";
+                                            message = "Modificar los pagos a los documentos relacionados del pago #" + paymentEntry.Number + " en la moneda local (" + currency + ").";
 
                                             validation.setMessage(message);
                                             validation.setComponent(moPaneGridPayments.getTable());
@@ -3654,6 +3826,21 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                                     }
                                 }
                             }
+                        }
+                    }
+                    
+                    //Warn user about manual accounting required for payments without associated bank account:
+                    
+                    if (paymentEntry.AccountDestKey == null) {
+                        SCfdXmlCatalogs xmlCatalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
+                        String message = "La forma de pago del pago #" + paymentEntry.Number + ", '" + xmlCatalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY, paymentEntry.PaymentWay) + "', no requiere de cuenta bancaria.\n"
+                                + "¡ADVERTENCIA: Será necesario cuadrar manualmente la contabilización de este pago!\n"
+                                + SLibConstants.MSG_CNF_MSG_CONT;
+                        if (miClient.showMsgBoxConfirm(message) != JOptionPane.YES_OPTION) {
+                            validation.setMessage("En el pago #" + paymentEntry.Number + " " + SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF.toLowerCase() + "'" + jlPayPaymentWay.getText() + "'");
+                            validation.setComponent(moPaneGridPayments.getTable());
+                            moPaneGridPayments.setTableRowSelection(index);
+                            break;
                         }
                     }
                     
@@ -3677,9 +3864,32 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             }
         }
         
+        // process journal voucher movements:
+        if (!validation.getIsError()) {
+            int index = 0;
+            SDataCfdPayment dummyPayment = new SDataCfdPayment();
+            dummyPayment.setAuxCfdDbmsDataReceptor(moDataRecBizPartner);
+            
+            try {
+                for (STableRow row : moPaneGridPayments.getGridRows()) {
+                    SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) row;
+                    paymentEntry.DataParentPayment = dummyPayment;
+                    paymentEntry.processRecord(miClient.getSession()); // very important to process journal voucher entries, to do the accounting!
+                    index++;
+                }
+            }
+            catch (Exception e) {
+                SLibUtils.printException(this, e);
+                
+                validation.setMessage(e.getMessage());
+                validation.setComponent(moPaneGridPayments.getTable());
+                moPaneGridPayments.setTableRowSelection(index);
+            }
+        }
+        
         if (!validation.getIsError() && moDataCfdPayment != null && !moDataCfdPayment.getIsRegistryNew()) {
-            if (miClient.showMsgBoxConfirm("La contabilización actual del CFDI será descartada y reemplazada de acuerdo a sus datos actuales.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                validation.setMessage("Favor de verificar si los datos actuales del CFDI son correctos.");
+            if (miClient.showMsgBoxConfirm("La contabilización previa del CFDI será descartada y reemplazada de acuerdo a sus datos actuales.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                validation.setMessage("Asegurarse que los datos actuales del CFDI son correctos.");
                 validation.setComponent(jbCancel);
             }
         }
@@ -3712,6 +3922,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moDataCfdPayment = (SDataCfdPayment) registry;
         SDataCfd cfd = moDataCfdPayment.getDbmsDataCfd();
         
+        // set voucher fields:
+        
         jtfVouNumberRo.setText(cfd.getCfdNumber());
         jtfVouNumberRo.setCaretPosition(0);
         
@@ -3729,7 +3941,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         jtfVouStatusRo.setCaretPosition(0);
         
         moDataComBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { moDataCfdPayment.getDbmsDataCfd().getFkCompanyBranchId_n()}, SLibConstants.EXEC_MODE_VERBOSE);
-        SFormUtilities.populateComboBox(miClient, jcbPayAccountDes, SDataConstants.FIN_ACC_CASH, new int[] { moDataComBranch.getPkBizPartnerBranchId() });
+        SFormUtilities.populateComboBox(miClient, jcbPayAccountDest, SDataConstants.FIN_ACC_CASH, new int[] { moDataComBranch.getPkBizPartnerBranchId() });
         renderComBranch();
         
         moFieldVouTaxRegime.setFieldValue(moDataCfdPayment.getEmisorRegimenFiscal());
@@ -3746,15 +3958,18 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         moFieldRecCfdiUse.setFieldValue(moDataCfdPayment.getReceptorUsoCFDI());
         
+        actionPerformedVouNext(false);
+        
+        // add payment entries:
+        
         for (SCfdPaymentEntry entry : moDataCfdPayment.getAuxCfdPaymentEntries()) {
             moPaneGridPayments.addTableRow(entry);
         }
         moPaneGridPayments.renderTableRows();
         moPaneGridPayments.setTableRowSelection(0);
+        
         computeVouTotal();
         valueChangedPayments();
-        
-        actionPerformedVouNext(false);
         
         if (!SDataUtilities.isPeriodOpen(miClient, cfd.getTimestamp()) || !cfd.getUuid().isEmpty()) {
             mbIsFormReadOnly = true;
@@ -3869,16 +4084,17 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         
         try {
             if (!moDataCfdPayment.getIsRegistryNew()) {
-                // NOTE: This is very seldom, no data updates made in Client, but are necessary due to tax calculations in invoices payments:
+                // NOTE: This is very seldom to occur, no data updates made in Client, but are necessary due to tax calculations in invoices payments:
                 moDataCfdPayment.deleteRecordFin(miClient.getSession().getStatement().getConnection());
             }
             
+            // add payment entries:
             moDataCfdPayment.getAuxCfdPaymentEntries().clear();
             for (STableRow row : moPaneGridPayments.getGridRows()) {
-                SCfdPaymentEntry entry = (SCfdPaymentEntry) row;
-                entry.DataParentPayment = moDataCfdPayment;
-                entry.processRecord(miClient.getSession()); // very important to process journal voucher entries, to do the accounting!
-                moDataCfdPayment.getAuxCfdPaymentEntries().add(entry);
+                SCfdPaymentEntry paymentEntry = (SCfdPaymentEntry) row;
+                paymentEntry.DataParentPayment = moDataCfdPayment;
+                paymentEntry.processRecord(miClient.getSession()); // very important to process journal voucher entries, to do the accounting!
+                moDataCfdPayment.getAuxCfdPaymentEntries().add(paymentEntry);
             }
         }
         catch (Exception e) {
@@ -3943,20 +4159,20 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             else if (button == jbPayDatePick) {
                 actionPerformedPayDatePick();
             }
+            else if (button == jbPayExchangeRatePick) {
+                actionPerformedPayExchangeRatePick();
+            }
             else if (button == jbPayRecordPick) {
                 actionPerformedPayRecordPick();
             }
             else if (button == jbPayRecordView) {
                 actionPerformedPayRecordView();
             }
-            else if (button == jbPayExchangeRatePick) {
-                actionPerformedPayExchangeRatePick();
-            }
             else if (button == jbPayAccountSrcPick) {
                 actionPerformedPayAccountSrcPick();
             }
-            else if (button == jbPayAccountDesPick) {
-                actionPerformedPayAccountDesPick();
+            else if (button == jbPayAccountDestPick) {
+                actionPerformedPayAccountDestPick();
             }
             else if (button == jbPayPaymentEntryAdd) {
                 actionPerformedPayPaymentEntryAdd();
@@ -3964,14 +4180,14 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             else if (button == jbPayPaymentEntryModify) {
                 actionPerformedPayPaymentEntryModify();
             }
+            else if (button == jbPayPaymentEntryDelete) {
+                actionPerformedPayPaymentEntryDelete();
+            }
             else if (button == jbPayPaymentEntryOk) {
                 actionPerformedPayPaymentEntryOk();
             }
             else if (button == jbPayPaymentEntryCancel) {
                 actionPerformedPayPaymentEntryCancel();
-            }
-            else if (button == jbPayPaymentEntryDelete) {
-                actionPerformedPayPaymentEntryDelete();
             }
             else if (button == jbDocDpsRelatedPickPend) {
                 actionPerformedDocDpsRelatedPick(MODE_DPS_PICK_PEND);
@@ -3991,14 +4207,17 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             else if (button == jbDocPaymentEntryDocModify) {
                 actionPerformedDocPaymentEntryDocModify();
             }
+            else if (button == jbDocPaymentEntryDocDelete) {
+                actionPerformedDocPaymentEntryDocDelete();
+            }
             else if (button == jbDocPaymentEntryDocOk) {
                 actionPerformedDocPaymentEntryDocOk();
             }
             else if (button == jbDocPaymentEntryDocCancel) {
                 actionPerformedDocPaymentEntryDocCancel();
             }
-            else if (button == jbDocPaymentEntryDocDelete) {
-                actionPerformedDocPaymentEntryDocDelete();
+            else if (button == jbAccConceptDocsEdit) {
+                actionPerformedAccConceptDocsEdit();
             }
             else if (button == jbOk) {
                 actionPerformedOk();
@@ -4024,8 +4243,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 else if (comboBox == jcbPayCurrency) {
                     itemStateChangedPayCurrency();
                 }
-                else if (comboBox == jcbPayAccountDes) {
-                    itemStateChangedPayAccountDes();
+                else if (comboBox == jcbPayAccountDest) {
+                    itemStateChangedPayAccountDest();
                 }
             }
         }

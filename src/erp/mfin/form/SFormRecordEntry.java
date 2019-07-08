@@ -26,6 +26,7 @@ import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SDataTax;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModSysConsts;
+import erp.mod.fin.db.SFinConsts;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
@@ -48,6 +49,7 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import sa.lib.SLibUtils;
 import sa.lib.xml.SXmlUtils;
 
 /**
@@ -1296,9 +1298,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             jtfFkDps.setToolTipText(null);
         }
         else {
-            jtfFkDps.setText("F " + moEntryDps.getNumberSeries() + (moEntryDps.getNumberSeries().length() == 0 ? "" : "-") + moEntryDps.getNumber() +
-                    ", " + miClient.getSessionXXX().getFormatters().getDateFormat().format(moEntryDps.getDate()) +
-                    ", $" + miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(moEntryDps.getTotalCy_r()) + " " + moEntryDps.getDbmsCurrencyKey());
+            jtfFkDps.setText(SFinConsts.TXT_INVOICE + " " + moEntryDps.getDpsNumber() + ", " +
+                    SLibUtils.DateFormatDate.format(moEntryDps.getDate()) + ", " +
+                    "$" + SLibUtils.getDecimalFormatAmount().format(moEntryDps.getTotalCy_r()) + " " + moEntryDps.getDbmsCurrencyKey());
             jtfFkDps.setToolTipText(jtfFkDps.getText());
             jtfFkDps.setCaretPosition(0);
         }

@@ -30,6 +30,7 @@ import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mod.SModConsts;
 import erp.mod.bps.db.SDbBizPartner;
+import erp.mod.fin.db.SFinConsts;
 import erp.mtrn.data.SDataDsm;
 import erp.mtrn.data.SDataDsmEntry;
 import erp.mtrn.form.SPanelDpsFinder;
@@ -887,13 +888,17 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
     }
 
     private void actionPerformedConcept() {
-        String bizPartner = "";
-        
         if (moDps != null) {
-            bizPartner = miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }, SDbBizPartner.FIELD_NAME_COMM) + "";
+            String concept = "";
+            
+            if (jcbFkCheckId_n.getSelectedIndex() > 0) {
+                concept += SFinConsts.TXT_CHECK + " " + ((Integer) ((SFormComponentItem) jcbFkCheckId_n.getSelectedItem()).getComplement()) + " " + moParamAccountCash.getAuxCode() + " ";
+            }
+            
+            concept += SFinConsts.TXT_INVOICE + " " + moDps.getDpsNumber() + " ";
+            concept += miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }, SDbBizPartner.FIELD_NAME_COMM).toString();
 
-            moFieldConcept.setString((jcbFkCheckId_n.getSelectedIndex() > 0 ? "CH " + ((Integer) ((SFormComponentItem) jcbFkCheckId_n.getSelectedItem()).getComplement()) + " / " + moParamAccountCash.getAuxCode() + " / " : "") + 
-                            "F " + (!moDps.getNumberSeries().isEmpty() ? moDps.getNumberSeries() + "-" : "") + moDps.getNumber() + " / " + bizPartner);
+            moFieldConcept.setString(concept);
         }
     }
 
@@ -1176,7 +1181,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         oDsm.setDbmsCompanyBranchCode(branch.getCode());
         oDsm.setDbmsErpDecimalsValue(miClient.getSessionXXX().getParamsErp().getDecimalsValue());
         oDsm.setDbmsIsRecordSaved(false);
-        oDsm.getDbmsEntry().add(oDsmEntry);
+        oDsm.getDbmsEntries().add(oDsmEntry);
 
         try {
             oDsm = (SDataDsm) miClient.getGuiModule(SDataConstants.MOD_FIN).processRegistry(oDsm);
@@ -1190,7 +1195,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
                     entry.setDbmsAccountComplement(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
 
                     if (jcbFkCheckId_n.getSelectedIndex() > 0) {
-                        entry.setAuxCheckNumber(((Integer) ((SFormComponentItem) jcbFkCheckId_n.getSelectedItem()).getComplement()).intValue());
+                        entry.setAuxCheckNumber((Integer) ((SFormComponentItem) jcbFkCheckId_n.getSelectedItem()).getComplement());
                     }
                 }
             }

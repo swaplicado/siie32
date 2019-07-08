@@ -5,6 +5,7 @@
 
 package erp.mfin.data;
 
+import erp.SErpConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
@@ -35,6 +36,7 @@ import sa.lib.SLibUtils;
 public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable, sa.lib.grid.SGridRow {
     
     public static final int LEN_CONCEPT = 100;
+    public static final int LEN_REFERENCE = 15;
 
     protected int mnPkYearId;
     protected int mnPkPeriodId;
@@ -141,11 +143,11 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     }
     
     private void sanitizeData() {
-        if (msConcept.length() > 100) {
-            msConcept = msConcept.substring(0, 100 - 3).trim() + "...";
+        if (msConcept.length() > LEN_CONCEPT) {
+            msConcept = msConcept.substring(0, LEN_CONCEPT - SErpConsts.ELLIPSIS.length()).trim() + SErpConsts.ELLIPSIS;
         }
-        if (msReference.length() > 15) {
-            msReference = msReference.substring(0, 15 - 3).trim() + "...";
+        if (msReference.length() > LEN_REFERENCE) {
+            msReference = msReference.substring(0, LEN_REFERENCE - SErpConsts.ELLIPSIS.length()).trim() + SErpConsts.ELLIPSIS;
         }
     }
 
@@ -757,6 +759,8 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
+            sanitizeData();
+
             if (moDbmsCheck != null) {
                 moDbmsCheck.setIsDeleted(mbIsDeleted);
                 if (mbIsDeleted) {
@@ -772,8 +776,6 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 }
             }
             
-            sanitizeData();
-
             callableStatement = connection.prepareCall(
                     "{ CALL fin_rec_ety_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +

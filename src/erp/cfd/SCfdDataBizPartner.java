@@ -272,7 +272,7 @@ public class SCfdDataBizPartner {
         cfd.ver3.cce11.DElementEmisor emisor = null;
         
         if (mfVersion == DCfdConsts.CFDI_VER_33) {
-            if (msBizPartnerRfc.length() == SFinConsts.RFC_PER_LEN) {
+            if (msBizPartnerRfc.length() == SFinConsts.LEN_RFC_PER) {
                 if (msBizPartnerCurp.isEmpty()) {
                     throw new Exception("El CURP del emisor no existe, y es requerido.");
                 }
@@ -297,7 +297,7 @@ public class SCfdDataBizPartner {
         else if (mfVersion == DCfdConsts.CFDI_VER_32) {
             emisor = new cfd.ver3.cce11.DElementEmisor();
 
-            if (msBizPartnerRfc.length() == SFinConsts.RFC_PER_LEN) {
+            if (msBizPartnerRfc.length() == SFinConsts.LEN_RFC_PER) {
                 emisor.getAttCurp().setString(msBizPartnerCurp);
             }
         }

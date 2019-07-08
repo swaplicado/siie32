@@ -4,6 +4,7 @@
  */
 package erp.mod.fin.form;
 
+import erp.SErpConsts;
 import erp.data.SDataConstantsSys;
 import erp.gui.session.SSessionCustom;
 import erp.mfin.data.SDataAccountCash;
@@ -441,7 +442,7 @@ public class SDialogCashMoveBizPartner extends SBeanFormDialog implements SDialo
         moIntCheckNumber.setIntegerSettings(SGuiUtils.getLabelName(jlCheckNumber), SGuiConsts.GUI_TYPE_INT_RAW, true);
         moKeyBizPartnerAccount.setKeySettings(miClient, SGuiUtils.getLabelName(jlBizPartnerAccount), false);
         moBoolCheckForBeneficiaryAccount.setBooleanSettings(SGuiUtils.getLabelName(moBoolCheckForBeneficiaryAccount.getText()), true);
-        moTextConcept.setTextSettings(SGuiUtils.getLabelName(jlConcept), 100);
+        moTextConcept.setTextSettings(SGuiUtils.getLabelName(jlConcept), SDataRecordEntry.LEN_CONCEPT);
 
         moFields.addField(moCurMoveCy.getField());
         moFields.addField(moDecExchangeRate);
@@ -530,7 +531,7 @@ public class SDialogCashMoveBizPartner extends SBeanFormDialog implements SDialo
      * @return Concept text. If text length exceds maximum allowed, then text is truncated and "..." concatenated at the end indicating it.
      */
     private String formatConcept(String concept) {
-        return concept.length() < moTextConcept.getMaxLength() ? concept : concept.substring(0, moTextConcept.getMaxLength() - 3) + "...";
+        return concept.length() < SDataRecordEntry.LEN_CONCEPT ? concept : concept.substring(0, SDataRecordEntry.LEN_CONCEPT - SErpConsts.ELLIPSIS.length()) + SErpConsts.ELLIPSIS;
     }
 
     private String composeConceptCash() {
@@ -553,7 +554,6 @@ public class SDialogCashMoveBizPartner extends SBeanFormDialog implements SDialo
 
     private String composeConceptCheck() {
         String concept = msMoveTypeAbbr;
-        SDbBizPartnerBranchBankAccount bankAccount = null;
 
         if (moBoolCheck.isSelected()) {
             concept += (concept.isEmpty() ? "" : "; ") + SFinConsts.TXT_CHECK + " " + moIntCheckNumber.getValue();
@@ -562,7 +562,7 @@ public class SDialogCashMoveBizPartner extends SBeanFormDialog implements SDialo
                 concept += "; " + (String) miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { moCashBankAccount.getFkBankId() }, SDbBizPartner.FIELD_NAME_COMM);
 
                 if (moKeyBizPartnerAccount.getSelectedIndex() > 0) {
-                    bankAccount = (SDbBizPartnerBranchBankAccount) miClient.getSession().readRegistry(SModConsts.BPSU_BANK_ACC, moKeyBizPartnerAccount.getValue());
+                    SDbBizPartnerBranchBankAccount bankAccount = (SDbBizPartnerBranchBankAccount) miClient.getSession().readRegistry(SModConsts.BPSU_BANK_ACC, moKeyBizPartnerAccount.getValue());
                     concept += "/" + (String) miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { bankAccount.getFkBankId() }, SDbBizPartner.FIELD_NAME_COMM);
                 }
             }

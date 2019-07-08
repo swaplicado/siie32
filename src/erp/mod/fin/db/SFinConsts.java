@@ -42,11 +42,11 @@ public class SFinConsts {
     public static final String TXT_BANK_BRA = "SUC.";
     public static final String TXT_BANK_ACC = "CTA.";
     public static final String TXT_CHECK = "CHQ";
-    public static final String TXT_INVOICE = "FAC";
+    public static final String TXT_INVOICE = "F";
 
-    public static final int RFC_PER_LEN = 13;
-    public static final int RFC_COM_LEN = 12;
-    public static final int CURP_LEN = 18;
+    public static final int LEN_RFC_PER = 13;
+    public static final int LEN_RFC_ORG = 12;
+    public static final int LEN_CURP = 18;
 
     public static final String MSG_ERR_ABP_ENT_NOT_FOUND = "No se encontró un paquete de configuración contable para la entidad: ";
     public static final String MSG_ERR_ABP_BPS_NOT_FOUND = "No se encontró un paquete de configuración contable para el asociado de negocios: ";

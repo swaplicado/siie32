@@ -29,6 +29,7 @@ import erp.mfin.data.SFinAccountUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SDbBizPartner;
+import erp.mod.fin.db.SFinConsts;
 import erp.mtrn.data.SDataDsm;
 import erp.mtrn.data.SDataDsmEntry;
 import erp.mtrn.form.SPanelDpsFinder;
@@ -886,7 +887,9 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         entry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         entry.setDbmsAccountingMoveSubclass(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL));
 
-        entry.setConcept("F " + (moDps.getNumberSeries().length() == 0 ? "" : moDps.getNumberSeries() + "-") + moDps.getNumber() + "; " + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
+        String concept = SFinConsts.TXT_INVOICE + " " + moDps.getDpsNumber() + " ";
+        concept += miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }, SDbBizPartner.FIELD_NAME_COMM).toString();
+        entry.setConcept(concept);
 
         if (mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP) {
             entry.setDebit(0);
@@ -1568,7 +1571,6 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
 
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
-        String bizPartner = "";
         double excDiff = 0;
         SDataDsmEntry oDsmEntry = new SDataDsmEntry();
         SDataDsm oDsm = new SDataDsm();
@@ -1648,7 +1650,7 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
         oDsm.setDbmsCompanyBranchCode(branch.getCode());
         oDsm.setDbmsErpDecimalsValue(miClient.getSessionXXX().getParamsErp().getDecimalsValue());
         oDsm.setDbmsIsRecordSaved(false);
-        oDsm.getDbmsEntry().add(oDsmEntry);
+        oDsm.getDbmsEntries().add(oDsmEntry);
 
         try {
             oDsm = (SDataDsm) miClient.getGuiModule(SDataConstants.MOD_FIN).processRegistry(oDsm);
@@ -1660,13 +1662,14 @@ public class SDialogRecordPaymentComplete extends javax.swing.JDialog implements
             if (excDiff != 0d && moDps.getFkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
                 oRecord.getDbmsRecordEntries().add(createRecordEntryExchangeDiff(excDiff));
             }
-            bizPartner = miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }, SDbBizPartner.FIELD_NAME_COMM) + "";
             
             for (SDataRecordEntry entry : oRecord.getDbmsRecordEntries()) {
                 entry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FIN_ACC, new Object[] { entry.getFkAccountIdXXX() }));
-                //entry.setDbmsCurrencyKey(jtfDpsValueCyCurKeyRo.getText()); //XXX (01/12/2014) jbarajas exchange difference
                 entry.setDbmsCurrencyKey(miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { entry.getFkCurrencyId() }));
-                entry.setConcept("F " + (moDps.getNumberSeries().toString().length() > 0 ? moDps.getNumberSeries() + "-" : "") + moDps.getNumber() + " / " + bizPartner);
+                
+                String concept = SFinConsts.TXT_INVOICE + " " + moDps.getDpsNumber() + " ";
+                concept += miClient.getSession().readField(SModConsts.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }, SDbBizPartner.FIELD_NAME_COMM).toString();
+                entry.setConcept(concept);
 
                 if (entry.getFkSystemMoveCategoryIdXXX() == SDataConstantsSys.FINS_CT_SYS_MOV_BPS) {
                     entry.setDbmsAccountComplement(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));

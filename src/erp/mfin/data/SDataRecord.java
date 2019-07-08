@@ -5,9 +5,11 @@
 
 package erp.mfin.data;
 
+import erp.SErpConsts;
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import static erp.mfin.data.SDataRecordEntry.LEN_CONCEPT;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -75,6 +77,12 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
      * Private methods
      */
     
+    private void sanitizeData() {
+        if (msConcept.length() > SDataRecordEntry.LEN_CONCEPT) {
+            msConcept = msConcept.substring(0, LEN_CONCEPT - SErpConsts.ELLIPSIS.length()).trim() + SErpConsts.ELLIPSIS;
+        }
+    }
+
     private void updateChecksLinks(java.sql.Connection connection) throws java.sql.SQLException, java.lang.Exception{
         String sql = "";
         Statement statement = connection.createStatement();
@@ -378,6 +386,8 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
+            sanitizeData();
+            
             callableStatement = connection.prepareCall(
                     "{ CALL fin_rec_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
