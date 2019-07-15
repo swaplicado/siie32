@@ -1996,7 +1996,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlComplConceptKey.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel82.add(jlComplConceptKey);
 
-        jtfComplConceptKey.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfComplConceptKey.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel82.add(jtfComplConceptKey);
 
         jPanel81.add(jPanel82);
@@ -2216,10 +2216,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldAddendaPartPriceUnitary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfAddendaPartPriceUnitary, jlAddendaPartPriceUnitary);
         moFieldAddendaPartPriceUnitary.setTabbedPaneIndex(TAB_CFD_ADD, jTabbedPane);
         moFieldComplConceptKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplConceptKey, jlComplConceptKey);
-        moFieldComplConceptKey.setLengthMax(10);
+        moFieldComplConceptKey.setLengthMax(35);
         moFieldComplConceptKey.setTabbedPaneIndex(TAB_CFD_COMPL, jTabbedPane);
         moFieldComplConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplConcept, jlComplConcept);
-        moFieldComplConcept.setLengthMax(100);
+        moFieldComplConcept.setLengthMax(130);
         moFieldComplConcept.setTabbedPaneIndex(TAB_CFD_COMPL, jTabbedPane);
         moFieldComplCfdProdServ = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfComplCfdProdServ, jlComplCfdProdServ);
         moFieldComplCfdProdServ.setLengthMax(8);

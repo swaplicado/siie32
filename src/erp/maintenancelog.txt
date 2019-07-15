@@ -1,8 +1,14 @@
 ================================================================================
+2019-07-15, 3.2 140.0
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Modificación de longitud de columnas de tabla Complemento Partidas de Documentos (trn_dps_ety_compl).
+
+================================================================================
 2019-07-08, 3.2 139.0
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
-1) Habilitación de captura de pagos en CFDI de recpción de pagos para formas de pago que no requieren cuenta bancaria beneficiaria (p. ej., efectivo, compensación, etc.).
+1) Habilitación de captura de pagos en CFDI de recepción de pagos para formas de pago que no requieren cuenta bancaria beneficiaria (p. ej., efectivo, compensación, etc.).
 
 ================================================================================
 2019-07-04, 3.2 138.2
