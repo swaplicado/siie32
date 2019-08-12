@@ -683,6 +683,7 @@ public abstract class SModConsts {
     public static final int HRSX_LAYOUT_SUA_HIRE = 1;
     public static final int HRSX_LAYOUT_SUA_SSC = 2;
     public static final int HRSX_LAYOUT_SUA_DISMISS = 3;
+    public static final int HRSX_LAYOUT_UPDATE_SSC = 4;
     
     public static final int HRSX_HIRE_DISMISSED = 0; // Employee hire log dismissed
     public static final int HRSX_HIRE_ACTIVE = 1;    // Employee hire log active
