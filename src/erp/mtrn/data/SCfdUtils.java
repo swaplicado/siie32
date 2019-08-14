@@ -49,11 +49,11 @@ import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbFormerPayrollImport;
-import erp.mod.hrs.db.SHrsFormerPayroll;
-import erp.mod.hrs.db.SHrsFormerReceiptConcept;
 import erp.mod.hrs.db.SHrsFormerConceptExtraTime;
 import erp.mod.hrs.db.SHrsFormerConceptIncident;
+import erp.mod.hrs.db.SHrsFormerPayroll;
 import erp.mod.hrs.db.SHrsFormerReceipt;
+import erp.mod.hrs.db.SHrsFormerReceiptConcept;
 import erp.mod.hrs.db.SHrsFormerUtils;
 import erp.mtrn.form.SDialogRestoreCfdi;
 import erp.print.SDataConstantsPrint;
@@ -105,10 +105,10 @@ import sa.lib.srv.SSrvConsts;
 import sa.lib.srv.SSrvLock;
 import sa.lib.srv.SSrvUtils;
 import sa.lib.xml.SXmlUtils;
-import views.core.soap.services.apps.CancelaCFDResult; // Finkok WS for cancelling CFDI
-import views.core.soap.services.apps.FolioArray; // Finkok WS for cancelling CFDI
-import views.core.soap.services.apps.ReceiptResult; // Finkok WS for cancelling CFDI
-import views.core.soap.services.apps.UUIDS; // Finkok WS for cancelling CFDI
+import views.core.soap.services.apps.CancelaCFDResult; 
+import views.core.soap.services.apps.FolioArray; 
+import views.core.soap.services.apps.ReceiptResult; 
+import views.core.soap.services.apps.UUIDS; 
 
 /**
  *
@@ -1428,7 +1428,12 @@ public abstract class SCfdUtils implements Serializable {
 
                                     case DCfdi33Consts.CANCELABLE_NO:
                                         // CFDI is not cancellable:
+                                        /* XXX 2019-08-14, Sergio Flores: Se deshabilita temporalmente la consulta de CFDI relacionados 
+                                         * debido a cambio inesperado en los parámetros de la solicitud del web service,
+                                         * ahora se discurrió que deben proporcionarse el RFC y CSD del receptor. ¡Sí, el CSD del receptor! WTF!
                                         throw new Exception("El CFDI es no cancelable.\n " + ackQuery.composeCfdiRelated());
+                                        */
+                                        throw new Exception("El CFDI es no cancelable.");
                                 }
 
                                 // check cancellation status:

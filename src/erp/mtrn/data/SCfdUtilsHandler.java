@@ -159,7 +159,11 @@ public class SCfdUtilsHandler {
                             }
                             
                             cfdiAckQuery = new CfdiAckQuery(cfd.getUuid(), valEsCancelable, valCodigoEstatus, valEstado, valEstatusCancelacion);
+                            /* XXX 2019-08-14, Sergio Flores: Se deshabilita temporalmente la consulta de CFDI relacionados 
+                             * debido a cambio inesperado en los parámetros de la solicitud del web service,
+                             * ahora se discurrió que deben proporcionarse el RFC y CSD del receptor. ¡Sí, el CSD del receptor! WTF!
                             cfdiAckQuery.CfdiRelatedList.addAll(getCfdiRelated(cfd));
+                            */
                         }
                         break;
                         
@@ -203,19 +207,9 @@ public class SCfdUtilsHandler {
             CfdiRelatedList = new ArrayList<>();
         }
         
-        public String composeMessage() {
-            String message;
-            
-            message = "ESTATUS SAT DEL CFDI '" + Uuid + "':\n";
-            message += "Cancelable: [" + CancellableInfo + "]\n";
-            message += "Recuperación: [" + RetrievalInfo + "]\n";
-            message += "Estatus CFDI: [" + CfdiStatus + "]\n";
-            message += "Estatus cancelación: [" + CancelStatus + "]\n";
-            message += composeCfdiRelated();
-            
-            return message;
-        }
-        
+        /* XXX 2019-08-14, Sergio Flores: Se deshabilita temporalmente la consulta de CFDI relacionados 
+         * debido a cambio inesperado en los parámetros de la solicitud del web service,
+         * ahora se discurrió que deben proporcionarse el RFC y CSD del receptor. ¡Sí, el CSD del receptor! WTF!
         public String composeCfdiRelated() {
             String message;
             
@@ -229,6 +223,23 @@ public class SCfdUtilsHandler {
                 }
             }
             
+            return message;
+        }
+        */
+        
+        public String composeMessage() {
+            String message;
+            
+            message = "ESTATUS SAT DEL CFDI '" + Uuid + "':\n";
+            message += "Cancelable: [" + CancellableInfo + "]\n";
+            message += "Recuperación: [" + RetrievalInfo + "]\n";
+            message += "Estatus CFDI: [" + CfdiStatus + "]\n";
+            message += "Estatus cancelación: [" + CancelStatus + "]\n";
+            /* XXX 2019-08-14, Sergio Flores: Se deshabilita temporalmente la consulta de CFDI relacionados 
+             * debido a cambio inesperado en los parámetros de la solicitud del web service,
+             * ahora se discurrió que deben proporcionarse el RFC y CSD del receptor. ¡Sí, el CSD del receptor! WTF!
+            message += composeCfdiRelated();
+            */
             return message;
         }
     }

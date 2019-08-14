@@ -1,4 +1,12 @@
 ================================================================================
+2019-08-14, 3.2 140.1
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Se deshabilita temporalmente la consulta de CFDI relacionados 
+    debido a cambio inesperado en los parámetros de la solicitud del web service,
+    ahora se discurrió que deben proporcionarse el RFC y CSD del receptor. ¡Sí, el CSD del receptor! WTF!.
+
+================================================================================
 2019-07-15, 3.2 140.0
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
