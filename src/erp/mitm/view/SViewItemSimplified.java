@@ -17,6 +17,7 @@ import erp.lib.table.STableSetting;
 import erp.mitm.form.SPanelFilterItemGeneric;
 import java.awt.Dimension;
 import javax.swing.JButton;
+import sa.gui.util.SUtilConsts;
 
 /**
  *
@@ -90,9 +91,9 @@ public class SViewItemSimplified extends erp.lib.table.STableTab implements java
 
         levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_ITM_ITEM).Level;
 
-        jbNew.setEnabled(levelRightEdit >= SDataConstantsSys.USRS_TP_LEV_AUTHOR);
-        jbEdit.setEnabled(levelRightEdit >= SDataConstantsSys.USRS_TP_LEV_AUTHOR);
-        jbCopy.setEnabled(levelRightEdit >= SDataConstantsSys.USRS_TP_LEV_AUTHOR);
+        jbNew.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
+        jbEdit.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
+        jbCopy.setEnabled(levelRightEdit >= SUtilConsts.LEV_AUTHOR);
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];

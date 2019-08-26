@@ -92,11 +92,15 @@ public abstract class SDataConstantsSys {
 
     public static final int CFGX_IVM_FIFO = 1;
 
-    public static final int USRS_TP_LEV_NA = 1;
-    public static final int USRS_TP_LEV_READER = 2;
+    /* XXX 2019-08-16 Sergio Flores: Not used yet.
+    public static final int USRS_TP_LEV_NO_PERMISSION = 0;
+    public static final int USRS_TP_LEV_READ = 1;
+    public static final int USRS_TP_LEV_CAPTURE = 2;
     public static final int USRS_TP_LEV_AUTHOR = 3;
     public static final int USRS_TP_LEV_EDITOR = 4;
-
+    public static final int USRS_TP_LEV_MANAGER = 5;
+    */
+    
     public static final int USRX_USER_NA = 1;
     public static final int USRX_USER_SUPER = 2;
 
@@ -237,6 +241,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_DOC_OMT_DOC_SRC = 104024;
     public static final int PRV_SAL_PRICE_CHG = 104031;
     public static final int PRV_SAL_CRED_CONFIG = 104041;
+    public static final int PRV_SAL_COMP_MON_EXT = 104061;
     public static final int PRV_SAL_REP = 104901;
 
     public static final int PRV_INV_DIOG_CFG = 105001;

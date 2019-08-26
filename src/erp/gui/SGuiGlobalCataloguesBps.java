@@ -50,8 +50,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenuItem jmiBizPartnerAttCarrier;
     private javax.swing.JMenuItem jmiBizPartnerAttEmployee;
     private javax.swing.JMenuItem jmiBizPartnerAttSalesAgent;
-    private javax.swing.JMenuItem jmiBizPartnerCategorySupplier;
-    private javax.swing.JMenuItem jmiBizPartnerCategoryCustomer;
+    private javax.swing.JMenuItem jmiBizPartnerCreditCustomer;
+    private javax.swing.JMenuItem jmiBizPartnerCreditSupplier;
     private javax.swing.JMenuItem jmiBizPartnerBranch;
     private javax.swing.JMenuItem jmiBizPartnerBranchCustomer;
     private javax.swing.JMenuItem jmiBizPartnerBranchSupplier;
@@ -150,8 +150,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmiBizPartnerAttCarrier = new JMenuItem("Transportistas");
         jmiBizPartnerAttEmployee = new JMenuItem("Empleados");
         jmiBizPartnerAttSalesAgent = new JMenuItem("Agentes de ventas");
-        jmiBizPartnerCategorySupplier = new JMenuItem("Información crédito de proveedores");
-        jmiBizPartnerCategoryCustomer = new JMenuItem("Información crédito de clientes");
+        jmiBizPartnerCreditCustomer = new JMenuItem("Información crédito de clientes");
+        jmiBizPartnerCreditSupplier = new JMenuItem("Información crédito de proveedores");
         jmMenuBranch = new JMenu("Sucursales");
         jmiBizPartnerBranch = new JMenuItem("Sucursales de todos los asociados de negocios (Q)");
         jmiBizPartnerBranchCustomer = new JMenuItem("Sucursales de clientes (Q)");
@@ -196,8 +196,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmMenuBizPartner.add(jmiBizPartnerAttSalesAgent);
 
         jmMenuBizPartner.addSeparator();
-        jmMenuBizPartner.add(jmiBizPartnerCategorySupplier);
-        jmMenuBizPartner.add(jmiBizPartnerCategoryCustomer);
+        jmMenuBizPartner.add(jmiBizPartnerCreditCustomer);
+        jmMenuBizPartner.add(jmiBizPartnerCreditSupplier);
 
         jmMenuBizPartner.addSeparator();
         jmMenuBranch.add(jmiBizPartnerBranch);
@@ -244,8 +244,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmiBizPartnerAttCarrier.addActionListener(this);
         jmiBizPartnerAttEmployee.addActionListener(this);
         jmiBizPartnerAttSalesAgent.addActionListener(this);
-        jmiBizPartnerCategorySupplier.addActionListener(this);
-        jmiBizPartnerCategoryCustomer.addActionListener(this);
+        jmiBizPartnerCreditCustomer.addActionListener(this);
+        jmiBizPartnerCreditSupplier.addActionListener(this);
         jmiBizPartnerBranch.addActionListener(this);
         jmiBizPartnerBranchSupplier.addActionListener(this);
         jmiBizPartnerBranchCustomer.addActionListener(this);
@@ -341,8 +341,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmiBizPartnerAttCarrier.setEnabled(hasRightBizPartner);
         jmiBizPartnerAttEmployee.setEnabled(hasRightBizPartnerEmployee);
         jmiBizPartnerAttSalesAgent.setEnabled(hasRightBizPartner);
-        jmiBizPartnerCategorySupplier.setEnabled(hasRightCreditPurchases);
-        jmiBizPartnerCategoryCustomer.setEnabled(hasRightCreditSales);
+        jmiBizPartnerCreditCustomer.setEnabled(hasRightCreditSales);
+        jmiBizPartnerCreditSupplier.setEnabled(hasRightCreditPurchases);
         jmMenuBranch.setEnabled(hasRightBizPartnerBranch || hasRightBizPartnerBranchSupplier || hasRightBizPartnerBranchCustomer || hasRightBizPartnerCreditor || hasRightBizPartnerDebtor);
         jmiBizPartnerBranch.setEnabled(hasRightBizPartnerBranch);
         jmiBizPartnerBranchSupplier.setEnabled(hasRightBizPartnerBranchSupplier);
@@ -883,11 +883,11 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
             else if (item == jmiBizPartnerAttSalesAgent) {
                 showView(SDataConstants.BPSX_BP_ATT_SAL_AGT);
             }
-            else if (item == jmiBizPartnerCategorySupplier) {
-                showView(SDataConstants.BPSU_BP_CT, SDataConstantsSys.BPSS_CT_BP_SUP);
-            }
-            else if (item == jmiBizPartnerCategoryCustomer) {
+            else if (item == jmiBizPartnerCreditCustomer) {
                 showView(SDataConstants.BPSU_BP_CT, SDataConstantsSys.BPSS_CT_BP_CUS);
+            }
+            else if (item == jmiBizPartnerCreditSupplier) {
+                showView(SDataConstants.BPSU_BP_CT, SDataConstantsSys.BPSS_CT_BP_SUP);
             }
             else if (item == jmiBizPartnerBranch) {
                 showView(SDataConstants.BPSU_BPB);

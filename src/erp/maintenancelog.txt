@@ -1,4 +1,11 @@
 ================================================================================
+2019-08-26, 3.2 141.0
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de permisos de usuario para modificar condiciones de crédito de clientes y proveedores.
+2) Implementación de permiso para emitir comprobantes (facturas y notas de crédito) en moneda extranjera.
+
+================================================================================
 2019-08-15, 3.2 140.2
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
