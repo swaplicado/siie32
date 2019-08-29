@@ -380,7 +380,9 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         ResultSet resultSet = null;
 
         try {
-            for (int i = (mnAnniversary == 0 ? 0 : mnAnniversary); i >= (mnAnniversary == 0 ? 0 : 1); i--) {
+            int anniversary = mnAnniversary + 1; // to show current aniversary, eventhough elapsed partially
+            
+            for (int i = (anniversary == 0 ? 0 : anniversary); i >= (anniversary == 0 ? 0 : 1); i--) {
                 sql = "SELECT f_ann, " +
                         "IF((ear.ben_year) IS NULL, IF(YEAR(ADDDATE('" + SLibUtils.DbmsDateFormatDate.format(moEmployee.getDateBenefits()) + "', INTERVAL " + i + " YEAR)) > YEAR('" + SLibUtils.DbmsDateFormatDate.format(moEmployee.getDateBenefits()) + "'), YEAR(ADDDATE('" + SLibUtils.DbmsDateFormatDate.format(moEmployee.getDateBenefits()) + "', INTERVAL " + i + " YEAR)) - 1, YEAR('" + SLibUtils.DbmsDateFormatDate.format(moEmployee.getDateBenefits()) + "')), ear.ben_year) AS f_ann_ano, " +
                         "ben_day, id_row, f_bon_per, " +

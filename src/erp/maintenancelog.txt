@@ -1,5 +1,12 @@
 ================================================================================
-2019-08-27, 3.2 141.1
+2019-08-29, 3.2 141.2
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Adición del año de aniversario actual al cárdex de consulta de prestaciones.
+    Anteriormente solamente se mostraban los años correspondientes a aniversarios totalmente cumplidos.
+
+================================================================================
+2019-08-29, 3.2 141.1
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Corrección a la adición del nodo otros pagos en el CFDI de nóminas para el 
