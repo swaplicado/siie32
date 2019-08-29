@@ -46,11 +46,11 @@ public class SHrsPayroll {
     protected HashMap<Integer, String> moEarningComputationTypesMap;
     protected HashMap<Integer, String> moDeductionComputationTypesMap;
     
-    public SHrsPayroll(SHrsPayrollDataProvider dataProvider) {
+    public SHrsPayroll(SHrsPayrollDataProvider dataProvider, SDbConfig config, SDbWorkingDaySettings workingDaySettings, SDbPayroll payroll) {
         moHrsPayrollDataProvider = dataProvider;
-        moConfig = null;
-        moWorkingDaySettings = null;
-        moPayroll = null;
+        moConfig = config;
+        moWorkingDaySettings = workingDaySettings;
+        moPayroll = payroll;
 
         maLoanTypeAdjustments = new ArrayList<>();
         maUmas = new ArrayList<>();
@@ -273,7 +273,7 @@ public class SHrsPayroll {
             }
         }
         
-        if (moPayroll.isNormal()) {
+        if (moPayroll.isPayrollNormal()) {
             // add wages and salaries:
             
             if (hrsEmployeeDays.getDaysWorked() > 0) {
@@ -394,7 +394,7 @@ public class SHrsPayroll {
         SDbEmployee employee = hrsReceipt.getHrsEmployee().getEmployee();
         ArrayList<SHrsReceiptDeduction> hrsReceiptDeductions = new ArrayList<>();
 
-        if (moPayroll.isNormal()) {
+        if (moPayroll.isPayrollNormal()) {
             // Get deductions that are withholding ones (deductions by law):
             
             for (SDbDeduction deduction : maDeductions) {
@@ -438,7 +438,7 @@ public class SHrsPayroll {
             }
         }
 
-        if (moPayroll.isNormal()) {
+        if (moPayroll.isPayrollNormal()) {
             hrsReceipt.computePayrollReceiptDays();
 
             // Get employee loans:
@@ -485,10 +485,8 @@ public class SHrsPayroll {
      * Public methods:
      */
 
-    public void setConfig(SDbConfig o) { moConfig = o; }
-    public void setWorkingDaySettings(SDbWorkingDaySettings o) { moWorkingDaySettings = o; }
-    public void setPayroll(SDbPayroll o) { moPayroll = o; }
-
+    public void setPayroll(SDbPayroll payroll) { moPayroll = payroll; }
+    
     public SDbConfig getConfig() { return moConfig; }
     public SDbWorkingDaySettings getWorkingDaySettings() { return moWorkingDaySettings; }
     public SDbPayroll getPayroll() { return moPayroll; }
@@ -866,7 +864,7 @@ public class SHrsPayroll {
         payrollReceipt.setWage(hrsEmployee.getEmployee().getWage());
         payrollReceipt.setSalarySscBase(hrsEmployee.getEmployee().getSalarySscBase());
         payrollReceipt.setWorkingHoursDay(hrsEmployee.getEmployee().getWorkingHoursDay());
-        payrollReceipt.setPaymentDaily(hrsEmployee.getEmployee().getEffectiveSalary(moConfig.isFortnightStandard()));
+        payrollReceipt.setPaymentDaily(hrsEmployee.getEmployee().getEffectiveSalary(moPayroll.isFortnightStandard()));
         payrollReceipt.setPaymentHourly(hrsEmployee.getEmployee().getWorkingHoursDay() > 0 ? payrollReceipt.getPaymentDaily() / hrsEmployee.getEmployee().getWorkingHoursDay() : 0);
         //payrollReceipt.setFactorCalendar();
         //payrollReceipt.setFactorDaysPaid();
@@ -1133,7 +1131,7 @@ public class SHrsPayroll {
         SDbPayrollReceipt payrollReceipt = createPayrollReceipt(hrsEmployee);
         hrsReceipt.setPayrollReceipt(payrollReceipt);
 
-        if (moPayroll.isNormal()) {
+        if (moPayroll.isPayrollNormal()) {
             hrsReceipt.getAbsenceConsumptions().addAll(crateAbsenceConsumptions(hrsReceipt));
         }
         

@@ -1717,7 +1717,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
 
-        if (moHrsReceipt.getHrsPayroll().getPayroll().isNormal()) {
+        if (moHrsReceipt.getHrsPayroll().getPayroll().isPayrollNormal()) {
             double daysWorked = 0;
             for (SHrsReceiptEarning hrsReceiptEarning : moHrsReceipt.getHrsReceiptEarnings()) {
                 if (hrsReceiptEarning.getEarning().isDaysWorked() && !hrsReceiptEarning.getEarning().isAbsence()) {
@@ -1731,12 +1731,13 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             }
             
             SHrsEmployeeDays hrsEmployeeDays = moHrsReceipt.getHrsEmployee().createEmployeeDays();
-            double maxWorkingDays = hrsEmployeeDays.getWorkingDays() * hrsEmployeeDays.getFactorCalendar();
+            double maxWorkingDays = hrsEmployeeDays.getWorkingDays();
             double daysCovered = daysWorked + daysAbsence;
             double daysDiff = maxWorkingDays - daysCovered;
             
             if (Math.abs(daysDiff) > 0.0001) {
-                String msg = "¡ADVERTENCIA! Los días laborables del empleado (" + maxWorkingDays + " " + (maxWorkingDays == 1 ? "día" : "días") + ") no coinciden con\n"
+                String msg = "¡ADVERTENCIA!\n"
+                        + "Los días laborables del empleado (" + maxWorkingDays + " " + (maxWorkingDays == 1 ? "día" : "días") + ") no son consistentes con\n"
                         + "los días a pagar (" + daysWorked + " " + (daysWorked == 1 ? "día" : "días") + ")"
                         + (daysAbsence == 0 ? "" : " más los días de incidencias (" + daysAbsence + " " + (daysAbsence == 1 ? "día" : "días") + ")" + "; esto es: "
                         + maxWorkingDays + " " + (maxWorkingDays == 1 ? "día" : "días") + " vs. " + daysCovered + " " + (daysCovered == 1 ? "día" : "días")) + ".\n"

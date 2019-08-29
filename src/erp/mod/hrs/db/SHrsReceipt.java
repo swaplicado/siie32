@@ -259,6 +259,7 @@ public class SHrsReceipt {
                 
                 // prepare for update or removal of existing subsidy earning:
                 hrsReceiptEarningPrevious = hrsReceiptEarning;
+                break;
             }
         }
         
@@ -284,7 +285,6 @@ public class SHrsReceipt {
             hrsReceiptEarningNew.setPayrollReceiptEarning(payrollReceiptEarningOther);
 
             maHrsReceiptEarnings.add(hrsReceiptEarningNew);
-            renumberHrsReceiptEarnings();
         }
         
         if (hrsReceiptEarningPrevious != null || isSubOffsetTotally) {
@@ -436,14 +436,16 @@ public class SHrsReceipt {
             double tableFactorPayroll;
             double tableFactorAnnual;
             SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays();
+            double yearDaysFactor = ((double) SHrsConsts.YEAR_MONTHS / (SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(moHrsPayroll.getPayroll().getFiscalYear()) ? 1d : 0d)));
             
-            if (moHrsPayroll.getPayroll().getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_FOR && moHrsPayroll.getConfig().isFortnightStandard()) {
-                tableFactorPayroll = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS_FORTNIGHTS_FIXED) * hrsEmployeeDays.getTaxableDaysPayroll();
-                tableFactorAnnual = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS_FORTNIGHTS_FIXED) * hrsEmployeeDays.getTaxableDaysAnnual();
+            if (moHrsPayroll.getPayroll().isPayrollFortnightStandard()) {
+                double yearDaysFactorStd = ((double) SHrsConsts.YEAR_MONTHS / SHrsConsts.YEAR_DAYS_FORTNIGHTS_FIXED);
+                tableFactorPayroll = yearDaysFactorStd * (hrsEmployeeDays.getTaxableDaysPayroll() <= SHrsConsts.FORTNIGHT_FIXED_DAYS ? hrsEmployeeDays.getTaxableDaysPayroll() : SHrsConsts.FORTNIGHT_FIXED_DAYS);
+                tableFactorAnnual = yearDaysFactor * hrsEmployeeDays.getTaxableDaysAnnual();
             }
             else {
-                tableFactorPayroll = ((double) SHrsConsts.YEAR_MONTHS / (SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(moHrsPayroll.getPayroll().getFiscalYear()) ? 1d : 0d))) * hrsEmployeeDays.getTaxableDaysPayroll();
-                tableFactorAnnual = ((double) SHrsConsts.YEAR_MONTHS / (SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(moHrsPayroll.getPayroll().getFiscalYear()) ? 1d : 0d))) * hrsEmployeeDays.getTaxableDaysAnnual();
+                tableFactorPayroll = yearDaysFactor * hrsEmployeeDays.getTaxableDaysPayroll();
+                tableFactorAnnual = yearDaysFactor * hrsEmployeeDays.getTaxableDaysAnnual();
             }
             
             moPayrollReceipt.setPayrollFactorTax(tableFactorPayroll);
@@ -707,7 +709,7 @@ public class SHrsReceipt {
         }
         
         // create other earning to inform subsidy assessed in receipt, if needed:
-        boolean isSubOffsetTotally = isTaxNet && payrollSubAssessed > 0 && payrollTaxAssessed > payrollSubAssessed; // convenience variable
+        boolean isSubOffsetTotally = isTaxNet && payrollSubAssessed > 0 && payrollTaxAssessed >= payrollSubAssessed; // convenience variable
         computeEarningOther(isSubOffsetTotally, earningOther, moHrsEmployee.createEmployeeDays());
         
         // Set tax and subsidy current calculations:
@@ -719,7 +721,7 @@ public class SHrsReceipt {
             if (isTaxNet) {
                 // compensate tax and subsidy between each other:
                 
-                if (payrollTaxAssessed > payrollSubAssessed) {
+                if (payrollTaxAssessed >= payrollSubAssessed) {
                     payrollTaxCompensated = payrollSubAssessed;
                     payrollSubCompensated = payrollSubAssessed;
                 }
@@ -1297,7 +1299,7 @@ public class SHrsReceipt {
         double employeeWorkableBusinessDays = hrsEmployeeDays.getBusinessDays() - hrsEmployeeDays.getDaysNotWorked_r();
         int consumptionActualBusinessDays = SHrsUtils.countBusinessDays(absenceConsumption.getDateStart(), absenceConsumption.getDateEnd(), moHrsPayroll.getWorkingDaySettings(), moHrsPayroll.getHolidays());
         
-        if (moHrsPayroll.getPayroll().isNormal()) {
+        if (moHrsPayroll.getPayroll().isPayrollNormal()) {
             if (absence.consumesCalendarDays()) {
                 // validate calendar days:
                 if (employeeWorkableCalendarDays <= 0) {
@@ -1582,11 +1584,11 @@ public class SHrsReceipt {
         
         SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays();
         
-        moPayrollReceipt.setFactorCalendar(hrsEmployeeDays.getFactorCalendar());
-        moPayrollReceipt.setFactorDaysPaid(hrsEmployeeDays.getFactorDaysPaid());
-        moPayrollReceipt.setReceiptDays(hrsEmployeeDays.getReceiptDays());
-        moPayrollReceipt.setWorkingDays(hrsEmployeeDays.getWorkingDays());
-        moPayrollReceipt.setDaysWorked(hrsEmployeeDays.getDaysWorked());
+        moPayrollReceipt.setFactorCalendar(hrsEmployeeDays.getFactorCalendar()); // just an informative datum
+        moPayrollReceipt.setFactorDaysPaid(hrsEmployeeDays.getFactorDaysPaid()); // just an informative datum
+        moPayrollReceipt.setReceiptDays(hrsEmployeeDays.getReceiptDays()); // just an informative datum
+        moPayrollReceipt.setWorkingDays(hrsEmployeeDays.getWorkingDays()); // just an informative datum
+        moPayrollReceipt.setDaysWorked(hrsEmployeeDays.getDaysWorked()); // just an informative datum
         moPayrollReceipt.setDaysHiredPayroll(hrsEmployeeDays.getDaysHiredPayroll());
         moPayrollReceipt.setDaysHiredAnnual(hrsEmployeeDays.getDaysHiredAnnual());
         moPayrollReceipt.setDaysIncapacityNotPaidPayroll(hrsEmployeeDays.getDaysIncapacityNotPaidPayroll());

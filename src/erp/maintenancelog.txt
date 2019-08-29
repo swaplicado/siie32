@@ -1,4 +1,14 @@
 ================================================================================
+2019-08-27, 3.2 141.1
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la adición del nodo otros pagos en el CFDI de nóminas para el 
+    Subsidio para el empleo efectivamente pagado al trabajador cuando el impuesto y el subsidio son iguales.
+2) Corrección a la determinación del factor de ajuste para tablas de ISR y Subsidio para el empleo 
+    para nóminas quincenales de días fijos (i.e., 15 días).
+3) Corrección a la validación de días a pagar en el diálogo de captura de recibos de nómina.
+
+================================================================================
 2019-08-26, 3.2 141.0
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

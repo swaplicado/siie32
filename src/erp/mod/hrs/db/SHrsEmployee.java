@@ -220,8 +220,8 @@ public class SHrsEmployee {
     }
 
     public SHrsEmployeeDays createEmployeeDays() {
-        double payrollCalendarDays = moHrsReceipt.getHrsPayroll().getPayroll().getCalendarDays_r(); // casted to double to compute a correct factor!
-        double factorCalendar = payrollCalendarDays == 0 ? 0 : moHrsReceipt.getHrsPayroll().getPayroll().getReceiptDays() / payrollCalendarDays;
+        double daysPayrollCalendar = moHrsReceipt.getHrsPayroll().getPayroll().getCalendarDays_r(); // casted to double to compute a correct factor!
+        double factorCalendar = daysPayrollCalendar == 0 ? 0 : moHrsReceipt.getHrsPayroll().getPayroll().getReceiptDays() / daysPayrollCalendar;
 
         int daysReceipt = mnDaysHiredPayroll;
         int daysWorking;

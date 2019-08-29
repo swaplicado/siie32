@@ -183,10 +183,15 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setWorkingHoursDay(int n) { mnWorkingHoursDay = n; }
     public void setPaymentDaily(double d) { mdPaymentDaily = d; }
     public void setPaymentHourly(double d) { mdPaymentHourly = d; }
+    /** Set factor for calendar (days). Just an informative datum. */
     public void setFactorCalendar(double d) { mdFactorCalendar = d; }
+    /** Set factor for days paids. Just an informative datum. */
     public void setFactorDaysPaid(double d) { mdFactorDaysPaid = d; }
+    /** Set receipt days. Just an informative datum. */
     public void setReceiptDays(double d) { mdReceiptDays = d; }
+    /** Set working days. Just an informative datum. */
     public void setWorkingDays(double d) { mdWorkingDays = d; }
+    /** Set days worked. Just an informative datum. */
     public void setDaysWorked(double d) { mdDaysWorked = d; }
     public void setDaysHiredPayroll(double d) { mdDaysHiredPayroll = d; }
     public void setDaysHiredAnnual(double d) { mdDaysHiredAnnual = d; }
@@ -252,10 +257,15 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public int getWorkingHoursDay() { return mnWorkingHoursDay; }
     public double getPaymentDaily() { return mdPaymentDaily; }
     public double getPaymentHourly() { return mdPaymentHourly; }
+    /** Get factor for calendar (days). Just an informative datum. */
     public double getFactorCalendar() { return mdFactorCalendar; }
+    /** Get factor for days paid. Just an informative datum. */
     public double getFactorDaysPaid() { return mdFactorDaysPaid; }
+    /** Get receipt days. Just an informative datum. */
     public double getReceiptDays() { return mdReceiptDays; }
+    /** Get working days. Just an informative datum. */
     public double getWorkingDays() { return mdWorkingDays; }
+    /** Get days worked. Just an informative datum. */
     public double getDaysWorked() { return mdDaysWorked; }
     public double getDaysHiredPayroll() { return mdDaysHiredPayroll; }
     public double getDaysHiredAnnual() { return mdDaysHiredAnnual; }

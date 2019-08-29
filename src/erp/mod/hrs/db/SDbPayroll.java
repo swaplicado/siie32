@@ -209,9 +209,8 @@ public class SDbPayroll extends SDbRegistryUser {
     public double getAuxTotalDeductions() { return mdAuxTotalDeductions; }
     public double getAuxTotalNet() { return mdAuxTotalEarnings - mdAuxTotalDeductions; }
     
-    public boolean isDummy() { return mbAuxIsDummy; }
-
-    public boolean isNormal() { return mnFkPaysheetTypeId == SModSysConsts.HRSS_TP_PAY_SHT_NOR; }
+    public boolean isPayrollNormal() { return mnFkPaysheetTypeId == SModSysConsts.HRSS_TP_PAY_SHT_NOR; }
+    public boolean isPayrollFortnightStandard() { return mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_FOR && mbFortnightStandard; }
 
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceipts() { return maChildPayrollReceipts; }
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceiptsToDelete() { return maChildPayrollReceiptsToDelete; }

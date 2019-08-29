@@ -786,11 +786,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
 
     @Override
     public SHrsPayroll createHrsPayroll(final SDbConfig config, final SDbWorkingDaySettings workingDaySettings, final SDbPayroll payroll, final boolean isCopy) throws Exception {
-        SHrsPayroll hrsPayroll = new SHrsPayroll(this);
-
-        hrsPayroll.setConfig(config);
-        hrsPayroll.setWorkingDaySettings(workingDaySettings);
-        hrsPayroll.setPayroll(payroll);
+        SHrsPayroll hrsPayroll = new SHrsPayroll(this, config, workingDaySettings, payroll);
 
         // Adjustments by loan type:
         hrsPayroll.getLoanTypeAdjustments().addAll(readLoanTypeAdjustment());

@@ -153,8 +153,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moIntPeriod = new sa.lib.gui.bean.SBeanFieldInteger();
         jbEditPeriod = new javax.swing.JButton();
         jPanel12 = new javax.swing.JPanel();
-        jlPayrollDays = new javax.swing.JLabel();
-        moIntPayrollDays = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlReceiptDays = new javax.swing.JLabel();
+        moIntReceiptDays = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel13 = new javax.swing.JPanel();
         jlWorkingDays = new javax.swing.JLabel();
         moIntWorkingDays = new sa.lib.gui.bean.SBeanFieldInteger();
@@ -376,12 +376,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPayrollDays.setText("Días nómina:");
-        jlPayrollDays.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jlPayrollDays);
+        jlReceiptDays.setText("Días nómina:");
+        jlReceiptDays.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlReceiptDays);
 
-        moIntPayrollDays.setEditable(false);
-        jPanel12.add(moIntPayrollDays);
+        moIntReceiptDays.setEditable(false);
+        jPanel12.add(moIntReceiptDays);
 
         jPanel6.add(jPanel12);
 
@@ -813,8 +813,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlNotes;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlPaymentType;
-    private javax.swing.JLabel jlPayrollDays;
     private javax.swing.JLabel jlPeriod;
+    private javax.swing.JLabel jlReceiptDays;
     private javax.swing.JLabel jlSsContribution;
     private javax.swing.JLabel jlTax;
     private javax.swing.JLabel jlTaxComputationType;
@@ -853,9 +853,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moDecUmiAmount;
     private sa.lib.gui.bean.SBeanFieldInteger moIntFiscalYear;
     private sa.lib.gui.bean.SBeanFieldInteger moIntNumber;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntPayrollDays;
     private sa.lib.gui.bean.SBeanFieldInteger moIntPeriod;
     private sa.lib.gui.bean.SBeanFieldInteger moIntPeriodYear;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntReceiptDays;
     private sa.lib.gui.bean.SBeanFieldInteger moIntWorkingDays;
     private sa.lib.gui.bean.SBeanFieldKey moKeyMwzReferenceType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyMwzType;
@@ -893,7 +893,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
         moIntPeriod.setIntegerSettings(SGuiUtils.getLabelName(jlPeriod.getText()), SGuiConsts.GUI_TYPE_INT_CAL_MONTH, true);
         moIntPeriod.setMaxInteger(SHrsConsts.YEAR_MONTHS);
-        moIntPayrollDays.setIntegerSettings(SGuiUtils.getLabelName(jlPayrollDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
+        moIntReceiptDays.setIntegerSettings(SGuiUtils.getLabelName(jlReceiptDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moIntWorkingDays.setIntegerSettings(SGuiUtils.getLabelName(jlWorkingDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moTextNotes.setTextSettings(SGuiUtils.getLabelName(jlNotes.getText()), 255, 0);
         moRadNormal.setBooleanSettings(SGuiUtils.getLabelName(moRadNormal.getText()), false);
@@ -928,7 +928,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moDateDateStart);
         moFields.addField(moDateDateEnd);
         moFields.addField(moIntPeriod);
-        moFields.addField(moIntPayrollDays); // is read-only
+        moFields.addField(moIntReceiptDays); // is read-only
         moFields.addField(moIntWorkingDays); // is read-only
         moFields.addField(moTextNotes);
         moFields.addField(moRadNormal);
@@ -1128,12 +1128,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
         
         // permanent read-only fields:
-        moIntPayrollDays.setEditable(false); 
+        moIntReceiptDays.setEditable(false); 
         moIntWorkingDays.setEditable(false);
         moDecMwzWage.setEditable(false);
         moDecMwzReferenceWage.setEditable(false);
         moDecUmaAmount.setEditable(false);
         moDecUmiAmount.setEditable(false);
+        moBoolClosed.setEnabled(false);
     }
     
     private int getPaysheetTypeId() {
@@ -1154,7 +1155,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     
     private void setPaysheetTypeId(int type) {
         switch(type) {
-        
             case SModSysConsts.HRSS_TP_PAY_SHT_NOR:
                 moRadNormal.setSelected(true);
                 break;
@@ -1177,61 +1177,66 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
     }
 
-    private void computePayroll() {
-        moRegistry.setFiscalYear(moIntFiscalYear.getValue());
-        moRegistry.setPeriodYear(moIntPeriodYear.getValue());
-        moRegistry.setPeriod(moIntPeriod.getValue());
-        moRegistry.setNumber(moIntNumber.getValue());
-        moRegistry.setDateStart(moDateDateStart.getValue());
-        moRegistry.setDateEnd(moDateDateEnd.getValue());
-        moRegistry.setCalendarDays_r(mnDaysCalendarPayroll);
-        moRegistry.setReceiptDays(moIntPayrollDays.getValue());
-        moRegistry.setWorkingDays(moIntWorkingDays.getValue());
-        moRegistry.setUmaAmount(moDecUmaAmount.getField().getValue());
-        moRegistry.setUmiAmount(moDecUmiAmount.getField().getValue());
-        moRegistry.setMwzWage(moDecMwzWage.getField().getValue());
-        moRegistry.setMwzReferenceWage(moDecMwzReferenceWage.getField().getValue());
-        moRegistry.setNotes(moTextNotes.getValue());
-        moRegistry.setTaxSubsidy(mbIsWithTaxSubsidy);
-        moRegistry.setSsContribution(moBoolSsContribution.getValue());
-        moRegistry.setFortnightStandard(moConfig.isFortnightStandard());
-        //moRegistry.setAccounting(...);
-        moRegistry.setClosed(moBoolClosed.getValue());
+    private void updatePayroll(final SDbPayroll payroll, final boolean populateReceipts) {
+        payroll.setFiscalYear(moIntFiscalYear.getValue());
+        payroll.setPeriodYear(moIntPeriodYear.getValue());
+        payroll.setPeriod(moIntPeriod.getValue());
+        payroll.setNumber(moIntNumber.getValue());
+        payroll.setDateStart(moDateDateStart.getValue());
+        payroll.setDateEnd(moDateDateEnd.getValue());
+        payroll.setCalendarDays_r(mnDaysCalendarPayroll);
+        payroll.setReceiptDays(moIntReceiptDays.getValue());
+        payroll.setWorkingDays(moIntWorkingDays.getValue());
+        payroll.setUmaAmount(moDecUmaAmount.getField().getValue());
+        payroll.setUmiAmount(moDecUmiAmount.getField().getValue());
+        payroll.setMwzWage(moDecMwzWage.getField().getValue());
+        payroll.setMwzReferenceWage(moDecMwzReferenceWage.getField().getValue());
+        payroll.setNotes(moTextNotes.getValue());
+        payroll.setTaxSubsidy(mbIsWithTaxSubsidy);
+        payroll.setSsContribution(moBoolSsContribution.getValue());
+        payroll.setFortnightStandard(moConfig.isFortnightStandard());
+        //payroll.setAccounting(...); // value set outside this form in another user case
+        //payroll.setClosed(moBoolClosed.getValue()); // value set outside this form in another user case
         
-        moRegistry.setFkPaymentTypeId(mnFormSubtype);
-        moRegistry.setFkPaysheetTypeId(getPaysheetTypeId());
+        payroll.setFkPaymentTypeId(mnFormSubtype);
+        payroll.setFkPaysheetTypeId(getPaysheetTypeId());
 
         if (moKeyMwzType.getSelectedIndex() > 0) {
-            moRegistry.setFkMwzTypeId(moKeyMwzType.getValue()[0]);
+            payroll.setFkMwzTypeId(moKeyMwzType.getValue()[0]);
         }
 
         if (moKeyMwzReferenceType.getSelectedIndex() > 0) {
-            moRegistry.setFkMwzReferenceTypeId(moKeyMwzReferenceType.getValue()[0]);
+            payroll.setFkMwzReferenceTypeId(moKeyMwzReferenceType.getValue()[0]);
         }
         
         if (moKeyTaxComputationType.getSelectedIndex() > 0) {
-            moRegistry.setFkTaxComputationTypeId(moKeyTaxComputationType.getValue()[0]);
+            payroll.setFkTaxComputationTypeId(moKeyTaxComputationType.getValue()[0]);
         }
 
         if (moKeyTax.getSelectedIndex() > 0) {
-            moRegistry.setFkTaxId(moKeyTax.getValue()[0]);
+            payroll.setFkTaxId(moKeyTax.getValue()[0]);
         }
 
         if (moKeyTaxSubsidy.getSelectedIndex() > 0) {
-            moRegistry.setFkTaxSubsidyId(moKeyTaxSubsidy.getValue()[0]);
+            payroll.setFkTaxSubsidyId(moKeyTaxSubsidy.getValue()[0]);
         }
 
         if (moKeySsContribution.getSelectedIndex() > 0) {
-            moRegistry.setFkSsContributionId(moKeySsContribution.getValue()[0]);
+            payroll.setFkSsContributionId(moKeySsContribution.getValue()[0]);
         }
         
-        moHrsPayroll.setPayroll(moRegistry);
-        populateRowPayrollEmployeesReceipts();
+        //payroll.setFkUserClosedId(...); // value set outside this form in another user case
+        
+        moHrsPayroll.setPayroll(payroll);
+        
+        if (populateReceipts) {
+            populateRowPayrollEmployeesReceipts();
+        }
     }
     
     private void computeReceipts() {
         try {
-            computePayroll();
+            updatePayroll(moRegistry, true);
             moHrsPayroll.computeReceipts();
             computePayrollValue();
         }
@@ -1261,7 +1266,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         if (mnDaysCalendarPayroll > 0) {
             workingDays = (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE ? moWorkingDaySettings.getWorkingDaysWeek() : moConfig.isFortnightStandard() ? SHrsConsts.FORTNIGHT_FIXED_DAYS : mnDaysCalendarPayroll);
             
-            moIntPayrollDays.setValue(mnFormSubtype == SModSysConsts.HRSS_TP_PAY_FOR && moConfig.isFortnightStandard() ? SHrsConsts.FORTNIGHT_FIXED_DAYS : mnDaysCalendarPayroll);
+            moIntReceiptDays.setValue(mnFormSubtype == SModSysConsts.HRSS_TP_PAY_FOR && moConfig.isFortnightStandard() ? SHrsConsts.FORTNIGHT_FIXED_DAYS : mnDaysCalendarPayroll);
             moIntWorkingDays.setValue(workingDays <= 0 ? 0 : workingDays);
         }
     }
@@ -1419,7 +1424,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             jtpPayroll.setSelectedIndex(1);
 
             if (!mbIsReadOnly) {
-                computePayroll();
+                updatePayroll(moRegistry, true);
             }
         }
     }
@@ -1885,7 +1890,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 moIntPeriod.setValue(moRegistry.getPeriod());
 
                 // Set days:
-                moIntPayrollDays.setValue(moRegistry.getReceiptDays());
+                moIntReceiptDays.setValue(moRegistry.getReceiptDays());
                 moIntWorkingDays.setValue(moRegistry.getWorkingDays());
                 
                 // Set salaries:
@@ -1936,38 +1941,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     @Override
     public SDbRegistry getRegistry() throws Exception {
         SDbPayroll registry = moRegistry.clone();
-        SDbPayrollReceipt payrollReceipt = null;
 
         if (registry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
         }
 
-        registry.setPeriodYear(moIntPeriodYear.getValue());
-        registry.setFiscalYear(moIntFiscalYear.getValue());
-        registry.setPeriod(moIntPeriod.getValue());
-        registry.setNumber(moIntNumber.getValue());
-        registry.setDateStart(moDateDateStart.getValue());
-        registry.setDateEnd(moDateDateEnd.getValue());
-        registry.setReceiptDays(moIntPayrollDays.getValue());
-        registry.setWorkingDays(moIntWorkingDays.getValue());
-        registry.setMwzWage(moDecMwzWage.getField().getValue());
-        registry.setMwzReferenceWage(moDecMwzReferenceWage.getField().getValue());
-        registry.setNotes(moTextNotes.getValue());
-        registry.setFkPaysheetTypeId(getPaysheetTypeId());
-        registry.setSsContribution(moBoolSsContribution.getValue());
-        registry.setTaxSubsidy(mbIsWithTaxSubsidy);
-        registry.setClosed(moBoolClosed.getValue());
-        registry.setFkPaymentTypeId(mnFormSubtype);
-        registry.setFkMwzTypeId(moKeyMwzType.getValue()[0]);
-        registry.setFkMwzReferenceTypeId(moKeyMwzReferenceType.getValue()[0]);
-        registry.setFkTaxComputationTypeId(moKeyTaxComputationType.getValue()[0]);
-        registry.setFkTaxId(moKeyTax.getValue()[0]);
-        registry.setFkTaxSubsidyId(moKeyTaxSubsidy.getValue()[0]);
-        registry.setFkSsContributionId(moKeySsContribution.getValue()[0]);
-
+        updatePayroll(registry, false);
+        
         registry.getChildPayrollReceipts().clear();
+        
         for (SHrsReceipt hrsReceipt : moHrsPayroll.getHrsReceipts()) {
-            payrollReceipt = hrsReceipt.getPayrollReceipt();
+            SDbPayrollReceipt payrollReceipt = hrsReceipt.getPayrollReceipt();
 
             // Obtain payrollReceiptEarnings:
 
