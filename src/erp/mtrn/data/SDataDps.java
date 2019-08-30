@@ -3558,6 +3558,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     if (moAuxFormerRecordKey != null) {
                         // If document had automatic accounting record, delete it including its header:
 
+                        mnFkUserDeleteId = mnFkUserEditId; // to preserve the annulment user in the accounting of the document
                         deleteRecord(moAuxFormerRecordKey, mbAuxIsFormerRecordAutomatic, connection);
                     }
 

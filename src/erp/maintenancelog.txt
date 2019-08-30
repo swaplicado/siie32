@@ -1,4 +1,11 @@
 ================================================================================
+2019-08-30, 3.2 141.3
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Ampliación de permiso de no modificación de crédito en vistas de crédito de asociados de negocios.
+2) Corrección a preservación de usuario al anular y eliminar registros. Especialmente para documentos y CFDI.
+
+================================================================================
 2019-08-29, 3.2 141.2
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

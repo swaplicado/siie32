@@ -176,7 +176,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         String sql;
         Statement statement = connection.createStatement();
         
-        sql = "UPDATE fin_rec_ety SET b_del = 1, fid_usr_edit = " + (mnAuxFkUserEditId != 0 ? mnAuxFkUserEditId : SUtilConsts.USR_NA_ID) + ", ts_del = NOW() "
+        sql = "UPDATE fin_rec_ety SET b_del = 1, fid_usr_del = " + (mnAuxFkUserDeleteId != 0 ? mnAuxFkUserDeleteId : SUtilConsts.USR_NA_ID) + ", ts_del = NOW() "
                 + "WHERE fid_cfd_n = " + moDbmsDataCfd.getPkCfdId() + " AND NOT b_del;";
         statement.execute(sql);
     }
@@ -520,6 +520,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
             else {
                 if (!wasRegistryNew) {
                     // delete last CFDI accounting movements in database:
+                    mnAuxFkUserDeleteId = mnAuxFkUserEditId;
                     deleteAccounting(connection);
 
                     // delete last CFDI accounting movements in memory:

@@ -14,10 +14,11 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import javax.swing.JButton;
+import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SViewBizPartnerCategory extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -29,10 +30,24 @@ public class SViewBizPartnerCategory extends erp.lib.table.STableTab implements 
     }
 
     private void initComponents() {
-        int i;
+        boolean canEditCredit = false;
+        int levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP).Level;
+        int levelRightEditCategory = 0;
 
+        switch (mnTabTypeAux01) {
+            case SDataConstantsSys.BPSS_CT_BP_SUP:
+                canEditCredit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_CRED_CONFIG).HasRight;
+                levelRightEditCategory = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_SUP).Level;
+                break;
+            case SDataConstantsSys.BPSS_CT_BP_CUS:
+                canEditCredit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_CRED_CONFIG).HasRight;
+                levelRightEditCategory = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP_CUS).Level;
+                break;
+            default:
+        }
+                
         jbNew.setEnabled(false);
-        jbEdit.setEnabled(true);
+        jbEdit.setEnabled(canEditCredit && (levelRightEditCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && mnTabTypeAux01 != SDataConstants.BPSU_BP);
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[2];
@@ -43,7 +58,7 @@ public class SViewBizPartnerCategory extends erp.lib.table.STableTab implements 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
 
-        i = 0;
+        int i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "bct.id_bp");
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "bct.id_ct_bp");
         for (i = 0; i < aoKeyFields.length; i++) {

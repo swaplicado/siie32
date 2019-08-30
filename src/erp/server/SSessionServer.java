@@ -26,11 +26,13 @@ import erp.lib.table.STableRowCustom;
 import erp.lib.table.STableUtilities;
 import erp.mbps.data.SDataEmployee;
 import erp.mfin.data.SFinAccountUtilities;
+import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mtrn.data.SCfdPacket;
 import erp.mtrn.data.SCfdPaymentUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataCfdPayment;
 import erp.mtrn.data.SDataCfdSignLog;
+import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataSign;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
@@ -541,13 +543,16 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                         
                         switch (packet.getFkCfdTypeId()) {
                             case SDataConstantsSys.TRNS_TP_CFD_INV:
-                                if (packet.getAuxDataDps() != null) {
-                                    packet.getAuxDataDps().setAuxIsProcessingCancellation(true);
+                                SDataDps dps = packet.getAuxDataDps();
+                                
+                                if (dps != null) {
+                                    dps.setAuxIsProcessingCancellation(true);
                                     
-                                    result = ((SDataRegistry) packet.getAuxDataDps()).canAnnul(moCompanyDatabase.getConnection());
+                                    result = dps.canAnnul(moCompanyDatabase.getConnection());
 
                                     if (result == SLibConstants.DB_CAN_ANNUL_YES) {
-                                        result = ((SDataRegistry) packet.getAuxDataDps()).annul(moCompanyDatabase.getConnection());
+                                        dps.setFkUserEditId(mnPkUserId); // preserve the user that requested the action
+                                        result = dps.annul(moCompanyDatabase.getConnection());
 
                                         if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
                                             result = SLibConstants.DB_CFD_OK;
@@ -557,23 +562,29 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                                 break;
                                 
                             case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
-                                if (packet.getAuxDataCfdPayment()!= null) {
+                                SDataCfdPayment cfdPayment = packet.getAuxDataCfdPayment();
+                                
+                                if (cfdPayment != null) {
                                     result = ((SDataRegistry) packet.getAuxDataCfdPayment()).canAnnul(moCompanyDatabase.getConnection());
 
                                     if (result == SLibConstants.DB_CAN_ANNUL_YES) {
                                         // irregular way to annul registries (CFD has just been annulled):
-                                        ((SDataCfdPayment) packet.getAuxDataCfdPayment()).deleteAccounting(moCompanyDatabase.getConnection());
+                                        cfdPayment.setFkUserDeleteId(mnPkUserId); // preserve the user that requested the action
+                                        cfdPayment.deleteAccounting(moCompanyDatabase.getConnection());
                                         result = SLibConstants.DB_CFD_OK;
                                     } 
                                 }
                                 break;
                                 
                             case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                                if (packet.getAuxDataPayrollReceiptIssue() != null) {
-                                    result = ((SDataRegistry) packet.getAuxDataPayrollReceiptIssue()).canAnnul(moCompanyDatabase.getConnection());
+                                 SDataPayrollReceiptIssue payrollReceiptIssue = packet.getAuxDataPayrollReceiptIssue();
+                                
+                                if (payrollReceiptIssue != null) {
+                                    result = payrollReceiptIssue.canAnnul(moCompanyDatabase.getConnection());
 
                                     if (result == SLibConstants.DB_CAN_ANNUL_YES) {
-                                        result = ((SDataRegistry) packet.getAuxDataPayrollReceiptIssue()).annul(moCompanyDatabase.getConnection());
+                                        payrollReceiptIssue.setFkUserUpdateId(mnPkUserId);
+                                        result = payrollReceiptIssue.annul(moCompanyDatabase.getConnection());
 
                                         if (result == SLibConstants.DB_ACTION_ANNUL_OK) {
                                             result = SLibConstants.DB_CFD_OK;
@@ -712,6 +723,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         int nResult = SLibConsts.UNDEFINED;
         Object[] oParams = null;
         SServerResponse oResponse = new SServerResponse(SSrvConsts.RESP_TYPE_OK);
+        SDataRegistry registry;
 
         try {
             switch (poRequest.getRequestType()) {
@@ -756,7 +768,14 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
                 case SServerConstants.REQ_DB_ACTION_SAVE:
                     startTransac();
-                    nResult = ((SDataRegistry) poRequest.getPacket()).save(moCompanyDatabase.getConnection());
+                    registry = (SDataRegistry) poRequest.getPacket();
+                    if (registry.getIsRegistryNew()) {
+                        registry.setFkUserNewId(mnPkUserId);
+                    }
+                    else {
+                        registry.setFkUserEditId(mnPkUserId);
+                    }
+                    nResult = registry.save(moCompanyDatabase.getConnection());
                     if (nResult == SLibConstants.DB_ACTION_SAVE_OK) {
                         commitTransac();
                     }
@@ -767,7 +786,9 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
                 case SServerConstants.REQ_DB_ACTION_ANNUL:
                     startTransac();
-                    nResult = ((SDataRegistry) poRequest.getPacket()).annul(moCompanyDatabase.getConnection());
+                    registry = (SDataRegistry) poRequest.getPacket();
+                    registry.setFkUserEditId(mnPkUserId);
+                    nResult = registry.annul(moCompanyDatabase.getConnection());
                     if (nResult == SLibConstants.DB_ACTION_ANNUL_OK) {
                         commitTransac();
                     }
@@ -778,7 +799,9 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
                 case SServerConstants.REQ_DB_ACTION_DELETE:
                     startTransac();
-                    nResult = ((SDataRegistry) poRequest.getPacket()).delete(moCompanyDatabase.getConnection());
+                    registry = (SDataRegistry) poRequest.getPacket();
+                    registry.setFkUserDeleteId(mnPkUserId);
+                    nResult = registry.delete(moCompanyDatabase.getConnection());
                     if (nResult == SLibConstants.DB_ACTION_DELETE_OK) {
                         commitTransac();
                     }
@@ -789,7 +812,9 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
                 case SServerConstants.REQ_DB_ACTION_PROCESS:
                     startTransac();
-                    nResult = ((SDataRegistry) poRequest.getPacket()).process(moCompanyDatabase.getConnection());
+                    registry = (SDataRegistry) poRequest.getPacket();
+                    registry.setFkUserEditId(mnPkUserId);
+                    nResult = registry.process(moCompanyDatabase.getConnection());
                     if (nResult == SLibConstants.DB_ACTION_PROCESS_OK) {
                         commitTransac();
                     }
