@@ -18,7 +18,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SViewCountry extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -45,7 +45,7 @@ public class SViewCountry extends erp.lib.table.STableTab implements java.awt.ev
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[12];
+        STableColumn[] aoTableColumns = new STableColumn[13];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "cty.id_cty");
@@ -63,8 +63,9 @@ public class SViewCountry extends erp.lib.table.STableTab implements java.awt.ev
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cty.cty_key", "Clave", 75);
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cty.cty_abbr", "Abr.", 50);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cty.cty_code", "Código país", 50);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cty.cty_group", "Código grupo", 50);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cty.cty_code", "Código país", 75);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cty.cty_group", "Agrupación SAT CFDI", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "cty.diot_code", "Código DIOT", 75);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "cty.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "cty.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -127,7 +128,7 @@ public class SViewCountry extends erp.lib.table.STableTab implements java.awt.ev
             }
         }
 
-        msSql = "SELECT cty.id_cty, cty.cty_key, cty.cty, cty.cty_abbr, cty.cty_code, cty.cty_group, cty.b_del, " +
+        msSql = "SELECT cty.id_cty, cty.cty_key, cty.cty, cty.cty_abbr, cty.cty_code, cty.cty_group, cty.diot_code, cty.b_del, " +
                 "cty.fid_usr_new, cty.fid_usr_edit, cty.fid_usr_del, cty.ts_new, cty.ts_edit, cty.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM erp.locu_cty AS cty " +
                 "INNER JOIN erp.usru_usr AS un ON " +

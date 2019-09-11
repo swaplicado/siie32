@@ -5,18 +5,19 @@
 
 package erp.mfin.data;
 
-import java.sql.CallableStatement;
-import java.sql.ResultSet;
-
 import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+    
+    public static final String ERR_MSG_VAT_TYPE = "No se ha configurado el tipo de IVA del impuesto ";
 
     protected int mnPkTaxBasicId;
     protected int mnPkTaxId;
@@ -24,6 +25,7 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected double mdPercentage;
     protected double mdValueUnitary;
     protected double mdValue;
+    protected java.lang.String msVatType;
     protected boolean mbIsDeleted;
     protected int mnFkTaxTypeId;
     protected int mnFkTaxCalculationTypeId;
@@ -53,6 +55,7 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setPercentage(double d) { mdPercentage = d; }
     public void setValueUnitary(double d) { mdValueUnitary = d; }
     public void setValue(double d) { mdValue = d; }
+    public void setVatType(java.lang.String s) { msVatType = s; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkTaxTypeId(int n) { mnFkTaxTypeId = n; }
     public void setFkTaxCalculationTypeId(int n) { mnFkTaxCalculationTypeId = n; }
@@ -70,6 +73,7 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
     public double getPercentage() { return mdPercentage; }
     public double getValueUnitary() { return mdValueUnitary; }
     public double getValue() { return mdValue; }
+    public java.lang.String getVatType() { return msVatType; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkTaxTypeId() { return mnFkTaxTypeId; }
     public int getFkTaxCalculationTypeId() { return mnFkTaxCalculationTypeId; }
@@ -116,6 +120,7 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
         mdPercentage = 0;
         mdValueUnitary = 0;
         mdValue = 0;
+        msVatType = "";
         mbIsDeleted = false;
         mnFkTaxTypeId = 0;
         mnFkTaxCalculationTypeId = 0;
@@ -171,6 +176,7 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
                 mdPercentage = resultSet.getDouble("tax.per");
                 mdValueUnitary = resultSet.getDouble("tax.val_u");
                 mdValue = resultSet.getDouble("tax.val");
+                msVatType = resultSet.getString("tax.vat_type");
                 mbIsDeleted = resultSet.getBoolean("tax.b_del");
                 mnFkTaxTypeId = resultSet.getInt("tax.fid_tp_tax");
                 mnFkTaxCalculationTypeId = resultSet.getInt("tax.fid_tp_tax_cal");
@@ -216,13 +222,14 @@ public class SDataTax extends erp.lib.data.SDataRegistry implements java.io.Seri
             callableStatement = connection.prepareCall(
                     "{ CALL erp.finu_tax_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?," +
-                    "?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkTaxBasicId);
             callableStatement.setInt(nParam++, mnPkTaxId);
             callableStatement.setString(nParam++, msTax);
             callableStatement.setDouble(nParam++, mdPercentage);
             callableStatement.setDouble(nParam++, mdValueUnitary);
             callableStatement.setDouble(nParam++, mdValue);
+            callableStatement.setString(nParam++, msVatType);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkTaxTypeId);
             callableStatement.setInt(nParam++, mnFkTaxCalculationTypeId);

@@ -473,10 +473,10 @@ public abstract class SDataReadComponentItems {
 
                 switch (catalogue) {
                     case SDataConstants.BPSX_BP_X_SUP_CUS:
-                        field = "AND (bp.b_sup = 1 OR bp.b_cus = 1) ";
+                        field = "AND (bp.b_sup OR bp.b_cus OR bp.b_co) ";
                         break;
                     case SDataConstants.BPSX_BP_X_CDR_DBR:
-                        field = "AND (bp.b_cdr = 1 OR bp.b_dbr = 1) ";
+                        field = "AND (bp.b_cdr OR bp.b_dbr OR bp.b_co) ";
                         break;
                     default:
                 }
@@ -484,7 +484,8 @@ public abstract class SDataReadComponentItems {
                 sql = "SELECT bp.id_bp AS f_id_1, bp.bp AS f_item " +
                         "FROM erp.bpsu_bp AS bp " +
                         "INNER JOIN erp.bpsu_bp_ct AS ct ON " +
-                        "bp.id_bp = ct.id_bp AND ct.id_ct_bp IN(" + (catalogue == SDataConstants.BPSX_BP_X_SUP_CUS ? SDataConstantsSys.BPSS_CT_BP_SUP + ", " + SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_CDR + ", " + SDataConstantsSys.BPSS_CT_BP_DBR) + ") " +
+                        "bp.id_bp = ct.id_bp AND ct.id_ct_bp IN (" +
+                        (catalogue == SDataConstants.BPSX_BP_X_SUP_CUS ? SDataConstantsSys.BPSS_CT_BP_SUP + ", " + SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_CDR + ", " + SDataConstantsSys.BPSS_CT_BP_DBR) + ") " +
                         "WHERE bp.b_del = 0 AND ct.b_del = 0 " + field +
                         "ORDER BY bp.bp, bp.id_bp ";
                 text = "asociado de negocios";

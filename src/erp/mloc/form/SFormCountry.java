@@ -23,11 +23,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
-import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas
+ * @author Alfonso Flores, Juan Barajas, Sergio Flores
  */
 public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -45,6 +44,7 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
     private erp.lib.form.SFormField moFieldCountryAbbr;
     private erp.lib.form.SFormField moFieldCountryCode;
     private erp.lib.form.SFormField moFieldCountryGroup;
+    private erp.lib.form.SFormField moFieldDiotCode;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
     /** Creates new form Countries */
@@ -77,7 +77,9 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         jlCountryCode = new javax.swing.JLabel();
         jtfCountryCode = new javax.swing.JTextField();
         jlCountryGroup = new javax.swing.JLabel();
-        moTextCountryGroup = new sa.lib.gui.bean.SBeanFieldText();
+        jtfCountryGroup = new javax.swing.JTextField();
+        jlDiotCode = new javax.swing.JLabel();
+        jtfDiotCode = new javax.swing.JTextField();
         jckIsDeleted = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
@@ -101,32 +103,41 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         jlKey.setText("Clave: *");
         jPanel3.add(jlKey);
 
-        jftKey.setText("CLAVE");
+        jftKey.setText("TEXT");
         jPanel3.add(jftKey);
 
+        jlCountry.setForeground(new java.awt.Color(0, 153, 153));
         jlCountry.setText("País: *");
         jPanel3.add(jlCountry);
 
-        jtfCountry.setText("NOMBRE");
+        jtfCountry.setText("TEXT");
         jPanel3.add(jtfCountry);
 
+        jlCountryAbbr.setForeground(new java.awt.Color(0, 153, 153));
         jlCountryAbbr.setText("Abreviatura: *");
         jPanel3.add(jlCountryAbbr);
 
-        jtfCountryAbbr.setText("ABREVIATURA");
+        jtfCountryAbbr.setText("TEXT");
         jPanel3.add(jtfCountryAbbr);
 
         jlCountryCode.setText("Código de país:");
         jPanel3.add(jlCountryCode);
 
-        jtfCountryCode.setText("CÓDIGO");
+        jtfCountryCode.setText("TEXT");
         jPanel3.add(jtfCountryCode);
 
-        jlCountryGroup.setText("Código del grupo:");
+        jlCountryGroup.setForeground(new java.awt.Color(0, 153, 153));
+        jlCountryGroup.setText("Agrupación SAT-CFDI:");
         jPanel3.add(jlCountryGroup);
 
-        moTextCountryGroup.setText("sBeanFieldText1");
-        jPanel3.add(moTextCountryGroup);
+        jtfCountryGroup.setText("TEXT");
+        jPanel3.add(jtfCountryGroup);
+
+        jlDiotCode.setText("Código DIOT:");
+        jPanel3.add(jlDiotCode);
+
+        jtfDiotCode.setText("TEXT");
+        jPanel3.add(jtfDiotCode);
 
         jckIsDeleted.setText("Registro eliminado");
         jckIsDeleted.setPreferredSize(new java.awt.Dimension(1000, 23));
@@ -167,13 +178,17 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         moFieldKey.setMaskFormatter(miClient.getSessionXXX().getParamsErp().getFormatKeyCountry());
         moFieldCountry = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfCountry, jlCountry);
         moFieldCountry.setLengthMax(100);
+        moFieldCountry.setAutoCaseType(0);
         moFieldCountryAbbr = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfCountryAbbr, jlCountryAbbr);
         moFieldCountryAbbr.setLengthMax(25);
+        moFieldCountryAbbr.setAutoCaseType(0);
         moFieldCountryCode = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCountryCode, jlCountryCode);
         moFieldCountryCode.setLengthMax(10);
-        moFieldCountryGroup = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, moTextCountryGroup.getComponent(), jlCountryGroup);
+        moFieldCountryGroup = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCountryGroup, jlCountryGroup);
         moFieldCountryGroup.setLengthMax(25);
-        moTextCountryGroup.setTextSettings(SGuiUtils.getLabelName(jlCountryGroup.getText()), 25);
+        moFieldCountryGroup.setAutoCaseType(0);
+        moFieldDiotCode = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfDiotCode, jlDiotCode);
+        moFieldDiotCode.setLengthMax(2);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
         mvFields.add(moFieldKey);
@@ -181,6 +196,7 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         mvFields.add(moFieldCountryAbbr);
         mvFields.add(moFieldCountryCode);
         mvFields.add(moFieldCountryGroup);
+        mvFields.add(moFieldDiotCode);
         mvFields.add(moFieldIsDeleted);
 
         jbOk.addActionListener(this);
@@ -256,11 +272,13 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
     private javax.swing.JLabel jlCountryAbbr;
     private javax.swing.JLabel jlCountryCode;
     private javax.swing.JLabel jlCountryGroup;
+    private javax.swing.JLabel jlDiotCode;
     private javax.swing.JLabel jlKey;
     private javax.swing.JTextField jtfCountry;
     private javax.swing.JTextField jtfCountryAbbr;
     private javax.swing.JTextField jtfCountryCode;
-    private sa.lib.gui.bean.SBeanFieldText moTextCountryGroup;
+    private javax.swing.JTextField jtfCountryGroup;
+    private javax.swing.JTextField jtfDiotCode;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -342,7 +360,8 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         moFieldCountry.setFieldValue(moCountry.getCountry());
         moFieldCountryAbbr.setFieldValue(moCountry.getCountryAbbr());
         moFieldCountryCode.setFieldValue(moCountry.getCountryCode());
-        moTextCountryGroup.setValue(moCountry.getCountryGroup());
+        moFieldCountryGroup.setFieldValue(moCountry.getCountryGroup());
+        moFieldDiotCode.setFieldValue(moCountry.getDiotCode());
         moFieldIsDeleted.setFieldValue(moCountry.getIsDeleted());
 
         renderKey();
@@ -363,7 +382,8 @@ public class SFormCountry extends javax.swing.JDialog implements erp.lib.form.SF
         moCountry.setCountry(moFieldCountry.getString());
         moCountry.setCountryAbbr(moFieldCountryAbbr.getString());
         moCountry.setCountryCode(moFieldCountryCode.getString());
-        moCountry.setCountryGroup(moTextCountryGroup.getValue());
+        moCountry.setCountryGroup(moFieldCountryGroup.getString());
+        moCountry.setDiotCode(moFieldDiotCode.getString());
         moCountry.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         return moCountry;

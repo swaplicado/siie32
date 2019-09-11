@@ -120,9 +120,9 @@
                           <SubComponents>
                             <Component class="javax.swing.JLabel" name="jlFkBizPartnerIdentityTypeId">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Tipo de identidad: *"/>
+                                <Property name="text" type="java.lang.String" value="Tipo identidad: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 23]"/>
+                                  <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -138,6 +138,13 @@
                               <AuxValues>
                                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
                               </AuxValues>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel1">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[50, 23]"/>
+                                </Property>
+                              </Properties>
                             </Component>
                             <Component class="javax.swing.JCheckBox" name="jckIsDeleted">
                               <Properties>
@@ -156,9 +163,9 @@
                           <SubComponents>
                             <Component class="javax.swing.JLabel" name="jlFkTaxIdentityTypeId">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Identidad impuestos: *"/>
+                                <Property name="text" type="java.lang.String" value="Identidad imptos.: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 23]"/>
+                                  <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -172,10 +179,19 @@
                                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
                               </AuxValues>
                             </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel2">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[50, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
                             <Component class="javax.swing.JCheckBox" name="jckIsCategoryDeleted">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Categor&#xed;a eliminada"/>
-                                <Property name="horizontalAlignment" type="int" value="4"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[150, 23]"/>
+                                </Property>
                               </Properties>
                             </Component>
                           </SubComponents>
@@ -191,7 +207,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Apellido(s): *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 23]"/>
+                                  <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -215,7 +231,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Nombre(s): *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 23]"/>
+                                  <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -239,14 +255,14 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Raz&#xf3;n social: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 23]"/>
+                                  <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
                             <Component class="javax.swing.JTextField" name="jtfBizPartner">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[354, 23]"/>
+                                  <Dimension value="[400, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -263,14 +279,14 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Nombre comercial:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 23]"/>
+                                  <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
                             <Component class="javax.swing.JTextField" name="jtfBizPartnerCommercial">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[354, 23]"/>
+                                  <Dimension value="[400, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -299,7 +315,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="RFC: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[125, 23]"/>
+                                  <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -315,7 +331,7 @@
                                 <Property name="horizontalAlignment" type="int" value="0"/>
                                 <Property name="text" type="java.lang.String" value="CURP:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[54, 23]"/>
+                                  <Dimension value="[50, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -342,7 +358,7 @@
                             <Component class="javax.swing.JTextField" name="jtfFiscalFrgId">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[100, 23]"/>
+                                  <Dimension value="[125, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -611,6 +627,13 @@
                               </Properties>
                             </Component>
                           </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel3">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
                         </Container>
                       </SubComponents>
                     </Container>
@@ -1118,6 +1141,33 @@
                     <Property name="verticalGap" type="int" value="2"/>
                   </Layout>
                   <SubComponents>
+                    <Container class="javax.swing.JPanel" name="jPanel14">
+
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                        <Property name="alignment" type="int" value="0"/>
+                        <Property name="verticalGap" type="int" value="0"/>
+                      </Layout>
+                      <SubComponents>
+                        <Component class="javax.swing.JLabel" name="jlDiotOperation">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Tipo operaci&#xf3;n DIOT:"/>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[175, 23]"/>
+                            </Property>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JComboBox" name="jcbDiotOperation">
+                          <Properties>
+                            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                              <Dimension value="[300, 23]"/>
+                            </Property>
+                          </Properties>
+                          <AuxValues>
+                            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
+                          </AuxValues>
+                        </Component>
+                      </SubComponents>
+                    </Container>
                     <Container class="javax.swing.JPanel" name="jPanel7">
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
@@ -1294,7 +1344,7 @@
                         </Component>
                       </SubComponents>
                     </Container>
-                    <Container class="javax.swing.JPanel" name="jPanel14">
+                    <Container class="javax.swing.JPanel" name="jPanel17">
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                         <Property name="alignment" type="int" value="0"/>

@@ -11,11 +11,6 @@ import java.util.HashMap;
  *
  * @author Sergio Flores, Claudio Peña, Sergio Flores
  * 
- * Maintenance Log:
- * 
- * 2016-07-14, Sergio Flores: implementation of new payment method catalogue (erp.TRNU_TP_PAY_SYS DB table).
- * 2018-02-28, Sergio Flores: implementation of constants of operations types.
- * 
  */
 public abstract class SDataConstantsSys {
 
@@ -90,8 +85,11 @@ public abstract class SDataConstantsSys {
     public static final int CFGS_LOT_MODEL_CONS = 1;
     public static final int CFGS_LOT_MODEL_CONS_DATE = 2;
 
+    public static final String CFG_PARAM_DIOT_ACCOUNTS = "DIOT_ACCOUNTS";
+    public static final String CFG_PARAM_DIOT_VAT_DEFAULT = "DIOT_VAT_DEFAULT";
+    
     public static final int CFGX_IVM_FIFO = 1;
-
+    
     /* XXX 2019-08-16 Sergio Flores: Not used yet.
     public static final int USRS_TP_LEV_NO_PERMISSION = 0;
     public static final int USRS_TP_LEV_READ = 1;
@@ -918,6 +916,8 @@ public abstract class SDataConstantsSys {
     public static final int [] FINU_CLS_ACC_USR_ORD_DEB = { 4, 1, 1 };
     public static final int [] FINU_CLS_ACC_USR_ORD_CRE = { 4, 2, 1 };
 
+    public static int FINU_TP_ACC_LEDGER_VAT_CREDITABLE = 9;
+    
     public static final int FINX_ACC_PAY = 1;
     public static final int FINX_ACC_PAY_PEND = 2;
 
@@ -930,7 +930,7 @@ public abstract class SDataConstantsSys {
     
     public static final int FINX_ACC = 1;
     public static final int FINX_ACC_DEEP = 2;
-
+    
     public static final int TRNS_CT_DPS_PUR = 1;
     public static final int TRNS_CT_DPS_SAL = 2;
 

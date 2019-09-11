@@ -154,6 +154,9 @@ public class SDataAccount extends erp.lib.data.SDataRegistry implements java.io.
     public boolean getDbmsIsRequiredCostCenter() { return mbDbmsIsRequiredCostCenter; }
     public int getDbmsMajorDeep() { return mnDbmsMajorDeep; }
     public java.lang.String getDbmsPkAccountMajorId() { return msDbmsPkAccountMajorId; }
+    
+    public int[] getAccountClassKey() { return new int[] { mnFkAccountTypeId_r, mnFkAccountClassId_r }; }
+    public int[] getAccountSubclassKey() { return new int[] { mnFkAccountTypeId_r, mnFkAccountClassId_r, mnFkAccountSubclassId_r }; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {

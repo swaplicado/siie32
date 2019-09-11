@@ -39,6 +39,7 @@ import erp.mfin.data.SDataTaxIdentity;
 import erp.mfin.data.SDataTaxRegion;
 import erp.mfin.data.SDataTaxableConceptType;
 import erp.mfin.data.SDataYear;
+import erp.mfin.data.diot.SDialogDiotLayout;
 import erp.mfin.form.SDialogRepAccount;
 import erp.mfin.form.SDialogRepAccountCashBalance;
 import erp.mfin.form.SDialogRepAccountConcept;
@@ -288,6 +289,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepPrtChartOfAccounts;
     private javax.swing.JMenuItem jmiRepTaxesByConcept;
     private javax.swing.JMenu jmRepFiscal;
+    private javax.swing.JMenuItem jmiRepFiscalDiotLayout;
     private javax.swing.JMenuItem jmiRepFiscalTaxPendSal;
     private javax.swing.JMenuItem jmiRepFiscalTaxPendPur;
     private javax.swing.JMenuItem jmiRepFiscalXmlFiles;
@@ -658,6 +660,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepTaxesByConcept = new JMenuItem("Reporte de impuestos por concepto...");
         
         jmRepFiscal = new JMenu("Reportes fiscales");
+        jmiRepFiscalDiotLayout = new JMenuItem("Layout DIOT...");
         jmiRepFiscalTaxPendSal = new JMenuItem("Impuestos pendientes de ingresos...");
         jmiRepFiscalTaxPendPur = new JMenuItem("Impuestos pendientes de egresos...");
         jmiRepFiscalXmlFiles = new JMenuItem("Archivos de contabilidad electrónica...");
@@ -769,8 +772,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         
         jmRep.addSeparator();
         
-        jmRepFiscal.add(jmiRepFiscalTaxPendPur);
+        jmRepFiscal.add(jmiRepFiscalDiotLayout);
+        jmRepFiscal.addSeparator();
         jmRepFiscal.add(jmiRepFiscalTaxPendSal);
+        jmRepFiscal.add(jmiRepFiscalTaxPendPur);
         jmRepFiscal.addSeparator();
         jmRepFiscal.add(jmiRepFiscalXmlFiles);
         jmRepFiscal.addSeparator();
@@ -918,8 +923,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepPrtJournalVouchers.addActionListener(this);
         jmiRepTaxesByConcept.addActionListener(this);
         jmiRepPrtChartOfAccounts.addActionListener(this);
-        jmiRepFiscalTaxPendPur.addActionListener(this);
+        jmiRepFiscalDiotLayout.addActionListener(this);
         jmiRepFiscalTaxPendSal.addActionListener(this);
+        jmiRepFiscalTaxPendPur.addActionListener(this);
         jmiRepFiscalXmlFiles.addActionListener(this);
         jmiRepFiscalMonthRepCfd.addActionListener(this);
         jmiRepFiscalMonthRepCf.addActionListener(this);
@@ -2186,6 +2192,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepTaxesByConcept) {
                 new SDialogRepTaxesByConcept(miClient).setVisible(true);
+            }
+            else if (item == jmiRepFiscalDiotLayout) {
+                new SDialogDiotLayout(miClient).setVisible(true);
             }
             else if (item == jmiRepFiscalTaxPendSal) {
                 new SDialogReportTaxPending(miClient.getSession().getClient(), SModSysConsts.TRNS_CT_DPS_SAL, SDataRepConstants.REP_TAX_PND_SAL).setVisible(true);

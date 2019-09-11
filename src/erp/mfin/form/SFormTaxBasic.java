@@ -34,7 +34,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Sergio Flores, Alfonso Flores, Juan Barajas
+ * @author Sergio Flores, Alfonso Flores, Juan Barajas, Sergio Flores
  */
 public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -117,7 +117,7 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
         jPanel2.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel3.setLayout(new java.awt.GridLayout(3, 1, 5, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(3, 1, 5, 3));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -199,22 +199,23 @@ public class SFormTaxBasic extends javax.swing.JDialog implements erp.lib.form.S
         moKeyCfdTaxId.setKeySettings((SGuiClient) miClient, SGuiUtils.getLabelName(jlFkCfdTaxId.getText()), true);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         mvFields.add(moFieldTaxBasic);
         mvFields.add(moFieldFkCfdTaxId);
         mvFields.add(moFieldIsDeleted);
 
         i = 0;
-        tableColumnsTaxes = new STableColumnForm[14];
+        tableColumnsTaxes = new STableColumnForm[15];
         tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Impuesto", 150);
-        tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo imp.", 100);
-        tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo cálc.", 100);
-        tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo apl.", 100);
+        tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo impuesto", 100);
+        tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo cálculo", 100);
+        tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo aplicación", 100);
         tableColumnsTaxes[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Tasa", STableConstants.WIDTH_PERCENTAGE);
         tableColumnsTaxes[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
         tableColumnsTaxes[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Monto fijo u. $", STableConstants.WIDTH_VALUE_UNITARY);
         tableColumnsTaxes[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
         tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Monto fijo $", STableConstants.WIDTH_VALUE);
+        tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo IVA", 100);
         tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
         tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. creación", STableConstants.WIDTH_USER);
         tableColumnsTaxes[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Creación", STableConstants.WIDTH_DATE_TIME);

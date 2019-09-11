@@ -11,24 +11,24 @@
 
 package erp.mfin.form;
 
+import erp.data.SDataConstants;
+import erp.lib.SLibConstants;
+import erp.lib.form.SFormComponentItem;
+import erp.lib.form.SFormField;
+import erp.lib.form.SFormUtilities;
+import erp.lib.form.SFormValidation;
+import erp.mfin.data.SDataTax;
+import erp.mfin.data.diot.SDiotConsts;
+import erp.mod.SModSysConsts;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.lib.SLibConstants;
-import erp.lib.form.SFormField;
-import erp.lib.form.SFormUtilities;
-import erp.lib.form.SFormValidation;
-import erp.mfin.data.SDataTax;
-import erp.mod.SModSysConsts;
-
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -48,6 +48,7 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldPercentage;
     private erp.lib.form.SFormField moFieldValueUnitary;
     private erp.lib.form.SFormField moFieldValue;
+    private erp.lib.form.SFormField moFieldVatType;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
     /** Creates new form SFormTax */
@@ -77,17 +78,19 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlTax = new javax.swing.JLabel();
         jtfTax = new javax.swing.JTextField();
         jlFkTaxTypeId = new javax.swing.JLabel();
-        jcbFkTaxTypeId = new javax.swing.JComboBox();
+        jcbFkTaxTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jlFkTaxCalculationTypeId = new javax.swing.JLabel();
-        jcbFkTaxCalculationTypeId = new javax.swing.JComboBox();
+        jcbFkTaxCalculationTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jlFkTaxApplicationTypeId = new javax.swing.JLabel();
-        jcbTaxApplicationType = new javax.swing.JComboBox();
+        jcbTaxApplicationType = new javax.swing.JComboBox<SFormComponentItem>();
         jlPercentage = new javax.swing.JLabel();
         jtfPercentage = new javax.swing.JTextField();
         jlValueUnitary = new javax.swing.JLabel();
         jtfValueUnitary = new javax.swing.JTextField();
         jlValue = new javax.swing.JLabel();
         jtfValue = new javax.swing.JTextField();
+        jlVatType = new javax.swing.JLabel();
+        jcbVatType = new javax.swing.JComboBox<SFormComponentItem>();
         jckIsDeleted = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -116,7 +119,7 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel2.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel3.setLayout(new java.awt.GridLayout(8, 2, 5, 1));
+        jPanel3.setLayout(new java.awt.GridLayout(9, 2, 5, 3));
 
         jlTax.setText("Impuesto: *");
         jPanel3.add(jlTax);
@@ -168,6 +171,12 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfValue.setText("0.00");
         jPanel3.add(jtfValue);
 
+        jlVatType.setText("Tipo de IVA:");
+        jPanel3.add(jlVatType);
+
+        jcbVatType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jPanel3.add(jcbVatType);
+
         jckIsDeleted.setText("Registro eliminado");
         jPanel3.add(jckIsDeleted);
 
@@ -175,8 +184,8 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-500)/2, (screenSize.height-300)/2, 500, 300);
+        setSize(new java.awt.Dimension(496, 339));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -192,9 +201,9 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void initComponentsExtra() {
         moFieldTax = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfTax, jlTax);
         moFieldTax.setLengthMax(50);
-        moFieldFkTaxTypeId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkTaxTypeId, jlFkTaxTypeId);
-        moFieldFkTaxCalculationTypeId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkTaxCalculationTypeId, jlFkTaxCalculationTypeId);
-        moFieldFkTaxApplicationTypeId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbTaxApplicationType, jlFkTaxApplicationTypeId);
+        moFieldFkTaxTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkTaxTypeId, jlFkTaxTypeId);
+        moFieldFkTaxCalculationTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkTaxCalculationTypeId, jlFkTaxCalculationTypeId);
+        moFieldFkTaxApplicationTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbTaxApplicationType, jlFkTaxApplicationTypeId);
         moFieldPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfPercentage, jlPercentage);
         moFieldPercentage.setIsPercent(true);
         moFieldPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
@@ -202,9 +211,10 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldValueUnitary.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat());
         moFieldValue = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfValue, jlValue);
         moFieldValue.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
+        moFieldVatType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbVatType, jlVatType);
         moFieldIsDeleted = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         mvFields.add(moFieldTax);
         mvFields.add(moFieldFkTaxTypeId);
         mvFields.add(moFieldFkTaxCalculationTypeId);
@@ -212,10 +222,19 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldPercentage);
         mvFields.add(moFieldValueUnitary);
         mvFields.add(moFieldValue);
+        mvFields.add(moFieldVatType);
         mvFields.add(moFieldIsDeleted);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
+        
+        jcbVatType.removeAllItems();
+        jcbVatType.addItem(new SFormComponentItem("", "(Seleccionar tipo IVA)"));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_EXEMPT, "IVA exento"));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_RATE_0, "IVA tasa 0"));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_GENERAL, "IVA general"));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER, "IVA región fronteriza"));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER_INC, "IVA estímulo región fronteriza norte"));
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -290,9 +309,10 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel3;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
-    private javax.swing.JComboBox jcbFkTaxCalculationTypeId;
-    private javax.swing.JComboBox jcbFkTaxTypeId;
-    private javax.swing.JComboBox jcbTaxApplicationType;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkTaxCalculationTypeId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkTaxTypeId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbTaxApplicationType;
+    private javax.swing.JComboBox<SFormComponentItem> jcbVatType;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JLabel jlFkTaxApplicationTypeId;
     private javax.swing.JLabel jlFkTaxCalculationTypeId;
@@ -301,6 +321,7 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlTax;
     private javax.swing.JLabel jlValue;
     private javax.swing.JLabel jlValueUnitary;
+    private javax.swing.JLabel jlVatType;
     private javax.swing.JTextField jtfPercentage;
     private javax.swing.JTextField jtfTax;
     private javax.swing.JTextField jtfValue;
@@ -348,11 +369,11 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
 
         if (!validation.getIsError()) {
-            if (moFieldFkTaxCalculationTypeId.getKeyAsIntArray()[0] == SModSysConsts.FINS_TP_TAX_CAL_RATE && moFieldPercentage.getDouble() == 0) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlPercentage.getText() + "'.");
-                validation.setComponent(jtfPercentage);
-            }
-            else if (moFieldFkTaxCalculationTypeId.getKeyAsIntArray()[0] == SModSysConsts.FINS_TP_TAX_CAL_AMT_FIX_U && moFieldValueUnitary.getDouble() == 0) {
+            // please note that percentage can be zero for rate-calculus type!
+            
+            // validate other calculus types:
+            
+            if (moFieldFkTaxCalculationTypeId.getKeyAsIntArray()[0] == SModSysConsts.FINS_TP_TAX_CAL_AMT_FIX_U && moFieldValueUnitary.getDouble() == 0) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlValueUnitary.getText() + "'.");
                 validation.setComponent(jtfValueUnitary);
             }
@@ -396,6 +417,7 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldPercentage.setFieldValue(moTax.getPercentage());
         moFieldValueUnitary.setFieldValue(moTax.getValueUnitary());
         moFieldValue.setFieldValue(moTax.getValue());
+        moFieldVatType.setFieldValue(moTax.getVatType());
         moFieldIsDeleted.setFieldValue(moTax.getIsDeleted());
 
         renderCalculationSettings();
@@ -437,6 +459,7 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
             moTax.setValue(0);
         }
 
+        moTax.setVatType((String) moFieldVatType.getFieldValue());
         moTax.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         moTax.setDbmsTaxType(jcbFkTaxTypeId.getSelectedItem().toString());

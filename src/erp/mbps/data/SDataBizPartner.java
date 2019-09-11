@@ -10,6 +10,7 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mfin.data.diot.SDiotConsts;
 import erp.mitm.data.SDataBizPartnerItemDescription;
 import erp.mitm.data.SDataItemBizPartnerDescription;
 import erp.mmkt.data.SDataConfigurationSalesAgent;
@@ -72,9 +73,9 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
 
     public SDataBizPartner() {
         super(SDataConstants.BPSU_BP);
-        mvDbmsBizPartnerBranches = new Vector<SDataBizPartnerBranch>();
-        mvDbmsBizPartnerNotes = new Vector<SDataBizPartnerNote>();
-        mvDbmsItemBizPartnerDescription = new Vector<SDataItemBizPartnerDescription>();
+        mvDbmsBizPartnerBranches = new Vector<>();
+        mvDbmsBizPartnerNotes = new Vector<>();
+        mvDbmsItemBizPartnerDescription = new Vector<>();
         maoDbmsCategorySettings = null;
         reset();
     }
@@ -203,6 +204,18 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         int country = getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n();
         
         return country == SLibConstants.UNDEFINED || client.getSession().getSessionCustom().isLocalCountry(new int[] { country });
+    }
+    
+    public String getDiotTerceroClave() {
+        return mnPkBizPartnerId + "-" + getDbmsCategorySettingsSup().msDiotOperation;
+    }
+
+    public String getDiotTipoTercero(SClientInterface client) {
+        return isDomestic(client) ? SDiotConsts.THIRD_DOMESTIC : SDiotConsts.THIRD_INTERNATIONAL;
+    }
+    
+    public String getDiotTipoOperación() {
+        return getDbmsCategorySettingsSup().msDiotOperation;
     }
 
     @Override

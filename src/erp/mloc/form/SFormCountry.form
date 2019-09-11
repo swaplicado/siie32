@@ -69,27 +69,33 @@
             </Component>
             <Component class="javax.swing.JFormattedTextField" name="jftKey">
               <Properties>
-                <Property name="text" type="java.lang.String" value="CLAVE"/>
+                <Property name="text" type="java.lang.String" value="TEXT"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jlCountry">
               <Properties>
+                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="99" green="99" red="0" type="rgb"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Pa&#xed;s: *"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="jtfCountry">
               <Properties>
-                <Property name="text" type="java.lang.String" value="NOMBRE"/>
+                <Property name="text" type="java.lang.String" value="TEXT"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jlCountryAbbr">
               <Properties>
+                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="99" green="99" red="0" type="rgb"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Abreviatura: *"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="jtfCountryAbbr">
               <Properties>
-                <Property name="text" type="java.lang.String" value="ABREVIATURA"/>
+                <Property name="text" type="java.lang.String" value="TEXT"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jlCountryCode">
@@ -99,17 +105,30 @@
             </Component>
             <Component class="javax.swing.JTextField" name="jtfCountryCode">
               <Properties>
-                <Property name="text" type="java.lang.String" value="C&#xd3;DIGO"/>
+                <Property name="text" type="java.lang.String" value="TEXT"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jlCountryGroup">
               <Properties>
-                <Property name="text" type="java.lang.String" value="C&#xf3;digo del grupo:"/>
+                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="99" green="99" red="0" type="rgb"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Agrupaci&#xf3;n SAT-CFDI:"/>
               </Properties>
             </Component>
-            <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextCountryGroup">
+            <Component class="javax.swing.JTextField" name="jtfCountryGroup">
               <Properties>
-                <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
+                <Property name="text" type="java.lang.String" value="TEXT"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="jlDiotCode">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="C&#xf3;digo DIOT:"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="jtfDiotCode">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="TEXT"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JCheckBox" name="jckIsDeleted">

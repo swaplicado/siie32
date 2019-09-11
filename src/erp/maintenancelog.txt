@@ -1,4 +1,15 @@
 ================================================================================
+2019-09-11, 3.2 143.0
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación DIOT:
+    - incorporación de clave DIOT en catálogo de países;
+    - incorporación de tipo de operación DIOT en catálogo de asociados de negocios (categoría proveedores);
+    - incorporación de tipo de IVA en catálogo de impuestos;
+    - creación de tabla de configuración de nuevos parámetros, con opciones: cuentas contables DIOT, e impuesto predeterminado DIOT;
+    - generación archivo layout DIOT, con opciones: a) separación con caracter | (pipe); o b) CSV para su manipulación en hoja de cálculo.
+
+================================================================================
 2019-08-30, 3.2 141.3
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

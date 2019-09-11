@@ -28,6 +28,7 @@ public class SDataTaxRow extends erp.lib.table.STableRow {
         mvValues.add(tax.getPercentage());
         mvValues.add(tax.getValueUnitary());
         mvValues.add(tax.getValue());
+        mvValues.add(tax.getVatType());
         mvValues.add(tax.getIsDeleted());
         mvValues.add(tax.getDbmsUserNew());
         mvValues.add(tax.getUserNewTs());
