@@ -2400,7 +2400,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     validation.setComponent(jcbFkCheckId_n);
                 }
                 else {
-                    boolean isCompany = moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0] == miClient.getSessionXXX().getCurrentCompany().getPkCompanyId();
+                    boolean isCompany = moFieldFkBizPartnerId_nr.getKeyAsIntArray() != null && moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0] == miClient.getSessionXXX().getCurrentCompany().getPkCompanyId();
                     
                     if (moEntryDps == null && moEntryDpsAdj != null) {
                         validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkDps.getText() + "'.");
