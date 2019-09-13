@@ -17,6 +17,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import sa.gui.util.SUtilConsts;
 
 /**
  *
@@ -40,6 +41,16 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
     public boolean isRegenerateOnlyNonStampedCfdi() { return mbRegenerateOnlyNonStampedCfdi; }
     public ArrayList<SCfdPacket> getCfdPackets() { return maCfdPackets; }
 
+    public void setIsDeleted(boolean b) { }
+    public void setFkUserNewId(int n) { }
+    public void setFkUserEditId(int n) { }
+    public void setFkUserDeleteId(int n) { }
+
+    public boolean getIsDeleted() { return false; }
+    public int getFkUserNewId() { return SUtilConsts.USR_NA_ID; }
+    public int getFkUserEditId() { return SUtilConsts.USR_NA_ID; }
+    public int getFkUserDeleteId() { return SUtilConsts.USR_NA_ID; }
+    
     @Override
     public int[] getPrimaryKey() {
         throw new UnsupportedOperationException("Not supported yet.");

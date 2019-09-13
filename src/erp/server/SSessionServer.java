@@ -769,12 +769,20 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                 case SServerConstants.REQ_DB_ACTION_SAVE:
                     startTransac();
                     registry = (SDataRegistry) poRequest.getPacket();
-                    if (registry.getIsRegistryNew()) {
-                        registry.setFkUserNewId(mnPkUserId);
+                    
+                    try {
+                        // some registries do not implement setter methods for user:
+                        if (registry.getIsRegistryNew()) {
+                            registry.setFkUserNewId(mnPkUserId);
+                        }
+                        else {
+                            registry.setFkUserEditId(mnPkUserId);
+                        }
                     }
-                    else {
-                        registry.setFkUserEditId(mnPkUserId);
+                    catch (java.lang.Exception e) {
+                        SLibUtilities.printOutException(this, e);
                     }
+                    
                     nResult = registry.save(moCompanyDatabase.getConnection());
                     if (nResult == SLibConstants.DB_ACTION_SAVE_OK) {
                         commitTransac();

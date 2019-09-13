@@ -1,4 +1,13 @@
 ================================================================================
+2019-09-13, 3.2 143.1
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la validación del asociado de negocios como empresa en la forma de captura de renglones de pólizas contables.
+2) Corrección a la obligatoriedad del asociado de negocios en la forma de captura de renglones de pólizas contables.
+3) Corrección al guardado de CFDI de nóminas erp.mod.hrs.db.SDbFormerPayrollImport, y al de registros en general 
+    que no implementan los métodos setter para el usuario, esto en la clase erp.server.SSessionServer.
+
+================================================================================
 2019-09-11, 3.2 143.0
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
