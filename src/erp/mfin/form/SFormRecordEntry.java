@@ -2764,7 +2764,15 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 moRecordEntry.setFkItemAuxId_n(SLibConstants.UNDEFINED);
             }
 
-            moRecordEntry.setDbmsAccountComplement((moRecordEntry.getDbmsAccountComplement().length() == 0 ? "" : moRecordEntry.getDbmsAccountComplement() + ", ") + moItem.getItem());
+            moRecordEntry.setDbmsAccountComplement(moItem.getItem());
+        }
+        else {
+            moRecordEntry.setUnits(0);
+            moRecordEntry.setFkItemId_n(0);
+            moRecordEntry.setFkUnitId_n(0);
+            moRecordEntry.setFkItemAuxId_n(0);
+
+            moRecordEntry.setDbmsAccountComplement("");
         }
 
         if (jtfFkYearId_n.isEnabled()) {

@@ -23,7 +23,7 @@ public class SDataRecordEntryRow extends erp.lib.table.STableRow {
         mvValues.clear();
         mvValues.add(entry.getSortingPosition());
         mvValues.add(entry.getFkAccountIdXXX());
-        mvValues.add(entry.getDbmsAccount() + (entry.getDbmsAccountComplement().length() == 0 ? "" : "; " + entry.getDbmsAccountComplement()));
+        mvValues.add(entry.getDbmsAccount() + (entry.getDbmsAccountComplement().isEmpty() ? "" : "; " + entry.getDbmsAccountComplement()));
         mvValues.add(entry.getConcept());
         mvValues.add(entry.getDebit());
         mvValues.add(entry.getCredit());

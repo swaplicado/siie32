@@ -1,4 +1,10 @@
 ================================================================================
+2019-09-20, 3.2 143.2
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la captura de renglones de pólizas contables, para remover el ítem y datos relacionados una vez deseleccionado precisamente el ítem.
+
+================================================================================
 2019-09-13, 3.2 143.1
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

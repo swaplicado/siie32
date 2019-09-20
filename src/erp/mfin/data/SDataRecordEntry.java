@@ -660,16 +660,24 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 msXtaSystemMoveType = resultSet.getString("smtp.name");
 
                 compBizPartner = resultSet.getString("b.bp");
-                if (resultSet.wasNull()) compBizPartner = "";
+                if (resultSet.wasNull()) {
+                    compBizPartner = "";
+                }
 
                 compEntity = resultSet.getString("e.ent");
-                if (resultSet.wasNull()) compEntity = "";
+                if (resultSet.wasNull()) {
+                    compEntity = "";
+                }
 
                 compItem = resultSet.getString("i.item");
-                if (resultSet.wasNull()) compItem = "";
+                if (resultSet.wasNull()) {
+                    compItem = "";
+                }
 
                 compTax = resultSet.getString("t.tax");
-                if (resultSet.wasNull()) compTax = "";
+                if (resultSet.wasNull()) {
+                    compTax = "";
+                }
 
                 switch (resultSet.getInt("a.fid_tp_acc_sys")) {
                     case SDataConstantsSys.FINS_TP_ACC_SYS_SUP:
@@ -685,7 +693,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                         break;
 
                     case SDataConstantsSys.FINS_TP_ACC_SYS_INV:
-                        msDbmsAccountComplement = compEntity + (compItem.length() == 0 ? "" : ", " + compItem);
+                        msDbmsAccountComplement = compEntity + (compItem.isEmpty() ? "" : ", " + compItem);
                         break;
 
                     case SDataConstantsSys.FINS_TP_ACC_SYS_PUR:
