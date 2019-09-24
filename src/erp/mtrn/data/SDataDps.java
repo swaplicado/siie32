@@ -14,6 +14,7 @@ import cfd.DCfdTax;
 import cfd.DCfdTaxes;
 import cfd.DCfdUtils;
 import cfd.DElement;
+import cfd.DElementParent;
 import cfd.ext.bachoco.DElementLineItem;
 import cfd.ext.bachoco.DElementPayment;
 import cfd.ext.elektra.DElementAp;
@@ -29,6 +30,8 @@ import cfd.ext.soriana.DElementDSCargaRemisionProv;
 import cfd.ext.soriana.DElementFolioNotaEntrada;
 import cfd.ver2.DAttributeOptionTipoDeComprobante;
 import cfd.ver3.cce11.DElementDescripcionesEspecificas;
+import cfd.ver3.clf10.DElementLeyenda;
+import cfd.ver3.clf10.DElementLeyendasFiscales;
 import cfd.ver33.DCfdi33Catalogs;
 import erp.SClient;
 import erp.cfd.SCfdConsts;
@@ -1209,8 +1212,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
     }
     
-    private boolean generateIntCommerceComplement() {
+    private boolean requireComplementoComercioExterior() {
         return mbAuxIsNeedCfdCce && moDbmsDataDpsCfd != null && !moDbmsDataDpsCfd.getCfdCceTipoOperacion().isEmpty();
+    }
+    
+    private boolean requireComplementoLeyendasFiscales() {
+        for (SDataDpsNotes dpsNotes : mvDbmsDpsNotes) {
+            if (dpsNotes.getIsCfdComplement() && !dpsNotes.getIsDeleted()) {
+                return true;
+            }
+        }
+        
+        return false;
     }
     
     private int getAccSysTypeIdBizPartnerXXX() {
@@ -1825,7 +1838,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
     public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
     public void setDbmsDataAddenda(erp.mtrn.data.SDataDpsAddenda o) { moDbmsDataAddenda = o; }
-    
+
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
     public java.util.Date getDbmsRecordDate() { return mtDbmsRecordDate; }
     public java.lang.String getDbmsCurrency() { return msDbmsCurrency; }
@@ -1856,19 +1869,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
 
         return entry;
-    }
-
-    public erp.mtrn.data.SDataDpsNotes getDbmsDpsNotes(int[] pk) {
-        SDataDpsNotes notes = null;
-
-        for (SDataDpsNotes n : mvDbmsDpsNotes) {
-            if (SLibUtilities.compareKeys(pk, n.getPrimaryKey())) {
-                notes = n;
-                break;
-            }
-        }
-
-        return notes;
     }
 
     public java.lang.String getDpsNumber() {
@@ -2195,29 +2195,31 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                 // Read aswell document notes:
 
-                sSql = "SELECT id_year, id_doc, id_nts FROM trn_dps_nts " +
+                sSql = "SELECT id_nts " +
+                        "FROM trn_dps_nts " +
                         "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " " +
-                        "ORDER BY id_year, id_doc, id_nts ";
+                        "ORDER BY id_nts ";
                 oResultSet = statement.executeQuery(sSql);
                 while (oResultSet.next()) {
-                    SDataDpsNotes note = new SDataDpsNotes();
-                    if (note.read(new int[] { oResultSet.getInt("id_year"), oResultSet.getInt("id_doc"), oResultSet.getInt("id_nts") }, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    SDataDpsNotes notes = new SDataDpsNotes();
+                    if (notes.read(new int[] { mnPkYearId, mnPkDocId, oResultSet.getInt("id_nts") }, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
-                        mvDbmsDpsNotes.add(note);
+                        mvDbmsDpsNotes.add(notes);
                     }
                 }
 
                 // Read aswell document entries:
 
-                sSql = "SELECT id_year, id_doc, id_ety FROM trn_dps_ety " +
+                sSql = "SELECT id_ety " +
+                        "FROM trn_dps_ety " +
                         "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " " +
                         "ORDER BY fid_tp_dps_ety = " + SDataConstantsSys.TRNS_TP_DPS_ETY_VIRT + ", sort_pos, id_ety ";
                 oResultSet = statement.executeQuery(sSql);
                 while (oResultSet.next()) {
                     SDataDpsEntry entry = new SDataDpsEntry();
-                    if (entry.read(new int[] { oResultSet.getInt("id_year"), oResultSet.getInt("id_doc"), oResultSet.getInt("id_ety") }, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
+                    if (entry.read(new int[] { mnPkYearId, mnPkDocId, oResultSet.getInt("id_ety") }, oStatementAux) != SLibConstants.DB_ACTION_READ_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
@@ -4499,6 +4501,24 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return comercioExterior;
     }
 
+    private cfd.DElement createCfdiNodeComplementoLeyendasFiscales10() throws java.lang.Exception {
+        DElementLeyendasFiscales leyendasFiscales = new DElementLeyendasFiscales();
+        
+        for (SDataDpsNotes dpsNotes : mvDbmsDpsNotes) {
+            if (dpsNotes.getIsCfdComplement() && !dpsNotes.getIsDeleted()) {
+                DElementLeyenda leyenda = new DElementLeyenda();
+                
+                leyenda.getAttDisposicionFiscal().setString(dpsNotes.getCfdComplementDisposition());
+                leyenda.getAttNorma().setString(dpsNotes.getCfdComplementRule());
+                leyenda.getAttTextoLeyenda().setString(dpsNotes.getNotes());
+                
+                leyendasFiscales.getEltLeyendas().add(leyenda);
+            }
+        }
+        
+        return leyendasFiscales;
+    }
+    
     private ArrayList<SCfdDataImpuesto> createCfdiNodeImpuestos32() {
         double dImptoTasa = 0;
         double dImpto = 0;
@@ -4963,7 +4983,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 else if (dpsEntry.getDbmsOriginalUnidadClave().isEmpty()) {
                     throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene clave de unidad del SAT.");
                 }
-                else if (generateIntCommerceComplement() && dpsEntry.getDbmsCustomsUnitSymbol().isEmpty() && dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
+                else if (requireComplementoComercioExterior() && dpsEntry.getDbmsCustomsUnitSymbol().isEmpty() && dpsEntry.getDbmsItemCustomsUnitSymbol().isEmpty()) {
                     throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene código de unidad aduana.");
                 }
                 
@@ -5033,11 +5053,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     @Override
     public DElement getElementComplemento() throws Exception { // CFDI 3.2 & 3.3
-        DElement complemento = null;
+        DElementParent complemento = null;
         
-        if (generateIntCommerceComplement()) {
+        if (requireComplementoComercioExterior()) {
             complemento = new cfd.ver33.DElementComplemento();
-            ((cfd.ver33.DElementComplemento) complemento).getElements().add(createCfdiNodeComplementoComercioExterior11());
+            complemento.getElements().add(createCfdiNodeComplementoComercioExterior11());
+        }
+        
+        if (requireComplementoLeyendasFiscales()) {
+            if (complemento == null) {
+                complemento = new cfd.ver33.DElementComplemento();
+            }
+            complemento.getElements().add(createCfdiNodeComplementoLeyendasFiscales10());
         }
         
         return complemento;

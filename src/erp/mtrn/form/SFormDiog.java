@@ -67,7 +67,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Sergio Flores
  */
 public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
@@ -160,7 +160,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jpDocType = new javax.swing.JPanel();
         jlDiogType = new javax.swing.JLabel();
         jtfDiogType = new javax.swing.JTextField();
-        jcbDiogAdjustmentType = new javax.swing.JComboBox<>();
+        jcbDiogAdjustmentType = new javax.swing.JComboBox<SFormComponentItem>();
         jpDocDate = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
         jftDate = new javax.swing.JFormattedTextField();
@@ -170,7 +170,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsDeleted = new javax.swing.JCheckBox();
         jpDocNumber = new javax.swing.JPanel();
         jlSeries = new javax.swing.JLabel();
-        jcbSeries = new javax.swing.JComboBox<>();
+        jcbSeries = new javax.swing.JComboBox<SFormComponentItem>();
         jtfNumber = new javax.swing.JTextField();
         jlDummy01 = new javax.swing.JLabel();
         jbWarehouseExchange = new javax.swing.JButton();
@@ -192,7 +192,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jPanel22 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jlProdOrderSource = new javax.swing.JLabel();
-        jcbProdOrderSource = new javax.swing.JComboBox<>();
+        jcbProdOrderSource = new javax.swing.JComboBox<SFormComponentItem>();
         jbProdOrderSource = new javax.swing.JButton();
         jPanel25 = new javax.swing.JPanel();
         jlItemSource = new javax.swing.JLabel();
@@ -202,7 +202,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
         jtfUnitSymbolSource = new javax.swing.JTextField();
         jpProductionOrderDestiny = new javax.swing.JPanel();
         jlProdOrderDestiny = new javax.swing.JLabel();
-        jcbProdOrderDestiny = new javax.swing.JComboBox<>();
+        jcbProdOrderDestiny = new javax.swing.JComboBox<SFormComponentItem>();
         jbProdOrderDestiny = new javax.swing.JButton();
         jtbSwitchProdOrderDestiny = new javax.swing.JToggleButton();
         jpProductionOrderDestinyItem = new javax.swing.JPanel();
@@ -584,7 +584,7 @@ public class SFormDiog extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNotes.setText("Comentarios:");
+        jlNotes.setText("Notas:");
         jlNotes.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel28.add(jlNotes);
 

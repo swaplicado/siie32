@@ -247,7 +247,7 @@ public class SFormDncDocumentNumberSeries extends javax.swing.JDialog implements
         moFieldApproveNumber_n.setDecimalFormat(miClient.getSessionXXX().getFormatters().getSimpleIntegerFormat());
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
         mvFields.add(moFieldPkDocNumberingCenterId);
         mvFields.add(moFieldPkDocNumberSeriesId);
         mvFields.add(moFieldNumberStart);
@@ -601,8 +601,8 @@ public class SFormDncDocumentNumberSeries extends javax.swing.JDialog implements
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        if (e.getStateChange() == ItemEvent.SELECTED) {
-            if (e.getSource() instanceof JComboBox) {
+        if (e.getSource() instanceof JComboBox) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
                 JComboBox comboBox = (JComboBox) e.getSource();
 
                 if (comboBox == jcbPkDocNumberSeriesId) {

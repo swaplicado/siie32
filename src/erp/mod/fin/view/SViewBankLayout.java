@@ -59,11 +59,11 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         
-        jbGetLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Obtener layout", this);
+        jbGetLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif")), "Obtener layout bancario", this);
         jbSend = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar solicitud de autorización", this);
-        jbBackToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a estatus anterior", this);
-	jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver detalles de pago", this);
-        moDialogBankLayoutCardex = new SDialogBankLayoutCardex(miClient, mnGridSubtype, "Detalle del layout");
+        jbBackToNew = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar al estatus anterior", this);
+	jbCardex = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_kardex.gif")), "Ver detalle del layout bancario", this);
+        moDialogBankLayoutCardex = new SDialogBankLayoutCardex(miClient, mnGridSubtype, "Detalle del layout bancario");
     
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGetLayout);
@@ -103,7 +103,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                     bankLayout = (SDbBankLayout) miClient.getSession().readRegistry(SModConsts.FIN_LAY_BANK, gridRow.getRowPrimaryKey(), SDbConsts.MODE_VERBOSE);
                     
                     if (bankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_APPROVED_ST) {
-                        miClient.showMsgBoxWarning("El layout no puede ser modificado en estatus " + SFinConsts.LAY_BANK_APPROVED_TEXT_ST);
+                        miClient.showMsgBoxWarning("El layout bancario no puede ser modificado en estatus " + SFinConsts.LAY_BANK_APPROVED_TEXT_ST);
                     }
                     else if (bankLayout.getDocsPayed() > 0) {
                         miClient.showMsgBoxWarning(SDbConsts.MSG_REG_DENIED_UPDATE + "\n¡Existen documentos con pagos aplicados!");
@@ -205,17 +205,17 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         bankLayout = readLayout();
         
         if (bankLayout != null) {
-            bankLayout.setAuxLayoutType(mnGridSubtype == SModSysConsts.FIN_LAY_BANK_PAY ? "TRANSFERENCIAS" : "ANTICIPOS");
+            bankLayout.setAuxLayoutType(mnGridSubtype == SModSysConsts.FIN_LAY_BANK_PAY ? "TRANSFERENCIAS" : "ANTICIPOS"); // XXX WTF!
             treasuryBankLayoutRequest = new STreasuryBankLayoutRequest(miClient, bankLayout);
             done = treasuryBankLayoutRequest.makeRequestToTreasury();
             
             if (done) {
-                miClient.showMsgBoxInformation("La solicitud fue enviada.");
+                miClient.showMsgBoxInformation("La solicitud de autorización ha sido enviada.");
                 miClient.getSession().notifySuscriptors(mnGridType);
             }
         }
         else {
-            miClient.showMsgBoxWarning("Error al leer el layout");
+            miClient.showMsgBoxWarning("Error al leer el layout bancario.");
         }
     }
     
@@ -235,7 +235,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
             }
         }
         else {
-            miClient.showMsgBoxWarning("Error al leer el layout");
+            miClient.showMsgBoxWarning("Error al leer el layout bancario.");
         }
     }
     
@@ -322,7 +322,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "l.dt_lay", "Pago"));
 	gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, SDbConsts.FIELD_ID + "1", "Folio", 50));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "status", "Estatus"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_tp_lay", "Tipo layout", 200));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_tp_lay", "Tipo layout bancario", 200));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_ent", "Cuenta bancaria", 250));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "l.cpt", "Concepto/Descripción", 250));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.con", "Consecutivo día", 50));

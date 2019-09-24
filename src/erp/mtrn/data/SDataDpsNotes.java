@@ -21,8 +21,11 @@ public class SDataDpsNotes extends erp.lib.data.SDataRegistry implements java.io
     protected int mnPkDocId;
     protected int mnPkNotesId;
     protected java.lang.String msNotes;
+    protected java.lang.String msCfdComplementDisposition;
+    protected java.lang.String msCfdComplementRule;
     protected boolean mbIsAllDocs;
     protected boolean mbIsPrintable;
+    protected boolean mbIsCfdComplement;
     protected boolean mbIsDeleted;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
@@ -44,8 +47,11 @@ public class SDataDpsNotes extends erp.lib.data.SDataRegistry implements java.io
     public void setPkDocId(int n) { mnPkDocId = n; }
     public void setPkNotesId(int n) { mnPkNotesId = n; }
     public void setNotes(java.lang.String s) { msNotes = s; }
+    public void setCfdComplementDisposition(java.lang.String s) { msCfdComplementDisposition = s; }
+    public void setCfdComplementRule(java.lang.String s) { msCfdComplementRule = s; }
     public void setIsAllDocs(boolean b) { mbIsAllDocs = b; }
     public void setIsPrintable(boolean b) { mbIsPrintable = b; }
+    public void setIsCfdComplement(boolean b) { mbIsCfdComplement = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
@@ -58,8 +64,11 @@ public class SDataDpsNotes extends erp.lib.data.SDataRegistry implements java.io
     public int getPkDocId() { return mnPkDocId; }
     public int getPkNotesId() { return mnPkNotesId; }
     public java.lang.String getNotes() { return msNotes; }
+    public java.lang.String getCfdComplementDisposition() { return msCfdComplementDisposition; }
+    public java.lang.String getCfdComplementRule() { return msCfdComplementRule; }
     public boolean getIsAllDocs() { return mbIsAllDocs; }
     public boolean getIsPrintable() { return mbIsPrintable; }
+    public boolean getIsCfdComplement() { return mbIsCfdComplement; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
@@ -96,8 +105,11 @@ public class SDataDpsNotes extends erp.lib.data.SDataRegistry implements java.io
         mnPkDocId = 0;
         mnPkNotesId = 0;
         msNotes = "";
+        msCfdComplementDisposition = "";
+        msCfdComplementRule = "";
         mbIsAllDocs = false;
         mbIsPrintable = false;
+        mbIsCfdComplement = false;
         mbIsDeleted = false;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
@@ -139,8 +151,11 @@ public class SDataDpsNotes extends erp.lib.data.SDataRegistry implements java.io
                 mnPkDocId = resultSet.getInt("n.id_doc");
                 mnPkNotesId = resultSet.getInt("n.id_nts");
                 msNotes = resultSet.getString("n.nts");
+                msCfdComplementDisposition = resultSet.getString("n.cfd_comp_disp");
+                msCfdComplementRule = resultSet.getString("n.cfd_comp_rule");
                 mbIsAllDocs = resultSet.getBoolean("n.b_all");
                 mbIsPrintable = resultSet.getBoolean("n.b_prt");
+                mbIsCfdComplement = resultSet.getBoolean("n.b_cfd_comp");
                 mbIsDeleted = resultSet.getBoolean("n.b_del");
                 mnFkUserNewId = resultSet.getInt("n.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("n.fid_usr_edit");
@@ -179,13 +194,17 @@ public class SDataDpsNotes extends erp.lib.data.SDataRegistry implements java.io
         try {
             callableStatement = connection.prepareCall(
                     "{ CALL trn_dps_nts_save(" +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                    "?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkNotesId);
             callableStatement.setString(nParam++, msNotes);
+            callableStatement.setString(nParam++, msCfdComplementDisposition);
+            callableStatement.setString(nParam++, msCfdComplementRule);
             callableStatement.setBoolean(nParam++, mbIsAllDocs);
             callableStatement.setBoolean(nParam++, mbIsPrintable);
+            callableStatement.setBoolean(nParam++, mbIsCfdComplement);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

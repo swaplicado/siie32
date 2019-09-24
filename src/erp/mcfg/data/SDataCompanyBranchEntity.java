@@ -179,7 +179,7 @@ public class SDataCompanyBranchEntity extends erp.lib.data.SDataRegistry impleme
                      * so this must be read only from a company database connection.
                      */
 
-                    for (int i = 1; i <= 3; i++) {
+                    for (int i = 1; i <= 2; i++) {
                         switch (i) {
                             case 1:
                                 table = "dps";

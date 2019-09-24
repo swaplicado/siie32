@@ -68,6 +68,7 @@ import erp.mtrn.data.SDataDpsNotesRow;
 import erp.mtrn.data.SDataDpsType;
 import erp.mtrn.data.SDataEntryDpsDpsAdjustment;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
+import erp.mtrn.data.SDataSystemNotes;
 import erp.mtrn.data.SGuiDpsEntryPrice;
 import erp.mtrn.data.SGuiDpsLink;
 import erp.mtrn.data.STrnDpsUtilities;
@@ -135,6 +136,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.mbps.data.SDataBizPartnerBranchAddress moBizPartnerBranchAddressMain;
     private erp.mbps.data.SDataBizPartnerBranchAddress moBizPartnerBranchAddress;
     private erp.mbps.data.SDataBizPartnerCategory moBizPartnerCategory;
+    private java.util.ArrayList<SDataSystemNotes> maSystemNotes;
     private erp.lib.form.SFormField moFieldDate;
     private erp.lib.form.SFormField moFieldDateDoc;
     private erp.lib.form.SFormField moFieldDateStartCredit;
@@ -2858,10 +2860,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jpNotes.add(moPaneGridNotes, BorderLayout.CENTER);
 
         i = 0;
-        aoTableColumns = new STableColumnForm[10];
+        aoTableColumns = new STableColumnForm[11];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Notas", 500);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Todos los docs.", STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Impresión", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Heredable a todos los documentos", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Visible al imprimir", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Complemento CFDI Leyendas Fiscales", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -3115,10 +3118,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
 
                     if (goAhead) {
-                        obtainNextNumber();
-                        updateDpsWithCurrentFormData();
-                        adequateDatesForOrderPrevious();
-                        addNotesFromSysConfig();
+                        try {
+                            obtainNextNumber();
+                            updateDpsWithCurrentFormData();
+                            adequateDatesForOrderPrevious();
+                            addSystemNotes();
+                        }
+                        catch (Exception e) {
+                            SLibUtilities.renderException(this, e);
+                        }
                         
                         if (jftDate.isEditable()) {
                             jftDate.requestFocus();
@@ -3755,7 +3763,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             // emulate item state changed events:
             
             itemChangeFkPaymentTypeId(moDps.getFkPaymentTypeId() == SLibConsts.UNDEFINED || mbIsAdj);   // reset days of credit if needed
-            itemChangeFkCurrencyId(false);  // do not calculate document's total
+            itemChangeFkCurrencyId(false); // do not calculate document's total
         }
     }
 
@@ -3799,22 +3807,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     /**
      * Add system notes for document.
      */
-    private void addNotesFromSysConfig() {
-        boolean exists = false;
-        
-        for (SDataDpsNotesRow notesRow : STrnUtilities.getSystemNotes(miClient, moDpsType.getPkDpsCategoryId(), moDpsType.getPkDpsClassId(), moDpsType.getPkDpsTypeId(), moDps.getFkCurrencyId())) {
-            // validate that current notes text is not already in notes grid:
+    private void addSystemNotes() throws Exception {
+        for (SDataDpsNotesRow dpsNotesRow : STrnUtilities.createDpsNotesRowsFromDpsNotes(STrnUtilities.createDpsNotesFromSystemNotes(miClient, (int[]) moDpsType.getPrimaryKey(), moDps.getFkCurrencyId(), true))) {
+            // check that current system notes has not been inserted into notes grid:
             
-            exists = false;
-            for (STableRow tableRow: moPaneGridNotes.getGridRows()){
-                if (((SDataDpsNotes) notesRow.getData()).getNotes().equals(((SDataDpsNotes) tableRow.getData()).getNotes())) {
+            boolean exists = false;
+            for (STableRow tableRow: moPaneGridNotes.getGridRows()) {
+                if (((SDataDpsNotes) dpsNotesRow.getData()).getNotes().equals(((SDataDpsNotes) tableRow.getData()).getNotes())) {
                     exists = true;
                     break;
                 }
             }
             
             if (!exists){
-                moPaneGridNotes.addTableRow(notesRow);
+                moPaneGridNotes.addTableRow(dpsNotesRow);
             }
         }
 
@@ -4414,7 +4420,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDateStartCredit.setEditable(false);
             jftDateStartCredit.setFocusable(false);
             jbDateStartCredit.setEnabled(false);
-            //jcbFkLanguageId.setEnabled(...);              // language is not editable
+            //jcbFkLanguageId.setEnabled(...); // language is not editable
             jcbFkDpsNatureId.setEnabled(false);
             jcbFkFunctionalArea.setEnabled(false);
 
@@ -4507,59 +4513,59 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             itemStateShipments();
             
             adecuatePaymentTypeSettings();
-            itemChangeFkPaymentTypeId(false);               // invokes methods itemStatePayments() and itemStateDateStartCredit()
+            itemChangeFkPaymentTypeId(false); // invokes methods itemStatePayments() and itemStateDateStartCredit()
             
             jcbFkPaymentTypeId.setEnabled(jcbFkPaymentTypeId.isEnabled() && !moDps.getIsCopied());
             jtfDaysOfCredit.setEditable(!moDps.getIsCopied() && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] != SDataConstantsSys.TRNS_TP_PAY_CASH);
             jtfDaysOfCredit.setFocusable(!moDps.getIsCopied() && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] != SDataConstantsSys.TRNS_TP_PAY_CASH);
-            //jckDateStartCredit.setEnabled(...);           // status already set by previous call to method itemChangeFkPaymentTypeId()
-            //jftDateStartCredit.setEditable(...);          // status already set by previous call to method itemChangeFkPaymentTypeId()
-            //jftDateStartCredit.setFocusable(...);         // status already set by previous call to method itemChangeFkPaymentTypeId()
-            //jbDateStartCredit.setEnabled(...);            // status already set by previous call to method itemChangeFkPaymentTypeId()
-            //jcbFkLanguageId.setEnabled(...);              // language is not editable
+            //jckDateStartCredit.setEnabled(...);   // status already set by previous call to method itemChangeFkPaymentTypeId()
+            //jftDateStartCredit.setEditable(...);  // status already set by previous call to method itemChangeFkPaymentTypeId()
+            //jftDateStartCredit.setFocusable(...); // status already set by previous call to method itemChangeFkPaymentTypeId()
+            //jbDateStartCredit.setEnabled(...);    // status already set by previous call to method itemChangeFkPaymentTypeId()
+            //jcbFkLanguageId.setEnabled(...);      // language is not editable
             jcbFkDpsNatureId.setEnabled(true);
             jcbFkFunctionalArea.setEnabled(isApplingFunctionalAreas());
 
             jcbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
             jbFkCurrencyId.setEnabled(moDps.getIsRegistryNew());
-            itemChangeFkCurrencyId(false);
-            updateCurrencyFieldsStatus(true);               // last time status check to prevent invalid currency changes
+            itemChangeFkCurrencyId(false);      // do not calculate document's total
+            updateCurrencyFieldsStatus(true);   // last time status check to prevent invalid currency changes
 
-            //jbExchangeRate.setEnabled(...);               // status already set by previous call to method itemChangeFkCurrencyId()
-            //jtfExchangeRate.setEditable(...);             // status already set by previous call to method itemChangeFkCurrencyId()
-            //jtfExchangeRate.setFocusable(...);            // status already set by previous call to method itemChangeFkCurrencyId()
-            //jbComputeTotal.setEnabled(...);               // status already set by previous call to method itemChangeFkCurrencyId()
+            //jbExchangeRate.setEnabled(...);   // status already set by previous call to method itemChangeFkCurrencyId()
+            //jtfExchangeRate.setEditable(...); // status already set by previous call to method itemChangeFkCurrencyId()
+            //jtfExchangeRate.setFocusable(...);// status already set by previous call to method itemChangeFkCurrencyId()
+            //jbComputeTotal.setEnabled(...);   // status already set by previous call to method itemChangeFkCurrencyId()
             
             jckIsDiscountDocApplying.setEnabled(true);
             itemStateIsDiscountDocApplying(false);
             itemStateIsDiscountDocPercentage(false);
             jckIsCopy.setEnabled(!mbIsSales && (mbIsDoc || mbIsAdj));
 
-            //jbEntryNew.setEnabled(true);                  // status already set by previous call to method updateDpsControlsStatus()
+            //jbEntryNew.setEnabled(true); // status already set by previous call to method updateDpsControlsStatus()
             jbEntryDelete.setEnabled(true);
             //jbEntryDiscountRetailChain.setEnabled(true);  // status already set by previous call to method updateDpsControlsStatus()
-            //jbEntryImportFromDps.setEnabled(true);        // status already set by previous call to method updateDpsControlsStatus()
-            //jbEntryWizard.setEnabled(true);               // status already set by previous call to method updateDpsControlsStatus()
+            //jbEntryImportFromDps.setEnabled(true);    // status already set by previous call to method updateDpsControlsStatus()
+            //jbEntryWizard.setEnabled(true);           // status already set by previous call to method updateDpsControlsStatus()
 
             jbNotesNew.setEnabled(true);
             jbNotesEdit.setEnabled(true);
             jbNotesDelete.setEnabled(true);
             jbSystemNotes.setEnabled(true);
 
-            //jcbAdjustTypeId.setEnabled(true);             // status already set by previous call to method updateDpsControlsStatus()
+            //jcbAdjustTypeId.setEnabled(true); // status already set by previous call to method updateDpsControlsStatus()
             jcbTaxRegionId.setEnabled(true);
             jbTaxRegionId.setEnabled(true);
 
             jftDateDocDelivery_n.setEditable(!mbIsAdj);
             jftDateDocDelivery_n.setFocusable(!mbIsAdj);
             jbDateDocDelivery_n.setEnabled(!mbIsAdj);
-            //jftDateOrderLapsing_n.setEditable(...);       // status already set by previous call to method updateDpsControlsStatus()
-            //jftDateOrderLapsing_n.setFocusable(...);      // status already set by previous call to method updateDpsControlsStatus()
-            //jbDateOrderLapsing_n.setEnabled(...);         // status already set by previous call to method updateDpsControlsStatus()
-            //jbSalesAgent.setEnabled(false);               // status already set by previous call to method updateDpsControlsStatus()
-            //jbSalesSupervisor.setEnabled(false);          // status already set by previous call to method updateDpsControlsStatus()
-            //jlFkContactId_n.setEnabled(false);            // status already set by previous call to method updateDpsControlsStatus()
-            //jcbFkContactId_n.setEnabled(false);           // status already set by previous call to method updateDpsControlsStatus()
+            //jftDateOrderLapsing_n.setEditable(...);   // status already set by previous call to method updateDpsControlsStatus()
+            //jftDateOrderLapsing_n.setFocusable(...);  // status already set by previous call to method updateDpsControlsStatus()
+            //jbDateOrderLapsing_n.setEnabled(...);     // status already set by previous call to method updateDpsControlsStatus()
+            //jbSalesAgent.setEnabled(false);       // status already set by previous call to method updateDpsControlsStatus()
+            //jbSalesSupervisor.setEnabled(false);  // status already set by previous call to method updateDpsControlsStatus()
+            //jlFkContactId_n.setEnabled(false);    // status already set by previous call to method updateDpsControlsStatus()
+            //jcbFkContactId_n.setEnabled(false);   // status already set by previous call to method updateDpsControlsStatus()
 
             jcbFkIncotermId.setEnabled(true);
             jbFkIncotermId.setEnabled(true);
@@ -6683,20 +6689,36 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
 
     private void actionSystemNotes() {
-        String option = "";
-
-        option = miClient.pickOption(SDataConstants.TRN_SYS_NTS, new int[] { moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId(), moDps.getFkDpsTypeId(), moDps.getFkCurrencyId() });
+        String option = miClient.pickOption(SDataConstants.TRN_SYS_NTS, new int[] { moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId(), moDps.getFkDpsTypeId(), moDps.getFkCurrencyId() });
 
         if (!option.isEmpty()) {
-            SDataDpsNotes notes = new SDataDpsNotes();
+            SDataDpsNotes dpsNotes = new SDataDpsNotes();
 
-            notes.setNotes(option);
-            notes.setIsAllDocs(true);
-            notes.setIsPrintable(true);
-            notes.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+            dpsNotes.setNotes(option);
+            dpsNotes.setIsAllDocs(true);
+            dpsNotes.setIsPrintable(true);
+            dpsNotes.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+            
+            // identify system notes, when possible:
+            
+            SDataSystemNotes systemNotes = null;
+            
+            for (SDataSystemNotes notes : maSystemNotes) {
+                if (option.equals(notes.getNotes())) {
+                    systemNotes = notes;
+                    break;
+                }
+            }
+            
+            if (systemNotes != null) {
+                dpsNotes.setIsCfdComplement(systemNotes.getIsCfdComplement());
+                dpsNotes.setCfdComplementDisposition(systemNotes.getCfdComplementDisposition());
+                dpsNotes.setCfdComplementRule(systemNotes.getCfdComplementRule());
+            }
+            
+            // add notes:
 
-            moPaneGridNotes.addTableRow(new SDataDpsNotesRow(notes));
-
+            moPaneGridNotes.addTableRow(new SDataDpsNotesRow(dpsNotes));
             moPaneGridNotes.renderTableRows();
             moPaneGridNotes.setTableRowSelection(0);
         }
@@ -7030,6 +7052,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbEntryWizard.setEnabled(false);
 
             jtfCurrencyKeyRo.setText((String) ((SFormComponentItem) jcbFkCurrencyId.getSelectedItem()).getComplement());
+        }
+        
+        if (jcbFkCurrencyId.getSelectedIndex() <= 0) {
+            maSystemNotes = null;
+        }
+        else {
+            try {
+                maSystemNotes = STrnUtilities.getSystemNotes(miClient, (int[]) moDpsType.getPrimaryKey(), moFieldFkCurrencyId.getKeyAsIntArray()[0]);
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
         }
 
         enableCfdCceFields(true);
@@ -7926,7 +7960,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         itemStateIsDiscountDocPercentage(false);
 
         itemChangeFkPaymentTypeId(true);
-        itemChangeFkCurrencyId(false);
+        itemChangeFkCurrencyId(false); // do not calculate document's total
         itemChangeFkIncotermId();
         itemChangeFkCarrierTypeId();
         itemChangeFkVehicleTypeId_n();
@@ -8774,10 +8808,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moPaneGridEntries.setTableRowSelection(0);
 
         for (SDataDpsNotes notes : moDps.getDbmsDpsNotes()) {
-            if (notes.getPkNotesId() != SLibConstants.UNDEFINED) {
-                moPaneGridNotes.addTableRow(new SDataDpsNotesRow(notes));
-            }
-            else if (notes.getIsAllDocs()) {
+            if (notes.getPkNotesId() != SLibConstants.UNDEFINED || notes.getIsAllDocs()) {
                 moPaneGridNotes.addTableRow(new SDataDpsNotesRow(notes));
             }
         }
@@ -8818,7 +8849,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         itemStateIsDiscountDocPercentage(false);
 
         itemChangeFkPaymentTypeId(false);
-        itemChangeFkCurrencyId(false);
+        itemChangeFkCurrencyId(false); // do not calculate document's total
         itemChangeFkCarrierTypeId();
 
         if (isCfdEmissionRequired()) {

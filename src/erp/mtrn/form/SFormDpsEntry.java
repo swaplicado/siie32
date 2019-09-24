@@ -72,7 +72,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Claudio Peña
+ * @author  Sergio Flores, Juan Barajas, Irving Sánchez, Gerardo Hernández, Uriel Castañeda, Claudio Peña, Sergio Flores
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
@@ -2352,9 +2352,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         i = 0;
         aoTableColumns = new STableColumnForm[11];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Notas", 500);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Todos los docs.", STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Impresión", STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "XML CFD", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Heredable a todos los documentos", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Visible al imprimir", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Descripción concepto CFDI", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -3801,20 +3801,19 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
 
     private void actionSystemNotes() {
-        String option = "";
-
-        option = miClient.pickOption(SDataConstants.TRN_SYS_NTS, new int[] { moParamDps.getFkDpsCategoryId(), moParamDps.getFkDpsClassId(), moParamDps.getFkDpsTypeId(), moParamDps.getFkCurrencyId() });
+        String option = miClient.pickOption(SDataConstants.TRN_SYS_NTS, new int[] { moParamDps.getFkDpsCategoryId(), moParamDps.getFkDpsClassId(), moParamDps.getFkDpsTypeId(), moParamDps.getFkCurrencyId() });
 
         if (!option.isEmpty()) {
-            SDataDpsEntryNotes notes = new SDataDpsEntryNotes();
+            SDataDpsEntryNotes dpsEntryNotes = new SDataDpsEntryNotes();
 
-            notes.setNotes(option);
-            notes.setIsAllDocs(true);
-            notes.setIsPrintable(true);
-            notes.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+            dpsEntryNotes.setNotes(option);
+            dpsEntryNotes.setIsAllDocs(true);
+            dpsEntryNotes.setIsPrintable(true);
+            dpsEntryNotes.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
 
-            moPaneGridNotes.addTableRow(new SDataDpsEntryNotesRow(notes));
+            // add notes:
 
+            moPaneGridNotes.addTableRow(new SDataDpsEntryNotesRow(dpsEntryNotes));
             moPaneGridNotes.renderTableRows();
             moPaneGridNotes.setTableRowSelection(0);
         }

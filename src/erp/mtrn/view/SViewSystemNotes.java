@@ -16,7 +16,7 @@ import javax.swing.JButton;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewSystemNotes extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -28,8 +28,6 @@ public class SViewSystemNotes extends erp.lib.table.STableTab implements java.aw
     }
 
     private void initComponents() {
-        int i;
-
         moTabFilterDeleted = new STabFilterDeleted(this);
 
         addTaskBarUpperComponent(moTabFilterDeleted);
@@ -39,22 +37,23 @@ public class SViewSystemNotes extends erp.lib.table.STableTab implements java.aw
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[14];
+        STableColumn[] aoTableColumns = new STableColumn[15];
 
-        i = 0;
+        int i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "v.id_nts");
         for (i = 0; i < aoKeyFields.length; i++) {
             moTablePane.getPrimaryKeyFields().add(aoKeyFields[i]);
         }
 
         i = 0;
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "v.nts", "Nota", 200);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "v.nts", "Notas predefinidas", 300);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "vct.f_ct_dps", "Categoría documento", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "vcl.f_cl_dps", "Clase documento", 200);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "vtp.f_tp_dps", "Tipo documento", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "vcu.f_cur_key", "Moneda", 200);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_aut", "Automática docs.", STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_prt", "Impresión", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "vcu.f_cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_aut", "Adición automática al crear documentos", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_prt", "Visible al imprimir", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_cfd_comp", "Complemento CFDI Leyendas Fiscales", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "v.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usr. creación", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "v.ts_new", "Creación", STableConstants.WIDTH_DATE_TIME);
@@ -85,13 +84,13 @@ public class SViewSystemNotes extends erp.lib.table.STableTab implements java.aw
             }
         }
 
-        msSql = "SELECT v.id_nts, v.nts, v.b_aut, v.b_prt, v.b_del, vct.ct_dps AS f_ct_dps, vcl.cl_dps AS f_cl_dps, vtp.tp_dps AS f_tp_dps, " +
+        msSql = "SELECT v.id_nts, v.nts, v.b_aut, v.b_prt, v.b_cfd_comp, v.b_del, " +
+                "vct.ct_dps AS f_ct_dps, vcl.cl_dps AS f_cl_dps, vtp.tp_dps AS f_tp_dps, " +
                 "vcu.cur_key AS f_cur_key, v.ts_new, v.ts_edit, v.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM trn_sys_nts AS v " +
                 "INNER JOIN erp.trns_ct_dps AS vct ON v.fid_ct_dps = vct.id_ct_dps " +
                 "INNER JOIN erp.trns_cl_dps AS vcl ON v.fid_ct_dps = vcl.id_ct_dps AND v.fid_cl_dps = vcl.id_cl_dps " +
-                "INNER JOIN erp.trnu_tp_dps AS vtp ON v.fid_ct_dps = vtp.id_ct_dps AND " +
-                "v.fid_cl_dps = vtp.id_cl_dps AND v.fid_tp_dps = vtp.id_tp_dps " +
+                "INNER JOIN erp.trnu_tp_dps AS vtp ON v.fid_ct_dps = vtp.id_ct_dps AND v.fid_cl_dps = vtp.id_cl_dps AND v.fid_tp_dps = vtp.id_tp_dps " +
                 "INNER JOIN erp.cfgu_cur AS vcu ON v.fid_cur = vcu.id_cur " +
                 "INNER JOIN erp.usru_usr AS un ON v.fid_usr_new = un.id_usr " +
                 "INNER JOIN erp.usru_usr AS ue ON v.fid_usr_edit = ue.id_usr " +

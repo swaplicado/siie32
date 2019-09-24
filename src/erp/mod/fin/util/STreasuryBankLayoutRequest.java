@@ -39,30 +39,25 @@ public class STreasuryBankLayoutRequest {
     }
     
     public boolean makeRequestToTreasury() {
-        boolean isSent = false;
-        SBankLayoutParams params = null;
-        SDialogComments dialogComments = null;
-        File pdf = null;
+        boolean sent = false;
         
-        String comment = "";
-        
-        dialogComments = new SDialogComments(miClient, "Comentarios");
+        SDialogComments dialogComments = new SDialogComments(miClient, "Comentarios");
         dialogComments.setVisible(true);
         
         if (dialogComments.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
             moBankLayout.setAuthorizationRequests(moBankLayout.getAuthorizationRequests() + 1);
-            comment = dialogComments.getComment();
             
+            String comment = dialogComments.getComment();
             SDbBankLayout bankLayout = SBankLayoutUtils.loadPaymentsXml(miClient, moBankLayout);
             
             if (moBankLayout != null) {
-                params = SBankLayoutUtils.getBankLayoutParams(miClient, bankLayout);
-                pdf = STreasuryBankLayoutFile.createDocument(miClient, params ,SBankLayoutUtils.populateRows(miClient, bankLayout.getLayoutBankPaymentRows(), bankLayout.getLayoutBankXmlRows(), bankLayout.getXtaBankPaymentType()));
+                SBankLayoutParams params = SBankLayoutUtils.getBankLayoutParams(miClient, bankLayout);
+                File pdf = STreasuryBankLayoutFile.createDocument(miClient, params ,SBankLayoutUtils.populateRows(miClient, bankLayout.getLayoutBankPaymentRows(), bankLayout.getLayoutBankXmlRows(), bankLayout.getXtaBankPaymentType()));
 
                 if (pdf != null) {
-                    isSent = sendMail(params, comment, pdf, null);
+                    sent = sendMail(params, comment, pdf, null);
 
-                    if (isSent) {
+                    if (sent) {
                         try {
                             if (bankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_NEW_ST) {
                                 SBankLayoutUtils.changeLayoutStatus(miClient, bankLayout, SFinConsts.LAY_BANK_APPROVED_ST);
@@ -76,7 +71,8 @@ public class STreasuryBankLayoutRequest {
                 }
             }
         }
-        return isSent;
+        
+        return sent;
     }
     
     public boolean sendMail(SBankLayoutParams params, String comment, File pdf, String email) {

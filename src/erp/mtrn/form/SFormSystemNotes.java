@@ -18,15 +18,16 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mtrn.data.SDataSystemNotes;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
-public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -38,19 +39,25 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
 
     private erp.mtrn.data.SDataSystemNotes moSystemNotes;
     private erp.lib.form.SFormComboBoxGroup moComboBoxGroup;
-    private erp.lib.form.SFormField moFieldNote;
-    private erp.lib.form.SFormField moFieldFkCategoryId;
-    private erp.lib.form.SFormField moFieldFkClassId;
-    private erp.lib.form.SFormField moFieldFkTypeId;
+    private erp.lib.form.SFormField moFieldNotes;
+    private erp.lib.form.SFormField moFieldIsDeleted;
+    private erp.lib.form.SFormField moFieldFkDpsCategoryId;
+    private erp.lib.form.SFormField moFieldFkDpsClassId;
+    private erp.lib.form.SFormField moFieldFkDpsTypeId;
     private erp.lib.form.SFormField moFieldFkCurrencyId;
     private erp.lib.form.SFormField moFieldIsAutomatic;
     private erp.lib.form.SFormField moFieldIsPrintable;
-    private erp.lib.form.SFormField moFieldIsDeleted;
+    private erp.lib.form.SFormField moFieldIsCfdComplement;
+    private erp.lib.form.SFormField moFieldCfdComplementDisposition;
+    private erp.lib.form.SFormField moFieldCfdComplementRule;
 
-    /** Creates new form SFormSystemNotes */
+    /** Creates new form SFormSystemNotes
+     * @param client GUI client.
+     */
     public SFormSystemNotes(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient =  client;
+        mnFormType = SDataConstants.TRN_SYS_NTS;
 
         initComponents();
         initComponentsExtra();
@@ -65,33 +72,43 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jbOk = new javax.swing.JButton();
-        jbCancel = new javax.swing.JButton();
+        jpRegistry = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jtaDocNumberSeries = new javax.swing.JTextArea();
-        jPanel11 = new javax.swing.JPanel();
-        jlDocNumberSeries = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
+        jlNotes = new javax.swing.JLabel();
+        jckIsDeleted = new javax.swing.JCheckBox();
+        jspNotes = new javax.swing.JScrollPane();
+        jtaNotes = new javax.swing.JTextArea();
+        jPanel13 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
-        jlFkCategoryId = new javax.swing.JLabel();
-        jcbFkCategoryId = new javax.swing.JComboBox<SFormComponentItem>();
+        jlFkDpsCategoryId = new javax.swing.JLabel();
+        jcbFkDpsCategoryId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel7 = new javax.swing.JPanel();
-        jlFkClassId = new javax.swing.JLabel();
-        jcbFkClassId = new javax.swing.JComboBox<SFormComponentItem>();
+        jlFkDpsClassId = new javax.swing.JLabel();
+        jcbFkDpsClassId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel8 = new javax.swing.JPanel();
-        jlFkTypeId = new javax.swing.JLabel();
-        jcbFkTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jlFkDpsTypeId = new javax.swing.JLabel();
+        jcbFkDpsTypeId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel10 = new javax.swing.JPanel();
         jlFkCurrencyId = new javax.swing.JLabel();
         jcbFkCurrencyId = new javax.swing.JComboBox<SFormComponentItem>();
         jPanel9 = new javax.swing.JPanel();
         jckIsAutomatic = new javax.swing.JCheckBox();
         jckIsPrintable = new javax.swing.JCheckBox();
-        jckIsDeleted = new javax.swing.JCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        jckIsCfdComplement = new javax.swing.JCheckBox();
+        jPanel3 = new javax.swing.JPanel();
+        jlCfdComplementDisposition = new javax.swing.JLabel();
+        jtfCfdComplementDisposition = new javax.swing.JTextField();
+        jlCfdComplementDispositionHint = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
+        jlCfdComplementRule = new javax.swing.JLabel();
+        jtfCfdComplementRule = new javax.swing.JTextField();
+        jlCfdComplementRuleHint = new javax.swing.JLabel();
+        jpControls = new javax.swing.JPanel();
+        jbOk = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Nota predefinida de documento");
@@ -102,114 +119,163 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpRegistry.setLayout(new java.awt.BorderLayout());
 
-        jbOk.setText("Aceptar");
-        jbOk.setToolTipText("[Ctrl + Enter]");
-        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbOk);
+        jPanel2.setLayout(new java.awt.BorderLayout(0, 3));
 
-        jbCancel.setText("Cancelar");
-        jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
+        jPanel5.setLayout(new java.awt.BorderLayout());
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+        jPanel12.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel2.setLayout(new java.awt.BorderLayout(0, 5));
+        jlNotes.setForeground(new java.awt.Color(0, 102, 102));
+        jlNotes.setText("Notas predeterminadas: *");
+        jlNotes.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel12.add(jlNotes, java.awt.BorderLayout.CENTER);
 
-        jPanel12.setLayout(new java.awt.BorderLayout(0, 5));
+        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setText("Registro eliminado");
+        jckIsDeleted.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel12.add(jckIsDeleted, java.awt.BorderLayout.EAST);
 
-        jtaDocNumberSeries.setColumns(20);
-        jtaDocNumberSeries.setRows(5);
-        jScrollPane1.setViewportView(jtaDocNumberSeries);
+        jPanel5.add(jPanel12, java.awt.BorderLayout.NORTH);
 
-        jPanel12.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jspNotes.setPreferredSize(new java.awt.Dimension(100, 100));
 
-        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jtaNotes.setColumns(20);
+        jtaNotes.setRows(5);
+        jspNotes.setViewportView(jtaNotes);
 
-        jlDocNumberSeries.setText("Nota predeterminada: *");
-        jlDocNumberSeries.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel11.add(jlDocNumberSeries);
+        jPanel5.add(jspNotes, java.awt.BorderLayout.CENTER);
 
-        jPanel12.add(jPanel11, java.awt.BorderLayout.NORTH);
+        jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
 
-        jPanel2.add(jPanel12, java.awt.BorderLayout.NORTH);
-
-        jPanel3.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
+        jPanel13.setLayout(new java.awt.GridLayout(8, 1, 0, 3));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkCategoryId.setText("Categoría de documento: *");
-        jlFkCategoryId.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel6.add(jlFkCategoryId);
+        jlFkDpsCategoryId.setText("Categoría documento: *");
+        jlFkDpsCategoryId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel6.add(jlFkDpsCategoryId);
 
-        jcbFkCategoryId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkCategoryId.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel6.add(jcbFkCategoryId);
+        jcbFkDpsCategoryId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbFkDpsCategoryId.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel6.add(jcbFkDpsCategoryId);
 
-        jPanel3.add(jPanel6);
+        jPanel13.add(jPanel6);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkClassId.setText("Clase de documento: *");
-        jlFkClassId.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel7.add(jlFkClassId);
+        jlFkDpsClassId.setText("Clase documento: *");
+        jlFkDpsClassId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel7.add(jlFkDpsClassId);
 
-        jcbFkClassId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkClassId.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel7.add(jcbFkClassId);
+        jcbFkDpsClassId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbFkDpsClassId.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel7.add(jcbFkDpsClassId);
 
-        jPanel3.add(jPanel7);
+        jPanel13.add(jPanel7);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkTypeId.setText("Tipo de documento: *");
-        jlFkTypeId.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel8.add(jlFkTypeId);
+        jlFkDpsTypeId.setText("Tipo documento: *");
+        jlFkDpsTypeId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel8.add(jlFkDpsTypeId);
 
-        jcbFkTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkTypeId.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel8.add(jcbFkTypeId);
+        jcbFkDpsTypeId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbFkDpsTypeId.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel8.add(jcbFkDpsTypeId);
 
-        jPanel3.add(jPanel8);
+        jPanel13.add(jPanel8);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkCurrencyId.setText("Moneda: *");
-        jlFkCurrencyId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFkCurrencyId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel10.add(jlFkCurrencyId);
 
         jcbFkCurrencyId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbFkCurrencyId.setPreferredSize(new java.awt.Dimension(250, 23));
+        jcbFkCurrencyId.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel10.add(jcbFkCurrencyId);
 
-        jPanel3.add(jPanel10);
+        jPanel13.add(jPanel10);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsAutomatic.setText("Adición automática al crear");
-        jckIsAutomatic.setPreferredSize(new java.awt.Dimension(200, 23));
+        jckIsAutomatic.setText("Adición automática al crear documentos");
+        jckIsAutomatic.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel9.add(jckIsAutomatic);
 
-        jckIsPrintable.setText("Impresión");
+        jckIsPrintable.setText("Visible al imprimir");
         jckIsPrintable.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel9.add(jckIsPrintable);
 
-        jckIsDeleted.setText("Registro eliminado");
-        jPanel9.add(jckIsDeleted);
+        jPanel13.add(jPanel9);
 
-        jPanel3.add(jPanel9);
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsCfdComplement.setText("Se integra como complemento CFDI Leyendas Fiscales");
+        jckIsCfdComplement.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel1.add(jckIsCfdComplement);
+
+        jPanel13.add(jPanel1);
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCfdComplementDisposition.setForeground(new java.awt.Color(0, 102, 102));
+        jlCfdComplementDisposition.setText("Disposición fiscal:");
+        jlCfdComplementDisposition.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel3.add(jlCfdComplementDisposition);
+
+        jtfCfdComplementDisposition.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel3.add(jtfCfdComplementDisposition);
+
+        jlCfdComplementDispositionHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlCfdComplementDispositionHint.setToolTipText("Ley, resolución o disposición fiscal que regula la leyenda, en siglas en mayúsculas y sin puntuación, p. ej., ISR");
+        jlCfdComplementDispositionHint.setPreferredSize(new java.awt.Dimension(18, 23));
+        jPanel3.add(jlCfdComplementDispositionHint);
+
+        jPanel13.add(jPanel3);
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jPanel3.add(jPanel4);
 
-        jPanel2.add(jPanel3, java.awt.BorderLayout.CENTER);
+        jlCfdComplementRule.setForeground(new java.awt.Color(0, 102, 102));
+        jlCfdComplementRule.setText("Norma:");
+        jlCfdComplementRule.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlCfdComplementRule);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.NORTH);
+        jtfCfdComplementRule.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel4.add(jtfCfdComplementRule);
 
-        setSize(new java.awt.Dimension(656, 388));
+        jlCfdComplementRuleHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlCfdComplementRuleHint.setToolTipText("Artículo o regla que regula la obligación de la leyenda");
+        jlCfdComplementRuleHint.setPreferredSize(new java.awt.Dimension(18, 23));
+        jPanel4.add(jlCfdComplementRuleHint);
+
+        jPanel13.add(jPanel4);
+
+        jPanel2.add(jPanel13, java.awt.BorderLayout.CENTER);
+
+        jpRegistry.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+        getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
+
+        jpControls.setPreferredSize(new java.awt.Dimension(392, 33));
+        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        jbOk.setText("Aceptar");
+        jbOk.setToolTipText("[Ctrl + Enter]");
+        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpControls.add(jbOk);
+
+        jbCancel.setText("Cancelar");
+        jbCancel.setToolTipText("[Escape]");
+        jpControls.add(jbCancel);
+
+        getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
+
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -218,31 +284,42 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
-
         moComboBoxGroup = new SFormComboBoxGroup(miClient);
 
-        moFieldNote = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtaDocNumberSeries, jlDocNumberSeries);
-        moFieldNote.setLengthMax(255);
-        moFieldFkCategoryId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCategoryId, jlFkCategoryId);
-        moFieldFkClassId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkClassId, jlFkClassId);
-        moFieldFkTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkTypeId, jlFkTypeId);
+        moFieldNotes = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtaNotes, jlNotes);
+        moFieldNotes.setLengthMax(1023);
+        moFieldNotes.setAutoCaseType(0);
+        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
+        moFieldFkDpsCategoryId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkDpsCategoryId, jlFkDpsCategoryId);
+        moFieldFkDpsClassId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkDpsClassId, jlFkDpsClassId);
+        moFieldFkDpsTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkDpsTypeId, jlFkDpsTypeId);
         moFieldFkCurrencyId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCurrencyId, jlFkCurrencyId);
         moFieldIsAutomatic = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsAutomatic);
         moFieldIsPrintable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsPrintable);
-        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
+        moFieldIsCfdComplement = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsCfdComplement);
+        moFieldCfdComplementDisposition = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdComplementDisposition, jlCfdComplementDisposition);
+        moFieldCfdComplementDisposition.setLengthMax(255);
+        moFieldCfdComplementDisposition.setAutoCaseType(0);
+        moFieldCfdComplementRule = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdComplementRule, jlCfdComplementRule);
+        moFieldCfdComplementRule.setLengthMax(255);
+        moFieldCfdComplementRule.setAutoCaseType(0);
 
-        mvFields.add(moFieldNote);
-        mvFields.add(moFieldFkCategoryId);
-        mvFields.add(moFieldFkClassId);
-        mvFields.add(moFieldFkTypeId);
+        mvFields = new Vector<>();
+        mvFields.add(moFieldNotes);
+        mvFields.add(moFieldIsDeleted);
+        mvFields.add(moFieldFkDpsCategoryId);
+        mvFields.add(moFieldFkDpsClassId);
+        mvFields.add(moFieldFkDpsTypeId);
         mvFields.add(moFieldFkCurrencyId);
         mvFields.add(moFieldIsAutomatic);
         mvFields.add(moFieldIsPrintable);
-        mvFields.add(moFieldIsDeleted);
+        mvFields.add(moFieldIsCfdComplement);
+        mvFields.add(moFieldCfdComplementDisposition);
+        mvFields.add(moFieldCfdComplementRule);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
+        jckIsCfdComplement.addItemListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -262,7 +339,7 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
-            jcbFkCategoryId.requestFocus();
+            jtaNotes.requestFocus();
         }
     }
 
@@ -287,35 +364,65 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
+    
+    private void itemStateChangedCfdComplement() {
+        if (jckIsCfdComplement.isSelected()) {
+            jtfCfdComplementDisposition.setEditable(true);
+            jtfCfdComplementDisposition.setFocusable(true);
+            jtfCfdComplementRule.setEditable(true);
+            jtfCfdComplementRule.setFocusable(true);
+            
+            jtfCfdComplementDisposition.requestFocusInWindow();
+        }
+        else {
+            jtfCfdComplementDisposition.setEditable(false);
+            jtfCfdComplementDisposition.setFocusable(false);
+            jtfCfdComplementRule.setEditable(false);
+            jtfCfdComplementRule.setFocusable(false);
+            
+            moFieldCfdComplementDisposition.resetField();
+            moFieldCfdComplementRule.resetField();
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkCategoryId;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkClassId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkCurrencyId;
-    private javax.swing.JComboBox<SFormComponentItem> jcbFkTypeId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkDpsCategoryId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkDpsClassId;
+    private javax.swing.JComboBox<SFormComponentItem> jcbFkDpsTypeId;
     private javax.swing.JCheckBox jckIsAutomatic;
+    private javax.swing.JCheckBox jckIsCfdComplement;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JCheckBox jckIsPrintable;
-    private javax.swing.JLabel jlDocNumberSeries;
-    private javax.swing.JLabel jlFkCategoryId;
-    private javax.swing.JLabel jlFkClassId;
+    private javax.swing.JLabel jlCfdComplementDisposition;
+    private javax.swing.JLabel jlCfdComplementDispositionHint;
+    private javax.swing.JLabel jlCfdComplementRule;
+    private javax.swing.JLabel jlCfdComplementRuleHint;
     private javax.swing.JLabel jlFkCurrencyId;
-    private javax.swing.JLabel jlFkTypeId;
-    private javax.swing.JTextArea jtaDocNumberSeries;
+    private javax.swing.JLabel jlFkDpsCategoryId;
+    private javax.swing.JLabel jlFkDpsClassId;
+    private javax.swing.JLabel jlFkDpsTypeId;
+    private javax.swing.JLabel jlNotes;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpRegistry;
+    private javax.swing.JScrollPane jspNotes;
+    private javax.swing.JTextArea jtaNotes;
+    private javax.swing.JTextField jtfCfdComplementDisposition;
+    private javax.swing.JTextField jtfCfdComplementRule;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -335,17 +442,23 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
-        jckIsDeleted.setEnabled(false);
         moComboBoxGroup.reset();
+
+        moFieldIsAutomatic.setFieldValue(true);
+        moFieldIsPrintable.setFieldValue(true);
+        moFieldIsCfdComplement.setFieldValue(false);
+        itemStateChangedCfdComplement();
+        
+        jckIsDeleted.setEnabled(false);
     }
 
     @Override
     public void formRefreshCatalogues() {
         moComboBoxGroup.clear();
 
-        moComboBoxGroup.addComboBox(SDataConstants.TRNS_CT_DPS, jcbFkCategoryId);
-        moComboBoxGroup.addComboBox(SDataConstants.TRNS_CL_DPS, jcbFkClassId);
-        moComboBoxGroup.addComboBox(SDataConstants.TRNU_TP_DPS, jcbFkTypeId);
+        moComboBoxGroup.addComboBox(SDataConstants.TRNS_CT_DPS, jcbFkDpsCategoryId);
+        moComboBoxGroup.addComboBox(SDataConstants.TRNS_CL_DPS, jcbFkDpsClassId);
+        moComboBoxGroup.addComboBox(SDataConstants.TRNU_TP_DPS, jcbFkDpsTypeId);
 
         SFormUtilities.populateComboBox(miClient, jcbFkCurrencyId, SDataConstants.CFGU_CUR, new int[] { miClient.getSessionXXX().getParamsErp().getFkCurrencyId() });
     }
@@ -389,14 +502,17 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
     public void setRegistry(erp.lib.data.SDataRegistry registry) {
         moSystemNotes = (SDataSystemNotes) registry;
 
-        moFieldNote.setFieldValue(moSystemNotes.getNotes());
-        moFieldFkCategoryId.setFieldValue(new int[] { moSystemNotes.getFkDpsCategoryId() });
-        moFieldFkClassId.setFieldValue(new int[] { moSystemNotes.getFkDpsCategoryId(), moSystemNotes.getFkDpsClassId() });
-        moFieldFkTypeId.setFieldValue(new int[] { moSystemNotes.getFkDpsCategoryId(), moSystemNotes.getFkDpsClassId(), moSystemNotes.getFkDpsTypeId() });
+        moFieldNotes.setFieldValue(moSystemNotes.getNotes());
+        moFieldIsDeleted.setFieldValue(moSystemNotes.getIsDeleted());
+        moFieldFkDpsCategoryId.setFieldValue(new int[] { moSystemNotes.getFkDpsCategoryId() });
+        moFieldFkDpsClassId.setFieldValue(new int[] { moSystemNotes.getFkDpsCategoryId(), moSystemNotes.getFkDpsClassId() });
+        moFieldFkDpsTypeId.setFieldValue(new int[] { moSystemNotes.getFkDpsCategoryId(), moSystemNotes.getFkDpsClassId(), moSystemNotes.getFkDpsTypeId() });
         moFieldFkCurrencyId.setFieldValue(new int[] { moSystemNotes.getFkCurrencyId() });
         moFieldIsAutomatic.setFieldValue(moSystemNotes.getIsAutomatic());
         moFieldIsPrintable.setFieldValue(moSystemNotes.getIsPrintable());
-        moFieldIsDeleted.setFieldValue(moSystemNotes.getIsDeleted());
+        moFieldIsCfdComplement.setFieldValue(moSystemNotes.getIsCfdComplement());
+        moFieldCfdComplementDisposition.setFieldValue(moSystemNotes.getCfdComplementDisposition());
+        moFieldCfdComplementRule.setFieldValue(moSystemNotes.getCfdComplementRule());
 
         jckIsDeleted.setEnabled(true);
     }
@@ -411,20 +527,24 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
             moSystemNotes.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
         }
 
-        moSystemNotes.setNotes(moFieldNote.getString());
-        moSystemNotes.setFkDpsCategoryId(moFieldFkTypeId.getKeyAsIntArray()[0]);
-        moSystemNotes.setFkDpsClassId(moFieldFkTypeId.getKeyAsIntArray()[1]);
-        moSystemNotes.setFkDpsTypeId(moFieldFkTypeId.getKeyAsIntArray()[2]);
-        moSystemNotes.setFkCurrencyId(moFieldFkCurrencyId.getKeyAsIntArray()[0]);
+        moSystemNotes.setNotes(moFieldNotes.getString());
+        moSystemNotes.setCfdComplementDisposition(moFieldCfdComplementDisposition.getString());
+        moSystemNotes.setCfdComplementRule(moFieldCfdComplementRule.getString());
         moSystemNotes.setIsAutomatic(moFieldIsAutomatic.getBoolean());
         moSystemNotes.setIsPrintable(moFieldIsPrintable.getBoolean());
+        moSystemNotes.setIsCfdComplement(moFieldIsCfdComplement.getBoolean());
         moSystemNotes.setIsDeleted(moFieldIsDeleted.getBoolean());
+        moSystemNotes.setFkDpsCategoryId(moFieldFkDpsTypeId.getKeyAsIntArray()[0]);
+        moSystemNotes.setFkDpsClassId(moFieldFkDpsTypeId.getKeyAsIntArray()[1]);
+        moSystemNotes.setFkDpsTypeId(moFieldFkDpsTypeId.getKeyAsIntArray()[2]);
+        moSystemNotes.setFkCurrencyId(moFieldFkCurrencyId.getKeyAsIntArray()[0]);
 
         return moSystemNotes;
     }
 
     @Override
     public void setValue(int type, java.lang.Object value) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -447,6 +567,16 @@ public class SFormSystemNotes extends javax.swing.JDialog implements erp.lib.for
             }
             else if (button == jbCancel) {
                 actionCancel();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof javax.swing.JCheckBox) {
+            javax.swing.JCheckBox checkBox = (javax.swing.JCheckBox) e.getSource();
+            if (checkBox == jckIsCfdComplement) {
+                itemStateChangedCfdComplement();
             }
         }
     }

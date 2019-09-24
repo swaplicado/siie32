@@ -14,7 +14,6 @@ package erp.mtrn.form;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
-import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
@@ -49,7 +48,10 @@ public class SDialogShowDocumentNotes extends javax.swing.JDialog implements erp
     private erp.mtrn.data.SDataDiog moDiog;
     private erp.mtrn.data.SDataDps moDps;
 
-    /** Creates new form SDialogShowDocumentNotes */
+    /** Creates new form SDialogShowDocumentNotes
+     * @param client GUI client.
+     * @param typeDocument SDataConstants.TRN_DPS or SDataConstants.TRN_DIOG.
+     */
     public SDialogShowDocumentNotes(erp.client.SClientInterface client, int typeDocument) {
         super(client.getFrame(), true);
         miClient =  client;
@@ -111,7 +113,7 @@ public class SDialogShowDocumentNotes extends javax.swing.JDialog implements erp
     private void initComponentsExtra() {
         int i = 0;
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moNotesPane = new STablePane(miClient);
         jpNotesPane.add(moNotesPane, BorderLayout.CENTER);
@@ -121,15 +123,30 @@ public class SDialogShowDocumentNotes extends javax.swing.JDialog implements erp
         erp.lib.table.STableColumnForm tableColumnsNote[];
 
         i = 0;
-        tableColumnsNote = new STableColumnForm[mnParamTypeDocument == SDataConstants.TRN_DPS ? 10 : 9];
+        tableColumnsNote = new STableColumnForm[mnParamTypeDocument == SDataConstants.TRN_DPS ? 11 : 9];
+        
         tableColumnsNote[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Notas", 500);
+        
         switch (mnParamTypeDocument) {
             case SDataConstants.TRN_DPS:
-                tableColumnsNote[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Todos los documentos", STableConstants.WIDTH_BOOLEAN_2X);
+                tableColumnsNote[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Heredable a todos los documentos dependientes", STableConstants.WIDTH_BOOLEAN_2X);
+                break;
+            case SDataConstants.TRN_DIOG:
                 break;
             default:
         }
-        tableColumnsNote[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Impresión", STableConstants.WIDTH_BOOLEAN_2X);
+        
+        tableColumnsNote[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Visible al imprimir", STableConstants.WIDTH_BOOLEAN_2X);
+        
+        switch (mnParamTypeDocument) {
+            case SDataConstants.TRN_DPS:
+                tableColumnsNote[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Complemento CFDI Leyendas Fiscales", STableConstants.WIDTH_BOOLEAN_2X);
+                break;
+            case SDataConstants.TRN_DIOG:
+                break;
+            default:
+        }
+        
         tableColumnsNote[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
         tableColumnsNote[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. creación", STableConstants.WIDTH_USER);
         tableColumnsNote[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_DATE_TIME, "Creación", STableConstants.WIDTH_DATE_TIME);

@@ -152,6 +152,7 @@ import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataDpsType;
 import erp.mtrn.data.SDataPac;
 import erp.mtrn.data.SDataStockLot;
+import erp.mtrn.data.SDataSystemNotes;
 import erp.mtrn.data.SProcBizPartnerLastPayment;
 import erp.mtrn.data.SProcDiogDncCompanyBranchEntityVal;
 import erp.mtrn.data.SProcDiogDncCompanyBranchVal;
@@ -713,6 +714,9 @@ public abstract class SDataUtilities {
             case SDataConstants.TRNU_TP_DPS:
                 registry = new SDataDpsType();
                 break;
+            case SDataConstants.TRN_SYS_NTS:
+                registry = new SDataSystemNotes();
+                break;
             case SDataConstants.TRN_DPS:
                 registry = new SDataDps();
                 break;
@@ -749,12 +753,14 @@ public abstract class SDataUtilities {
             case SDataConstants.TRN_BP_BLOCK:
                 registry = new SDataBizPartnerBlocking();
                 break;
+                
             case SDataConstants.MKT_CFG_CUS:
                 registry = new erp.mmkt.data.SDataCustomerConfig();
                 break;
             case SDataConstants.MKT_CFG_CUSB:
                 registry = new erp.mmkt.data.SDataCustomerBranchConfig();
                 break;
+                
             case SDataConstants.MFG_BOM:
                 registry = new SDataBom();
                 break;

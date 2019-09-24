@@ -1245,7 +1245,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                             sViewTitle = "Folios docs. ventas";
                             break;
                         case SDataConstants.TRN_DNC_DIOG_DNS:
-                            sViewTitle = "Folios docs. mercancías";
+                            sViewTitle = "Folios docs. inventarios";
                             break;
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);

@@ -18,6 +18,7 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mtrn.data.SDataDpsNotes;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
@@ -26,7 +27,7 @@ import javax.swing.AbstractAction;
  *
  * @author Sergio Flores
  */
-public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -38,11 +39,16 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
 
     private erp.mtrn.data.SDataDpsNotes moDpsNotes;
     private erp.lib.form.SFormField moFieldNotes;
+    private erp.lib.form.SFormField moFieldIsDeleted;
     private erp.lib.form.SFormField moFieldIsAllDocs;
     private erp.lib.form.SFormField moFieldIsPrintable;
-    private erp.lib.form.SFormField moFieldIsDeleted;
+    private erp.lib.form.SFormField moFieldIsCfdComplement;
+    private erp.lib.form.SFormField moFieldCfdComplementDisposition;
+    private erp.lib.form.SFormField moFieldCfdComplementRule;
 
-    /** Creates new form SFormDpsNotes */
+    /** Creates new form SFormDpsNotes
+     * @param client GUI client.
+     */
     public SFormDpsNotes(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient =  client;
@@ -61,17 +67,31 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jpRegistry = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jbOk = new javax.swing.JButton();
-        jbCancel = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jckIsDeleted = new javax.swing.JCheckBox();
+        jspNotes = new javax.swing.JScrollPane();
         jtaNotes = new javax.swing.JTextArea();
+        jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jckIsAllDocs = new javax.swing.JCheckBox();
         jckIsPrintable = new javax.swing.JCheckBox();
-        jckIsDeleted = new javax.swing.JCheckBox();
+        jPanel5 = new javax.swing.JPanel();
+        jckIsCfdComplement = new javax.swing.JCheckBox();
+        jPanel7 = new javax.swing.JPanel();
+        jlCfdComplementDisposition = new javax.swing.JLabel();
+        jtfCfdComplementDisposition = new javax.swing.JTextField();
+        jlCfdComplementDispositionHint = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
+        jlCfdComplementRule = new javax.swing.JLabel();
+        jtfCfdComplementRule = new javax.swing.JTextField();
+        jlCfdComplementRuleHint = new javax.swing.JLabel();
+        jpControls = new javax.swing.JPanel();
+        jbOk = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Notas del documento");
@@ -82,52 +102,115 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpRegistry.setLayout(new java.awt.BorderLayout());
+
+        jPanel6.setLayout(new java.awt.BorderLayout(0, 3));
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jlNotes.setForeground(new java.awt.Color(0, 102, 102));
+        jlNotes.setText("Notas: *");
+        jlNotes.setPreferredSize(new java.awt.Dimension(32, 23));
+        jPanel4.add(jlNotes, java.awt.BorderLayout.CENTER);
+
+        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setText("Registro eliminado");
+        jckIsDeleted.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel4.add(jckIsDeleted, java.awt.BorderLayout.EAST);
+
+        jPanel1.add(jPanel4, java.awt.BorderLayout.NORTH);
+
+        jspNotes.setPreferredSize(new java.awt.Dimension(100, 175));
+
+        jtaNotes.setColumns(20);
+        jtaNotes.setRows(5);
+        jspNotes.setViewportView(jtaNotes);
+
+        jPanel1.add(jspNotes, java.awt.BorderLayout.CENTER);
+
+        jPanel6.add(jPanel1, java.awt.BorderLayout.NORTH);
+
+        jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 3));
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsAllDocs.setText("Heredable a todos los documentos dependientes");
+        jckIsAllDocs.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel3.add(jckIsAllDocs);
+
+        jckIsPrintable.setText("Visible al imprimir");
+        jckIsPrintable.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel3.add(jckIsPrintable);
+
+        jPanel2.add(jPanel3);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsCfdComplement.setText("Se integra como complemento CFDI Leyendas Fiscales");
+        jckIsCfdComplement.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel5.add(jckIsCfdComplement);
+
+        jPanel2.add(jPanel5);
+
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCfdComplementDisposition.setForeground(new java.awt.Color(0, 102, 102));
+        jlCfdComplementDisposition.setText("Disposición fiscal:");
+        jlCfdComplementDisposition.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlCfdComplementDisposition);
+
+        jtfCfdComplementDisposition.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel7.add(jtfCfdComplementDisposition);
+
+        jlCfdComplementDispositionHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlCfdComplementDispositionHint.setToolTipText("Ley, resolución o disposición fiscal que regula la leyenda, en siglas en mayúsculas y sin puntuación, p. ej., ISR");
+        jlCfdComplementDispositionHint.setPreferredSize(new java.awt.Dimension(18, 23));
+        jPanel7.add(jlCfdComplementDispositionHint);
+
+        jPanel2.add(jPanel7);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlCfdComplementRule.setForeground(new java.awt.Color(0, 102, 102));
+        jlCfdComplementRule.setText("Norma:");
+        jlCfdComplementRule.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jlCfdComplementRule);
+
+        jtfCfdComplementRule.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel8.add(jtfCfdComplementRule);
+
+        jlCfdComplementRuleHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlCfdComplementRuleHint.setToolTipText("Artículo o regla que regula la obligación de la leyenda");
+        jlCfdComplementRuleHint.setPreferredSize(new java.awt.Dimension(18, 23));
+        jPanel8.add(jlCfdComplementRuleHint);
+
+        jPanel2.add(jPanel8);
+
+        jPanel6.add(jPanel2, java.awt.BorderLayout.CENTER);
+
+        jpRegistry.add(jPanel6, java.awt.BorderLayout.NORTH);
+
+        getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
+
+        jpControls.setPreferredSize(new java.awt.Dimension(392, 33));
+        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbOk);
+        jpControls.add(jbOk);
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
+        jpControls.add(jbCancel);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
+        getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel2.setLayout(new java.awt.BorderLayout());
-
-        jlNotes.setText("Notas: *");
-        jlNotes.setPreferredSize(new java.awt.Dimension(32, 23));
-        jPanel2.add(jlNotes, java.awt.BorderLayout.NORTH);
-
-        jtaNotes.setColumns(20);
-        jtaNotes.setRows(5);
-        jScrollPane1.setViewportView(jtaNotes);
-
-        jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
-
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jckIsAllDocs.setText("Para todos los documentos");
-        jckIsAllDocs.setPreferredSize(new java.awt.Dimension(175, 23));
-        jPanel3.add(jckIsAllDocs);
-
-        jckIsPrintable.setText("Para impresión");
-        jckIsPrintable.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel3.add(jckIsPrintable);
-
-        jckIsDeleted.setText("Registro eliminado");
-        jckIsDeleted.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel3.add(jckIsDeleted);
-
-        jPanel2.add(jPanel3, java.awt.BorderLayout.PAGE_END);
-
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
-
-        setSize(new java.awt.Dimension(600, 300));
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -136,21 +219,33 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
 
         moFieldNotes = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtaNotes, jlNotes);
-        moFieldNotes.setLengthMax(255);
+        moFieldNotes.setLengthMax(1023);
+        moFieldNotes.setAutoCaseType(0);
+        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDeleted);
         moFieldIsAllDocs = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsAllDocs);
         moFieldIsPrintable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsPrintable);
-        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDeleted);
+        moFieldIsCfdComplement = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsCfdComplement);
+        moFieldCfdComplementDisposition = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdComplementDisposition, jlCfdComplementDisposition);
+        moFieldCfdComplementDisposition.setLengthMax(255);
+        moFieldCfdComplementDisposition.setAutoCaseType(0);
+        moFieldCfdComplementRule = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdComplementRule, jlCfdComplementRule);
+        moFieldCfdComplementRule.setLengthMax(255);
+        moFieldCfdComplementRule.setAutoCaseType(0);
 
+        mvFields = new Vector<>();
         mvFields.add(moFieldNotes);
+        mvFields.add(moFieldIsDeleted);
         mvFields.add(moFieldIsAllDocs);
         mvFields.add(moFieldIsPrintable);
-        mvFields.add(moFieldIsDeleted);
+        mvFields.add(moFieldIsCfdComplement);
+        mvFields.add(moFieldCfdComplementDisposition);
+        mvFields.add(moFieldCfdComplementRule);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
+        jckIsCfdComplement.addItemListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -195,19 +290,53 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
         mnFormResult = SLibConstants.FORM_RESULT_CANCEL;
         setVisible(false);
     }
+    
+    private void itemStateChangedCfdComplement() {
+        if (jckIsCfdComplement.isSelected()) {
+            jtfCfdComplementDisposition.setEditable(true);
+            jtfCfdComplementDisposition.setFocusable(true);
+            jtfCfdComplementRule.setEditable(true);
+            jtfCfdComplementRule.setFocusable(true);
+            
+            jtfCfdComplementDisposition.requestFocusInWindow();
+        }
+        else {
+            jtfCfdComplementDisposition.setEditable(false);
+            jtfCfdComplementDisposition.setFocusable(false);
+            jtfCfdComplementRule.setEditable(false);
+            jtfCfdComplementRule.setFocusable(false);
+            
+            moFieldCfdComplementDisposition.resetField();
+            moFieldCfdComplementRule.resetField();
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
     private javax.swing.JCheckBox jckIsAllDocs;
+    private javax.swing.JCheckBox jckIsCfdComplement;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JCheckBox jckIsPrintable;
+    private javax.swing.JLabel jlCfdComplementDisposition;
+    private javax.swing.JLabel jlCfdComplementDispositionHint;
+    private javax.swing.JLabel jlCfdComplementRule;
+    private javax.swing.JLabel jlCfdComplementRuleHint;
     private javax.swing.JLabel jlNotes;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpRegistry;
+    private javax.swing.JScrollPane jspNotes;
     private javax.swing.JTextArea jtaNotes;
+    private javax.swing.JTextField jtfCfdComplementDisposition;
+    private javax.swing.JTextField jtfCfdComplementRule;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -229,6 +358,8 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
 
         moFieldIsAllDocs.setFieldValue(true);
         moFieldIsPrintable.setFieldValue(true);
+        moFieldIsCfdComplement.setFieldValue(false);
+        itemStateChangedCfdComplement();
 
         jckIsDeleted.setEnabled(false);
     }
@@ -278,9 +409,12 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
         moDpsNotes = (SDataDpsNotes) registry;
 
         moFieldNotes.setFieldValue(moDpsNotes.getNotes());
+        moFieldIsDeleted.setFieldValue(moDpsNotes.getIsDeleted());
         moFieldIsAllDocs.setFieldValue(moDpsNotes.getIsAllDocs());
         moFieldIsPrintable.setFieldValue(moDpsNotes.getIsPrintable());
-        moFieldIsDeleted.setFieldValue(moDpsNotes.getIsDeleted());
+        moFieldIsCfdComplement.setFieldValue(moDpsNotes.getIsCfdComplement());
+        moFieldCfdComplementDisposition.setFieldValue(moDpsNotes.getCfdComplementDisposition());
+        moFieldCfdComplementRule.setFieldValue(moDpsNotes.getCfdComplementRule());
 
         jckIsDeleted.setEnabled(true);
     }
@@ -297,8 +431,11 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
         }
 
         moDpsNotes.setNotes(moFieldNotes.getString());
+        moDpsNotes.setCfdComplementDisposition(moFieldCfdComplementDisposition.getString());
+        moDpsNotes.setCfdComplementRule(moFieldCfdComplementRule.getString());
         moDpsNotes.setIsAllDocs(moFieldIsAllDocs.getBoolean());
         moDpsNotes.setIsPrintable(moFieldIsPrintable.getBoolean());
+        moDpsNotes.setIsCfdComplement(moFieldIsCfdComplement.getBoolean());
         moDpsNotes.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         return moDpsNotes;
@@ -329,6 +466,16 @@ public class SFormDpsNotes extends javax.swing.JDialog implements erp.lib.form.S
             }
             else if (button == jbCancel) {
                 actionCancel();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof javax.swing.JCheckBox) {
+            javax.swing.JCheckBox checkBox = (javax.swing.JCheckBox) e.getSource();
+            if (checkBox == jckIsCfdComplement) {
+                itemStateChangedCfdComplement();
             }
         }
     }

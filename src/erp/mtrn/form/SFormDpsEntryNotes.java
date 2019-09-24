@@ -38,16 +38,18 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
 
     private erp.mtrn.data.SDataDpsEntryNotes moDpsEntryNotes;
     private erp.lib.form.SFormField moFieldNotes;
+    private erp.lib.form.SFormField moFieldIsDeleted;
     private erp.lib.form.SFormField moFieldIsAllDocs;
     private erp.lib.form.SFormField moFieldIsPrintable;
     private erp.lib.form.SFormField moFieldIsCfd;
-    private erp.lib.form.SFormField moFieldIsDeleted;
 
-    /** Creates new form SFormDpsEntryNotes */
+    /** Creates new form SFormDpsEntryNotes
+     * @param client
+     */
     public SFormDpsEntryNotes(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient =  client;
-        mnFormType = SDataConstants.TRN_DPS_NTS;
+        mnFormType = SDataConstants.TRN_DPS_ETY_NTS;
 
         initComponents();
         initComponentsExtra();
@@ -62,18 +64,23 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jpRegistry = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jbOk = new javax.swing.JButton();
-        jbCancel = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jckIsDeleted = new javax.swing.JCheckBox();
+        jspNotes = new javax.swing.JScrollPane();
         jtaNotes = new javax.swing.JTextArea();
-        jPanel3 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
         jckIsAllDocs = new javax.swing.JCheckBox();
         jckIsPrintable = new javax.swing.JCheckBox();
+        jPanel8 = new javax.swing.JPanel();
         jckIsCfd = new javax.swing.JCheckBox();
-        jckIsDeleted = new javax.swing.JCheckBox();
+        jpControls = new javax.swing.JPanel();
+        jbOk = new javax.swing.JButton();
+        jbCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Notas del detalle del documento");
@@ -84,56 +91,81 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpRegistry.setLayout(new java.awt.BorderLayout());
+
+        jPanel1.setLayout(new java.awt.BorderLayout(0, 3));
+
+        jPanel2.setLayout(new java.awt.BorderLayout());
+
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jlNotes.setForeground(new java.awt.Color(0, 102, 102));
+        jlNotes.setText("Notas: *");
+        jlNotes.setPreferredSize(new java.awt.Dimension(32, 23));
+        jPanel4.add(jlNotes, java.awt.BorderLayout.CENTER);
+
+        jckIsDeleted.setForeground(java.awt.Color.red);
+        jckIsDeleted.setText("Registro eliminado");
+        jckIsDeleted.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jckIsDeleted.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel4.add(jckIsDeleted, java.awt.BorderLayout.EAST);
+
+        jPanel2.add(jPanel4, java.awt.BorderLayout.NORTH);
+
+        jspNotes.setPreferredSize(new java.awt.Dimension(100, 175));
+
+        jtaNotes.setColumns(20);
+        jtaNotes.setRows(5);
+        jspNotes.setViewportView(jtaNotes);
+
+        jPanel2.add(jspNotes, java.awt.BorderLayout.CENTER);
+
+        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+        jPanel5.setLayout(new java.awt.GridLayout(2, 1, 0, 3));
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsAllDocs.setText("Heredable a todos los documentos dependientes");
+        jckIsAllDocs.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel6.add(jckIsAllDocs);
+
+        jckIsPrintable.setText("Visible al imprimir");
+        jckIsPrintable.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel6.add(jckIsPrintable);
+
+        jPanel5.add(jPanel6);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jckIsCfd.setText("Se anexa a la descripción del concepto del CFDI");
+        jckIsCfd.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel8.add(jckIsCfd);
+
+        jPanel5.add(jPanel8);
+
+        jPanel1.add(jPanel5, java.awt.BorderLayout.CENTER);
+
+        jpRegistry.add(jPanel1, java.awt.BorderLayout.NORTH);
+
+        getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
+
+        jpControls.setPreferredSize(new java.awt.Dimension(392, 33));
+        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
         jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbOk);
+        jpControls.add(jbOk);
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
-        jPanel1.add(jbCancel);
+        jpControls.add(jbCancel);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
+        getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel2.setLayout(new java.awt.BorderLayout());
-
-        jlNotes.setText("Notas: *");
-        jlNotes.setPreferredSize(new java.awt.Dimension(32, 23));
-        jPanel2.add(jlNotes, java.awt.BorderLayout.NORTH);
-
-        jtaNotes.setColumns(20);
-        jtaNotes.setRows(5);
-        jScrollPane1.setViewportView(jtaNotes);
-
-        jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
-
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jckIsAllDocs.setText("Para todos los documentos");
-        jckIsAllDocs.setPreferredSize(new java.awt.Dimension(175, 23));
-        jPanel3.add(jckIsAllDocs);
-
-        jckIsPrintable.setText("Para impresión");
-        jckIsPrintable.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel3.add(jckIsPrintable);
-
-        jckIsCfd.setText("Para XML CFD");
-        jckIsCfd.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel3.add(jckIsCfd);
-
-        jckIsDeleted.setText("Registro eliminado");
-        jckIsDeleted.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel3.add(jckIsDeleted);
-
-        jPanel2.add(jPanel3, java.awt.BorderLayout.PAGE_END);
-
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
-
-        setSize(new java.awt.Dimension(600, 300));
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -142,15 +174,15 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
     }//GEN-LAST:event_formWindowActivated
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
-
         moFieldNotes = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtaNotes, jlNotes);
         moFieldNotes.setLengthMax(1023);
+        moFieldNotes.setAutoCaseType(0);
+        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDeleted);
         moFieldIsAllDocs = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsAllDocs);
         moFieldIsPrintable = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsPrintable);
         moFieldIsCfd = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsCfd);
-        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDeleted);
 
+        mvFields = new Vector<>();
         mvFields.add(moFieldNotes);
         mvFields.add(moFieldIsAllDocs);
         mvFields.add(moFieldIsPrintable);
@@ -207,8 +239,10 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
     private javax.swing.JCheckBox jckIsAllDocs;
@@ -216,6 +250,9 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JCheckBox jckIsPrintable;
     private javax.swing.JLabel jlNotes;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpRegistry;
+    private javax.swing.JScrollPane jspNotes;
     private javax.swing.JTextArea jtaNotes;
     // End of variables declaration//GEN-END:variables
 
@@ -288,10 +325,10 @@ public class SFormDpsEntryNotes extends javax.swing.JDialog implements erp.lib.f
         moDpsEntryNotes = (SDataDpsEntryNotes) registry;
 
         moFieldNotes.setFieldValue(moDpsEntryNotes.getNotes());
+        moFieldIsDeleted.setFieldValue(moDpsEntryNotes.getIsDeleted());
         moFieldIsAllDocs.setFieldValue(moDpsEntryNotes.getIsAllDocs());
         moFieldIsPrintable.setFieldValue(moDpsEntryNotes.getIsPrintable());
         moFieldIsCfd.setFieldValue(moDpsEntryNotes.getIsCfd());
-        moFieldIsDeleted.setFieldValue(moDpsEntryNotes.getIsDeleted());
 
         jckIsDeleted.setEnabled(true);
     }

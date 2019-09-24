@@ -11,18 +11,20 @@ import erp.lib.SLibUtilities;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
-import java.util.Date;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDataSystemNotes extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkNotesId;
-    protected String msNotes;
+    protected java.lang.String msNotes;
+    protected java.lang.String msCfdComplementDisposition;
+    protected java.lang.String msCfdComplementRule;
     protected boolean mbIsAutomatic;
     protected boolean mbIsPrintable;
+    protected boolean mbIsCfdComplement;
     protected boolean mbIsDeleted;
     protected int mnFkDpsCategoryId;
     protected int mnFkDpsClassId;
@@ -31,13 +33,13 @@ public class SDataSystemNotes extends erp.lib.data.SDataRegistry implements java
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
-    protected Date mtUserNewTs;
-    protected Date mtUserEditTs;
-    protected Date mtUserDeleteTs;
+    protected java.util.Date mtUserNewTs;
+    protected java.util.Date mtUserEditTs;
+    protected java.util.Date mtUserDeleteTs;
 
-    protected String msDbmsUserNew;
-    protected String msDbmsUserEdit;
-    protected String msDbmsUserDelete;
+    protected java.lang.String msDbmsUserNew;
+    protected java.lang.String msDbmsUserEdit;
+    protected java.lang.String msDbmsUserDelete;
 
     public SDataSystemNotes() {
         super(SDataConstants.TRN_DPS_NTS);
@@ -46,8 +48,11 @@ public class SDataSystemNotes extends erp.lib.data.SDataRegistry implements java
 
     public void setPkNotesId(int n) { mnPkNotesId = n; }
     public void setNotes(java.lang.String s) { msNotes = s; }
+    public void setCfdComplementDisposition(java.lang.String s) { msCfdComplementDisposition = s; }
+    public void setCfdComplementRule(java.lang.String s) { msCfdComplementRule = s; }
     public void setIsAutomatic(boolean b) { mbIsAutomatic = b; }
     public void setIsPrintable(boolean b) { mbIsPrintable = b; }
+    public void setIsCfdComplement(boolean b) { mbIsCfdComplement = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkDpsCategoryId(int n) { mnFkDpsCategoryId = n; }
     public void setFkDpsClassId(int n) { mnFkDpsClassId = n; }
@@ -62,8 +67,11 @@ public class SDataSystemNotes extends erp.lib.data.SDataRegistry implements java
 
     public int getPkNotesId() { return mnPkNotesId; }
     public java.lang.String getNotes() { return msNotes; }
+    public java.lang.String getCfdComplementDisposition() { return msCfdComplementDisposition; }
+    public java.lang.String getCfdComplementRule() { return msCfdComplementRule; }
     public boolean getIsAutomatic() { return mbIsAutomatic; }
     public boolean getIsPrintable() { return mbIsPrintable; }
+    public boolean getIsCfdComplement() { return mbIsCfdComplement; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkDpsCategoryId() { return mnFkDpsCategoryId; }
     public int getFkDpsClassId() { return mnFkDpsClassId; }
@@ -83,6 +91,10 @@ public class SDataSystemNotes extends erp.lib.data.SDataRegistry implements java
     public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
+    
+    public int[] getDpsTypeKey() {
+        return new int[] { mnFkDpsCategoryId, mnFkDpsClassId, mnFkDpsTypeId };
+    }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -100,8 +112,11 @@ public class SDataSystemNotes extends erp.lib.data.SDataRegistry implements java
 
         mnPkNotesId = 0;
         msNotes = "";
+        msCfdComplementDisposition = "";
+        msCfdComplementRule = "";
         mbIsAutomatic = false;
         mbIsPrintable = false;
+        mbIsCfdComplement = false;
         mbIsDeleted = false;
         mnFkDpsCategoryId = 0;
         mnFkDpsClassId = 0;
@@ -145,8 +160,11 @@ public class SDataSystemNotes extends erp.lib.data.SDataRegistry implements java
             else {
                 mnPkNotesId = resultSet.getInt("n.id_nts");
                 msNotes = resultSet.getString("n.nts");
+                msCfdComplementDisposition = resultSet.getString("n.cfd_comp_disp");
+                msCfdComplementRule = resultSet.getString("n.cfd_comp_rule");
                 mbIsAutomatic = resultSet.getBoolean("n.b_aut");
                 mbIsPrintable = resultSet.getBoolean("n.b_prt");
+                mbIsCfdComplement = resultSet.getBoolean("b_cfd_comp");
                 mbIsDeleted = resultSet.getBoolean("n.b_del");
                 mnFkDpsCategoryId = resultSet.getInt("n.fid_ct_dps");
                 mnFkDpsClassId = resultSet.getInt("n.fid_cl_dps");
@@ -190,11 +208,14 @@ public class SDataSystemNotes extends erp.lib.data.SDataRegistry implements java
             callableStatement = connection.prepareCall(
                     "{ CALL trn_sys_nts_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkNotesId);
             callableStatement.setString(nParam++, msNotes);
+            callableStatement.setString(nParam++, msCfdComplementDisposition);
+            callableStatement.setString(nParam++, msCfdComplementRule);
             callableStatement.setBoolean(nParam++, mbIsAutomatic);
             callableStatement.setBoolean(nParam++, mbIsPrintable);
+            callableStatement.setBoolean(nParam++, mbIsCfdComplement);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkDpsCategoryId);
             callableStatement.setInt(nParam++, mnFkDpsClassId);

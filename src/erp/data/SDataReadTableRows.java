@@ -34,9 +34,9 @@ public abstract class SDataReadTableRows {
         int i = 0;
         STableField[] aoPkFields = null;
         STableField[] aoQueryFields = null;
-        ArrayList<STableField> aPkFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<STableField>();
+        ArrayList<STableField> aPkFields = new ArrayList<>();
+        ArrayList<STableField> aQueryFields = new ArrayList<>();
+        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
 
@@ -134,9 +134,9 @@ public abstract class SDataReadTableRows {
         int i = 0;
         STableField[] aoPkFields = null;
         STableField[] aoQueryFields = null;
-        ArrayList<STableField> aPkFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<STableField>();
+        ArrayList<STableField> aPkFields = new ArrayList<>();
+        ArrayList<STableField> aQueryFields = new ArrayList<>();
+        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
 
@@ -179,9 +179,9 @@ public abstract class SDataReadTableRows {
         int i = 0;
         STableField[] aoPkFields = null;
         STableField[] aoQueryFields = null;
-        ArrayList<STableField> aPkFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<STableField>();
+        ArrayList<STableField> aPkFields = new ArrayList<>();
+        ArrayList<STableField> aQueryFields = new ArrayList<>();
+        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
 
@@ -236,9 +236,9 @@ public abstract class SDataReadTableRows {
         String field = "";
         STableField[] aoPkFields = null;
         STableField[] aoQueryFields = null;
-        ArrayList<STableField> aPkFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<STableField>();
+        ArrayList<STableField> aPkFields = new ArrayList<>();
+        ArrayList<STableField> aQueryFields = new ArrayList<>();
+        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
 
@@ -548,9 +548,9 @@ public abstract class SDataReadTableRows {
         int i = 0;
         STableField[] aoPkFields = null;
         STableField[] aoQueryFields = null;
-        ArrayList<STableField> aPkFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<STableField>();
+        ArrayList<STableField> aPkFields = new ArrayList<>();
+        ArrayList<STableField> aQueryFields = new ArrayList<>();
+        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
         java.util.Date tDate = null;
@@ -1172,9 +1172,9 @@ public abstract class SDataReadTableRows {
         int i = 0;
         STableField[] aoPkFields = null;
         STableField[] aoQueryFields = null;
-        ArrayList<STableField> aPkFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<STableField>();
+        ArrayList<STableField> aPkFields = new ArrayList<>();
+        ArrayList<STableField> aQueryFields = new ArrayList<>();
+        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
         String sWorkingDate = piClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(piClient.getSessionXXX().getWorkingDate());
@@ -1733,9 +1733,9 @@ public abstract class SDataReadTableRows {
         int i = 0;
         STableField[] aoPkFields = null;
         STableField[] aoQueryFields = null;
-        ArrayList<STableField> aPkFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<STableField>();
+        ArrayList<STableField> aPkFields = new ArrayList<>();
+        ArrayList<STableField> aQueryFields = new ArrayList<>();
+        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
 
@@ -1866,14 +1866,15 @@ public abstract class SDataReadTableRows {
                 aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_nts");
 
                 i = 0;
-                aoQueryFields = new STableField[5];
+                aoQueryFields = new STableField[6];
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "f_item");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "t.tp_dps");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "c.cur_key");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_BOOLEAN, "s.b_aut");
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_BOOLEAN, "s.b_prt");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_BOOLEAN, "s.b_cfd_comp");
 
-                sSql = "SELECT s.id_nts, s.nts AS f_item, t.tp_dps, c.cur_key, s.b_aut, s.b_prt " +
+                sSql = "SELECT s.id_nts, s.nts AS f_item, t.tp_dps, c.cur_key, s.b_aut, s.b_prt, s.b_cfd_comp " +
                         "FROM trn_sys_nts AS s " +
                         "INNER JOIN erp.trnu_tp_dps AS t ON " +
                         "s.fid_ct_dps = t.id_ct_dps AND s.fid_cl_dps = t.id_cl_dps AND s.fid_tp_dps = t.id_tp_dps " +
@@ -2660,9 +2661,9 @@ public abstract class SDataReadTableRows {
         int i = 0;
         STableField[] aoPkFields = null;
         STableField[] aoQueryFields = null;
-        ArrayList<STableField> aPkFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<STableField>();
+        ArrayList<STableField> aPkFields = new ArrayList<>();
+        ArrayList<STableField> aQueryFields = new ArrayList<>();
+        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
 
@@ -2805,9 +2806,9 @@ public abstract class SDataReadTableRows {
         int i = 0;
         STableField[] aoPkFields = null;
         STableField[] aoQueryFields = null;
-        ArrayList<STableField> aPkFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<STableField>();
+        ArrayList<STableField> aPkFields = new ArrayList<>();
+        ArrayList<STableField> aQueryFields = new ArrayList<>();
+        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
 
@@ -2895,9 +2896,9 @@ public abstract class SDataReadTableRows {
         int i = 0;
         STableField[] aoPkFields = null;
         STableField[] aoQueryFields = null;
-        ArrayList<STableField> aPkFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryFields = new ArrayList<STableField>();
-        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<STableField>();
+        ArrayList<STableField> aPkFields = new ArrayList<>();
+        ArrayList<STableField> aQueryFields = new ArrayList<>();
+        ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
 

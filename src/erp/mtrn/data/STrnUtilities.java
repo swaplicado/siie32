@@ -2278,35 +2278,84 @@ public abstract class STrnUtilities {
         return aTrnDocs;
     }
 
-    public static Vector<SDataDpsNotesRow> getSystemNotes(final SClientInterface client, final int catDpsId, final int classDpsId, final int typeDpsId, final int curDpsId) {
-        String sql = "";
-        ResultSet resulSet = null;
-        Vector<SDataDpsNotesRow> notesRow = new Vector<>();
+    /**
+     * Get all system notes, except deleted ones, for given type of DPS and currency.
+     * @param client GUI client.
+     * @param dpsTypeKey Key of DPS type.
+     * @param currencyId Currency.
+     * @return Array of requested system notes.
+     * @throws Exception 
+     */
+    public static ArrayList<SDataSystemNotes> getSystemNotes(final SClientInterface client, final int[] dpsTypeKey, final int currencyId) throws Exception {
+        ArrayList<SDataSystemNotes> systemNotesArray = new ArrayList<>();
 
-        try {
-            sql = "SELECT nts "
-                    + "FROM trn_sys_nts "
-                    + "WHERE b_del = 0 AND b_aut = 1 AND "
-                    + "fid_ct_dps = " + catDpsId + " AND fid_cl_dps = " + classDpsId + " AND fid_tp_dps = " + typeDpsId + " AND fid_cur = " + curDpsId + " ";
+        String sql = "SELECT id_nts "
+                + "FROM trn_sys_nts "
+                + "WHERE NOT b_del AND "
+                + "fid_ct_dps = " + dpsTypeKey[0] + " AND fid_cl_dps = " + dpsTypeKey[1] + " AND fid_tp_dps = " + dpsTypeKey[2] + " AND "
+                + "fid_cur = " + currencyId + ";";
 
-
-            resulSet = client.getSession().getStatement().executeQuery(sql);
+        try (Statement statement = client.getSession().getStatement().getConnection().createStatement()) {
+            ResultSet resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
-                SDataDpsNotes notes = new SDataDpsNotes();
-
-                notes.setNotes(resulSet.getString("nts"));
-                notes.setIsAllDocs(true);
-                notes.setIsPrintable(true);
-                notes.setFkUserNewId(client.getSession().getUser().getPkUserId());
-
-                notesRow.add(new SDataDpsNotesRow(notes));
+                SDataSystemNotes systemNotes = (SDataSystemNotes) SDataUtilities.readRegistry(client, SDataConstants.TRN_SYS_NTS, new int[] { resulSet.getInt(1) }, SLibConstants.EXEC_MODE_SILENT);
+                systemNotesArray.add(systemNotes);
             }
         }
-        catch (Exception e) {
-            SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
+
+        return systemNotesArray;
+    }
+
+    /**
+     * Create DPS notes from system notes, all or automatic or non-automatic only, except deleted ones, for given type of DPS and currency.
+     * @param client GUI client.
+     * @param dpsTypeKey Key of DPS type.
+     * @param currencyId Currency.
+     * @param automatic When <code>true</code> only automatic notes are retrieved. When <code>false</code> only non-automatic notes are retrieved. When <code>null</code> all notes are retrieved.
+     * @return Array of DPS notes.
+     * @throws Exception 
+     */
+    public static ArrayList<SDataDpsNotes> createDpsNotesFromSystemNotes(final SClientInterface client, final int[] dpsTypeKey, final int currencyId, final Boolean automatic) throws Exception {
+        ArrayList<SDataSystemNotes> systemNotesArray = getSystemNotes(client, dpsTypeKey, currencyId);
+        ArrayList<SDataDpsNotes> dpsNotesArray = new ArrayList<>();
+
+        for (SDataSystemNotes systemNotes : systemNotesArray) {
+            if (automatic == null || automatic && systemNotes.getIsAutomatic() || !automatic && !systemNotes.getIsAutomatic()) {
+                SDataDpsNotes dpsNotes = new SDataDpsNotes();
+                
+                //dpsNotes.setPkYearId(...);
+                //dpsNotes.setPkDocId(...);
+                //dpsNotes.setPkNotesId(...);
+                dpsNotes.setNotes(systemNotes.getNotes());
+                dpsNotes.setCfdComplementDisposition(systemNotes.getCfdComplementDisposition());
+                dpsNotes.setCfdComplementRule(systemNotes.getCfdComplementRule());
+                dpsNotes.setIsAllDocs(true);
+                dpsNotes.setIsPrintable(systemNotes.getIsPrintable());
+                dpsNotes.setIsCfdComplement(systemNotes.getIsCfdComplement());
+                //dpsNotes.setIsDeleted(...);
+                dpsNotes.setFkUserNewId(client.getSessionXXX().getUser().getPkUserId());
+                dpsNotes.setFkUserEditId(SUtilConsts.USR_NA_ID);
+                dpsNotes.setFkUserDeleteId(SUtilConsts.USR_NA_ID);
+                //dpsNotes.setUserNewTs(...);
+                //dpsNotes.setUserEditTs(...);
+                //dpsNotes.setUserDeleteTs(...);
+                
+                dpsNotesArray.add(dpsNotes);
+            }
         }
 
-        return notesRow;
+        return dpsNotesArray;
+    }
+    
+    public static ArrayList<SDataDpsNotesRow> createDpsNotesRowsFromDpsNotes(final ArrayList<SDataDpsNotes> dpsNotesArray) throws Exception {
+        ArrayList<SDataDpsNotesRow> dpsNotesRows = new ArrayList<>();
+        
+        for (SDataDpsNotes dpsNotes : dpsNotesArray) {
+            SDataDpsNotesRow dpsNotesRow = new SDataDpsNotesRow(dpsNotes);
+            dpsNotesRows.add(dpsNotesRow);
+        }
+        
+        return dpsNotesRows;
     }
 
      /**

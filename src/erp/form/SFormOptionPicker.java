@@ -792,12 +792,13 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
                 break;
 
             case SDataConstants.TRN_SYS_NTS:
-                aoTableColumns = new STableColumnForm[5];
-                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nota", 300);
-                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo doc.", 300);
+                aoTableColumns = new STableColumnForm[6];
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Notas predeterminadas", 300);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo documento", 300);
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
-                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Automática", STableConstants.WIDTH_BOOLEAN_2X);
-                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Impresión", STableConstants.WIDTH_BOOLEAN_2X);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Adición automática al crear documentos", STableConstants.WIDTH_BOOLEAN_2X);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Visible al impresión", STableConstants.WIDTH_BOOLEAN_2X);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Complemento CFDI Leyendas Fiscales", STableConstants.WIDTH_BOOLEAN_2X);
                 setTitle("Seleccionar nota");
                 break;
 
