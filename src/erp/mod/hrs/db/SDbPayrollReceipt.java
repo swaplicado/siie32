@@ -409,7 +409,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         double paymentMonthly;
         
         if (mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_WEE) {
-            paymentMonthly = SLibUtils.roundAmount(mdSalary * SHrsConsts.YEAR_DAYS);
+            paymentMonthly = SLibUtils.roundAmount(mdSalary * SHrsConsts.MONTH_DAYS);
         }
         else {
             paymentMonthly = mdWage;
