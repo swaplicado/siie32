@@ -109,18 +109,22 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
 
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
     
-    public boolean isStamped() {
+    public boolean isCfdStamped() {
         if (moDbmsDataCfd != null) {
             return moDbmsDataCfd.isStamped() && moDbmsDataCfd.getFkXmlStatusId() != SDataConstantsSys.TRNS_ST_DPS_ANNULED;
         }
         return false;
     }
     
-    public boolean isAnnul() {
+    public boolean isCfdAnnulled() {
         if (moDbmsDataCfd != null) {
             return moDbmsDataCfd.isStamped() && moDbmsDataCfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
         }
         return false;
+    }
+    
+    public boolean isCfdEditable() {
+        return !isCfdStamped() || isCfdAnnulled();
     }
     
     public java.lang.String getPayrollReceiptIssueNumber() {

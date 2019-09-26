@@ -2490,19 +2490,6 @@ public abstract class SHrsUtils {
         return scheduledDays;
     }
     
-    public static void createPayrollReceiptIssues(final SGuiSession session, final SDbPayroll payroll) throws Exception {
-        for (SDbPayrollReceipt payrollReceipt : payroll.getChildPayrollReceipts()) {
-            payrollReceipt.setAuxDateIssue(payroll.getDateEnd());
-            payrollReceipt.createIssues(session);
-        }
-    }
-    
-    public static void updateToNewStatusPayrollReceiptIssues(final SGuiSession session, final SDbPayroll payroll) throws Exception {
-        for (SDbPayrollReceipt payrollReceipt : payroll.getChildPayrollReceipts()) {
-            payrollReceipt.updateToNewStatusIssues(session);
-        }
-    }
-    
     public static double getSbcIntegrationFactor(final SGuiSession session, final Date dateBenefits, final Date dateCutoff) throws Exception {
         int seniority = 0;
         int daysTableAnnualBonus = 0;

@@ -474,7 +474,7 @@ public class SHrsReceipt {
             }
 
             if (earningsTaxableArt174 > 0) {
-                double taxAssessedAlt = SHrsUtils.computeTaxAlt(taxTable, earningsTaxableArt174, moPayrollReceipt.getPaymentMonthly(), tableFactor);
+                double taxAssessedAlt = SHrsUtils.computeTaxAlt(taxTable, earningsTaxableArt174, moPayrollReceipt.getMonthlyPayment(), tableFactor);
                 taxAssessed = SLibUtils.roundAmount(taxAssessed + taxAssessedAlt); // update assessed tax
             }
 
@@ -507,7 +507,7 @@ public class SHrsReceipt {
                 }
 
                 if (earningsTaxableArt174 > 0) {
-                    double subsidyComputedAlt = SHrsUtils.computeTaxSubsidyAlt(subsidyTable, earningsTaxableArt174, moPayrollReceipt.getPaymentMonthly(), tableFactor);
+                    double subsidyComputedAlt = SHrsUtils.computeTaxSubsidyAlt(subsidyTable, earningsTaxableArt174, moPayrollReceipt.getMonthlyPayment(), tableFactor);
                     subAssessed = SLibUtils.roundAmount(subAssessed + subsidyComputedAlt); // update assessed subsidy
                 }
                 

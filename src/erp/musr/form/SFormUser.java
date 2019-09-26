@@ -42,7 +42,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author  Sergio Flores
+ * @author Sergio Flores, Alfonso Flores, Sergio Flores
  */
 public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
@@ -1225,7 +1225,6 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
     private void initComponentsExtra() {
         int i;
-        mvFields = new Vector<SFormField>();
 
         erp.lib.table.STableColumnForm tableColumnsUserCompanies[];
         erp.lib.table.STableColumnForm tableColumnsUserCompanyBranches[];
@@ -1288,6 +1287,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldUserPlant.setListValidationType(SLibConstants.LIST_VALIDATION_BY_CONTENT);
         moFieldUserPlant.setTabbedPaneIndex(3, jTabbedPane1);
 
+        mvFields = new Vector<>();
         mvFields.add(moFieldUser);
         mvFields.add(moFieldEmail);
         mvFields.add(moFieldIsUniversalCompanies);
@@ -1326,11 +1326,11 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jbSetDefaultPos.addActionListener(this);
         jbSetDefaultPlant.addActionListener(this);
 
-        mvUserBranches = new Vector<Vector<STableRowCustom>>();
-        mvUserCashAccounts = new Vector<Vector<SFormComponentItem>>();
-        mvUserWarehouses = new Vector<Vector<SFormComponentItem>>();
-        mvUserPos = new Vector<Vector<SFormComponentItem>>();
-        mvUserPlants = new Vector<Vector<SFormComponentItem>>();
+        mvUserBranches = new Vector<>();
+        mvUserCashAccounts = new Vector<>();
+        mvUserWarehouses = new Vector<>();
+        mvUserPos = new Vector<>();
+        mvUserPlants = new Vector<>();
 
         i = 0;
         tableColumnsUserCompanies = new STableColumnForm[3];
@@ -1386,10 +1386,11 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         jbEditUserPassword.setEnabled(false);
         jpfUserPassword.setEnabled(true);
         jpfUserPasswordConfirm.setEnabled(true);
-        jpfUserPassword.requestFocus();
+        jpfUserPassword.requestFocusInWindow();
     }
 
     private void actionEdit(boolean edit) {
+        
     }
 
     private void actionOk() {
@@ -1426,12 +1427,12 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
         int i = 0;
         int j = 0;
 
-        mvDbmsCompanies = new Vector<SDataCompany>();
-        mvDbmsCompanyBranches = new Vector<SDataBizPartnerBranch>();
-        mvDbmsCashAccounts = new Vector<SDataCompanyBranchEntity>();
-        mvDbmsWarehouses = new Vector<SDataCompanyBranchEntity>();
-        mvDbmsPos = new Vector<SDataCompanyBranchEntity>();
-        mvDbmsPlants = new Vector<SDataCompanyBranchEntity>();
+        mvDbmsCompanies = new Vector<>();
+        mvDbmsCompanyBranches = new Vector<>();
+        mvDbmsCashAccounts = new Vector<>();
+        mvDbmsWarehouses = new Vector<>();
+        mvDbmsPos = new Vector<>();
+        mvDbmsPlants = new Vector<>();
 
         // Read the companies:
 
@@ -1484,7 +1485,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         mvUserBranches.clear();
         for (i = 0; i < mvDbmsCompanies.size(); i++) {
-            rows = new Vector<STableRowCustom>();
+            rows = new Vector<>();
             row = new STableRowCustom();
             row.setPrimaryKey(new int[] { mvDbmsCompanies.get(i).getPkCompanyId() });
             row.getValues().add(mvDbmsCompanies.get(i).getCompany());
@@ -1494,28 +1495,28 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         mvUserCashAccounts.clear();
         for (i = 0; i < mvDbmsCompanyBranches.size(); i++) {
-            items = new Vector<SFormComponentItem>();
+            items = new Vector<>();
             items.add(new SFormComponentItem(new int[]{ mvDbmsCompanyBranches.get(i).getPkBizPartnerBranchId() }, mvDbmsCompanyBranches.get(i).getBizPartnerBranch()));
             mvUserCashAccounts.add(items);
         }
 
         mvUserWarehouses.clear();
         for (i = 0; i < mvDbmsCompanyBranches.size(); i++) {
-            items = new Vector<SFormComponentItem>();
+            items = new Vector<>();
             items.add(new SFormComponentItem(new int[]{ mvDbmsCompanyBranches.get(i).getPkBizPartnerBranchId() }, mvDbmsCompanyBranches.get(i).getBizPartnerBranch()));
             mvUserWarehouses.add(items);
         }
 
         mvUserPos.clear();
         for (i = 0; i < mvDbmsCompanyBranches.size(); i++) {
-            items = new Vector<SFormComponentItem>();
+            items = new Vector<>();
             items.add(new SFormComponentItem(new int[]{ mvDbmsCompanyBranches.get(i).getPkBizPartnerBranchId() }, mvDbmsCompanyBranches.get(i).getBizPartnerBranch()));
             mvUserPos.add(items);
         }
 
         mvUserPlants.clear();
         for (i = 0; i < mvDbmsCompanyBranches.size(); i++) {
-            items = new Vector<SFormComponentItem>();
+            items = new Vector<>();
             items.add(new SFormComponentItem(new int[]{ mvDbmsCompanyBranches.get(i).getPkBizPartnerBranchId() }, mvDbmsCompanyBranches.get(i).getBizPartnerBranch()));
             mvUserPlants.add(items);
         }
@@ -1567,6 +1568,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                                 }
                             }
                         }
+                        
                         renderButtonsCashAccountIsUniversal();
                         if (!mbResetCompanyBranchEntities) {
                             mvUserBranches.get(i).get(j).getValues().set(3, jckIsUniversalCashAccount.isSelected());
@@ -1593,6 +1595,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                                 }
                             }
                         }
+                        
                         renderButtonsWarehouseIsUniversal();
                         if (!mbResetCompanyBranchEntities) {
                             mvUserBranches.get(i).get(j).getValues().set(4, jckIsUniversalWarehouse.isSelected());
@@ -1619,6 +1622,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                                 }
                             }
                         }
+                        
                         renderButtonsPosIsUniversal();
                         if (!mbResetCompanyBranchEntities) {
                             mvUserBranches.get(i).get(j).getValues().set(5, jckIsUniversalPos.isSelected());
@@ -1645,6 +1649,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                                 }
                             }
                         }
+                        
                         renderButtonsPlantsIsUniversal();
                         if (!mbResetCompanyBranchEntities) {
                             mvUserBranches.get(i).get(j).getValues().set(6, jckIsUniversalPlant.isSelected());
@@ -1714,9 +1719,11 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
             if (jltCompanySystem.getModel().getSize() >=0) {
                 jltCompanySystem.setSelectedIndex(0);
             }
+            
             populateComboBoxCompany();
             renderButtonsBranch();
         }
+        
         renderComboBoxCompany();
     }
 
@@ -1737,11 +1744,13 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                 row.setPrimaryKey(new int[] { pkCompany });
                 moUserCompaniesPane.addTableRow(row);
             }
+            
             populateComboBoxCompany();
             renderButtonsBranch();
             moUserCompaniesPane.renderTableRows();
             jltCompanySystem.setListData(mvEmptyListItems);
         }
+        
         renderComboBoxCompany();
     }
 
@@ -1765,14 +1774,16 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                 SFormUtilities.addListItem(jltCompanySystem, item);
                 moUserCompaniesPane.renderTableRows();
             }
+            
             populateComboBoxCompany();
         }
+        
         populateTableUserBranches();
         renderComboBoxCompany();
     }
 
     private void actionReturnAllCompany() {
-        Vector<SFormComponentItem> vListCompanies = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vListCompanies = new Vector<>();
         STableRow row = null;
         int i;
 
@@ -1800,6 +1811,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                 }
             }
         }
+        
         //moUserCompaniesPane.clearTableRows();
         populateTableUserBranches();
         populateComboBoxCompany();
@@ -1863,6 +1875,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                     }
                 }
             }
+            
             populateTableUserBranches();
             jltCompanyBranches.setListData(mvEmptyListItems);
             moUserCompanyBranchesPane.renderTableRows();
@@ -1902,12 +1915,13 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
                 moUserCompanyBranchesPane.renderTableRows();
             }
+            
             populateTableUserBranches();
         }
     }
 
     private void actionReturnAllBranch() {
-        Vector<SFormComponentItem> vListBranches = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vListBranches = new Vector<>();
         STableRow row = null;
         int x;
 
@@ -1946,6 +1960,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                 }
             }
         }
+        
         populateListCompanyBranches();
         jltCompanyBranchWarehouses.setListData(mvEmptyListItems);
         jltCompanyBranchPos.setListData(mvEmptyListItems);
@@ -1965,6 +1980,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                             populateListUserCashAccounts();
                         }
                     }
+                    
                     if (jltCompanyBranchCashAccount.getModel().getSize() >=0) {
                         jltCompanyBranchCashAccount.setSelectedIndex(0);
                     }
@@ -1987,6 +2003,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                             }
                         }
                     }
+                    
                     populateListUserCashAccounts();
                     jltCompanyBranchCashAccount.setListData(mvEmptyListItems);
                 }
@@ -2009,6 +2026,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                         populateListUserCashAccounts();
                     }
                 }
+                
                 if (jltUserCashAccount.getModel().getSize() >= 0) {
                     jltUserCashAccount.setSelectedIndex(0);
                 }
@@ -2118,7 +2136,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void actionReturnAllWarehouses() {
-        Vector<SFormComponentItem> vListWarehouses = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vListWarehouses = new Vector<>();
         int index = 0;
         int x = 0;
 
@@ -2219,7 +2237,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void actionReturnAllPos() {
-        Vector<SFormComponentItem> vListPos = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vListPos = new Vector<>();
         int index = 0;
         int x = 0;
 
@@ -2320,7 +2338,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void actionReturnAllPlants() {
-        Vector<SFormComponentItem> vListPlants = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vListPlants = new Vector<>();
         int index = 0;
         int x = 0;
 
@@ -2641,7 +2659,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void populateListCompanyBranches() {
-        Vector<SFormComponentItem> vListBranches = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vListBranches = new Vector<>();
         boolean exists = false;
 
         if (!jckIsUniversal.isSelected()) {
@@ -2710,7 +2728,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void populateListCompanyBranchCashAccounts() {
-        Vector<SFormComponentItem> vListItems = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vListItems = new Vector<>();
         boolean exists = false;
 
          if (!jckIsUniversal.isSelected()) {
@@ -2765,7 +2783,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void populateListCompanyBranchWarehouses() {
-        Vector<SFormComponentItem> vListItems = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vListItems = new Vector<>();
         boolean exists = false;
 
         if (!jckIsUniversal.isSelected()) {
@@ -2820,7 +2838,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void populateListCompanyBranchPos() {
-        Vector<SFormComponentItem> vListItems = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vListItems = new Vector<>();
         boolean exists = false;
 
         if (!jckIsUniversal.isSelected()) {
@@ -2875,7 +2893,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void populateListCompanyBranchPlants() {
-        Vector<SFormComponentItem> vListItems = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vListItems = new Vector<>();
         boolean exists = false;
 
         if (!jckIsUniversal.isSelected()) {
@@ -2910,7 +2928,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private boolean validateReturnCompany(int pk) {
-        Vector<SDataBizPartnerBranch> vListBranches = new Vector<SDataBizPartnerBranch>();
+        Vector<SDataBizPartnerBranch> vListBranches = new Vector<>();
         boolean bExistConfig = false;
         int pkBranch;
         int x;
@@ -3009,8 +3027,8 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void removeBranches(int pkCompany) {
-        Vector<SDataBizPartnerBranch> vListBranches = new Vector<SDataBizPartnerBranch>();
-        Vector<SFormComponentItem> vListItems = new Vector<SFormComponentItem>();
+        Vector<SDataBizPartnerBranch> vListBranches = new Vector<>();
+        Vector<SFormComponentItem> vListItems = new Vector<>();
         STableRow row = null;
         boolean exists;
         int pkBranch;
@@ -3054,7 +3072,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     private void removeBranchesDependencies(int pk) {
-        Vector<SFormComponentItem> vListPlants = new Vector<SFormComponentItem>();
+        Vector<SFormComponentItem> vListPlants = new Vector<>();
         int x;
         int y;
 
@@ -3167,6 +3185,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                     populateListUserCashAccounts();
                     jltUserCashAccount.setSelectedIndex(index);
                     break;
+                    
                 case SDataConstantsSys.CFGS_CT_ENT_WH:
                     if (jltUserWarehouses.getSelectedIndex() != -1) {
                         unsetDefaultEntity(categoryEnt);
@@ -3182,6 +3201,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                     populateListUserWarehouses();
                     jltUserWarehouses.setSelectedIndex(index);
                     break;
+                    
                 case SDataConstantsSys.CFGS_CT_ENT_POS:
                     if (jltUserPos.getSelectedIndex() != -1) {
                         unsetDefaultEntity(categoryEnt);
@@ -3197,6 +3217,7 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                     populateListUserPos();
                     jltUserPos.setSelectedIndex(index);
                     break;
+                    
                 case SDataConstantsSys.CFGS_CT_ENT_PLANT:
                     if (jltUserPlants.getSelectedIndex() != -1) {
                         unsetDefaultEntity(categoryEnt);
@@ -3212,8 +3233,8 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
                     populateListUserPlants();
                     jltUserPlants.setSelectedIndex(index);
                     break;
+                    
                 default:
-                    break;
             }
         }
     }
@@ -3588,6 +3609,10 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
     @Override
     public void formClearRegistry() {
         moUser.setPkUserId(SLibConstants.UNDEFINED);
+        moUser.setIsRegistryNew(true);
+        jpfUserPassword.setEnabled(true);
+        jpfUserPasswordConfirm.setEnabled(true);
+        jbEditUserPassword.setEnabled(false);
     }
 
     @Override
@@ -3751,9 +3776,9 @@ public class SFormUser extends javax.swing.JDialog implements erp.lib.form.SForm
 
         jpfUserPassword.setEnabled(false);
         jpfUserPasswordConfirm.setEnabled(false);
-        jckIsDeleted.setEnabled(moUser.getIsCanDelete());
-        jckIsActive.setEnabled(true);
         jbEditUserPassword.setEnabled(true);
+        jckIsActive.setEnabled(true);
+        jckIsDeleted.setEnabled(moUser.getIsCanDelete());
 
         for (i = 0; i < moUser.getDbmsAccessCompanies().size(); i++) {
             for (j = 0; j < jltCompanySystem.getModel().getSize(); j++ ) {

@@ -1862,7 +1862,7 @@ public abstract class STrnUtilities {
                                     SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
                                     payrollReceipt.read(client.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
                                     docNumber = SDbPayroll.composePayrollNumber(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n());
-                                    docNumber += " " + payrollReceipt.getIssueNumber();
+                                    docNumber += " " + payrollReceipt.getPayrollReceiptIssueNumber();
                                     isCancelled = payrollReceipt.getChildPayrollReceiptIssue() == null ? cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED : payrollReceipt.getChildPayrollReceiptIssue().getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                                     cancelledDate = payrollReceipt.getChildPayrollReceiptIssue() == null ? cfd.getTimestamp() : payrollReceipt.getChildPayrollReceiptIssue().getTsUserUpdate();
                                     docType = "Recibo de nomina";

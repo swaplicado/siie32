@@ -26,7 +26,7 @@ import sa.lib.gui.SGuiSession;
  */
 public abstract class SHrsFinUtils {
     
-    public static boolean canOpenPayRoll(final SGuiSession session, final int payrollId) throws Exception {
+    public static boolean canOpenPayroll(final SGuiSession session, final int payrollId) throws Exception {
         String sql = "";
         Object [] pk = null;
         SDataRecord moRecord = null;     
@@ -57,34 +57,14 @@ public abstract class SHrsFinUtils {
         return true;
     }
     
-    public static boolean canClosePayRoll(final SGuiSession session, final int payrollId) throws Exception {
-        throw new Exception("Not supported yet.");
-    }
-    
-    public static void deletePayRollRecords(final SGuiSession session, final int payrollId) throws Exception {
+    public static void deletePayrollRecordEntries(final SGuiSession session, final int payrollId) throws Exception {
         String sql = "";
         
-        sql = "UPDATE fin_rec_ety SET b_del = 1, fid_usr_del = " + session.getUser().getPkUserId() + ", ts_del = now() "
+        sql = "UPDATE fin_rec_ety SET "
+                + "b_del = 1, "
+                + "fid_usr_del = " + session.getUser().getPkUserId() + ", ts_del = now() "
                 + "WHERE fid_pay_n = " + payrollId + ";";
         session.getStatement().execute(sql);
-    }
-    
-    public static boolean isRecordPayroll(final SGuiSession session, final int payrollId) throws Exception {
-        boolean isRecord = false;
-        String sql = "";
-        Object [] pk = null;
-        ResultSet resultSet = null;
-        
-        sql = "SELECT DISTINCT r.id_year, r.id_per, r.id_bkc, r.id_tp_rec, r.id_num "
-                + "FROM fin_rec r "
-                + "INNER JOIN fin_rec_ety re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
-                + "WHERE fid_pay_n = " + payrollId + " AND r.b_del = 0 AND re.b_del = 0; ";
-        
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            isRecord = true;
-        }
-        return isRecord;
     }
     
     /**
