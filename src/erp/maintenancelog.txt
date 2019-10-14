@@ -1,4 +1,12 @@
 ================================================================================
+2019-10-10, 3.2 145.1
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al estatus habilitado erróneo de campo de captura estado en panel de domicilios de sucursales de asociados de negocios.
+2) Refactorización a la funcionalidad de generación y aplicación de pagos de layouts bancarios.
+3) Implementación notificación mail en la generación de layouts bancarios para la dispersión masiva de pagos.
+
+================================================================================
 2019-09-26, 3.2 145.0
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

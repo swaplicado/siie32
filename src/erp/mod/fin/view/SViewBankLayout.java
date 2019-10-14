@@ -12,8 +12,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbBankLayout;
 import erp.mod.fin.db.SFinConsts;
 import erp.mod.fin.form.SDialogBankLayoutCardex;
-import erp.mod.fin.util.SBankLayoutUtils;
-import erp.mod.fin.util.STreasuryBankLayoutRequest;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -49,6 +48,12 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
     private JButton jbCardex;
     private SDialogBankLayoutCardex moDialogBankLayoutCardex;
     
+    /**
+     * Create view for bank layouts.
+     * @param client GUI client.
+     * @param gridSubtype SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY or SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY.
+     * @param title Layout title.
+     */
     public SViewBankLayout(SGuiClient client, int gridSubtype, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FIN_LAY_BANK, gridSubtype, title);
         setRowButtonsEnabled(true, false, true, false, true);
@@ -70,7 +75,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSend);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbBackToNew);
 	
-        if (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_PAY) {
+        if (mnGridSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
         }
     }
@@ -102,8 +107,8 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                 else {
                     bankLayout = (SDbBankLayout) miClient.getSession().readRegistry(SModConsts.FIN_LAY_BANK, gridRow.getRowPrimaryKey(), SDbConsts.MODE_VERBOSE);
                     
-                    if (bankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_APPROVED_ST) {
-                        miClient.showMsgBoxWarning("El layout bancario no puede ser modificado en estatus " + SFinConsts.LAY_BANK_APPROVED_TEXT_ST);
+                    if (bankLayout.getLayoutStatus() == SDbBankLayout.STATUS_APPROVED) {
+                        miClient.showMsgBoxWarning("El layout bancario no puede ser modificado en estatus " + SDbBankLayout.STATUS_APPROVED_TEXT);
                     }
                     else if (bankLayout.getDocsPayed() > 0) {
                         miClient.showMsgBoxWarning(SDbConsts.MSG_REG_DENIED_UPDATE + "\n¡Existen documentos con pagos aplicados!");
@@ -175,7 +180,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         return valid;
     }
     
-    private SDbBankLayout readLayout() {
+    private SDbBankLayout readBankLayout() {
         SDbBankLayout bankLayout = null;
         
         if (jbGetLayout.isEnabled()) {
@@ -184,58 +189,58 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                 
                 bankLayout = (SDbBankLayout) miClient.getSession().readRegistry(SModConsts.FIN_LAY_BANK, gridRow.getRowPrimaryKey());
             }
+            
+            if (bankLayout == null) {
+                miClient.showMsgBoxWarning("Error al leer el layout bancario.");
+            }
         }
         
         return bankLayout;
     }
     
     private void actionGetLayout() {
-        SDbBankLayout bankLayout = null;
+        SDbBankLayout bankLayout = readBankLayout();
         
-        bankLayout = readLayout();
         if (bankLayout != null) {
             SFinUtilities.writeLayout((SClientInterface) miClient, bankLayout.getLayoutText(), "");
         }
     }
     
     private void actionSend() {
-        boolean done = false;
-        SDbBankLayout bankLayout = null;
-        STreasuryBankLayoutRequest treasuryBankLayoutRequest = null;
-        bankLayout = readLayout();
+        SDbBankLayout bankLayout = readBankLayout();
         
-        if (bankLayout != null) {
-            bankLayout.setAuxLayoutType(mnGridSubtype == SModSysConsts.FIN_LAY_BANK_PAY ? "TRANSFERENCIAS" : "ANTICIPOS"); // XXX WTF!
-            treasuryBankLayoutRequest = new STreasuryBankLayoutRequest(miClient, bankLayout);
-            done = treasuryBankLayoutRequest.makeRequestToTreasury();
-            
-            if (done) {
-                miClient.showMsgBoxInformation("La solicitud de autorización ha sido enviada.");
-                miClient.getSession().notifySuscriptors(mnGridType);
-            }
-        }
-        else {
-            miClient.showMsgBoxWarning("Error al leer el layout bancario.");
-        }
-    }
-    
-    private void actionBack() {
-        SDbBankLayout bankLayout = null;
-        
-        bankLayout = readLayout();
         if (bankLayout != null) {
             try {
-                if (bankLayout.getLayoutStatus() == SFinConsts.LAY_BANK_APPROVED_ST) {
-                    SBankLayoutUtils.changeLayoutStatus(miClient, bankLayout, SFinConsts.LAY_BANK_NEW_ST);
+                miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                
+                if (bankLayout.sendMailTreasuryRequest(miClient)) {
                     miClient.getSession().notifySuscriptors(mnGridType);
                 }
             }
             catch (Exception e) {
-                SLibUtils.printException(this, e);
+                SLibUtils.showException(this, e);
+            }
+            finally {
+                miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         }
-        else {
-            miClient.showMsgBoxWarning("Error al leer el layout bancario.");
+    }
+    
+    private void actionBack() {
+        SDbBankLayout bankLayout = readBankLayout();
+        
+        if (bankLayout != null) {
+            try {
+                if (bankLayout.getLayoutStatus() == SDbBankLayout.STATUS_APPROVED) {
+                    if (miClient.showMsgBoxConfirm("¿Está seguro que desea enviar el layout bancario al estatus anterior?") == JOptionPane.YES_OPTION) {
+                        bankLayout.updateLayoutStatus(miClient, SDbBankLayout.STATUS_NEW);
+                        miClient.getSession().notifySuscriptors(mnGridType);
+                    }
+                }
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
         }
     }
     
@@ -251,8 +256,13 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                     miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
                 }
                 else {
-                    moDialogBankLayoutCardex.setFormParams(gridRow.getRowPrimaryKey());
-                    moDialogBankLayoutCardex.setVisible(true);
+                    try {
+                        moDialogBankLayoutCardex.setFormParams(gridRow.getRowPrimaryKey());
+                        moDialogBankLayoutCardex.setVisible(true);
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
                 }
             }
         }
@@ -283,7 +293,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
                 + "l.amt, l.amt_pay, (l.amt - l.amt_pay) AS f_amt_x_pay, "
                 + "l.tra, l.tra_pay, (l.tra - l.tra_pay) AS f_tra_x_pay, "
                 + "l.dps, l.dps_pay, (l.dps - l.dps_pay) AS f_doc_x_pay, "
-                + "IF (l.lay_st = "+ SFinConsts.LAY_BANK_APPROVED_ST + ", '" + SFinConsts.LAY_BANK_APPROVED_TEXT_ST + "', '" + SFinConsts.LAY_BANK_NEW_TEXT_ST + "') AS status, l.auth_req, "
+                + "IF (l.lay_st = "+ SDbBankLayout.STATUS_APPROVED + ", '" + SDbBankLayout.STATUS_APPROVED_TEXT + "', '" + SDbBankLayout.STATUS_NEW_TEXT + "') AS status, "
                 + "tp.tp_lay_bank AS f_tp_lay, "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_HSBC + ", '" + SFinConsts.TXT_LAY_BANK_HSBC + "', "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_SANTANDER + ", '" + SFinConsts.TXT_LAY_BANK_SANTANDER + "', "
@@ -333,7 +343,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.tra", "Transferencias", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.tra_pay", "Transferencias pagadas", 100));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "f_tra_x_pay", "Transferencias x pagar", 100));
-        if (mnGridSubtype == SModSysConsts.FIN_LAY_BANK_PAY) {
+        if (mnGridSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.dps", "Documentos", 100));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.dps_pay", "Documentos pagados", 100));
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "f_doc_x_pay", "Documentos x pagar", 100));            

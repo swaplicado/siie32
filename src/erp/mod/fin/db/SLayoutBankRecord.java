@@ -6,6 +6,7 @@
 package erp.mod.fin.db;
 
 import java.util.ArrayList;
+import java.util.Date;
 import sa.lib.SLibUtils;
 
 /**
@@ -15,25 +16,39 @@ import sa.lib.SLibUtils;
 public class SLayoutBankRecord {
 
     protected SLayoutBankRecordKey moLayoutBankRecordKey;
+    protected String msBookkeepingCenterCode;
+    protected String msCompanyBranchCode;
+    protected Date mtDate;
+    
     protected ArrayList<SLayoutBankPayment> maLayoutBankPayments;
 
     public SLayoutBankRecord(SLayoutBankRecordKey recordLayout) {
         moLayoutBankRecordKey = recordLayout;
+        msBookkeepingCenterCode = "";
+        msCompanyBranchCode = "";
+        mtDate = null;
+        
         maLayoutBankPayments = new ArrayList<>();
     }
 
     public void setLayoutBankRecordKey(SLayoutBankRecordKey n) { moLayoutBankRecordKey = n; }
-
+    public void setBookkeepingCenterCode(String s) { msBookkeepingCenterCode = s; }
+    public void setCompanyBranchCode(String s) { msCompanyBranchCode = s; }
+    public void setDate(Date t) { mtDate = t; }
+    
     public SLayoutBankRecordKey getLayoutBankRecordKey() { return moLayoutBankRecordKey; }
+    public String getBookkeepingCenterCode() { return msBookkeepingCenterCode; }
+    public String getCompanyBranchCode() { return msCompanyBranchCode; }
+    public Date getDate() { return mtDate; }
     
     public ArrayList<SLayoutBankPayment> getLayoutBankPayments() { return maLayoutBankPayments; }
     
-    public SLayoutBankPayment obtainLayoutBankPayment(int bizPartner, int bizPartnerBranch, int bizPartnerAccBank) { 
+    public SLayoutBankPayment getLayoutBankPayment(int bizPartnerId, int bizPartnerBranchId, int bizPartnerBranchAccountBankId) { 
         SLayoutBankPayment layoutBankPayment = null;
         
-        for (SLayoutBankPayment bankPayment : maLayoutBankPayments) {
-            if (SLibUtils.compareKeys(new int[] { bankPayment.getBizPartnerId(), bankPayment.getBizPartnerBranchId(), bankPayment.getBizPartnerBranchAccountId() }, new int[] {bizPartner, bizPartnerBranch, bizPartnerAccBank })) {
-                layoutBankPayment = bankPayment;
+        for (SLayoutBankPayment payment : maLayoutBankPayments) {
+            if (SLibUtils.compareKeys(new int[] { payment.getBizPartnerId(), payment.getBizPartnerBranchId(), payment.getBizPartnerBranchBankAccountId() }, new int[] {bizPartnerId, bizPartnerBranchId, bizPartnerBranchAccountBankId })) {
+                layoutBankPayment = payment;
                 break;
             }
         }
@@ -41,27 +56,26 @@ public class SLayoutBankRecord {
         return layoutBankPayment; 
     }
     
-    public void removeLayoutBankPayment(int bizPartner, int bizPartnerBranch, int bizPartnerAccBank) { 
-        SLayoutBankPayment layoutBankPaymentRemove = null;
+    public void removeLayoutBankPayment(int bizPartnerId, int bizPartnerBranchId, int bizPartnerBranchAccountBankId) { 
+        SLayoutBankPayment layoutBankPayment = getLayoutBankPayment(bizPartnerId, bizPartnerBranchId, bizPartnerBranchAccountBankId);
         
-        for (SLayoutBankPayment bankPayment : maLayoutBankPayments) {
-            if (SLibUtils.compareKeys(new int[] { bankPayment.getBizPartnerId(), bankPayment.getBizPartnerBranchId(), bankPayment.getBizPartnerBranchAccountId() }, new int[] {bizPartner, bizPartnerBranch, bizPartnerAccBank })) {
-                layoutBankPaymentRemove = bankPayment;
-                break;
-            }
+        if (layoutBankPayment != null) {
+            maLayoutBankPayments.remove(layoutBankPayment);
         }
-        
-        maLayoutBankPayments.remove(layoutBankPaymentRemove);
     }
     
     @Override
     public SLayoutBankRecord clone() {
-        SLayoutBankRecord layoutBankRecord = new SLayoutBankRecord(moLayoutBankRecordKey);
+        SLayoutBankRecord clone = new SLayoutBankRecord(moLayoutBankRecordKey.clone());
         
+        clone.setBookkeepingCenterCode(this.getBookkeepingCenterCode());
+        clone.setCompanyBranchCode(this.getCompanyBranchCode());
+        clone.setDate(this.getDate());
+    
         for (SLayoutBankPayment payment : maLayoutBankPayments) {
-            layoutBankRecord.getLayoutBankPayments().add(payment.clone());
+            clone.getLayoutBankPayments().add(payment.clone());
         }
         
-        return layoutBankRecord;
+        return clone;
     }
 }

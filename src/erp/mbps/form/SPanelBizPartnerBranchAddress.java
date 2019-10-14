@@ -402,22 +402,24 @@ public class SPanelBizPartnerBranchAddress extends javax.swing.JPanel implements
     // End of variables declaration//GEN-END:variables
 
     public void setParamIsInMainWindow(boolean b) { mbParamIsInMainWindow = b; renderAddress(); }
+    
     public void setParamIsCompany(boolean b) { mbParamIsCompany = b; }
 
     public void setFieldsEnabled(boolean enable) {
-        jtfStreet.setEnabled(enable);
-        jtfStreetNumberExt.setEnabled(enable);
-        jtfStreetNumberInt.setEnabled(enable);
-        jtfNeighborhood.setEnabled(enable);
-        jtfReference.setEnabled(enable);
-        jtfLocality.setEnabled(enable);
-        jtfCounty.setEnabled(enable);
-        jtfState.setEnabled(enable);
-        jtfZipCode.setEnabled(enable);
         jckIsDefault.setEnabled(false);
         jcbFkCountryId_n.setEnabled(jcbFkCountryId_n.isEnabled() ? enable : false);
         jbPickCountry.setEnabled(jbPickCountry.isEnabled() ? enable : false);
         jbEditCountry.setEnabled(enable);
+        jtfZipCode.setEnabled(enable);
+        jcbFkStateId_n.setEnabled(enable && jcbFkStateId_n.getItemCount() > 1);
+        jtfState.setEnabled(enable);
+        jtfCounty.setEnabled(enable);
+        jtfLocality.setEnabled(enable);
+        jtfNeighborhood.setEnabled(enable);
+        jtfReference.setEnabled(enable);
+        jtfStreet.setEnabled(enable);
+        jtfStreetNumberExt.setEnabled(enable);
+        jtfStreetNumberInt.setEnabled(enable);
     }
 
     public void requestFocusFirstTime() {

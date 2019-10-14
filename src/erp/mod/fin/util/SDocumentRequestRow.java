@@ -6,8 +6,12 @@
 package erp.mod.fin.util;
 
 /**
- *
- * @author Edwin Carmona
+ * Instances of this class are used by JasperReports.
+ * Objects are passed as a parameter to the constructor of class class <code>net.sf.jasperreports.engine.data.JRBeanCollectionDataSource</code>, contained within an instance of <code>java.util.ArrayList</code>, in method <code>createTreasuryPdf()</code> of class <code>erp.mod.fin.db.SDbBankLayout</code>.
+ * All properties are used!
+ * WARNING: Please do not edit any name of members or methods!
+ * 
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SDocumentRequestRow {
     
@@ -18,7 +22,6 @@ public class SDocumentRequestRow {
     private double mdOriginalCurrencyAmount;
     private String msConcept;
     private String msObservation;
-
     
     public void setBank(String s) { msBank = s; }
     public void setBankAccount(String s) { msBankAccount = s; }

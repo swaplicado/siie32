@@ -36,9 +36,16 @@ import sa.lib.gui.SGuiParams;
 public class SViewBankLayoutPayments extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
-    private JButton jbPayment;
+    private JButton jbApplyPayments;
     private JButton jbCloseLayout;
     
+    /**
+     * Create view for payment of bank layouts.
+     * @param client GUI client.
+     * @param gridSubtype SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY or SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY.
+     * @param title Layout title.
+     * @param params Sets grid mode to SModConsts.VIEW_ST_PEND or SModConsts.VIEW_ST_DONE.
+     */
     public SViewBankLayoutPayments(SGuiClient client, int gridSubtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.FIN_LAY_BANK, gridSubtype, title, params);
         setRowButtonsEnabled(false);
@@ -53,14 +60,16 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
         
-        jbPayment = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money.gif")), "Aplicar pagos", this);
+        jbApplyPayments = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_money.gif")), "Aplicar pagos", this);
         jbCloseLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_ok.gif")), (mnGridMode == SModConsts.VIEW_ST_PEND ? "Cerrar" : "Abrir") + " layout para pago", this);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPayment);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbApplyPayments);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseLayout);
+        
+      
     }
     
     private void actionApplyPayments() {
-        if (jbPayment.isEnabled()) {
+        if (jbApplyPayments.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -77,7 +86,7 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
                     miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
                 }
                 else {
-                    miClient.getSession().getModule(mnModuleType, mnModuleSubtype).showForm(mnGridType, SModSysConsts.FIN_LAY_BANK_ACC, new SGuiParams(gridRow.getRowPrimaryKey()));
+                    miClient.getSession().getModule(mnModuleType, mnModuleSubtype).showForm(mnGridType, SModSysConsts.FINX_LAY_BANK_ACC, new SGuiParams(gridRow.getRowPrimaryKey()));
                 }
             }
         }
@@ -96,10 +105,10 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
 
                     bankLayout = (SDbBankLayout) miClient.getSession().readRegistry(SModConsts.FIN_LAY_BANK, gridRow.getRowPrimaryKey());
-                    if (miClient.showMsgBoxConfirm("Está por " + (mnGridMode == SModConsts.VIEW_ST_PEND ? "cerrar" : "abrir") + " el layout para pago.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
+                    if (miClient.showMsgBoxConfirm("Está por " + (mnGridMode == SModConsts.VIEW_ST_PEND ? "cerrar" : "abrir") + " el layout para aplicación de pagos.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
                         if (mnGridMode == SModConsts.VIEW_ST_DONE) {
                             if (!bankLayout.isClosedPayment()) {
-                                miClient.showMsgBoxWarning("¡El layout no se puede abrir, no fué cerrado de forma manual!");
+                                miClient.showMsgBoxWarning("¡El layout no se puede abrir, puesto que no fué cerrado de forma manual!");
                                 canClose = false;
                             }
                         }
@@ -116,6 +125,11 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
                 }
             }
         }
+    }
+    
+    @Override
+    public void actionMouseClicked() {
+        actionApplyPayments();
     }
 
     @Override
@@ -144,6 +158,7 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
                 + "l.dt_lay, l.dt_due, l.cpt, l.con, "
                 + "l.amt, l.amt_pay, (l.amt - l.amt_pay) AS f_amt_x_pay, "
                 + "l.tra, l.tra_pay, (l.tra - l.tra_pay) AS f_tra_x_pay, "
+                + "IF (l.lay_st = "+ SDbBankLayout.STATUS_APPROVED + ", '" + SDbBankLayout.STATUS_APPROVED_TEXT + "', '" + SDbBankLayout.STATUS_NEW_TEXT + "') AS status, "
                 + "tp.tp_lay_bank AS f_tp_lay, "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_HSBC + ", '" + SFinConsts.TXT_LAY_BANK_HSBC + "', "
                 + "IF(tp.lay_bank = " + SFinConsts.LAY_BANK_SANTANDER + ", '" + SFinConsts.TXT_LAY_BANK_SANTANDER + "', "
@@ -187,7 +202,8 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "l.dt_lay", "Pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, SDbConsts.FIELD_ID + "1", "Folio", 50));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_tp_lay", "Tipo layout", 200));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "status", "Estatus"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_tp_lay", "Tipo layout bancario", 200));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "f_ent", "Cuenta bancaria", 250));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "l.cpt", "Concepto/Descripción", 250));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "l.con", "Consecutivo día", 50));
@@ -221,7 +237,7 @@ public class SViewBankLayoutPayments extends SGridPaneView implements ActionList
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbPayment) {
+            if (button == jbApplyPayments) {
                 actionApplyPayments();
             }
             else if (button == jbCloseLayout) {

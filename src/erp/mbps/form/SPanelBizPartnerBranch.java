@@ -283,7 +283,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlEmail.setText("Cuenta correo-e");
+        jlEmail.setText("Cuenta(s) correo-e:");
         jlEmail.setPreferredSize(new java.awt.Dimension(110, 23));
         jlEmail.setRequestFocusEnabled(false);
         jPanel9.add(jlEmail);
@@ -294,7 +294,7 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         jlAddingMultipleMailHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlAddingMultipleMailHelp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlAddingMultipleMailHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlAddingMultipleMailHelp.setToolTipText("Para varias cuentas de correo-e, separarlas con \";\", sin espacios, p. ej., \"ejemplo1@mail.com;ejemplo2@mail.com\"");
+        jlAddingMultipleMailHelp.setToolTipText("Separar varias cuentas con \";\", sin espacios, p. ej., \"cuenta1@mail.com;cuenta2@mail.com\"");
         jlAddingMultipleMailHelp.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel9.add(jlAddingMultipleMailHelp);
 

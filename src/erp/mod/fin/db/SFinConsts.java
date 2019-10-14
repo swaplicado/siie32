@@ -7,9 +7,13 @@ package erp.mod.fin.db;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SFinConsts {
+
+    public static final int LEN_RFC_PER = 13;
+    public static final int LEN_RFC_ORG = 12;
+    public static final int LEN_CURP = 18;
 
     public static final int LAY_BANK_HSBC = 1;
     public static final int LAY_BANK_SANTANDER = 2;
@@ -23,30 +27,13 @@ public class SFinConsts {
     public static final java.lang.String TXT_LAY_BANK_BBVA = "LAYOUT BBVA";
     public static final java.lang.String TXT_LAY_BANK_BANAMEX = "LAYOUT BANAMEX";
     
-    public static final java.lang.String TXT_VAL = "VALUACIÓN";
-    
-    /** Bank layout for payments */
-    public static final int LAY_BANK_TYPE_PAY = 2;
-    /** Bank layout for prepayments */
-    public static final int LAY_BANK_TYPE_ADV = 3;
-    
-    public static final int LAY_BANK_NEW_ST = 0;
-    public static final int LAY_BANK_APPROVED_ST = 1;
-    
     public static final int LAY_TP_BANK_DEP_CIE = 11;
     
-    public static final String LAY_BANK_NEW_TEXT_ST = "NUEVO";
-    public static final String LAY_BANK_APPROVED_TEXT_ST = "APROBADO";
-
     public static final String TXT_BANK_BANK = "BCO.";
     public static final String TXT_BANK_BRA = "SUC.";
     public static final String TXT_BANK_ACC = "CTA.";
     public static final String TXT_CHECK = "CHQ";
     public static final String TXT_INVOICE = "F";
-
-    public static final int LEN_RFC_PER = 13;
-    public static final int LEN_RFC_ORG = 12;
-    public static final int LEN_CURP = 18;
 
     public static final String MSG_ERR_ABP_ENT_NOT_FOUND = "No se encontró un paquete de configuración contable para la entidad: ";
     public static final String MSG_ERR_ABP_BPS_NOT_FOUND = "No se encontró un paquete de configuración contable para el asociado de negocios: ";

@@ -10,7 +10,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SXmlBankLayoutPaymentDoc extends SXmlElement {
 
@@ -20,9 +20,10 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
     public static final String ATT_LAY_ROW_AMT = "Amount";
     public static final String ATT_LAY_ROW_AMT_CY = "AmountCy";
     public static final String ATT_LAY_ROW_CUR = "Currency";
-    public static final String ATT_LAY_ROW_EXT_RATE = "ExchangeRate";
+    public static final String ATT_LAY_ROW_EXR = "ExchangeRate";
     public static final String ATT_LAY_ROW_REF_REC = "ReferenceRecord";
     public static final String ATT_LAY_ROW_OBS = "Observation";
+    public static final String ATT_LAY_ROW_EMAIL = "Email";
 
     protected SXmlAttribute moRowDpsYear;
     protected SXmlAttribute moRowDpsDoc;
@@ -32,6 +33,7 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
     protected SXmlAttribute moRowExchangeRate;
     protected SXmlAttribute moRowReferenceRecord;
     protected SXmlAttribute moRowObservation;
+    protected SXmlAttribute moRowEmail;
 
     public SXmlBankLayoutPaymentDoc() {
         super(NAME);
@@ -41,9 +43,10 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
         moRowAmount = new SXmlAttribute(ATT_LAY_ROW_AMT);
         moRowAmountCy = new SXmlAttribute(ATT_LAY_ROW_AMT_CY);
         moRowCurrency = new SXmlAttribute(ATT_LAY_ROW_CUR);
-        moRowExchangeRate = new SXmlAttribute(ATT_LAY_ROW_EXT_RATE);
+        moRowExchangeRate = new SXmlAttribute(ATT_LAY_ROW_EXR);
         moRowReferenceRecord = new SXmlAttribute(ATT_LAY_ROW_REF_REC);
         moRowObservation = new SXmlAttribute(ATT_LAY_ROW_OBS);
+        moRowEmail = new SXmlAttribute(ATT_LAY_ROW_EMAIL);
         
         mvXmlAttributes.add(moRowDpsYear);
         mvXmlAttributes.add(moRowDpsDoc);
@@ -53,5 +56,6 @@ public class SXmlBankLayoutPaymentDoc extends SXmlElement {
         mvXmlAttributes.add(moRowExchangeRate);
         mvXmlAttributes.add(moRowReferenceRecord);
         mvXmlAttributes.add(moRowObservation);
+        mvXmlAttributes.add(moRowEmail);
     }
 }

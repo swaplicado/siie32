@@ -525,15 +525,15 @@ public abstract class SModSysConsts {
     public static final String FINU_TP_REC_CASH_BANK = "CB";
     
     /** Accounting of bank layout */
-    public static final int FIN_LAY_BANK_ACC = 1;
+    public static final int FINX_LAY_BANK_ACC = 1;
     /** Bank layout for payments */
-    public static final int FIN_LAY_BANK_PAY = 2;
+    public static final int FINX_LAY_BANK_TRN_TP_PAY = 2;
     /** Bank layout for prepayments */
-    public static final int FIN_LAY_BANK_PREPAY = 3;
+    public static final int FINX_LAY_BANK_TRN_TP_PREPAY = 3;
     /** Bank layout for own transfers */
-    public static final int FIN_LAY_BANK_OWN = 11;
+    public static final int FINX_LAY_BANK_TRN_TP_OWN_TRANSFER = 11;
     /** Used only as grid identifier! */
-    public static final int FIN_LAY_BANK_QRY = 21;
+    public static final int FINX_LAY_BANK_QRY = 21;
 
     /*
      * Transactions

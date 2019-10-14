@@ -62,14 +62,16 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     protected java.util.Date mtUserNewTs;
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
-
+    
+    protected java.lang.String msDbmsBookkeepingCenterCode;
+    protected java.lang.String msDbmsCompanyBranchCode;
     protected erp.mfin.data.SDataAccountCash moDbmsDataAccountCash;
     protected java.util.Vector<erp.mfin.data.SDataRecordEntry> mvDbmsRecordEntries;
 
     public SDataRecord() {
         super(SDataConstants.FIN_REC);
         mlRegistryTimeout = 1000 * 60 * 60 * 2; // 2 hr
-        mvDbmsRecordEntries = new Vector<SDataRecordEntry>();
+        mvDbmsRecordEntries = new Vector<>();
         reset();
     }
 
@@ -169,7 +171,11 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
     public void setDbmsDataAccountCash(erp.mfin.data.SDataAccountCash o) { moDbmsDataAccountCash = o; }
-
+    public void setDbmsBookkeepingCenterCode(java.lang.String s) { msDbmsBookkeepingCenterCode = s; }
+    public void setDbmsCompanyBranchCode(java.lang.String s) { msDbmsCompanyBranchCode = s; }
+    
+    public java.lang.String getDbmsBookkeepingCenterCode() { return msDbmsBookkeepingCenterCode; }
+    public java.lang.String getDbmsCompanyBranchCode() { return msDbmsCompanyBranchCode; }
     public erp.mfin.data.SDataAccountCash getDbmsDataAccountCash() { return moDbmsDataAccountCash; }
     public java.util.Vector<SDataRecordEntry> getDbmsRecordEntries() { return mvDbmsRecordEntries; }
 
@@ -198,15 +204,15 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     }
 
     public int getLastSortingPosition() {
-        int position = 0;
+        int lastSortingPosition = 0;
                 
         for (SDataRecordEntry entry : mvDbmsRecordEntries) {
-            if (!entry.getIsDeleted()) {
-                position = entry.getSortingPosition();
+            if (!entry.getIsDeleted() && entry.getSortingPosition() > lastSortingPosition) {
+                lastSortingPosition = entry.getSortingPosition();
             }
         }
         
-        return position;
+        return lastSortingPosition;
     }
 
     public void checkIsEditable(final Connection connection) throws Exception {
@@ -279,6 +285,8 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         mtUserEditTs = null;
         mtUserDeleteTs = null;
 
+        msDbmsBookkeepingCenterCode = "";
+        msDbmsCompanyBranchCode = "";
         moDbmsDataAccountCash = null;
         mvDbmsRecordEntries.clear();
     }
@@ -294,41 +302,48 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
         reset();
 
         try {
-            sql = "SELECT * FROM fin_rec " +
-                    "WHERE id_year = " + key[0] + " AND id_per = " + key[1] + " AND " +
-                    "id_bkc = " + key[2] + " AND id_tp_rec = '" + key[3] + "' AND " +
-                    "id_num = " + key[4] + " ";
+            sql = "SELECT r.*, bkc.code, cob.code " +
+                    "FROM fin_rec AS r " +
+                    "INNER JOIN fin_bkc AS bkc ON r.id_bkc = bkc.id_bkc " +
+                    "INNER JOIN erp.bpsu_bpb AS cob ON r.fid_cob = cob.id_bpb " +
+                    "WHERE r.id_year = " + key[0] + " AND r.id_per = " + key[1] + " AND " +
+                    "r.id_bkc = " + key[2] + " AND r.id_tp_rec = '" + key[3] + "' AND r.id_num = " + key[4] + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
             }
             else {
-                mnPkYearId = resultSet.getInt("id_year");
-                mnPkPeriodId = resultSet.getInt("id_per");
-                mnPkBookkeepingCenterId = resultSet.getInt("id_bkc");
-                msPkRecordTypeId = resultSet.getString("id_tp_rec");
-                mnPkNumberId = resultSet.getInt("id_num");
-                mtDate = resultSet.getDate("dt");
-                msConcept = resultSet.getString("concept");
-                mbIsAdjustmentsYearEnd = resultSet.getBoolean("b_adj_year");
-                mbIsAdjustmentsAudit = resultSet.getBoolean("b_adj_audit");
-                mbIsAudited = resultSet.getBoolean("b_audit");
-                mbIsAuthorized = resultSet.getBoolean("b_authorn");
-                mbIsSystem = resultSet.getBoolean("b_sys");
-                mbIsDeleted = resultSet.getBoolean("b_del");
-                mnFkCompanyBranchId = resultSet.getInt("fid_cob");
-                mnFkCompanyBranchId_n = resultSet.getInt("fid_cob_n");
-                mnFkAccountCashId_n = resultSet.getInt("fid_acc_cash_n");
-                mnFkUserAuditedId = resultSet.getInt("fid_usr_audit");
-                mnFkUserAuthorizedId = resultSet.getInt("fid_usr_authorn");
-                mnFkUserNewId = resultSet.getInt("fid_usr_new");
-                mnFkUserEditId = resultSet.getInt("fid_usr_edit");
-                mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
-                mtUserAuditedTs = resultSet.getTimestamp("ts_audit");
-                mtUserAuthorizedTs = resultSet.getTimestamp("ts_authorn");
-                mtUserNewTs = resultSet.getTimestamp("ts_new");
-                mtUserEditTs = resultSet.getTimestamp("ts_edit");
-                mtUserDeleteTs = resultSet.getTimestamp("ts_del");
+                mnPkYearId = resultSet.getInt("r.id_year");
+                mnPkPeriodId = resultSet.getInt("r.id_per");
+                mnPkBookkeepingCenterId = resultSet.getInt("r.id_bkc");
+                msPkRecordTypeId = resultSet.getString("r.id_tp_rec");
+                mnPkNumberId = resultSet.getInt("r.id_num");
+                mtDate = resultSet.getDate("r.dt");
+                msConcept = resultSet.getString("r.concept");
+                mbIsAdjustmentsYearEnd = resultSet.getBoolean("r.b_adj_year");
+                mbIsAdjustmentsAudit = resultSet.getBoolean("r.b_adj_audit");
+                mbIsAudited = resultSet.getBoolean("r.b_audit");
+                mbIsAuthorized = resultSet.getBoolean("r.b_authorn");
+                mbIsSystem = resultSet.getBoolean("r.b_sys");
+                mbIsDeleted = resultSet.getBoolean("r.b_del");
+                mnFkCompanyBranchId = resultSet.getInt("r.fid_cob");
+                mnFkCompanyBranchId_n = resultSet.getInt("r.fid_cob_n");
+                mnFkAccountCashId_n = resultSet.getInt("r.fid_acc_cash_n");
+                mnFkUserAuditedId = resultSet.getInt("r.fid_usr_audit");
+                mnFkUserAuthorizedId = resultSet.getInt("r.fid_usr_authorn");
+                mnFkUserNewId = resultSet.getInt("r.fid_usr_new");
+                mnFkUserEditId = resultSet.getInt("r.fid_usr_edit");
+                mnFkUserDeleteId = resultSet.getInt("r.fid_usr_del");
+                mtUserAuditedTs = resultSet.getTimestamp("r.ts_audit");
+                mtUserAuthorizedTs = resultSet.getTimestamp("r.ts_authorn");
+                mtUserNewTs = resultSet.getTimestamp("r.ts_new");
+                mtUserEditTs = resultSet.getTimestamp("r.ts_edit");
+                mtUserDeleteTs = resultSet.getTimestamp("r.ts_del");
+                
+                // Read aswell complementary data:
+
+                msDbmsBookkeepingCenterCode = resultSet.getString("bkc.code");
+                msDbmsCompanyBranchCode = resultSet.getString("cob.code");
 
                 // Read aswell cash account:
 
@@ -377,6 +392,7 @@ public class SDataRecord extends erp.lib.data.SDataRegistry implements java.io.S
     /**
      * Saves accounting record.
      * Sorting position of all active entries must be already set.
+     * @param connection
      */
     @Override
     public int save(java.sql.Connection connection) {

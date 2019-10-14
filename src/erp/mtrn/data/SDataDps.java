@@ -33,7 +33,6 @@ import cfd.ver3.cce11.DElementDescripcionesEspecificas;
 import cfd.ver3.clf10.DElementLeyenda;
 import cfd.ver3.clf10.DElementLeyendasFiscales;
 import cfd.ver33.DCfdi33Catalogs;
-import erp.SClient;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
@@ -3835,7 +3834,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         }
                     }
 
-                    body += STrnUtilities.computeMailFooterEndTable(SClient.APP_NAME , SClient.APP_COPYRIGHT, SClient.APP_PROVIDER, SClient.VENDOR_WEBSITE , SClient.APP_RELEASE);
+                    body += STrnUtilities.computeMailFooterEndTable();
                     
                     toRecipients.add(emailList);
 

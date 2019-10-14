@@ -5,10 +5,11 @@
 package erp.mod.fin.db;
 
 /**
- *
- * @author Juan Barajas, Alfredo Pérez
+ * Abstraction of a payment for text representation of bank layouts.
+ * 
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
-public class SLayoutBankPaymentTxt {
+public class SLayoutBankPaymentText {
 
     protected double mdTotalAmount;
     protected String msReference;
@@ -34,7 +35,7 @@ public class SLayoutBankPaymentTxt {
     protected String msBajioBankNick;
     protected int mnBankKey;
 
-    public SLayoutBankPaymentTxt() {
+    public SLayoutBankPaymentText() {
         mdTotalAmount = 0;
         msReference = "";
         msConcept = "";

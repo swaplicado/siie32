@@ -26,7 +26,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SLayoutBankAccountingAdvance {
 
@@ -70,7 +70,7 @@ public class SLayoutBankAccountingAdvance {
         msBizPartner = "";
         msReferenceRecord = "";
         
-        maRecordEntries = new ArrayList<SDataRecordEntry>();
+        maRecordEntries = new ArrayList<>();
     }
 
     public void setGuiSession(SGuiSession o) { moSession = o; }
@@ -216,7 +216,8 @@ public class SLayoutBankAccountingAdvance {
         entry.setFkUnitId_n(SLibConsts.UNDEFINED);
 
         entry.setFkUserNewId(moSession.getUser().getPkUserId());
-        entry.setFkUserEditId(moSession.getUser().getPkUserId());
+        //entry.setFkUserEditId(...);
+        //entry.setFkUserDeleteId(...);
         
         return entry;
     }
@@ -256,6 +257,8 @@ public class SLayoutBankAccountingAdvance {
         entry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[1]);
         entry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL[2]);
         entry.setFkUserNewId(moSession.getUser().getPkUserId());
+        //entry.setFkUserEditId(...);
+        //entry.setFkUserDeleteId(...);
         entry.setDbmsAccountingMoveSubclass(moSession.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL, SDbRegistry.FIELD_NAME) + "");
 
         entry.setDebit(0);

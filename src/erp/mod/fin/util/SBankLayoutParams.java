@@ -9,34 +9,28 @@ import java.util.Date;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SBankLayoutParams {
     
     private String msTitle;
-    private String msCompanyName;
-    private Date moDateTimeRequest;
+    private Date moDatetimeRequest;
     private Date moApplicationDate;
-    private String msLayoutType;
+    private String msBankLayoutType;
     private String msBank;
     private String msBankAccount;
-    private String msTypePayment;
+    private String msPaymentType;
     private String msCurrency;
     private String msCurrencyDps;
     private double mdOriginalTotal;
-    private double mdTotal;
-    private String msFolio;
-    private String msAuthRequests;
+    private String msBankLayoutNumber;
     private boolean mbIsDifferentCurrency;
 
     public String getTitle() { return msTitle; }
     public void setTitle(String title) { msTitle = title; }
 
-    public String getCompanyName() { return msCompanyName; }
-    public void setCompanyName(String companyName) { msCompanyName = companyName; }
-
-    public Date getDateTimeRequest() { return moDateTimeRequest; }
-    public void setDateTimeRequest(Date dateTimeRequest) { moDateTimeRequest = dateTimeRequest; }
+    public Date getDatetimeRequest() { return moDatetimeRequest; }
+    public void setDatetimeRequest(Date dateTimeRequest) { moDatetimeRequest = dateTimeRequest; }
 
     public Date getApplicationDate() { return moApplicationDate; }
     public void setApplicationDate(Date applicationDate) { moApplicationDate = applicationDate; }
@@ -44,14 +38,14 @@ public class SBankLayoutParams {
     public String getBank() { return msBank; }
     public void setBank(String bank) { msBank = bank; }
     
-    public String getLayoutType() { return msLayoutType; }
-    public void setLayoutType(String layoutType) { msLayoutType = layoutType; }
+    public String getBankLayoutType() { return msBankLayoutType; }
+    public void setBankLayoutType(String layoutType) { msBankLayoutType = layoutType; }
 
     public String getBankAccount() { return msBankAccount; }
     public void setBankAccount(String bankAccount) { msBankAccount = bankAccount; }
 
-    public String getTypePayment() { return msTypePayment; }
-    public void setTypePayment(String typePayment) { msTypePayment = typePayment; }
+    public String getPaymentType() { return msPaymentType; }
+    public void setPaymentType(String typePayment) { msPaymentType = typePayment; }
 
     public String getCurrency() { return msCurrency; }
     public void setCurrency(String currency) { msCurrency = currency; }
@@ -59,18 +53,12 @@ public class SBankLayoutParams {
     public String getCurrencyDps() { return msCurrencyDps; }
     public void setCurrencyDps(String currency) { msCurrencyDps = currency; }
 
-    public double getTotal() { return mdTotal; }
-    public void setTotal(double total) { mdTotal = total; }
-    
     public double getOriginalTotal() { return mdOriginalTotal; }
     public void setOriginalTotal(double originalTotal) { mdOriginalTotal = originalTotal; }
 
-    public String getFolio() { return msFolio; }
-    public void setFolio(String folio) { msFolio = folio; }
+    public String getBankLayoutNumber() { return msBankLayoutNumber; }
+    public void setBankLayoutNumber(String number) { msBankLayoutNumber = number; }
 
-    public String getAuthRequests() { return msAuthRequests; }
-    public void setAuthRequests(String authRequests) { msAuthRequests = authRequests; }
-    
     public boolean getIsDifferentCurrency() { return mbIsDifferentCurrency; }
     public void setIsDifferentCurrency(boolean b) { mbIsDifferentCurrency = b; }
 }

@@ -921,8 +921,6 @@ public abstract class SDataConstantsSys {
     public static final int FINX_ACC_PAY = 1;
     public static final int FINX_ACC_PAY_PEND = 2;
 
-    public static final int FINX_EXC_RATE_CUR_SYS = 1;
-
     public static final int FINX_TP_ACC_MOV_DPS_PUR = 1;
     public static final int FINX_TP_ACC_MOV_DPS_SAL = 2;
     public static final int FINX_TP_ACC_MOV_BIZ_PARTNER_SUP = 3;

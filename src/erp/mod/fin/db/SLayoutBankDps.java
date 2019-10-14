@@ -4,52 +4,32 @@
  */
 package erp.mod.fin.db;
 
+import erp.mtrn.data.SDataDps;
+
 /**
  *
- * @author Juan Barajas, Alfredo Pérez
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
 public class SLayoutBankDps {
 
-    protected int mnPkYearId;
-    protected int mnPkDocId;
-    protected int mnDpsCategoryId;
-    protected int mnDpsClassId;
-    protected int mnDpsTypeId;
-    protected int mnDpsCurId;
-    protected double mdDpsAmount;
-    protected double mdDpsExcRate;
+    protected SDataDps moDps;
+    protected double mdPayment;
+    protected String msEmail; // semicolon separated mail recipients
 
-    public SLayoutBankDps(int dpsYear, int dpsDoc, int dpsCategory, int dpsClass, int dpsType, int dpsCur, double dpsAmount, double dpsExcRate) {
-        mnPkYearId = dpsYear;
-        mnPkDocId = dpsDoc;
-        mnDpsCategoryId = dpsCategory;
-        mnDpsClassId = dpsClass;
-        mnDpsTypeId = dpsType;
-        mnDpsCurId = dpsCur;
-        mdDpsAmount = dpsAmount;
-        mdDpsExcRate = dpsExcRate;
+    public SLayoutBankDps(final SDataDps dps, final double payment, final String email) {
+        moDps = dps;
+        mdPayment = payment;
+        msEmail = email;
     }
 
-    public void setPkYearId(int n) { mnPkYearId = n; }
-    public void setPkDocId(int n) { mnPkDocId = n; }
-    public void setDpsCategoryId(int n) { mnDpsCategoryId = n; }
-    public void setDpsClassId(int n) { mnDpsClassId = n; }
-    public void setDpsTypeId(int n) { mnDpsTypeId = n; }
-    public void setDpsCurId(int n) { mnDpsCurId = n; }
-    public void setDpsAmount(double d) { mdDpsAmount = d; }
-    public void setDpsExcRate(double d) { mdDpsExcRate = d; }
-
-    public int getPkYearId() { return mnPkYearId; }
-    public int getPkDocId() { return mnPkDocId; }
-    public int getDpsCategoryId() { return mnDpsCategoryId; }
-    public int getDpsClassId() { return mnDpsClassId; }
-    public int getDpsTypeId() { return mnDpsTypeId; }
-    public int getDpsCurId() { return mnDpsCurId; }
-    public double getDpsAmount() { return mdDpsAmount; }
-    public double getDpsExcRate() { return mdDpsExcRate; }
+    public SDataDps getDps() { return moDps; }
+    public double getPayment() { return mdPayment; }
+    public String getEmail() { return msEmail; }
     
     @Override
     public SLayoutBankDps clone() {
-        return new SLayoutBankDps(mnPkYearId, mnPkDocId, mnDpsCategoryId, mnDpsClassId, mnDpsTypeId, mnDpsCurId, mdDpsAmount, mdDpsExcRate);
+        SLayoutBankDps clone = new SLayoutBankDps(this.getDps(), this.getPayment(), this.getEmail());
+        
+        return clone;
     }
 }

@@ -9,6 +9,7 @@ import erp.data.SDataConstantsSys;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
 import erp.mod.SModSysConsts;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -17,74 +18,69 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiItem;
 
 /**
- *
- * @author Juan Barajas, Alfredo Pérez
+ * Abstraction of a row when editing bank layouts, aplicating payments or just showing bank layouts.
+ * Editing bank layouts and aplicating payments in SFormBankLayout.
+ * Showing bank layouts in SDialogBankLayoutCardex.
+ * 
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
 public class SLayoutBankRow implements SGridRow {
     
-    public static final int LENGTH_MAX_REF = 20;
+    public static final int MODE_FORM_EDITION = 1;
+    public static final int MODE_DIALOG_CARDEX = 2;
+    public static final int AGREEMENT_REFERENCE_MAX_LEN = 20;
 
     protected SGuiClient miClient;
     
-    protected int mnLayoutRowType;
-    protected int mnLayoutRowSubType;
-    protected int mnPkYearId;
-    protected int mnPkDocId;
+    protected int mnRowMode; // read-only property
+    protected int mnTransactionType;
+    protected int mnPaymentType;
     protected int mnBizPartnerId;
-    protected int mnBizPartnerBranchId;
-    protected int mnBizPartnerBranchBankAccountId;
-    protected java.lang.String msBizPartner;
-    protected java.lang.String msBizPartnerKey;
-    protected java.lang.String msBizPartnerBranch;
-    protected java.lang.String msSantanderBankCode;
-    protected java.lang.String msBajioBankCode;
-    protected java.lang.String msBajioBankAlias;
-    protected java.lang.String msTypeDps;
-    protected java.lang.String msNumberSer;
-    protected java.util.Date mtDate;
-    protected java.util.Date mtDateMaturityRo;
-    protected java.lang.String msBizPartnerBranchCob;
-    protected boolean mbIsForPayment;
-    protected boolean mbIsToPayed;
-    protected double mdBalance;
-    protected SMoney moBalance;     // amount in local currency
-    protected SMoney moBalanceCy;   // amout in origial currency
-    protected SMoney moBalanceTot;
-    protected double mdExchangeRate;
-    protected double mdBalanceCy;
-    protected double mdBalanceTotCy;
-    protected double mdBalanceAccountDebit;
-    protected double mdBalanceAccountDebitTot;
-    
+    protected String msBizPartner;
+    protected String msBizPartnerKey;
+    protected String msSantanderBankCode;
+    protected String msBajioBankCode;
+    protected String msBajioBankAlias;
+    protected int mnDpsYearId;
+    protected int mnDpsDocId;
+    protected String msDpsType;
+    protected String msDpsNumber;
+    protected Date mtDpsDate;
+    protected Date mtDpsDateMaturity;
+    protected String msDpsCompanyBranchCode;
+    protected boolean mbForPayment;
+    protected boolean mbPayed;
+    protected SMoney moMoneyDpsBalance;
+    protected SMoney moMoneyPayment;
     protected double mdBalanceTotByBizPartner;
     protected double mdBalancePayed;
-    protected java.lang.String msCurrencyKey;
-    protected java.lang.String msCurrencyKeyCy;
-    protected java.lang.String msAccountCredit;
-    protected java.lang.String msEmail;
-    protected java.lang.String msBizPartnerCreditFiscalId;
+    protected String msPayerAccountCurrencyKey;
+    protected String msDpsCurrencyKey;
+    protected String msBeneficiaryAccountNumber;
+    protected String msBeneficiaryEmail;
+    protected String msBeneficiaryFiscalId;
     protected double mdSubTotal;
     protected double mdTaxCharged;
     protected double mdTaxRetained;
     protected double mdTotal;
     protected double mdTotalVat;
-   
-    protected java.lang.String msAccountDebit;
-    protected java.lang.String msBizPartnerDebitFiscalId;
-    protected java.lang.String msAccountType;
-    protected java.lang.String msConcept;
-    protected java.lang.String msDescription;
-    protected java.lang.String msReference;
-    protected java.lang.String msAgreement;
-    protected java.lang.String msAgreementReference;
-    protected java.lang.String msConceptCie;
+    protected String msAccountDebit;
+    protected String msBizPartnerDebitFiscalId;
+    protected String msAccountType;
+    protected String msConcept;
+    protected String msDescription;
+    protected String msReference;
+    protected String msAgreement;
+    protected String msAgreementReference;
+    protected String msConceptCie;
     protected int mnReferenceNumber;
-    protected int mnCf;
+    protected int mnFiscalVoucher; // 0 or 1
     protected int mnApply;
     protected int mnBankKey;
     protected int mnCurrencyId;
     protected String msReferenceRecord;
     protected String msObservations;
+    protected SLayoutBankRecord moLayoutBankRecord;
     
     protected ArrayList<SDataBizPartnerBranchBankAccount> maBranchBankAccountCredits;
     protected ArrayList<SGuiItem> maAccountCredits;
@@ -92,48 +88,44 @@ public class SLayoutBankRow implements SGridRow {
     protected HashMap<String, String> moCodeBankAccountCredits;
     protected HashMap<String, String> moAliasBankAccountCredits;
     
-    public SLayoutBankRow(SGuiClient client) {
+    /**
+     * Create a new bank layout row.
+     * @param client GUI client.
+     * @param rowMode Row mode, can be MODE_FORM_EDITION, MODE_DIALOG_CARDEX
+     */
+    public SLayoutBankRow(SGuiClient client, int rowMode) {
         miClient = client;
+        mnRowMode = rowMode;
         reset();
     }
 
     public void reset() {
-        mnLayoutRowType = 0;
-        mnLayoutRowSubType = 0;
-        mnPkYearId = 0;
-        mnPkDocId = 0;
+        mnTransactionType = 0;
+        mnPaymentType = 0;
         mnBizPartnerId = 0;
-        mnBizPartnerBranchId = 0;
-        mnBizPartnerBranchBankAccountId = 0;
         msBizPartner = "";
         msBizPartnerKey = "";
-        msBizPartnerBranch = "";
         msSantanderBankCode = "";
         msBajioBankCode = "";
         msBajioBankAlias = "";
-        msTypeDps = "";
-        msNumberSer = "";
-        mtDate = null;
-        mtDateMaturityRo = null;
-        msBizPartnerBranchCob = "";
-        mbIsForPayment = false;
-        mbIsToPayed = false;
-        mdBalance = 0;
-        moBalance = null;
-        moBalanceCy = null;
-        moBalanceTot = null;
-        mdExchangeRate = 0;
-        mdBalanceCy = 0;
-        mdBalanceTotCy = 0;
-        mdBalanceAccountDebit = 0;
-        mdBalanceAccountDebitTot = 0;
+        mnDpsYearId = 0;
+        mnDpsDocId = 0;
+        msDpsType = "";
+        msDpsNumber = "";
+        mtDpsDate = null;
+        mtDpsDateMaturity = null;
+        msDpsCompanyBranchCode = "";
+        mbForPayment = false;
+        mbPayed = false;
+        moMoneyDpsBalance = null;
+        moMoneyPayment = null;
         mdBalanceTotByBizPartner = 0;
         mdBalancePayed = 0;
-        msCurrencyKey = "";
-        msCurrencyKeyCy = "";      
-        msAccountCredit = "";
-        msEmail = "";
-        msBizPartnerCreditFiscalId = "";
+        msPayerAccountCurrencyKey = "";
+        msDpsCurrencyKey = "";      
+        msBeneficiaryAccountNumber = "";
+        msBeneficiaryEmail = "";
+        msBeneficiaryFiscalId = "";
         mdSubTotal = 0;
         mdTaxCharged = 0;
         mdTaxRetained = 0;
@@ -149,12 +141,13 @@ public class SLayoutBankRow implements SGridRow {
         msAgreementReference = "";
         msConceptCie = "";
         mnReferenceNumber = 0;
-        mnCf = 0;
+        mnFiscalVoucher = 0;
         mnApply = 0;
         mnBankKey = 0;
         mnCurrencyId = 0;
         msReferenceRecord = "";
         msObservations = "";
+        moLayoutBankRecord = null;
         
         maBranchBankAccountCredits = new ArrayList<>();
         maAccountCredits = new ArrayList<>();
@@ -163,115 +156,110 @@ public class SLayoutBankRow implements SGridRow {
         moAliasBankAccountCredits = new HashMap<>();
     }
 
-    public void setLayoutRowType(int n) { mnLayoutRowType = n; }
-    public void setLayoutRowSubType(int n) { mnLayoutRowSubType = n; }
-    public void setPkYearId(int n) { mnPkYearId = n; }
-    public void setPkDocId(int n) { mnPkDocId = n; }
+    public void setTransactionType(int n) { mnTransactionType = n; }
+    public void setPaymentType(int n) { mnPaymentType = n; }
     public void setBizPartnerId(int n) { mnBizPartnerId = n; }
-    public void setBizPartnerBranchId(int n) { mnBizPartnerBranchId = n; }
-    public void setBizPartnerBranchAccountId(int n) { mnBizPartnerBranchBankAccountId = n; }
-    public void setBizPartner(java.lang.String s) { msBizPartner = s; }
-    public void setBizPartnerKey(java.lang.String s) { msBizPartnerKey = s; }
-    public void setBizPartnerBranch(String s) { msBizPartnerBranch = s; }
+    public void setBizPartner(String s) { msBizPartner = s; }
+    public void setBizPartnerKey(String s) { msBizPartnerKey = s; }
     public void setSantanderBankCode(String s) { msSantanderBankCode = s; }
     public void setBajioBankCode(String s) { msBajioBankCode = s; }
     public void setBajioBankAlias(String s) { msBajioBankAlias = s; }
-    public void setTypeDps(String s) { msTypeDps = s; }
-    public void setNumberSer(String s) { msNumberSer = s; }
-    public void setDate(java.util.Date t) { mtDate = t; }
-    public void setDateMaturityRo(java.util.Date t) { mtDateMaturityRo = t; }
-    public void setBizPartnerBranchCob(String s) { msBizPartnerBranchCob = s; }
-    public void setIsForPayment(boolean b) { mbIsForPayment = b; }
-    public void setIsToPayed(boolean b) { mbIsToPayed = b; }
-    public void setBalance (SMoney o) { moBalance = o; }
-    public void setBalanceCy (SMoney o) { moBalanceCy = o; }
-    public void setBalanceTot(SMoney o) { moBalanceTot = o; }
+    public void setDpsYearId(int n) { mnDpsYearId = n; }
+    public void setDpsDocId(int n) { mnDpsDocId = n; }
+    public void setDpsType(String s) { msDpsType = s; }
+    public void setDpsNumber(String s) { msDpsNumber = s; }
+    public void setDpsDate(Date t) { mtDpsDate = t; }
+    public void setDpsDateMaturity(Date t) { mtDpsDateMaturity = t; }
+    public void setDpsCompanyBranchCode(String s) { msDpsCompanyBranchCode = s; }
+    public void setForPayment(boolean b) { mbForPayment = b; }
+    public void setPayed(boolean b) { mbPayed = b; }
+    public void setMoneyDpsBalance(SMoney o) { moMoneyDpsBalance = o; }
+    public void setMoneyPayment(SMoney o) { moMoneyPayment = o; }
     public void setBalanceTotByBizPartner(double d) { mdBalanceTotByBizPartner = d; }
     public void setBalancePayed(double d) { mdBalancePayed = d; }
-    public void setCurrencyKey(java.lang.String s) { msCurrencyKey = s; }
-    public void setCurrencyKeyCy(java.lang.String s) { msCurrencyKeyCy = s; }
-    public void setAccountCredit(java.lang.String s) { msAccountCredit = s; }
-    public void setAgreement(java.lang.String s) { msAgreement= s; }
-    public void setAgreementReference(java.lang.String s) { msAgreementReference= s; }
-    public void setConceptCie(java.lang.String s) { msConceptCie = s; }
-    public void setEmail(java.lang.String s) { msEmail = s; }
-    public void setBizPartnerCreditFiscalId(String s) { msBizPartnerCreditFiscalId = s; }
+    public void setPayerAccountCurrencyKey(String s) { msPayerAccountCurrencyKey = s; }
+    public void setDpsCurrencyKey(String s) { msDpsCurrencyKey = s; }
+    public void setBeneficiaryAccountNumber(String s) { msBeneficiaryAccountNumber = s; }
+    public void setBeneficiaryEmail(String s) { msBeneficiaryEmail = s; }
+    public void setBeneficiaryFiscalId(String s) { msBeneficiaryFiscalId = s; }
     public void setSubTotal(double d) { mdSubTotal = d; }
     public void setTaxCharged(double d) { mdTaxCharged = d; }
     public void setTaxRetained(double d) { mdTaxRetained = d; }
     public void setTotal(double d) { mdTotal = d; }
     public void setTotalVat(double d) { mdTotalVat = d; }
-    public void setExchangeRate(double d) { moBalanceTot.setExchangeRate(d); }
-    public void setAccountDebit(java.lang.String s) { msAccountDebit = s; }
+    public void setAccountDebit(String s) { msAccountDebit = s; }
     public void setBizPartnerDebitFiscalId(String s) { msBizPartnerDebitFiscalId = s; }
-    public void setAccType(java.lang.String s) { msAccountType = s; }
-    public void setConcept(java.lang.String s) { msConcept = s; }
-    public void setDescription(java.lang.String s) { msDescription = s; }
-    public void setReference(java.lang.String s) { msReference = s; }
+    public void setAccType(String s) { msAccountType = s; }
+    public void setConcept(String s) { msConcept = s; }
+    public void setDescription(String s) { msDescription = s; }
+    public void setReference(String s) { msReference = s; }
+    public void setAgreement(String s) { msAgreement= s; }
+    public void setAgreementReference(String s) { msAgreementReference= s; }
+    public void setConceptCie(String s) { msConceptCie = s; }
     public void setReferenceNumber(int n) { mnReferenceNumber = n; }
-    public void setCf(int n) { mnCf = n; }
+    public void setFiscalVoucher(int n) { mnFiscalVoucher = n; }
     public void setApply(int n) { mnApply = n; }
     public void setBankKey(int n) { mnBankKey = n; }
     public void setCurrencyId(int n) { mnCurrencyId = n; }
     public void setReferenceRecord(String s) { msReferenceRecord = s; }
     public void setObservations(String s) { msObservations = s; }
+    public void setLayoutBankRecord(SLayoutBankRecord o) { moLayoutBankRecord = o; }
     
     public void setAccountCreditArray(ArrayList<SGuiItem> a) { maAccountCredits = a; }
     public void setAgreementsReferencesArray(ArrayList<SGuiItem> a) { maAgreementReferences = a; }
     public void setBranchBankAccountCreditArray(ArrayList<SDataBizPartnerBranchBankAccount> a) { maBranchBankAccountCredits = a; }
     
-    public int getLayoutRowType() { return mnLayoutRowType; }
-    public int getLayoutRowSubType() { return mnLayoutRowSubType; }
-    public int getPkYearId() { return mnPkYearId; }
-    public int getPkDocId() { return mnPkDocId; }
+    public void setExchangeRate(double exchangeRate) { moMoneyPayment.setExchangeRate(exchangeRate); }
+    
+    public int getRowMode() { return mnRowMode; }
+    public int getTransactionType() { return mnTransactionType; }
+    public int getPaymentType() { return mnPaymentType; }
     public int getBizPartnerId() { return mnBizPartnerId; }
-    public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
-    public int getBizPartnerBranchAccountId() { return mnBizPartnerBranchBankAccountId; }
-    public java.lang.String getBizPartner() { return msBizPartner; }
-    public java.lang.String getBizPartnerKey() { return msBizPartnerKey; }
-    public java.lang.String getBizPartnerBranch() { return msBizPartnerBranch; }
-    public java.lang.String getSantanderBankCode() { return msSantanderBankCode; }
-    public java.lang.String getBajioBankCode() { return msBajioBankCode; }
-    public java.lang.String getBajioBankAlias() { return msBajioBankAlias; }
-    public java.lang.String getTypeDps() { return msTypeDps; }
-    public java.lang.String getNumberSer() { return msNumberSer; }
-    public java.util.Date getDate() { return mtDate; }
-    public java.util.Date getDateMaturityRo() { return mtDateMaturityRo; }
-    public java.lang.String getBizPartnerBranchCob() { return msBizPartnerBranchCob; }
-    public boolean getIsForPayment() { return mbIsForPayment; }
-    public boolean getIsToPayed() { return mbIsToPayed; }
-    public SMoney getBalance() { return moBalance; }
-    public SMoney getBalanceCy() { return moBalanceCy; }
-    public SMoney getBalanceTot() { return moBalanceTot; }
+    public String getBizPartner() { return msBizPartner; }
+    public String getBizPartnerKey() { return msBizPartnerKey; }
+    public String getSantanderBankCode() { return msSantanderBankCode; }
+    public String getBajioBankCode() { return msBajioBankCode; }
+    public String getBajioBankAlias() { return msBajioBankAlias; }
+    public int getDpsYearId() { return mnDpsYearId; }
+    public int getDpsDocId() { return mnDpsDocId; }
+    public String getDpsType() { return msDpsType; }
+    public String getDpsNumber() { return msDpsNumber; }
+    public Date getDpsDate() { return mtDpsDate; }
+    public Date getDpsDateMaturity() { return mtDpsDateMaturity; }
+    public String getDpsCompanyBranchCode() { return msDpsCompanyBranchCode; }
+    public boolean isForPayment() { return mbForPayment; }
+    public boolean isPayed() { return mbPayed; }
+    public SMoney getMoneyDpsBalance() { return moMoneyDpsBalance; }
+    public SMoney getMoneyPayment() { return moMoneyPayment; }
     public double getBalanceTotByBizPartner() { return mdBalanceTotByBizPartner; }
     public double getBalancePayed() { return mdBalancePayed; }
-    public java.lang.String getCurrencyKey() { return msCurrencyKey; }
-    public java.lang.String getCurrencyKeyCy() { return msCurrencyKeyCy; }
-    public java.lang.String getAccountCredit() { return msAccountCredit; }
-    public java.lang.String getAgreement() { return msAgreement; }
-    public java.lang.String getAgreementReference() { return msAgreementReference; }
-    public java.lang.String getConceptCie() { return msConceptCie; }
-    public java.lang.String getEmail() { return msEmail; }
-    public java.lang.String getBizPartnerCreditFiscalId() { return msBizPartnerCreditFiscalId; }
+    public String getPayerAccountCurrencyKey() { return msPayerAccountCurrencyKey; }
+    public String getDpsCurrencyKey() { return msDpsCurrencyKey; }
+    public String getBeneficiaryAccountNumber() { return msBeneficiaryAccountNumber; }
+    public String getBeneficiaryEmail() { return msBeneficiaryEmail; }
+    public String getBeneficiaryFiscalId() { return msBeneficiaryFiscalId; }
     public double getSubTotal() { return mdSubTotal; }
     public double getTaxCharged() { return mdTaxCharged; }
     public double getTaxRetained() { return mdTaxRetained; }
     public double getTotal() { return mdTotal; }
     public double getTotalVat() { return mdTotalVat; }
-    public double getExchangeRate() { return mdExchangeRate; }
-    public java.lang.String getAccountDebit() { return msAccountDebit; }
-    public java.lang.String getBizPartnerDebitFiscalId() { return msBizPartnerDebitFiscalId; }
-    public java.lang.String getAccType() { return msAccountType; }
-    public java.lang.String getConcept() { return msConcept; }
-    public java.lang.String getDescription() { return msDescription; }
-    public java.lang.String getReference() { return msReference; }
+    public String getAccountDebit() { return msAccountDebit; }
+    public String getBizPartnerDebitFiscalId() { return msBizPartnerDebitFiscalId; }
+    public String getAccType() { return msAccountType; }
+    public String getConcept() { return msConcept; }
+    public String getDescription() { return msDescription; }
+    public String getReference() { return msReference; }
+    public String getAgreement() { return msAgreement; }
+    public String getAgreementReference() { return msAgreementReference; }
+    public String getConceptCie() { return msConceptCie; }
     public int getReferenceNumber() { return mnReferenceNumber; }
-    public int getCf() { return mnCf; }
+    public int getFiscalVoucher() { return mnFiscalVoucher; }
     public int getApply() { return mnApply; }
     public int getBankKey() { return mnBankKey; }
     public int getCurrencyId() { return mnCurrencyId; }
     public String getReferenceRecord() { return msReferenceRecord; }
     public String getObservations() { return msObservations; }
+    public SLayoutBankRecord getLayoutBankRecord() { return moLayoutBankRecord; }
     
     public ArrayList<SDataBizPartnerBranchBankAccount> getBranchBankAccountCredits() { return maBranchBankAccountCredits; }
     public ArrayList<SGuiItem> getAccountCredits() { return maAccountCredits; }
@@ -309,11 +297,11 @@ public class SLayoutBankRow implements SGridRow {
     public int[] getRowPrimaryKey() {
         int[] key = new int[] { SLibConsts.UNDEFINED };
         
-        switch (mnLayoutRowType) {
-            case SModSysConsts.FIN_LAY_BANK_PAY:
-                key = new int[] { mnPkYearId, mnPkDocId };
+        switch (mnTransactionType) {
+            case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
+                key = new int[] { mnDpsYearId, mnDpsDocId };
                 break;
-            case SModSysConsts.FIN_LAY_BANK_PREPAY:
+            case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
                 key = new int[] { mnBizPartnerId };
                 break;
             default:
@@ -356,93 +344,148 @@ public class SLayoutBankRow implements SGridRow {
     public Object getRowValueAt(int col) {
         Object value = null;
         
-        switch (mnLayoutRowType) {
-            case SModSysConsts.FIN_LAY_BANK_PAY:
-                switch (col) {
-                    case 0:
-                        value = msBizPartner;
-                        break;
-                    case 1:
-                        value = msTypeDps;
-                        break;
-                    case 2:
-                        value = msNumberSer;
-                        break;
-                    case 3:
-                        value = mtDate;
-                        break;
-                    case 4:
-                        value = msBizPartnerBranchCob;
-                        break;
-                    case 5:
-                        value = mbIsForPayment;
-                        break;
-                    case 6:
-                        value = moBalance.getAmountOriginal();
-                        break;
-                    case 7:
-                        value = moBalanceTot.getAmountOriginal();               // amount to pay
-                        break;
-                    case 8:
-                        value = msCurrencyKeyCy;
-                        break;
-                    case 9:
-                        value = moBalanceTot.getExchangeRate();
-                        break;
-                    case 10:
-                        value = moBalanceTot.getAmountLocal();                  // amount to pay in bank's currency
-                        break;
-                    case 11:
-                        value = msCurrencyKey;                                  // bank key currency
-                        break;    
-                    case 12:
-                        if (!msAgreement.isEmpty()) { //if (mnLayoutRowSubType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) { alphalapz
-                            value = msAgreement;
+        switch (mnRowMode) {
+            case MODE_FORM_EDITION:
+                switch (mnTransactionType) {
+                    case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
+                        switch (col) {
+                            case 0:
+                                value = msBizPartner;
+                                break;
+                            case 1:
+                                value = msDpsType;
+                                break;
+                            case 2:
+                                value = msDpsNumber;
+                                break;
+                            case 3:
+                                value = mtDpsDate;
+                                break;
+                            case 4:
+                                value = msDpsCompanyBranchCode;
+                                break;
+                            case 5:
+                                value = mbForPayment;
+                                break;
+                            case 6:
+                                value = moMoneyDpsBalance.getOriginalAmount();
+                                break;
+                            case 7:
+                                value = moMoneyPayment.getOriginalAmount();
+                                break;
+                            case 8:
+                                value = msDpsCurrencyKey;
+                                break;
+                            case 9:
+                                value = moMoneyPayment.getExchangeRate();
+                                break;
+                            case 10:
+                                value = moMoneyPayment.getLocalAmount(); // amount to pay in bank's currency
+                                break;
+                            case 11:
+                                value = msPayerAccountCurrencyKey; // bank key currency
+                                break;    
+                            case 12:
+                                if (!msAgreement.isEmpty()) {
+                                    value = msAgreement;
+                                }
+                                else {
+                                    value = msBeneficiaryAccountNumber;
+                                }
+                                break;
+                            case 13:
+                                if (msAgreementReference == null) {
+                                    value = "";
+                                }
+                                else {
+                                    value = msAgreementReference;
+                                }
+                                break;
+                            case 14:
+                                value = msConceptCie; // reference agreement CIE
+                                break;
+                            case 15:
+                                value = msBeneficiaryEmail;                            
+                                break;
+                            case 16:
+                                value = msBeneficiaryFiscalId;
+                                break;
+                            case 17:
+                                value = mdSubTotal;
+                                break;
+                            case 18:
+                                value = mdTaxCharged;
+                                break;
+                            case 19:
+                                value = mdTaxRetained;
+                                break;
+                            case 20:
+                                value = mdTotal;
+                                break;
+                            case 21:
+                                value = mtDpsDateMaturity;
+                                break;
+                            case 22:
+                                value = msObservations;
+                                break;
+                            default:
                         }
-                        else {
-                            value = msAccountCredit;
+                        break;
+
+                    case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
+                        switch (col) {
+                            case 0:
+                                value = msBizPartner;
+                                break;
+                            case 1:
+                                value = msBizPartnerKey;
+                                break;
+                            case 2:
+                                value = moMoneyPayment.getOriginalAmount(); // amount to pay
+                                break;
+                            case 3:
+                                value = msPayerAccountCurrencyKey;
+                                break;
+                            case 4:
+                                if (!msAgreement.isEmpty()) { 
+                                    value = msAgreement;
+                                }
+                                else {
+                                    value = msBeneficiaryAccountNumber;
+                                }
+                                break;
+                            case 5:
+                                if (msAgreementReference == null) {
+                                    value = "";
+                                }
+                                else {
+                                    value = msAgreementReference;
+                                }
+                                break;
+                            case 6:
+                                value = msConceptCie; // reference agreement CIE
+                                break;
+                            case 7:
+                                value = msBeneficiaryEmail;
+                                break;
+                            case 8:
+                                value = msBeneficiaryFiscalId;
+                                break;
+                            case 9:
+                                value = msReferenceRecord;
+                                break;
+                            case 10:
+                                value = msObservations;
+                                break;
+                            default:
                         }
                         break;
-                    case 13:
-                        if (msAgreementReference == null) {
-                            value = "";
-                        }
-                        else {
-                            value = msAgreementReference;
-                        }
-                        break;
-                    case 14:
-                        value = msConceptCie;                                   // reference agreement CIE
-                        break;
-                    case 15:
-                        value = msEmail;                            
-                        break;
-                    case 16:
-                        value = msBizPartnerCreditFiscalId;
-                        break;
-                    case 17:
-                        value = mdSubTotal;
-                        break;
-                    case 18:
-                        value = mdTaxCharged;
-                        break;
-                    case 19:
-                        value = mdTaxRetained;
-                        break;
-                    case 20:
-                        value = mdTotal;
-                        break;
-                    case 21:
-                        value = mtDateMaturityRo;
-                        break;
-                    case 22:
-                        value = msObservations;
-                        break;
+
                     default:
                 }
                 break;
                 
-            case SModSysConsts.FIN_LAY_BANK_PREPAY:
+            case MODE_DIALOG_CARDEX:
                 switch (col) {
                     case 0:
                         value = msBizPartner;
@@ -451,45 +494,67 @@ public class SLayoutBankRow implements SGridRow {
                         value = msBizPartnerKey;
                         break;
                     case 2:
-                        value = moBalanceTot.getAmountOriginal();   // amount to pay
+                        value = msDpsType;
                         break;
                     case 3:
-                        value = msCurrencyKey;
+                        value = msDpsNumber;
                         break;
                     case 4:
-                        if (!msAgreement.isEmpty()) { 
+                        value = mtDpsDate;
+                        break;
+                    case 5:
+                        value = msDpsCompanyBranchCode;
+                        break;
+                    case 6:
+                        value = moMoneyPayment.getOriginalAmount();
+                        break;
+                    case 7:
+                        value =  msDpsCurrencyKey;
+                        break;
+                    case 8:
+                        value = moMoneyPayment.getExchangeRate();
+                        break;
+                    case 9:
+                        if (!msAgreement.isEmpty()) {
                             value = msAgreement;
                         }
                         else {
-                            value = msAccountCredit;
+                            value = msBeneficiaryAccountNumber;
                         }
-                        break;
-                    case 5:
-                        if (msAgreementReference == null) {
-                            value = "";
-                        }
-                        else {
-                            value = msAgreementReference;
-                        }
-                        break;
-                    case 6:
-                        value = msConceptCie;                                   // reference agreement CIE
-                        break;
-                    case 7:
-                        value = msEmail;
-                        break;
-                    case 8:
-                        value = msBizPartnerCreditFiscalId;
-                        break;
-                    case 9:
-                        value = msReferenceRecord;
                         break;
                     case 10:
+                        value = msAgreementReference;
+                        break;
+                    case 11:
+                        if (msConceptCie == null) {
+                            value = "";
+                        }
+                        else{
+                            value = msConceptCie;
+                        }
+                        break;
+                    case 12:
+                        value = moLayoutBankRecord.getLayoutBankRecordKey().getRecordPeriod();
+                        break;
+                    case 13:
+                        value = moLayoutBankRecord.getBookkeepingCenterCode();
+                        break;
+                    case 14:
+                        value = moLayoutBankRecord.getCompanyBranchCode();
+                        break;
+                    case 15:
+                        value = moLayoutBankRecord.getLayoutBankRecordKey().getRecordNumber();
+                        break;
+                    case 16:
+                        value = moLayoutBankRecord.getDate();
+                        break;
+                    case 17:
                         value = msObservations;
                         break;
                     default:
                 }
                 break;
+                
             default:
         }
 
@@ -498,167 +563,176 @@ public class SLayoutBankRow implements SGridRow {
 
     @Override
     public void setRowValueAt(Object value, int col) {
-        switch (mnLayoutRowType) {
-            case SModSysConsts.FIN_LAY_BANK_PAY:
-                switch (col) {
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        break;
-                    case 5:
-                        mbIsForPayment = (boolean) value;
-                        break;
-                    case 6:
-                        break;
-                    case 7:
-                        moBalanceTot.setAmountOriginal((double) value);
-                        break;
-                    case 8:
-                        break;
-                    case 9:
-                        if (moBalance.getCurrencyLocalId() != moBalanceTot.getCurrencyOriginalId()) {
-                            moBalanceTot.setExchangeRate((double) value);
-                        }   
-                        break;
-                    case 10:
-                        break;
-                    case 11:
-                        break;
-                    case 12:   
-                        //Cuenta/Convenio
-                        if (value == null) {
-                            msAgreement = "";
-                        }
-                        else {
-                            if (mnLayoutRowSubType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
-                                if ( value instanceof String) {
-                                    msAgreement =  (String) value;
+        switch (mnRowMode) {
+            case MODE_FORM_EDITION:
+                switch (mnTransactionType) {
+                    case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
+                        switch (col) {
+                            case 0:
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                                break;
+                            case 5:
+                                mbForPayment = (boolean) value;
+                                break;
+                            case 6:
+                                break;
+                            case 7:
+                                moMoneyPayment.setOriginalAmount((double) value);
+                                break;
+                            case 8:
+                                break;
+                            case 9:
+                                if (!moMoneyDpsBalance.isLocalCurrency() || moMoneyDpsBalance.getOriginalCurrencyId() != moMoneyPayment.getOriginalCurrencyId()) {
+                                    setExchangeRate((double) value);
+                                }   
+                                break;
+                            case 10:
+                            case 11:
+                                break;
+                            case 12:   
+                                //Cuenta/Convenio
+                                if (value == null) {
+                                    msAgreement = "";
                                 }
                                 else {
-                                    msAgreement = ((SGuiItem) value).getItem();
+                                    if (mnPaymentType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                                        if ( value instanceof String) {
+                                            msAgreement =  (String) value;
+                                        }
+                                        else {
+                                            msAgreement = ((SGuiItem) value).getItem();
+                                        }
+                                    }
+                                    else {
+                                        msBeneficiaryAccountNumber = ((SGuiItem) value).getItem();
+                                    }
                                 }
-                            }
-                            else {
-                                msAccountCredit = ((SGuiItem) value).getItem();
-                            }
-                        }
-                        break;    
-                    case 13:
-                        if (value == null) {
-                            msAgreementReference = "";
-                        }
-                        else {
-                            if ( value instanceof String) {
-                                msAgreementReference =  (String) value;
-                            }
-                            else {
-                                msAgreementReference = ((SGuiItem) value).getItem();
-                            }
-                        }
-                        break;
-                    case 14:
-                        if (value == null) {
-                            msConceptCie = "";
-                        }
-                        else {
-                            if ( value instanceof String) {
-                                msConceptCie =  (String) value;
-                            }
-                            else {
-                                msConceptCie = ((SGuiItem) value).getItem();
-                            }
-                        }
-                        break;
-                    case 15:
-                        msEmail = (String) value;
-                        break;
-                    case 16:
-                    case 17:
-                    case 18:
-                    case 19:
-                    case 20:
-                    case 21:
-                        break;
-                    case 22:
-                        msObservations = (String) value;
-                        break;
-                    default:
-                        break;
-                    }
-                    break;
-            case SModSysConsts.FIN_LAY_BANK_PREPAY:
-                switch (col) {
-                    case 0:
-                    case 1:
-                        break;
-                    case 2:
-                         moBalanceTot.setAmountOriginal((double) value);
-                        break;
-                    case 3:
-                        break;
-                    case 4:   
-                        //Cuenta/Convenio
-                        if (value == null) {
-                            msAgreement = "";
-                            msAccountCredit = "";
-                        }
-                        else {
-//                            if (mnLayoutRowSubType == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
-                            if (!msAgreement.isEmpty()) {
-                                if ( value instanceof String) {
-                                    msAgreement =  (String) value;
+                                break;    
+                            case 13:
+                                if (value == null) {
+                                    msAgreementReference = "";
                                 }
                                 else {
-                                    msAgreement = ((SGuiItem) value).getItem();
+                                    if (value instanceof String) {
+                                        msAgreementReference =  (String) value;
+                                    }
+                                    else {
+                                        msAgreementReference = ((SGuiItem) value).getItem();
+                                    }
                                 }
-                            }
-                            else {
-                                msAccountCredit = ((SGuiItem) value).getItem();
-                            }
+                                break;
+                            case 14:
+                                if (value == null) {
+                                    msConceptCie = "";
+                                }
+                                else {
+                                    if (value instanceof String) {
+                                        msConceptCie =  (String) value;
+                                    }
+                                    else {
+                                        msConceptCie = ((SGuiItem) value).getItem();
+                                    }
+                                }
+                                break;
+                            case 15:
+                                msBeneficiaryEmail = (String) value;
+                                break;
+                            case 16:
+                            case 17:
+                            case 18:
+                            case 19:
+                            case 20:
+                            case 21:
+                                break;
+                            case 22:
+                                msObservations = (String) value;
+                                break;
+                            default:
+                                break;
                         }
-                        break;    
-                    case 5:
-                        if (value == null) {
-                            msAgreementReference = "";
+                        break;
+
+                    case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
+                        switch (col) {
+                            case 0:
+                            case 1:
+                                break;
+                            case 2:
+                                 moMoneyPayment.setOriginalAmount((double) value);
+                                break;
+                            case 3:
+                                break;
+                            case 4:   
+                                //Cuenta/Convenio
+                                if (value == null) {
+                                    msAgreement = "";
+                                    msBeneficiaryAccountNumber = "";
+                                }
+                                else {
+                                    if (!msAgreement.isEmpty()) {
+                                        if ( value instanceof String) {
+                                            msAgreement =  (String) value;
+                                        }
+                                        else {
+                                            msAgreement = ((SGuiItem) value).getItem();
+                                        }
+                                    }
+                                    else {
+                                        msBeneficiaryAccountNumber = ((SGuiItem) value).getItem();
+                                    }
+                                }
+                                break;    
+                            case 5:
+                                if (value == null) {
+                                    msAgreementReference = "";
+                                }
+                                else {
+                                    if (value instanceof String) {
+                                        msAgreementReference =  (String) value;
+                                    }
+                                    else {
+                                        msAgreementReference = ((SGuiItem) value).getItem();
+                                    }
+                                }
+                                break;
+                            case 6:
+                                if (value == null) {
+                                    msConceptCie = "";
+                                }
+                                else {
+                                    if (value instanceof String) {
+                                        msConceptCie =  (String) value;
+                                    }
+                                    else {
+                                        msConceptCie = ((SGuiItem) value).getItem();
+                                    }
+                                }
+                                break;
+                            case 7:
+                                msBeneficiaryEmail = (String) value;
+                                break;
+                            case 8:
+                                break;
+                            case 9:
+                                msReferenceRecord = (String) value;
+                                break;
+                            case 10:
+                                msObservations = (String) value;
+                                break;
+                            default:
                         }
-                        else {
-                            if ( value instanceof String) {
-                                msAgreementReference =  (String) value;
-                            }
-                            else {
-                                msAgreementReference = ((SGuiItem) value).getItem();
-                            }
-                        }
                         break;
-                    case 6:
-                        if (value == null) {
-                            msConceptCie = "";
-                        }
-                        else {
-                            if ( value instanceof String) {
-                                msConceptCie =  (String) value;
-                            }
-                            else {
-                                msConceptCie = ((SGuiItem) value).getItem();
-                            }
-                        }
-                        break;
-                    case 7:
-                        msEmail = (String) value;
-                        break;
-                    case 8:
-                        break;
-                    case 9:
-                        msReferenceRecord = (String) value;
-                        break;
-                    case 10:
-                        msObservations = (String) value;
-                        break;
+
                     default:
                 }
                 break;
+                
+            case MODE_DIALOG_CARDEX:
+                break;
+                
             default:
         }
     }

@@ -18,8 +18,7 @@ import erp.mfin.data.SFinUtilities;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.fin.util.STreasuryBankLayoutFile;
-import erp.mod.fin.util.STreasuryBankLayoutRequest;
+import erp.mtrn.data.STrnUtilities;
 import erp.print.SDataConstantsPrint;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -44,6 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -234,7 +234,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -368,7 +368,7 @@ public abstract class SHrsUtils {
                     
                     sAccountCredit = SLibUtilities.textTrim(resultSetDetail.getString("emp.bank_acc"));
                     balance = resultSetDetail.getDouble("pay_net");
-                    sBizPartner = SFinUtilities.getBizPartnerForBanamex(client.getSession(), resultSetDetail.getInt("rcp.id_emp"));
+                    sBizPartner = SFinUtilities.getBizPartnerForCitibanamex(client.getSession(), resultSetDetail.getInt("rcp.id_emp"));
                     nEmployeeBankAuxId = resultSetDetail.getInt("_bank_id");
                     nEmployeeBankId = nEmployeeBankAuxId == 0 ? moConfig.getFkBankId() : nEmployeeBankAuxId;
                     
@@ -423,7 +423,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -513,7 +513,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -824,7 +824,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -939,7 +939,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -1044,7 +1044,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -1860,7 +1860,7 @@ public abstract class SHrsUtils {
         return wage;
     }
 
-    public static HashMap<String, Object> createPayrollReceiptMap(final SGuiClient client, final int[] payrollKey, final int pnPrintMode) throws java.lang.Exception {
+    public static HashMap<String, Object> createPayrollReceiptMap(final SGuiClient client, final int[] payrollKey, final int pnPrintMode) throws Exception {
         double dTotalPercepciones = 0;
         double dTotalDeducciones = 0;
         SDbLoan loan = null;
@@ -2012,9 +2012,9 @@ public abstract class SHrsUtils {
      * @param client Interface Client
      * @param pnPrintMode print mode (e.g. SDataConstantsPrint.PRINT_MODE_)
      * @param payrollKey payrroll key
-     * @throws java.lang.Exception
+     * @throws Exception
      */
-    public static void printPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
+    public static void printPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws Exception {
         HashMap<String, Object> map = new HashMap<>();
         map = createPayrollReceiptMap(client, payrollKey, pnPrintMode);
         
@@ -2031,21 +2031,19 @@ public abstract class SHrsUtils {
         }
     }
     
-    public static void sendPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
-        boolean isSent = false;
-        HashMap<String, Object> map = new HashMap<>();
-        File pdf = null;
-        STreasuryBankLayoutRequest layoutRequest = new STreasuryBankLayoutRequest(client, null);
-        
-        map = createPayrollReceiptMap(client, payrollKey, pnPrintMode);
-        pdf = createPayrollReceipt(client, map);
+    public static void sendPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws Exception {
+        HashMap<String, Object> map = createPayrollReceiptMap(client, payrollKey, pnPrintMode);
+        File pdf = createPayrollReceipt(client, map);
         
         SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BP, new int[] { (Integer)map.get("nEmployeeId") }, SLibConstants.EXEC_MODE_SILENT);
-        String mail = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
+        String recipient = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
             
         if (pdf != null) {
-            isSent = layoutRequest.sendMail(null, "", pdf, STreasuryBankLayoutRequest.SND_TP_PAY_RCP, mail);
-            if (isSent) {
+            String subject = "Envío de recibo de nómina";
+            String body = "Se adjunta recibo de nómina en formato PDF.";
+            boolean sent = STrnUtilities.sendMailPdf((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_CFD, pdf, subject, body, recipient);
+            
+            if (sent) {
                 client.showMsgBoxInformation("El recibo de nómina ha sido enviado correctamente.\n");
             }
             else {
@@ -2054,7 +2052,7 @@ public abstract class SHrsUtils {
         }
     }
     
-    public static void sendPayrollReceipts(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
+    public static void sendPayrollReceipts(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws Exception {
         ArrayList<SDbPayrollReceipt> payrollReceipts = new ArrayList<>();
         SDbPayroll payroll = new SDbPayroll();
         payroll.read(client.getSession(), new int[] { payrollKey[0] });
@@ -2101,14 +2099,14 @@ public abstract class SHrsUtils {
             fos.write(reportBytes);
             fos.close();
         }
-        catch (Exception e) {
-            SLibUtils.showException(STreasuryBankLayoutFile.class, e);
+        catch (JRException | IOException e) {
+            SLibUtils.showException(SHrsUtils.class, e);
         }
         
         return file;  
     }
     
-    public static void printPrePayroll(final SGuiClient client, final int payrollKey) throws java.lang.Exception {
+    public static void printPrePayroll(final SGuiClient client, final int payrollKey) throws Exception {
         HashMap<String, Object> map = null;
         SDataBizPartner bizPartnerCompany = null;
 
