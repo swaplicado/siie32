@@ -5,6 +5,7 @@
 
 package erp.mod.fin.db;
 
+import erp.mod.SModSysConsts;
 import java.util.ArrayList;
 import java.util.HashSet;
 import sa.lib.SLibUtils;
@@ -28,7 +29,8 @@ public class SLayoutBankPayment {
     protected int mnBookkeepingNumberId_n;
     protected int mnAction;
     protected String msReferenceRecord;
-    protected String msPaymentObservations;
+    protected String msPrepaymentObservations;
+    protected String msPrepaymentEmail;
     
     protected ArrayList<SLayoutBankDps> maLayoutBankDpss;
 
@@ -42,7 +44,8 @@ public class SLayoutBankPayment {
         mnBookkeepingNumberId_n = 0;
         mnAction = 0;
         msReferenceRecord = "";
-        msPaymentObservations = "";
+        msPrepaymentObservations = "";
+        msPrepaymentEmail = "";
         
         maLayoutBankDpss = new ArrayList<>();
     }
@@ -56,7 +59,8 @@ public class SLayoutBankPayment {
     public void setBookkeepingNumberId_n(int n) { mnBookkeepingNumberId_n = n; }
     public void setAction(int n) { mnAction = n; }
     public void setReferenceRecord(String s) { msReferenceRecord = s; }
-    public void setPaymentObservations(String s) { msPaymentObservations = s; }
+    public void setPrepaymentObservations(String s) { msPrepaymentObservations = s; }
+    public void setPrepaymentEmail(String s) { msPrepaymentEmail = s; }
     
     public int getTransactionType() { return mnTransactionType; }
     public int getBizPartnerId() { return mnBizPartnerId; }
@@ -67,7 +71,8 @@ public class SLayoutBankPayment {
     public int getBookkeepingNumberId_n() { return mnBookkeepingNumberId_n; }
     public int getAction() { return mnAction; }
     public String getReferenceRecord() { return msReferenceRecord; }
-    public String getPaymentObservations() { return msPaymentObservations; }
+    public String getPrepaymentObservations() { return msPrepaymentObservations; }
+    public String getPrepaymentEmail() { return msPrepaymentEmail; }
     
     public ArrayList<SLayoutBankDps> getLayoutBankDpss() { return maLayoutBankDpss; }
 
@@ -81,12 +86,30 @@ public class SLayoutBankPayment {
     public ArrayList<String> getEmailRecipients() {
         HashSet<String> recipients = new HashSet<>();
         
-        for (SLayoutBankDps layoutBankDps : maLayoutBankDpss) {
-            String[] emails = SLibUtils.textExplode(layoutBankDps.getEmail(), ";");
-            for (String email : emails) {
-                recipients.add(email);
-            }
+        switch (mnTransactionType) {
+            case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
+                for (SLayoutBankDps layoutBankDps : maLayoutBankDpss) {
+                    String[] emails = SLibUtils.textExplode(layoutBankDps.getEmail(), ";");
+                    for (String email : emails) {
+                        recipients.add(email);
+                    }
+                }
+                break;
+                
+            case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
+                String[] emails = SLibUtils.textExplode(msPrepaymentEmail, ";");
+                for (String email : emails) {
+                    recipients.add(email);
+                }
+                break;
+                
+            case SModSysConsts.FINX_LAY_BANK_TRN_TP_OWN_TRANSFER:
+                // not supported yet!
+                break;
+                
+            default:
         }
+        
             
         return new ArrayList<>(recipients);
     }
@@ -102,7 +125,8 @@ public class SLayoutBankPayment {
         clone.setBookkeepingNumberId_n(this.getBookkeepingNumberId_n());
         clone.setAction(this.getAction());
         clone.setReferenceRecord(this.getReferenceRecord());
-        clone.setPaymentObservations(this.getPaymentObservations());
+        clone.setPrepaymentObservations(this.getPrepaymentObservations());
+        clone.setPrepaymentEmail(this.getPrepaymentEmail());
         
         for (SLayoutBankDps child : maLayoutBankDpss) {
             if (child != null) {

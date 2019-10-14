@@ -1290,7 +1290,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     layoutBankRow.setBizPartnerKey(resulSet.getString("bp_key"));
                     layoutBankRow.setBeneficiaryFiscalId(resulSet.getString("fiscal_id"));
                     
-                    layoutBankRow.setMoneyPayment(new SMoney(miClient.getSession(), 0d, 0, 1d));
+                    layoutBankRow.setMoneyPayment(new SMoney(miClient.getSession(), 0d, mnDpsCurrencyId, 1d));
                     layoutBankRow.setBalanceTotByBizPartner(0);
                     layoutBankRow.setPayerAccountCurrencyKey(resulSet.getString("_cur"));
                     layoutBankRow.setCurrencyId(mnDpsCurrencyId);
@@ -1322,6 +1322,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         rows.add(layoutBankRow);
                         mltAccountCredits.add(maBeneficiaryAccountGuiItems);
                     }
+                    
                     if (!maAgreementGuiItems.isEmpty()) {
                         mltAgreementsReferences.add(moAgreementReferencesMap.get(msAgreement));
                     }
@@ -1542,13 +1543,20 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         
                         SXmlBankLayoutPaymentDoc xmlBankLayoutPaymentDoc = (SXmlBankLayoutPaymentDoc) elementDoc;
                         
-                        int[] key = new int[] { SLibConsts.UNDEFINED };
+                        int[] key = null;
                         
                         if (isModeForTransfersOfPayments()) {
-                            key = new int[] { (Integer) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).getValue(), (Integer) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).getValue() };
+                            // DPS primary key:
+                            key = new int[] {
+                                (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).getValue(), 
+                                (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).getValue()
+                            };
                         }
                         else if (isModeForTransfersOfPrepayments()) {
-                            key = new int[] { (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BP).getValue() };
+                            // business parther primary key:
+                            key = new int[] {
+                                (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BP).getValue()
+                            };
                         }
                         
                         if (maAllLayoutBankRows != null) {
@@ -1564,6 +1572,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                     else {
                                         layoutBankRowInArray.setExchangeRate((double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXR).getValue());
                                     }
+                                    layoutBankRowInArray.getMoneyPayment().setOriginalCurrencyId((int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).getValue());
                                     layoutBankRowInArray.setBalancePayed((double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).getValue());
                                     layoutBankRowInArray.setBeneficiaryAccountNumber(layoutBankRowInArray.getBranchBankAccountCreditNumber(new int[] { (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BPB).getValue(), (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue() }, mnBankPaymentTypeId));
                                     layoutBankRowInArray.setAgreement((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).getValue());
