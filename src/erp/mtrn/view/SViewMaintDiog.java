@@ -284,7 +284,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 break;
             case SUtilConsts.PER_ITM:
                 aoKeyFields = new STableField[3];
-                aoTableColumns = new STableColumn[29];
+                aoTableColumns = new STableColumn[28];
                 break;
             default:
                 aoKeyFields = null;
@@ -320,7 +320,6 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "iog.val_r", "Total $", STableConstants.WIDTH_VALUE_2X);
         }
         if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
-            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "iogn.nts", "Comentarios", 150);
             aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "ioge.qty", "Cantidad", STableConstants.WIDTH_QUANTITY);
             aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", STableConstants.WIDTH_ITEM);
@@ -498,13 +497,13 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
         }
         
         Date date = moTabFilterDatePeriod.getDate();
-
+        
         msSql = "SELECT " ;
                 if (mnTabTypeAux02 == SUtilConsts.PER_DOC) {
                     msSql += "iog.id_year, iog.id_doc, iog.b_del, ";
                 }
                 else if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
-                    msSql +=  "ioge.id_year, ioge.id_doc, ioge.id_ety, ioge.b_del, iogn.nts, " ;
+                    msSql +=  "ioge.id_year, ioge.id_doc, ioge.id_ety, ioge.b_del, " ;
                 }
                 msSql += "iog.dt, iog.val_r, iog.b_audit, iog.b_authorn, iog.b_sys, " +
                 "CONCAT(iog.num_ser, IF(LENGTH(iog.num_ser) = 0, '', '-'), erp.lib_fix_int(iog.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS f_num, " +
@@ -525,20 +524,19 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 "INNER JOIN erp.cfgu_cob_ent AS ent ON iog.fid_cob = ent.id_cob AND iog.fid_wh = ent.id_ent " +
                 "INNER JOIN erp.usru_usr AS uaud ON iog.fid_usr_audit = uaud.id_usr " +
                 "INNER JOIN erp.usru_usr AS uaut ON iog.fid_usr_authorn = uaut.id_usr " +
-                "INNER JOIN trn_maint_user_supv AS supv ON iog.fid_maint_user_supv = supv.id_maint_user_supv ";
+                "INNER JOIN trn_maint_user_supv AS supv ON iog.fid_maint_user_supv = supv.id_maint_user_supv "; 
                 if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
                    msSql +=  "INNER JOIN trn_diog_ety AS ioge ON ioge.id_year = iog.id_year AND ioge.id_doc = iog.id_doc " +
-                            "INNER JOIN trn_diog_nts AS iogn ON iogn.id_year = iog.id_year AND iogn.id_doc = iog.id_doc " +
                             "INNER JOIN erp.itmu_item AS i ON i.id_item = ioge.fid_item " +
                             "INNER JOIN erp.itmu_unit AS unit ON unit.id_unit = ioge.fid_unit " +
                             "INNER JOIN trn_maint_area AS maint ON maint.id_maint_area = ioge.fid_maint_area ";
-                }
+                }                
                 msSql += "INNER JOIN erp.usru_usr AS un ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_new = un.id_usr " +
                 "INNER JOIN erp.usru_usr AS ue ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_edit = ue.id_usr " +
                 "INNER JOIN erp.usru_usr AS ud ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_del = ud.id_usr ";
                 if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
                     msSql += "LEFT OUTER JOIN " +
-                            "(SELECT *,1 COALESCE(t._ext_dbt / t._ext_mov_in, 0.0) AS _avg_prc " +
+                            "(SELECT *, COALESCE(t._ext_dbt / t._ext_mov_in, 0.0) AS _avg_prc " +
                             "FROM (" +
                             "SELECT id_item, id_unit, id_cob, id_wh, " +
                             "SUM(mov_in) AS _mov_in, SUM(mov_out) AS _mov_out, SUM(mov_in - mov_out) AS _stk, " +
