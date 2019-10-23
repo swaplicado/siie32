@@ -54,7 +54,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
      * @param auxType01 Use case of view: SModSysConsts.TRNX_MAINT_...
      */
     public SViewMaintStock(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
-        super(client, tabTitle, SDataConstants.TRNX_MAINT_STK, auxType01);
+        super(client, tabTitle, SDataConstants.TRNX_STK_ITEM, auxType01);
         initComponents();
     }
 
@@ -180,7 +180,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[9];
+                aoTableColumns = new STableColumn[10];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL_MAINT:
@@ -222,6 +222,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
         if (isMaintUserNeeded()) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_bp", "Responsable", 200);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "supv.name", "Residente", 200);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_signed", "Firmado", STableConstants.WIDTH_BOOLEAN);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "_diog_dt", "Primer movimiento", 100);
         }
         
@@ -393,7 +394,10 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 "IF(SUM(s.mov_in - s.mov_out) > sc.qty_max, " + STableConstants.ICON_WARN + ", " + STableConstants.ICON_VIEW_LIG_WHI + ")))) AS f_ico, " +
                 "SUM(s.mov_in) AS f_mov_i, " +
                 "SUM(s.mov_out) AS f_mov_o, " +
-                "SUM(s.mov_in - s.mov_out) AS f_stk " +
+                "SUM(s.mov_in - s.mov_out) AS f_stk, " +
+                "(SELECT COUNT(*) FROM trn_maint_diog_sig AS sig " +
+                "INNER JOIN trn_diog AS dio " +
+                "WHERE sig.fk_diog_year = dio.id_year AND sig.fk_diog_doc = dio.id_doc AND sig.ts_usr_ins >= dio.ts_edit) > 0 AS _signed "+
                 "FROM trn_stk AS s " +
                 "INNER JOIN erp.itmu_item AS i ON i.id_item = s.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON u.id_unit = s.id_unit " +
