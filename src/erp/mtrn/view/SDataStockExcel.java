@@ -14,27 +14,23 @@ public class SDataStockExcel  {
 
     private String msClave;
     private String msItem;
-    private int mnExistencias;
     private String msUnidad;
     private double mnCosto;
 
-    public SDataStockExcel(String clave, String item, int existencias, String unidad, double costo) {
+    public SDataStockExcel(String clave, String item, String unidad, double costo) {
         this.msClave = clave;
         this.msItem = item;
-        this.mnExistencias = existencias;
         this.msUnidad = unidad;
         this.mnCosto = costo;
     }
 
     public void setClave(String n) { msClave = n; }
     public void setItem(String n) { msItem = n; }
-    public void setExistencias(int n) { mnExistencias = n; }
     public void setUnidad(String n) { msUnidad = n; }
     public void setCosto(double n) { mnCosto = n; }
     
     public String getClave() { return msClave; }
     public String getItem() { return msItem; }
-    public int getExistencias() { return mnExistencias; }
     public String getUnidad() { return msUnidad; }
     public double getCosto() { return mnCosto; }
 }
