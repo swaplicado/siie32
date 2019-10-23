@@ -136,6 +136,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
     
     private javax.swing.JMenu jmMenuStk;
     private javax.swing.JMenuItem jmiStkStock;
+    private javax.swing.JMenuItem jmiStkStockValueCost;
     private javax.swing.JMenuItem jmiStkStockLot;
     private javax.swing.JMenuItem jmiStkStockWarehouse;
     private javax.swing.JMenuItem jmiStkStockWarehouseLot;
@@ -459,6 +460,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         
         jmMenuStk = new JMenu("Inventarios");
         jmiStkStock = new JMenuItem("Existencias");
+        jmiStkStockValueCost = new JMenuItem("Existencias valor ítem");
         jmiStkStockLot = new JMenuItem("Existencias por lote");
         jmiStkStockWarehouse = new JMenuItem("Existencias por almacén");
         jmiStkStockWarehouseLot = new JMenuItem("Existencias por almacén por lote");
@@ -469,6 +471,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiStkStockClosing = new JMenuItem("Generación de inventarios iniciales...");
         
         jmMenuStk.add(jmiStkStock);
+        jmMenuStk.add(jmiStkStockValueCost);
         jmMenuStk.add(jmiStkStockLot);
         jmMenuStk.addSeparator();
         jmMenuStk.add(jmiStkStockWarehouse);
@@ -483,6 +486,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmMenuStk.add(jmiStkStockClosing);
         
         jmiStkStock.addActionListener(this);
+        jmiStkStockValueCost.addActionListener(this);
         jmiStkStockLot.addActionListener(this);
         jmiStkStockWarehouse.addActionListener(this);
         jmiStkStockWarehouseLot.addActionListener(this);
@@ -862,6 +866,10 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
+                    break;
+                case SDataConstants.TRNX_STK_ITEM:
+                    viewClass = erp.mtrn.view.SViewStockCostUnit.class;
+                    title = "Existencias valor ítem";
                     break;
                 case SDataConstants.TRNX_STK_MOVES:
                     viewClass = erp.mtrn.view.SViewStockMoves.class;
@@ -1423,6 +1431,9 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiStkStock) {
                 showView(SDataConstants.TRN_STK, SDataConstants.TRNX_STK_STK);
+            }
+            else if (item == jmiStkStockValueCost) {
+                showView(SDataConstants.TRNX_STK_ITEM, SDataConstants.TRNX_STK_ITEM);
             }
             else if (item == jmiReportStockPeriod) {
                 menuRepStockPeriod();
