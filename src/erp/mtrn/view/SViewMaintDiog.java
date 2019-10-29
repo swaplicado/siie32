@@ -538,7 +538,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 "INNER JOIN erp.usru_usr AS ud ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_del = ud.id_usr ";
                 if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
                     msSql += "LEFT OUTER JOIN " +
-                            "(SELECT *, COALESCE(t._ext_dbt / t._ext_mov_in, 0.0) AS _avg_prc " +
+                            "(SELECT *,1 COALESCE(t._ext_dbt / t._ext_mov_in, 0.0) AS _avg_prc " +
                             "FROM (" +
                             "SELECT id_item, id_unit, id_cob, id_wh, " +
                             "SUM(mov_in) AS _mov_in, SUM(mov_out) AS _mov_out, SUM(mov_in - mov_out) AS _stk, " +
