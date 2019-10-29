@@ -1263,23 +1263,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-            /* 2019-10-28, Sergio Flores: Former query. If it is no longer used, please remove it!
-            String sql = "SELECT b.id_bp, b.bp, b.fiscal_id, bct.bp_key, bpb.id_bpb, bpb_con.email_01, " +
-                    "(SELECT cur_key FROM erp.cfgu_cur WHERE id_cur = (IF(bct.fid_cur_n IS NULL, (SELECT fid_cur FROM erp.cfg_param_erp), bct.fid_cur_n))) AS _cur " +
-                    "FROM erp.bpsu_bp AS b " +
-                    "INNER JOIN erp.bpsu_bp_ct AS bct ON  bct.id_bp = b.id_bp AND bct.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_SUP + " AND " +
-                    (mnDpsCurrencyId == 0 || !miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { mnDpsCurrencyId }) ? // this member is zero when associated combo box is clear, then result set will be empty
-                        "bct.fid_cur_n = " + mnDpsCurrencyId + " " : // currency is not the local one or is zero
-                        "(bct.fid_cur_n IS NULL OR bct.fid_cur_n = " + mnDpsCurrencyId + ") ") + // currency is the local one
-                    "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = b.id_bp AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " +
-                    "LEFT OUTER JOIN erp.bpsu_bpb_con AS bpb_con ON bpb.id_bpb = bpb_con.id_bpb AND bpb_con.id_con = " + SDataConstantsSys.BPSS_TP_CON_ADM + " " +
-                    "WHERE EXISTS (SELECT * FROM erp.bpsu_bank_acc AS ac WHERE bpb.id_bpb = ac.id_bpb AND ac.fid_bank " + 
-                    (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") " +
-                    "AND NOT b.b_del AND NOT bct.b_del " +
-                    "ORDER BY b.bp, b.id_bp; ";
-            */
-            
-            // Show beneficiaries that have bank accounts wich currency equals the requested one:
+            // Show beneficiaries that have bank accounts whose currency equals the requested one:
             
             String sql = "SELECT b.id_bp, b.bp, b.fiscal_id, bct.bp_key, bpb.id_bpb, bpb_con.email_01, " +
                     "'" + (mnDpsCurrencyId == 0 ? "" : miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { mnDpsCurrencyId })) + "' AS _cur " +

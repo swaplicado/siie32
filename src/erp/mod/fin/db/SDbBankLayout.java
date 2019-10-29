@@ -1266,7 +1266,7 @@ public class SDbBankLayout extends SDbRegistryUser {
             SDocumentRequestRow documentRequestRow = new SDocumentRequestRow();
             documentRequestRow.setBank(dataBizPartnerBranchBankAccount.getDbmsBank());
             
-            if (mnFkBankLayoutTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+            if (mnXtaBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
                 documentRequestRow.setBankAccount(paymentRow.getAgreement() + "/" + paymentRow.getAgreementReference());
             }
             else {

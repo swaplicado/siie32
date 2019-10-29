@@ -492,7 +492,7 @@ public abstract class SHrsUtils {
                     n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
                      
                     buffer += SLibUtilities.textRepeat("0", 9 - n).concat(nMoveNum++ + "");
-                    buffer += SLibUtilities.textRepeat(" ", 16); // Blank
+                    buffer += SLibUtilities.textRepeat(" ", 16); // blank
                     buffer += "99";
                     buffer += sAccountCredit.concat(sAccountCredit.length() > 20 ? sAccountCredit.substring(0,20) : (SLibUtilities.textRepeat(" ", (sAccountCredit.length() == 20 ? 0 : 20 - sAccountCredit.length())))); 
                     buffer += formatDesc.format(balance).replace(".", "");
@@ -634,7 +634,7 @@ public abstract class SHrsUtils {
      * @return
      * @throws SQLException 
      */
-    private static ArrayList prepareSqlQueryHigh(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    private static ArrayList<Integer> prepareSqlQueryHigh(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateIni = formatter.format(dateApplicationIni);
         String dateEnd = formatter.format(dateApplicationEnd);
@@ -647,11 +647,12 @@ public abstract class SHrsUtils {
                 + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_ACTIVE ;
 
         resultSet = client.getSession().getStatement().executeQuery(sqlId);
-        ArrayList <Integer> resultsId = new ArrayList();
+        ArrayList<Integer> resultsId = new ArrayList<>();
 
         while (resultSet.next()) {
           resultsId.add(resultSet.getInt("id_emp"));                  
         }
+        
         return resultsId;
     }
     
@@ -663,7 +664,7 @@ public abstract class SHrsUtils {
      * @return
      * @throws SQLException 
      */
-    private static ArrayList prepareSqlQueryMod(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    private static ArrayList<Integer> prepareSqlQueryMod(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateIni = formatter.format(dateApplicationIni);
         String dateEnd = formatter.format(dateApplicationEnd);
@@ -676,7 +677,7 @@ public abstract class SHrsUtils {
                 + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del ";        
 
         resultSet = client.getSession().getStatement().executeQuery(sqlId);
-        ArrayList <Integer> resultsId = new ArrayList();
+        ArrayList<Integer> resultsId = new ArrayList<>();
 
         while (resultSet.next()) {
           resultsId.add(resultSet.getInt("id_emp"));                  
@@ -692,7 +693,7 @@ public abstract class SHrsUtils {
      * @return
      * @throws SQLException 
      */
-    private static ArrayList prepareSqlQueryLow(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    private static ArrayList<Integer> prepareSqlQueryLow(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateIni = formatter.format(dateApplicationIni);
         String dateEnd = formatter.format(dateApplicationEnd);
@@ -705,7 +706,7 @@ public abstract class SHrsUtils {
                 + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + " "; 
 
         resultSet = client.getSession().getStatement().executeQuery(sqlId);
-        ArrayList <Integer> resultsId = new ArrayList();
+        ArrayList<Integer> resultsId = new ArrayList<>();
 
         while (resultSet.next()) {
           resultsId.add(resultSet.getInt("id_emp"));                  
@@ -753,7 +754,7 @@ public abstract class SHrsUtils {
             try {
                 statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
-                ArrayList <Integer> pkPrimaryK = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
+                ArrayList<Integer> pkPrimaryK = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
     
                 for (int i = 0; i <= pkPrimaryK.size()-1; i++){
                 int pkUser = pkPrimaryK.get(i);
@@ -870,7 +871,7 @@ public abstract class SHrsUtils {
             try {
                 statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
-                ArrayList <Integer> pkPrimaryK = prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
+                ArrayList<Integer> pkPrimaryK = prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
     
                 for (int i = 0; i <= pkPrimaryK.size()-1; i++){
                     int pkUser = pkPrimaryK.get(i);
@@ -983,7 +984,7 @@ public abstract class SHrsUtils {
             try {
                 statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
-                ArrayList <Integer> pkPrimaryK = prepareSqlQueryLow(client, dateLayoutStart, dateLayoutEnd);
+                ArrayList<Integer> pkPrimaryK = prepareSqlQueryLow(client, dateLayoutStart, dateLayoutEnd);
     
                 for (int i = 0; i <= pkPrimaryK.size()-1; i++){
                 int pkUser = pkPrimaryK.get(i);
@@ -1869,8 +1870,8 @@ public abstract class SHrsUtils {
         SDbPayroll payroll = null;
         SDbPayrollReceipt payrollReceipt = null;
         HashMap<String, Object> map = null;
-        ArrayList aPercepciones = null;
-        ArrayList aDeducciones = null;
+        ArrayList<Object> aPercepciones = null;
+        ArrayList<Object> aDeducciones = null;
         DecimalFormat oFixedFormatAux = null;
 
         payroll = new SDbPayroll();
@@ -1926,8 +1927,8 @@ public abstract class SHrsUtils {
 
         map.put("Ejercicio", payroll.getPeriodYear() + "-" + oFixedFormatAux.format(payroll.getPeriod()));
 
-        aPercepciones = new ArrayList();
-        aDeducciones = new ArrayList();
+        aPercepciones = new ArrayList<>();
+        aDeducciones = new ArrayList<>();
 
         dTotalPercepciones = 0;
         dTotalDeducciones = 0;

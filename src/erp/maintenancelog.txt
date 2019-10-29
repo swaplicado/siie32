@@ -1,4 +1,12 @@
 ================================================================================
+2019-10-29, 3.2 145.4
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección de manejo equívoco en arreglos independientes de empleados disponibles y seleccionados para layout bancario de dispersión de nóminas.
+2) Corrección de texto omitido convenio/referencia en solicitudes de autorización de pagos para layouts bancarios de convenios, p. ej., BBVA CIE.
+3) Corrección consulta documentos de consumos de refacciones a detalle.
+
+================================================================================
 2019-10-28, 3.2 145.3
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
