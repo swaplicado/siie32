@@ -1262,7 +1262,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            
+
+            /* 2019-10-28, Sergio Flores: Former query. If it is no longer used, please remove it!
             String sql = "SELECT b.id_bp, b.bp, b.fiscal_id, bct.bp_key, bpb.id_bpb, bpb_con.email_01, " +
                     "(SELECT cur_key FROM erp.cfgu_cur WHERE id_cur = (IF(bct.fid_cur_n IS NULL, (SELECT fid_cur FROM erp.cfg_param_erp), bct.fid_cur_n))) AS _cur " +
                     "FROM erp.bpsu_bp AS b " +
@@ -1276,7 +1277,21 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") " +
                     "AND NOT b.b_del AND NOT bct.b_del " +
                     "ORDER BY b.bp, b.id_bp; ";
-
+            */
+            
+            // Show beneficiaries that have bank accounts wich currency equals the requested one:
+            
+            String sql = "SELECT b.id_bp, b.bp, b.fiscal_id, bct.bp_key, bpb.id_bpb, bpb_con.email_01, " +
+                    "'" + (mnDpsCurrencyId == 0 ? "" : miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { mnDpsCurrencyId })) + "' AS _cur " +
+                    "FROM erp.bpsu_bp AS b " +
+                    "INNER JOIN erp.bpsu_bp_ct AS bct ON  bct.id_bp = b.id_bp AND bct.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_SUP + " " +
+                    "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = b.id_bp AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " +
+                    "LEFT OUTER JOIN erp.bpsu_bpb_con AS bpb_con ON bpb.id_bpb = bpb_con.id_bpb AND bpb_con.id_con = " + SDataConstantsSys.BPSS_TP_CON_ADM + " " +
+                    "WHERE EXISTS (SELECT * FROM erp.bpsu_bank_acc AS ac WHERE bpb.id_bpb = ac.id_bpb AND ac.fid_cur = " + mnDpsCurrencyId + " AND ac.fid_bank " + 
+                    (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") " +
+                    "AND NOT b.b_del AND NOT bct.b_del " +
+                    "ORDER BY b.bp, b.id_bp; ";
+            
             try (ResultSet resulSet = miClient.getSession().getStatement().executeQuery(sql)) {
                 while (resulSet.next()) {
                     SLayoutBankRow layoutBankRow = new SLayoutBankRow(miClient, SLayoutBankRow.MODE_FORM_EDITION);
@@ -1290,7 +1305,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     layoutBankRow.setBizPartnerKey(resulSet.getString("bp_key"));
                     layoutBankRow.setBeneficiaryFiscalId(resulSet.getString("fiscal_id"));
                     
-                    layoutBankRow.setMoneyPayment(new SMoney(miClient.getSession(), 0d, 0, 1d));
+                    layoutBankRow.setMoneyPayment(new SMoney(miClient.getSession(), 0d, mnDpsCurrencyId, 1d));
                     layoutBankRow.setBalanceTotByBizPartner(0);
                     layoutBankRow.setPayerAccountCurrencyKey(resulSet.getString("_cur"));
                     layoutBankRow.setCurrencyId(mnDpsCurrencyId);
@@ -1322,6 +1337,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         rows.add(layoutBankRow);
                         mltAccountCredits.add(maBeneficiaryAccountGuiItems);
                     }
+                    
                     if (!maAgreementGuiItems.isEmpty()) {
                         mltAgreementsReferences.add(moAgreementReferencesMap.get(msAgreement));
                     }
@@ -1542,13 +1558,20 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         
                         SXmlBankLayoutPaymentDoc xmlBankLayoutPaymentDoc = (SXmlBankLayoutPaymentDoc) elementDoc;
                         
-                        int[] key = new int[] { SLibConsts.UNDEFINED };
+                        int[] key = null;
                         
                         if (isModeForTransfersOfPayments()) {
-                            key = new int[] { (Integer) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).getValue(), (Integer) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).getValue() };
+                            // DPS primary key:
+                            key = new int[] {
+                                (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_YEAR).getValue(), 
+                                (int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_DPS_DOC).getValue()
+                            };
                         }
                         else if (isModeForTransfersOfPrepayments()) {
-                            key = new int[] { (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BP).getValue() };
+                            // business parther primary key:
+                            key = new int[] {
+                                (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BP).getValue()
+                            };
                         }
                         
                         if (maAllLayoutBankRows != null) {
@@ -1564,6 +1587,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                     else {
                                         layoutBankRowInArray.setExchangeRate((double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXR).getValue());
                                     }
+                                    layoutBankRowInArray.getMoneyPayment().setOriginalCurrencyId((int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).getValue());
                                     layoutBankRowInArray.setBalancePayed((double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).getValue());
                                     layoutBankRowInArray.setBeneficiaryAccountNumber(layoutBankRowInArray.getBranchBankAccountCreditNumber(new int[] { (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BPB).getValue(), (int) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_BANK_BANK).getValue() }, mnBankPaymentTypeId));
                                     layoutBankRowInArray.setAgreement((String) xmlBankLayoutPayment.getAttribute(SXmlBankLayoutPayment.ATT_LAY_PAY_AGREE).getValue());

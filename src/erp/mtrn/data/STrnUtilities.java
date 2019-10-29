@@ -2873,7 +2873,8 @@ public abstract class STrnUtilities {
         return "<p" + (htmlClass.isEmpty() ? "" : " class=\"" +  htmlClass+ "\"") + ">"
                 + "<b>Favor de no responder a este correo-e.</b><br>"
                 + "Fue generado de forma automatica con " + SClient.APP_NAME + " | &copy;" + SClient.APP_COPYRIGHT + " " + SClient.VENDOR + "<br>"
-                + "tel.: " + SClient.VENDOR_PHONE + " | mail: " + SClient.VENDOR_MAIL + " | web: " + SClient.VENDOR_WEBSITE
+                + "tel.: " + SClient.VENDOR_PHONE + " | mail: " + SClient.VENDOR_MAIL + " | web: " + SClient.VENDOR_WEBSITE + "<br>"
+                + SClient.APP_RELEASE
                 + "</p>";
     }
         

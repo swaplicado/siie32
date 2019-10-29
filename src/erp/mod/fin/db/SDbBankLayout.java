@@ -1129,7 +1129,8 @@ public class SDbBankLayout extends SDbRegistryUser {
                             // is a prepayment:
                             
                             layoutBankPayment.setTransactionType(SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY);
-                            layoutBankPayment.setPaymentObservations(observations);
+                            layoutBankPayment.setPrepaymentObservations(observations);
+                            layoutBankPayment.setPrepaymentEmail(email);
                         }
                         else {
                             // is a payment:

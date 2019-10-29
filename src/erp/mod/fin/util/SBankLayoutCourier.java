@@ -64,7 +64,7 @@ public class SBankLayoutCourier extends Thread {
                 + paymentRow.getBizPartner() + ":"
                 + "</p>"
                 + "<p>"
-                + "Se programó una transferencia a tu cuenta " + paymentRow.getBeneficiaryAccountBankName() + " con terminación " + paymentRow.getBeneficiaryAccountNumberShort() + "."
+                + "Se programo una transferencia a tu cuenta " + paymentRow.getBeneficiaryAccountBankName() + " con terminacion " + paymentRow.getBeneficiaryAccountNumberShort() + "."
                 + "</p>"
                 + "<p>"
                 + "Importe: $" + SLibUtils.getDecimalFormatAmount().format(paymentRow.getPayment()) + " " + miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { paymentRow.getCurrencyId() }) + "."
@@ -105,12 +105,12 @@ public class SBankLayoutCourier extends Thread {
                 // this type of payment does not contain individual payments:
                 
                 mailBody += "<p>"
-                        + "Motivo: " + payment.getPaymentObservations()
+                        + "Motivo: " + payment.getPrepaymentObservations()
                         + "</p>";
                 break;
                 
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_OWN_TRANSFER:
-                // not supported yet
+                // not supported yet!
                 break;
             default:
         }
@@ -124,8 +124,8 @@ public class SBankLayoutCourier extends Thread {
                 + "<p>"
                 + "<small>"
                 + "P.D.<br>"
-                + "Verás reflejado el movimiento en tu cuenta en unos minutos más.<br>"
-                + "Para recibir adecuadamente estas notificaciones, agréganos a tu lista de contactos."
+                + "Veras reflejado el movimiento en tu cuenta en unos minutos mas.<br>"
+                + "Para recibir adecuadamente estas notificaciones, agreganos a tu lista de contactos."
                 + "</small>"
                 + "</p>";
         

@@ -1,10 +1,16 @@
 ================================================================================
+2019-10-28, 3.2 145.3
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección de consulta para la obtención de beneficiarios de anticipos en moneda extranjera.
+
+================================================================================
 2019-10-23, 3.2 145.2
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
-1) Implementación del status firma en Stock herramientas en préstamos (Invetarios)
-2) Implementación de la columna 'comentarios' Docs. consumos refacciones a detalle (Invetarios)
-3) Implementación de vista Existencias valor ítem, para control de precios unitarios para MP
+1) Implementación del status firma en stock herramientas en préstamos (Invetarios).
+2) Implementación de la columna 'comentarios' en "Docs. consumos refacciones a detalle (Invetarios)".
+3) Implementación de vista 'Existencias valor ítem', para control de precios unitarios para MP Software.
 
 ================================================================================
 2019-10-10, 3.2 145.1
