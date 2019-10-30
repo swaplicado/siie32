@@ -88,28 +88,33 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
 
         if (isViewForCategoryPur()) {
             if (isViewForEstimate()) {
-                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_EST).Level >= SUtilConsts.LEV_EDITOR;
+                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_EST).Level >= SUtilConsts.LEV_EDITOR ||
+                        miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_PUR_DOC_EST_CLO);
                 hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_EST).Level == SUtilConsts.LEV_MANAGER;
                 levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_EST).Level;
             }
             else if (isViewForOrder()) {
-                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level >= SUtilConsts.LEV_EDITOR;
+                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level >= SUtilConsts.LEV_EDITOR ||
+                        miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_PUR_DOC_ORD_CLO);
                 hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level == SUtilConsts.LEV_MANAGER;
                 levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_ORD).Level;
             }
         }
         else {
             if (isViewForEstimate()) {
-                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_EST).Level >= SUtilConsts.LEV_EDITOR;
+                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_EST).Level >= SUtilConsts.LEV_EDITOR ||
+                        miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_SAL_DOC_EST_CLO);
                 hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_EST).Level == SUtilConsts.LEV_MANAGER;
                 levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_EST).Level;
             }
             else if (isViewForOrder()) {
-                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level >= SUtilConsts.LEV_EDITOR;
+                hasRightToClose = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level >= SUtilConsts.LEV_EDITOR ||
+                        miClient.getSessionXXX().getUser().hasPrivilege(SDataConstantsSys.PRV_SAL_DOC_ORD_CLO);
                 hasRightToOpen = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level == SUtilConsts.LEV_MANAGER;
                 levelDoc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_ORD).Level;
             }
         }
+        
         mbHasRightAuthor = levelDoc == SUtilConsts.LEV_AUTHOR;
 
         mjbClose = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_CLOSE));

@@ -213,6 +213,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_PUR_PRICE_CHG = 103031;
     public static final int PRV_PUR_CRED_CONFIG = 103041;
     public static final int PRV_PUR_ITEM_SUP = 103051;
+    public static final int PRV_PUR_DOC_EST_CLO = 103056;
+    public static final int PRV_PUR_DOC_ORD_CLO = 103057;
     public static final int PRV_PUR_REP = 103901;
 
     public static final int PRV_SAL_DPS_DNS = 104001;
@@ -239,6 +241,8 @@ public abstract class SDataConstantsSys {
     public static final int PRV_SAL_DOC_OMT_DOC_SRC = 104024;
     public static final int PRV_SAL_PRICE_CHG = 104031;
     public static final int PRV_SAL_CRED_CONFIG = 104041;
+    public static final int PRV_SAL_DOC_EST_CLO = 104056;
+    public static final int PRV_SAL_DOC_ORD_CLO = 104057;
     public static final int PRV_SAL_COMP_MON_EXT = 104061;
     public static final int PRV_SAL_REP = 104901;
 
