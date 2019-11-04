@@ -37,7 +37,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.lib.form.SFormExtendedInterface, java.awt.event.ActionListener {
 
@@ -166,7 +166,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         jpBranchAddress = new javax.swing.JPanel();
         jpOficialAddress = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
-        jckIsAddress = new javax.swing.JCheckBox();
+        jckCaptureAddress = new javax.swing.JCheckBox();
         jPanel17 = new javax.swing.JPanel();
         jPanel16 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
@@ -429,14 +429,14 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
 
         jPanel21.setLayout(new java.awt.BorderLayout());
 
-        jckIsAddress.setText("Capturar domicilio");
-        jckIsAddress.setPreferredSize(new java.awt.Dimension(250, 23));
-        jckIsAddress.addItemListener(new java.awt.event.ItemListener() {
+        jckCaptureAddress.setText("Capturar domicilio");
+        jckCaptureAddress.setPreferredSize(new java.awt.Dimension(250, 23));
+        jckCaptureAddress.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jckIsAddressItemStateChanged(evt);
+                jckCaptureAddressItemStateChanged(evt);
             }
         });
-        jPanel21.add(jckIsAddress, java.awt.BorderLayout.CENTER);
+        jPanel21.add(jckCaptureAddress, java.awt.BorderLayout.CENTER);
 
         jpBranchAddress.add(jPanel21, java.awt.BorderLayout.NORTH);
 
@@ -554,9 +554,9 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         }
     }//GEN-LAST:event_jcbFkBizPartnerIdentityTypeIdItemStateChanged
 
-    private void jckIsAddressItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckIsAddressItemStateChanged
-        itemStateChangedIsAddress();
-    }//GEN-LAST:event_jckIsAddressItemStateChanged
+    private void jckCaptureAddressItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckCaptureAddressItemStateChanged
+        itemStateChangedCaptureAddress();
+    }//GEN-LAST:event_jckCaptureAddressItemStateChanged
 
     private void jckIsAttEmployeeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jckIsAttEmployeeItemStateChanged
         itemStateChangedIsAttEmployee();
@@ -622,7 +622,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         moFieldKey.setLengthMax(25);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
         moFieldIsCategoryDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsCategoryDeleted);
-        moFieldIsAddress = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsAddress);
+        moFieldIsAddress = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckCaptureAddress);
         moFieldEmail = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfEmail, jlEmail);
         moFieldEmail.setLengthMax(50);
         moFieldEmail.setAutoCaseType(SLibConstants.UNDEFINED);
@@ -687,8 +687,8 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         renderBizPartnerCategories();
     }
 
-    private void itemStateChangedIsAddress() {
-        moPanelBizPartnerBranchAddress.setFieldsEnabled(jckIsAddress.isSelected());
+    private void itemStateChangedCaptureAddress() {
+        moPanelBizPartnerBranchAddress.setFieldsEnabled(jckCaptureAddress.isSelected());
     }
     
     private void itemStateChangedIsAttEmployee() {
@@ -965,7 +965,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
     private javax.swing.JComboBox jcbFkBizPartnerCategoryId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkBizPartnerIdentityTypeId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkBizPartnerTypeId;
-    private javax.swing.JCheckBox jckIsAddress;
+    private javax.swing.JCheckBox jckCaptureAddress;
     private javax.swing.JCheckBox jckIsAttBank;
     private javax.swing.JCheckBox jckIsAttCarrier;
     private javax.swing.JCheckBox jckIsAttEmployee;
@@ -1043,8 +1043,8 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
         renderKey();
         moPanelBizPartnerBranchAddress.formReset();
         moPanelBizPartnerBranchAddress.setParamIsInMainWindow(true);
-        jckIsAddress.setSelected(false);
-        itemStateChangedIsAddress();
+        jckCaptureAddress.setSelected(false);
+        itemStateChangedCaptureAddress();
 
         mnPkContactId = 0;
         jckIsDeleted.setEnabled(false);
@@ -1145,7 +1145,7 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
             }
         }
 
-        if (!validation.getIsError() && jckIsAddress.isSelected()) {
+        if (!validation.getIsError() && jckCaptureAddress.isSelected()) {
             validation = moPanelBizPartnerBranchAddress.formValidate();
         }
 
@@ -1240,8 +1240,8 @@ public class SFormBizPartnerSimple extends javax.swing.JDialog implements erp.li
             moFieldEmail.setFieldValue(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01());
         }
 
-        jckIsAddress.setSelected(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreet().length() > 0);
-        itemStateChangedIsAddress();
+        jckCaptureAddress.setSelected(moBizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getStreet().length() > 0);
+        itemStateChangedCaptureAddress();
 
         jckIsDeleted.setEnabled(true);
         jckIsCategoryDeleted.setEnabled(true);

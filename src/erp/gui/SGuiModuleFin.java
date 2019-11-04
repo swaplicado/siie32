@@ -1990,28 +1990,28 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 showView(SDataConstants.TRN_CTR);
             }
             else if (item == jmiFinLayoutBank) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PAY, null);
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY, null);
             }
             else if (item == jmiFinLayoutBankPending) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PAY, new SGuiParams(SModConsts.VIEW_ST_PEND));
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY, new SGuiParams(SModConsts.VIEW_ST_PEND));
             }
             else if (item == jmiFinLayoutBankDone) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PAY, new SGuiParams(SModConsts.VIEW_ST_DONE));
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY, new SGuiParams(SModConsts.VIEW_ST_DONE));
             }
             else if (item == jmiFinLayoutBankAdvances) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PREPAY, null);
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY, null);
             }
             else if (item == jmiFinLayoutBankPendingAdvances) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PREPAY, new SGuiParams(SModConsts.VIEW_ST_PEND));
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY, new SGuiParams(SModConsts.VIEW_ST_PEND));
             }
             else if (item == jmiFinLayoutBankDoneAdvances) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_PREPAY, new SGuiParams(SModConsts.VIEW_ST_DONE));
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK, SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY, new SGuiParams(SModConsts.VIEW_ST_DONE));
             }
             else if (item == jmiFinCfdPayment) {
                 miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY_REC);
             }
             else if (item == jmiFinImportPayments) {
-                miClient.getSession().showView(SModConsts.FIN_LAY_BANK_DEP, SModSysConsts.FIN_LAY_BANK_PAY, null);
+                miClient.getSession().showView(SModConsts.FIN_LAY_BANK_DEP, SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY, null);
             }
             else if (item == jmiRepTrialBalStandard) {
                 new SDialogRepTrialBalanceDual(miClient, SDataConstants.FIN_ACC, false).setVisible(true);

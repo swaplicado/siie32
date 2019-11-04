@@ -44,7 +44,7 @@ import sa.lib.gui.SGuiSession;
 import sa.lib.xml.SXmlElement;
 
 /**
- * Processing and utilities of the importation of payments bancomer CIE
+ * Processing and utilities of the importation of payments BBVA CIE
  * 
  * @author Edwin Carmona, Sergio Flores
  */
@@ -184,7 +184,7 @@ public class SImportPayments {
             }
         }
         catch (Exception e) {
-            SLibUtils.printException(SBankLayoutUtils.class.getName(), e);
+            SLibUtils.printException(SImportPayments.class.getName(), e);
         }
 
         return key;

@@ -13,7 +13,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Sergio Flores
  */
 public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -247,6 +247,7 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
         msDbmsDestinyCurrencyKey = "";
         msDbmsDestinyAccount = "";
         msDbmsDestinyDps = "";
+        msDbmsDestinyTpDps = "";
         msDbmsUserNew = "";
         msDbmsUserEdit = "";
         msDbmsUserDelete = "";

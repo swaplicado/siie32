@@ -1,4 +1,49 @@
 ================================================================================
+2019-10-29, 3.2 146.0
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de permisos para cerrar cotizaciones y pedidos.
+
+================================================================================
+2019-10-29, 3.2 145.4
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección de manejo equívoco en arreglos independientes de empleados disponibles y seleccionados para layout bancario de dispersión de nóminas.
+2) Corrección de texto omitido convenio/referencia en solicitudes de autorización de pagos para layouts bancarios de convenios, p. ej., BBVA CIE.
+3) Corrección consulta documentos de consumos de refacciones a detalle.
+
+================================================================================
+2019-10-28, 3.2 145.3
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección de consulta para la obtención de beneficiarios de anticipos en moneda extranjera.
+
+================================================================================
+2019-10-23, 3.2 145.2
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Implementación del status firma en stock herramientas en préstamos (Invetarios).
+2) Implementación de la columna 'comentarios' en "Docs. consumos refacciones a detalle (Invetarios)".
+3) Implementación de vista 'Existencias valor ítem', para control de precios unitarios para MP Software.
+
+================================================================================
+2019-10-10, 3.2 145.1
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al estatus habilitado erróneo de campo de captura estado en panel de domicilios de sucursales de asociados de negocios.
+2) Refactorización a la funcionalidad de generación y aplicación de pagos de layouts bancarios.
+3) Implementación notificación mail en la generación de layouts bancarios para la dispersión masiva de pagos.
+
+================================================================================
+2019-09-26, 3.2 145.0
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Remoción de privilegio Catálogo Usuarios del Rol Administrador Configuración.
+2) Corrección a estatus inhabilitado de campos de captura de contraseña en copia de usuarios.
+3) Refactorizacion de funcionalidades de cierre y reapertura de nóminas.
+4) Corrección a la determinación si un CFDI es editable (si no está timbrado y emitido (vivo), o si está timbrado pero cancelado).
+
+================================================================================
 2019-09-24, 3.2 144.0
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

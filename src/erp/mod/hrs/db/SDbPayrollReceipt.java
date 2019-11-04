@@ -97,12 +97,12 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
     
-    protected Date mtAuxDateIssue;
-    
     protected SDbPayrollReceiptIssue moChildPayrollReceiptIssue;
     protected ArrayList<SDbPayrollReceiptEarning> maChildPayrollReceiptEarnings;
     protected ArrayList<SDbPayrollReceiptDeduction> maChildPayrollReceiptDeductions;
     protected ArrayList<SDbAbsenceConsumption> maChildAbsenceConsumptions;
+    
+    protected Date mtAuxDateOfIssue;
     
     public SDbPayrollReceipt() {
         super(SModConsts.HRS_PAY_RCP);
@@ -320,10 +320,6 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
-    public void setAuxDateIssue(Date t) { mtAuxDateIssue = t; }
-
-    public Date getAuxDateIssue() { return mtAuxDateIssue; }
-    
     public void setChildPayrollReceiptIssue(SDbPayrollReceiptIssue o) { moChildPayrollReceiptIssue = o; }
 
     public SDbPayrollReceiptIssue getChildPayrollReceiptIssue() { return moChildPayrollReceiptIssue; }
@@ -331,7 +327,11 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public ArrayList<SDbPayrollReceiptDeduction> getChildPayrollReceiptDeductions() { return maChildPayrollReceiptDeductions; }
     public ArrayList<SDbAbsenceConsumption> getChildAbsenceConsumption() { return maChildAbsenceConsumptions; }
     
-    public void createIssues(final SGuiSession session) throws Exception {
+    public void setAuxDateOfIssue(Date t) { mtAuxDateOfIssue = t; }
+
+    public Date getAuxDateOfIssue() { return mtAuxDateOfIssue; }
+    
+    public void createPayrollReceiptIssue(final SGuiSession session) throws Exception {
         int issueId = 0;
         String numberSerie = "";
         int number = 0;
@@ -343,7 +343,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             issueId = moChildPayrollReceiptIssue.getPkIssueId();
             numberSerie = moChildPayrollReceiptIssue.getNumberSeries();
             number = moChildPayrollReceiptIssue.getNumber();
-            mtAuxDateIssue = moChildPayrollReceiptIssue.getDateIssue();
+            mtAuxDateOfIssue = moChildPayrollReceiptIssue.getDateIssue();
             paymentSystemType = moChildPayrollReceiptIssue.getFkPaymentSystemTypeId();
         }
         
@@ -355,8 +355,8 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             payrollReceiptIssues.setPkIssueId(issueId);
             payrollReceiptIssues.setNumberSeries(numberSerie); // update when generate CFDI
             payrollReceiptIssues.setNumber(number); // update when generate CFDI
-            payrollReceiptIssues.setDateIssue(mtAuxDateIssue); // update when generate CFDI
-            payrollReceiptIssues.setDatePayment(mtAuxDateIssue); // update when generate CFDI
+            payrollReceiptIssues.setDateIssue(mtAuxDateOfIssue); // update when generate CFDI
+            payrollReceiptIssues.setDatePayment(mtAuxDateOfIssue); // update when generate CFDI
             payrollReceiptIssues.setBankAccount(""); // update when generate CFDI
             payrollReceiptIssues.setEarnings_r(mdEarnings_r);
             payrollReceiptIssues.setDeductions_r(mdDeductions_r);
@@ -375,14 +375,14 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         }
     }
     
-    public void updateToNewStatusIssues(final SGuiSession session) throws Exception {
-        if (moChildPayrollReceiptIssue != null && moChildPayrollReceiptIssue.getFkReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_EMITED && !moChildPayrollReceiptIssue.isStamped()) {
+    public void updatePayrollReceiptIssueAsNewOne(final SGuiSession session) throws Exception {
+        if (moChildPayrollReceiptIssue != null && moChildPayrollReceiptIssue.isCfdEditable()) {
             moChildPayrollReceiptIssue.setFkReceiptStatusId(SModSysConsts.TRNS_ST_DPS_NEW);
             moChildPayrollReceiptIssue.save(session);
         }
     }
     
-    public String getIssueNumber() {
+    public String getPayrollReceiptIssueNumber() {
         return moChildPayrollReceiptIssue == null ? "" : moChildPayrollReceiptIssue.getPayrollReceiptIssueNumber();
     }
 
@@ -405,7 +405,11 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         return effectiveSalary;
     }
     
-    public double getPaymentMonthly() {
+    /**
+     * Gets monthly payment recorded on (fortnightly payrolls) or calculated (weekly payrolls) from the receipt.
+     * @return Monthly payment.
+     */
+    public double getMonthlyPayment() {
         double paymentMonthly;
         
         if (mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_WEE) {
@@ -504,7 +508,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
-        mtAuxDateIssue = null;
+        mtAuxDateOfIssue = null;
 
         maChildPayrollReceiptEarnings = new ArrayList<>();
         maChildPayrollReceiptDeductions = new ArrayList<>();
@@ -662,7 +666,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                 if (resultSet.next()) {
                     moChildPayrollReceiptIssue = new SDbPayrollReceiptIssue();
                     moChildPayrollReceiptIssue.read(session, new int[] { mnPkPayrollId, mnPkEmployeeId, resultSet.getInt(1) });
-                    mtAuxDateIssue = moChildPayrollReceiptIssue.getDateIssue();
+                    mtAuxDateOfIssue = moChildPayrollReceiptIssue.getDateIssue();
                 }
             }
 
@@ -976,11 +980,11 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         boolean can = super.canDelete(session);
 
         if (can && moChildPayrollReceiptIssue != null) {
-            if (moChildPayrollReceiptIssue.isStamped()) {
+            if (moChildPayrollReceiptIssue.isCfdStamped()) {
                 can = false;
                 msQueryResult = "¡No es posible eliminar el recibo, está timbrado!";
             }
-            else if (moChildPayrollReceiptIssue.isAnnul()) {
+            else if (moChildPayrollReceiptIssue.isCfdAnnulled()) {
                 can = false;
                 msQueryResult = "¡No es posible eliminar el recibo, está anulado!";
             }

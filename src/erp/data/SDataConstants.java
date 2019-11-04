@@ -531,6 +531,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DIOG_MFG_MOVE_ASG = 207596;
     public static final int TRNX_DIOG_MFG_MOVE_RET = 207597;
     public static final int TRNX_STK_PERIOD = 207598;
+    public static final int TRNX_STK_ITEM = 207601;
 
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;

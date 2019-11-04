@@ -12,7 +12,6 @@ import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
-import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
@@ -70,7 +69,6 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     private erp.client.SClientInterface miClient;
     private erp.lib.table.STablePane moTablePaneEmpAvailable;
     private erp.lib.table.STablePane moTablePaneEmpSelected;
-    private int mnPayrollId;
     private java.lang.String msPayType;
     private java.lang.String msPayTypeAbbr;
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
@@ -392,7 +390,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         int i = 0;
         STableColumnForm[] aoTableColumns = null;
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moTablePaneEmpAvailable = new STablePaneGrid(miClient);
         moTablePaneEmpAvailable.setDoubleClickAction(this, "actionAdd");
@@ -405,7 +403,6 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         moDateFormat = new SimpleDateFormat("yyyyMMdd");
         moAccountingPayroll = new SDbAccountingPayroll();
 
-        mnPayrollId = 0;
         msPayType = "";
         msPayTypeAbbr = "";
         moDialogRecordPicker = new SDialogRecordPicker(miClient, SDataConstants.FINX_REC_USER);
@@ -488,30 +485,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         Statement statement = null;
         ResultSet resultSet = null;
 
-        int per_year = 0;
-        int per = 0;
-        int num = 0;
-        int fk_tp_pay = 0;
-        int wrk_day = 0;
-        int id_tp_pay_sht = 0;
-        String dt_sta = "";
-        String dt_end = "";
-        String nts = "";
-        boolean b_clo = false;
-
-        int id_emp = 0;
-        String bp = "";
-        int id_dep = 0;
-        String name = "";
-        int code = 0;
-        int id_bp = 0;
-        double f_ear = 0;
-        double f_ded = 0;
-        SDataBizPartner bizPartner = null;
-
         // Display payroll:
-
-        mnPayrollId = moPayroll.getPkPayrollId();
 
         jtfPayrollPeriod.setText(moPayroll.getPeriodYear() + "-" + SLibUtils.DecimalFormatCalendarMonth.format(moPayroll.getPeriod()));
         jtfPayrollNumber.setText((moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? "SEM " : "QNA " ) + moPayroll.getNumber());
@@ -530,7 +504,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
             sql = "SELECT per_year, per, num, fk_tp_pay, nts, dt_sta, dt_end, fk_tp_pay_sht, b_clo " +
                     "FROM hrs_pay " +
-                    "WHERE id_pay = " + mnPayrollId + " ";
+                    "WHERE id_pay = " + moPayroll.getPkPayrollId() + " ";
 
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
@@ -539,17 +513,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             else {
                 // Prepare payroll registry:
 
-                per_year = resultSet.getInt("per_year");
-                per = resultSet.getInt("per");
-                num = resultSet.getInt("num");
-                fk_tp_pay = resultSet.getInt("fk_tp_pay");
-                nts = SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("nts")), 100);
-                dt_sta = resultSet.getString("dt_sta");
-                dt_end = resultSet.getString("dt_end");
-                id_tp_pay_sht = resultSet.getInt("fk_tp_pay_sht");
-                b_clo = resultSet.getBoolean("b_clo");
-
-                switch (fk_tp_pay) {
+                switch (moPayroll.getFkPaymentTypeId()) {
                     case SModSysConsts.HRSS_TP_PAY_WEE:
                         msPayType = SHrsFormerConsts.PAY_WEE;
                         msPayTypeAbbr = SHrsFormerConsts.PAY_WEE_ABB;
@@ -562,19 +526,19 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 }
 
                 moFormerPayroll = new SDataFormerPayroll();
-                moFormerPayroll.setPkPayrollId(mnPayrollId);
-                moFormerPayroll.setYear(per_year);
-                moFormerPayroll.setPeriod(per);
-                moFormerPayroll.setNumber(num);
+                moFormerPayroll.setPkPayrollId(moPayroll.getPkPayrollId());
+                moFormerPayroll.setYear(moPayroll.getPeriodYear());
+                moFormerPayroll.setPeriod(moPayroll.getPeriod());
+                moFormerPayroll.setNumber(moPayroll.getNumber());
                 moFormerPayroll.setType(msPayType);
-                moFormerPayroll.setNote(nts);
-                moFormerPayroll.setDateBegin(moDateFormat.parse(dt_sta));
-                moFormerPayroll.setDateEnd(moDateFormat.parse(dt_end));
-                moFormerPayroll.setDatePayment(moDateFormat.parse(dt_end));
+                moFormerPayroll.setNote(SLibUtils.textLeft(moPayroll.getNotes(), 100));
+                moFormerPayroll.setDateBegin(moPayroll.getDateStart());
+                moFormerPayroll.setDateEnd(moPayroll.getDateEnd());
+                moFormerPayroll.setDatePayment(moPayroll.getDateEnd());
                 moFormerPayroll.setDebit_r(0);
                 moFormerPayroll.setCredit_r(0);
-                moFormerPayroll.setIsRegular(id_tp_pay_sht  == SModSysConsts.HRSS_TP_PAY_SHT_NOR);
-                moFormerPayroll.setIsClosed(b_clo);
+                moFormerPayroll.setIsRegular(moPayroll.isPayrollNormal());
+                moFormerPayroll.setIsClosed(moPayroll.isClosed());
                 moFormerPayroll.setIsDeleted(false);
                 moFormerPayroll.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                 moFormerPayroll.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
@@ -602,7 +566,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         "INNER JOIN erp.hrss_tp_sal AS st ON st.id_tp_sal = rcp.fk_tp_sal " +
                         "INNER JOIN erp.hrsu_tp_emp AS et ON et.id_tp_emp = rcp.fk_tp_emp " +
                         "INNER JOIN erp.hrsu_tp_wrk AS ec ON rcp.fk_tp_wrk = ec.id_tp_wrk " +
-                        "WHERE rcp.b_del = 0 AND p.id_pay = " + mnPayrollId + " " +
+                        "WHERE rcp.b_del = 0 AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
                         "GROUP BY bp.bp, bp.id_bp, emp.id_emp, d.id_dep, d.name, d.code, rcp.wage, rcp.pay_day_r, rcp.sal_ssc, rcp.wrk_day, rcp.day_wrk, rcp.day_pad, st.name, et.code, ec.code " +
                         "ORDER BY bp.bp, bp.id_bp, emp.id_emp, d.id_dep, d.name, d.code, rcp.wage, rcp.pay_day_r, rcp.sal_ssc, rcp.wrk_day, rcp.day_wrk, rcp.day_pad, st.name, et.code, ec.code ";
 
@@ -610,24 +574,23 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 while (resultSet.next()) {
                     SRowEmployee row = new SRowEmployee();
 
-                    id_emp = resultSet.getInt("id_emp");
-                    bp = SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("bp")), 155);
-                    id_dep = resultSet.getInt("id_dep");
-                    name = SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("name")), 50);
-                    code = SLibUtilities.parseInt(resultSet.getString("code"));
-                    f_ear = resultSet.getDouble("f_ear");
-                    f_ded = resultSet.getDouble("f_ded");
+                    int employeeId = resultSet.getInt("id_emp");
+                    String bizPartnerName = SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("bp")), 155);
+                    String departmentName = SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("name")), 50);
+                    int departmentCode = SLibUtilities.parseInt(resultSet.getString("code"));
+                    double earnings = resultSet.getDouble("f_ear");
+                    double deductions = resultSet.getDouble("f_ded");
 
-                    row.setPrimaryKey(new int[] { id_emp });
-                    row.getValues().add(bp);
-                    row.getValues().add(id_emp);
-                    row.getValues().add(name);
-                    row.getValues().add(code);
-                    row.getValues().add(f_ear);
-                    row.getValues().add(f_ded);
-                    row.getValues().add(f_ear - f_ded);
+                    row.setPrimaryKey(new int[] { employeeId });
+                    row.getValues().add(bizPartnerName);
+                    row.getValues().add(employeeId);
+                    row.getValues().add(departmentName);
+                    row.getValues().add(departmentCode);
+                    row.getValues().add(earnings);
+                    row.getValues().add(deductions);
+                    row.getValues().add(SLibUtils.roundAmount(earnings - deductions));
 
-                    if (fk_tp_pay == 1) {
+                    if (moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE) {
                         // Pay weekly:
 
                         row.setSalary((resultSet.getDouble("pay_day_r") * 365d) / 12d);
@@ -638,9 +601,9 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         row.setSalary(resultSet.getDouble("wage"));
                     }
 
-                    wrk_day = resultSet.getInt("wrk_day");
+                    int workingDays = resultSet.getInt("wrk_day");
                     row.setDaysWorked(resultSet.getInt("day_wrk"));
-                    row.setDaysNotWorked(wrk_day - row.getDaysWorked());
+                    row.setDaysNotWorked(workingDays - row.getDaysWorked());
                     row.setDaysPayed(resultSet.getInt("day_pad"));
                     row.setSalaryType(SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("name")), 10));
                     row.setEmployeeType(SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("tp_emp")), 10));
@@ -649,22 +612,22 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     
                     // Validate business partner for current employee:
 
-                    id_bp = resultSet.getInt("id_bp");
+                    int bizPartnerId = resultSet.getInt("id_bp");
 
-                    if (id_bp == 0) {
-                        throw new Exception("No se ha especificado el ID del asociado de negocios del empleado '" + bp + " (" + id_emp + ")'.");
+                    if (bizPartnerId == 0) {
+                        throw new Exception("No se ha especificado el ID del asociado de negocios del empleado '" + bizPartnerName + " (" + employeeId + ")'.");
                     }
                     else {
-                        bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { id_bp }, SLibConstants.EXEC_MODE_VERBOSE);
+                        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.EXEC_MODE_VERBOSE);
                         if (bizPartner == null) {
-                            throw new Exception("El asociado de negocios (ID = " + id_bp + ") del empleado '" + bp + " (" + id_emp + ")' tiene un inconveniente:\nEl registro no existe.");
+                            throw new Exception("El asociado de negocios (ID = " + bizPartnerId + ") del empleado '" + bizPartnerName + " (" + employeeId + ")' tiene un inconveniente:\nEl registro no existe.");
                         }
                         else if (bizPartner.getIsDeleted()) {
-                            throw new Exception("El asociado de negocios (ID = " + id_bp + ") del empleado '" + bp + " (" + id_emp + ")' tiene un inconveniente:\nEl registro está eliminado.");
+                            throw new Exception("El asociado de negocios (ID = " + bizPartnerId + ") del empleado '" + bizPartnerName + " (" + employeeId + ")' tiene un inconveniente:\nEl registro está eliminado.");
                         }
                     }
 
-                    row.setFkBizPartnerId(id_bp);
+                    row.setFkBizPartnerId(bizPartnerId);
 
                     moTablePaneEmpAvailable.addTableRow(row);
                 }
@@ -672,6 +635,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 moTablePaneEmpAvailable.renderTableRows();
                 moTablePaneEmpAvailable.setTableRowSelection(0);
             }
+            
             computeTotals();
         }
         catch (Exception e) {
@@ -711,7 +675,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         moFormerPayroll.getDbmsDataFormerPayrollEmp().clear();
         moFormerPayroll.getDbmsDataFormerPayrollMove().clear();
         
-        moAccountingPayroll.setPkPayrollId(mnPayrollId);
+        moAccountingPayroll.setPkPayrollId(moPayroll.getPkPayrollId());
 
         for (int i = 0; i < moTablePaneEmpSelected.getTableGuiRowCount(); i++) {
             add = true;
@@ -728,7 +692,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             if (add) {
                 record = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, recordKey, SLibConstants.EXEC_MODE_VERBOSE);
                 for (SDataRecordEntry entry : record.getDbmsRecordEntries()) {
-                    if (entry.getFkPayrollId_n() == mnPayrollId && !entry.getIsDeleted()) {
+                    if (entry.getFkPayrollId_n() == moPayroll.getPkPayrollId() && !entry.getIsDeleted()) {
                         entry.setIsDeleted(true);
                         entry.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
                         entry.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
@@ -745,7 +709,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             }
 
             formerPayrollEmp = new SDataFormerPayrollEmp();
-            formerPayrollEmp.setPkPayrollId(mnPayrollId);
+            formerPayrollEmp.setPkPayrollId(moPayroll.getPkPayrollId());
             formerPayrollEmp.setPkEmployeeId(((int[]) row.getPrimaryKey())[0]);
             formerPayrollEmp.setEmployee((String) row.getValues().get(0));
             formerPayrollEmp.setDepartment((String) row.getValues().get(2));
@@ -839,7 +803,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         entry.setFkDiogYearId_n(0);
         entry.setFkDiogDocId_n(0);
         entry.setFkPayrollFormerId_n(0);
-        entry.setFkPayrollId_n(mnPayrollId);
+        entry.setFkPayrollId_n(moPayroll.getPkPayrollId());
         entry.setFkItemId_n(itemId);
         entry.setFkItemAuxId_n(0);
         entry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
@@ -905,7 +869,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         oStatementCfg = miClient.getSession().getStatement().getConnection().createStatement();
         oStatementRec = miClient.getSession().getStatement().getConnection().createStatement();
 
-        if (SHrsFinUtils.existsAccountingSettingsForPayrollAll(miClient.getSession(), mnPayrollId)) {
+        if (SHrsFinUtils.existsAccountingSettingsForPayrollAll(miClient.getSession(), moPayroll.getPkPayrollId())) {
             initPayrollRecords();
 
             for (Object[] records : mvRecords) {
@@ -929,7 +893,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                     "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                     "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
-                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                     "UNION " +
@@ -942,7 +906,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                     "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                     "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
                                     "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
-                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                     "UNION " +
@@ -956,7 +920,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                     "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
                                     "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
                                     "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                     "ORDER BY f_id_tipo, f_id_aux, f_ref; ";
                         sType = "percepción";
@@ -976,7 +940,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                     "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
                                     "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                     "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
-                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                     "UNION " +
@@ -989,7 +953,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                     "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                     "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
                                     "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
-                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                     "UNION " +
@@ -1003,7 +967,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                     "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
                                     "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
                                     "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                    "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                     "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                     "ORDER BY f_id_tipo, f_id_aux, f_ref ";
                         sType = "deducción";
@@ -1135,7 +1099,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                                         "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
                                         "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
                                         "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                         "GROUP BY ear.id_ear, ear.name_abbr " +
 
@@ -1147,7 +1111,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
                                         "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
                                         "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ")" + (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + nF_id_ref + " ") : "") + 
                                         "GROUP BY ear.id_ear, ear.name_abbr, d.id_dep, d.name, d.code " +
 
@@ -1161,7 +1125,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                                         "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
                                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
                                         "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
                                         "GROUP BY ear.id_ear, ear.name_abbr, bp.id_bp, bp.bp " +
                                         "ORDER BY f_id_tipo_rec, id_ear, f_ref; ";
@@ -1180,7 +1144,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                                         "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
                                         "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
                                         "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                         "GROUP BY ded.id_ded, ded.name_abbr " +
 
@@ -1192,7 +1156,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
                                         "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
                                         "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ")" + (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + nF_id_ref + " ") : "") +
                                         "GROUP BY ded.id_ded, ded.name_abbr, d.id_dep, d.name, d.code " +
 
@@ -1206,7 +1170,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                                         "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
                                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + mnPayrollId + " " +
+                                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
                                         "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
                                         "GROUP BY ded.id_ded, ded.name_abbr, bp.id_bp, bp.bp " +
                                         "ORDER BY f_id_tipo_rec, id_ded, f_ref; ";
@@ -1296,7 +1260,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             // Create payroll move:
 
                             oPayrollMove = new SDataFormerPayrollMove();
-                            oPayrollMove.setPkPayrollId(mnPayrollId);
+                            oPayrollMove.setPkPayrollId(moPayroll.getPkPayrollId());
                             oPayrollMove.setPkMoveId(++nMoveId);
                             oPayrollMove.setType(nType);
                             oPayrollMove.setTransactionId(nF_id_aux);
@@ -1401,7 +1365,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     public SDbAccountingPayrollEmployee createAccountingPayrollEmployee(int employeeId) {
         SDbAccountingPayrollEmployee accountingPayrollEmployee = new SDbAccountingPayrollEmployee();
         
-        accountingPayrollEmployee.setPkPayrollId(mnPayrollId);
+        accountingPayrollEmployee.setPkPayrollId(moPayroll.getPkPayrollId());
         //accountingPayrollEmployee.setPkAccountingId(int n);
         accountingPayrollEmployee.setPkEmployeeId(employeeId);
         accountingPayrollEmployee.setFkRecordYearId(moCurrentRecord.getPkYearId());

@@ -50,8 +50,6 @@ import sa.lib.gui.bean.SBeanFormDialog;
 public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListener, ItemListener {
 
     private erp.mbps.data.SDataBizPartnerBranchBankAccount moDataBizPartnerBranchBankAccount;
-    private ArrayList<SRowPayrollEmployee> maRowPayrollEmployeesAvailable;
-    private ArrayList<SRowPayrollEmployee> maRowPayrollEmployeesSelected;
     
     private final int mnPayrollId;
     private SGridPaneForm moGridPaneEmployeesAvailable;
@@ -274,15 +272,6 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 960, 600);
 
-        try {
-            maRowPayrollEmployeesAvailable = SHrsPayrollUtils.obtainRowPayrollEmployeesAvailable(miClient.getSession(), mnPayrollId);
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-
-        maRowPayrollEmployeesSelected = new ArrayList<>();
-        
         jbSave.setText("Aceptar");
 
         moDateEmission.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEmission.getText()), true);
@@ -389,8 +378,17 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     }
 
     private void populateEmployees() {
-        moGridPaneEmployeesAvailable.populateGrid(new Vector<>(maRowPayrollEmployeesAvailable));
-        moGridPaneEmployeesSelected.populateGrid(new Vector<>(maRowPayrollEmployeesSelected));
+        ArrayList<SRowPayrollEmployee> employeesAvailable = null;
+        
+        try {
+            employeesAvailable = SHrsPayrollUtils.obtainRowPayrollEmployeesAvailable(miClient.getSession(), mnPayrollId);
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+
+        moGridPaneEmployeesAvailable.populateGrid(new Vector<SGridRow>(employeesAvailable));
+        moGridPaneEmployeesSelected.populateGrid(new Vector<SGridRow>());
         
         computeTotals();
     }
@@ -457,8 +455,6 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
                 SRowPayrollEmployee rowSelected = new SRowPayrollEmployee(rowAvailable);
                 
-                maRowPayrollEmployeesSelected.add(maRowPayrollEmployeesAvailable.remove(index));
-                
                 moGridPaneEmployeesSelected.addGridRow(rowSelected);
                 moGridPaneEmployeesSelected.renderGridRows();
                 moGridPaneEmployeesSelected.setSelectedGridRow(moGridPaneEmployeesSelected.getModel().getRowCount() - 1);
@@ -505,8 +501,6 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
                 SRowPayrollEmployee rowAvailable = new SRowPayrollEmployee(rowSelected);
                 
-                maRowPayrollEmployeesAvailable.add(maRowPayrollEmployeesSelected.remove(index));
-
                 moGridPaneEmployeesAvailable.addGridRow(rowAvailable);
                 moGridPaneEmployeesAvailable.renderGridRows();
                 moGridPaneEmployeesAvailable.setSelectedGridRow(moGridPaneEmployeesAvailable.getModel().getRowCount() - 1);
@@ -582,7 +576,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
             }
             
             if (validation.isValid()) {
-                if (maRowPayrollEmployeesSelected.isEmpty()) {
+                if (moGridPaneEmployeesSelected.getModel().getRowCount() == 0) {
                     validation.setMessage("Debe seleccionar al menos un recibo para generar el layout.");
                     validation.setComponent(moGridPaneEmployeesAvailable.getTable());
                 }
@@ -591,7 +585,9 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
                     int withoutBankAccount = 0;
                     HashSet<String> banksSet = new HashSet<>();
                     
-                    for (SRowPayrollEmployee row : maRowPayrollEmployeesSelected) {
+                    for (SGridRow gridRow : moGridPaneEmployeesSelected.getModel().getGridRows()) {
+                        SRowPayrollEmployee row = (SRowPayrollEmployee) gridRow;
+                        
                         if (row.getBank().isEmpty()) {
                             withoutBank++;
                         }
@@ -627,10 +623,12 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     public void actionSave() {
         if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
-                String[] employeeIds = new String[maRowPayrollEmployeesSelected.size()];
+                int index = 0;
+                String[] employeeIds = new String[moGridPaneEmployeesSelected.getModel().getRowCount()];
                 
-                for (int index = 0; index < maRowPayrollEmployeesSelected.size(); index++) {
-                    employeeIds[index] = "" + maRowPayrollEmployeesSelected.get(index).getPkEmployeeId();
+                for (SGridRow gridRow : moGridPaneEmployeesSelected.getModel().getGridRows()) {
+                    SRowPayrollEmployee row = (SRowPayrollEmployee) gridRow;
+                    employeeIds[index++] = "" + row.getPkEmployeeId();
                 }
                 
                 switch (moKeyLayout.getValue()[0]) {

@@ -5,38 +5,42 @@
 
 package erp.mod.fin.db;
 
+import erp.mod.SModSysConsts;
 import java.util.Date;
 import sa.lib.grid.SGridRow;
 import sa.lib.gui.SGuiClient;
 
 /**
- *
+ * Abstraction of a grid row when paying (doing the accounting of) bank layouts.
+ * 
  * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
 public class SLayoutBankPaymentRow implements SGridRow {
 
     protected SGuiClient miClient;
-    
     protected int mnBizPartnerId;
     protected int mnBizPartnerBranchId;
     protected int mnBizPartnerBranchBankAccountId;
-    protected int mnLayoutRowSubType;
     protected String msBizPartner;
     protected String msBizPartnerKey;
-    protected boolean mbIsForPayment;
-    protected boolean mbIsToPayed;
-    protected double mdBalance;
-    protected double mdBalanceTot;
-    protected String msCurrencyKey;
-    protected String msAccountCredit;
+    protected double mdPayment;
+    protected double mdPaymentCur;
+    protected int mnCurrencyId;
+    protected double mdExchangeRate;
+    protected String msPayerAccountCurrencyKey;
+    protected String msBeneficiaryAccountBankName;
+    protected String msBeneficiaryAccountNumber;
+    protected String msBeneficiaryAccountNumberShort;
     protected String msAgreement;
     protected String msAgreementReference;
-    protected String msAgreementConcept;
+    protected String msAgreementConceptCie;
     protected String msRecordPeriod;
     protected String msRecordBkc;
     protected String msRecordCob;
     protected String msRecordNumber;
     protected Date mtRecordDate;
+    protected boolean mbForPayment;
+    protected boolean mbPayed;
     
     protected SLayoutBankPayment moLayoutBankPayment;
     protected SLayoutBankRecordKey moLayoutBankRecordKey;
@@ -51,23 +55,26 @@ public class SLayoutBankPaymentRow implements SGridRow {
         mnBizPartnerId = 0;
         mnBizPartnerBranchId = 0;
         mnBizPartnerBranchBankAccountId = 0;
-        mnLayoutRowSubType = 0;
         msBizPartner = "";
         msBizPartnerKey = "";
-        mbIsForPayment = false;
-        mbIsToPayed = false;
-        mdBalance = 0;
-        mdBalanceTot = 0;
-        msCurrencyKey = "";
-        msAccountCredit = "";
+        mdPayment = 0;
+        mdPaymentCur = 0;
+        mnCurrencyId = SModSysConsts.CFGU_CUR_MXN;
+        mdExchangeRate = 1d;
+        msPayerAccountCurrencyKey = "";
+        msBeneficiaryAccountBankName = "";
+        msBeneficiaryAccountNumber = "";
+        msBeneficiaryAccountNumberShort = "";
         msAgreement = "";
         msAgreementReference = "";
-        msAgreementConcept = "";
+        msAgreementConceptCie = "";
         msRecordPeriod = "";
         msRecordBkc = "";
         msRecordCob = "";
         msRecordNumber = "";
         mtRecordDate = null;
+        mbForPayment = false;
+        mbPayed = false;
         
         moLayoutBankPayment = null;
         moLayoutBankRecordKey = null;
@@ -77,59 +84,65 @@ public class SLayoutBankPaymentRow implements SGridRow {
     public void setBizPartnerId(int n) { mnBizPartnerId = n; }
     public void setBizPartnerBranchId(int n) { mnBizPartnerBranchId = n; }
     public void setBizPartnerBranchAccountId(int n) { mnBizPartnerBranchBankAccountId = n; }
-    public void setLayoutRowSubType(int n) { mnLayoutRowSubType = n; }
     public void setBizPartner(String s) { msBizPartner = s; }
     public void setBizPartnerKey(String s) { msBizPartnerKey = s; }
-    public void setIsForPayment(boolean b) { mbIsForPayment = b; }
-    public void setIsToPayed(boolean b) { mbIsToPayed = b; }
-    public void setBalance(double d) { mdBalance = d; }
-    public void setBalanceTot(double d) { mdBalanceTot = d; }
-    public void setCurrencyKey(String s) { msCurrencyKey = s; }
-    public void setAccountCredit(String s) { msAccountCredit = s; }
+    public void setPayment(double d) { mdPayment = d; }
+    public void setPaymentCur(double d) { mdPaymentCur = d; }
+    public void setCurrencyId(int n) { mnCurrencyId = n; }
+    public void setExchangeRate(double d) { mdExchangeRate = d; }
+    public void setPayerAccountCurrencyKey(String s) { msPayerAccountCurrencyKey = s; }
+    public void seBeneficiaryAccountBankName(String s) { msBeneficiaryAccountBankName = s; }
+    public void setBeneficiaryAccountNumber(String s) { msBeneficiaryAccountNumber = s; }
+    public void setBeneficiaryAccountNumberShort(String s) { msBeneficiaryAccountNumberShort = s; }
     public void setAgreement(String s) { msAgreement = s; }
     public void setAgreementReference(String s) { msAgreementReference = s; }
-    public void setAgreementConcept(String s) { msAgreementConcept = s; }
+    public void setAgreementConceptCie(String s) { msAgreementConceptCie = s; }
     public void setRecordPeriod(String s) { msRecordPeriod = s; }
     public void setRecordBkc(String s) { msRecordBkc = s; }
     public void setRecordCob(String s) { msRecordCob = s; }
     public void setRecordNumber(String s) { msRecordNumber = s; }
     public void setRecordDate(Date t) { mtRecordDate = t; }
+    public void setForPayment(boolean b) { mbForPayment = b; }
+    public void setPayed(boolean b) { mbPayed = b; }
     
     public void setLayoutBankPayment(SLayoutBankPayment o) { moLayoutBankPayment = o; }
     public void setLayoutBankRecordKey(SLayoutBankRecordKey o) { moLayoutBankRecordKey = o; }
     public void setLayoutBankRecordKeyOld(SLayoutBankRecordKey o) { moLayoutBankRecordKeyOld = o; }
     
+    public int getBizPartnerId() { return mnBizPartnerId; }
+    public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
+    public int getBizPartnerBranchAccountId() { return mnBizPartnerBranchBankAccountId; }
+    public String getBizPartner() { return msBizPartner; }
+    public String getBizPartnerKey() { return msBizPartnerKey; }
+    public double getPayment() { return mdPayment; }
+    public double getPaymentCur() { return mdPaymentCur; }
+    public int getCurrencyId() { return mnCurrencyId; }
+    public double getExchangeRate() { return mdExchangeRate; }
+    public String getPayerAccountCurrencyKey() { return msPayerAccountCurrencyKey; }
+    public String getBeneficiaryAccountBankName() { return msBeneficiaryAccountBankName; }
+    public String getBeneficiaryAccountNumber() { return msBeneficiaryAccountNumber; }
+    public String getBeneficiaryAccountNumberShort() { return msBeneficiaryAccountNumberShort; }
+    public String getAgreement() { return msAgreement; }
+    public String getAgreementReference() { return msAgreementReference; }
+    public String getAgreementConceptCie() { return msAgreementConceptCie; }
+    public String getRecordPeriod() { return msRecordPeriod; }
+    public String getRecordBkc() { return msRecordBkc; }
+    public String getRecordCob() { return msRecordCob; }
+    public String getRecordNumber() { return msRecordNumber; }
+    public Date getRecordDate() { return mtRecordDate; }
+    public boolean isForPayment() { return mbForPayment; }
+    public boolean isPayed() { return mbPayed; }
+    
+    public SLayoutBankPayment getLayoutBankPayment() { return moLayoutBankPayment; }
+    public SLayoutBankRecordKey getLayoutBankRecordKey() { return moLayoutBankRecordKey; }
+    public SLayoutBankRecordKey getLayoutBankRecordKeyOld() { return moLayoutBankRecordKeyOld; }
+
     public void setPrimaryKey(int[] pk) {
         mnBizPartnerId = pk[0];
         mnBizPartnerBranchId = pk[1];
         mnBizPartnerBranchBankAccountId = pk[1];
     }
     
-    public int getBizPartnerId() { return mnBizPartnerId; }
-    public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
-    public int getBizPartnerBranchAccountId() { return mnBizPartnerBranchBankAccountId; }
-    public int getLayoutRowSubType() { return mnLayoutRowSubType; }
-    public String getBizPartner() { return msBizPartner; }
-    public String getBizPartnerKey() { return msBizPartnerKey; }
-    public boolean getIsForPayment() { return mbIsForPayment; }
-    public boolean getIsToPayed() { return mbIsToPayed; }
-    public double getBalance() { return mdBalance; }
-    public double getBalanceTot() { return mdBalanceTot; }
-    public String getCurrencyKey() { return msCurrencyKey; }
-    public String getAccountCredit() { return msAccountCredit; }
-    public String getAgreement() { return msAgreement; }
-    public String getAgreementReference() { return msAgreementReference; }
-    public String getAgreementConcept() { return msAgreementConcept; }
-    public String getRecordPeriod() { return msRecordPeriod; }
-    public String getRecordBkc() { return msRecordBkc; }
-    public String getRecordCob() { return msRecordCob; }
-    public String getRecordNumber() { return msRecordNumber; }
-    public Date getRecordDate() { return mtRecordDate; }
-    
-    public SLayoutBankPayment getLayoutBankPayment() { return moLayoutBankPayment; }
-    public SLayoutBankRecordKey getLayoutBankRecordKey() { return moLayoutBankRecordKey; }
-    public SLayoutBankRecordKey getLayoutBankRecordKeyOld() { return moLayoutBankRecordKeyOld; }
-
     @Override
     public int[] getRowPrimaryKey() {
         return new int[] { mnBizPartnerId, mnBizPartnerBranchId, mnBizPartnerBranchBankAccountId };
@@ -177,27 +190,22 @@ public class SLayoutBankPaymentRow implements SGridRow {
                 value = msBizPartnerKey;
                 break;
             case 2:
-                value = mbIsForPayment;
+                value = mbForPayment;
                 break;
             case 3:
-                value = mdBalance;
+                value = mdPayment;
                 break;
             case 4:
-                value = msCurrencyKey;
+                value = msPayerAccountCurrencyKey;
                 break;
             case 5:
-                if (msAgreement == null || msAgreement.isEmpty()) {
-                    value = msAccountCredit;
-                }
-                else {
-                    value = msAgreement;
-                }
+                value = msAgreement == null && !msAgreement.isEmpty() ? msAgreement : msBeneficiaryAccountNumber;
                 break;
             case 6:
                 value = msAgreementReference;
                 break;
             case 7:
-                value = msAgreementConcept;
+                value = msAgreementConceptCie;
                 break;
             case 8:
                 value = msRecordPeriod;
@@ -223,65 +231,66 @@ public class SLayoutBankPaymentRow implements SGridRow {
     public void setRowValueAt(Object value, int row) {
         switch (row) {
             case 0:
-                break;
             case 1:
                 break;
             case 2:
-                mbIsForPayment = (boolean) value;
+                mbForPayment = (boolean) value;
                 break;
             case 3:
-                break;
             case 4:
-                break;
             case 5:   
-                break;    
             case 6:
-                break;
             case 7:
-                break;
             case 8:
-                break;
             case 9:
-                break;
             case 10:
-                break;
             case 11:
-                break;
             case 12:
                 break;
             default:
-                break;
         }
     }
     
     @Override
     public SLayoutBankPaymentRow clone() throws CloneNotSupportedException {
-        SLayoutBankPaymentRow registry = new SLayoutBankPaymentRow(miClient);
+        SLayoutBankPaymentRow clone = new SLayoutBankPaymentRow(miClient);
         
-        registry.setBizPartnerId(this.getBizPartnerId());
-        registry.setBizPartnerBranchId(this.getBizPartnerBranchId());
-        registry.setBizPartnerBranchAccountId(this.getBizPartnerBranchAccountId());
-        registry.setBizPartner(this.getBizPartner());
-        registry.setBizPartnerKey(this.getBizPartnerKey());
-        registry.setIsForPayment(this.getIsForPayment());
-        registry.setIsToPayed(this.getIsToPayed());
-        registry.setBalance(this.getBalance());
-        registry.setBalanceTot(this.getBalanceTot());
-        registry.setCurrencyKey(this.getCurrencyKey());
-        registry.setAccountCredit(this.getAccountCredit());
-        registry.setAgreement(this.getAgreement());
-        registry.setAgreementReference(this.getAgreementReference());
-        registry.setAgreementConcept(this.getAgreementConcept());
-        registry.setRecordPeriod(this.getRecordPeriod());
-        registry.setRecordBkc(this.getRecordBkc());
-        registry.setRecordCob(this.getRecordCob());
-        registry.setRecordNumber(this.getRecordNumber());
-        registry.setRecordDate(this.getRecordDate());
+        clone.setBizPartnerId(this.getBizPartnerId());
+        clone.setBizPartnerBranchId(this.getBizPartnerBranchId());
+        clone.setBizPartnerBranchAccountId(this.getBizPartnerBranchAccountId());
+        clone.setBizPartner(this.getBizPartner());
+        clone.setBizPartnerKey(this.getBizPartnerKey());
+        clone.setPayment(this.getPayment());
+        clone.setPaymentCur(this.getPaymentCur());
+        clone.setCurrencyId(this.getCurrencyId());
+        clone.setExchangeRate(this.getExchangeRate());
+        clone.setPayerAccountCurrencyKey(this.getPayerAccountCurrencyKey());
+        clone.seBeneficiaryAccountBankName(this.getBeneficiaryAccountBankName());
+        clone.setBeneficiaryAccountNumber(this.getBeneficiaryAccountNumber());
+        clone.setBeneficiaryAccountNumberShort(this.getBeneficiaryAccountNumberShort());
+        clone.setAgreement(this.getAgreement());
+        clone.setAgreementReference(this.getAgreementReference());
+        clone.setAgreementConceptCie(this.getAgreementConceptCie());
+        clone.setRecordPeriod(this.getRecordPeriod());
+        clone.setRecordBkc(this.getRecordBkc());
+        clone.setRecordCob(this.getRecordCob());
+        clone.setRecordNumber(this.getRecordNumber());
+        clone.setRecordDate(this.getRecordDate());
+        clone.setForPayment(this.isForPayment());
+        clone.setPayed(this.isPayed());
         
-        registry.setLayoutBankPayment(this.getLayoutBankPayment());
-        registry.setLayoutBankRecordKey(this.getLayoutBankRecordKey());
-        registry.setLayoutBankRecordKeyOld(this.getLayoutBankRecordKeyOld());
+        if (this.getLayoutBankPayment() != null) {
+            clone.setLayoutBankPayment(this.getLayoutBankPayment().clone());
+        }
         
-        return registry;
+        if (this.getLayoutBankRecordKey() != null) {
+            clone.setLayoutBankRecordKey(this.getLayoutBankRecordKey().clone());
+        }
+        
+        if (this.getLayoutBankRecordKeyOld() != null) {
+            clone.setLayoutBankRecordKeyOld(this.getLayoutBankRecordKeyOld().clone());
+        }
+        
+        return clone;
     }
 }

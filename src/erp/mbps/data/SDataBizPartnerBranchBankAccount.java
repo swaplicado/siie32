@@ -15,9 +15,11 @@ import java.util.Vector;
 
 /**
  *
- * @author Alfonso Flores
+ * @author Alfonso Flores, Sergio Flores
  */
 public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry implements java.io.Serializable{
+    
+    public static final int ACCOUNT_NUMBER_VISIBLE_RIGHT_LEN = 4;
 
     protected int mnPkBizPartnerBranchId;
     protected int mnPkBankAccountId;
@@ -59,7 +61,7 @@ public class SDataBizPartnerBranchBankAccount extends erp.lib.data.SDataRegistry
 
     public SDataBizPartnerBranchBankAccount() {
         super(SDataConstants.BPSU_BANK_ACC);
-        mvDbmsBankAccountCards = new Vector<SDataBizPartnerBranchBankAccountCard>();
+        mvDbmsBankAccountCards = new Vector<>();
         mvDbmsBankAccountLayoutBank = new Vector<>();
         reset();
     }

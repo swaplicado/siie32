@@ -16,11 +16,11 @@ import erp.mfin.data.SDataAccountCash;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbBankLayout;
-import erp.mod.fin.db.SLayoutBankCardextRow;
 import erp.mod.fin.db.SLayoutBankPaymentRow;
+import erp.mod.fin.db.SLayoutBankRecord;
+import erp.mod.fin.db.SLayoutBankRow;
 import erp.mod.fin.db.SLayoutBankXmlRow;
 import erp.mod.fin.db.SMoney;
-import erp.mod.fin.util.SBankLayoutUtils;
 import erp.mtrn.data.SDataDps;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -240,7 +240,7 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         moDecBalanceTot.setEditable(false);
         
         // var for grid consulting
-        moGridPayments = new SGridPaneForm(miClient, SModConsts.FIN_LAY_BANK, SModSysConsts.FIN_LAY_BANK_QRY, "Detalle de pagos") {
+        moGridPayments = new SGridPaneForm(miClient, SModConsts.FIN_LAY_BANK, SModSysConsts.FINX_LAY_BANK_QRY, "Detalle de pagos") {
             
             @Override
             public void initGrid() {
@@ -260,7 +260,7 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Pago mon cta $", STableConstants.WIDTH_VALUE_2X));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda cta"));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_EXC_RATE, "TC", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "No. Cuenta/Convenio", 125));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Cuenta/Convenio", 125));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Referencia", 125));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Concepto", 100));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_REG_PER, "Período póliza"));
@@ -288,82 +288,81 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         }
     }
       
-    private void loadLayout() {
+    private void loadLayout() throws Exception {
         int numberDocs = 0;
         double total = 0d; 
         boolean found = false;
-        SLayoutBankCardextRow auxRow = new SLayoutBankCardextRow(miClient);
-        ArrayList<SGridRow> rows = new ArrayList<>();
-        SDataDps dps = null;
+        ArrayList<SGridRow> gridRows = new ArrayList<>();
         
         jtfRows.setText("0/0");
         
-        SDbBankLayout bankLayout = SBankLayoutUtils.loadPaymentsXml(miClient, moBankLayout);
+        moBankLayout.parseBankLayoutXml(miClient);
         
         jtfRegistryKey.setText(SLibUtils.textKey(moBankLayout.getPrimaryKey()));
-        jtfDate.setText(((SClientInterface) miClient).getSessionXXX().getFormatters().getDateFormat().format(moBankLayout.getDateLayout()));
+        jtfDate.setText(SLibUtils.DateFormatDate.format(moBankLayout.getDateLayout()));
+        jtfLayoutType.setText(moBankLayout.getXtaBankLayoutType());
         
-        //renderLayoutTypeBank(layout.getFkBankLayoutTypeId());
-        
-        jtfLayoutType.setText(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.FINU_TP_LAY_BANK, new int[] { bankLayout.getFkBankLayoutTypeId() }, SLibConstants.DESCRIPTION_CODE));
-        renderAccountSettings(new int[] {bankLayout.getFkBankCompanyBranchId(), bankLayout.getFkBankAccountCashId()});
+        renderAccountSettings(new int[] { moBankLayout.getFkBankCompanyBranchId(), moBankLayout.getFkBankAccountCashId() });
        
-        for (SLayoutBankXmlRow row : bankLayout.getLayoutBankXmlRows()) {
-            auxRow.setBizPartnerId(row.getBizPartner());
-            auxRow.setBizPartnerBranchId(row.getBizPartnerBranch());
-            auxRow.setBizPartnerBranchAccountId(row.getBizPartnerBranchAccount());
-            auxRow.setPkYearId(row.getDpsYear());
-            auxRow.setPkDocId(row.getDpsDoc());
-            auxRow.setAgreement(row.getAgreement());
-            auxRow.setAgreementReference(row.getAgreementReference());
-            auxRow.setConceptCie(row.getConceptCie());
+        for (SLayoutBankXmlRow xmlRow : moBankLayout.getAuxLayoutBankXmlRows()) {
+            SLayoutBankRow layoutBankRow = new SLayoutBankRow(miClient, SLayoutBankRow.MODE_DIALOG_CARDEX);
             
-            dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, new int[] {row.getDpsYear(), row.getDpsDoc() }, SLibConstants.EXEC_MODE_SILENT);
+            layoutBankRow.setBizPartnerId(xmlRow.getBizPartnerId());
+            layoutBankRow.setDpsYearId(xmlRow.getDpsYearId());
+            layoutBankRow.setDpsDocId(xmlRow.getDpsDocId());
+            layoutBankRow.setAgreement(xmlRow.getAgreement());
+            layoutBankRow.setAgreementReference(xmlRow.getAgreementReference());
+            layoutBankRow.setConceptCie(xmlRow.getConceptCie());
             
-            auxRow.setBizPartnerBranchCob(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.DESCRIPTION_CODE));
-            auxRow.setDpsType(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.TRNU_TP_DPS, dps.getDpsTypeKey(), SLibConstants.DESCRIPTION_CODE));
-            auxRow.setDpsNumber(dps.getDpsNumber());
-            auxRow.setDpsDate(dps.getDate());
-            auxRow.setBalanceTot(new SMoney(row.getAmountPayed(), row.getCurrencyId(), row.getExchangeRate(), row.getCurrencyId()));
-            auxRow.setObservation(row.getObservations());
+            SDataDps dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, new int[] {xmlRow.getDpsYearId(), xmlRow.getDpsDocId() }, SLibConstants.EXEC_MODE_SILENT);
             
-            total = total + auxRow.getBalanceTot().getAmountOriginal();
-            for (SLayoutBankPaymentRow rowPay : bankLayout.getLayoutBankPaymentRows()) {
+            layoutBankRow.setDpsCompanyBranchCode(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.DESCRIPTION_CODE));
+            layoutBankRow.setDpsType(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.TRNU_TP_DPS, dps.getDpsTypeKey(), SLibConstants.DESCRIPTION_CODE));
+            layoutBankRow.setDpsNumber(dps.getDpsNumber());
+            layoutBankRow.setDpsDate(dps.getDate());
+            layoutBankRow.setMoneyPayment(new SMoney(miClient.getSession(), xmlRow.getAmountPayed(), xmlRow.getCurrencyId(), xmlRow.getExchangeRate()));
+            layoutBankRow.setObservations(xmlRow.getObservations());
+            
+            total = total + layoutBankRow.getMoneyPayment().getOriginalAmount();
+            for (SLayoutBankPaymentRow layoutBankPaymentRow : moBankLayout.getAuxLayoutBankPaymentRows()) {
                 found = false;
-                if (moBankLayout.getXtaBankPaymentType() == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
-                    if (auxRow.getAgreement().equals(rowPay.getAgreement()) && auxRow.getAgreementRefernce().equals(rowPay.getAgreementReference())) {
+                
+                if (moBankLayout.getXtaBankPaymentTypeId() == SDataConstantsSys.FINS_TP_PAY_BANK_AGREE) {
+                    if (layoutBankRow.getAgreement().equals(layoutBankPaymentRow.getAgreement()) && layoutBankRow.getAgreementReference().equals(layoutBankPaymentRow.getAgreementReference())) {
                         found = true;
                     }
                 }
                 else {
-                    if (auxRow.getBizPartnerId() == rowPay.getBizPartnerId()) {
+                    if (layoutBankRow.getBizPartnerId() == layoutBankPaymentRow.getBizPartnerId()) {
                         found = true;
                     }
                 }
-                if(found) {
-                    auxRow.setBizPartner(rowPay.getBizPartner());
-                    auxRow.setBizPartnerKey(rowPay.getBizPartnerKey());
-                    auxRow.setCurrencyKey(rowPay.getCurrencyKey());
-                    auxRow.setAccountCredit(rowPay.getAccountCredit());
-                    auxRow.setAgreement(rowPay.getAgreement());
-                    auxRow.setAgreementReference(rowPay.getAgreementReference());
-                    auxRow.setConceptCie(rowPay.getAgreementConcept());
-                    auxRow.setRecordPeriod(rowPay.getRecordPeriod());
-                    auxRow.setRecordBkc(rowPay.getRecordBkc());
-                    auxRow.setRecordCob(rowPay.getRecordCob());
-                    auxRow.setRecordNumber(rowPay.getRecordNumber());
-                    auxRow.setRecordDate(rowPay.getRecordDate());
+                
+                if (found) {
+                    layoutBankRow.setBizPartner(layoutBankPaymentRow.getBizPartner());
+                    layoutBankRow.setBizPartnerKey(layoutBankPaymentRow.getBizPartnerKey());
+                    layoutBankRow.setPayerAccountCurrencyKey(layoutBankPaymentRow.getPayerAccountCurrencyKey());
+                    layoutBankRow.setBeneficiaryAccountNumber(layoutBankPaymentRow.getBeneficiaryAccountNumber());
+                    layoutBankRow.setAgreement(layoutBankPaymentRow.getAgreement());
+                    layoutBankRow.setAgreementReference(layoutBankPaymentRow.getAgreementReference());
+                    layoutBankRow.setConceptCie(layoutBankPaymentRow.getAgreementConceptCie());
+                    
+                    SLayoutBankRecord layoutBankRecord = new SLayoutBankRecord(layoutBankPaymentRow.getLayoutBankRecordKey());
+                    layoutBankRecord.setBookkeepingCenterCode(layoutBankPaymentRow.getRecordBkc());
+                    layoutBankRecord.setCompanyBranchCode(layoutBankPaymentRow.getRecordCob());
+                    layoutBankRecord.setDate(layoutBankPaymentRow.getRecordDate());
+                    layoutBankRow.setLayoutBankRecord(layoutBankRecord);
+                    break;
                 }
             }
            
-            rows.add(auxRow);
+            gridRows.add(layoutBankRow);
             numberDocs++;
-            auxRow = new SLayoutBankCardextRow(miClient);
         }
                
         moDecBalanceTot.setValue(total);
         
-        moGridPayments.populateGrid(new Vector<SGridRow>(rows));
+        moGridPayments.populateGrid(new Vector<>(gridRows));
         moGridPayments.createGridColumns();
         
         jtfRows.setText(SLibUtils.DecimalFormatInteger.format(numberDocs) + "/" + SLibUtils.DecimalFormatInteger.format(moGridPayments.getModel().getRowCount()));
@@ -374,8 +373,8 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         }
     }
     
-    public void setFormParams(final int[] layoutKey) {
-        moBankLayout = (SDbBankLayout) miClient.getSession().readRegistry(SModConsts.FIN_LAY_BANK, layoutKey);
+    public void setFormParams(final int[] bankLayoutPk) throws Exception {
+        moBankLayout = (SDbBankLayout) miClient.getSession().readRegistry(SModConsts.FIN_LAY_BANK, bankLayoutPk);
         loadLayout();
     }
     

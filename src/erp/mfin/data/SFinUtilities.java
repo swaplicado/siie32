@@ -14,7 +14,7 @@ import erp.lib.SLibUtilities;
 import erp.mod.SModSysConsts;
 import erp.mod.fin.db.SDbAccount;
 import erp.mod.fin.db.SFinUtils;
-import erp.mod.fin.db.SLayoutBankPaymentTxt;
+import erp.mod.fin.db.SLayoutBankPaymentText;
 import erp.mod.fin.db.SLayoutBankRow;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,13 +32,15 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
+import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiItem;
 import sa.lib.gui.SGuiSession;
 import sa.lib.prt.SPrtConsts;
 import sa.lib.prt.SPrtUtils;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez, Daniel López
+ * @author Juan Barajas, Alfredo Pérez, Daniel López, Sergio Flores
  */
 public abstract class SFinUtilities {
     
@@ -81,7 +84,7 @@ public abstract class SFinUtilities {
 
         for (int j = index + 1; j < vRows.size(); j++) {
             values = vRows.get(j);
-            if (values.getBizPartnerId() == nBizPartnerId && values.getAccountCredit().compareTo(accountCredit) == 0) {
+            if (values.getBizPartnerId() == nBizPartnerId && values.getBeneficiaryAccountNumber().compareTo(accountCredit) == 0) {
                 mdBalanceTot += values.getBalanceTotByBizPartner();
                 if (values.getTaxCharged() != 0) {
                     mdTaxChargedTot += (values.getTotalVat() * (values.getBalanceTotByBizPartner() / values.getTotal()));
@@ -103,6 +106,10 @@ public abstract class SFinUtilities {
 
         return index;
     }
+    
+    /*
+     * Bank layouts
+     */
     
     public static void writeLayout(SClientInterface client, String layout, java.lang.String title) {
         String fileName = "";
@@ -163,38 +170,26 @@ public abstract class SFinUtilities {
         return typePayBank;
     }
     
-    public static String getBizPartnerForBanamex(SGuiSession session, int bizPartnerId) throws Exception {
-        String bizPartner = "";
-        String firstname = "";
-        String lastname = "";
-        String motherLastname = "";
-        String fatherLastname = "";
-        String sql = "";
-        ResultSet resulSet = null;
-
-        sql = "SELECT bp, lastname, firstname, fid_tp_bp_idy " +
-              "FROM erp.bpsu_bp " +
-              "WHERE id_bp = " + bizPartnerId;
-
-        resulSet = session.getDatabase().getConnection().createStatement().executeQuery(sql);
-        if (resulSet.next()) {
-            if (resulSet.getInt("fid_tp_bp_idy") == SModSysConsts.BPSS_TP_BP_IDY_ORG) {
-                firstname = resulSet.getString("bp");
-                bizPartner = "," + SLibUtilities.textToAlphanumeric(firstname) + "/";
-            }
-            else {
-                firstname = resulSet.getString("firstname");
-                lastname = resulSet.getString("lastname");
-                fatherLastname = lastname.substring(0, !lastname.contains(" ") ? lastname.length() : lastname.indexOf(" "));
-                motherLastname = lastname.length() > fatherLastname.length() + 1 ? lastname.substring(fatherLastname.length() + 1) : "";
-                bizPartner = SLibUtilities.textToAlphanumeric(firstname) + "," + SLibUtilities.textToAlphanumeric(fatherLastname) + "/" + SLibUtilities.textToAlphanumeric(motherLastname);
+    public static ArrayList<SGuiItem> getAgreementReferences(final SGuiClient client, final int bizPartnerBranchId, final String agreement) throws Exception {
+        ArrayList<SGuiItem> references = new ArrayList<>();
+        
+        String sql = "SELECT ref "
+                + "FROM erp.BPSU_BANK_ACC "
+                + "WHERE NOT b_del AND id_bpb = " + bizPartnerBranchId + " AND agree = '" + agreement + "';";
+        
+        try (Statement statement = client.getSession().getStatement().getConnection().createStatement()) {
+            ResultSet result = statement.executeQuery(sql);
+            
+            while(result.next()) {
+                references.add(new SGuiItem(result.getString(1)));
             }
         }
-        return bizPartner;
+        
+        return references;
     }
     
     /*
-     * HSBC
+     * Bank layouts of HSBC
      */
     
     public static java.lang.String createLayoutHsbcThirdOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
@@ -223,7 +218,7 @@ public abstract class SFinUtilities {
                 sBizPartner = SLibUtilities.textToAlphanumeric(values.getBizPartner());
                 sReference = SLibUtilities.textToAlphanumeric(values.getReference());
                 sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
-                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sAccountCredit = SLibUtilities.textTrim(values.getBeneficiaryAccountNumber());
                 sConcept = SLibUtilities.textToAlphanumeric(values.getConcept());
                 mdBalanceTot = values.getBalanceTotByBizPartner();
                 /*
@@ -246,7 +241,7 @@ public abstract class SFinUtilities {
                 layout += values.getCurrencyId();
                 layout += SLibUtilities.textRepeat(" ", (sReference.length() >= 30 ? 0 : 430 - sReference.length())).concat(SLibUtilities.textLeft(sReference, 30));
                 layout += (sBizPartner.length() > 40 ? SLibUtilities.textLeft(sBizPartner, 40) : sBizPartner).concat(SLibUtilities.textRepeat(" ", (40 - sBizPartner.length())));
-                layout += values.getCf();
+                layout += values.getFiscalVoucher();
                 layout += SLibUtilities.textRepeat(" ", 18);
                 layout += formatDesc.format(0d).replace(".", "");
                 layout += SLibUtilities.textRepeat(" ", 60);
@@ -270,7 +265,7 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    public static java.lang.String createLayoutHsbcThird(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+    public static java.lang.String createLayoutHsbcThird(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title) {
         int nMoveNum = 1;
         int n = 0;
         java.lang.String sBizPartner = "";
@@ -285,8 +280,7 @@ public abstract class SFinUtilities {
         mbIsRepeated = false;
 
         try {
-            for (SLayoutBankPaymentTxt payment : payments) {
-
+            for (SLayoutBankPaymentText payment : payments) {
                 n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
 
                 sBizPartner = SLibUtilities.textToAlphanumeric(payment.getBizPartner());
@@ -352,7 +346,7 @@ public abstract class SFinUtilities {
                 sBizPartner = SLibUtilities.textToAlphanumeric(values.getBizPartner());
                 sReference = SLibUtilities.textToAlphanumeric(values.getReference());
                 sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
-                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sAccountCredit = SLibUtilities.textTrim(values.getBeneficiaryAccountNumber());
                 mdBalanceTot = values.getBalanceTotByBizPartner();
                 if (values.getTaxCharged() != 0) {
                     mdTaxChargedTot = (values.getTotalVat() * (mdBalanceTot / values.getTotal()));
@@ -370,7 +364,7 @@ public abstract class SFinUtilities {
                 layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
                 layout += SLibUtilities.textRepeat(" ", (sReference.length() >= 40 ? 0 : 40 - sReference.length())).concat(SLibUtilities.textLeft(sReference, 40));
                 layout += formatDesc.format(mdBalanceTot).replace(".", "");
-                //layout += values.getBizPartnerCreditFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBizPartnerCreditFiscalId().length()))); XXX No required is optional (jbarajas)
+                //layout += values.getBeneficiaryFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBeneficiaryFiscalId().length()))); XXX No required is optional (jbarajas)
                 //layout += formatDescs.format(mdTaxChargedTot); XXX No required is optional (jbarajas)
                 //layout += sEmail.concat(SLibUtilities.textRepeat(" ", (100 - sEmail.length()))); XXX No required is optional (jbarajas)
 
@@ -383,7 +377,7 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    public static java.lang.String createLayoutHsbcTef(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, Date date) {
+    public static java.lang.String createLayoutHsbcTef(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title, Date date) {
         int n = 0;
         java.lang.String sBizPartner = "";
         java.lang.String sReference = "";
@@ -407,8 +401,7 @@ public abstract class SFinUtilities {
 
             layout += "\r\n";
             
-            for (SLayoutBankPaymentTxt payment : payments) {
-
+            for (SLayoutBankPaymentText payment : payments) {
                 n = (int) (Math.floor(Math.log10(payment.getHsbcBankCode())) + 1);
 
                 sBizPartner = SLibUtilities.textToAlphanumeric(payment.getBizPartner());
@@ -453,7 +446,7 @@ public abstract class SFinUtilities {
 
                 nBizPartnerId = values.getBizPartnerId();
                 sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
-                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sAccountCredit = SLibUtilities.textTrim(values.getBeneficiaryAccountNumber());
                 sConcept = SLibUtilities.textToAlphanumeric(values.getConcept());
                 sDescription = SLibUtilities.textToAlphanumeric(values.getDescription());
                 mdBalanceTot = values.getBalanceTotByBizPartner();
@@ -477,7 +470,7 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    public static java.lang.String createLayoutHsbcSpeiFdN(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+    public static java.lang.String createLayoutHsbcSpeiFdN(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title) {
         int n = 0;
         java.lang.String sAccountDebit = "";
         java.lang.String sAccountCredit = "";
@@ -488,8 +481,7 @@ public abstract class SFinUtilities {
         mdBalanceTot = 0;
 
         try {
-            for (SLayoutBankPaymentTxt payment : payments) {
-
+            for (SLayoutBankPaymentText payment : payments) {
                 n = (int) (Math.floor(Math.log10(payment.getHsbcBankCode())) + 1);
 
                 sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
@@ -534,7 +526,7 @@ public abstract class SFinUtilities {
 
                 nBizPartnerId = values.getBizPartnerId();
                 sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
-                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sAccountCredit = SLibUtilities.textTrim(values.getBeneficiaryAccountNumber());
                 sConcept = SLibUtilities.textToAlphanumeric(values.getConcept());
                 mdBalanceTot = values.getBalanceTotByBizPartner();
                 if (values.getTaxCharged() != 0) {
@@ -551,7 +543,7 @@ public abstract class SFinUtilities {
                 layout += SLibUtilities.textRepeat("0", (sAccountCredit.length() >= 20 ? 0 : 20 - sAccountCredit.length())).concat(SLibUtilities.textLeft(sAccountCredit, 20));
                 layout += formatDesc.format(mdBalanceTot).replace(".", "");
                 layout += "S"; // CF
-                layout += values.getBizPartnerCreditFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBizPartnerCreditFiscalId().length())));
+                layout += values.getBeneficiaryFiscalId().concat(SLibUtilities.textRepeat(" ", (18 - values.getBeneficiaryFiscalId().length())));
                 layout += values.getTaxCharged() != 0 ? formatDesc.format(mdTaxChargedTot).replace(".", "") : formatDesc.format(0d).replace(".", "");
                 layout += SLibUtilities.textRepeat("0", 3).concat(SLibUtilities.textRight(sAccountDebit, 4)); // Numerical Reference
                 layout += SLibUtilities.textRepeat(" ", (sConcept.length() >= 40 ? 0 : 40 - sConcept.length())).concat(SLibUtilities.textLeft(sConcept, 40));
@@ -565,7 +557,7 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    public static java.lang.String createLayoutHsbcSpeiFdY(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+    public static java.lang.String createLayoutHsbcSpeiFdY(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title) {
         java.lang.String sAccountDebit = "";
         java.lang.String sAccountCredit = "";
         java.lang.String sConcept = "";
@@ -574,8 +566,7 @@ public abstract class SFinUtilities {
         mdBalanceTot = 0;
 
         try {
-            for (SLayoutBankPaymentTxt payment : payments) {
-
+            for (SLayoutBankPaymentText payment : payments) {
                 sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
                 sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
                 sConcept = SLibUtilities.textToAlphanumeric(payment.getConcept());
@@ -601,7 +592,7 @@ public abstract class SFinUtilities {
     }
 
     /*
-     * Santander
+     * Bank layouts of Santander
      */
     
     public static java.lang.String createLayoutSantanderThirdOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title) {
@@ -623,7 +614,7 @@ public abstract class SFinUtilities {
 
                 nBizPartnerId = values.getBizPartnerId();
                 sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
-                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sAccountCredit = SLibUtilities.textTrim(values.getBeneficiaryAccountNumber());
                 sConcept = SLibUtilities.textToAlphanumeric(values.getConcept());
                 mdBalanceTot = values.getBalanceTotByBizPartner();
                 if (values.getTaxCharged() != 0) {
@@ -641,7 +632,7 @@ public abstract class SFinUtilities {
                 layout += SLibUtilities.textRepeat(" ", 5); // Blank
                 layout += formatDesc.format(mdBalanceTot);
                 layout += SLibUtilities.textRepeat(" ", (sConcept.length() >= 40 ? 0 : 40 - sConcept.length())).concat(SLibUtilities.textLeft(sConcept, 40));
-                layout += formatDate.format(values.getDate());
+                layout += formatDate.format(values.getDpsDate());
 
                 layout += "\r\n";
             }
@@ -652,7 +643,7 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    public static java.lang.String createLayoutSantanderThird(ArrayList<SLayoutBankPaymentTxt> payments, Date date, java.lang.String title) {
+    public static java.lang.String createLayoutSantanderThird(ArrayList<SLayoutBankPaymentText> payments, Date date, java.lang.String title) {
         java.lang.String sAccountDebit = "";
         java.lang.String sAccountCredit = "";
         java.lang.String sConcept = "";
@@ -662,8 +653,7 @@ public abstract class SFinUtilities {
         mdBalanceTot = 0;
 
         try {
-            for (SLayoutBankPaymentTxt payment : payments) {
-
+            for (SLayoutBankPaymentText payment : payments) {
                 sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
                 sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
                 sConcept = SLibUtilities.textToAlphanumeric(payment.getConcept());
@@ -709,7 +699,7 @@ public abstract class SFinUtilities {
                 sBizPartner = SLibUtilities.textToAlphanumeric(values.getBizPartner());
                 sBizPartnerSantanderCode = SLibUtilities.textToAlphanumeric(values.getSantanderBankCode());
                 sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
-                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sAccountCredit = SLibUtilities.textTrim(values.getBeneficiaryAccountNumber());
                 sConcept = SLibUtilities.textToAlphanumeric(values.getConcept());
                 sReference = SLibUtilities.textToAlphanumeric(values.getReference());
                 mdBalanceTot = values.getBalanceTotByBizPartner();
@@ -743,7 +733,7 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    public static java.lang.String createLayoutSantanderTef(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+    public static java.lang.String createLayoutSantanderTef(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
@@ -751,7 +741,7 @@ public abstract class SFinUtilities {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
-    public static java.lang.String createLayoutSantanderSpeiFdN(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+    public static java.lang.String createLayoutSantanderSpeiFdN(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title) {
         java.lang.String sBizPartner = "";
         java.lang.String sBizPartnerSantanderCode = "";
         java.lang.String sAccountDebit = "";
@@ -763,8 +753,7 @@ public abstract class SFinUtilities {
         mdBalanceTot = 0;
 
         try {
-            for (SLayoutBankPaymentTxt payment : payments) {
-
+            for (SLayoutBankPaymentText payment : payments) {
                 sBizPartner = SLibUtilities.textToAlphanumeric(payment.getBizPartner());
                 sBizPartnerSantanderCode = SLibUtilities.textToAlphanumeric(payment.getSantanderBankCode());
                 sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
@@ -800,15 +789,15 @@ public abstract class SFinUtilities {
         return createLayoutSantanderTefOld(client, vRows, title);
     }
     
-    public static java.lang.String createLayoutSantanderSpeiFdY(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+    public static java.lang.String createLayoutSantanderSpeiFdY(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title) {
         return createLayoutSantanderSpeiFdN(payments, title);
     }
     
     /*
-     * BanBajío
+     * Bank layouts of BanBajío
      */
     
-    public static java.lang.String createLayoutBanBajioOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title, Date date, Date dateApplication, int consecutiveDay, String typeLay, String typeAccountCredit) {
+    private static java.lang.String createLayoutBanBajioOld(erp.client.SClientInterface client, Vector<SLayoutBankRow> vRows, java.lang.String title, Date date, Date dateApplication, int consecutiveDay, String typeLay, String typeAccountCredit) {
         int nMoveNum = 2;
         int nMoveNumTotal = 0;
         int n = 0;
@@ -849,7 +838,7 @@ public abstract class SFinUtilities {
                 sBizPartnerAliasBanBajio = SLibUtilities.textToAlphanumeric(values.getBajioBankAlias());
                 sReference = SLibUtilities.textToAlphanumeric(values.getReference());
                 sAccountDebit = SLibUtilities.textTrim(values.getAccountDebit());
-                sAccountCredit = SLibUtilities.textTrim(values.getAccountCredit());
+                sAccountCredit = SLibUtilities.textTrim(values.getBeneficiaryAccountNumber());
                 mdBalanceTot = values.getBalanceTotByBizPartner();
                 mdBalanceTotal += mdBalanceTot;
                 if (values.getTaxCharged() != 0) {
@@ -900,7 +889,7 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    public static java.lang.String createLayoutBanBajio(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, Date date, Date dateApplication, int consecutiveDay, String typeLay, String typeAccountCredit) {
+    private static java.lang.String createLayoutBanBajio(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title, Date date, Date dateApplication, int consecutiveDay, String typeLay, String typeAccountCredit) {
         int nMoveNum = 2;
         int nMoveNumTotal = 0;
         int n = 0;
@@ -927,8 +916,7 @@ public abstract class SFinUtilities {
 
             layout += "\r\n";
 
-            for (SLayoutBankPaymentTxt payment : payments) {
-
+            for (SLayoutBankPaymentText payment : payments) {
                 n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
                 
                 sBizPartnerBanBajioCode = SLibUtilities.textToAlphanumeric(payment.getBajioBankCode());
@@ -982,7 +970,7 @@ public abstract class SFinUtilities {
         return createLayoutBanBajioOld(client, vRows, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_LOCAL, TXT_TYPE_ACCOUNT_CHECK);
     }
     
-    public static java.lang.String createLayoutBanBajioThird(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, Date date, int consecutiveDay) {
+    public static java.lang.String createLayoutBanBajioThird(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title, Date date, int consecutiveDay) {
         return createLayoutBanBajio(payments, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_LOCAL, TXT_TYPE_ACCOUNT_CHECK);
     }
     
@@ -990,7 +978,7 @@ public abstract class SFinUtilities {
         return createLayoutBanBajioOld(client, vRows, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_TEF, TXT_TYPE_ACCOUNT_CLABE);
     }
     
-    public static java.lang.String createLayoutBanBajioTef(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, Date date, int consecutiveDay) {
+    public static java.lang.String createLayoutBanBajioTef(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title, Date date, int consecutiveDay) {
         return createLayoutBanBajio(payments, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_TEF, TXT_TYPE_ACCOUNT_CLABE);
     }
     
@@ -998,15 +986,15 @@ public abstract class SFinUtilities {
         return createLayoutBanBajioOld(client, vRows, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_SPEI, TXT_TYPE_ACCOUNT_CLABE);
     }
     
-    public static java.lang.String createLayoutBanBajioSpeiFdN(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, Date date, int consecutiveDay) {
+    public static java.lang.String createLayoutBanBajioSpeiFdN(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title, Date date, int consecutiveDay) {
         return createLayoutBanBajio(payments, title, date, date, consecutiveDay, TXT_TYPE_LAY_BANBAJIO_SPEI, TXT_TYPE_ACCOUNT_CLABE);
     }
     
     /*
-     * BBVA Bancomer
+     * Bank layouts of BBVA
      */
     
-    private static java.lang.String createLayoutBbvaInterbank(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, String availability) {
+    private static java.lang.String createLayoutBbvaInterbank(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title, String availability) {
         int n = 0;
         java.lang.String sBizPartner = "";
         java.lang.String sAccountDebit = "";
@@ -1017,8 +1005,7 @@ public abstract class SFinUtilities {
         mdBalanceTot = 0;
 
         try {
-            for (SLayoutBankPaymentTxt payment : payments) {
-
+            for (SLayoutBankPaymentText payment : payments) {
                 n = (int) (Math.floor(Math.log10(payment.getBankKey())) + 1);
                 
                 sBizPartner = SLibUtilities.textToAlphanumeric(payment.getBizPartner());
@@ -1047,7 +1034,7 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    public static java.lang.String createLayoutBbvaThird(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+    public static java.lang.String createLayoutBbvaThird(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title) {
         java.lang.String sReference = "";
         java.lang.String sAccountDebit = "";
         java.lang.String sAccountCredit = "";
@@ -1058,8 +1045,7 @@ public abstract class SFinUtilities {
         mbIsRepeated = false;
 
         try {
-            for (SLayoutBankPaymentTxt payment : payments) {
-
+            for (SLayoutBankPaymentText payment : payments) {
                 sReference = SLibUtilities.textToAlphanumeric(payment.getReference());
                 sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
                 sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
@@ -1080,15 +1066,15 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    public static java.lang.String createLayoutBbvaTef(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+    public static java.lang.String createLayoutBbvaTef(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title) {
         return createLayoutBbvaInterbank(payments, title, TXT_TYPE_LAY_BBVA_TEF);
     }
     
-    public static java.lang.String createLayoutBbvaSpei(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+    public static java.lang.String createLayoutBbvaSpei(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title) {
         return createLayoutBbvaInterbank(payments, title, TXT_TYPE_LAY_BBVA_SPEI);
     }
     
-    public static java.lang.String createLayoutBbvaCie(final ArrayList<SLayoutBankPaymentTxt> payments) {
+    public static java.lang.String createLayoutBbvaCie(final ArrayList<SLayoutBankPaymentText> payments) {
         double dImporte = 0;
         java.lang.String sConceptoCie = "";
         java.lang.String sConvenioCie = "";
@@ -1101,7 +1087,7 @@ public abstract class SFinUtilities {
         DecimalFormat oFormatImporte = new DecimalFormat(SLibUtils.textRepeat("0", 13) + "." + SLibUtils.textRepeat("0", 2));   // fixed length defined in layout specification
         
         try {
-            for (SLayoutBankPaymentTxt payment : payments) {
+            for (SLayoutBankPaymentText payment : payments) {
                 sConceptoCie = SLibUtilities.textTrim(payment.getConceptCie());
                 sConvenioCie = SLibUtilities.textToAlphanumeric(payment.getAgreement());
                 sAsuntoOrdenante = SLibUtilities.textTrim(payment.getAccountDebit());
@@ -1125,10 +1111,41 @@ public abstract class SFinUtilities {
     }
     
     /*
-     * Citibanamex
+     * Bank layouts of Citibanamex
      */
     
-    public static java.lang.String createLayoutBanamexThird(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title) {
+    
+    public static String getBizPartnerForCitibanamex(SGuiSession session, int bizPartnerId) throws Exception {
+        String bizPartner = "";
+        String firstname = "";
+        String lastname = "";
+        String motherLastname = "";
+        String fatherLastname = "";
+        String sql = "";
+        ResultSet resulSet = null;
+
+        sql = "SELECT bp, lastname, firstname, fid_tp_bp_idy " +
+              "FROM erp.bpsu_bp " +
+              "WHERE id_bp = " + bizPartnerId;
+
+        resulSet = session.getDatabase().getConnection().createStatement().executeQuery(sql);
+        if (resulSet.next()) {
+            if (resulSet.getInt("fid_tp_bp_idy") == SModSysConsts.BPSS_TP_BP_IDY_ORG) {
+                firstname = resulSet.getString("bp");
+                bizPartner = "," + SLibUtilities.textToAlphanumeric(firstname) + "/";
+            }
+            else {
+                firstname = resulSet.getString("firstname");
+                lastname = resulSet.getString("lastname");
+                fatherLastname = lastname.substring(0, !lastname.contains(" ") ? lastname.length() : lastname.indexOf(" "));
+                motherLastname = lastname.length() > fatherLastname.length() + 1 ? lastname.substring(fatherLastname.length() + 1) : "";
+                bizPartner = SLibUtilities.textToAlphanumeric(firstname) + "," + SLibUtilities.textToAlphanumeric(fatherLastname) + "/" + SLibUtilities.textToAlphanumeric(motherLastname);
+            }
+        }
+        return bizPartner;
+    }
+    
+    public static java.lang.String createLayoutCitibanamexThird(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title) {
         java.lang.String sReference = "";
         java.lang.String sAccountDebit = "";
         java.lang.String sAccountBranchDebit = "";
@@ -1141,8 +1158,7 @@ public abstract class SFinUtilities {
         mbIsRepeated = false;
 
         try {
-            for (SLayoutBankPaymentTxt payment : payments) {
-
+            for (SLayoutBankPaymentText payment : payments) {
                 sReference = SLibUtilities.textToAlphanumeric(payment.getReference());
                 sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
                 sAccountBranchDebit = SLibUtilities.textTrim(payment.getAccountBranchDebit());
@@ -1175,7 +1191,7 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    private static java.lang.String createLayoutBanamexInterbank(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, String lapse, SGuiSession session) {
+    private static java.lang.String createLayoutCitibanamexInterbank(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title, String lapse, SGuiSession session) {
         int n = 0;
         java.lang.String sDescription = "";
         java.lang.String sAccountDebit = "";
@@ -1190,14 +1206,14 @@ public abstract class SFinUtilities {
         mbIsRepeated = false;
 
         try {
-            for (SLayoutBankPaymentTxt payment : payments) {
+            for (SLayoutBankPaymentText payment : payments) {
                 n = (int) (Math.floor(Math.log10(payment.getBankKey())) + 1);
 
                 sDescription = SLibUtilities.textToAlphanumeric(payment.getReference());
                 sAccountDebit = SLibUtilities.textTrim(payment.getAccountDebit());
                 sAccountBranchDebit = SLibUtilities.textTrim(payment.getAccountBranchDebit());
                 sAccountCredit = SLibUtilities.textTrim(payment.getAccountCredit());
-                sBizPartner = getBizPartnerForBanamex(session, payment.getBizPartnerId());
+                sBizPartner = getBizPartnerForCitibanamex(session, payment.getBizPartnerId());
                 mdBalanceTot = payment.getTotalAmount();
 
                 layout += TXT_TYPE_BMX_TRAN_CLABE; // Type transaction
@@ -1227,13 +1243,17 @@ public abstract class SFinUtilities {
         return layout;
     }
     
-    public static java.lang.String createLayoutBanamexTef(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, SGuiSession session) {
-        return createLayoutBanamexInterbank(payments, title, TXT_TERM_BMX_NEXT_DAY, session);
+    public static java.lang.String createLayoutCitibanamexTef(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title, SGuiSession session) {
+        return createLayoutCitibanamexInterbank(payments, title, TXT_TERM_BMX_NEXT_DAY, session);
     }
     
-    public static java.lang.String createLayoutBanamexSpei(ArrayList<SLayoutBankPaymentTxt> payments, java.lang.String title, SGuiSession session) {
-        return createLayoutBanamexInterbank(payments, title, TXT_TERM_BMX_SAME_DAY, session);
+    public static java.lang.String createLayoutCitibanamexSpei(ArrayList<SLayoutBankPaymentText> payments, java.lang.String title, SGuiSession session) {
+        return createLayoutCitibanamexInterbank(payments, title, TXT_TERM_BMX_SAME_DAY, session);
     }
+    
+    /*
+     * Miscellaneous
+     */
     
     /**
      * Checks if accounting transactions have a business partner.

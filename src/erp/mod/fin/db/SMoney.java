@@ -5,52 +5,46 @@
  */
 package erp.mod.fin.db;
 
-import erp.data.SDataConstantsSys;
 import sa.lib.SLibUtils;
+import sa.lib.gui.SGuiSession;
 /**
  *
- * @author Uriel Castañeda, Sergio Flores, Alfredo Pérez
+ * @author Uriel Castañeda, Alfredo Pérez, Sergio Flores
  */
-public class SMoney {
+public final class SMoney {
     
-    private int mnCurrencyOriginalId;
-    private int mnCurrencyLocalId;
-    private double mdAmountOriginal;
+    private SGuiSession moSession;
+    private double mdOriginalAmount;
+    private int mnOriginalCurrencyId;
     private double mdExchangeRate;
 
-    public SMoney(double amountOriginal, int currencyOriginalId) {
-        this(amountOriginal, currencyOriginalId, 0.0, currencyOriginalId);
+    public SMoney(SGuiSession session, double originalAmount, int originalCurrencyId, double exchangeRate) {
+        moSession = session;
+        mdOriginalAmount = originalAmount;
+        mnOriginalCurrencyId = originalCurrencyId;
+        setExchangeRate(exchangeRate);
     }
     
-    public SMoney(double amountOriginal, int currencyOriginalId, double exchangeRate, int currencyLocalId) {
-        mnCurrencyOriginalId = currencyOriginalId;
-        mnCurrencyLocalId = currencyLocalId;
-        mdAmountOriginal = amountOriginal;
-        mdExchangeRate = (mnCurrencyOriginalId == mnCurrencyLocalId ? SDataConstantsSys.FINX_EXC_RATE_CUR_SYS : exchangeRate);
-    }
-    
-    public int getCurrencyOriginalId() { return mnCurrencyOriginalId; }
-    public int getCurrencyLocalId() { return mnCurrencyLocalId; }
-    public double getAmountOriginal() { return mdAmountOriginal; }
+    public double getOriginalAmount() { return mdOriginalAmount; }
+    public int getOriginalCurrencyId() { return mnOriginalCurrencyId; }
     public double getExchangeRate() { return mdExchangeRate; }
 
-    public double getAmountLocal () {
-        return SLibUtils.round(mdAmountOriginal * mdExchangeRate, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+    public void setOriginalAmount(double d) { mdOriginalAmount = d; }
+    public void setOriginalCurrencyId(int n) { mnOriginalCurrencyId = n; }
+    public void setExchangeRate(double exchangeRate) { mdExchangeRate = isLocalCurrency() ? 1d : exchangeRate; }
+    
+    public double getLocalAmount() {
+        return SLibUtils.roundAmount(mdOriginalAmount * mdExchangeRate);
     }
     
-    public void setExchangeRate(double d) { mdExchangeRate = d; }
-    public void setAmountOriginal(double d) { mdAmountOriginal = d; }
-    
-    public void addAmountOriginal(double d) {
-        mdAmountOriginal = SLibUtils.round(mdAmountOriginal + d, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-    }
-    
-    public void subtractAmountOginal(double d) {
-        mdAmountOriginal = SLibUtils.round(mdAmountOriginal - d, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
+    public boolean isLocalCurrency() {
+        return moSession.getSessionCustom().isLocalCurrency(new int[] { mnOriginalCurrencyId });
     }
     
     @Override
     public SMoney clone() {
-        return new SMoney(mdAmountOriginal, mnCurrencyOriginalId, mdExchangeRate, mnCurrencyLocalId);
+        SMoney clone = new SMoney(moSession, mdOriginalAmount, mnOriginalCurrencyId, mdExchangeRate);
+        
+        return clone;
     }
 }

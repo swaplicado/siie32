@@ -1776,7 +1776,7 @@ public abstract class STrnUtilities {
                         + "<th id=\"number\" style=\"min-width: 10em; max-width: 10em;\">Saldo</th> "
                         + "</tr> "
                         + body 
-                        + computeMailFooterEndTable(SClient.APP_NAME , SClient.APP_COPYRIGHT, SClient.APP_PROVIDER, SClient.VENDOR_WEBSITE , SClient.APP_RELEASE);
+                        + computeMailFooterEndTable();
                 
                 sendMail(client, SModSysConsts.CFGS_TP_MMS_CON_SAL, body, "", recipientsTo, recipientsCc, recipientsBcc);
             }
@@ -1787,7 +1787,6 @@ public abstract class STrnUtilities {
         catch (Exception e) {
             SLibUtilities.printOutException(STrnUtilities.class.getName(), e);
         }
-    
     }
     
     /**
@@ -1862,7 +1861,7 @@ public abstract class STrnUtilities {
                                     SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
                                     payrollReceipt.read(client.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
                                     docNumber = SDbPayroll.composePayrollNumber(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n());
-                                    docNumber += " " + payrollReceipt.getIssueNumber();
+                                    docNumber += " " + payrollReceipt.getPayrollReceiptIssueNumber();
                                     isCancelled = payrollReceipt.getChildPayrollReceiptIssue() == null ? cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED : payrollReceipt.getChildPayrollReceiptIssue().getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                                     cancelledDate = payrollReceipt.getChildPayrollReceiptIssue() == null ? cfd.getTimestamp() : payrollReceipt.getChildPayrollReceiptIssue().getTsUserUpdate();
                                     docType = "Recibo de nomina";
@@ -2853,31 +2852,30 @@ public abstract class STrnUtilities {
         return mail;
     }
     
-    public static String computeMailFooterEndTable(final String appName, final String copyright, final String appProvider, final String vendorWebsite, final String appRelease) {
-        return "</table> "
-            + " <font size = 1><p> *Entrega men: Mes del que se esta retirando </p> "
-            + " <p> *Cant. prog: Cantidad programada para el mes actual </p> "
-            + " <p> *Remanente mes: Cantidad restante del mes </p> "
-            + " <p> *Cant. total: Cantidad total del contrato </p> "
-            + " <p> *Remanente cant. total: Cantidad restante de la cantidad total del contrato </p> </font> " 
-            + computeMailFooter(appName, copyright, appProvider, vendorWebsite, appRelease);
+    public static String computeMailFooterEndTable() {
+        return "</table>"
+                + "<font size=\"1\">"
+                + "<p>*Entrega men: Mes del que se esta retirando</p>"
+                + "<p>*Cant. prog: Cantidad programada para el mes actual</p>"
+                + "<p>*Remanente mes: Cantidad restante del mes</p>"
+                + "<p>*Cant. total: Cantidad total del contrato</p>"
+                + "<p>*Remanente cant. total: Cantidad restante de la cantidad total del contrato</p>"
+                + "</font>"
+                + "<br>"
+                + "<br>"
+                + "<hr>"
+                + composeMailFooter("")
+                + "</body>"
+                + "</html>";
     }
     
-    public static String computeMailFooter(final String appName, final String copyright, final String appProvider, final String vendorWebsite, final String appRelease) {
-        return "<br> "
-            + "<br> "
-            + "<hr> "
-            + "<span id =\"info\"> "
-            + SLibUtils.textToHtml("Favor de no responder este correo-e, fue generado de forma automÃ¡tica.")
-            + "<br>"
-            + appName+ " &copy;" + copyright + " " + appProvider
-            + "</span><span id=\"website\"><br> "
-            + vendorWebsite
-            + "</span><span id=\"release\"><br> "
-            + appRelease
-            + "</span> "
-            + "</body> "
-            + "</html> ";
+    public static String composeMailFooter(final String htmlClass) {
+        return "<p" + (htmlClass.isEmpty() ? "" : " class=\"" +  htmlClass+ "\"") + ">"
+                + "<b>Favor de no responder a este correo-e.</b><br>"
+                + "Fue generado de forma automatica con " + SClient.APP_NAME + " | &copy;" + SClient.APP_COPYRIGHT + " " + SClient.VENDOR + "<br>"
+                + "tel.: " + SClient.VENDOR_PHONE + " | mail: " + SClient.VENDOR_MAIL + " | web: " + SClient.VENDOR_WEBSITE + "<br>"
+                + SClient.APP_RELEASE
+                + "</p>";
     }
         
     /**
@@ -3104,6 +3102,82 @@ public abstract class STrnUtilities {
                 }
             }
         }    
+    }
+    
+    /**
+     * To send mail with PDF file attached.
+     * @param client GUI client.
+     * @param mmsType Tipe of Mail Messaging Service (SModSysConsts.CFGS_TP_MMS_FIN_PAY_AUTH_REQ or SModSysConsts.CFGS_TP_MMS_CFD).
+     * @param pdf PDF file to attach.
+     * @param subject Mail subject.
+     * @param body Mail body.
+     * @return <code>true</code> if mail send.
+     * @throws java.lang.Exception 
+     */
+    public static boolean sendMailPdf(final SClientInterface client, final int mmsType, final File pdf, final String subject, final String body) throws Exception {
+        return sendMailPdf(client, mmsType, pdf, subject, body, "");
+    }
+    
+    /**
+     * To send mail with PDF file attached.
+     * @param client GUI client.
+     * @param mmsType Tipe of Mail Messaging Service (SModSysConsts.CFGS_TP_MMS_FIN_PAY_AUTH_REQ or SModSysConsts.CFGS_TP_MMS_CFD).
+     * @param pdf PDF file to attach.
+     * @param subject Mail subject.
+     * @param body Mail body.
+     * @param recipients Mail recipients, semicolon separated.
+     * @return <code>true</code> if mail send.
+     * @throws java.lang.Exception 
+     */
+    public static boolean sendMailPdf(final SClientInterface client, final int mmsType, final File pdf, final String subject, final String body, final String recipients) throws Exception {
+        SDbMms mms = null;
+        SMailSender sender = null;
+        ArrayList<String> toRecipients = null;
+        ArrayList<String> ccRecipients = null;
+        SMail mail = null;
+        boolean sent = false;
+        
+        if (pdf != null) {
+            mms = STrnUtilities.getMms(client, mmsType);
+
+            if (mms != null && mms.getQueryResultId() == SDbConsts.READ_OK) {
+                if (!recipients.isEmpty()) {
+                    toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(recipients, ";")));
+                }
+                else if (!mms.getRecipientTo().isEmpty()) {
+                    toRecipients = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(mms.getRecipientTo(), ";")));
+                }
+
+                if (toRecipients == null || toRecipients.isEmpty()) {
+                    throw new Exception("No existen destinatarios para el envío del correo-e.");
+                }
+
+                if (!mms.getRecipientCarbonCopy().isEmpty()) {
+                    ccRecipients = new ArrayList<>(Arrays.asList(SLibUtilities.textExplode(mms.getRecipientCarbonCopy(), ";")));
+                }
+
+                sender = new SMailSender(mms.getHost(), mms.getPort(), mms.getProtocol(), mms.isStartTls(), mms.isAuth(), mms.getUser(), mms.getUserPassword(), mms.getUser());
+
+                if (ccRecipients == null) {
+                    mail = new SMail(sender, subject, body, toRecipients);
+                }
+                else {
+                    mail = new SMail(sender, subject, body, toRecipients, ccRecipients);
+                }
+
+                mail.getAttachments().add(pdf);
+                mail.send();
+                sent = true;
+            }
+            else {
+                throw new Exception("No existe ninguna configuración para envío de solicitudes.");
+            }
+        }
+        else {
+            throw new Exception("No existe PDF para el envío.");
+        }
+        
+        return sent;
     }
     
     public static boolean updateDeliveryAddress(final SClientInterface client, final int[] idBranchAddress, final int[] pkTrnDps) {

@@ -94,7 +94,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         try {
 
             // Render concept:
-            sConcept = msDbmsSubsystemTypeBiz + "; " + msDbmsCompanyBranchCode + "; " + SLibUtils.DateFormatDate.format(mtDate).toString();
+            sConcept = msDbmsSubsystemTypeBiz + "; " + msDbmsCompanyBranchCode + "; " + SLibUtils.DateFormatDate.format(mtDate);
 
             // 4.2.2 Save accounting record:
 

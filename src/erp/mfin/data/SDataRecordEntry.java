@@ -382,6 +382,8 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         return getRecordPrimaryKey() + "-" + SLibUtils.DecimalNumberFormat.format(mnPkEntryId);
     }
     
+    public int[] getBookkeepingNumberKey_n() { return mnFkBookkeepingYearId_n == 0 && mnFkBookkeepingNumberId_n == 0 ? null : new int[] { mnFkBookkeepingYearId_n, mnFkBookkeepingNumberId_n }; }
+    
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkYearId = (Integer) ((Object[]) pk)[0];

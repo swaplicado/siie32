@@ -18,8 +18,7 @@ import erp.mfin.data.SFinUtilities;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.fin.util.STreasuryBankLayoutFile;
-import erp.mod.fin.util.STreasuryBankLayoutRequest;
+import erp.mtrn.data.STrnUtilities;
 import erp.print.SDataConstantsPrint;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -44,6 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -234,7 +234,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -368,7 +368,7 @@ public abstract class SHrsUtils {
                     
                     sAccountCredit = SLibUtilities.textTrim(resultSetDetail.getString("emp.bank_acc"));
                     balance = resultSetDetail.getDouble("pay_net");
-                    sBizPartner = SFinUtilities.getBizPartnerForBanamex(client.getSession(), resultSetDetail.getInt("rcp.id_emp"));
+                    sBizPartner = SFinUtilities.getBizPartnerForCitibanamex(client.getSession(), resultSetDetail.getInt("rcp.id_emp"));
                     nEmployeeBankAuxId = resultSetDetail.getInt("_bank_id");
                     nEmployeeBankId = nEmployeeBankAuxId == 0 ? moConfig.getFkBankId() : nEmployeeBankAuxId;
                     
@@ -423,7 +423,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -492,7 +492,7 @@ public abstract class SHrsUtils {
                     n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
                      
                     buffer += SLibUtilities.textRepeat("0", 9 - n).concat(nMoveNum++ + "");
-                    buffer += SLibUtilities.textRepeat(" ", 16); // Blank
+                    buffer += SLibUtilities.textRepeat(" ", 16); // blank
                     buffer += "99";
                     buffer += sAccountCredit.concat(sAccountCredit.length() > 20 ? sAccountCredit.substring(0,20) : (SLibUtilities.textRepeat(" ", (sAccountCredit.length() == 20 ? 0 : 20 - sAccountCredit.length())))); 
                     buffer += formatDesc.format(balance).replace(".", "");
@@ -513,7 +513,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -634,7 +634,7 @@ public abstract class SHrsUtils {
      * @return
      * @throws SQLException 
      */
-    private static ArrayList prepareSqlQueryHigh(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    private static ArrayList<Integer> prepareSqlQueryHigh(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateIni = formatter.format(dateApplicationIni);
         String dateEnd = formatter.format(dateApplicationEnd);
@@ -647,11 +647,12 @@ public abstract class SHrsUtils {
                 + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_ACTIVE ;
 
         resultSet = client.getSession().getStatement().executeQuery(sqlId);
-        ArrayList <Integer> resultsId = new ArrayList();
+        ArrayList<Integer> resultsId = new ArrayList<>();
 
         while (resultSet.next()) {
           resultsId.add(resultSet.getInt("id_emp"));                  
         }
+        
         return resultsId;
     }
     
@@ -663,7 +664,7 @@ public abstract class SHrsUtils {
      * @return
      * @throws SQLException 
      */
-    private static ArrayList prepareSqlQueryMod(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    private static ArrayList<Integer> prepareSqlQueryMod(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateIni = formatter.format(dateApplicationIni);
         String dateEnd = formatter.format(dateApplicationEnd);
@@ -676,7 +677,7 @@ public abstract class SHrsUtils {
                 + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del ";        
 
         resultSet = client.getSession().getStatement().executeQuery(sqlId);
-        ArrayList <Integer> resultsId = new ArrayList();
+        ArrayList<Integer> resultsId = new ArrayList<>();
 
         while (resultSet.next()) {
           resultsId.add(resultSet.getInt("id_emp"));                  
@@ -692,7 +693,7 @@ public abstract class SHrsUtils {
      * @return
      * @throws SQLException 
      */
-    private static ArrayList prepareSqlQueryLow(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    private static ArrayList<Integer> prepareSqlQueryLow(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         String dateIni = formatter.format(dateApplicationIni);
         String dateEnd = formatter.format(dateApplicationEnd);
@@ -705,7 +706,7 @@ public abstract class SHrsUtils {
                 + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + " "; 
 
         resultSet = client.getSession().getStatement().executeQuery(sqlId);
-        ArrayList <Integer> resultsId = new ArrayList();
+        ArrayList<Integer> resultsId = new ArrayList<>();
 
         while (resultSet.next()) {
           resultsId.add(resultSet.getInt("id_emp"));                  
@@ -753,7 +754,7 @@ public abstract class SHrsUtils {
             try {
                 statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
-                ArrayList <Integer> pkPrimaryK = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
+                ArrayList<Integer> pkPrimaryK = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
     
                 for (int i = 0; i <= pkPrimaryK.size()-1; i++){
                 int pkUser = pkPrimaryK.get(i);
@@ -824,7 +825,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -870,7 +871,7 @@ public abstract class SHrsUtils {
             try {
                 statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
-                ArrayList <Integer> pkPrimaryK = prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
+                ArrayList<Integer> pkPrimaryK = prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
     
                 for (int i = 0; i <= pkPrimaryK.size()-1; i++){
                     int pkUser = pkPrimaryK.get(i);
@@ -939,7 +940,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -983,7 +984,7 @@ public abstract class SHrsUtils {
             try {
                 statement = client.getSession().getStatement();
                 bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
-                ArrayList <Integer> pkPrimaryK = prepareSqlQueryLow(client, dateLayoutStart, dateLayoutEnd);
+                ArrayList<Integer> pkPrimaryK = prepareSqlQueryLow(client, dateLayoutStart, dateLayoutEnd);
     
                 for (int i = 0; i <= pkPrimaryK.size()-1; i++){
                 int pkUser = pkPrimaryK.get(i);
@@ -1044,7 +1045,7 @@ public abstract class SHrsUtils {
                     SLibUtilities.launchFile(file.getPath());
                 }
             }
-            catch (java.lang.Exception e) {
+            catch (Exception e) {
                 SLibUtilities.renderException(STableUtilities.class.getName(), e);
             }
         }
@@ -1860,7 +1861,7 @@ public abstract class SHrsUtils {
         return wage;
     }
 
-    public static HashMap<String, Object> createPayrollReceiptMap(final SGuiClient client, final int[] payrollKey, final int pnPrintMode) throws java.lang.Exception {
+    public static HashMap<String, Object> createPayrollReceiptMap(final SGuiClient client, final int[] payrollKey, final int pnPrintMode) throws Exception {
         double dTotalPercepciones = 0;
         double dTotalDeducciones = 0;
         SDbLoan loan = null;
@@ -1869,8 +1870,8 @@ public abstract class SHrsUtils {
         SDbPayroll payroll = null;
         SDbPayrollReceipt payrollReceipt = null;
         HashMap<String, Object> map = null;
-        ArrayList aPercepciones = null;
-        ArrayList aDeducciones = null;
+        ArrayList<Object> aPercepciones = null;
+        ArrayList<Object> aDeducciones = null;
         DecimalFormat oFixedFormatAux = null;
 
         payroll = new SDbPayroll();
@@ -1926,8 +1927,8 @@ public abstract class SHrsUtils {
 
         map.put("Ejercicio", payroll.getPeriodYear() + "-" + oFixedFormatAux.format(payroll.getPeriod()));
 
-        aPercepciones = new ArrayList();
-        aDeducciones = new ArrayList();
+        aPercepciones = new ArrayList<>();
+        aDeducciones = new ArrayList<>();
 
         dTotalPercepciones = 0;
         dTotalDeducciones = 0;
@@ -2012,9 +2013,9 @@ public abstract class SHrsUtils {
      * @param client Interface Client
      * @param pnPrintMode print mode (e.g. SDataConstantsPrint.PRINT_MODE_)
      * @param payrollKey payrroll key
-     * @throws java.lang.Exception
+     * @throws Exception
      */
-    public static void printPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
+    public static void printPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws Exception {
         HashMap<String, Object> map = new HashMap<>();
         map = createPayrollReceiptMap(client, payrollKey, pnPrintMode);
         
@@ -2031,21 +2032,19 @@ public abstract class SHrsUtils {
         }
     }
     
-    public static void sendPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
-        boolean isSent = false;
-        HashMap<String, Object> map = new HashMap<>();
-        File pdf = null;
-        STreasuryBankLayoutRequest layoutRequest = new STreasuryBankLayoutRequest(client, null);
-        
-        map = createPayrollReceiptMap(client, payrollKey, pnPrintMode);
-        pdf = createPayrollReceipt(client, map);
+    public static void sendPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws Exception {
+        HashMap<String, Object> map = createPayrollReceiptMap(client, payrollKey, pnPrintMode);
+        File pdf = createPayrollReceipt(client, map);
         
         SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BP, new int[] { (Integer)map.get("nEmployeeId") }, SLibConstants.EXEC_MODE_SILENT);
-        String mail = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
+        String recipient = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
             
         if (pdf != null) {
-            isSent = layoutRequest.sendMail(null, "", pdf, STreasuryBankLayoutRequest.SND_TP_PAY_RCP, mail);
-            if (isSent) {
+            String subject = "Envío de recibo de nómina";
+            String body = "Se adjunta recibo de nómina en formato PDF.";
+            boolean sent = STrnUtilities.sendMailPdf((SClientInterface) client, SModSysConsts.CFGS_TP_MMS_CFD, pdf, subject, body, recipient);
+            
+            if (sent) {
                 client.showMsgBoxInformation("El recibo de nómina ha sido enviado correctamente.\n");
             }
             else {
@@ -2054,7 +2053,7 @@ public abstract class SHrsUtils {
         }
     }
     
-    public static void sendPayrollReceipts(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws java.lang.Exception {
+    public static void sendPayrollReceipts(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws Exception {
         ArrayList<SDbPayrollReceipt> payrollReceipts = new ArrayList<>();
         SDbPayroll payroll = new SDbPayroll();
         payroll.read(client.getSession(), new int[] { payrollKey[0] });
@@ -2101,14 +2100,14 @@ public abstract class SHrsUtils {
             fos.write(reportBytes);
             fos.close();
         }
-        catch (Exception e) {
-            SLibUtils.showException(STreasuryBankLayoutFile.class, e);
+        catch (JRException | IOException e) {
+            SLibUtils.showException(SHrsUtils.class, e);
         }
         
         return file;  
     }
     
-    public static void printPrePayroll(final SGuiClient client, final int payrollKey) throws java.lang.Exception {
+    public static void printPrePayroll(final SGuiClient client, final int payrollKey) throws Exception {
         HashMap<String, Object> map = null;
         SDataBizPartner bizPartnerCompany = null;
 
@@ -2488,19 +2487,6 @@ public abstract class SHrsUtils {
          }
          
         return scheduledDays;
-    }
-    
-    public static void createPayrollReceiptIssues(final SGuiSession session, final SDbPayroll payroll) throws Exception {
-        for (SDbPayrollReceipt payrollReceipt : payroll.getChildPayrollReceipts()) {
-            payrollReceipt.setAuxDateIssue(payroll.getDateEnd());
-            payrollReceipt.createIssues(session);
-        }
-    }
-    
-    public static void updateToNewStatusPayrollReceiptIssues(final SGuiSession session, final SDbPayroll payroll) throws Exception {
-        for (SDbPayrollReceipt payrollReceipt : payroll.getChildPayrollReceipts()) {
-            payrollReceipt.updateToNewStatusIssues(session);
-        }
     }
     
     public static double getSbcIntegrationFactor(final SGuiSession session, final Date dateBenefits, final Date dateCutoff) throws Exception {

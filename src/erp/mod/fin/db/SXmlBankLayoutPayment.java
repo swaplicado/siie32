@@ -10,34 +10,33 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas, Alfredo Pérez
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
 public class SXmlBankLayoutPayment extends SXmlElement {
 
     public static final String NAME = "Pay";
     public static final String ATT_LAY_PAY_AMT = "PayAmount";
     public static final String ATT_LAY_PAY_AMT_CY = "PayAmountCy";
-    public static final String ATT_LAY_PAY_REF_ALP = "PayReferenceAlpha";
     public static final String ATT_LAY_PAY_CUR = "PayCurrency";
+    public static final String ATT_LAY_PAY_EXR = "PayExchangeRate";
     public static final String ATT_LAY_PAY_AGREE = "Agreement";
     public static final String ATT_LAY_PAY_AGREE_REF = "AgreementReference";
     public static final String ATT_LAY_PAY_AGREE_CON = "ConceptCie";
-    public static final String ATT_LAY_PAY_EXT_RATE = "PayExchangeRate";
-    public static final String ATT_LAY_PAY_REF = "PayReference";
-    public static final String ATT_LAY_PAY_CPT = "PayConcept";
+    public static final String ATT_LAY_PAY_REF_ALPHA = "PayReferenceAlpha";
+    public static final String ATT_LAY_PAY_CON = "PayConcept";
     public static final String ATT_LAY_PAY_HSBC_FIS_VOU = "HsbcFiscalVoucher";
     public static final String ATT_LAY_PAY_HSBC_ACC_TP = "HsbcAccountType";
     public static final String ATT_LAY_PAY_HSBC_BANK_CODE = "HsbcBankCode";
     public static final String ATT_LAY_PAY_HSBC_FIS_ID_DBT = "HsbcFiscalIdDebit";
     public static final String ATT_LAY_PAY_HSBC_FIS_ID_CRD = "HsbcFiscalIdCredit";
-    public static final String ATT_LAY_PAY_HSBC_DCRP = "HsbcDescription";
-    public static final String ATT_LAY_PAY_SAN_BANK_CODE = "SantBankCode";
+    public static final String ATT_LAY_PAY_HSBC_DESCRIP = "HsbcDescription";
+    public static final String ATT_LAY_PAY_SANT_BANK_CODE = "SantBankCode";
     public static final String ATT_LAY_PAY_BAJIO_BANK_CODE = "BajioBankCode";
     public static final String ATT_LAY_PAY_BAJIO_NICK = "BajioNick";
     public static final String ATT_LAY_PAY_BANK_KEY = "BankKey";
     public static final String ATT_LAY_PAY_APPLIED = "PayApplied";
     public static final String ATT_LAY_PAY_BP = "PayBizPartnertId";
-    public static final String ATT_LAY_PAY_BANK_BP = "PayBankBizPartnertId";
+    public static final String ATT_LAY_PAY_BANK_BPB = "PayBankBizPartnertId";
     public static final String ATT_LAY_PAY_BANK_BANK = "PayBankBankId";
     public static final String ATT_LAY_PAY_REC_YEAR = "PayRecordYearId";
     public static final String ATT_LAY_PAY_REC_PER = "PayRecordPeriodId";
@@ -48,15 +47,15 @@ public class SXmlBankLayoutPayment extends SXmlElement {
     public static final String ATT_LAY_PAY_BKK_NUM = "PayBkkNumberId";
     public static final String ATT_LAY_ROW_REF_REC = "ReferenceRecord";
 
-    protected SXmlAttribute moPayReference;
-    protected SXmlAttribute moPayConcept;
     protected SXmlAttribute moPayAmount;
     protected SXmlAttribute moPayAmountCy;
     protected SXmlAttribute moPayCurrency;
+    protected SXmlAttribute moPayExchangeRate;
     protected SXmlAttribute moAgreement;
     protected SXmlAttribute moAgreementReference;
-    protected SXmlAttribute moConceptCie;
-    protected SXmlAttribute moPayExchangeRate;
+    protected SXmlAttribute moAgreementConceptCie;
+    protected SXmlAttribute moPayReferenceAlpha;
+    protected SXmlAttribute moPayConcept;
     protected SXmlAttribute moPayHsbcFiscalVoucher;
     protected SXmlAttribute moPayHsbcAccountType;
     protected SXmlAttribute moPayHsbcBankCode;
@@ -86,25 +85,25 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         moPayAmount = new SXmlAttribute(ATT_LAY_PAY_AMT);
         moPayAmountCy = new SXmlAttribute(ATT_LAY_PAY_AMT_CY);
         moPayCurrency = new SXmlAttribute(ATT_LAY_PAY_CUR);
+        moPayExchangeRate = new SXmlAttribute(ATT_LAY_PAY_EXR);
         moAgreement = new SXmlAttribute(ATT_LAY_PAY_AGREE);
         moAgreementReference = new SXmlAttribute(ATT_LAY_PAY_AGREE_REF);
-        moConceptCie = new SXmlAttribute(ATT_LAY_PAY_AGREE_CON);
-        moPayExchangeRate = new SXmlAttribute(ATT_LAY_PAY_EXT_RATE);
-        moPayReference = new SXmlAttribute(ATT_LAY_PAY_REF_ALP);
-        moPayConcept = new SXmlAttribute(ATT_LAY_PAY_CPT);
+        moAgreementConceptCie = new SXmlAttribute(ATT_LAY_PAY_AGREE_CON);
+        moPayReferenceAlpha = new SXmlAttribute(ATT_LAY_PAY_REF_ALPHA);
+        moPayConcept = new SXmlAttribute(ATT_LAY_PAY_CON);
         moPayHsbcFiscalVoucher = new SXmlAttribute(ATT_LAY_PAY_HSBC_FIS_VOU);
         moPayHsbcAccountType = new SXmlAttribute(ATT_LAY_PAY_HSBC_ACC_TP);
         moPayHsbcBankCode = new SXmlAttribute(ATT_LAY_PAY_HSBC_BANK_CODE);
         moPayHsbcFiscalIdDebit = new SXmlAttribute(ATT_LAY_PAY_HSBC_FIS_ID_DBT);
         moPayHsbcFiscalIdCredit = new SXmlAttribute(ATT_LAY_PAY_HSBC_FIS_ID_CRD);
-        moPayHsbcDescription = new SXmlAttribute(ATT_LAY_PAY_HSBC_DCRP);
-        moPaySantBankCode = new SXmlAttribute(ATT_LAY_PAY_SAN_BANK_CODE);
+        moPayHsbcDescription = new SXmlAttribute(ATT_LAY_PAY_HSBC_DESCRIP);
+        moPaySantBankCode = new SXmlAttribute(ATT_LAY_PAY_SANT_BANK_CODE);
         moPayBajioBankCode = new SXmlAttribute(ATT_LAY_PAY_BAJIO_BANK_CODE);
         moPayBajioNick = new SXmlAttribute(ATT_LAY_PAY_BAJIO_NICK);
         moPayBankKey = new SXmlAttribute(ATT_LAY_PAY_BANK_KEY);
         moPayApplied = new SXmlAttribute(ATT_LAY_PAY_APPLIED);
         moPayBizPartnertId = new SXmlAttribute(ATT_LAY_PAY_BP);
-        moPayBankBizPartnertId = new SXmlAttribute(ATT_LAY_PAY_BANK_BP);
+        moPayBankBizPartnertId = new SXmlAttribute(ATT_LAY_PAY_BANK_BPB);
         moPayBankBankId = new SXmlAttribute(ATT_LAY_PAY_BANK_BANK);
         moPayRecordYearId = new SXmlAttribute(ATT_LAY_PAY_REC_YEAR);
         moPayRecordPeriodId = new SXmlAttribute(ATT_LAY_PAY_REC_PER);
@@ -115,14 +114,14 @@ public class SXmlBankLayoutPayment extends SXmlElement {
         moPayBkkNumberId = new SXmlAttribute(ATT_LAY_PAY_BKK_NUM);
         moRowReferenceRecord = new SXmlAttribute(ATT_LAY_ROW_REF_REC);
 
-        mvXmlAttributes.add(moPayReference);
+        mvXmlAttributes.add(moPayReferenceAlpha);
         mvXmlAttributes.add(moPayConcept);
         mvXmlAttributes.add(moPayAmount);
         mvXmlAttributes.add(moPayAmountCy);
         mvXmlAttributes.add(moPayCurrency);
         mvXmlAttributes.add(moAgreement);
         mvXmlAttributes.add(moAgreementReference);
-        mvXmlAttributes.add(moConceptCie);
+        mvXmlAttributes.add(moAgreementConceptCie);
         mvXmlAttributes.add(moPayExchangeRate);
         mvXmlAttributes.add(moPayHsbcFiscalVoucher);
         mvXmlAttributes.add(moPayHsbcAccountType);

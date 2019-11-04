@@ -242,6 +242,19 @@ public class SDbPayroll extends SDbRegistryUser {
         return payrollNumber;
     }
 
+    public void createPayrollReceiptIssues(final SGuiSession session) throws Exception {
+        for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
+            payrollReceipt.setAuxDateOfIssue(mtDateEnd);
+            payrollReceipt.createPayrollReceiptIssue(session);
+        }
+    }
+    
+    public void updatePayrollReceiptIssuesAsNewOnes(final SGuiSession session) throws Exception {
+        for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
+            payrollReceipt.updatePayrollReceiptIssueAsNewOne(session);
+        }
+    }
+    
     @Override
     public void setPrimaryKey(int[] pk) {
         mnPkPayrollId = pk[0];
@@ -520,12 +533,12 @@ public class SDbPayroll extends SDbRegistryUser {
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceiptsToDelete) {
             payrollReceipt.setDeleted(true);
             payrollReceipt.setPkPayrollId(mnPkPayrollId);
-            payrollReceipt.setAuxDateIssue(mtDateEnd);
+            payrollReceipt.setAuxDateOfIssue(mtDateEnd);
             payrollReceipt.save(session);
         }
         
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
-            if (payrollReceipt.getChildPayrollReceiptIssue() == null || !payrollReceipt.getChildPayrollReceiptIssue().isStamped()) {
+            if (payrollReceipt.getChildPayrollReceiptIssue() == null || !payrollReceipt.getChildPayrollReceiptIssue().isCfdStamped()) {
                 payrollReceipt.setRegistryNew(true);
                 payrollReceipt.setPkPayrollId(mnPkPayrollId);
                 payrollReceipt.save(session);

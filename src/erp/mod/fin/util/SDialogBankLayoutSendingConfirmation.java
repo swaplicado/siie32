@@ -15,14 +15,14 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
-public class SDialogComments extends SBeanFormDialog {
+public class SDialogBankLayoutSendingConfirmation extends SBeanFormDialog {
 
     /**
-     * Creates new form SDialogComments
+     * Creates new form SDialogBankLayoutSendingConfirmation
      */
-    public SDialogComments(SGuiClient client, String title) {
+    public SDialogBankLayoutSendingConfirmation(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -42,7 +42,10 @@ public class SDialogComments extends SBeanFormDialog {
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jlComment = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
         moTextComment = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel6 = new javax.swing.JPanel();
+        moBoolSendMailToBeneficiaries = new sa.lib.gui.bean.SBeanFieldBoolean();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -51,18 +54,31 @@ public class SDialogComments extends SBeanFormDialog {
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(1, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlComment.setText("Comentario:");
-        jlComment.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlComment.setText("Comentarios para la solicitud de autorización:");
+        jlComment.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel3.add(jlComment);
 
-        moTextComment.setPreferredSize(new java.awt.Dimension(250, 23));
-        jPanel3.add(moTextComment);
-
         jPanel2.add(jPanel3);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moTextComment.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel5.add(moTextComment);
+
+        jPanel2.add(jPanel5);
+
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        moBoolSendMailToBeneficiaries.setSelected(true);
+        moBoolSendMailToBeneficiaries.setText("Enviar notificación vía correo-e a los beneficiarios");
+        moBoolSendMailToBeneficiaries.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel6.add(moBoolSendMailToBeneficiaries);
+
+        jPanel2.add(jPanel6);
 
         jPanel4.add(jPanel2, java.awt.BorderLayout.NORTH);
 
@@ -78,22 +94,32 @@ public class SDialogComments extends SBeanFormDialog {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JLabel jlComment;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolSendMailToBeneficiaries;
     private sa.lib.gui.bean.SBeanFieldText moTextComment;
     // End of variables declaration//GEN-END:variables
     
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 400, 250);
+        SGuiUtils.setWindowBounds(this, 480, 300);
         
         moTextComment.setTextSettings(SGuiUtils.getLabelName(jlComment), 255, 0);
+        moBoolSendMailToBeneficiaries.setBooleanSettings(moBoolSendMailToBeneficiaries.getText(), true);
         
         moFields.addField(moTextComment);
+        moFields.addField(moBoolSendMailToBeneficiaries);
+        moFields.setFormButton(jbSave);
         
         jbSave.setText("Enviar");
     }
     
     public String getComment() {
         return moTextComment.getValue();
+    }
+    
+    public boolean isSendMailToBeneficiariesChecked() {
+        return moBoolSendMailToBeneficiaries.getValue();
     }
     
     @Override

@@ -1008,15 +1008,15 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         SRowPayrollEmployee rowPayrollReceipt = (SRowPayrollEmployee) moGridPanePayrollReceipts.getSelectedGridRow();
                         SHrsReceipt hrsReceipt = rowPayrollReceipt.getHrsReceipt().clone();
                         
-                        if (!mbIsReadOnly) {
+                        SDbPayrollReceiptIssue payrollReceiptIssue = rowPayrollReceipt.getHrsReceipt().getPayrollReceipt().getChildPayrollReceiptIssue();
+                        boolean isReceiptEditable = !mbIsReadOnly && (payrollReceiptIssue == null || payrollReceiptIssue.isCfdEditable());
+                        
+                        if (!mbIsReadOnly && isReceiptEditable) {
                             hrsReceipt.computeReceipt();
                         }
-                        
-                        SDbPayrollReceiptIssue payrollReceiptIssue = rowPayrollReceipt.getHrsReceipt().getPayrollReceipt().getChildPayrollReceiptIssue();
-                        boolean editable = !mbIsReadOnly && (payrollReceiptIssue == null || payrollReceiptIssue.getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_NEW);
 
                         SDialogPayrollReceipt dlgPayrollReceipt = new SDialogPayrollReceipt(miClient, "Recibo de nómina");
-                        dlgPayrollReceipt.setValue(SGuiConsts.PARAM_REQ_PAY, editable);
+                        dlgPayrollReceipt.setValue(SGuiConsts.PARAM_REQ_PAY, isReceiptEditable);
                         dlgPayrollReceipt.setValue(SModConsts.HRS_PAY_RCP, hrsReceipt);
                         dlgPayrollReceipt.setValue(SModConsts.HRS_EAR, moHrsPayroll.getEarnings());
                         dlgPayrollReceipt.setValue(SModConsts.HRS_DED, moHrsPayroll.getDeductions());

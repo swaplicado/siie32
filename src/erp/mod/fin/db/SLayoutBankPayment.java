@@ -5,81 +5,135 @@
 
 package erp.mod.fin.db;
 
+import erp.mod.SModSysConsts;
 import java.util.ArrayList;
+import java.util.HashSet;
+import sa.lib.SLibUtils;
 
 /**
- *
- * @author Juan Barajas, Alfredo Pérez
+ * Abstraction of a payment of a bank layout.
+ * 
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
 public class SLayoutBankPayment {
     
     public static final int ACTION_PAY_APPLY = 1;
     public static final int ACTION_PAY_REMOVE = 2;
 
-    protected int mnLayoutPaymentType;
+    protected int mnTransactionType;
     protected int mnBizPartnerId;
     protected int mnBizPartnerBranchId;
     protected int mnBizPartnerBranchBankAccountId;
-    protected SMoney moAmount;
-    protected int mnFkBookkeepingYearId_n;
-    protected int mnFkBookkeepingNumberId_n;
+    protected SMoney moMoneyAmount;
+    protected int mnBookkeepingYearId_n;
+    protected int mnBookkeepingNumberId_n;
     protected int mnAction;
     protected String msReferenceRecord;
+    protected String msPrepaymentObservations;
+    protected String msPrepaymentEmail;
     
-    protected ArrayList<SLayoutBankDps> maLayoutBankDps;
+    protected ArrayList<SLayoutBankDps> maLayoutBankDpss;
 
-    public SLayoutBankPayment(int layoutRowType, int bizPartnerId, int bizPartnerBranchId, int bizPartnerBranchBankAccountId) {
-        mnLayoutPaymentType = layoutRowType;
+    public SLayoutBankPayment(int transactionType, int bizPartnerId, int bizPartnerBranchId, int bizPartnerBranchBankAccountId) {
+        mnTransactionType = transactionType;
         mnBizPartnerId = bizPartnerId;
         mnBizPartnerBranchId = bizPartnerBranchId;
         mnBizPartnerBranchBankAccountId = bizPartnerBranchBankAccountId;
-        moAmount = null;
-        mnFkBookkeepingYearId_n = 0;
-        mnFkBookkeepingNumberId_n = 0;
+        moMoneyAmount = null;
+        mnBookkeepingYearId_n = 0;
+        mnBookkeepingNumberId_n = 0;
         mnAction = 0;
         msReferenceRecord = "";
+        msPrepaymentObservations = "";
+        msPrepaymentEmail = "";
         
-        maLayoutBankDps = new ArrayList<SLayoutBankDps>();
+        maLayoutBankDpss = new ArrayList<>();
     }
 
-    public void setLayoutRowType(int n) { mnLayoutPaymentType = n; }
+    public void setTransactionType(int n) { mnTransactionType = n; }
     public void setBizPartnerId(int n) { mnBizPartnerId = n; }
     public void setBizPartnerBranchId(int n) { mnBizPartnerBranchId = n; }
-    public void setBizPartnerBranchAccountId(int n) { mnBizPartnerBranchBankAccountId = n; }
-    public void setAmount(SMoney a) { moAmount = a; }
-    public void setFkBookkeepingYearId_n(int n) { mnFkBookkeepingYearId_n = n; }
-    public void setFkBookkeepingNumberId_n(int n) { mnFkBookkeepingNumberId_n = n; }
+    public void setBizPartnerBranchBankAccountId(int n) { mnBizPartnerBranchBankAccountId = n; }
+    public void setMoneyAmount(SMoney o) { moMoneyAmount = o; }
+    public void setBookkeepingYearId_n(int n) { mnBookkeepingYearId_n = n; }
+    public void setBookkeepingNumberId_n(int n) { mnBookkeepingNumberId_n = n; }
     public void setAction(int n) { mnAction = n; }
     public void setReferenceRecord(String s) { msReferenceRecord = s; }
+    public void setPrepaymentObservations(String s) { msPrepaymentObservations = s; }
+    public void setPrepaymentEmail(String s) { msPrepaymentEmail = s; }
     
-    public int getLayoutPaymentType() { return mnLayoutPaymentType; }
+    public int getTransactionType() { return mnTransactionType; }
     public int getBizPartnerId() { return mnBizPartnerId; }
     public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
-    public int getBizPartnerBranchAccountId() { return mnBizPartnerBranchBankAccountId; }
-    public SMoney getAmount() { return moAmount; }
-    public int getFkBookkeepingYearId_n() { return mnFkBookkeepingYearId_n; }
-    public int getFkBookkeepingNumberId_n() { return mnFkBookkeepingNumberId_n; }
+    public int getBizPartnerBranchBankAccountId() { return mnBizPartnerBranchBankAccountId; }
+    public SMoney getMoneyAmount() { return moMoneyAmount; }
+    public int getBookkeepingYearId_n() { return mnBookkeepingYearId_n; }
+    public int getBookkeepingNumberId_n() { return mnBookkeepingNumberId_n; }
     public int getAction() { return mnAction; }
     public String getReferenceRecord() { return msReferenceRecord; }
+    public String getPrepaymentObservations() { return msPrepaymentObservations; }
+    public String getPrepaymentEmail() { return msPrepaymentEmail; }
     
-    public ArrayList<SLayoutBankDps> getLayoutBankDps() { return maLayoutBankDps; }
+    public ArrayList<SLayoutBankDps> getLayoutBankDpss() { return maLayoutBankDpss; }
+
+    public int[] getBookkeepingNumberKey_n() { return mnBookkeepingYearId_n == 0 && mnBookkeepingNumberId_n == 0 ? null : new int[] { mnBookkeepingYearId_n, mnBookkeepingNumberId_n }; }
+    public int[] getBizPartnerBranchBankAccountKey() { return new int[] { mnBizPartnerBranchId, mnBizPartnerBranchBankAccountId }; }
+    
+    /**
+     * Get a list of unrepeatable email recipients.
+     * @return 
+     */
+    public ArrayList<String> getEmailRecipients() {
+        HashSet<String> recipients = new HashSet<>();
+        
+        switch (mnTransactionType) {
+            case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
+                for (SLayoutBankDps layoutBankDps : maLayoutBankDpss) {
+                    String[] emails = SLibUtils.textExplode(layoutBankDps.getEmail(), ";");
+                    for (String email : emails) {
+                        recipients.add(email);
+                    }
+                }
+                break;
+                
+            case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
+                String[] emails = SLibUtils.textExplode(msPrepaymentEmail, ";");
+                for (String email : emails) {
+                    recipients.add(email);
+                }
+                break;
+                
+            case SModSysConsts.FINX_LAY_BANK_TRN_TP_OWN_TRANSFER:
+                // not supported yet!
+                break;
+                
+            default:
+        }
+        
+            
+        return new ArrayList<>(recipients);
+    }
     
     @Override
     public SLayoutBankPayment clone() {
-        SLayoutBankPayment bankPayment = new SLayoutBankPayment(this.getLayoutPaymentType(), this.getBizPartnerId(), this.getBizPartnerBranchId(), this.getBizPartnerBranchAccountId());
+        SLayoutBankPayment clone = new SLayoutBankPayment(this.getTransactionType(), this.getBizPartnerId(), this.getBizPartnerBranchId(), this.getBizPartnerBranchBankAccountId());
         
-        bankPayment.setAmount(this.getAmount());
-        bankPayment.setFkBookkeepingYearId_n(this.getFkBookkeepingYearId_n());
-        bankPayment.setFkBookkeepingNumberId_n(this.getFkBookkeepingNumberId_n());
-        bankPayment.setAction(this.getAction());
-        bankPayment.setReferenceRecord(this.getReferenceRecord());
+        if (this.getMoneyAmount() != null) {
+            clone.setMoneyAmount(this.getMoneyAmount().clone());
+        }
+        clone.setBookkeepingYearId_n(this.getBookkeepingYearId_n());
+        clone.setBookkeepingNumberId_n(this.getBookkeepingNumberId_n());
+        clone.setAction(this.getAction());
+        clone.setReferenceRecord(this.getReferenceRecord());
+        clone.setPrepaymentObservations(this.getPrepaymentObservations());
+        clone.setPrepaymentEmail(this.getPrepaymentEmail());
         
-        for (SLayoutBankDps bankDps : maLayoutBankDps) {
-            if (bankDps != null) {
-                bankPayment.getLayoutBankDps().add(bankDps.clone());
+        for (SLayoutBankDps child : maLayoutBankDpss) {
+            if (child != null) {
+                clone.getLayoutBankDpss().add(child.clone());
             }
         }
         
-        return bankPayment;
+        return clone;
     }
 }

@@ -324,7 +324,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlEmail">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Cuenta correo-e"/>
+                    <Property name="text" type="java.lang.String" value="Cuenta(s) correo-e:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[110, 23]"/>
                     </Property>
@@ -347,7 +347,7 @@
                     <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                       <Image iconType="3" name="/erp/img/icon_view_help.png"/>
                     </Property>
-                    <Property name="toolTipText" type="java.lang.String" value="Para varias cuentas de correo-e, separarlas con &quot;;&quot;, sin espacios, p. ej., &quot;ejemplo1@mail.com;ejemplo2@mail.com&quot;"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Separar varias cuentas con &quot;;&quot;, sin espacios, p. ej., &quot;cuenta1@mail.com;cuenta2@mail.com&quot;"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[23, 23]"/>
                     </Property>

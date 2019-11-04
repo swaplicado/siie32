@@ -20,23 +20,11 @@ import erp.mtrn.form.SDialogStockSegregations;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCompanyBranchEntity;
 import java.awt.Dimension;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.table.DefaultTableCellRenderer;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -46,15 +34,12 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
 
     public static final String TXT_DEC_INC = "Ver más decimales";
     public static final String TXT_DEC_DEC = "Ver menos decimales";
-    private static String[] columns = {"Clave", "Ítem", "Existencias", "Unidad", "Costo"};
-    private static final List<SDataStockExcel> stockExportExcel = new ArrayList<>();
     
     private int mnColIn;
     private int mnColOut;
     private int mnColStock;
     private javax.swing.JButton jbCardex;
     private javax.swing.JButton jbSegregations;
-    private javax.swing.JButton jbExportExcel;
     private javax.swing.JToggleButton jtbDecimals;
     private erp.lib.table.STabFilterDate moTabFilterDate;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
@@ -113,12 +98,6 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
         jtbDecimals.setToolTipText(TXT_DEC_INC);
         jtbDecimals.addActionListener(this);
         addTaskBarUpperComponent(jtbDecimals);
-
-        jbExportExcel = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
-        jbExportExcel.setPreferredSize(new Dimension(23, 23));
-        jbExportExcel.setToolTipText("Importar a excel");
-        jbExportExcel.addActionListener(this);
-        addTaskBarUpperComponent(jbExportExcel);
         
         switch (mnTabTypeAux01) {
             case SDataConstants.TRNX_STK_STK:
@@ -126,7 +105,6 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields = new STableField[2];
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
-
                 aoTableColumns = new STableColumn[8];
                 break;
 
@@ -162,7 +140,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
 
                 aoTableColumns = new STableColumn[11];
                 break;
-
+                
             default:
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
@@ -219,11 +197,11 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "u.symbol", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
-
+ 
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
         }
-
+        
         mvSuscriptors.add(mnTabType);
         mvSuscriptors.add(SDataConstants.ITMU_ITEM);
         mvSuscriptors.add(SDataConstants.ITMU_UNIT);
@@ -284,93 +262,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 moDialogStockCardex.setFormParams(moTabFilterDate.getDate(), itemId, unitId, lotId, whKey, mode);
                 moDialogStockCardex.setVisible(true);
            }
-        }     
-    }
-
-    public void actionExportExcel() throws FileNotFoundException, IOException, SQLException {
-        File folder = new File("/Ficheros-Excel-Existencias");
-        String mySql = "";
-
-        if (!folder.exists()) {
-            folder.mkdir();
         }
-        String routeXLSX = "C:\\Ficheros-Excel-Existencias\\" + ("Inventario.xls");
-                
-        if (jbExportExcel.isEnabled()) {
-            for (int i = 0 ; i < moTablePane.getTableModelRowCount(); i++) {
-                double stockItemsDouble = (double) moTablePane.getTableRow(i).getValues().elementAt(2);
-                int stockItems = (int) stockItemsDouble;
-                int [] idItem = (int []) moTablePane.getTableRow(i).getPrimaryKey();
-                double priceItem = 0;
-                ResultSet resultSetHeader = null;
-
-                mySql = "SELECT ety.price_u_cur " +
-                        "FROM trn_dps_ety AS ety " +
-                        "INNER JOIN erp.itmu_item AS item ON item.id_item = ety.fid_item " +
-                        "WHERE ety.fid_item = " + idItem[0] + " " +
-                        "ORDER BY ety.ts_new DESC " +
-                        "LIMIT 1 ";
-                
-                    resultSetHeader = miClient.getSession().getStatement().executeQuery(mySql);
-                
-                    if (resultSetHeader.next()) {
-                        priceItem = resultSetHeader.getDouble("ety.price_u_cur");
-                    }
-                    else {
-                        priceItem = 0.0;
-                    }
-
-                stockExportExcel.add(new SDataStockExcel((String) moTablePane.getTableRow(i).getValues().firstElement(),
-                        (String) moTablePane.getTableRow(i).getValues().elementAt(1), stockItems,
-                        (String) moTablePane.getTableRow(i).getValues().elementAt(7), priceItem )); // Verificar el precio o quitarlo
-            }
-
-            Workbook workbook = new XSSFWorkbook();
-            CreationHelper createHelper = workbook.getCreationHelper();
-            Sheet sheet = workbook.createSheet("Existencias");
-            //Formato de texto header
-            Font headerFont = workbook.createFont();
-            headerFont.setBoldweight(Font.BOLDWEIGHT_NORMAL);
-            headerFont.setFontHeightInPoints((short) 14);
-            headerFont.setColor(IndexedColors.WHITE.getIndex());
-            //Formato color solido header celdas
-            CellStyle headerCellStyle = workbook.createCellStyle();
-            headerCellStyle.setFont(headerFont);
-            Row headerRow = sheet.createRow(0);
-            headerCellStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
-            headerCellStyle.setFillPattern(headerCellStyle.SOLID_FOREGROUND);
-            for (int i = 0; i < columns.length; i++) { 
-                Cell cell = headerRow.createCell(i);
-                cell.setCellValue(columns[i]);
-                cell.setCellStyle(headerCellStyle);
-            }
-            CellStyle dateCellStyle = workbook.createCellStyle();
-            dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy"));
-            int rowNum = 1;
-            for (SDataStockExcel SDataStockExcel: stockExportExcel) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(SDataStockExcel.getClave());
-                row.createCell(1).setCellValue(SDataStockExcel.getItem());
-                row.createCell(2).setCellValue(SDataStockExcel.getExistencias());
-                row.createCell(3).setCellValue(SDataStockExcel.getUnidad());
-                row.createCell(4).setCellValue(SDataStockExcel.getCosto());
-
-            }
-
-            for (int i = 0; i < columns.length; i++) {
-                sheet.autoSizeColumn(i);
-            }
-            
-            File file;
-	    file = new File(routeXLSX);
-            FileOutputStream fileOut = new FileOutputStream(file);
-            workbook.write(fileOut);
-            fileOut.close(); 
-            
-
-        }
-        
-        miClient.showMsgBoxInformation("Excel de existencias generado exitosamente \nEl archivo se a guardado en: Disco local (C)->Ficheros->Excel->Existencias");        
     }
 
     public void actionSegregations() {
@@ -450,7 +342,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 "FROM trn_stk_seg_whs AS swhs " +
                 "INNER JOIN trn_stk_seg_whs_ety AS wety ON swhs.id_stk_seg = wety.id_stk_seg AND swhs.id_whs = wety.id_whs " +
                 "WHERE fid_year = " + year + "  AND fid_item = i.id_item AND fid_unit = u.id_unit " + sqlSegWhere + ")";
-
+        
         msSql = "SELECT s.id_item, s.id_unit, " +
                 "i.item_key, i.item, u.symbol, " +
                 (!showLots() ? "" : "s.id_lot, l.lot, l.dt_exp_n, l.b_block, ") +
@@ -482,7 +374,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 (!showWarehouses() ? "" : ", bpb.code, ent.code, s.id_cob, s.id_wh ") +
                 (!showLots() ? "" : ", l.lot, l.dt_exp_n, l.b_block, s.id_lot ");
     }
-
+    
     @Override
     public void actionPerformed(java.awt.event.ActionEvent e) {
         super.actionPerformed(e);
@@ -492,15 +384,6 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
 
             if (button == jbCardex) {
                 actionCardex();
-            }
-            else if (button == jbExportExcel) {
-                try {
-                    actionExportExcel();
-                } catch (IOException ex) {
-                    Logger.getLogger(SViewStock.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SQLException ex) {
-                    Logger.getLogger(SViewStock.class.getName()).log(Level.SEVERE, null, ex);
-                }
             }
             else if (button == jbSegregations) {
                 actionSegregations();

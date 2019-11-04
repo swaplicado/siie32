@@ -70,7 +70,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas, Edwin Carmona, Alfredo Pérez
+ * @author Sergio Flores, Juan Barajas, Edwin Carmona, Alfredo Pérez, Sergio Flores
  */
 public class SModuleFin extends SGuiModule {
 
@@ -452,7 +452,7 @@ public class SModuleFin extends SGuiModule {
                 view = new SViewAbpTax(miClient, "Paq. contab. aut. impuestos");
                 break;
             case SModConsts.FIN_LAY_BANK:
-                if (subtype == SModSysConsts.FIN_LAY_BANK_PAY) {
+                if (subtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
                     if (params == null) {
                         view = new SViewBankLayout(miClient, subtype, "Layouts transferencias");
                     }
@@ -469,7 +469,7 @@ public class SModuleFin extends SGuiModule {
                         }
                     }
                 }
-                else if (subtype == SModSysConsts.FIN_LAY_BANK_PREPAY) {
+                else if (subtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY) {
                     if (params == null) {
                         view = new SViewBankLayout(miClient, subtype, "Layouts anticipos");
                     }
@@ -636,15 +636,15 @@ public class SModuleFin extends SGuiModule {
                 break;
             case SModConsts.FIN_LAY_BANK:
                 switch (subtype) {
-                    case SModSysConsts.FIN_LAY_BANK_ACC:
+                    case SModSysConsts.FINX_LAY_BANK_ACC:
                         if (moFormBankLayoutAccounting == null) moFormBankLayoutAccounting = new SFormBankLayout(miClient, subtype, "Contabilización de pagos bancarios");
                         form = moFormBankLayoutAccounting;
                         break;
-                    case SModSysConsts.FIN_LAY_BANK_PAY:
+                    case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                         if (moFormBankLayoutPayments == null) moFormBankLayoutPayments = new SFormBankLayout(miClient, subtype, "Layout de transferencias");
                         form = moFormBankLayoutPayments;
                         break;
-                    case SModSysConsts.FIN_LAY_BANK_PREPAY:
+                    case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
                         if (moFormBankLayoutPrepayments == null) moFormBankLayoutPrepayments = new SFormBankLayout(miClient, subtype, "Layout de anticipos");
                         form = moFormBankLayoutPrepayments;
                         break;

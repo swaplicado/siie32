@@ -99,19 +99,23 @@ import sa.lib.srv.SSrvCompany;
 import sa.lib.xml.SXmlUtils;
 
 /**
- *
+ * SIIE Client.
+ * 
  * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Sergio Flores
  * @version 3.2
  */
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 144.0"; // fecha release: 2019-09-24
+    public static final String APP_RELEASE = "3.2 146.0"; // fecha release: 2019-10-29
     public static final String APP_COPYRIGHT = "2007-2019";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
-    public static final String VENDOR_COPYRIGHT = APP_NAME + " ©" + APP_COPYRIGHT + " " + APP_PROVIDER;
+    public static final String VENDOR = APP_PROVIDER;
+    public static final String VENDOR_COPYRIGHT = APP_NAME + " ©" + APP_COPYRIGHT + " " + VENDOR;
+    public static final String VENDOR_PHONE = "(443) 204-1032";
     public static final String VENDOR_WEBSITE = "www.swaplicado.com.mx";
+    public static final String VENDOR_MAIL = "contacto@swaplicado.com.mx";
 
     private boolean mbFirstActivation;
     private boolean mbLoggedIn;
@@ -539,7 +543,6 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jbSession.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/gui_session.gif"))); // NOI18N
         jbSession.setToolTipText("Cambiar sesión...");
         jbSession.setContentAreaFilled(false);
-        jbSession.setOpaque(false);
         jbSession.setPreferredSize(new java.awt.Dimension(23, 23));
         jpStatus.add(jbSession);
 
@@ -549,7 +552,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         jtfUser.setToolTipText("Usuario actual");
         jtfUser.setFocusable(false);
         jtfUser.setOpaque(false);
-        jtfUser.setPreferredSize(new java.awt.Dimension(75, 20));
+        jtfUser.setPreferredSize(new java.awt.Dimension(125, 20));
         jpStatus.add(jtfUser);
 
         jtfLoginTimestamp.setEditable(false);
@@ -2213,7 +2216,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
     @Override
     public HashMap<String, Object> createReportParams() {
-        HashMap<String, Object> map = new HashMap<String, Object>();
+        HashMap<String, Object> map = new HashMap<>();
 
         map.put("sCompanyName", moSessionXXX.getCompany().getCompany());
         map.put("sUserName", moSessionXXX.getUser().getUser());

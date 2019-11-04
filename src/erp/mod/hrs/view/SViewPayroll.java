@@ -103,10 +103,6 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     }
     
     private void actionCloseOpen() {
-        boolean canClose = false;
-        boolean close = false;
-        SDbPayroll payroll = null;
-        
         if (jbCloseOpen.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
@@ -115,10 +111,13 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 try {
                     SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
 
-                    payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, gridRow.getRowPrimaryKey());
+                    SDbPayroll payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, gridRow.getRowPrimaryKey());
                     if (miClient.showMsgBoxConfirm("Está por " + (!payroll.isClosed() ? "cerrar" : "abrir") + " la nómina '" + payroll.getAuxPaymentType() + " - " + payroll.getNumber() + "'.\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                        if (payroll.isClosed() && SHrsFinUtils.canOpenPayRoll(miClient.getSession(), payroll.getPkPayrollId())) {
-                            SHrsFinUtils.deletePayRollRecords(miClient.getSession(), payroll.getPkPayrollId());
+                        boolean close = false;
+                        boolean canClose = false;
+                        
+                        if (payroll.isClosed() && SHrsFinUtils.canOpenPayroll(miClient.getSession(), payroll.getPkPayrollId())) {
+                            SHrsFinUtils.deletePayrollRecordEntries(miClient.getSession(), payroll.getPkPayrollId());
                             close = false; // Open payroll
                             canClose = true;
                         }
@@ -140,11 +139,13 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                         }
                         
                         if (close) {
-                            SHrsUtils.createPayrollReceiptIssues(miClient.getSession(), payroll);
+                            // payroll is being closed:
+                            payroll.createPayrollReceiptIssues(miClient.getSession());
                             canClose = true;
                         }
                         else {
-                            SHrsUtils.updateToNewStatusPayrollReceiptIssues(miClient.getSession(), payroll);
+                            // payroll is being opened:
+                            payroll.updatePayrollReceiptIssuesAsNewOnes(miClient.getSession());
                             canClose = true;
                         }
                         

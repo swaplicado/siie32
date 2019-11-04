@@ -12,7 +12,7 @@ import erp.lib.SLibConstants;
 import erp.mbps.data.SDataBizPartner;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mod.SModConsts;
-import erp.mod.fin.util.STreasuryBankLayoutRequest;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsCfdUtils;
@@ -21,6 +21,7 @@ import erp.mtrn.data.SCfdPrintThread;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
+import erp.mtrn.data.STrnUtilities;
 import erp.print.SDataConstantsPrint;
 import java.awt.Cursor;
 import java.io.File;
@@ -34,14 +35,15 @@ import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
+import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
  * @author Juan Barajas, Alfredo Pérez, Sergio Flores
  */
-public class SDialogCfdProcessing extends sa.lib.gui.bean.SBeanFormDialog {
+public class SDialogCfdProcessing extends SBeanFormDialog {
     
-    protected SClientInterface miClient;
+    protected SClientInterface miClient; // WTF!, it hides member of parent class!
     
     protected ArrayList<SDataCfd> maCfds;
     protected ArrayList<int[]> maPayrollReceiptKeys;
@@ -343,33 +345,27 @@ public class SDialogCfdProcessing extends sa.lib.gui.bean.SBeanFormDialog {
     }
     
     private void sendPayrollReceipts() throws Exception {
-        boolean isSent = false;
         int cfdProcessed = 0;
         int cfdProcessedOk = 0;
         int cfdProcessedWrong = 0;
         String detailMessage = "";
-        String mail = "";
-        
-        STreasuryBankLayoutRequest layoutRequest = null;
-        SDataBizPartner bizPartner  = null;
-        HashMap<String, Object> map = new HashMap<>();
-        File pdf = null;
         
         moIntCfdToProcess.setValue(maPayrollReceipts.size());
         
         for (SDbPayrollReceipt payrollReceipt : maPayrollReceipts) {
-            bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { payrollReceipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
-            mail = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
+            SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { payrollReceipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
+            String recipient = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
+            HashMap<String, Object> map = SHrsUtils.createPayrollReceiptMap((SGuiClient) miClient, payrollReceipt.getPrimaryKey(), SDataConstantsPrint.PRINT_MODE_PDF_FILE);
+            File pdf = SHrsUtils.createPayrollReceipt((SGuiClient) miClient, map);
             
-            map = SHrsUtils.createPayrollReceiptMap((SGuiClient) miClient, payrollReceipt.getPrimaryKey(), SDataConstantsPrint.PRINT_MODE_PDF_FILE);
-            pdf = SHrsUtils.createPayrollReceipt((SGuiClient) miClient, map);
             cfdProcessed++;
         
             if (pdf != null) {
-                layoutRequest = new STreasuryBankLayoutRequest((SGuiClient) miClient, null);
-                isSent = layoutRequest.sendMail(null, "", pdf, STreasuryBankLayoutRequest.SND_TP_PAY_RCP, mail);
+                String subject = "Envío de recibo de nómina";
+                String body = "Se adjunta recibo de nómina en formato PDF.";
+                boolean sent = STrnUtilities.sendMailPdf(miClient, SModSysConsts.CFGS_TP_MMS_CFD, pdf, subject, body, recipient);
                     
-                if (isSent) {
+                if (sent) {
                     cfdProcessedOk++;
                     detailMessage += "Recibo enviado.\n";
                 }
