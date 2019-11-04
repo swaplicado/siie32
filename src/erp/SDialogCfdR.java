@@ -68,8 +68,8 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         jbSelectFileGen = new javax.swing.JButton();
         jPanel20 = new javax.swing.JPanel();
         jlGenerate = new javax.swing.JLabel();
-        bCutOffDate = new sa.lib.gui.bean.SBeanFieldDate();
-        jLabel1 = new javax.swing.JLabel();
+        bIntYear = new sa.lib.gui.bean.SBeanFieldInteger();
+        bIntPer = new sa.lib.gui.bean.SBeanFieldInteger();
         jBGenerateFile = new javax.swing.JButton();
         jlGenerateFileHelp = new javax.swing.JLabel();
         jPanel22 = new javax.swing.JPanel();
@@ -117,15 +117,15 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
 
         jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlGenerate.setText("Fecha de corte:*");
+        jlGenerate.setText("Año/mes:*");
         jlGenerate.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel20.add(jlGenerate);
 
-        bCutOffDate.setPreferredSize(new java.awt.Dimension(120, 23));
-        jPanel20.add(bCutOffDate);
+        bIntYear.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel20.add(bIntYear);
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(25, 23));
-        jPanel20.add(jLabel1);
+        bIntPer.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel20.add(bIntPer);
 
         jBGenerateFile.setText("Generar Archivo");
         jBGenerateFile.setPreferredSize(new java.awt.Dimension(120, 23));
@@ -134,7 +134,7 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         jlGenerateFileHelp.setForeground(new java.awt.Color(109, 109, 109));
         jlGenerateFileHelp.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlGenerateFileHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlGenerateFileHelp.setToolTipText("Elija el directorio donde se guardará el archivo, después seleccione la fecha de corte para generarlo.");
+        jlGenerateFileHelp.setToolTipText("Elija el directorio donde se guardará el archivo, después seleccione año y mes de las nóminas para generarlo.");
         jlGenerateFileHelp.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel20.add(jlGenerateFileHelp);
 
@@ -230,9 +230,9 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private sa.lib.gui.bean.SBeanFieldDate bCutOffDate;
+    private sa.lib.gui.bean.SBeanFieldInteger bIntPer;
+    private sa.lib.gui.bean.SBeanFieldInteger bIntYear;
     private javax.swing.JButton jBGenerateFile;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel14;
@@ -387,7 +387,7 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
             return;
         }
         
-        boolean result = oj.start(msCsvGenPath, bCutOffDate.getValue());
+        boolean result = oj.start(msCsvGenPath, bIntYear.getValue(), bIntPer.getValue());
         
         if (result) {
             miClient.showMsgBoxInformation("El archivo fue generado exitosamente.");
@@ -403,8 +403,13 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         jbSave.setText("Guardar");
         moFields.setFormButton(jbSave);
         
-        bCutOffDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlGenerate.getText()), true);
-        bCutOffDate.setValue(miClient.getSession().getCurrentDate());
+        bIntYear.setMinInteger(2019);
+        bIntYear.setMaxInteger(2019);
+        bIntYear.setIntegerSettings(SGuiUtils.getLabelName(jlGenerate.getText()), WIDTH, true);
+        
+        bIntPer.setMinInteger(1);
+        bIntPer.setMaxInteger(12);
+        bIntPer.setIntegerSettings(SGuiUtils.getLabelName(jlGenerate.getText()), WIDTH, true);
         
         reloadCatalogues();
     }

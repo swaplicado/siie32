@@ -143,7 +143,7 @@ public abstract class SHrsCfdUtils {
         return receipts;
     }
     
-    private static SHrsFormerPayroll readHrsFormerPayrollAndReceipt(final SClientInterface client, final int[] receiptKey) throws SQLException, Exception {
+    public static SHrsFormerPayroll readHrsFormerPayrollAndReceipt(final SClientInterface client, final int[] receiptKey) throws SQLException, Exception {
         int nPaymentType = 0;
         int nBankDefaultId = 0;
         int nEarningTaxSubsidyCompId = 0;

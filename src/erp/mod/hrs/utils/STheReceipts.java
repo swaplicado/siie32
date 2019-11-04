@@ -39,7 +39,7 @@ public class STheReceipts {
         this.miClient = client;
     }
     
-    public boolean start(String path, Date cutOffDate) {
+    public boolean start(String path, int nYear, int nPer) {
          ResultSet resulPayroll;
          List<String[]> dataList = new ArrayList();
          dataList.add(new String[]
@@ -65,9 +65,6 @@ public class STheReceipts {
                                 });
         
         try {
-            
-            DateFormat dateFormatt = new SimpleDateFormat("yyyy-MM-dd");
-            String strDate = dateFormatt.format(cutOffDate);
             
             String query = "SELECT  " +
                             "    hp.fis_year, " +
@@ -96,7 +93,7 @@ public class STheReceipts {
                             "    hp.per_year = 2019 " +
                             "        AND hp.fk_tp_pay_sht = 1 " +
                             "        AND NOT hp.b_del " +
-                            "        AND (tc.fid_st_xml = 2) AND hp.dt_end <= '" + strDate + "' " +
+                            "        AND (tc.fid_st_xml = 2) AND hp.per_year = " + nYear + " AND hp.per = " + nPer +
                             " ORDER BY hp.num ASC, hp.fk_tp_pay, bb.bp ASC;";
             
             resulPayroll = miClient.getSession().getStatement().
@@ -208,7 +205,7 @@ public class STheReceipts {
 
             hrsReceipt.setPayrollReceipt(payrollReceipt);
             
-            if (payroll.isNormal()) {
+            if (payroll.isPayrollNormal()) {
                 hrsReceipt.getAbsenceConsumptions().addAll(moHrsPayroll.crateAbsenceConsumptions(hrsReceipt));
             }
 
@@ -231,7 +228,7 @@ public class STheReceipts {
             oRow.setTaxPayed(receiptAux.getAnnualTaxPayed());
             oRow.setSubPayed(receiptAux.getAnnualTaxSubsidyPayed());
             
-            DecimalFormat df = new DecimalFormat("#.00");
+            DecimalFormat df = new DecimalFormat("##.00");
             if (receiptAux.getAnnualTaxSubsidyAssessed() > receiptAux.getAnnualTaxAssessed()) {
                 double subsidy = receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed() - (receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed());
 
