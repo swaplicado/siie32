@@ -33,6 +33,9 @@ import erp.mtrn.data.SDataCfd;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -207,6 +210,7 @@ public class SReceiptsR {
             
             SDbPayrollReceiptIssue issuen = issue.clone();
             
+            writeXml(cfd.getUuid(), cfd.getDocXml());
             //anular
             if (! this.annulCfd(cfd, issue)) {
                 return ERROR;
@@ -263,6 +267,7 @@ public class SReceiptsR {
             cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_ANNULED);
             cfd.save(miClient.getSession().getStatement().getConnection());
             
+            boolean cancel;
             if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
 //                cancel = SCfdUtils.cancelAndSendCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, true, SModSysConsts.TRNU_TP_DPS_ANN_NA);
             }
@@ -406,10 +411,14 @@ public class SReceiptsR {
 
         if (((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
 //            SCfdUtils.signAndSendCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
+            System.out.println("Timbrar y enviar");
         }
         else {
 //            SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
+            System.out.println("solo timbrar");
         }
+        
+        writeXml("REEXP" + relationedUuid, cfd.getDocXml());
         
         return true;
     }
@@ -475,6 +484,7 @@ public class SReceiptsR {
                         comprobanteCfdi33 = (cfd.ver33.DElementComprobante) SCfdUtils.createCfdi33RootElement((SClientInterface) session.getClient(), receipt);
                         comprobanteCfdi33 = this.addOtrosPagosSubsidy(comprobanteCfdi33, causedSubsidy, payedSubsidy, relationedUuid);
                         cfdVersion = comprobanteCfdi33.getVersion();
+                        comprobanteCfdi33.getAttFecha().setDatetime(new Date());
                         
                         packet.setCfdStringSigned(DCfdUtils.generateOriginalString(comprobanteCfdi33));
                         packet.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_NEW); // after stamping changes to emitted
@@ -652,5 +662,12 @@ public class SReceiptsR {
         }
         
         return cfd;
+    }
+    
+    public void writeXml(String name, String xml) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("reexpedicion/" + name + ".xml"));
+        writer.write(xml);
+
+        writer.close();
     }
 }

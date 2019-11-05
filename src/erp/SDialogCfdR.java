@@ -405,11 +405,11 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         
         bIntYear.setMinInteger(2019);
         bIntYear.setMaxInteger(2019);
-        bIntYear.setIntegerSettings(SGuiUtils.getLabelName(jlGenerate.getText()), WIDTH, true);
+        bIntYear.setIntegerSettings(SGuiUtils.getLabelName(jlGenerate.getText()), SGuiConsts.GUI_TYPE_INT_CAL_YEAR , true);
         
         bIntPer.setMinInteger(1);
         bIntPer.setMaxInteger(12);
-        bIntPer.setIntegerSettings(SGuiUtils.getLabelName(jlGenerate.getText()), WIDTH, true);
+        bIntPer.setIntegerSettings(SGuiUtils.getLabelName(jlGenerate.getText()), SGuiConsts.GUI_TYPE_INT_CAL_MONTH, true);
         
         reloadCatalogues();
     }
