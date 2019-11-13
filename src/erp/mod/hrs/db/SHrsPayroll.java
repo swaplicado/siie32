@@ -240,7 +240,7 @@ public class SHrsPayroll {
         return payrollReceiptDeduction;
     }
 
-    private ArrayList<SHrsReceiptEarning> createHrsReceiptEarnings(final SHrsReceipt hrsReceipt, final Date dateStart, final Date dateEnd) throws Exception {
+    public ArrayList<SHrsReceiptEarning> createHrsReceiptEarnings(final SHrsReceipt hrsReceipt, final Date dateStart, final Date dateEnd) throws Exception {
         int moveId = 0;
         SDbEmployee employee = hrsReceipt.getHrsEmployee().getEmployee();
         ArrayList<SHrsReceiptEarning> hrsReceiptEarnings = new ArrayList<>();
@@ -389,7 +389,7 @@ public class SHrsPayroll {
         return hrsReceiptEarnings;
     }
     
-    private ArrayList<SHrsReceiptDeduction> createHrsReceiptDeductions(final SHrsReceipt hrsReceipt, final Date dateStart, final Date dateEnd) throws Exception {
+    public ArrayList<SHrsReceiptDeduction> createHrsReceiptDeductions(final SHrsReceipt hrsReceipt, final Date dateStart, final Date dateEnd) throws Exception {
         int moveId = 0;
         SDbEmployee employee = hrsReceipt.getHrsEmployee().getEmployee();
         ArrayList<SHrsReceiptDeduction> hrsReceiptDeductions = new ArrayList<>();
@@ -927,7 +927,7 @@ public class SHrsPayroll {
         return payrollReceipt;
     }
     
-    private ArrayList<SDbAbsenceConsumption> crateAbsenceConsumptions(final SHrsReceipt hrsReceipt) throws Exception {
+    public ArrayList<SDbAbsenceConsumption> crateAbsenceConsumptions(final SHrsReceipt hrsReceipt) throws Exception {
         ArrayList<SDbAbsenceConsumption> absenceConsumptions = new ArrayList<>();
         
         // prepare for absence consumptions:

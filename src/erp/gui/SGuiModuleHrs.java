@@ -5,6 +5,7 @@
 
 package erp.gui;
 
+import erp.SDialogCfdR;
 import erp.cfd.SCfdConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -113,6 +114,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiPayAutoDeductionsByEmployeeDet;
     private javax.swing.JMenuItem jmiPayCalculatedAmountMonth;
     private javax.swing.JMenuItem jmiPayCalculatedEstimateIncomeTax;
+    private javax.swing.JMenuItem jmiReReceipts;
     
     private javax.swing.JMenu jmBenefit;
     private javax.swing.JMenuItem jmiBenefitBenefitVac;
@@ -282,6 +284,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsByEmployeeDet = new JMenuItem("Por empleado a detalle");
         jmiPayCalculatedAmountMonth = new JMenuItem("Calcular ingreso mensual");
         jmiPayCalculatedEstimateIncomeTax = new JMenuItem("Calcular impuesto acumulado");
+        jmiReReceipts = new JMenuItem("Reexpedición de recibos");
 
         jmPay.add(jmiPayPayrollWeekly);
         jmPay.add(jmiPayPayrollWeeklyRec);
@@ -311,6 +314,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.addSeparator();
         jmPay.add(jmiPayCalculatedAmountMonth);
         jmPay.add(jmiPayCalculatedEstimateIncomeTax);
+        jmPay.add(jmiReReceipts);
                 
         jmBenefit = new JMenu("Prestaciones");
         jmiBenefitBenefitVac = new JMenuItem("Control de vacaciones");
@@ -451,6 +455,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsByEmployeeDet.addActionListener(this);
         jmiPayCalculatedAmountMonth.addActionListener(this);
         jmiPayCalculatedEstimateIncomeTax.addActionListener(this);
+        jmiReReceipts.addActionListener(this);
         
         jmiBenefitBenefitVac.addActionListener(this);
         jmiBenefitBenefitBonVac.addActionListener(this);
@@ -558,6 +563,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayAutoDeductionsByEmployeeDet.setEnabled(isPermissionPay);
         jmiPayCalculatedAmountMonth.setEnabled(isPermissionPay);
         jmiPayCalculatedEstimateIncomeTax.setEnabled(isPermissionPay);
+        jmiReReceipts.setEnabled(isPermissionPay);
         
         jmBenefit.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight);
         jmiBenefitBenefitVac.setEnabled(true);
@@ -948,6 +954,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiPayCalculatedEstimateIncomeTax) {
                 new SDialogCalculateIncomeTax((SGuiClient) miClient, "Calcular impuesto acumulado").setFormVisible(true);
+            }
+            else if (item == jmiReReceipts) {
+                new SDialogCfdR((SGuiClient) miClient, "Reexpedición de recibos").setFormVisible(true);
             }
             else if (item == jmiBenefitBenefitVac) {
                 miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_VAC, null);
