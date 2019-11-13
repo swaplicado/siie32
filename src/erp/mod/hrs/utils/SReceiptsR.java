@@ -269,16 +269,18 @@ public class SReceiptsR {
             
             boolean cancel;
             if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-//                cancel = SCfdUtils.cancelAndSendCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, true, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                cancel = SCfdUtils.cancelAndSendCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, true, SModSysConsts.TRNU_TP_DPS_ANN_NA);
             }
             else {
-//                cancel = SCfdUtils.cancelCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, true, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                cancel = SCfdUtils.cancelCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, true, SModSysConsts.TRNU_TP_DPS_ANN_NA);
             }
             
-            issue.setFkReceiptStatusId(SDataConstantsSys.TRNS_ST_DPS_ANNULED);
-            issue.save(miClient.getSession());
-            
-            annuled = true;
+            if (cancel) {
+                issue.setFkReceiptStatusId(SDataConstantsSys.TRNS_ST_DPS_ANNULED);
+                issue.save(miClient.getSession());
+
+                annuled = true;
+            }
         }
         catch (SQLException ex) {
             Logger.getLogger(SReceiptsR.class.getName()).log(Level.SEVERE, null, ex);
