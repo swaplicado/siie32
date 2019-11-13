@@ -1,5 +1,5 @@
 ================================================================================
-2019-11-05, 3.2 147.0
+2019-11-13, 3.2 147.0
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de captura opcional de Tercero Causante de Impuestos en partidas de DPS.
