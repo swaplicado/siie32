@@ -185,6 +185,8 @@ public abstract class SDataConstants {
 
     public static final int BPSX_BP_X_SUP_CUS = 204514;
     public static final int BPSX_BP_X_CDR_DBR = 204515;
+    public static final int BPSX_BP_X_SUP_CDR = 204516;
+    public static final int BPSX_BP_X_CUS_DBR = 204517;
     public static final int BPSX_BP_CT = 204518;
 
     public static final int BPSX_BPB_CON_SUP = 204521;
@@ -218,7 +220,7 @@ public abstract class SDataConstants {
     public static final int BPSX_BP_ATT_BANK = 204551;
     public static final int BPSX_BP_ATT_CARR = 204552;
     public static final int BPSX_BP_ATT_EMP = 204553;
-    public static final int BPSX_BP_ATT_EMP_MFG = 204517;
+    public static final int BPSX_BP_ATT_EMP_MFG = 204554;
     public static final int BPSX_BP_ATT_SAL_AGT = 204555;
 
     public static final int ITMS_CT_ITEM = 205001;

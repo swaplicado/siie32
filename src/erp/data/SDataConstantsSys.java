@@ -920,7 +920,14 @@ public abstract class SDataConstantsSys {
     public static final int [] FINU_CLS_ACC_USR_ORD_DEB = { 4, 1, 1 };
     public static final int [] FINU_CLS_ACC_USR_ORD_CRE = { 4, 2, 1 };
 
-    public static int FINU_TP_ACC_LEDGER_VAT_CREDITABLE = 9;
+    public static final int FINU_TP_ACC_LEDGER_CUS = 6;
+    public static final int FINU_TP_ACC_LEDGER_DBR = 7;
+    public static final int FINU_TP_ACC_LEDGER_VAT_CREDITABLE = 9;
+    public static final int FINU_TP_ACC_LEDGER_VAT_CREDITABLE_PEND = 10;
+    public static final int FINU_TP_ACC_LEDGER_SUP = 33;
+    public static final int FINU_TP_ACC_LEDGER_CDR = 34;
+    public static final int FINU_TP_ACC_LEDGER_VAT_PAYABLE = 36;
+    public static final int FINU_TP_ACC_LEDGER_VAT_PAYABLE_PEND = 37;
     
     public static final int FINX_ACC_PAY = 1;
     public static final int FINX_ACC_PAY_PEND = 2;

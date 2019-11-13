@@ -110,6 +110,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected int mnFkUnitId;
     protected int mnFkOriginalUnitId;
     protected int mnFkTaxRegionId;
+    protected int mnFkThirdTaxCausingId_n;
     protected int mnFkDpsAdjustmentTypeId;
     protected int mnFkDpsAdjustmentSubtypeId;
     protected int mnFkDpsEntryTypeId;
@@ -189,15 +190,15 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public SDataDpsEntry() {
         super(SDataConstants.TRN_DPS_ETY);
 
-        mvDbmsEntryNotes = new Vector<SDataDpsEntryNotes>();
-        mvDbmsEntryTaxes = new Vector<SDataDpsEntryTax>();
-        mvDbmsEntryCommissions = new Vector<SDataDpsEntryCommissions>();
-        mvDbmsEntryPrices = new Vector<SDataDpsEntryPrice>();
+        mvDbmsEntryNotes = new Vector<>();
+        mvDbmsEntryTaxes = new Vector<>();
+        mvDbmsEntryCommissions = new Vector<>();
+        mvDbmsEntryPrices = new Vector<>();
 
-        mvDbmsDpsLinksAsSource = new Vector<SDataDpsDpsLink>();
-        mvDbmsDpsLinksAsDestiny = new Vector<SDataDpsDpsLink>();
-        mvDbmsDpsAdjustmentsAsDps = new Vector<SDataDpsDpsAdjustment>();
-        mvDbmsDpsAdjustmentsAsAdjustment = new Vector<SDataDpsDpsAdjustment>();
+        mvDbmsDpsLinksAsSource = new Vector<>();
+        mvDbmsDpsLinksAsDestiny = new Vector<>();
+        mvDbmsDpsAdjustmentsAsDps = new Vector<>();
+        mvDbmsDpsAdjustmentsAsAdjustment = new Vector<>();
 
         mbFlagReadLinksAswell = true;
 
@@ -283,6 +284,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setFkUnitId(int n) { mnFkUnitId = n; }
     public void setFkOriginalUnitId(int n) { mnFkOriginalUnitId = n; }
     public void setFkTaxRegionId(int n) { mnFkTaxRegionId = n; }
+    public void setFkThirdTaxCausingId_n(int n) { mnFkThirdTaxCausingId_n = n; }
     public void setFkDpsAdjustmentTypeId(int n) { mnFkDpsAdjustmentTypeId = n; }
     public void setFkDpsAdjustmentSubtypeId(int n) { mnFkDpsAdjustmentSubtypeId = n; }
     public void setFkDpsEntryTypeId(int n) { mnFkDpsEntryTypeId = n; }
@@ -377,6 +379,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public int getFkUnitId() { return mnFkUnitId; }
     public int getFkOriginalUnitId() { return mnFkOriginalUnitId; }
     public int getFkTaxRegionId() { return mnFkTaxRegionId; }
+    public int getFkThirdTaxCausingId_n() { return mnFkThirdTaxCausingId_n; }
     public int getFkDpsAdjustmentTypeId() { return mnFkDpsAdjustmentTypeId; }
     public int getFkDpsAdjustmentSubtypeId() { return mnFkDpsAdjustmentSubtypeId; }
     public int getFkDpsEntryTypeId() { return mnFkDpsEntryTypeId; }
@@ -590,6 +593,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mnFkUnitId = 0;
         mnFkOriginalUnitId = 0;
         mnFkTaxRegionId = 0;
+        mnFkThirdTaxCausingId_n = 0;
         mnFkDpsAdjustmentTypeId = 0;
         mnFkDpsAdjustmentSubtypeId = 0;
         mnFkDpsEntryTypeId = 0;
@@ -781,6 +785,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mnFkUnitId = resultSet.getInt("de.fid_unit");
                 mnFkOriginalUnitId = resultSet.getInt("de.fid_orig_unit");
                 mnFkTaxRegionId = resultSet.getInt("de.fid_tax_reg");
+                mnFkThirdTaxCausingId_n = resultSet.getInt("de.fid_third_tax_n");
                 mnFkDpsAdjustmentTypeId = resultSet.getInt("de.fid_tp_dps_adj");
                 mnFkDpsAdjustmentSubtypeId = resultSet.getInt("de.fid_stp_dps_adj");
                 mnFkDpsEntryTypeId = resultSet.getInt("de.fid_tp_dps_ety");
@@ -1082,7 +1087,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " + 
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?) }");
+                    "?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -1162,6 +1167,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             callableStatement.setInt(nParam++, mnFkUnitId);
             callableStatement.setInt(nParam++, mnFkOriginalUnitId);
             callableStatement.setInt(nParam++, mnFkTaxRegionId);
+            if (mnFkThirdTaxCausingId_n > SLibConsts.UNDEFINED) callableStatement.setInt(nParam++, mnFkThirdTaxCausingId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             callableStatement.setInt(nParam++, mnFkDpsAdjustmentTypeId);
             callableStatement.setInt(nParam++, mnFkDpsAdjustmentSubtypeId);
             callableStatement.setInt(nParam++, mnFkDpsEntryTypeId);
@@ -1714,6 +1720,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setFkUnitId(mnFkUnitId);
         clone.setFkOriginalUnitId(mnFkOriginalUnitId);
         clone.setFkTaxRegionId(mnFkTaxRegionId);
+        clone.setFkThirdTaxCausingId_n(mnFkThirdTaxCausingId_n);
         clone.setFkDpsAdjustmentTypeId(mnFkDpsAdjustmentTypeId);
         clone.setFkDpsAdjustmentSubtypeId(mnFkDpsAdjustmentSubtypeId);
         clone.setFkDpsEntryTypeId(mnFkDpsEntryTypeId);

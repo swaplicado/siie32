@@ -1,4 +1,21 @@
 ================================================================================
+2019-11-05, 3.2 147.0
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de captura opcional de Tercero Causante de Impuestos en partidas de DPS.
+2) Corrección a la carga de asociados de negocios en cuadro combinado en captura de renglones de pólizas contables 
+    para cuentas contables que sólo requieren asociados de negocios, puesto que por no ser relacionadas con 
+    clientes, deudores, proveedores o acreedores, no se mostraba ningún asociado de negocios.
+3) Corrección a la vista de control de vacaciones para empleados inactivos y mejoramiento de la misma
+    con la adición de fecha de la última baja y contextualización de la fecha de corte según el estatus del empleado.
+
+================================================================================
+2019-11-01, 3.2 146.1
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de ajuste de -2 hr a la hora de timbrado para prevenir error 401.
+
+================================================================================
 2019-10-29, 3.2 146.0
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
@@ -41,7 +58,7 @@ Sergio Abraham FLORES GUTIÉRREZ
 1) Remoción de privilegio Catálogo Usuarios del Rol Administrador Configuración.
 2) Corrección a estatus inhabilitado de campos de captura de contraseña en copia de usuarios.
 3) Refactorizacion de funcionalidades de cierre y reapertura de nóminas.
-4) Corrección a la determinación si un CFDI es editable (si no está timbrado y emitido (vivo), o si está timbrado pero cancelado).
+4) Corrección a la determinación si un CFDI de nómina es editable (si no está timbrado y emitido (vivo), o si está timbrado pero cancelado).
 
 ================================================================================
 2019-09-24, 3.2 144.0

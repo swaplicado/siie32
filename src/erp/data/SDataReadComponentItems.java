@@ -334,6 +334,7 @@ public abstract class SDataReadComponentItems {
         java.lang.String sql = "";
         java.lang.String text = "";
         java.lang.String field = "";
+        java.lang.String filter = "";
 
         switch (catalogue) {
             case SDataConstants.BPSS_CT_BP:
@@ -469,24 +470,35 @@ public abstract class SDataReadComponentItems {
                 break;
             case SDataConstants.BPSX_BP_X_SUP_CUS:
             case SDataConstants.BPSX_BP_X_CDR_DBR:
+            case SDataConstants.BPSX_BP_X_SUP_CDR:
+            case SDataConstants.BPSX_BP_X_CUS_DBR:
                 lenPk = 1;
 
                 switch (catalogue) {
                     case SDataConstants.BPSX_BP_X_SUP_CUS:
                         field = "AND (bp.b_sup OR bp.b_cus OR bp.b_co) ";
+                        filter = "" + SDataConstantsSys.BPSS_CT_BP_SUP + ", " + SDataConstantsSys.BPSS_CT_BP_CUS + ", " + SDataConstantsSys.BPSS_CT_BP_CO;
                         break;
                     case SDataConstants.BPSX_BP_X_CDR_DBR:
                         field = "AND (bp.b_cdr OR bp.b_dbr OR bp.b_co) ";
+                        filter = "" + SDataConstantsSys.BPSS_CT_BP_CDR + ", " + SDataConstantsSys.BPSS_CT_BP_DBR + ", " + SDataConstantsSys.BPSS_CT_BP_CO;
+                        break;
+                    case SDataConstants.BPSX_BP_X_SUP_CDR:
+                        field = "AND (bp.b_sup OR bp.b_cdr OR bp.b_co) ";
+                        filter = "" + SDataConstantsSys.BPSS_CT_BP_SUP + ", " + SDataConstantsSys.BPSS_CT_BP_CDR + ", " + SDataConstantsSys.BPSS_CT_BP_CO;
+                        break;
+                    case SDataConstants.BPSX_BP_X_CUS_DBR:
+                        field = "AND (bp.b_cus OR bp.b_dbr OR bp.b_co) ";
+                        filter = "" + SDataConstantsSys.BPSS_CT_BP_CUS + ", " + SDataConstantsSys.BPSS_CT_BP_DBR + ", " + SDataConstantsSys.BPSS_CT_BP_CO;
                         break;
                     default:
                 }
 
-                sql = "SELECT bp.id_bp AS f_id_1, bp.bp AS f_item " +
+                sql = "SELECT DISTINCT bp.id_bp AS f_id_1, bp.bp AS f_item " +
                         "FROM erp.bpsu_bp AS bp " +
                         "INNER JOIN erp.bpsu_bp_ct AS ct ON " +
-                        "bp.id_bp = ct.id_bp AND ct.id_ct_bp IN (" +
-                        (catalogue == SDataConstants.BPSX_BP_X_SUP_CUS ? SDataConstantsSys.BPSS_CT_BP_SUP + ", " + SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_CDR + ", " + SDataConstantsSys.BPSS_CT_BP_DBR) + ") " +
-                        "WHERE bp.b_del = 0 AND ct.b_del = 0 " + field +
+                        "bp.id_bp = ct.id_bp AND ct.id_ct_bp IN (" + filter + ") " +
+                        "WHERE NOT bp.b_del AND NOT ct.b_del " + field +
                         "ORDER BY bp.bp, bp.id_bp ";
                 text = "asociado de negocios";
                 break;

@@ -100,6 +100,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
     private erp.form.SFormOptionPicker moPickerBizPartnerEmployee;
     private erp.form.SFormOptionPicker moPickerBizPartnerExtraSupplierCustomer;
     private erp.form.SFormOptionPicker moPickerBizPartnerExtraCreditorDebtor;
+    private erp.form.SFormOptionPicker moPickerBizPartnerExtraSupplierCreditor;
+    private erp.form.SFormOptionPicker moPickerBizPartnerExtraCustomerDebtor;
     private erp.form.SFormOptionPicker moPickerBizPartnerAttBank;
     private erp.form.SFormOptionPicker moPickerBizPartnerAttCarrier;
     private erp.form.SFormOptionPicker moPickerBizPartnerSalesAgent;
@@ -788,6 +790,12 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                     break;
                 case SDataConstants.BPSX_BP_X_CDR_DBR:
                     picker = moPickerBizPartnerExtraCreditorDebtor = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerBizPartnerExtraCreditorDebtor);
+                    break;
+                case SDataConstants.BPSX_BP_X_SUP_CDR:
+                    picker = moPickerBizPartnerExtraSupplierCreditor = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerBizPartnerExtraSupplierCreditor);
+                    break;
+                case SDataConstants.BPSX_BP_X_CUS_DBR:
+                    picker = moPickerBizPartnerExtraCustomerDebtor= SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerBizPartnerExtraCustomerDebtor);
                     break;
                 case SDataConstants.BPSX_BP_ATT_BANK:
                     picker = moPickerBizPartnerAttBank = SFormOptionPicker.createOptionPicker(miClient, optionType, moPickerBizPartnerAttBank);

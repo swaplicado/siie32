@@ -1,5 +1,8 @@
 package erp.mfin.data.diot;
 
+import cfd.DCfdConsts;
+import erp.client.SClientInterface;
+import erp.mbps.data.SDataBizPartner;
 import java.text.DecimalFormat;
 import sa.lib.SLibUtils;
 
@@ -12,6 +15,7 @@ public class SDiotTercero {
     public static final String GLOBAL_CLAVE = 0 + "-" + SDiotConsts.THIRD_GLOBAL;
     
     public boolean IsCompany;
+    public boolean IsDomestic;
     public int BizPartnerId;
     public String TipoTercero; // 1
     public String TipoOperación; // 2
@@ -45,19 +49,51 @@ public class SDiotTercero {
     }
     
     public SDiotTercero() {
-        this(false, 0, SDiotConsts.THIRD_UNDEFINED, SDiotConsts.OPER_UNDEFINED, "", "");
+        resetTercero(false, false, 0, SDiotConsts.THIRD_UNDEFINED, SDiotConsts.OPER_UNDEFINED, "", "");
     }
     
-    public SDiotTercero(boolean isCompany, int bizPartnerId, String tipoTercero, String tipoOperación, String rfc, String extIdFiscal) {
-        IsCompany = isCompany;
-        BizPartnerId = bizPartnerId;
-        TipoTercero = tipoTercero;
-        TipoOperación = tipoOperación;
-        Rfc = rfc;
-        ExtIdFiscal = extIdFiscal;
-        ExtNombre = "";
-        ExtPaísResidencia = "";
-        ExtNacionalidad = "";
+    public SDiotTercero(final SClientInterface client, final SDataBizPartner bizPartner) {
+        if (bizPartner == null) {
+            resetTercero(false, true, 0, SDiotConsts.THIRD_GLOBAL, SDiotConsts.OPER_OTHER, DCfdConsts.RFC_GEN_NAC, "");
+        }
+        else {
+            String tipoTercero;
+            String tipoOperación;
+            boolean isCompany = bizPartner.getPkBizPartnerId() == client.getSessionXXX().getCurrentCompany().getPkCompanyId();
+
+            if (isCompany) {
+                tipoTercero = SDiotConsts.THIRD_UNDEFINED;
+                tipoOperación = SDiotConsts.OPER_UNDEFINED;
+            }
+            else {
+                tipoTercero = bizPartner.getDiotTipoTercero(client);
+                tipoOperación = bizPartner.getDiotTipoOperación();
+            }
+
+            boolean isDomestic = bizPartner.isDomestic(client);
+
+            resetTercero(isCompany, isDomestic, bizPartner.getPkBizPartnerId(), tipoTercero, tipoOperación, bizPartner.getFiscalId(), bizPartner.getFiscalFrgId());
+            
+            if (!isDomestic) {
+                this.ExtNombre = bizPartner.getBizPartner();
+                this.ExtPaísResidencia = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getDiotCode();
+                this.ExtNacionalidad = this.ExtPaísResidencia;
+            }
+        }
+        
+    }
+    
+    private void resetTercero(final boolean isCompany, final boolean isDomestic, final int bizPartnerId, final String tipoTercero, final String tipoOperación, final String rfc, final String extIdFiscal) {
+        this.IsCompany = isCompany;
+        this.IsDomestic = isDomestic;
+        this.BizPartnerId = bizPartnerId;
+        this.TipoTercero = tipoTercero;
+        this.TipoOperación = tipoOperación;
+        this.Rfc = rfc;
+        this.ExtIdFiscal = extIdFiscal;
+        this.ExtNombre = "";
+        this.ExtPaísResidencia = "";
+        this.ExtNacionalidad = "";
     }
     
     /**
@@ -68,7 +104,7 @@ public class SDiotTercero {
         return BizPartnerId + "-" + TipoOperación;
     }
     
-    public boolean isTotalZero() {
+    public boolean isTotallyZero() {
         return ValorPagosNacIva1516 == 0 &&
                 ValorPagosNacIva15 == 0 &&
                 IvaPagadoNoAcredNac1516 == 0 &&

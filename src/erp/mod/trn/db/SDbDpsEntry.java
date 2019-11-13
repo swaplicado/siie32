@@ -107,6 +107,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected int mnFkUnitId;
     protected int mnFkOriginalUnitId;
     protected int mnFkTaxRegionId;
+    protected int mnFkThirdTaxCausingId_n;
     protected int mnFkDpsAdjustmentTypeId;
     protected int mnFkDpsAdjustmentSubtypeId;
     protected int mnFkDpsEntryTypeId;
@@ -211,6 +212,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public void setFkUnitId(int n) { mnFkUnitId = n; }
     public void setFkOriginalUnitId(int n) { mnFkOriginalUnitId = n; }
     public void setFkTaxRegionId(int n) { mnFkTaxRegionId = n; }
+    public void setFkThirdTaxCausingId_n(int n) { mnFkThirdTaxCausingId_n = n; }
     public void setFkDpsAdjustmentTypeId(int n) { mnFkDpsAdjustmentTypeId = n; }
     public void setFkDpsAdjustmentSubtypeId(int n) { mnFkDpsAdjustmentSubtypeId = n; }
     public void setFkDpsEntryTypeId(int n) { mnFkDpsEntryTypeId = n; }
@@ -305,6 +307,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public int getFkUnitId() { return mnFkUnitId; }
     public int getFkOriginalUnitId() { return mnFkOriginalUnitId; }
     public int getFkTaxRegionId() { return mnFkTaxRegionId; }
+    public int getFkThirdTaxCausingId_n() { return mnFkThirdTaxCausingId_n; }
     public int getFkDpsAdjustmentTypeId() { return mnFkDpsAdjustmentTypeId; }
     public int getFkDpsAdjustmentSubtypeId() { return mnFkDpsAdjustmentSubtypeId; }
     public int getFkDpsEntryTypeId() { return mnFkDpsEntryTypeId; }
@@ -419,6 +422,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
         mnFkUnitId = 0;
         mnFkOriginalUnitId = 0;
         mnFkTaxRegionId = 0;
+        mnFkThirdTaxCausingId_n = 0;
         mnFkDpsAdjustmentTypeId = 0;
         mnFkDpsAdjustmentSubtypeId = 0;
         mnFkDpsEntryTypeId = 0;
@@ -557,6 +561,7 @@ public class SDbDpsEntry extends SDbRegistryUser {
             mnFkUnitId = resultSet.getInt("fid_unit");
             mnFkOriginalUnitId = resultSet.getInt("fid_orig_unit");
             mnFkTaxRegionId = resultSet.getInt("fid_tax_reg");
+            mnFkThirdTaxCausingId_n = resultSet.getInt("fid_third_tax_n");
             mnFkDpsAdjustmentTypeId = resultSet.getInt("fid_tp_dps_adj");
             mnFkDpsAdjustmentSubtypeId = resultSet.getInt("fid_stp_dps_adj");
             mnFkDpsEntryTypeId = resultSet.getInt("fid_tp_dps_ety");

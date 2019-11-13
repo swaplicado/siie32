@@ -234,7 +234,7 @@ public class SFormTax extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_RATE_0, "IVA tasa 0"));
         jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_GENERAL, "IVA general"));
         jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER, "IVA región fronteriza"));
-        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER_INC, "IVA estímulo región fronteriza norte"));
+        jcbVatType.addItem(new SFormComponentItem(SDiotConsts.VAT_TYPE_BORDER_NORTH_INC, "IVA estímulo región fronteriza norte"));
 
         AbstractAction actionOk = new AbstractAction() {
             @Override

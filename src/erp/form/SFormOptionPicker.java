@@ -339,6 +339,8 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
 
             case SDataConstants.BPSX_BP_X_SUP_CUS:
             case SDataConstants.BPSX_BP_X_CDR_DBR:
+            case SDataConstants.BPSX_BP_X_SUP_CDR:
+            case SDataConstants.BPSX_BP_X_CUS_DBR:
                 aoTableColumns = new STableColumnForm[1];
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Asociado de negocios", 300);
                 setTitle("Seleccionar asociado de negocios");

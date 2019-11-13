@@ -233,7 +233,6 @@ public abstract class SDataReadTableRows {
         int i = 0;
         int category = 0;
         int sortingType = 0;
-        String field = "";
         STableField[] aoPkFields = null;
         STableField[] aoQueryFields = null;
         ArrayList<STableField> aPkFields = new ArrayList<>();
@@ -241,6 +240,8 @@ public abstract class SDataReadTableRows {
         ArrayList<STableField> aQueryAdditionalFields = new ArrayList<>();
         ArrayList<SLibRpnArgument>[] aaRpnArguments = null;
         String sSql = "";
+        String field = "";
+        String filter = "";
 
         switch (pnDataType) {
             case SDataConstants.BPSS_CT_BP:
@@ -454,12 +455,24 @@ public abstract class SDataReadTableRows {
 
             case SDataConstants.BPSX_BP_X_SUP_CUS:
             case SDataConstants.BPSX_BP_X_CDR_DBR:
+            case SDataConstants.BPSX_BP_X_SUP_CDR:
+            case SDataConstants.BPSX_BP_X_CUS_DBR:
                 switch (pnDataType) {
                     case SDataConstants.BPSX_BP_X_SUP_CUS:
-                        field = "AND (b_sup OR b_cus OR b_co) ";
+                        field = "AND (bp.b_sup OR bp.b_cus OR bp.b_co) ";
+                        filter = "" + SDataConstantsSys.BPSS_CT_BP_SUP + ", " + SDataConstantsSys.BPSS_CT_BP_CUS + ", " + SDataConstantsSys.BPSS_CT_BP_CO;
                         break;
                     case SDataConstants.BPSX_BP_X_CDR_DBR:
-                        field = "AND (b_cdr OR b_dbr OR b_co) ";
+                        field = "AND (bp.b_cdr OR bp.b_dbr OR bp.b_co) ";
+                        filter = "" + SDataConstantsSys.BPSS_CT_BP_CDR + ", " + SDataConstantsSys.BPSS_CT_BP_DBR + ", " + SDataConstantsSys.BPSS_CT_BP_CO;
+                        break;
+                    case SDataConstants.BPSX_BP_X_SUP_CDR:
+                        field = "AND (bp.b_sup OR bp.b_cdr OR bp.b_co) ";
+                        filter = "" + SDataConstantsSys.BPSS_CT_BP_SUP + ", " + SDataConstantsSys.BPSS_CT_BP_CDR + ", " + SDataConstantsSys.BPSS_CT_BP_CO;
+                        break;
+                    case SDataConstants.BPSX_BP_X_CUS_DBR:
+                        field = "AND (bp.b_cus OR bp.b_dbr OR bp.b_co) ";
+                        filter = "" + SDataConstantsSys.BPSS_CT_BP_CUS + ", " + SDataConstantsSys.BPSS_CT_BP_DBR + ", " + SDataConstantsSys.BPSS_CT_BP_CO;
                         break;
                     default:
                 }
@@ -471,12 +484,11 @@ public abstract class SDataReadTableRows {
                 aoQueryFields = new STableField[1];
                 aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "bp");
 
-                sSql = "SELECT bp.id_bp, bp.bp " +
+                sSql = "SELECT DISTINCT bp.id_bp, bp.bp " +
                         "FROM erp.bpsu_bp AS bp " +
                         "INNER JOIN erp.bpsu_bp_ct AS ct ON " +
-                        "bp.id_bp = ct.id_bp AND ct.id_ct_bp IN (" +
-                        (pnDataType == SDataConstants.BPSX_BP_X_SUP_CUS ? SDataConstantsSys.BPSS_CT_BP_SUP + ", " + SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_CDR + ", " + SDataConstantsSys.BPSS_CT_BP_DBR) + ") " +
-                        "WHERE bp.b_del = 0 AND ct.b_del = 0 " + field +
+                        "bp.id_bp = ct.id_bp AND ct.id_ct_bp IN (" + filter + ") " +
+                        "WHERE NOT bp.b_del AND NOT ct.b_del " + field +
                         "ORDER BY bp.bp, bp.id_bp ";
                 break;
 

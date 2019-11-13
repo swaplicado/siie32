@@ -1238,6 +1238,7 @@
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                         <Property name="columns" type="int" value="1"/>
                         <Property name="rows" type="int" value="2"/>
+                        <Property name="verticalGap" type="int" value="1"/>
                       </Layout>
                       <SubComponents>
                         <Container class="javax.swing.JPanel" name="jPanel13">
@@ -1249,9 +1250,9 @@
                           <SubComponents>
                             <Component class="javax.swing.JLabel" name="jlFkTaxRegionId">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Regi&#xf3;n de impuestos de la partida: *"/>
+                                <Property name="text" type="java.lang.String" value="Regi&#xf3;n de impuestos: *"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[200, 23]"/>
+                                  <Dimension value="[120, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -1275,6 +1276,15 @@
                                 </Property>
                               </Properties>
                             </Component>
+                            <Component class="javax.swing.JCheckBox" name="jckIsTaxesAutomaticApplying">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="C&#xe1;lculo autom&#xe1;tico de impuestos"/>
+                                <Property name="horizontalTextPosition" type="int" value="10"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[225, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
                           </SubComponents>
                         </Container>
                         <Container class="javax.swing.JPanel" name="jPanel34">
@@ -1284,11 +1294,40 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JCheckBox" name="jckIsTaxesAutomaticApplying">
+                            <Component class="javax.swing.JLabel" name="jlFkThirdTaxCausingId_n">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="C&#xe1;lculo autom&#xe1;tico de impuestos"/>
+                                <Property name="text" type="java.lang.String" value="Tercero causante:"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[200, 23]"/>
+                                  <Dimension value="[120, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JComboBox" name="jcbFkThirdTaxCausingId_n">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[400, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbFkThirdTaxCausingId_n">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="..."/>
+                                <Property name="toolTipText" type="java.lang.String" value="Seleccionar tercero causante"/>
+                                <Property name="focusable" type="boolean" value="false"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[23, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbEditFkThirdTaxCausingId_n">
+                              <Properties>
+                                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                  <Image iconType="3" name="/erp/img/icon_std_edit.gif"/>
+                                </Property>
+                                <Property name="toolTipText" type="java.lang.String" value="Habilitar tercero causante"/>
+                                <Property name="focusable" type="boolean" value="false"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[23, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>

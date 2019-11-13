@@ -16,9 +16,14 @@ public abstract class SDiotConsts {
     public static final String THIRD_INTERNATIONAL = "05";
     public static final String THIRD_GLOBAL = "15";
     
+    /** VAT type: Exempt. */
     public static final String VAT_TYPE_EXEMPT = "Exent";
+    /** VAT type: Zero rate. */
     public static final String VAT_TYPE_RATE_0 = "TCero";
+    /** VAT type: General rate. */
     public static final String VAT_TYPE_GENERAL = "TGral";
+    /** VAT type: Border rate. */
     public static final String VAT_TYPE_BORDER = "TFron";
-    public static final String VAT_TYPE_BORDER_INC = "EFron";
+    /** VAT type: Northern border incentive rate. */
+    public static final String VAT_TYPE_BORDER_NORTH_INC = "EFron";
 }

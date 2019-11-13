@@ -76,10 +76,14 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jbPickDateEnd = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jckExcludeTotalZeros = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
         jrbFormatPipe = new javax.swing.JRadioButton();
         jPanel14 = new javax.swing.JPanel();
         jrbFormatCsv = new javax.swing.JRadioButton();
+        jPanel4 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
         jbSave = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -88,10 +92,10 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         setTitle("Layout DIOT");
         setResizable(false);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del layout:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del layout DIOT:"));
+        jPanel6.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -137,11 +141,14 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         jPanel6.add(jPanel15);
 
+        jLabel1.setText("Formato del archivo:");
+        jPanel6.add(jLabel1);
+
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgFormat.add(jrbFormatPipe);
-        jrbFormatPipe.setText("Valores separados por el caracter | (pipe)");
-        jrbFormatPipe.setPreferredSize(new java.awt.Dimension(300, 23));
+        jrbFormatPipe.setText("Valores separados por barra vertical, el caracter \"pipe\" |");
+        jrbFormatPipe.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel13.add(jrbFormatPipe);
 
         jPanel6.add(jPanel13);
@@ -149,13 +156,33 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgFormat.add(jrbFormatCsv);
-        jrbFormatCsv.setText("Valores separados por coma (CSV)");
-        jrbFormatCsv.setPreferredSize(new java.awt.Dimension(300, 23));
+        jrbFormatCsv.setText("Valores separados por coma (CSV), incluye resumen informativo y lista de excepciones");
+        jrbFormatCsv.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel14.add(jrbFormatCsv);
 
         jPanel6.add(jPanel14);
 
         jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("ADVERTENCIAS:"));
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        jTextArea1.setEditable(false);
+        jTextArea1.setBackground(java.awt.SystemColor.control);
+        jTextArea1.setColumns(20);
+        jTextArea1.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
+        jTextArea1.setLineWrap(true);
+        jTextArea1.setRows(5);
+        jTextArea1.setText("1) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas equivocadamente a otras tasas de IVA, pero deliberadamente manipuladas para que el monto del IVA fuera igual a cero, serán por defecto clasificados como operaciones de IVA tasa 0 en el archivo del layout DIOT.\n\n2) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas conjuntamente en el mismo asiento contable con operaciones a otras tasas de IVA, serán por defecto clasificados como operaciones de IVA exento en el archivo del layout DIOT.");
+        jTextArea1.setWrapStyleWord(true);
+        jScrollPane1.setViewportView(jTextArea1);
+
+        jPanel4.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        jPanel2.add(jPanel4, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -172,7 +199,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(416, 289));
+        setSize(new java.awt.Dimension(656, 439));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -274,14 +301,18 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgFormat;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbPickDateEnd;
     private javax.swing.JButton jbPickDateStart;

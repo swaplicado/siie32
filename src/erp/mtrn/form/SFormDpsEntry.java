@@ -149,6 +149,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.form.SFormField moFieldIsInventoriable;
     private erp.lib.form.SFormField moFieldIsDeleted;
     private erp.lib.form.SFormField moFieldFkTaxRegionId;
+    private erp.lib.form.SFormField moFieldFkThirdTaxCausingId_n;
     private erp.lib.form.SFormField moFieldFkItemReferenceId_n;
     private erp.lib.form.SFormField moFieldReference;
     private erp.lib.form.SFormField moFieldOperationsType;
@@ -347,8 +348,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlFkTaxRegionId = new javax.swing.JLabel();
         jcbFkTaxRegionId = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkTaxRegionId = new javax.swing.JButton();
-        jPanel34 = new javax.swing.JPanel();
         jckIsTaxesAutomaticApplying = new javax.swing.JCheckBox();
+        jPanel34 = new javax.swing.JPanel();
+        jlFkThirdTaxCausingId_n = new javax.swing.JLabel();
+        jcbFkThirdTaxCausingId_n = new javax.swing.JComboBox();
+        jbFkThirdTaxCausingId_n = new javax.swing.JButton();
+        jbEditFkThirdTaxCausingId_n = new javax.swing.JButton();
         jpCommissions = new javax.swing.JPanel();
         jpPricesData = new javax.swing.JPanel();
         jPanel46 = new javax.swing.JPanel();
@@ -1132,12 +1137,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         jpTaxInfo.add(jPanel14, java.awt.BorderLayout.WEST);
 
-        jPanel33.setLayout(new java.awt.GridLayout(2, 1));
+        jPanel33.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFkTaxRegionId.setText("Región de impuestos de la partida: *");
-        jlFkTaxRegionId.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlFkTaxRegionId.setText("Región de impuestos: *");
+        jlFkTaxRegionId.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel13.add(jlFkTaxRegionId);
 
         jcbFkTaxRegionId.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -1149,13 +1154,33 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbFkTaxRegionId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel13.add(jbFkTaxRegionId);
 
+        jckIsTaxesAutomaticApplying.setText("Cálculo automático de impuestos");
+        jckIsTaxesAutomaticApplying.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jckIsTaxesAutomaticApplying.setPreferredSize(new java.awt.Dimension(225, 23));
+        jPanel13.add(jckIsTaxesAutomaticApplying);
+
         jPanel33.add(jPanel13);
 
         jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsTaxesAutomaticApplying.setText("Cálculo automático de impuestos");
-        jckIsTaxesAutomaticApplying.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel34.add(jckIsTaxesAutomaticApplying);
+        jlFkThirdTaxCausingId_n.setText("Tercero causante:");
+        jlFkThirdTaxCausingId_n.setPreferredSize(new java.awt.Dimension(120, 23));
+        jPanel34.add(jlFkThirdTaxCausingId_n);
+
+        jcbFkThirdTaxCausingId_n.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel34.add(jcbFkThirdTaxCausingId_n);
+
+        jbFkThirdTaxCausingId_n.setText("...");
+        jbFkThirdTaxCausingId_n.setToolTipText("Seleccionar tercero causante");
+        jbFkThirdTaxCausingId_n.setFocusable(false);
+        jbFkThirdTaxCausingId_n.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel34.add(jbFkThirdTaxCausingId_n);
+
+        jbEditFkThirdTaxCausingId_n.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_edit.gif"))); // NOI18N
+        jbEditFkThirdTaxCausingId_n.setToolTipText("Habilitar tercero causante");
+        jbEditFkThirdTaxCausingId_n.setFocusable(false);
+        jbEditFkThirdTaxCausingId_n.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel34.add(jbEditFkThirdTaxCausingId_n);
 
         jPanel33.add(jPanel34);
 
@@ -2187,6 +2212,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDeleted);
         moFieldFkTaxRegionId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkTaxRegionId, jlFkTaxRegionId);
         moFieldFkTaxRegionId.setPickerButton(jbFkTaxRegionId);
+        moFieldFkThirdTaxCausingId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkThirdTaxCausingId_n, jlFkThirdTaxCausingId_n);
+        moFieldFkThirdTaxCausingId_n.setPickerButton(jbFkThirdTaxCausingId_n);
         moFieldFkItemReferenceId_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemReferenceId_n, jlFkItemReferenceId_n);
         moFieldFkItemReferenceId_n.setPickerButton(jbFkItemReferenceId_n);
         moFieldReference = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfReference, jlReference);
@@ -2283,6 +2310,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields.add(moFieldIsInventoriable);
         mvFields.add(moFieldIsDeleted);
         mvFields.add(moFieldFkTaxRegionId);
+        mvFields.add(moFieldFkThirdTaxCausingId_n);
         mvFields.add(moFieldFkItemReferenceId_n);
         mvFields.add(moFieldReference);
         mvFields.add(moFieldOperationsType);
@@ -2422,20 +2450,21 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbCancel.addActionListener(this);
         jbConceptKey.addActionListener(this);
         jbConcept.addActionListener(this);
+        jbItemBizPartnerDescription.addActionListener(this);
         jbFkItemId.addActionListener(this);
         jbSetPrepayment.addActionListener(this);
-        jbItemBizPartnerDescription.addActionListener(this);
         jbFkOriginalUnitId.addActionListener(this);
         jbPriceUnitaryCyWizard.addActionListener(this);
         jbPriceHistory.addActionListener(this);
+        jbFkItemReferenceId_n.addActionListener(this);
+        jbFkTaxRegionId.addActionListener(this);
+        jbFkThirdTaxCausingId_n.addActionListener(this);
+        jbEditFkThirdTaxCausingId_n.addActionListener(this);
         jbNotesNew.addActionListener(this);
         jbNotesEdit.addActionListener(this);
         jbNotesDelete.addActionListener(this);
         jbSystemNotes.addActionListener(this);
-        jbFkTaxRegionId.addActionListener(this);
-        jbFkItemReferenceId_n.addActionListener(this);
         jtbNotesFilter.addActionListener(this);
-        
         jbPriceNew.addActionListener(this);
         jbPriceSave.addActionListener(this);
         jbClearPriceFields.addActionListener(this);
@@ -2635,6 +2664,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.setFkUnitId(0);
             moDpsEntry.setFkOriginalUnitId(0);
             moDpsEntry.setFkTaxRegionId(0);
+            moDpsEntry.setFkThirdTaxCausingId_n(0);
 
             moDpsEntry.setDbmsFkItemGenericId(0);
 
@@ -2649,6 +2679,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moDpsEntry.setFkUnitId(moItem.getFkUnitId());
             moDpsEntry.setFkOriginalUnitId(moFieldFkOriginalUnitId.getKeyAsIntArray()[0]);
             moDpsEntry.setFkTaxRegionId(moFieldFkTaxRegionId.getKeyAsIntArray()[0]);
+            moDpsEntry.setFkThirdTaxCausingId_n(moFieldFkThirdTaxCausingId_n.getKeyAsIntArray()[0]);
             moDpsEntry.setIsPrepayment(moItem.getIsPrepayment());
             
             moDpsEntry.setDbmsFkItemGenericId(moItem.getFkItemGenericId());
@@ -3438,6 +3469,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jcbFkTaxRegionId.setEnabled(false);
             jbFkTaxRegionId.setEnabled(false);
             jckIsTaxesAutomaticApplying.setEnabled(false);
+            jcbFkThirdTaxCausingId_n.setEnabled(false);
+            jbFkThirdTaxCausingId_n.setEnabled(false);
+            jbEditFkThirdTaxCausingId_n.setEnabled(false);
 
             jtfLength.setEnabled(false);
             jtfSurface.setEnabled(false);
@@ -3502,6 +3536,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jcbFkTaxRegionId.setEnabled(true);
             jbFkTaxRegionId.setEnabled(true);
             jckIsTaxesAutomaticApplying.setEnabled(true);
+            jcbFkThirdTaxCausingId_n.setEnabled(false);
+            jbFkThirdTaxCausingId_n.setEnabled(false);
+            jbEditFkThirdTaxCausingId_n.setEnabled(true);
 
             jcbFkVehicleTypeId_n.setEnabled(true);
             jtfDriver.setEnabled(true);
@@ -3727,6 +3764,27 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldFkItemId.getKeyAsIntArray()[0], moParamBizPartner.getPkBizPartnerId(), new int[] { moParamDps.getFkDpsCategoryId(), moParamDps.getFkDpsClassId()});
     }
 
+    private void actionFkItemReferenceId_n() {
+        miClient.pickOption(SDataConstants.ITMX_ITEM_IOG, moFieldFkItemReferenceId_n, null);
+    }
+
+    private void actionFkTaxRegionId() {
+        if (miClient.pickOption(SDataConstants.FINU_TAX_REG, moFieldFkTaxRegionId, null) == SLibConstants.FORM_RESULT_OK) {
+            itemChangedFkTaxRegionId();
+        }
+    }
+    
+    private void actionFkThirdTaxCausingId_n() {
+        miClient.pickOption(moParamDps.isForSales() ? SDataConstants.BPSX_BP_CUS : SDataConstants.BPSX_BP_SUP, moFieldFkThirdTaxCausingId_n, null);
+    }
+
+    private void actionEditFkThirdTaxCausingId_n() {
+        jbEditFkThirdTaxCausingId_n.setEnabled(false);
+        jbFkThirdTaxCausingId_n.setEnabled(true);
+        jcbFkThirdTaxCausingId_n.setEnabled(true);
+        jcbFkThirdTaxCausingId_n.requestFocusInWindow();
+    }
+
     private void actionNotesNew() {
         if (jbNotesNew.isEnabled()) {
             moFormNotes.formReset();
@@ -3790,16 +3848,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
     }
 
-    private void actionNotesFilter() {
-        if (jtbNotesFilter.isEnabled()) {
-            int index = moPaneGridNotes.getTable().getSelectedRow();
-
-            moPaneGridNotes.setGridViewStatus(!jtbNotesFilter.isSelected() ? STableConstants.VIEW_STATUS_ALL : STableConstants.VIEW_STATUS_ALIVE);
-            moPaneGridNotes.renderTableRows();
-            moPaneGridNotes.setTableRowSelection(index < moPaneGridNotes.getTableGuiRowCount() ? index : moPaneGridNotes.getTableGuiRowCount() - 1);
-        }
-    }
-
     private void actionSystemNotes() {
         String option = miClient.pickOption(SDataConstants.TRN_SYS_NTS, new int[] { moParamDps.getFkDpsCategoryId(), moParamDps.getFkDpsClassId(), moParamDps.getFkDpsTypeId(), moParamDps.getFkCurrencyId() });
 
@@ -3816,6 +3864,16 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moPaneGridNotes.addTableRow(new SDataDpsEntryNotesRow(dpsEntryNotes));
             moPaneGridNotes.renderTableRows();
             moPaneGridNotes.setTableRowSelection(0);
+        }
+    }
+
+    private void actionNotesFilter() {
+        if (jtbNotesFilter.isEnabled()) {
+            int index = moPaneGridNotes.getTable().getSelectedRow();
+
+            moPaneGridNotes.setGridViewStatus(!jtbNotesFilter.isSelected() ? STableConstants.VIEW_STATUS_ALL : STableConstants.VIEW_STATUS_ALIVE);
+            moPaneGridNotes.renderTableRows();
+            moPaneGridNotes.setTableRowSelection(index < moPaneGridNotes.getTableGuiRowCount() ? index : moPaneGridNotes.getTableGuiRowCount() - 1);
         }
     }
 
@@ -3846,78 +3904,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             calculateEntryPrice();
             moAuxEntryPriceEdited.setOriginalPriceUnitaryCySystem(moFieldPriceOriginalPriceUnitaryCy.getDouble());
             jtfContractPriceNumbrerReference.requestFocus();
-        }
-    }
-
-    private void actionPriceEdit() {
-        if (jbGridPriceEdit.isEnabled()) {
-            mnAuxEntryPriceAction = STrnConsts.ACTION_EDIT;
-            mnAuxEntryPriceEditedIndex = moPaneGridPrices.getTable().getSelectedRow();
-            
-            if (mnAuxEntryPriceEditedIndex != -1) {
-                moAuxEntryPriceEdited = (SDataDpsEntryPrice) moPaneGridPrices.getSelectedTableRow().getData();
-                
-                enableDeliveryPriceButtonFields(false);
-                enablePriceEntryContractFields(true);
-                enableDeliveryPriceFields(true);
-                enablePriceGridFields(false);
-
-                jtfContractPriceYear.setEditable(false);
-                jtfContractPriceMonth.setEditable(false);
-                
-                jckIsDirectPrice.setSelected(moAuxEntryPriceEdited.getIsPriceVariable());
-                moFieldContractPriceReferenceNumbrer.setString(moAuxEntryPriceEdited.getReferenceNumber());
-                moFieldContractPriceYear.setInteger(moAuxEntryPriceEdited.getContractPriceYear());
-                moFieldContractPriceMonth.setInteger(moAuxEntryPriceEdited.getContractPriceMonth());
-                moFieldPriceOriginalQuantity.setDouble(moAuxEntryPriceEdited.getOriginalQuantity());
-                jckChangePrice.setSelected(moAuxEntryPriceEdited.getOriginalPriceUnitaryCy() != moAuxEntryPriceEdited.getOriginalPriceUnitaryCySystem());
-                moFieldPriceOriginalPriceUnitaryCy.setDouble(moAuxEntryPriceEdited.getOriginalPriceUnitaryCy());
-                moFieldContractBase.setDouble(moAuxEntryPriceEdited.getContractBase());
-                moFieldContractFuture.setDouble(moAuxEntryPriceEdited.getContractFuture());
-                moFieldContractFactor.setDouble(moAuxEntryPriceEdited.getContractFactor());
-            }
-        }
-    }
-
-    private void actionPriceDelete() {
-        if (jbGridPriceDelete.isEnabled()) {
-            mnAuxEntryPriceEditedIndex = moPaneGridPrices.getTable().getSelectedRow();
-
-            if (mnAuxEntryPriceEditedIndex != -1) {
-                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
-                    moAuxEntryPriceEdited = (SDataDpsEntryPrice) moPaneGridPrices.getTableRow(mnAuxEntryPriceEditedIndex).getData();
-
-                    if (moAuxEntryPriceEdited.getIsDeleted()) {
-                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_REG_ALREADY_DELETE);
-                    }
-                    else {
-                        if (moAuxEntryPriceEdited.getUserNewTs() == null) {
-                            moPaneGridPrices.removeTableRow(mnAuxEntryPriceEditedIndex);
-                        }
-                        else {
-                            moAuxEntryPriceEdited.setIsDeleted(true);
-                            moAuxEntryPriceEdited.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
-                            moAuxEntryPriceEdited.setIsRegistryEdited(true);
-                            moAuxEntryPriceEdited.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
-
-                            moPaneGridPrices.setTableRow(new SDataDpsEntryPriceRow(moAuxEntryPriceEdited), mnAuxEntryPriceEditedIndex);
-                        }
-
-                        moPaneGridPrices.renderTableRows();
-                        moPaneGridPrices.setTableRowSelection(mnAuxEntryPriceEditedIndex < moPaneGridPrices.getTableGuiRowCount() ? mnAuxEntryPriceEditedIndex : moPaneGridPrices.getTableGuiRowCount() - 1);
-                    }
-                    moAuxEntryPriceEdited = null;
-                }                
-            }
-        }
-    }
-
-    private void actionPriceFilter() {
-        if (jtbGridPriceFilter.isEnabled()) {
-            mnAuxEntryPriceEditedIndex = moPaneGridPrices.getTable().getSelectedRow();
-            moPaneGridPrices.setGridViewStatus(!jtbGridPriceFilter.isSelected() ? STableConstants.VIEW_STATUS_ALL : STableConstants.VIEW_STATUS_ALIVE);
-            moPaneGridPrices.renderTableRows();
-            moPaneGridPrices.setTableRowSelection(mnAuxEntryPriceEditedIndex < moPaneGridPrices.getTableGuiRowCount() ? mnAuxEntryPriceEditedIndex : moPaneGridPrices.getTableGuiRowCount() - 1);
         }
     }
 
@@ -4049,6 +4035,78 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }    
     }
     
+    private void actionPriceEdit() {
+        if (jbGridPriceEdit.isEnabled()) {
+            mnAuxEntryPriceAction = STrnConsts.ACTION_EDIT;
+            mnAuxEntryPriceEditedIndex = moPaneGridPrices.getTable().getSelectedRow();
+            
+            if (mnAuxEntryPriceEditedIndex != -1) {
+                moAuxEntryPriceEdited = (SDataDpsEntryPrice) moPaneGridPrices.getSelectedTableRow().getData();
+                
+                enableDeliveryPriceButtonFields(false);
+                enablePriceEntryContractFields(true);
+                enableDeliveryPriceFields(true);
+                enablePriceGridFields(false);
+
+                jtfContractPriceYear.setEditable(false);
+                jtfContractPriceMonth.setEditable(false);
+                
+                jckIsDirectPrice.setSelected(moAuxEntryPriceEdited.getIsPriceVariable());
+                moFieldContractPriceReferenceNumbrer.setString(moAuxEntryPriceEdited.getReferenceNumber());
+                moFieldContractPriceYear.setInteger(moAuxEntryPriceEdited.getContractPriceYear());
+                moFieldContractPriceMonth.setInteger(moAuxEntryPriceEdited.getContractPriceMonth());
+                moFieldPriceOriginalQuantity.setDouble(moAuxEntryPriceEdited.getOriginalQuantity());
+                jckChangePrice.setSelected(moAuxEntryPriceEdited.getOriginalPriceUnitaryCy() != moAuxEntryPriceEdited.getOriginalPriceUnitaryCySystem());
+                moFieldPriceOriginalPriceUnitaryCy.setDouble(moAuxEntryPriceEdited.getOriginalPriceUnitaryCy());
+                moFieldContractBase.setDouble(moAuxEntryPriceEdited.getContractBase());
+                moFieldContractFuture.setDouble(moAuxEntryPriceEdited.getContractFuture());
+                moFieldContractFactor.setDouble(moAuxEntryPriceEdited.getContractFactor());
+            }
+        }
+    }
+
+    private void actionPriceDelete() {
+        if (jbGridPriceDelete.isEnabled()) {
+            mnAuxEntryPriceEditedIndex = moPaneGridPrices.getTable().getSelectedRow();
+
+            if (mnAuxEntryPriceEditedIndex != -1) {
+                if (miClient.showMsgBoxConfirm(SLibConstants.MSG_CNF_REG_DELETE) == JOptionPane.YES_OPTION) {
+                    moAuxEntryPriceEdited = (SDataDpsEntryPrice) moPaneGridPrices.getTableRow(mnAuxEntryPriceEditedIndex).getData();
+
+                    if (moAuxEntryPriceEdited.getIsDeleted()) {
+                        miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_REG_ALREADY_DELETE);
+                    }
+                    else {
+                        if (moAuxEntryPriceEdited.getUserNewTs() == null) {
+                            moPaneGridPrices.removeTableRow(mnAuxEntryPriceEditedIndex);
+                        }
+                        else {
+                            moAuxEntryPriceEdited.setIsDeleted(true);
+                            moAuxEntryPriceEdited.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
+                            moAuxEntryPriceEdited.setIsRegistryEdited(true);
+                            moAuxEntryPriceEdited.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
+
+                            moPaneGridPrices.setTableRow(new SDataDpsEntryPriceRow(moAuxEntryPriceEdited), mnAuxEntryPriceEditedIndex);
+                        }
+
+                        moPaneGridPrices.renderTableRows();
+                        moPaneGridPrices.setTableRowSelection(mnAuxEntryPriceEditedIndex < moPaneGridPrices.getTableGuiRowCount() ? mnAuxEntryPriceEditedIndex : moPaneGridPrices.getTableGuiRowCount() - 1);
+                    }
+                    moAuxEntryPriceEdited = null;
+                }                
+            }
+        }
+    }
+
+    private void actionPriceFilter() {
+        if (jtbGridPriceFilter.isEnabled()) {
+            mnAuxEntryPriceEditedIndex = moPaneGridPrices.getTable().getSelectedRow();
+            moPaneGridPrices.setGridViewStatus(!jtbGridPriceFilter.isSelected() ? STableConstants.VIEW_STATUS_ALL : STableConstants.VIEW_STATUS_ALIVE);
+            moPaneGridPrices.renderTableRows();
+            moPaneGridPrices.setTableRowSelection(mnAuxEntryPriceEditedIndex < moPaneGridPrices.getTableGuiRowCount() ? mnAuxEntryPriceEditedIndex : moPaneGridPrices.getTableGuiRowCount() - 1);
+        }
+    }
+
     private void calculateEntryPrice() {
         double price = 0;
         
@@ -4065,16 +4123,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 moFieldPriceOriginalPriceUnitaryCy.setDouble(price);
             }
         }
-    }
-
-    private void actionFkTaxRegionId() {
-        if (miClient.pickOption(SDataConstants.FINU_TAX_REG, moFieldFkTaxRegionId, null) == SLibConstants.FORM_RESULT_OK) {
-            itemChangedFkTaxRegionId();
-        }
-    }
-
-    private void actionFkItemReferenceId_n() {
-        miClient.pickOption(SDataConstants.ITMX_ITEM_IOG, moFieldFkItemReferenceId_n, null);
     }
 
     private void actionEdit() {
@@ -4107,15 +4155,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         setVisible(false);
     }
 
-    /**
-     * Verify if the value is equal to blank value
-     * @param value
-     * @return 
-     */
-    private boolean isBlank(final String value) {
-        return value.compareTo(STrnConsts.TXT_FIELD_BLANK) == 0;
-    }
-    
     public void publicPriceUnitaryCyWizard() {
         actionPriceUnitaryCyWizard();
     }
@@ -4280,10 +4319,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JButton jbClearPriceFields;
     private javax.swing.JButton jbConcept;
     private javax.swing.JButton jbConceptKey;
+    private javax.swing.JButton jbEditFkThirdTaxCausingId_n;
     private javax.swing.JButton jbFkItemId;
     private javax.swing.JButton jbFkItemReferenceId_n;
     private javax.swing.JButton jbFkOriginalUnitId;
     private javax.swing.JButton jbFkTaxRegionId;
+    private javax.swing.JButton jbFkThirdTaxCausingId_n;
     private javax.swing.JButton jbGridPriceDelete;
     private javax.swing.JButton jbGridPriceEdit;
     private javax.swing.JButton jbGridPriceNew;
@@ -4304,6 +4345,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JComboBox<SFormComponentItem> jcbFkItemReferenceId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkOriginalUnitId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkTaxRegionId;
+    private javax.swing.JComboBox jcbFkThirdTaxCausingId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkVehicleTypeId_n;
     private javax.swing.JComboBox jcbOperationsType;
     private javax.swing.JCheckBox jckAuxPreserveQuantity;
@@ -4362,6 +4404,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JLabel jlFkItemReferenceId_n;
     private javax.swing.JLabel jlFkOriginalUnitId;
     private javax.swing.JLabel jlFkTaxRegionId;
+    private javax.swing.JLabel jlFkThirdTaxCausingId_n;
     private javax.swing.JLabel jlFkVehicleTypeId_n;
     private javax.swing.JLabel jlIsPriceVariable;
     private javax.swing.JLabel jlLength;
@@ -4996,6 +5039,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlDiscountDoc.getText() + "' debido al valor del campo '" + jlOperationsType.getText() + "'.");
                 validation.setComponent(jtfDiscountDocCy);
             }
+            else if (jcbFkThirdTaxCausingId_n.getSelectedIndex() > 0 && SLibUtils.belongsTo(moFieldFkThirdTaxCausingId_n.getKeyAsIntArray()[0], new int[] { moParamDps.getFkBizPartnerId_r(), miClient.getSessionXXX().getCurrentCompany().getPkCompanyId() })) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkThirdTaxCausingId_n.getText() + "'."); // third party cannot be the owner of this document nor the company itself
+                validation.setComponent(jcbFkThirdTaxCausingId_n);
+            }
             else if (jcbFkVehicleTypeId_n.getSelectedIndex() <= 0 && SDataDpsEntry.validateShipmentDataValue(moFieldPlate.getString(), (isDataShipDomesticReq && (moParamDps.isOrderSal() || moParamDps.isDocumentSal())))) {
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkVehicleTypeId_n.getText() + "'.");
                 validation.setComponent(jcbFkVehicleTypeId_n);
@@ -5311,6 +5358,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldIsInventoriable.setFieldValue(moDpsEntry.getIsInventoriable());
         moFieldIsDeleted.setFieldValue(moDpsEntry.getIsDeleted());
         moFieldFkTaxRegionId.setFieldValue(new int[] { moDpsEntry.getFkTaxRegionId() });
+        moFieldFkThirdTaxCausingId_n.setFieldValue(new int[] { moDpsEntry.getFkThirdTaxCausingId_n() });
         moFieldFkItemReferenceId_n.setFieldValue(new int[] { moDpsEntry.getFkItemRefId_n() });
         moFieldReference.setFieldValue(moDpsEntry.getReference());
         moFieldOperationsType.setFieldValue(new int[] { moDpsEntry.getOperationsType() });
@@ -5518,6 +5566,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     }
                     
                     SFormUtilities.populateComboBox(miClient, jcbFkCashAccountId_n, SDataConstants.FIN_ACC_CASH, new int[] { moParamDps.getFkCompanyBranchId() });
+                    SFormUtilities.populateComboBox(miClient, jcbFkThirdTaxCausingId_n, moParamDps.isForSales() ? SDataConstants.BPSX_BP_CUS : SDataConstants.BPSX_BP_SUP);
                     
                     jcbOperationsType.removeAllItems();
                     jcbOperationsType.addItem(new SFormComponentItem(null, "(Seleccionar tipo operación)"));
@@ -5632,6 +5681,18 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             else if (button == jbPriceHistory) {
                 actionPriceHistory();
             }
+            else if (button == jbFkItemReferenceId_n) {
+                actionFkItemReferenceId_n();
+            }
+            else if (button == jbFkTaxRegionId) {
+                actionFkTaxRegionId();
+            }
+            else if (button == jbFkThirdTaxCausingId_n) {
+                actionFkThirdTaxCausingId_n();
+            }
+            else if (button == jbEditFkThirdTaxCausingId_n) {
+                actionEditFkThirdTaxCausingId_n();
+            }
             else if (button == jbNotesNew) {
                 actionNotesNew();
             }
@@ -5644,14 +5705,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             else if (button == jbSystemNotes) {
                 actionSystemNotes();
             }
-            else if (button == jbGridPriceNew || button == jbPriceNew) {
+            else if (button == jbPriceNew) {
                 actionPriceNew();
-            }
-            else if (button == jbGridPriceEdit) {
-                actionPriceEdit();
-            }
-            else if (button == jbGridPriceDelete) {
-                 actionPriceDelete();
             }
             else if (button == jbPriceSave) {
                 actionPriceSave();
@@ -5659,11 +5714,14 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             else if (button == jbClearPriceFields) {
                 actionPriceClearFields();
             }
-            else if (button == jbFkTaxRegionId) {
-                actionFkTaxRegionId();
+            else if (button == jbGridPriceNew) {
+                actionPriceNew();
             }
-            else if (button == jbFkItemReferenceId_n) {
-                actionFkItemReferenceId_n();
+            else if (button == jbGridPriceEdit) {
+                actionPriceEdit();
+            }
+            else if (button == jbGridPriceDelete) {
+                 actionPriceDelete();
             }
         }
         if (e.getSource() instanceof javax.swing.JToggleButton) {

@@ -706,7 +706,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         long ellapsedMilliseconds = datetime.getTime() - SLibTimeUtils.convertToDateOnly(datetime).getTime();
 
         Date date = new Date();
-        date.setTime(moParentPayroll.getFecha().getTime() + ellapsedMilliseconds);
+        date.setTime(moParentPayroll.getFecha().getTime() + ellapsedMilliseconds - (1000 * 60 * 60 * 2)); // -2 hr to prevent error code 401 when stamping fiscal voucher
 
         return date;
     }

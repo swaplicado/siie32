@@ -112,7 +112,7 @@ public abstract class SAccountUtils {
 
         return levels;
     }
-    
+
     /**
      * Composes a new account mask based on provided original account mask up to desired level limit.
      * @param mask Original account mask.

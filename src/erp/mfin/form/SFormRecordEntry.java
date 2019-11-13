@@ -96,6 +96,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private int mnOptionsItemType;
     private boolean mbIsBizPartnerRequired;
     private boolean mbIsItemRequired;
+    private boolean mbIsTaxRequired;
     private int[] manCurrentEntityKey_n;
     private int[] manLastCurrencyKey;
     private int[] manDpsClassKey;
@@ -718,7 +719,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(800, 675));
+        setSize(new java.awt.Dimension(816, 679));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -928,6 +929,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         mnOptionsItemType = SDataConstants.UNDEFINED;
         mbIsBizPartnerRequired = false;
         mbIsItemRequired = false;
+        mbIsTaxRequired = false;
         jtfIsBizPartnerRequired.setText("");
         bgTax.clearSelection();
 
@@ -1030,7 +1032,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             // Check if it is necesary to enable business partner fields:
 
             if (oAccountMajor.getIsRequiredBizPartner() || isAccSysBizPartnerAll || isAccSysPurchases || isAccClsPurchases || isAccSysSales || isAccClsSales || isAccSysTax || isDiotAccount) {
-                if (isAccSysBizPartnerAll || isAccSysSales || isAccSysPurchases && isAccClsPurchases) {
+                if (isAccSysBizPartnerAll || isAccSysPurchases && isAccClsPurchases || isAccSysSales && isAccClsSales) {
                     mbIsBizPartnerRequired = true;
                     jtfIsBizPartnerRequired.setText("(Requerido)");
                 }
@@ -1052,7 +1054,25 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     mnOptionsBizPartnerType = SDataConstants.BPSX_BP_DBR;
                 }
                 else if (isAccSysTax) {
-                    mnOptionsBizPartnerType = SDataConstants.BPSX_BP_X_SUP_CUS;
+                    mnOptionsBizPartnerType = SDataConstants.BPSX_BP_X_SUP_CUS; // suppliers and customers!
+                }
+                else {
+                    switch (oAccountMajor.getFkAccountLedgerTypeId()) {
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_CUS:
+                            mnOptionsBizPartnerType = SDataConstants.BPSX_BP_CUS;
+                            break;
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_DBR:
+                            mnOptionsBizPartnerType = SDataConstants.BPSX_BP_X_CUS_DBR;
+                            break;
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_SUP:
+                            mnOptionsBizPartnerType = SDataConstants.BPSX_BP_SUP;
+                            break;
+                        case SDataConstantsSys.FINU_TP_ACC_LEDGER_CDR:
+                            mnOptionsBizPartnerType = SDataConstants.BPSX_BP_X_SUP_CDR;
+                            break;
+                        default:
+                            mnOptionsBizPartnerType = SDataConstants.BPSU_BP; // all business partners!
+                    }
                 }
 
                 SFormUtilities.populateComboBox(miClient, jcbFkBizPartnerId_nr, mnOptionsBizPartnerType);
@@ -1081,7 +1101,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
             // Check if it is necesary to enable tax fields:
 
-            if (isAccSysTax) {
+            if (isAccSysTax || isAccSysPurchases) {
+                mbIsTaxRequired = isAccSysTax;
+                
                 jlFkTaxId_n.setEnabled(true);
                 jcbFkTaxId_n.setEnabled(true);
                 jbFkTaxId_n.setEnabled(true);
@@ -1483,7 +1505,6 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         return type;
     }
-
 
     private int[] getSystemMoveTypeKey() {
         int[] key = null;
@@ -2292,7 +2313,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jcbFkItemAuxId_n.removeAllItems();
         msXmlPath = "";
         jtfXmlFilesNumber.setText("");
-        maCfdRecordRows = new ArrayList<SDataCfdRecordRow>();
+        maCfdRecordRows = new ArrayList<>();
 
         renderCurrencySettings();
         renderAccountSettings();
@@ -2362,13 +2383,17 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "'.");
                     validation.setComponent(jcbFkBizPartnerId_nr);
                 }
-                else if (jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() <= 0) {
+                else if (jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() <= 0 && mbIsTaxRequired) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkTaxId_n.getText() + "'.");
                     validation.setComponent(jcbFkTaxId_n);
                 }
                 else if (isDiotAccount && tax != null && tax.getVatType().isEmpty()) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkTaxId_n.getText() + "'.\n" + SDataTax.ERR_MSG_VAT_TYPE + "'" + tax.getTax() + "'.");
                     validation.setComponent(jcbFkTaxId_n);
+                }
+                else if (!mbIsTaxRequired && jcbFkTaxId_n.isEnabled() && jcbFkBizPartnerId_nr.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0 && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "'.");
+                    validation.setComponent(jcbFkBizPartnerId_nr);
                 }
                 else if (jcbFkEntityId_n.isEnabled() && jcbFkEntityId_n.getSelectedIndex() <= 0) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkEntityId_n.getText() + "'.");
