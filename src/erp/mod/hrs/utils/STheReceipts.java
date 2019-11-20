@@ -6,10 +6,12 @@
 package erp.mod.hrs.utils;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbWorkingDaySettings;
+import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsEmployee;
 import erp.mod.hrs.db.SHrsPayroll;
 import erp.mod.hrs.db.SHrsPayrollDataProvider;
@@ -73,6 +75,9 @@ public class STheReceipts {
                             "    hpr.id_emp, " +
                             "    bb.bp, " +
                             "    tc.uuid, " +
+                            "    IF(hpr.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + ", " +
+                            "        hpr.sal * " + SHrsConsts.MONTH_DAYS + ", " +
+                            "        hpr.wage) AS montly_sal," +
                             "    (SELECT  " +
                             "            MAX(fid_pay_rcp_iss_n) " +
                             "        FROM " +
@@ -93,8 +98,9 @@ public class STheReceipts {
                             "    hp.per_year = 2019 " +
                             "        AND hp.fk_tp_pay_sht = 1 " +
                             "        AND NOT hp.b_del " +
-                            "        AND (tc.fid_st_xml = 2) AND hp.per_year = " + nYear + " AND hp.per = " + nPer +
-                            " ORDER BY hp.num ASC, hp.fk_tp_pay, bb.bp ASC;";
+                            "        AND (tc.fid_st_xml = 2) AND hp.per_year = " + nYear + " AND hp.per = " + nPer + " " +
+                            "HAVING montly_sal < 8000 " +
+                            "ORDER BY hp.num ASC, hp.fk_tp_pay, bb.bp ASC;";
             
             resulPayroll = miClient.getSession().getStatement().
                     getConnection().createStatement().
@@ -106,6 +112,9 @@ public class STheReceipts {
             String uuid = "";
             String nom = "";
             String emp = "";
+            SHrsPayroll moHrsPayroll = null;
+            SHrsPayrollDataProvider prov = new SHrsPayrollDataProvider(miClient.getSession());
+            SDbConfig moConfig = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
             
             while (resulPayroll.next()) {
                 id_pay_read = resulPayroll.getInt("id_pay");
@@ -117,17 +126,16 @@ public class STheReceipts {
                     id_pay = id_pay_read;
                     payroll = new SDbPayroll();
                     payroll.read(miClient.getSession(), new int[] { id_pay });
+                    
+                    SDbWorkingDaySettings moWorkingDaySettings = SHrsUtils.getPayrollWorkingDaySettings(miClient.getSession(), payroll.getFkPaysheetTypeId());
+                    moHrsPayroll = prov.createHrsPayroll(moConfig, moWorkingDaySettings, payroll, false);
                 }
                 
                 int receiptKey [] = new int[] { id_pay, resulPayroll.getInt("id_emp"), resulPayroll.getInt("max_issue") };
                 SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
                 payrollReceipt.read(miClient.getSession(), receiptKey);
                 
-                if (payrollReceipt.getMonthlyPayment()> 8000d) {
-                    continue;
-                }
-                
-                SOutputData row = this.calculate(payroll, payrollReceipt, uuid);
+                SOutputData row = this.calculate(payroll, moHrsPayroll, payrollReceipt, uuid, prov);
                 
                 dataList.add(new String[]
                             { 
@@ -180,19 +188,12 @@ public class STheReceipts {
      * @param uuid
      * @return 
      */
-    private SOutputData calculate(SDbPayroll payroll, SDbPayrollReceipt payrollReceipt, String uuid) {
+    private SOutputData calculate(SDbPayroll payroll, SHrsPayroll moHrsPayroll, SDbPayrollReceipt payrollReceipt, String uuid, SHrsPayrollDataProvider prov) {
         SOutputData oRow = null;
         SDbPayrollReceipt payrollReceiptOriginal;
         
         try {
             payrollReceiptOriginal = payrollReceipt.clone();
-            
-            SDbWorkingDaySettings moWorkingDaySettings = SHrsUtils.getPayrollWorkingDaySettings(miClient.getSession(), payroll.getFkPaysheetTypeId());
-            
-            SDbConfig moConfig = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
-            SHrsPayrollDataProvider prov = new SHrsPayrollDataProvider(miClient.getSession());
-            
-            SHrsPayroll moHrsPayroll = prov.createHrsPayroll(moConfig, moWorkingDaySettings, payroll, false);
             
             SHrsReceipt hrsReceipt = new SHrsReceipt();
             hrsReceipt.setHrsPayroll(moHrsPayroll);
