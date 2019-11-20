@@ -235,6 +235,9 @@ public class SDbBenefitTable extends SDbRegistryUser {
 
         // Save aswell child registries:
 
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW_AUX) + " "
+                + "WHERE id_ben = " + mnPkBenefitId + " ";
+
         msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN_ROW) + " "
                 + "WHERE id_ben = " + mnPkBenefitId + " ";
 

@@ -1,5 +1,5 @@
 ================================================================================
-2019-11-13, 3.2 147.0
+2019-11-19, 3.2 147.0
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de captura opcional de Tercero Causante de Impuestos en partidas de DPS.
@@ -8,12 +8,19 @@ Sergio Abraham FLORES GUTIÉRREZ
     clientes, deudores, proveedores o acreedores, no se mostraba ningún asociado de negocios.
 3) Corrección a la vista de control de vacaciones para empleados inactivos y mejoramiento de la misma
     con la adición de fecha de la última baja y contextualización de la fecha de corte según el estatus del empleado.
+4) Implementación de vista-consulta Vacaciones Pendientes.
 
 ================================================================================
 2019-11-01, 3.2 146.1
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de ajuste de -2 hr a la hora de timbrado para prevenir error 401.
+
+================================================================================
+2019-11-13, 3.2 146.0
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Implementación de reexpedición de CFDI de nóminas para incorporar el Subsidio para el empleo efectivamente entregado al trabajador.
 
 ================================================================================
 2019-10-29, 3.2 146.0

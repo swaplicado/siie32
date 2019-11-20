@@ -241,7 +241,7 @@
                     </Property>
                     <Property name="lineWrap" type="boolean" value="true"/>
                     <Property name="rows" type="int" value="5"/>
-                    <Property name="text" type="java.lang.String" value="1) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas equivocadamente a otras tasas de IVA, pero deliberadamente manipuladas para que el monto del IVA fuera igual a cero, ser&#xe1;n por defecto clasificados como operaciones de IVA tasa 0 en el archivo del layout DIOT.&#xa;&#xa;2) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas conjuntamente en el mismo asiento contable con operaciones a otras tasas de IVA, ser&#xe1;n por defecto clasificados como operaciones de IVA exento en el archivo del layout DIOT."/>
+                    <Property name="text" type="java.lang.String" value="1) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas equivocadamente a otras tasas de IVA, pero deliberadamente manipuladas para que el monto del IVA fuera igual a cero, ser&#xe1;n por defecto clasificados como operaciones de IVA tasa 0 en el archivo del layout DIOT.&#xa;&#xa;2) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas simult&#xe1;neamente en el mismo asiento contable con operaciones a otras tasas de IVA, ser&#xe1;n por defecto clasificados como operaciones de IVA exento en el archivo del layout DIOT."/>
                     <Property name="wrapStyleWord" type="boolean" value="true"/>
                   </Properties>
                 </Component>

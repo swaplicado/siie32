@@ -418,7 +418,7 @@ public class SDiotLayout {
                                     netSubtotalCalculated = SLibUtils.roundAmount(vat.getPercentage() == 0 ? 0 : vatToProcess / vat.getPercentage());
 
                                     if (terceroToProcess == tercero) {
-                                        double netTotalCalculated = SLibUtils.roundAmount(netSubtotalCalculated + diotAccounting.getVatDebit() - diotAccounting.getVatCredit());
+                                        double netTotalCalculated = SLibUtils.roundAmount(netSubtotalCalculated + diotAccounting.getVatSumDebits() - diotAccounting.getVatSumCredits());
                                         double netTotalRealVsCalculated = SLibUtils.roundAmount(paymentAmount - netTotalCalculated);
 
                                         if (netTotalRealVsCalculated < -AMOUNT_DIFF_ALLOWANCE) {

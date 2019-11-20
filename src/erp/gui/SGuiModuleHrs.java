@@ -120,6 +120,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiBenefitBenefitVac;
     private javax.swing.JMenuItem jmiBenefitBenefitBonVac;
     private javax.swing.JMenuItem jmiBenefitBenefitBonAnn;
+    private javax.swing.JMenuItem jmiBenefitBenefitVacPending;
     private javax.swing.JMenuItem jmiBenefitBenefitAdjustmentEarning;
     private javax.swing.JMenuItem jmiBenefitLoan;
     private javax.swing.JMenuItem jmiBenefitLoanAdjustmentEarning;
@@ -320,6 +321,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiBenefitBenefitVac = new JMenuItem("Control de vacaciones");
         jmiBenefitBenefitBonVac = new JMenuItem("Control de prima vacacional");
         jmiBenefitBenefitBonAnn = new JMenuItem("Control de gratificación anual");
+        jmiBenefitBenefitVacPending = new JMenuItem("Vacaciones pendientes");
         jmiBenefitBenefitAdjustmentEarning = new JMenuItem("Ajustes a prestaciones");
         jmiBenefitLoan = new JMenuItem("Control de créditos y préstamos");
         jmiBenefitLoanAdjustmentEarning = new JMenuItem("Incremento de créditos y préstamos");
@@ -329,6 +331,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmBenefit.add(jmiBenefitBenefitVac);
         jmBenefit.add(jmiBenefitBenefitBonVac);
         jmBenefit.add(jmiBenefitBenefitBonAnn);
+        jmBenefit.addSeparator();
+        jmBenefit.add(jmiBenefitBenefitVacPending);
         jmBenefit.addSeparator();
         jmBenefit.add(jmiBenefitBenefitAdjustmentEarning);
         jmBenefit.addSeparator();
@@ -460,6 +464,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiBenefitBenefitVac.addActionListener(this);
         jmiBenefitBenefitBonVac.addActionListener(this);
         jmiBenefitBenefitBonAnn.addActionListener(this);
+        jmiBenefitBenefitVacPending.addActionListener(this);
         jmiBenefitBenefitAdjustmentEarning.addActionListener(this);
         jmiBenefitLoan.addActionListener(this);
         jmiBenefitLoanAdjustmentEarning.addActionListener(this);
@@ -569,6 +574,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiBenefitBenefitVac.setEnabled(true);
         jmiBenefitBenefitBonVac.setEnabled(true);
         jmiBenefitBenefitBonAnn.setEnabled(true);
+        jmiBenefitBenefitVacPending.setEnabled(true);
         jmiBenefitBenefitAdjustmentEarning.setEnabled(true);
         jmiBenefitLoan.setEnabled(true);
         jmiBenefitLoanAdjustmentEarning.setEnabled(true);
@@ -966,6 +972,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiBenefitBenefitBonAnn) {
                 miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_ANN_BON, null);
+            }
+            else if (item == jmiBenefitBenefitVacPending) {
+                miClient.getSession().showView(SModConsts.HRSX_BEN_VAC_PEND, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiBenefitBenefitAdjustmentEarning) {
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP_EAR, SModConsts.HRS_BEN, null);

@@ -164,8 +164,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         
         /*
         NOTE:
-        The following query shows ONLY active employees by cut off date.
-        Shows also requested benefit type estimations and payments of days and amounts, 
+        Shows requested benefit type estimations and payments of days and amounts, 
         from current year and previous one, according as well to cut off date.
         */
         
@@ -441,6 +440,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
+        moSuscriptionsSet.add(SModConsts.HRS_BEN);
         moSuscriptionsSet.add(SModConsts.HRS_EAR);
         moSuscriptionsSet.add(SModConsts.HRS_DED);
         moSuscriptionsSet.add(SModConsts.HRS_PAY);

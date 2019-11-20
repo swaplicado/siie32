@@ -97,6 +97,7 @@ import erp.mod.hrs.view.SViewAutomaticEarnings;
 import erp.mod.hrs.view.SViewBenefit;
 import erp.mod.hrs.view.SViewBenefitTable;
 import erp.mod.hrs.view.SViewBenefitTableRow;
+import erp.mod.hrs.view.SViewBenefitVacationPending;
 import erp.mod.hrs.view.SViewCfdiPayroll;
 import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
@@ -424,6 +425,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_BEN_ROW:
                 registry = new SDbBenefitTableRow();
+                break;
+            case SModConsts.HRS_BEN_ROW_AUX:
+                registry = null;
                 break;
             case SModConsts.HRS_WRK_SAL:
                 registry = new SDbWorkerTypeSalary();
@@ -868,20 +872,23 @@ public class SModuleHrs extends SGuiModule {
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
                 break;
-                case SModConsts.HRSX_BEN_MOV:
-                    switch (subtype) {
-                        case SModSysConsts.HRSS_TP_BEN_VAC:
-                            view = new SViewBenefit(miClient, subtype, "Control vacaciones");
-                            break;
-                        case SModSysConsts.HRSS_TP_BEN_VAC_BON:
-                            view = new SViewBenefit(miClient, subtype, "Control prima vacacional");
-                            break;
-                        case SModSysConsts.HRSS_TP_BEN_ANN_BON:
-                            view = new SViewBenefit(miClient, subtype, "Control gratificación anual");
-                            break;
+            case SModConsts.HRSX_BEN_MOV:
+                switch (subtype) {
+                    case SModSysConsts.HRSS_TP_BEN_VAC:
+                        view = new SViewBenefit(miClient, subtype, "Control vacaciones");
+                        break;
+                    case SModSysConsts.HRSS_TP_BEN_VAC_BON:
+                        view = new SViewBenefit(miClient, subtype, "Control prima vacacional");
+                        break;
+                    case SModSysConsts.HRSS_TP_BEN_ANN_BON:
+                        view = new SViewBenefit(miClient, subtype, "Control gratificación anual");
+                        break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
+                break;
+            case SModConsts.HRSX_BEN_VAC_PEND:
+                view = new SViewBenefitVacationPending(miClient, "Vacaciones pendientes");
                 break;
             case SModConsts.HRS_ACC_EAR:
                     switch (subtype) {

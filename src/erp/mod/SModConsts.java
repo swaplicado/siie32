@@ -634,6 +634,7 @@ public abstract class SModConsts {
     public static final int HRS_SSC_ROW = 2063042;
     public static final int HRS_BEN = 2063051;
     public static final int HRS_BEN_ROW = 2063052;
+    public static final int HRS_BEN_ROW_AUX = 2063056;
     public static final int HRS_WRK_SAL = 2063071;
     public static final int HRS_MWZ_WAGE = 2063072;
     public static final int HRS_UMA = 2063073;
@@ -675,6 +676,7 @@ public abstract class SModConsts {
     public static final int HRSX_BEN_MOV = 2064051;
     public static final int HRSX_BEN_SUM = 2064052;
     public static final int HRSX_BEN_DET = 2064053;
+    public static final int HRSX_BEN_VAC_PEND = 2064056;
     public static final int HRSX_EMP_INT = 2064061;
     public static final int HRSX_LOAN_PAY = 2064091;
     public static final int HRSX_ABS_MOV = 2064101;
@@ -1194,6 +1196,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_SSC_ROW, "hrs_ssc_row");
         TablesMap.put(HRS_BEN, "hrs_ben");
         TablesMap.put(HRS_BEN_ROW, "hrs_ben_row");
+        TablesMap.put(HRS_BEN_ROW_AUX, "hrs_ben_row_aux");
         TablesMap.put(HRS_WRK_SAL, "hrs_wrk_sal");
         TablesMap.put(HRS_MWZ_WAGE, "hrs_mwz_wage");
         TablesMap.put(HRS_UMA, "hrs_uma");

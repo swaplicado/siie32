@@ -176,7 +176,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jTextArea1.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText("1) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas equivocadamente a otras tasas de IVA, pero deliberadamente manipuladas para que el monto del IVA fuera igual a cero, serán por defecto clasificados como operaciones de IVA tasa 0 en el archivo del layout DIOT.\n\n2) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas conjuntamente en el mismo asiento contable con operaciones a otras tasas de IVA, serán por defecto clasificados como operaciones de IVA exento en el archivo del layout DIOT.");
+        jTextArea1.setText("1) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas equivocadamente a otras tasas de IVA, pero deliberadamente manipuladas para que el monto del IVA fuera igual a cero, serán por defecto clasificados como operaciones de IVA tasa 0 en el archivo del layout DIOT.\n\n2) Los importes de pagos realizados a operaciones de IVA tasa 0 o exento que en su momento fueron provisionadas simultáneamente en el mismo asiento contable con operaciones a otras tasas de IVA, serán por defecto clasificados como operaciones de IVA exento en el archivo del layout DIOT.");
         jTextArea1.setWrapStyleWord(true);
         jScrollPane1.setViewportView(jTextArea1);
 
