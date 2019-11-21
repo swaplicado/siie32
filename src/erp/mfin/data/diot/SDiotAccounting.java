@@ -6,6 +6,7 @@
 package erp.mfin.data.diot;
 
 import erp.data.SDataConstantsSys;
+import erp.mtrn.data.SDataDps;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class SDiotAccounting {
     private int mnEntryUserId;
     private Object[] maoRecordKey;
     private int[] manBkkNumberKey;
+    private SDataDps moDps; 
     private int[] manDpsKey;
     private ArrayList<Entry> maEntries;
     private ArrayList<ThirdTax> maThirdTaxes;
@@ -32,15 +34,16 @@ public class SDiotAccounting {
      * @param entryUserId
      * @param recordKey
      * @param bkkNumberKey
-     * @param dpsKey
+     * @param dps
      * @throws Exception 
      */
-    public SDiotAccounting(final Statement statement, final int entryUserId, final Object[] recordKey, final int[] bkkNumberKey, final int[] dpsKey) throws Exception {
+    public SDiotAccounting(final Statement statement, final int entryUserId, final Object[] recordKey, final int[] bkkNumberKey, final SDataDps dps) throws Exception {
         miStatement = statement;
         mnEntryUserId = entryUserId;
         maoRecordKey = recordKey;
         manBkkNumberKey = bkkNumberKey;
-        manDpsKey = dpsKey;
+        moDps = dps;
+        manDpsKey = moDps == null ? new int[2] : (int[]) moDps.getPrimaryKey();
         
         createChildren();
     }
@@ -248,6 +251,23 @@ public class SDiotAccounting {
         }
         
         return dpsSubtotal;
+    }
+    
+    /**
+     * Get DPS original subtotal according to type of system movement and VAT.
+     * @param sysMovTypeXxx Key of type of system movement
+     * @param vatKey Key of required VAT. Can be null.
+     * @return DPS original tax.
+     */
+    public double getEntryDpsSubtotalRatio(int[] sysMovTypeXxx, final int[] vatKey) {
+        double dpsSubtotalRatio = 0;
+        Entry entry = getEntry(sysMovTypeXxx, vatKey);
+        
+        if (entry != null) {
+            dpsSubtotalRatio = moDps == null || moDps.getTotal_r() == 0 ? 0 : entry.DpsSubtotal / moDps.getTotal_r();
+        }
+        
+        return dpsSubtotalRatio;
     }
     
     /**

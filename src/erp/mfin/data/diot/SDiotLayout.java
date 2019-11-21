@@ -128,7 +128,8 @@ public class SDiotLayout {
                 resultSet.getInt(tableAlias + ".id_num") + "-" +
                 resultSet.getInt(tableAlias + ".id_ety") +
                 (account == null ? "" : "; cuenta contable: " +  account.getPkAccountIdXXX()) +
-                (bizPartner == null ? "" : "; tercero: " + bizPartner.getBizPartnerCommercial());
+                (bizPartner == null ? "" : "; tercero: " + bizPartner.getBizPartnerCommercial() + " " +
+                "(" + (bizPartner.isDomestic(miClient) ? bizPartner.getFiscalId() : bizPartner.getFiscalFrgId()) + ")");
     }
     
     public String getLayout(final int format, final boolean excludeTotalZeros) throws Exception {
@@ -326,11 +327,12 @@ public class SDiotLayout {
                             resultSet.getInt("re.usr_id"), 
                             createFinRecordKey(resultSet, "re"), 
                             new int[] { resultSet.getInt("re.fid_bkk_year_n"), resultSet.getInt("re.fid_bkk_num_n") },
-                            new int[] { resultSet.getInt("re.fid_dps_year_n"), resultSet.getInt("re.fid_dps_doc_n") }
+                            dps
                     );
                     
                     double paymentAmount = diotAccounting.getPaymentAmount();
                     double paymentRatio = dps == null || dps.getTotal_r() == 0 ? 1.0 : paymentAmount / dps.getTotal_r();
+                    double txnAmount = SLibUtils.roundAmount(diotAccounting.getEntryDpsSubtotal(SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT, (int[]) vat.getPrimaryKey()) * paymentRatio);
                     
                     if (debit > 0 || credit < 0 || (debit == 0 && credit == 0)) {
                         // VAT creditable of payments of purchases:
@@ -339,18 +341,18 @@ public class SDiotLayout {
                             switch (vat.getVatType()) {
                                 case SDiotConsts.VAT_TYPE_EXEMPT:
                                     if (tercero.IsDomestic) {
-                                        tercero.ValorPagosImpIvaExento = SLibUtils.roundAmount(tercero.ValorPagosImpIvaExento + paymentAmount);
+                                        tercero.ValorPagosImpIvaExento = SLibUtils.roundAmount(tercero.ValorPagosImpIvaExento + txnAmount);
                                     }
                                     else {
-                                        tercero.ValorPagosNacIvaExento = SLibUtils.roundAmount(tercero.ValorPagosNacIvaExento + paymentAmount);
+                                        tercero.ValorPagosNacIvaExento = SLibUtils.roundAmount(tercero.ValorPagosNacIvaExento + txnAmount);
                                     }
                                     break;
 
                                 case SDiotConsts.VAT_TYPE_RATE_0:
-                                case SDiotConsts.VAT_TYPE_GENERAL:          // VAT deliberately manipulated to be cero
-                                case SDiotConsts.VAT_TYPE_BORDER:           // VAT deliberately manipulated to be cero
-                                case SDiotConsts.VAT_TYPE_BORDER_NORTH_INC: // VAT deliberately manipulated to be cero
-                                    tercero.ValorPagosNacIva0 = SLibUtils.roundAmount(tercero.ValorPagosNacIva0 + paymentAmount);
+                                case SDiotConsts.VAT_TYPE_GENERAL:          // VAT deliberately manipulated to be zero
+                                case SDiotConsts.VAT_TYPE_BORDER:           // VAT deliberately manipulated to be zero
+                                case SDiotConsts.VAT_TYPE_BORDER_NORTH_INC: // VAT deliberately manipulated to be zero
+                                    tercero.ValorPagosNacIva0 = SLibUtils.roundAmount(tercero.ValorPagosNacIva0 + txnAmount);
                                     break;
 
                                 default:
@@ -360,7 +362,7 @@ public class SDiotLayout {
                                             + " No fue posible clasificar el impuesto '" + vat.getTax() + "', tipo IVA '" + vat.getVatType() + "':\n"
                                             + " importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + ";\n"
                                             + " total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + "."; 
-                                    warnings += "\"" + warning + "\"\n";
+                                    warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
                                     System.out.println(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\n" + warning);
                             }
                         }
@@ -379,11 +381,13 @@ public class SDiotLayout {
                                 }
                                 
                                 SDiotTercero terceroCausing = moTerceros.get(bizPartnerCausing.getDiotTerceroClave());
+                                
                                 if (terceroCausing == null) {
                                     terceroCausing = new SDiotTercero(miClient, bizPartnerCausing);
                                     moTerceros.put(terceroCausing.getClave(), terceroCausing);
-                                    tercerosToProcess.add(terceroCausing);
                                 }
+                                
+                                tercerosToProcess.add(terceroCausing);
                             }
                             
                             // process DIOT terceros, including the directly current one:
@@ -418,10 +422,10 @@ public class SDiotLayout {
                                     netSubtotalCalculated = SLibUtils.roundAmount(vat.getPercentage() == 0 ? 0 : vatToProcess / vat.getPercentage());
 
                                     if (terceroToProcess == tercero) {
-                                        double netTotalCalculated = SLibUtils.roundAmount(netSubtotalCalculated + diotAccounting.getVatSumDebits() - diotAccounting.getVatSumCredits());
-                                        double netTotalRealVsCalculated = SLibUtils.roundAmount(paymentAmount - netTotalCalculated);
+                                        //double netTotalCalculated = SLibUtils.roundAmount(netSubtotalCalculated + diotAccounting.getVatSumDebits() - diotAccounting.getVatSumCredits());
+                                        double netSubtotalCalculatedDiff = SLibUtils.roundAmount(txnAmount - netSubtotalCalculated);
 
-                                        if (netTotalRealVsCalculated < -AMOUNT_DIFF_ALLOWANCE) {
+                                        if (netSubtotalCalculatedDiff < -AMOUNT_DIFF_ALLOWANCE) {
                                             // suspicious situation: calculated net-total is greater than the real one:
 
                                             warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, bizPartner) + ":\n"
@@ -429,13 +433,14 @@ public class SDiotLayout {
                                                     + " importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + "; "
                                                     + "IVA a procesar: $" + SLibUtils.getDecimalFormatAmount().format(vatToProcess) + "; "
                                                     + "IVA remanente: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount - vatProcessed) + ";\n"
-                                                    + " total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + " < "
-                                                    + "total neto calculado: $" + SLibUtils.getDecimalFormatAmount().format(netTotalCalculated) + " = "
-                                                    + "diferencia: $" + SLibUtils.getDecimalFormatAmountUnitary().format(netTotalRealVsCalculated) + "."; 
-                                            warnings += "\"" + warning + "\"\n";
+                                                    + " total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + "; "
+                                                    + "subtotal real: $" + SLibUtils.getDecimalFormatAmount().format(txnAmount) + " < "
+                                                    + "subtotal calculado: $" + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalculated) + " = "
+                                                    + "diferencia: $" + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalculatedDiff) + "."; 
+                                            warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
                                             System.out.println(warning);
                                         }
-                                        else if (netTotalRealVsCalculated > AMOUNT_DIFF_ALLOWANCE) {
+                                        else if (netSubtotalCalculatedDiff > AMOUNT_DIFF_ALLOWANCE) {
                                             // manageable situation: calculated net-total is less than the real one:
 
                                             warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, bizPartner) + ":\n"
@@ -443,17 +448,18 @@ public class SDiotLayout {
                                                     + " importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + "; "
                                                     + "IVA a procesar: $" + SLibUtils.getDecimalFormatAmount().format(vatToProcess) + "; "
                                                     + "IVA remanente: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount - vatProcessed) + ":\n"
-                                                    + " total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + " > "
-                                                    + "total neto calculado: $" + SLibUtils.getDecimalFormatAmount().format(netTotalCalculated) + " = "
-                                                    + "diferencia: $" + SLibUtils.getDecimalFormatAmountUnitary().format(netTotalRealVsCalculated) + "."; 
-                                            warnings += "\"" + warning + "\"\n";
+                                                    + " total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + "; "
+                                                    + "subtotal real: $" + SLibUtils.getDecimalFormatAmount().format(txnAmount) + " > "
+                                                    + "subtotal calculado: $" + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalculated) + " = "
+                                                    + "diferencia: $" + SLibUtils.getDecimalFormatAmount().format(netSubtotalCalculatedDiff) + "."; 
+                                            warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
                                             System.out.println(warning);
 
-                                            tercero.ValorPagosImpIvaExento = SLibUtils.roundAmount(tercero.ValorPagosImpIvaExento + netTotalRealVsCalculated);
+                                            tercero.ValorPagosImpIvaExento = SLibUtils.roundAmount(tercero.ValorPagosImpIvaExento + netSubtotalCalculatedDiff);
                                         }
-                                        else if (netTotalRealVsCalculated != 0) {
+                                        else if (netSubtotalCalculatedDiff != 0) {
                                             // adjust calculated subtotal due to difference between real and calculated net-total:
-                                            netSubtotalCalculated = SLibUtils.roundAmount(netSubtotalCalculated + netTotalRealVsCalculated);
+                                            netSubtotalCalculated = SLibUtils.roundAmount(netSubtotalCalculated + netSubtotalCalculatedDiff);
                                         }
                                     }
 
@@ -486,10 +492,10 @@ public class SDiotLayout {
                                             warning = "" + entries + ".- " + composeFinRecordEntry(resultSet, "re", account, bizPartner) + ":\n"
                                                     + " No fue posible clasificar el impuesto '" + vat.getTax() + "', tipo IVA '" + vat.getVatType() + "':\n"
                                                     + " importe IVA: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount) + "; "
-                                                    + "IVA a procesar: $" + SLibUtils.getDecimalFormatAmount().format(vatToProcess) + ";"
+                                                    + "IVA a procesar: $" + SLibUtils.getDecimalFormatAmount().format(vatToProcess) + "; "
                                                     + "IVA remanente: $" + SLibUtils.getDecimalFormatAmount().format(vatAmount - vatProcessed) + ":\n"
                                                     + " total neto real: $" + SLibUtils.getDecimalFormatAmount().format(paymentAmount) + "."; 
-                                            warnings += "\"" + warning + "\"\n";
+                                            warnings += "\"" + warning.replaceAll("\n", " ") + "\"\n";
                                             System.out.println(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION + "\n" + warning);
                                     }
                                 }

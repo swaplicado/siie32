@@ -1,4 +1,14 @@
 ================================================================================
+2019-11-21, 3.2 148.0
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de mejoras a la generación del layout DIOT:
+    - IVA cobrado por cuenta de terceros;
+    - tratamiento de IVA tasa 0 a contabilizaciones de IVA a distintas tasas, pero deliberadamente capturado en cero;
+    - tratamiento de IVA exento al excedente del subtotal respecto al monto de IVA contabilizado.
+2) Implementación de vista-consulta Vacaciones Pendientes.
+
+================================================================================
 2019-11-20, 3.2 147.1
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
@@ -14,7 +24,6 @@ Sergio Abraham FLORES GUTIÉRREZ
     clientes, deudores, proveedores o acreedores, no se mostraba ningún asociado de negocios.
 3) Corrección a la vista de control de vacaciones para empleados inactivos y mejoramiento de la misma
     con la adición de fecha de la última baja y contextualización de la fecha de corte según el estatus del empleado.
-4) Implementación de vista-consulta Vacaciones Pendientes.
 
 ================================================================================
 2019-11-01, 3.2 146.1
