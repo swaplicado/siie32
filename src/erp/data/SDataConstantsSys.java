@@ -1537,6 +1537,8 @@ public abstract class SDataConstantsSys {
     public static final int REP_FIN_RECS = 206004;
     public static final int REP_FIN_RECS_CY = 206005;
     public static final int REP_FIN_REC_ADV = 206053;
+    public static final int REP_FIN_JOURNAL_VOUCHERS = 206071;
+    public static final int REP_FIN_JOURNAL_VOUCHERS_CY = 206072;
     public static final int REP_FIN_BPS_BAL = 206006;           // business partner balance (cutoff date)
     public static final int REP_FIN_BPS_BAL_PER = 206049;       // business partner balance (cutoff period)
     public static final int REP_FIN_BPS_BAL_CRED = 206050;      // business partner balance with credit (cutoff date)

@@ -269,8 +269,12 @@ public abstract class SDataReadComponentItems {
                 isComplementApplying = true;
                 break;
             case SDataConstants.USRU_USR:
+            case SDataConstants.USRX_FIN_REC:
                 lenPk = 1;
-                sql = "SELECT id_usr AS f_id_1, usr AS f_item FROM erp.usru_usr WHERE b_del = 0 ORDER BY usr, id_usr ";
+                sql = "SELECT u.id_usr AS f_id_1, u.usr AS f_item FROM erp.usru_usr AS u WHERE NOT u.b_del "
+                        + (catalogue == SDataConstants.USRX_FIN_REC ? "AND u.id_usr IN "
+                        + "(SELECT DISTINCT r.fid_usr_new FROM fin_rec AS r WHERE NOT r.b_del ORDER BY r.fid_usr_new) " : "")
+                        + "ORDER BY u.usr, u.id_usr ";
                 text = "usuario";
                 break;
             default:

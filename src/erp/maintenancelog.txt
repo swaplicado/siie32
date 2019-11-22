@@ -1,5 +1,11 @@
 ================================================================================
-2019-11-21, 3.2 148.0
+SIIE 3.2 148.1/ 2019-11-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de impresión masiva de pólizas contables, en hoja individual, con filtro opcional por creador.
+
+================================================================================
+SIIE 3.2 148.0/ 2019-11-21
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de mejoras a la generación del layout DIOT:

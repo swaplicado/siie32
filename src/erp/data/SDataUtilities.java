@@ -2832,6 +2832,12 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_FIN_REC_ADV:
                 name = "reps/fin_rec_adv.jasper";
                 break;
+            case SDataConstantsSys.REP_FIN_JOURNAL_VOUCHERS:
+                name = "reps/fin_journal_vouchers.jasper";
+                break;
+            case SDataConstantsSys.REP_FIN_JOURNAL_VOUCHERS_CY:
+                name = "reps/fin_journal_vouchers_cy.jasper";
+                break;
             case SDataConstantsSys.REP_FIN_BPS_BAL:
                 name = "reps/fin_bps_bal.jasper";
                 break;

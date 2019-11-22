@@ -29,14 +29,18 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.JComboBox;
+import javax.swing.JRadioButton;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
+import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
 
 /**
  *
  * @author Alfonso Flores, Sergio Flores
  */
-public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -53,8 +57,9 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
     private erp.lib.form.SFormField moFieldDateEnd;
     private erp.lib.form.SFormField moFieldFiscalYear;
     private erp.lib.form.SFormField moFieldPeriod;
-    private erp.lib.form.SFormField moFieldNumberInitial;
+    private erp.lib.form.SFormField moFieldNumberStart;
     private erp.lib.form.SFormField moFieldNumberEnd;
+    private erp.lib.form.SFormField moFieldCreator;
 
     /** Creates new form SDialogRepRecords */
     public SDialogRepRecords(erp.client.SClientInterface client) {
@@ -77,13 +82,37 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        buttonGroupRangeOptions = new javax.swing.ButtonGroup();
-        buttonGroupCurrencyOptions = new javax.swing.ButtonGroup();
+        bgRange = new javax.swing.ButtonGroup();
+        bgCurrency = new javax.swing.ButtonGroup();
+        bgPrinting = new javax.swing.ButtonGroup();
+        jpSettings = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jbPrint = new javax.swing.JButton();
-        jbExit = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jlBookKeepingCenter = new javax.swing.JLabel();
+        jcbBookKeepingCenter = new javax.swing.JComboBox();
+        jbBookKeepingCenter = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        jlRecordType = new javax.swing.JLabel();
+        jcbRecordType = new javax.swing.JComboBox();
+        jbRecordType = new javax.swing.JButton();
+        jPanel8 = new javax.swing.JPanel();
+        jlAccountCash = new javax.swing.JLabel();
+        jcbAccountCash = new javax.swing.JComboBox();
+        jbAccountCash = new javax.swing.JButton();
+        jPanel11 = new javax.swing.JPanel();
+        jPanel15 = new javax.swing.JPanel();
+        jPanel16 = new javax.swing.JPanel();
+        jrbRangeByDate = new javax.swing.JRadioButton();
+        jPanel17 = new javax.swing.JPanel();
+        jrbRangeByNumber = new javax.swing.JRadioButton();
+        jPanel18 = new javax.swing.JPanel();
+        jPanel19 = new javax.swing.JPanel();
+        jrbCurrencyLocal = new javax.swing.JRadioButton();
+        jPanel20 = new javax.swing.JPanel();
+        jrbCurrencyOriginal = new javax.swing.JRadioButton();
+        jPanel22 = new javax.swing.JPanel();
+        jPanel21 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
@@ -97,33 +126,28 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
         jPanel9 = new javax.swing.JPanel();
         jlFiscalYear = new javax.swing.JLabel();
         jtfFiscalYear = new javax.swing.JTextField();
-        Dummy04 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         jlPeriod = new javax.swing.JLabel();
         jtfPeriod = new javax.swing.JTextField();
         jPanel10 = new javax.swing.JPanel();
-        jlNumberInitial = new javax.swing.JLabel();
-        jtfNumberInitial = new javax.swing.JTextField();
-        Dummy03 = new javax.swing.JLabel();
+        jlNumberStart = new javax.swing.JLabel();
+        jtfNumberStart = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
         jlNumberEnd = new javax.swing.JLabel();
         jtfNumberEnd = new javax.swing.JTextField();
-        jPanel11 = new javax.swing.JPanel();
-        jPanel12 = new javax.swing.JPanel();
-        jlBookKeepingCenter = new javax.swing.JLabel();
-        jcbBookKeepingCenter = new javax.swing.JComboBox();
-        jbBookKeepingCenter = new javax.swing.JButton();
-        jPanel4 = new javax.swing.JPanel();
-        jlRecordType = new javax.swing.JLabel();
-        jcbRecordType = new javax.swing.JComboBox();
-        jbRecordType = new javax.swing.JButton();
-        jPanel8 = new javax.swing.JPanel();
-        jlAccountCash = new javax.swing.JLabel();
-        jcbAccountCash = new javax.swing.JComboBox();
-        jbAccountCash = new javax.swing.JButton();
-        jrbByDateRange = new javax.swing.JRadioButton();
-        jrbByNumberRange = new javax.swing.JRadioButton();
+        jPanel23 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jrbByLocalCurrency = new javax.swing.JRadioButton();
-        jrbByRecordCurrency = new javax.swing.JRadioButton();
+        jPanel6 = new javax.swing.JPanel();
+        jrbPrintingCollective = new javax.swing.JRadioButton();
+        jPanel24 = new javax.swing.JPanel();
+        jrbPrintingIndividual = new javax.swing.JRadioButton();
+        jPanel25 = new javax.swing.JPanel();
+        jlCreator = new javax.swing.JLabel();
+        jcbCreator = new javax.swing.JComboBox();
+        jbCreatorPickMe = new javax.swing.JButton();
+        jpControls = new javax.swing.JPanel();
+        jbPrint = new javax.swing.JButton();
+        jbExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Impresión de pólizas contables");
@@ -136,28 +160,123 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
             }
         });
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(392, 33));
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        jpSettings.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
+        jpSettings.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jbPrint.setText("Imprimir");
-        jbPrint.setToolTipText("[Ctrl + Enter]");
-        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbPrint);
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jbExit.setText("Cerrar");
-        jbExit.setToolTipText("[Escape]");
-        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel1.add(jbExit);
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
+        jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración del reporte:"));
-        jPanel2.setLayout(new java.awt.BorderLayout(0, 5));
+        jlBookKeepingCenter.setText("Centro contable: *");
+        jlBookKeepingCenter.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlBookKeepingCenter);
 
-        jPanel6.setLayout(new java.awt.BorderLayout(0, 1));
+        jcbBookKeepingCenter.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel12.add(jcbBookKeepingCenter);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Período:"));
-        jPanel5.setLayout(new java.awt.GridLayout(2, 1, 0, 2));
+        jbBookKeepingCenter.setText("jButton1");
+        jbBookKeepingCenter.setToolTipText("Seleccionar centro contable");
+        jbBookKeepingCenter.setFocusable(false);
+        jbBookKeepingCenter.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel12.add(jbBookKeepingCenter);
+
+        jPanel2.add(jPanel12);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlRecordType.setText("Tipo póliza:");
+        jlRecordType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlRecordType);
+
+        jcbRecordType.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel4.add(jcbRecordType);
+
+        jbRecordType.setText("jButton2");
+        jbRecordType.setToolTipText("Seleccionar tipo de póliza");
+        jbRecordType.setFocusable(false);
+        jbRecordType.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel4.add(jbRecordType);
+
+        jPanel2.add(jPanel4);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAccountCash.setText("Cuenta dinero:");
+        jlAccountCash.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jlAccountCash);
+
+        jcbAccountCash.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel8.add(jcbAccountCash);
+
+        jbAccountCash.setText("jButton1");
+        jbAccountCash.setToolTipText("Seleccionar cuenta de efectivo");
+        jbAccountCash.setFocusable(false);
+        jbAccountCash.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel8.add(jbAccountCash);
+
+        jPanel2.add(jPanel8);
+
+        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+        jPanel11.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder("Modalidad de filtros del reporte:"));
+        jPanel15.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        bgRange.add(jrbRangeByDate);
+        jrbRangeByDate.setText("Por rango de fechas");
+        jrbRangeByDate.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel16.add(jrbRangeByDate);
+
+        jPanel15.add(jPanel16);
+
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        bgRange.add(jrbRangeByNumber);
+        jrbRangeByNumber.setText("Por rango de folios");
+        jrbRangeByNumber.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel17.add(jrbRangeByNumber);
+
+        jPanel15.add(jPanel17);
+
+        jPanel11.add(jPanel15);
+
+        jPanel18.setBorder(javax.swing.BorderFactory.createTitledBorder("Moneda del reporte:"));
+        jPanel18.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        bgCurrency.add(jrbCurrencyLocal);
+        jrbCurrencyLocal.setText("Moneda local");
+        jPanel19.add(jrbCurrencyLocal);
+
+        jPanel18.add(jPanel19);
+
+        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        bgCurrency.add(jrbCurrencyOriginal);
+        jrbCurrencyOriginal.setText("Moneda original");
+        jPanel20.add(jrbCurrencyOriginal);
+
+        jPanel18.add(jPanel20);
+
+        jPanel11.add(jPanel18);
+
+        jPanel1.add(jPanel11, java.awt.BorderLayout.CENTER);
+
+        jpSettings.add(jPanel1, java.awt.BorderLayout.NORTH);
+
+        jPanel22.setLayout(new java.awt.BorderLayout());
+
+        jPanel21.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Rango de fechas:"));
+        jPanel5.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -195,192 +314,138 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
 
         jPanel5.add(jPanel14);
 
-        jPanel6.add(jPanel5, java.awt.BorderLayout.NORTH);
+        jPanel21.add(jPanel5);
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Rango:"));
-        jPanel7.setLayout(new java.awt.GridLayout(2, 1, 0, 2));
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Rango de folios:"));
+        jPanel7.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFiscalYear.setText("Ejercicio fiscal: *");
+        jlFiscalYear.setText("Ejercicio: *");
         jlFiscalYear.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlFiscalYear);
 
         jtfFiscalYear.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfFiscalYear.setText("FISCAL YEAR");
-        jtfFiscalYear.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfFiscalYear.setText("0000");
+        jtfFiscalYear.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(jtfFiscalYear);
 
-        Dummy04.setPreferredSize(new java.awt.Dimension(105, 0));
-        jPanel9.add(Dummy04);
+        jLabel1.setPreferredSize(new java.awt.Dimension(10, 23));
+        jPanel9.add(jLabel1);
 
-        jlPeriod.setText("Periodo: *");
+        jlPeriod.setText("Período: *");
         jlPeriod.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel9.add(jlPeriod);
 
         jtfPeriod.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfPeriod.setText("PERIOD");
-        jtfPeriod.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfPeriod.setText("00");
+        jtfPeriod.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel9.add(jtfPeriod);
 
         jPanel7.add(jPanel9);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlNumberInitial.setText("Folio inicial: *");
-        jlNumberInitial.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel10.add(jlNumberInitial);
+        jlNumberStart.setText("Folio inicial: *");
+        jlNumberStart.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel10.add(jlNumberStart);
 
-        jtfNumberInitial.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfNumberInitial.setText("NUM INITIAL");
-        jtfNumberInitial.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel10.add(jtfNumberInitial);
+        jtfNumberStart.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfNumberStart.setText("0");
+        jtfNumberStart.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel10.add(jtfNumberStart);
 
-        Dummy03.setPreferredSize(new java.awt.Dimension(105, 0));
-        jPanel10.add(Dummy03);
+        jLabel2.setPreferredSize(new java.awt.Dimension(10, 23));
+        jPanel10.add(jLabel2);
 
         jlNumberEnd.setText("Folio final: *");
         jlNumberEnd.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel10.add(jlNumberEnd);
 
         jtfNumberEnd.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfNumberEnd.setText("NUM END");
-        jtfNumberEnd.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfNumberEnd.setText("0");
+        jtfNumberEnd.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel10.add(jtfNumberEnd);
 
         jPanel7.add(jPanel10);
 
-        jPanel6.add(jPanel7, java.awt.BorderLayout.CENTER);
+        jPanel21.add(jPanel7);
 
-        jPanel2.add(jPanel6, java.awt.BorderLayout.CENTER);
+        jPanel22.add(jPanel21, java.awt.BorderLayout.NORTH);
 
-        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
-        jPanel11.setPreferredSize(new java.awt.Dimension(451, 155));
-        jPanel11.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
+        jPanel23.setBorder(javax.swing.BorderFactory.createTitledBorder("Modalidad de impresión:"));
+        jPanel23.setLayout(new java.awt.BorderLayout());
 
-        jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel3.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jlBookKeepingCenter.setText("Centro contable: *");
-        jlBookKeepingCenter.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel12.add(jlBookKeepingCenter);
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jcbBookKeepingCenter.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbBookKeepingCenter.setPreferredSize(new java.awt.Dimension(372, 23));
-        jPanel12.add(jcbBookKeepingCenter);
+        bgPrinting.add(jrbPrintingCollective);
+        jrbPrintingCollective.setText("Continua");
+        jrbPrintingCollective.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel6.add(jrbPrintingCollective);
 
-        jbBookKeepingCenter.setText("jButton1");
-        jbBookKeepingCenter.setToolTipText("Seleccionar centro contable");
-        jbBookKeepingCenter.setFocusable(false);
-        jbBookKeepingCenter.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel12.add(jbBookKeepingCenter);
+        jPanel3.add(jPanel6);
 
-        jPanel11.add(jPanel12);
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        bgPrinting.add(jrbPrintingIndividual);
+        jrbPrintingIndividual.setText("Individual");
+        jrbPrintingIndividual.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel24.add(jrbPrintingIndividual);
 
-        jlRecordType.setText("Tipo de póliza:");
-        jlRecordType.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel4.add(jlRecordType);
+        jPanel3.add(jPanel24);
 
-        jcbRecordType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbRecordType.setPreferredSize(new java.awt.Dimension(372, 23));
-        jcbRecordType.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jcbRecordTypeItemStateChanged(evt);
-            }
-        });
-        jPanel4.add(jcbRecordType);
+        jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbRecordType.setText("jButton2");
-        jbRecordType.setToolTipText("Seleccionar tipo de póliza");
-        jbRecordType.setFocusable(false);
-        jbRecordType.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel4.add(jbRecordType);
+        jlCreator.setText("Creador:");
+        jlCreator.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel25.add(jlCreator);
 
-        jPanel11.add(jPanel4);
+        jcbCreator.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel25.add(jcbCreator);
 
-        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jbCreatorPickMe.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_mod_hrs.png"))); // NOI18N
+        jbCreatorPickMe.setToolTipText("Seleccionarme");
+        jbCreatorPickMe.setFocusable(false);
+        jbCreatorPickMe.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel25.add(jbCreatorPickMe);
 
-        jlAccountCash.setText("Cuenta de efectivo:");
-        jlAccountCash.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel8.add(jlAccountCash);
+        jPanel3.add(jPanel25);
 
-        jcbAccountCash.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jcbAccountCash.setPreferredSize(new java.awt.Dimension(372, 23));
-        jPanel8.add(jcbAccountCash);
+        jPanel23.add(jPanel3, java.awt.BorderLayout.PAGE_START);
 
-        jbAccountCash.setText("jButton1");
-        jbAccountCash.setToolTipText("Seleccionar cuenta de efectivo");
-        jbAccountCash.setFocusable(false);
-        jbAccountCash.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel8.add(jbAccountCash);
+        jPanel22.add(jPanel23, java.awt.BorderLayout.CENTER);
 
-        jPanel11.add(jPanel8);
+        jpSettings.add(jPanel22, java.awt.BorderLayout.CENTER);
 
-        buttonGroupRangeOptions.add(jrbByDateRange);
-        jrbByDateRange.setText("Por rango de fechas");
-        jrbByDateRange.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jrbByDateRangeItemStateChanged(evt);
-            }
-        });
-        jPanel11.add(jrbByDateRange);
+        getContentPane().add(jpSettings, java.awt.BorderLayout.CENTER);
 
-        buttonGroupRangeOptions.add(jrbByNumberRange);
-        jrbByNumberRange.setText("Por rango de folios");
-        jrbByNumberRange.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jrbByNumberRangeItemStateChanged(evt);
-            }
-        });
-        jPanel11.add(jrbByNumberRange);
+        jpControls.setPreferredSize(new java.awt.Dimension(392, 33));
+        jpControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jPanel2.add(jPanel11, java.awt.BorderLayout.NORTH);
+        jbPrint.setText("Imprimir");
+        jbPrint.setToolTipText("[Ctrl + Enter]");
+        jbPrint.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpControls.add(jbPrint);
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Moneda del reporte:"));
-        jPanel3.setPreferredSize(new java.awt.Dimension(109, 80));
-        jPanel3.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
+        jbExit.setText("Cerrar");
+        jbExit.setToolTipText("[Escape]");
+        jbExit.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpControls.add(jbExit);
 
-        buttonGroupCurrencyOptions.add(jrbByLocalCurrency);
-        jrbByLocalCurrency.setText("Moneda local");
-        jPanel3.add(jrbByLocalCurrency);
+        getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        buttonGroupCurrencyOptions.add(jrbByRecordCurrency);
-        jrbByRecordCurrency.setText("Moneda de la póliza contable");
-        jPanel3.add(jrbByRecordCurrency);
-
-        jPanel2.add(jPanel3, java.awt.BorderLayout.SOUTH);
-
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
-
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-600)/2, (screenSize.height-500)/2, 600, 500);
+        setSize(new java.awt.Dimension(736, 489));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         windowActivated();
     }//GEN-LAST:event_formWindowActivated
 
-    private void jrbByDateRangeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jrbByDateRangeItemStateChanged
-        if (evt.getStateChange() == ItemEvent.SELECTED) {
-            itemStateChangedByDateRange();
-        }
-    }//GEN-LAST:event_jrbByDateRangeItemStateChanged
-
-    private void jrbByNumberRangeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jrbByNumberRangeItemStateChanged
-        if (evt.getStateChange() == ItemEvent.SELECTED) {
-            itemStateChangedByNumberRange();
-        }
-    }//GEN-LAST:event_jrbByNumberRangeItemStateChanged
-
-    private void jcbRecordTypeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jcbRecordTypeItemStateChanged
-        if (evt.getStateChange() == ItemEvent.SELECTED) {
-            itemStateChangedRecordType();
-        }
-    }//GEN-LAST:event_jcbRecordTypeItemStateChanged
-
     public void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldBookKeepingCenter = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbBookKeepingCenter, jlBookKeepingCenter);
         moFieldBookKeepingCenter.setPickerButton(jbBookKeepingCenter);
@@ -388,29 +453,31 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
         moFieldRecordType.setPickerButton(jbRecordType);
         moFieldAccountCash = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbAccountCash, jlAccountCash);
         moFieldAccountCash.setPickerButton(jbAccountCash);
-        moFieldDateStart = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateStart, jlDateStart);
+        moFieldDateStart = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateStart, jlDateStart);
         moFieldDateStart.setPickerButton(jbDateStart);
-        moFieldDateEnd = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateEnd, jlDateEnd);
+        moFieldDateEnd = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateEnd, jlDateEnd);
         moFieldDateEnd.setPickerButton(jbDateEnd);
-        moFieldFiscalYear = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfFiscalYear, jlFiscalYear);
+        moFieldFiscalYear = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfFiscalYear, jlFiscalYear);
         moFieldFiscalYear.setIntegerMin(2000);
         moFieldFiscalYear.setIntegerMax(2100);
         moFieldFiscalYear.setMinInclusive(true);
         moFieldFiscalYear.setMaxInclusive(true);
         moFieldFiscalYear.setDecimalFormat(miClient.getSessionXXX().getFormatters().getYearFormat());
-        moFieldPeriod = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfPeriod, jlPeriod);
-        moFieldNumberInitial = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfNumberInitial, jlNumberInitial);
-        moFieldNumberEnd = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, false, jtfNumberEnd, jlNumberEnd);
+        moFieldPeriod = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfPeriod, jlPeriod);
+        moFieldNumberStart = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfNumberStart, jlNumberStart);
+        moFieldNumberEnd = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfNumberEnd, jlNumberEnd);
+        moFieldCreator = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCreator, jlCreator);
 
         mvFields.add(moFieldBookKeepingCenter);
         mvFields.add(moFieldRecordType);
         mvFields.add(moFieldAccountCash);
         mvFields.add(moFieldDateStart);
         mvFields.add(moFieldDateEnd);
-        mvFields.add(moFieldPeriod);
         mvFields.add(moFieldFiscalYear);
-        mvFields.add(moFieldNumberInitial);
+        mvFields.add(moFieldPeriod);
+        mvFields.add(moFieldNumberStart);
         mvFields.add(moFieldNumberEnd);
+        mvFields.add(moFieldCreator);
 
         jbPrint.addActionListener(this);
         jbExit.addActionListener(this);
@@ -419,6 +486,12 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
         jbAccountCash.addActionListener(this);
         jbDateStart.addActionListener(this);
         jbDateEnd.addActionListener(this);
+        jbCreatorPickMe.addActionListener(this);
+        jrbRangeByDate.addItemListener(this);
+        jrbRangeByNumber.addItemListener(this);
+        jrbPrintingCollective.addItemListener(this);
+        jrbPrintingIndividual.addItemListener(this);
+        jcbRecordType.addItemListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -440,6 +513,7 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
     private void windowActivated() {
         if (mbFirstTime) {
             mbFirstTime = false;
+            
             if (miClient.getSessionXXX().getCurrentCompanyBranchId() == 0) {
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_SESSION_BRANCH);
                 actionClose();
@@ -451,12 +525,7 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
     }
 
     private void actionPrint() {
-        Cursor cursor = getCursor();
         SFormValidation validation = formValidate();
-        Map<String, Object> map = null;
-        JasperPrint jasperPrint = null;
-        JasperViewer jasperViewer = null;
-        java.util.Date dt = new Date();
 
         if (validation.getIsError()) {
             if (validation.getComponent() != null) {
@@ -469,38 +538,91 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
         else {
             try {
                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                
+                int report;
+                String title;
+                Map<String, Object> map = miClient.createReportParams();
+                
+                if (jrbPrintingCollective.isSelected()) {
+                    title = "Listado de pólizas contables";
+                    report = jrbCurrencyLocal.isSelected() ? SDataConstantsSys.REP_FIN_RECS : SDataConstantsSys.REP_FIN_RECS_CY;
+                    
+                    map.put("nIdBkc", moFieldBookKeepingCenter.getKeyAsIntArray()[0]);
+                    map.put("sIdTpRec", jcbRecordType.getSelectedIndex() == 0 ? "" : (String) moFieldRecordType.getKeyAsObjectArray()[0]);
+                    map.put("tDtInitial", moFieldDateStart.getDate());
+                    map.put("tDtEnd", moFieldDateEnd.getDate());
+                    map.put("nNumInitial", moFieldNumberStart.getInteger());
+                    map.put("nNumEnd", moFieldNumberEnd.getInteger());
+                    map.put("bIsByDate", jrbRangeByDate.isSelected());
+                    map.put("sBkcDescrip", jcbBookKeepingCenter.getSelectedItem().toString());
+                    map.put("sDtInitialText", jftDateStart.getText());
+                    map.put("sDtEndText", jftDateEnd.getText());
+                    map.put("nIdPer", moFieldPeriod.getInteger());
+                    map.put("sTpRecDescrip", jcbRecordType.getSelectedIndex() == 0 ? "(TODAS)" : jcbRecordType.getSelectedItem().toString());
+                    map.put("sDateTime", miClient.getSessionXXX().getFormatters().getDatetimeFormat().format(new Date()));
+                    map.put("nNumRecordLength", SDataConstantsSys.NUM_LEN_FIN_REC);
+                    map.put("nIdYear", moFieldFiscalYear.getInteger());
+                    map.put("sCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
+                    map.put("sCurrencyKeyErp", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
+                    map.put("sSqlAccountCash", jcbAccountCash.isEnabled() && moFieldAccountCash.getKeyAsIntArray()[0] > 0 ?
+                        " AND r.fid_cob_n = " + moFieldAccountCash.getKeyAsIntArray()[0] + " AND r.fid_acc_cash_n = " + moFieldAccountCash.getKeyAsIntArray()[1] + " " : "");
+                }
+                else {
+                    title = "Pólizas contables";
+                    report = jrbCurrencyLocal.isSelected() ? SDataConstantsSys.REP_FIN_JOURNAL_VOUCHERS : SDataConstantsSys.REP_FIN_JOURNAL_VOUCHERS_CY;
+                    
+                    map.put("nLenLedger", SLibUtils.parseInt(SLibUtils.textLeft("" + miClient.getSessionXXX().getParamsCompany().getMaskAccount(), 1)));
+                    map.put("nLenRecPeriod", SLibUtils.DecimalFormatCalendarMonth.getMaximumIntegerDigits());
+                    map.put("nLenRecNumber", SDataConstantsSys.NUM_LEN_FIN_REC);
+                    
+                    if (jrbRangeByDate.isSelected()) {
+                        map.put("tRecDateStart", moFieldDateStart.getDate());
+                        map.put("tRecDateEnd", moFieldDateEnd.getDate());
+                    }
+                    else {
+                        Date period = SLibTimeUtils.createDate(moFieldFiscalYear.getInteger(), moFieldPeriod.getInteger());
+                        
+                        map.put("tRecDateStart", SLibTimeUtils.getBeginOfMonth(period));
+                        map.put("tRecDateEnd", SLibTimeUtils.getEndOfMonth(period));
+                        
+                        map.put("nRecNumStart", moFieldNumberStart.getInteger());
+                        map.put("nRecNumEnd", moFieldNumberEnd.getInteger());
+                    }
+                    
+                    if (jcbCreator.getSelectedIndex() > 0) {
+                        map.put("nRecCreator", moFieldCreator.getKeyAsIntArray()[0]);
+                        map.put("sRecCreatorOperator", "="); // to apply comparison in SQL query
+                    }
+                    
+                    if (jcbBookKeepingCenter.getSelectedIndex() > 0) {
+                        map.put("nRecBkc", moFieldBookKeepingCenter.getKeyAsIntArray()[0]);
+                        map.put("sRecBkcOperator", "="); // to apply comparison in SQL query
+                    }
+                    
+                    if (jcbRecordType.getSelectedIndex() > 0) {
+                        map.put("sRecType", (String) moFieldRecordType.getKeyAsObjectArray()[0]);
+                        map.put("sRecTypeOperator", "="); // to apply comparison in SQL query
+                    }
+                    
+                    map.put("nSysCurrency", miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
+                    
+                    if (jcbAccountCash.getSelectedIndex() > 0) {
+                        int[] key = moFieldAccountCash.getKeyAsIntArray();
+                        
+                        map.put("sSqlAccCash", "AND r.fid_cob_n = " + key[0] + " AND r.fid_acc_cash_n = " + key[1] + " ");
+                    }
+                }
 
-                map = miClient.createReportParams();
-                map.put("nIdBkc", moFieldBookKeepingCenter.getKeyAsIntArray()[0]);
-                map.put("sIdTpRec", jcbRecordType.getSelectedIndex() == 0 ? "" : (String) moFieldRecordType.getKeyAsObjectArray()[0]);
-                map.put("tDtInitial", moFieldDateStart.getDate());
-                map.put("tDtEnd", moFieldDateEnd.getDate());
-                map.put("nNumInitial", moFieldNumberInitial.getInteger());
-                map.put("nNumEnd", moFieldNumberEnd.getInteger());
-                map.put("bIsByDate", jrbByDateRange.isSelected());
-                map.put("sBkcDescrip", jcbBookKeepingCenter.getSelectedItem().toString());
-                map.put("sDtInitialText", jftDateStart.getText());
-                map.put("sDtEndText", jftDateEnd.getText());
-                map.put("nIdPer", moFieldPeriod.getInteger());
-                map.put("sTpRecDescrip", jcbRecordType.getSelectedIndex() == 0 ? "(TODAS)" : jcbRecordType.getSelectedItem().toString());
-                map.put("sDateTime", miClient.getSessionXXX().getFormatters().getDatetimeFormat().format(dt));
-                map.put("nNumRecordLength", SDataConstantsSys.NUM_LEN_FIN_REC);
-                map.put("nIdYear", moFieldFiscalYear.getInteger());
-                map.put("sCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
-                map.put("sCurrencyKeyErp", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
-                map.put("sSqlAccountCash", jcbAccountCash.isEnabled() && moFieldAccountCash.getKeyAsIntArray()[0] > 0 ?
-                    " AND r.fid_cob_n = " + moFieldAccountCash.getKeyAsIntArray()[0] + " AND r.fid_acc_cash_n = " + moFieldAccountCash.getKeyAsIntArray()[1] + " " : "");
-
-                jasperPrint = SDataUtilities.fillReport(miClient, jrbByLocalCurrency.isSelected() ? SDataConstantsSys.REP_FIN_RECS : SDataConstantsSys.REP_FIN_RECS_CY, map);
-                jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle("Listado de movimientos de pólizas contables");
+                JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, report, map);
+                JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
+                jasperViewer.setTitle(title);
                 jasperViewer.setVisible(true);
             }
             catch(Exception e) {
                 SLibUtilities.renderException(this, e);
             }
             finally {
-                setCursor(cursor);
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }
         }
     }
@@ -510,81 +632,79 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
         setVisible(false);
     }
 
-    private void actionBookKeepingCenter() {
+    private void actionPerformedBookKeepingCenter() {
         miClient.pickOption(SDataConstants.FIN_BKC, moFieldBookKeepingCenter, null);
     }
 
-    private void actionRecordType() {
+    private void actionPerformedRecordType() {
         miClient.pickOption(SDataConstants.FINX_TP_REC_ALL, moFieldRecordType, null);
     }
 
-    private void actionDateInitial() {
-        miClient.getGuiDatePickerXXX().formReset();
-        miClient.getGuiDatePickerXXX().setDate(moFieldDateStart.getDate());
-        miClient.getGuiDatePickerXXX().setVisible(true);
-
-        if (miClient.getGuiDatePickerXXX().getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            moFieldDateStart.setDate(miClient.getGuiDatePickerXXX().getGuiDate());
-            jftDateStart.requestFocus();
-        }
-    }
-
-    private void actionDateEnd() {
-        miClient.getGuiDatePickerXXX().formReset();
-        miClient.getGuiDatePickerXXX().setDate(moFieldDateEnd.getDate());
-        miClient.getGuiDatePickerXXX().setVisible(true);
-
-        if (miClient.getGuiDatePickerXXX().getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            moFieldDateEnd.setDate(miClient.getGuiDatePickerXXX().getGuiDate());
-            jftDateEnd.requestFocus();
-        }
-    }
-
-    private void actionAccountCash() {
+    private void actionPerformedAccountCash() {
         miClient.pickOption(SDataConstants.FIN_ACC_CASH, moFieldAccountCash, new int[] { miClient.getSessionXXX().getCurrentCompanyBranchId() });
     }
 
+    private void actionPerformedDateStart() {
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateStart.getDate(), moFieldDateStart);
+    }
+
+    private void actionPerformedDateEnd() {
+        miClient.getGuiDatePickerXXX().pickDate(moFieldDateEnd.getDate(), moFieldDateEnd);
+    }
+    
+    private void actionPerformedCreatorPickMe() {
+        moFieldCreator.setFieldValue(new int[] { miClient.getSession().getUser().getPkUserId() });
+        jcbCreator.requestFocusInWindow();
+    }
+
     private void renderRangeOptions() {
-        if (jrbByDateRange.isSelected()) {
-            jlDateStart.setEnabled(true);
+        if (jrbRangeByDate.isSelected()) {
             jftDateStart.setEnabled(true);
             jbDateStart.setEnabled(true);
-            jlDateEnd.setEnabled(true);
             jftDateEnd.setEnabled(true);
             jbDateEnd.setEnabled(true);
-            jlFiscalYear.setEnabled(false);
             jtfFiscalYear.setEnabled(false);
-            jlPeriod.setEnabled(false);
             jtfPeriod.setEnabled(false);
-            jlNumberInitial.setEnabled(false);
-            jtfNumberInitial.setEnabled(false);
-            jlNumberEnd.setEnabled(false);
+            jtfNumberStart.setEnabled(false);
             jtfNumberEnd.setEnabled(false);
+            
+            moFieldDateStart.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSession().getCurrentDate()));
+            moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSession().getCurrentDate()));
+            moFieldFiscalYear.resetField();
+            moFieldPeriod.resetField();
+            moFieldNumberStart.resetField();
+            moFieldNumberEnd.resetField();
         }
         else {
-            jlDateStart.setEnabled(false);
             jftDateStart.setEnabled(false);
             jbDateStart.setEnabled(false);
-            jlDateEnd.setEnabled(false);
             jftDateEnd.setEnabled(false);
             jbDateEnd.setEnabled(false);
-            jlFiscalYear.setEnabled(true);
             jtfFiscalYear.setEnabled(true);
-            jlPeriod.setEnabled(true);
             jtfPeriod.setEnabled(true);
-            jlNumberInitial.setEnabled(true);
-            jtfNumberInitial.setEnabled(true);
-            jlNumberEnd.setEnabled(true);
+            jtfNumberStart.setEnabled(true);
             jtfNumberEnd.setEnabled(true);
+            
+            moFieldDateStart.resetField();
+            moFieldDateEnd.resetField();
+            moFieldFiscalYear.setFieldValue(miClient.getSessionXXX().getWorkingYear());
+            moFieldPeriod.setFieldValue(SLibTimeUtilities.digestYearMonth(miClient.getSession().getCurrentDate())[1]);
+            moFieldNumberStart.setFieldValue(1);
+            moFieldNumberEnd.resetField();
         }
     }
-
-    private void itemStateChangedByDateRange() {
-        renderRangeOptions();
-    }
-
-    private void itemStateChangedByNumberRange() {
-        renderRangeOptions();
+    
+    private void renderPrintingOptions() {
+        if (jrbPrintingCollective.isSelected()) {
+            jcbCreator.setEnabled(false);
+            jbCreatorPickMe.setEnabled(false);
+            
+            moFieldCreator.resetField();
+        }
+        else {
+            jcbCreator.setEnabled(true);
+            jbCreatorPickMe.setEnabled(true);
+        }
     }
 
     private void itemStateChangedRecordType() {
@@ -599,20 +719,52 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
         jlAccountCash.setEnabled(enable);
         jcbAccountCash.setEnabled(enable);
         jbAccountCash.setEnabled(enable);
+        
+        if (!enable) {
+            moFieldAccountCash.resetField();
+        }
+    }
+
+    private void itemStateChangedRangeByDate() {
+        renderRangeOptions();
+    }
+
+    private void itemStateChangedRangeByNumber() {
+        renderRangeOptions();
+    }
+    
+    private void itemStateChangedPrintingCollective() {
+        renderPrintingOptions();
+    }
+
+    private void itemStateChangedPrintingIndividual() {
+        renderPrintingOptions();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel Dummy03;
-    private javax.swing.JLabel Dummy04;
-    private javax.swing.ButtonGroup buttonGroupCurrencyOptions;
-    private javax.swing.ButtonGroup buttonGroupRangeOptions;
+    private javax.swing.ButtonGroup bgCurrency;
+    private javax.swing.ButtonGroup bgPrinting;
+    private javax.swing.ButtonGroup bgRange;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
+    private javax.swing.JPanel jPanel23;
+    private javax.swing.JPanel jPanel24;
+    private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -622,6 +774,7 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbAccountCash;
     private javax.swing.JButton jbBookKeepingCenter;
+    private javax.swing.JButton jbCreatorPickMe;
     private javax.swing.JButton jbDateEnd;
     private javax.swing.JButton jbDateStart;
     private javax.swing.JButton jbExit;
@@ -629,25 +782,31 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
     private javax.swing.JButton jbRecordType;
     private javax.swing.JComboBox jcbAccountCash;
     private javax.swing.JComboBox jcbBookKeepingCenter;
+    private javax.swing.JComboBox jcbCreator;
     private javax.swing.JComboBox jcbRecordType;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlAccountCash;
     private javax.swing.JLabel jlBookKeepingCenter;
+    private javax.swing.JLabel jlCreator;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlFiscalYear;
     private javax.swing.JLabel jlNumberEnd;
-    private javax.swing.JLabel jlNumberInitial;
+    private javax.swing.JLabel jlNumberStart;
     private javax.swing.JLabel jlPeriod;
     private javax.swing.JLabel jlRecordType;
-    private javax.swing.JRadioButton jrbByDateRange;
-    private javax.swing.JRadioButton jrbByLocalCurrency;
-    private javax.swing.JRadioButton jrbByNumberRange;
-    private javax.swing.JRadioButton jrbByRecordCurrency;
+    private javax.swing.JPanel jpControls;
+    private javax.swing.JPanel jpSettings;
+    private javax.swing.JRadioButton jrbCurrencyLocal;
+    private javax.swing.JRadioButton jrbCurrencyOriginal;
+    private javax.swing.JRadioButton jrbPrintingCollective;
+    private javax.swing.JRadioButton jrbPrintingIndividual;
+    private javax.swing.JRadioButton jrbRangeByDate;
+    private javax.swing.JRadioButton jrbRangeByNumber;
     private javax.swing.JTextField jtfFiscalYear;
     private javax.swing.JTextField jtfNumberEnd;
-    private javax.swing.JTextField jtfNumberInitial;
+    private javax.swing.JTextField jtfNumberStart;
     private javax.swing.JTextField jtfPeriod;
     // End of variables declaration//GEN-END:variables
 
@@ -666,18 +825,16 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
-        jrbByDateRange.setSelected(true);
-        jrbByLocalCurrency.setSelected(true);
-        moFieldDateStart.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
-        moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
-        moFieldFiscalYear.setFieldValue(miClient.getSessionXXX().getWorkingYear());
-        moFieldPeriod.setFieldValue(SLibTimeUtilities.digestYearMonth(miClient.getSessionXXX().getWorkingDate())[1]);
-        moFieldNumberInitial.setFieldValue(1);
+        jrbRangeByDate.setSelected(true);
+        jrbCurrencyLocal.setSelected(true);
+        jrbPrintingCollective.setSelected(true);
+        
         renderRangeOptions();
+        renderPrintingOptions();
         itemStateChangedRecordType();
 
         if (jcbBookKeepingCenter.getItemCount() == 2) {
-            moFieldBookKeepingCenter.setKey(new int[] { 1 });
+            jcbBookKeepingCenter.setSelectedIndex(1);
         }
     }
 
@@ -686,6 +843,7 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
         SFormUtilities.populateComboBox(miClient, jcbBookKeepingCenter, SDataConstants.FIN_BKC);
         SFormUtilities.populateComboBox(miClient, jcbRecordType, SDataConstants.FINX_TP_REC_ALL);
         SFormUtilities.populateComboBox(miClient, jcbAccountCash, SDataConstants.FIN_ACC_CASH, new int[] { miClient.getSessionXXX().getCurrentCompanyBranchId() });
+        SFormUtilities.populateComboBox(miClient, jcbCreator, SDataConstants.USRX_FIN_REC);
     }
 
     @Override
@@ -701,41 +859,21 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
         }
 
         if (!validation.getIsError()) {
-            if (jrbByDateRange.isSelected() && moFieldDateStart.getDate() == null) {
-                validation.setMessage("La fecha inicial es invalida.");
-                validation.setComponent(jftDateStart);
+            if (jrbRangeByDate.isSelected()) {
+                if (jrbRangeByDate.isSelected() && moFieldDateEnd.getDate().compareTo(moFieldDateStart.getDate()) < 0) {
+                    validation.setMessage("La fecha final debe ser mayor o igual a la fecha inicial.");
+                    validation.setComponent(jftDateEnd);
+                }
+                else if (SLibTimeUtilities.digestYear(moFieldDateEnd.getDate())[0] != SLibTimeUtilities.digestYear(moFieldDateStart.getDate())[0]) {
+                    validation.setMessage("La fecha inicial y final deben pertenecer al mismo ejercicio.");
+                    validation.setComponent(jftDateStart);
+                }
             }
-            else if (jrbByDateRange.isSelected() && moFieldDateEnd.getDate() == null) {
-                validation.setMessage("La fecha final es invalida.");
-                validation.setComponent(jftDateEnd);
-            }
-            else if (jrbByDateRange.isSelected() && moFieldDateEnd.getDate().compareTo(moFieldDateStart.getDate()) < 0) {
-                validation.setMessage("La fecha final debe ser mayor o igual a la fecha inicial.");
-                validation.setComponent(jftDateEnd);
-            }
-            else if (SLibTimeUtilities.digestYear(moFieldDateEnd.getDate())[0] != SLibTimeUtilities.digestYear(moFieldDateStart.getDate())[0]) {
-                validation.setMessage("La fecha inicial y final deben pertenecer al mismo ejercicio.");
-                validation.setComponent(jftDateStart);
-            }
-            else if (jrbByNumberRange.isSelected() && moFieldFiscalYear.getInteger() == 0) {
-                validation.setMessage("El valor del campo '" + jlFiscalYear.getText() + "'. debe ser mayor a 0.");
-                validation.setComponent(jtfFiscalYear);
-            }
-            else if (jrbByNumberRange.isSelected() && moFieldPeriod.getInteger() == 0) {
-                validation.setMessage("El valor del campo '" + jlPeriod.getText() + "'. debe ser mayor a 0.");
-                validation.setComponent(jtfPeriod);
-            }
-            else if (jrbByNumberRange.isSelected() && moFieldNumberInitial.getInteger() == 0) {
-                validation.setMessage("El valor del campo " + jlNumberInitial.getText() + " debe ser mayor a 0.");
-                validation.setComponent(jtfNumberInitial);
-            }
-            else if (jrbByNumberRange.isSelected() && moFieldNumberEnd.getInteger() == 0) {
-                validation.setMessage("El valor del campo " + jlNumberEnd.getText() + " debe ser mayor a 0.");
-                validation.setComponent(jtfNumberEnd);
-            }
-            else if (jrbByNumberRange.isSelected() && moFieldNumberEnd.getInteger() < moFieldNumberInitial.getInteger()) {
-                validation.setMessage("El valor del folio final debe ser mayor o igual que el valor del folio inicial.");
-                validation.setComponent(jtfNumberEnd);
+            else {
+                if (moFieldNumberEnd.getInteger() < moFieldNumberStart.getInteger()) {
+                    validation.setMessage("El valor del folio final debe ser mayor o igual que el valor del folio inicial.");
+                    validation.setComponent(jtfNumberEnd);
+                }
             }
         }
 
@@ -799,19 +937,49 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
                 actionClose();
             }
             else if (button == jbBookKeepingCenter) {
-                actionBookKeepingCenter();
+                actionPerformedBookKeepingCenter();
             }
             else if (button == jbRecordType) {
-                actionRecordType();
+                actionPerformedRecordType();
             }
             else if (button == jbAccountCash) {
-                actionAccountCash();
+                actionPerformedAccountCash();
             }
             else if (button == jbDateStart) {
-                actionDateInitial();
+                actionPerformedDateStart();
             }
             else if (button == jbDateEnd) {
-                actionDateEnd();
+                actionPerformedDateEnd();
+            }
+            else if (button == jbCreatorPickMe) {
+                actionPerformedCreatorPickMe();
+            }
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof JComboBox) {
+            JComboBox comboBox = (JComboBox) e.getSource();
+            
+            if (comboBox == jcbRecordType) {
+                itemStateChangedRecordType();
+            }
+        }
+        else if (e.getSource() instanceof JRadioButton && e.getStateChange() == ItemEvent.SELECTED) {
+            JRadioButton radioButton = (JRadioButton) e.getSource();
+            
+            if (radioButton == jrbRangeByDate) {
+                itemStateChangedRangeByDate();
+            }
+            else if (radioButton == jrbRangeByNumber) {
+                itemStateChangedRangeByNumber();
+            }
+            else if (radioButton == jrbPrintingCollective) {
+                itemStateChangedPrintingCollective();
+            }
+            else if (radioButton == jrbPrintingIndividual) {
+                itemStateChangedPrintingIndividual();
             }
         }
     }
