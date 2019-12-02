@@ -108,23 +108,20 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public static final int AUT_AUTHORN_REJ_NA = 0;
     public static final int AUT_AUTHORN_REJ_LIM_USR = 1;
     public static final int AUT_AUTHORN_REJ_LIM_USR_MON = 2;
-    public static final int AUT_AUTHORN_REJ_LIM_FUNC_MON = 3;
-    
-    public static final String TXT_AUT_AUTHORN_REJ_NA = "No aplica";
-    public static final String TXT_AUT_AUTHORN_REJ_LIM_USR = "Tope evento usuario";
-    public static final String TXT_AUT_AUTHORN_REJ_LIM_USR_MON = "Tope mensual usuario";
-    public static final String TXT_AUT_AUTHORN_REJ_LIM_FUNC_MON = "Tope mensual área funcional";
+    public static final int AUT_AUTHORN_REJ_LIM_FUNC_MON_ORD = 3;
+    public static final int AUT_AUTHORN_REJ_LIM_FUNC_MON_DOC = 4;
     
     public static final int AMT_PRE_PAY = 1;
     public static final int AMT_PRE_PAY_CY = 2;
     
-    public static final HashMap<Integer, String> AutAuthornRejMap = new HashMap<Integer, String>();
+    public static final HashMap<Integer, String> AutAuthornRejMap = new HashMap<>();
     
     static {
-        AutAuthornRejMap.put(AUT_AUTHORN_REJ_NA, TXT_AUT_AUTHORN_REJ_NA);
-        AutAuthornRejMap.put(AUT_AUTHORN_REJ_LIM_USR, TXT_AUT_AUTHORN_REJ_LIM_USR);
-        AutAuthornRejMap.put(AUT_AUTHORN_REJ_LIM_USR_MON, TXT_AUT_AUTHORN_REJ_LIM_USR_MON);
-        AutAuthornRejMap.put(AUT_AUTHORN_REJ_LIM_FUNC_MON, TXT_AUT_AUTHORN_REJ_LIM_FUNC_MON);
+        AutAuthornRejMap.put(AUT_AUTHORN_REJ_NA, "No aplica");
+        AutAuthornRejMap.put(AUT_AUTHORN_REJ_LIM_USR, "Tope evento usuario");
+        AutAuthornRejMap.put(AUT_AUTHORN_REJ_LIM_USR_MON, "Tope mensual usuario");
+        AutAuthornRejMap.put(AUT_AUTHORN_REJ_LIM_FUNC_MON_ORD, "Tope mensual área funcional (órdenes)");
+        AutAuthornRejMap.put(AUT_AUTHORN_REJ_LIM_FUNC_MON_DOC, "Tope mensual área funcional (facturas)");
     }
             
     protected int mnPkYearId;
@@ -284,86 +281,177 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
      * Private functions
      */
 
-    private boolean isDpsAuthorizedUser(SDataUserConfigurationTransaction oUserConfig) throws java.sql.SQLException, java.lang.Exception {
-        return oUserConfig.getPurchasesOrderLimit_n() == 0 || oUserConfig.getPurchasesOrderLimit_n() >= mdTotal_r;
+    /**
+     * Check if purchases transaction is authorized in an event basis, according to current user.
+     * @param userConfigTxn User Configuration Transaction for current user.
+     * @param dpsClassKey DPS class key. SDataConstatsSys.TRNS_CL_DPS orders and documents (invoices) for purchases and sales.
+     * @return <code>true</code> if purchases transaction is authorized in an event basis, otherwise <code>false</code>.
+     * @throws java.sql.SQLException
+     * @throws java.lang.Exception 
+     */
+    private boolean isDpsAuthorizedEventUser(final erp.mtrn.data.SDataUserConfigurationTransaction userConfigTxn, final int[] dpsClassKey) throws java.sql.SQLException, java.lang.Exception {
+        boolean authorized = false;
+        
+        if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD)) {
+            authorized = userConfigTxn.getPurchasesOrderLimit_n() == 0; // limit of zero means no limit
+
+            if (!authorized) {
+                authorized = mdTotal_r <= userConfigTxn.getPurchasesOrderLimit_n();
+            }
+        }
+        else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
+            authorized = userConfigTxn.getPurchasesDocLimit_n() == 0; // limit of zero means no limit
+
+            if (!authorized) {
+                authorized = mdTotal_r <= userConfigTxn.getPurchasesDocLimit_n();
+            }
+        }
+        else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD)) {
+            authorized = userConfigTxn.getSalesOrderLimit_n() == 0; // limit of zero means no limit
+
+            if (!authorized) {
+                authorized = mdTotal_r <= userConfigTxn.getSalesOrderLimit_n();
+            }
+        }
+        else if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC)) {
+            authorized = userConfigTxn.getSalesDocLimit_n() == 0; // limit of zero means no limit
+
+            if (!authorized) {
+                authorized = mdTotal_r <= userConfigTxn.getSalesDocLimit_n();
+            }
+        }
+        else {
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
+        return authorized;
     }
     
-    private boolean isDpsAuthorizedUserMonth(java.sql.Connection connection, SDataUserConfigurationTransaction oUserConfig) throws java.sql.SQLException, java.lang.Exception {
-        double amtAccumUser = 0;
+    /**
+     * Check if purchases transaction is authorized in a monthly basis, according to current user.
+     * @param userConfigTxn User Configuration Transaction for current user.
+     * @param dpsClassKey DPS class key. SDataConstatsSys.TRNS_CL_DPS orders for purchases.
+     * @return <code>true</code> if purchases transaction is authorized in a monthly basis, otherwise <code>false</code>.
+     * @throws java.sql.SQLException
+     * @throws java.lang.Exception 
+     */
+    private boolean isDpsAuthorizedMonthlyUser(final java.sql.Statement statement, final erp.mtrn.data.SDataUserConfigurationTransaction userConfigTxn, final int[] dpsClassKey) throws java.sql.SQLException, java.lang.Exception {
+        boolean authorized = false;
         
-        amtAccumUser = STrnUtils.getOrderAmountMonthUser(connection, (int[]) getPrimaryKey(), mtDate, mnFkUserNewId);
+        if (SLibUtils.compareKeys(dpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD)) {
+            authorized = userConfigTxn.getPurchasesOrderLimitMonthly_n() == 0; // limit of zero means no limit
+
+            if (!authorized) {
+                double monthlyAmount = STrnUtils.getDpsMonthlyAmountUser(statement, dpsClassKey, (int[]) getPrimaryKey(), mtDate, mnFkUserNewId);
+                authorized = (monthlyAmount + mdSubtotal_r) <= userConfigTxn.getPurchasesOrderLimitMonthly_n();
+            }
+        }
+        else {
+            throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
         
-        return oUserConfig.getPurchasesOrderLimitMonthly_n() == 0 || (oUserConfig.getPurchasesOrderLimitMonthly_n() >= mdTotal_r && oUserConfig.getPurchasesOrderLimitMonthly_n() >= (amtAccumUser + mdTotal_r));
+        return authorized;
     }
     
-    private boolean isDpsAuthorizedFunctionalAreaMonth(java.sql.Connection connection) throws java.sql.SQLException, java.lang.Exception {
-        double limitFuncArea = 0;
-        double amtAccumFuncArea = 0;
+    /**
+     * Check if transaction is authorized in a monthly basis, according to current functional area.
+     * @param statement Database connection statement.
+     * @param dpsClassKey DPS class key. SDataConstatsSys.TRNS_CL_DPS orders and documents (invoices) for purchases.
+     * @return <code>true</code> if transaction is authorized in a monthly basis, otherwise <code>false</code>.
+     * @throws java.sql.SQLException
+     * @throws java.lang.Exception 
+     */
+    private boolean isDpsAuthorizedMonthlyFunctionalArea(final java.sql.Statement statement, final int[] dpsClassKey) throws java.sql.SQLException, java.lang.Exception {
+        Double maxLimit = STrnUtils.getMaxLimitMonthFunctionalArea(statement, mtDate, mnFkFunctionalAreaId);
+        boolean authorized = maxLimit == null; // limit equal to null means no limit
         
-        limitFuncArea = STrnUtils.getMaxLimitMonthFunctionalArea(connection, mnFkFunctionalAreaId);
-        amtAccumFuncArea = STrnUtils.getOrderAmountMonthFunctionalArea(connection, (int[]) getPrimaryKey(), mtDate, mnFkFunctionalAreaId);
+        if (!authorized) {
+            double monthlyAmount = STrnUtils.getDpsMonthlyAmountFunctionalArea(statement, dpsClassKey, (int[]) getPrimaryKey(), mtDate, mnFkFunctionalAreaId);
+            authorized = (monthlyAmount + mdSubtotal_r) <= maxLimit;
+        }
         
-        return limitFuncArea == 0 || (limitFuncArea >= mdTotal_r && limitFuncArea >= (amtAccumFuncArea + mdTotal_r));
+        return authorized;
     }
     
     private boolean isDpsAuthorized(java.sql.Connection connection) throws java.sql.SQLException, java.lang.Exception {
         boolean autorized = false;
-        Statement oStatement = null;
-        SDataUserConfigurationTransaction oUserConfig = null;
+        Statement statement = connection.createStatement();
+        SDataUserConfigurationTransaction userConfigTxn = new SDataUserConfigurationTransaction();
 
-        oStatement = connection.createStatement();
-
-        oUserConfig = new SDataUserConfigurationTransaction();
-
-        if (oUserConfig.read(new int[] { mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId }, oStatement) != SLibConstants.DB_ACTION_READ_OK) {
+        if (userConfigTxn.read(new int[] { mnFkUserNewId }, statement) != SLibConstants.DB_ACTION_READ_OK) {
             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
         }
         else {
             if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
                 if (isOrderPur()) {
-                    autorized = isDpsAuthorizedUser(oUserConfig);
-                    
+                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
+
                     if (!autorized) {
                         mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR;
                     }
                     else {
-                        autorized = isDpsAuthorizedUserMonth(connection, oUserConfig);
-                        
+                        autorized = isDpsAuthorizedMonthlyUser(statement, userConfigTxn, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
+
                         if (!autorized) {
                             mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR_MON;
                         }
                         else {
-                            autorized = isDpsAuthorizedFunctionalAreaMonth(connection);
-                            
+                            autorized = isDpsAuthorizedMonthlyFunctionalArea(statement, SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
+
                             if (!autorized) {
-                                mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_FUNC_MON;
+                                mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_FUNC_MON_ORD;
                             }
                             else {
-                                mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
+                                autorized = isDpsAuthorizedMonthlyFunctionalArea(statement, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC);
+
+                                if (!autorized) {
+                                    mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_FUNC_MON_DOC;
+                                }
+                                else {
+                                    mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
+                                }
                             }
                         }
                     }
                 }
                 else if (isDocumentPur()) {
-                    if (oUserConfig.getPurchasesDocLimit_n() == 0 || oUserConfig.getPurchasesDocLimit_n() >= mdTotal_r) {
-                        autorized = true;
+                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC);
+
+                    if (!autorized) {
+                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR;
+                    }
+                    else {
+                        autorized = isDpsAuthorizedMonthlyFunctionalArea(statement, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC);
+
+                        if (!autorized) {
+                            mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_FUNC_MON_DOC;
+                        }
+                        else {
+                            mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
+                        }
                     }
                 }
-                /*
-                if (isOrderPur() && (oUserConfig.getPurchasesOrderLimit_n() == 0 || oUserConfig.getPurchasesOrderLimit_n() >= mdTotal_r)) {
-                    isAutorized = true;
-                }
-                else if (isDocumentPur() && (oUserConfig.getPurchasesDocLimit_n() == 0 || oUserConfig.getPurchasesDocLimit_n() >= mdTotal_r)) {
-                    isAutorized = true;
-                }
-                */
             }
             else if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_SAL) {
-                if (isOrderSal() && (oUserConfig.getSalesOrderLimit_n() == 0 || oUserConfig.getSalesOrderLimit_n() >= mdTotal_r)) {
-                    autorized = true;
+                if (isOrderSal()) {
+                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNS_CL_DPS_SAL_ORD);
+
+                    if (!autorized) {
+                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR;
+                    }
+                    else {
+                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
+                    }
                 }
-                else if (isDocumentSal() && (oUserConfig.getSalesDocLimit_n() == 0 || oUserConfig.getSalesDocLimit_n() >= mdTotal_r)) {
-                    autorized = true;
+                else if (isDocumentSal()) {
+                    autorized = isDpsAuthorizedEventUser(userConfigTxn, SDataConstantsSys.TRNS_CL_DPS_SAL_DOC);
+
+                    if (!autorized) {
+                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_LIM_USR;
+                    }
+                    else {
+                        mnAutomaticAuthorizationRejection = AUT_AUTHORN_REJ_NA;
+                    }
                 }
             }
         }
@@ -2402,7 +2490,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mnLastDbActionResult = SLibConsts.UNDEFINED;
 
         try {
-            updateAuthorizationStatus(connection); // applys only for orders and documents
+            updateAuthorizationStatus(connection); // applys only for orders and invoices
 
             nParam = 1;
             oCallableStatement = connection.prepareCall(

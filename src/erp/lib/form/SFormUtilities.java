@@ -397,7 +397,6 @@ public abstract class SFormUtilities {
      * @param client Client interface.
      * @param list Visual control (javax.swing.JList object).
      * @param dataType Constant defined in erp.data.SDataConstants.
-     * @param firstItem First item to be displayed in list.
      */
     public static void populateList(erp.client.SClientInterface client, javax.swing.JList list, int dataType) {
         populateList(client, list, dataType, null);
@@ -407,7 +406,6 @@ public abstract class SFormUtilities {
      * @param client Client interface.
      * @param list Visual control (javax.swing.JList object).
      * @param dataType Constant defined in erp.data.SDataConstants.
-     * @param firstItem First item to be displayed in list.
      * @param filterPk Primary key to be used as filter in list.
      */
     @SuppressWarnings("unchecked")

@@ -11,8 +11,8 @@ import erp.mod.cfg.db.SDbCurrency;
 import erp.mod.cfg.db.SDbFunctionalArea;
 import erp.mod.cfg.db.SDbLanguage;
 import erp.mod.cfg.db.SDbShift;
-import erp.mod.cfg.form.SFormFunctionalsAreas;
-import erp.mod.cfg.view.SViewFunctionalsAreas;
+import erp.mod.cfg.form.SFormFunctionalArea;
+import erp.mod.cfg.view.SViewFunctionalArea;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
@@ -28,11 +28,11 @@ import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores, Claudio Peña
+ * @author Juan Barajas, Claudio Peña, Sergio Flores
  */
 public class SModuleCfg extends SGuiModule {
 
-    private SFormFunctionalsAreas moFunctionalsAreas;
+    private SFormFunctionalArea moFunctionalsAreas;
     
     public SModuleCfg(SGuiClient client) {
         super(client, SModConsts.MOD_CFG_N, SLibConsts.UNDEFINED);
@@ -129,7 +129,7 @@ public class SModuleCfg extends SGuiModule {
 
         switch (type) {
             case SModConsts.CFGU_FUNC:
-                view = new SViewFunctionalsAreas(miClient, "Áreas funcionales");
+                view = new SViewFunctionalArea(miClient, "Áreas funcionales");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -149,7 +149,7 @@ public class SModuleCfg extends SGuiModule {
         
         switch (type) {
             case SModConsts.CFGU_FUNC:
-                if (moFunctionalsAreas == null) moFunctionalsAreas = new SFormFunctionalsAreas(miClient, "Área funcional");
+                if (moFunctionalsAreas == null) moFunctionalsAreas = new SFormFunctionalArea(miClient, "Área funcional");
                 form = moFunctionalsAreas;
                 break;
             default:

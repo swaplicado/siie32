@@ -242,7 +242,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgDncDpsCompanyBranchEntity.setEnabled(hasRightFinanceDpsDnc || hasRightPurchasesDpsDnc || hasRightSalesDpsDnc);
         jmiCfgDncDiogCompanyBranchEntity.setEnabled(hasRightDiogDnc);
         jmiCfgDpsNature.setEnabled(hasRightParamsCompany || hasRightParamsErp);
-        jmiCfgFunctionalAreas.setEnabled(hasRightParamsCompany || hasRightParamsErp);
+        jmiCfgFunctionalAreas.setEnabled((hasRightParamsCompany || hasRightParamsErp) && miClient.getSessionXXX().getParamsCompany().getIsFunctionalAreas());
         jmiCfgSystemNotes.setEnabled(hasRightParamsCompany || hasRightParamsErp);
         jmiCfgMmsItem.setEnabled(hasRightParamsCompany || hasRightParamsErp);
         jmiCfgItemRequiredDps.setEnabled(hasRightParamsCompany || hasRightParamsErp);

@@ -201,7 +201,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         moFieldSearchBizPartnerId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbSearchBizPartnerId, jlSearchBizPartnerId);
         moFieldSearchBizPartnerId.setPickerButton(jbSearchBizPartnerId);
         moFieldSearchNumberDps = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSearchNumberSeries, jlSearchNumber);
-        moFieldSearchNumberDps.setLengthMax(15);
+        moFieldSearchNumberDps.setLengthMax(15 + 15 + 1); // length of: document series + document number + hyphen
         moFieldSearchNumberDps.setPickerButton(jbPickDps);
 
         mvFields = new Vector<>();

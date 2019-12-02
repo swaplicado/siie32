@@ -10,6 +10,8 @@ import erp.mod.trn.db.SDbDeliveryEntry;
 import erp.mod.trn.db.SDbDps;
 import erp.mod.trn.db.SDbDpsEntry;
 import erp.mod.trn.db.SDbDpsEntryPrice;
+import erp.mod.trn.db.SDbFunctionalAreaBudget;
+import erp.mod.trn.db.SDbFunctionalAreaBudgets;
 import erp.mod.trn.db.SDbInventoryMfgCost;
 import erp.mod.trn.db.SDbInventoryValuation;
 import erp.mod.trn.db.SDbItemRequiredDpsConfig;
@@ -20,6 +22,7 @@ import erp.mod.trn.db.SDbMaintUser;
 import erp.mod.trn.db.SDbMaintUserSupervisor;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.form.SFormDelivery;
+import erp.mod.trn.form.SFormFunctionalAreaBudgets;
 import erp.mod.trn.form.SFormInventoryValuation;
 import erp.mod.trn.form.SFormItemRequiredDpsConfig;
 import erp.mod.trn.form.SFormMaintArea;
@@ -32,6 +35,8 @@ import erp.mod.trn.view.SViewDelivery;
 import erp.mod.trn.view.SViewDeliveryQuery;
 import erp.mod.trn.view.SViewDpsEntryContractPrice;
 import erp.mod.trn.view.SViewDpsSendWebService;
+import erp.mod.trn.view.SViewFunctionalAreaBudgets;
+import erp.mod.trn.view.SViewFunctionalAreaExpenses;
 import erp.mod.trn.view.SViewInventoryCost;
 import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
@@ -60,7 +65,7 @@ import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Gil De Jesús
+ * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Gil De Jesús, Sergio Flores
  */
 public class SModuleTrn extends SGuiModule {
 
@@ -73,6 +78,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormMaintUser moFormMaintUserContractor;
     private SFormMaintUser moFormMaintUserToolMaintProv;
     private SFormMaintUserSupervisor moFormMaintUserSupv;
+    private SFormFunctionalAreaBudgets moFormFunctionalAreaBudgets;
 
     public SModuleTrn(SGuiClient client, int subtype) {
         super(client, SModConsts.MOD_TRN_N, subtype);
@@ -152,6 +158,12 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_MAINT_DIOG_SIG:
                 registry = new SDbMaintDiogSignature();
+                break;
+            case SModConsts.TRN_FUNC_BUDGET:
+                registry = new SDbFunctionalAreaBudget();
+                break;
+            case SModConsts.TRNX_FUNC_BUDGETS:
+                registry = new SDbFunctionalAreaBudgets();
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -329,6 +341,12 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRNX_ACC_PEND:
                 view = new SViewAccountsPending(miClient, subtype, (subtype == SModSysConsts.BPSS_CT_BP_CUS ? "CXC" : "CXP"));
                 break;
+            case SModConsts.TRNX_FUNC_BUDGETS:
+                view = new SViewFunctionalAreaBudgets(miClient, "Presupuestos mensuales gastos");
+                break;
+            case SModConsts.TRNX_FUNC_EXPENSES:
+                view = new SViewFunctionalAreaExpenses(miClient, subtype, "Control presupuestos mensuales gastos");
+                break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
@@ -386,6 +404,10 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAINT_USER_SUPV:
                 if (moFormMaintUserSupv == null) moFormMaintUserSupv = new SFormMaintUserSupervisor(miClient, "Residente de contratista");
                 form = moFormMaintUserSupv;
+                break;
+            case SModConsts.TRNX_FUNC_BUDGETS:
+                if (moFormFunctionalAreaBudgets == null) moFormFunctionalAreaBudgets = new SFormFunctionalAreaBudgets(miClient, "Presupuestos mensuales de gastos");
+                form = moFormFunctionalAreaBudgets;
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

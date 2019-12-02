@@ -77,10 +77,10 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jPanel15 = new javax.swing.JPanel();
         jckExcludeTotalZeros = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
-        jPanel13 = new javax.swing.JPanel();
-        jrbFormatPipe = new javax.swing.JRadioButton();
         jPanel14 = new javax.swing.JPanel();
         jrbFormatCsv = new javax.swing.JRadioButton();
+        jPanel13 = new javax.swing.JPanel();
+        jrbFormatPipe = new javax.swing.JRadioButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
@@ -144,23 +144,23 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jLabel1.setText("Formato del archivo:");
         jPanel6.add(jLabel1);
 
-        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        bgFormat.add(jrbFormatPipe);
-        jrbFormatPipe.setText("Valores separados por barra vertical, el caracter \"pipe\" |");
-        jrbFormatPipe.setPreferredSize(new java.awt.Dimension(500, 23));
-        jPanel13.add(jrbFormatPipe);
-
-        jPanel6.add(jPanel13);
-
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         bgFormat.add(jrbFormatCsv);
-        jrbFormatCsv.setText("Valores separados por coma (CSV), incluye resumen informativo y lista de excepciones");
-        jrbFormatCsv.setPreferredSize(new java.awt.Dimension(500, 23));
+        jrbFormatCsv.setText("Valores sin redondear, separados por coma (CSV), incluye resumen informativo y lista de excepciones");
+        jrbFormatCsv.setPreferredSize(new java.awt.Dimension(600, 23));
         jPanel14.add(jrbFormatCsv);
 
         jPanel6.add(jPanel14);
+
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        bgFormat.add(jrbFormatPipe);
+        jrbFormatPipe.setText("Valores redondeados, separados por barra vertical, el caracter \"pipe\" |");
+        jrbFormatPipe.setPreferredSize(new java.awt.Dimension(600, 23));
+        jPanel13.add(jrbFormatPipe);
+
+        jPanel6.add(jPanel13);
 
         jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
@@ -221,7 +221,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         moFieldDateStart.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
         jckExcludeTotalZeros.setSelected(true);
-        jrbFormatPipe.setSelected(true);
+        jrbFormatCsv.setSelected(true);
                 
         SFormUtilities.createActionMap(rootPane, this, "actionPerformedPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionPerformedCancel", "cancel", KeyEvent.VK_ESCAPE, 0);

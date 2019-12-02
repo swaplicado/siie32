@@ -87,6 +87,13 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="Dummy01">
+                  <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                    </Property>
+                    <Property name="horizontalAlignment" type="int" value="11"/>
+                    <Property name="text" type="java.lang.String" value="(l&#xed;mite 0.00 = sin l&#xed;mite)"/>
+                  </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jlPurchasesOrderLimit_n">
                   <Properties>
@@ -129,7 +136,7 @@
                 </Container>
                 <Component class="javax.swing.JLabel" name="jlPurchasesOrderLimitMonthly_n">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="L&#xed;mite m&#xe1;x. mensual autorizado pedidos compras:"/>
+                    <Property name="text" type="java.lang.String" value="L&#xed;mite m&#xe1;x. mes autorizado pedidos compras:"/>
                   </Properties>
                 </Component>
                 <Container class="javax.swing.JPanel" name="jPanel12">
@@ -211,6 +218,13 @@
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="Dummy02">
+                  <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                    </Property>
+                    <Property name="horizontalAlignment" type="int" value="11"/>
+                    <Property name="text" type="java.lang.String" value="(l&#xed;mite 0.00 = sin l&#xed;mite)"/>
+                  </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jlSalesOrderLimit_n">
                   <Properties>
@@ -450,7 +464,9 @@
                     </Constraint>
                   </Constraints>
 
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout">
+                    <Property name="horizontalGap" type="int" value="5"/>
+                  </Layout>
                   <SubComponents>
                     <Container class="javax.swing.JPanel" name="jPanel85">
                       <Properties>
@@ -466,7 +482,7 @@
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlFunctionalsAreasSystem">
+                        <Component class="javax.swing.JLabel" name="jlFunctionalAreasSystem">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="&#xc1;reas funcionales disponibles:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -479,7 +495,7 @@
                             </Constraint>
                           </Constraints>
                         </Component>
-                        <Container class="javax.swing.JScrollPane" name="jScrollPane11">
+                        <Container class="javax.swing.JScrollPane" name="jspFunctionalAreasSystem">
                           <AuxValues>
                             <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
                           </AuxValues>
@@ -491,9 +507,9 @@
 
                           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
                           <SubComponents>
-                            <Component class="javax.swing.JList" name="jltFunctionalsAreas">
+                            <Component class="javax.swing.JList" name="jltFunctionalAreasSystem">
                               <Events>
-                                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jltFunctionalsAreasMouseClicked"/>
+                                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jltFunctionalAreasSystemMouseClicked"/>
                               </Events>
                               <AuxValues>
                                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
@@ -517,7 +533,7 @@
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
                       <SubComponents>
-                        <Component class="javax.swing.JLabel" name="jlFunctionalsAreasUser">
+                        <Component class="javax.swing.JLabel" name="jlFunctionalAreasUser">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="&#xc1;reas funcionales del usuario:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -530,7 +546,7 @@
                             </Constraint>
                           </Constraints>
                         </Component>
-                        <Container class="javax.swing.JScrollPane" name="jScrollPane12">
+                        <Container class="javax.swing.JScrollPane" name="jspFunctionalAreasUser">
                           <AuxValues>
                             <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
                           </AuxValues>
@@ -542,9 +558,9 @@
 
                           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
                           <SubComponents>
-                            <Component class="javax.swing.JList" name="jltUserFunctionalsAreas">
+                            <Component class="javax.swing.JList" name="jltFunctionalAreasUser">
                               <Events>
-                                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jltUserFunctionalsAreasMouseClicked"/>
+                                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jltFunctionalAreasUserMouseClicked"/>
                               </Events>
                               <AuxValues>
                                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;SFormComponentItem&gt;"/>
@@ -644,25 +660,25 @@
                                     <Property name="rows" type="int" value="4"/>
                                   </Layout>
                                   <SubComponents>
-                                    <Component class="javax.swing.JButton" name="jbTransferFunctionalsAreas">
+                                    <Component class="javax.swing.JButton" name="jbTransferFunctionalArea">
                                       <Properties>
                                         <Property name="text" type="java.lang.String" value="&gt;"/>
                                         <Property name="toolTipText" type="java.lang.String" value="Agregar"/>
                                       </Properties>
                                     </Component>
-                                    <Component class="javax.swing.JButton" name="jbTransferAllFunctionalsAreas">
+                                    <Component class="javax.swing.JButton" name="jbTransferAllFunctionalAreas">
                                       <Properties>
                                         <Property name="text" type="java.lang.String" value="&gt;&gt;"/>
                                         <Property name="toolTipText" type="java.lang.String" value="Agregar todos"/>
                                       </Properties>
                                     </Component>
-                                    <Component class="javax.swing.JButton" name="jbReturnFunctionalsAreas">
+                                    <Component class="javax.swing.JButton" name="jbReturnFunctionalAreas">
                                       <Properties>
                                         <Property name="text" type="java.lang.String" value="&lt;"/>
                                         <Property name="toolTipText" type="java.lang.String" value="Remover"/>
                                       </Properties>
                                     </Component>
-                                    <Component class="javax.swing.JButton" name="jbReturnAllFunctionalsAreas">
+                                    <Component class="javax.swing.JButton" name="jbReturnAllFunctionalAreas">
                                       <Properties>
                                         <Property name="text" type="java.lang.String" value="&lt;&lt;"/>
                                         <Property name="toolTipText" type="java.lang.String" value="Remover todos"/>

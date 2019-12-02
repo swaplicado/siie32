@@ -18,7 +18,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Sergio Flores
  */
 public abstract class SDataReadComponentItems {
 
@@ -208,9 +208,20 @@ public abstract class SDataReadComponentItems {
                  */
                 lenPk = 1;
                 sql = "SELECT fa.id_func AS f_id_1, name AS f_item "
-                        + "FROM cfgu_func AS fa "
-                        + (pk == null ? "" : "INNER JOIN usr_usr_func AS fau ON fau.id_func = fa.id_func AND fau.id_usr = " + ((int[]) pk)[0] + " ")
-                        + "WHERE b_del = 0 ORDER BY fa.name, fa.id_func ";
+                        + "FROM cfgu_func AS fa ";
+                if (pk != null) {
+                    sql += "INNER JOIN usr_usr_func AS fau ON "
+                            + "fau.id_func = fa.id_func AND fau.id_usr = " + ((int[]) pk)[0] + " ";
+                }
+                sql += "WHERE NOT b_del ";
+                if (pk != null) {
+                    sql += "UNION "
+                            + "SELECT fa.id_func AS f_id_1, name AS f_item "
+                            + "FROM cfgu_func AS fa "
+                            + "WHERE fa.id_func = " + SModSysConsts.CFGU_FUNC_NON+ " ";
+                }
+                sql += "ORDER BY f_item, f_id_1 ";
+                
                 text = "área funcional";
                 break;
 

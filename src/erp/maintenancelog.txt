@@ -1,4 +1,19 @@
 ================================================================================
+SIIE 3.2 149.0/ 2019-11-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de control de gastos mediante presupuestos mensuales por área funcional,
+    adicional al control existente de límite mensual de gastos predeterminado por área funcional,
+    y por usuario de manera mensual o por evento.
+2) Corrección a la longitud de serie y folio de documento en panel de búsqueda de documentos.
+
+================================================================================
+SIIE 3.2 148.2/ 2019-11-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la generación del layout DIOT y a la descripción de las excepciones a la consola y al archivo CSV.
+
+================================================================================
 SIIE 3.2 148.1/ 2019-11-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

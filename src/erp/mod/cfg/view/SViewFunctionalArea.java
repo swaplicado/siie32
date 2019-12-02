@@ -16,11 +16,11 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
-public class SViewFunctionalsAreas extends SGridPaneView {
+public class SViewFunctionalArea extends SGridPaneView {
 
-    public SViewFunctionalsAreas(SGuiClient client, String title) {
+    public SViewFunctionalArea(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.CFGU_FUNC, SLibConsts.UNDEFINED, title);
         setRowButtonsEnabled(true, true, true, false, true);
     }

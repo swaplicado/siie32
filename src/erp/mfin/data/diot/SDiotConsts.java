@@ -15,6 +15,7 @@ public abstract class SDiotConsts {
     public static final String THIRD_DOMESTIC = "04";
     public static final String THIRD_INTERNATIONAL = "05";
     public static final String THIRD_GLOBAL = "15";
+    public static final String THIRD_GLOBAL_NAME = "Proveedor Global";
     
     /** VAT type: Exempt. */
     public static final String VAT_TYPE_EXEMPT = "Exent";

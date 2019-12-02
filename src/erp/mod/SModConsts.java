@@ -418,6 +418,7 @@ public abstract class SModConsts {
     public static final int TRN_MAINT_USER = 2023311;
     public static final int TRN_MAINT_USER_SUPV = 2023316;
     public static final int TRN_MAINT_DIOG_SIG = 2023321;
+    public static final int TRN_FUNC_BUDGET = 2023331;
 
     public static final int TRN_DNC_DPS = 2023501;
     public static final int TRN_DNC_DPS_DNS = 2023502;
@@ -434,6 +435,8 @@ public abstract class SModConsts {
     public static final int TRNX_INT_CUS_QRY = 2024053;     // integral query customers
     public static final int TRNX_INT_SUP_QRY = 2024054;     // integral query provider
     public static final int TRNX_ACC_PEND = 2024071;        // accounts pending: receivable accounts & payable accounts
+    public static final int TRNX_FUNC_BUDGETS = 2024331;    // massive CRUD of functional area monthly-budgets
+    public static final int TRNX_FUNC_EXPENSES = 2024336;    // massive CRUD of functional area monthly-budgets
     
     public static final int TRNR_DPS_CON_BP = 2025001;
     public static final int TRNR_CON_STA = 2025002;
@@ -1035,6 +1038,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_MAINT_USER, "trn_maint_user");
         TablesMap.put(TRN_MAINT_USER_SUPV, "trn_maint_user_supv");
         TablesMap.put(TRN_MAINT_DIOG_SIG, "trn_maint_diog_sig");
+        TablesMap.put(TRN_FUNC_BUDGET, "trn_func_budget");
 
         TablesMap.put(TRN_DNC_DPS, "trn_dnc_dps");
         TablesMap.put(TRN_DNC_DPS_DNS, "trn_dnc_dps_dns");

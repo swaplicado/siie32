@@ -17,18 +17,18 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Sergio Flores
+ * @author Juan Barajas, Sergio Flores
  */
-public class SFormFunctionalsAreas extends SBeanForm {
+public class SFormFunctionalArea extends SBeanForm {
 
     private SDbFunctionalArea moRegistry;
 
     /**
-     * Creates new form SFormFunctionalsAreas
+     * Creates new form SFormFunctionalArea
      * @param client
      * @param title
      */
-    public SFormFunctionalsAreas(SGuiClient client, String title) {
+    public SFormFunctionalArea(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.CFGU_FUNC, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -55,6 +55,7 @@ public class SFormFunctionalsAreas extends SBeanForm {
         jPanel28 = new javax.swing.JPanel();
         jlExpensesMonthly = new javax.swing.JLabel();
         moDecExpensesMonthly = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jLabel1 = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -66,8 +67,6 @@ public class SFormFunctionalsAreas extends SBeanForm {
         jlCode.setText("Código:*");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlCode);
-
-        moTextCode.setText("sBeanFieldText1");
         jPanel4.add(moTextCode);
 
         jPanel2.add(jPanel4);
@@ -78,7 +77,6 @@ public class SFormFunctionalsAreas extends SBeanForm {
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlName);
 
-        moTextName.setText("sBeanFieldText1");
         moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel5.add(moTextName);
 
@@ -91,6 +89,11 @@ public class SFormFunctionalsAreas extends SBeanForm {
         jPanel28.add(jlExpensesMonthly);
         jPanel28.add(moDecExpensesMonthly);
 
+        jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel1.setText("(límite mensual 0.00 = sin límite mensual)");
+        jLabel1.setPreferredSize(new java.awt.Dimension(205, 23));
+        jPanel28.add(jLabel1);
+
         jPanel2.add(jPanel28);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
@@ -98,6 +101,7 @@ public class SFormFunctionalsAreas extends SBeanForm {
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel28;

@@ -4,6 +4,7 @@ import cfd.DCfdConsts;
 import erp.client.SClientInterface;
 import erp.mbps.data.SDataBizPartner;
 import java.text.DecimalFormat;
+import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
 /**
@@ -12,7 +13,7 @@ import sa.lib.SLibUtils;
  */
 public class SDiotTercero {
 
-    public static final String GLOBAL_CLAVE = 0 + "-" + SDiotConsts.THIRD_GLOBAL;
+    public static final String GLOBAL_CLAVE = 0 + "-" + SDiotConsts.OPER_OTHER;
     
     public boolean IsCompany;
     public boolean IsDomestic;
@@ -42,10 +43,12 @@ public class SDiotTercero {
     public double IvaRetenido; // 23
     public double IvaNotasCréditoCompras; // 24
     
-    protected static final DecimalFormat Format;
+    protected static final DecimalFormat FormatPipe;
+    protected static final DecimalFormat FormatCsv;
     
     static {
-        Format = new DecimalFormat("0");
+        FormatPipe = new DecimalFormat("#0");
+        FormatCsv = new DecimalFormat("#0.00");
     }
     
     public SDiotTercero() {
@@ -80,7 +83,6 @@ public class SDiotTercero {
                 this.ExtNacionalidad = this.ExtPaísResidencia;
             }
         }
-        
     }
     
     private void resetTercero(final boolean isCompany, final boolean isDomestic, final int bizPartnerId, final String tipoTercero, final String tipoOperación, final String rfc, final String extIdFiscal) {
@@ -125,78 +127,82 @@ public class SDiotTercero {
     }
     
     public void addTercero(final SDiotTercero tercero) {
-        ValorPagosNacIva1516 = SLibUtils.roundAmount(ValorPagosNacIva1516 + SLibUtils.round(tercero.ValorPagosNacIva1516, 0));
-        ValorPagosNacIva15 = SLibUtils.roundAmount(ValorPagosNacIva15 + SLibUtils.round(tercero.ValorPagosNacIva15, 0));
-        IvaPagadoNoAcredNac1516 = SLibUtils.roundAmount(IvaPagadoNoAcredNac1516 + SLibUtils.round(tercero.IvaPagadoNoAcredNac1516, 0));
-        ValorPagosNacIva1011 = SLibUtils.roundAmount(ValorPagosNacIva1011 + SLibUtils.round(tercero.ValorPagosNacIva1011, 0));
-        ValorPagosNacIva10 = SLibUtils.roundAmount(ValorPagosNacIva10 + SLibUtils.round(tercero.ValorPagosNacIva10, 0));
-        ValorPagosNacIvaEstFront = SLibUtils.roundAmount(ValorPagosNacIvaEstFront + SLibUtils.round(tercero.ValorPagosNacIvaEstFront, 0));
-        IvaPagadoNoAcredNac1011 = SLibUtils.roundAmount(IvaPagadoNoAcredNac1011 + SLibUtils.round(tercero.IvaPagadoNoAcredNac1011, 0));
-        IvaPagadoNoAcredNacEstFront = SLibUtils.roundAmount(IvaPagadoNoAcredNacEstFront + SLibUtils.round(tercero.IvaPagadoNoAcredNacEstFront, 0));
-        ValorPagosImpIva1516 = SLibUtils.roundAmount(ValorPagosImpIva1516 + SLibUtils.round(tercero.ValorPagosImpIva1516, 0));
-        IvaPagadoNoAcredImp1516 = SLibUtils.roundAmount(IvaPagadoNoAcredImp1516 + SLibUtils.round(tercero.IvaPagadoNoAcredImp1516, 0));
-        ValorPagosImpIva1011 = SLibUtils.roundAmount(ValorPagosImpIva1011 + SLibUtils.round(tercero.ValorPagosImpIva1011, 0));
-        IvaPagadoNoAcredImp1011 = SLibUtils.roundAmount(IvaPagadoNoAcredImp1011 + SLibUtils.round(tercero.IvaPagadoNoAcredImp1011, 0));
-        ValorPagosImpIvaExento = SLibUtils.roundAmount(ValorPagosImpIvaExento + SLibUtils.round(tercero.ValorPagosImpIvaExento, 0));
-        ValorPagosNacIva0 = SLibUtils.roundAmount(ValorPagosNacIva0 + SLibUtils.round(tercero.ValorPagosNacIva0, 0));
-        ValorPagosNacIvaExento = SLibUtils.roundAmount(ValorPagosNacIvaExento + SLibUtils.round(tercero.ValorPagosNacIvaExento, 0));
-        IvaRetenido = SLibUtils.roundAmount(IvaRetenido + SLibUtils.round(tercero.IvaRetenido, 0));
-        IvaNotasCréditoCompras = SLibUtils.roundAmount(IvaNotasCréditoCompras + SLibUtils.round(tercero.IvaNotasCréditoCompras, 0));
+        ValorPagosNacIva1516 = SLibUtils.roundAmount(ValorPagosNacIva1516 + tercero.ValorPagosNacIva1516);
+        ValorPagosNacIva15 = SLibUtils.roundAmount(ValorPagosNacIva15 + tercero.ValorPagosNacIva15);
+        IvaPagadoNoAcredNac1516 = SLibUtils.roundAmount(IvaPagadoNoAcredNac1516 + tercero.IvaPagadoNoAcredNac1516);
+        ValorPagosNacIva1011 = SLibUtils.roundAmount(ValorPagosNacIva1011 + tercero.ValorPagosNacIva1011);
+        ValorPagosNacIva10 = SLibUtils.roundAmount(ValorPagosNacIva10 + tercero.ValorPagosNacIva10);
+        ValorPagosNacIvaEstFront = SLibUtils.roundAmount(ValorPagosNacIvaEstFront + tercero.ValorPagosNacIvaEstFront);
+        IvaPagadoNoAcredNac1011 = SLibUtils.roundAmount(IvaPagadoNoAcredNac1011 + tercero.IvaPagadoNoAcredNac1011);
+        IvaPagadoNoAcredNacEstFront = SLibUtils.roundAmount(IvaPagadoNoAcredNacEstFront + tercero.IvaPagadoNoAcredNacEstFront);
+        ValorPagosImpIva1516 = SLibUtils.roundAmount(ValorPagosImpIva1516 + tercero.ValorPagosImpIva1516);
+        IvaPagadoNoAcredImp1516 = SLibUtils.roundAmount(IvaPagadoNoAcredImp1516 + tercero.IvaPagadoNoAcredImp1516);
+        ValorPagosImpIva1011 = SLibUtils.roundAmount(ValorPagosImpIva1011 + tercero.ValorPagosImpIva1011);
+        IvaPagadoNoAcredImp1011 = SLibUtils.roundAmount(IvaPagadoNoAcredImp1011 + tercero.IvaPagadoNoAcredImp1011);
+        ValorPagosImpIvaExento = SLibUtils.roundAmount(ValorPagosImpIvaExento + tercero.ValorPagosImpIvaExento);
+        ValorPagosNacIva0 = SLibUtils.roundAmount(ValorPagosNacIva0 + tercero.ValorPagosNacIva0);
+        ValorPagosNacIvaExento = SLibUtils.roundAmount(ValorPagosNacIvaExento + tercero.ValorPagosNacIvaExento);
+        IvaRetenido = SLibUtils.roundAmount(IvaRetenido + tercero.IvaRetenido);
+        IvaNotasCréditoCompras = SLibUtils.roundAmount(IvaNotasCréditoCompras + tercero.IvaNotasCréditoCompras);
     }
     
     /**
      * Get DIOT layout row.
-     * @param format Options defined in <code>SDiotLayout</code>.
-     * @return Layout row.
+     * @param format Format of DIOT layout row. Options defined in <code>SDiotLayout</code>.
+     * @return DIOT layout row.
      */
-    public String getLayoutRow(int format) {
+    public String getLayoutRow(int format) throws Exception {
         String row = "";
         String separator = "";
+        DecimalFormat decimalFormat = null;
         
         switch (format) {
             case SDiotLayout.FORMAT_PIPE:
                 separator = "|";
-                row = TipoTercero + "|" +
-                        TipoOperación + "|" +
-                        Rfc + "|" +
-                        ExtIdFiscal + "|" +
-                        SLibUtils.textToAscii(ExtNombre) + "|" +
-                        ExtPaísResidencia + "|" +
-                        ExtNacionalidad + "|";
+                decimalFormat = FormatPipe;
+                row = TipoTercero + separator +
+                        TipoOperación + separator +
+                        Rfc + separator +
+                        ExtIdFiscal + separator +
+                        SLibUtils.textToAscii(ExtNombre) + separator +
+                        ExtPaísResidencia + separator +
+                        ExtNacionalidad + separator;
                 break;
                 
             case SDiotLayout.FORMAT_CSV:
                 separator = ",";
-                row = "\"" + TipoTercero + "\"," +
-                        "\"" + TipoOperación + "\"," +
-                        "\"" + Rfc + "\"," +
-                        "\"" + ExtIdFiscal + "\"," +
-                        "\"" + SLibUtils.textToAscii(ExtNombre) + "\"," +
-                        "\"" + ExtPaísResidencia + "\"," +
-                        "\"" + ExtNacionalidad + "\",";
+                decimalFormat = FormatCsv;
+                row = "\"" + TipoTercero + "\"" + separator +
+                        "\"" + TipoOperación + "\"" + separator +
+                        "\"" + Rfc + "\"" + separator +
+                        "\"" + ExtIdFiscal + "\"" + separator +
+                        "\"" + SLibUtils.textToAscii(ExtNombre) + "\"" + separator +
+                        "\"" + ExtPaísResidencia + "\"" + separator +
+                        "\"" + ExtNacionalidad + "\"" + separator;
                 break;
                 
             default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
         
         return row +
-                (ValorPagosNacIva1516 == 0 ? "" : Format.format(ValorPagosNacIva1516)) + separator +
-                (ValorPagosNacIva15 == 0 ? "" : Format.format(ValorPagosNacIva15)) + separator +
-                (IvaPagadoNoAcredNac1516 == 0 ? "" : Format.format(IvaPagadoNoAcredNac1516)) + separator +
-                (ValorPagosNacIva1011 == 0 ? "" : Format.format(ValorPagosNacIva1011)) + separator +
-                (ValorPagosNacIva10 == 0 ? "" : Format.format(ValorPagosNacIva10)) + separator +
-                (ValorPagosNacIvaEstFront == 0 ? "" : Format.format(ValorPagosNacIvaEstFront)) + separator +
-                (IvaPagadoNoAcredNac1011 == 0 ? "" : Format.format(IvaPagadoNoAcredNac1011)) + separator +
-                (IvaPagadoNoAcredNacEstFront == 0 ? "" : Format.format(IvaPagadoNoAcredNacEstFront)) + separator +
-                (ValorPagosImpIva1516 == 0 ? "" : Format.format(ValorPagosImpIva1516)) + separator +
-                (IvaPagadoNoAcredImp1516 == 0 ? "" : Format.format(IvaPagadoNoAcredImp1516)) + separator +
-                (ValorPagosImpIva1011 == 0 ? "" : Format.format(ValorPagosImpIva1011)) + separator +
-                (IvaPagadoNoAcredImp1011 == 0 ? "" : Format.format(IvaPagadoNoAcredImp1011)) + separator +
-                (ValorPagosImpIvaExento == 0 ? "" : Format.format(ValorPagosImpIvaExento)) + separator +
-                (ValorPagosNacIva0 == 0 ? "" : Format.format(ValorPagosNacIva0)) + separator +
-                (ValorPagosNacIvaExento == 0 ? "" : Format.format(ValorPagosNacIvaExento)) + separator +
-                (IvaRetenido == 0 ? "" : Format.format(IvaRetenido)) + separator +
-                (IvaNotasCréditoCompras == 0 ? "" : Format.format(IvaNotasCréditoCompras));
+                (ValorPagosNacIva1516 == 0 ? "" : decimalFormat.format(ValorPagosNacIva1516)) + separator +
+                (ValorPagosNacIva15 == 0 ? "" : decimalFormat.format(ValorPagosNacIva15)) + separator +
+                (IvaPagadoNoAcredNac1516 == 0 ? "" : decimalFormat.format(IvaPagadoNoAcredNac1516)) + separator +
+                (ValorPagosNacIva1011 == 0 ? "" : decimalFormat.format(ValorPagosNacIva1011)) + separator +
+                (ValorPagosNacIva10 == 0 ? "" : decimalFormat.format(ValorPagosNacIva10)) + separator +
+                (ValorPagosNacIvaEstFront == 0 ? "" : decimalFormat.format(ValorPagosNacIvaEstFront)) + separator +
+                (IvaPagadoNoAcredNac1011 == 0 ? "" : decimalFormat.format(IvaPagadoNoAcredNac1011)) + separator +
+                (IvaPagadoNoAcredNacEstFront == 0 ? "" : decimalFormat.format(IvaPagadoNoAcredNacEstFront)) + separator +
+                (ValorPagosImpIva1516 == 0 ? "" : decimalFormat.format(ValorPagosImpIva1516)) + separator +
+                (IvaPagadoNoAcredImp1516 == 0 ? "" : decimalFormat.format(IvaPagadoNoAcredImp1516)) + separator +
+                (ValorPagosImpIva1011 == 0 ? "" : decimalFormat.format(ValorPagosImpIva1011)) + separator +
+                (IvaPagadoNoAcredImp1011 == 0 ? "" : decimalFormat.format(IvaPagadoNoAcredImp1011)) + separator +
+                (ValorPagosImpIvaExento == 0 ? "" : decimalFormat.format(ValorPagosImpIvaExento)) + separator +
+                (ValorPagosNacIva0 == 0 ? "" : decimalFormat.format(ValorPagosNacIva0)) + separator +
+                (ValorPagosNacIvaExento == 0 ? "" : decimalFormat.format(ValorPagosNacIvaExento)) + separator +
+                (IvaRetenido == 0 ? "" : decimalFormat.format(IvaRetenido)) + separator +
+                (IvaNotasCréditoCompras == 0 ? "" : decimalFormat.format(IvaNotasCréditoCompras));
     }
     
     public static String getLayoutRowHeadings() {

@@ -188,7 +188,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         mjbViewLinks.setEnabled(true);
 
         aoKeyFields = new STableField[2];
-        aoTableColumns = new STableColumn[(isViewDocsPending() || isViewDocsRejected() ? 15 : 14)];
+        aoTableColumns = new STableColumn[(isViewDocsPending() || isViewDocsRejected() ? 16 : 15)];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "d.id_year");
@@ -228,9 +228,10 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "c.cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sa.st_dps_authorn", "Estatus", 100);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "un.usr", "Usuario", STableConstants.WIDTH_USER);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "sa.st_dps_authorn", "Estatus autorizacón", 100);
         if (isViewDocsPending() || isViewDocsRejected()) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_aut_auth_rej", "No autorización automática", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_aut_auth_rej", "No autorización automática", 200);
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ua.usr", "Usr. autorización", STableConstants.WIDTH_USER);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "d.ts_authorn", "Autorizado", STableConstants.WIDTH_DATE_TIME);
@@ -366,7 +367,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                         }
 
                         if (reject) {
-                            Vector<Object> params = new Vector<Object>();
+                            Vector<Object> params = new Vector<>();
 
                             params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[0]);
                             params.add(((int[])moTablePane.getSelectedTableRow().getPrimaryKey())[1]);
@@ -375,7 +376,7 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                             params.add(miClient.getSession().getUser().getPkUserId());
                             params = SDataUtilities.callProcedure(miClient, SProcConstants.TRN_DPS_UPD, params, SLibConstants.EXEC_MODE_SILENT);
 
-                            if (params.size() == 0) {
+                            if (params.isEmpty()) {
                                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_PROCESS);
                             }
                             else {
@@ -577,10 +578,10 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
     public void createSqlQuery() {
         String sqlFilter = "";
         String sqlDatePeriod = "";
-        String sqlTypeDocument = "";
         String sqlCompanyBranch = "";
         String sqlBizPartner = "";
         String sqlDocNature = "";
+        String sqlFunctionalArea = "";
         String sqlOrderBy = "";
         STableSetting setting = null;
 
@@ -603,12 +604,12 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_NAT) {
                 if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
-                    sqlDocNature += (sqlDocNature.length() == 0 ? "" : "AND ") + "d.fid_dps_nat = " + ((Integer) setting.getSetting()) + " ";
+                    sqlDocNature += (sqlDocNature.isEmpty() ? "" : "AND ") + "d.fid_dps_nat = " + ((Integer) setting.getSetting()) + " ";
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_ARE) {
                 if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
-                    sqlDocNature += (sqlDocNature.length() == 0 ? "" : "AND ") + "d.fid_func = " + ((Integer) setting.getSetting()) + " ";
+                    sqlFunctionalArea += (sqlFunctionalArea.isEmpty() ? "" : "AND ") + "d.fid_func = " + ((Integer) setting.getSetting()) + " ";
                 }
             }
         }
@@ -662,13 +663,15 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
 
         msSql = "SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, d.num_ref, d.b_close, d.b_del, d.ts_close, " +
                 "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
-                (isViewDocsPending() || isViewDocsRejected() ? 
-                ("IF(d.aut_authorn_rej = " + SDataDps.AUT_AUTHORN_REJ_LIM_USR + ", '" + SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_LIM_USR) + "', " +
+                (isViewDocsPending() || isViewDocsRejected() ? (
+                "IF(d.aut_authorn_rej = " + SDataDps.AUT_AUTHORN_REJ_LIM_USR + ", '" + SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_LIM_USR) + "', " +
                 "IF(d.aut_authorn_rej = " + SDataDps.AUT_AUTHORN_REJ_LIM_USR_MON + ", '" + SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_LIM_USR_MON) + "', " +
-                "IF(d.aut_authorn_rej = " + SDataDps.AUT_AUTHORN_REJ_LIM_FUNC_MON + ", '" + SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_LIM_FUNC_MON) + "', '" +
-                SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_NA) + "'))) " +
-                "AS _aut_auth_rej, ") : "") + 
-                "d.ts_authorn, d.tot_cur_r, dt.code, c.cur_key, b.id_bp, b.bp, bc.bp_key, bb.id_bpb, bb.bpb, cb.code, sa.st_dps_authorn, ua.usr " +
+                "IF(d.aut_authorn_rej = " + SDataDps.AUT_AUTHORN_REJ_LIM_FUNC_MON_ORD + ", '" + SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_LIM_FUNC_MON_ORD) + "', " +
+                "IF(d.aut_authorn_rej = " + SDataDps.AUT_AUTHORN_REJ_LIM_FUNC_MON_DOC + ", '" + SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_LIM_FUNC_MON_DOC) + "', '" +
+                SDataDps.AutAuthornRejMap.get(SDataDps.AUT_AUTHORN_REJ_NA) + "')))) AS _aut_auth_rej, ") : "") + 
+                "d.ts_authorn, d.tot_cur_r, dt.code, c.cur_key, " + 
+                "b.id_bp, b.bp, bc.bp_key, bb.id_bpb, bb.bpb, cb.code, " +
+                "sa.st_dps_authorn, ua.usr, un.usr " +
                 "FROM trn_dps AS d " +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON " +
                 "d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps" + sqlFilter +
@@ -680,14 +683,14 @@ public class SViewDpsPendAuthorized extends erp.lib.table.STableTab implements j
                 "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
                 "INNER JOIN erp.usru_usr AS ua ON d.fid_usr_authorn = ua.id_usr " +
                 "INNER JOIN erp.usru_usr AS un ON d.fid_usr_new = un.id_usr " + (mbHasRightAuthor ? " AND d.fid_usr_new = " + miClient.getSession().getUser().getPkUserId() + " " : "") +
-                "WHERE d.b_del = 0 AND d.fid_st_dps_authorn IN (" +
+                "WHERE NOT d.b_del AND d.fid_st_dps_authorn IN (" +
                 (isViewDocsPending() ? "" + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_NA + ", " + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_PENDING :
                     isViewDocsAuthorized() ? "" + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_AUTHORN : "" + SDataConstantsSys.TRNS_ST_DPS_AUTHORN_REJECT) + ") " +
-                (sqlDatePeriod.length() == 0 ? "" : "AND " + sqlDatePeriod) + " " +
-                (sqlCompanyBranch.length() == 0 ? "" : "AND " + sqlCompanyBranch) + " " +
-                (sqlTypeDocument.length() == 0 ? "" : "AND " + sqlTypeDocument) + " " +
-                (sqlBizPartner.length() == 0 ? "" : "AND " + sqlBizPartner) + " " +
-                (sqlDocNature.length() == 0 ? "" : "AND " + sqlDocNature) + " " +
+                (sqlDatePeriod.isEmpty() ? "" : "AND " + sqlDatePeriod) +
+                (sqlCompanyBranch.isEmpty() ? "" : "AND " + sqlCompanyBranch) +
+                (sqlBizPartner.isEmpty() ? "" : "AND " + sqlBizPartner) +
+                (sqlDocNature.isEmpty() ? "" : "AND " + sqlDocNature) +
+                (sqlFunctionalArea.isEmpty() ? "" : "AND " + sqlFunctionalArea) +
                 sqlOrderBy;
     }
 
