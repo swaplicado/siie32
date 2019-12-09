@@ -134,7 +134,7 @@ public class SReceiptsR {
                 return SUCCESS;
             }
             else if(cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED) {
-                if (this.hasBeenReplaced(cfd.getUuid())) {
+                if (this.hasBeenReplaced(cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n(), cfd.getUuid())) {
                     return SKIP;
                 }
                 
@@ -152,19 +152,26 @@ public class SReceiptsR {
      * @param uuid
      * @return true if the uuid received is in uuid_rel field
      */
-    private boolean hasBeenReplaced(String uuid) {
+    private boolean hasBeenReplaced(final int payroll, final int emp, String uuid) {
         ResultSet resulReceipts;
         
         try {
             resulReceipts = miClient.getSession().getStatement().
                     getConnection().createStatement().
                     executeQuery("SELECT " +
-                        "* " +
+                        "    * " +
                         "FROM " +
-                        "hrs_pay_rcp_iss " +
+                        "    hrs_pay_rcp_iss hpri " +
+                        "        INNER JOIN " +
+                        "    trn_cfd tc ON hpri.id_iss = tc.fid_pay_rcp_iss_n " +
+                        "        AND hpri.id_pay = tc.fid_pay_rcp_pay_n " +
+                        "        AND hpri.id_emp = tc.fid_pay_rcp_emp_n " +
                         "WHERE " +
-                        "uuid_rel = '" + uuid + "' " +
-                        "AND NOT b_del;");
+                        "    id_pay = " + payroll + " AND id_emp = " + emp + " " +
+                        "        AND tc.fid_st_xml = 2 " +
+                        "        AND uuid_rel = '"+ uuid +"' " +
+                        "        AND NOT b_del " +
+                        "ORDER BY id_iss DESC LIMIT 1;");
             
             if (resulReceipts.next()) {
                 return true;
@@ -211,9 +218,11 @@ public class SReceiptsR {
             SDbPayrollReceiptIssue issuen = issue.clone();
             
             writeXml(cfd.getUuid(), cfd.getDocXml());
+            System.out.println(cfd.getUuid());
             //anular
             if (! this.annulCfd(cfd, issue)) {
-                return ERROR;
+//                return ERROR;
+                System.out.println("ERROR, NO ANULADO");
             }
             annuled = true;
 
@@ -263,13 +272,9 @@ public class SReceiptsR {
         boolean annuled = false;
         
         try {
-            
-            cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_ANNULED);
-            cfd.save(miClient.getSession().getStatement().getConnection());
-            
             boolean cancel;
             if (((SClientInterface) miClient).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                cancel = SCfdUtils.cancelAndSendCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, true, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                cancel = SCfdUtils.cancelAndSendCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, false, SModSysConsts.TRNU_TP_DPS_ANN_NA);
             }
             else {
                 cancel = SCfdUtils.cancelCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, true, SModSysConsts.TRNU_TP_DPS_ANN_NA);
@@ -278,6 +283,9 @@ public class SReceiptsR {
             if (cancel) {
                 issue.setFkReceiptStatusId(SDataConstantsSys.TRNS_ST_DPS_ANNULED);
                 issue.save(miClient.getSession());
+                
+//                cfd.setFkXmlStatusId(SDataConstantsSys.TRNS_ST_DPS_ANNULED);
+//                cfd.save(miClient.getSession().getStatement().getConnection());
 
                 annuled = true;
             }
@@ -376,7 +384,7 @@ public class SReceiptsR {
         
         // el impuesto y el subsidio son iguales
         if (subsidyXml == 0 && taxXml == 0) {
-            return 4; // se agrega el subsidio a otros pagos
+            return ADD_OTHER_SUBSIDY; // se agrega el subsidio a otros pagos
         }
             
         return ERROR; // error
@@ -412,11 +420,11 @@ public class SReceiptsR {
         }
 
         if (((SClientInterface) session.getClient()).getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-//            SCfdUtils.signAndSendCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
+            SCfdUtils.signAndSendCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
             System.out.println("Timbrar y enviar");
         }
         else {
-//            SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
+            SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
             System.out.println("solo timbrar");
         }
         
@@ -594,6 +602,7 @@ public class SReceiptsR {
                     
                     //se reemplaza con el nuevo con los valores correctos
                     ((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos().getEltHijosOtroPago().add(otroPago);
+                    otrosPagos = ((cfd.ver3.nom12.DElementNomina) element).getEltOtrosPagos();
                 }
                 // si no tiene OtrosPagos, se agrega este con un hijo subsidio
                 else {

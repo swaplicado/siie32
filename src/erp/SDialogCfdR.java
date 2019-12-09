@@ -280,6 +280,12 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         for (SInputData row : rows) {
             int result = p.processReceipt(row);
             
+            if (result == SReceiptsR.ANNULED) {
+                this.mnCanceled++;
+                System.out.println("ERROR EN " + row.getUuid());
+                break;
+            }
+            
             switch (result) {
                 case SReceiptsR.SUCCESS:
                         this.mnSucess++;
