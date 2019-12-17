@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 149.1/ 2019-12-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se corrige funcionalidad para eexpedición de recibos de nómina.
+2) Se comentan las opciones en el menú ya que no son necesarias para el usuario.
+
+================================================================================
 SIIE 3.2 149.0/ 2019-11-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

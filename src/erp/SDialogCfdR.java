@@ -82,18 +82,19 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         jPanel17 = new javax.swing.JPanel();
         jlAll = new javax.swing.JLabel();
         sBTotal = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlErrors = new javax.swing.JLabel();
+        sBErrors = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel16 = new javax.swing.JPanel();
         jlCanceled = new javax.swing.JLabel();
         sBCanceled = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlNa = new javax.swing.JLabel();
+        sBNa = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel15 = new javax.swing.JPanel();
         jlIssues = new javax.swing.JLabel();
         sBSuccess = new sa.lib.gui.bean.SBeanFieldInteger();
+        cancelRecipes = new javax.swing.JButton();
         jPanel18 = new javax.swing.JPanel();
-        jlErrors = new javax.swing.JLabel();
-        sBErrors = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel19 = new javax.swing.JPanel();
-        jlNa = new javax.swing.JLabel();
-        sBNa = new sa.lib.gui.bean.SBeanFieldInteger();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -177,6 +178,13 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         sBTotal.setEditable(false);
         jPanel17.add(sBTotal);
 
+        jlErrors.setText("Errores:");
+        jlErrors.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel17.add(jlErrors);
+
+        sBErrors.setEditable(false);
+        jPanel17.add(sBErrors);
+
         jPanel2.add(jPanel17);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -187,6 +195,13 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
 
         sBCanceled.setEditable(false);
         jPanel16.add(sBCanceled);
+
+        jlNa.setText("Omitidos/No aplica:");
+        jlNa.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel16.add(jlNa);
+
+        sBNa.setEditable(false);
+        jPanel16.add(sBNa);
 
         jPanel2.add(jPanel16);
 
@@ -199,28 +214,15 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         sBSuccess.setEditable(false);
         jPanel15.add(sBSuccess);
 
+        cancelRecipes.setText("Cancelar Recibos");
+        jPanel15.add(cancelRecipes);
+
         jPanel2.add(jPanel15);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlErrors.setText("Errores:");
-        jlErrors.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel18.add(jlErrors);
-
-        sBErrors.setEditable(false);
-        jPanel18.add(sBErrors);
-
         jPanel2.add(jPanel18);
 
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlNa.setText("Omitidos/No aplica:");
-        jlNa.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel19.add(jlNa);
-
-        sBNa.setEditable(false);
-        jPanel19.add(sBNa);
-
         jPanel2.add(jPanel19);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
@@ -232,6 +234,7 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private sa.lib.gui.bean.SBeanFieldInteger bIntPer;
     private sa.lib.gui.bean.SBeanFieldInteger bIntYear;
+    private javax.swing.JButton cancelRecipes;
     private javax.swing.JButton jBGenerateFile;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
@@ -269,7 +272,7 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
     /**
      * process the file and update the form
      */
-    private void expediteReceipts() {
+    private void expediteReceipts(final int nAction) {
         ArrayList<SInputData> rows = SCsvFileManager.readFile(msCsvPath);
         
         this.mnTotal = rows.size();
@@ -278,17 +281,18 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         boolean bContinue = true;
         SReceiptsR p = new SReceiptsR(miClient);
         for (SInputData row : rows) {
-            int result = p.processReceipt(row);
+            int result = p.processReceipt(row, nAction);
             
-            if (result == SReceiptsR.ANNULED) {
-                this.mnCanceled++;
-                System.out.println("ERROR EN " + row.getUuid());
-                break;
-            }
+//            if (result == SReceiptsR.ANNULED) {
+//                this.mnCanceled++;
+//                System.out.println("ERROR EN " + row.getUuid());
+//                break;
+//            }
             
             switch (result) {
                 case SReceiptsR.SUCCESS:
                         this.mnSucess++;
+                        break;
                         
                 case SReceiptsR.ANNULED:
                         this.mnCanceled++;
@@ -400,11 +404,23 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
         }
     }
     
+    private void actionCancelRecipes() {
+        if (msCsvPath == null || msCsvPath.equals("")) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un archivo para guardar el archivo");
+            return;
+        }
+        
+        expediteReceipts(SReceiptsR.CANCEL_RECEIPTS);
+        
+        miClient.showMsgBoxInformation("El archivo fue generado exitosamente.");
+    }
+    
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 480, 300);
         jbSelectFile.addActionListener(this);
         jbSelectFileGen.addActionListener(this);
         jBGenerateFile.addActionListener(this);
+        cancelRecipes.addActionListener(this);
         
         jbSave.setText("Guardar");
         moFields.setFormButton(jbSave);
@@ -459,7 +475,7 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
     public void actionSave() {
         if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
-                expediteReceipts();
+                expediteReceipts(SReceiptsR.EMMIT_RECEIPTS);
             }
         }
     }
@@ -477,6 +493,9 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
             }
             else if (button == jBGenerateFile) {
                 actionGenerateFile();
+            }
+            else if (button == cancelRecipes) {
+                actionCancelRecipes();
             }
         }
     }

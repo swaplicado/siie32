@@ -59,6 +59,9 @@ public class SReceiptsR {
     private final static int CHANGE_CAUSED_SUBSIDY = 8;
     private final static int ADD_OTHER_SUBSIDY = 3;
     
+    public final static int CANCEL_RECEIPTS = 1;
+    public final static int EMMIT_RECEIPTS = 2;
+    
     public final static int SUCCESS = 10;
     public final static int ANNULED = 5;
     public final static int SKIP = 6;
@@ -74,6 +77,7 @@ public class SReceiptsR {
      * process the row of SInputData and return the result
      * 
      * @param row
+     * @param nAction
      * @return integer:
         SUCCESS
         ANNULED
@@ -82,14 +86,15 @@ public class SReceiptsR {
         NOT_APPLY
         ERROR
      */
-    public int processReceipt(SInputData row) {
-        return this.processCfd(row.getUuid(), row.getSubsidy(), row.getTax());
+    public int processReceipt(SInputData row, final int nAction) {
+        return this.processCfd(row.getUuid(), row.getSubsidy(), row.getTax(), nAction);
     }
     
     /**
      * @param uuid  String with the uuid of cfdi
      * @param subsidy value of subsidy in the file
      * @param tax value of tax in the file
+     * @param nAction
      * 
      * @return integer:
         SUCCESS
@@ -99,13 +104,13 @@ public class SReceiptsR {
         NOT_APPLY
         ERROR
      */
-    public int processCfd(String uuid, double subsidy, double tax) {
+    public int processCfd(String uuid, double subsidy, double tax, final int nAction) {
         SDataCfd cfd = SReceiptsR.readCfdByUuid(this.miClient, uuid);
         
         if (cfd != null) {
-            int r = this.validateCfd(cfd);
+            int r = this.validateCfd(cfd, nAction);
             if (r == SUCCESS) {
-                return this.processReceipt(cfd, subsidy, tax);
+                return this.processReceipt(cfd, subsidy, tax, nAction);
             }
             
             return r;
@@ -124,9 +129,13 @@ public class SReceiptsR {
         NOT_APPLY if the cfd isn't a cfd of payrol or isn't emited
         ERROR if the received xml is null
      */
-    private int validateCfd(SDataCfd cfd) {
+    private int validateCfd(SDataCfd cfd, final int nAction) {
         if (cfd == null) {
             return ERROR;
+        }
+        
+        if (nAction == CANCEL_RECEIPTS) {
+            return SUCCESS;
         }
         
         if (cfd.getFkPayrollReceiptPayrollId_n() > 0 && !cfd.getUuid().equals("")) {
@@ -197,7 +206,7 @@ public class SReceiptsR {
         ANNULED if the process only was annuled but not issued
         ERROR
      */
-    private int processReceipt(SDataCfd cfd, double dSubsidy, double dTax) {
+    private int processReceipt(SDataCfd cfd, double dSubsidy, double dTax, final int nAction) {
         boolean annuled = false;
         try {
             double dXmlSubsidy = this.getSubsidyFromXml(cfd.getDocXml());
@@ -219,11 +228,19 @@ public class SReceiptsR {
             
             writeXml(cfd.getUuid(), cfd.getDocXml());
             System.out.println(cfd.getUuid());
+            
             //anular
             if (! this.annulCfd(cfd, issue)) {
-//                return ERROR;
                 System.out.println("ERROR, NO ANULADO");
             }
+            else {
+                System.out.println("ANULADO");
+            }
+
+            if (nAction == CANCEL_RECEIPTS) {
+               return ANNULED;
+            }
+            
             annuled = true;
 
             switch (iValid) {
@@ -277,7 +294,7 @@ public class SReceiptsR {
                 cancel = SCfdUtils.cancelAndSendCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, false, SModSysConsts.TRNU_TP_DPS_ANN_NA);
             }
             else {
-                cancel = SCfdUtils.cancelCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, true, SModSysConsts.TRNU_TP_DPS_ANN_NA);
+                cancel = SCfdUtils.cancelCfdi(((SClientInterface) miClient), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, new Date(), true, false, SModSysConsts.TRNU_TP_DPS_ANN_NA);
             }
             
             if (cancel) {

@@ -318,8 +318,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.addSeparator();
         jmPay.add(jmiPayCalculatedAmountMonth);
         jmPay.add(jmiPayCalculatedEstimateIncomeTax);
-        jmPay.add(jmiReReceipts);
-        jmPay.add(jmiVerifyCfdis);
+//        jmPay.add(jmiReReceipts);
+//        jmPay.add(jmiVerifyCfdis);
                 
         jmBenefit = new JMenu("Prestaciones");
         jmiBenefitBenefitVac = new JMenuItem("Control de vacaciones");
