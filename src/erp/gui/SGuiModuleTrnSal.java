@@ -42,6 +42,7 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDncDocumentNumberSeries;
 import erp.mtrn.data.SDataSign;
 import erp.mtrn.form.SDialogRepBizPartnerBalanceAging;
+import erp.mtrn.form.SDialogRepCommercialSalesPurchases;
 import erp.mtrn.form.SDialogRepContractStock;
 import erp.mtrn.form.SDialogRepDpsBizPartner;
 import erp.mtrn.form.SDialogRepDpsList;
@@ -225,6 +226,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepTrnComparative;
     private javax.swing.JMenuItem jmiRepTrnDpsDetailBizPartner;
     private javax.swing.JMenuItem jmiRepTrnNetTotal;
+    private javax.swing.JMenuItem jmiRepTrnCommTotal;
     private javax.swing.JMenuItem jmiRepTrnNetAnalytic;
     private javax.swing.JMenuItem jmiRepTrnFileCsv;
     private javax.swing.JMenuItem jmiRepTrnJournal;
@@ -252,6 +254,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private erp.mtrn.form.SDialogRepSalesPurchasesComparative moDialogRepSalesPurchasesComparative;
     private erp.mtrn.form.SDialogRepSalesPurchasesDetailByBizPartner moDialogRepSalesPurchasesDetailByBizPartner;
     private erp.mtrn.form.SDialogRepSalesPurchasesNet moDialogRepSalesPurchasesNet;
+    private erp.mtrn.form.SDialogRepCommercialSalesPurchases moDialogRepCommercialSalesPurchases;
     private erp.mtrn.form.SDialogRepSalesPurchasesFileCsv moDialogRepSalesPurchasesFileCsv;
     private erp.mtrn.form.SDialogRepSalesPurchasesJournal moDialogRepSalesPurchasesJournal;
     private erp.mtrn.form.SDialogRepSalesPurchasesPriceUnitary moDialogRepSalesPurchasesItemUnitaryPrice;
@@ -559,6 +562,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnComparative = new JMenuItem("Reporte comparativo de ventas netas...");
         jmiRepTrnDpsDetailBizPartner = new JMenuItem("Reporte detallado de ventas por cliente...");
         jmiRepTrnNetTotal = new JMenuItem("Relación de ventas netas por periodo...");
+        jmiRepTrnCommTotal = new JMenuItem("Relación comercial de ventas por periodo...");
         jmiRepTrnNetAnalytic = new JMenuItem("Relación de ventas, devoluciones y descuentos por periodo...");
         jmiRepTrnFileCsv = new JMenuItem("Archivo CSV de ventas netas por periodo...");
         jmiRepTrnJournal = new JMenuItem("Reporte de diario de ventas...");
@@ -625,6 +629,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmRep.add(jmiRepTrnDpsDetailBizPartner);
         jmRep.addSeparator();
         jmRep.add(jmiRepTrnNetTotal);
+        jmRep.add(jmiRepTrnCommTotal);
         jmRep.add(jmiRepTrnNetAnalytic);
         jmRep.addSeparator();
         jmRep.add(jmiRepTrnFileCsv);
@@ -648,6 +653,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         moDialogRepSalesPurchasesComparative = new SDialogRepSalesPurchasesComparative(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL);
         moDialogRepSalesPurchasesDetailByBizPartner = new SDialogRepSalesPurchasesDetailByBizPartner(miClient);
         moDialogRepSalesPurchasesNet = new SDialogRepSalesPurchasesNet(miClient);
+        moDialogRepCommercialSalesPurchases = new SDialogRepCommercialSalesPurchases(miClient);
         moDialogRepSalesPurchasesFileCsv = new SDialogRepSalesPurchasesFileCsv(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL);
         moDialogRepSalesPurchasesJournal = new SDialogRepSalesPurchasesJournal(miClient);
         moDialogRepSalesPurchasesItemUnitaryPrice = new SDialogRepSalesPurchasesPriceUnitary(miClient);
@@ -779,6 +785,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiRepTrnComparative.addActionListener(this);
         jmiRepTrnDpsDetailBizPartner.addActionListener(this);
         jmiRepTrnNetTotal.addActionListener(this);
+        jmiRepTrnCommTotal.addActionListener(this);
         jmiRepTrnNetAnalytic.addActionListener(this);
         jmiRepTrnFileCsv.addActionListener(this);
         jmiRepTrnJournal.addActionListener(this);
@@ -2085,6 +2092,13 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                 moDialogRepSalesPurchasesNet.setParamIsSupplier(false);
                 moDialogRepSalesPurchasesNet.setParamIsNet(true);
                 moDialogRepSalesPurchasesNet.setFormVisible(true);
+            }
+            else if (item == jmiRepTrnCommTotal) {
+                moDialogRepCommercialSalesPurchases.formRefreshCatalogues();
+                moDialogRepCommercialSalesPurchases.formReset();
+                moDialogRepCommercialSalesPurchases.setParamIsSupplier(false);
+                moDialogRepCommercialSalesPurchases.setParamIsNet(true);
+                moDialogRepCommercialSalesPurchases.setFormVisible(true);
             }
             else if (item == jmiRepTrnNetAnalytic) {
                 moDialogRepSalesPurchasesNet.formRefreshCatalogues();
