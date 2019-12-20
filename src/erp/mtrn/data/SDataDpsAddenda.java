@@ -44,13 +44,14 @@ public class SDataDpsAddenda extends erp.lib.data.SDataRegistry implements java.
     protected java.lang.String msSorianaCita;
     protected java.lang.String msModeloDpsDescripcion;
     protected int mnCfdAddendaSubtype;
+    protected java.lang.String msJsonData;
     protected int mnFkCfdAddendaTypeId;
 
-    protected java.util.Vector<SDataDpsAddendaEntry> mvDbmsDpsAddEntries;
+    protected java.util.Vector<SDataDpsAddendaEntry> mvDbmsDpsAddendaEntries;
 
     public SDataDpsAddenda() {
         super(SDataConstants.TRN_DPS_ADD);
-        mvDbmsDpsAddEntries = new Vector<>();
+        mvDbmsDpsAddendaEntries = new Vector<>();
         reset();
     }
 
@@ -71,6 +72,7 @@ public class SDataDpsAddenda extends erp.lib.data.SDataRegistry implements java.
     public void setSorianaCita(java.lang.String s) { msSorianaCita = s; }
     public void setModeloDpsDescripcion(java.lang.String s) { msModeloDpsDescripcion = s; }
     public void setCfdAddendaSubtype(int n) { mnCfdAddendaSubtype = n; }
+    public void setJsonData(java.lang.String s) { msJsonData = s; }
     public void setFkCfdAddendaTypeId(int n) { mnFkCfdAddendaTypeId = n; }
 
     public int getPkYearId() { return mnPkYearId; }
@@ -90,9 +92,10 @@ public class SDataDpsAddenda extends erp.lib.data.SDataRegistry implements java.
     public java.lang.String getSorianaCita() { return msSorianaCita; }
     public java.lang.String getModeloDpsDescripcion() { return msModeloDpsDescripcion; }
     public int getCfdAddendaSubtype() { return mnCfdAddendaSubtype; }
+    public java.lang.String getJsonData() { return msJsonData; }
     public int getFkCfdAddendaTypeId() { return mnFkCfdAddendaTypeId; }
 
-    public java.util.Vector<SDataDpsAddendaEntry> getDbmsDpsAddEntries() { return mvDbmsDpsAddEntries; }
+    public java.util.Vector<SDataDpsAddendaEntry> getDbmsDpsAddendaEntries() { return mvDbmsDpsAddendaEntries; }
 
     @Override
     public void setPrimaryKey(Object pk) {
@@ -126,9 +129,10 @@ public class SDataDpsAddenda extends erp.lib.data.SDataRegistry implements java.
         msSorianaCita = "";
         msModeloDpsDescripcion = "";
         mnCfdAddendaSubtype = 0;
+        msJsonData = "";
         mnFkCfdAddendaTypeId = 0;
 
-        mvDbmsDpsAddEntries.clear();
+        mvDbmsDpsAddendaEntries.clear();
     }
 
     @Override
@@ -165,6 +169,7 @@ public class SDataDpsAddenda extends erp.lib.data.SDataRegistry implements java.
                 msSorianaCita = resultSet.getString("sor_cita");
                 msModeloDpsDescripcion = resultSet.getString("dps_description");
                 mnCfdAddendaSubtype = resultSet.getInt("stp_cfd_add");
+                msJsonData = resultSet.getString("json_data");
                 mnFkCfdAddendaTypeId = resultSet.getInt("fid_tp_cfd_add");
             }
 
@@ -173,7 +178,8 @@ public class SDataDpsAddenda extends erp.lib.data.SDataRegistry implements java.
             mbIsRegistryNew = false;
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
 
-            // Read Addenda entries:
+            // read addenda entries:
+            
             sql = "SELECT id_year, id_doc, id_ety " +
                     "FROM trn_dps_add_ety " +
                     "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " " +
@@ -185,7 +191,7 @@ public class SDataDpsAddenda extends erp.lib.data.SDataRegistry implements java.
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                 }
                 else {
-                    mvDbmsDpsAddEntries.add(entry);
+                    mvDbmsDpsAddendaEntries.add(entry);
                 }
             }
         }
@@ -211,7 +217,14 @@ public class SDataDpsAddenda extends erp.lib.data.SDataRegistry implements java.
         try {
             statement = connection.createStatement();
 
-            sql = "DELETE FROM trn_dps_add WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";";
+            sql = "DELETE FROM trn_dps_add_ety " +
+                    "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";";
+            
+            statement.execute(sql);
+
+            sql = "DELETE FROM trn_dps_add " +
+                    "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";";
+            
             statement.execute(sql);
 
             sql = "INSERT INTO trn_dps_add (" +
@@ -219,27 +232,24 @@ public class SDataDpsAddenda extends erp.lib.data.SDataRegistry implements java.
                     "fol_not_rec, bac_soc, bac_org, bac_div, " +
                     "sor_tda, sor_ent_mer, sor_rem_fec, sor_rem_fol, " +
                     "sor_ped_fol, sor_bto_tp, sor_bto_can, sor_not_ent_fol, sor_cita, " +
-                    "dps_description, stp_cfd_add, fid_tp_cfd_add) " +
+                    "dps_description, stp_cfd_add, json_data, fid_tp_cfd_add) " +
                     "VALUES (" + 
                     mnPkYearId + ", " + mnPkDocId + ", " +
                     "'" + msLorealFolioNotaRecepcion + "', '" + msBachocoSociedad + "', '" + msBachocoOrganizacionCompra + "', '" + msBachocoDivision + "', " + 
                     mnSorianaTienda + ", " + mnSorianaEntregaMercancia + ", '" + SLibUtils.DbmsDateFormatDate.format(mtSorianaRemisionFecha) + "', '" + msSorianaRemisionFolio + "', " +
                     "'" + msSorianaPedidoFolio + "', " + mnSorianaBultoTipo + ", " + mdSorianaBultoCantidad + ", '" + msSorianaNotaEntradaFolio + "', '" + msSorianaCita + "', " +
-                    "'" + msModeloDpsDescripcion + "', " + mnCfdAddendaSubtype + ", " + mnFkCfdAddendaTypeId + ");";
+                    "'" + msModeloDpsDescripcion + "', " + mnCfdAddendaSubtype + ", '" + msJsonData + "', " + mnFkCfdAddendaTypeId + ");";
+            
             statement.execute(sql);
+            
+            statement.close();
 
-            mnDbmsErrorId = 0;
-            msDbmsError = "";
+            // save addenda entries:
 
-            if (mnDbmsErrorId != 0) {
-                throw new Exception(msDbmsError);
-            }
-            else {
-                for (SDataDpsAddendaEntry dpsAddEntry : mvDbmsDpsAddEntries) {
-                    if (dpsAddEntry.getIsRegistryNew() || dpsAddEntry.getIsRegistryEdited()) {
-                        if (dpsAddEntry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
-                        }
+            for (SDataDpsAddendaEntry dpsAddEntry : mvDbmsDpsAddendaEntries) {
+                if (dpsAddEntry.getIsRegistryNew() || dpsAddEntry.getIsRegistryEdited()) {
+                    if (dpsAddEntry.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }
             }
@@ -257,31 +267,24 @@ public class SDataDpsAddenda extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public int delete(Connection connection) {
-        String sql = "";
-        Statement statement = null;
-
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            statement = connection.createStatement();
-
-            sql = "DELETE FROM trn_dps_add " +
+            // delete addenda entries:
+            
+            for (SDataDpsAddendaEntry dpsAddEntry : mvDbmsDpsAddendaEntries) {
+                if (dpsAddEntry.delete(connection) != SLibConstants.DB_ACTION_DELETE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_DELETE_DEP);
+                    }
+            }
+            
+            // delete addenda:
+            
+            String sql = "DELETE FROM trn_dps_add " +
                     "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + ";";
-            statement.execute(sql);
+            
+            connection.createStatement().execute(sql);
 
-            mnDbmsErrorId = 0;
-            msDbmsError = "";
-
-            if (mnDbmsErrorId != 0) {
-                throw new Exception(msDbmsError);
-            }
-            else {
-                for (SDataDpsAddendaEntry dpsAddEntry : mvDbmsDpsAddEntries) {
-                    if (dpsAddEntry.delete(connection) != SLibConstants.DB_ACTION_DELETE_OK) {
-                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_DELETE_DEP);
-                        }
-                }
-            }
             mbIsRegistryNew = false;
             mnLastDbActionResult = SLibConstants.DB_ACTION_DELETE_OK;
         }

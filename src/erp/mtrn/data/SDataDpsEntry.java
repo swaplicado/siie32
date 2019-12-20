@@ -76,6 +76,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected double mdOriginalPriceUnitarySystemCy;
     protected double mdOriginalDiscountUnitaryCy;
     protected double mdOriginalDiscountUnitarySystemCy;
+    protected double mdSalesPriceUnitaryCy;
+    protected double mdSalesFreightUnitaryCy;
     protected double mdLength;
     protected double mdSurface;
     protected double mdVolume;
@@ -104,6 +106,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected boolean mbIsTaxesAutomaticApplying;
     protected boolean mbIsPriceVariable;
     protected boolean mbIsPriceConfirm;
+    protected boolean mbIsSalesFreightRequired;
+    protected boolean mbIsSalesFreightConfirm;
+    protected boolean mbIsSalesFreightAdd;
     protected boolean mbIsInventoriable;
     protected boolean mbIsDeleted;
     protected int mnFkItemId;
@@ -150,16 +155,17 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     protected java.lang.String msDbmsCustomsUnitSymbol;
     protected java.lang.String msDbmsItemCustomsUnitSymbol;
     protected double mdDbmsItemCustomsUnitEquivalence;
-    protected int mnDbmsDpsAddBachocoNumberPosition;
-    protected java.lang.String msDbmsDpsAddBachocoCenter;
-    protected int mnDbmsDpsAddLorealEntryNumber;
-    protected java.lang.String msDbmsDpsAddSorianaBarCode;
-    protected java.lang.String msDbmsDpsAddElektraOrder;
-    protected java.lang.String msDbmsDpsAddElektraBarcode;
-    protected int mnDbmsDpsAddElektraCages;
-    protected double mdDbmsDpsAddElektraCagePriceUnitary;
-    protected int mnDbmsDpsAddElektraParts;
-    protected double mdDbmsDpsAddElektraPartPriceUnitary;
+    protected int mnDbmsAddBachocoNumeroPosicion;
+    protected java.lang.String msDbmsAddBachocoCentro;
+    protected int mnDbmsAddLorealEntryNumber;
+    protected java.lang.String msDbmsAddSorianaCodigo;
+    protected java.lang.String msDbmsAddElektraOrder;
+    protected java.lang.String msDbmsAddElektraBarcode;
+    protected int mnDbmsAddElektraCages;
+    protected double mdDbmsAddElektraCagePriceUnitary;
+    protected int mnDbmsAddElektraParts;
+    protected double mdDbmsAddElektraPartPriceUnitary;
+    protected java.lang.String msDbmsAddJsonData;
 
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryNotes> mvDbmsEntryNotes;
     protected java.util.Vector<erp.mtrn.data.SDataDpsEntryTax> mvDbmsEntryTaxes;
@@ -250,6 +256,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setOriginalPriceUnitarySystemCy(double d) { mdOriginalPriceUnitarySystemCy = d; }
     public void setOriginalDiscountUnitaryCy(double d) { mdOriginalDiscountUnitaryCy = d; }
     public void setOriginalDiscountUnitarySystemCy(double d) { mdOriginalDiscountUnitarySystemCy = d; }
+    public void setSalesPriceUnitaryCy(double d) { mdSalesPriceUnitaryCy = d; }
+    public void setSalesFreightUnitaryCy(double d) { mdSalesFreightUnitaryCy = d; }
     public void setLength(double d) { mdLength = d; }
     public void setSurface(double d) { mdSurface = d; }
     public void setVolume(double d) { mdVolume = d; }
@@ -278,6 +286,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setIsTaxesAutomaticApplying(boolean b) { mbIsTaxesAutomaticApplying = b; }
     public void setIsPriceVariable(boolean b) { mbIsPriceVariable = b; }
     public void setIsPriceConfirm(boolean b) { mbIsPriceConfirm = b; }
+    public void setIsSalesFreightRequired(boolean b) { mbIsSalesFreightRequired = b; }
+    public void setIsSalesFreightConfirm(boolean b) { mbIsSalesFreightConfirm = b; }
+    public void setIsSalesFreightAdd(boolean b) { mbIsSalesFreightAdd = b; }
     public void setIsInventoriable(boolean b) { mbIsInventoriable = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkItemId(int n) { mnFkItemId = n; }
@@ -345,6 +356,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public double getOriginalPriceUnitarySystemCy() { return mdOriginalPriceUnitarySystemCy; }
     public double getOriginalDiscountUnitaryCy() { return mdOriginalDiscountUnitaryCy; }
     public double getOriginalDiscountUnitarySystemCy() { return mdOriginalDiscountUnitarySystemCy; }
+    public double getSalesPriceUnitaryCy() { return mdSalesPriceUnitaryCy; }
+    public double getSalesFreightUnitaryCy() { return mdSalesFreightUnitaryCy; }
     public double getLength() { return mdLength; }
     public double getSurface() { return mdSurface; }
     public double getVolume() { return mdVolume; }
@@ -373,6 +386,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public boolean getIsTaxesAutomaticApplying() { return mbIsTaxesAutomaticApplying; }
     public boolean getIsPriceVariable() { return mbIsPriceVariable; }
     public boolean getIsPriceConfirm() { return mbIsPriceConfirm; }
+    public boolean getIsSalesFreightRequired() { return mbIsSalesFreightRequired; }
+    public boolean getIsSalesFreightConfirm() { return mbIsSalesFreightConfirm; }
+    public boolean getIsSalesFreightAdd() { return mbIsSalesFreightAdd; }
     public boolean getIsInventoriable() { return mbIsInventoriable; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkItemId() { return mnFkItemId; }
@@ -419,16 +435,17 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsCustomsUnitSymbol(java.lang.String s) { msDbmsCustomsUnitSymbol = s; }
     public void setDbmsItemCustomsUnitSymbol(java.lang.String s) { msDbmsItemCustomsUnitSymbol = s; }
     public void setDbmsItemCustomsUnitEquivalence(double d) { mdDbmsItemCustomsUnitEquivalence = d; }
-    public void setDbmsDpsAddBachocoNumberPosition(int n) { mnDbmsDpsAddBachocoNumberPosition = n; }
-    public void setDbmsDpsAddBachocoCenter(java.lang.String s) { msDbmsDpsAddBachocoCenter = s; }
-    public void setDbmsDpsAddLorealEntryNumber(int n) { mnDbmsDpsAddLorealEntryNumber = n; }
-    public void setDbmsDpsAddSorianaBarCode(java.lang.String s) { msDbmsDpsAddSorianaBarCode = s; }
-    public void setDbmsDpsAddElektraOrder(java.lang.String s) { msDbmsDpsAddElektraOrder = s; }
-    public void setDbmsDpsAddElektraBarcode(java.lang.String s) { msDbmsDpsAddElektraBarcode = s; }
-    public void setDbmsDpsAddElektraCages(int n) { mnDbmsDpsAddElektraCages = n; }
-    public void setDbmsDpsAddElektraCagePriceUnitary(double d) { mdDbmsDpsAddElektraCagePriceUnitary = d; }
-    public void setDbmsDpsAddElektraParts(int n) { mnDbmsDpsAddElektraParts = n; }
-    public void setDbmsDpsAddElektraPartPriceUnitary(double d) { mdDbmsDpsAddElektraPartPriceUnitary = d; }
+    public void setDbmsAddBachocoNumeroPosicion(int n) { mnDbmsAddBachocoNumeroPosicion = n; }
+    public void setDbmsAddBachocoCentro(java.lang.String s) { msDbmsAddBachocoCentro = s; }
+    public void setDbmsAddLorealEntryNumber(int n) { mnDbmsAddLorealEntryNumber = n; }
+    public void setDbmsAddSorianaCodigo(java.lang.String s) { msDbmsAddSorianaCodigo = s; }
+    public void setDbmsAddElektraOrder(java.lang.String s) { msDbmsAddElektraOrder = s; }
+    public void setDbmsAddElektraBarcode(java.lang.String s) { msDbmsAddElektraBarcode = s; }
+    public void setDbmsAddElektraCages(int n) { mnDbmsAddElektraCages = n; }
+    public void setDbmsAddElektraCagePriceUnitary(double d) { mdDbmsAddElektraCagePriceUnitary = d; }
+    public void setDbmsAddElektraParts(int n) { mnDbmsAddElektraParts = n; }
+    public void setDbmsAddElektraPartPriceUnitary(double d) { mdDbmsAddElektraPartPriceUnitary = d; }
+    public void setDbmsAddJsonData(java.lang.String s) { msDbmsAddJsonData = s; }
 
     public int getDbmsFkItemGenericId() { return mnDbmsFkItemGenericId; }
     public boolean getDbmsItemGenDataShipDomesticReq() { return mbDbmsItemGenDataShipDomesticReq; }
@@ -454,16 +471,17 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getDbmsCustomsUnitSymbol() { return msDbmsCustomsUnitSymbol; }
     public java.lang.String getDbmsItemCustomsUnitSymbol() { return msDbmsItemCustomsUnitSymbol; }
     public double getDbmsItemCustomsUnitEquivalence() { return mdDbmsItemCustomsUnitEquivalence; }
-    public int getDbmsDpsAddBachocoNumberPosition() { return mnDbmsDpsAddBachocoNumberPosition; }
-    public java.lang.String getDbmsDpsAddBachocoCenter() { return msDbmsDpsAddBachocoCenter; }
-    public int getDbmsDpsAddLorealEntryNumber() { return mnDbmsDpsAddLorealEntryNumber; }
-    public java.lang.String getDbmsDpsAddSorianaBarCode() { return msDbmsDpsAddSorianaBarCode; }
-    public java.lang.String getDbmsDpsAddElektraOrder() { return msDbmsDpsAddElektraOrder; }
-    public java.lang.String getDbmsDpsAddElektraBarcode() { return msDbmsDpsAddElektraBarcode; }
-    public int getDbmsDpsAddElektraCages() { return mnDbmsDpsAddElektraCages; }
-    public double getDbmsDpsAddElektraCagePriceUnitary() { return mdDbmsDpsAddElektraCagePriceUnitary; }
-    public int getDbmsDpsAddElektraParts() { return mnDbmsDpsAddElektraParts; }
-    public double getDbmsDpsAddElektraPartPriceUnitary() { return mdDbmsDpsAddElektraPartPriceUnitary; }
+    public int getDbmsAddBachocoNumeroPosicion() { return mnDbmsAddBachocoNumeroPosicion; }
+    public java.lang.String getDbmsAddBachocoCentro() { return msDbmsAddBachocoCentro; }
+    public int getDbmsAddLorealEntryNumber() { return mnDbmsAddLorealEntryNumber; }
+    public java.lang.String getDbmsAddSorianaCodigo() { return msDbmsAddSorianaCodigo; }
+    public java.lang.String getDbmsAddElektraOrder() { return msDbmsAddElektraOrder; }
+    public java.lang.String getDbmsAddElektraBarcode() { return msDbmsAddElektraBarcode; }
+    public int getDbmsAddElektraCages() { return mnDbmsAddElektraCages; }
+    public double getDbmsAddElektraCagePriceUnitary() { return mdDbmsAddElektraCagePriceUnitary; }
+    public int getDbmsAddElektraParts() { return mnDbmsAddElektraParts; }
+    public double getDbmsAddElektraPartPriceUnitary() { return mdDbmsAddElektraPartPriceUnitary; }
+    public java.lang.String getDbmsAddJsonData() { return msDbmsAddJsonData; }
 
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryNotes> getDbmsEntryNotes() { return mvDbmsEntryNotes; }
     public java.util.Vector<erp.mtrn.data.SDataDpsEntryTax> getDbmsEntryTaxes() { return mvDbmsEntryTaxes; }
@@ -559,6 +577,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mdOriginalPriceUnitarySystemCy = 0;
         mdOriginalDiscountUnitaryCy = 0;
         mdOriginalDiscountUnitarySystemCy = 0;
+        mdSalesPriceUnitaryCy = 0;
+        mdSalesFreightUnitaryCy = 0;
         mdLength = 0;
         mdSurface = 0;
         mdVolume = 0;
@@ -587,6 +607,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mbIsTaxesAutomaticApplying = false;
         mbIsPriceVariable = false;
         mbIsPriceConfirm = false;
+        mbIsSalesFreightRequired = false;
+        mbIsSalesFreightConfirm = false;
+        mbIsSalesFreightAdd = false;
         mbIsInventoriable = false;
         mbIsDeleted = false;
         mnFkItemId = 0;
@@ -633,16 +656,17 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         msDbmsCustomsUnitSymbol = "";
         msDbmsItemCustomsUnitSymbol = "";
         mdDbmsItemCustomsUnitEquivalence = 0;
-        mnDbmsDpsAddBachocoNumberPosition = 0;
-        msDbmsDpsAddBachocoCenter = "";
-        mnDbmsDpsAddLorealEntryNumber = 0;
-        msDbmsDpsAddSorianaBarCode = "";
-        msDbmsDpsAddElektraOrder = "";
-        msDbmsDpsAddElektraBarcode = "";
-        mnDbmsDpsAddElektraCages = 0;
-        mdDbmsDpsAddElektraCagePriceUnitary = 0;
-        mnDbmsDpsAddElektraParts = 0;
-        mdDbmsDpsAddElektraPartPriceUnitary = 0;
+        mnDbmsAddBachocoNumeroPosicion = 0;
+        msDbmsAddBachocoCentro = "";
+        mnDbmsAddLorealEntryNumber = 0;
+        msDbmsAddSorianaCodigo = "";
+        msDbmsAddElektraOrder = "";
+        msDbmsAddElektraBarcode = "";
+        mnDbmsAddElektraCages = 0;
+        mdDbmsAddElektraCagePriceUnitary = 0;
+        mnDbmsAddElektraParts = 0;
+        mdDbmsAddElektraPartPriceUnitary = 0;
+        msDbmsAddJsonData = "";
 
         mvDbmsEntryNotes.clear();
         mvDbmsEntryTaxes.clear();
@@ -684,7 +708,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "igen.b_ship_dom, igen.b_ship_int, igen.b_ship_qlt, igen.fid_cfd_prod_serv, " +
                     "u.symbol, ou.symbol, ou.unit_base_equiv, ou.symbol_custs, ou.unit_custs, cu.code, ocu.code, brd.brd, " +
                     "tr.tax_reg, tda.stp_dps_adj, tde.tp_dps_ety, cc.code, cc.cc, ir.item, ade.bac_num_pos, ade.bac_cen, ade.lor_num_ety, ade.sor_cod, " +
-                    "ade.ele_ord, ade.ele_barc, ade.ele_cag, ade.ele_cag_price_u, ade.ele_par, ade.ele_par_price_u " +
+                    "ade.ele_ord, ade.ele_barc, ade.ele_cag, ade.ele_cag_price_u, ade.ele_par, ade.ele_par_price_u, ade.json_data " +
                     "FROM trn_dps_ety AS de " +
                     "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
                     "INNER JOIN erp.itmu_igen AS igen ON i.fid_igen = igen.id_igen " +
@@ -751,6 +775,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mdOriginalPriceUnitarySystemCy = resultSet.getDouble("de.orig_price_u_sys_cur");
                 mdOriginalDiscountUnitaryCy = resultSet.getDouble("de.orig_disc_u_cur");
                 mdOriginalDiscountUnitarySystemCy = resultSet.getDouble("de.orig_disc_u_sys_cur");
+                mdSalesPriceUnitaryCy = resultSet.getDouble("de.sales_price_u_cur");
+                mdSalesFreightUnitaryCy = resultSet.getDouble("de.sales_freight_u_cur");
                 mdLength = resultSet.getDouble("de.len");
                 mdSurface = resultSet.getDouble("de.surf");
                 mdVolume = resultSet.getDouble("de.vol");
@@ -778,7 +804,10 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 mbIsDiscountRetailChain = resultSet.getBoolean("de.b_disc_retail_chain");
                 mbIsTaxesAutomaticApplying = resultSet.getBoolean("de.b_tax_aut");
                 mbIsPriceVariable = resultSet.getBoolean("de.b_prc_var");
-                mbIsPriceConfirm = resultSet.getBoolean("b_prc_cnf");
+                mbIsPriceConfirm = resultSet.getBoolean("de.b_prc_cnf");
+                mbIsSalesFreightRequired = resultSet.getBoolean("de.b_sales_freight_req");
+                mbIsSalesFreightConfirm = resultSet.getBoolean("de.b_sales_freight_cnf");
+                mbIsSalesFreightAdd = resultSet.getBoolean("de.b_sales_freight_add");
                 mbIsInventoriable = resultSet.getBoolean("de.b_inv");
                 mbIsDeleted = resultSet.getBoolean("de.b_del");
                 mnFkItemId = resultSet.getInt("de.fid_item");
@@ -830,45 +859,49 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 if (resultSet.wasNull()) {
                     msDbmsItemRef_n = "";
                 }
-                mnDbmsDpsAddBachocoNumberPosition  = resultSet.getInt("ade.bac_num_pos");
+                mnDbmsAddBachocoNumeroPosicion  = resultSet.getInt("ade.bac_num_pos");
                 if (resultSet.wasNull()) {
-                    mnDbmsDpsAddBachocoNumberPosition = 0;
+                    mnDbmsAddBachocoNumeroPosicion = 0;
                 }
-                msDbmsDpsAddBachocoCenter = resultSet.getString("ade.bac_cen");
+                msDbmsAddBachocoCentro = resultSet.getString("ade.bac_cen");
                 if (resultSet.wasNull()) {
-                    msDbmsDpsAddBachocoCenter = "";
+                    msDbmsAddBachocoCentro = "";
                 }
-                mnDbmsDpsAddLorealEntryNumber = resultSet.getInt("ade.lor_num_ety");
+                mnDbmsAddLorealEntryNumber = resultSet.getInt("ade.lor_num_ety");
                 if (resultSet.wasNull()) {
-                    mnDbmsDpsAddLorealEntryNumber = 0;
+                    mnDbmsAddLorealEntryNumber = 0;
                 }
-                msDbmsDpsAddSorianaBarCode = resultSet.getString("ade.sor_cod");
+                msDbmsAddSorianaCodigo = resultSet.getString("ade.sor_cod");
                 if (resultSet.wasNull()) {
-                    msDbmsDpsAddSorianaBarCode = "";
+                    msDbmsAddSorianaCodigo = "";
                 }
-                msDbmsDpsAddElektraOrder = resultSet.getString("ade.ele_ord");
+                msDbmsAddElektraOrder = resultSet.getString("ade.ele_ord");
                 if (resultSet.wasNull()) {
-                    msDbmsDpsAddElektraOrder = "";
+                    msDbmsAddElektraOrder = "";
                 }
-                msDbmsDpsAddElektraBarcode = resultSet.getString("ade.ele_barc");
+                msDbmsAddElektraBarcode = resultSet.getString("ade.ele_barc");
                 if (resultSet.wasNull()) {
-                    msDbmsDpsAddElektraBarcode = "";
+                    msDbmsAddElektraBarcode = "";
                 }
-                mnDbmsDpsAddElektraCages = resultSet.getInt("ade.ele_cag");
+                mnDbmsAddElektraCages = resultSet.getInt("ade.ele_cag");
                 if (resultSet.wasNull()) {
-                    mnDbmsDpsAddElektraCages = 0;
+                    mnDbmsAddElektraCages = 0;
                 }
-                mdDbmsDpsAddElektraCagePriceUnitary = resultSet.getDouble("ade.ele_cag_price_u");
+                mdDbmsAddElektraCagePriceUnitary = resultSet.getDouble("ade.ele_cag_price_u");
                 if (resultSet.wasNull()) {
-                    mdDbmsDpsAddElektraCagePriceUnitary = 0;
+                    mdDbmsAddElektraCagePriceUnitary = 0;
                 }
-                mnDbmsDpsAddElektraParts = resultSet.getInt("ade.ele_par");
+                mnDbmsAddElektraParts = resultSet.getInt("ade.ele_par");
                 if (resultSet.wasNull()) {
-                    mnDbmsDpsAddElektraParts = 0;
+                    mnDbmsAddElektraParts = 0;
                 }
-                mdDbmsDpsAddElektraPartPriceUnitary = resultSet.getDouble("ade.ele_par_price_u");
+                mdDbmsAddElektraPartPriceUnitary = resultSet.getDouble("ade.ele_par_price_u");
                 if (resultSet.wasNull()) {
-                    mdDbmsDpsAddElektraPartPriceUnitary = 0;
+                    mdDbmsAddElektraPartPriceUnitary = 0;
+                }
+                msDbmsAddJsonData = resultSet.getString("ade.json_data");
+                if (resultSet.wasNull()) {
+                    msDbmsAddJsonData = "";
                 }
 
                 msDbmsUnidadClave = resultSet.getString("cu.code");
@@ -1087,7 +1120,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " + 
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkDocId);
             callableStatement.setInt(nParam++, mnPkEntryId);
@@ -1133,6 +1166,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             callableStatement.setDouble(nParam++, mdOriginalPriceUnitarySystemCy);
             callableStatement.setDouble(nParam++, mdOriginalDiscountUnitaryCy);
             callableStatement.setDouble(nParam++, mdOriginalDiscountUnitarySystemCy);
+            callableStatement.setDouble(nParam++, mdSalesPriceUnitaryCy);
+            callableStatement.setDouble(nParam++, mdSalesFreightUnitaryCy);
             callableStatement.setDouble(nParam++, mdLength);
             callableStatement.setDouble(nParam++, mdSurface);
             callableStatement.setDouble(nParam++, mdVolume);
@@ -1161,6 +1196,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
             callableStatement.setBoolean(nParam++, mbIsTaxesAutomaticApplying);
             callableStatement.setBoolean(nParam++, mbIsPriceVariable);
             callableStatement.setBoolean(nParam++, mbIsPriceConfirm);
+            callableStatement.setBoolean(nParam++, mbIsSalesFreightRequired);
+            callableStatement.setBoolean(nParam++, mbIsSalesFreightConfirm);
+            callableStatement.setBoolean(nParam++, mbIsSalesFreightAdd);
             callableStatement.setBoolean(nParam++, mbIsInventoriable);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkItemId);
@@ -1405,6 +1443,15 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         // Quantity, unitary prices and discounts:
 
         mdQuantity = SLibUtilities.round(mdOriginalQuantity * dFactQty, nDecsQty);
+        
+        if (mbIsSalesFreightRequired) {
+            if (mbIsSalesFreightAdd) {
+                mdOriginalPriceUnitaryCy = SLibUtilities.round(mdSalesPriceUnitaryCy + mdSalesFreightUnitaryCy, nDecsValUnit);
+            }
+            else {
+                mdOriginalPriceUnitaryCy = mdSalesPriceUnitaryCy;
+            }
+        }
 
         mdPriceUnitaryCy = SLibUtilities.round(mdOriginalPriceUnitaryCy * dFactValUnit, nDecsValUnit);
         mdPriceUnitarySystemCy = SLibUtilities.round(mdOriginalPriceUnitarySystemCy * dFactValUnit, nDecsValUnit);
@@ -1571,6 +1618,12 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         mdOriginalPriceUnitarySystemCy = 0;
         mdOriginalDiscountUnitaryCy = 0;
         mdOriginalDiscountUnitarySystemCy = 0;
+        
+        mdSalesPriceUnitaryCy = 0;
+        mdSalesFreightUnitaryCy = 0;
+        mbIsSalesFreightRequired = false;
+        mbIsSalesFreightConfirm = false;
+        mbIsSalesFreightAdd = false;
 
         mnFkItemId = 0;
         mnFkUnitId = 0;
@@ -1686,6 +1739,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setOriginalPriceUnitarySystemCy(mdOriginalPriceUnitarySystemCy);
         clone.setOriginalDiscountUnitaryCy(mdOriginalDiscountUnitaryCy);
         clone.setOriginalDiscountUnitarySystemCy(mdOriginalDiscountUnitarySystemCy);
+        clone.setSalesPriceUnitaryCy(mdSalesPriceUnitaryCy);
+        clone.setSalesFreightUnitaryCy(mdSalesFreightUnitaryCy);
         clone.setLength(mdLength);
         clone.setSurface(mdSurface);
         clone.setVolume(mdVolume);
@@ -1714,6 +1769,9 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setIsTaxesAutomaticApplying(mbIsTaxesAutomaticApplying);
         clone.setIsPriceVariable(mbIsPriceVariable);
         clone.setIsPriceConfirm(mbIsPriceConfirm);
+        clone.setIsSalesFreightRequired(mbIsSalesFreightRequired);
+        clone.setIsSalesFreightConfirm(mbIsSalesFreightConfirm);
+        clone.setIsSalesFreightAdd(mbIsSalesFreightAdd);
         clone.setIsInventoriable(mbIsInventoriable);
         clone.setIsDeleted(mbIsDeleted);
         clone.setFkItemId(mnFkItemId);
@@ -1758,16 +1816,17 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         clone.setDbmsCustomsUnitSymbol(msDbmsCustomsUnitSymbol);
         clone.setDbmsItemCustomsUnitSymbol(msDbmsItemCustomsUnitSymbol);
         clone.setDbmsItemCustomsUnitEquivalence(mdDbmsItemCustomsUnitEquivalence);
-        clone.setDbmsDpsAddBachocoNumberPosition(mnDbmsDpsAddBachocoNumberPosition);
-        clone.setDbmsDpsAddBachocoCenter(msDbmsDpsAddBachocoCenter);
-        clone.setDbmsDpsAddLorealEntryNumber(mnDbmsDpsAddLorealEntryNumber);
-        clone.setDbmsDpsAddSorianaBarCode(msDbmsDpsAddSorianaBarCode);
-        clone.setDbmsDpsAddElektraOrder(msDbmsDpsAddElektraOrder);
-        clone.setDbmsDpsAddElektraBarcode(msDbmsDpsAddElektraBarcode);
-        clone.setDbmsDpsAddElektraCages(mnDbmsDpsAddElektraCages);
-        clone.setDbmsDpsAddElektraCagePriceUnitary(mdDbmsDpsAddElektraCagePriceUnitary);
-        clone.setDbmsDpsAddElektraParts(mnDbmsDpsAddElektraParts);
-        clone.setDbmsDpsAddElektraPartPriceUnitary(mdDbmsDpsAddElektraPartPriceUnitary);
+        clone.setDbmsAddBachocoNumeroPosicion(mnDbmsAddBachocoNumeroPosicion);
+        clone.setDbmsAddBachocoCentro(msDbmsAddBachocoCentro);
+        clone.setDbmsAddLorealEntryNumber(mnDbmsAddLorealEntryNumber);
+        clone.setDbmsAddSorianaCodigo(msDbmsAddSorianaCodigo);
+        clone.setDbmsAddElektraOrder(msDbmsAddElektraOrder);
+        clone.setDbmsAddElektraBarcode(msDbmsAddElektraBarcode);
+        clone.setDbmsAddElektraCages(mnDbmsAddElektraCages);
+        clone.setDbmsAddElektraCagePriceUnitary(mdDbmsAddElektraCagePriceUnitary);
+        clone.setDbmsAddElektraParts(mnDbmsAddElektraParts);
+        clone.setDbmsAddElektraPartPriceUnitary(mdDbmsAddElektraPartPriceUnitary);
+        clone.setDbmsAddJsonData(msDbmsAddJsonData);
 
         clone.getDbmsEntryNotes().addAll(mvDbmsEntryNotes);
         clone.getDbmsEntryTaxes().addAll(mvDbmsEntryTaxes);
@@ -1796,10 +1855,10 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
      * @return 
      */
     public static boolean validateShipmentDataValue(final String value, final boolean requiered) {
-        return ((value.isEmpty() || value == STrnConsts.TXT_FIELD_BLANK) && requiered) ; 
+        return ((value.isEmpty() || value.equals(STrnConsts.TXT_FIELD_BLANK)) && requiered);
     }
     
-     /**
+    /**
      * Verify if the value is equal to blank value
      * @param value
      * @return 
@@ -1808,7 +1867,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
         return value.compareTo(STrnConsts.TXT_FIELD_BLANK) == 0;
     }
     
-      /**
+    /**
      * Verify if shipment data is needed
      * @return 
      */

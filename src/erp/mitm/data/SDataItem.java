@@ -16,7 +16,7 @@ import java.util.Vector;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Alfonso Flores, Sergio Flores, Juan Barajas, Cesar Orozco
+ * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Sergio Flores
  */
 public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -67,6 +67,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected boolean mbIsFreeDiscountEntry;
     protected boolean mbIsFreeDiscountDoc;
     protected boolean mbIsFreeCommissions;
+    protected boolean mbIsSalesFreightRequired;
     protected boolean mbIsDeleted;
     protected int mnFkItemGenericId;
     protected int mnFkItemLineId_n;
@@ -106,8 +107,8 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
 
     public SDataItem() {
         super(SDataConstants.ITMU_ITEM);
-        mvDbmsItemBarcodes = new Vector<SDataItemBarcode>();
-        mvDbmsItemForeignLanguageDescriptions = new Vector<SDataItemForeignLanguage>();
+        mvDbmsItemBarcodes = new Vector<>();
+        mvDbmsItemForeignLanguageDescriptions = new Vector<>();
         reset();
     }
 
@@ -158,6 +159,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setIsFreeDiscountEntry(boolean b) { mbIsFreeDiscountEntry = b; }
     public void setIsFreeDiscountDoc(boolean b) { mbIsFreeDiscountDoc = b; }
     public void setIsFreeCommissions(boolean b) { mbIsFreeCommissions = b; }
+    public void setIsSalesFreightRequired(boolean b) { mbIsSalesFreightRequired = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkItemGenericId(int n) { mnFkItemGenericId = n; }
     public void setFkItemLineId_n(int n) { mnFkItemLineId_n = n; }
@@ -237,6 +239,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public boolean getIsFreeDiscountEntry() { return mbIsFreeDiscountEntry; }
     public boolean getIsFreeDiscountDoc() { return mbIsFreeDiscountDoc; }
     public boolean getIsFreeCommissions() { return mbIsFreeCommissions; }
+    public boolean getIsSalesFreightRequired() { return mbIsSalesFreightRequired; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkItemGenericId() { return mnFkItemGenericId; }
     public int getFkItemLineId_n() { return mnFkItemLineId_n; }
@@ -274,21 +277,11 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.util.Vector<SDataItemBarcode> getDbmsItemBarcodes() { return mvDbmsItemBarcodes; }
     public java.util.Vector<SDataItemForeignLanguage> getDbmsItemForeignLanguageDescriptions() { return mvDbmsItemForeignLanguageDescriptions; }
 
-    public boolean getDbmsIsFreePrice() { return mbIsFreePrice || (moDbmsDataItemGeneric == null ? false : moDbmsDataItemGeneric.getDbmsIsFreePrice()); }
-    public boolean getDbmsIsFreeDiscount() { return mbIsFreeDiscount || (moDbmsDataItemGeneric == null ? false : moDbmsDataItemGeneric.getDbmsIsFreeDiscount()); }
-    public boolean getDbmsIsFreeDiscountUnitary() { return mbIsFreeDiscountUnitary || (moDbmsDataItemGeneric == null ? false : moDbmsDataItemGeneric.getDbmsIsFreeDiscountUnitary()); }
-    public boolean getDbmsIsFreeDiscountEntry() { return mbIsFreeDiscountEntry || (moDbmsDataItemGeneric == null ? false : moDbmsDataItemGeneric.getDbmsIsFreeDiscountEntry()); }
-    public boolean getDbmsIsFreeDiscountDoc() { return mbIsFreeDiscountDoc || (moDbmsDataItemGeneric == null ? false : moDbmsDataItemGeneric.getDbmsIsFreeDiscountDoc()); }
-    public boolean getDbmsIsFreeCommissions() { return mbIsFreeCommissions || (moDbmsDataItemGeneric == null ? false : moDbmsDataItemGeneric.getDbmsIsFreeCommissions()); }
-    public boolean getDbmsIsInventoriable() { return mbIsInventoriable || (moDbmsDataItemGeneric == null ? false : moDbmsDataItemGeneric.getIsInventoriable()); }
-    public boolean getDbmsIsLotApplying() { return mbIsLotApplying || (moDbmsDataItemGeneric == null ? false : moDbmsDataItemGeneric.getIsLotApplying()); }
-    public boolean getDbmsIsBulk() { return mbIsBulk || (moDbmsDataItemGeneric == null ? false : moDbmsDataItemGeneric.getIsBulk()); }
-
     public int getDbmsFkDefaultItemRefId_n() {
         int id = mnFkDefaultItemRefId_n;
 
-        if (mnFkDefaultItemRefId_n == SLibConstants.UNDEFINED && moDbmsDataItemGeneric != null) {
-            mnFkDefaultItemRefId_n = moDbmsDataItemGeneric.getFkDefaultItemRefId_n();
+        if (id == SLibConstants.UNDEFINED && moDbmsDataItemGeneric != null) {
+            id = moDbmsDataItemGeneric.getFkDefaultItemRefId_n();
         }
 
         return id;
@@ -355,6 +348,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         mbIsFreeDiscountEntry = false;
         mbIsFreeDiscountDoc = false;
         mbIsFreeCommissions = false;
+        mbIsSalesFreightRequired = false;
         mbIsDeleted = false;
         mnFkItemGenericId = 0;
         mnFkItemLineId_n = 0;
@@ -457,6 +451,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 mbIsFreeDiscountEntry = resultSet.getBoolean("b_free_disc_ety");
                 mbIsFreeDiscountDoc = resultSet.getBoolean("b_free_disc_doc");
                 mbIsFreeCommissions = resultSet.getBoolean("b_free_comms");
+                mbIsSalesFreightRequired = resultSet.getBoolean("b_sales_freight_req");
                 mbIsDeleted = resultSet.getBoolean("b_del");
                 mnFkItemGenericId = resultSet.getInt("fid_igen");
                 mnFkItemLineId_n = resultSet.getInt("fid_line_n");
@@ -569,7 +564,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msItem);
@@ -617,6 +612,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setBoolean(nParam++, mbIsFreeDiscountEntry);
             callableStatement.setBoolean(nParam++, mbIsFreeDiscountDoc);
             callableStatement.setBoolean(nParam++, mbIsFreeCommissions);
+            callableStatement.setBoolean(nParam++, mbIsSalesFreightRequired);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
             callableStatement.setInt(nParam++, mnFkItemGenericId);
             if (mnFkItemLineId_n > 0) callableStatement.setInt(nParam++, mnFkItemLineId_n); else callableStatement.setNull(nParam++, java.sql.Types.SMALLINT);

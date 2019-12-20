@@ -33,13 +33,6 @@ public class SDataItemFamily extends erp.lib.data.SDataRegistry implements java.
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
 
-    protected boolean mbDbmsIsFreePrice;
-    protected boolean mbDbmsIsFreeDiscount;
-    protected boolean mbDbmsIsFreeDiscountUnitary;
-    protected boolean mbDbmsIsFreeDiscountEntry;
-    protected boolean mbDbmsIsFreeDiscountDoc;
-    protected boolean mbDbmsIsFreeCommissions;
-
     public SDataItemFamily() {
         super(SDataConstants.ITMU_IFAM);
         reset();
@@ -77,13 +70,6 @@ public class SDataItemFamily extends erp.lib.data.SDataRegistry implements java.
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
-    public boolean getDbmsIsFreePrice() { return mbDbmsIsFreePrice; }
-    public boolean getDbmsIsFreeDiscount() { return mbDbmsIsFreeDiscount; }
-    public boolean getDbmsIsFreeDiscountUnitary() { return mbDbmsIsFreeDiscountUnitary; }
-    public boolean getDbmsIsFreeDiscountEntry() { return mbDbmsIsFreeDiscountEntry; }
-    public boolean getDbmsIsFreeDiscountDoc() { return mbDbmsIsFreeDiscountDoc; }
-    public boolean getDbmsIsFreeCommissions() { return mbDbmsIsFreeCommissions; }
-
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkItemFamilyId = ((int[]) pk)[0];
@@ -113,13 +99,6 @@ public class SDataItemFamily extends erp.lib.data.SDataRegistry implements java.
         mtUserNewTs = null;
         mtUserEditTs = null;
         mtUserDeleteTs = null;
-
-        mbDbmsIsFreePrice = false;
-        mbDbmsIsFreeDiscount = false;
-        mbDbmsIsFreeDiscountUnitary = false;
-        mbDbmsIsFreeDiscountEntry = false;
-        mbDbmsIsFreeDiscountDoc = false;
-        mbDbmsIsFreeCommissions = false;
     }
 
     @Override
@@ -153,43 +132,6 @@ public class SDataItemFamily extends erp.lib.data.SDataRegistry implements java.
                 mtUserNewTs = resultSet.getTimestamp("ts_new");
                 mtUserEditTs = resultSet.getTimestamp("ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("ts_del");
-
-                // Set aditional configuration from item family clasification hierarchy:
-
-                mbDbmsIsFreePrice = mbIsFreePrice;
-                mbDbmsIsFreeDiscount = mbIsFreeDiscount;
-                mbDbmsIsFreeDiscountUnitary = mbIsFreeDiscountUnitary;
-                mbDbmsIsFreeDiscountEntry = mbIsFreeDiscountEntry;
-                mbDbmsIsFreeDiscountDoc = mbIsFreeDiscountDoc;
-                mbDbmsIsFreeCommissions = mbIsFreeCommissions;
-
-                sql = "SELECT b_free_price, b_free_disc, b_free_disc_u, " +
-                        "b_free_disc_ety, b_free_disc_doc, b_free_comms " +
-                        "FROM erp.cfg_param_erp ";
-                resultSet = statement.executeQuery(sql);
-                if (!resultSet.next()) {
-                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                }
-                else {
-                    if (!mbDbmsIsFreePrice) {
-                        mbDbmsIsFreePrice = resultSet.getBoolean("b_free_price");
-                    }
-                    if (!mbDbmsIsFreeDiscount) {
-                        mbDbmsIsFreeDiscount = resultSet.getBoolean("b_free_disc");
-                    }
-                    if (!mbDbmsIsFreeDiscountUnitary) {
-                        mbDbmsIsFreeDiscountUnitary = resultSet.getBoolean("b_free_disc_u");
-                    }
-                    if (!mbDbmsIsFreeDiscountEntry) {
-                        mbDbmsIsFreeDiscountEntry = resultSet.getBoolean("b_free_disc_ety");
-                    }
-                    if (!mbDbmsIsFreeDiscountDoc) {
-                        mbDbmsIsFreeDiscountDoc = resultSet.getBoolean("b_free_disc_doc");
-                    }
-                    if (!mbDbmsIsFreeCommissions) {
-                        mbDbmsIsFreeCommissions = resultSet.getBoolean("b_free_comms");
-                    }
-                }
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;

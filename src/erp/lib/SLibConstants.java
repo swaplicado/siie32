@@ -244,9 +244,10 @@ public abstract class SLibConstants {
     public static final java.lang.String MSG_ERR_GUI_REG_ALREADY_DELETE = "El registro ya está eliminado.";
     public static final java.lang.String MSG_ERR_GUI_REG_ALREADY_ANNUL = "El registro ya está anulado.";
     public static final java.lang.String MSG_ERR_GUI_FIELD_EMPTY = "Se debe especificar un valor para el campo ";
-    public static final java.lang.String MSG_ERR_GUI_USE_CFDI = "El Uso de CFDI del documento debe ser ";
     public static final java.lang.String MSG_ERR_GUI_FIELD_VALUE_DIF = "Se debe especificar un valor diferente para el campo ";
     public static final java.lang.String MSG_ERR_GUI_FIELD_VALUE_NOT_REQ = "No se debe especificar ningún valor para el campo ";
+    public static final java.lang.String MSG_ERR_GUI_FIELD_OPTION_SELECT = "Se debe seleccionar el campo ";
+    public static final java.lang.String MSG_ERR_GUI_FIELD_OPTION_UNSELECT = "Se debe deseleccionar el campo ";
     public static final java.lang.String MSG_ERR_GUI_FORM_READ_ONLY = "La forma es de solo lectura.";
     public static final java.lang.String MSG_ERR_GUI_FORM_EDIT_ONLY = "La forma es solamente para modificar registros.";
     public static final java.lang.String MSG_ERR_GUI_OPT_UNDEF = "Se debe seleccionar una opción.";
@@ -254,6 +255,7 @@ public abstract class SLibConstants {
     public static final java.lang.String MSG_ERR_GUI_SESSION_BRANCH = "No se ha seleccionado una sucursal de la empresa en la sesión de usuario.";
     public static final java.lang.String MSG_ERR_GUI_CFG_DNC = "No se ha definido un centro de foliado para la sucursal o entidad.";
     public static final java.lang.String MSG_ERR_GUI_CFG_DNS = "No se ha definido una serie de folios para el tipo de documento.";
+    public static final java.lang.String MSG_ERR_GUI_CFDI_USE = "El Uso de CFDI del documento debe ser ";
     public static final java.lang.String MSG_ERR_GUI_EMPTY_ACC = "La cuenta contable definida está en blanco.";
     public static final java.lang.String MSG_ERR_GUI_EMPTY_CC = "El centro de costo definido está en blanco.";
     public static final java.lang.String MSG_ERR_GUI_NO_DNS_ = "No hay folios para el documento en el almacén ";

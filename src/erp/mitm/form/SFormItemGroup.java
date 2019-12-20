@@ -52,7 +52,10 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
     private erp.lib.form.SFormField moFieldIsFreeCommissions;
     private erp.lib.form.SFormField moFieldIsDeleted;
 
-    /** Creates new form SFormItemGroup */
+    /**
+     * Creates new form SFormItemGroup
+     * @param client
+     */
     public SFormItemGroup(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient =  client;
@@ -154,7 +157,7 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
         jckIsFreeDiscountUnitary.setText("Sin descuento unitario");
         jPanel12.add(jckIsFreeDiscountUnitary);
 
-        jckIsFreePrice.setText("Sin precio");
+        jckIsFreePrice.setText("Sin precio en listas de precios");
         jPanel12.add(jckIsFreePrice);
 
         jckIsFreeDiscountEntry.setText("Sin descuento en partida");
@@ -196,8 +199,8 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
 
         getContentPane().add(jpCommand, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-480)/2, (screenSize.height-300)/2, 480, 300);
+        setSize(new java.awt.Dimension(480, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -211,7 +214,7 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
     }//GEN-LAST:event_jcbFkItemFamilyIdItemStateChanged
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldFkItemFamilyId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemFamilyId, jlFkItemFamilyId);
         moFieldFkItemFamilyId.setPickerButton(jbFkItemFamilyId);
@@ -261,6 +264,41 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
         }
     }
 
+    private void readItemFamilySettings() {
+        if (jcbFkItemFamilyId.getSelectedIndex() <= 0) {
+            jckIsFreeDiscountUnitary.setEnabled(false);
+            jckIsFreeDiscountEntry.setEnabled(false);
+            jckIsFreeDiscountDoc.setEnabled(false);
+            jckIsFreePrice.setEnabled(false);
+            jckIsFreeDiscount.setEnabled(false);
+            jckIsFreeCommissions.setEnabled(false);
+            
+            jckIsFreeDiscountUnitary.setSelected(false);
+            jckIsFreeDiscountEntry.setSelected(false);
+            jckIsFreeDiscountDoc.setSelected(false);
+            jckIsFreePrice.setSelected(false);
+            jckIsFreeDiscount.setSelected(false);
+            jckIsFreeCommissions.setSelected(false);
+        }
+        else {
+            SDataItemFamily family = (SDataItemFamily) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_IFAM, moFieldFkItemFamilyId.getKey(),SLibConstants.EXEC_MODE_VERBOSE);
+
+            jckIsFreeDiscountUnitary.setEnabled(family.getIsFreeDiscountUnitary());
+            jckIsFreeDiscountEntry.setEnabled(family.getIsFreeDiscountEntry());
+            jckIsFreeDiscountDoc.setEnabled(family.getIsFreeDiscountDoc());
+            jckIsFreePrice.setEnabled(family.getIsFreePrice());
+            jckIsFreeDiscount.setEnabled(family.getIsFreeDiscount());
+            jckIsFreeCommissions.setEnabled(family.getIsFreeCommissions());
+
+            jckIsFreeDiscountUnitary.setSelected(family.getIsFreeDiscountUnitary());
+            jckIsFreeDiscountEntry.setSelected(family.getIsFreeDiscountEntry());
+            jckIsFreeDiscountDoc.setSelected(family.getIsFreeDiscountDoc());
+            jckIsFreePrice.setSelected(family.getIsFreePrice());
+            jckIsFreeDiscount.setSelected(family.getIsFreeDiscount());
+            jckIsFreeCommissions.setSelected(family.getIsFreeCommissions());
+        }
+    }
+
     private void actionOk() {
         SFormValidation validation = formValidate();
 
@@ -288,30 +326,7 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
     }
 
     private void itemStateChangedItemFamily() {
-        readItemFamilyParams();
-    }
-
-    private void readItemFamilyParams() {
-        SDataItemFamily oItemFamily = new SDataItemFamily();
-
-        if (moFieldFkItemFamilyId.getKeyAsIntArray()[0] == 0) {
-                jckIsFreePrice.setEnabled(false);
-                jckIsFreeDiscount.setEnabled(false);
-                jckIsFreeDiscountUnitary.setEnabled(false);
-                jckIsFreeDiscountEntry.setEnabled(false);
-                jckIsFreeDiscountDoc.setEnabled(false);
-                jckIsFreeCommissions.setEnabled(false);
-        }
-        else {
-            oItemFamily = (SDataItemFamily) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_IFAM, moFieldFkItemFamilyId.getKey(),SLibConstants.EXEC_MODE_SILENT);
-
-            jckIsFreeDiscountUnitary.setEnabled(oItemFamily.getDbmsIsFreeDiscountUnitary());
-            jckIsFreeDiscountEntry.setEnabled(oItemFamily.getDbmsIsFreeDiscountEntry());
-            jckIsFreeDiscountDoc.setEnabled(oItemFamily.getDbmsIsFreeDiscountDoc());
-            jckIsFreePrice.setEnabled(oItemFamily.getDbmsIsFreePrice());
-            jckIsFreeDiscount.setEnabled(oItemFamily.getDbmsIsFreeDiscount());
-            jckIsFreeCommissions.setEnabled(oItemFamily.getDbmsIsFreeCommissions());
-        }
+        readItemFamilySettings();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -358,8 +373,8 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
             ((erp.lib.form.SFormField) mvFields.get(i)).resetField();
         }
 
-        moFieldFkItemFamilyId.setFieldValue(new int[] { 0 });
-        readItemFamilyParams();
+        readItemFamilySettings();
+        
         jckIsDeleted.setEnabled(false);
     }
 
@@ -391,6 +406,13 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
             }
         }
 
+        if (!validation.getIsError()) {
+            if (jckIsFreeDiscount.isSelected() && !jckIsFreePrice.isSelected()) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_OPTION_SELECT + "'" + jckIsFreePrice.getText() + "'");
+                validation.setComponent(jckIsFreePrice);
+            }
+        }
+        
         return validation;
     }
 
@@ -419,16 +441,16 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
         moItemGroup = (SDataItemGroup) registry;
 
         moFieldFkItemFamilyId.setFieldValue(new int[] { moItemGroup.getFkItemFamilyId() });
+        readItemFamilySettings();
         moFieldItemGroup.setFieldValue(moItemGroup.getItemGroup());
-        moFieldIsFreePrice.setFieldValue(moItemGroup.getIsFreePrice());
-        moFieldIsFreeDiscount.setFieldValue(moItemGroup.getIsFreeDiscount());
         moFieldIsFreeDiscountUnitary.setFieldValue(moItemGroup.getIsFreeDiscountUnitary());
         moFieldIsFreeDiscountEntry.setFieldValue(moItemGroup.getIsFreeDiscountEntry());
         moFieldIsFreeDiscountDoc.setFieldValue(moItemGroup.getIsFreeDiscountDoc());
+        moFieldIsFreePrice.setFieldValue(moItemGroup.getIsFreePrice());
+        moFieldIsFreeDiscount.setFieldValue(moItemGroup.getIsFreeDiscount());
         moFieldIsFreeCommissions.setFieldValue(moItemGroup.getIsFreeCommissions());
         moFieldIsDeleted.setFieldValue(moItemGroup.getIsDeleted());
 
-        readItemFamilyParams();
         jckIsDeleted.setEnabled(true);
     }
 
@@ -444,12 +466,12 @@ public class SFormItemGroup extends javax.swing.JDialog implements erp.lib.form.
 
         moItemGroup.setFkItemFamilyId(moFieldFkItemFamilyId.getKeyAsIntArray()[0]);
         moItemGroup.setItemGroup(moFieldItemGroup.getString());
-        moItemGroup.setIsFreePrice(moFieldIsFreePrice.getBoolean());
-        moItemGroup.setIsFreeDiscount(moFieldIsFreeDiscount.getBoolean());
-        moItemGroup.setIsFreeDiscountUnitary(moFieldIsFreeDiscountUnitary.getBoolean());
-        moItemGroup.setIsFreeDiscountEntry(moFieldIsFreeDiscountEntry.getBoolean());
-        moItemGroup.setIsFreeDiscountDoc(moFieldIsFreeDiscountDoc.getBoolean());
-        moItemGroup.setIsFreeCommissions(moFieldIsFreeCommissions.getBoolean());
+        moItemGroup.setIsFreePrice(jckIsFreePrice.isEnabled() && moFieldIsFreePrice.getBoolean());
+        moItemGroup.setIsFreeDiscount(jckIsFreeDiscount.isEnabled() && moFieldIsFreeDiscount.getBoolean());
+        moItemGroup.setIsFreeDiscountUnitary(jckIsFreeDiscountUnitary.isEnabled() && moFieldIsFreeDiscountUnitary.getBoolean());
+        moItemGroup.setIsFreeDiscountEntry(jckIsFreeDiscountEntry.isEnabled() && moFieldIsFreeDiscountEntry.getBoolean());
+        moItemGroup.setIsFreeDiscountDoc(jckIsFreeDiscountDoc.isEnabled() && moFieldIsFreeDiscountDoc.getBoolean());
+        moItemGroup.setIsFreeCommissions(jckIsFreeCommissions.isEnabled() && moFieldIsFreeCommissions.getBoolean());
         moItemGroup.setIsDeleted(moFieldIsDeleted.getBoolean());
 
         return moItemGroup;

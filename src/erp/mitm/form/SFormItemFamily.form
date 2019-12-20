@@ -107,7 +107,7 @@
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="jckIsFreePrice">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Sin precio"/>
+                    <Property name="text" type="java.lang.String" value="Sin precio en listas de precios"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="jckIsFreeDiscountEntry">

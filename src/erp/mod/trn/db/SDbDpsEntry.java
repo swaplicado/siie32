@@ -73,6 +73,8 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected double mdOriginalPriceUnitarySystemCy;
     protected double mdOriginalDiscountUnitaryCy;
     protected double mdOriginalDiscountUnitarySystemCy;
+    protected double mdSalesPriceUnitaryCy;
+    protected double mdSalesFreightUnitaryCy;
     protected double mdLength;
     protected double mdSurface;
     protected double mdVolume;
@@ -101,6 +103,9 @@ public class SDbDpsEntry extends SDbRegistryUser {
     protected boolean mbIsTaxesAutomaticApplying;
     protected boolean mbIsPriceVariable;
     protected boolean mbIsPriceConfirm;
+    protected boolean mbIsSalesFreightRequired;
+    protected boolean mbIsSalesFreightConfirm;
+    protected boolean mbIsSalesFreightAdd;
     protected boolean mbIsInventoriable;
     protected boolean mbIsDeleted;
     protected int mnFkItemId;
@@ -178,6 +183,8 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public void setOriginalPriceUnitarySystemCy(double d) { mdOriginalPriceUnitarySystemCy = d; }
     public void setOriginalDiscountUnitaryCy(double d) { mdOriginalDiscountUnitaryCy = d; }
     public void setOriginalDiscountUnitarySystemCy(double d) { mdOriginalDiscountUnitarySystemCy = d; }
+    public void setSalesPriceUnitaryCy(double d) { mdSalesPriceUnitaryCy = d; }
+    public void setSalesFreightUnitaryCy(double d) { mdSalesFreightUnitaryCy = d; }
     public void setLength(double d) { mdLength = d; }
     public void setSurface(double d) { mdSurface = d; }
     public void setVolume(double d) { mdVolume = d; }
@@ -206,6 +213,9 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public void setIsTaxesAutomaticApplying(boolean b) { mbIsTaxesAutomaticApplying = b; }
     public void setIsPriceVariable(boolean b) { mbIsPriceVariable = b; }
     public void setIsPriceConfirm(boolean b) { mbIsPriceConfirm = b; }
+    public void setIsSalesFreightRequired(boolean b) { mbIsSalesFreightRequired = b; }
+    public void setIsSalesFreightConfirm(boolean b) { mbIsSalesFreightConfirm = b; }
+    public void setIsSalesFreightAdd(boolean b) { mbIsSalesFreightAdd = b; }
     public void setIsInventoriable(boolean b) { mbIsInventoriable = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
     public void setFkItemId(int n) { mnFkItemId = n; }
@@ -273,6 +283,8 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public double getOriginalPriceUnitarySystemCy() { return mdOriginalPriceUnitarySystemCy; }
     public double getOriginalDiscountUnitaryCy() { return mdOriginalDiscountUnitaryCy; }
     public double getOriginalDiscountUnitarySystemCy() { return mdOriginalDiscountUnitarySystemCy; }
+    public double getSalesPriceUnitaryCy() { return mdSalesPriceUnitaryCy; }
+    public double getSalesFreightUnitaryCy() { return mdSalesFreightUnitaryCy; }
     public double getLength() { return mdLength; }
     public double getSurface() { return mdSurface; }
     public double getVolume() { return mdVolume; }
@@ -301,6 +313,9 @@ public class SDbDpsEntry extends SDbRegistryUser {
     public boolean getIsTaxesAutomaticApplying() { return mbIsTaxesAutomaticApplying; }
     public boolean getIsPriceVariable() { return mbIsPriceVariable; }
     public boolean getIsPriceConfirm() { return mbIsPriceConfirm; }
+    public boolean getIsSalesFreightRequired() { return mbIsSalesFreightRequired; }
+    public boolean getIsSalesFreightConfirm() { return mbIsSalesFreightConfirm; }
+    public boolean getIsSalesFreightAdd() { return mbIsSalesFreightAdd; }
     public boolean getIsInventoriable() { return mbIsInventoriable; }
     public boolean getIsDeleted() { return mbIsDeleted; }
     public int getFkItemId() { return mnFkItemId; }
@@ -388,6 +403,8 @@ public class SDbDpsEntry extends SDbRegistryUser {
         mdOriginalPriceUnitarySystemCy = 0;
         mdOriginalDiscountUnitaryCy = 0;
         mdOriginalDiscountUnitarySystemCy = 0;
+        mdSalesPriceUnitaryCy = 0;
+        mdSalesFreightUnitaryCy = 0;
         mdLength = 0;
         mdSurface = 0;
         mdVolume = 0;
@@ -416,6 +433,9 @@ public class SDbDpsEntry extends SDbRegistryUser {
         mbIsTaxesAutomaticApplying = false;
         mbIsPriceVariable = false;
         mbIsPriceConfirm = false;
+        mbIsSalesFreightRequired = false;
+        mbIsSalesFreightConfirm = false;
+        mbIsSalesFreightAdd = false;
         mbIsInventoriable = false;
         mbIsDeleted = false;
         mnFkItemId = 0;
@@ -527,6 +547,8 @@ public class SDbDpsEntry extends SDbRegistryUser {
             mdOriginalPriceUnitarySystemCy = resultSet.getDouble("orig_price_u_sys_cur");
             mdOriginalDiscountUnitaryCy = resultSet.getDouble("orig_disc_u_cur");
             mdOriginalDiscountUnitarySystemCy = resultSet.getDouble("orig_disc_u_sys_cur");
+            mdSalesPriceUnitaryCy = resultSet.getDouble("sales_price_u_cur");
+            mdSalesFreightUnitaryCy = resultSet.getDouble("sales_freight_u_cur");
             mdLength = resultSet.getDouble("len");
             mdSurface = resultSet.getDouble("surf");
             mdVolume = resultSet.getDouble("vol");
@@ -555,6 +577,9 @@ public class SDbDpsEntry extends SDbRegistryUser {
             mbIsTaxesAutomaticApplying = resultSet.getBoolean("b_tax_aut");
             mbIsPriceVariable = resultSet.getBoolean("b_prc_var");
             mbIsPriceConfirm = resultSet.getBoolean("b_prc_cnf");
+            mbIsSalesFreightRequired = resultSet.getBoolean("b_sales_freight_req");
+            mbIsSalesFreightConfirm = resultSet.getBoolean("b_sales_freight_cnf");
+            mbIsSalesFreightAdd = resultSet.getBoolean("b_sales_freight_add");
             mbIsInventoriable = resultSet.getBoolean("b_inv");
             mbIsDeleted = resultSet.getBoolean("b_del");
             mnFkItemId = resultSet.getInt("fid_item");

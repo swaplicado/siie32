@@ -30,15 +30,21 @@ public class SDataDpsType extends erp.lib.data.SDataRegistry implements java.io.
     protected java.util.Date mtUserNewTs;
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
+    
+    protected erp.mtrn.data.STrnDpsType moXtaDpsType; // read-only member
 
     public SDataDpsType() {
         super(SDataConstants.TRNU_TP_DPS);
         reset();
     }
+    
+    private void createXtaDpsType() {
+        moXtaDpsType = new STrnDpsType(mnPkDpsCategoryId, mnPkDpsClassId, mnPkDpsTypeId);
+    }
 
     public void setPkDpsCategoryId(int n) { mnPkDpsCategoryId = n; }
     public void setPkDpsClassId(int n) { mnPkDpsClassId = n; }
-    public void setPkDpsTypeId(int n) { mnPkDpsTypeId = n; }
+    public void setPkDpsTypeId(int n) { mnPkDpsTypeId = n; createXtaDpsType(); }
     public void setDpsType(java.lang.String s) { msDpsType = s; }
     public void setIsCanEdit(boolean b) { mbIsCanEdit = b; }
     public void setIsCanDelete(boolean b) { mbIsCanDelete = b; }
@@ -64,6 +70,8 @@ public class SDataDpsType extends erp.lib.data.SDataRegistry implements java.io.
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
+    public erp.mtrn.data.STrnDpsType getXtaDpsType() { return moXtaDpsType; }
+    
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkDpsCategoryId = ((int[]) pk)[0];
@@ -125,6 +133,8 @@ public class SDataDpsType extends erp.lib.data.SDataRegistry implements java.io.
                 mtUserNewTs = resultSet.getTimestamp("ts_new");
                 mtUserEditTs = resultSet.getTimestamp("ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("ts_del");
+                
+                createXtaDpsType();
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;

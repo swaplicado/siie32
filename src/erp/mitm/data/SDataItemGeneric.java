@@ -15,7 +15,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Juan Barajas
+ * @author Alfonso Flores, Juan Barajas, Sergio Flores
  */
 public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -79,6 +79,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     protected boolean mbIsFreeDiscountEntry;
     protected boolean mbIsFreeDiscountDoc;
     protected boolean mbIsFreeCommissions;
+    protected boolean mbIsSalesFreightRequired;
     protected boolean mbIsDataShipDomesticReq;
     protected boolean mbIsDataShipInternationalReq;
     protected boolean mbIsDataShipQualityReq;
@@ -105,12 +106,12 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
 
-    protected erp.mitm.data.SDataItemGroup moDbmsDataItemGroup;
+    protected int mnDbmsFkItemFamilyId;
     protected java.util.Vector<erp.mitm.data.SDataItemGenericBizArea> mvDbmsBizAreas;
 
     public SDataItemGeneric() {
         super(SDataConstants.ITMU_IGEN);
-        mvDbmsBizAreas = new Vector<SDataItemGenericBizArea>();
+        mvDbmsBizAreas = new Vector<>();
         reset();
     }
 
@@ -174,6 +175,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     public void setIsFreeDiscountEntry(boolean b) { mbIsFreeDiscountEntry = b; }
     public void setIsFreeDiscountDoc(boolean b) { mbIsFreeDiscountDoc = b; }
     public void setIsFreeCommissions(boolean b) { mbIsFreeCommissions = b; }
+    public void setIsSalesFreightRequired(boolean b) { mbIsSalesFreightRequired = b; }
     public void setIsDataShipDomesticReq(boolean b) { mbIsDataShipDomesticReq = b; }
     public void setIsDataShipInternationalReq(boolean b) { mbIsDataShipInternationalReq = b; }
     public void setIsDataShipQualityReq(boolean b) { mbIsDataShipQualityReq = b; }
@@ -260,6 +262,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     public boolean getIsFreeDiscountEntry() { return mbIsFreeDiscountEntry; }
     public boolean getIsFreeDiscountDoc() { return mbIsFreeDiscountDoc; }
     public boolean getIsFreeCommissions() { return mbIsFreeCommissions; }
+    public boolean getIsSalesFreightRequired() { return mbIsSalesFreightRequired; }
     public boolean getIsDataShipDomesticReq() { return mbIsDataShipDomesticReq; }
     public boolean getIsDataShipInternationalReq() { return mbIsDataShipInternationalReq; }
     public boolean getIsDataQualityReq() { return mbIsDataShipQualityReq; }
@@ -286,14 +289,12 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
-    public erp.mitm.data.SDataItemGroup getDbmsDataItemGroup() { return moDbmsDataItemGroup; }
+    public int getDbmsFkItemFamilyId() { return mnDbmsFkItemFamilyId; }
     public java.util.Vector<SDataItemGenericBizArea> getDbmsBizAreas() { return mvDbmsBizAreas; }
-    public boolean getDbmsIsFreePrice() { return mbIsFreePrice || (moDbmsDataItemGroup == null ? false : moDbmsDataItemGroup.getDbmsIsFreePrice()); }
-    public boolean getDbmsIsFreeDiscount() { return mbIsFreeDiscount || (moDbmsDataItemGroup == null ? false : moDbmsDataItemGroup.getDbmsIsFreeDiscount()); }
-    public boolean getDbmsIsFreeDiscountUnitary() { return mbIsFreeDiscountUnitary || (moDbmsDataItemGroup == null ? false : moDbmsDataItemGroup.getDbmsIsFreeDiscountUnitary()); }
-    public boolean getDbmsIsFreeDiscountEntry() { return mbIsFreeDiscountEntry || (moDbmsDataItemGroup == null ? false : moDbmsDataItemGroup.getDbmsIsFreeDiscountEntry()); }
-    public boolean getDbmsIsFreeDiscountDoc() { return mbIsFreeDiscountDoc || (moDbmsDataItemGroup == null ? false : moDbmsDataItemGroup.getDbmsIsFreeDiscountDoc()); }
-    public boolean getDbmsIsFreeCommissions() { return mbIsFreeCommissions || (moDbmsDataItemGroup == null ? false : moDbmsDataItemGroup.getDbmsIsFreeCommissions()); }
+    
+    public int[] getItemCategoryKey() { return new int[] { mnFkItemCategoryId }; }
+    public int[] getItemClassKey() { return new int[] { mnFkItemCategoryId, mnFkItemClassId }; }
+    public int[] getItemTypeKey() { return new int[] { mnFkItemCategoryId, mnFkItemClassId, mnFkItemTypeId }; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -369,6 +370,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
         mbIsFreeDiscountEntry = false;
         mbIsFreeDiscountDoc = false;
         mbIsFreeCommissions = false;
+        mbIsSalesFreightRequired = false;
         mbIsDataShipDomesticReq = false;
         mbIsDataShipInternationalReq = false;
         mbIsDataShipQualityReq = false;
@@ -395,7 +397,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
         mtUserEditTs = null;
         mtUserDeleteTs = null;
 
-        moDbmsDataItemGroup = null;
+        mnDbmsFkItemFamilyId = 0;
         mvDbmsBizAreas.clear();
     }
 
@@ -447,7 +449,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
                 mnKeyOrdinaryPosBrand = resultSet.getInt("igen.key_ord_pos_brd");
                 mnKeyOrdinaryPosManufacturer = resultSet.getInt("igen.key_ord_pos_mfr");
                 mnKeyOrdinaryPosCode = resultSet.getInt("igen.key_ord_pos_code");
-                mnDaysForExpiration = resultSet.getInt("days_exp");
+                mnDaysForExpiration = resultSet.getInt("igen.days_exp");
                 msSerialNumber = resultSet.getString("igen.serial_num");
                 msSerialNumberFormat = resultSet.getString("igen.serial_num_fmt");
                 mdSurplusPercentage = resultSet.getDouble("igen.surplus_per");
@@ -480,6 +482,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
                 mbIsFreeDiscountEntry = resultSet.getBoolean("igen.b_free_disc_ety");
                 mbIsFreeDiscountDoc = resultSet.getBoolean("igen.b_free_disc_doc");
                 mbIsFreeCommissions = resultSet.getBoolean("igen.b_free_comms");
+                mbIsSalesFreightRequired = resultSet.getBoolean("igen.b_sales_freight_req");
                 mbIsDataShipDomesticReq = resultSet.getBoolean("igen.b_ship_dom");
                 mbIsDataShipInternationalReq = resultSet.getBoolean("igen.b_ship_int");
                 mbIsDataShipQualityReq = resultSet.getBoolean("igen.b_ship_qlt");
@@ -497,22 +500,16 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
                 mnFkSerialNumberTypeId = resultSet.getInt("igen.fid_tp_snr");
                 mnFkAdministrativeConceptTypeId = resultSet.getInt("igen.fid_tp_adm_cpt");
                 mnFkTaxableConceptTypeId = resultSet.getInt("igen.fid_tp_tax_cpt");
-                mnFkDefaultItemRefId_n = resultSet.getInt("fid_item_ref_def_n");
+                mnFkDefaultItemRefId_n = resultSet.getInt("igen.fid_item_ref_def_n");
                 mnFkCfdProdServId = resultSet.getInt("igen.fid_cfd_prod_serv");
-                if (resultSet.wasNull()) mnFkDefaultItemRefId_n = 0;
                 mnFkUserNewId = resultSet.getInt("igen.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("igen.fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("igen.fid_usr_del");
                 mtUserNewTs = resultSet.getTimestamp("igen.ts_new");
                 mtUserEditTs = resultSet.getTimestamp("igen.ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("igen.ts_del");
-
-                // Read aswell item group object:
-
-                moDbmsDataItemGroup = new SDataItemGroup();
-                if (moDbmsDataItemGroup.read(new int[] { mnFkItemGroupId }, statement) != SLibConstants.DB_ACTION_READ_OK) {
-                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                }
+                
+                mnDbmsFkItemFamilyId = resultSet.getInt("igrp.fid_ifam");
 
                 // Read aswell item generic's business areas:
 
@@ -564,7 +561,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ? ) }");
+                    "?, ?, ?, ? ) }");
             callableStatement.setInt(nParam++, mnPkItemGenericId);
             callableStatement.setString(nParam++, msItemGeneric);
             callableStatement.setString(nParam++, msItemGenericShort);
@@ -625,6 +622,7 @@ public class SDataItemGeneric extends erp.lib.data.SDataRegistry implements java
             callableStatement.setBoolean(nParam++, mbIsFreeDiscountEntry);
             callableStatement.setBoolean(nParam++, mbIsFreeDiscountDoc);
             callableStatement.setBoolean(nParam++, mbIsFreeCommissions);
+            callableStatement.setBoolean(nParam++, mbIsSalesFreightRequired);
             callableStatement.setBoolean(nParam++, mbIsDataShipDomesticReq);
             callableStatement.setBoolean(nParam++, mbIsDataShipInternationalReq);
             callableStatement.setBoolean(nParam++, mbIsDataShipQualityReq);

@@ -34,8 +34,6 @@ public class SDataItemGroup extends erp.lib.data.SDataRegistry implements java.i
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
 
-    protected erp.mitm.data.SDataItemFamily moDbmsDataItemFamily;
-
     public SDataItemGroup() {
         super(SDataConstants.ITMU_IGRP);
         reset();
@@ -75,14 +73,6 @@ public class SDataItemGroup extends erp.lib.data.SDataRegistry implements java.i
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
-    public erp.mitm.data.SDataItemFamily getDbmsDataItemFamily() { return moDbmsDataItemFamily; }
-    public boolean getDbmsIsFreePrice() { return mbIsFreePrice || (moDbmsDataItemFamily == null ? false : moDbmsDataItemFamily.getDbmsIsFreePrice()); }
-    public boolean getDbmsIsFreeDiscount() { return mbIsFreeDiscount || (moDbmsDataItemFamily == null ? false : moDbmsDataItemFamily.getDbmsIsFreeDiscount()); }
-    public boolean getDbmsIsFreeDiscountUnitary() { return mbIsFreeDiscountUnitary || (moDbmsDataItemFamily == null ? false : moDbmsDataItemFamily.getDbmsIsFreeDiscountUnitary()); }
-    public boolean getDbmsIsFreeDiscountEntry() { return mbIsFreeDiscountEntry || (moDbmsDataItemFamily == null ? false : moDbmsDataItemFamily.getDbmsIsFreeDiscountEntry()); }
-    public boolean getDbmsIsFreeDiscountDoc() { return mbIsFreeDiscountDoc || (moDbmsDataItemFamily == null ? false : moDbmsDataItemFamily.getDbmsIsFreeDiscountDoc()); }
-    public boolean getDbmsIsFreeCommissions() { return mbIsFreeCommissions || (moDbmsDataItemFamily == null ? false : moDbmsDataItemFamily.getDbmsIsFreeCommissions()); }
-
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkItemGroupId = ((int[]) pk)[0];
@@ -113,8 +103,6 @@ public class SDataItemGroup extends erp.lib.data.SDataRegistry implements java.i
         mtUserNewTs = null;
         mtUserEditTs = null;
         mtUserDeleteTs = null;
-
-        moDbmsDataItemFamily = null;
     }
 
     @Override
@@ -149,13 +137,6 @@ public class SDataItemGroup extends erp.lib.data.SDataRegistry implements java.i
                 mtUserNewTs = resultSet.getTimestamp("ts_new");
                 mtUserEditTs = resultSet.getTimestamp("ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("ts_del");
-
-                // Read aswell item family object:
-
-                moDbmsDataItemFamily = new SDataItemFamily();
-                if (moDbmsDataItemFamily.read(new int[] { mnFkItemFamilyId }, statement) != SLibConstants.DB_ACTION_READ_OK) {
-                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                }
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;

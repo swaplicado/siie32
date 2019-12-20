@@ -25,30 +25,30 @@ public final class SCfdParams implements java.io.Serializable {
     private java.lang.String msRuta;
     private double mdInterestDelayRate;
 
-    private int mnTipoAddenda;
-    private java.lang.String msLorealFolioNotaRecepcion;
+    private java.lang.String msLorealFolioNotaRecepción;
     private java.lang.String msBachocoSociedad;
-    private java.lang.String msBachocoOrganizacionCompra;
-    private java.lang.String msBachocoDivision;
-    private java.lang.String msModeloDpsDescripcion;
-    private java.lang.String msCentro;
+    private java.lang.String msBachocoOrganizaciónCompra;
+    private java.lang.String msBachocoDivisión;
     private int mnSorianaTienda;
-    private int mnSorianaEntregaMercancia;
-    private Date mtSorianaFechaRemision;
-    private java.lang.String msSorianaFolioRemision;
-    private java.lang.String msSorianaFolioPedido;
-    private int mnSorianaTipoBulto;
-    private double mdSorianaCantidadBulto;
+    private int mnSorianaEntregaMercancía;
+    private Date mtSorianaRemisiónFecha;
+    private java.lang.String msSorianaRemisiónFolio;
+    private java.lang.String msSorianaPedidoFolio;
+    private int mnSorianaBultoTipo;
+    private double mdSorianaBultoCantidad;
     protected java.lang.String msSorianaNotaEntradaFolio;
     protected java.lang.String msSorianaCita;
+    private java.lang.String msModeloDpsDescripción;
     protected int mnCfdAddendaSubtype;
-    private java.lang.Boolean mbAgregarAddenda;
+    private java.lang.String msJsonData;
+    private int mnFkCfdAddendaTypeId;
+    
     private java.lang.String msAcuseCancelacion;
     private java.lang.String msUuid;
     private java.lang.String mtFechaTimbrado;
-    private java.lang.String msSelloCFD;
-    private java.lang.String msNoCertificadoSAT;
-    private java.lang.String msSelloSAT;
+    private java.lang.String msSelloCfd;
+    private java.lang.String msNoCertificadoSat;
+    private java.lang.String msSelloSat;
     private java.lang.String msRfcEmisor;
     private java.lang.String msRfcReceptor;
     private double mdTotalCy;
@@ -76,30 +76,30 @@ public final class SCfdParams implements java.io.Serializable {
         msRuta = "";
         mdInterestDelayRate = 0;
 
-        mnTipoAddenda = 0;
-        msLorealFolioNotaRecepcion = "";
+        msLorealFolioNotaRecepción = "";
         msBachocoSociedad = "";
-        msBachocoOrganizacionCompra = "";
-        msBachocoDivision = "";
-        msModeloDpsDescripcion = "";
-        msCentro = "";
+        msBachocoOrganizaciónCompra = "";
+        msBachocoDivisión = "";
         mnSorianaTienda = 0;
-        mnSorianaEntregaMercancia = 0;
-        mtSorianaFechaRemision = null;
-        msSorianaFolioRemision = "";
-        msSorianaFolioPedido = "";
-        mnSorianaTipoBulto = 0;
-        mdSorianaCantidadBulto = 0;
+        mnSorianaEntregaMercancía = 0;
+        mtSorianaRemisiónFecha = null;
+        msSorianaRemisiónFolio = "";
+        msSorianaPedidoFolio = "";
+        mnSorianaBultoTipo = 0;
+        mdSorianaBultoCantidad = 0;
         msSorianaNotaEntradaFolio = "";
         msSorianaCita = "";
+        msModeloDpsDescripción = "";
         mnCfdAddendaSubtype = 0;
-        mbAgregarAddenda = false;
+        msJsonData = "";
+        mnFkCfdAddendaTypeId = 0;
+        
         msAcuseCancelacion = "";
         msUuid = "";
         mtFechaTimbrado = null;
-        msSelloCFD = "";
-        msNoCertificadoSAT = "";
-        msSelloSAT = "";
+        msSelloCfd = "";
+        msNoCertificadoSat = "";
+        msSelloSat = "";
         msRfcEmisor = "";
         msRfcReceptor = "";
         mdTotalCy = 0;
@@ -126,30 +126,31 @@ public final class SCfdParams implements java.io.Serializable {
     public void setFactura(java.lang.String s) { msFactura = s; }
     public void setRuta(java.lang.String s) { msRuta = s; }
     public void setInterestDelayRate(double d) { mdInterestDelayRate = d; }
-    public void setTipoAddenda(int n) { mnTipoAddenda = n; }
-    public void setLorealFolioNotaRecepcion(java.lang.String s) { msLorealFolioNotaRecepcion = s; }
+    
+    public void setLorealFolioNotaRecepción(java.lang.String s) { msLorealFolioNotaRecepción = s; }
     public void setBachocoSociedad(java.lang.String s) { msBachocoSociedad = s; }
-    public void setBachocoOrganizacionCompra(java.lang.String s) { msBachocoOrganizacionCompra = s; }
-    public void setBachocoDivision(java.lang.String s) { msBachocoDivision = s; }
-    public void setModeloDpsDescripcion(java.lang.String s) { msModeloDpsDescripcion = s; }
-    public void setCentro(java.lang.String s) { msCentro = s; }
+    public void setBachocoOrganizaciónCompra(java.lang.String s) { msBachocoOrganizaciónCompra = s; }
+    public void setBachocoDivisión(java.lang.String s) { msBachocoDivisión = s; }
     public void setSorianaTienda(int n) { mnSorianaTienda = n; }
-    public void setSorianaEntregaMercancia(int n) { mnSorianaEntregaMercancia = n; }
-    public void setSorianaFechaRemision(Date t) { mtSorianaFechaRemision = t; }
-    public void setSorianaFolioRemision(java.lang.String s) { msSorianaFolioRemision = s; }
-    public void setSorianaFolioPedido(java.lang.String s) { msSorianaFolioPedido = s; }
-    public void setSorianaTipoBulto(int n) { mnSorianaTipoBulto = n; }
-    public void setSorianaCantidadBulto(double d) { mdSorianaCantidadBulto = d; }
+    public void setSorianaEntregaMercancía(int n) { mnSorianaEntregaMercancía = n; }
+    public void setSorianaRemisiónFecha(Date t) { mtSorianaRemisiónFecha = t; }
+    public void setSorianaRemisiónFolio(java.lang.String s) { msSorianaRemisiónFolio = s; }
+    public void setSorianaPedidoFolio(java.lang.String s) { msSorianaPedidoFolio = s; }
+    public void setSorianaBultoTipo(int n) { mnSorianaBultoTipo = n; }
+    public void setSorianaBultoCantidad(double d) { mdSorianaBultoCantidad = d; }
     public void setSorianaNotaEntradaFolio(java.lang.String s) { msSorianaNotaEntradaFolio = s; }
     public void setSorianaCita(java.lang.String s) { msSorianaCita = s; }
+    public void setModeloDpsDescripción(java.lang.String s) { msModeloDpsDescripción = s; }
     public void setCfdAddendaSubtype(int n) { mnCfdAddendaSubtype = n; }
-    public void setAgregarAddenda(java.lang.Boolean b) { mbAgregarAddenda = b; }
+    public void setJsonData(java.lang.String s) { msJsonData = s; }
+    public void setFkCfdAddendaTypeId(int n) { mnFkCfdAddendaTypeId = n; }
+    
     public void setAcuseCancelacion(java.lang.String s) { msAcuseCancelacion = s; }
     public void setUuid(java.lang.String s) { msUuid = s; }
     public void setFechaTimbrado(java.lang.String s) { mtFechaTimbrado = s; }
-    public void setSelloCFD(java.lang.String s) { msSelloCFD = s; }
-    public void setNoCertificadoSAT(java.lang.String s) { msNoCertificadoSAT = s; }
-    public void setSelloSAT(java.lang.String s) { msSelloSAT = s; }
+    public void setSelloCfd(java.lang.String s) { msSelloCfd = s; }
+    public void setNoCertificadoSat(java.lang.String s) { msNoCertificadoSat = s; }
+    public void setSelloSat(java.lang.String s) { msSelloSat = s; }
     public void setRfcEmisor(java.lang.String s) { msRfcEmisor = s; }
     public void setRfcReceptor(java.lang.String s) { msRfcReceptor = s; }
     public void setTotalCy(double d) { mdTotalCy = d; }
@@ -174,30 +175,31 @@ public final class SCfdParams implements java.io.Serializable {
     public java.lang.String getFactura() { return msFactura; }
     public java.lang.String getRuta() { return msRuta; }
     public double getInterestDelayRate() { return mdInterestDelayRate; }
-    public int getTipoAddenda() { return mnTipoAddenda; }
-    public java.lang.String getLorealFolioNotaRecepcion() { return msLorealFolioNotaRecepcion; }
+    
+    public java.lang.String getLorealFolioNotaRecepción() { return msLorealFolioNotaRecepción; }
     public java.lang.String getBachocoSociedad() { return msBachocoSociedad; }
-    public java.lang.String getBachocoOrganizacionCompra() { return msBachocoOrganizacionCompra; }
-    public java.lang.String getBachocoDivision() { return msBachocoDivision; }
-    public java.lang.String getModeloDpsDescripcion() { return msModeloDpsDescripcion; }
-    public java.lang.String getCentro() { return msCentro; }
+    public java.lang.String getBachocoOrganizaciónCompra() { return msBachocoOrganizaciónCompra; }
+    public java.lang.String getBachocoDivisión() { return msBachocoDivisión; }
     public int getSorianaTienda() { return mnSorianaTienda; }
-    public int getSorianaEntregaMercancia() { return mnSorianaEntregaMercancia; }
-    public Date getSorianaFechaRemision() { return mtSorianaFechaRemision; }
-    public java.lang.String getSorianaFolioRemision() { return msSorianaFolioRemision; }
-    public java.lang.String getSorianaFolioPedido() { return msSorianaFolioPedido; }
-    public int getSorianaTipoBulto() { return mnSorianaTipoBulto; }
-    public double getSorianaCantidadBulto() { return mdSorianaCantidadBulto; }
+    public int getSorianaEntregaMercancía() { return mnSorianaEntregaMercancía; }
+    public Date getSorianaRemisiónFecha() { return mtSorianaRemisiónFecha; }
+    public java.lang.String getSorianaRemisiónFolio() { return msSorianaRemisiónFolio; }
+    public java.lang.String getSorianaPedidoFolio() { return msSorianaPedidoFolio; }
+    public int getSorianaBultoTipo() { return mnSorianaBultoTipo; }
+    public double getSorianaBultoCantidad() { return mdSorianaBultoCantidad; }
     public java.lang.String getSorianaNotaEntradaFolio() { return msSorianaNotaEntradaFolio; }
     public java.lang.String getSorianaCita() { return msSorianaCita; }
+    public java.lang.String getModeloDpsDescripción() { return msModeloDpsDescripción; }
     public int getCfdAddendaSubtype() { return mnCfdAddendaSubtype; }
-    public java.lang.Boolean getAgregarAddenda() { return mbAgregarAddenda; }
+    public java.lang.String getJsonData() { return msJsonData; }
+    public int getFkCfdAddendaTypeId() { return mnFkCfdAddendaTypeId; }
+    
     public java.lang.String getAcuseCancelacion() { return msAcuseCancelacion; }
     public java.lang.String getUuid() { return msUuid; }
     public java.lang.String getFechaTimbrado() { return mtFechaTimbrado; }
-    public java.lang.String getSelloCFD() { return msSelloCFD; }
-    public java.lang.String getNoCertificadoSAT() { return msNoCertificadoSAT; }
-    public java.lang.String getSelloSAT() { return msSelloSAT; }
+    public java.lang.String getSelloCfd() { return msSelloCfd; }
+    public java.lang.String getNoCertificadoSat() { return msNoCertificadoSat; }
+    public java.lang.String getSelloSat() { return msSelloSat; }
     public java.lang.String getRfcEmisor() { return msRfcEmisor; }
     public java.lang.String getRfcReceptor() { return msRfcReceptor; }
     public double getTotalCy() { return mdTotalCy; }

@@ -43,7 +43,7 @@ import sa.lib.gui.SGuiUtils;
 
 /*
  *
- * @author Alfonso Flores, Sergio Flores, juan Barajas
+ * @author Alfonso Flores, Juan Barajas, Sergio Flores
  */
 public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
 
@@ -131,20 +131,24 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private erp.lib.form.SFormField moFieldIsFreePrice;
     private erp.lib.form.SFormField moFieldIsFreeDiscount;
     private erp.lib.form.SFormField moFieldIsFreeCommissions;
+    private erp.lib.form.SFormField moFieldIsSalesFreightRequired;
+    private erp.lib.form.SFormField moFieldIsItemRefRequired;
     private erp.lib.form.SFormField moFieldBizArea;
     private erp.lib.form.SFormField moFieldBizAreaItemGeneric;
-    private erp.lib.form.SFormField moFieldIsItemRefRequired;
     private erp.lib.form.SFormField moFieldFkDefaultItemRefeferenceId_n;
     private erp.lib.form.SFormField moFieldFkAdministrativeConceptTypeId;
     private erp.lib.form.SFormField moFieldFkTaxableConceptTypeId;
     private erp.lib.form.SFormField moFieldFkCfdProdServId;
-    private erp.lib.form.SFormField moFieldIsShipDomestic;
-    private erp.lib.form.SFormField moFieldIsShipInternational;
-    private erp.lib.form.SFormField moFieldIsShipQuality;
+    private erp.lib.form.SFormField moFieldIsShipDataDomestic;
+    private erp.lib.form.SFormField moFieldIsShipDataInternational;
+    private erp.lib.form.SFormField moFieldIsShipDataQuality;
     
     private boolean mbIsLotApplyingBySystem;
     
-    /** Creates new form SFormItemGeneric */
+    /**
+     * Creates new form SFormItemGeneric
+     * @param client
+     */
     public SFormItemGeneric(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient =  client;
@@ -324,17 +328,18 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jckIsWeightGrossApplying = new javax.swing.JCheckBox();
         jckIsWeightDeliveryApplying = new javax.swing.JCheckBox();
         jpProperties122 = new javax.swing.JPanel();
-        jpProperties1221 = new javax.swing.JPanel();
         jckIsFreeDiscountUnitary = new javax.swing.JCheckBox();
         jckIsFreePrice = new javax.swing.JCheckBox();
         jckIsFreeDiscountEntry = new javax.swing.JCheckBox();
         jckIsFreeDiscount = new javax.swing.JCheckBox();
         jckIsFreeDiscountDoc = new javax.swing.JCheckBox();
         jckIsFreeCommissions = new javax.swing.JCheckBox();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
+        jckIsSalesFreightRequired = new javax.swing.JCheckBox();
+        jLabel6 = new javax.swing.JLabel();
         jlSurplusPercentage = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         jtfSurplusPercentage = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
         jpProperties2 = new javax.swing.JPanel();
         jpProperties21 = new javax.swing.JPanel();
         jpProperties211 = new javax.swing.JPanel();
@@ -373,11 +378,11 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jpShipment = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        jckIsDomesticShipment = new javax.swing.JCheckBox();
+        jckIsShipDataDomesticReq = new javax.swing.JCheckBox();
         jPanel7 = new javax.swing.JPanel();
-        jckIsInternationalShipment = new javax.swing.JCheckBox();
+        jckIsShipDataInternationalReq = new javax.swing.JCheckBox();
         jPanel8 = new javax.swing.JPanel();
-        jckIsQualityShipment = new javax.swing.JCheckBox();
+        jckIsShipDataQualityReq = new javax.swing.JCheckBox();
         jpCommand = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -1027,47 +1032,47 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         jpProperties12.add(jpProperties121);
 
         jpProperties122.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración de comercialización para documentos:"));
-        jpProperties122.setLayout(new java.awt.BorderLayout());
-
-        jpProperties1221.setPreferredSize(new java.awt.Dimension(100, 80));
-        jpProperties1221.setLayout(new java.awt.GridLayout(3, 2, 5, 0));
+        jpProperties122.setLayout(new java.awt.GridLayout(5, 2, 5, 0));
 
         jckIsFreeDiscountUnitary.setText("Sin descuento unitario");
-        jpProperties1221.add(jckIsFreeDiscountUnitary);
+        jpProperties122.add(jckIsFreeDiscountUnitary);
 
-        jckIsFreePrice.setText("Sin precio");
-        jpProperties1221.add(jckIsFreePrice);
+        jckIsFreePrice.setText("Sin precio en listas de precios");
+        jpProperties122.add(jckIsFreePrice);
 
         jckIsFreeDiscountEntry.setText("Sin descuento en partida");
-        jpProperties1221.add(jckIsFreeDiscountEntry);
+        jpProperties122.add(jckIsFreeDiscountEntry);
 
         jckIsFreeDiscount.setText("Sin descuento en listas de precios");
-        jpProperties1221.add(jckIsFreeDiscount);
+        jpProperties122.add(jckIsFreeDiscount);
 
         jckIsFreeDiscountDoc.setText("Sin descuento en documento");
-        jpProperties1221.add(jckIsFreeDiscountDoc);
+        jpProperties122.add(jckIsFreeDiscountDoc);
 
         jckIsFreeCommissions.setText("Sin comisiones de venta");
-        jpProperties1221.add(jckIsFreeCommissions);
+        jpProperties122.add(jckIsFreeCommissions);
 
-        jpProperties122.add(jpProperties1221, java.awt.BorderLayout.NORTH);
+        jckIsSalesFreightRequired.setText("Requiere flete en ventas");
+        jpProperties122.add(jckIsSalesFreightRequired);
+        jpProperties122.add(jLabel6);
 
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jlSurplusPercentage.setText("Excedente por defecto entre doctos.:");
+        jlSurplusPercentage.setPreferredSize(new java.awt.Dimension(225, 23));
+        jpProperties122.add(jlSurplusPercentage);
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlSurplusPercentage.setText("Excedente predeterminado:");
-        jlSurplusPercentage.setPreferredSize(new java.awt.Dimension(225, 23));
-        jPanel2.add(jlSurplusPercentage);
 
         jtfSurplusPercentage.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfSurplusPercentage.setText("0.00%");
         jtfSurplusPercentage.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel2.add(jtfSurplusPercentage);
 
-        jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
+        jLabel7.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel7.setText("(ventas y compras)");
+        jLabel7.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel2.add(jLabel7);
 
-        jpProperties122.add(jPanel1, java.awt.BorderLayout.CENTER);
+        jpProperties122.add(jPanel2);
 
         jpProperties12.add(jpProperties122);
 
@@ -1101,7 +1106,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jpProperties212.setLayout(new java.awt.BorderLayout());
 
-        jpProperties2121.setBorder(javax.swing.BorderFactory.createEmptyBorder(15, 0, 0, 0));
+        jpProperties2121.setBorder(javax.swing.BorderFactory.createEmptyBorder(25, 0, 0, 0));
         jpProperties2121.setLayout(new java.awt.GridLayout(4, 1, 5, 5));
 
         jbBizAreaAssign.setText(">");
@@ -1258,25 +1263,25 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsDomesticShipment.setText("Embarque nacional");
-        jckIsDomesticShipment.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel5.add(jckIsDomesticShipment);
+        jckIsShipDataDomesticReq.setText("Embarque nacional");
+        jckIsShipDataDomesticReq.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel5.add(jckIsShipDataDomesticReq);
 
         jPanel4.add(jPanel5);
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsInternationalShipment.setText("Embarque internacional");
-        jckIsInternationalShipment.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel7.add(jckIsInternationalShipment);
+        jckIsShipDataInternationalReq.setText("Embarque internacional");
+        jckIsShipDataInternationalReq.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel7.add(jckIsShipDataInternationalReq);
 
         jPanel4.add(jPanel7);
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckIsQualityShipment.setText("Calidad");
-        jckIsQualityShipment.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel8.add(jckIsQualityShipment);
+        jckIsShipDataQualityReq.setText("Calidad");
+        jckIsShipDataQualityReq.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel8.add(jckIsShipDataQualityReq);
 
         jPanel4.add(jPanel8);
 
@@ -1325,7 +1330,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
      */
 
     private void initComponentsExtra() {
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moComboBoxFamilyItem = new SFormComboBoxGroup(miClient);
         moComboBoxCategoryItem = new SFormComboBoxGroup(miClient);
@@ -1481,6 +1486,8 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldIsFreeDiscount.setTabbedPaneIndex(1, jTabbedPane);
         moFieldIsFreeCommissions = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsFreeCommissions);
         moFieldIsFreeCommissions.setTabbedPaneIndex(1, jTabbedPane);
+        moFieldIsSalesFreightRequired = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSalesFreightRequired);
+        moFieldIsSalesFreightRequired.setTabbedPaneIndex(1, jTabbedPane);
         moFieldBizArea = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jltBizAreaAvailable, jlBizAreaAvailable);
         moFieldBizArea.setTabbedPaneIndex(1, jTabbedPane);
         moFieldBizAreaItemGeneric = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jltBizAreaAsignated, jlBizAreaAsignated);
@@ -1501,12 +1508,12 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldFkCfdProdServId.setTabbedPaneIndex(1, jTabbedPane);
         moKeyCfdProdServId.setKeySettings((SGuiClient) miClient, SGuiUtils.getLabelName(jlFkCfdProdServId.getText()), true);
 
-        moFieldIsShipDomestic = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDomesticShipment);
-        moFieldIsShipDomestic.setTabbedPaneIndex(2, jTabbedPane);
-        moFieldIsShipInternational = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsInternationalShipment);
-        moFieldIsShipInternational.setTabbedPaneIndex(2, jTabbedPane);
-        moFieldIsShipQuality = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsQualityShipment);
-        moFieldIsShipQuality.setTabbedPaneIndex(2, jTabbedPane);
+        moFieldIsShipDataDomestic = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsShipDataDomesticReq);
+        moFieldIsShipDataDomestic.setTabbedPaneIndex(2, jTabbedPane);
+        moFieldIsShipDataInternational = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsShipDataInternationalReq);
+        moFieldIsShipDataInternational.setTabbedPaneIndex(2, jTabbedPane);
+        moFieldIsShipDataQuality = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsShipDataQualityReq);
+        moFieldIsShipDataQuality.setTabbedPaneIndex(2, jTabbedPane);
         
         mvFields.add(moFieldFkItemCategoryId);
         mvFields.add(moFieldFkItemClassId);
@@ -1578,6 +1585,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         mvFields.add(moFieldIsFreePrice);
         mvFields.add(moFieldIsFreeDiscount);
         mvFields.add(moFieldIsFreeCommissions);
+        mvFields.add(moFieldIsSalesFreightRequired);
         mvFields.add(moFieldBizArea);
         mvFields.add(moFieldBizAreaItemGeneric);
         mvFields.add(moFieldIsItemRefRequired);
@@ -1585,9 +1593,9 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         mvFields.add(moFieldFkAdministrativeConceptTypeId);
         mvFields.add(moFieldFkTaxableConceptTypeId);
         mvFields.add(moFieldFkCfdProdServId);
-        mvFields.add(moFieldIsShipDomestic);
-        mvFields.add(moFieldIsShipInternational);
-        mvFields.add(moFieldIsShipQuality);
+        mvFields.add(moFieldIsShipDataDomestic);
+        mvFields.add(moFieldIsShipDataInternational);
+        mvFields.add(moFieldIsShipDataQuality);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
@@ -1644,278 +1652,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
             jcbFkItemCategoryId.requestFocus();
         }
     }
-
-    private void renderItemGenericShortSettings() {
-        if (jckIsItemShortApplying.isSelected()) {
-            jtfItemGenericShort.setEnabled(true);
-            jbCopyItemGeneric.setEnabled(true);
-        }
-        else {
-            jtfItemGenericShort.setEnabled(false);
-            jbCopyItemGeneric.setEnabled(false);
-
-            moFieldItemGenericShort.setFieldValue("");
-        }
-    }
-
-    private void renderItemKeySettings() {
-        if (jckIsItemKeyApplying.isSelected()) {
-            jckIsItemKeyAutomatic.setEnabled(true);
-        }
-        else {
-            jckIsItemKeyAutomatic.setEnabled(false);
-
-            moFieldIsItemKeyAutomatic.setFieldValue(false);
-        }
-
-        renderItemKeyAutomaticSettings();
-        renderItemLineSettings();
-    }
-
-    private void renderItemKeyAutomaticSettings() {
-        if (jckIsItemKeyAutomatic.isSelected()) {
-            jtfCode.setEnabled(true);
-            jtfKeyOrdinaryPosItemGeneric.setEnabled(true);
-            jtfKeyOrdinaryPosBrand.setEnabled(true);
-            jtfKeyOrdinaryPosManufacturer.setEnabled(true);
-            jtfKeyOrdinaryPosCode.setEnabled(true);
-        }
-        else {
-            jtfCode.setEnabled(false);
-            jtfKeyOrdinaryPosItemGeneric.setEnabled(false);
-            jtfKeyOrdinaryPosBrand.setEnabled(false);
-            jtfKeyOrdinaryPosManufacturer.setEnabled(false);
-            jtfKeyOrdinaryPosCode.setEnabled(false);
-
-            moFieldCode.setFieldValue("");
-            moFieldKeyOrdinaryPosItemGeneric.setFieldValue(0);
-            moFieldKeyOrdinaryPosBrand.setFieldValue(0);
-            moFieldKeyOrdinaryPosManufacturer.setFieldValue(0);
-            moFieldKeyOrdinaryPosCode.setFieldValue(0);
-        }
-
-        renderItemLineSettings();
-    }
-
-    private void renderItemLineSettings() {
-        if (jckIsItemLineApplying.isSelected()) {
-            jtfNamingLinePosItemGeneric.setEnabled(true);
-            jtfNamingLinePosItemLine.setEnabled(true);
-            jtfNamingLinePosBrand.setEnabled(true);
-            jtfNamingLinePosManufacturer.setEnabled(true);
-        }
-        else {
-            jtfNamingLinePosItemGeneric.setEnabled(false);
-            jtfNamingLinePosItemLine.setEnabled(false);
-            jtfNamingLinePosBrand.setEnabled(false);
-            jtfNamingLinePosManufacturer.setEnabled(false);
-
-            moFieldNamingLinePosItemGeneric.setFieldValue(0);
-            moFieldNamingLinePosItemLine.setFieldValue(0);
-            moFieldNamingLinePosBrand.setFieldValue(0);
-            moFieldNamingLinePosManufacturer.setFieldValue(0);
-        }
-
-        if (jckIsItemLineApplying.isSelected() && jckIsItemKeyAutomatic.isSelected()) {
-            jtfKeyLinePosItemGeneric.setEnabled(true);
-            jtfKeyLinePosItemLine.setEnabled(true);
-            jtfKeyLinePosBrand.setEnabled(true);
-            jtfKeyLinePosManufacturer.setEnabled(true);
-        }
-        else {
-            jtfKeyLinePosItemGeneric.setEnabled(false);
-            jtfKeyLinePosItemLine.setEnabled(false);
-            jtfKeyLinePosBrand.setEnabled(false);
-            jtfKeyLinePosManufacturer.setEnabled(false);
-
-            moFieldKeyLinePosItemGeneric.setFieldValue(0);
-            moFieldKeyLinePosItemLine.setFieldValue(0);
-            moFieldKeyLinePosBrand.setFieldValue(0);
-            moFieldKeyLinePosManufacturer.setFieldValue(0);
-        }
-    }
-
-    private void renderIsInventoriable() {
-        if (jckIsInventoriable.isSelected()) {
-            jckIsLotApplying.setEnabled(mbIsLotApplyingBySystem);
-            jcbFkSerialNumberTypeId.setEnabled(true);
-        }
-        else {
-            jckIsLotApplying.setEnabled(false);
-            jcbFkSerialNumberTypeId.setEnabled(false);
-
-            moFieldFkSerialNumberTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMS_TP_SNR_NA });
-        }
-
-        if (!jckIsLotApplying.isEnabled()) {
-            moFieldIsLotApplying.setFieldValue(false);
-        }
-
-        itemStateChangedFkSerialNumberTypeId();
-        renderIsLotApplying();
-    }
-
-    private void renderIsLotApplying() {
-        if (jckIsLotApplying.isSelected()) {
-            jtfDaysForExpiration.setEnabled(true);
-        }
-        else {
-            jtfDaysForExpiration.setEnabled(false);
-        }
-
-        if (!jtfDaysForExpiration.isEnabled()) {
-            moFieldDaysForExpiration.setFieldValue(0);
-        }
-    }
-
-    private void renderUnitUnitsContainedTypeSettings() {
-        if (jckIsUnitsContainedApplying.isSelected()) {
-            jcbFkUnitUnitsContainedTypeId.setEnabled(true);
-        }
-        else if (!jckIsUnitsContainedApplying.isSelected()) {
-            jcbFkUnitUnitsContainedTypeId.setEnabled(false);
-            moFieldFkUnitUnitsContainedTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_UNIT_NA });
-        }
-    }
-
-    private void renderUnitUnitsVirtualTypeSettings() {
-        if (jckIsUnitsVirtualApplying.isSelected()) {
-            jcbFkUnitUnitsVirtualTypeId.setEnabled(true);
-        }
-        else if (!jckIsUnitsVirtualApplying.isSelected()) {
-            jcbFkUnitUnitsVirtualTypeId.setEnabled(false);
-            moFieldFkUnitUnitsVirtualTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_UNIT_NA });
-        }
-    }
-
-    private void renderUnitNetContentTypeSettings() {
-        if (jckIsNetContentApplying.isSelected()) {
-            jcbFkUnitNetContentTypeId.setEnabled(true);
-        }
-        else {
-            jcbFkUnitNetContentTypeId.setEnabled(false);
-            moFieldFkUnitNetContentTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_UNIT_NA });
-        }
-    }
-
-    private void renderUnitNetContentUnitaryTypeSettings() {
-        if (jckIsNetContentUnitaryApplying.isSelected()) {
-            jcbFkUnitNetContentUnitaryTypeId.setEnabled(true);
-        }
-        else {
-            jcbFkUnitNetContentUnitaryTypeId.setEnabled(false);
-            moFieldFkUnitNetContentUnitaryTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_UNIT_NA });
-        }
-    }
-
-    private void renderLength() {
-        if (jckIsLengthApplying.isSelected()) {
-            jckIsLengthUnitaryApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsLengthUnitaryApplying());
-            jckIsLengthVariable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsLengthVariable());
-        }
-        else {
-            jckIsLengthUnitaryApplying.setEnabled(false);
-            jckIsLengthVariable.setEnabled(false);
-        }
-
-        if (!jckIsLengthUnitaryApplying.isEnabled()) {
-            moFieldIsLengthUnitaryApplying.setFieldValue(false);
-        }
-        if (!jckIsLengthVariable.isEnabled()) {
-            moFieldIsLengthVariable.setFieldValue(false);
-        }
-    }
-
-    private void renderSurface() {
-        if (jckIsSurfaceApplying.isSelected()) {
-            jckIsSurfaceUnitaryApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsSurfaceUnitaryApplying());
-            jckIsSurfaceVariable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsSurfaceVariable());
-        }
-        else {
-            jckIsSurfaceUnitaryApplying.setEnabled(false);
-            jckIsSurfaceVariable.setEnabled(false);
-        }
-
-        if (!jckIsSurfaceUnitaryApplying.isEnabled()) {
-            moFieldIsSurfaceUnitaryApplying.setFieldValue(false);
-        }
-        if (!jckIsSurfaceVariable.isEnabled()) {
-            moFieldIsSurfaceVariable.setFieldValue(false);
-        }
-    }
-
-    private void renderVolume() {
-        if (jckIsVolumeApplying.isSelected()) {
-            jckIsVolumeUnitaryApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsVolumeUnitaryApplying());
-            jckIsVolumeVariable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsVolumeVariable());
-        }
-        else {
-            jckIsVolumeUnitaryApplying.setEnabled(false);
-            jckIsVolumeVariable.setEnabled(false);
-        }
-
-        if (!jckIsVolumeUnitaryApplying.isEnabled()) {
-            moFieldIsVolumeUnitaryApplying.setFieldValue(false);
-        }
-        if (!jckIsVolumeVariable.isEnabled()) {
-            moFieldIsVolumeVariable.setFieldValue(false);
-        }
-    }
-
-    private void renderMass() {
-        if (jckIsMassApplying.isSelected()) {
-            jckIsMassUnitaryApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsMassUnitaryApplying());
-            jckIsMassVariable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsMassVariable());
-        }
-        else {
-            jckIsMassUnitaryApplying.setEnabled(false);
-            jckIsMassVariable.setEnabled(false);
-        }
-
-        if (!jckIsMassUnitaryApplying.isEnabled()) {
-            moFieldIsMassUnitaryApplying.setFieldValue(false);
-        }
-        if (!jckIsMassVariable.isEnabled()) {
-            moFieldIsMassVariable.setFieldValue(false);
-        }
-    }
-
-    private void renderIsItemRefRequired() {
-        if (jckIsItemRefRequired.isSelected()) {
-            jcbFkDefaultItemRefId_n.setEnabled(true);
-            jbFkDefaultItemRefId_n.setEnabled(true);
-        }
-        else {
-            jcbFkDefaultItemRefId_n.setEnabled(false);
-            jbFkDefaultItemRefId_n.setEnabled(false);
-
-            moFieldFkDefaultItemRefeferenceId_n.setFieldValue(null);
-        }
-    }
-
-    private void renderBizArea() {
-        if (jltBizAreaAvailable.getModel().getSize() == 1) {
-            actionBizAreaAssign();
-
-            jltBizAreaAvailable.setEnabled(false);
-            jltBizAreaAsignated.setEnabled(false);
-
-            jbBizAreaAssign.setEnabled(false);
-            jbBizAreaAssignAll.setEnabled(false);
-            jbBizAreaRemove.setEnabled(false);
-            jbBizAreaRemoveAll.setEnabled(false);
-        }
-        else {
-            jltBizAreaAvailable.setEnabled(true);
-            jltBizAreaAsignated.setEnabled(true);
-
-            jbBizAreaAssign.setEnabled(true);
-            jbBizAreaAssignAll.setEnabled(true);
-            jbBizAreaRemove.setEnabled(true);
-            jbBizAreaRemoveAll.setEnabled(true);
-        }
-    }
-
+    
     private void readErpParams() {
         if (miClient.getSessionXXX().getParamsErp().getIsItemShortApplying()) {
             jckIsItemShortApplying.setEnabled(true);
@@ -1954,60 +1691,349 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
 
         mbIsLotApplyingBySystem = miClient.getSessionXXX().getParamsErp().getIsLotApplying();
 
-        renderIsInventoriable();
-        renderUnitUnitsContainedTypeSettings();
-        renderUnitUnitsVirtualTypeSettings();
-        renderUnitNetContentTypeSettings();
-        renderUnitNetContentUnitaryTypeSettings();
-        renderLength();
-        renderSurface();
-        renderVolume();
-        renderMass();
-        renderIsItemRefRequired();
+        renderIsInventoriableSettings();
+        renderIsUnitsContainedApplyingSettings();
+        renderIsUnitsVirtualApplyingSettings();
+        renderIsNetContentApplyingSettings();
+        renderIsNetContentUnitaryApplyingSettings();
+        renderIsLengthApplyingSettings();
+        renderIsSurfaceApplyingSettings();
+        renderIsVolumeApplyingSettings();
+        renderIsMassApplyingSettings();
+        renderIsItemRefRequiredSettings();
     }
 
     private void readItemGroupSettings() {
         SDataItemGroup oItemGroup = new SDataItemGroup();
 
         if (jcbFkItemGroupId.getSelectedIndex() <= 0) {
-                jckIsFreeDiscountUnitary.setEnabled(false);
-                jckIsFreeDiscountEntry.setEnabled(false);
-                jckIsFreeDiscountDoc.setEnabled(false);
-                jckIsFreePrice.setEnabled(false);
-                jckIsFreeDiscount.setEnabled(false);
-                jckIsFreeCommissions.setEnabled(false);
+            jckIsFreeDiscountUnitary.setEnabled(false);
+            jckIsFreeDiscountEntry.setEnabled(false);
+            jckIsFreeDiscountDoc.setEnabled(false);
+            jckIsFreePrice.setEnabled(false);
+            jckIsFreeDiscount.setEnabled(false);
+            jckIsFreeCommissions.setEnabled(false);
+            
+            jckIsSalesFreightRequired.setEnabled(false);
 
-                moFieldIsFreeDiscountUnitary.setFieldValue(false);
-                moFieldIsFreeDiscountEntry.setFieldValue(false);
-                moFieldIsFreeDiscountDoc.setFieldValue(false);
-                moFieldIsFreePrice.setFieldValue(false);
-                moFieldIsFreeDiscount.setFieldValue(false);
-                moFieldIsFreeCommissions.setFieldValue(false);
+            moFieldIsFreeDiscountUnitary.setFieldValue(false);
+            moFieldIsFreeDiscountEntry.setFieldValue(false);
+            moFieldIsFreeDiscountDoc.setFieldValue(false);
+            moFieldIsFreePrice.setFieldValue(false);
+            moFieldIsFreeDiscount.setFieldValue(false);
+            moFieldIsFreeCommissions.setFieldValue(false);
+            
+            moFieldIsSalesFreightRequired.setFieldValue(false);
         }
         else {
             oItemGroup = (SDataItemGroup) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_IGRP, moFieldFkItemGroupId.getKey(), SLibConstants.EXEC_MODE_SILENT);
 
-            jckIsFreeDiscountUnitary.setEnabled(oItemGroup.getDbmsIsFreeDiscountUnitary());
-            moFieldIsFreeDiscountUnitary.setFieldValue(oItemGroup.getDbmsIsFreeDiscountUnitary());
+            jckIsFreeDiscountUnitary.setEnabled(oItemGroup.getIsFreeDiscountUnitary());
+            jckIsFreeDiscountEntry.setEnabled(oItemGroup.getIsFreeDiscountEntry());
+            jckIsFreeDiscountDoc.setEnabled(oItemGroup.getIsFreeDiscountDoc());
+            jckIsFreePrice.setEnabled(oItemGroup.getIsFreePrice());
+            jckIsFreeDiscount.setEnabled(oItemGroup.getIsFreeDiscount());
+            jckIsFreeCommissions.setEnabled(oItemGroup.getIsFreeCommissions());
+            
+            jckIsSalesFreightRequired.setEnabled(true);
+            
+            moFieldIsFreeDiscountUnitary.setFieldValue(oItemGroup.getIsFreeDiscountUnitary());
+            moFieldIsFreeDiscountEntry.setFieldValue(oItemGroup.getIsFreeDiscountEntry());
+            moFieldIsFreeDiscountDoc.setFieldValue(oItemGroup.getIsFreeDiscountDoc());
+            moFieldIsFreePrice.setFieldValue(oItemGroup.getIsFreePrice());
+            moFieldIsFreeDiscount.setFieldValue(oItemGroup.getIsFreeDiscount());
+            moFieldIsFreeCommissions.setFieldValue(oItemGroup.getIsFreeCommissions());
 
-            jckIsFreeDiscountEntry.setEnabled(oItemGroup.getDbmsIsFreeDiscountEntry());
-            moFieldIsFreeDiscountEntry.setFieldValue(oItemGroup.getDbmsIsFreeDiscountEntry());
+            moFieldIsSalesFreightRequired.setFieldValue(false);
+        }
+    }
+    
+    private void renderFkSerialNumberTypeIdSettings() {
+        if (jcbFkSerialNumberTypeId.getSelectedIndex() > 0 && moFieldFkSerialNumberTypeId.getKeyAsIntArray()[0] != SDataConstantsSys.ITMS_TP_SNR_NA) {
+            jtfSerialNumber.setEnabled(true);
+            jtfSerialNumberFormat.setEnabled(true);
+        }
+        else {
+            jtfSerialNumber.setEnabled(false);
+            jtfSerialNumberFormat.setEnabled(false);
 
-            jckIsFreeDiscountDoc.setEnabled(oItemGroup.getDbmsIsFreeDiscountDoc());
-            moFieldIsFreeDiscountDoc.setFieldValue(oItemGroup.getDbmsIsFreeDiscountDoc());
-
-            jckIsFreePrice.setEnabled(oItemGroup.getDbmsIsFreePrice());
-            moFieldIsFreePrice.setFieldValue(oItemGroup.getDbmsIsFreePrice());
-
-            jckIsFreeDiscount.setEnabled(oItemGroup.getDbmsIsFreeDiscount());
-            moFieldIsFreeDiscount.setFieldValue(oItemGroup.getDbmsIsFreeDiscount());
-
-            jckIsFreeCommissions.setEnabled(oItemGroup.getDbmsIsFreeCommissions());
-            moFieldIsFreeCommissions.setFieldValue(oItemGroup.getDbmsIsFreeCommissions());
+            moFieldSerialNumber.setFieldValue("");
+            moFieldSerialNumberFormat.setFieldValue("");
         }
     }
 
-   private int comparePositions(int[] data) {
+    private void renderIsItemShortApplyingSettings() {
+        if (jckIsItemShortApplying.isSelected()) {
+            jtfItemGenericShort.setEnabled(true);
+            jbCopyItemGeneric.setEnabled(true);
+        }
+        else {
+            jtfItemGenericShort.setEnabled(false);
+            jbCopyItemGeneric.setEnabled(false);
+
+            moFieldItemGenericShort.setFieldValue("");
+        }
+    }
+
+    private void renderIsItemKeyApplyingSettings() {
+        if (jckIsItemKeyApplying.isSelected()) {
+            jckIsItemKeyAutomatic.setEnabled(true);
+        }
+        else {
+            jckIsItemKeyAutomatic.setEnabled(false);
+
+            moFieldIsItemKeyAutomatic.setFieldValue(false);
+        }
+
+        renderIsItemKeyAutomaticSettings();
+        renderIsItemLineApplyingSettings();
+    }
+
+    private void renderIsItemKeyAutomaticSettings() {
+        if (jckIsItemKeyAutomatic.isSelected()) {
+            jtfCode.setEnabled(true);
+            jtfKeyOrdinaryPosItemGeneric.setEnabled(true);
+            jtfKeyOrdinaryPosBrand.setEnabled(true);
+            jtfKeyOrdinaryPosManufacturer.setEnabled(true);
+            jtfKeyOrdinaryPosCode.setEnabled(true);
+        }
+        else {
+            jtfCode.setEnabled(false);
+            jtfKeyOrdinaryPosItemGeneric.setEnabled(false);
+            jtfKeyOrdinaryPosBrand.setEnabled(false);
+            jtfKeyOrdinaryPosManufacturer.setEnabled(false);
+            jtfKeyOrdinaryPosCode.setEnabled(false);
+
+            moFieldCode.setFieldValue("");
+            moFieldKeyOrdinaryPosItemGeneric.setFieldValue(0);
+            moFieldKeyOrdinaryPosBrand.setFieldValue(0);
+            moFieldKeyOrdinaryPosManufacturer.setFieldValue(0);
+            moFieldKeyOrdinaryPosCode.setFieldValue(0);
+        }
+
+        renderIsItemLineApplyingSettings();
+    }
+
+    private void renderIsItemLineApplyingSettings() {
+        if (jckIsItemLineApplying.isSelected()) {
+            jtfNamingLinePosItemGeneric.setEnabled(true);
+            jtfNamingLinePosItemLine.setEnabled(true);
+            jtfNamingLinePosBrand.setEnabled(true);
+            jtfNamingLinePosManufacturer.setEnabled(true);
+        }
+        else {
+            jtfNamingLinePosItemGeneric.setEnabled(false);
+            jtfNamingLinePosItemLine.setEnabled(false);
+            jtfNamingLinePosBrand.setEnabled(false);
+            jtfNamingLinePosManufacturer.setEnabled(false);
+
+            moFieldNamingLinePosItemGeneric.setFieldValue(0);
+            moFieldNamingLinePosItemLine.setFieldValue(0);
+            moFieldNamingLinePosBrand.setFieldValue(0);
+            moFieldNamingLinePosManufacturer.setFieldValue(0);
+        }
+
+        if (jckIsItemLineApplying.isSelected() && jckIsItemKeyAutomatic.isSelected()) {
+            jtfKeyLinePosItemGeneric.setEnabled(true);
+            jtfKeyLinePosItemLine.setEnabled(true);
+            jtfKeyLinePosBrand.setEnabled(true);
+            jtfKeyLinePosManufacturer.setEnabled(true);
+        }
+        else {
+            jtfKeyLinePosItemGeneric.setEnabled(false);
+            jtfKeyLinePosItemLine.setEnabled(false);
+            jtfKeyLinePosBrand.setEnabled(false);
+            jtfKeyLinePosManufacturer.setEnabled(false);
+
+            moFieldKeyLinePosItemGeneric.setFieldValue(0);
+            moFieldKeyLinePosItemLine.setFieldValue(0);
+            moFieldKeyLinePosBrand.setFieldValue(0);
+            moFieldKeyLinePosManufacturer.setFieldValue(0);
+        }
+    }
+
+    private void renderIsInventoriableSettings() {
+        if (jckIsInventoriable.isSelected()) {
+            jckIsLotApplying.setEnabled(mbIsLotApplyingBySystem);
+            jcbFkSerialNumberTypeId.setEnabled(true);
+        }
+        else {
+            jckIsLotApplying.setEnabled(false);
+            jcbFkSerialNumberTypeId.setEnabled(false);
+
+            moFieldFkSerialNumberTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMS_TP_SNR_NA });
+        }
+
+        if (!jckIsLotApplying.isEnabled()) {
+            moFieldIsLotApplying.setFieldValue(false);
+        }
+
+        itemStateChangedFkSerialNumberTypeId();
+        renderIsLotApplying();
+    }
+
+    private void renderIsLotApplying() {
+        if (jckIsLotApplying.isSelected()) {
+            jtfDaysForExpiration.setEnabled(true);
+        }
+        else {
+            jtfDaysForExpiration.setEnabled(false);
+        }
+
+        if (!jtfDaysForExpiration.isEnabled()) {
+            moFieldDaysForExpiration.setFieldValue(0);
+        }
+    }
+
+    private void renderIsUnitsContainedApplyingSettings() {
+        if (jckIsUnitsContainedApplying.isSelected()) {
+            jcbFkUnitUnitsContainedTypeId.setEnabled(true);
+        }
+        else if (!jckIsUnitsContainedApplying.isSelected()) {
+            jcbFkUnitUnitsContainedTypeId.setEnabled(false);
+            moFieldFkUnitUnitsContainedTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_UNIT_NA });
+        }
+    }
+
+    private void renderIsUnitsVirtualApplyingSettings() {
+        if (jckIsUnitsVirtualApplying.isSelected()) {
+            jcbFkUnitUnitsVirtualTypeId.setEnabled(true);
+        }
+        else if (!jckIsUnitsVirtualApplying.isSelected()) {
+            jcbFkUnitUnitsVirtualTypeId.setEnabled(false);
+            moFieldFkUnitUnitsVirtualTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_UNIT_NA });
+        }
+    }
+
+    private void renderIsNetContentApplyingSettings() {
+        if (jckIsNetContentApplying.isSelected()) {
+            jcbFkUnitNetContentTypeId.setEnabled(true);
+        }
+        else {
+            jcbFkUnitNetContentTypeId.setEnabled(false);
+            moFieldFkUnitNetContentTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_UNIT_NA });
+        }
+    }
+
+    private void renderIsNetContentUnitaryApplyingSettings() {
+        if (jckIsNetContentUnitaryApplying.isSelected()) {
+            jcbFkUnitNetContentUnitaryTypeId.setEnabled(true);
+        }
+        else {
+            jcbFkUnitNetContentUnitaryTypeId.setEnabled(false);
+            moFieldFkUnitNetContentUnitaryTypeId.setFieldValue(new int[] { SDataConstantsSys.ITMU_TP_UNIT_NA });
+        }
+    }
+
+    private void renderIsLengthApplyingSettings() {
+        if (jckIsLengthApplying.isSelected()) {
+            jckIsLengthUnitaryApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsLengthUnitaryApplying());
+            jckIsLengthVariable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsLengthVariable());
+        }
+        else {
+            jckIsLengthUnitaryApplying.setEnabled(false);
+            jckIsLengthVariable.setEnabled(false);
+        }
+
+        if (!jckIsLengthUnitaryApplying.isEnabled()) {
+            moFieldIsLengthUnitaryApplying.setFieldValue(false);
+        }
+        if (!jckIsLengthVariable.isEnabled()) {
+            moFieldIsLengthVariable.setFieldValue(false);
+        }
+    }
+
+    private void renderIsSurfaceApplyingSettings() {
+        if (jckIsSurfaceApplying.isSelected()) {
+            jckIsSurfaceUnitaryApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsSurfaceUnitaryApplying());
+            jckIsSurfaceVariable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsSurfaceVariable());
+        }
+        else {
+            jckIsSurfaceUnitaryApplying.setEnabled(false);
+            jckIsSurfaceVariable.setEnabled(false);
+        }
+
+        if (!jckIsSurfaceUnitaryApplying.isEnabled()) {
+            moFieldIsSurfaceUnitaryApplying.setFieldValue(false);
+        }
+        if (!jckIsSurfaceVariable.isEnabled()) {
+            moFieldIsSurfaceVariable.setFieldValue(false);
+        }
+    }
+
+    private void renderIsVolumeApplyingSettings() {
+        if (jckIsVolumeApplying.isSelected()) {
+            jckIsVolumeUnitaryApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsVolumeUnitaryApplying());
+            jckIsVolumeVariable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsVolumeVariable());
+        }
+        else {
+            jckIsVolumeUnitaryApplying.setEnabled(false);
+            jckIsVolumeVariable.setEnabled(false);
+        }
+
+        if (!jckIsVolumeUnitaryApplying.isEnabled()) {
+            moFieldIsVolumeUnitaryApplying.setFieldValue(false);
+        }
+        if (!jckIsVolumeVariable.isEnabled()) {
+            moFieldIsVolumeVariable.setFieldValue(false);
+        }
+    }
+
+    private void renderIsMassApplyingSettings() {
+        if (jckIsMassApplying.isSelected()) {
+            jckIsMassUnitaryApplying.setEnabled(miClient.getSessionXXX().getParamsErp().getIsMassUnitaryApplying());
+            jckIsMassVariable.setEnabled(miClient.getSessionXXX().getParamsErp().getIsMassVariable());
+        }
+        else {
+            jckIsMassUnitaryApplying.setEnabled(false);
+            jckIsMassVariable.setEnabled(false);
+        }
+
+        if (!jckIsMassUnitaryApplying.isEnabled()) {
+            moFieldIsMassUnitaryApplying.setFieldValue(false);
+        }
+        if (!jckIsMassVariable.isEnabled()) {
+            moFieldIsMassVariable.setFieldValue(false);
+        }
+    }
+
+    private void renderIsItemRefRequiredSettings() {
+        if (jckIsItemRefRequired.isSelected()) {
+            jcbFkDefaultItemRefId_n.setEnabled(true);
+            jbFkDefaultItemRefId_n.setEnabled(true);
+        }
+        else {
+            jcbFkDefaultItemRefId_n.setEnabled(false);
+            jbFkDefaultItemRefId_n.setEnabled(false);
+
+            moFieldFkDefaultItemRefeferenceId_n.setFieldValue(null);
+        }
+    }
+
+    private void renderBizArea() {
+        if (jltBizAreaAvailable.getModel().getSize() == 1) {
+            actionBizAreaAssign();
+
+            jltBizAreaAvailable.setEnabled(false);
+            jltBizAreaAsignated.setEnabled(false);
+
+            jbBizAreaAssign.setEnabled(false);
+            jbBizAreaAssignAll.setEnabled(false);
+            jbBizAreaRemove.setEnabled(false);
+            jbBizAreaRemoveAll.setEnabled(false);
+        }
+        else {
+            jltBizAreaAvailable.setEnabled(true);
+            jltBizAreaAsignated.setEnabled(true);
+
+            jbBizAreaAssign.setEnabled(true);
+            jbBizAreaAssignAll.setEnabled(true);
+            jbBizAreaRemove.setEnabled(true);
+            jbBizAreaRemoveAll.setEnabled(true);
+        }
+    }
+
+    private int comparePositions(int[] data) {
        int position = 0;
        boolean isEqual = false;
 
@@ -2099,10 +2125,6 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         miClient.pickOption(SDataConstants.FINU_TP_TAX_CPT, moFieldFkTaxableConceptTypeId, moFieldFkTaxableConceptTypeId.getKeyAsIntArray());
     }
     
-    private void actionFkCfdConcept() {
-        miClient.pickOption(SDataConstants.FINU_TP_TAX_CPT, moFieldFkCfdProdServId, moFieldFkCfdProdServId.getKeyAsIntArray());
-    }
-
     private void actionOk() {
         SFormValidation validation = formValidate();
 
@@ -2147,37 +2169,27 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void itemStateChangedFkSerialNumberTypeId() {
-        if (jcbFkSerialNumberTypeId.getSelectedIndex() > 0 && moFieldFkSerialNumberTypeId.getKeyAsIntArray()[0] != SDataConstantsSys.ITMS_TP_SNR_NA) {
-            jtfSerialNumber.setEnabled(true);
-            jtfSerialNumberFormat.setEnabled(true);
-        }
-        else {
-            jtfSerialNumber.setEnabled(false);
-            jtfSerialNumberFormat.setEnabled(false);
-
-            moFieldSerialNumber.setFieldValue("");
-            moFieldSerialNumberFormat.setFieldValue("");
-        }
+        renderFkSerialNumberTypeIdSettings();
     }
 
     private void itemStateChangedIsItemShortApplying() {
-        renderItemGenericShortSettings();
+        renderIsItemShortApplyingSettings();
     }
 
     private void itemStateChangedIsItemKeyApplying() {
-        renderItemKeySettings();
+        renderIsItemKeyApplyingSettings();
     }
 
     private void itemStateChangedIsItemKeyAutomatic() {
-        renderItemKeyAutomaticSettings();
+        renderIsItemKeyAutomaticSettings();
     }
 
     private void itemStateChangedIsItemLineApplying() {
-        renderItemLineSettings();
+        renderIsItemLineApplyingSettings();
     }
 
     private void itemStateChangedIsInventoriable() {
-        renderIsInventoriable();
+        renderIsInventoriableSettings();
     }
 
     private void itemStateChangedIsLotApplying() {
@@ -2185,39 +2197,39 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     }
 
     private void itemStateChangedIsUnitsContainedApplying() {
-        renderUnitUnitsContainedTypeSettings();
+        renderIsUnitsContainedApplyingSettings();
     }
 
     private void itemStateChangedIsUnitsVirtualApplying() {
-        renderUnitUnitsVirtualTypeSettings();
+        renderIsUnitsVirtualApplyingSettings();
     }
 
-    public void itemStateChangedIsNetContentApplying() {
-        renderUnitNetContentTypeSettings();
+    private void itemStateChangedIsNetContentApplying() {
+        renderIsNetContentApplyingSettings();
     }
 
     private void itemStateChangedIsNetContentUnitaryApplying() {
-        renderUnitNetContentUnitaryTypeSettings();
+        renderIsNetContentUnitaryApplyingSettings();
     }
 
-    private void itemStateChangedIsLenghtApplying() {
-        renderLength();
+    private void itemStateChangedIsLengthApplying() {
+        renderIsLengthApplyingSettings();
     }
 
-    public void itemStateChangedIsSurfaceApplying() {
-        renderSurface();
+    private void itemStateChangedIsSurfaceApplying() {
+        renderIsSurfaceApplyingSettings();
     }
 
     private void itemStateChangedIsVolumeApplying() {
-        renderVolume();
+        renderIsVolumeApplyingSettings();
     }
 
     private void itemStateChangedIsMassApplying() {
-        renderMass();
+        renderIsMassApplyingSettings();
     }
 
     private void itemStateChangedIsItemRefRequired() {
-        renderIsItemRefRequired();
+        renderIsItemRefRequiredSettings();
     }
 
     /*
@@ -2230,7 +2242,8 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel35;
@@ -2276,14 +2289,12 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JComboBox<SFormComponentItem> jcbFkUnitUnitsVirtualTypeId;
     private javax.swing.JCheckBox jckIsBulk;
     private javax.swing.JCheckBox jckIsDeleted;
-    private javax.swing.JCheckBox jckIsDomesticShipment;
     private javax.swing.JCheckBox jckIsFreeCommissions;
     private javax.swing.JCheckBox jckIsFreeDiscount;
     private javax.swing.JCheckBox jckIsFreeDiscountDoc;
     private javax.swing.JCheckBox jckIsFreeDiscountEntry;
     private javax.swing.JCheckBox jckIsFreeDiscountUnitary;
     private javax.swing.JCheckBox jckIsFreePrice;
-    private javax.swing.JCheckBox jckIsInternationalShipment;
     private javax.swing.JCheckBox jckIsInventoriable;
     private javax.swing.JCheckBox jckIsItemKeyApplying;
     private javax.swing.JCheckBox jckIsItemKeyAutomatic;
@@ -2302,7 +2313,10 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JCheckBox jckIsNetContentApplying;
     private javax.swing.JCheckBox jckIsNetContentUnitaryApplying;
     private javax.swing.JCheckBox jckIsNetContentVariable;
-    private javax.swing.JCheckBox jckIsQualityShipment;
+    private javax.swing.JCheckBox jckIsSalesFreightRequired;
+    private javax.swing.JCheckBox jckIsShipDataDomesticReq;
+    private javax.swing.JCheckBox jckIsShipDataInternationalReq;
+    private javax.swing.JCheckBox jckIsShipDataQualityReq;
     private javax.swing.JCheckBox jckIsSurfaceApplying;
     private javax.swing.JCheckBox jckIsSurfaceUnitaryApplying;
     private javax.swing.JCheckBox jckIsSurfaceVariable;
@@ -2372,7 +2386,6 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JPanel jpProperties1214;
     private javax.swing.JPanel jpProperties1215;
     private javax.swing.JPanel jpProperties122;
-    private javax.swing.JPanel jpProperties1221;
     private javax.swing.JPanel jpProperties2;
     private javax.swing.JPanel jpProperties21;
     private javax.swing.JPanel jpProperties211;
@@ -2470,24 +2483,25 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldFkDefaultItemRefeferenceId_n.setFieldValue(null);
         moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
         moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { SDataConstantsSys.NA });
-        jltBizAreaAsignated.setListData(new Vector<SFormComponentItem>());
+        jltBizAreaAsignated.setListData(new Vector<>());
 
         readErpParams();
+        
         readItemGroupSettings();
-        renderItemGenericShortSettings();
-        renderItemKeySettings();
-        renderItemKeyAutomaticSettings();
-        renderItemLineSettings();
-        renderIsInventoriable();
-        renderUnitNetContentTypeSettings();
-        renderUnitNetContentUnitaryTypeSettings();
-        renderUnitUnitsContainedTypeSettings();
-        renderUnitUnitsVirtualTypeSettings();
-        renderLength();
-        renderSurface();
-        renderVolume();
-        renderMass();
-        renderIsItemRefRequired();
+        renderIsItemShortApplyingSettings();
+        renderIsItemKeyApplyingSettings();
+        renderIsItemKeyAutomaticSettings();
+        renderIsItemLineApplyingSettings();
+        renderIsInventoriableSettings();
+        renderIsNetContentApplyingSettings();
+        renderIsNetContentUnitaryApplyingSettings();
+        renderIsUnitsContainedApplyingSettings();
+        renderIsUnitsVirtualApplyingSettings();
+        renderIsLengthApplyingSettings();
+        renderIsSurfaceApplyingSettings();
+        renderIsVolumeApplyingSettings();
+        renderIsMassApplyingSettings();
+        renderIsItemRefRequiredSettings();
         renderBizArea();
 
         jckIsDeleted.setEnabled(false);
@@ -2568,28 +2582,6 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
                     validation.setComponent(jcbFkUnitTypeId);
                     validation.setMessage("Se debe seleccionar una opción para el campo '" + jlFkUnitTypeId.getText() + "'.");
                 }
-                /*
-                else if (jckIsUnitsContainedApplying.isSelected() && moFieldFkUnitUnitsContainedTypeId.getKeyAsIntArray()[0] == 0) {
-                   validation.setTabbedPaneIndex(0);
-                   validation.setComponent(jcbFkUnitUnitsContainedTypeId);
-                   validation.setMessage("Se debe seleccionar una opción para el campo '" + jckIsUnitsContainedApplying.getText() + "'.");
-                }
-                else if (jckIsUnitsVirtualApplying.isSelected() && moFieldFkUnitUnitsVirtualTypeId.getKeyAsIntArray()[0] == 0) {
-                    validation.setTabbedPaneIndex(0);
-                    validation.setComponent(jcbFkUnitUnitsVirtualTypeId);
-                    validation.setMessage("Se debe seleccionar una opción para el campo '" + jckIsUnitsVirtualApplying.getText() + "'.");
-                }
-                else if (jckIsNetContentApplying.isSelected() && moFieldFkUnitNetContentTypeId.getKeyAsIntArray()[0] == 0) {
-                    validation.setTabbedPaneIndex(0);
-                    validation.setComponent(jcbFkUnitNetContentTypeId);
-                    validation.setMessage("Se debe seleccionar una opción para el campo '" + jckIsNetContentApplying.getText() + "'.");
-                }
-                else if (jckIsNetContentUnitaryApplying.isSelected() && moFieldFkUnitNetContentUnitaryTypeId.getKeyAsIntArray()[0] == 0) {
-                    validation.setTabbedPaneIndex(0);
-                    validation.setComponent(jcbFkUnitNetContentUnitaryTypeId);
-                    validation.setMessage("Se debe seleccionar una opción para el campo '" + jckIsNetContentUnitaryApplying.getText() + "'.");
-                }
-                */
                 else if (jckIsInventoriable.isSelected() &&
                         !(SLibUtilities.belongsTo(moFieldFkItemClassId.getKeyAsIntArray(), new int[][] { SDataConstantsSys.ITMS_CL_ITEM_SAL_PRO, SDataConstantsSys.ITMS_CL_ITEM_PUR_CON }))) {
                     validation.setTabbedPaneIndex(0);
@@ -2685,6 +2677,11 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
                     validation.setTabbedPaneIndex(1);
                     validation.setMessage("Debe seleccionar una opción para las áreas de negocios del ítem génerico.");
                 }
+                else if (jckIsFreeDiscount.isSelected() && !jckIsFreePrice.isSelected()) {
+                    validation.setTabbedPaneIndex(1);
+                    validation.setComponent(jckIsFreePrice);
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_OPTION_SELECT + "'" + jckIsFreePrice.getText() + "'");
+                }
             }
         }
 
@@ -2719,19 +2716,25 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldFkItemClassId.setFieldValue(new int[] { moItemGeneric.getFkItemCategoryId(), moItemGeneric.getFkItemClassId() });
         moFieldFkItemTypeId.setFieldValue(new int[] { moItemGeneric.getFkItemCategoryId(), moItemGeneric.getFkItemClassId(), moItemGeneric.getFkItemTypeId() });
         moFieldIsDeleted.setFieldValue(moItemGeneric.getIsDeleted());
-        moFieldFkDbmsItemFamilyId.setFieldValue(new int[] { moItemGeneric.getDbmsDataItemGroup().getFkItemFamilyId() });
+        moFieldFkDbmsItemFamilyId.setFieldValue(new int[] { moItemGeneric.getDbmsFkItemFamilyId() });
         moFieldFkItemGroupId.setFieldValue(new int[] { moItemGeneric.getFkItemGroupId() });
+        readItemGroupSettings();
         moFieldIsItemShortApplying.setFieldValue(moItemGeneric.getIsItemShortApplying());
+        renderIsItemShortApplyingSettings();
         moFieldItemGeneric.setFieldValue(moItemGeneric.getItemGeneric());
         moFieldItemGenericShort.setFieldValue(moItemGeneric.getItemGenericShort());
         moFieldIsItemKeyApplying.setFieldValue(moItemGeneric.getIsItemKeyApplying());
+        renderIsItemKeyApplyingSettings();
         moFieldIsItemKeyAutomatic.setFieldValue(moItemGeneric.getIsItemKeyAutomatic());
+        renderIsItemKeyAutomaticSettings();
         moFieldCode.setFieldValue(moItemGeneric.getCode());
         moFieldIsItemLineApplying.setFieldValue(moItemGeneric.getIsItemLineApplying());
+        renderIsItemLineApplyingSettings();
         moFieldIsItemKeyEditable.setFieldValue(moItemGeneric.getIsItemKeyEditable());
         moFieldIsItemNameEditable.setFieldValue(moItemGeneric.getIsItemNameEditable());
         moFieldIsBulk.setFieldValue(moItemGeneric.getIsBulk());
         moFieldIsInventoriable.setFieldValue(moItemGeneric.getIsInventoriable());
+        renderIsInventoriableSettings();
         moFieldIsLotApplying.setFieldValue(moItemGeneric.getIsLotApplying());
         moFieldDaysForExpiration.setFieldValue(moItemGeneric.getDaysForExpiration());
         moFieldFkSerialNumberTypeId.setFieldValue(new int[] { moItemGeneric.getFkSerialNumberTypeId() });
@@ -2741,12 +2744,16 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldFkUnitTypeId.setFieldValue(new int[] { moItemGeneric.getFkUnitTypeId() });
         moFieldIsUnitsContainedApplying.setFieldValue(moItemGeneric.getIsUnitsContainedApplying());
         moFieldFkUnitUnitsContainedTypeId.setFieldValue(new int[] { moItemGeneric.getFkUnitUnitsContainedTypeId() });
+        renderIsUnitsContainedApplyingSettings();
         moFieldIsUnitsVirtualApplying.setFieldValue(moItemGeneric.getIsUnitsVirtualApplying());
+        renderIsUnitsVirtualApplyingSettings();
         moFieldFkUnitUnitsVirtualTypeId.setFieldValue(new int[] { moItemGeneric.getFkUnitUnitsVirtualTypeId() });
         moFieldIsUnitsPackageApplying.setFieldValue(moItemGeneric.getIsUnitsPackageApplying());
         moFieldIsNetContentApplying.setFieldValue(moItemGeneric.getIsNetContentApplying());
+        renderIsNetContentApplyingSettings();
         moFieldFkUnitNetContentTypeId.setFieldValue(new int[] { moItemGeneric.getFkUnitNetContentTypeId() });
         moFieldIsNetContentUnitaryApplying.setFieldValue(moItemGeneric.getIsNetContentUnitaryApplying());
+        renderIsNetContentUnitaryApplyingSettings();
         moFieldFkUnitNetContentUnitaryTypeId.setFieldValue(new int[] { moItemGeneric.getFkUnitNetContentUnitaryTypeId() });
         moFieldIsNetContentVariable.setFieldValue(moItemGeneric.getIsNetContentVariable());
         moFieldNamingOrdinaryPosItemGeneric.setFieldValue(moItemGeneric.getNamingOrdinaryPosItemGeneric());
@@ -2767,15 +2774,19 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldKeyLinePosBrand.setFieldValue(moItemGeneric.getKeyLinePosBrand());
         moFieldKeyLinePosManufacturer.setFieldValue(moItemGeneric.getKeyLinePosManufacturer());
         moFieldIsLengthApplying.setFieldValue(moItemGeneric.getIsLengthApplying());
+        renderIsLengthApplyingSettings();
         moFieldIsLengthUnitaryApplying.setFieldValue(moItemGeneric.getIsLengthUnitaryApplying());
         moFieldIsLengthVariable.setFieldValue(moItemGeneric.getIsLengthVariable());
         moFieldIsSurfaceApplying.setFieldValue(moItemGeneric.getIsSurfaceApplying());
+        renderIsSurfaceApplyingSettings();
         moFieldIsSurfaceUnitaryApplying.setFieldValue(moItemGeneric.getIsSurfaceUnitaryApplying());
         moFieldIsSurfaceVariable.setFieldValue(moItemGeneric.getIsSurfaceVariable());
         moFieldIsVolumeApplying.setFieldValue(moItemGeneric.getIsVolumeApplying());
+        renderIsVolumeApplyingSettings();
         moFieldIsVolumeUnitaryApplying.setFieldValue(moItemGeneric.getIsVolumeUnitaryApplying());
         moFieldIsVolumeVariable.setFieldValue(moItemGeneric.getIsVolumeVariable());
         moFieldIsMassApplying.setFieldValue(moItemGeneric.getIsMassApplying());
+        renderIsMassApplyingSettings();
         moFieldIsMassUnitaryApplying.setFieldValue(moItemGeneric.getIsMassUnitaryApplying());
         moFieldIsMassVariable.setFieldValue(moItemGeneric.getIsMassVariable());
         moFieldIsWeightGrossApplying.setFieldValue(moItemGeneric.getIsWeightGrossApplying());
@@ -2783,23 +2794,25 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moFieldIsFreeDiscountUnitary.setFieldValue(moItemGeneric.getIsFreeDiscountUnitary());
         moFieldIsFreeDiscountEntry.setFieldValue(moItemGeneric.getIsFreeDiscountEntry());
         moFieldIsFreeDiscountDoc.setFieldValue(moItemGeneric.getIsFreeDiscountDoc());
-        moFieldIsShipDomestic.setFieldValue(moItemGeneric.getIsDataShipDomesticReq());
-        moFieldIsShipInternational.setFieldValue(moItemGeneric.getIsDataShipInternationalReq());
-        moFieldIsShipQuality.setFieldValue(moItemGeneric.getIsDataQualityReq());
         moFieldIsFreePrice.setFieldValue(moItemGeneric.getIsFreePrice());
         moFieldIsFreeDiscount.setFieldValue(moItemGeneric.getIsFreeDiscount());
         moFieldIsFreeCommissions.setFieldValue(moItemGeneric.getIsFreeCommissions());
+        moFieldIsSalesFreightRequired.setFieldValue(moItemGeneric.getIsSalesFreightRequired());
         moFieldIsItemRefRequired.setFieldValue(moItemGeneric.getIsItemReferenceRequired());
+        renderIsItemRefRequiredSettings();
         moFieldFkDefaultItemRefeferenceId_n.setFieldValue(new int[] { moItemGeneric.getFkDefaultItemRefId_n() });
         moFieldFkAdministrativeConceptTypeId.setFieldValue(new int[] { moItemGeneric.getFkAdministrativeConceptTypeId() });
         moFieldFkTaxableConceptTypeId.setFieldValue(new int[] { moItemGeneric.getFkTaxableConceptTypeId() });
         moKeyCfdProdServId.setValue(new int[] { moItemGeneric.getFkCfdProdServId() });
+        moFieldIsShipDataDomestic.setFieldValue(moItemGeneric.getIsDataShipDomesticReq());
+        moFieldIsShipDataInternational.setFieldValue(moItemGeneric.getIsDataShipInternationalReq());
+        moFieldIsShipDataQuality.setFieldValue(moItemGeneric.getIsDataQualityReq());
 
         if (!moItemGeneric.getIsItemShortApplying()) {
             jtfItemGenericShort.setEnabled(false);
         }
 
-        if (moItemGeneric.getDbmsBizAreas().size() == 0) {
+        if (moItemGeneric.getDbmsBizAreas().isEmpty()) {
             renderBizArea();
         }
         else {
@@ -2812,22 +2825,6 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
                 }
             }
         }
-
-        readItemGroupSettings();
-        renderItemGenericShortSettings();
-        renderItemKeySettings();
-        renderItemKeyAutomaticSettings();
-        renderItemLineSettings();
-        renderIsInventoriable();
-        renderUnitUnitsContainedTypeSettings();
-        renderUnitUnitsVirtualTypeSettings();
-        renderUnitNetContentTypeSettings();
-        renderUnitNetContentUnitaryTypeSettings();
-        renderLength();
-        renderSurface();
-        renderVolume();
-        renderMass();
-        renderIsItemRefRequired();
 
         jckIsDeleted.setEnabled(true);
     }
@@ -2914,9 +2911,10 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
         moItemGeneric.setIsFreePrice(moFieldIsFreePrice.getBoolean());
         moItemGeneric.setIsFreeDiscount(moFieldIsFreeDiscount.getBoolean());
         moItemGeneric.setIsFreeCommissions(moFieldIsFreeCommissions.getBoolean());
-        moItemGeneric.setIsDataShipDomesticReq(moFieldIsShipDomestic.getBoolean());
-        moItemGeneric.setIsDataShipInternationalReq(moFieldIsShipInternational.getBoolean());
-        moItemGeneric.setIsDataShipQualityReq(moFieldIsShipQuality.getBoolean());
+        moItemGeneric.setIsSalesFreightRequired(moFieldIsSalesFreightRequired.getBoolean());
+        moItemGeneric.setIsDataShipDomesticReq(moFieldIsShipDataDomestic.getBoolean());
+        moItemGeneric.setIsDataShipInternationalReq(moFieldIsShipDataInternational.getBoolean());
+        moItemGeneric.setIsDataShipQualityReq(moFieldIsShipDataQuality.getBoolean());
         moItemGeneric.setIsItemReferenceRequired(moFieldIsItemRefRequired.getBoolean());
         moItemGeneric.setFkDefaultItemRefId_n(moFieldFkDefaultItemRefeferenceId_n.getKeyAsIntArray()[0]);
         moItemGeneric.setFkAdministrativeConceptTypeId(moFieldFkAdministrativeConceptTypeId.getKeyAsIntArray()[0]);
@@ -3064,7 +3062,7 @@ public class SFormItemGeneric extends javax.swing.JDialog implements erp.lib.for
                     itemStateChangedIsNetContentUnitaryApplying();
                 }
                 else if (checkBox == jckIsLengthApplying) {
-                    itemStateChangedIsLenghtApplying();
+                    itemStateChangedIsLengthApplying();
                 }
                 else if (checkBox == jckIsSurfaceApplying) {
                     itemStateChangedIsSurfaceApplying();

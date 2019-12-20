@@ -1042,21 +1042,21 @@ public class SFormExplotionMaterials extends javax.swing.JDialog implements erp.
 
         // Unitary discount settings:
 
-        if (moItem.getDbmsIsFreeDiscountUnitary()) {
+        if (moItem.getIsFreeDiscountUnitary()) {
             moDpsEntry.setIsDiscountUnitaryPercentage(false);
             moDpsEntry.setOriginalDiscountUnitaryCy(0d);
         }
 
         // Entry discount settings:
 
-        if (moItem.getDbmsIsFreeDiscountEntry()) {
+        if (moItem.getIsFreeDiscountEntry()) {
             moDpsEntry.setIsDiscountEntryPercentage(false);
             moDpsEntry.setDiscountEntryCy(0d);
         }
 
         // Document discount settings:
 
-        if (!moDps.getIsDiscountDocApplying() || moItem.getDbmsIsFreeDiscountDoc()) {
+        if (!moDps.getIsDiscountDocApplying() || moItem.getIsFreeDiscountDoc()) {
             moDpsEntry.setIsDiscountDocApplying(false);
             moDpsEntry.setDiscountDocCy(0d);
         }

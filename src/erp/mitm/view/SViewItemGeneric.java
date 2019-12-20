@@ -58,7 +58,7 @@ public class SViewItemGeneric extends erp.lib.table.STableTab implements java.aw
         jbDelete.setEnabled(false);
 
         STableField[] aoKeyFields = new STableField[1];
-        STableColumn[] aoTableColumns = new STableColumn[43];
+        STableColumn[] aoTableColumns = new STableColumn[44];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "ig.id_igen");
@@ -85,7 +85,7 @@ public class SViewItemGeneric extends erp.lib.table.STableTab implements java.aw
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tunc.tp_unit", "Tipo unidad cont. neto", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "tuncu.tp_unit", "Tipo unidad cont. neto u.", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "ig.days_exp", "Días anaquel", 50);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "ig.surplus_per", "Excedente predeterminado", STableConstants.WIDTH_PERCENTAGE);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "ig.surplus_per", "Excedente por defecto entre doctos.", STableConstants.WIDTH_PERCENTAGE);
         aoTableColumns[i++].setCellRenderer(new STableCellRendererNumber(new DecimalFormat("#,##0" + "." + SLibUtilities.textRepeat("0", 4) + "%")));
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "snr.tp_snr", "Tipo no. serie", 100);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_weight_gross", "Peso bruto", STableConstants.WIDTH_BOOLEAN_2X);
@@ -95,12 +95,13 @@ public class SViewItemGeneric extends erp.lib.table.STableTab implements java.aw
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_item_name_edit", "Nom. modif.", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_item_short", "Nom. corto", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "ig.igen_short", "Ítem genérico (corto)", 100);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_disc_u", "S/desc. u.", STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_disc_ety", "S/desc. par.", STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_disc_doc", "S/desc. doc.", STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_price", "S/precio", STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_disc", "S/desc.", STableConstants.WIDTH_BOOLEAN_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_comms", "S/comisión", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_disc_u", "S/ descto. u.", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_disc_ety", "S/ descto. part.", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_disc_doc", "S/ descto. docto.", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_price", "S/ precio", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_disc", "S/ descto. listas precios", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_free_comms", "S/ comisiones", STableConstants.WIDTH_BOOLEAN_2X);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_sales_freight_req", "Req. flete ventas", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_ship_dom", "Embarque nacional", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_ship_int", "Embarque internacional", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "ig.b_ship_qlt", "Calidad", STableConstants.WIDTH_BOOLEAN_2X);
@@ -174,7 +175,7 @@ public class SViewItemGeneric extends erp.lib.table.STableTab implements java.aw
 
         msSql = "SELECT ig.id_igen, igen,igen, ig.igen_short, ig.code, ig.b_line, ig.b_item_short, ig.b_item_name_edit, ig.b_item_key_edit, " +
                 "ig.b_inv, ig.b_lot, ig.b_bulk, ig.days_exp, ig.b_weight_gross, ig.b_weight_delivery, " +
-                "ig.b_free_price, ig.b_free_disc, ig.b_free_disc_u, ig.b_free_disc_ety, ig.b_free_disc_doc, ig.b_free_comms, ig.b_ship_dom, ig.b_ship_int, ig.b_ship_qlt, ig.b_del, ig.surplus_per, " +
+                "ig.b_free_price, ig.b_free_disc, ig.b_free_disc_u, ig.b_free_disc_ety, ig.b_free_disc_doc, ig.b_free_comms, ig.b_sales_freight_req, ig.b_ship_dom, ig.b_ship_int, ig.b_ship_qlt, ig.b_del, ig.surplus_per, " +
                 "ict.ct_item, icl.cl_item, itp.tp_item, igrp.igrp, ifam.ifam, cfdps.code AS _cfdps_code, cfdps.name AS _cfdps_name, tu.tp_unit, tuc.tp_unit, tuv.tp_unit, tunc.tp_unit, tuncu.tp_unit, snr.tp_snr, " +
                 "ig.ts_new, ig.ts_edit, ig.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM erp.itmu_igen AS ig " +

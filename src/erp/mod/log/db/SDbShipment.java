@@ -286,21 +286,21 @@ public class SDbShipment extends SDbRegistryUser {
         moDpsOrderEntry.setPriceUnitaryReal_r(dPrice);
         moDpsOrderEntry.setPriceUnitaryRealCy_r(dPrice);
 
-        if (moItem.getDbmsIsFreeDiscountUnitary()) {
+        if (moItem.getIsFreeDiscountUnitary()) {
             moDpsOrderEntry.setIsDiscountUnitaryPercentage(false);
             moDpsOrderEntry.setOriginalDiscountUnitaryCy(0d);
         }
 
         // Entry discount settings:
 
-        if (moItem.getDbmsIsFreeDiscountEntry()) {
+        if (moItem.getIsFreeDiscountEntry()) {
             moDpsOrderEntry.setIsDiscountEntryPercentage(false);
             moDpsOrderEntry.setDiscountEntryCy(0d);
         }
 
         // Document discount settings:
 
-        if (!moDpsOrder.getIsDiscountDocApplying() || moItem.getDbmsIsFreeDiscountDoc()) {
+        if (!moDpsOrder.getIsDiscountDocApplying() || moItem.getIsFreeDiscountDoc()) {
             moDpsOrderEntry.setIsDiscountDocApplying(false);
             moDpsOrderEntry.setDiscountDocCy(0d);
         }

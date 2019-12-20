@@ -13,9 +13,15 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
 
+/* IMPORTANT:
+ * Every single change made to the definition of this class' table must be updated also in the following classes:
+ * - erp.mtrn.data.SDataCfd
+ * All of them also make raw SQL insertions.
+ */
+
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDataDpsAddendaEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable  {
 
@@ -32,6 +38,7 @@ public class SDataDpsAddendaEntry extends erp.lib.data.SDataRegistry implements 
     protected double mdElektraCagePriceUnitary;
     protected int mnElektraParts;
     protected double mdElektraPartPriceUnitary;
+    protected java.lang.String msJsonData;
 
     public SDataDpsAddendaEntry() {
         super(SDataConstants.TRN_DPS_ADD_ETY);
@@ -51,6 +58,7 @@ public class SDataDpsAddendaEntry extends erp.lib.data.SDataRegistry implements 
     public void setElektraCagePriceUnitary(double d) { mdElektraCagePriceUnitary = d; }
     public void setElektraParts(int n) { mnElektraParts = n; }
     public void setElektraPartPriceUnitary(double d) { mdElektraPartPriceUnitary = d; }
+    public void setJsonData(java.lang.String s) { msJsonData = s; }
 
     public int getPkYearId() { return mnPkYearId; }
     public int getPkDocId() { return mnPkDocId; }
@@ -65,6 +73,7 @@ public class SDataDpsAddendaEntry extends erp.lib.data.SDataRegistry implements 
     public double getElektraCagePriceUnitary() { return mdElektraCagePriceUnitary; }
     public int getElektraParts() { return mnElektraParts; }
     public double getElektraPartPriceUnitary() { return mdElektraPartPriceUnitary; }
+    public java.lang.String getJsonData() { return msJsonData; }
 
     @Override
     public void setPrimaryKey(Object pk) {
@@ -95,6 +104,7 @@ public class SDataDpsAddendaEntry extends erp.lib.data.SDataRegistry implements 
         mdElektraCagePriceUnitary = 0;
         mnElektraParts = 0;
         mdElektraPartPriceUnitary = 0;
+        msJsonData = "";
     }
 
     @Override
@@ -126,10 +136,11 @@ public class SDataDpsAddendaEntry extends erp.lib.data.SDataRegistry implements 
                 mdElektraCagePriceUnitary = resultSet.getDouble("ele_cag_price_u");
                 mnElektraParts = resultSet.getInt("ele_par");
                 mdElektraPartPriceUnitary = resultSet.getDouble("ele_par_price_u");
+                msJsonData = resultSet.getString("json_data");
             }
 
-                mbIsRegistryNew = false;
-                mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
+            mbIsRegistryNew = false;
+            mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
         }
         catch (java.sql.SQLException e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_READ_ERROR;
@@ -153,18 +164,27 @@ public class SDataDpsAddendaEntry extends erp.lib.data.SDataRegistry implements 
         try {
             statement = connection.createStatement();
 
-            sql = "DELETE FROM trn_dps_add_ety WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + " ";
+            sql = "DELETE FROM trn_dps_add_ety " +
+                    "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + ";";
+            
             statement.execute(sql);
 
-            sql = "INSERT INTO trn_dps_add_ety (id_year, id_doc, " +
-                    "id_ety, bac_num_pos, bac_cen, lor_num_ety, sor_cod, ele_ord, ele_barc, ele_cag, ele_cag_price_u, ele_par, ele_par_price_u) " +
-                    "VALUES (" + mnPkYearId + ", " + mnPkDocId + ", " + mnPkEntryId + ", " +
-                    mnBachocoNumeroPosicion + ", '" + msBachocoCentro + "', " + mnLorealEntryNumber + ", '" + msSorianaCodigo + "', '" +
-                    msElektraOrder + "', '" + msElektraBarcode + "', " + mnElektraCages + ", " + mdElektraCagePriceUnitary + ", " + mnElektraParts + ", " + mdElektraPartPriceUnitary + ")";
+            sql = "INSERT INTO trn_dps_add_ety (" +
+                    "id_year, id_doc, id_ety, " +
+                    "bac_num_pos, bac_cen, lor_num_ety, sor_cod, " +
+                    "ele_ord, ele_barc, " +
+                    "ele_cag, ele_cag_price_u, ele_par, ele_par_price_u, " +
+                    "json_data) " +
+                    "VALUES (" + 
+                    mnPkYearId + ", " + mnPkDocId + ", " + mnPkEntryId + ", " +
+                    mnBachocoNumeroPosicion + ", '" + msBachocoCentro + "', " + mnLorealEntryNumber + ", '" + msSorianaCodigo + "', " +
+                    "'" + msElektraOrder + "', '" + msElektraBarcode + "', " + 
+                    mnElektraCages + ", " + mdElektraCagePriceUnitary + ", " + mnElektraParts + ", " + mdElektraPartPriceUnitary + ", " +
+                    "'" + msJsonData + "');";
+            
             statement.execute(sql);
 
-            mnDbmsErrorId = 0;
-            msDbmsError = "";
+            statement.close();
 
             mbIsRegistryNew = false;
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
@@ -179,23 +199,14 @@ public class SDataDpsAddendaEntry extends erp.lib.data.SDataRegistry implements 
 
     @Override
     public int delete(Connection connection) {
-        String sql = "";
-        Statement statement = null;
-
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            statement = connection.createStatement();
+            String sql = "DELETE FROM trn_dps_add_ety " +
+                    "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + ";";
+            
+            connection.createStatement().execute(sql);
 
-            sql = "DELETE FROM trn_dps_add_ety WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " AND id_ety = " + mnPkEntryId + " ";
-            statement.execute(sql);
-
-            mnDbmsErrorId = 0;
-            msDbmsError = "";
-
-            if (mnDbmsErrorId != 0) {
-                throw new Exception(msDbmsError);
-            }
             mbIsRegistryNew = false;
             mnLastDbActionResult = SLibConstants.DB_ACTION_DELETE_OK;
         }

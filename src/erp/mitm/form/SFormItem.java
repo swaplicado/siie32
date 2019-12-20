@@ -57,7 +57,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Juan Barajas, Cesar Orozco
+ * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Sergio Flores
  */
 public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
 
@@ -127,6 +127,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldIsFreePrice;
     private erp.lib.form.SFormField moFieldIsFreeDiscount;
     private erp.lib.form.SFormField moFieldIsFreeCommissions;
+    private erp.lib.form.SFormField moFieldIsSalesFreightRequired;
     private erp.lib.form.SFormField moFieldSurplusPercentage;
     private erp.lib.form.SFormField moFieldIsReference;
     private erp.lib.form.SFormField moFieldIsPrepayment;
@@ -152,7 +153,10 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.mitm.data.SDataItemLine moItemLine;
     private erp.mitm.data.SDataItem moItem;
 
-    /** Creates new form SFormItem */
+    /**
+     * Creates new form SFormItem
+     * @param client
+     */
     public SFormItem(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient =  client;
@@ -328,8 +332,12 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsFreeDiscount = new javax.swing.JCheckBox();
         jckIsFreeDiscountDoc = new javax.swing.JCheckBox();
         jckIsFreeCommissions = new javax.swing.JCheckBox();
+        jckIsSalesFreightRequired = new javax.swing.JCheckBox();
+        jLabel1 = new javax.swing.JLabel();
         jlSurplusPercentage = new javax.swing.JLabel();
+        jPanel16 = new javax.swing.JPanel();
         jtfSurplusPercentage = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
         jckIsReference = new javax.swing.JCheckBox();
         jckIsPrepayment = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
@@ -1032,12 +1040,12 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jpConfig1.setLayout(new java.awt.BorderLayout());
 
         jPanel39.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración para comercialización:"));
-        jPanel39.setLayout(new java.awt.GridLayout(7, 2, 5, 5));
+        jPanel39.setLayout(new java.awt.GridLayout(8, 2, 5, 5));
 
         jckIsFreeDiscountUnitary.setText("Sin descuento unitario");
         jPanel39.add(jckIsFreeDiscountUnitary);
 
-        jckIsFreePrice.setText("Sin precio");
+        jckIsFreePrice.setText("Sin precio en listas de precios");
         jPanel39.add(jckIsFreePrice);
 
         jckIsFreeDiscountEntry.setText("Sin descuento en partida");
@@ -1052,14 +1060,27 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jckIsFreeCommissions.setText("Sin comisiones de venta");
         jPanel39.add(jckIsFreeCommissions);
 
-        jlSurplusPercentage.setText("Excedente predeterminado:");
+        jckIsSalesFreightRequired.setText("Requiere flete en ventas");
+        jPanel39.add(jckIsSalesFreightRequired);
+        jPanel39.add(jLabel1);
+
+        jlSurplusPercentage.setText("Excedente por defecto entre doctos.:");
         jlSurplusPercentage.setPreferredSize(new java.awt.Dimension(225, 23));
         jPanel39.add(jlSurplusPercentage);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jtfSurplusPercentage.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfSurplusPercentage.setText("0.00%");
         jtfSurplusPercentage.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel39.add(jtfSurplusPercentage);
+        jPanel16.add(jtfSurplusPercentage);
+
+        jLabel7.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel7.setText("(ventas y compras)");
+        jLabel7.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel16.add(jLabel7);
+
+        jPanel39.add(jPanel16);
 
         jckIsReference.setText("Referencia obligatoria");
         jPanel39.add(jckIsReference);
@@ -1345,7 +1366,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         erp.lib.table.STableColumnForm[] tableColumnsItemForeignLanguage;
         erp.lib.table.STableColumnForm[] tableColumnsItemBarcode;
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moItemBarcodePane = new STablePane(miClient);
         moItemBarcodePane.setDoubleClickAction(this, "publicActionModifyItemBarcode");
@@ -1490,6 +1511,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldIsFreeDiscount.setTabbedPaneIndex(1, jTabbedPane);
         moFieldIsFreeCommissions = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsFreeCommissions);
         moFieldIsFreeCommissions.setTabbedPaneIndex(1, jTabbedPane);
+        moFieldIsSalesFreightRequired = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSalesFreightRequired);
+        moFieldIsSalesFreightRequired.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSurplusPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_FLOAT, false, jtfSurplusPercentage, jlSurplusPercentage);
         moFieldSurplusPercentage.setIsPercent(true);
         moFieldSurplusPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
@@ -1583,6 +1606,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         mvFields.add(moFieldIsFreePrice);
         mvFields.add(moFieldIsFreeDiscount);
         mvFields.add(moFieldIsFreeCommissions);
+        mvFields.add(moFieldIsSalesFreightRequired);
         mvFields.add(moFieldSurplusPercentage);
         mvFields.add(moFieldIsReference);
         mvFields.add(moFieldIsPrepayment);
@@ -1831,6 +1855,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             jckIsFreeDiscount.setSelected(false);
             jckIsFreeCommissions.setEnabled(false);
             jckIsFreeCommissions.setSelected(false);
+            jckIsSalesFreightRequired.setEnabled(false);
+            jckIsSalesFreightRequired.setSelected(false);
 
             jcbFkDefaultItemRefId_n.setEnabled(false);
             jbFkDefaultItemRefId_n.setEnabled(false);
@@ -2026,23 +2052,26 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
 
             jcbFkUnitAlternativeTypeId.setEnabled(moFieldIsInventoriable.getBoolean());
 
-            jckIsFreeDiscountUnitary.setEnabled(moItemGeneric.getDbmsIsFreeDiscountUnitary());
-            moFieldIsFreeDiscountUnitary.setFieldValue(moItemGeneric.getDbmsIsFreeDiscountUnitary());
+            jckIsFreeDiscountUnitary.setEnabled(moItemGeneric.getIsFreeDiscountUnitary());
+            moFieldIsFreeDiscountUnitary.setFieldValue(moItemGeneric.getIsFreeDiscountUnitary());
 
-            jckIsFreeDiscountEntry.setEnabled(moItemGeneric.getDbmsIsFreeDiscountEntry());
-            moFieldIsFreeDiscountEntry.setFieldValue(moItemGeneric.getDbmsIsFreeDiscountEntry());
+            jckIsFreeDiscountEntry.setEnabled(moItemGeneric.getIsFreeDiscountEntry());
+            moFieldIsFreeDiscountEntry.setFieldValue(moItemGeneric.getIsFreeDiscountEntry());
 
-            jckIsFreeDiscountDoc.setEnabled(moItemGeneric.getDbmsIsFreeDiscountDoc());
-            moFieldIsFreeDiscountDoc.setFieldValue(moItemGeneric.getDbmsIsFreeDiscountDoc());
+            jckIsFreeDiscountDoc.setEnabled(moItemGeneric.getIsFreeDiscountDoc());
+            moFieldIsFreeDiscountDoc.setFieldValue(moItemGeneric.getIsFreeDiscountDoc());
 
-            jckIsFreePrice.setEnabled(moItemGeneric.getDbmsIsFreePrice());
-            moFieldIsFreePrice.setFieldValue(moItemGeneric.getDbmsIsFreePrice());
+            jckIsFreePrice.setEnabled(moItemGeneric.getIsFreePrice());
+            moFieldIsFreePrice.setFieldValue(moItemGeneric.getIsFreePrice());
 
-            jckIsFreeDiscount.setEnabled(moItemGeneric.getDbmsIsFreeDiscount());
-            moFieldIsFreeDiscount.setFieldValue(moItemGeneric.getDbmsIsFreeDiscount());
+            jckIsFreeDiscount.setEnabled(moItemGeneric.getIsFreeDiscount());
+            moFieldIsFreeDiscount.setFieldValue(moItemGeneric.getIsFreeDiscount());
 
-            jckIsFreeCommissions.setEnabled(moItemGeneric.getDbmsIsFreeCommissions());
-            moFieldIsFreeCommissions.setFieldValue(moItemGeneric.getDbmsIsFreeCommissions());
+            jckIsFreeCommissions.setEnabled(moItemGeneric.getIsFreeCommissions());
+            moFieldIsFreeCommissions.setFieldValue(moItemGeneric.getIsFreeCommissions());
+
+            jckIsSalesFreightRequired.setEnabled(moItemGeneric.getIsSalesFreightRequired());
+            moFieldIsSalesFreightRequired.setFieldValue(moItemGeneric.getIsSalesFreightRequired());
 
             jcbFkDefaultItemRefId_n.setEnabled(moItemGeneric.getIsItemReferenceRequired());
             jbFkDefaultItemRefId_n.setEnabled(moItemGeneric.getIsItemReferenceRequired());
@@ -2740,6 +2769,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -2747,6 +2778,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
@@ -2855,6 +2887,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JCheckBox jckIsNetContentVariable;
     private javax.swing.JCheckBox jckIsPrepayment;
     private javax.swing.JCheckBox jckIsReference;
+    private javax.swing.JCheckBox jckIsSalesFreightRequired;
     private javax.swing.JCheckBox jckIsSurfaceVariable;
     private javax.swing.JCheckBox jckIsVolumeVariable;
     private javax.swing.JLabel jlCode;
@@ -3081,10 +3114,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                             validation.setComponent(jcbFkUnitAlternativeTypeId);
                             validation.setTabbedPaneIndex(0);
                         }
-                    }
-
-                    if (!validation.getIsError()) {
-                        if (moFieldIsDeleted.getBoolean() && hasStock()) {
+                        else if (moFieldIsDeleted.getBoolean() && hasStock()) {
                             validation.setMessage("El ítem '" + jtfName.getText() + "' no puede ser eliminado\n debido a que tiene existencias en los inventarios.");
                             validation.setComponent(jckIsDeleted);
                             validation.setTabbedPaneIndex(0);
@@ -3107,6 +3137,11 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
                         else if (moFieldCustomsUnit.getString().isEmpty() && moFieldCustomsEquivalence.getDouble() != 0) {
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlCustomsUnit.getText() + "'.");
                             validation.setComponent(jtfCustomsUnit);
+                            validation.setTabbedPaneIndex(1);
+                        }
+                        else if (jckIsFreeDiscount.isSelected() && !jckIsFreePrice.isSelected()) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_OPTION_SELECT + "'" + jckIsFreePrice.getText() + "'");
+                            validation.setComponent(jckIsFreePrice);
                             validation.setTabbedPaneIndex(1);
                         }
                     }
@@ -3212,6 +3247,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldIsFreePrice.setFieldValue(moItem.getIsFreePrice());
         moFieldIsFreeDiscount.setFieldValue(moItem.getIsFreeDiscount());
         moFieldIsFreeCommissions.setFieldValue(moItem.getIsFreeCommissions());
+        moFieldIsSalesFreightRequired.setFieldValue(moItem.getIsSalesFreightRequired());
         moFieldSurplusPercentage.setFieldValue(moItem.getSurplusPercentage());
         moFieldIsReference.setFieldValue(moItem.getIsReference());
         moFieldIsPrepayment.setFieldValue(moItem.getIsPrepayment());
@@ -3351,6 +3387,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setIsFreeDiscountEntry(moFieldIsFreeDiscountEntry.getBoolean());
         moItem.setIsFreeDiscountDoc(moFieldIsFreeDiscountDoc.getBoolean());
         moItem.setIsFreeCommissions(moFieldIsFreeCommissions.getBoolean());
+        moItem.setIsSalesFreightRequired(moFieldIsSalesFreightRequired.getBoolean());
         
         moItem.setFkDefaultItemRefId_n(jcbFkDefaultItemRefId_n.getSelectedIndex() <= 0 ? 0 : moFieldFkDefaultItemRefId_n.getKeyAsIntArray()[0]);
         moItem.setFkAdministrativeConceptTypeId(moFieldFkAdministrativeConceptTypeId.getKeyAsIntArray()[0]);

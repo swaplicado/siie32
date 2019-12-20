@@ -1501,98 +1501,84 @@
                         </Property>
                       </Properties>
 
-                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                        <Property name="columns" type="int" value="2"/>
+                        <Property name="horizontalGap" type="int" value="5"/>
+                        <Property name="rows" type="int" value="5"/>
+                      </Layout>
                       <SubComponents>
-                        <Container class="javax.swing.JPanel" name="jpProperties1221">
+                        <Component class="javax.swing.JCheckBox" name="jckIsFreeDiscountUnitary">
                           <Properties>
+                            <Property name="text" type="java.lang.String" value="Sin descuento unitario"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JCheckBox" name="jckIsFreePrice">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Sin precio en listas de precios"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JCheckBox" name="jckIsFreeDiscountEntry">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Sin descuento en partida"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JCheckBox" name="jckIsFreeDiscount">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Sin descuento en listas de precios"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JCheckBox" name="jckIsFreeDiscountDoc">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Sin descuento en documento"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JCheckBox" name="jckIsFreeCommissions">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Sin comisiones de venta"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JCheckBox" name="jckIsSalesFreightRequired">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Requiere flete en ventas"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="jLabel6">
+                        </Component>
+                        <Component class="javax.swing.JLabel" name="jlSurplusPercentage">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Excedente por defecto entre doctos.:"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                              <Dimension value="[100, 80]"/>
+                              <Dimension value="[225, 23]"/>
                             </Property>
                           </Properties>
-                          <Constraints>
-                            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                              <BorderConstraints direction="North"/>
-                            </Constraint>
-                          </Constraints>
+                        </Component>
+                        <Container class="javax.swing.JPanel" name="jPanel2">
 
-                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-                            <Property name="columns" type="int" value="2"/>
-                            <Property name="horizontalGap" type="int" value="5"/>
-                            <Property name="rows" type="int" value="3"/>
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JCheckBox" name="jckIsFreeDiscountUnitary">
+                            <Component class="javax.swing.JTextField" name="jtfSurplusPercentage">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Sin descuento unitario"/>
+                                <Property name="horizontalAlignment" type="int" value="11"/>
+                                <Property name="text" type="java.lang.String" value="0.00%"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JCheckBox" name="jckIsFreePrice">
+                            <Component class="javax.swing.JLabel" name="jLabel7">
                               <Properties>
-                                <Property name="text" type="java.lang.String" value="Sin precio"/>
+                                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                  <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                                </Property>
+                                <Property name="text" type="java.lang.String" value="(ventas y compras)"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JCheckBox" name="jckIsFreeDiscountEntry">
-                              <Properties>
-                                <Property name="text" type="java.lang.String" value="Sin descuento en partida"/>
-                              </Properties>
-                            </Component>
-                            <Component class="javax.swing.JCheckBox" name="jckIsFreeDiscount">
-                              <Properties>
-                                <Property name="text" type="java.lang.String" value="Sin descuento en listas de precios"/>
-                              </Properties>
-                            </Component>
-                            <Component class="javax.swing.JCheckBox" name="jckIsFreeDiscountDoc">
-                              <Properties>
-                                <Property name="text" type="java.lang.String" value="Sin descuento en documento"/>
-                              </Properties>
-                            </Component>
-                            <Component class="javax.swing.JCheckBox" name="jckIsFreeCommissions">
-                              <Properties>
-                                <Property name="text" type="java.lang.String" value="Sin comisiones de venta"/>
-                              </Properties>
-                            </Component>
-                          </SubComponents>
-                        </Container>
-                        <Container class="javax.swing.JPanel" name="jPanel1">
-                          <Constraints>
-                            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                              <BorderConstraints direction="Center"/>
-                            </Constraint>
-                          </Constraints>
-
-                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
-                          <SubComponents>
-                            <Container class="javax.swing.JPanel" name="jPanel2">
-                              <Constraints>
-                                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                                  <BorderConstraints direction="North"/>
-                                </Constraint>
-                              </Constraints>
-
-                              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                                <Property name="alignment" type="int" value="0"/>
-                                <Property name="verticalGap" type="int" value="0"/>
-                              </Layout>
-                              <SubComponents>
-                                <Component class="javax.swing.JLabel" name="jlSurplusPercentage">
-                                  <Properties>
-                                    <Property name="text" type="java.lang.String" value="Excedente predeterminado:"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[225, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                                <Component class="javax.swing.JTextField" name="jtfSurplusPercentage">
-                                  <Properties>
-                                    <Property name="horizontalAlignment" type="int" value="11"/>
-                                    <Property name="text" type="java.lang.String" value="0.00%"/>
-                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                      <Dimension value="[75, 23]"/>
-                                    </Property>
-                                  </Properties>
-                                </Component>
-                              </SubComponents>
-                            </Container>
                           </SubComponents>
                         </Container>
                       </SubComponents>
@@ -1694,7 +1680,7 @@
                           <Properties>
                             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                <EmptyBorder bottom="0" left="0" right="0" top="15"/>
+                                <EmptyBorder bottom="0" left="0" right="0" top="25"/>
                               </Border>
                             </Property>
                           </Properties>
@@ -2076,7 +2062,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JCheckBox" name="jckIsDomesticShipment">
+                    <Component class="javax.swing.JCheckBox" name="jckIsShipDataDomesticReq">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Embarque nacional"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -2093,7 +2079,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JCheckBox" name="jckIsInternationalShipment">
+                    <Component class="javax.swing.JCheckBox" name="jckIsShipDataInternationalReq">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Embarque internacional"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -2110,7 +2096,7 @@
                     <Property name="verticalGap" type="int" value="0"/>
                   </Layout>
                   <SubComponents>
-                    <Component class="javax.swing.JCheckBox" name="jckIsQualityShipment">
+                    <Component class="javax.swing.JCheckBox" name="jckIsShipDataQualityReq">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Calidad"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

@@ -362,7 +362,7 @@ public abstract class SFinAccountUtilities {
                     idReference = item.getDbmsDataItemGeneric().getFkItemGroupId();
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_IFAM:
-                    idReference = item.getDbmsDataItemGeneric().getDbmsDataItemGroup().getFkItemFamilyId();
+                    idReference = item.getDbmsDataItemGeneric().getDbmsFkItemFamilyId();
                     break;
                 case SDataConstantsSys.TRNS_TP_LINK_TP_ITEM:
                     idReference = item.getDbmsDataItemGeneric().getFkItemTypeId();

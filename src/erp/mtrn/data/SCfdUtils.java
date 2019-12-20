@@ -2020,25 +2020,24 @@ public abstract class SCfdUtils implements Serializable {
             params.setPedido(pedido);
             params.setContrato(contrato);
 
-            if (moDps.getDbmsDataAddenda() != null && bizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
-                params.setTipoAddenda(moDps.getDbmsDataAddenda().getFkCfdAddendaTypeId());
-                params.setLorealFolioNotaRecepcion(moDps.getDbmsDataAddenda().getLorealFolioNotaRecepcion());
+            if (moDps.getDbmsDataAddenda() != null && bizPartner.getIsCustomer() && bizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA) {
+                params.setLorealFolioNotaRecepción(moDps.getDbmsDataAddenda().getLorealFolioNotaRecepcion());
                 params.setBachocoSociedad(moDps.getDbmsDataAddenda().getBachocoSociedad());
-                params.setBachocoOrganizacionCompra(moDps.getDbmsDataAddenda().getBachocoOrganizacionCompra());
-                params.setBachocoDivision(moDps.getDbmsDataAddenda().getBachocoDivision());
-                params.setModeloDpsDescripcion(moDps.getDbmsDataAddenda().getModeloDpsDescripcion());
-                
+                params.setBachocoOrganizaciónCompra(moDps.getDbmsDataAddenda().getBachocoOrganizacionCompra());
+                params.setBachocoDivisión(moDps.getDbmsDataAddenda().getBachocoDivision());
                 params.setSorianaTienda(moDps.getDbmsDataAddenda().getSorianaTienda());
-                params.setSorianaEntregaMercancia(moDps.getDbmsDataAddenda().getSorianaEntregaMercancia());
-                params.setSorianaFechaRemision(moDps.getDbmsDataAddenda().getSorianaRemisionFecha());
-                params.setSorianaFolioRemision(moDps.getDbmsDataAddenda().getSorianaRemisionFolio());
-                params.setSorianaFolioPedido(moDps.getDbmsDataAddenda().getSorianaPedidoFolio());
-                params.setSorianaTipoBulto(moDps.getDbmsDataAddenda().getSorianaBultoTipo());
-                params.setSorianaCantidadBulto(moDps.getDbmsDataAddenda().getSorianaBultoCantidad());
+                params.setSorianaEntregaMercancía(moDps.getDbmsDataAddenda().getSorianaEntregaMercancia());
+                params.setSorianaRemisiónFecha(moDps.getDbmsDataAddenda().getSorianaRemisionFecha());
+                params.setSorianaRemisiónFolio(moDps.getDbmsDataAddenda().getSorianaRemisionFolio());
+                params.setSorianaPedidoFolio(moDps.getDbmsDataAddenda().getSorianaPedidoFolio());
+                params.setSorianaBultoTipo(moDps.getDbmsDataAddenda().getSorianaBultoTipo());
+                params.setSorianaBultoCantidad(moDps.getDbmsDataAddenda().getSorianaBultoCantidad());
                 params.setSorianaNotaEntradaFolio(moDps.getDbmsDataAddenda().getSorianaNotaEntradaFolio());
                 params.setSorianaCita(moDps.getDbmsDataAddenda().getSorianaCita());
-                
+                params.setModeloDpsDescripción(moDps.getDbmsDataAddenda().getModeloDpsDescripcion());
                 params.setCfdAddendaSubtype(moDps.getDbmsDataAddenda().getCfdAddendaSubtype());
+                params.setJsonData(moDps.getDbmsDataAddenda().getJsonData());
+                params.setFkCfdAddendaTypeId(moDps.getDbmsDataAddenda().getFkCfdAddendaTypeId());
             }
             
             int xmlType = moDps.getDbmsDataCfd() != null ? moDps.getDbmsDataCfd().getFkXmlTypeId() : ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdTypeXmlTypes().get(SDataConstantsSys.TRNS_TP_CFD_INV);
@@ -2060,8 +2059,6 @@ public abstract class SCfdUtils implements Serializable {
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
             }
 
-            params.setAgregarAddenda(true); // WARNING: This line of code differs from counterpart method in class SFormDps!!!
-            
             // Ruta:
 
             customerBranchConfig = (SDataCustomerBranchConfig) SDataUtilities.readRegistry(miClient, SDataConstants.MKT_CFG_CUSB, new int[] { bizPartnerBranch.getPkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
@@ -2996,7 +2993,7 @@ public abstract class SCfdUtils implements Serializable {
             
             packet.setFkCfdTypeId(SDataConstantsSys.TRNS_TP_CFD_INV);
             packet.setFkXmlTypeId(xmlType);
-            packet.setFkXmlDeliveryTypeId(params.getTipoAddenda() != SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA ? SModSysConsts.TRNS_TP_XML_DVY_NA : SModSysConsts.TRNS_TP_XML_DVY_WS_SOR);
+            packet.setFkXmlDeliveryTypeId(params.getFkCfdAddendaTypeId() == SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA ? SModSysConsts.TRNS_TP_XML_DVY_WS_SOR : SModSysConsts.TRNS_TP_XML_DVY_NA);
             packet.setFkXmlDeliveryStatusId(SModSysConsts.TRNS_ST_XML_DVY_PENDING);
             packet.setFkUserDeliveryId(client.getSession().getUser().getPkUserId());
             
