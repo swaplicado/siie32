@@ -660,8 +660,9 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                 
                 msSql = "SELECT id_iss "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " "
-                        + "WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + " "
+                        + "WHERE id_pay = " + mnPkPayrollId + " AND id_emp = " + mnPkEmployeeId + " AND NOT b_del "
                         + "ORDER BY id_iss DESC LIMIT 1";
+                
                 resultSet = statement.executeQuery(msSql);
                 if (resultSet.next()) {
                     moChildPayrollReceiptIssue = new SDbPayrollReceiptIssue();

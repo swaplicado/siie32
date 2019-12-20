@@ -3010,6 +3010,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_TRN_PS_CL_ITEM_TOT:
                 name = "reps/trn_ps_item_tot.jasper";
                 break;
+            case SDataConstantsSys.REP_TRN_PS_CL_ITEM_TOT_COMM:
+                name = "reps/trn_ps_item_tot_comm.jasper";
+                break;
             case SDataConstantsSys.REP_TRN_PS_COMP_PY:
                 name = "reps/trn_ps_comp_py.jasper";
                 break;

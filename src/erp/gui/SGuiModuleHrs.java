@@ -6,6 +6,7 @@
 package erp.gui;
 
 import erp.SDialogCfdR;
+import erp.SDialogVerifyCfdis;
 import erp.cfd.SCfdConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -115,6 +116,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiPayCalculatedAmountMonth;
     private javax.swing.JMenuItem jmiPayCalculatedEstimateIncomeTax;
     private javax.swing.JMenuItem jmiReReceipts;
+    private javax.swing.JMenuItem jmiVerifyCfdis;
     
     private javax.swing.JMenu jmBenefit;
     private javax.swing.JMenuItem jmiBenefitBenefitVac;
@@ -286,6 +288,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayCalculatedAmountMonth = new JMenuItem("Calcular ingreso mensual");
         jmiPayCalculatedEstimateIncomeTax = new JMenuItem("Calcular impuesto acumulado");
         jmiReReceipts = new JMenuItem("Reexpedición de recibos");
+        jmiVerifyCfdis = new JMenuItem("Verificar CFDIs");
 
         jmPay.add(jmiPayPayrollWeekly);
         jmPay.add(jmiPayPayrollWeeklyRec);
@@ -315,7 +318,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.addSeparator();
         jmPay.add(jmiPayCalculatedAmountMonth);
         jmPay.add(jmiPayCalculatedEstimateIncomeTax);
-        jmPay.add(jmiReReceipts);
+//        jmPay.add(jmiReReceipts);
+//        jmPay.add(jmiVerifyCfdis);
                 
         jmBenefit = new JMenu("Prestaciones");
         jmiBenefitBenefitVac = new JMenuItem("Control de vacaciones");
@@ -460,6 +464,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayCalculatedAmountMonth.addActionListener(this);
         jmiPayCalculatedEstimateIncomeTax.addActionListener(this);
         jmiReReceipts.addActionListener(this);
+        jmiVerifyCfdis.addActionListener(this);
         
         jmiBenefitBenefitVac.addActionListener(this);
         jmiBenefitBenefitBonVac.addActionListener(this);
@@ -569,6 +574,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayCalculatedAmountMonth.setEnabled(isPermissionPay);
         jmiPayCalculatedEstimateIncomeTax.setEnabled(isPermissionPay);
         jmiReReceipts.setEnabled(isPermissionPay);
+        jmiVerifyCfdis.setEnabled(isPermissionPay);
         
         jmBenefit.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight);
         jmiBenefitBenefitVac.setEnabled(true);
@@ -963,6 +969,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiReReceipts) {
                 new SDialogCfdR((SGuiClient) miClient, "Reexpedición de recibos").setFormVisible(true);
+            }
+            else if (item == jmiVerifyCfdis) {
+                new SDialogVerifyCfdis((SGuiClient) miClient, "Verificación de CFDIs").setFormVisible(true);
             }
             else if (item == jmiBenefitBenefitVac) {
                 miClient.getSession().showView(SModConsts.HRSX_BEN_MOV, SModSysConsts.HRSS_TP_BEN_VAC, null);

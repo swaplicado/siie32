@@ -37,6 +37,8 @@ import sa.lib.gui.SGuiClient;
 public class STheReceipts {
     private SGuiClient miClient;
     
+    private final static int DATA_TYPE_TEXT = 1;
+    
     public STheReceipts(SGuiClient client) {
         this.miClient = client;
     }
@@ -47,6 +49,7 @@ public class STheReceipts {
          dataList.add(new String[]
                             { 
                                 "UUID XML",
+                                "FOLIO XML",
                                 "ISR_CALC",
                                 "ISR_ACUM",
                                 "ISR_PEND",
@@ -75,6 +78,7 @@ public class STheReceipts {
                             "    hpr.id_emp, " +
                             "    bb.bp, " +
                             "    tc.uuid, " +
+                            "    erp.f_get_xml_atr('cfdi:Comprobante', 'Folio=', tc.doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_folio, " +
                             "    IF(hpr.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + ", " +
                             "        hpr.sal * " + SHrsConsts.MONTH_DAYS + ", " +
                             "        hpr.wage) AS montly_sal," +
@@ -95,8 +99,7 @@ public class STheReceipts {
                             "    trn_cfd tc ON hpr.id_pay = tc.fid_pay_rcp_pay_n " +
                             "        AND hpr.id_emp = tc.fid_pay_rcp_emp_n " +
                             "WHERE " +
-                            "    hp.per_year = 2019 " +
-                            "        AND hp.fk_tp_pay_sht = 1 " +
+                            "        hp.fk_tp_pay_sht = 1 " +
                             "        AND NOT hp.b_del " +
                             "        AND (tc.fid_st_xml = 2) AND hp.per_year = " + nYear + " AND hp.per = " + nPer + " " +
                             "HAVING montly_sal < 8000 " +
@@ -112,6 +115,7 @@ public class STheReceipts {
             String uuid = "";
             String nom = "";
             String emp = "";
+            String xmlFolio = "";
             SHrsPayroll moHrsPayroll = null;
             SHrsPayrollDataProvider prov = new SHrsPayrollDataProvider(miClient.getSession());
             SDbConfig moConfig = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
@@ -119,6 +123,7 @@ public class STheReceipts {
             while (resulPayroll.next()) {
                 id_pay_read = resulPayroll.getInt("id_pay");
                 uuid = resulPayroll.getString("uuid");
+                xmlFolio = resulPayroll.getString("_xml_folio");
                 nom = resulPayroll.getString("num");
                 emp = resulPayroll.getString("bp");
                 
@@ -135,11 +140,12 @@ public class STheReceipts {
                 SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
                 payrollReceipt.read(miClient.getSession(), receiptKey);
                 
-                SOutputData row = this.calculate(payroll, moHrsPayroll, payrollReceipt, uuid, prov);
+                SOutputData row = this.calculate(payroll, moHrsPayroll, payrollReceipt, uuid, xmlFolio, prov);
                 
                 dataList.add(new String[]
                             { 
                                 row.getUuid(),
+                                row.getXmlFolio(),
                                 row.getTaxCalculated() + "",
                                 row.getTaxPayed() + "",
                                 (row.getTaxCalculated() - row.getTaxPayed()) + "",
@@ -188,7 +194,7 @@ public class STheReceipts {
      * @param uuid
      * @return 
      */
-    private SOutputData calculate(SDbPayroll payroll, SHrsPayroll moHrsPayroll, SDbPayrollReceipt payrollReceipt, String uuid, SHrsPayrollDataProvider prov) {
+    private SOutputData calculate(SDbPayroll payroll, SHrsPayroll moHrsPayroll, SDbPayrollReceipt payrollReceipt, String uuid, String xmlFolio, SHrsPayrollDataProvider prov) {
         SOutputData oRow = null;
         SDbPayrollReceipt payrollReceiptOriginal;
         
@@ -218,81 +224,168 @@ public class STheReceipts {
             
             SDbPayrollReceipt receiptAux = hrsReceipt.getPayrollReceipt();
             
-            oRow = new SOutputData();
-            oRow.setIdPay(receiptAux.getPkPayrollId());
-            oRow.setNomType(payroll.getAuxPaymentType());
-            oRow.setIdEmp(receiptAux.getPkEmployeeId());
-            oRow.setUuid(uuid);
-            oRow.setSubsidyCalculated(receiptAux.getAnnualTaxSubsidyAssessed());
-            oRow.setTaxCalculated(receiptAux.getAnnualTaxAssessed());
-            oRow.setTaxPayed(receiptAux.getAnnualTaxPayed());
-            oRow.setSubPayed(receiptAux.getAnnualTaxSubsidyPayed());
-            
-            DecimalFormat df = new DecimalFormat("#0.00");
-            if ((receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed()) > (receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed())) {
-                double subsidy = receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed() - (receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed());
-
-                if (Math.abs(subsidy - payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()) < 0.001) { // si el monto es igual
-                    System.out.println("CORRECTO. SUB > ISR");
-                    oRow.setResult("CORRECTO");
-                    oRow.setComments("SUB > ISR");
-                }
-                else {
-                    // los montos no coinciden
-                    System.out.println("SUB Calculado: " + df.format(subsidy) + 
-                                        "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()) + 
-                                        (payrollReceiptOriginal.getAnnualTaxAssessed() > 0 ? "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) : ""));
-                    oRow.setResult("INCORRECTO");
-                    oRow.setComments("SUB Calculado: " + df.format(subsidy) + 
-                                        "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()) + 
-                                        (payrollReceiptOriginal.getAnnualTaxAssessed() > 0 ? "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) : ""));
-                }
-                
-                oRow.setSubsidyToPay(df.format(subsidy));
+            if (payroll.getFkTaxComputationTypeId() == SModSysConsts.HRSS_TP_TAX_COMP_ANN) {
+              oRow = this.getRowAnnualCalc(payroll, payrollReceiptOriginal, receiptAux, uuid, xmlFolio);
             }
-            else if ((receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed()) > (receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed())) {
-                    double tax = receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed() - (receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed());
-
-                    if (Math.abs(tax - payrollReceiptOriginal.getAnnualTaxAssessed()) < 0.001) { // si el monto es igual
-                        System.out.println("CORRECTO. ISR > SUB");
-                        oRow.setResult("CORRECTO");
-                        oRow.setComments("ISR > SUB");
-                    }
-                    else {
-                        // los montos no coinciden
-                        System.out.println("ISR Calculado: " + df.format(tax) + 
-                                            "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) + 
-                                                (payrollReceiptOriginal.getAnnualTaxSubsidyAssessed() > 0 ? "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()) : ""));
-                        oRow.setResult("INCORRECTO");
-                        oRow.setComments("ISR Calculado: " + df.format(tax) + 
-                                            "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) + 
-                                                (payrollReceiptOriginal.getAnnualTaxSubsidyAssessed() > 0 ? "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()) : ""));
-                    }
-                    
-                    oRow.setTaxToHold(df.format(tax));
-                }
-                else {
-                    double subsidy = receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed() - (receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed());
-                    double tax = receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed() - (receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed());
-                    
-                    oRow.setSubsidyToPay(df.format(subsidy));
-                    oRow.setTaxToHold(df.format(tax));
-                    
-                    System.out.println("ISR Calculado: " + df.format(tax) + " SUB calculado: " + df.format(subsidy) +
-                                            "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) + "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()));
-                    oRow.setResult("NO DEFINIDO");
-                    oRow.setComments("ISR Calculado: " + df.format(tax) + " SUB calculado: " + df.format(subsidy) +
-                                            "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) + "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()));
-                }
-            
-            oRow.setSubsidyXml(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed());
-            oRow.setTaxXml(payrollReceiptOriginal.getAnnualTaxAssessed());
+            else {
+              oRow = this.getRowPayrollCalc(payroll, payrollReceiptOriginal, receiptAux, uuid, xmlFolio);
+            }
             
             System.out.println("");
         }
         catch (Exception ex) {
             Logger.getLogger(STheReceipts.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        return oRow;
+    }
+    
+    private SOutputData getRowAnnualCalc(SDbPayroll payroll, SDbPayrollReceipt payrollReceiptOriginal, SDbPayrollReceipt receiptAux, String uuid, String xmlFolio) {
+        SOutputData oRow = new SOutputData();
+        oRow.setIdPay(receiptAux.getPkPayrollId());
+        oRow.setNomType(payroll.getAuxPaymentType());
+        oRow.setIdEmp(receiptAux.getPkEmployeeId());
+        oRow.setUuid(uuid);
+        oRow.setXmlFolio(xmlFolio);
+        oRow.setSubsidyCalculated(receiptAux.getAnnualTaxSubsidyAssessed());
+        oRow.setTaxCalculated(receiptAux.getAnnualTaxAssessed());
+        oRow.setTaxPayed(receiptAux.getAnnualTaxPayed());
+        oRow.setSubPayed(receiptAux.getAnnualTaxSubsidyPayed());
+
+        DecimalFormat df = new DecimalFormat("#0.00");
+        if ((receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed()) > (receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed())) {
+            double subsidy = receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed() - (receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed());
+
+            if (Math.abs(subsidy - payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()) < 0.001) { // si el monto es igual
+                System.out.println("CORRECTO. SUB > ISR");
+                oRow.setResult("CORRECTO");
+                oRow.setComments("SUB > ISR");
+            }
+            else {
+                // los montos no coinciden
+                System.out.println("SUB Calculado: " + df.format(subsidy) + 
+                                    "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()) + 
+                                    (payrollReceiptOriginal.getAnnualTaxAssessed() > 0 ? "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) : ""));
+                oRow.setResult("INCORRECTO");
+                oRow.setComments("SUB Calculado: " + df.format(subsidy) + 
+                                    "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()) + 
+                                    (payrollReceiptOriginal.getAnnualTaxAssessed() > 0 ? "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) : ""));
+            }
+
+            oRow.setSubsidyToPay(df.format(subsidy));
+        }
+        else if ((receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed()) > (receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed())) {
+                double tax = receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed() - (receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed());
+
+                if (Math.abs(tax - payrollReceiptOriginal.getAnnualTaxAssessed()) < 0.001) { // si el monto es igual
+                    System.out.println("CORRECTO. ISR > SUB");
+                    oRow.setResult("CORRECTO");
+                    oRow.setComments("ISR > SUB");
+                }
+                else {
+                    // los montos no coinciden
+                    System.out.println("ISR Calculado: " + df.format(tax) + 
+                                        "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) + 
+                                            (payrollReceiptOriginal.getAnnualTaxSubsidyAssessed() > 0 ? "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()) : ""));
+                    oRow.setResult("INCORRECTO");
+                    oRow.setComments("ISR Calculado: " + df.format(tax) + 
+                                        "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) + 
+                                            (payrollReceiptOriginal.getAnnualTaxSubsidyAssessed() > 0 ? "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()) : ""));
+                }
+
+                oRow.setTaxToHold(df.format(tax));
+            }
+            else {
+                double subsidy = receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed() - (receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed());
+                double tax = receiptAux.getAnnualTaxAssessed() - receiptAux.getAnnualTaxPayed() - (receiptAux.getAnnualTaxSubsidyAssessed() - receiptAux.getAnnualTaxSubsidyPayed());
+
+                oRow.setSubsidyToPay(df.format(subsidy));
+                oRow.setTaxToHold(df.format(tax));
+
+                System.out.println("ISR Calculado: " + df.format(tax) + " SUB calculado: " + df.format(subsidy) +
+                                        "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) + "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()));
+                oRow.setResult("NO DEFINIDO");
+                oRow.setComments("ISR Calculado: " + df.format(tax) + " SUB calculado: " + df.format(subsidy) +
+                                        "; XML ISR: " + df.format(payrollReceiptOriginal.getAnnualTaxAssessed()) + "; XML SUB: " + df.format(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed()));
+            }
+
+        oRow.setSubsidyXml(payrollReceiptOriginal.getAnnualTaxSubsidyAssessed());
+        oRow.setTaxXml(payrollReceiptOriginal.getAnnualTaxAssessed());
+        
+        return oRow;
+    }
+    
+    private SOutputData getRowPayrollCalc(SDbPayroll payroll, SDbPayrollReceipt payrollReceiptOriginal, SDbPayrollReceipt receiptAux, String uuid, String xmlFolio) {
+        SOutputData oRow = new SOutputData();
+        oRow.setIdPay(receiptAux.getPkPayrollId());
+        oRow.setNomType(payroll.getAuxPaymentType());
+        oRow.setIdEmp(receiptAux.getPkEmployeeId());
+        oRow.setUuid(uuid);
+        oRow.setXmlFolio(xmlFolio);
+        oRow.setSubsidyCalculated(receiptAux.getPayrollTaxSubsidyAssessed());
+        oRow.setTaxCalculated(receiptAux.getPayrollTaxAssessed());
+        oRow.setTaxPayed(receiptAux.getPayrollTaxPayed());
+        oRow.setSubPayed(receiptAux.getPayrollTaxSubsidyPayed());
+
+        DecimalFormat df = new DecimalFormat("#0.00");
+        if ((receiptAux.getPayrollTaxSubsidyAssessed() - receiptAux.getPayrollTaxSubsidyPayed()) > (receiptAux.getPayrollTaxAssessed() - receiptAux.getPayrollTaxPayed())) {
+            double subsidy = receiptAux.getPayrollTaxSubsidyAssessed() - receiptAux.getPayrollTaxSubsidyPayed() - (receiptAux.getPayrollTaxAssessed() - receiptAux.getPayrollTaxPayed());
+
+            if (Math.abs(subsidy - payrollReceiptOriginal.getPayrollTaxSubsidyAssessed()) < 0.001) { // si el monto es igual
+                System.out.println("CORRECTO. SUB > ISR");
+                oRow.setResult("CORRECTO");
+                oRow.setComments("SUB > ISR");
+            }
+            else {
+                // los montos no coinciden
+                System.out.println("SUB Calculado: " + df.format(subsidy) + 
+                                    "; XML SUB: " + df.format(payrollReceiptOriginal.getPayrollTaxSubsidyAssessed()) + 
+                                    (payrollReceiptOriginal.getPayrollTaxAssessed() > 0 ? "; XML ISR: " + df.format(payrollReceiptOriginal.getPayrollTaxAssessed()) : ""));
+                oRow.setResult("INCORRECTO");
+                oRow.setComments("SUB Calculado: " + df.format(subsidy) + 
+                                    "; XML SUB: " + df.format(payrollReceiptOriginal.getPayrollTaxSubsidyAssessed()) + 
+                                    (payrollReceiptOriginal.getPayrollTaxAssessed() > 0 ? "; XML ISR: " + df.format(payrollReceiptOriginal.getPayrollTaxAssessed()) : ""));
+            }
+
+            oRow.setSubsidyToPay(df.format(subsidy));
+        }
+        else if ((receiptAux.getPayrollTaxAssessed() - receiptAux.getPayrollTaxPayed()) > (receiptAux.getPayrollTaxSubsidyAssessed() - receiptAux.getPayrollTaxSubsidyPayed())) {
+                double tax = receiptAux.getPayrollTaxAssessed() - receiptAux.getPayrollTaxPayed() - (receiptAux.getPayrollTaxSubsidyAssessed() - receiptAux.getPayrollTaxSubsidyPayed());
+
+                if (Math.abs(tax - payrollReceiptOriginal.getPayrollTaxAssessed()) < 0.001) { // si el monto es igual
+                    System.out.println("CORRECTO. ISR > SUB");
+                    oRow.setResult("CORRECTO");
+                    oRow.setComments("ISR > SUB");
+                }
+                else {
+                    // los montos no coinciden
+                    System.out.println("ISR Calculado: " + df.format(tax) + 
+                                        "; XML ISR: " + df.format(payrollReceiptOriginal.getPayrollTaxAssessed()) + 
+                                            (payrollReceiptOriginal.getPayrollTaxSubsidyAssessed() > 0 ? "; XML SUB: " + df.format(payrollReceiptOriginal.getPayrollTaxSubsidyAssessed()) : ""));
+                    oRow.setResult("INCORRECTO");
+                    oRow.setComments("ISR Calculado: " + df.format(tax) + 
+                                        "; XML ISR: " + df.format(payrollReceiptOriginal.getPayrollTaxAssessed()) + 
+                                            (payrollReceiptOriginal.getPayrollTaxSubsidyAssessed() > 0 ? "; XML SUB: " + df.format(payrollReceiptOriginal.getPayrollTaxSubsidyAssessed()) : ""));
+                }
+
+                oRow.setTaxToHold(df.format(tax));
+            }
+            else {
+                double subsidy = receiptAux.getPayrollTaxSubsidyAssessed() - receiptAux.getPayrollTaxSubsidyPayed() - (receiptAux.getPayrollTaxAssessed() - receiptAux.getPayrollTaxPayed());
+                double tax = receiptAux.getPayrollTaxAssessed() - receiptAux.getPayrollTaxPayed() - (receiptAux.getPayrollTaxSubsidyAssessed() - receiptAux.getPayrollTaxSubsidyPayed());
+
+                oRow.setSubsidyToPay(df.format(subsidy));
+                oRow.setTaxToHold(df.format(tax));
+
+                System.out.println("ISR Calculado: " + df.format(tax) + " SUB calculado: " + df.format(subsidy) +
+                                        "; XML ISR: " + df.format(payrollReceiptOriginal.getPayrollTaxAssessed()) + "; XML SUB: " + df.format(payrollReceiptOriginal.getPayrollTaxSubsidyAssessed()));
+                oRow.setResult("NO DEFINIDO");
+                oRow.setComments("ISR Calculado: " + df.format(tax) + " SUB calculado: " + df.format(subsidy) +
+                                        "; XML ISR: " + df.format(payrollReceiptOriginal.getPayrollTaxAssessed()) + "; XML SUB: " + df.format(payrollReceiptOriginal.getPayrollTaxSubsidyAssessed()));
+            }
+
+        oRow.setSubsidyXml(payrollReceiptOriginal.getPayrollTaxSubsidyAssessed());
+        oRow.setTaxXml(payrollReceiptOriginal.getPayrollTaxAssessed());
         
         return oRow;
     }

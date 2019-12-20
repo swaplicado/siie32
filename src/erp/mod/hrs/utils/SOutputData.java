@@ -22,6 +22,7 @@ public class SOutputData {
     private String resSubsidyDif;
     private String resTaxDif;
     private String uuid;
+    private String xmlFolio;
     private String nomType;
     private String result;
     private String comments;
@@ -149,6 +150,14 @@ public class SOutputData {
 
     public void setIdEmp(int idEmp) {
         this.idEmp = idEmp;
+    }
+
+    public String getXmlFolio() {
+        return xmlFolio;
+    }
+
+    public void setXmlFolio(String xmlFolio) {
+        this.xmlFolio = xmlFolio;
     }
     
     

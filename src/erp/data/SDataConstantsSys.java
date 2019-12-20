@@ -1619,6 +1619,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_STK_MOV_MOV = 207032;   // stock movements detailed per movement
     public static final int REP_TRN_STK_MOV_SUM = 207033;   // stock movements summary
     public static final int REP_TRN_STK_MOV_SUM_SUM = 207034;   // sumary of stock movements summary
+    public static final int REP_TRN_PS_CL_ITEM_TOT_COMM = 207035;
     
     public static final int REP_TRN_CFD = 207101;
     public static final int REP_TRN_CFDI = 207102;
