@@ -2773,6 +2773,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         return textField == jtfContractBase || textField == jtfContractFuture || textField == jtfContractFactor;
     }
     
+    private boolean isCfdAddendaPosible() {
+        return moParamDps != null && moParamDps.isDocumentOrAdjustmentSal() && 
+                moParamBizPartner != null && moParamBizPartner.getIsCustomer() && moParamBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId() != SDataConstantsSys.BPSS_TP_CFD_ADD_NA;
+    }
+    
     private String composeMsgMissingShipData() {
         String message = "";
 
@@ -3668,24 +3673,25 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private java.lang.String composeAddendaJsonData() {
         String json = "";
         
-        switch(moParamBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
-            case SDataConstantsSys.BPSS_TP_CFD_ADD_NA:
-            case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
-            case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
-            case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
-            case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
-            case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
-                break;
-                
-            case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
-                SAddendaAmc71XmlLine amc71XmlLine = new SAddendaAmc71XmlLine();
-                amc71XmlLine.PurchaseOrder = moFieldAddAmc71PurchaseOrder.getString();
-                amc71XmlLine.PurchaseOrderDate = moFieldAddAmc71PurchaseOrderDate.getDate();
-                amc71XmlLine.Barcode = moFieldAddGenBarcode.getString();
-                json = amc71XmlLine.encodeJson();
-                break;
-                
-            default:
+        if (isCfdAddendaPosible()) {
+            switch(moParamBizPartner.getDbmsCategorySettingsCus().getFkCfdAddendaTypeId()) {
+                case SDataConstantsSys.BPSS_TP_CFD_ADD_SORIANA:
+                case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
+                case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
+                case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
+                case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
+                    break;
+
+                case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
+                    SAddendaAmc71XmlLine amc71XmlLine = new SAddendaAmc71XmlLine();
+                    amc71XmlLine.PurchaseOrder = moFieldAddAmc71PurchaseOrder.getString();
+                    amc71XmlLine.PurchaseOrderDate = moFieldAddAmc71PurchaseOrderDate.getDate();
+                    amc71XmlLine.Barcode = moFieldAddGenBarcode.getString();
+                    json = amc71XmlLine.encodeJson();
+                    break;
+
+                default:
+            }
         }
         
         return json;
@@ -5848,17 +5854,32 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         
         // Addenda data row:
         
-        moDpsEntry.setDbmsAddBachocoNumeroPosicion(moFieldAddBachocoNúmeroPosición.getInteger());
-        moDpsEntry.setDbmsAddBachocoCentro(moFieldAddBachocoCentro.getString());
-        moDpsEntry.setDbmsAddLorealEntryNumber(moFieldAddLorealEntryNumber.getInteger());
-        moDpsEntry.setDbmsAddSorianaCodigo(moFieldAddGenBarcode.getString());
-        moDpsEntry.setDbmsAddElektraOrder(moFieldAddElektraOrder.getString());
-        moDpsEntry.setDbmsAddElektraBarcode(moFieldAddGenBarcode.getString());
-        moDpsEntry.setDbmsAddElektraCages(moFieldAddElektraCages.getInteger());
-        moDpsEntry.setDbmsAddElektraCagePriceUnitary(moFieldAddElektraCagePriceUnitary.getDouble());
-        moDpsEntry.setDbmsAddElektraParts(moFieldAddElektraParts.getInteger());
-        moDpsEntry.setDbmsAddElektraPartPriceUnitary(moFieldAddElektraPartPriceUnitary.getDouble());
-        moDpsEntry.setDbmsAddJsonData(composeAddendaJsonData());
+        if (!isCfdAddendaPosible()) {
+            moDpsEntry.setDbmsAddBachocoNumeroPosicion(0);
+            moDpsEntry.setDbmsAddBachocoCentro("");
+            moDpsEntry.setDbmsAddLorealEntryNumber(0);
+            moDpsEntry.setDbmsAddSorianaCodigo("");
+            moDpsEntry.setDbmsAddElektraOrder("");
+            moDpsEntry.setDbmsAddElektraBarcode("");
+            moDpsEntry.setDbmsAddElektraCages(0);
+            moDpsEntry.setDbmsAddElektraCagePriceUnitary(0.0);
+            moDpsEntry.setDbmsAddElektraParts(0);
+            moDpsEntry.setDbmsAddElektraPartPriceUnitary(0.0);
+            moDpsEntry.setDbmsAddJsonData("");
+        }
+        else {
+            moDpsEntry.setDbmsAddBachocoNumeroPosicion(moFieldAddBachocoNúmeroPosición.getInteger());
+            moDpsEntry.setDbmsAddBachocoCentro(moFieldAddBachocoCentro.getString());
+            moDpsEntry.setDbmsAddLorealEntryNumber(moFieldAddLorealEntryNumber.getInteger());
+            moDpsEntry.setDbmsAddSorianaCodigo(moFieldAddGenBarcode.getString());
+            moDpsEntry.setDbmsAddElektraOrder(moFieldAddElektraOrder.getString());
+            moDpsEntry.setDbmsAddElektraBarcode(moFieldAddGenBarcode.getString());
+            moDpsEntry.setDbmsAddElektraCages(moFieldAddElektraCages.getInteger());
+            moDpsEntry.setDbmsAddElektraCagePriceUnitary(moFieldAddElektraCagePriceUnitary.getDouble());
+            moDpsEntry.setDbmsAddElektraParts(moFieldAddElektraParts.getInteger());
+            moDpsEntry.setDbmsAddElektraPartPriceUnitary(moFieldAddElektraPartPriceUnitary.getDouble());
+            moDpsEntry.setDbmsAddJsonData(composeAddendaJsonData());
+        }
         
         if (moFieldComplConceptKey.getString().isEmpty()) {
             moDpsEntry.setDbmsComplement(null);

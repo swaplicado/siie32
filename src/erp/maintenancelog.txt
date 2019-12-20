@@ -1,4 +1,16 @@
 ================================================================================
+SIIE 3.2 153.2/ 2019-12-20
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección a la vista de movimientos de almacén de refacciones para el mostrado de registros con y sin comentarios.
+
+================================================================================
+SIIE 3.2 153.1/ 2019-12-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la generación innecesaria de datos en formato JSON para addendas en documentos que no son CFDI emitidos por la empresa.
+
+================================================================================
 SIIE 3.2 153.0/ 2019-12-20
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
