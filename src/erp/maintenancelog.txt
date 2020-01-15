@@ -1,5 +1,5 @@
 ================================================================================
-SIIE 3.2 153.1/ 2020-01-15
+SIIE 3.2 153.3/ 2020-01-15
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Corrección a tipo de dato de Clave Empleado en vista Empleados, para permitir su ordenamiento como número entero.

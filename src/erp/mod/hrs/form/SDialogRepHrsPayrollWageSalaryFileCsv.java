@@ -205,7 +205,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         jPanel10.setLayout(new java.awt.GridLayout(2, 1));
 
         moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
-        moRadOrderByNumDepartament.setText("Número del departamento");
+        moRadOrderByNumDepartament.setText("Código del departamento");
         jPanel10.add(moRadOrderByNumDepartament);
 
         moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
