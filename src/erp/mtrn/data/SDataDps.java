@@ -15,6 +15,7 @@ import cfd.DCfdTaxes;
 import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.DElementParent;
+import cfd.ext.amece71.DElementAdditionalReferenceIdentification;
 import cfd.ext.bachoco.DElementLineItem;
 import cfd.ext.elektra.DElementAp;
 import cfd.ext.elektra.DElementDetailItems;
@@ -4544,7 +4545,9 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     }
     
     /**
-     * Create addenda for AMECE 7.1 (e.g., Comercial City Fresko, S de RL de CV, (CCF), a.k.a., "La Comer").
+     * Create CFDI addenda for AMECE 7.1 (e.g., Comercial City Fresko, S de RL de CV, (CCF), a.k.a., "La Comer").
+     * <strong>WARNING:</strong> This method has a vulnerability: if multiple tax rates are present in document, there is no way to handle it.
+     * It is assumed that all document entries have the same tax reate, if any, allways.
      * @param dIvaPct VAT rate applied to DPS.
      * @return Addenda.
      * @throws java.lang.Exception
@@ -4615,6 +4618,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         // element additional information:
         
+        payment.getEltAdditionalInformation().getEltReferenceIdentification().getAttType().setString(DElementAdditionalReferenceIdentification.TYPE_ATZ);
         payment.getEltAdditionalInformation().getEltReferenceIdentification().setValue("0");
         
         // element buyer:
@@ -4677,10 +4681,16 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 lineItem.getEltTradeItemDescriptionInformation().getEltLongText().setValue(dpsEntry.getConcept());
                 lineItem.getEltInvoicedQuantity().getAttUnitOfMeasure().setString(dpsEntry.getDbmsUnidadClave());
                 lineItem.getEltInvoicedQuantity().setValue("" + (int) dpsEntry.getQuantity());
-                lineItem.getEltGrossPrice().getEltAmount().setValue(SAddendaUtils.DecimalFormatAmount.format(SLibUtils.roundAmount(dpsEntry.getOriginalQuantity() == 0 ? 0 : dpsEntry.getTotalCy_r() / dpsEntry.getOriginalQuantity())));
-                lineItem.getEltNetPrice().getEltAmount().setValue(SAddendaUtils.DecimalFormatAmount.format(SLibUtils.roundAmount(dpsEntry.getOriginalPriceUnitaryCy())));
+                if (dpsEntry.getOriginalQuantity() == 0) {
+                    lineItem.getEltGrossPrice().getEltAmount().setValue(SAddendaUtils.DecimalFormatAmount.format(0d));
+                    lineItem.getEltNetPrice().getEltAmount().setValue(SAddendaUtils.DecimalFormatAmount.format(0d));
+                }
+                else {
+                    lineItem.getEltGrossPrice().getEltAmount().setValue(SAddendaUtils.DecimalFormatAmount.format(SLibUtils.roundAmount(dpsEntry.getSubtotalProvisionalCy_r() / dpsEntry.getOriginalQuantity())));
+                    lineItem.getEltNetPrice().getEltAmount().setValue(SAddendaUtils.DecimalFormatAmount.format(SLibUtils.roundAmount(dpsEntry.getSubtotalCy_r() / dpsEntry.getOriginalQuantity())));
+                }
                 lineItem.getEltAdditionalInformation().getEltReferenceIdentification().setValue(amc71XmlLine.PurchaseOrder);
-                lineItem.getEltTotalLineAmount().getEltGrossAmount().getEltAmount().setValue(SAddendaUtils.DecimalFormatAmount.format(dpsEntry.getTotalCy_r()));
+                lineItem.getEltTotalLineAmount().getEltGrossAmount().getEltAmount().setValue(SAddendaUtils.DecimalFormatAmount.format(dpsEntry.getSubtotalProvisionalCy_r()));
                 lineItem.getEltTotalLineAmount().getEltNetAmount().getEltAmount().setValue(SAddendaUtils.DecimalFormatAmount.format(dpsEntry.getSubtotalCy_r()));
                 
                 payment.getEltItems().getEltHijosLineItem().add(lineItem);

@@ -206,7 +206,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         jPanel18.add(jlFkPaymentType);
 
         jtfPaymentType.setEditable(false);
-        jtfPaymentType.setText("jTextField1");
+        jtfPaymentType.setText("TEXT");
         jtfPaymentType.setFocusable(false);
         jtfPaymentType.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel18.add(jtfPaymentType);
@@ -232,7 +232,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         jPanel6.add(moKeyAbsenceClass);
 
         jlAbsenceClassHelp.setForeground(java.awt.Color.gray);
-        jlAbsenceClassHelp.setText("jLabel2");
+        jlAbsenceClassHelp.setText("TEXT");
         jlAbsenceClassHelp.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel6.add(jlAbsenceClassHelp);
 
@@ -255,7 +255,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         jlNumber.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlNumber);
 
-        moTextNumber.setText("sBeanFieldText1");
+        moTextNumber.setText("TEXT");
         moTextNumber.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel4.add(moTextNumber);
 
@@ -291,7 +291,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBenefitAnniversary.setText("Aniversario:*");
+        jlBenefitAnniversary.setText("Aniversario/año:*");
         jlBenefitAnniversary.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlBenefitAnniversary);
 
@@ -303,12 +303,14 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         moIntAnniversaryYear.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel11.add(moIntAnniversaryYear);
 
-        jlBenefitAnniversaryOriginal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlBenefitAnniversaryOriginal.setText("Valores originales:");
-        jlBenefitAnniversaryOriginal.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlBenefitAnniversaryOriginal.setForeground(java.awt.SystemColor.textInactiveText);
+        jlBenefitAnniversaryOriginal.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jlBenefitAnniversaryOriginal.setText("Aniversario/año originales:");
+        jlBenefitAnniversaryOriginal.setPreferredSize(new java.awt.Dimension(155, 23));
         jPanel11.add(jlBenefitAnniversaryOriginal);
 
         jtfAnniversaryOriginal.setEditable(false);
+        jtfAnniversaryOriginal.setForeground(java.awt.SystemColor.textInactiveText);
         jtfAnniversaryOriginal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfAnniversaryOriginal.setText("0");
         jtfAnniversaryOriginal.setToolTipText("Aniversario");
@@ -317,6 +319,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         jPanel11.add(jtfAnniversaryOriginal);
 
         jtfAnniversaryYearOriginal.setEditable(false);
+        jtfAnniversaryYearOriginal.setForeground(java.awt.SystemColor.textInactiveText);
         jtfAnniversaryYearOriginal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfAnniversaryYearOriginal.setText("0");
         jtfAnniversaryYearOriginal.setToolTipText("Año aniversario");
@@ -364,6 +367,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
+        jlDaysEffective.setForeground(java.awt.Color.red);
         jlDaysEffective.setText("Días efectivos:*");
         jlDaysEffective.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel10.add(jlDaysEffective);
@@ -383,12 +387,14 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         jtfDaysEffectiveMax.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jtfDaysEffectiveMax);
 
-        jlDaysEffectiveOriginal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlDaysEffectiveOriginal.setText("Valor original:");
-        jlDaysEffectiveOriginal.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDaysEffectiveOriginal.setForeground(java.awt.SystemColor.textInactiveText);
+        jlDaysEffectiveOriginal.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jlDaysEffectiveOriginal.setText("Días efectivos originales:");
+        jlDaysEffectiveOriginal.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(jlDaysEffectiveOriginal);
 
         jtfDaysEffectiveOriginal.setEditable(false);
+        jtfDaysEffectiveOriginal.setForeground(java.awt.SystemColor.textInactiveText);
         jtfDaysEffectiveOriginal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfDaysEffectiveOriginal.setText("0");
         jtfDaysEffectiveOriginal.setFocusable(false);
@@ -403,7 +409,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         jlNotes.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel12.add(jlNotes);
 
-        moTextNotes.setText("sBeanFieldText1");
+        moTextNotes.setText("TEXT");
         moTextNotes.setPreferredSize(new java.awt.Dimension(400, 23));
         jPanel12.add(moTextNotes);
 
@@ -889,16 +895,13 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
                     validation.setComponent(jbGoNext);
                 }
                 else if (moIntDaysEffective.getValue() > mnDaysEffectiveMax) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlDaysEffective) + "' (" + moIntDaysEffective.getValue() + ")" +
-                            SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + "" + mnDaysEffectiveMax + ".");
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlDaysEffective) + "' (" + moIntDaysEffective.getValue() + ")" + SGuiConsts.ERR_MSG_FIELD_VAL_LESS_EQUAL + "" + mnDaysEffectiveMax + ".");
                     validation.setComponent(moIntDaysEffective);
                 }
-                
-                if (validation.isValid()) {
+                else {
                     if (SDbAbsenceClass.consumesCalendarDays(moKeyAbsenceClass.getValue()[0])) {
                         if (moIntDaysEffective.getValue() != mnDaysEffectiveMax) {
-                            msg = SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlDaysEffective) + "' (" + moIntDaysEffective.getValue() + ")" +
-                                    SGuiConsts.ERR_MSG_FIELD_VAL_EQUAL + mnDaysEffectiveMax + ", pero son distintos.";
+                            msg = SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlDaysEffective) + "' (" + moIntDaysEffective.getValue() + ")" + SGuiConsts.ERR_MSG_FIELD_VAL_EQUAL + mnDaysEffectiveMax + ", pero son distintos.";
 
                             if (miClient.showMsgBoxConfirm(msg + "\n" + SGuiConsts.MSG_CNF_CONT) == JOptionPane.NO_OPTION) {
                                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + SGuiUtils.getLabelName(jlDaysEffective));
@@ -927,7 +930,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
                             }
                         }
                     }
-                    
+
                     if (validation.isValid()) {
                         // validate that period of this absence does not overlap with other employee's absences:
                         try {

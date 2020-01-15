@@ -19,6 +19,7 @@ import java.io.OutputStreamWriter;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
@@ -323,68 +324,56 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         return earnings;
     }
     
-    private double[] getAmountDeductions(final int employeeId, final String sqlStatusPay) throws Exception {
-        double amtDeduction[] = null;
-        String sql = "";
-        ResultSet resultSet = null;
-        Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
+    /**
+     * Get deductions array.
+     * @param employeeId
+     * @param sqlStatusPay
+     * @return Deductios array. At index 0, whitholdings; at index 1, tax; at index 2, all deductions.
+     * @throws Exception 
+     */
+    private double[] getDeductions(final int employeeId, final String sqlStatusPay) throws Exception {
+        double deductions[] = null;
 
-        sql = "SELECT SUM(IF(d.b_who = 1, prd.amt_r, 0)) AS f_ded, SUM(prd.amt_r) AS f_ded_all " +
-                "FROM hrs_pay AS p " +
-                "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                (!moRadFilterTypeDatePay.isSelected() ?  "" : "INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp "
+        String sql = "SELECT "
+                + "SUM(IF(d.b_who = 1, prd.amt_r, 0.0)) AS f_ded_who, "
+                + "SUM(IF(prd.fk_tp_ded = " + SModSysConsts.HRSS_TP_DED_TAX + ", prd.amt_r, 0.0)) AS f_ded_tax, "
+                + "SUM(prd.amt_r) AS f_ded_all "
+                + "FROM hrs_pay AS p "
+                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                + (!moRadFilterTypeDatePay.isSelected() ?  "" : "INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp "
                 + "AND rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' "
-                + "AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
-                "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp " +
-                "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded " +
-                "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 " + sqlStatusPay +
-                (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "");
+                + "AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ")
+                + "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                + "INNER JOIN hrs_ded AS d ON d.id_ded = prd.fk_ded "
+                + "WHERE p.b_del = 0 AND pr.b_del = 0 AND prd.b_del = 0 " + sqlStatusPay
+                + (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "");
                 
                 if (moRadFilterTypePeriod.isSelected()) {
-                    sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
-                            "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";
+                    sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " "
+                            + "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";
                 }
                 else if (moRadFilterTypeDate.isSelected()) {
                     sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
                 }
+                
                 sql += " AND prd.id_emp = " + employeeId + " ";
 
-        resultSet = statement.executeQuery(sql);
-        while (resultSet.next()) {
-            amtDeduction = new double[2];
-            
-            amtDeduction[0] = resultSet.getDouble("f_ded");
-            amtDeduction[1] = resultSet.getDouble("f_ded_all");
+        try (Statement statement = miClient.getSession().getDatabase().getConnection().createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+            while (resultSet.next()) {
+                deductions = new double[] {
+                    SLibUtils.roundAmount(resultSet.getDouble("f_ded_who")),
+                    SLibUtils.roundAmount(resultSet.getDouble("f_ded_tax")),
+                    SLibUtils.roundAmount(resultSet.getDouble("f_ded_all"))
+                };
+            }
         }
 
-        return amtDeduction;
+        return deductions;
     }
     
     private void computeReport() {
-        String sql = "";
-        String sSqlInnerIssue = "";
-        String sqlStatusPay = "";
-        ResultSet resulSetEmployee = null;
-        ResultSet resulSet = null;
-        String buffer = "";
-        String sTaxExentHeader = "";
-        String sEarningHeader = "";
-        int nEmployeeId = 0;
-        double dAmountTax = 0;
-        double dAmountExem = 0;
-        double dTotalAmountTax = 0;
-        double dTotalAmountExem = 0;
-        double dTotalAmountDelivered = 0;
-        double dPayrollTax = 0;
-        double dTotalCost = 0;
-        double dEmployersImss = 0;
-        double dDeduction = 0;
-        double dDeductionAll = 0;
-        double dTotalAmountGross = 0;
-        double dTotalAmountNet = 0;
-        double adAmountDeductions[];
         Cursor cursor = getCursor();
-        ArrayList<SDbEarning> earnings = new ArrayList<>();
         int payrollStatus = (int) moPanelHrsFilterPayrollStatus.getValue(SLibConsts.UNDEFINED);
 
         try {
@@ -395,18 +384,19 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                 File file = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
                 BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 
-                earnings = getEarnings();
+                ArrayList<SDbEarning> earnings = getEarnings();
                 
                 // Construir gravado y exento:
                 
-                sEarningHeader += ", , , ,";
+                String headerTaxExempt = "";
+                String headerEarnings = ", , , ,"; // to shift headers left and keep space for employee number and name and department code and name
                 
                 for (SDbEarning earning : earnings) {
-                    sEarningHeader += "\"" + (earning.getCode() + " " + earning.getName()) + "\", ,";
-                    sTaxExentHeader += "\"GRAVADO\",\"EXCENTO\",";
+                    headerTaxExempt += "\"GRAVADO\",\"EXCENTO\",";
+                    headerEarnings += "\"" + (earning.getCode() + " " + earning.getName()) + "\", ,";
                 }
                 
-                buffer = ((SClientInterface)miClient).getSessionXXX().getCompany().getCompany() + "\n";
+                String buffer = ((SClientInterface)miClient).getSessionXXX().getCompany().getCompany() + "\n";
                 buffer += "REPORTE PARA DECLARACIÓN INFORMATIVA DE SUELDOS Y SALARIOS\n";
                 if (moRadFilterTypeDate.isSelected() || moRadFilterTypeDatePay.isSelected()) {
                     buffer += "PERIODO: DEL " + SLibUtils.DateFormatDate.format(moDateDateStart.getValue()) + " AL " + SLibUtils.DateFormatDate.format(moDateDateEnd.getValue()) + "\n" ;
@@ -421,18 +411,18 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                 bw.write(SLibUtilities.textToAscii(buffer));
                 bw.write("\n\n");
                 
-                buffer = sEarningHeader;
+                buffer = headerEarnings;
                 bw.write(SLibUtilities.textToAscii(buffer));
                 
                 bw.write("\n");
-                buffer = "\"EMPLEADO_ID\",\"EMPLEADO\",\"DEPARTAMENTO_ID\",\"DEPARTAMENTO\"," + sTaxExentHeader + ""
-                        + "\"SUBTOTAL GRAVADO\",\"SUBTOTAL EXCENTO\",\"TOTAL ENTREGADO\",\"DEDUCCIONES DE LEY\",\"TODAS LAS DEDUCCIONES\",\"SALDO BRUTO\",\"SALDO NETO\"";
+                buffer = "\"CLAVE EMPLEADO\",\"EMPLEADO\",\"CÓDIGO DEPARTAMENTO\",\"DEPARTAMENTO\"," + headerTaxExempt + ""
+                        + "\"SUBTOTAL GRAVADO\",\"SUBTOTAL EXCENTO\",\"PERCEPCIONES TODAS\","
+                        + "\"DEDUCCIONES DE LEY\",\"ISR RET. SALARIOS\",\"DEDUCCIONES TODAS\","
+                        + "\"PAGO TOTAL BRUTO\",\"PAGO TOTAL NETO\"";
 
                 bw.write(SLibUtilities.textToAscii(buffer));
                 
-                //moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
-                
-                sql = "SELECT DISTINCT pre.id_emp, e.num, b.bp, d.code, d.name " +
+                String sql = "SELECT DISTINCT pre.id_emp, e.num, b.bp, d.code, d.name " +
                         "FROM hrs_pay AS p " +
                         "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
                         "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
@@ -445,104 +435,105 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                         "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 " +
                         (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " ";
                         
-                        if (moRadFilterTypePeriod.isSelected()) {
-                            sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
-                                    "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " " + getOrderBy();
-                        }
-                        else if (moRadFilterTypeDate.isSelected()) {
-                            sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' " + getOrderBy();
-                        }
-        
-                        if (payrollStatus != SPanelHrsFilterPayrollStatus.STATUS_UNDEF) {
-                            if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_CLOSE) {
-                                sql += sqlStatusPay = " AND p.b_clo = 1 ";                
-                            }
-                            else if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_OPEN) {
-                                sql += sqlStatusPay = " AND p.b_clo = 0 ";
-                            }
-                        }
-        
-
-                resulSetEmployee = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
-                while (resulSetEmployee.next()) {
-                    dTotalAmountTax = 0;
-                    dTotalAmountExem = 0;
-                    dTotalAmountDelivered = 0;
-                    dPayrollTax = 0;
-                    dEmployersImss = 0;
-                    dTotalCost = 0;
-                    dDeduction = 0;
-                    dDeductionAll = 0;
-                    dTotalAmountGross = 0;
-                    dTotalAmountNet = 0;
-                    buffer = "";
-                    
-                    nEmployeeId = resulSetEmployee.getInt("pre.id_emp");
-                    
-                    buffer += "\"" + resulSetEmployee.getString("e.num").replace("\"", "'") + "\",";
-                    buffer += "\"" + resulSetEmployee.getString("b.bp").replace("\"", "'") + "\",";
-                    buffer += "\"" + resulSetEmployee.getString("d.code").replace("\"", "'") + "\",";
-                    buffer += "\"" + resulSetEmployee.getString("d.name").replace("\"", "'") + "\",";
-                    
-                    for (SDbEarning earning : earnings) {
-                        sql = "SELECT SUM(pre.amt_exem) AS f_exem, SUM(pre.amt_taxa) AS f_tax " +
-                                "FROM hrs_pay AS p " +
-                                "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
-                                (!moRadFilterTypeDatePay.isSelected() ?  "" : " INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp "
-                                + "AND rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' "
-                                + "AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
-                                "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
-                                "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 " + sqlStatusPay +
-                                (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " AND pre.id_emp = " + nEmployeeId + " " +
-                                "AND pre.fk_ear = " + earning.getPkEarningId();
-                                
-                                if (moRadFilterTypePeriod.isSelected()) {
-                                    sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
-                                            "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";
-                                }
-                                else if (moRadFilterTypeDate.isSelected()) {
-                                    sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
-                                }
-
-                        resulSet = miClient.getSession().getStatement().executeQuery(sql);
-                        while (resulSet.next()) {
-                            
-                            dAmountTax = resulSet.getDouble("f_tax");
-                            dAmountExem = resulSet.getDouble("f_exem");
-
-                            buffer += SLibUtils.round(dAmountTax, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits()) + ",";
-                            buffer += SLibUtils.round(dAmountExem, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits()) + ",";
-                            
-                            dTotalAmountTax += dAmountTax;
-                            dTotalAmountExem += dAmountExem;
-                        }
-                    }
-                    dTotalAmountDelivered = SLibUtils.round(dTotalAmountTax + dTotalAmountExem, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                    dTotalCost = SLibUtils.round(dTotalAmountDelivered + dPayrollTax + dEmployersImss, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                    adAmountDeductions = getAmountDeductions(nEmployeeId, sqlStatusPay);
-                    if (adAmountDeductions != null) {
-                        dDeduction = SLibUtils.round(adAmountDeductions[0], SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                        dDeductionAll = SLibUtils.round(adAmountDeductions[1], SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                    }
-                    dTotalAmountGross = SLibUtils.round(dTotalAmountDelivered - dDeductionAll, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                    dTotalAmountNet = SLibUtils.round(dTotalAmountDelivered - dDeduction, SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits());
-                    
-                    buffer += (dTotalAmountTax) + ",";
-                    buffer += (dTotalAmountExem) + ",";
-                    buffer += (dTotalAmountDelivered) + ",";
-                    /*
-                    buffer += (dPayrollTax) + ",";
-                    buffer += (dEmployersImss) + ",";
-                    buffer += (dTotalCost) + ",";
-                    */
-                    buffer += (dDeduction) + ",";
-                    buffer += (dDeductionAll) + ",";
-                    buffer += (dTotalAmountGross) + ",";
-                    buffer += (dTotalAmountNet) + ",";
-                    
-                    bw.write("\n");
-                    bw.write(SLibUtilities.textToAscii(buffer));
+                if (moRadFilterTypePeriod.isSelected()) {
+                    sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
+                            "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " " + getOrderBy();
                 }
+                else if (moRadFilterTypeDate.isSelected()) {
+                    sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' " + getOrderBy();
+                }
+
+                String sqlStatusPay = "";
+                
+                if (payrollStatus != SPanelHrsFilterPayrollStatus.STATUS_UNDEF) {
+                    if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_CLOSE) {
+                        sql += sqlStatusPay = " AND p.b_clo = 1 ";                
+                    }
+                    else if (payrollStatus == SPanelHrsFilterPayrollStatus.STATUS_OPEN) {
+                        sql += sqlStatusPay = " AND p.b_clo = 0 ";
+                    }
+                }
+
+                try (Statement stEmployee = miClient.getSession().getStatement().getConnection().createStatement()) {
+                    ResultSet rsEmployee = stEmployee.executeQuery(sql);
+                    while (rsEmployee.next()) {
+                        buffer = "";
+                        
+                        double totalTaxable = 0;
+                        double totalExempt = 0;
+
+                        int employeeId = rsEmployee.getInt("pre.id_emp");
+
+                        buffer += "\"" + rsEmployee.getString("e.num").replace("\"", "'") + "\",";
+                        buffer += "\"" + rsEmployee.getString("b.bp").replace("\"", "'") + "\",";
+                        buffer += "\"" + rsEmployee.getString("d.code").replace("\"", "'") + "\",";
+                        buffer += "\"" + rsEmployee.getString("d.name").replace("\"", "'") + "\",";
+
+                        for (SDbEarning earning : earnings) {
+                            sql = "SELECT SUM(pre.amt_taxa) AS f_taxable, SUM(pre.amt_exem) AS f_exempt " +
+                                    "FROM hrs_pay AS p " +
+                                    "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                                    (!moRadFilterTypeDatePay.isSelected() ?  "" : " INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp "
+                                    + "AND rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' "
+                                    + "AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
+                                    "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
+                                    "WHERE p.b_del = 0 AND pr.b_del = 0 AND pre.b_del = 0 " + sqlStatusPay +
+                                    (moKeyPaymentType.getSelectedIndex() > 0 ? " AND p.fk_tp_pay = " + moKeyPaymentType.getValue()[0] : "") + " AND pre.id_emp = " + employeeId + " " +
+                                    "AND pre.fk_ear = " + earning.getPkEarningId();
+
+                                    if (moRadFilterTypePeriod.isSelected()) {
+                                        sql += " AND p.per_year = " + moIntPeriodYear.getValue() + " " +
+                                                "AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";
+                                    }
+                                    else if (moRadFilterTypeDate.isSelected()) {
+                                        sql += " AND p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' ";
+                                    }
+
+                            try (ResultSet resulSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                                while (resulSet.next()) {
+                                    double taxable = SLibUtils.roundAmount(resulSet.getDouble("f_taxable"));
+                                    double exempt = SLibUtils.roundAmount(resulSet.getDouble("f_exempt"));
+
+                                    buffer += taxable + ",";
+                                    buffer += exempt + ",";
+
+                                    totalTaxable = SLibUtils.roundAmount(totalTaxable + taxable);
+                                    totalExempt = SLibUtils.roundAmount(totalExempt + exempt);
+                                }
+                            }
+                        }
+
+                        double deductionWho = 0;
+                        double deductionTax = 0;
+                        double deductionAll = 0;
+                        double totalPayed = SLibUtils.roundAmount(totalTaxable + totalExempt);
+                        double[] deductions = getDeductions(employeeId, sqlStatusPay);
+                        
+                        if (deductions != null) {
+                            deductionWho = SLibUtils.roundAmount(deductions[0]);
+                            deductionTax = SLibUtils.roundAmount(deductions[1]);
+                            deductionAll = SLibUtils.roundAmount(deductions[2]);
+                        }
+
+                        buffer += (totalTaxable) + ",";
+                        buffer += (totalExempt) + ",";
+                        buffer += (totalPayed) + ",";
+                        
+                        buffer += (deductionWho) + ",";
+                        buffer += (deductionTax) + ",";
+                        buffer += (deductionAll) + ",";
+
+                        double paymentGross = SLibUtils.roundAmount(totalPayed - deductionWho);
+                        double paymentNet = SLibUtils.roundAmount(totalPayed - deductionAll);
+
+                        buffer += (paymentGross) + ",";
+                        buffer += (paymentNet) + ",";
+
+                        bw.write("\n");
+                        bw.write(SLibUtilities.textToAscii(buffer));
+                    }
+                }
+                
                 bw.flush();
                 bw.close();
                 
@@ -557,7 +548,6 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         finally {
             setCursor(cursor);
         }
-        
     }
     
     private void initComponentsCustom() {
@@ -600,12 +590,15 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         moRadFilterTypeDate.addChangeListener(this);
         moRadFilterTypeDatePay.addChangeListener(this);
         
+        Date start = SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate());
+        Date end = SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate());
+        
         moRadFilterTypePeriod.setSelected(true);
         moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
-        moIntPeriodStart.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
-        moIntPeriodEnd.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
-        moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
-        moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
+        moIntPeriodStart.setValue(SLibTimeUtils.digestMonth(start)[1]);
+        moIntPeriodEnd.setValue(SLibTimeUtils.digestMonth(end)[1]);
+        moDateDateStart.setValue(start);
+        moDateDateEnd.setValue(end);
         moRadOrderByNameEmployee.setSelected(true);
         moRadOrderByNameDepartament.setSelected(true);
         
@@ -628,6 +621,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
+        
     }
 
     @Override
@@ -671,7 +665,6 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                     (SBeanFieldRadio) e.getSource() == moRadFilterTypeDatePay) {
                 actionEnableFields();
             }
-            
         }
     }
 }

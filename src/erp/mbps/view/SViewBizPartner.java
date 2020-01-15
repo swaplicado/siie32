@@ -286,8 +286,9 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 break;
 
             case SDataConstants.BPSX_BP_EMP:
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Asociado negocios", 250);
-                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_emp_num", "Clave", 50);
+                aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bp.bp", "Nombre empleado", 250);
+                aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "_emp_num", "Clave empleado", 50);
+                aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
                 msOrderKey = "bp.bp, bp.id_bp ";
 
                 levelRightEditCategory = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).Level;

@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 153.1/ 2020-01-15
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a tipo de dato de Clave Empleado en vista Empleados, para permitir su ordenamiento como número entero.
+2) Adición de columna ISR retenido por salario en reporte CSV para declaración informativa de sueldos y salarios.
+3) Mejora a validación en la selección de recibos de nómina en cero en la generación de layouts bancarios para dispersión masiva de nóminas.
+
+================================================================================
 SIIE 3.2 153.2/ 2019-12-20
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
