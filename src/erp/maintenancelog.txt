@@ -1,4 +1,16 @@
 ================================================================================
+SIIE 3.2 153.4/ 2020-01-16
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al control de modificación o no modificación de precios al capturar documentos:
+    Primeramente, la política de precios para ventas y compras en la configuración de la empresa sienta las bases del control de modificación de precios.
+    El control es exclusivamente para productos en ventas y para insumos (consumibles) en compras.
+    La política "no restricción", permite modificar precios si no hay listas de precios, o si no se ha definido un precio para el producto o insumo, o si dicho precio es cero.
+    La política "precio requerido", requiere que siempre haya un precio para el producto o insumo.
+    Se permite la modificación de precios al capturar documentos a los usuarios que pueden capturar listas de precios de ventas y compras,
+    o que tienen el permiso específico para modificar precios de ventas y compras al capturar documentos.
+
+================================================================================
 SIIE 3.2 153.3/ 2020-01-15
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

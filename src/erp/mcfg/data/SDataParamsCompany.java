@@ -21,6 +21,9 @@ import sa.lib.gui.SGuiConfigCompany;
 public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements java.io.Serializable, SGuiConfigCompany {
     
     public static final String FILES_DIR = "files";
+    
+    public static final int PRICE_POLICY_NOT_RESTRICTED = 0;
+    public static final int PRICE_POLICY_PRICE_REQUIRED = 1;
 
     protected int mnPkConfigCoId;
     protected int mnDaysOfGraceSupplier;

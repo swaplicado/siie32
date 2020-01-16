@@ -26,6 +26,7 @@ import erp.lib.table.STablePaneGrid;
 import erp.lib.table.STableRow;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerBranch;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.form.SPanelAccount;
 import erp.mitm.data.SDataItem;
 import erp.mitm.data.SDataItemBizPartnerDescription;
@@ -200,12 +201,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private final int COL_TAX_CUR = 5;   // column index for amount in taxes pane
 
     private boolean mbEnableDataAddenda;
-    private boolean mbRightPriceListForPurchases;
-    private boolean mbRightPriceListForSales;
-    private boolean mbRightOmitSourceDoc;
+    private boolean mbRightMktPriceListPurchases;
+    private boolean mbRightMktPriceListSales;
+    private boolean mbRightPurPriceChange;
+    private boolean mbRightSalPriceChange;
+    private boolean mbRightTrnOmitSourceDoc;
     private boolean mbAllowDiscount;
-    private int mnPricePolicyForPurchases;
-    private int mnPricePolicyForSales;
     private double mdQuantitySrcOrig;
     private double mdQuantityDesOrig;
     private double mdQuantityPrc;
@@ -216,7 +217,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private int mnAuxEntryPriceEditedIndex;
     private SDataDpsEntryPrice moAuxEntryPriceEdited;
 
-    /** Creates new form DFormDpsEntry */
+    /** Creates new form DFormDpsEntry
+     * @param client GUI client.
+     */
     public SFormDpsEntry(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -2241,10 +2244,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         STableColumnForm[] aoTableColumns = null;
         moParamsItemPriceList = null;
 
-        mbRightPriceListForPurchases = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MKT_PLIST_PUR).HasRight;
-        mbRightPriceListForSales = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MKT_PLIST_SAL).HasRight;
-        mnPricePolicyForPurchases = miClient.getSessionXXX().getParamsCompany().getPricePolicyForPurchases();
-        mnPricePolicyForSales = miClient.getSessionXXX().getParamsCompany().getPricePolicyForSales();
+        mbRightMktPriceListPurchases = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MKT_PLIST_PUR).HasRight;
+        mbRightMktPriceListSales = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_MKT_PLIST_SAL).HasRight;
+        mbRightPurPriceChange = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_PRICE_CHG).HasRight;
+        mbRightSalPriceChange = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_PRICE_CHG).HasRight;
 
         mvFields = new Vector<>();
         moFieldFkItemId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkItemId, jlFkItemId);
@@ -2755,7 +2758,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
             
             if (moParamDps != null) {
-                mbRightOmitSourceDoc = moParamDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL ? 
+                mbRightTrnOmitSourceDoc = moParamDps.isForSales() ? 
                     miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_OMT_DOC_SRC).HasRight :
                     miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_OMT_DOC_SRC).HasRight;
             }
@@ -3412,6 +3415,60 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         renderOriginalUnitSymbol();
         renderUnitSymbol();
     }
+    
+    private boolean isPriceEditable() {
+        if (moDpsEntry.getContractPriceMonth() != 0 && moDpsEntry.getContractPriceMonth() != 0) {
+            return false; // price set by contract
+        }
+        else if (moParamDps.isForSales() && moItem.isClassSalesProduct()) {
+            // sales document and a product is being sold:
+            
+            if (mbRightMktPriceListSales || mbRightSalPriceChange) {
+                return true; // user can set or edit prices
+            }
+            else {
+                switch (miClient.getSessionXXX().getParamsCompany().getPricePolicyForSales()) {
+                    case SDataParamsCompany.PRICE_POLICY_NOT_RESTRICTED:
+                        if (moParamsItemPriceList == null || (!moParamsItemPriceList.isItemPriceFound() || (moParamsItemPriceList.isItemPriceFound() && moParamsItemPriceList.getItemPrice() == 0))) {
+                            return true; // no price list available or price not found or found but zero
+                        }
+                        else {
+                            return false; // preserve price found
+                        }
+                    
+                    case SDataParamsCompany.PRICE_POLICY_PRICE_REQUIRED:
+                        return false; // price should be set
+                        
+                    default:
+                }
+            }
+        }
+        else if (moParamDps.isForPurchases() && moItem.isClassPurchasesConsumable()) {
+            // purchases document and a consumable is being purchased:
+            
+            if (mbRightMktPriceListPurchases || mbRightPurPriceChange) {
+                return true; // user can set or edit prices
+            }
+            else {
+                switch (miClient.getSessionXXX().getParamsCompany().getPricePolicyForPurchases()) {
+                    case SDataParamsCompany.PRICE_POLICY_NOT_RESTRICTED:
+                        if (moParamsItemPriceList == null || (!moParamsItemPriceList.isItemPriceFound() || (moParamsItemPriceList.isItemPriceFound() && moParamsItemPriceList.getItemPrice() == 0))) {
+                            return true; // no price list available or price not found or found but zero
+                        }
+                        else {
+                            return false; // preserve price found
+                        }
+                    
+                    case SDataParamsCompany.PRICE_POLICY_PRICE_REQUIRED:
+                        return false; // price should be set
+                        
+                    default:
+                }
+            }
+        }
+        
+        return true; // otherwise price should be allways editable
+    }
 
     private void enableItemFields() {
         if (moItem != null) {
@@ -3419,12 +3476,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             
             boolean isSalesFreightRequired = isSalesFreightRequired();
 
-            if ((moParamsItemPriceList != null && moParamsItemPriceList.isItemPriceFound()) || 
-                (moDpsEntry.getContractPriceMonth() != 0 && moDpsEntry.getContractPriceMonth() != 0) || 
-                (moParamDps.isForSales() && mnPricePolicyForSales > 0 && !mbRightPriceListForSales && SLibUtilities.compareKeys(moItem.getDbmsDataItemGeneric().getItemClassKey(), SDataConstantsSys.ITMS_CL_ITEM_SAL_PRO)) || 
-                (moParamDps.isForPurchases() && mnPricePolicyForPurchases > 0 && !mbRightPriceListForPurchases && SLibUtilities.compareKeys(moItem.getDbmsDataItemGeneric().getItemClassKey(), SDataConstantsSys.ITMS_CL_ITEM_PUR_CON))) {
-
-                mbAllowDiscount = moParamDps.isForPurchases();
+            if (!isPriceEditable()) {
+                mbAllowDiscount = false;
 
                 jtfOriginalPriceUnitaryCy.setEditable(false);
                 jtfOriginalPriceUnitaryCy.setFocusable(false);
@@ -3539,7 +3592,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jckIsSurplusPercentageApplying.setEnabled(true);
         }
     }
-    
+
     private void enableAccountFields(boolean edit) {
         if (moFieldIsPrepayment.getBoolean() && moParamDps.isDocument()) {
             if (edit) {
@@ -3669,7 +3722,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             default:
         }
     }
-    
+
     private java.lang.String composeAddendaJsonData() {
         String json = "";
         
@@ -5175,7 +5228,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     @Override
     public void formReset() {
         mbResetingForm = true;
-        mbRightOmitSourceDoc = false;
+        mbRightTrnOmitSourceDoc = false;
         mbAllowDiscount = true;
         
         mnFormResult = SLibConstants.UNDEFINED;
@@ -5569,7 +5622,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             // Check if entry item needs to be added to document from source document:
 
             try {
-                if (!mbRightOmitSourceDoc) {
+                if (!mbRightTrnOmitSourceDoc) {
                     STrnUtils.checkItemStandaloneDoc(miClient.getSession(), moParamDps.getDpsTypeKey(), moItem.getPkItemId(), moDpsEntry.hasDpsLinksAsDestiny());
                 }
             }

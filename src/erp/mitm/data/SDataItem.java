@@ -6,6 +6,7 @@
 package erp.mitm.data;
 
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModSysConsts;
@@ -285,6 +286,14 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         }
 
         return id;
+    }
+    
+    public boolean isClassSalesProduct() {
+        return SLibUtilities.compareKeys(moDbmsDataItemGeneric.getItemClassKey(), SDataConstantsSys.ITMS_CL_ITEM_SAL_PRO);
+    }
+
+    public boolean isClassPurchasesConsumable() {
+        return SLibUtilities.compareKeys(moDbmsDataItemGeneric.getItemClassKey(), SDataConstantsSys.ITMS_CL_ITEM_PUR_CON);
     }
 
     @Override
