@@ -34,6 +34,7 @@ import erp.mod.fin.db.SFinUtils;
 import erp.mod.hrs.db.SDbAccountingPayroll;
 import erp.mod.hrs.db.SDbAccountingPayrollEmployee;
 import erp.mod.hrs.db.SDbPayroll;
+import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsFinUtils;
 import erp.mod.hrs.db.SHrsFormerConsts;
 import erp.server.SServerConstants;
@@ -47,20 +48,24 @@ import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiConsts;
+import sa.lib.gui.SGuiUtils;
 import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas
+ * @author Sergio Flores, Juan Barajas, Sergio Flores
  */
 public class SDialogPayrollAccounting extends JDialog implements ActionListener {
-
+    
     private int mnFormResult;
     private boolean mbFirstTime;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
@@ -126,7 +131,9 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jbPickRecord = new javax.swing.JButton();
         jlDummy3 = new javax.swing.JLabel();
         jpPaymentType = new javax.swing.JPanel();
-        jlDummy2 = new javax.swing.JLabel();
+        jlBankFilter = new javax.swing.JLabel();
+        jcbBankFilter = new javax.swing.JComboBox();
+        jlBankFilterHint = new javax.swing.JLabel();
         jpEmployeesAvailable = new javax.swing.JPanel();
         jlTotalAvailables = new javax.swing.JLabel();
         jpEmployeesSelected = new javax.swing.JPanel();
@@ -274,18 +281,28 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
         jpPaymentType.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDummy2.setPreferredSize(new java.awt.Dimension(150, 23));
-        jpPaymentType.add(jlDummy2);
+        jlBankFilter.setText("Filtro banco:");
+        jlBankFilter.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpPaymentType.add(jlBankFilter);
+
+        jcbBankFilter.setPreferredSize(new java.awt.Dimension(300, 23));
+        jpPaymentType.add(jcbBankFilter);
+
+        jlBankFilterHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlBankFilterHint.setText("(al seleccionar empleados)");
+        jlBankFilterHint.setPreferredSize(new java.awt.Dimension(200, 23));
+        jpPaymentType.add(jlBankFilterHint);
 
         jPanel8.add(jpPaymentType);
 
         jPanel4.add(jPanel8, java.awt.BorderLayout.NORTH);
 
         jpEmployeesAvailable.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados disponibles:"));
-        jpEmployeesAvailable.setPreferredSize(new java.awt.Dimension(350, 100));
+        jpEmployeesAvailable.setPreferredSize(new java.awt.Dimension(450, 100));
         jpEmployeesAvailable.setLayout(new java.awt.BorderLayout());
 
         jlTotalAvailables.setText("n");
+        jlTotalAvailables.setPreferredSize(new java.awt.Dimension(100, 20));
         jpEmployeesAvailable.add(jlTotalAvailables, java.awt.BorderLayout.SOUTH);
 
         jPanel4.add(jpEmployeesAvailable, java.awt.BorderLayout.LINE_START);
@@ -295,6 +312,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jpEmployeesSelected.setLayout(new java.awt.BorderLayout());
 
         jlTotalSelected.setText("n");
+        jlTotalSelected.setPreferredSize(new java.awt.Dimension(100, 20));
         jpEmployeesSelected.add(jlTotalSelected, java.awt.BorderLayout.SOUTH);
 
         jPanel4.add(jpEmployeesSelected, java.awt.BorderLayout.LINE_END);
@@ -355,7 +373,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(976, 638));
+        setSize(new java.awt.Dimension(1056, 689));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -411,34 +429,38 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         mvRecords = new Vector<>();
 
         i = 0;
-        aoTableColumns = new STableColumnForm[7];
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empleado", 150);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Cve. empleado", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns = new STableColumnForm[8];
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre empleado", 150);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Clave empleado", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Departamento", 100);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Cve. departamento", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código departamento", 50);
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Percepciones $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Deducciones $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Alcance neto $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Banco", 100);
 
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePaneEmpAvailable.addTableColumn(aoTableColumns[i]);
         }
 
         i = 0;
-        aoTableColumns = new STableColumnForm[12];
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Empleado", 150);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Cve. empleado", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns = new STableColumnForm[13];
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Nombre empleado", 150);
+        aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Clave empleado", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns[i++].setCellRenderer(SGridUtils.CellRendererIntegerRaw);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Departamento", 100);
-        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Cve. departamento", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código departamento", 50);
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Percepciones $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Deducciones $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
         aoTableColumns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Alcance neto $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Banco", 100);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro contable", STableConstants.WIDTH_CODE_COB);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
@@ -481,10 +503,6 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
     @SuppressWarnings("unchecked")
     private void populatePayroll() {
-        String sql = "";
-        Statement statement = null;
-        ResultSet resultSet = null;
-
         // Display payroll:
 
         jtfPayrollPeriod.setText(moPayroll.getPeriodYear() + "-" + SLibUtils.DecimalFormatCalendarMonth.format(moPayroll.getPeriod()));
@@ -500,13 +518,13 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jtfPayrollNet.setCaretPosition(0);
 
         try {
-            statement = miClient.getSession().getStatement();
+            Statement statement = miClient.getSession().getStatement();
 
-            sql = "SELECT per_year, per, num, fk_tp_pay, nts, dt_sta, dt_end, fk_tp_pay_sht, b_clo " +
+            String sql = "SELECT per_year, per, num, fk_tp_pay, nts, dt_sta, dt_end, fk_tp_pay_sht, b_clo " +
                     "FROM hrs_pay " +
                     "WHERE id_pay = " + moPayroll.getPkPayrollId() + " ";
 
-            resultSet = statement.executeQuery(sql);
+            ResultSet resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception("No fue posible leer el registro de la nómina.");
             }
@@ -543,97 +561,78 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 moFormerPayroll.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
                 moFormerPayroll.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
                 moFormerPayroll.setFkUserDeleteId(miClient.getSession().getUser().getPkUserId());
+                
+                // Prepare bank filter:
+                
+                HashSet<String> banks = new HashSet<>();
+                banks.add("- " + SUtilConsts.TXT_SELECT + " " + SGuiUtils.getLabelName(jlBankFilter) + " -");
+                boolean isEmptyBankAdded = false;
 
                 // Display payroll data:
 
-                sql = "SELECT bp.bp, bp.id_bp, emp.id_emp, d.id_dep, d.name, d.code, " +
-                        "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
-                        "FROM hrs_pay_rcp AS r " +
-                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
-                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) AS f_ear, " +
-                        "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
-                        "FROM hrs_pay_rcp AS r " +
-                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
-                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS f_ded, " +
-                        //"SUM(rcp.ear_r) AS f_ear, SUM(rcp.ded_r) AS f_ded, " +
-                        "rcp.wage, rcp.pay_day_r, rcp.sal_ssc, rcp.wrk_day, rcp.day_wrk, rcp.day_pad, " +
-                        "st.name, et.code AS tp_emp, ec.code AS tp_wrk " +
+                sql = "SELECT bp.bp, emp.id_emp, CAST(emp.num AS UNSIGNED INTEGER) AS _emp_num, dep.name, dep.code, dep.id_dep, " +
+                        "p.fk_tp_pay, pr.ear_r, pr.ded_r, pr.pay_r, pr.pay_day_r, pr.day_wrk, pr.day_not_wrk_r, pr.day_pad, " +
+                        "tpsal.name, tpsal.code, tpemp.name, tpemp.code, tpwrk.name, tpwrk.code, COALESCE(bnk.name, '') AS _bank " +
                         "FROM hrs_pay AS p " +
-                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                        "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                        "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
-                        "INNER JOIN erp.hrss_tp_sal AS st ON st.id_tp_sal = rcp.fk_tp_sal " +
-                        "INNER JOIN erp.hrsu_tp_emp AS et ON et.id_tp_emp = rcp.fk_tp_emp " +
-                        "INNER JOIN erp.hrsu_tp_wrk AS ec ON rcp.fk_tp_wrk = ec.id_tp_wrk " +
-                        "WHERE rcp.b_del = 0 AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                        "GROUP BY bp.bp, bp.id_bp, emp.id_emp, d.id_dep, d.name, d.code, rcp.wage, rcp.pay_day_r, rcp.sal_ssc, rcp.wrk_day, rcp.day_wrk, rcp.day_pad, st.name, et.code, ec.code " +
-                        "ORDER BY bp.bp, bp.id_bp, emp.id_emp, d.id_dep, d.name, d.code, rcp.wage, rcp.pay_day_r, rcp.sal_ssc, rcp.wrk_day, rcp.day_wrk, rcp.day_pad, st.name, et.code, ec.code ";
+                        "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp " +
+                        "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = pr.fk_dep " +
+                        "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = pr.id_emp " +
+                        "INNER JOIN erp.hrss_tp_sal AS tpsal ON tpsal.id_tp_sal = pr.fk_tp_sal " +
+                        "INNER JOIN erp.hrsu_tp_emp AS tpemp ON tpemp.id_tp_emp = pr.fk_tp_emp " +
+                        "INNER JOIN erp.hrsu_tp_wrk AS tpwrk ON tpwrk.id_tp_wrk = pr.fk_tp_wrk " +
+                        "LEFT OUTER JOIN erp.hrss_bank AS bnk ON emp.fk_bank_n = bnk.id_bank " +
+                        "WHERE p.id_pay = " + moPayroll.getPkPayrollId() + " AND NOT pr.b_del " +
+                        "ORDER BY bp.bp, emp.id_emp ";
 
                 resultSet = statement.executeQuery(sql);
                 while (resultSet.next()) {
                     SRowEmployee row = new SRowEmployee();
 
-                    int employeeId = resultSet.getInt("id_emp");
-                    String bizPartnerName = SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("bp")), 155);
-                    String departmentName = SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("name")), 50);
-                    int departmentCode = SLibUtilities.parseInt(resultSet.getString("code"));
-                    double earnings = resultSet.getDouble("f_ear");
-                    double deductions = resultSet.getDouble("f_ded");
-
-                    row.setPrimaryKey(new int[] { employeeId });
-                    row.getValues().add(bizPartnerName);
-                    row.getValues().add(employeeId);
-                    row.getValues().add(departmentName);
-                    row.getValues().add(departmentCode);
-                    row.getValues().add(earnings);
-                    row.getValues().add(deductions);
-                    row.getValues().add(SLibUtils.roundAmount(earnings - deductions));
-
-                    if (moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE) {
-                        // Pay weekly:
-
-                        row.setSalary((resultSet.getDouble("pay_day_r") * 365d) / 12d);
-                    }
-                    else {
-                        // Pay biweekly or monthly:
-
-                        row.setSalary(resultSet.getDouble("wage"));
-                    }
-
-                    int workingDays = resultSet.getInt("wrk_day");
-                    row.setDaysWorked(resultSet.getInt("day_wrk"));
-                    row.setDaysNotWorked(workingDays - row.getDaysWorked());
-                    row.setDaysPayed(resultSet.getInt("day_pad"));
-                    row.setSalaryType(SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("name")), 10));
-                    row.setEmployeeType(SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("tp_emp")), 10));
-                    row.setEmployeeCategory(SLibUtilities.textLeft(SLibUtilities.textTrim(resultSet.getString("tp_wrk")), 10));
-
+                    row.setPrimaryKey(new int[] { resultSet.getInt("emp.id_emp") });
+                    row.getValues().add(resultSet.getString("bp.bp"));
+                    row.getValues().add(resultSet.getInt("_emp_num"));
+                    row.getValues().add(resultSet.getString("dep.name"));
+                    row.getValues().add(resultSet.getString("dep.code"));
+                    row.getValues().add(resultSet.getDouble("pr.ear_r"));
+                    row.getValues().add(resultSet.getDouble("pr.ded_r"));
+                    row.getValues().add(resultSet.getDouble("pr.pay_r"));
+                    row.getValues().add(resultSet.getString("_bank"));
                     
-                    // Validate business partner for current employee:
-
-                    int bizPartnerId = resultSet.getInt("id_bp");
-
-                    if (bizPartnerId == 0) {
-                        throw new Exception("No se ha especificado el ID del asociado de negocios del empleado '" + bizPartnerName + " (" + employeeId + ")'.");
-                    }
-                    else {
-                        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.EXEC_MODE_VERBOSE);
-                        if (bizPartner == null) {
-                            throw new Exception("El asociado de negocios (ID = " + bizPartnerId + ") del empleado '" + bizPartnerName + " (" + employeeId + ")' tiene un inconveniente:\nEl registro no existe.");
-                        }
-                        else if (bizPartner.getIsDeleted()) {
-                            throw new Exception("El asociado de negocios (ID = " + bizPartnerId + ") del empleado '" + bizPartnerName + " (" + employeeId + ")' tiene un inconveniente:\nEl registro está eliminado.");
-                        }
-                    }
-
-                    row.setFkBizPartnerId(bizPartnerId);
+                    row.setSalary(resultSet.getDouble("pr.pay_day_r"));
+                    row.setDaysWorked(resultSet.getInt("pr.day_wrk"));
+                    row.setDaysNotWorked(resultSet.getInt("pr.day_not_wrk_r"));
+                    row.setDaysPayed(resultSet.getInt("pr.day_pad"));
+                    row.setSalaryType(resultSet.getString("tpsal.name"));
+                    row.setEmployeeType(resultSet.getString("tpemp.name"));
+                    row.setBank(resultSet.getString("_bank"));
+                    row.setEmployeeCategory(resultSet.getString("tpwrk.name"));
+                    row.setFkBizPartnerId(resultSet.getInt("emp.id_emp"));
 
                     moTablePaneEmpAvailable.addTableRow(row);
+                    
+                    // Process bank filter:
+                    
+                    if (row.getBank().isEmpty()) {
+                        if (!isEmptyBankAdded) {
+                            isEmptyBankAdded = true;
+                            banks.add(SHrsConsts.EMPTY_BANK);
+                        }
+                    }
+                    else {
+                        banks.add(row.getBank());
+                    }
                 }
 
                 moTablePaneEmpAvailable.renderTableRows();
                 moTablePaneEmpAvailable.setTableRowSelection(0);
+                
+                // Set bank filter:
+                
+                jcbBankFilter.removeAllItems();
+                for (String bank : banks) {
+                    jcbBankFilter.addItem(bank);
+                }
             }
             
             computeTotals();
@@ -699,7 +698,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     }
                 }
 
-                employees = new Vector<Integer>();
+                employees = new Vector<>();
                 employees.add(((int[]) row.getPrimaryKey())[0]);
 
                 mvRecords.add(new Object[] { record, employees });
@@ -1416,8 +1415,29 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     }
 
     public void actionAddAll() {
-        while (moTablePaneEmpAvailable.getTableGuiRowCount() > 0) {
-            moTablePaneEmpAvailable.setTableRowSelection(0);
+        String bank = "";
+        
+        if (jcbBankFilter.getSelectedIndex() > 0) {
+            bank = jcbBankFilter.getSelectedItem().toString();
+
+            if (bank.equals(SHrsConsts.EMPTY_BANK)) {
+                bank = "";
+            }
+        }
+
+        int from = 0;
+        int rows = moTablePaneEmpAvailable.getTableModel().getRowCount();
+        
+        for (int row = 0; row < rows; row++) {
+            moTablePaneEmpAvailable.setTableRowSelection(from);
+            
+            if (jcbBankFilter.getSelectedIndex() > 0) {
+                if (!((SRowEmployee) moTablePaneEmpAvailable.getSelectedTableRow()).getBank().equals(bank)) {
+                    from++;
+                    continue;
+                }
+            }
+            
             if (!actionAdd()) {
                 break;
             }
@@ -1432,8 +1452,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         index = moTablePaneEmpSelected.getTable().getSelectedRow();
         if (index != -1) {
             row = (SRowEmployee) moTablePaneEmpSelected.getSelectedTableRow();
-            for (int i = 1; i <= 5; i++) {
-                row.getValues().remove(7);
+            for (int i = 1; i <= 5; i++) { // XXX really bizarre!!!
+                row.getValues().remove(8); // XXX really bizarre!!!
             }
 
             moTablePaneEmpSelected.removeTableRow(index);
@@ -1532,8 +1552,10 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
     private javax.swing.JButton jbPickRecord;
     private javax.swing.JButton jbRemove;
     private javax.swing.JButton jbRemoveAll;
+    private javax.swing.JComboBox jcbBankFilter;
+    private javax.swing.JLabel jlBankFilter;
+    private javax.swing.JLabel jlBankFilterHint;
     private javax.swing.JLabel jlDummy01;
-    private javax.swing.JLabel jlDummy2;
     private javax.swing.JLabel jlDummy3;
     private javax.swing.JLabel jlPayroll;
     private javax.swing.JLabel jlPayrollDates;

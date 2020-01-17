@@ -15,9 +15,10 @@ public class SRowEmployee extends erp.lib.table.STableRow {
     protected java.lang.String msEmployeeCategory;
     protected java.lang.String msEmployeeType;
     protected java.lang.String msSalaryType;
+    protected java.lang.String msBank;
     protected double mdSalary;
-    protected int mnDaysNotWorked;
     protected int mnDaysWorked;
+    protected int mnDaysNotWorked;
     protected int mnDaysPayed;
     protected int mnFkBizPartnerId;
     protected int mnFkPaymentSystemTypeId;
@@ -33,9 +34,10 @@ public class SRowEmployee extends erp.lib.table.STableRow {
         msEmployeeCategory = "";
         msEmployeeType = "";
         msSalaryType = "";
+        msBank = "";
         mdSalary = 0;
-        mnDaysNotWorked = 0;
         mnDaysWorked = 0;
+        mnDaysNotWorked = 0;
         mnDaysPayed = 0;
         mnFkBizPartnerId = 0;
         mnFkPaymentSystemTypeId = 0;
@@ -49,9 +51,10 @@ public class SRowEmployee extends erp.lib.table.STableRow {
     public void setEmployeeCategory(java.lang.String s) { msEmployeeCategory = s; }
     public void setEmployeeType(java.lang.String s) { msEmployeeType = s; }
     public void setSalaryType(java.lang.String s) { msSalaryType = s; }
+    public void setBank(java.lang.String s) { msBank = s; }
     public void setSalary(double d) { mdSalary = d; }
-    public void setDaysNotWorked(int n) { mnDaysNotWorked = n; }
     public void setDaysWorked(int n) { mnDaysWorked = n; }
+    public void setDaysNotWorked(int n) { mnDaysNotWorked = n; }
     public void setDaysPayed(int n) { mnDaysPayed = n; }
     public void setFkBizPartnerId(int n) { mnFkBizPartnerId = n; }
     public void setFkPaymentSystemTypeId(int n) { mnFkPaymentSystemTypeId = n; }
@@ -60,9 +63,10 @@ public class SRowEmployee extends erp.lib.table.STableRow {
     public java.lang.String getEmployeeCategory() { return msEmployeeCategory; }
     public java.lang.String getEmployeeType() { return msEmployeeType; }
     public java.lang.String getSalaryType() { return msSalaryType; }
+    public java.lang.String getBank() { return msBank; }
     public double getSalary() { return mdSalary; }
-    public int getDaysNotWorked() { return mnDaysNotWorked; }
     public int getDaysWorked() { return mnDaysWorked; }
+    public int getDaysNotWorked() { return mnDaysNotWorked; }
     public int getDaysPayed() { return mnDaysPayed; }
     public int getFkBizPartnerId() { return mnFkBizPartnerId; }
     public int getFkPaymentSystemTypeId() { return mnFkPaymentSystemTypeId; }

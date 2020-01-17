@@ -294,16 +294,16 @@ public class SDbBankLayout extends SDbRegistryUser {
                    case SFinConsts.LAY_BANK_HSBC:
                        msLayoutText = SFinUtilities.createLayoutHsbcThird(layoutBankPaymentTexts, layoutTitle);
                       break;
-                  case SFinConsts.LAY_BANK_SANTANDER:
+                  case SFinConsts.LAY_BANK_SANT:
                        msLayoutText = SFinUtilities.createLayoutSantanderThird(layoutBankPaymentTexts, mtDateLayout, layoutTitle);
                       break;
-                  case SFinConsts.LAY_BANK_BANBAJIO:
+                  case SFinConsts.LAY_BANK_BBAJ:
                        msLayoutText = SFinUtilities.createLayoutBanBajioThird(layoutBankPaymentTexts, layoutTitle, mtDateLayout, mnConsecutive);
                       break;
                   case SFinConsts.LAY_BANK_BBVA:
                        msLayoutText = SFinUtilities.createLayoutBbvaThird(layoutBankPaymentTexts, layoutTitle);
                       break;
-                  case SFinConsts.LAY_BANK_BANAMEX:
+                  case SFinConsts.LAY_BANK_CITI:
                        msLayoutText = SFinUtilities.createLayoutCitibanamexThird(layoutBankPaymentTexts, layoutTitle);
                       break;
                    default:
@@ -316,16 +316,16 @@ public class SDbBankLayout extends SDbRegistryUser {
                    case SFinConsts.LAY_BANK_HSBC:
                        msLayoutText = SFinUtilities.createLayoutHsbcTef(layoutBankPaymentTexts, layoutTitle, mtDateLayout);
                       break;
-                  case SFinConsts.LAY_BANK_SANTANDER:
+                  case SFinConsts.LAY_BANK_SANT:
                        msLayoutText = SFinUtilities.createLayoutSantanderTef(layoutBankPaymentTexts, layoutTitle);
                       break;
-                  case SFinConsts.LAY_BANK_BANBAJIO:
+                  case SFinConsts.LAY_BANK_BBAJ:
                        msLayoutText = SFinUtilities.createLayoutBanBajioTef(layoutBankPaymentTexts, layoutTitle, mtDateLayout, mnConsecutive);
                       break;
                    case SFinConsts.LAY_BANK_BBVA:
                        msLayoutText = SFinUtilities.createLayoutBbvaTef(layoutBankPaymentTexts, layoutTitle);
                       break;
-                   case SFinConsts.LAY_BANK_BANAMEX:
+                   case SFinConsts.LAY_BANK_CITI:
                        msLayoutText = SFinUtilities.createLayoutCitibanamexTef(layoutBankPaymentTexts, layoutTitle, session);
                       break;
                    default:
@@ -338,16 +338,16 @@ public class SDbBankLayout extends SDbRegistryUser {
                    case SFinConsts.LAY_BANK_HSBC:
                        msLayoutText = SFinUtilities.createLayoutHsbcSpeiFdN(layoutBankPaymentTexts, layoutTitle);
                        break;
-                  case SFinConsts.LAY_BANK_SANTANDER:
+                  case SFinConsts.LAY_BANK_SANT:
                        msLayoutText = SFinUtilities.createLayoutSantanderSpeiFdN(layoutBankPaymentTexts, layoutTitle);
                       break;
-                  case SFinConsts.LAY_BANK_BANBAJIO:
+                  case SFinConsts.LAY_BANK_BBAJ:
                        msLayoutText = SFinUtilities.createLayoutBanBajioSpeiFdN(layoutBankPaymentTexts, layoutTitle, mtDateLayout, mnConsecutive);
                       break;
                    case SFinConsts.LAY_BANK_BBVA:
                        msLayoutText = SFinUtilities.createLayoutBbvaSpei(layoutBankPaymentTexts, layoutTitle);
                       break;
-                   case SFinConsts.LAY_BANK_BANAMEX:
+                   case SFinConsts.LAY_BANK_CITI:
                        msLayoutText = SFinUtilities.createLayoutCitibanamexSpei(layoutBankPaymentTexts, layoutTitle, session);
                       break;
                    default:
@@ -360,13 +360,13 @@ public class SDbBankLayout extends SDbRegistryUser {
                    case SFinConsts.LAY_BANK_HSBC:
                        msLayoutText = SFinUtilities.createLayoutHsbcSpeiFdY(layoutBankPaymentTexts, layoutTitle);
                       break;
-                  case SFinConsts.LAY_BANK_SANTANDER:
+                  case SFinConsts.LAY_BANK_SANT:
                        msLayoutText = SFinUtilities.createLayoutSantanderSpeiFdY(layoutBankPaymentTexts, layoutTitle);
                       break;
                    case SFinConsts.LAY_BANK_BBVA:
                        msLayoutText = SFinUtilities.createLayoutBbvaSpei(layoutBankPaymentTexts, layoutTitle);
                       break;
-                   case SFinConsts.LAY_BANK_BANAMEX:
+                   case SFinConsts.LAY_BANK_CITI:
                        msLayoutText = SFinUtilities.createLayoutCitibanamexSpei(layoutBankPaymentTexts, layoutTitle, session);
                       break;
                    default:

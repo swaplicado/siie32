@@ -964,6 +964,11 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_DAY_HOL = 4;    // Holiday
     public static final int HRSS_TP_DAY_ABS = 5;    // Absence
 
+    public static final int HRSS_BANK_CITI = 2;     // Citybanamex
+    public static final int HRSS_BANK_BBVA = 12;    // BBVA
+    public static final int HRSS_BANK_SANT = 14;    // Santander
+    public static final int HRSS_BANK_HSBC = 21;    // HSBC
+    public static final int HRSS_BANK_BBAJ = 30;    // BanBajío
     public static final int HRSS_BANK_NON = 999;    // Non applicable
 
     public static final int HRSU_CL_ABS_ABS = 1;    // Absence

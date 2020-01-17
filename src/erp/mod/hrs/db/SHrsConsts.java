@@ -4,6 +4,10 @@
  */
 package erp.mod.hrs.db;
 
+import erp.mod.SModSysConsts;
+import erp.mod.fin.db.SFinConsts;
+import java.util.HashMap;
+
 /**
  *
  * @author Sergio Flores
@@ -58,6 +62,24 @@ public class SHrsConsts {
     public static final String TXT_PAY_PER_REF_SD = "SD";
     public static final String TXT_PAY_PER_REF_SBC = "SBC";
     public static final String TXT_PAY_PER_REF_OTRO = "OTRO";
+    public static final String EMPTY_BANK = "(SIN BANCO)";
     
     public static final String ERR_PERIOD_DATE_INVALID = "Fecha inválida en el período.";
+    
+    public static final HashMap<Integer, Integer> BanksHrsToFin = new HashMap<>();
+    public static final HashMap<Integer, Integer> BanksFinToHrs = new HashMap<>();
+    
+    static {
+        BanksHrsToFin.put(SModSysConsts.HRSS_BANK_HSBC, SFinConsts.LAY_BANK_HSBC);
+        BanksHrsToFin.put(SModSysConsts.HRSS_BANK_SANT, SFinConsts.LAY_BANK_SANT);
+        BanksHrsToFin.put(SModSysConsts.HRSS_BANK_BBAJ, SFinConsts.LAY_BANK_BBAJ);
+        BanksHrsToFin.put(SModSysConsts.HRSS_BANK_BBVA, SFinConsts.LAY_BANK_BBVA);
+        BanksHrsToFin.put(SModSysConsts.HRSS_BANK_CITI, SFinConsts.LAY_BANK_CITI);
+        
+        BanksFinToHrs.put(SFinConsts.LAY_BANK_HSBC, SModSysConsts.HRSS_BANK_HSBC);
+        BanksFinToHrs.put(SFinConsts.LAY_BANK_SANT, SModSysConsts.HRSS_BANK_SANT);
+        BanksFinToHrs.put(SFinConsts.LAY_BANK_BBAJ, SModSysConsts.HRSS_BANK_BBAJ);
+        BanksFinToHrs.put(SFinConsts.LAY_BANK_BBVA, SModSysConsts.HRSS_BANK_BBVA);
+        BanksFinToHrs.put(SFinConsts.LAY_BANK_CITI, SModSysConsts.HRSS_BANK_CITI);
+    }
 }

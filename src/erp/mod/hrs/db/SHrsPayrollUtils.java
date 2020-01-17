@@ -21,7 +21,7 @@ public abstract class SHrsPayrollUtils {
     public static ArrayList<SRowPayrollEmployee> obtainRowPayrollEmployeesAvailable(SGuiSession session, int idPayroll) throws Exception {
         ArrayList<SRowPayrollEmployee> rows = new ArrayList<>();
 
-        String sql = "SELECT b.bp, e.num, e.id_emp, e.bank_acc, pr.ear_r, pr.ded_r, COALESCE(bank.name, '') AS _bank " +
+        String sql = "SELECT b.bp, e.num, e.id_emp, e.bank_acc, pr.ear_r, pr.ded_r, COALESCE(bank.name, '') AS _bank, COALESCE(e.fk_bank_n, 0) AS _bank_id " +
                 "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON pr.id_emp = e.id_emp " +
@@ -39,6 +39,7 @@ public abstract class SHrsPayrollUtils {
                 row.setName(resultSet.getString("b.bp"));
                 row.setTotalEarnings(resultSet.getDouble("pr.ear_r"));
                 row.setTotalDeductions(resultSet.getDouble("pr.ded_r"));
+                row.setBankId(resultSet.getInt("_bank_id"));
                 row.setBank(resultSet.getString("_bank"));
                 row.setBankAccount(resultSet.getString("e.bank_acc"));
                 

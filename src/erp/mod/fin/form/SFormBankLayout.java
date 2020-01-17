@@ -794,7 +794,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     }
 
     private boolean isEditableConsecutive() {
-        return mnLayoutBank == SFinConsts.LAY_BANK_BANBAJIO;
+        return mnLayoutBank == SFinConsts.LAY_BANK_BBAJ;
     }
 
     private boolean isEditableConcept() {
@@ -804,15 +804,15 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             case SFinConsts.LAY_BANK_HSBC:
                 editable = mnBankPaymentTypeId == SDataConstantsSys.FINS_TP_PAY_BANK_THIRD;
                 break;
-            case SFinConsts.LAY_BANK_SANTANDER:
+            case SFinConsts.LAY_BANK_SANT:
                 editable = true;
                 break;
-            case SFinConsts.LAY_BANK_BANBAJIO:
+            case SFinConsts.LAY_BANK_BBAJ:
                 break;
             case SFinConsts.LAY_BANK_BBVA:
                 editable = false;
                 break;
-            case SFinConsts.LAY_BANK_BANAMEX:
+            case SFinConsts.LAY_BANK_CITI:
                 break;
             default:
         }
@@ -1432,7 +1432,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         beneficiaryAccoountsMap.add(beneficiaryAccount);
                     }
                     layoutBankRow.getCodeBankAccountCredits().put(mnBankPaymentTypeId != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? resultSet.getString("b.acc_num_std") : resultSet.getString("b.acc_num"),
-                                                    mnLayoutBank == SFinConsts.LAY_BANK_BANBAJIO ? resultSet.getString("bp.code_bank_baj") : resultSet.getString("bp.code_bank_san"));
+                                                    mnLayoutBank == SFinConsts.LAY_BANK_BBAJ ? resultSet.getString("bp.code_bank_baj") : resultSet.getString("bp.code_bank_san"));
                     layoutBankRow.getAliasBankAccountCredits().put(mnBankPaymentTypeId != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? resultSet.getString("b.acc_num_std") : resultSet.getString("b.acc_num"), resultSet.getString("b.alias_baj"));
 
                     bizPartnerBranchBankAccount = (SDataBizPartnerBranchBankAccount) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BANK_ACC, new int[] { bpbId, bpbBankAccountId }, SLibConstants.EXEC_MODE_SILENT); 
@@ -1656,7 +1656,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         // validate "alias" for payment with BanBajio Bank:
 
-        if (mnLayoutBank == SFinConsts.LAY_BANK_BANBAJIO) {
+        if (mnLayoutBank == SFinConsts.LAY_BANK_BBAJ) {
             for (SLayoutBankRow row : layoutBankRows) {
                 if (row.getBajioBankAlias().isEmpty()) {
                     throw new Exception("No se ha especificado el 'alias ' de la cuenta de abono '" + row.getBeneficiaryAccountNumber() + "' del proveedor '" + row.getBizPartner() + "'.");
@@ -2389,10 +2389,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
         layouts.add(new SGuiItem("(" + SUtilConsts.TXT_SELECT + " layout bancario)"));
         layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_HSBC }, SFinConsts.TXT_LAY_BANK_HSBC));
-        layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_SANTANDER }, SFinConsts.TXT_LAY_BANK_SANTANDER));
-        layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BANBAJIO }, SFinConsts.TXT_LAY_BANK_BANBAJIO));
+        layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_SANT }, SFinConsts.TXT_LAY_BANK_SANT));
+        layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BBAJ }, SFinConsts.TXT_LAY_BANK_BBAJ));
         layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BBVA }, SFinConsts.TXT_LAY_BANK_BBVA));
-        layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BANAMEX }, SFinConsts.TXT_LAY_BANK_BANAMEX));
+        layouts.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_CITI }, SFinConsts.TXT_LAY_BANK_CITI));
         
         moKeyLayoutBank.removeAllItems();
         for (int i = 0; i < layouts.size(); i++) {
