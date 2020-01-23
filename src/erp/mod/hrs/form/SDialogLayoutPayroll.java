@@ -302,7 +302,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         moKeyLayout.setKeySettings(miClient, SGuiUtils.getLabelName(jlPkLayout), true);
         moKeyAccountDebit.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountDebit), true);
         moIntConsecutiveDay.setIntegerSettings(SGuiUtils.getLabelName(jlConsecutiveDay), SGuiConsts.GUI_TYPE_INT, true);
-        moKeyBankFilter.setKeySettings(miClient, SGuiUtils.getLabelName(jlBankFilter), true);
+        moKeyBankFilter.setKeySettings(miClient, SGuiUtils.getLabelName(jlBankFilter), false);
 
         moFields.addField(moDateEmission);
         moFields.addField(moKeyLayout);
@@ -393,8 +393,8 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
         items.add(new SGuiItem(new int[] { SLibConsts.UNDEFINED }, "- " + SUtilConsts.TXT_SELECT + " layout -"));
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BBAJ }, SFinConsts.TXT_LAY_BANK_BBAJ));
-        items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_CITI }, SFinConsts.TXT_LAY_BANK_CITI));
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_BBVA }, SFinConsts.TXT_LAY_BANK_BBVA));
+        items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_CITI }, SFinConsts.TXT_LAY_BANK_CITI));
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_HSBC }, SFinConsts.TXT_LAY_BANK_HSBC));
         items.add(new SGuiItem(new int[] { SFinConsts.LAY_BANK_SANT }, SFinConsts.TXT_LAY_BANK_SANT));
 
@@ -752,14 +752,17 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
                         case SFinConsts.LAY_BANK_BBAJ:
                             SHrsUtils.createPayrollLayoutBanBajio(miClient, mnPayrollId, moKeyLayout.getSelectedItem().getItem(), moDateEmission.getValue(), moDataBizPartnerBranchBankAccount.getBankAccountNumber(), moIntConsecutiveDay.getValue(), employeeIds);
                             break;
-                        case SFinConsts.LAY_BANK_CITI:
-                            SHrsUtils.createPayrollLayoutBanamex(miClient, mnPayrollId, moKeyLayout.getSelectedItem().getItem(), moDateEmission.getValue(), moDataBizPartnerBranchBankAccount.getBankAccountNumber(), moIntConsecutiveDay.getValue(), employeeIds, moDataBizPartnerBranchBankAccount.getFkBankId());
-                            break;
                         case SFinConsts.LAY_BANK_BBVA:
                             SHrsUtils.createPayrollLayoutBbva(miClient, mnPayrollId, miClient.getSession().getCurrentDate(), employeeIds);
                             break;
+                        case SFinConsts.LAY_BANK_CITI:
+                            SHrsUtils.createPayrollLayoutCitibanamex(miClient, mnPayrollId, moKeyLayout.getSelectedItem().getItem(), moDateEmission.getValue(), moDataBizPartnerBranchBankAccount.getBankAccountNumber(), moIntConsecutiveDay.getValue(), employeeIds, moDataBizPartnerBranchBankAccount.getFkBankId());
+                            break;
                         case SFinConsts.LAY_BANK_HSBC:
                             SHrsUtils.createPayrollLayoutHsbc(miClient, mnPayrollId, miClient.getSession().getCurrentDate(), employeeIds, moDataBizPartnerBranchBankAccount.getBankAccountNumber());
+                            break;
+                        case SFinConsts.LAY_BANK_SANT:
+                            SHrsUtils.createPayrollLayoutSantander(miClient, mnPayrollId, moDateEmission.getValue(), employeeIds, moDataBizPartnerBranchBankAccount.getBankAccountNumber());
                             break;
                         default:
                             miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

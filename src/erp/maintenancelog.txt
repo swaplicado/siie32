@@ -1,8 +1,23 @@
 ================================================================================
+SIIE 3.2 154.0/ 2020-01-23
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de fecha de terminación de contrato en el catálogo de empleados y su consulta.
+
+================================================================================
+SIIE 3.2 153.6/ 2020-01-21
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Adición de columna días y montos proporcionales en cárdex del control de prestaciones.
+2) Corrección a la información del cárdex del control de prestaciones para empleados con más de una reincorporación.
+3) Corrección de días y montos pagados en vista de control de prestaciones con el reemplazo de las variables definidas por el usuario (UDV) usadas en la consulta al DBMS.
+
+================================================================================
 SIIE 3.2 153.5/ 2020-01-17
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Mejoramiento a la selección de empleados para contabilización y generación de layouts bancarios de nóminas.
+2) Implementación del layout Santander para dispersión de nóminas.
 
 ================================================================================
 SIIE 3.2 153.4/ 2020-01-16

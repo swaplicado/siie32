@@ -294,7 +294,7 @@ public class SViewBenefitVacationPending extends SGridPaneView implements Action
                 + "@vac_right - (@vac_ear + @vac_ded) AS _vac_pend, "
                 + "b.id_bp AS " + SDbConsts.FIELD_ID + "1, "
                 + "@seniority AS " + SDbConsts.FIELD_ID + "2, "
-                + "DATEDIFF(@cut_off, e.dt_ben) AS " + SDbConsts.FIELD_ID + "3, "
+                + "DATEDIFF(@cut_off, DATE_ADD(e.dt_ben, INTERVAL @seniority YEAR)) AS " + SDbConsts.FIELD_ID + "3, "
                 + sqlBenefit + " AS " + SDbConsts.FIELD_ID + "4, "
                 + "b.bp AS " + SDbConsts.FIELD_NAME + ", "
                 + "e.num AS " + SDbConsts.FIELD_CODE + " "

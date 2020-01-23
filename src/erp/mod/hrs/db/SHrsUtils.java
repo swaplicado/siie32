@@ -60,12 +60,26 @@ import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiSession;
+import sa.lib.prt.SPrtConsts;
+import sa.lib.prt.SPrtUtils;
 
 /**
  *
  * @author Juan Barajas, Alfredo Perez, Claudio Peña, Sergio Flores
  */
 public abstract class SHrsUtils {
+    
+    /**
+     * Compose file name for bank layout.
+     * @param postfix File postfix.
+     * @param fileExt File extension.
+     * @return File name.
+     */
+    private static String composeFileName(final String postfix, final String fileExt) {
+        return SLibUtils.FileDateFormatDatetime.format(new Date()) + 
+                (postfix.isEmpty() ? "" : " " + postfix) + 
+                (fileExt.isEmpty() ? "" : "." + fileExt);
+    }
     
     /**
      * Replaces special characters \áàäéèëíìïóòöúùuñÁÀÄÉÈËÍÌÏÓÒÖÚÙÜÑçÇ\.
@@ -133,7 +147,7 @@ public abstract class SHrsUtils {
         m = (int) (Math.floor(Math.log10(dayFileName)) + 1);
         employeesId = SLibUtils.textImplode(employees, ",");
         
-        fileName = "D" + config.getBajioAffinityGroup() + SLibUtilities.textRepeat("0", 2 - n).concat(consecutiveDay + "") + (monthFileName < 10 ? "0." + monthFileName : "1." + (monthFileName - 10)) + SLibUtilities.textRepeat("0", 2 - m).concat(dayFileName + "")+ "";
+        fileName = "D" + config.getBajioAffinityGroup() + SLibUtilities.textRepeat("0", 2 - n).concat(consecutiveDay + "") + (monthFileName < 10 ? "0." + monthFileName : "1." + (monthFileName - 10)) + SLibUtilities.textRepeat("0", 2 - m).concat(dayFileName + "") + "";
 
         client.getFileChooser().setSelectedFile(new File(fileName));
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
@@ -158,7 +172,7 @@ public abstract class SHrsUtils {
                 bw.write(buffer);
                 bw.newLine();
                 
-                sql = "SELECT rcp.id_emp, emp.bank_acc, " +
+                sql = "SELECT rcp.id_emp, b.bp, emp.bank_acc, " +
                         "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                         "FROM hrs_pay_rcp AS r " +
                         "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
@@ -170,8 +184,10 @@ public abstract class SHrsUtils {
                         "FROM hrs_pay AS p " +
                         "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
-                        "AND rcp.id_emp IN (" + employeesId + ")";
+                        "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = rcp.id_emp " +
+                        "WHERE p.id_pay = " + payrollId + " AND rcp.id_emp IN (" + employeesId + ") AND rcp.pay_r > 0 AND " +
+                        "emp.bank_acc <> '' AND NOT p.b_del AND NOT rcp.b_del " +
+                        "ORDER BY b.bp, rcp.id_emp;";
                 
                 resultSet = client.getSession().getStatement().executeQuery(sql);
                 while (resultSet.next()) {
@@ -241,7 +257,95 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * Creates payroll bank-layout for Banamex.
+     * Creates payroll bank-layout for BBVA.
+     * @param client
+     * @param payrollId
+     * @param dateApplication
+     * @param employees Employees IDs.
+    */
+    public static void createPayrollLayoutBbva(SGuiClient client, int payrollId, Date dateApplication, String[] employees) {
+        ResultSet resulSet = null;
+        Statement statement = null;
+        String sql = "";
+        String sBizPartner = "";
+        String employeesId = "";
+        int nMoveNum = 1;
+        int n = 0;
+        String sAccountCredit = "";
+        String buffer = "";
+        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
+        double balance = 0;
+        double total = 0;
+        
+        String fileName = composeFileName("nom bbva", "txt");
+        
+        employeesId = SLibUtils.textImplode(employees, ",");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                
+                sql = "SELECT rcp.id_emp, emp.bank_acc, b.bp, " +
+                        "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) - " +
+                        "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
+                        "FROM hrs_pay_rcp AS r " +
+                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
+                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS _pay_net " +
+                        "FROM hrs_pay AS p " +
+                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
+                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
+                        "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = rcp.id_emp " +
+                        "WHERE p.id_pay = " + payrollId + " AND rcp.id_emp IN (" + employeesId + ") AND rcp.pay_r > 0 AND " +
+                        "emp.bank_acc <> '' AND NOT p.b_del AND NOT rcp.b_del " +
+                        "ORDER BY b.bp, rcp.id_emp;";
+                
+                resulSet = statement.executeQuery(sql);
+                while (resulSet.next()) {
+                    buffer = "";
+                    
+                    sAccountCredit = SLibUtilities.textTrim(resulSet.getString("emp.bank_acc"));
+                    balance = resulSet.getDouble("_pay_net");
+                    sBizPartner = SLibUtilities.textToAlphanumeric(SLibUtilities.textTrim(resulSet.getString("b.bp")));
+                  
+                    n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
+                     
+                    buffer += SLibUtilities.textRepeat("0", 9 - n).concat(nMoveNum++ + "");
+                    buffer += SLibUtilities.textRepeat(" ", 16); // blank
+                    buffer += "99";
+                    buffer += sAccountCredit.concat(sAccountCredit.length() > 20 ? sAccountCredit.substring(0,20) : (SLibUtilities.textRepeat(" ", (sAccountCredit.length() == 20 ? 0 : 20 - sAccountCredit.length())))); 
+                    buffer += formatDesc.format(balance).replace(".", "");
+                    buffer += sBizPartner.concat(sBizPartner.length() > 40 ? sBizPartner.substring(0,40) : (SLibUtilities.textRepeat(" ", (sBizPartner.length() == 40 ? 0 : 40 - sBizPartner.length())))); //beneficiary
+                    buffer += "001";
+                    buffer += "001";
+                    
+                    bw.write(buffer);
+                    total += balance;
+                    bw.newLine();
+                }
+
+                bw.flush();
+                bw.close();
+                
+                showPayrollLayoutTotal(client, total);
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
+    /**
+     * Creates payroll bank-layout for Citibanamex.
      * @param client
      * @param payrollId
      * @param title
@@ -251,18 +355,16 @@ public abstract class SHrsUtils {
      * @param employees Employees IDs.
      * @param bankId ID of the bank of payment.
      */
-    public static void createPayrollLayoutBanamex(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay, String[] employees, int bankId) {
+    public static void createPayrollLayoutCitibanamex(SGuiClient client, int payrollId, java.lang.String title, Date dateApplication, String accountDebit, int consecutiveDay, String[] employees, int bankId) {
         ResultSet resultSetHeader = null;
         ResultSet resultSetDetail = null;
         BufferedWriter bw = null;
         DecimalFormat formatDescTotal = new DecimalFormat("0000000000000000.00");
         SimpleDateFormat formatDateData = new SimpleDateFormat("yyMMdd");
-        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
         SDbConfig moConfig;
         SDataBizPartner oBizPartner = null;
         SDbPayroll moPayroll = null;
         String sql = "";
-        String fileName = "";
         String buffer = "";
         String sAccountDebit = "";
         String sAccountCredit = "";
@@ -285,7 +387,7 @@ public abstract class SHrsUtils {
         sCompany = SLibUtilities.textToAlphanumeric(((SClientInterface) client).getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner());
         employeesId = SLibUtils.textImplode(employees, ",");
         
-        fileName = formatDateTitle.format(new Date()).concat(" bmx nom.txt");
+        String fileName = composeFileName("nom citibanamex", "txt");
 
         client.getFileChooser().setSelectedFile(new File(fileName));
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
@@ -311,7 +413,7 @@ public abstract class SHrsUtils {
                 bw.newLine();
                 
                 // global registry (Type 2)
-                sql = "SELECT rcp.id_emp, emp.bank_acc, " +
+                sql = "SELECT rcp.id_emp, b.bp, emp.bank_acc, " +
                         "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                         "FROM hrs_pay_rcp AS r " +
                         "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
@@ -323,8 +425,10 @@ public abstract class SHrsUtils {
                         "FROM hrs_pay AS p " +
                         "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
-                        "AND rcp.id_emp IN (" + employeesId + ")";
+                        "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = rcp.id_emp " +
+                        "WHERE p.id_pay = " + payrollId + " AND rcp.id_emp IN (" + employeesId + ") AND rcp.pay_r > 0 AND " +
+                        "emp.bank_acc <> '' AND NOT p.b_del AND NOT rcp.b_del " +
+                        "ORDER BY b.bp, rcp.id_emp;";
                 
                 resultSetHeader = client.getSession().getStatement().executeQuery(sql);
                 while (resultSetHeader.next()) {
@@ -345,7 +449,7 @@ public abstract class SHrsUtils {
                 bw.newLine();
                 
                 // detail registry (type 3)
-                sql = "SELECT rcp.id_emp, emp.bank_acc, COALESCE(emp.fk_bank_n, 0) AS _bank_id, " +
+                sql = "SELECT rcp.id_emp, bp.bp, emp.bank_acc, COALESCE(emp.fk_bank_n, 0) AS _bank_id, " +
                         "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                         "FROM hrs_pay_rcp AS r " +
                         "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
@@ -358,9 +462,9 @@ public abstract class SHrsUtils {
                         "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                         "INNER JOIN erp.bpsu_bp bp ON (emp.id_emp = bp.id_bp) " +
-                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
-                        "AND rcp.id_emp IN (" + employeesId + ") " +
-                        "ORDER BY bp.bp, emp.num;";
+                        "WHERE p.id_pay = " + payrollId + " AND rcp.id_emp IN (" + employeesId + ") AND rcp.pay_r > 0 AND " +
+                        "emp.bank_acc <> '' AND NOT p.b_del AND NOT rcp.b_del " +
+                        "ORDER BY b.bp, rcp.id_emp;";
                 
                 resultSetDetail = client.getSession().getStatement().executeQuery(sql);
                 while (resultSetDetail.next()) {
@@ -415,6 +519,7 @@ public abstract class SHrsUtils {
 
                 bw.write(buffer);
                 bw.newLine();
+                
                 bw.flush();
                 bw.close();
 
@@ -429,96 +534,6 @@ public abstract class SHrsUtils {
         }
     }
 
-    /**
-     * Creates payroll bank-layout for BBVA Bancomer.
-     * @param client
-     * @param payrollId
-     * @param dateApplication
-     * @param employees Employees IDs.
-    */
-    public static void createPayrollLayoutBbva(SGuiClient client, int payrollId, Date dateApplication, String[] employees) {
-        ResultSet resulSet = null;
-        Statement statement = null;
-        String sql = "";
-        String fileName = "";
-        String sBizPartner = "";
-        String employeesId = "";
-        int nMoveNum = 1;
-        int n = 0;
-        String sAccountCredit = "";
-        String buffer = "";
-        DecimalFormat formatDesc = new DecimalFormat("0000000000000.00");
-        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
-        double balance = 0;
-        double total = 0;
-        
-        fileName = formatDateTitle.format(new Date()).concat(" bbva nom.txt");
-        
-        employeesId = SLibUtils.textImplode(employees, ",");
-        
-        client.getFileChooser().setSelectedFile(new File(fileName));
-        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
-            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
-
-            try {
-                statement = client.getSession().getStatement();
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
-                
-                sql = "SELECT rcp.id_emp, emp.bank_acc, b.bp, " +
-                        "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
-                        "FROM hrs_pay_rcp AS r " +
-                        "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
-                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ear.b_del = 0 AND rcp_ear.id_emp = rcp.id_emp) - " +
-                        "(SELECT COALESCE(SUM(rcp_ded.amt_r), 0) " +
-                        "FROM hrs_pay_rcp AS r " +
-                        "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = r.id_pay AND rcp_ded.id_emp = r.id_emp " +
-                        "WHERE r.id_pay = p.id_pay AND r.b_del = 0 AND rcp_ded.b_del = 0 AND rcp_ded.id_emp = rcp.id_emp) AS _pay_net " +
-                        "FROM hrs_pay AS p " +
-                        "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
-                        "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
-                        "INNER JOIN erp.bpsu_bp AS b ON emp.id_emp = b.id_bp " +
-                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
-                        "AND rcp.id_emp IN (" + employeesId + ") " +
-                        "ORDER BY rcp.id_emp, emp.bank_acc, b.bp";
-                
-                resulSet = statement.executeQuery(sql);
-                while (resulSet.next()) {
-                    buffer = "";
-                    
-                    sAccountCredit = SLibUtilities.textTrim(resulSet.getString("emp.bank_acc"));
-                    balance = resulSet.getDouble("_pay_net");
-                    sBizPartner = SLibUtilities.textToAlphanumeric(SLibUtilities.textTrim(resulSet.getString("b.bp")));
-                  
-                    n = (int) (Math.floor(Math.log10(nMoveNum)) + 1);
-                     
-                    buffer += SLibUtilities.textRepeat("0", 9 - n).concat(nMoveNum++ + "");
-                    buffer += SLibUtilities.textRepeat(" ", 16); // blank
-                    buffer += "99";
-                    buffer += sAccountCredit.concat(sAccountCredit.length() > 20 ? sAccountCredit.substring(0,20) : (SLibUtilities.textRepeat(" ", (sAccountCredit.length() == 20 ? 0 : 20 - sAccountCredit.length())))); 
-                    buffer += formatDesc.format(balance).replace(".", "");
-                    buffer += sBizPartner.concat(sBizPartner.length() > 40 ? sBizPartner.substring(0,40) : (SLibUtilities.textRepeat(" ", (sBizPartner.length() == 40 ? 0 : 40 - sBizPartner.length())))); //beneficiary
-                    buffer += "001";
-                    buffer += "001";
-                    
-                    bw.write(buffer);
-                    total += balance;
-                    bw.newLine();
-                }
-
-                bw.flush();
-                bw.close();
-                
-                showPayrollLayoutTotal(client, total);
-                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
-                    SLibUtilities.launchFile(file.getPath());
-                }
-            }
-            catch (Exception e) {
-                SLibUtilities.renderException(STableUtilities.class.getName(), e);
-            }
-        }
-    }
-    
     /**
      * Creates payroll bank-layout for HSBC.
      * @param client
@@ -531,9 +546,7 @@ public abstract class SHrsUtils {
         ResultSet resulSet = null;
         Statement statement = null;
         String sql = "";
-        String fileName = "";
         String employeesId = "";
-        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyMMdd HHmm");
         String sNameEmploy = "";
         String sAccountCredit = "";
         StringBuilder headerLayout = new StringBuilder();
@@ -547,19 +560,18 @@ public abstract class SHrsUtils {
 
         SimpleDateFormat formatDate = new SimpleDateFormat("ddMMyyyy");
 
-        fileName = formatDateTitle.format(new Date()).concat(" HSBC nom.csv");
+        String fileName = composeFileName("nom hsbc", "csv");
 
         employeesId = SLibUtils.textImplode(employees, ",");
 
         client.getFileChooser().setSelectedFile(new File(fileName));
-
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
             File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
 
             try {   
                 statement = client.getSession().getStatement();
 
-                sql = "SELECT rcp.id_emp, emp.bank_acc, b.bp, p.fk_tp_pay, " +
+                sql = "SELECT rcp.id_emp, b.bp, emp.bank_acc, p.fk_tp_pay, " +
                         "(SELECT COALESCE(SUM(rcp_ear.amt_r), 0) " +
                         "FROM hrs_pay_rcp AS r " +
                         "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = r.id_pay AND rcp_ear.id_emp = r.id_emp " +
@@ -572,9 +584,9 @@ public abstract class SHrsUtils {
                         "INNER JOIN hrs_pay_rcp AS rcp ON rcp.id_pay = p.id_pay " +
                         "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp " +
                         "INNER JOIN erp.bpsu_bp AS b ON emp.id_emp = b.id_bp " +
-                        "WHERE p.b_del = 0 AND rcp.b_del = 0 AND LENGTH(emp.bank_acc) > 0 AND rcp.id_pay = " + payrollId + " AND rcp.pay_r > 0 " +
-                        "AND rcp.id_emp IN (" + employeesId + ") " +
-                        "ORDER BY rcp.id_emp, emp.bank_acc, b.bp;";
+                        "WHERE p.id_pay = " + payrollId + " AND rcp.id_emp IN (" + employeesId + ") AND rcp.pay_r > 0 AND " +
+                        "emp.bank_acc <> '' AND NOT p.b_del AND NOT rcp.b_del " +
+                        "ORDER BY b.bp, rcp.id_emp;";
 
                 resulSet = statement.executeQuery(sql);
                 while (resulSet.next()) {
@@ -613,6 +625,98 @@ public abstract class SHrsUtils {
                 }
                 catch (FileNotFoundException ex) {
                     Logger.getLogger(SHrsUtils.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                showPayrollLayoutTotal(client, total);
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (SQLException | IOException e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+	
+    /**
+     * Creates payroll bank-layout for Santander.
+     * @param client GUI client.
+     * @param payrollId Payroll ID.
+     * @param paymentDate Payment date.
+     * @param employees Employees IDs.
+     * @param bankAccount Bank account number of payment.
+     */
+    public static void createPayrollLayoutSantander(SGuiClient client, int payrollId, Date paymentDate, String[] employees, String bankAccount) {
+        String fileName = composeFileName("nom santander", "txt");
+
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+            DecimalFormat formatPosition = new DecimalFormat("00000");
+            DecimalFormat formatAmount = new DecimalFormat("0000000000000000.00");
+            SimpleDateFormat formatDate = new SimpleDateFormat("MMddyyyy");
+            double total = 0;
+                
+            try {
+                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"))) {
+                    int entry = 0;
+                    String buffer = "";
+                    
+                    // compose header:
+                    
+                    buffer = "1"; // tipo de registro
+                    buffer += formatPosition.format(++entry); // número de secuencia
+                    buffer += "E"; // sentido (archivo de salida de Enlace)
+                    buffer += formatDate.format(new Date());
+                    buffer += SPrtUtils.formatText(SLibUtils.textTrim(bankAccount), 16, SPrtConsts.ALIGN_LEFT, SPrtConsts.TRUNC_TRUNC);
+                    buffer += formatDate.format(paymentDate);
+                    writer.append(buffer);
+                    writer.newLine();
+                    
+                    // compose entries:
+                    
+                    int count = 0;
+                    String sqlEmployees = SLibUtils.textImplode(employees, ", ");
+                    String sql = "SELECT bp.lastname, bp.firstname, bp.id_bp, emp.lastname1, emp.lastname2, emp.num, emp.bank_acc, pr.pay_r " +
+                            "FROM hrs_pay AS p " +
+                            "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
+                            "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp " +
+                            "INNER JOIN erp.bpsu_bp AS bp ON emp.id_emp = bp.id_bp " +
+                            "WHERE p.id_pay = " + payrollId + " AND pr.id_emp IN (" + sqlEmployees + ") AND pr.pay_r > 0 AND " +
+                            "emp.bank_acc <> '' AND NOT p.b_del AND NOT pr.b_del " +
+                            "ORDER BY bp.lastname, bp.firstname, bp.id_bp;";
+                    
+                    ResultSet resulSet = client.getSession().getStatement().executeQuery(sql);
+                    while (resulSet.next()) {
+                        buffer = "2"; // tipo de registro
+                        buffer += formatPosition.format(++entry); // número de secuencia
+                        buffer += SPrtUtils.formatText(resulSet.getString("emp.num"), 7, SPrtConsts.ALIGN_LEFT, SPrtConsts.TRUNC_TRUNC);
+                        buffer += SPrtUtils.formatText(resulSet.getString("emp.lastname1"), 30, SPrtConsts.ALIGN_LEFT, SPrtConsts.TRUNC_TRUNC);
+                        buffer += SPrtUtils.formatText(resulSet.getString("emp.lastname2"), 20, SPrtConsts.ALIGN_LEFT, SPrtConsts.TRUNC_TRUNC);
+                        buffer += SPrtUtils.formatText(resulSet.getString("bp.firstname"), 30, SPrtConsts.ALIGN_LEFT, SPrtConsts.TRUNC_TRUNC);
+                        buffer += SPrtUtils.formatText(resulSet.getString("emp.bank_acc"), 16, SPrtConsts.ALIGN_LEFT, SPrtConsts.TRUNC_TRUNC);
+                        buffer += formatAmount.format(resulSet.getDouble("pr.pay_r")).replace(".", "");
+                        buffer += "01"; // concepto: 01 - PAGO DE NOMINA
+                        
+                        writer.append(buffer);
+                        writer.newLine();
+                        
+                        count++;
+                        total = SLibUtils.roundAmount(total + resulSet.getDouble("pr.pay_r"));
+                    }
+
+                    // compose footer:
+                    
+                    buffer = "3"; // tipo de registro
+                    buffer += formatPosition.format(++entry); // número de secuencia
+                    buffer += formatPosition.format(count); // total de registros
+                    buffer += formatAmount.format(total).replace(".", "");
+                    writer.append(buffer);
+                    writer.newLine();
+                    
+                    // write file:
+                    
+                    writer.flush();
                 }
                 
                 showPayrollLayoutTotal(client, total);

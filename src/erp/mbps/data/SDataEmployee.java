@@ -59,6 +59,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected Date mtDateWage;
     protected Date mtDateSalarySscBase;
     protected int mnWorkingHoursDay;
+    protected Date mtContractExpiration_n;
     protected String msBankAccount;
     protected java.sql.Blob moImagePhoto_n;
     protected java.sql.Blob moImageSignature_n;
@@ -208,6 +209,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setDateWage(Date t) { mtDateWage = t; }
     public void setDateSalarySscBase(Date t) { mtDateSalarySscBase = t; }
     public void setWorkingHoursDay(int n) { mnWorkingHoursDay = n; }
+    public void setContractExpiration_n(Date t) { mtContractExpiration_n = t; }
     public void setBankAccount(String s) { msBankAccount = s; }
     public void setImagePhoto_n(java.sql.Blob o) { moImagePhoto_n = o; }
     public void setImageSignature_n(java.sql.Blob o) { moImageSignature_n = o; }
@@ -270,6 +272,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public Date getDateWage() { return mtDateWage; }
     public Date getDateSalarySscBase() { return mtDateSalarySscBase; }
     public int getWorkingHoursDay() { return mnWorkingHoursDay; }
+    public Date getContractExpiration_n() { return mtContractExpiration_n; }
     public String getBankAccount() { return msBankAccount; }
     public java.sql.Blob getImagePhoto_n() { return moImagePhoto_n; }
     public java.sql.Blob getImageSignature_n() { return moImageSignature_n; }
@@ -393,6 +396,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mtDateWage = null;
         mtDateSalarySscBase = null;
         mnWorkingHoursDay = 0;
+        mtContractExpiration_n = null;
         msBankAccount = "";
         moImagePhoto_n = null;
         moImageSignature_n = null;
@@ -474,6 +478,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mtDateWage = resultSet.getDate("dt_wage");
                 mtDateSalarySscBase = resultSet.getDate("dt_sal_ssc");
                 mnWorkingHoursDay = resultSet.getInt("wrk_hrs_day");
+                mtContractExpiration_n = resultSet.getDate("con_exp_n");
                 msBankAccount = resultSet.getString("bank_acc");
                 /*
                 moImagePhoto_n = resultSet.getBlob("img_pho_n");
@@ -613,6 +618,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateWage) + "', " + 
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " + 
                         mnWorkingHoursDay + ", " +
+                        (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " + 
                         "'" + msBankAccount + "', " + 
                         "NULL, " +
                         "NULL, " +
@@ -666,6 +672,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "dt_wage = '" + SLibUtils.DbmsDateFormatDate.format(mtDateWage) + "', " +
                         "dt_sal_ssc = '" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " +
                         "wrk_hrs_day = " + mnWorkingHoursDay + ", " +
+                        "con_exp_n = " + (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " +
                         "bank_acc = '" + msBankAccount + "', " +
                         /*
                         "img_pho_n = " + (moImagePhoto_n == null ? null : moImagePhoto_n) + ", " +

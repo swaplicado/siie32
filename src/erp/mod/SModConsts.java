@@ -680,7 +680,8 @@ public abstract class SModConsts {
     public static final int HRSX_BEN_SUM = 2064052;
     public static final int HRSX_BEN_DET = 2064053;
     public static final int HRSX_BEN_VAC_PEND = 2064056;
-    public static final int HRSX_EMP_INT = 2064061;
+    public static final int HRSX_EMP_INT = 2064061;     // employees integral
+    public static final int HRSX_EMP_CON_EXP = 2064066; // employees contract expiration
     public static final int HRSX_LOAN_PAY = 2064091;
     public static final int HRSX_ABS_MOV = 2064101;
     public static final int HRSX_SSC_UPD = 2064102;

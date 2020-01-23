@@ -205,7 +205,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moTextName.setText("sBeanFieldText1");
         moTextName.setFocusable(false);
         moTextName.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        moTextName.setPreferredSize(new java.awt.Dimension(300, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel16.add(moTextName);
 
         moTextNumber.setText("sBeanFieldText1");

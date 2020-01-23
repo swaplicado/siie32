@@ -48,8 +48,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
     private javax.swing.JMenuItem jmiBizPartnerCreditor;
     private javax.swing.JMenuItem jmiBizPartnerAttBank;
     private javax.swing.JMenuItem jmiBizPartnerAttCarrier;
-    private javax.swing.JMenuItem jmiBizPartnerAttEmployee;
     private javax.swing.JMenuItem jmiBizPartnerAttSalesAgent;
+    private javax.swing.JMenuItem jmiBizPartnerAttEmployee;
     private javax.swing.JMenuItem jmiBizPartnerCreditCustomer;
     private javax.swing.JMenuItem jmiBizPartnerCreditSupplier;
     private javax.swing.JMenuItem jmiBizPartnerBranch;
@@ -150,8 +150,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmiBizPartnerCreditor = new JMenuItem("Acreedores diversos");
         jmiBizPartnerAttBank = new JMenuItem("Bancos");
         jmiBizPartnerAttCarrier = new JMenuItem("Transportistas");
-        jmiBizPartnerAttEmployee = new JMenuItem("Empleados");
         jmiBizPartnerAttSalesAgent = new JMenuItem("Agentes de ventas");
+        jmiBizPartnerAttEmployee = new JMenuItem("Empleados");
         jmiBizPartnerCreditCustomer = new JMenuItem("Información crédito de clientes");
         jmiBizPartnerCreditSupplier = new JMenuItem("Información crédito de proveedores");
         jmMenuBranch = new JMenu("Sucursales");
@@ -194,8 +194,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmMenuBizPartner.addSeparator();
         jmMenuBizPartner.add(jmiBizPartnerAttBank);
         jmMenuBizPartner.add(jmiBizPartnerAttCarrier);
-        jmMenuBizPartner.add(jmiBizPartnerAttEmployee);
         jmMenuBizPartner.add(jmiBizPartnerAttSalesAgent);
+        jmMenuBizPartner.add(jmiBizPartnerAttEmployee);
 
         jmMenuBizPartner.addSeparator();
         jmMenuBizPartner.add(jmiBizPartnerCreditCustomer);
@@ -244,8 +244,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmiBizPartnerCreditor.addActionListener(this);
         jmiBizPartnerAttBank.addActionListener(this);
         jmiBizPartnerAttCarrier.addActionListener(this);
-        jmiBizPartnerAttEmployee.addActionListener(this);
         jmiBizPartnerAttSalesAgent.addActionListener(this);
+        jmiBizPartnerAttEmployee.addActionListener(this);
         jmiBizPartnerCreditCustomer.addActionListener(this);
         jmiBizPartnerCreditSupplier.addActionListener(this);
         jmiBizPartnerBranch.addActionListener(this);
@@ -341,8 +341,8 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
         jmiBizPartnerCreditor.setEnabled(hasRightBizPartnerCreditor);
         jmiBizPartnerAttBank.setEnabled(hasRightBizPartner);
         jmiBizPartnerAttCarrier.setEnabled(hasRightBizPartner);
-        jmiBizPartnerAttEmployee.setEnabled(hasRightBizPartnerEmployee);
         jmiBizPartnerAttSalesAgent.setEnabled(hasRightBizPartner);
+        jmiBizPartnerAttEmployee.setEnabled(hasRightBizPartnerEmployee);
         jmiBizPartnerCreditCustomer.setEnabled(hasRightCreditSales);
         jmiBizPartnerCreditSupplier.setEnabled(hasRightCreditPurchases);
         jmMenuBranch.setEnabled(hasRightBizPartnerBranch || hasRightBizPartnerBranchSupplier || hasRightBizPartnerBranchCustomer || hasRightBizPartnerCreditor || hasRightBizPartnerDebtor);
@@ -537,8 +537,9 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                 case SDataConstants.BPSX_BP_CDR:
                 case SDataConstants.BPSX_BP_ATT_BANK:
                 case SDataConstants.BPSX_BP_ATT_CARR:
-                case SDataConstants.BPSX_BP_EMP:
                 case SDataConstants.BPSX_BP_ATT_SAL_AGT:
+                case SDataConstants.BPSX_BP_EMP:
+                case SDataConstants.BPSX_BP_EMP_CON_EXP:
                     oViewClass = erp.mbps.view.SViewBizPartner.class;
                     switch(viewType) {
                         case SDataConstants.BPSU_BP:
@@ -562,20 +563,25 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                         case SDataConstants.BPSX_BP_ATT_CARR:
                             sViewTitle = "Transportistas";
                             break;
+                        case SDataConstants.BPSX_BP_ATT_SAL_AGT:
+                            sViewTitle = "Agentes ventas";
+                            break;
                         case SDataConstants.BPSX_BP_EMP:
                             sViewTitle = "Empleados";
                             break;
-                        case SDataConstants.BPSX_BP_ATT_SAL_AGT:
-                            sViewTitle = "Agentes ventas";
+                        case SDataConstants.BPSX_BP_EMP_CON_EXP:
+                            sViewTitle = "Terminación contratos empleados";
                             break;
                         default:
                     }
                     auxType01 = viewType;
                     break;
+                    
                 case SDataConstants.BPSX_BP_EMP_REL:
                     oViewClass = erp.mbps.view.SViewBizPartnerEmployeeRelatives.class;
                     sViewTitle = "Datos personales empleados";
                     break;
+                    
                 case SDataConstants.BPSU_BP_CT:
                     oViewClass = erp.mbps.view.SViewBizPartnerCategory.class;
                     switch(auxType01) {
@@ -587,6 +593,7 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                             break;
                     }
                     break;
+                    
                 case SDataConstants.BPSU_BPB:
                 case SDataConstants.BPSX_BPB_SUP:
                 case SDataConstants.BPSX_BPB_CUS:
@@ -613,6 +620,7 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                     }
                     auxType01 = viewType;
                     break;
+                    
                 case SDataConstants.BPSU_BPB_ADD:
                 case SDataConstants.BPSX_BPB_ADD_SUP:
                 case SDataConstants.BPSX_BPB_ADD_CUS:
@@ -643,6 +651,7 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                     }
                     auxType01 = viewType;
                     break;
+                    
                 case SDataConstants.BPSU_BPB_CON:
                 case SDataConstants.BPSX_BPB_CON_SUP:
                 case SDataConstants.BPSX_BPB_CON_CUS:
@@ -673,6 +682,7 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                     }
                     auxType01 = viewType;
                     break;
+                    
                 case SDataConstants.BPSU_BANK_ACC:
                 case SDataConstants.BPSX_BANK_ACC_SUP:
                 case SDataConstants.BPSX_BANK_ACC_CUS:
@@ -703,6 +713,7 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                     }
                     auxType01 = viewType;
                     break;
+                    
                 case SDataConstants.BPSU_BP_ADDEE:
                     oViewClass = erp.mbps.view.SViewBizPartnerAddressee.class;
                     switch (auxType01) {
@@ -712,14 +723,17 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                         default:
                     }
                     break;
+                    
                 case SDataConstants.BPSU_TP_BP:
                     oViewClass = erp.mbps.view.SViewBizPartnerType.class;
                     sViewTitle = "Tipos asoc. negocios";
                     break;
+                    
                 case SDataConstants.BPSU_BA:
                     oViewClass = erp.mbps.view.SViewBizPartnerBizArea.class;
                     sViewTitle = "Áreas negocios";
                     break;
+                    
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
             }
@@ -885,11 +899,11 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
             else if (item == jmiBizPartnerAttCarrier) {
                 showView(SDataConstants.BPSX_BP_ATT_CARR);
             }
-            else if (item == jmiBizPartnerAttEmployee) {
-                showView(SDataConstants.BPSX_BP_EMP);
-            }
             else if (item == jmiBizPartnerAttSalesAgent) {
                 showView(SDataConstants.BPSX_BP_ATT_SAL_AGT);
+            }
+            else if (item == jmiBizPartnerAttEmployee) {
+                showView(SDataConstants.BPSX_BP_EMP);
             }
             else if (item == jmiBizPartnerCreditCustomer) {
                 showView(SDataConstants.BPSU_BP_CT, SDataConstantsSys.BPSS_CT_BP_CUS);

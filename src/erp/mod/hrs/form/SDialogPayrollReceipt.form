@@ -85,7 +85,7 @@
                           <Font name="Tahoma" size="11" style="1"/>
                         </Property>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[300, 23]"/>
+                          <Dimension value="[350, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
