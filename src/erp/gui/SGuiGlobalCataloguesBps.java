@@ -422,6 +422,7 @@ public class SGuiGlobalCataloguesBps extends erp.lib.gui.SGuiModule implements j
                     miForm.setValue(SDataConstantsSys.VALUE_BIZ_PARTNER_TYPE, new int[] { formType });
                     break;
                 case SDataConstants.BPSX_BP_EMP:
+                case SDataConstants.BPSX_BP_EMP_CON_EXP:
                     if (moFormBizPartnerEmployee == null) {
                         moFormBizPartnerEmployee = new SFormBizPartnerEmployee(miClient);
                     }
