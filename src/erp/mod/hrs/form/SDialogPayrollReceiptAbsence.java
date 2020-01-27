@@ -54,7 +54,7 @@ public class SDialogPayrollReceiptAbsence extends SBeanFormDialog implements Act
     private SDbBenefitTable moBenefitTable;
     private SHrsBenefit moHrsBenefit;
     private ArrayList<SHrsBenefit> maHrsBenefits;
-    private ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnniversarys;
+    private ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnniversaries;
     
     /**
      * Creates new form SDialogPayrollReceiptAbsence
@@ -328,14 +328,14 @@ public class SDialogPayrollReceiptAbsence extends SBeanFormDialog implements Act
         
         aBenefitTables.add(moBenefitTable);
         
-        maBenefitTableAnniversarys = SHrsUtils.createBenefitTablesAnniversarys(aBenefitTables);
+        maBenefitTableAnniversaries = SHrsUtils.createBenefitTablesAnniversaries(aBenefitTables);
     }
     
     private void readHrsBenefitAcummulate(int seniority, int benefitYear) {
         try {
             loadBenefitTables();
             
-            maHrsBenefits = SHrsUtils.readHrsBenefits(miClient.getSession(), moHrsReceipt.getHrsEmployee().getEmployee(), SModSysConsts.HRSS_TP_BEN_VAC, seniority, benefitYear, moHrsReceipt.getHrsPayroll().getPayroll().getPkPayrollId(), maBenefitTableAnniversarys, null, moHrsReceipt.getPayrollReceipt().getPaymentDaily());
+            maHrsBenefits = SHrsUtils.readHrsBenefits(miClient.getSession(), moHrsReceipt.getHrsEmployee().getEmployee(), SModSysConsts.HRSS_TP_BEN_VAC, seniority, benefitYear, moHrsReceipt.getHrsPayroll().getPayroll().getPkPayrollId(), maBenefitTableAnniversaries, null, moHrsReceipt.getPayrollReceipt().getPaymentDaily());
             
             moIntBenefitAnniversary.setValue(seniority);
             moIntBenefitYear.setValue(benefitYear);

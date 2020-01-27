@@ -52,7 +52,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
 
     private int mnVacationsEarningId;
     private int mnDaysEffectiveMax;
-    private ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnniversarys;
+    private ArrayList<SHrsBenefitTableAnniversary> maBenefitTableAnniversaries;
 
     /**
      * Creates new form SFormAbsence
@@ -530,8 +530,8 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         moFields.setFormButton(jbSave);
     }
     
-    private boolean isVacation() {
-        return moKeyAbsenceClass.getSelectedIndex() > 0 && SDbAbsenceClass.isVacation(moKeyAbsenceClass.getValue()[0]);
+    private boolean isVacations() {
+        return moKeyAbsenceClass.getSelectedIndex() > 0 && SDbAbsenceClass.isVacations(moKeyAbsenceClass.getValue()[0]);
     }
     
     private void showEmployee() {
@@ -556,25 +556,22 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         int daysScheduled = 0;
         int daysPayed = 0;
         
-        if (!isVacation()) {
-            moIntAnniversaryYear.resetField();
+        if (!isVacations()) {
+            moIntAnniversaryYear.resetField(); // updating a read-only field!
         }
         else {
-            moIntAnniversaryYear.setValue(SLibTimeUtils.digestYear(moEmployee.getDateBenefits())[0] + ((Integer) jsAnniversary.getValue() - 1));
+            moIntAnniversaryYear.setValue(SLibTimeUtils.digestYear(moEmployee.getDateBenefits())[0] + ((Integer) jsAnniversary.getValue() - 1)); // updating a read-only field!
             
-            int seniority = (Integer) jsAnniversary.getValue();
-            int anniversaryYear = moIntAnniversaryYear.getValue();
+            int seniority = (Integer) jsAnniversary.getValue(); // this is the GUI control that can trigger calls to this method!
+            int anniversaryYear = moIntAnniversaryYear.getValue(); // value of a read-only field
             SHrsBenefitTableAnniversary benefitTableAnniversary = null;
 
             try {
-                boolean updated;
-                for (SHrsBenefitTableAnniversary anniversary : maBenefitTableAnniversarys) {
-                    updated = false;
+                for (SHrsBenefitTableAnniversary anniversary : maBenefitTableAnniversaries) {
                     if (anniversary.getBenefitAnn() <= seniority) {
                         benefitTableAnniversary = anniversary;
-                        updated = true;
                     }
-                    if (!updated) {
+                    else {
                         break;
                     }
                 }
@@ -610,14 +607,14 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
      * @throws Exception 
      */
     private void prepareBenefitTableOfVacations() throws Exception {
-        if (!isVacation()) {
-            maBenefitTableAnniversarys = null;
+        if (!isVacations()) {
+            maBenefitTableAnniversaries = null;
         }
         else {
             SDbBenefitTable benefitTable = SHrsUtils.getBenefitTableByEarning(miClient.getSession(), mnVacationsEarningId, moEmployee.getFkPaymentTypeId(), moDateDateEnd.getValue());
             ArrayList<SDbBenefitTable> benefitTables = new ArrayList<>();
             benefitTables.add(benefitTable);
-            maBenefitTableAnniversarys = SHrsUtils.createBenefitTablesAnniversarys(benefitTables);
+            maBenefitTableAnniversaries = SHrsUtils.createBenefitTablesAnniversaries(benefitTables);
         }
     }
     
@@ -628,7 +625,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         moKeyAbsenceType.setEnabled(!next);
         moDateDateStart.setEditable(!next);
         moDateDateEnd.setEditable(!next);
-        jsAnniversary.setEnabled(next ? isVacation() : false);
+        jsAnniversary.setEnabled(next ? isVacations() : false);
         moIntDaysEffective.setEditable(next);
     }
     
@@ -656,11 +653,11 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
             calculateDaysEffectiveMax();
             moIntDaysEffective.setValue(mnDaysEffectiveMax);
 
-            if (!isVacation()) {
+            if (!isVacations()) {
                 // reset spinner:
                 jsAnniversary.setValue(1);
 
-                // smooth user input:
+                // ease up user input:
                 moIntDaysEffective.requestFocusInWindow();
             }
             else {
@@ -674,7 +671,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
                     SLibUtils.showException(this, e);
                 }
 
-                // smooth user input:
+                // ease up user input:
                 ((JSpinner.DefaultEditor) jsAnniversary.getEditor()).getTextField().requestFocusInWindow();
             }
 
@@ -740,7 +737,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         }
     }
     
-    private void stateChangeAnniversary() {
+    private void stateChangedAnniversary() {
         showBenefits();
     }
 
@@ -871,8 +868,8 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         registry.setDateStart(moDateDateStart.getValue());
         registry.setDateEnd(moDateDateEnd.getValue());
         registry.setEffectiveDays(moIntDaysEffective.getValue());
-        registry.setBenefitsAnniversary(!isVacation() ? 0 : (Integer) jsAnniversary.getValue());
-        registry.setBenefitsYear(!isVacation() ? 0 : moIntAnniversaryYear.getValue());
+        registry.setBenefitsAnniversary(!isVacations() ? 0 : (Integer) jsAnniversary.getValue());
+        registry.setBenefitsYear(!isVacations() ? 0 : moIntAnniversaryYear.getValue());
         registry.setNotes(moTextNotes.getValue());
         //registry.setClosed(moBoolClosed.getValue());  // not editable from this context
         registry.setFkAbsenceClassId(moKeyAbsenceType.getValue()[0]);
@@ -909,7 +906,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
                             }
                         }
                     }
-                    else if (isVacation()) {
+                    else if (isVacations()) {
                         if ((moIntDaysEffective.getValue() + moIntDaysScheduled.getValue()) > moIntDaysBenefit.getValue()) {
                             msg = "La suma de '" + SGuiUtils.getLabelName(jlDaysScheduled) + "' + '" + SGuiUtils.getLabelName(jlDaysEffective) + "' es mayor a '" + SGuiUtils.getLabelName(jlDaysBenefit) + "'.";
 
@@ -942,6 +939,52 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
                                                 + "se traslapa con el de la ausencia '" + absence.composeAbsenceDescription() + "'.");
                                         validation.setComponent(moDateDateStart); // even though this field is non-editable, set focus on it
                                     }
+                                }
+                            }
+                        }
+                        catch (Exception e) {
+                            validation.setMessage(e.getMessage());
+                        }
+                    }
+                    
+                    if (validation.isValid() && isVacations()) {
+                        // validate that absences are all scheduled in chronological order, without gaps between anniversaries:
+                        
+                        int maxAnniversary = (Integer) jsAnniversary.getValue(); // this is the GUI control that can trigger calls to this method!
+                        int anniversaryYear = SLibTimeUtils.digestYear(moEmployee.getDateBenefits())[0];
+                        
+                        try {
+                            for (SHrsBenefitTableAnniversary anniversary : maBenefitTableAnniversaries) {
+                                if (anniversary.getBenefitAnn() < maxAnniversary) {
+                                    int daysPayed = SHrsUtils.getPaymentVacationsByEmployee(miClient.getSession(), moEmployee.getPkEmployeeId(), anniversary.getBenefitAnn(), anniversaryYear);
+                                    int daysToPay = (int) anniversary.getValue() - daysPayed;
+                                    int daysScheduled = SHrsUtils.getScheduledDays(miClient.getSession(), moEmployee, anniversary.getBenefitAnn(), anniversaryYear, moRegistry.getPkAbsenceId());
+                                    int daysToSchedule = (int) anniversary.getValue() - daysScheduled;
+                                    
+                                    if (daysToPay > 0) {
+                                        String baseMessage = "En el aniversario " + anniversary.getBenefitAnn() + " del empleado " + moEmployee.getAuxEmployee() + ",\n"
+                                                + "correspondiente al año " + anniversaryYear + ", de un total de " + ((int) anniversary.getValue()) + " días de vacaciones,\n";
+                                        if (daysToSchedule > 0) {
+                                            if (miClient.showMsgBoxConfirm(baseMessage
+                                                    + (daysToPay == 1 ? "queda 1 día" : "quedan " + daysToPay + " días") + " de vacaciones por pagar, y\n"
+                                                    + (daysToSchedule == 1 ? "queda 1 día" : "quedan " + daysToSchedule + " días") + " de vacaciones por programar.\n"
+                                                    + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                                                throw new Exception("Se debería programar y pagar las vacaciones de aniversarios previos del empleado " + moEmployee.getAuxEmployee() + ".");
+                                            }
+                                        }
+                                        else {
+                                            if (miClient.showMsgBoxConfirm(baseMessage
+                                                    + (daysToPay == 1 ? "queda 1 día" : "quedan " + daysToPay + " días") + " de vacaciones por pagar.\n"
+                                                    + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
+                                                throw new Exception("Se debería pagar las vacaciones de aniversarios previos del empleado " + moEmployee.getAuxEmployee() + ".");
+                                            }
+                                        }
+                                    }
+                                    
+                                    anniversaryYear++;
+                                }
+                                else {
+                                    break;
                                 }
                             }
                         }
@@ -990,7 +1033,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
             JSpinner spinner = (JSpinner) e.getSource();
 
             if (spinner == jsAnniversary) {
-                stateChangeAnniversary();
+                stateChangedAnniversary();
             }
         }
     }

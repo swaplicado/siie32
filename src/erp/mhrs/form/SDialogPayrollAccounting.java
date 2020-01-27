@@ -37,6 +37,7 @@ import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsFinUtils;
 import erp.mod.hrs.db.SHrsFormerConsts;
+import erp.mod.utils.SDialogMessages;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
 import erp.server.SServerResponse;
@@ -48,6 +49,7 @@ import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JButton;
@@ -56,6 +58,7 @@ import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridUtils;
+import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.srv.SSrvConsts;
@@ -389,21 +392,6 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         actionCancel();
     }//GEN-LAST:event_jbCancelActionPerformed
 
-    private void computeTotals() {
-        int countAvailables = 0;
-        int countSelected = 0;
-        
-        for (int i = 0; i < moTablePaneEmpAvailable.getTableGuiRowCount(); i++) {
-            countAvailables++;
-        }
-        for (int i = 0; i < moTablePaneEmpSelected.getTableGuiRowCount(); i++) {
-            countSelected++;
-        }
-        
-        jlTotalAvailables.setText(" " + countAvailables + " empleados disponibles.");
-        jlTotalSelected.setText(" " + countSelected + " empleados seleccionados.");
-    }
-    
     private void initComponentsExtra() {
         int i = 0;
         STableColumnForm[] aoTableColumns = null;
@@ -501,6 +489,21 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         }
     }
 
+    private void computeTotals() {
+        int countAvailables = 0;
+        int countSelected = 0;
+        
+        for (int i = 0; i < moTablePaneEmpAvailable.getTableGuiRowCount(); i++) {
+            countAvailables++;
+        }
+        for (int i = 0; i < moTablePaneEmpSelected.getTableGuiRowCount(); i++) {
+            countSelected++;
+        }
+        
+        jlTotalAvailables.setText(" " + countAvailables + " empleados disponibles.");
+        jlTotalSelected.setText(" " + countSelected + " empleados seleccionados.");
+    }
+    
     @SuppressWarnings("unchecked")
     private void populatePayroll() {
         // Display payroll:
@@ -509,7 +512,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         jtfPayrollNumber.setText((moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? "SEM " : "QNA " ) + moPayroll.getNumber());
         jtfPayrollDates.setText(SLibUtils.DateFormatDate.format(moPayroll.getDateStart()) + " - " + SLibUtils.DateFormatDate.format(moPayroll.getDateEnd()));
         jtfPayrollNotes.setText(moPayroll.getNotes());
-        jtfPayrollNet.setText(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(moPayroll.getAuxTotalNet()));
+        jtfPayrollNet.setText(SLibUtils.getDecimalFormatAmount().format(moPayroll.getAuxTotalNet()));
 
         jtfPayrollPeriod.setCaretPosition(0);
         jtfPayrollNumber.setCaretPosition(0);
@@ -565,7 +568,6 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 // Prepare bank filter:
                 
                 HashSet<String> banks = new HashSet<>();
-                banks.add("- " + SUtilConsts.TXT_SELECT + " " + SGuiUtils.getLabelName(jlBankFilter) + " -");
                 boolean isEmptyBankAdded = false;
 
                 // Display payroll data:
@@ -599,15 +601,16 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                     row.getValues().add(resultSet.getDouble("pr.pay_r"));
                     row.getValues().add(resultSet.getString("_bank"));
                     
+                    row.setEmployeeCategory(resultSet.getString("tpwrk.code"));
+                    row.setEmployeeType(resultSet.getString("tpemp.code"));
+                    row.setSalaryType(SLibUtils.textLeft(resultSet.getString("tpsal.name"), 3)); // system's catalog, name can be truncated to length of 3
+                    row.setBank(resultSet.getString("_bank"));
                     row.setSalary(resultSet.getDouble("pr.pay_day_r"));
                     row.setDaysWorked(resultSet.getInt("pr.day_wrk"));
                     row.setDaysNotWorked(resultSet.getInt("pr.day_not_wrk_r"));
                     row.setDaysPayed(resultSet.getInt("pr.day_pad"));
-                    row.setSalaryType(resultSet.getString("tpsal.name"));
-                    row.setEmployeeType(resultSet.getString("tpemp.name"));
-                    row.setBank(resultSet.getString("_bank"));
-                    row.setEmployeeCategory(resultSet.getString("tpwrk.name"));
                     row.setFkBizPartnerId(resultSet.getInt("emp.id_emp"));
+                    row.setFkPaymentSystemTypeId(0); // not supported yet!
 
                     moTablePaneEmpAvailable.addTableRow(row);
                     
@@ -629,8 +632,11 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                 
                 // Set bank filter:
                 
-                jcbBankFilter.removeAllItems();
-                for (String bank : banks) {
+                banks.add("- " + SUtilConsts.TXT_SELECT + " " + SGuiUtils.getLabelName(jlBankFilter) + " -");
+                Object[] banksArray = banks.toArray();
+                Arrays.sort(banksArray);
+                
+                for (Object bank : banksArray) {
                     jcbBankFilter.addItem(bank);
                 }
             }
@@ -712,7 +718,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             formerPayrollEmp.setPkEmployeeId(((int[]) row.getPrimaryKey())[0]);
             formerPayrollEmp.setEmployee((String) row.getValues().get(0));
             formerPayrollEmp.setDepartment((String) row.getValues().get(2));
-            formerPayrollEmp.setDepartmentKey("" + (Integer) row.getValues().get(3));
+            formerPayrollEmp.setDepartmentKey((String) row.getValues().get(3));
             formerPayrollEmp.setEmployeeCategory(row.getEmployeeCategory());
             formerPayrollEmp.setEmployeeType(row.getEmployeeType());
             formerPayrollEmp.setSalaryType(row.getSalaryType());
@@ -722,7 +728,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             formerPayrollEmp.setDaysNotWorked(row.getDaysNotWorked());
             formerPayrollEmp.setDaysWorked(row.getDaysWorked());
             formerPayrollEmp.setDaysPayed(row.getDaysPayed());
-            formerPayrollEmp.setNumberSeries("NOM");
+            formerPayrollEmp.setNumberSeries(SHrsConsts.CFD_SERIES);
             formerPayrollEmp.setNumber(0);
             formerPayrollEmp.setIsDeleted(false);
             formerPayrollEmp.setFkBizPartnerId_n(row.getFkBizPartnerId());
@@ -867,6 +873,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
         oStatementCfg = miClient.getSession().getStatement().getConnection().createStatement();
         oStatementRec = miClient.getSession().getStatement().getConnection().createStatement();
+        SDialogMessages messages = new SDialogMessages((SGuiClient) miClient, "Errores de configuración de contabilización", "Lista de errores de configuración de contabilización:");
 
         if (SHrsFinUtils.existsAccountingSettingsForPayrollAll(miClient.getSession(), moPayroll.getPkPayrollId())) {
             initPayrollRecords();
@@ -874,7 +881,13 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             for (Object[] records : mvRecords) {
                 oRecord = (SDataRecord) records[0];
                 sEmployees = composeEmployeeQuery((Vector<Integer>) records[1]);
+                
                 nEntryId = oRecord.getDbmsRecordEntries().size();
+                
+                /*
+                iteration 1: processing of perceptions;
+                iteration 2: processing of deductions.
+                */
 
                 for (nType = 1; nType <= 2; nType++) {
                     if (nType == 1) {
@@ -1009,14 +1022,14 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         // Validate account:
 
                         if (fk_acc == SLibConstants.UNDEFINED) {
-                            throw new Exception(sMsg + "'cuenta contable' no ha sido especificada aún.");
+                            messages.appendMessage(sMsg + "'cuenta contable' no ha sido especificada aún.");
                         }
                         else {
                             fk_acc_s = SFinUtils.getAccountFormerIdXXX(miClient.getSession(), fk_acc);
                             oAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { fk_acc_s }, SLibConstants.EXEC_MODE_VERBOSE);
                             sVal = SDataUtilities.validateAccount(miClient, oAccount, null);
                             if (sVal.length() != 0) {
-                                throw new Exception(sMsg + "'cuenta contable' ('" + fk_acc_s + "') tiene un inconveniente:\n" + sVal);
+                                messages.appendMessage(sMsg + "'cuenta contable' ('" + fk_acc_s + "') tiene un inconveniente:\n" + sVal);
                             }
 
                             oAccountMajor = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { oAccount.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
@@ -1032,11 +1045,11 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             oCostCenter = (SDataCostCenter) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_CC, new Object[] { fk_cc_s }, SLibConstants.EXEC_MODE_VERBOSE);
                             sVal = SDataUtilities.validateCostCenter(miClient, oCostCenter, null);
                             if (sVal.length() != 0) {
-                                throw new Exception(sMsg + "'centro de costo' ('" + fk_cc_s + "') tiene un inconveniente:\n" + sVal);
+                                messages.appendMessage(sMsg + "'centro de costo' ('" + fk_cc_s + "') tiene un inconveniente:\n" + sVal);
                             }
                         }
                         else if (oAccount.getDbmsIsRequiredCostCenter()) {
-                            throw new Exception(sMsg + "'centro de costo' ('" + fk_cc_s + "') tiene un inconveniente:\nLa cuenta contable correspondiente '" + fk_acc_s + "' requiere de un centro de costo.");
+                            messages.appendMessage(sMsg + "'centro de costo' ('" + fk_cc_s + "') tiene un inconveniente:\nLa cuenta contable correspondiente '" + fk_acc_s + "' requiere de un centro de costo.");
                         }
 
                         // Validate item:
@@ -1044,15 +1057,10 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         if (fk_item_n > SLibConstants.UNDEFINED) {
                             oItems = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM,  new int[] { fk_item_n }, SLibConstants.EXEC_MODE_VERBOSE);
                             if (oItems == null) {
-                                throw new Exception(sMsg + "'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nEl registro no existe.");
+                                messages.appendMessage(sMsg + "'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nEl registro no existe.");
                             }
-                            /*
-                            else if (oItems != 1) {
-                                throw new Exception(sMsg + "'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nSe encontraron " + oItems.length + " registros.");
-                            }
-                            */
                             else if (oItems.getIsDeleted()) {
-                                throw new Exception(sMsg + "'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nEl registro está eliminado.");
+                                messages.appendMessage(sMsg + "'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nEl registro está eliminado.");
                             }
                         }
 
@@ -1060,16 +1068,16 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
                         if (fk_bp_n == 0) {
                             if (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) {
-                                throw new Exception(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nNo se ha especificado el asociado de negocios.");
+                                messages.appendMessage(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nNo se ha especificado el asociado de negocios.");
                             }
                         }
                         else {
                             oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { fk_bp_n }, SLibConstants.EXEC_MODE_VERBOSE);
                             if (oBizPartner == null) {
-                                throw new Exception(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nEl registro no existe.");
+                                messages.appendMessage(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nEl registro no existe.");
                             }
                             else if (oBizPartner.getIsDeleted()) {
-                                throw new Exception(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nEl registro está eliminado.");
+                                messages.appendMessage(sMsg + "'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nEl registro está eliminado.");
                             }
                         }
 
@@ -1078,10 +1086,10 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                         if (fk_tax_bas_n != 0 && fk_tax_tax_n != 0) {
                             oTax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, new int[] { fk_tax_bas_n, fk_tax_tax_n }, SLibConstants.EXEC_MODE_VERBOSE);
                             if (oTax == null) {
-                                throw new Exception(sMsg + "'impuesto' ('" + fk_tax_bas_n + ", " + fk_tax_tax_n + "') tiene un inconveniente:\nEl registro no existe.");
+                                messages.appendMessage(sMsg + "'impuesto' ('" + fk_tax_bas_n + ", " + fk_tax_tax_n + "') tiene un inconveniente:\nEl registro no existe.");
                             }
                             else if (oTax.getIsDeleted()) {
-                                throw new Exception(sMsg + "'impuesto' ('" + fk_tax_bas_n + ", " + fk_tax_tax_n + "') tiene un inconveniente:\nEl registro está eliminado.");
+                                messages.appendMessage(sMsg + "'impuesto' ('" + fk_tax_bas_n + ", " + fk_tax_tax_n + "') tiene un inconveniente:\nEl registro está eliminado.");
                             }
                         }
 
@@ -1278,9 +1286,19 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             moFormerPayroll.getDbmsDataFormerPayrollMove().add(oPayrollMove);
                         } // end record
                     } // end configuration
-                }
+                } // end processing of perceptions and deductions
 
                 moFormerPayroll.getAuxDataRecord().add(oRecord);
+            }
+        }
+        
+        if (messages.getMessagesCount() > 0) {
+            if (messages.getMessagesCount() == 1) {
+                throw new Exception(messages.getMessages()); // throw exception with a simple message
+            }
+            else {
+                messages.setVisible(true);
+                throw new Exception("Corregir los errores de configuración de contabilización.");
             }
         }
         
@@ -1289,8 +1307,9 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
         // Validate that fully accounted payroll
         
-        if (SLibUtilities.round((dDebit_r - dCredit_r), miClient.getSessionXXX().getParamsErp().getDecimalsValue()) != SLibUtilities.round(moPayroll.getAuxTotalNet(), miClient.getSessionXXX().getParamsErp().getDecimalsValue())) {
-            throw new Exception("¡Hay una diferencia entre el alcance neto de la nómina (" + miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(moPayroll.getAuxTotalNet()) +") y el monto neto de la afectación contable (" + miClient.getSessionXXX().getFormatters().getDecimalsValueFormat().format(dDebit_r - dCredit_r) +")!");
+        if (SLibUtils.roundAmount(dDebit_r - dCredit_r) != SLibUtils.roundAmount(moPayroll.getAuxTotalNet())) {
+            throw new Exception("¡Hay una diferencia entre el alcance neto de la nómina, $" + SLibUtils.getDecimalFormatAmount().format(moPayroll.getAuxTotalNet()) +", y "
+                    + "el monto neto de la afectación contable, $" + SLibUtils.getDecimalFormatAmount().format(dDebit_r - dCredit_r) +"!");
         }
         
         moAccountingPayroll.save(miClient.getSession());

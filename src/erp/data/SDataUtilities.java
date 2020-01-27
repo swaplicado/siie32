@@ -2183,24 +2183,24 @@ public abstract class SDataUtilities {
     }
 
     /**
-     * Checks if business partner is blocked.
+     * Checks if business partner is blocked indirectly.
+     * Business partners blocked this way, are blocked on purchases or sales SIIE modules, besides the catalog of business partners itself.
      *
      * @param client ERP Client interface.
      * @param idBizPartner Business partner primary key.
      * @param idBizPartnerCategory Business partner's category primary key.
      * @return <code>true</code> if business partner is blocked.
+     * @throws java.lang.Exception
      */
     @SuppressWarnings("unchecked")
     public static boolean obtainIsBizPartnerBlocked(erp.client.SClientInterface client, int idBizPartner, int idBizPartnerCategory) throws java.lang.Exception {
         boolean blocked = false;
-        String sql = "";
-        ResultSet resultSet = null;
+        String sql = "SELECT b_block FROM trn_bp_block WHERE id_bp = " + idBizPartner + " AND id_ct_bp = " + idBizPartnerCategory + " AND NOT b_del ";
 
-        sql = "SELECT b_block FROM trn_bp_block WHERE id_bp = " + idBizPartner + " AND id_ct_bp = " + idBizPartnerCategory + " AND NOT b_del ";
-
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            blocked = resultSet.getBoolean("b_block");
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                blocked = resultSet.getBoolean("b_block");
+            }
         }
 
         return blocked;
@@ -2210,16 +2210,15 @@ public abstract class SDataUtilities {
      * Obtain if bizPartner is blocked by Dps:
      *
      * @param client SClientInterface.
-     * @param paKeyDps Key of Dps
+     * @param dpsKey Key of Dps
      * @return boolean if bizPartner is blocked
+     * @throws java.lang.Exception
      */
     @SuppressWarnings("unchecked")
     public static boolean obtainIsBizPartnerBlockedByDps(erp.client.SClientInterface client, int[] dpsKey) throws java.lang.Exception {
         boolean blocked = false;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT d.fid_ct_dps, sup.b_block AS f_block_sup, cus.b_block AS f_block_cus " +
+        String sql = "SELECT d.fid_ct_dps, sup.b_block AS f_block_sup, cus.b_block AS f_block_cus " +
                 "FROM trn_dps AS d " +
                 "LEFT OUTER JOIN trn_bp_block AS sup ON " +
                 "d.fid_bp_r = sup.id_bp AND sup.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_SUP + " AND sup.b_del = 0 " +
@@ -2227,16 +2226,17 @@ public abstract class SDataUtilities {
                 "d.fid_bp_r = cus.id_bp AND cus.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_CUS + " AND cus.b_del = 0 " +
                 "WHERE d.id_year = " + dpsKey[0] + " AND d.id_doc = " + dpsKey[1] + " ";
 
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            if (resultSet.getInt("d.fid_ct_dps") == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-                if (resultSet.getObject("f_block_sup") != null) {
-                    blocked = resultSet.getBoolean("f_block_sup");
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                if (resultSet.getInt("d.fid_ct_dps") == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                    if (resultSet.getObject("f_block_sup") != null) {
+                        blocked = resultSet.getBoolean("f_block_sup");
+                    }
                 }
-            }
-            else {
-                if (resultSet.getObject("f_block_cus") != null) {
-                    blocked = resultSet.getBoolean("f_block_cus");
+                else {
+                    if (resultSet.getObject("f_block_cus") != null) {
+                        blocked = resultSet.getBoolean("f_block_cus");
+                    }
                 }
             }
         }
@@ -2248,16 +2248,15 @@ public abstract class SDataUtilities {
      * Obtain shipment values by entry:
      *
      * @param client SClientInterface.
-     * @param paPkDpsEntryId Key dps entry Id
+     * @param dpsEntryKey Key dps entry Id
      * @return values of shipment entry
+     * @throws java.lang.Exception
      */
     @SuppressWarnings("unchecked")
     public static double[] obtainShipmentByEntry(erp.client.SClientInterface client, int[] dpsEntryKey) throws java.lang.Exception {
         double[] adShip = null;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT COALESCE(et.qty, 0), COALESCE(et.orig_qty, 0), COALESCE(SUM(se.qty), 0) AS f_ship_qty, COALESCE(SUM(se.orig_qty), 0) AS f_ship_orig_qty, " +
+        String sql = "SELECT COALESCE(et.qty, 0), COALESCE(et.orig_qty, 0), COALESCE(SUM(se.qty), 0) AS f_ship_qty, COALESCE(SUM(se.orig_qty), 0) AS f_ship_orig_qty, " +
             "COALESCE(et.qty - SUM(se.qty), 0) AS f_pend_ship " +
             "FROM trn_dps AS d " +
             "INNER JOIN trn_dps_ety AS et ON d.id_year = et.id_year AND d.id_doc = et.id_doc AND et.b_del = 0 " +
@@ -2267,18 +2266,19 @@ public abstract class SDataUtilities {
             "INNER JOIN log_ship AS sh ON se.id_year = sh.id_year AND se.id_doc = sh.id_doc AND sh.b_del = 0 " +
             "WHERE et.id_year = " + dpsEntryKey[0] + " AND et.id_doc = " + dpsEntryKey[1] + " AND et.id_ety = " + dpsEntryKey[2] + " ";
 
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            if (resultSet.getObject(1) != null) {
-                adShip = new double[] {
-                    resultSet.getObject(1) == null ? new Double(0) : resultSet.getDouble(1),
-                    resultSet.getObject(2) == null ? new Double(0) : resultSet.getDouble(2),
-                    resultSet.getObject(3) == null ? new Double(0) : resultSet.getDouble(3),
-                    resultSet.getObject(4) == null ? new Double(0) : resultSet.getDouble(4),
-                    resultSet.getObject(5) == null ? new Double(0) : resultSet.getDouble(5)};
-            }
-            else {
-                adShip = new double[] { new Double(0), new Double(0), new Double(0), new Double(0), new Double(0) };
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                if (resultSet.getObject(1) != null) {
+                    adShip = new double[] {
+                        resultSet.getObject(1) == null ? new Double(0) : resultSet.getDouble(1),
+                        resultSet.getObject(2) == null ? new Double(0) : resultSet.getDouble(2),
+                        resultSet.getObject(3) == null ? new Double(0) : resultSet.getDouble(3),
+                        resultSet.getObject(4) == null ? new Double(0) : resultSet.getDouble(4),
+                        resultSet.getObject(5) == null ? new Double(0) : resultSet.getDouble(5)};
+                }
+                else {
+                    adShip = new double[] { new Double(0), new Double(0), new Double(0), new Double(0), new Double(0) };
+                }
             }
         }
 
@@ -2295,20 +2295,19 @@ public abstract class SDataUtilities {
     @SuppressWarnings("unchecked")
     public static java.lang.String[] obtainAccountsCosts(erp.client.SClientInterface client, int[] pnCompanyBranchId, boolean pbIsDirectCost) throws java.lang.Exception {
         java.lang.String[] asAccounts = null;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT fid_acc_payroll, " + (pbIsDirectCost ? "fid_acc_expen_mfg" : "fid_acc_wp") + " FROM fin_acc_cob_ent WHERE id_cob = " + pnCompanyBranchId[0] + " AND id_ent = " + pnCompanyBranchId[1] + " AND b_del = 0; ";
+        String sql = "SELECT fid_acc_payroll, " + (pbIsDirectCost ? "fid_acc_expen_mfg" : "fid_acc_wp") + " FROM fin_acc_cob_ent WHERE id_cob = " + pnCompanyBranchId[0] + " AND id_ent = " + pnCompanyBranchId[1] + " AND b_del = 0; ";
 
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            if (resultSet.getObject(1) != null) {
-                asAccounts = new java.lang.String[] {
-                    resultSet.getObject(1) == null ? "" : resultSet.getString(1),
-                    resultSet.getObject(2) == null ? "" : resultSet.getString(2) };
-            }
-            else {
-                asAccounts = new java.lang.String[] { "", "" };
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                if (resultSet.getObject(1) != null) {
+                    asAccounts = new java.lang.String[] {
+                        resultSet.getObject(1) == null ? "" : resultSet.getString(1),
+                        resultSet.getObject(2) == null ? "" : resultSet.getString(2) };
+                }
+                else {
+                    asAccounts = new java.lang.String[] { "", "" };
+                }
             }
         }
 
@@ -2320,19 +2319,18 @@ public abstract class SDataUtilities {
         java.lang.String[] asAccounts = null;
         SDataAccount account = null;
         ArrayList<SDataAccount> dataAccounts = new ArrayList<SDataAccount>();
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT am.id_acc "
+        String sql = "SELECT am.id_acc "
                 + "FROM fin_acc AS a "
                 + "INNER JOIN fin_acc AS am ON a.id_acc = CONCAT(LEFT(am.id_acc, 4), '-0000-0000') "
                 + "WHERE a.fid_tp_acc_r = " + pnTypeId[0] + " AND a.fid_cl_acc_r = " + pnTypeId[1] + " AND a.fid_cls_acc_r = " + pnTypeId[2] + " AND a.b_del = 0 AND am.b_del = 0; ";
         
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            account = (SDataAccount) SDataUtilities.readRegistry(client, SDataConstants.FIN_ACC, new Object[] { resultSet.getString("id_acc") }, SLibConstants.EXEC_MODE_SILENT);
-            
-            dataAccounts.add(account);
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                account = (SDataAccount) SDataUtilities.readRegistry(client, SDataConstants.FIN_ACC, new Object[] { resultSet.getString("id_acc") }, SLibConstants.EXEC_MODE_SILENT);
+                
+                dataAccounts.add(account);
+            }
         }
 
         return dataAccounts;
@@ -2347,14 +2345,13 @@ public abstract class SDataUtilities {
     @SuppressWarnings("unchecked")
     public static int obtainIndirectManufacturingCosts(erp.client.SClientInterface client) throws java.lang.Exception {
         int nPkGicId = 0;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT id_cost_gic FROM erp.finu_cost_gic WHERE id_cost_gic = 1 AND b_del = 0; ";
+        String sql = "SELECT id_cost_gic FROM erp.finu_cost_gic WHERE id_cost_gic = 1 AND b_del = 0; ";
 
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            nPkGicId = resultSet.getObject("id_cost_gic") == null ? 0 : resultSet.getInt("id_cost_gic");
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                nPkGicId = resultSet.getObject("id_cost_gic") == null ? 0 : resultSet.getInt("id_cost_gic");
+            }
         }
 
         return nPkGicId;
@@ -2365,21 +2362,19 @@ public abstract class SDataUtilities {
      *
      * @param client SClientInterface.
      * @return Vector<SDataCommissionsSalesAgent>
+     * @throws java.lang.Exception
      */
     @SuppressWarnings("unchecked")
     public static java.util.Vector<erp.mmkt.data.SDataCommissionsSalesAgent> obtainSalesAgent(erp.client.SClientInterface client) throws java.lang.Exception {
-        String sql = "";
-        ResultSet resultSet = null;
-
         Vector<SDataCommissionsSalesAgent> vCommissionsSalesAgent = new Vector<SDataCommissionsSalesAgent>();
         SDataCommissionsSalesAgent oCommissionsSalesAgent = null;
 
-        sql = "SELECT DISTINCT id_bp, bp " +
+        String sql = "SELECT DISTINCT id_bp, bp " +
                 "FROM erp.bpsu_bp " +
                 "WHERE b_att_sal_agt = TRUE " +
                 "ORDER BY bp, id_bp; ";
 
-        resultSet = client.getSession().getStatement().executeQuery(sql);
+        ResultSet resultSet = client.getSession().getStatement().executeQuery(sql);
         while (resultSet.next()) {
             oCommissionsSalesAgent = new SDataCommissionsSalesAgent();
             oCommissionsSalesAgent.setPkSalesAgentId(resultSet.getInt("id_bp"));
@@ -2387,6 +2382,7 @@ public abstract class SDataUtilities {
 
             vCommissionsSalesAgent.add(oCommissionsSalesAgent);
         }
+        resultSet.close();
 
         return vCommissionsSalesAgent;
     }
@@ -2399,21 +2395,19 @@ public abstract class SDataUtilities {
      */
     @SuppressWarnings("unchecked")
     public static java.util.Vector<erp.mmkt.data.SDataCommissionsSalesAgentType> obtainSalesAgentType(erp.client.SClientInterface client) throws java.lang.Exception {
-        String sql = "";
-        ResultSet resultSet = null;
-
         Vector<SDataCommissionsSalesAgentType> vCommissionsSalesAgentType = new Vector<SDataCommissionsSalesAgentType>();
         SDataCommissionsSalesAgentType oCommissionsSalesAgentType = null;
 
-        sql = "SELECT * FROM mktu_tp_sal_agt WHERE b_del = 0; ";
+        String sql = "SELECT * FROM mktu_tp_sal_agt WHERE b_del = 0; ";
 
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            oCommissionsSalesAgentType = new SDataCommissionsSalesAgentType();
-            oCommissionsSalesAgentType.setPkSalesAgentTypeId(resultSet.getInt(1));
-            oCommissionsSalesAgentType.setDbmsSalesAgentType(resultSet.getString(2));
-
-            vCommissionsSalesAgentType.add(oCommissionsSalesAgentType);
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                oCommissionsSalesAgentType = new SDataCommissionsSalesAgentType();
+                oCommissionsSalesAgentType.setPkSalesAgentTypeId(resultSet.getInt(1));
+                oCommissionsSalesAgentType.setDbmsSalesAgentType(resultSet.getString(2));
+                
+                vCommissionsSalesAgentType.add(oCommissionsSalesAgentType);
+            }
         }
 
         return vCommissionsSalesAgentType;
@@ -2467,18 +2461,17 @@ public abstract class SDataUtilities {
      */
     @SuppressWarnings("unchecked")
     public static int obtainLotByItem(erp.client.SClientInterface client, int nPkItemId, int nPkUnitId) throws java.lang.Exception {
-        int nLotId = 0;
-        String sql = "";
-        ResultSet resultSet = null;
+        int lotId = 0;
 
-        sql = "SELECT COALESCE(MAX(lot), 0) + 1 AS f_lot FROM trn_lot WHERE id_item = " + nPkItemId + " AND id_unit = " + nPkUnitId + " ";
+        String sql = "SELECT COALESCE(MAX(lot), 0) + 1 AS f_lot FROM trn_lot WHERE id_item = " + nPkItemId + " AND id_unit = " + nPkUnitId + " ";
 
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            nLotId = resultSet.getObject("f_lot") == null ? 0 : resultSet.getInt("f_lot");
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                lotId = resultSet.getObject("f_lot") == null ? 0 : resultSet.getInt("f_lot");
+            }
         }
 
-        return nLotId;
+        return lotId;
     }
 
     /**
@@ -2545,25 +2538,25 @@ public abstract class SDataUtilities {
      * @param client SClientInterface.
      * @param nFkOrderPrincipalItemId int
      * @param nFkOrderPrincipalUnitId int
-     * @param nFkOrderSecundaryItemId int
-     * @param nFkOrderSecundaryUnitId int
+     * @param nFkOrderSecondaryItemId int
+     * @param nFkOrderSecondaryUnitId int
      * @param sBom String
      * @return nPkItemId
+     * @throws java.lang.Exception
      */
     @SuppressWarnings("unchecked")
     public static int validateIngredientInFormula(erp.client.SClientInterface client, int nFkOrderPrincipalItemId, int nFkOrderPrincipalUnitId, int nFkOrderSecondaryItemId, int nFkOrderSecondaryUnitId, java.lang.String sBom) throws java.lang.Exception {
         int nPkItemId = 0;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT MAX(b.fid_item_n) " +
+        String sql = "SELECT MAX(b.fid_item_n) " +
             "FROM mfg_bom AS b " +
             "WHERE b.b_del = 0 AND b.fid_item = " + nFkOrderPrincipalItemId + " AND b.fid_unit = " + nFkOrderPrincipalUnitId + " AND b.bom = '" + sBom + "' " +
             "AND b.fid_item_n = " + nFkOrderSecondaryItemId + " AND b.fid_unit_n = " + nFkOrderSecondaryUnitId + "; ";
 
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            nPkItemId = resultSet.getObject(1) == null ? 0 : resultSet.getInt(1);
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                nPkItemId = resultSet.getObject(1) == null ? 0 : resultSet.getInt(1);
+            }
         }
 
         return nPkItemId;

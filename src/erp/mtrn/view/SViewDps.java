@@ -460,10 +460,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         STableColumn[] aoTableColumns = null;
 
         if (mbIsDoc || mbIsDocAdj) {
-            aoTableColumns = new STableColumn[47];  // extra columns for accounting record and CFD info
+            aoTableColumns = new STableColumn[48];  // extra columns for accounting record and CFD info
         }
         else {
-            aoTableColumns = new STableColumn[41];
+            aoTableColumns = new STableColumn[42];
         }
 
         i = 0;
@@ -505,18 +505,18 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             if (mbIsDoc || mbIsDocAdj) {
                 aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "x.can_st", "Estatus cancelación", 35);
             }
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dt.code", "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "d.num_ref", "Referencia doc.", STableConstants.WIDTH_DOC_NUM_REF);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dt.code", "Tipo documento", STableConstants.WIDTH_CODE_DOC);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio documento", STableConstants.WIDTH_DOC_NUM);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "d.num_ref", "Ref documento", STableConstants.WIDTH_DOC_NUM_REF);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt", "Fecha documento", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cob_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt_doc_delivery_n", "Entrega programada", STableConstants.WIDTH_DATE);
         }
         else {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dt.code", "Tipo doc.", STableConstants.WIDTH_CODE_DOC);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio doc.", STableConstants.WIDTH_DOC_NUM);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "d.num_ref", "Referencia doc.", STableConstants.WIDTH_DOC_NUM_REF);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt", "Fecha doc.", STableConstants.WIDTH_DATE);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "dt.code", "Tipo documento", STableConstants.WIDTH_CODE_DOC);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_num", "Folio documento", STableConstants.WIDTH_DOC_NUM);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "d.num_ref", "Ref documento", STableConstants.WIDTH_DOC_NUM_REF);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt", "Fecha documento", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cob_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "d.dt_doc_delivery_n", "Entrega programada", STableConstants.WIDTH_DATE);
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "f_ico", "Estatus", STableConstants.WIDTH_ICON);
@@ -552,25 +552,26 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
 
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.stot_cur_r", "Subtotal mon $", STableConstants.WIDTH_VALUE_2X);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tax_charged_cur_r", "Imp tras mon $", STableConstants.WIDTH_VALUE);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tax_retained_cur_r", "Imp ret mon $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tax_charged_cur_r", "Impto tras mon $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tax_retained_cur_r", "Impto ret mon $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_cur_r", "Total mon $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cur_key", "Moneda", STableConstants.WIDTH_CURRENCY_KEY);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.exc_rate", "T cambio", STableConstants.WIDTH_EXCHANGE_RATE);
         aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererExchangeRate());
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.stot_r", "Subtotal $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tax_charged_r", "Imp tras $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tax_charged_r", "Impto tras $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setSumApplying(true);
-        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tax_retained_r", "Imp ret $", STableConstants.WIDTH_VALUE);
+        aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tax_retained_r", "Impto ret $", STableConstants.WIDTH_VALUE);
         aoTableColumns[i++].setSumApplying(true);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "d.tot_r", "Total $", STableConstants.WIDTH_VALUE_2X);
         aoTableColumns[i++].setSumApplying(true);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_cur_key_local", "Moneda local", STableConstants.WIDTH_CURRENCY_KEY);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "d.comms_ref", "Ref comercial", STableConstants.WIDTH_DOC_NUM_REF);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_dn_code", "Naturaleza documento", STableConstants.WIDTH_CODE_DOC);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_fa_code", "Área funcional", STableConstants.WIDTH_CODE_DOC);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_dn_code", "Naturaleza doc.", STableConstants.WIDTH_CODE_DOC);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "d.comms_ref", "Referencia coms.", STableConstants.WIDTH_DOC_NUM_REF);
-        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "num_ord", "Ord. prod.", STableConstants.WIDTH_DOC_NUM);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_concept", "Concepto documento", 200);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_mfg_ord", "Orden producción", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "d.b_copy", "Copia", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "d.b_audit", "Auditado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "d.b_link", "Vinculado", STableConstants.WIDTH_BOOLEAN);
@@ -1097,37 +1098,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         }
                         else {
                             try {
-                                
                                 STrnUtilities.createReportOrder(miClient, null, oDps, SDataConstantsPrint.PRINT_MODE_VIEWER);
-                                /* XXX New way of printing the report (jbarajas, 25-09-2015)
-                                setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-                                map = miClient.createReportParams();
-                                map.put("nIdYear", oDps.getPkYearId());
-                                map.put("nIdDoc", oDps.getPkDocId());
-                                map.put("sTitle", SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { oDps.getFkDpsCategoryId(),
-                                oDps.getFkDpsClassId(), oDps.getFkDpsTypeId() }));
-                                map.put("bIsSupplier", mbIsCategoryPur ? true : false);
-                                map.put("sAddressLine1", addressOficial[0]);
-                                map.put("sAddressLine2", addressOficial[1]);
-                                map.put("sAddressLine3", addressOficial[2]);
-                                map.put("sAddressLine4", addressOficial[3]);
-                                map.put("sAddressDelivery1", mbIsCategoryPur ? addressDeliveryCompany[0] : addressDelivery[0]);
-                                map.put("sAddressDelivery2", mbIsCategoryPur ? addressDeliveryCompany[1] : addressDelivery[1]);
-                                map.put("sAddressDelivery3", mbIsCategoryPur ? addressDeliveryCompany[2] : addressDelivery[2]);
-                                map.put("sAddressDelivery4", mbIsCategoryPur ? addressDeliveryCompany.length > 3 ? addressDeliveryCompany[3] : "" :
-                                    addressDelivery.length > 3 ? addressDelivery[3] : "");
-                                map.put("sUserBuyer", sUserBuyer != null ? sUserBuyer : oUserBuyer.getUser());
-                                map.put("sUserAuthorize", sUserAuthorize != null ? sUserAuthorize : oUserAuthorize.getUser());
-                                map.put("nBizPartnerCategory", mbIsCategoryPur ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
-                                map.put("nIdTpCarSup", SModSysConsts.LOGS_TP_CAR_CAR);
-                                map.put("sNotes", miClient.getSessionXXX().getParamsCompany().getNotesPurchasesOrder());
-
-                                jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_ORDER, map);
-                                jasperViewer = new JasperViewer(jasperPrint, false);
-                                jasperViewer.setTitle("Impresión de pedido");
-                                jasperViewer.setVisible(true);
-                                */
                             }
                             catch (Exception e) {
                                 SLibUtilities.renderException(this, e);
@@ -1987,13 +1958,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, " +
                 "d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, " +
                 "d.b_copy, d.b_link, d.b_close, d.b_audit, d.b_del, d.ts_link, d.ts_close, d.ts_new, d.ts_edit, d.ts_del, dt.code, " +
+                "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "(SELECT fa.code FROM cfgu_func AS fa WHERE d.fid_func = fa.id_func) AS f_fa_code, " +
                 "(SELECT dn.code FROM erp.trnu_dps_nat AS dn WHERE d.fid_dps_nat = dn.id_dps_nat) AS f_dn_code, " +
-                "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
-                "(SELECT CONCAT(src.num_ser, IF(length(src.num_ser) = 0, '', '-'), src.num) AS id_ped " +
-                "FROM trn_dps AS src INNER JOIN trn_dps_dps_supply AS spl ON src.id_doc = spl.id_src_doc AND src.id_year = spl.id_src_year " +
-                "WHERE spl.id_des_doc = d.id_doc AND src.id_year = d.id_year AND src.b_del = 0 LIMIT 1) AS f_ord_num, " +
-                "(SELECT CONCAT(ord.id_year, '-', ord.num) FROM mfg_ord AS ord WHERE d.fid_mfg_year_n = ord.id_year AND d.fid_mfg_ord_n = ord.id_ord) AS num_ord, " +
+                "(SELECT CONCAT(dps_src.num_ser, IF(length(dps_src.num_ser) = 0, '', '-'), dps_src.num) " +
+                "FROM trn_dps AS dps_src INNER JOIN trn_dps_dps_supply AS spl ON dps_src.id_doc = spl.id_src_doc AND dps_src.id_year = spl.id_src_year " +
+                "WHERE spl.id_des_doc = d.id_doc AND dps_src.id_year = d.id_year AND dps_src.b_del = 0 LIMIT 1) AS f_ord_num, " +
+                "(SELECT de.concept FROM trn_dps_ety AS de WHERE de.id_doc = d.id_doc AND de.id_year = d.id_year AND NOT de.b_del ORDER BY de.id_ety LIMIT 1) AS f_concept, " +
+                "(SELECT CONCAT(mo.id_year, '-', mo.num) FROM mfg_ord AS mo WHERE d.fid_mfg_year_n = mo.id_year AND d.fid_mfg_ord_n = mo.id_ord) AS f_mfg_ord, " +
                 "IF(d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
                 "IF(x.ts IS NULL OR doc_xml = '', " + STableConstants.ICON_NULL  + ", " + // not is CFD nor CFDI
                 "IF(x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + // is CFD

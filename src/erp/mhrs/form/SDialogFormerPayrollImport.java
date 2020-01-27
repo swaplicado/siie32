@@ -33,6 +33,7 @@ import erp.mhrs.data.SRowEmployee;
 import erp.mitm.data.SDataItem;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsFormerConsts;
 import erp.mod.hrs.db.SHrsFormerPayroll;
 import erp.mod.hrs.db.SHrsFormerUtils;
@@ -406,7 +407,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         int i = 0;
         STableColumnForm[] aoTableColumns = null;
 
-        mvFields = new Vector<SFormField>();
+        mvFields = new Vector<>();
 
         moFieldFkPaymentSystemTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkPaymentSystemTypeId, jlFkPaymentSystemTypeId);
         moFieldDate = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jtfDate, jlDate);
@@ -437,7 +438,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         moDialogRecordPicker = new SDialogRecordPicker(miClient, SDataConstants.FINX_REC_USER);
         moFormerPayroll = null;
         moCurrentRecord = null;
-        mvRecords = new Vector<Object[]>();
+        mvRecords = new Vector<>();
 
         i = 0;
         aoTableColumns = new STableColumnForm[7];
@@ -822,7 +823,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
             formerPayrollEmp.setDaysNotWorked(row.getDaysNotWorked());
             formerPayrollEmp.setDaysWorked(row.getDaysWorked());
             formerPayrollEmp.setDaysPayed(row.getDaysPayed());
-            formerPayrollEmp.setNumberSeries("NOM");
+            formerPayrollEmp.setNumberSeries(SHrsConsts.CFD_SERIES);
             formerPayrollEmp.setNumber(0);
             formerPayrollEmp.setIsDeleted(false);
             formerPayrollEmp.setFkBizPartnerId_n(row.getFkBizPartnerId());

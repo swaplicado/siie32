@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 154.1/ 2020-01-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Validación de programación de vacaciones y su aplicación (pago) en orden cronológico al crear incidencias de vacaciones precisamente.
+2) Corrección a la generación de opciones del filtro por banco al contabilizar nóminas.
+3) Corrección a la contabilización de nóminas, debido a efectos colaterales por el mejoramiento a la selección de empleados mediante el filtro por banco.
+4) Implementación de concentración de mensajes de error de configuración de contabilización de nóminas, para mostrar todos los mensajes en una sola ocasión, y no uno a uno.
+
+================================================================================
 SIIE 3.2 154.0/ 2020-01-23
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

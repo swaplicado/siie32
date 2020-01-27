@@ -64,7 +64,7 @@ public class SDbAbsenceClass extends SDbRegistryUser {
         return absenceClass == SModSysConsts.HRSU_CL_ABS_DIS;
     }
 
-    public static boolean isVacation(final int absenceClass) {
+    public static boolean isVacations(final int absenceClass) {
         return absenceClass == SModSysConsts.HRSU_CL_ABS_VAC;
     }
 
@@ -73,7 +73,7 @@ public class SDbAbsenceClass extends SDbRegistryUser {
     }
     
     public boolean isVacation() {
-        return isVacation(mnPkAbsenceClassId);
+        return isVacations(mnPkAbsenceClassId);
     }
     
     public boolean isDisability() {

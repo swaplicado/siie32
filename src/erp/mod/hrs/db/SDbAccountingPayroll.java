@@ -192,14 +192,17 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
 
         session.getStatement().execute(msSql);
 
-        // Delete registries dependent:
+        // Delete previous registries:
 
+        msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY_RCP) + " " +
+                    "WHERE id_pay = " + mnPkPayrollId + " AND id_acc = " + mnPkAccountingId;
+        
         msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY) + " SET b_del = 1 " +
                     "WHERE id_pay = " + mnPkPayrollId + " AND id_acc < " + mnPkAccountingId;
         
-         session.getStatement().execute(msSql);
+        session.getStatement().execute(msSql);
         
-        // Save payrollReceips:
+        // Save payroll receips:
         
         for (SDbAccountingPayrollEmployee accountingPayrollEmployee : maChildAccountingPayrollEmployee) {
             accountingPayrollEmployee.setRegistryNew(true);

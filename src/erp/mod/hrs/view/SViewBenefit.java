@@ -357,7 +357,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         
         // # employee's general info:
         msSql = "SELECT "
-                + "bp.id_bp AS _emp_id, bp.bp AS _emp_name, e.num AS _emp_num, e.b_act AS _emp_act, "
+                + "bp.id_bp AS _emp_id, bp.bp AS _emp_name, CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.b_act AS _emp_act, "
                 + "e.fk_tp_pay AS _pay_tp_id, tp.name AS _pay_tp_name, "
                 + "e.dt_ben AS _emp_dt_ben, e.dt_dis_n AS _emp_dt_dis_n, ";
         
@@ -577,8 +577,8 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
         
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
         
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, "Empleado"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, SDbConsts.FIELD_CODE, "Clave"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, "Nombre empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "_emp_num", "Clave empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_emp_act", "Activo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "_pay_tp_name", "Período pago", 75));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_curr_sal_day", "Salario diario $", 75));

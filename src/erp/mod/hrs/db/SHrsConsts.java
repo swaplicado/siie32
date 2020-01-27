@@ -62,7 +62,9 @@ public class SHrsConsts {
     public static final String TXT_PAY_PER_REF_SD = "SD";
     public static final String TXT_PAY_PER_REF_SBC = "SBC";
     public static final String TXT_PAY_PER_REF_OTRO = "OTRO";
+    
     public static final String EMPTY_BANK = "(SIN BANCO)";
+    public static final String CFD_SERIES = "NOM";
     
     public static final String ERR_PERIOD_DATE_INVALID = "Fecha inválida en el período.";
     

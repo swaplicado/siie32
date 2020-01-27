@@ -138,7 +138,7 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     }
 
     public boolean isVacation() {
-        return SDbAbsenceClass.isVacation(mnFkAbsenceClassId);
+        return SDbAbsenceClass.isVacations(mnFkAbsenceClassId);
     }
     
     public String composeAbsenceDescription() {

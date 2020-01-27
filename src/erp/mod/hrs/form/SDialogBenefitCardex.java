@@ -368,16 +368,6 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         
         return days;
     }
-    
-    private void loadAbsenceSelected() {
-        SRowBenefitCardex benefitCardex = null;
-        
-        benefitCardex = (SRowBenefitCardex) moGridBenefitSummary.getSelectedGridRow();
-
-        if (benefitCardex != null) {
-            showBenefitDetail(benefitCardex);
-        }
-    }
 
     @SuppressWarnings("unchecked")
     private void showBenefitCardex() {
@@ -521,6 +511,17 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         }
     }
 
+    /**
+     * Show detail of current benefit.
+     */
+    private void valueChangedBenefitSummary() {
+        SRowBenefitCardex benefitCardex = (SRowBenefitCardex) moGridBenefitSummary.getSelectedGridRow();
+
+        if (benefitCardex != null) {
+            showBenefitDetail(benefitCardex);
+        }
+    }
+    
     public void setFormParams(final int employeeId, final int seniorityYears, final int seniorityDays, final int benefitsTableId, final Date dateCutoff) {
         SDbConfig config = (SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
         
@@ -589,7 +590,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
             if (moGridBenefitSummary.getTable().getSelectedRowCount() != -1) {
-                loadAbsenceSelected();
+                valueChangedBenefitSummary();
             }
         }
     }

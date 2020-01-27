@@ -214,7 +214,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
     }
     
     private ArrayList<SHrsBenefitTableAnniversary> createBenefitTableAnniversarys(ArrayList<SDbBenefitTable> benefitTables) throws Exception {
-        return SHrsUtils.createBenefitTablesAnniversarys(benefitTables);
+        return SHrsUtils.createBenefitTablesAnniversaries(benefitTables);
     }
 
     private ArrayList<SDbMwzTypeWage> readMwzTypeWages() throws Exception {
