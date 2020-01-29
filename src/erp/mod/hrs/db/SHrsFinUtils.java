@@ -133,51 +133,52 @@ public abstract class SHrsFinUtils {
     }
     
     public static boolean validateAccount(final SGuiSession session, final int accountId, final int costCenterId, final int bizPartnerId, final int itemId, final int taxBasicId, final int taxTaxId) throws Exception {
-        SDataAccount account = null;
-        SDataAccount accountMajor = null;
-        SDataCostCenter costCenter = null;
-        int nSystemType = SDataConstantsSys.UNDEFINED;
-        String fk_acc_s = "";
-        String fk_cc_s = "";
-        String sVal = "";
+        String validationMsg;
         
-        fk_acc_s = SFinUtils.getAccountFormerIdXXX(session, accountId);
-        account = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { fk_acc_s }, SLibConstants.EXEC_MODE_VERBOSE);
+        String accountPk = SFinUtils.getAccountFormerIdXXX(session, accountId);
         
-        sVal = SDataUtilities.validateAccount((SClientInterface) session.getClient(), account, null);
-        if (sVal.length() != 0) {
-            throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\n" + sVal);
+        SDataAccount account = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { accountPk }, SLibConstants.EXEC_MODE_VERBOSE);
+        validationMsg = SDataUtilities.validateAccount((SClientInterface) session.getClient(), account, null, false);
+        if (!validationMsg.isEmpty()) {
+            throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\n" + validationMsg);
         }
-        accountMajor = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
         
-        if (accountMajor.getIsRequiredCostCenter() || accountMajor.getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES) {
+        SDataAccount accountLedger = (SDataAccount) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
+        validationMsg = SDataUtilities.validateAccount((SClientInterface) session.getClient(), accountLedger, null, true);
+        if (!validationMsg.isEmpty()) {
+            throw new Exception("La cuenta contable de mayor ('" + account.getDbmsPkAccountMajorId() + "') tiene un inconveniente:\n" + validationMsg);
+        }
+        
+        if (account.getIsRequiredCostCenter() || accountLedger.getIsRequiredCostCenter() || accountLedger.getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES) {
             if (costCenterId == SLibConsts.UNDEFINED) {
-                throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere centro de costos y no está definido.");
+                throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\nRequiere centro de costos y no está definido.");
             }
             else {
-                fk_cc_s = SFinUtils.getCostCenterFormerIdXXX(session, costCenterId);
-                costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_CC, new Object[] { fk_cc_s }, SLibConstants.EXEC_MODE_VERBOSE);
-                sVal = SDataUtilities.validateCostCenter((SClientInterface) session.getClient(), costCenter, null);
-                if (sVal.length() != 0) {
-                    throw new Exception("'El centro de costo ('" + fk_cc_s + "') tiene un inconveniente:\n" + sVal);
+                String costCenterPk = SFinUtils.getCostCenterFormerIdXXX(session, costCenterId);
+                
+                SDataCostCenter costCenter = (SDataCostCenter) SDataUtilities.readRegistry((SClientInterface) session.getClient(), SDataConstants.FIN_CC, new Object[] { costCenterPk }, SLibConstants.EXEC_MODE_VERBOSE);
+                validationMsg = SDataUtilities.validateCostCenter((SClientInterface) session.getClient(), costCenter, null);
+                if (validationMsg.length() != 0) {
+                    throw new Exception("'El centro de costo ('" + costCenterPk + "') tiene un inconveniente:\n" + validationMsg);
                 }
             }
         }
-        nSystemType = accountMajor.getFkAccountSystemTypeId();
         
-        if ((accountMajor.getIsRequiredBizPartner() || SLibUtilities.belongsTo(nSystemType, new int[] {
+        int nSystemType = accountLedger.getFkAccountSystemTypeId();
+        
+        if ((accountLedger.getIsRequiredBizPartner() || SLibUtilities.belongsTo(nSystemType, new int[] {
             SDataConstantsSys.FINS_TP_ACC_SYS_SUP, SDataConstantsSys.FINS_TP_ACC_SYS_CUS, SDataConstantsSys.FINS_TP_ACC_SYS_CDR, SDataConstantsSys.FINS_TP_ACC_SYS_DBR })) &&
                 bizPartnerId == SLibConsts.UNDEFINED) {
-            throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere asociado de negocios y no está definido.");
+            throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\nRequiere asociado de negocios y no está definido.");
         }
-        if ((accountMajor.getIsRequiredItem() || accountMajor.getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES) &&
+        if ((accountLedger.getIsRequiredItem() || accountLedger.getFkAccountTypeId_r() == SDataConstantsSys.FINS_TP_ACC_RES) &&
                 itemId == SLibConsts.UNDEFINED) {
-            throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere ítem y no está definido.");
+            throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\nRequiere ítem y no está definido.");
         }
         if (SLibUtilities.belongsTo(nSystemType, new int[] {
             SDataConstantsSys.FINS_TP_ACC_SYS_TAX_CDT, SDataConstantsSys.FINS_TP_ACC_SYS_TAX_DBT }) &&
                 taxBasicId == SLibConsts.UNDEFINED && taxTaxId == SLibConsts.UNDEFINED) {
-            throw new Exception("La cuenta contable ('" + fk_acc_s + "') tiene un inconveniente:\nRequiere impuesto y no está definido.");
+            throw new Exception("La cuenta contable ('" + accountPk + "') tiene un inconveniente:\nRequiere impuesto y no está definido.");
         }
         
         return true;

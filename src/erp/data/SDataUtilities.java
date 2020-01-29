@@ -3271,12 +3271,25 @@ public abstract class SDataUtilities {
     }
     
     /**
+     * Validate if account is usable.
      * @param client Client interface.
      * @param account Account to be validated;
      * @param date Date of movement (can be null).
      * @return Validation text.
      */
-    public static java.lang.String validateAccount(erp.client.SClientInterface client, erp.mfin.data.SDataAccount account, java.util.Date date) {
+    public static java.lang.String validateAccount(final erp.client.SClientInterface client, final erp.mfin.data.SDataAccount account, final java.util.Date date) {
+        return validateAccount(client, account, date, false);
+    }
+    
+    /**
+     * Validate if account is usable.
+     * @param client Client interface.
+     * @param account Account to be validated;
+     * @param date Date of movement (can be null).
+     * @param validatingLedger Flag to indicate a ledger account validation.
+     * @return Validation text.
+     */
+    public static java.lang.String validateAccount(final erp.client.SClientInterface client, final erp.mfin.data.SDataAccount account, final java.util.Date date, final boolean validatingLedger) {
         int usedLevels = 0;
         String msg = "";
 
@@ -3301,7 +3314,7 @@ public abstract class SDataUtilities {
                     "es posterior a la fecha final de vigencia de la cuenta contable " +
                     "(" + client.getSessionXXX().getFormatters().getDateFormat().format(account.getDateEnd_n()) + ").";
         }
-        else {
+        else if (!validatingLedger) {
             usedLevels = getAccountUsedLevelsCount(account.getPkAccountIdXXX(), getAccountLevels(account.getPkAccountIdXXX()));
 
             if (usedLevels != account.getDbmsMajorDeep()) {

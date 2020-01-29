@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 154.2/ 2020-01-29
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la contabilización de nóminas, debido a efectos colaterales por el mejoramiento de la concentración de todos los errores en un solo mensaje al usuario.
+
+================================================================================
 SIIE 3.2 154.1/ 2020-01-27
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
