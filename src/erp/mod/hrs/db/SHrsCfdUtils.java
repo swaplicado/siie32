@@ -440,7 +440,7 @@ public abstract class SHrsCfdUtils {
                             hrsFormerReceiptConcept = new SHrsFormerReceiptConcept();
                             hrsFormerReceiptConcept.setClaveEmpresa(sEarTaxSubsidyCode);
                             hrsFormerReceiptConcept.setClaveOficial(SModSysConsts.HRSS_TP_EAR_TAX_SUB);
-                            hrsFormerReceiptConcept.setConcepto(SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY.toUpperCase());
+                            hrsFormerReceiptConcept.setConcepto(SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY_EFF.toUpperCase());
                             hrsFormerReceiptConcept.setCantidad(0);
                             hrsFormerReceiptConcept.setHoras_r(0);
                             hrsFormerReceiptConcept.setTotalGravado(0);

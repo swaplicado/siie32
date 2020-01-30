@@ -270,7 +270,7 @@ public class SFormLoanAdjustmentEarning extends SBeanForm implements ItemListene
     @Override
     public SDbRegistry getRegistry() throws Exception {
         SDbPayrollReceiptEarning registry = moRegistry.clone();
-        SDbEarning earning = SHrsUtils.getEarningByType(miClient, SModConsts.HRSS_TP_LOAN, moKeyLoanType.getValue()[0]);
+        SDbEarning earning = SHrsUtils.getEarningForLoanType(miClient, moKeyLoanType.getValue()[0]);
 
         if (registry.isRegistryNew()) {}
 

@@ -270,7 +270,7 @@ public class SFormLoanAdjustmentDeduction extends SBeanForm implements ItemListe
     @Override
     public SDbRegistry getRegistry() throws Exception {
         SDbPayrollReceiptDeduction registry = moRegistry.clone();
-        SDbDeduction deduction = SHrsUtils.getDeductionByType(miClient, SModConsts.HRSS_TP_LOAN, moKeyLoanType.getValue()[0]);
+        SDbDeduction deduction = SHrsUtils.getDeductionForLoanType(miClient, moKeyLoanType.getValue()[0]);
 
         if (registry.isRegistryNew()) {}
 

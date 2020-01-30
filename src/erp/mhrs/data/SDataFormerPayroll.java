@@ -51,9 +51,9 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
     public SDataFormerPayroll() {
         super(SDataConstants.HRS_SIE_PAY);
 
-        mvDbmsDataFormerPayrollEmp = new Vector<SDataFormerPayrollEmp>();
-        mvDbmsDataFormerPayrollMove = new Vector<SDataFormerPayrollMove>();
-        mvAuxDataRecord = new Vector<SDataRecord>();
+        mvDbmsDataFormerPayrollEmp = new Vector<>();
+        mvDbmsDataFormerPayrollMove = new Vector<>();
+        mvAuxDataRecord = new Vector<>();
 
         reset();
     }

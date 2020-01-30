@@ -593,7 +593,7 @@ public class SReceiptsR {
         otroPago = new cfd.ver3.nom12.DElementOtroPago();
         otroPago.getAttTipoOtroPago().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB }, SDbRegistry.FIELD_CODE));
         otroPago.getAttClave().setString(DCfdVer3Utils.formatAttributeValueAsKey("012" + ""));
-        otroPago.getAttConcepto().setString(SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY.toUpperCase());
+        otroPago.getAttConcepto().setString(SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY_EFF.toUpperCase());
         otroPago.getAttImporte().setDouble(payedSubsidy);
 
         cfd.ver3.nom12.DElementSubsidioEmpleo subsidioEmpleo = new cfd.ver3.nom12.DElementSubsidioEmpleo();

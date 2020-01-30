@@ -3806,7 +3806,7 @@ public abstract class SCfdUtils implements Serializable {
     }
     
     public static cfd.DElement createCfdi33RootElement(final SClientInterface client, final SCfdXmlCfdi33 xmlCfdi) throws Exception {
-        //Comprobante:
+        // Comprobante:
         
         cfd.ver33.DElementComprobante comprobante = new cfd.ver33.DElementComprobante();
 
@@ -3855,7 +3855,7 @@ public abstract class SCfdUtils implements Serializable {
             hasIntCommerceNode = ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior") != null;
         }
         
-        //Emisor:
+        // Emisor:
         
         SDbCfdBizPartner emisor = new SDbCfdBizPartner(client);
         emisor.setBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
@@ -3877,7 +3877,7 @@ public abstract class SCfdUtils implements Serializable {
 
         comprobante.setEltEmisor(elementEmisor);
         
-        //Receptor:
+        // Receptor:
 
         SDbCfdBizPartner receptor = new SDbCfdBizPartner(client);
         receptor.setBizPartnerIds(xmlCfdi.getReceptorId(), xmlCfdi.getReceptorSucursalId());
@@ -3918,13 +3918,13 @@ public abstract class SCfdUtils implements Serializable {
         
         comprobante.setEltReceptor(elementReceptor);
         
-        //Conceptos:
+        // Conceptos:
 
         for (SCfdDataConcepto concept : xmlCfdi.getElementsConcepto()) {
             comprobante.getEltConceptos().getEltConceptos().add(concept.createRootElementConcept33());
         }
 
-        //Impuestos:
+        // Impuestos:
 
         if (!SLibUtils.belongsTo(xmlCfdi.getCfdType(), new int[] { SDataConstantsSys.TRNS_TP_CFD_PAYROLL, SDataConstantsSys.TRNS_TP_CFD_PAY_REC })) {
             boolean exemptTaxesAvailable = false;

@@ -1574,105 +1574,181 @@ public abstract class SHrsUtils {
     }
 
     /**
-     * Get earning by provided code
-     * @param client SGuiClient
-     * @param codeToFind Code of desired earning
-     * @return Object Earning
+     * Get earning by provided code of earning.
+     * @param client GUI client.
+     * @param code Code of desired earning.
+     * @return Found earning.
      * @throws Exception
      */
-    public static SDbEarning getEarning(final SGuiClient client, final String codeToFind) throws Exception {
+    public static SDbEarning getEarning(final SGuiClient client, final String code) throws Exception {
         SDbEarning earning = null;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT id_ear "
+        String sql = "SELECT id_ear "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " "
-                + "WHERE code = '" + codeToFind + "' AND NOT b_del "
-                + "ORDER BY code, id_ear;";
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            earning = new SDbEarning();
-            earning.read(client.getSession(), new int[] { resultSet.getInt("id_ear") });
+                + "WHERE code = '" + code + "' AND NOT b_del "
+                + "ORDER BY id_ear "
+                + "LIMIT 1;";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                earning = new SDbEarning();
+                earning.read(client.getSession(), new int[] { resultSet.getInt(1) });
+            }
         }
 
         return earning;
     }
 
     /**
-     * Get deduction by provided code
-     * @param client SGuiClient
-     * @param codeToFind Code of desired deduction
-     * @return Object Deduction
+     * Get earning by provided type of earning.
+     * @param client GUI client.
+     * @param type Type earning of desired earning.
+     * @return Found earning.
      * @throws Exception
      */
-    public static SDbDeduction getDeduction(final SGuiClient client, final String codeToFind) throws Exception {
-        SDbDeduction deduction = null;
-        String sql = "";
-        ResultSet resultSet = null;
+    public static SDbEarning getEarning(final SGuiClient client, final int type) throws Exception {
+        SDbEarning earning = null;
 
-        sql = "SELECT id_ded "
+        String sql = "SELECT id_ear "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " "
+                + "WHERE fk_tp_ear = " + type + " AND NOT b_del "
+                + "ORDER BY code, id_ear "
+                + "LIMIT 1;";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                earning = new SDbEarning();
+                earning.read(client.getSession(), new int[] { resultSet.getInt(1) });
+            }
+        }
+
+        return earning;
+    }
+
+    /**
+     * Get deduction by provided code of deduction.
+     * @param client GUI client.
+     * @param code Code of desired deduction.
+     * @return Found deduction.
+     * @throws Exception
+     */
+    public static SDbDeduction getDeduction(final SGuiClient client, final String code) throws Exception {
+        SDbDeduction deduction = null;
+
+        String sql = "SELECT id_ded "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " "
-                + "WHERE code = '" + codeToFind + "' AND NOT b_del "
-                + "ORDER BY code, id_ded;";
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            deduction = new SDbDeduction();
-            deduction.read(client.getSession(), new int[] { resultSet.getInt("id_ded") });
+                + "WHERE code = '" + code + "' AND NOT b_del "
+                + "ORDER BY id_ded "
+                + "LIMIT 1;";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                deduction = new SDbDeduction();
+                deduction.read(client.getSession(), new int[] { resultSet.getInt(1) });
+            }
         }
 
         return deduction;
     }
     
     /**
-     * Get earning by provided type ID.
-     * @param client SGuiClient
-     * @param type type filter options: SModConsts.HRSS_TP_BEN or SModConsts.HRSS_TP_LOAN
-     * @param typeId ID the type indicated.
-     * @return Object Earning
+     * Get deduction by provided type of deduction.
+     * @param client GUI client.
+     * @param type Type of deduction of desired deduction.
+     * @return Found deduction.
      * @throws Exception
      */
-    public static SDbEarning getEarningByType(final SGuiClient client, final int type, final int typeId) throws Exception {
+    public static SDbDeduction getDeduction(final SGuiClient client, final int type) throws Exception {
+        SDbDeduction deduction = null;
+
+        String sql = "SELECT id_ded "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " "
+                + "WHERE fk_tp_ded = " + type + " AND NOT b_del "
+                + "ORDER BY code, id_ded "
+                + "LIMIT 1;";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                deduction = new SDbDeduction();
+                deduction.read(client.getSession(), new int[] { resultSet.getInt(1) });
+            }
+        }
+
+        return deduction;
+    }
+    
+    /**
+     * Get earning by provided type of registry.
+     * @param client GUI client.
+     * @param type Type of registry. Supported options: benefit (SModConsts.HRSS_TP_BEN) or loan (SModConsts.HRSS_TP_LOAN.)
+     * @param typeId ID the type of registry required. For example type of benefit or type of loan desired.
+     * @return Matching earning found.
+     * @throws Exception
+     */
+    private static SDbEarning getEarningForType(final SGuiClient client, final int type, final int typeId) throws Exception {
         SDbEarning earning = null;
-        String sql = "";
         String sqlType = "";
-        ResultSet resultSet = null;
         
         switch (type) {
             case SModConsts.HRSS_TP_BEN:
-                sqlType = "fk_tp_ben = " + typeId;
+                sqlType = "fk_tp_ben = " + typeId + " ";
                 break;
             case SModConsts.HRSS_TP_LOAN:
-                sqlType = "fk_tp_loan = " + typeId;
+                sqlType = "fk_tp_loan = " + typeId + " ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        sql = "SELECT id_ear " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " " +
-                "WHERE " + sqlType + " ORDER BY code, name, id_ear LIMIT 1 ";
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            earning = new SDbEarning();
-            earning.read(client.getSession(), new int[] { resultSet.getInt("id_ear") });
+        String sql = "SELECT id_ear "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " "
+                + "WHERE " + sqlType + "AND NOT b_del "
+                + "ORDER BY code, id_ear "
+                + "LIMIT 1;";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                earning = new SDbEarning();
+                earning.read(client.getSession(), new int[] { resultSet.getInt(1) });
+            }
         }
 
         return earning;
     }
+    
+    /**
+     * Get the first earning found for the type of benefit provided.
+     * @param client GUI client.
+     * @param benefitType ID of type of benefit required.
+     * @return Found earning.
+     * @throws Exception 
+     */
+    public static SDbEarning getEarningForBenefitType(final SGuiClient client, final int benefitType) throws Exception {
+        return getEarningForType(client, SModConsts.HRSS_TP_BEN, benefitType);
+    }
+    
+    /**
+     * Get the first earning found for the type of loan provided.
+     * @param client GUI client.
+     * @param loanType ID of type of loan required.
+     * @return Found earning.
+     * @throws Exception 
+     */
+    public static SDbEarning getEarningForLoanType(final SGuiClient client, final int loanType) throws Exception {
+        return getEarningForType(client, SModConsts.HRSS_TP_LOAN, loanType);
+    }
 
     /**
-     * Get deduction by provided type ID.
-     * @param client SGuiClient
-     * @param type type filter options: SModConsts.HRSS_TP_BEN or SModConsts.HRSS_TP_LOAN
-     * @param typeId ID the type indicated.
-     * @return Object Deduction
+     * Get deduction by provided type of registry.
+     * @param client GUI client.
+     * @param type Type of registry. Supported options: benefit (SModConsts.HRSS_TP_BEN) or loan (SModConsts.HRSS_TP_LOAN.)
+     * @param typeId ID the type of registry required. For example type of benefit or type of loan desired.
+     * @return Matching deduction found.
      * @throws Exception
      */
-    public static SDbDeduction getDeductionByType(final SGuiClient client, final int type, final int typeId) throws Exception {
+    private static SDbDeduction getDeductionForType(final SGuiClient client, final int type, final int typeId) throws Exception {
         SDbDeduction deduction = null;
-        String sql = "";
         String sqlType = "";
-        ResultSet resultSet = null;
         
         switch (type) {
             case SModConsts.HRSS_TP_BEN:
@@ -1685,16 +1761,42 @@ public abstract class SHrsUtils {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        sql = "SELECT id_ded " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " " +
-                "WHERE " + sqlType + " ORDER BY code, name, id_ded LIMIT 1 ";
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            deduction = new SDbDeduction();
-            deduction.read(client.getSession(), new int[] { resultSet.getInt("id_ded") });
+        String sql = "SELECT id_ded "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " "
+                + "WHERE " + sqlType + " AND NOT b_del "
+                + "ORDER BY code, id_ded "
+                + "LIMIT 1;";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                deduction = new SDbDeduction();
+                deduction.read(client.getSession(), new int[] { resultSet.getInt(1) });
+            }
         }
 
         return deduction;
+    }
+
+    /**
+     * Get the first deduction found for the type of deduction provided.
+     * @param client GUI client.
+     * @param benefitType ID of type of benefit required.
+     * @return Found deduction.
+     * @throws Exception 
+     */
+    public static SDbDeduction getDeductionForBenefitType(final SGuiClient client, final int benefitType) throws Exception {
+        return getDeductionForType(client, SModConsts.HRSS_TP_BEN, benefitType);
+    }
+    
+    /**
+     * Get the first deduction found for the type of loan provided.
+     * @param client GUI client.
+     * @param loanType ID of type of loan required.
+     * @return Found deduction.
+     * @throws Exception 
+     */
+    public static SDbDeduction getDeductionForLoanType(final SGuiClient client, final int loanType) throws Exception {
+        return getDeductionForType(client, SModConsts.HRSS_TP_LOAN, loanType);
     }
 
     /**

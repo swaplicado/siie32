@@ -84,7 +84,8 @@ public abstract class SCfdConsts {
     public static final String CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE_CODE = "01";
     public static final String CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE_CODE = "02";
 
-    public static final String CFDI_OTHER_PAY_TAX_SUBSIDY = "Subsidio para el empleo (efectivamente entregado al trabajador).";
+    public static final String CFDI_OTHER_PAY_TAX_SUBSIDY = "Subsidio para el empleo.";
+    public static final String CFDI_OTHER_PAY_TAX_SUBSIDY_EFF = "Subsidio para el empleo (efectivamente entregado al trabajador).";
 
     public static final String PAYROLL_PER_ISR = "001";
     public static final String PAYROLL_PER_SUB_EMP = "002";

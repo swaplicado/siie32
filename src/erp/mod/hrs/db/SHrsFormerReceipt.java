@@ -10,12 +10,12 @@ import cfd.DElement;
 import cfd.ver2.DAttributeOptionFormaDePago;
 import cfd.ver2.DAttributeOptionTipoDeComprobante;
 import cfd.ver3.DCfdVer3Utils;
-import cfd.ver3.nom11.DElementDeduccion;
-import cfd.ver3.nom11.DElementDeducciones;
-import cfd.ver3.nom11.DElementPercepcion;
-import cfd.ver3.nom11.DElementPercepciones;
-import cfd.ver3.nom12.DElementIncapacidad;
-import cfd.ver3.nom12.DElementSeparacionIndemnizacion;
+//import cfd.ver3.nom11.DElementDeduccion;
+//import cfd.ver3.nom11.DElementDeducciones;
+//import cfd.ver3.nom11.DElementPercepcion;
+//import cfd.ver3.nom11.DElementPercepciones;
+//import cfd.ver3.nom12.DElementIncapacidad;
+//import cfd.ver3.nom12.DElementSeparacionIndemnizacion;
 import cfd.ver33.DCfdi33Catalogs;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataConcepto;
@@ -33,6 +33,7 @@ import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
+import sa.lib.gui.SGuiClient;
 
 /**
  *
@@ -304,7 +305,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
     
     private cfd.ver3.nom12.DElementSeparacionIndemnizacion createElementEarningSeparation(final double totalGravado, final double totalExento) {
-        cfd.ver3.nom12.DElementSeparacionIndemnizacion separacionIndemnizacion = new DElementSeparacionIndemnizacion();
+        cfd.ver3.nom12.DElementSeparacionIndemnizacion separacionIndemnizacion = new cfd.ver3.nom12.DElementSeparacionIndemnizacion();
         
         separacionIndemnizacion.getAttTotalPagado().setDouble(totalGravado + totalExento);
         separacionIndemnizacion.getAttNumAñosServicio().setInteger((int) SLibUtils.round(((double) mnAntiguedad / SHrsConsts.YEAR_WEEKS), 0));
@@ -316,7 +317,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
     
     private cfd.ver3.nom12.DElementIncapacidad createElementEarningDisability(final SHrsFormerReceiptConcept concept) {
-        cfd.ver3.nom12.DElementIncapacidad incapacidad =  new DElementIncapacidad();
+        cfd.ver3.nom12.DElementIncapacidad incapacidad =  new cfd.ver3.nom12.DElementIncapacidad();
         
         incapacidad.getAttDiasIncapacidad().setInteger((int) concept.getCantidad());
         incapacidad.getAttTipoIncapacidad().setString(concept.getXtaClaveIncapacidad());
@@ -325,39 +326,47 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         return incapacidad;
     }
     
-    private cfd.ver3.nom12.DElementOtroPago createElementEarningOtherPay(final SHrsFormerReceiptConcept concept) {
+    private cfd.ver3.nom12.DElementOtroPago createElementOtroPago12(final String tipo, final String clave, final String concepto, final double importe) {
+        cfd.ver3.nom12.DElementOtroPago otroPago = new cfd.ver3.nom12.DElementOtroPago();
+        otroPago.getAttTipoOtroPago().setString(tipo);
+        otroPago.getAttClave().setString(SLibUtils.textToXml(clave));
+        otroPago.getAttConcepto().setString(SLibUtils.textToXml(concepto));
+        otroPago.getAttImporte().setDouble(importe);
+        return otroPago;
+    }
+    
+    private cfd.ver3.nom12.DElementSubsidioEmpleo createElementSubsidioEmpleo12(final double subsidioCausado) {
+        cfd.ver3.nom12.DElementSubsidioEmpleo subsidioEmpleo = new cfd.ver3.nom12.DElementSubsidioEmpleo();
+        subsidioEmpleo.getAttSubsidioCausado().setDouble(subsidioCausado);
+        return subsidioEmpleo;
+    }
+    
+    private cfd.ver3.nom12.DElementOtroPago createElementEarningOtherPayment(final SHrsFormerReceiptConcept concept) {
         cfd.ver3.nom12.DElementOtroPago otroPago = null;
 
         if (concept.getTotalImporte() != 0 || concept.getXtaSubsidioEmpleo() != 0) {
             String conceptText = "";
-            String otherPaymentKey = "";
+            String otherPaymentType = "";
             
             switch (concept.getClaveOficial()) {
                 case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
-                    conceptText = SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY;
-                    otherPaymentKey = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB }, SDbRegistry.FIELD_CODE);
+                    conceptText = SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY_EFF; // to preserve text case according to oficially suggested text
+                    otherPaymentType = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB }, SDbRegistry.FIELD_CODE);
                     break;
                     
                 case SModSysConsts.HRSS_TP_EAR_OTH:
                     conceptText = concept.getConcepto();
-                    otherPaymentKey = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_OTH }, SDbRegistry.FIELD_CODE);
+                    otherPaymentType = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_OTH }, SDbRegistry.FIELD_CODE);
                     break;
                     
                 default:
             }
             
-            if (!otherPaymentKey.isEmpty()) {
-                otroPago = new cfd.ver3.nom12.DElementOtroPago();
-                otroPago.getAttTipoOtroPago().setString(otherPaymentKey);
-                otroPago.getAttClave().setString(DCfdVer3Utils.formatAttributeValueAsKey(composeKey(concept.getClaveEmpresa(), 3)));
-                otroPago.getAttConcepto().setString(SLibUtils.textToXml(conceptText));
-                otroPago.getAttImporte().setDouble(concept.getTotalImporte());
+            if (!otherPaymentType.isEmpty()) {
+                otroPago = createElementOtroPago12(otherPaymentType, DCfdVer3Utils.formatAttributeValueAsKey(composeKey(concept.getClaveEmpresa(), 3)), conceptText, concept.getTotalImporte());
                 
                 if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
-                    cfd.ver3.nom12.DElementSubsidioEmpleo subsidioEmpleo = new cfd.ver3.nom12.DElementSubsidioEmpleo();
-                    subsidioEmpleo.getAttSubsidioCausado().setDouble(concept.getXtaSubsidioEmpleo());
-
-                    otroPago.setEltSubsidioEmpleo(subsidioEmpleo);
+                    otroPago.setEltSubsidioEmpleo(createElementSubsidioEmpleo12(concept.getXtaSubsidioEmpleo()));
                 }
             }
         }
@@ -374,8 +383,8 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         double dTotalExtraTime = 0;
         double dTotalExtraTimeAux = 0;
         cfd.ver3.nom11.DElementNomina nomina = new cfd.ver3.nom11.DElementNomina();
-        cfd.ver3.nom11.DElementPercepciones percepciones = new DElementPercepciones();
-        cfd.ver3.nom11.DElementDeducciones deducciones = new DElementDeducciones();
+        cfd.ver3.nom11.DElementPercepciones percepciones = new cfd.ver3.nom11.DElementPercepciones();
+        cfd.ver3.nom11.DElementDeducciones deducciones = new cfd.ver3.nom11.DElementDeducciones();
         cfd.ver3.nom11.DElementIncapacidades incapacidades = new cfd.ver3.nom11.DElementIncapacidades();
         cfd.ver3.nom11.DElementHorasExtras horasExtras = new cfd.ver3.nom11.DElementHorasExtras();
 
@@ -404,7 +413,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         for (SHrsFormerReceiptConcept concept : moChildConcepts) {
             switch (concept.getPkTipoConcepto()) {
                 case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
-                    cfd.ver3.nom11.DElementPercepcion percepcion = new DElementPercepcion();
+                    cfd.ver3.nom11.DElementPercepcion percepcion = new cfd.ver3.nom11.DElementPercepcion();
 
                     dTotalTaxedPerceptions = SLibUtils.roundAmount(dTotalTaxedPerceptions + concept.getTotalGravado());
                     dTotalExemptPerceptions = SLibUtils.roundAmount(dTotalExemptPerceptions + concept.getTotalExento());
@@ -431,7 +440,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
                     }
                     break;
                 case SCfdConsts.CFDI_PAYROLL_DEDUCTION:
-                    cfd.ver3.nom11.DElementDeduccion deduccion = new DElementDeduccion();
+                    cfd.ver3.nom11.DElementDeduccion deduccion = new cfd.ver3.nom11.DElementDeduccion();
 
                     dTotalTaxedDeductions = SLibUtils.roundAmount(dTotalTaxedDeductions + concept.getTotalGravado());
                     dTotalExemptDeductions = SLibUtils.roundAmount(dTotalExemptDeductions + concept.getTotalExento());
@@ -572,14 +581,21 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         receptor.getAttSalarioDiarioIntegrado().setDouble(mdSalarioDiarioIntegrado);
         receptor.getAttClaveEntFed().setString(msClaveEstado);
         
+        // Payments and discounts:
+        
+        boolean requireSubsidioEmpleo = mnTipoRegimen == SModSysConsts.HRSS_TP_REC_SCHE_WAG;
+        boolean containsSubsidioEmpleo = false;
+        
         for (SHrsFormerReceiptConcept concept : moChildConcepts) {
             if (concept.getTotalImporte() != 0) {
                 switch (concept.getPkTipoConcepto()) {
                     case SCfdConsts.CFDI_PAYROLL_PERCEPTION:
                         switch (concept.getClaveOficial()) {
                             case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
+                                containsSubsidioEmpleo = true;
+                                // falls through...
                             case SModSysConsts.HRSS_TP_EAR_OTH:
-                                cfd.ver3.nom12.DElementOtroPago otroPago = createElementEarningOtherPay(concept);
+                                cfd.ver3.nom12.DElementOtroPago otroPago = createElementEarningOtherPayment(concept);
                                 if (otroPago != null) {
                                     otrosPagos.getEltHijosOtroPago().add(otroPago);
                                 }
@@ -636,6 +652,22 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
                         throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
             }
+        }
+        
+        if (requireSubsidioEmpleo && !containsSubsidioEmpleo) {
+            // Subsidio para el empleo is required, eventhough it is zero:
+            
+            cfd.ver3.nom12.DElementOtroPago otroPago = createElementOtroPago12(
+                    (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB }, SDbRegistry.FIELD_CODE), 
+                    SHrsUtils.getEarning((SGuiClient) miClient, SModSysConsts.HRSS_TP_EAR_TAX_SUB).getCode(), 
+                    SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY, 
+                    0);
+            
+            otroPago.setEltSubsidioEmpleo(createElementSubsidioEmpleo12(0));
+            
+            otrosPagos.getEltHijosOtroPago().add(otroPago);
+            
+            nomina.getAttTotalOtrosPagos().setCanBeZero(true);
         }
 
         nomina.setEltEmisor(emisor);
@@ -913,6 +945,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public DElement getElementComplemento() throws Exception { // CFDI 3.2 & 3.3
         DElement complemento = new cfd.ver33.DElementComplemento();
 
+        //((cfd.ver33.DElementComplemento) complemento).getElements().add(createCfdiElementNomina11());
         ((cfd.ver33.DElementComplemento) complemento).getElements().add(createCfdiElementNomina12());
 
         return complemento;

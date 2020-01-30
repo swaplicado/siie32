@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 155.0/ 2020-01-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de nuevas disposiciones fiscales para la emisión de CFDI de nóminas:
+    Incorporación del nodo Otros Pagos con el dato del Subsidio para el empleo, no importando que sea 0,
+    para empleados cuyo régimen de contratación sea Sueldos (02).
+
+================================================================================
 SIIE 3.2 154.2/ 2020-01-29
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -887,12 +887,15 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_CMP = 25;       // Compensation
     public static final int HRSS_TP_EAR_OTH = 999;      // Other payments that are not income
 
-    public static final int HRSS_TP_OTH_PAY_TAX_REF_OPT = 1;    // Tax Refund of Overpayed Tax
-    public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2;        // Tax Subsidy
-    public static final int HRSS_TP_OTH_PAY_TRV_EXP = 3;        // Travel Expenses
-    public static final int HRSS_TP_OTH_PAY_TAX_BAL = 4;        // Tax Positive Balance
-    public static final int HRSS_TP_OTH_PAY_TAX_REF_OWHT = 5;   // Tax Refund of Overwithheld Tax
-    public static final int HRSS_TP_OTH_PAY_OTH = 999;          // Other payments
+    public static final int HRSS_TP_OTH_PAY_TAX_REF_OPT = 1;        // Tax Refund of Overpayed Tax
+    public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2;            // Tax Subsidy
+    public static final int HRSS_TP_OTH_PAY_TRV_EXP = 3;            // Travel Expenses
+    public static final int HRSS_TP_OTH_PAY_TAX_BAL = 4;            // Tax Positive Balance
+    public static final int HRSS_TP_OTH_PAY_TAX_REF_OWHT = 5;       // Tax Refund of Overwithheld Tax
+    public static final int HRSS_TP_OTH_PAY_FOOD = 6;               // Food
+    public static final int HRSS_TP_OTH_PAY_TAX_ADJ_TAX_SUB = 7;    // Tax Adjusted by Tax Subsidy
+    public static final int HRSS_TP_OTH_PAY_TAX_SUB_UNDUE = 8;      // Tax Subsidy Undue (improper)
+    public static final int HRSS_TP_OTH_PAY_OTH = 999;              // Other payments
 
     public static final int HRSS_TP_DED_COMP_AMT = 1;           // Amount
     //public static final int HRSS_TP_DED_COMP_DAYS = 2;        // Days                 disabled 2018-07-03 because seemingly has not ever been used
@@ -905,10 +908,11 @@ public abstract class SModSysConsts {
     //public static final int HRSS_TP_DED_COMP_IBT = 26;        // Income Before Tax    disabled 2018-07-03 because seemingly has not ever been used
     //public static final int HRSS_TP_DED_COMP_IAT = 27;        // Income After Tax     disabled 2018-07-03 because seemingly has not ever been used
 
-    public static final int HRSS_TP_DED_SSC = 1;    // Social Security
-    public static final int HRSS_TP_DED_TAX = 2;    // Tax
-    public static final int HRSS_TP_DED_DIS = 6;    // Disability
-    public static final int HRSS_TP_DED_ABS = 20;   // Absenteeism
+    public static final int HRSS_TP_DED_SSC = 1;            // Social Security
+    public static final int HRSS_TP_DED_TAX = 2;            // Tax
+    public static final int HRSS_TP_DED_DIS = 6;            // Disability
+    public static final int HRSS_TP_DED_ABS = 20;           // Absenteeism
+    public static final int HRSS_TP_DED_TAX_SUB_ADJ = 107;  // Tax Subsidy Adjustent
 
     public static final int HRSS_TP_BEN_NON = 1;        // Non applicable
     public static final int HRSS_TP_BEN_ANN_BON = 11;   // Annual bonus
@@ -962,6 +966,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_DIS_RSK = 1;    // Risk
     public static final int HRSS_TP_DIS_DIS = 2;    // Disease
     public static final int HRSS_TP_DIS_MAT = 3;    // Maternity
+    public static final int HRSS_TP_DIS_CCC = 4;    // Cancer Child Care
 
     public static final int HRSS_TP_DAY_NON = 1;    // Non applicable
     public static final int HRSS_TP_DAY_WRK = 2;    // Workday
@@ -969,7 +974,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_DAY_HOL = 4;    // Holiday
     public static final int HRSS_TP_DAY_ABS = 5;    // Absence
 
-    public static final int HRSS_BANK_CITI = 2;     // Citybanamex
+    public static final int HRSS_BANK_CITI = 2;     // Citibanamex
     public static final int HRSS_BANK_BBVA = 12;    // BBVA
     public static final int HRSS_BANK_SANT = 14;    // Santander
     public static final int HRSS_BANK_HSBC = 21;    // HSBC

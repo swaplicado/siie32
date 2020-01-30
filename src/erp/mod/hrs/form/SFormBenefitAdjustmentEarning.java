@@ -316,7 +316,7 @@ public class SFormBenefitAdjustmentEarning extends SBeanForm implements ItemList
     @Override
     public SDbRegistry getRegistry() throws Exception {
         SDbPayrollReceiptEarning registry = moRegistry.clone();
-        SDbEarning earning = SHrsUtils.getEarningByType(miClient, SModConsts.HRSS_TP_BEN, moKeyBenefitType.getValue()[0]);
+        SDbEarning earning = SHrsUtils.getEarningForBenefitType(miClient, moKeyBenefitType.getValue()[0]);
 
         if (registry.isRegistryNew()) {}
 
