@@ -183,9 +183,9 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
                     "id_acc = " + mnPkAccountingId + ", " +
                     */
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                    "fk_usr_ins = " + mnFkUserInsertId + ", " +
+                    //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
-                    "ts_usr_ins = " + "NOW()" + ", " +
+                    //"ts_usr_ins = " + "NOW()" + ", " +
                     "ts_usr_upd = " + "NOW()" + " " +
                     getSqlWhere();
         }
@@ -195,10 +195,12 @@ public class SDbAccountingPayroll extends SDbRegistryUser {
         // Delete previous registries:
 
         msSql = "DELETE FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY_RCP) + " " +
-                    "WHERE id_pay = " + mnPkPayrollId + " AND id_acc = " + mnPkAccountingId;
+                    "WHERE id_pay = " + mnPkPayrollId + " AND id_acc = " + mnPkAccountingId + ";";
+        
+        session.getStatement().execute(msSql);
         
         msSql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_PAY) + " SET b_del = 1 " +
-                    "WHERE id_pay = " + mnPkPayrollId + " AND id_acc < " + mnPkAccountingId;
+                    "WHERE id_pay = " + mnPkPayrollId + " AND id_acc < " + mnPkAccountingId + ";";
         
         session.getStatement().execute(msSql);
         

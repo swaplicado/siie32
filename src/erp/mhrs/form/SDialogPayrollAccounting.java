@@ -682,7 +682,9 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         moFormerPayroll.getDbmsDataFormerPayrollEmp().clear();
         moFormerPayroll.getDbmsDataFormerPayrollMove().clear();
         
+        moAccountingPayroll.setRegistryNew(true);
         moAccountingPayroll.setPkPayrollId(moPayroll.getPkPayrollId());
+        moAccountingPayroll.getChildAccountingPayrollEmployees().clear();
 
         for (int i = 0; i < moTablePaneEmpSelected.getTableGuiRowCount(); i++) {
             add = true;
@@ -844,31 +846,28 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         SDataTax oTax = null;
         SDataItem oItems = null;
 
-        double dDebit_r = 0;
-        double dCredit_r = 0;
-
-        int nF_id_tipo = 0;
-        int nF_id_tipo_rec = 0;
-        int nF_id_aux = 0;
-        String nF_aux = "";
-        int nF_id_ref = 0;
-        String sF_ref = "";
-        String sF_ref_cve = "";
-        int fk_acc = 0;
-        int fk_cc_n = 0;
-        int fk_item_n = 0;
-        int fk_bp_n = 0;
-        int fk_tax_bas_n = 0;
-        int fk_tax_tax_n = 0;
-        String fk_acc_s = "";
-        String fk_cc_s = "";
-        String fk_item_s = "";
-        double dF_mto = 0;
-        String concept = "";
         double debit = 0;
         double credit = 0;
+        double totalDebit = 0;
+        double totalCredit = 0;
+        int typeId = 0;
+        int recordTypeId = 0;
+        int auxId = 0;
+        String aux = "";
+        int referenceId = 0;
+        String reference = "";
+        String referenceCode = "";
+        int accountId = 0;
+        int costCenterId = 0;
+        int itemId = 0;
+        int bizPartnerId = 0;
+        int taxBasicId = 0;
+        int taxTaxId = 0;
+        double amount = 0;
+        String concept = "";
         HashMap<String, SDataAccount> accountsSet = new HashMap<>();
         HashMap<String, SDataAccount> ledgerAccountsSet = new HashMap<>();
+        HashMap<Integer, String> costCenterPksSet = new HashMap<>();
 
         oStatementCfg = miClient.getSession().getStatement().getConnection().createStatement();
         oStatementRec = miClient.getSession().getStatement().getConnection().createStatement();
@@ -986,45 +985,45 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
                     oResultSetCfg = oStatementCfg.executeQuery(sSql);
                     while (oResultSetCfg.next()) {
-                        nF_id_tipo = oResultSetCfg.getInt("f_id_tipo");
-                        nF_id_aux = oResultSetCfg.getInt("f_id_aux");
-                        nF_aux = oResultSetCfg.getString("f_aux");
-                        nF_id_ref = oResultSetCfg.getInt("f_id_ref");
-                        sF_ref = oResultSetCfg.getString("f_ref");
-                        sF_ref_cve = oResultSetCfg.getString("f_ref_cve");
-                        fk_acc = oResultSetCfg.getInt("fk_acc");
-                        fk_cc_n = oResultSetCfg.getInt("fk_cc_n");
-                        fk_item_n = oResultSetCfg.getInt("fk_item_n");
-                        fk_bp_n = oResultSetCfg.getInt("fk_bp_n");
-                        fk_tax_bas_n = oResultSetCfg.getInt("fk_tax_bas_n");
-                        fk_tax_tax_n = oResultSetCfg.getInt("fk_tax_tax_n");
+                        typeId = oResultSetCfg.getInt("f_id_tipo");
+                        auxId = oResultSetCfg.getInt("f_id_aux");
+                        aux = oResultSetCfg.getString("f_aux");
+                        referenceId = oResultSetCfg.getInt("f_id_ref");
+                        reference = oResultSetCfg.getString("f_ref");
+                        referenceCode = oResultSetCfg.getString("f_ref_cve");
+                        accountId = oResultSetCfg.getInt("fk_acc");
+                        costCenterId = oResultSetCfg.getInt("fk_cc_n");
+                        itemId = oResultSetCfg.getInt("fk_item_n");
+                        bizPartnerId = oResultSetCfg.getInt("fk_bp_n");
+                        taxBasicId = oResultSetCfg.getInt("fk_tax_bas_n");
+                        taxTaxId = oResultSetCfg.getInt("fk_tax_tax_n");
 
                         oBizPartner = null;
                         oTax = null;
                         oItems = null;
 
-                        switch (nF_id_tipo) {
+                        switch (typeId) {
                             case SModSysConsts.HRSS_TP_ACC_GBL: // global link
-                                sMsg = "La configuración de contabilización para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "',\nde ámbito global, tiene un problema:\n";
+                                sMsg = "La configuración de contabilización para la " + sType + " No. " + auxId + " '" + aux + "',\nde ámbito global, tiene un problema:\n";
                                 break;
                             case SModSysConsts.HRSS_TP_ACC_DEP: // link by department
-                                sMsg = "La configuración de contabilización para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "',\ndel departamento No. " + sF_ref_cve + " '" + sF_ref + "' (" + nF_id_ref + "), tiene un problema:\n";
+                                sMsg = "La configuración de contabilización para la " + sType + " No. " + auxId + " '" + aux + "',\ndel departamento No. " + referenceCode + " '" + reference + "' (" + referenceId + "), tiene un problema:\n";
                                 break;
                             case SModSysConsts.HRSS_TP_ACC_EMP: // link by employee
-                                sMsg = "La configuración de contabilización para la " + sType + " No. " + nF_id_aux + " '" + nF_aux + "',\ndel empleado No. " + nF_id_ref + " '" + sF_ref + "', tiene un problema:\n";
+                                sMsg = "La configuración de contabilización para la " + sType + " No. " + auxId + " '" + aux + "',\ndel empleado No. " + referenceId + " '" + reference + "', tiene un problema:\n";
                                 break;
                             default:
                         }
 
                         // Validate account:
 
-                        if (fk_acc == SLibConstants.UNDEFINED) {
+                        if (accountId == SLibConstants.UNDEFINED) {
                             messages.appendMessage(sMsg + "el campo 'cuenta contable' no ha sido especificada aún.");
                         }
                         else {
                             try {
                                 // validates account and, if necessary, cost center:
-                                SHrsFinUtils.validateAccount(miClient.getSession(), fk_acc, fk_cc_n, fk_bp_n, fk_item_n, fk_tax_bas_n, fk_tax_tax_n);
+                                SHrsFinUtils.validateAccount(miClient.getSession(), accountId, costCenterId, bizPartnerId, itemId, taxBasicId, taxTaxId);
                             }
                             catch (Exception e) {
                                 messages.appendMessage(sMsg + e.getMessage());
@@ -1033,42 +1032,42 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
                         // Validate item:
 
-                        if (fk_item_n > SLibConstants.UNDEFINED) {
-                            oItems = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM,  new int[] { fk_item_n }, SLibConstants.EXEC_MODE_VERBOSE);
+                        if (itemId > SLibConstants.UNDEFINED) {
+                            oItems = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM,  new int[] { itemId }, SLibConstants.EXEC_MODE_VERBOSE);
                             if (oItems == null) {
-                                messages.appendMessage(sMsg + "el campo 'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nEl registro no existe.");
+                                messages.appendMessage(sMsg + "el campo 'ítem' ('" + itemId + "') tiene un inconveniente:\nEl registro no existe.");
                             }
                             else if (oItems.getIsDeleted()) {
-                                messages.appendMessage(sMsg + "el campo 'ítem' ('" + fk_item_n + "') tiene un inconveniente:\nEl registro está eliminado.");
+                                messages.appendMessage(sMsg + "el campo 'ítem' ('" + itemId + "') tiene un inconveniente:\nEl registro está eliminado.");
                             }
                         }
 
                         // Validate business partner:
 
-                        if (fk_bp_n == 0) {
-                            if (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) {
-                                messages.appendMessage(sMsg + "el campo 'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nNo se ha especificado el asociado de negocios.");
+                        if (bizPartnerId == 0) {
+                            if (typeId == SModSysConsts.HRSS_TP_ACC_EMP) {
+                                messages.appendMessage(sMsg + "el campo 'asociado de negocios' ('" + bizPartnerId + "') tiene un inconveniente:\nNo se ha especificado el asociado de negocios.");
                             }
                         }
                         else {
-                            oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { fk_bp_n }, SLibConstants.EXEC_MODE_VERBOSE);
+                            oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.EXEC_MODE_VERBOSE);
                             if (oBizPartner == null) {
-                                messages.appendMessage(sMsg + "el campo 'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nEl registro no existe.");
+                                messages.appendMessage(sMsg + "el campo 'asociado de negocios' ('" + bizPartnerId + "') tiene un inconveniente:\nEl registro no existe.");
                             }
                             else if (oBizPartner.getIsDeleted()) {
-                                messages.appendMessage(sMsg + "el campo 'asociado de negocios' ('" + fk_bp_n + "') tiene un inconveniente:\nEl registro está eliminado.");
+                                messages.appendMessage(sMsg + "el campo 'asociado de negocios' ('" + bizPartnerId + "') tiene un inconveniente:\nEl registro está eliminado.");
                             }
                         }
 
                         // Validate tax:
 
-                        if (fk_tax_bas_n != 0 && fk_tax_tax_n != 0) {
-                            oTax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, new int[] { fk_tax_bas_n, fk_tax_tax_n }, SLibConstants.EXEC_MODE_VERBOSE);
+                        if (taxBasicId != 0 && taxTaxId != 0) {
+                            oTax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, new int[] { taxBasicId, taxTaxId }, SLibConstants.EXEC_MODE_VERBOSE);
                             if (oTax == null) {
-                                messages.appendMessage(sMsg + "el campo 'impuesto' ('" + fk_tax_bas_n + ", " + fk_tax_tax_n + "') tiene un inconveniente:\nEl registro no existe.");
+                                messages.appendMessage(sMsg + "el campo 'impuesto' ('" + taxBasicId + ", " + taxTaxId + "') tiene un inconveniente:\nEl registro no existe.");
                             }
                             else if (oTax.getIsDeleted()) {
-                                messages.appendMessage(sMsg + "el campo 'impuesto' ('" + fk_tax_bas_n + ", " + fk_tax_tax_n + "') tiene un inconveniente:\nEl registro está eliminado.");
+                                messages.appendMessage(sMsg + "el campo 'impuesto' ('" + taxBasicId + ", " + taxTaxId + "') tiene un inconveniente:\nEl registro está eliminado.");
                             }
                         }
 
@@ -1086,7 +1085,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
                                         "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                        "AND ear.id_ear = " + auxId + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                         "GROUP BY ear.id_ear, ear.name_abbr " +
 
                                         "UNION " +
@@ -1098,7 +1097,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
                                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ")" + (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + nF_id_ref + " ") : "") + 
+                                        "AND ear.id_ear = " + auxId + " AND rcp.id_emp IN (" + sEmployees + ")" + (typeId == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + referenceId + " ") : "") + 
                                         "GROUP BY ear.id_ear, ear.name_abbr, d.id_dep, d.name, d.code " +
 
                                         "UNION " +
@@ -1112,7 +1111,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
                                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
                                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND ear.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ear.id_ear = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
+                                        "AND ear.id_ear = " + auxId + " AND rcp.id_emp IN (" + sEmployees + ") " + ((typeId == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + referenceId + " ") : (typeId == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + referenceId + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
                                         "GROUP BY ear.id_ear, ear.name_abbr, bp.id_bp, bp.bp " +
                                         "ORDER BY f_id_tipo_rec, id_ear, f_ref; ";
                             sType = "percepción";
@@ -1131,7 +1130,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
                                         "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                        "AND ded.id_ded = " + auxId + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                         "GROUP BY ded.id_ded, ded.name_abbr " +
 
                                         "UNION " +
@@ -1143,7 +1142,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
                                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ")" + (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + nF_id_ref + " ") : "") +
+                                        "AND ded.id_ded = " + auxId + " AND rcp.id_emp IN (" + sEmployees + ")" + (typeId == SModSysConsts.HRSS_TP_ACC_DEP ? (" AND d.id_dep = " + referenceId + " ") : "") +
                                         "GROUP BY ded.id_ded, ded.name_abbr, d.id_dep, d.name, d.code " +
 
                                         "UNION " +
@@ -1157,7 +1156,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                         "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
                                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep " +
                                         "WHERE p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND ded.fk_tp_acc_rec = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " " +
-                                        "AND ded.id_ded = " + nF_id_aux + " AND rcp.id_emp IN (" + sEmployees + ") " + ((nF_id_tipo == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + nF_id_ref + " ") : (nF_id_tipo == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + nF_id_ref + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
+                                        "AND ded.id_ded = " + auxId + " AND rcp.id_emp IN (" + sEmployees + ") " + ((typeId == SModSysConsts.HRSS_TP_ACC_EMP) ? ("AND emp.id_emp = " + referenceId + " ") : (typeId == SModSysConsts.HRSS_TP_ACC_DEP) ? ("AND d.id_dep = " + referenceId + " ") : "") + //AND emp.id_emp IN (" + sEmployees + ") " +
                                         "GROUP BY ded.id_ded, ded.name_abbr, bp.id_bp, bp.bp " +
                                         "ORDER BY f_id_tipo_rec, id_ded, f_ref; ";
                             sType = "deducción";
@@ -1165,52 +1164,52 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
 
                         oResultSetRec = oStatementRec.executeQuery(sSql);
                         while (oResultSetRec.next()) {
-                            nF_id_tipo_rec = oResultSetRec.getInt("f_id_tipo_rec");
-                            nF_id_ref = oResultSetRec.getInt("f_id_ref");
-                            sF_ref = oResultSetRec.getString("f_ref");
-                            sF_ref_cve = oResultSetRec.getString("f_ref_cve");
-                            dF_mto = oResultSetRec.getDouble("f_mto");
+                            recordTypeId = oResultSetRec.getInt("f_id_tipo_rec");
+                            referenceId = oResultSetRec.getInt("f_id_ref");
+                            reference = oResultSetRec.getString("f_ref");
+                            referenceCode = oResultSetRec.getString("f_ref_cve");
+                            amount = oResultSetRec.getDouble("f_mto");
 
                             // Create record entry:
 
-                            switch (nF_id_tipo_rec) {
+                            switch (recordTypeId) {
                                 case SModSysConsts.HRSS_TP_ACC_GBL: // global link
-                                    concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux;
+                                    concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + aux;
                                     break;
                                 case SModSysConsts.HRSS_TP_ACC_DEP: // link by department
-                                    concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux + "; " + sF_ref_cve + ". " + sF_ref;
+                                    concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + aux + "; " + referenceCode + ". " + reference;
                                     break;
                                 case SModSysConsts.HRSS_TP_ACC_EMP: // link by employee
-                                    concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + nF_aux + "; " + sF_ref_cve + ". " + sF_ref;
+                                    concept = msPayTypeAbbr + ". " + moFormerPayroll.getNumber() + "; " + aux + "; " + referenceCode + ". " + reference;
                                     break;
                                 default:
                             }
 
                             if (nType == 1) {
-                                if (dF_mto >= 0d) {
-                                    debit = dF_mto;
+                                if (amount >= 0d) {
+                                    debit = amount;
                                     credit = 0;
                                 }
                                 else {
                                     debit = 0;
-                                    credit = -dF_mto;
+                                    credit = -amount;
                                 }
                             }
                             else {
-                                if (dF_mto >= 0d) {
+                                if (amount >= 0d) {
                                     debit = 0;
-                                    credit = dF_mto;
+                                    credit = amount;
                                 }
                                 else {
-                                    debit = -dF_mto;
+                                    debit = -amount;
                                     credit = 0;
                                 }
                             }
 
-                            dDebit_r += debit;
-                            dCredit_r += credit;
+                            totalDebit = SLibUtils.roundAmount(totalDebit + debit);
+                            totalCredit = SLibUtils.roundAmount(totalCredit + credit);
 
-                            String accountPk = SFinUtils.getAccountFormerIdXXX(miClient.getSession(), fk_acc);
+                            String accountPk = SFinUtils.getAccountFormerIdXXX(miClient.getSession(), accountId);
                             
                             SDataAccount account = accountsSet.get(accountPk);
                             if (account == null) {
@@ -1220,6 +1219,15 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             SDataAccount ledgerAccount = account.getDeep() == 1 ? account : ledgerAccountsSet.get(account.getDbmsPkAccountMajorId());
                             if (ledgerAccount == null) {
                                 ledgerAccount = (SDataAccount) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_ACC, new Object[] { account.getDbmsPkAccountMajorId() }, SLibConstants.EXEC_MODE_VERBOSE);
+                            }
+                            
+                            String costCenterPk = "";
+                                    
+                            if (costCenterId != 0) {
+                                costCenterPk = costCenterPksSet.get(costCenterId);
+                                if (costCenterPksSet.isEmpty()) {
+                                    costCenterPk = SFinUtils.getCostCenterFormerIdXXX(miClient.getSession(), costCenterId);
+                                }
                             }
         
                             switch (ledgerAccount.getFkAccountSystemTypeId()) {
@@ -1250,10 +1258,10 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             }
 
                             oRecord.getDbmsRecordEntries().add(createRecordEntry(oRecord.getPrimaryKey(), SLibUtilities.textLeft(concept, 100),
-                                    debit, credit, fk_acc_s, fk_cc_s, fk_item_n,
+                                    debit, credit, account.getPkAccountIdXXX(), costCenterPk, itemId,
                                     oBizPartner == null ? SLibConstants.UNDEFINED : oBizPartner.getPkBizPartnerId(),
                                     oBizPartner == null ? SLibConstants.UNDEFINED : oBizPartner.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId(),
-                                    new int[] { fk_tax_bas_n, fk_tax_tax_n }, anSysAccountTypeKey, anSysMoveTypeKey, anSysMoveTypeKeyXXX));
+                                    new int[] { taxBasicId, taxTaxId }, anSysAccountTypeKey, anSysMoveTypeKey, anSysMoveTypeKeyXXX));
 
                             // Create payroll move:
 
@@ -1261,12 +1269,12 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                             oPayrollMove.setPkPayrollId(moPayroll.getPkPayrollId());
                             oPayrollMove.setPkMoveId(++nMoveId);
                             oPayrollMove.setType(nType);
-                            oPayrollMove.setTransactionId(nF_id_aux);
-                            oPayrollMove.setTransaction(nF_aux);
-                            oPayrollMove.setReferenceId(nF_id_ref);
-                            oPayrollMove.setReference(sF_ref);
-                            oPayrollMove.setReferenceKey(sF_ref_cve);
-                            oPayrollMove.setAmount(dF_mto);
+                            oPayrollMove.setTransactionId(auxId);
+                            oPayrollMove.setTransaction(aux);
+                            oPayrollMove.setReferenceId(referenceId);
+                            oPayrollMove.setReference(reference);
+                            oPayrollMove.setReferenceKey(referenceCode);
+                            oPayrollMove.setAmount(amount);
                             oPayrollMove.setFkYearId(oRecord.getPkYearId());
                             oPayrollMove.setFkPeriodId(oRecord.getPkPeriodId());
                             oPayrollMove.setFkBookkeepingCenterId(oRecord.getPkBookkeepingCenterId());
@@ -1293,14 +1301,14 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
             }
         }
         
-        moFormerPayroll.setDebit_r(dDebit_r);
-        moFormerPayroll.setCredit_r(dCredit_r);
+        moFormerPayroll.setDebit_r(totalDebit);
+        moFormerPayroll.setCredit_r(totalCredit);
 
         // Validate that fully accounted payroll
         
-        if (SLibUtils.roundAmount(dDebit_r - dCredit_r) != SLibUtils.roundAmount(moPayroll.getAuxTotalNet())) {
+        if (SLibUtils.roundAmount(totalDebit - totalCredit) != SLibUtils.roundAmount(moPayroll.getAuxTotalNet())) {
             throw new Exception("¡Hay una diferencia entre el alcance neto de la nómina, $" + SLibUtils.getDecimalFormatAmount().format(moPayroll.getAuxTotalNet()) +", y "
-                    + "el monto neto de la afectación contable, $" + SLibUtils.getDecimalFormatAmount().format(dDebit_r - dCredit_r) +"!");
+                    + "el monto neto de la afectación contable, $" + SLibUtils.getDecimalFormatAmount().format(totalDebit - totalCredit) +"!");
         }
         
         moAccountingPayroll.save(miClient.getSession());

@@ -300,6 +300,7 @@ public class SHrsReceipt {
         moPayrollReceipt.setPayrollTaxCompensated(0);
         moPayrollReceipt.setPayrollTaxPending_r(0);
         moPayrollReceipt.setPayrollTaxPayed(0);
+        moPayrollReceipt.setPayrollTaxSubsidyAssessedGross(0);
         moPayrollReceipt.setPayrollTaxSubsidyAssessed(0);
         moPayrollReceipt.setPayrollTaxSubsidyCompensated(0);
         moPayrollReceipt.setPayrollTaxSubsidyPending_r(0);
@@ -320,6 +321,7 @@ public class SHrsReceipt {
         double taxAssessed = 0;
         double subAssessed = 0;
         double payrollTaxAssessed = 0;
+        double payrollSubAssessedGross = 0;
         double payrollSubAssessed = 0;
         
         SHrsReceiptEarning hrsReceiptEarningSubNew = null;
@@ -511,7 +513,15 @@ public class SHrsReceipt {
                     subAssessed = SLibUtils.roundAmount(subAssessed + subsidyComputedAlt); // update assessed subsidy
                 }
                 
-                payrollSubAssessed = SLibUtils.roundAmount(subAssessed - (annualSubCompensated + annualSubPayed));
+                // Get maximum value for subsidy:
+                
+                SDbTaxSubsidyTable taxSubsidyTable = moHrsPayroll.getTaxSubsidyTable(moHrsPayroll.getPayroll().getFkTaxSubsidyId());
+                double maxSubAssessed = taxSubsidyTable.getChildRows().get(0).getTaxSubsidy();
+                
+                // Compute subsidy:
+                
+                payrollSubAssessedGross = SLibUtils.roundAmount(subAssessed - (annualSubCompensated + annualSubPayed));
+                payrollSubAssessed = payrollSubAssessedGross <= maxSubAssessed ? payrollSubAssessedGross : maxSubAssessed; // applay maximum value for subsidy when needed
 
                 if (payrollSubAssessed > 0) {
                     SDbPayrollReceiptEarning payrollReceiptEarningSub = moHrsPayroll.createPayrollReceiptEarning(
@@ -735,6 +745,7 @@ public class SHrsReceipt {
             moPayrollReceipt.setPayrollTaxCompensated(payrollTaxCompensated);
             moPayrollReceipt.setPayrollTaxPending_r(payrollTax);
             moPayrollReceipt.setPayrollTaxPayed(isUserTax ? userTax : payrollTax);
+            moPayrollReceipt.setPayrollTaxSubsidyAssessedGross(payrollSubAssessedGross);
             moPayrollReceipt.setPayrollTaxSubsidyAssessed(payrollSubAssessed);
             moPayrollReceipt.setPayrollTaxSubsidyCompensated(payrollSubCompensated);
             moPayrollReceipt.setPayrollTaxSubsidyPending_r(payrollSub);

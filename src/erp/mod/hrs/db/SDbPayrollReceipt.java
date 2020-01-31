@@ -62,6 +62,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     protected double mdPayrollTaxCompensated;
     protected double mdPayrollTaxPending_r;
     protected double mdPayrollTaxPayed;
+    protected double mdPayrollTaxSubsidyAssessedGross;
     protected double mdPayrollTaxSubsidyAssessed;
     protected double mdPayrollTaxSubsidyCompensated;
     protected double mdPayrollTaxSubsidyPending_r;
@@ -213,6 +214,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setPayrollTaxCompensated(double d) { mdPayrollTaxCompensated = d; }
     public void setPayrollTaxPending_r(double d) { mdPayrollTaxPending_r = d; }
     public void setPayrollTaxPayed(double d) { mdPayrollTaxPayed = d; }
+    public void setPayrollTaxSubsidyAssessedGross(double d) { mdPayrollTaxSubsidyAssessedGross = d; }
     public void setPayrollTaxSubsidyAssessed(double d) { mdPayrollTaxSubsidyAssessed = d; }
     public void setPayrollTaxSubsidyCompensated(double d) { mdPayrollTaxSubsidyCompensated = d; }
     public void setPayrollTaxSubsidyPending_r(double d) { mdPayrollTaxSubsidyPending_r = d; }
@@ -287,6 +289,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public double getPayrollTaxCompensated() { return mdPayrollTaxCompensated; }
     public double getPayrollTaxPending_r() { return mdPayrollTaxPending_r; }
     public double getPayrollTaxPayed() { return mdPayrollTaxPayed; }
+    public double getPayrollTaxSubsidyAssessedGross() { return mdPayrollTaxSubsidyAssessedGross; }
     public double getPayrollTaxSubsidyAssessed() { return mdPayrollTaxSubsidyAssessed; }
     public double getPayrollTaxSubsidyCompensated() { return mdPayrollTaxSubsidyCompensated; }
     public double getPayrollTaxSubsidyPending_r() { return mdPayrollTaxSubsidyPending_r; }
@@ -475,6 +478,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         mdPayrollTaxCompensated = 0;
         mdPayrollTaxPending_r = 0;
         mdPayrollTaxPayed = 0;
+        mdPayrollTaxSubsidyAssessedGross = 0;
         mdPayrollTaxSubsidyAssessed = 0;
         mdPayrollTaxSubsidyCompensated = 0;
         mdPayrollTaxSubsidyPending_r = 0;
@@ -587,6 +591,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             mdPayrollTaxCompensated = resultSet.getDouble("pay_tax_comp");
             mdPayrollTaxPending_r = resultSet.getDouble("pay_tax_pend_r");
             mdPayrollTaxPayed = resultSet.getDouble("pay_tax_payd");
+            mdPayrollTaxSubsidyAssessedGross = resultSet.getDouble("pay_tax_sub_assd_gross");
             mdPayrollTaxSubsidyAssessed = resultSet.getDouble("pay_tax_sub_assd");
             mdPayrollTaxSubsidyCompensated = resultSet.getDouble("pay_tax_sub_comp");
             mdPayrollTaxSubsidyPending_r = resultSet.getDouble("pay_tax_sub_pend_r");
@@ -736,6 +741,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     mdPayrollTaxCompensated + ", " + 
                     mdPayrollTaxPending_r + ", " + 
                     mdPayrollTaxPayed + ", " + 
+                    mdPayrollTaxSubsidyAssessedGross + ", " + 
                     mdPayrollTaxSubsidyAssessed + ", " + 
                     mdPayrollTaxSubsidyCompensated + ", " + 
                     mdPayrollTaxSubsidyPending_r + ", " + 
@@ -814,6 +820,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     "pay_tax_comp = " + mdPayrollTaxCompensated + ", " +
                     "pay_tax_pend_r = " + mdPayrollTaxPending_r + ", " +
                     "pay_tax_payd = " + mdPayrollTaxPayed + ", " +
+                    "pay_tax_sub_assd_gross = " + mdPayrollTaxSubsidyAssessedGross + ", " +
                     "pay_tax_sub_assd = " + mdPayrollTaxSubsidyAssessed + ", " +
                     "pay_tax_sub_comp = " + mdPayrollTaxSubsidyCompensated + ", " +
                     "pay_tax_sub_pend_r = " + mdPayrollTaxSubsidyPending_r + ", " +
@@ -925,6 +932,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         registry.setPayrollTaxCompensated(this.getPayrollTaxCompensated());
         registry.setPayrollTaxPending_r(this.getPayrollTaxPending_r());
         registry.setPayrollTaxPayed(this.getPayrollTaxPayed());
+        registry.setPayrollTaxSubsidyAssessedGross(this.getPayrollTaxSubsidyAssessedGross());
         registry.setPayrollTaxSubsidyAssessed(this.getPayrollTaxSubsidyAssessed());
         registry.setPayrollTaxSubsidyCompensated(this.getPayrollTaxSubsidyCompensated());
         registry.setPayrollTaxSubsidyPending_r(this.getPayrollTaxSubsidyPending_r());

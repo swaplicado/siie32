@@ -891,6 +891,7 @@ public class SHrsPayroll {
         //payrollReceipt.setPayrollTaxCompensated();
         //payrollReceipt.setPayrollTaxPending_r();
         //payrollReceipt.setPayrollTaxPayed();
+        //payrollReceipt.setPayrollTaxSubsidyAssessedGross();
         //payrollReceipt.setPayrollTaxSubsidyAssessed();
         //payrollReceipt.setPayrollTaxSubsidyCompensated();
         //payrollReceipt.setPayrollTaxSubsidyPending_r();

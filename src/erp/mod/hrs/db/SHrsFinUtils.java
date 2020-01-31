@@ -68,7 +68,7 @@ public abstract class SHrsFinUtils {
     }
     
     /**
-     * Validate if exists any accounting settings for all earning and deduction  of the payroll.
+     * Validate if exists any accounting settings for all earning and deduction of the payroll.
      * @param session User GUI session.
      * @param payrollId payroll ID to validate.
      * @return

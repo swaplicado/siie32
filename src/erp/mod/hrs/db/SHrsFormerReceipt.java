@@ -439,6 +439,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
                         horasExtras.getEltHijosHorasExtra().add(horasExtra);
                     }
                     break;
+                    
                 case SCfdConsts.CFDI_PAYROLL_DEDUCTION:
                     cfd.ver3.nom11.DElementDeduccion deduccion = new cfd.ver3.nom11.DElementDeduccion();
 
@@ -453,6 +454,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
 
                     deducciones.getEltHijosDeduccion().add(deduccion);
                     break;
+                    
                 default:
             }
         }

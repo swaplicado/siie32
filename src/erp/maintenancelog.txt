@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 156.0/ 2020-01-31
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de nuevas disposiciones fiscales para la emisión de CFDI de nóminas:
+    Validación de tope máximo permitido para Subsidio para el empleo causado en periodos menores a 31 días.
+
+================================================================================
 SIIE 3.2 155.0/ 2020-01-30
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
