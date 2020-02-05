@@ -196,7 +196,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 aoTableColumns = new STableColumn[26];
                 break;
             case SDataConstants.BPSX_BP_EMP:
-                aoTableColumns = new STableColumn[59];
+                aoTableColumns = new STableColumn[61];
                 break;
             case SDataConstants.BPSX_BP_EMP_CON_EXP:
                 aoTableColumns = new STableColumn[21];
@@ -386,6 +386,9 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "mwz.name", "Área geográfica", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bank.name", "Banco", 100);
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.bank_acc", "Cuenta bancaria", 100);
+            aoTableColumns[i++].setApostropheOnCsvRequired(true);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "gsrv.name", "Prov. despensa", 100);
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.grocery_srv_acc", "Cuenta despensa", 100);
             aoTableColumns[i++].setApostropheOnCsvRequired(true);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_with_img_pho", "Foto", STableConstants.WIDTH_BOOLEAN);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "_with_img_sig", "Firma", STableConstants.WIDTH_BOOLEAN);
@@ -773,8 +776,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "fid_cl_dps IN(" + SDataConstantsSys.TRNS_CL_DPS_PUR_DOC[1] + ", " + SDataConstantsSys.TRNS_CL_DPS_PUR_ADJ[1] + ")) AS f_last_trans, " +
                 (!mbIsViewEmployees ? "" :
                 "CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.ssn, e.dt_bir, e.dt_ben, e.dt_hire, e.dt_dis_n, IF(" + mbHasRightEmpWage + ", e.sal, 0) AS f_sal, IF(" + mbHasRightEmpWage + ", e.dt_sal, NULL) AS f_dt_sal, IF(" + mbHasRightEmpWage + ", e.wage, 0) AS f_wage, " +
-                "IF(" + mbHasRightEmpWage + ", e.dt_wage, NULL) AS f_dt_wage, IF(" + mbHasRightEmpWage + ", e.sal_ssc, 0) AS f_sal_ssc, IF(" + mbHasRightEmpWage + ", e.dt_sal_ssc, NULL) AS f_dt_sal_ssc, e.wrk_hrs_day, e.con_exp_n, e.bank_acc, e.b_mfg_ope, e.b_act, e.b_uni, " +
-                "pay.name, sal.name, emp.name, wrk.name, wrktp.name, mwz.name, dep.name, pos.name, sht.name, con.name, rshe.name, risk.name, bank.name, " +
+                "IF(" + mbHasRightEmpWage + ", e.dt_wage, NULL) AS f_dt_wage, IF(" + mbHasRightEmpWage + ", e.sal_ssc, 0) AS f_sal_ssc, IF(" + mbHasRightEmpWage + ", e.dt_sal_ssc, NULL) AS f_dt_sal_ssc, e.wrk_hrs_day, e.con_exp_n, e.bank_acc, e.grocery_srv_acc, e.b_mfg_ope, e.b_act, e.b_uni, " +
+                "pay.name, sal.name, emp.name, wrk.name, wrktp.name, mwz.name, dep.name, pos.name, sht.name, con.name, rshe.name, risk.name, bank.name, gsrv.name, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_bir, '%Y%m')) / " + SLibTimeConsts.MONTHS + " AS _e_age, " +
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(e.dt_ben, '%Y%m')) / " + SLibTimeConsts.MONTHS + " AS _e_sen, " +
                 "DATEDIFF(e.con_exp_n, CURDATE()) AS _con_val, " +
@@ -812,7 +815,8 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "LEFT OUTER JOIN erp.hrss_tp_rec_sche AS rshe ON e.fk_tp_rec_sche = rshe.id_tp_rec_sche " +
                 "LEFT OUTER JOIN erp.hrss_tp_pos_risk AS risk ON e.fk_tp_pos_risk = risk.id_tp_pos_risk " +
                 "LEFT OUTER JOIN erp.hrss_tp_work_day AS wrktp ON e.fk_tp_work_day = wrktp.id_tp_work_day " +
-                "LEFT OUTER JOIN erp.hrss_bank AS bank ON e.fk_bank_n = bank.id_bank ") +
+                "LEFT OUTER JOIN erp.hrss_bank AS bank ON e.fk_bank_n = bank.id_bank " +
+                "LEFT OUTER JOIN erp.hrss_grocery_srv AS gsrv ON e.fk_grocery_srv = gsrv.id_grocery_srv ") +
                 (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere) + sqlBizPartner + 
                 (mnFilterPaymentTypeId == 0 ? "" : "AND e.fk_tp_pay = " + mnFilterPaymentTypeId + " ") +
                 (mnFilterDepartamentId == 0 ? "" : "AND e.fk_dep = " + mnFilterDepartamentId + " ") +

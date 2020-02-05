@@ -149,6 +149,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Importación de nóminas");
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -160,7 +161,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de la nómina:"));
         jPanel1.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel3.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPayroll.setText("Nómina:");
         jlPayroll.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -175,12 +176,12 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         jtfPayrollNumber.setEditable(false);
         jtfPayrollNumber.setText("QNA. 1");
         jtfPayrollNumber.setFocusable(false);
-        jtfPayrollNumber.setPreferredSize(new java.awt.Dimension(75, 23));
+        jtfPayrollNumber.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel3.add(jtfPayrollNumber);
 
         jPanel1.add(jPanel3);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPayrollDates.setText("Período nómina:");
         jlPayrollDates.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -189,7 +190,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         jtfPayrollDates.setEditable(false);
         jtfPayrollDates.setText("01/01/2001 - 01/01/2001");
         jtfPayrollDates.setFocusable(false);
-        jtfPayrollDates.setPreferredSize(new java.awt.Dimension(152, 23));
+        jtfPayrollDates.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jtfPayrollDates);
 
         jlPayrollNet.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -212,7 +213,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
         jPanel1.add(jPanel5);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPayrollNotes.setText("Comentarios:");
         jlPayrollNotes.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -233,7 +234,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
         jPanel8.setLayout(new java.awt.GridLayout(2, 0, 0, 5));
 
-        jpAccountingRecord.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jpAccountingRecord.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlRecord.setText("Póliza contable:");
         jlRecord.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -291,7 +292,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
         jPanel8.add(jpAccountingRecord);
 
-        jpPaymentType.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jpPaymentType.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkPaymentSystemTypeId.setText("Método de pago:");
         jlFkPaymentSystemTypeId.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -364,7 +365,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
         getContentPane().add(jpGrid, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(2));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
@@ -387,8 +388,8 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-976)/2, (screenSize.height-638)/2, 976, 638);
+        setSize(new java.awt.Dimension(976, 638));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

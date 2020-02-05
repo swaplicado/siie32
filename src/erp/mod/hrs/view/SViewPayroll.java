@@ -17,6 +17,7 @@ import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SHrsCfdUtils;
 import erp.mod.hrs.db.SHrsFinUtils;
 import erp.mod.hrs.db.SHrsUtils;
+import erp.mod.hrs.form.SDialogLayoutGroceryService;
 import erp.mod.hrs.form.SDialogLayoutPayroll;
 import erp.mod.hrs.form.SDialogRepHrsReportsPayroll;
 import erp.mtrn.data.SCfdUtils;
@@ -56,7 +57,8 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
     private JButton jbGenerateSignCfdi;
     private JButton jbPrintReports;
     private JButton jbSendCfdi;
-    private JButton jbGenerateBankLayout;
+    private JButton jbGenerateLayoutBank;
+    private JButton jbGenerateLayoutGroceryService;
     
     public SViewPayroll(SGuiClient client, String title, int subtype) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_PAY, subtype, title);
@@ -76,14 +78,16 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         jbGenerateSignCfdi = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_DOC_IMPORT), "Generar y timbrar recibos nómina", this);
         jbPrintReports = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), "Imprimir reportes nómina", this);
         jbSendCfdi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar recibos nómina vía mail", this);
-        jbGenerateBankLayout = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Generar layout dispersión nómina", this);
+        jbGenerateLayoutBank = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Generar layout dispersión nómina", this);
+        jbGenerateLayoutGroceryService = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_delivery.gif")), "Generar layout dispersión despensas", this);
         
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCloseOpen);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGenerateSignCfdi);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintReports);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSendCfdi);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGenerateBankLayout);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGenerateLayoutBank);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbGenerateLayoutGroceryService);
     }
 
     @Override
@@ -252,8 +256,8 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         }
     }
  
-    private void actionGenerateBankLayout() {
-        if (jbGenerateBankLayout.isEnabled()) {
+    private void actionGenerateLayoutBank() {
+        if (jbGenerateLayoutBank.isEnabled()) {
             if (jtTable.getSelectedRowCount() != 1) {
                 miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
             }
@@ -272,6 +276,35 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 else {
                     try {
                         new SDialogLayoutPayroll(miClient, gridRow.getRowPrimaryKey()[0], "Layout para dispersión de nóminas").setVisible(true);
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+            }
+        }
+    }
+
+    private void actionGenerateLayoutGroceryService() {
+        if (jbGenerateLayoutGroceryService.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+
+                if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                    miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                }
+                else if (gridRow.isRowSystem()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_IS_SYSTEM);
+                }
+                else if (!gridRow.isUpdatable()) {
+                    miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
+                }
+                else {
+                    try {
+                        new SDialogLayoutGroceryService(miClient, gridRow.getRowPrimaryKey()[0]).setVisible(true);
                     }
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -409,8 +442,11 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
             else if (button == jbSendCfdi) {
                 actionSendCfdi();
             }
-            else if (button == jbGenerateBankLayout) {
-                actionGenerateBankLayout();
+            else if (button == jbGenerateLayoutBank) {
+                actionGenerateLayoutBank();
+            }
+            else if (button == jbGenerateLayoutGroceryService) {
+                actionGenerateLayoutGroceryService();
             }
         }
     }

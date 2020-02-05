@@ -19,8 +19,8 @@ import erp.lib.table.STablePaneGrid;
 import erp.lib.table.STableRow;
 import erp.mhrs.data.SHrsPayrollEmployeeReceipt;
 import erp.mod.SModConsts;
-import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConfig;
+import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mtrn.data.SDataCfd;
 import java.awt.BorderLayout;
@@ -36,6 +36,7 @@ import javax.swing.JDialog;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -122,6 +123,7 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Generación de CFDI de nóminas");
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -475,10 +477,9 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
         ArrayList<SHrsPayrollEmployeeReceipt> rowsSelected = null;
         
         if (!maHrsPayrollEmployeeReceipt.isEmpty()) {
-            jtfPayrollPeriod.setText(maHrsPayrollEmployeeReceipt.get(0).getPeriodYear() + "-" + (maHrsPayrollEmployeeReceipt.get(0).getPeriod() >= 10 ? "" : "0" ) + maHrsPayrollEmployeeReceipt.get(0).getPeriod());
-            jtfPayrollNumber.setText((maHrsPayrollEmployeeReceipt.get(0).getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? "SEM " : "QNA " ) + maHrsPayrollEmployeeReceipt.get(0).getPayrollNumber());
-            jtfPayrollDates.setText(miClient.getSessionXXX().getFormatters().getDateFormat().format(maHrsPayrollEmployeeReceipt.get(0).getDateStart()) + " - " +
-                    miClient.getSessionXXX().getFormatters().getDateFormat().format(maHrsPayrollEmployeeReceipt.get(0).getDateEnd()));
+            jtfPayrollPeriod.setText(SLibUtils.DecimalFormatCalendarYear.format(maHrsPayrollEmployeeReceipt.get(0).getPeriodYear()) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(maHrsPayrollEmployeeReceipt.get(0).getPeriod()));
+            jtfPayrollNumber.setText(SDbPayroll.getPaymentTypeAbbr(maHrsPayrollEmployeeReceipt.get(0).getFkPaymentTypeId()) + " " + maHrsPayrollEmployeeReceipt.get(0).getPayrollNumber());
+            jtfPayrollDates.setText(SLibUtils.DateFormatDate.format(maHrsPayrollEmployeeReceipt.get(0).getDateStart()) + " - " + SLibUtils.DateFormatDate.format(maHrsPayrollEmployeeReceipt.get(0).getDateEnd()));
             jtfPayrollNotes.setText(maHrsPayrollEmployeeReceipt.get(0).getNotes());
             
             jtfPayrollPeriod.setCaretPosition(0);
@@ -501,6 +502,7 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
                         rowsSelected.add(row);                          // receipt had been added already
                     }
                 }
+                
                 moTablePaneReceiptAvailable.renderTableRows();
                 moTablePaneReceiptAvailable.setTableRowSelection(0);
 

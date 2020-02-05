@@ -988,7 +988,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     }
     
     private void renderEmployee() {
-        moTextName.setValue(moHrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
+        moTextName.setValue(moHrsReceipt.getHrsEmployee().getEmployee().getAuxEmployeeName());
         moTextNumber.setValue(moHrsReceipt.getHrsEmployee().getEmployee().getNumber());
         moTextFiscalId.setValue(moHrsReceipt.getHrsEmployee().getEmployee().getAuxFiscalId());
         moTextAlternativeId.setValue(moHrsReceipt.getHrsEmployee().getEmployee().getAuxAlternativeId());

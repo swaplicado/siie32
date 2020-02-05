@@ -609,6 +609,7 @@ public abstract class SModConsts {
     public static final int HRSS_TP_DIS = 2061075;
     public static final int HRSS_TP_DAY = 2061081;
     public static final int HRSS_BANK = 2061091;
+    public static final int HRSS_GROCERY_SRV = 2061096;
 
     public static final int HRSU_CL_ABS = 2062001;
     public static final int HRSU_TP_ABS = 2062002;
@@ -1173,6 +1174,7 @@ public abstract class SModConsts {
         TablesMap.put(HRSS_TP_DIS, "erp.hrss_tp_dis");
         TablesMap.put(HRSS_TP_DAY, "erp.hrss_tp_day");
         TablesMap.put(HRSS_BANK, "erp.hrss_bank");
+        TablesMap.put(HRSS_GROCERY_SRV, "erp.hrss_grocery_srv");
 
         TablesMap.put(HRSU_CL_ABS, "erp.hrsu_cl_abs");
         TablesMap.put(HRSU_TP_ABS, "erp.hrsu_tp_abs");

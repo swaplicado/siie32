@@ -214,34 +214,7 @@ public class SDbPayroll extends SDbRegistryUser {
 
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceipts() { return maChildPayrollReceipts; }
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceiptsToDelete() { return maChildPayrollReceiptsToDelete; }
-
-    // XXX replace sentences for email subject with payroll receipt number data:
-    public static String composePayrollNumber(final SGuiSession session, final int payrollId) throws Exception {
-        String payrollNumber = "";
-        
-        String sql = "SELECT per_year, per, num, fk_tp_pay "
-                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
-                + "WHERE id_pay = " + payrollId + ";";
-        ResultSet resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            payrollNumber += resultSet.getInt("per_year");
-            
-            switch (resultSet.getInt("fk_tp_pay")) {
-                case SModSysConsts.HRSS_TP_PAY_WEE:
-                    payrollNumber += " " + SHrsFormerConsts.PAY_WEE_ABB;
-                    break;
-                case SModSysConsts.HRSS_TP_PAY_FOR:
-                    payrollNumber += " " + SHrsFormerConsts.PAY_FOR_ABB;
-                    break;
-                default:
-            }
-            
-            payrollNumber += " " + SLibUtils.DecimalFormatCalendarDay.format(resultSet.getInt("num"));
-        }
-        
-        return payrollNumber;
-    }
-
+    
     public void createPayrollReceiptIssues(final SGuiSession session) throws Exception {
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
             payrollReceipt.setAuxDateOfIssue(mtDateEnd);
@@ -253,6 +226,50 @@ public class SDbPayroll extends SDbRegistryUser {
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
             payrollReceipt.updatePayrollReceiptIssueAsNewOne(session);
         }
+    }
+    
+    public String composePayrollPeriod() {
+        return SLibUtils.DecimalFormatCalendarYear.format(mnPeriodYear) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(mnPeriod);
+    }
+
+    public String composePayrollNumber() {
+        return getPaymentTypeAbbr(mnFkPaymentTypeId) + " " + mnNumber;
+    }
+
+    public String getPaymentTypeAbbr() {
+        return getPaymentTypeAbbr(mnFkPaymentTypeId);
+    }
+    
+    public static String getPaymentTypeAbbr(final int payrollTypeId) {
+        String abbr = "";
+        
+        switch (payrollTypeId) {
+            case SModSysConsts.HRSS_TP_PAY_WEE:
+                abbr = SHrsFormerConsts.PAY_WEE_ABB;
+                break;
+            case SModSysConsts.HRSS_TP_PAY_FOR:
+                abbr = SHrsFormerConsts.PAY_FOR_ABB;
+                break;
+            default:
+        }
+        
+        return abbr;
+    }
+
+    // XXX replace sentences for email subject with payroll receipt number data:
+    public static String composePayrollYearAndNumber(final SGuiSession session, final int payrollId) throws Exception {
+        String payrollNumber = "";
+        
+        String sql = "SELECT per_year, per, num, fk_tp_pay "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
+                + "WHERE id_pay = " + payrollId + ";";
+        ResultSet resultSet = session.getStatement().executeQuery(sql);
+        if (resultSet.next()) {
+            payrollNumber = SLibUtils.DecimalFormatCalendarYear.format(resultSet.getInt("per_year")) + " " + 
+                    getPaymentTypeAbbr(resultSet.getInt("fk_tp_pay")) + " " + resultSet.getInt("num");
+        }
+        
+        return payrollNumber;
     }
     
     @Override

@@ -1858,9 +1858,8 @@ public abstract class STrnUtilities {
                                     break;
 
                                 case SCfdConsts.CFDI_PAYROLL_VER_CUR:
-                                    SDbPayrollReceipt payrollReceipt = new SDbPayrollReceipt();
-                                    payrollReceipt.read(client.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
-                                    docNumber = SDbPayroll.composePayrollNumber(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n());
+                                    SDbPayrollReceipt payrollReceipt = (SDbPayrollReceipt) client.getSession().readRegistry(SModConsts.HRS_PAY_RCP, new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
+                                    docNumber = SDbPayroll.composePayrollYearAndNumber(client.getSession(), cfd.getFkPayrollReceiptPayrollId_n());
                                     docNumber += " " + payrollReceipt.getPayrollReceiptIssueNumber();
                                     isCancelled = payrollReceipt.getChildPayrollReceiptIssue() == null ? cfd.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED : payrollReceipt.getChildPayrollReceiptIssue().getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED;
                                     cancelledDate = payrollReceipt.getChildPayrollReceiptIssue() == null ? cfd.getTimestamp() : payrollReceipt.getChildPayrollReceiptIssue().getTsUserUpdate();

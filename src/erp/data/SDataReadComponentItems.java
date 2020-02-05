@@ -1877,13 +1877,19 @@ public abstract class SDataReadComponentItems {
                 lenPk = 1;
                 sql = "SELECT id_tp_work_day AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_WORK_DAY) + " WHERE b_del = 0 ORDER BY sort ";
-                text = "jornada";
+                text = "tipo jornada";
                 break;
             case SModConsts.HRSS_BANK:
                 lenPk = 1;
                 sql = "SELECT id_bank AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_BANK) + " WHERE b_del = 0 ORDER BY sort ";
                 text = "banco";
+                break;
+            case SModConsts.HRSS_GROCERY_SRV:
+                lenPk = 1;
+                sql = "SELECT id_grocery_srv AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_GROCERY_SRV) + " WHERE b_del = 0 ORDER BY sort ";
+                text = "proveedor despensa";
                 break;
             case SModConsts.HRSU_TP_EMP:
                 lenPk = 1;

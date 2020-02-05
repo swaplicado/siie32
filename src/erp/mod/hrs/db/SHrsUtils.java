@@ -383,7 +383,7 @@ public abstract class SHrsUtils {
         moConfig = (SDbConfig) client.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { SUtilConsts.BPR_CO_ID });
         oBizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BP, new int[] { bankId }, SLibConstants.EXEC_MODE_SILENT);
         moPayroll = (SDbPayroll)  client.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { payrollId }, SDbConsts.MODE_STEALTH);
-        sDescription = (moPayroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE ? SHrsFormerConsts.PAY_WEE_ABB : SHrsFormerConsts.PAY_FOR_ABB ) + moPayroll.getNumber() + " " + formatDateData.format(dateApplication);
+        sDescription = moPayroll.composePayrollNumber() + " " + formatDateData.format(dateApplication);
         sCompany = SLibUtilities.textToAlphanumeric(((SClientInterface) client).getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner());
         employeesId = SLibUtils.textImplode(employees, ",");
         

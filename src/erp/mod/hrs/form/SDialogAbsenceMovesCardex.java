@@ -369,7 +369,7 @@ public class SDialogAbsenceMovesCardex extends SBeanFormDialog {
     private void initAbsence() {
         SDbEmployee employee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { moAbsence.getPkEmployeeId() });
         
-        moTextEmployeeName.setValue(employee.getAuxEmployee());
+        moTextEmployeeName.setValue(employee.getAuxEmployeeName());
         moTextAbsenceClass.setValue(moAbsence.getXtaAbsenceClass());
         moTextAbsenceType.setValue(moAbsence.getXtaAbsenceType());
         moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moAbsence.getDateStart()));

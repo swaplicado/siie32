@@ -291,7 +291,7 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
     
     private void renderEmployee() {
         if (moEmployee != null) {
-            moTextName.setValue(moEmployee.getAuxEmployee());
+            moTextName.setValue(moEmployee.getAuxEmployeeName());
             moTextNumber.setValue(moEmployee.getNumber());
             moTextFiscalId.setValue(moEmployee.getAuxFiscalId());
             moTextAlternativeId.setValue(moEmployee.getAuxAlternativeId());

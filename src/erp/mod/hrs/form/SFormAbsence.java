@@ -962,21 +962,21 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
                                     int daysToSchedule = (int) anniversary.getValue() - daysScheduled;
                                     
                                     if (daysToPay > 0) {
-                                        String baseMessage = "En el aniversario " + anniversary.getBenefitAnn() + " del empleado " + moEmployee.getAuxEmployee() + ",\n"
+                                        String baseMessage = "En el aniversario " + anniversary.getBenefitAnn() + " del empleado " + moEmployee.getAuxEmployeeName() + ",\n"
                                                 + "correspondiente al año " + anniversaryYear + ", de un total de " + ((int) anniversary.getValue()) + " días de vacaciones,\n";
                                         if (daysToSchedule > 0) {
                                             if (miClient.showMsgBoxConfirm(baseMessage
                                                     + (daysToPay == 1 ? "queda 1 día" : "quedan " + daysToPay + " días") + " de vacaciones por pagar, y\n"
                                                     + (daysToSchedule == 1 ? "queda 1 día" : "quedan " + daysToSchedule + " días") + " de vacaciones por programar.\n"
                                                     + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                                                throw new Exception("Se debería programar y pagar las vacaciones de aniversarios previos del empleado " + moEmployee.getAuxEmployee() + ".");
+                                                throw new Exception("Se debería programar y pagar las vacaciones de aniversarios previos del empleado " + moEmployee.getAuxEmployeeName() + ".");
                                             }
                                         }
                                         else {
                                             if (miClient.showMsgBoxConfirm(baseMessage
                                                     + (daysToPay == 1 ? "queda 1 día" : "quedan " + daysToPay + " días") + " de vacaciones por pagar.\n"
                                                     + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                                                throw new Exception("Se debería pagar las vacaciones de aniversarios previos del empleado " + moEmployee.getAuxEmployee() + ".");
+                                                throw new Exception("Se debería pagar las vacaciones de aniversarios previos del empleado " + moEmployee.getAuxEmployeeName() + ".");
                                             }
                                         }
                                     }

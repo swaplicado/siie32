@@ -54,6 +54,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected int mnWorkingHoursDay;
     protected Date mtContractExpiration_n;
     protected String msBankAccount;
+    protected String msGroceryServiceAccount;
     protected java.sql.Blob moImagePhoto_n;
     protected java.sql.Blob moImageSignature_n;
     protected boolean mbUnionized;
@@ -84,6 +85,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected int mnFkCatalogueEducationClassId;
     protected int mnFkCatalogueEducationTypeId;
     protected int mnFkBankId_n;
+    protected int mnFkGroceryServiceId;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
@@ -92,7 +94,8 @@ public class SDbEmployee extends SDbRegistryUser {
     */
     
     protected boolean mbAuxActive;
-    protected String msAuxEmployee;
+    protected String msAuxEmployeeName;
+    protected String msAuxEmployeeProperName;
     protected String msAuxFiscalId;
     protected String msAuxAlternativeId;
     protected SDbEmployeeHireLog moXtaEmployeeHireLog;
@@ -122,6 +125,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setWorkingHoursDay(int n) { mnWorkingHoursDay = n; }
     public void setContractExpiration_n(Date t) { mtContractExpiration_n = t; }
     public void setBankAccount(String s) { msBankAccount = s; }
+    public void setGroceryServiceAccount(String s) { msGroceryServiceAccount = s; }
     public void setImagePhoto_n(java.sql.Blob o) { moImagePhoto_n = o; }
     public void setImageSignature_n(java.sql.Blob o) { moImageSignature_n = o; }
     public void setUnionized(boolean b) { mbUnionized = b; }
@@ -150,6 +154,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setFkCatalogueEducationClassId(int n) { mnFkCatalogueEducationClassId = n; }
     public void setFkCatalogueEducationTypeId(int n) { mnFkCatalogueEducationTypeId = n; }
     public void setFkBankId_n(int n) { mnFkBankId_n = n; }
+    public void setFkGroceryServiceId(int n) { mnFkGroceryServiceId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -173,6 +178,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public int getWorkingHoursDay() { return mnWorkingHoursDay; }
     public Date getContractExpiration_n() { return mtContractExpiration_n; }
     public String getBankAccount() { return msBankAccount; }
+    public String getGroceryServiceAccount() { return msGroceryServiceAccount; }
     public java.sql.Blob getImagePhoto_n() { return moImagePhoto_n; }
     public java.sql.Blob getImageSignature_n() { return moImageSignature_n; }
     public boolean isUnionized() { return mbUnionized; }
@@ -201,13 +207,15 @@ public class SDbEmployee extends SDbRegistryUser {
     public int getFkCatalogueEducationClassId() { return mnFkCatalogueEducationClassId; }
     public int getFkCatalogueEducationTypeId() { return mnFkCatalogueEducationTypeId; }
     public int getFkBankId_n() { return mnFkBankId_n; }
+    public int getFkGroceryServiceId() { return mnFkGroceryServiceId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
     public void setAuxActive(boolean b) { mbAuxActive = b; }
-    public void setAuxEmployee(String s) { msAuxEmployee = s; }
+    public void setAuxEmployeeName(String s) { msAuxEmployeeName = s; }
+    public void setAuxEmployeePropername(String s) { msAuxEmployeeProperName = s; }
     public void setAuxFiscalId(String s) { msAuxFiscalId = s; }
     public void setAuxAlternativeId(String s) { msAuxAlternativeId = s; }
     public void setXtaEmployeeHireLog(SDbEmployeeHireLog o) { moXtaEmployeeHireLog = o; }
@@ -216,7 +224,8 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setXtaNotes(String s) { msXtaNotes = s; }
     
     public boolean isAuxActive() { return mbAuxActive; }
-    public String getAuxEmployee() { return msAuxEmployee; }
+    public String getAuxEmployeeName() { return msAuxEmployeeName; }
+    public String getAuxEmployeeProperName() { return msAuxEmployeeProperName; }
     public String getAuxFiscalId() { return msAuxFiscalId; }
     public String getAuxAlternativeId() { return msAuxAlternativeId; }
     public SDbEmployeeHireLog getXtaEmployeeHireLog() { return moXtaEmployeeHireLog; }
@@ -315,6 +324,7 @@ public class SDbEmployee extends SDbRegistryUser {
         mnWorkingHoursDay = 0;
         mtContractExpiration_n = null;
         msBankAccount = "";
+        msGroceryServiceAccount = "";
         moImagePhoto_n = null;
         moImageSignature_n = null;
         mbUnionized = false;
@@ -343,13 +353,15 @@ public class SDbEmployee extends SDbRegistryUser {
         mnFkCatalogueEducationClassId = 0;
         mnFkCatalogueEducationTypeId = 0;
         mnFkBankId_n = 0;
+        mnFkGroceryServiceId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
         mbAuxActive = false;
-        msAuxEmployee = "";
+        msAuxEmployeeName = "";
+        msAuxEmployeeProperName = "";
         msAuxFiscalId = "";
         msAuxAlternativeId = "";
         moXtaEmployeeHireLog = null;
@@ -412,6 +424,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mnWorkingHoursDay = resultSet.getInt("wrk_hrs_day");
             mtContractExpiration_n = resultSet.getDate("con_exp_n");
             msBankAccount = resultSet.getString("bank_acc");
+            msGroceryServiceAccount = resultSet.getString("grocery_srv_acc");
             /*
             moImagePhoto_n = resultSet.getBlob("img_pho_n");
             moImageSignature_n = resultSet.getBlob("img_sig_n");
@@ -444,6 +457,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mnFkCatalogueEducationClassId = resultSet.getInt("fk_cl_cat_edu");
             mnFkCatalogueEducationTypeId = resultSet.getInt("fk_tp_cat_edu");
             mnFkBankId_n = resultSet.getInt("fk_bank_n");
+            mnFkGroceryServiceId = resultSet.getInt("fk_grocery_srv");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -451,13 +465,14 @@ public class SDbEmployee extends SDbRegistryUser {
 
             mbAuxActive = mbActive;
             
-            msSql = "SELECT bp, fiscal_id, alt_id FROM erp.bpsu_bp WHERE id_bp = " + mnPkEmployeeId;
+            msSql = "SELECT bp, lastname, firstname, fiscal_id, alt_id FROM erp.bpsu_bp WHERE id_bp = " + mnPkEmployeeId;
             resultSet = session.getStatement().executeQuery(msSql);
             if (!resultSet.next()) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
             }
             else {
-                msAuxEmployee = resultSet.getString("bp");
+                msAuxEmployeeName = resultSet.getString("bp");
+                msAuxEmployeeProperName = resultSet.getString("firstname") + " " + resultSet.getString("lastname");
                 msAuxFiscalId = resultSet.getString("fiscal_id");
                 msAuxAlternativeId = resultSet.getString("alt_id");
             }
@@ -503,6 +518,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     mnWorkingHoursDay + ", " + 
                     (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " + 
                     "'" + msBankAccount + "', " + 
+                    "'" + msGroceryServiceAccount + "', " + 
                     "NULL, " +
                     "NULL, " +
                     (mbUnionized ? 1 : 0) + ", " + 
@@ -531,6 +547,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     mnFkCatalogueEducationClassId + ", " + 
                     mnFkCatalogueEducationTypeId + ", " + 
                     (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
+                    mnFkGroceryServiceId + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " + 
@@ -561,6 +578,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "wrk_hrs_day = " + mnWorkingHoursDay + ", " +
                     "con_exp_n = " + (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " +
                     "bank_acc = '" + msBankAccount + "', " +
+                    "grocery_srv_acc = '" + msGroceryServiceAccount + "', " +
                     /*
                     "img_pho_n = " + moImagePhoto_n + ", " +
                     "img_sig_n = " + moImageSignature_n + ", " +
@@ -591,6 +609,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "fk_cl_cat_edu = " + mnFkCatalogueEducationClassId + ", " +
                     "fk_tp_cat_edu = " + mnFkCatalogueEducationTypeId + ", " +
                     "fk_bank_n = " + (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
+                    "fk_grocery_srv = " + mnFkGroceryServiceId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -654,6 +673,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setWorkingHoursDay(this.getWorkingHoursDay());
         registry.setContractExpiration_n(this.getContractExpiration_n());
         registry.setBankAccount(this.getBankAccount());
+        registry.setGroceryServiceAccount(this.getGroceryServiceAccount());
         registry.setImagePhoto_n(this.getImagePhoto_n());
         registry.setImageSignature_n(this.getImageSignature_n());
         registry.setUnionized(this.isUnionized());
@@ -682,6 +702,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setFkCatalogueEducationClassId(this.getFkCatalogueEducationClassId());
         registry.setFkCatalogueEducationTypeId(this.getFkCatalogueEducationTypeId());
         registry.setFkBankId_n(this.getFkBankId_n());
+        registry.setFkGroceryServiceId(this.getFkGroceryServiceId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

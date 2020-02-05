@@ -69,6 +69,7 @@ public class SDialogFormerPayrollPicker extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Importación de nóminas");
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -79,7 +80,7 @@ public class SDialogFormerPayrollPicker extends javax.swing.JDialog {
         jpGrid.setLayout(new java.awt.BorderLayout());
         getContentPane().add(jpGrid, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.FlowLayout(2));
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
         jbOk.setToolTipText("[Ctrl + Enter]");
@@ -102,8 +103,8 @@ public class SDialogFormerPayrollPicker extends javax.swing.JDialog {
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-600)/2, (screenSize.height-400)/2, 600, 400);
+        setSize(new java.awt.Dimension(600, 400));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

@@ -981,6 +981,9 @@ public abstract class SModSysConsts {
     public static final int HRSS_BANK_BBAJ = 30;    // BanBajío
     public static final int HRSS_BANK_NON = 999;    // Non applicable
 
+    public static final int HRSS_GROCERY_SRV_NON = 1;       // Non applicable
+    public static final int HRSS_GROCERY_SRV_SI_VALE = 2;   // Sí Vale
+
     public static final int HRSU_CL_ABS_ABS = 1;    // Absence
     public static final int HRSU_CL_ABS_DIS = 2;    // Disease
     public static final int HRSU_CL_ABS_VAC = 3;    // Vacation

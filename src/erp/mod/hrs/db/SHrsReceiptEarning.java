@@ -224,7 +224,7 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
             case INPUT_BY_EAR:
                 switch (row) {
                     case 0: // employee name
-                        value = moHrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee();
+                        value = moHrsReceipt.getHrsEmployee().getEmployee().getAuxEmployeeName();
                         break;
                     case 1: // value alleged (units alleged), EDITABLE!
                         value = moPayrollReceiptEarning.getUnitsAlleged();

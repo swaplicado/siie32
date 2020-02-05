@@ -88,7 +88,7 @@ public abstract class SHrsPayrollUtils {
             row.setPkEmployeeId(hrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId());
             row.setFkPaymentTypeId(hrsReceipt.getHrsEmployee().getEmployee().getFkPaymentTypeId());
             row.setCode(hrsReceipt.getHrsEmployee().getEmployee().getNumber());
-            row.setName(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployee());
+            row.setName(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployeeName());
             row.setTotalEarnings(hrsReceipt.getTotalEarnings());
             row.setTotalDeductions(hrsReceipt.getTotalDeductions());
             row.setHrsReceipt(hrsReceipt);
