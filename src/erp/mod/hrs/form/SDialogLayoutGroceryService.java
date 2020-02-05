@@ -42,6 +42,8 @@ import sa.lib.gui.bean.SBeanFieldKey;
  */
 public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog implements java.awt.event.ActionListener, java.awt.event.ItemListener {
     
+    private final int NAME_MAX_LEN_SI_VALE = 26;
+    
     private SDbPayroll moPayroll;
     private SGridPaneForm moReceiptsGrid;
     private HashMap<Integer, SDbEmployee> moEmployeesMap;
@@ -67,6 +69,7 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        moButtonGroup = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jlPayroll = new javax.swing.JLabel();
@@ -110,6 +113,8 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
         jtfAmountWithAccountCur = new javax.swing.JTextField();
         jpReceipts = new javax.swing.JPanel();
         jPanel16 = new javax.swing.JPanel();
+        moRadCopyWithAccount = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadCopyAll = new sa.lib.gui.bean.SBeanFieldRadio();
         jbCopyToClipboard = new javax.swing.JButton();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de la nómina:"));
@@ -317,6 +322,16 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
+        moButtonGroup.add(moRadCopyWithAccount);
+        moRadCopyWithAccount.setText("Copiar recibos c/cuenta");
+        moRadCopyWithAccount.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel16.add(moRadCopyWithAccount);
+
+        moButtonGroup.add(moRadCopyAll);
+        moRadCopyAll.setText("Copiar todos los recibos");
+        moRadCopyAll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel16.add(moRadCopyAll);
+
         jbCopyToClipboard.setText("Copiar al portapapeles");
         jbCopyToClipboard.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel16.add(jbCopyToClipboard);
@@ -372,7 +387,10 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
     private javax.swing.JTextField jtfReceiptsTotal;
     private javax.swing.JTextField jtfReceiptsWithAccount;
     private javax.swing.JTextField jtfReceiptsWithoutAccount;
+    private javax.swing.ButtonGroup moButtonGroup;
     private sa.lib.gui.bean.SBeanFieldKey moKeyGroceryService;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadCopyAll;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadCopyWithAccount;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -382,6 +400,11 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
         
         jbSave.setEnabled(false);
         jbCancel.setText(SUtilConsts.TXT_CLOSE);
+        
+        moFields.addField(moKeyGroceryService);
+        moFields.addField(moRadCopyWithAccount);
+        moFields.addField(moRadCopyAll);
+        moFields.setFormButton(jbCopyToClipboard);
         
         jtfPayrollPeriod.setText(moPayroll.composePayrollPeriod());
         jtfPayrollNumber.setText(moPayroll.composePayrollNumber());
@@ -403,6 +426,8 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
         jtfAmountWithAccountCur.setCaretPosition(0);
         jtfAmountWithoutAccountCur.setCaretPosition(0);
         
+        moRadCopyWithAccount.setSelected(true);
+        
         moReceiptsGrid = new SGridPaneForm(miClient, 0, 0, "Recibos") {
             
             @Override
@@ -415,7 +440,9 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
                 ArrayList<SGridColumnForm> columns = new ArrayList<>();
 
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 250));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Cuenta despensa", 125));
+                SGridColumnForm column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Cuenta despensa", 125);
+                column.setApostropheOnCsvRequired(true);
+                columns.add(column);
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Monto $"));
                 
                 return columns;
@@ -475,30 +502,45 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
     }
     
     private void actionPerformedCopyToClipboard() {
-        int count = 0;
-        double total = 0;
-        String string = "";
-        DecimalFormat amountFormat = new DecimalFormat("#0.00");
+        GroceryService groceryService = (GroceryService) moKeyGroceryService.getSelectedItem().getComplement();
         
-        for (SGridRow row : moReceiptsGrid.getModel().getGridRows()) {
-            Receipt receipt = (Receipt) row;
-            if (!receipt.getAccount().isEmpty()) {
-                count++;
-                total = SLibUtils.roundAmount(total + receipt.getAmount());
-                string += (string.isEmpty() ? "" : "\n") + 
-                        SLibUtils.textToAscii(receipt.getRowName().replaceAll(",", "")) + "\t'" + 
-                        receipt.getAccount() + "\t" + 
-                        amountFormat.format(receipt.getAmount());
+        if (groceryService != null) {
+            int count = 0;
+            double total = 0;
+            String string = "";
+            DecimalFormat amountFormat = new DecimalFormat("#0.00");
+
+            for (SGridRow row : moReceiptsGrid.getModel().getGridRows()) {
+                Receipt receipt = (Receipt) row;
+                if (moRadCopyAll.isSelected() || !receipt.getAccount().isEmpty()) {
+                    count++;
+                    total = SLibUtils.roundAmount(total + receipt.getAmount());
+
+                    String name = "";
+
+                    switch (groceryService.getId()) {
+                        case SModSysConsts.HRSS_GROCERY_SRV_SI_VALE:
+                            name = SLibUtils.textLeft(SLibUtils.textToAscii(receipt.getRowName().replaceAll(",", "")), NAME_MAX_LEN_SI_VALE);
+                            break;
+                        default:
+                            name = receipt.getRowName();
+                    }
+
+                    string += (string.isEmpty() ? "" : "\n") + 
+                            name + "\t'" + 
+                            receipt.getAccount() + "\t" + 
+                            amountFormat.format(receipt.getAmount());
+                }
             }
+
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            StringSelection stringSelection = new StringSelection(string);
+            clipboard.setContents(stringSelection, stringSelection);
+
+            miClient.showMsgBoxInformation("Información copiada al portapapeles:\n"
+                    + "número de recibos: " + count + "\n"
+                    + "monto total: $" + SLibUtils.getDecimalFormatAmount().format(total) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode());
         }
-        
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        StringSelection stringSelection = new StringSelection(string);
-        clipboard.setContents(stringSelection, stringSelection);
-        
-        miClient.showMsgBoxInformation("Información copiada al portapapeles:\n"
-                + "número de recibos: " + count + "\n"
-                + "monto total: $" + SLibUtils.getDecimalFormatAmount().format(total) + " " + miClient.getSession().getSessionCustom().getLocalCurrencyCode());
     }
     
     private void itemStateChangedGroceryService() {
@@ -531,6 +573,17 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
                         rows.add(receipt);
                     }
                 }
+            }
+            
+            if (moKeyGroceryService.getSelectedIndex() <= 0 || groceryService.getId() == SModSysConsts.HRSS_GROCERY_SRV_NON) {
+                moRadCopyWithAccount.setEnabled(false);
+                moRadCopyAll.setEnabled(false);
+                jbCopyToClipboard.setEnabled(false);
+            }
+            else {
+                moRadCopyWithAccount.setEnabled(true);
+                moRadCopyAll.setEnabled(true);
+                jbCopyToClipboard.setEnabled(true);
             }
         }
         

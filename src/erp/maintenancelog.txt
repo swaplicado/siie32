@@ -1,5 +1,5 @@
 ================================================================================
-SIIE 3.2 157.0/ 2020-02-04
+SIIE 3.2 157.0/ 2020-02-05
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de generación de layout para carga masiva de pago de despensas.
