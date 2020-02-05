@@ -918,9 +918,6 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCatAbsenceClass) {
                 miClient.getSession().showView(SModConsts.HRSU_CL_ABS, SLibConsts.UNDEFINED, null);
             }
-            else if (item == jmiPayAbsence) {
-                miClient.getSession().showView(SModConsts.HRS_ABS, SLibConsts.UNDEFINED, null);
-            }
             else if (item == jmiPayPayrollWeekly) {
                 miClient.getSession().showView(SModConsts.HRS_PAY, SModSysConsts.HRSS_TP_PAY_WEE, null);
             }
@@ -932,6 +929,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiPayPayrollFortnightlyRowRec) {
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP, SModSysConsts.HRSS_TP_PAY_FOR, null);
+            }
+            else if (item == jmiPayAbsence) {
+                miClient.getSession().showView(SModConsts.HRS_ABS, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiPayPayrollBkkRecord) {
                 miClient.getSession().showView(SModConsts.HRSX_PAY_REC, SLibConsts.UNDEFINED, null);
