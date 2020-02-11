@@ -102,7 +102,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
         jlDeduction.setPreferredSize(new java.awt.Dimension(100, 23));
         jpDeduction.add(jlDeduction);
 
-        moKeyDeduction.setPreferredSize(new java.awt.Dimension(300, 23));
+        moKeyDeduction.setPreferredSize(new java.awt.Dimension(250, 23));
         jpDeduction.add(moKeyDeduction);
 
         jpMain.add(jpDeduction, java.awt.BorderLayout.NORTH);

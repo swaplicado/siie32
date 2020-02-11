@@ -68,6 +68,9 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jlEarningComputationType = new javax.swing.JLabel();
         moKeyEarningComputationType = new sa.lib.gui.bean.SBeanFieldKey();
         jlEarningComputationTypeHelp = new javax.swing.JLabel();
+        jlUnitsFactor = new javax.swing.JLabel();
+        moDecUnitsFactor = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlUnitsFactor1 = new javax.swing.JLabel();
         jPanel29 = new javax.swing.JPanel();
         jlDummy1 = new javax.swing.JLabel();
         jlSettingsBase = new javax.swing.JLabel();
@@ -106,22 +109,22 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jlUnitsMaximumWeek = new javax.swing.JLabel();
         moDecUnitsMaximumWeek = new sa.lib.gui.bean.SBeanFieldDecimal();
         jlUnitsMaximumWeekHelp = new javax.swing.JLabel();
-        jPanel14 = new javax.swing.JPanel();
-        jlUnitsFactor = new javax.swing.JLabel();
-        moDecUnitsFactor = new sa.lib.gui.bean.SBeanFieldDecimal();
         jPanel3 = new javax.swing.JPanel();
-        moBoolWelfare = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolDaysAdjustment = new sa.lib.gui.bean.SBeanFieldBoolean();
-        moBoolDaysAbsence = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolDaysWorked = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolDaysAbsence = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolDaysWorkedBased = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolLoan = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolWelfare = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel24 = new javax.swing.JPanel();
         jPanel26 = new javax.swing.JPanel();
         jPanel27 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jlEarningType = new javax.swing.JLabel();
         moKeyEarningType = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel33 = new javax.swing.JPanel();
+        jlOtherPaymentType = new javax.swing.JLabel();
+        moKeyOtherPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel15 = new javax.swing.JPanel();
         jlLoanType = new javax.swing.JLabel();
         moKeyLoanType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -149,18 +152,19 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moBoolPayrollTax = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel32 = new javax.swing.JPanel();
         moBoolAlternativeTaxCalculation = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel34 = new javax.swing.JPanel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel25.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(15, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCode.setText("Código:*");
-        jlCode.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlCode.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel6.add(jlCode);
 
         moTextCode.setText("sBeanFieldText2");
@@ -171,7 +175,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlName.setText("Nombre:*");
-        jlName.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlName.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel4.add(jlName);
 
         moTextName.setText("sBeanFieldText1");
@@ -183,7 +187,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNameAbbreviated.setText("Nombre corto:*");
-        jlNameAbbreviated.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlNameAbbreviated.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel22.add(jlNameAbbreviated);
 
         moTextNameAbbreviated.setText("sBeanFieldText1");
@@ -202,7 +206,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEarningComputationType.setText("Tipo cálculo percepción:*");
-        jlEarningComputationType.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlEarningComputationType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel7.add(jlEarningComputationType);
 
         moKeyEarningComputationType.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -215,11 +219,21 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jlEarningComputationTypeHelp.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel7.add(jlEarningComputationTypeHelp);
 
+        jlUnitsFactor.setText("Factor cálculo:*");
+        jlUnitsFactor.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlUnitsFactor);
+        jPanel7.add(moDecUnitsFactor);
+
+        jlUnitsFactor1.setForeground(java.awt.Color.gray);
+        jlUnitsFactor1.setText("1x, 2x, ...");
+        jlUnitsFactor1.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel7.add(jlUnitsFactor1);
+
         jPanel2.add(jPanel7);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDummy1.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlDummy1.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel29.add(jlDummy1);
 
         jlSettingsBase.setText("Configuración base:");
@@ -235,7 +249,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEarningExemptionType.setText("Tipo exención percepción:*");
-        jlEarningExemptionType.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlEarningExemptionType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel16.add(jlEarningExemptionType);
 
         moKeyEarningExemptionType.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -249,7 +263,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlExemptionMwz.setText("UMA exentas (antes SM):");
-        jlExemptionMwz.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlExemptionMwz.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel8.add(jlExemptionMwz);
         jPanel8.add(moDecExemptionMwz);
 
@@ -269,7 +283,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlExemptionSalaryEqualsMwzPercentage.setText("% exención si SB = SMA:");
-        jlExemptionSalaryEqualsMwzPercentage.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlExemptionSalaryEqualsMwzPercentage.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel9.add(jlExemptionSalaryEqualsMwzPercentage);
         jPanel9.add(moDecExemptionSalaryEqualsMwzPercentage);
 
@@ -285,7 +299,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlExemptionSalaryEqualsMwzLimit.setText("Tope exención si SB = SMA:");
-        jlExemptionSalaryEqualsMwzLimit.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlExemptionSalaryEqualsMwzLimit.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(jlExemptionSalaryEqualsMwzLimit);
         jPanel10.add(moDecExemptionSalaryEqualsMwzLimit);
 
@@ -301,7 +315,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlExemptionSalaryGreaterMwzPercentage.setText("% exención si SB > SMA:");
-        jlExemptionSalaryGreaterMwzPercentage.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlExemptionSalaryGreaterMwzPercentage.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jlExemptionSalaryGreaterMwzPercentage);
         jPanel11.add(moDecExemptionSalaryGreaterMwzPercentage);
 
@@ -317,7 +331,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlExemptionSalaryGreaterMwzLimit.setText("Tope exención si SB > SMA:");
-        jlExemptionSalaryGreaterMwzLimit.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlExemptionSalaryGreaterMwzLimit.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel12.add(jlExemptionSalaryGreaterMwzLimit);
         jPanel12.add(moDecExemptionSalaryGreaterMwzLimit);
 
@@ -333,7 +347,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel23.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPayPercentage.setText("Porcentaje pago:");
-        jlPayPercentage.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlPayPercentage.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel23.add(jlPayPercentage);
         jPanel23.add(moDecPayPercentage);
 
@@ -349,7 +363,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlUnitsMaximumWeek.setText("No. unidades máximas:");
-        jlUnitsMaximumWeek.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlUnitsMaximumWeek.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel13.add(jlUnitsMaximumWeek);
         jPanel13.add(moDecUnitsMaximumWeek);
 
@@ -362,40 +376,31 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jPanel2.add(jPanel13);
 
-        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlUnitsFactor.setText("Factor cálculo:*");
-        jlUnitsFactor.setPreferredSize(new java.awt.Dimension(175, 23));
-        jPanel14.add(jlUnitsFactor);
-        jPanel14.add(moDecUnitsFactor);
-
-        jPanel2.add(jPanel14);
-
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        moBoolWelfare.setText("Es previsión social");
-        moBoolWelfare.setPreferredSize(new java.awt.Dimension(175, 23));
-        jPanel3.add(moBoolWelfare);
-
-        moBoolDaysAdjustment.setText("Aplica días ajuste");
+        moBoolDaysAdjustment.setText("Aplica ajuste días");
         moBoolDaysAdjustment.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel3.add(moBoolDaysAdjustment);
-
-        moBoolDaysAbsence.setText("Aplica días incidencia");
-        moBoolDaysAbsence.setPreferredSize(new java.awt.Dimension(140, 23));
-        jPanel3.add(moBoolDaysAbsence);
 
         moBoolDaysWorked.setText("Cuenta como días trabajados");
         moBoolDaysWorked.setPreferredSize(new java.awt.Dimension(185, 23));
         jPanel3.add(moBoolDaysWorked);
+
+        moBoolDaysAbsence.setText("Aplica días incidencia");
+        moBoolDaysAbsence.setPreferredSize(new java.awt.Dimension(140, 23));
+        jPanel3.add(moBoolDaysAbsence);
 
         moBoolDaysWorkedBased.setText("En base a días pagados");
         moBoolDaysWorkedBased.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel3.add(moBoolDaysWorkedBased);
 
         moBoolLoan.setText("Es crédito/préstamo");
-        moBoolLoan.setPreferredSize(new java.awt.Dimension(125, 23));
+        moBoolLoan.setPreferredSize(new java.awt.Dimension(135, 23));
         jPanel3.add(moBoolLoan);
+
+        moBoolWelfare.setText("Es previsión social");
+        moBoolWelfare.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel3.add(moBoolWelfare);
 
         jPanel2.add(jPanel3);
 
@@ -407,12 +412,12 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jPanel26.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel27.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel27.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlEarningType.setText("Tipo percepción:*");
-        jlEarningType.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlEarningType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jlEarningType);
 
         moKeyEarningType.setPreferredSize(new java.awt.Dimension(400, 23));
@@ -420,10 +425,21 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jPanel27.add(jPanel5);
 
+        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlOtherPaymentType.setText("Tipo otro pago:*");
+        jlOtherPaymentType.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel33.add(jlOtherPaymentType);
+
+        moKeyOtherPaymentType.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel33.add(moKeyOtherPaymentType);
+
+        jPanel27.add(jPanel33);
+
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlLoanType.setText("Tipo crédito/préstamo:*");
-        jlLoanType.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlLoanType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel15.add(jlLoanType);
 
         moKeyLoanType.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -434,7 +450,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlBenefitType.setText("Tipo prestación:*");
-        jlBenefitType.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlBenefitType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel19.add(jlBenefitType);
 
         moKeyBenefitType.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -445,7 +461,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAccountingConfigurationType.setText("Tipo configuración contable:*");
-        jlAccountingConfigurationType.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlAccountingConfigurationType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel17.add(jlAccountingConfigurationType);
 
         moKeyAccountingConfigurationType.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -461,7 +477,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAccountingRecordType.setText("Tipo registro contable:*");
-        jlAccountingRecordType.setPreferredSize(new java.awt.Dimension(175, 23));
+        jlAccountingRecordType.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel18.add(jlAccountingRecordType);
 
         moKeyAccountingRecordType.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -476,7 +492,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jPanel26.add(jPanel27, java.awt.BorderLayout.WEST);
 
-        jPanel28.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel28.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
 
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -524,6 +540,9 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         jPanel28.add(jPanel32);
 
+        jPanel34.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel28.add(jPanel34);
+
         jPanel26.add(jPanel28, java.awt.BorderLayout.CENTER);
 
         jPanel24.add(jPanel26, java.awt.BorderLayout.NORTH);
@@ -539,7 +558,6 @@ public class SFormEarning extends SBeanForm implements ItemListener {
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
@@ -560,6 +578,8 @@ public class SFormEarning extends SBeanForm implements ItemListener {
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
+    private javax.swing.JPanel jPanel33;
+    private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -594,11 +614,13 @@ public class SFormEarning extends SBeanForm implements ItemListener {
     private javax.swing.JLabel jlName;
     private javax.swing.JLabel jlNameAbbreviated;
     private javax.swing.JLabel jlNameAbbreviatedHelp;
+    private javax.swing.JLabel jlOtherPaymentType;
     private javax.swing.JLabel jlPayPercentage;
     private javax.swing.JLabel jlPayPercentageHelp;
     private javax.swing.JLabel jlSettingsBase;
     private javax.swing.JLabel jlSettingsOptional;
     private javax.swing.JLabel jlUnitsFactor;
+    private javax.swing.JLabel jlUnitsFactor1;
     private javax.swing.JLabel jlUnitsMaximumWeek;
     private javax.swing.JLabel jlUnitsMaximumWeekHelp;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolAlternativeTaxCalculation;
@@ -629,6 +651,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarningExemptionTypeYear;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarningType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyLoanType;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyOtherPaymentType;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     private sa.lib.gui.bean.SBeanFieldText moTextNameAbbreviated;
@@ -641,34 +664,35 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moFieldKeyGroup.addFieldKey(moKeyAbsenceClass, SModConsts.HRSU_CL_ABS, SLibConsts.UNDEFINED, null);
         moFieldKeyGroup.addFieldKey(moKeyAbsenceType, SModConsts.HRSU_TP_ABS, SLibConsts.UNDEFINED, null);
 
-        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
-        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 100);
-        moTextNameAbbreviated.setTextSettings(SGuiUtils.getLabelName(jlNameAbbreviated.getText()), 25);
-        moDecExemptionMwz.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionMwz.getText()), SGuiConsts.GUI_TYPE_DEC, false);
-        moDecExemptionMwzYear.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionMwz.getText()), SGuiConsts.GUI_TYPE_DEC, false);
-        moDecExemptionSalaryEqualsMwzPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryEqualsMwzPercentage.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
-        moDecExemptionSalaryEqualsMwzLimit.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryEqualsMwzLimit.getText()), SGuiConsts.GUI_TYPE_DEC, false);
-        moDecExemptionSalaryGreaterMwzPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryGreaterMwzPercentage.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
-        moDecExemptionSalaryGreaterMwzLimit.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryGreaterMwzLimit.getText()), SGuiConsts.GUI_TYPE_DEC, false);
-        moDecPayPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlPayPercentage.getText()), SGuiConsts.GUI_TYPE_DEC_PER_DISC, true);
-        moDecUnitsMaximumWeek.setDecimalSettings(SGuiUtils.getLabelName(jlUnitsMaximumWeek.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false);
-        moDecUnitsFactor.setDecimalSettings(SGuiUtils.getLabelName(jlUnitsFactor.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
-        moBoolWelfare.setBooleanSettings(SGuiUtils.getLabelName(moBoolWelfare.getText()), false);
+        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 10);
+        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName), 100);
+        moTextNameAbbreviated.setTextSettings(SGuiUtils.getLabelName(jlNameAbbreviated), 25);
+        moKeyEarningComputationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningComputationType), true);
+        moDecUnitsFactor.setDecimalSettings(SGuiUtils.getLabelName(jlUnitsFactor), SGuiConsts.GUI_TYPE_DEC_AMT, true);
+        moKeyEarningExemptionType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningExemptionType), true);
+        moKeyEarningExemptionTypeYear.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningExemptionType), true);
+        moDecExemptionMwz.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionMwz), SGuiConsts.GUI_TYPE_DEC, false);
+        moDecExemptionMwzYear.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionMwz), SGuiConsts.GUI_TYPE_DEC, false);
+        moDecExemptionSalaryEqualsMwzPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryEqualsMwzPercentage), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
+        moDecExemptionSalaryEqualsMwzLimit.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryEqualsMwzLimit), SGuiConsts.GUI_TYPE_DEC, false);
+        moDecExemptionSalaryGreaterMwzPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryGreaterMwzPercentage), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
+        moDecExemptionSalaryGreaterMwzLimit.setDecimalSettings(SGuiUtils.getLabelName(jlExemptionSalaryGreaterMwzLimit), SGuiConsts.GUI_TYPE_DEC, false);
+        moDecPayPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlPayPercentage), SGuiConsts.GUI_TYPE_DEC_PER_DISC, true);
+        moDecUnitsMaximumWeek.setDecimalSettings(SGuiUtils.getLabelName(jlUnitsMaximumWeek), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false);
         moBoolDaysAdjustment.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysAdjustment.getText()), false);
-        moBoolDaysAbsence.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysAbsence.getText()), false);
         moBoolDaysWorked.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysWorked.getText()), false);
+        moBoolDaysAbsence.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysAbsence.getText()), false);
         moBoolDaysWorkedBased.setBooleanSettings(SGuiUtils.getLabelName(moBoolDaysWorkedBased.getText()), false);
         moBoolLoan.setBooleanSettings(SGuiUtils.getLabelName(moBoolLoan.getText()), false);
-        moKeyEarningType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningType.getText()), true);
-        moKeyEarningComputationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningComputationType.getText()), true);
-        moKeyEarningExemptionType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningExemptionType.getText()), true);
-        moKeyEarningExemptionTypeYear.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningExemptionType.getText()), true);
-        moKeyLoanType.setKeySettings(miClient, SGuiUtils.getLabelName(jlLoanType.getText()), true);
-        moKeyBenefitType.setKeySettings(miClient, SGuiUtils.getLabelName(jlBenefitType.getText()), true);
-        moKeyAccountingConfigurationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountingConfigurationType.getText()), true);
-        moKeyAccountingRecordType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountingRecordType.getText()), true);
-        moKeyAbsenceClass.setKeySettings(miClient, SGuiUtils.getLabelName(jlAbsenceClass.getText()), false);
-        moKeyAbsenceType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAbsenceType.getText()), false);
+        moBoolWelfare.setBooleanSettings(SGuiUtils.getLabelName(moBoolWelfare.getText()), false);
+        moKeyEarningType.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningType), true);
+        moKeyOtherPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlOtherPaymentType), true);
+        moKeyLoanType.setKeySettings(miClient, SGuiUtils.getLabelName(jlLoanType), true);
+        moKeyBenefitType.setKeySettings(miClient, SGuiUtils.getLabelName(jlBenefitType), true);
+        moKeyAccountingConfigurationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountingConfigurationType), true);
+        moKeyAccountingRecordType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAccountingRecordType), true);
+        moKeyAbsenceClass.setKeySettings(miClient, SGuiUtils.getLabelName(jlAbsenceClass), false);
+        moKeyAbsenceType.setKeySettings(miClient, SGuiUtils.getLabelName(jlAbsenceType), false);
         moBoolWithholding.setBooleanSettings(SGuiUtils.getLabelName(moBoolWithholding.getText()), false);
         moBoolPayrollTax.setBooleanSettings(SGuiUtils.getLabelName(moBoolPayrollTax.getText()), false);
         moBoolAlternativeTaxCalculation.setBooleanSettings(SGuiUtils.getLabelName(moBoolAlternativeTaxCalculation.getText()), false);
@@ -677,6 +701,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moFields.addField(moTextName);
         moFields.addField(moTextNameAbbreviated);
         moFields.addField(moKeyEarningComputationType);
+        moFields.addField(moDecUnitsFactor);
         moFields.addField(moKeyEarningExemptionType);
         moFields.addField(moKeyEarningExemptionTypeYear);
         moFields.addField(moDecExemptionMwz);
@@ -687,14 +712,14 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moFields.addField(moDecExemptionSalaryGreaterMwzLimit);
         moFields.addField(moDecPayPercentage);
         moFields.addField(moDecUnitsMaximumWeek);
-        moFields.addField(moDecUnitsFactor);
-        moFields.addField(moBoolWelfare);
         moFields.addField(moBoolDaysAdjustment);
-        moFields.addField(moBoolDaysAbsence);
         moFields.addField(moBoolDaysWorked);
+        moFields.addField(moBoolDaysAbsence);
         moFields.addField(moBoolDaysWorkedBased);
         moFields.addField(moBoolLoan);
+        moFields.addField(moBoolWelfare);
         moFields.addField(moKeyEarningType);
+        moFields.addField(moKeyOtherPaymentType);
         moFields.addField(moKeyLoanType);
         moFields.addField(moKeyBenefitType);
         moFields.addField(moKeyAccountingConfigurationType);
@@ -747,7 +772,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
     }
 
     private void itemStateChangedEarningComputationType() {
-        if (moKeyEarningComputationType.getValue().length > 0) {
+        if (moKeyEarningComputationType.getSelectedIndex() > 0) {
             if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
                 moDecPayPercentage.setEnabled(false);
                 moDecPayPercentage.setValue(0d);
@@ -790,7 +815,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
     }
     
     private void itemStateChangedEarningExemptionType() {
-        if (moKeyEarningExemptionType.getValue().length > 0) {
+        if (moKeyEarningExemptionType.getSelectedIndex() > 0) {
             if (moKeyEarningExemptionType.getValue()[0] != SModSysConsts.HRSS_TP_EAR_EXEM_PER) {
                 moDecExemptionMwz.setEnabled(true);
                 moDecExemptionSalaryEqualsMwzPercentage.setEnabled(false);
@@ -801,8 +826,6 @@ public class SFormEarning extends SBeanForm implements ItemListener {
                 moDecExemptionSalaryEqualsMwzLimit.setValue(0d);
                 moDecExemptionSalaryGreaterMwzPercentage.setValue(0d);
                 moDecExemptionSalaryGreaterMwzLimit.setValue(0d);
-                moBoolWelfare.setSelected(false);
-                moBoolWelfare.setEnabled(false);
             }
             else {
                 moDecExemptionMwz.setEnabled(false);
@@ -811,19 +834,36 @@ public class SFormEarning extends SBeanForm implements ItemListener {
                 moDecExemptionSalaryEqualsMwzLimit.setEnabled(true);
                 moDecExemptionSalaryGreaterMwzPercentage.setEnabled(true);
                 moDecExemptionSalaryGreaterMwzLimit.setEnabled(true);
-                moBoolWelfare.setEnabled(true);
             }
         }
     }
     
     private void itemStateChangedEarningExemptionTypeYear() {
-        if (moKeyEarningExemptionTypeYear.getValue().length > 0) {
+        if (moKeyEarningExemptionTypeYear.getSelectedIndex() > 0) {
             if (moKeyEarningExemptionTypeYear.getValue()[0] != SModSysConsts.HRSS_TP_EAR_EXEM_PER) {
                 moDecExemptionMwzYear.setEnabled(true);
             }
             else {
                 moDecExemptionMwzYear.setEnabled(false);
                 moDecExemptionMwzYear.setValue(0d);
+            }
+        }
+    }
+    
+    private void itemStateChangedEarningType() {
+        moKeyOtherPaymentType.setEnabled(false);
+        moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_NON });
+        
+        if (moKeyEarningType.getSelectedIndex() > 0) {
+            switch (moKeyEarningType.getValue()[0]) {
+                case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
+                    moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB });
+                    break;
+                case SModSysConsts.HRSS_TP_EAR_OTH:
+                    moKeyOtherPaymentType.setEnabled(true);
+                    moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_OTH });
+                    break;
+                default:
             }
         }
     }
@@ -834,6 +874,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moKeyEarningComputationType.addItemListener(this);
         moKeyEarningExemptionType.addItemListener(this);
         moKeyEarningExemptionTypeYear.addItemListener(this);
+        moKeyEarningType.addItemListener(this);
     }
 
     @Override
@@ -842,14 +883,16 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moKeyEarningComputationType.removeItemListener(this);
         moKeyEarningExemptionType.removeItemListener(this);
         moKeyEarningExemptionTypeYear.removeItemListener(this);
+        moKeyEarningType.removeItemListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyEarningType, SModConsts.HRSS_TP_EAR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyEarningComputationType, SModConsts.HRSS_TP_EAR_COMP, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyEarningExemptionType, SModConsts.HRSS_TP_EAR_EXEM, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyEarningExemptionTypeYear, SModConsts.HRSS_TP_EAR_EXEM, SLibConsts.UNDEFINED, new SGuiParams(new int[] { SModSysConsts.HRSS_TP_EAR_EXEM_MWZ_GBL }));
+        miClient.getSession().populateCatalogue(moKeyEarningType, SModConsts.HRSS_TP_EAR, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyOtherPaymentType, SModConsts.HRSS_TP_OTH_PAY, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyLoanType, SModConsts.HRSS_TP_LOAN, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyBenefitType, SModConsts.HRSS_TP_BEN, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyAccountingConfigurationType, SModConsts.HRSS_TP_ACC, SLibConsts.UNDEFINED, null);
@@ -907,10 +950,15 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moBoolPayrollTax.setValue(moRegistry.isPayrollTax());
         moBoolAlternativeTaxCalculation.setValue(moRegistry.isAlternativeTaxCalculation());
         moKeyEarningType.setValue(new int[] { moRegistry.getFkEarningTypeId() });
+        itemStateChangedEarningType();
+        moKeyOtherPaymentType.setValue(new int[] { moRegistry.getFkOtherPaymentTypeId() });
         moKeyEarningComputationType.setValue(new int[] { moRegistry.getFkEarningComputationTypeId() });
+        itemStateChangedEarningComputationType();
         moKeyEarningExemptionType.setValue(new int[] { moRegistry.getFkEarningExemptionTypeId() });
+        itemStateChangedEarningExemptionType();
         moKeyEarningExemptionTypeYear.setValue(new int[] { moRegistry.getFkEarningExemptionTypeYearId() });
         moBoolLoan.setValue(moRegistry.isLoan());
+        itemStateChangedLoan();
         moKeyLoanType.setValue(new int[] { moRegistry.getFkLoanTypeId() });
         moKeyBenefitType.setValue(new int[] { moRegistry.getFkBenefitTypeId() });
         moKeyAccountingConfigurationType.setValue(new int[] { moRegistry.getFkAccountingConfigurationTypeId() });
@@ -920,9 +968,10 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         setFormEditable(true);
         
-        itemStateChangedLoan();
+        itemStateChangedEarningType();
         itemStateChangedEarningComputationType();
         itemStateChangedEarningExemptionType();
+        itemStateChangedLoan();
 
         addAllListeners();
     }
@@ -957,6 +1006,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         registry.setFkEarningComputationTypeId(moKeyEarningComputationType.getValue()[0]);
         registry.setFkEarningExemptionTypeId(moKeyEarningExemptionType.getValue()[0]);
         registry.setFkEarningExemptionTypeYearId(moKeyEarningExemptionTypeYear.getValue()[0]);
+        registry.setFkOtherPaymentTypeId(moKeyOtherPaymentType.getValue()[0]);
         registry.setFkLoanTypeId(moKeyLoanType.getValue()[0]);
         registry.setFkBenefitTypeId(moKeyBenefitType.getValue()[0]);
         registry.setFkAccountingConfigurationTypeId(moKeyAccountingConfigurationType.getValue()[0]);
@@ -972,7 +1022,11 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
-            if (moBoolLoan.getValue() && moKeyLoanType.getValue()[0] <= SModSysConsts.HRSS_TP_LOAN_NON) { // should not be less, just in case
+            if (moKeyEarningType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_OTH && moKeyOtherPaymentType.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NON) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlOtherPaymentType) + "'.");
+                validation.setComponent(moKeyOtherPaymentType);
+            }
+            else if (moBoolLoan.getValue() && moKeyLoanType.getValue()[0] <= SModSysConsts.HRSS_TP_LOAN_NON) { // should not be less, just in case
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlLoanType) + "'.");
                 validation.setComponent(moKeyLoanType);
             }
@@ -1041,8 +1095,11 @@ public class SFormEarning extends SBeanForm implements ItemListener {
             else if (comboBox == moKeyEarningExemptionTypeYear) {
                 itemStateChangedEarningExemptionTypeYear();
             }
+            else if (comboBox == moKeyEarningType) {
+                itemStateChangedEarningType();
+            }
         }
-        else if (e.getSource() instanceof JCheckBox && e.getStateChange() == ItemEvent.SELECTED) {
+        else if (e.getSource() instanceof JCheckBox) {
             JCheckBox checkBox = (JCheckBox)  e.getSource();
 
             if (checkBox == moBoolLoan) {

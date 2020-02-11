@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 159.0/ 2020-02-10
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de captura en recibos de nóminas de monto Subsidio para el empleo efectivamente entregado al trabajador.
+1) Implementación de selección en recibos de nóminas de Tipo otro pago en captura de percepciones Otros pagos.
+
+================================================================================
 SIIE 3.2 157.0/ 2020-02-05
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

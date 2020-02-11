@@ -66,7 +66,7 @@ public class SHrsReceiptEarning implements SGridRow, Comparable {
     public void computeEarning() {
         if (!moPayrollReceiptEarning.isUserEdited()) {
             if (moEarning.getFkEarningComputationTypeId() == SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME) {
-                // update amount unit with current income in receipt; units alleged contains % to apply:
+                // update amount unit with current income in receipt; units alleged contains percentage to apply:
                 moPayrollReceiptEarning.setAmountUnitary(SLibUtils.round(moHrsReceipt.getTotalEarningsDependentsDaysWorked(), SLibUtils.getDecimalFormatAmountUnitary().getMaximumFractionDigits()));
             }
             

@@ -32,6 +32,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     protected double mdAmount_r;
     protected double mdAmountExempt;
     protected double mdAmountTaxable;
+    protected double mdAuxiliarAmount;
     protected int mnBenefitYear;
     protected int mnBenefitAnniversary;
     protected boolean mbAlternativeTaxCalculation;
@@ -45,6 +46,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     protected int mnFkLoanEmployeeId_n;
     protected int mnFkLoanLoanId_n;
     protected int mnFkLoanTypeId_n;
+    protected int mnFkOtherPaymentTypeId;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
@@ -73,6 +75,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public void setAmount_r(double d) { mdAmount_r = d; }
     public void setAmountExempt(double d) { mdAmountExempt = d; }
     public void setAmountTaxable(double d) { mdAmountTaxable = d; }
+    public void setAuxiliarAmount(double d) { mdAuxiliarAmount = d; }
     public void setBenefitYear(int n) { mnBenefitYear = n; }
     public void setBenefitAnniversary(int n) { mnBenefitAnniversary = n; }
     public void setAlternativeTaxCalculation(boolean b) { mbAlternativeTaxCalculation = b; }
@@ -86,6 +89,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public void setFkLoanEmployeeId_n(int n) { mnFkLoanEmployeeId_n = n; }
     public void setFkLoanLoanId_n(int n) { mnFkLoanLoanId_n = n; }
     public void setFkLoanTypeId_n(int n) { mnFkLoanTypeId_n = n; }
+    public void setFkOtherPaymentTypeId(int n) { mnFkOtherPaymentTypeId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
@@ -104,6 +108,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public double getAmount_r() { return mdAmount_r; }
     public double getAmountExempt() { return mdAmountExempt; }
     public double getAmountTaxable() { return mdAmountTaxable; }
+    public double getAuxiliarAmount() { return mdAuxiliarAmount; }
     public int getBenefitYear() { return mnBenefitYear; }
     public int getBenefitAnniversary() { return mnBenefitAnniversary; }
     public boolean isAlternativeTaxCalculation() { return mbAlternativeTaxCalculation; }
@@ -117,6 +122,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public int getFkLoanEmployeeId_n() { return mnFkLoanEmployeeId_n; }
     public int getFkLoanLoanId_n() { return mnFkLoanLoanId_n; }
     public int getFkLoanTypeId_n() { return mnFkLoanTypeId_n; }
+    public int getFkOtherPaymentTypeId() { return mnFkOtherPaymentTypeId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -153,6 +159,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         mdAmount_r = 0;
         mdAmountExempt = 0;
         mdAmountTaxable = 0;
+        mdAuxiliarAmount = 0;
         mnBenefitYear = 0;
         mnBenefitAnniversary = 0;
         mbAlternativeTaxCalculation = false;
@@ -166,6 +173,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         mnFkLoanEmployeeId_n = 0;
         mnFkLoanLoanId_n = 0;
         mnFkLoanTypeId_n = 0;
+        mnFkOtherPaymentTypeId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -228,6 +236,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
             mdAmount_r = resultSet.getDouble("amt_r");
             mdAmountExempt = resultSet.getDouble("amt_exem");
             mdAmountTaxable = resultSet.getDouble("amt_taxa");
+            mdAuxiliarAmount = resultSet.getDouble("aux_amt");
             mnBenefitYear = resultSet.getInt("ben_year");
             mnBenefitAnniversary = resultSet.getInt("ben_ann");
             mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
@@ -241,6 +250,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
             mnFkLoanEmployeeId_n = resultSet.getInt("fk_loan_emp_n");
             mnFkLoanLoanId_n = resultSet.getInt("fk_loan_loan_n");
             mnFkLoanTypeId_n = resultSet.getInt("fk_tp_loan_n");
+            mnFkOtherPaymentTypeId = resultSet.getInt("fk_tp_oth_pay");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -295,6 +305,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     mdAmount_r + ", " + 
                     mdAmountExempt + ", " + 
                     mdAmountTaxable + ", " + 
+                    mdAuxiliarAmount + ", " + 
                     mnBenefitYear + ", " + 
                     mnBenefitAnniversary + ", " + 
                     (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
@@ -308,6 +319,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +
                     (mnFkLoanTypeId_n > 0 ? mnFkLoanTypeId_n : "NULL") + ", " +
+                    mnFkOtherPaymentTypeId + ", " + 
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
                     "NOW()" + ", " +
@@ -331,19 +343,21 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     "amt_r = " + mdAmount_r + ", " +
                     "amt_exem = " + mdAmountExempt + ", " +
                     "amt_taxa = " + mdAmountTaxable + ", " +
+                    "aux_amt = " + mdAuxiliarAmount + ", " +
                     "ben_year = " + mnBenefitYear + ", " +
                     "ben_ann = " + mnBenefitAnniversary + ", " +
                     "b_alt_tax = " + (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
                     "b_usr = " + (mbUserEdited ? 1 : 0) + ", " +
                     "b_aut = " + (mbAutomatic ? 1 : 0) + ", " +
-                    //"b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                    //"b_sys = " + (mbSystem ? 1 : 0) + ", " +
+                    "b_del = " + (mbDeleted ? 1 : 0) + ", " +
+                    "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ear = " + mnFkEarningTypeId + ", " +
                     "fk_ear = " + mnFkEarningId + ", " +
                     "fk_tp_ben = " + mnFkBenefitTypeId + ", " +
                     "fk_loan_emp_n = " + (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     "fk_loan_loan_n = " + (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +
                     "fk_tp_loan_n = " + (mnFkLoanTypeId_n > 0 ? mnFkLoanTypeId_n : "NULL") + ", " +
+                    "fk_tp_oth_pay = " + mnFkOtherPaymentTypeId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -382,6 +396,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         registry.setAmount_r(this.getAmount_r());
         registry.setAmountExempt(this.getAmountExempt());
         registry.setAmountTaxable(this.getAmountTaxable());
+        registry.setAuxiliarAmount(this.getAuxiliarAmount());
         registry.setBenefitYear(this.getBenefitYear());
         registry.setBenefitAnniversary(this.getBenefitAnniversary());
         registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());
@@ -395,6 +410,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         registry.setFkLoanEmployeeId_n(this.getFkLoanEmployeeId_n());
         registry.setFkLoanLoanId_n(this.getFkLoanLoanId_n());
         registry.setFkLoanTypeId_n(this.getFkLoanTypeId_n());
+        registry.setFkOtherPaymentTypeId(this.getFkOtherPaymentTypeId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

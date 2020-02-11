@@ -79,6 +79,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextName">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -91,6 +92,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextNumber">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="toolTipText" type="java.lang.String" value="Clave"/>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -120,6 +122,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextPaymentType">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[85, 23]"/>
@@ -136,6 +139,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextDateBirth">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
@@ -152,6 +156,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextDepartament">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[175, 23]"/>
@@ -168,6 +173,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextSalaryType">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                       </Properties>
                     </Component>
@@ -181,6 +187,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextFiscalId">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="XAXX010101000"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[105, 23]"/>
@@ -206,6 +213,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecSalary">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[85, 23]"/>
@@ -222,6 +230,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextDateBenefits">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="toolTipText" type="java.lang.String" value=""/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -239,6 +248,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextPosition">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[175, 23]"/>
@@ -255,6 +265,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextEmployeeType">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                       </Properties>
                     </Component>
@@ -268,6 +279,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextAlternativeId">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="XAXX010101XXXXXX00"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[140, 23]"/>
@@ -293,6 +305,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecWage">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="0"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -310,6 +323,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextDateLastHire">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
@@ -326,6 +340,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextShift">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[175, 23]"/>
@@ -342,6 +357,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextWorkerType">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                       </Properties>
                     </Component>
@@ -355,6 +371,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextSocialSecurityNumber">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="00000000000"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[85, 23]"/>
@@ -380,6 +397,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldDecimal" name="moDecSalarySscBase">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[85, 23]"/>
@@ -396,6 +414,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextDateLastDismiss_n">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[75, 23]"/>
@@ -412,6 +431,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldInteger" name="moIntWorkingHoursDay">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[50, 23]"/>
                         </Property>
@@ -434,6 +454,7 @@
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextRecruitmentSchemeType">
                       <Properties>
+                        <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[300, 23]"/>
@@ -510,6 +531,9 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                                 <Property name="toolTipText" type="java.lang.String" value="C&#xf3;digo percepci&#xf3;n"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[50, 23]"/>
+                                </Property>
                               </Properties>
                               <Events>
                                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="moTextEarningCodeKeyPressed"/>
@@ -530,7 +554,15 @@
                                 <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Nombre percepci&#xf3;n"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[247, 23]"/>
+                                  <Dimension value="[250, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyEarningOtherPayment">
+                              <Properties>
+                                <Property name="toolTipText" type="java.lang.String" value="Tipo otro pago"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[200, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -552,7 +584,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Cr&#xe9;dito/pr&#xe9;stamo:*"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[250, 23]"/>
+                                  <Dimension value="[200, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -562,6 +594,34 @@
                                 <Property name="toolTipText" type="java.lang.String" value=""/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlEarningAuxAmount">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Monto auxiliar:"/>
+                                <Property name="toolTipText" type="java.lang.String" value=""/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[100, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jlEarningAuxAmountHint">
+                              <Properties>
+                                <Property name="horizontalAlignment" type="int" value="0"/>
+                                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                  <Image iconType="3" name="/erp/img/icon_view_help.png"/>
+                                </Property>
+                                <Property name="toolTipText" type="java.lang.String" value="Monto auxiliar"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[20, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel2">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[50, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -582,7 +642,7 @@
                             <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyEarningLoan_n">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[250, 23]"/>
+                                  <Dimension value="[200, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -593,9 +653,22 @@
                                 </Property>
                               </Properties>
                             </Component>
+                            <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurEarningAuxAmount">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
                             <Component class="javax.swing.JButton" name="jbAddEarning">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Agregar"/>
+                                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                                  <Insets value="[2, 0, 2, 0]"/>
+                                </Property>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
                               </Properties>
                             </Component>
                           </SubComponents>
@@ -612,7 +685,7 @@
                       </Border>
                     </Property>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[500, 1]"/>
+                      <Dimension value="[475, 1]"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -648,6 +721,9 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                                 <Property name="toolTipText" type="java.lang.String" value="C&#xf3;digo deducci&#xf3;n"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[50, 23]"/>
+                                </Property>
                               </Properties>
                               <Events>
                                 <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="moTextDeductionCodeKeyPressed"/>
@@ -668,7 +744,7 @@
                                 <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Nombre deducci&#xf3;n"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[247, 23]"/>
+                                  <Dimension value="[250, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -690,7 +766,7 @@
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Cr&#xe9;dito/pr&#xe9;stamo:*"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[250, 23]"/>
+                                  <Dimension value="[200, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -720,7 +796,7 @@
                             <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyDeductionLoan_n">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[250, 23]"/>
+                                  <Dimension value="[200, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -734,6 +810,12 @@
                             <Component class="javax.swing.JButton" name="jbAddDeduction">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="Agregar"/>
+                                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                                  <Insets value="[2, 0, 2, 0]"/>
+                                </Property>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
                               </Properties>
                             </Component>
                           </SubComponents>
@@ -814,6 +896,10 @@
                               </Properties>
                             </Component>
                             <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurEarningsTotal">
+                              <Properties>
+                                <Property name="editable" type="boolean" value="false"/>
+                                <Property name="focusable" type="boolean" value="false"/>
+                              </Properties>
                             </Component>
                           </SubComponents>
                         </Container>
@@ -833,6 +919,10 @@
                               </Properties>
                             </Component>
                             <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurDeductionsTotal">
+                              <Properties>
+                                <Property name="editable" type="boolean" value="false"/>
+                                <Property name="focusable" type="boolean" value="false"/>
+                              </Properties>
                             </Component>
                           </SubComponents>
                         </Container>
@@ -852,6 +942,10 @@
                               </Properties>
                             </Component>
                             <Component class="sa.lib.gui.bean.SBeanCompoundFieldCurrency" name="moCurNetTotal">
+                              <Properties>
+                                <Property name="editable" type="boolean" value="false"/>
+                                <Property name="focusable" type="boolean" value="false"/>
+                              </Properties>
                             </Component>
                           </SubComponents>
                         </Container>

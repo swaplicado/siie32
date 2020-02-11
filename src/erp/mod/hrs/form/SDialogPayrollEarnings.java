@@ -5,6 +5,7 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SHrsEmployeeDays;
@@ -43,7 +44,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPaneFormOwner, ItemListener, ActionListener, CellEditorListener {
+public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPaneFormOwner, ActionListener, ItemListener, CellEditorListener {
 
     private static final int COL_VAL = 1;
     private static final int COL_AMT_UNT = 3;
@@ -78,6 +79,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         jpEarning = new javax.swing.JPanel();
         jlEarning = new javax.swing.JLabel();
         moKeyEarning = new sa.lib.gui.bean.SBeanFieldKey();
+        moKeyOtherPayment = new sa.lib.gui.bean.SBeanFieldKey();
         jpEmployee = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -103,8 +105,12 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         jlEarning.setPreferredSize(new java.awt.Dimension(100, 23));
         jpEarning.add(jlEarning);
 
-        moKeyEarning.setPreferredSize(new java.awt.Dimension(300, 23));
+        moKeyEarning.setPreferredSize(new java.awt.Dimension(250, 23));
         jpEarning.add(moKeyEarning);
+
+        moKeyOtherPayment.setToolTipText("Tipo otro pago");
+        moKeyOtherPayment.setPreferredSize(new java.awt.Dimension(250, 23));
+        jpEarning.add(moKeyOtherPayment);
 
         jpMain.add(jpEarning, java.awt.BorderLayout.NORTH);
 
@@ -185,6 +191,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
     private sa.lib.gui.bean.SBeanCompoundField moCompValue;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurTotal;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarning;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyOtherPayment;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
@@ -193,12 +200,14 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);
 
-        moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarning.getText()), true);
+        moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarning), true);
+        moKeyOtherPayment.setKeySettings(miClient, SGuiUtils.getLabelName(moKeyOtherPayment.getToolTipText()), true);
         moCompValue.setCompoundFieldSettings(miClient);
         moCompValue.getField().setDecimalSettings(SGuiUtils.getLabelName(jlValue), SGuiConsts.GUI_TYPE_DEC_QTY, true);
         moCompValue.getField().setNextButton(jbSetAll);
         
         moFields.addField(moKeyEarning);
+        moFields.addField(moKeyOtherPayment);
         moFields.addField(moCompValue.getField());
         moFields.setFormButton(jbSave);
 
@@ -295,10 +304,16 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
             moveId = hrsReceipt.getHrsReceiptEarnings().size() + 1;
         }
 
-        return hrsReceipt.getHrsPayroll().createPayrollReceiptEarning(
+        SDbPayrollReceiptEarning earning = hrsReceipt.getHrsPayroll().createPayrollReceiptEarning(
                 hrsReceipt, hrsReceiptEarning.getEarning(), hrsEmployeeDays, null, 
                 unitsAlleged, amountUnitAlleged, false, 
                 0, 0, moveId);
+        
+        if (moKeyOtherPayment.isEnabled() && moKeyOtherPayment.getSelectedIndex() > 0) {
+            earning.setFkOtherPaymentTypeId(moKeyOtherPayment.getValue()[0]);
+        }
+        
+        return earning;
     }
     
     private void refreshGridRows() {
@@ -422,12 +437,23 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
     private void itemStateChangedEarning() {
         Vector<SGridRow> rows = new Vector<>();
         
+        moKeyOtherPayment.setEnabled(false);
+        moKeyOtherPayment.resetField();
+        
         if (moKeyEarning.getSelectedIndex() <= 0) {
             moEarning = null;
         }
         else {
             moEarning = moEarningsMap.get(moKeyEarning.getValue()[0]);
             moCompValue.setCompoundText(moHrsPayroll.getEarningComputationTypesMap().get(moEarning.getFkEarningComputationTypeId()));
+            
+            moKeyOtherPayment.setValue(new int[] { moEarning.getFkOtherPaymentTypeId() });
+            if (moEarning.getFkEarningTypeId() == SModSysConsts.HRSS_TP_EAR_OTH) {
+                moKeyOtherPayment.setEnabled(true);
+            }
+            else {
+                moKeyOtherPayment.setEnabled(false);
+            }
             
             // prepare grid rows:
             
@@ -466,6 +492,22 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         moGridEmployeeRow.getTable().getDefaultEditor(Double.class).addCellEditorListener(this);
         moGridEmployeeRow.setSelectedGridRow(0);
         computeTotal();
+    }
+    
+    private void itemStateChangedEarningOtherPayment() {
+        int otherPaymentType;
+        
+        if (moKeyOtherPayment.getSelectedIndex() <= 0) {
+            otherPaymentType = SModSysConsts.HRSS_TP_OTH_PAY_NON;
+        }
+        else {
+            otherPaymentType = moKeyOtherPayment.getValue()[0];
+        }
+        
+        for (SGridRow row : moGridEmployeeRow.getModel().getGridRows()) {
+            SHrsReceiptEarning hrsReceiptEarning = (SHrsReceiptEarning) row;
+            hrsReceiptEarning.getPayrollReceiptEarning().setFkOtherPaymentTypeId(otherPaymentType);
+        }
     }
     
     private void processCellEdition() {
@@ -541,23 +583,25 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
     
     @Override
     public void addAllListeners() {
-        moKeyEarning.addItemListener(this);
         jbSetAll.addActionListener(this);
         jbClear.addActionListener(this);
         jbClearAll.addActionListener(this);
+        moKeyEarning.addItemListener(this);
+        moKeyOtherPayment.addItemListener(this);
     }
 
     @Override
     public void removeAllListeners() {
-        moKeyEarning.removeItemListener(this);
         jbSetAll.removeActionListener(this);
         jbClear.removeActionListener(this);
         jbClearAll.removeActionListener(this);
+        moKeyEarning.removeItemListener(this);
+        moKeyOtherPayment.removeItemListener(this);
     }
 
     @Override
     public void reloadCatalogues() {
-        
+        miClient.getSession().populateCatalogue(moKeyOtherPayment, SModConsts.HRSS_TP_OTH_PAY, 0, null);
     }
 
     @Override
@@ -572,6 +616,19 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
 
     @Override
     public SGuiValidation validateForm() {
+        SGuiValidation validation = new SGuiValidation();
+        
+        if (moKeyOtherPayment.isEnabled()) {
+            if (moKeyOtherPayment.getSelectedIndex() <= 0) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(moKeyOtherPayment.getToolTipText()) + "'.");
+                validation.setComponent(moKeyOtherPayment);
+            }
+            else if (moKeyOtherPayment.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NON) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(moKeyOtherPayment.getToolTipText()) + "'.");
+                validation.setComponent(moKeyOtherPayment);
+            }
+        }
+        
         return new SGuiValidation();
     }
 
@@ -646,6 +703,9 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
 
             if (comboBox == moKeyEarning) {
                 itemStateChangedEarning();
+            }
+            else if (comboBox == moKeyOtherPayment) {
+                itemStateChangedEarningOtherPayment();
             }
         }
     }

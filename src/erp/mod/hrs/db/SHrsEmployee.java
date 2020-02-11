@@ -207,28 +207,29 @@ public class SHrsEmployee {
     }
 
     public SHrsAccumulatedDeduction getHrsAccumulatedDeductionByType(final int deductionType) {
-        SHrsAccumulatedDeduction oHrsAccumulatedDeduction = null;
+        SHrsAccumulatedDeduction hrsAccumulatedDeduction = null;
 
         for (SHrsAccumulatedDeduction deduction : maYearHrsAccumulatedDeductionsByType) {
             if (deduction.getDeductionId() == deductionType) {
-                oHrsAccumulatedDeduction = deduction;
+                hrsAccumulatedDeduction = deduction;
                 break;
             }
         }
 
-        return oHrsAccumulatedDeduction;
+        return hrsAccumulatedDeduction;
     }
 
     public SHrsEmployeeDays createEmployeeDays() {
-        double daysPayrollCalendar = moHrsReceipt.getHrsPayroll().getPayroll().getCalendarDays_r(); // casted to double to compute a correct factor!
-        double factorCalendar = daysPayrollCalendar == 0 ? 0 : moHrsReceipt.getHrsPayroll().getPayroll().getReceiptDays() / daysPayrollCalendar;
+        SDbPayroll payroll = moHrsReceipt.getHrsPayroll().getPayroll(); // convenience variable
+        double daysPayrollCalendar = payroll.getCalendarDays_r(); // casted to double to compute a correct factor!
+        double factorCalendar = daysPayrollCalendar == 0 ? 0 : payroll.getReceiptDays() / daysPayrollCalendar;
 
         int daysReceipt = mnDaysHiredPayroll;
         int daysWorking;
 
-        if (moHrsReceipt.getHrsPayroll().getPayroll().getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE) {
-            int daysInactive = moHrsReceipt.getHrsPayroll().getPayroll().getReceiptDays() - daysReceipt;
-            daysWorking = moHrsReceipt.getHrsPayroll().getPayroll().getWorkingDays() - daysInactive;
+        if (payroll.getFkPaymentTypeId() == SModSysConsts.HRSS_TP_PAY_WEE) {
+            int daysInactive = payroll.getReceiptDays() - daysReceipt;
+            daysWorking = payroll.getWorkingDays() - daysInactive;
         }
         else {
             daysWorking = mnDaysHiredPayroll;

@@ -62,7 +62,15 @@
             <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyEarning">
               <Properties>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[300, 23]"/>
+                  <Dimension value="[250, 23]"/>
+                </Property>
+              </Properties>
+            </Component>
+            <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyOtherPayment">
+              <Properties>
+                <Property name="toolTipText" type="java.lang.String" value="Tipo otro pago"/>
+                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                  <Dimension value="[250, 23]"/>
                 </Property>
               </Properties>
             </Component>

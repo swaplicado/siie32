@@ -887,6 +887,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_CMP = 25;       // Compensation
     public static final int HRSS_TP_EAR_OTH = 999;      // Other payments that are not income
 
+    public static final int HRSS_TP_OTH_PAY_NON = 0;                // Tax Refund of Overpayed Tax
     public static final int HRSS_TP_OTH_PAY_TAX_REF_OPT = 1;        // Tax Refund of Overpayed Tax
     public static final int HRSS_TP_OTH_PAY_TAX_SUB = 2;            // Tax Subsidy
     public static final int HRSS_TP_OTH_PAY_TRV_EXP = 3;            // Travel Expenses

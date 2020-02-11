@@ -538,32 +538,12 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSS_TP_PAY:
                 settings = new SGuiCatalogueSettings("Tipo periodo pago", 1);
-                sql = "SELECT id_tp_pay AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                sql = "SELECT id_tp_pay AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_SAL:
                 settings = new SGuiCatalogueSettings("Tipo salario", 1);
                 sql = "SELECT id_tp_sal AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
-                break;
-            case SModConsts.HRSS_TP_CON:
-                settings = new SGuiCatalogueSettings("Tipo contrato", 1);
-                sql = "SELECT id_tp_con AS " + SDbConsts.FIELD_ID + "1, (code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
-                break;
-            case SModConsts.HRSS_TP_REC_SCHE:
-                settings = new SGuiCatalogueSettings("Régimen contratación", 1);
-                sql = "SELECT id_tp_rec_sche AS " + SDbConsts.FIELD_ID + "1, (code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
-                break;
-            case SModConsts.HRSS_TP_POS_RISK:
-                settings = new SGuiCatalogueSettings("Riesgo trabajo", 1);
-                sql = "SELECT id_tp_pos_risk AS " + SDbConsts.FIELD_ID + "1, (code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
-                break;
-            case SModConsts.HRSS_TP_WORK_DAY:
-                settings = new SGuiCatalogueSettings("Tipo jornada", 1);
-                sql = "SELECT id_tp_work_day AS " + SDbConsts.FIELD_ID + "1, (code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_ACC:
@@ -591,17 +571,22 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSS_TP_EAR:
                 settings = new SGuiCatalogueSettings("Tipo percepción", 1);
-                sql = "SELECT id_tp_ear AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                sql = "SELECT id_tp_ear AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
-            case SModConsts.HRSS_TP_DED:
-                settings = new SGuiCatalogueSettings("Tipo deducción", 1);
-                sql = "SELECT id_tp_ded AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+            case SModConsts.HRSS_TP_OTH_PAY:
+                settings = new SGuiCatalogueSettings("Tipo otro pago", 1);
+                sql = "SELECT id_tp_oth_pay AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_DED_COMP:
                 settings = new SGuiCatalogueSettings("Tipo cálculo deducción", 1);
                 sql = "SELECT id_tp_ded_comp AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                break;
+            case SModConsts.HRSS_TP_DED:
+                settings = new SGuiCatalogueSettings("Tipo deducción", 1);
+                sql = "SELECT id_tp_ded AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_BEN:
@@ -625,6 +610,36 @@ public class SModuleHrs extends SGuiModule {
                 sql = "SELECT id_tp_loan_pay AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
+            case SModConsts.HRSS_TP_CON:
+                settings = new SGuiCatalogueSettings("Tipo contrato", 1);
+                sql = "SELECT id_tp_con AS " + SDbConsts.FIELD_ID + "1, (code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                break;
+            case SModConsts.HRSS_TP_REC_SCHE:
+                settings = new SGuiCatalogueSettings("Régimen contratación", 1);
+                sql = "SELECT id_tp_rec_sche AS " + SDbConsts.FIELD_ID + "1, (code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                break;
+            case SModConsts.HRSS_TP_POS_RISK:
+                settings = new SGuiCatalogueSettings("Riesgo trabajo", 1);
+                sql = "SELECT id_tp_pos_risk AS " + SDbConsts.FIELD_ID + "1, (code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                break;
+            case SModConsts.HRSS_TP_WORK_DAY:
+                settings = new SGuiCatalogueSettings("Tipo jornada", 1);
+                sql = "SELECT id_tp_work_day AS " + SDbConsts.FIELD_ID + "1, (code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                break;
+            case SModConsts.HRSS_TP_DIS:
+                settings = new SGuiCatalogueSettings("Tipo incapacidad", 1);
+                sql = "SELECT id_tp_dis AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                break;
+            case SModConsts.HRSS_TP_DAY:
+                settings = new SGuiCatalogueSettings("Tipo día", 1);
+                sql = "SELECT id_tp_day AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                break;
             case SModConsts.HRSS_BANK:
                 settings = new SGuiCatalogueSettings("Banco", 1);
                 sql = "SELECT id_bank AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
@@ -633,11 +648,6 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSS_GROCERY_SRV:
                 settings = new SGuiCatalogueSettings("Proveedor despensa", 1);
                 sql = "SELECT id_grocery_srv AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
-                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
-                break;
-            case SModConsts.HRSS_TP_DIS:
-                settings = new SGuiCatalogueSettings("Tipo incapacidad", 1);
-                sql = "SELECT id_tp_dis AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
             case SModConsts.HRSU_CL_ABS:

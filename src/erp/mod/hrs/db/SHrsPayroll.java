@@ -144,6 +144,7 @@ public class SHrsPayroll {
         payrollReceiptEarning.setAmount_r(amount);
         //payrollReceiptEarning.setAmountExempt(...);
         //payrollReceiptEarning.setAmountTaxable(...);
+        //payrollReceiptEarning.setAuxiliarAmount(...);
         
         if (hrsBenefitBase == null) {
             payrollReceiptEarning.setFactorAmount(earning.getUnitsFactor());
@@ -174,6 +175,7 @@ public class SHrsPayroll {
         payrollReceiptEarning.setFkLoanEmployeeId_n(loanEmployeeId_n);
         payrollReceiptEarning.setFkLoanLoanId_n(loanLoanId_n);
         payrollReceiptEarning.setFkLoanTypeId_n(loanEmployeeId_n != 0 && loanLoanId_n != 0 ? earning.getFkLoanTypeId() : 0);
+        payrollReceiptEarning.setFkOtherPaymentTypeId(earning.getFkOtherPaymentTypeId());
         /*
         payrollReceiptEarning.setFkUserInsertId(...);
         payrollReceiptEarning.setFkUserUpdateId(...);

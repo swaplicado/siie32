@@ -307,8 +307,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     "ben_ann = " + mnBenefitAnniversary + ", " +
                     "b_usr = " + (mbUserEdited ? 1 : 0) + ", " +
                     "b_aut = " + (mbAutomatic ? 1 : 0) + ", " +
-                    //"b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                    //"b_sys = " + (mbSystem ? 1 : 0) + ", " +
+                    "b_del = " + (mbDeleted ? 1 : 0) + ", " +
+                    "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ded = " + mnFkDeductionTypeId + ", " +
                     "fk_ded = " + mnFkDeductionId + ", " +
                     "fk_tp_ben = " + mnFkBenefitTypeId + ", " +

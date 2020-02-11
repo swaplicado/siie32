@@ -67,7 +67,7 @@ public class SFormAbsenceType extends SBeanForm implements ItemListener {
 
         jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlAbsenceClass.setForeground(new java.awt.Color(0, 0, 255));
         jlAbsenceClass.setText("Clase incidencia:*");
@@ -79,7 +79,7 @@ public class SFormAbsenceType extends SBeanForm implements ItemListener {
 
         jPanel2.add(jPanel6);
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCode.setText("Código:*");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -90,19 +90,19 @@ public class SFormAbsenceType extends SBeanForm implements ItemListener {
 
         jPanel2.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlName.setText("Nombre:*");
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlName);
 
         moTextName.setText("sBeanFieldText1");
-        moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel5.add(moTextName);
 
         jPanel2.add(jPanel5);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDisabilityType.setText("Tipo incapacidad:*");
         jlDisabilityType.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -149,7 +149,7 @@ public class SFormAbsenceType extends SBeanForm implements ItemListener {
 
         moKeyAbsenceClass.setKeySettings(miClient, SGuiUtils.getLabelName(jlAbsenceClass), true);
         moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
-        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
+        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 100);
         moKeyDisabilityType.setKeySettings(miClient, SGuiUtils.getLabelName(jlDisabilityType), true);
         moBoolPayable.setBooleanSettings(moBoolPayable.getText(), false);
 

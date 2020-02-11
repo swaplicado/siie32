@@ -4,11 +4,13 @@
  */
 package erp.mod.hrs.db;
 
+import erp.cfd.SCfdConsts;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -21,6 +23,14 @@ import sa.lib.gui.SGuiSession;
  * @author Juan Barajas, Sergio Flores
  */
 public class SDbEarning extends SDbRegistryUser {
+    
+    public static final HashMap<Integer, String> AuxAmountLabels = new HashMap<>();
+    public static final HashMap<Integer, String> AuxAmountHints = new HashMap<>();
+    
+    static {
+        AuxAmountLabels.put(SModSysConsts.HRSS_TP_EAR_TAX_SUB, "Subsidio efectivo");
+        AuxAmountHints.put(SModSysConsts.HRSS_TP_EAR_TAX_SUB, SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY_EFF);
+    }
 
     protected int mnPkEarningId;
     protected String msCode;
@@ -52,6 +62,7 @@ public class SDbEarning extends SDbRegistryUser {
     protected int mnFkEarningComputationTypeId;
     protected int mnFkEarningExemptionTypeId;
     protected int mnFkEarningExemptionTypeYearId;
+    protected int mnFkOtherPaymentTypeId;
     protected int mnFkLoanTypeId;
     protected int mnFkBenefitTypeId;
     protected int mnFkAccountingConfigurationTypeId;
@@ -99,6 +110,7 @@ public class SDbEarning extends SDbRegistryUser {
     public void setFkEarningComputationTypeId(int n) { mnFkEarningComputationTypeId = n; }
     public void setFkEarningExemptionTypeId(int n) { mnFkEarningExemptionTypeId = n; }
     public void setFkEarningExemptionTypeYearId(int n) { mnFkEarningExemptionTypeYearId = n; }
+    public void setFkOtherPaymentTypeId(int n) { mnFkOtherPaymentTypeId = n; }
     public void setFkLoanTypeId(int n) { mnFkLoanTypeId = n; }
     public void setFkBenefitTypeId(int n) { mnFkBenefitTypeId = n; }
     public void setFkAccountingConfigurationTypeId(int n) { mnFkAccountingConfigurationTypeId = n; }
@@ -138,6 +150,7 @@ public class SDbEarning extends SDbRegistryUser {
     public int getFkEarningComputationTypeId() { return mnFkEarningComputationTypeId; }
     public int getFkEarningExemptionTypeId() { return mnFkEarningExemptionTypeId; }
     public int getFkEarningExemptionTypeYearId() { return mnFkEarningExemptionTypeYearId; }
+    public int getFkOtherPaymentTypeId() { return mnFkOtherPaymentTypeId; }
     public int getFkLoanTypeId() { return mnFkLoanTypeId; }
     public int getFkBenefitTypeId() { return mnFkBenefitTypeId; }
     public int getFkAccountingConfigurationTypeId() { return mnFkAccountingConfigurationTypeId; }
@@ -219,6 +232,7 @@ public class SDbEarning extends SDbRegistryUser {
         mnFkEarningComputationTypeId = 0;
         mnFkEarningExemptionTypeId = 0;
         mnFkEarningExemptionTypeYearId = 0;
+        mnFkOtherPaymentTypeId = 0;
         mnFkLoanTypeId = 0;
         mnFkBenefitTypeId = 0;
         mnFkAccountingConfigurationTypeId = 0;
@@ -302,6 +316,7 @@ public class SDbEarning extends SDbRegistryUser {
             mnFkEarningComputationTypeId = resultSet.getInt("fk_tp_ear_comp");
             mnFkEarningExemptionTypeId = resultSet.getInt("fk_tp_ear_exem");
             mnFkEarningExemptionTypeYearId = resultSet.getInt("fk_tp_ear_exem_year");
+            mnFkOtherPaymentTypeId = resultSet.getInt("fk_tp_oth_pay");
             mnFkLoanTypeId = resultSet.getInt("fk_tp_loan");
             mnFkBenefitTypeId = resultSet.getInt("fk_tp_ben");
             mnFkAccountingConfigurationTypeId = resultSet.getInt("fk_tp_acc_cfg");
@@ -364,6 +379,7 @@ public class SDbEarning extends SDbRegistryUser {
                     mnFkEarningComputationTypeId + ", " + 
                     mnFkEarningExemptionTypeId + ", " + 
                     mnFkEarningExemptionTypeYearId + ", " + 
+                    mnFkOtherPaymentTypeId + ", " + 
                     mnFkLoanTypeId + ", " + 
                     mnFkBenefitTypeId + ", " + 
                     mnFkAccountingConfigurationTypeId + ", " + 
@@ -409,6 +425,7 @@ public class SDbEarning extends SDbRegistryUser {
                     "fk_tp_ear_comp = " + mnFkEarningComputationTypeId + ", " +
                     "fk_tp_ear_exem = " + mnFkEarningExemptionTypeId + ", " +
                     "fk_tp_ear_exem_year = " + mnFkEarningExemptionTypeYearId + ", " +
+                    "fk_tp_oth_pay = " + mnFkOtherPaymentTypeId + ", " +
                     "fk_tp_loan = " + mnFkLoanTypeId + ", " +
                     "fk_tp_ben = " + mnFkBenefitTypeId + ", " +
                     "fk_tp_acc_cfg = " + mnFkAccountingConfigurationTypeId + ", " +
@@ -461,6 +478,7 @@ public class SDbEarning extends SDbRegistryUser {
         registry.setFkEarningComputationTypeId(this.getFkEarningComputationTypeId());
         registry.setFkEarningExemptionTypeId(this.getFkEarningExemptionTypeId());
         registry.setFkEarningExemptionTypeYearId(this.getFkEarningExemptionTypeYearId());
+        registry.setFkOtherPaymentTypeId(this.getFkOtherPaymentTypeId());
         registry.setFkLoanTypeId(this.getFkLoanTypeId());
         registry.setFkBenefitTypeId(this.getFkBenefitTypeId());
         registry.setFkAccountingConfigurationTypeId(this.getFkAccountingConfigurationTypeId());
