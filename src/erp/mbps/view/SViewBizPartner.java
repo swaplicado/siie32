@@ -360,10 +360,10 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pos.name", "Puesto", 100);
         }
         if (mnTabTypeAux01 == SDataConstants.BPSX_BP_EMP) {
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_sal", "Salario $", 100);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_dt_sal", "Salario últ. cambio", STableConstants.WIDTH_DATE);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_wage", "Sueldo $", 100);
-            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_dt_wage", "Sueldo últ. cambio", STableConstants.WIDTH_DATE);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_sal", "Salario diario $", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_dt_sal", "Salario diario últ. cambio", STableConstants.WIDTH_DATE);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_wage", "Sueldo mensual $", 100);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_dt_wage", "Sueldo mensual últ. cambio", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_sal_ssc", "SBC $", 100);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "f_dt_sal_ssc", "SBC últ. cambio", STableConstants.WIDTH_DATE);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "e.wrk_hrs_day", "Jornada hrs", 50);

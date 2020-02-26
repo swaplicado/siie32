@@ -633,13 +633,25 @@ public class SGuiDatePicker extends javax.swing.JDialog implements erp.lib.form.
         }
     }
 
+    public erp.lib.gui.SGuiDate pickDate(java.util.Date date) {
+        formReset();
+        setDate(date);
+        setVisible(true);
+
+        if (mnFormResult == SLibConstants.FORM_RESULT_OK) {
+            return moGuiDate;
+        }
+
+        return null;
+    }
+
     public int pickDate(java.util.Date date, erp.lib.form.SFormField field) {
         formReset();
         setDate(date);
         setVisible(true);
 
         if (mnFormResult == SLibConstants.FORM_RESULT_OK) {
-            field.setDate(miClient.getGuiDatePickerXXX().getGuiDate());
+            field.setDate(moGuiDate);
             field.getComponent().requestFocus();
         }
 

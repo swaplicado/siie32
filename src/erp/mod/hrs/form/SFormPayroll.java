@@ -4,7 +4,6 @@
  */
 package erp.mod.hrs.form;
 
-import erp.data.SDataConstantsSys;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbAbsenceConsumption;
@@ -23,6 +22,7 @@ import erp.mod.hrs.db.SHrsReceiptEarning;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.db.SRowPayrollEmployee;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -30,8 +30,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -115,8 +115,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private void initComponents() {
 
         jPanel3 = new javax.swing.JPanel();
-        gpoRadioPayrollType = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
+        bgPayrollType = new javax.swing.ButtonGroup();
+        bgViewEmployees = new javax.swing.ButtonGroup();
+        jpMain = new javax.swing.JPanel();
         jtpPayroll = new javax.swing.JTabbedPane();
         jpPayroll = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
@@ -166,7 +167,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel43 = new javax.swing.JPanel();
         moRadSpecial = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel45 = new javax.swing.JPanel();
-        moRadExOrd = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadExtraordinary = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel21 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jlTaxComputationType = new javax.swing.JLabel();
@@ -222,9 +223,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jpReceipts = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jpControls = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
         jPanel39 = new javax.swing.JPanel();
-        jbEmployeeViewActive = new javax.swing.JButton();
-        jbEmployeeViewAll = new javax.swing.JButton();
+        jlView = new javax.swing.JLabel();
+        moRadViewEmployeesActive = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadViewEmployeesAll = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel4 = new javax.swing.JPanel();
+        jlFilter = new javax.swing.JLabel();
+        moBoolFilterWages = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolFilterAssimilated = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolFilterRetirees = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolFilterOthers = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel40 = new javax.swing.JPanel();
         jbReceiptCaptureEarnings = new javax.swing.JButton();
         jbReceiptCaptureDeductions = new javax.swing.JButton();
@@ -240,8 +249,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jpPayrollReceipts = new javax.swing.JPanel();
         jlTotalSelected = new javax.swing.JLabel();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jpMain.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
+        jpMain.setLayout(new java.awt.BorderLayout());
 
         jtpPayroll.setTabPlacement(javax.swing.JTabbedPane.LEFT);
         jtpPayroll.setAutoscrolls(true);
@@ -409,7 +418,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        gpoRadioPayrollType.add(moRadNormal);
+        bgPayrollType.add(moRadNormal);
         moRadNormal.setText("Es nómina normal");
         moRadNormal.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel17.add(moRadNormal);
@@ -418,7 +427,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel43.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        gpoRadioPayrollType.add(moRadSpecial);
+        bgPayrollType.add(moRadSpecial);
         moRadSpecial.setText("Es nómina especial");
         moRadSpecial.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel43.add(moRadSpecial);
@@ -427,10 +436,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel45.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        gpoRadioPayrollType.add(moRadExOrd);
-        moRadExOrd.setText("Es nómina extraordinaria");
-        moRadExOrd.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel45.add(moRadExOrd);
+        bgPayrollType.add(moRadExtraordinary);
+        moRadExtraordinary.setText("Es nómina extraordinaria");
+        moRadExtraordinary.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel45.add(moRadExtraordinary);
 
         jPanel6.add(jPanel45);
 
@@ -649,22 +658,56 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jpControls.setLayout(new java.awt.BorderLayout());
 
-        jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel2.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jbEmployeeViewActive.setText("Ver empleados activos");
-        jbEmployeeViewActive.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbEmployeeViewActive.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel39.add(jbEmployeeViewActive);
+        jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jbEmployeeViewAll.setText("Ver todos los empleados");
-        jbEmployeeViewAll.setMargin(new java.awt.Insets(2, 0, 2, 0));
-        jbEmployeeViewAll.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel39.add(jbEmployeeViewAll);
+        jlView.setText("Ver:");
+        jlView.setPreferredSize(new java.awt.Dimension(25, 23));
+        jlView.setRequestFocusEnabled(false);
+        jPanel39.add(jlView);
 
-        jpControls.add(jPanel39, java.awt.BorderLayout.WEST);
+        bgViewEmployees.add(moRadViewEmployeesActive);
+        moRadViewEmployeesActive.setText("Empleados activos");
+        moRadViewEmployeesActive.setPreferredSize(new java.awt.Dimension(135, 23));
+        jPanel39.add(moRadViewEmployeesActive);
+
+        bgViewEmployees.add(moRadViewEmployeesAll);
+        moRadViewEmployeesAll.setText("Todos los empleados");
+        moRadViewEmployeesAll.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel39.add(moRadViewEmployeesAll);
+
+        jPanel2.add(jPanel39);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFilter.setText("Agregar:");
+        jlFilter.setPreferredSize(new java.awt.Dimension(50, 23));
+        jlFilter.setRequestFocusEnabled(false);
+        jPanel4.add(jlFilter);
+
+        moBoolFilterWages.setText("Sueldos");
+        moBoolFilterWages.setPreferredSize(new java.awt.Dimension(70, 23));
+        jPanel4.add(moBoolFilterWages);
+
+        moBoolFilterAssimilated.setText("Asimilados");
+        moBoolFilterAssimilated.setPreferredSize(new java.awt.Dimension(80, 23));
+        jPanel4.add(moBoolFilterAssimilated);
+
+        moBoolFilterRetirees.setText("Jubilados");
+        moBoolFilterRetirees.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(moBoolFilterRetirees);
+
+        moBoolFilterOthers.setText("Otros");
+        moBoolFilterOthers.setPreferredSize(new java.awt.Dimension(60, 23));
+        jPanel4.add(moBoolFilterOthers);
+
+        jPanel2.add(jPanel4);
+
+        jpControls.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel40.setPreferredSize(new java.awt.Dimension(550, 33));
-        jPanel40.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel40.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbReceiptCaptureEarnings.setText("Capturar percepciones");
         jbReceiptCaptureEarnings.setMargin(new java.awt.Insets(2, 0, 2, 0));
@@ -681,7 +724,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel5.add(jpControls, java.awt.BorderLayout.NORTH);
 
         jpAvailableEmployees.setBorder(javax.swing.BorderFactory.createTitledBorder("Empleados disponibles:"));
-        jpAvailableEmployees.setPreferredSize(new java.awt.Dimension(310, 100));
+        jpAvailableEmployees.setPreferredSize(new java.awt.Dimension(325, 100));
         jpAvailableEmployees.setLayout(new java.awt.BorderLayout());
 
         jlTotalAvailables.setText("[number of available employees]");
@@ -723,7 +766,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel5.add(jpControlsReceipts, java.awt.BorderLayout.CENTER);
 
         jpPayrollReceipts.setBorder(javax.swing.BorderFactory.createTitledBorder("Recibos de nómina:"));
-        jpPayrollReceipts.setPreferredSize(new java.awt.Dimension(565, 100));
+        jpPayrollReceipts.setPreferredSize(new java.awt.Dimension(550, 100));
         jpPayrollReceipts.setLayout(new java.awt.BorderLayout());
 
         jlTotalSelected.setText("[number of selected employees]");
@@ -735,16 +778,16 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jtpPayroll.addTab("Recibos", jpReceipts);
 
-        jPanel1.add(jtpPayroll, java.awt.BorderLayout.CENTER);
+        jpMain.add(jtpPayroll, java.awt.BorderLayout.CENTER);
         jtpPayroll.getAccessibleContext().setAccessibleName("Configuración");
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jpMain, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup gpoRadioPayrollType;
+    private javax.swing.ButtonGroup bgPayrollType;
+    private javax.swing.ButtonGroup bgViewEmployees;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -755,6 +798,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
@@ -774,6 +818,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel39;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel40;
     private javax.swing.JPanel jPanel41;
     private javax.swing.JPanel jPanel42;
@@ -791,8 +836,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JButton jbEditNumber;
     private javax.swing.JButton jbEditPeriod;
     private javax.swing.JButton jbEditPeriodYear;
-    private javax.swing.JButton jbEmployeeViewActive;
-    private javax.swing.JButton jbEmployeeViewAll;
     private javax.swing.JButton jbGetNextNumber;
     private javax.swing.JButton jbGoTabReceipts;
     private javax.swing.JButton jbReceiptAdd;
@@ -805,6 +848,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlDummy01;
+    private javax.swing.JLabel jlFilter;
     private javax.swing.JLabel jlFiscalYear;
     private javax.swing.JLabel jlMwzReferenceType;
     private javax.swing.JLabel jlMwzReferenceWage;
@@ -827,11 +871,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlTotalSelected;
     private javax.swing.JLabel jlUmaAmount;
     private javax.swing.JLabel jlUmiAmount;
+    private javax.swing.JLabel jlView;
     private javax.swing.JLabel jlWorkingDays;
     private javax.swing.JLabel jlYear;
     private javax.swing.JPanel jpAvailableEmployees;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpControlsReceipts;
+    private javax.swing.JPanel jpMain;
     private javax.swing.JPanel jpPayroll;
     private javax.swing.JPanel jpPayrollReceipts;
     private javax.swing.JPanel jpReceipts;
@@ -841,6 +887,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JTextField jtfTaxSubsidyOption;
     private javax.swing.JTabbedPane jtpPayroll;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolClosed;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolFilterAssimilated;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolFilterOthers;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolFilterRetirees;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolFilterWages;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolSsContribution;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
@@ -863,9 +913,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanFieldKey moKeyTax;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTaxComputationType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTaxSubsidy;
-    private sa.lib.gui.bean.SBeanFieldRadio moRadExOrd;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadExtraordinary;
     private sa.lib.gui.bean.SBeanFieldRadio moRadNormal;
     private sa.lib.gui.bean.SBeanFieldRadio moRadSpecial;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadViewEmployeesActive;
+    private sa.lib.gui.bean.SBeanFieldRadio moRadViewEmployeesAll;
     private sa.lib.gui.bean.SBeanFieldText moTextNotes;
     // End of variables declaration//GEN-END:variables
 
@@ -898,7 +950,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moTextNotes.setTextSettings(SGuiUtils.getLabelName(jlNotes.getText()), 255, 0);
         moRadNormal.setBooleanSettings(SGuiUtils.getLabelName(moRadNormal.getText()), false);
         moRadSpecial.setBooleanSettings(SGuiUtils.getLabelName(moRadSpecial.getText()), false);
-        moRadExOrd.setBooleanSettings(SGuiUtils.getLabelName(moRadExOrd.getText()), false);
+        moRadExtraordinary.setBooleanSettings(SGuiUtils.getLabelName(moRadExtraordinary.getText()), false);
         moKeyTaxComputationType.setKeySettings(miClient, SGuiUtils.getLabelName(jlTaxComputationType.getText()), true);
         moKeyTax.setKeySettings(miClient, SGuiUtils.getLabelName(jlTax.getText()), true);
         moKeyTaxSubsidy.setKeySettings(miClient, SGuiUtils.getLabelName(jlTaxSubsidy.getText()), true);
@@ -921,6 +973,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moDecTotalDeductions.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTotalDeductions.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDecTotalNet.setCompoundFieldSettings(miClient);
         moDecTotalNet.getField().setDecimalSettings(SGuiUtils.getLabelName(jlTotalNet.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moRadViewEmployeesActive.setBooleanSettings(moRadViewEmployeesActive.getText(), false);
+        moRadViewEmployeesAll.setBooleanSettings(moRadViewEmployeesAll.getText(), false);
+        moBoolFilterWages.setBooleanSettings(moBoolFilterWages.getText(), false);
+        moBoolFilterAssimilated.setBooleanSettings(moBoolFilterAssimilated.getText(), false);
+        moBoolFilterRetirees.setBooleanSettings(moBoolFilterRetirees.getText(), false);
+        moBoolFilterOthers.setBooleanSettings(moBoolFilterOthers.getText(), false);
 
         moFields.addField(moIntPeriodYear);
         moFields.addField(moIntFiscalYear);
@@ -933,7 +991,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moTextNotes);
         moFields.addField(moRadNormal);
         moFields.addField(moRadSpecial);
-        moFields.addField(moRadExOrd);
+        moFields.addField(moRadExtraordinary);
         moFields.addField(moKeyTaxComputationType);
         moFields.addField(moKeyTax);
         moFields.addField(moKeyTaxSubsidy);
@@ -946,6 +1004,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moDecUmaAmount.getField()); // is read-only
         moFields.addField(moDecUmiAmount.getField()); // is read-only
         moFields.addField(moBoolClosed); // is read-only
+        moFields.addField(moRadViewEmployeesActive);
+        moFields.addField(moRadViewEmployeesAll);
+        moFields.addField(moBoolFilterWages);
+        moFields.addField(moBoolFilterAssimilated);
+        moFields.addField(moBoolFilterRetirees);
+        moFields.addField(moBoolFilterOthers);
         moFields.setFormButton(jbSave);
 
         jtpPayroll.setSelectedIndex(0);
@@ -958,14 +1022,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                int col = 0;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
-                SGridColumnForm[] columns = new SGridColumnForm[2];
 
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200);
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave");
-
-                gridColumnsForm.addAll(Arrays.asList((SGridColumnForm[]) columns));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Activo"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Régimen contratación"));
 
                 return gridColumnsForm;
             }
@@ -983,17 +1045,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                int col = 0;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
-                SGridColumnForm[] columns = new SGridColumnForm[5];
 
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200);
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total percepciones $");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total deducciones $");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total neto $");
-
-                gridColumnsForm.addAll(Arrays.asList((SGridColumnForm[]) columns));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total percepciones $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total deducciones $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Total neto $"));
 
                 return gridColumnsForm;
             }
@@ -1005,13 +1063,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
                     }
                     else {
-                        SRowPayrollEmployee rowPayrollReceipt = (SRowPayrollEmployee) moGridPanePayrollReceipts.getSelectedGridRow();
-                        SHrsReceipt hrsReceipt = rowPayrollReceipt.getHrsReceipt().clone();
+                        SRowPayrollEmployee rowPayrollEmployee = (SRowPayrollEmployee) moGridPanePayrollReceipts.getSelectedGridRow();
+                        SHrsReceipt hrsReceipt = rowPayrollEmployee.getHrsReceipt().clone();
                         
-                        SDbPayrollReceiptIssue payrollReceiptIssue = rowPayrollReceipt.getHrsReceipt().getPayrollReceipt().getChildPayrollReceiptIssue();
+                        SDbPayrollReceiptIssue payrollReceiptIssue = rowPayrollEmployee.getHrsReceipt().getPayrollReceipt().getChildPayrollReceiptIssue(); // convenience variable
                         boolean isReceiptEditable = !mbIsReadOnly && (payrollReceiptIssue == null || payrollReceiptIssue.isCfdEditable());
                         
-                        if (!mbIsReadOnly && isReceiptEditable) {
+                        if (isReceiptEditable) {
                             hrsReceipt.computeReceipt();
                         }
 
@@ -1041,8 +1099,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moGridPanePayrollReceipts.setPaneFormOwner(null);
         jpPayrollReceipts.add(moGridPanePayrollReceipts, BorderLayout.CENTER);
 
+        /* 2020-02-21, Sergio Flores: Prevent from preserving user preferences of grids in this dialog.
         mvFormGrids.add(moGridPaneEmployeesAvailable);
         mvFormGrids.add(moGridPanePayrollReceipts);
+        */
     }
 
     private void showCounts() {
@@ -1069,12 +1129,15 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             }
             else {
                 for (SHrsReceipt hrsReceipt : moHrsPayroll.getHrsReceipts()) {
-                    if (hrsReceipt.getPayrollReceipt().getChildPayrollReceiptIssue() != null && hrsReceipt.getPayrollReceipt().getChildPayrollReceiptIssue().getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                    SDbPayrollReceiptIssue payrollReceiptIssue = hrsReceipt.getPayrollReceipt().getChildPayrollReceiptIssue(); // convenience variable
+                    
+                    if (payrollReceiptIssue != null && !payrollReceiptIssue.isCfdEditable()) {
                         enable = false;
                         break;
                     }
                 }
             }
+            
             moTextNotes.setEnabled(enable);
             moKeyTaxComputationType.setEnabled(enable);
             moKeyTax.setEnabled(enable);
@@ -1083,9 +1146,15 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             moBoolSsContribution.setEnabled(enable);
             moKeyMwzType.setEnabled(enable);
             moKeyMwzReferenceType.setEnabled(enable);
+            jbTaxSubsidyOptionChange.setEnabled(enable);
             jbReceiptCaptureEarnings.setEnabled(enable);
             jbReceiptCaptureDeductions.setEnabled(enable);
-            jbTaxSubsidyOptionChange.setEnabled(!mbIsReadOnly);
+            moRadViewEmployeesActive.setEnabled(!mbIsReadOnly);
+            moRadViewEmployeesAll.setEnabled(!mbIsReadOnly);
+            moBoolFilterWages.setEnabled(!mbIsReadOnly);
+            moBoolFilterAssimilated.setEnabled(!mbIsReadOnly);
+            moBoolFilterRetirees.setEnabled(!mbIsReadOnly);
+            moBoolFilterOthers.setEnabled(!mbIsReadOnly);
             jbReceiptAdd.setEnabled(!mbIsReadOnly);
             jbReceiptAddAll.setEnabled(!mbIsReadOnly);
             jbReceiptRemove.setEnabled(!mbIsReadOnly);
@@ -1113,7 +1182,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             jbEditPeriod.setEnabled(true);
             moRadNormal.setEnabled(true);
             moRadSpecial.setEnabled(true);
-            moRadExOrd.setEnabled(true);
+            moRadExtraordinary.setEnabled(true);
         }
         else {
             jbEditPeriodYear.setEnabled(mbIsCopyingPayroll);
@@ -1124,7 +1193,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             jbEditPeriod.setEnabled(mbIsCopyingPayroll);
             moRadNormal.setEnabled(mbIsCopyingPayroll);
             moRadSpecial.setEnabled(mbIsCopyingPayroll);
-            moRadExOrd.setEnabled(mbIsCopyingPayroll);
+            moRadExtraordinary.setEnabled(mbIsCopyingPayroll);
         }
         
         // permanent read-only fields:
@@ -1146,7 +1215,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         else if (moRadSpecial.isSelected()) {
             type = SModSysConsts.HRSS_TP_PAY_SHT_SPE;
         }
-        else if (moRadExOrd.isSelected()) {
+        else if (moRadExtraordinary.isSelected()) {
             type = SModSysConsts.HRSS_TP_PAY_SHT_EXT;
         }
         
@@ -1162,18 +1231,18 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 moRadSpecial.setSelected(true);
                 break;
             case SModSysConsts.HRSS_TP_PAY_SHT_EXT:
-                moRadExOrd.setSelected(true);
+                moRadExtraordinary.setSelected(true);
                 break;
             default:
                 moRadNormal.setSelected(true);
         }
     }
     
-    private void validatePayrollReceiptCfdi(SRowPayrollEmployee rowReceipt) throws Exception {
-        SDbPayrollReceiptIssue issue = rowReceipt.getHrsReceipt().getPayrollReceipt().getChildPayrollReceiptIssue();
+    private void validatePayrollReceiptCfdi(SRowPayrollEmployee rowPayrollEmployee) throws Exception {
+        SDbPayrollReceiptIssue payrollReceiptIssue = rowPayrollEmployee.getHrsReceipt().getPayrollReceipt().getChildPayrollReceiptIssue(); // convenience variable
         
-        if (issue != null && issue.getFkReceiptStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
-            throw new Exception("No se puede remover el recibo de '" + rowReceipt.getName() + "', porque está emitido.");
+        if (payrollReceiptIssue != null && !payrollReceiptIssue.isCfdEditable()) {
+            throw new Exception("No se puede remover el recibo de '" + rowPayrollEmployee.getName() + "', porque " + (payrollReceiptIssue.isCfdStamped() ? "está timbrado" : "no es modificable") + ".");
         }
     }
 
@@ -1338,21 +1407,22 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
     }
 
-    private void populateRowPayrollEmployeesAvailable(final boolean activeOnly) throws Exception {
-        ArrayList<Integer> employees = new ArrayList<>();
+    private void populateRowPayrollEmployeesAvailable(final boolean activesOnly) throws Exception {
+        ArrayList<Integer> selectedEmployeesIds = new ArrayList<>();
+        
         for (int i = 0; i < moGridPanePayrollReceipts.getModel().getRowCount(); i++) {
-            employees.add(((SRowPayrollEmployee) moGridPanePayrollReceipts.getGridRow(i)).getPkEmployeeId());
+            selectedEmployeesIds.add(((SRowPayrollEmployee) moGridPanePayrollReceipts.getGridRow(i)).getPkEmployeeId());
         }
 
-        ArrayList<SRowPayrollEmployee> rowsAvailable = SHrsPayrollUtils.obtainRowPayrollEmployeesAvailable(miClient.getSession(), mnFormSubtype, moDateDateStart.getValue(), moDateDateEnd.getValue(), activeOnly, employees);
-        moGridPaneEmployeesAvailable.populateGrid(new Vector<>(rowsAvailable));
+        moGridPaneEmployeesAvailable.populateGrid(new Vector<>(
+                SHrsPayrollUtils.obtainRowPayrollEmployeesAvailable(miClient.getSession(), mnFormSubtype, moDateDateStart.getValue(), moDateDateEnd.getValue(), activesOnly, selectedEmployeesIds)));
         
         showCounts();
     }
 
     private void populateRowPayrollEmployeesReceipts() {
-        ArrayList<SRowPayrollEmployee> rowsSelected = SHrsPayrollUtils.createRowPayrollEmployeesSelected(moHrsPayroll.getHrsReceipts());
-        moGridPanePayrollReceipts.populateGrid(new Vector<>(rowsSelected));
+        moGridPanePayrollReceipts.populateGrid(new Vector<>(
+                SHrsPayrollUtils.createRowPayrollEmployees(miClient.getSession(), moHrsPayroll.getHrsReceipts())));
     }
 
     private void actionEditPeriodYear() {
@@ -1430,7 +1500,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     }
     
     private void itemStatePaysheetType() {
-        moBoolSsContribution.setSelected(!moRadSpecial.isSelected());
+        moBoolSsContribution.setSelected(moRadNormal.isSelected() || moRadExtraordinary.isSelected());
     }
     
     private void changeNumber() {
@@ -1441,6 +1511,24 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             catch (Exception ex) {
                 SLibUtils.printException(this, ex);
             }
+        }
+    }
+
+    private void itemStateEmployeesViewActive() {
+        try {
+            populateRowPayrollEmployeesAvailable(true);
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+    }
+
+    private void itemStateEmployeesViewAll() {
+        try {
+            populateRowPayrollEmployeesAvailable(false);
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
         }
     }
 
@@ -1457,8 +1545,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         else {
             try {
                 int index = moGridPaneEmployeesAvailable.getTable().getSelectedRow();
-                SRowPayrollEmployee rowEmployeeAvailable = (SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow();
-                SHrsReceipt hrsReceipt = moHrsPayroll.createHrsReceipt(rowEmployeeAvailable.getPkEmployeeId(), moIntPeriodYear.getValue(), moIntPeriod.getValue(), moIntFiscalYear.getValue(), moDateDateStart.getValue(), moDateDateEnd.getValue(), moKeyTaxComputationType.getValue()[0]);
+                SRowPayrollEmployee rowEmployee = (SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow();
+                SHrsReceipt hrsReceipt = moHrsPayroll.createHrsReceipt(rowEmployee.getPkEmployeeId(), moIntPeriodYear.getValue(), moIntPeriod.getValue(), moIntFiscalYear.getValue(), moDateDateStart.getValue(), moDateDateEnd.getValue(), moKeyTaxComputationType.getValue()[0]);
 
                 // recover receipt if it was already deleted:
                 
@@ -1478,12 +1566,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 moGridPaneEmployeesAvailable.renderGridRows();
                 moGridPaneEmployeesAvailable.setSelectedGridRow(index < moGridPaneEmployeesAvailable.getModel().getRowCount() ? index : moGridPaneEmployeesAvailable.getModel().getRowCount() - 1);
 
-                SRowPayrollEmployee rowEmployeeReceipt = new SRowPayrollEmployee(rowEmployeeAvailable);
-                rowEmployeeReceipt.setTotalEarnings(hrsReceipt.getTotalEarnings());
-                rowEmployeeReceipt.setTotalDeductions(hrsReceipt.getTotalDeductions());
-                rowEmployeeReceipt.setHrsReceipt(hrsReceipt);
+                SRowPayrollEmployee rowReceipt = new SRowPayrollEmployee(rowEmployee);
+                rowReceipt.setRowCase(SRowPayrollEmployee.CASE_RECEIPT);
+                rowReceipt.setTotalEarnings(hrsReceipt.getTotalEarnings());
+                rowReceipt.setTotalDeductions(hrsReceipt.getTotalDeductions());
+                rowReceipt.setHrsReceipt(hrsReceipt);
 
-                moGridPanePayrollReceipts.addGridRow(rowEmployeeReceipt);
+                moGridPanePayrollReceipts.addGridRow(rowReceipt);
                 moGridPanePayrollReceipts.renderGridRows();
                 moGridPanePayrollReceipts.setSelectedGridRow(moGridPanePayrollReceipts.getTable().convertRowIndexToView(moGridPanePayrollReceipts.getModel().getRowCount() - 1));
 
@@ -1501,10 +1590,76 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     }
 
     private void actionReceiptAddAll() {
-        while (moGridPaneEmployeesAvailable.getTable().getRowCount() > 0) {
-            moGridPaneEmployeesAvailable.setSelectedGridRow(0);
-            if (!actionReceiptAdd()) {
-                break;
+        int rows = moGridPaneEmployeesAvailable.getTable().getRowCount();
+        
+        if (rows > 0) {
+            // prepare filters of recruitment scheme types:
+            
+            HashSet<Integer> recruitmentSchemesTypesSet = new HashSet<>();
+
+            if (moBoolFilterWages.isSelected()) {
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
+            }
+            if (moBoolFilterAssimilated.isSelected()) {
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO);
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV);
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD);
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL);
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO);
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA);
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH);
+            }
+            if (moBoolFilterRetirees.isSelected()) {
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET);
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_PEN);
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET_PEN);
+            }
+            if (moBoolFilterOthers.isSelected()) {
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_COMP);
+                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_OTH);
+            }
+
+            if (recruitmentSchemesTypesSet.isEmpty()) {
+                miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFilter) + "'.");
+                moBoolFilterWages.requestFocusInWindow();
+            }
+            else {
+                int processed = 0;
+                
+                try {
+                    jtpPayroll.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                    
+                    // add all available employees:
+
+                    int index = 0;
+
+                    for (int row = 0; row < rows; row++) {
+                        // select top row:
+                        moGridPaneEmployeesAvailable.setSelectedGridRow(index);
+
+                        if (!recruitmentSchemesTypesSet.contains(((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getRecruitmentSchemeTypeId())) {
+                            index++; // skip current row and go next
+                        }
+                        else {
+                            if (!actionReceiptAdd()) {
+                                index++; // skip current row and go next
+                            }
+                            else {
+                                processed++;
+                            }
+                        }
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtils.showException(this, e);
+                }
+                finally {
+                    jtpPayroll.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+
+                if (processed == 0) {
+                    miClient.showMsgBoxInformation("¡No se agregó ningún empleado disponible!");
+                }
             }
         }
     }
@@ -1522,24 +1677,25 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         else {
             try {
                 int index = moGridPanePayrollReceipts.getTable().getSelectedRow();
-                SRowPayrollEmployee rowEmployeeReceipt = (SRowPayrollEmployee) moGridPanePayrollReceipts.getSelectedGridRow();
+                SRowPayrollEmployee rowReceipt = (SRowPayrollEmployee) moGridPanePayrollReceipts.getSelectedGridRow();
                 
-                validatePayrollReceiptCfdi(rowEmployeeReceipt);
+                validatePayrollReceiptCfdi(rowReceipt);
                 
-                if (!rowEmployeeReceipt.getHrsReceipt().getPayrollReceipt().isRegistryNew()) {
-                    maPayrollReceiptsDeleted.add(rowEmployeeReceipt.getHrsReceipt().getPayrollReceipt());
+                if (!rowReceipt.getHrsReceipt().getPayrollReceipt().isRegistryNew()) {
+                    maPayrollReceiptsDeleted.add(rowReceipt.getHrsReceipt().getPayrollReceipt());
                 }
-                moHrsPayroll.removeHrsReceipt(rowEmployeeReceipt.getPkEmployeeId());
+                moHrsPayroll.removeHrsReceipt(rowReceipt.getPkEmployeeId());
 
                 moGridPanePayrollReceipts.removeGridRow(moGridPanePayrollReceipts.getTable().getSelectedRow());
                 moGridPanePayrollReceipts.renderGridRows();
                 moGridPanePayrollReceipts.setSelectedGridRow(index < moGridPanePayrollReceipts.getModel().getRowCount() ? index : moGridPanePayrollReceipts.getModel().getRowCount() - 1);
                 
-                if (mnFormSubtype == rowEmployeeReceipt.getFkPaymentTypeId()) {
-                    SRowPayrollEmployee rowEmployeeAvailable = new SRowPayrollEmployee(rowEmployeeReceipt);
-                    rowEmployeeAvailable.clearReceipt();
+                if (mnFormSubtype == rowReceipt.getFkPaymentTypeId()) {
+                    SRowPayrollEmployee rowEmployee = new SRowPayrollEmployee(rowReceipt);
+                    rowEmployee.setRowCase(SRowPayrollEmployee.CASE_EMPLOYEE);
+                    rowEmployee.clearReceipt();
 
-                    moGridPaneEmployeesAvailable.addGridRow(rowEmployeeAvailable);
+                    moGridPaneEmployeesAvailable.addGridRow(rowEmployee);
                     moGridPaneEmployeesAvailable.renderGridRows();
                     moGridPaneEmployeesAvailable.setSelectedGridRow(moGridPaneEmployeesAvailable.getTable().convertRowIndexToView(moGridPaneEmployeesAvailable.getModel().getRowCount() - 1));
                 }
@@ -1558,32 +1714,44 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     }
 
     private void actionReceiptRemoveAll() {
-        while (moGridPanePayrollReceipts.getTable().getRowCount() > 0) {
-            moGridPanePayrollReceipts.setSelectedGridRow(0);
-            if (!actionReceiptRemove()) {
-                break;
+        int rows = moGridPanePayrollReceipts.getTable().getRowCount();
+        
+        if (rows > 0) {
+            int processed = 0;
+            
+            try {
+                jtpPayroll.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+                
+                // remove all payroll receipts:
+
+                int index = 0;
+
+                for (int row = 0; row < rows; row++) {
+                    // select top row:
+                    moGridPanePayrollReceipts.setSelectedGridRow(index);
+
+                    if (!actionReceiptRemove()) {
+                        index++; // skip current row and go next
+                    }
+                    else {
+                        processed++;
+                    }
+                }
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+            finally {
+                jtpPayroll.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
+            
+            if (processed == 0) {
+                miClient.showMsgBoxInformation("¡No se removió ningún recibo de nómina!");
             }
         }
     }
 
-    private void actionEmployeeViewActive() {
-        try {
-            populateRowPayrollEmployeesAvailable(true);
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-    }
-
-    private void actionEmployeeViewAll() {
-        try {
-            populateRowPayrollEmployeesAvailable(false);
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
-    }
-
+    @SuppressWarnings("unchecked")
     private void actionReceiptCaptureEarnings() {
         try {
             ArrayList<SHrsReceipt> hrsReceipts = new ArrayList<>();
@@ -1611,6 +1779,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
     }
     
+    @SuppressWarnings("unchecked")
     private void actionReceiptCaptureDeductions() {
         try {
             ArrayList<SHrsReceipt> hrsReceipts = new ArrayList<>();
@@ -1737,15 +1906,15 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbReceiptAddAll.addActionListener(this);
         jbReceiptRemove.addActionListener(this);
         jbReceiptRemoveAll.addActionListener(this);
-        jbEmployeeViewActive.addActionListener(this);
-        jbEmployeeViewAll.addActionListener(this);
         jbReceiptCaptureEarnings.addActionListener(this);
         jbReceiptCaptureDeductions.addActionListener(this);
         jbTaxSubsidyOptionChange.addActionListener(this);
         
         moRadNormal.addItemListener(this);
         moRadSpecial.addItemListener(this);
-        moRadExOrd.addItemListener(this);
+        moRadExtraordinary.addItemListener(this);
+        moRadViewEmployeesActive.addItemListener(this);
+        moRadViewEmployeesAll.addItemListener(this);
 
         moKeyMwzType.addItemListener(this);
         moKeyMwzReferenceType.addItemListener(this);
@@ -1777,15 +1946,15 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbReceiptAddAll.removeActionListener(this);
         jbReceiptRemove.removeActionListener(this);
         jbReceiptRemoveAll.removeActionListener(this);
-        jbEmployeeViewActive.removeActionListener(this);
-        jbEmployeeViewAll.removeActionListener(this);
         jbReceiptCaptureEarnings.removeActionListener(this);
         jbReceiptCaptureDeductions.removeActionListener(this);
         jbTaxSubsidyOptionChange.removeActionListener(this);
 
         moRadNormal.removeItemListener(this);
         moRadSpecial.removeItemListener(this);
-        moRadExOrd.removeItemListener(this);
+        moRadExtraordinary.removeItemListener(this);
+        moRadViewEmployeesActive.removeItemListener(this);
+        moRadViewEmployeesAll.removeItemListener(this);
         
         moKeyMwzType.removeItemListener(this);
         moKeyMwzReferenceType.removeItemListener(this);
@@ -1932,6 +2101,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             clearCurrentValues();
             updateFieldsStatus();
             enableFieldsCfdiStatus();
+            
+            moRadViewEmployeesActive.setSelected(true);
+            moBoolFilterWages.setSelected(true);
+            moBoolFilterAssimilated.setSelected(false);
+            moBoolFilterRetirees.setSelected(false);
+            moBoolFilterOthers.setSelected(false);
+            
             jbSave.setEnabled(!mbIsReadOnly);
 
             addAllListeners();
@@ -2099,12 +2275,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 else if (button == jbReceiptRemoveAll) {
                     actionReceiptRemoveAll();
                 }
-                else if (button == jbEmployeeViewActive) {
-                    actionEmployeeViewActive();
-                }
-                else if (button == jbEmployeeViewAll) {
-                    actionEmployeeViewAll();
-                }
                 else if (button == jbReceiptCaptureEarnings) {
                     actionReceiptCaptureEarnings();
                 }
@@ -2152,14 +2322,18 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     computeReceipts();
                 }
             }
-            else if (evt.getSource() instanceof SBeanFieldRadio) {
-                if (evt.getStateChange() == ItemEvent.SELECTED) {
-                    SBeanFieldRadio radioButton = (SBeanFieldRadio) evt.getSource();
+            else if (evt.getSource() instanceof SBeanFieldRadio && evt.getStateChange() == ItemEvent.SELECTED) {
+                SBeanFieldRadio field = (SBeanFieldRadio) evt.getSource();
 
-                    if (radioButton == moRadSpecial || radioButton == moRadNormal || radioButton == moRadExOrd) {
-                        itemStatePaysheetType();
-                        changeNumber();
-                    }
+                if (field == moRadSpecial || field == moRadNormal || field == moRadExtraordinary) {
+                    itemStatePaysheetType();
+                    changeNumber();
+                }
+                else if (field == moRadViewEmployeesActive) {
+                    itemStateEmployeesViewActive();
+                }
+                else if (field == moRadViewEmployeesAll) {
+                    itemStateEmployeesViewAll();
                 }
             }
         }

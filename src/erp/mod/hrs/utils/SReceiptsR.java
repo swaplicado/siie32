@@ -251,7 +251,7 @@ public class SReceiptsR {
                         dXmlSubsidy = 0.01d;
                         issuen.setPayment_r(issuen.getPayment_r() + dXmlSubsidy);
                         issuen.setUuidRelated(cfd.getUuid());
-                        issuen.setDateIssue(new Date());
+                        issuen.setDateOfIssue(new Date());
                         break;
             }
             
@@ -553,7 +553,7 @@ public class SReceiptsR {
             
             SDbFormerPayrollImport payrollImport = new SDbFormerPayrollImport();
             payrollImport.setPayrollId(receipt.getParentPayroll().getPkNominaId());
-            payrollImport.setRegenerateOnlyNonStampedCfdi(cfdiPendingSigned);
+            payrollImport.setRegenerateNonStampedCfdi(cfdiPendingSigned);
             payrollImport.getCfdPackets().addAll(cfdPackets);
             
             SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);

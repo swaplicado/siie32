@@ -52,9 +52,9 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
 
     /**
      * Creates new form SDialogBenefitCardex
-     * @param client
-     * @param formSubtype
-     * @param title
+     * @param client GUI client.
+     * @param formSubtype Type of benefit. SModSysConsts.HRSS_TP_BEN_...
+     * @param title Title of dialog.
      */
     public SDialogBenefitCardex(SGuiClient client, int formSubtype, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_BEN_MOV, formSubtype, title);
@@ -211,7 +211,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         jpBenefitSummary.setLayout(new java.awt.BorderLayout());
         jPanel3.add(jpBenefitSummary, java.awt.BorderLayout.NORTH);
 
-        jpBenefitDetail.setBorder(javax.swing.BorderFactory.createTitledBorder("Prestación detalle:"));
+        jpBenefitDetail.setBorder(javax.swing.BorderFactory.createTitledBorder("Detalle de pagos de la prestación:"));
         jpBenefitDetail.setLayout(new java.awt.BorderLayout());
         jPanel3.add(jpBenefitDetail, java.awt.BorderLayout.CENTER);
 
@@ -285,6 +285,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Días proporcionales"));
                 
                 if (mnFormSubtype == SModSysConsts.HRSS_TP_BEN_VAC) {
+                    gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Días programados"));
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Días pagados"));
                     gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Días x pagar"));
                 }
@@ -410,33 +411,49 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                         }
                     }
                     
+                    // scheduled days (only for vacations):
+                    
+                    if (mnFormSubtype == SModSysConsts.HRSS_TP_BEN_VAC) {
+                        sql = "SELECT SUM(eff_day) AS _days_sched "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ABS) + " "
+                                + "WHERE id_emp = " + moEmployee.getPkEmployeeId() + " AND "
+                                + "fk_cl_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[0] + " AND "
+                                + "fk_tp_abs = " + SModSysConsts.HRSU_TP_ABS_VAC[1] + " AND "
+                                + "ben_year = " + benefitYear + " AND ben_ann = " + anniversary + " AND "
+                                + "NOT b_del;";
+                        resultSet = miClient.getSession().getStatement().executeQuery(sql);
+                        if (resultSet.next()) {
+                            row.setBenefitDaysScheduled(resultSet.getDouble(1));
+                        }
+                    }
+                    
+                    // payed days and amount:
+                    
                     double payedDays = 0;
                     double payedAmount = 0;
                     
-                    sql = "SELECT pre.ben_year, pre.ben_ann, SUM(pre.unt_all) AS _days, SUM(pre.amt_r) AS _amount "
+                    sql = "SELECT SUM(pre.unt_all) AS _days, SUM(pre.amt_r) AS _amount "
                             + "FROM hrs_pay AS p "
                             + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
                             + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                             + "WHERE pr.id_emp = " + moEmployee.getPkEmployeeId() + " AND pre.fk_tp_ben = " + mnFormSubtype + " AND "
-                            + "pre.ben_year = (" + benefitYear + ") AND pre.ben_ann = " + anniversary + " AND "
+                            + "pre.ben_year = " + benefitYear + " AND pre.ben_ann = " + anniversary + " AND "
                             + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "
-                            + "NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
-                            + "GROUP BY pre.ben_year, pre.ben_ann;";
+                            + "NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del;";
                     resultSet = miClient.getSession().getStatement().executeQuery(sql);
                     if (resultSet.next()) {
                         payedDays = resultSet.getDouble("_days");
                         payedAmount = resultSet.getDouble("_amount");
                     }
                     
-                    sql = "SELECT prd.ben_year, prd.ben_ann, SUM(prd.unt_all) AS _days, SUM(prd.amt_r) AS _amount "
+                    sql = "SELECT SUM(prd.unt_all) AS _days, SUM(prd.amt_r) AS _amount "
                             + "FROM hrs_pay AS p "
                             + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
                             + "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
                             + "WHERE pr.id_emp = " + moEmployee.getPkEmployeeId() + " AND prd.fk_tp_ben = " + mnFormSubtype + " AND "
-                            + "prd.ben_year = (" + benefitYear + ") AND prd.ben_ann = " + anniversary + " AND "
+                            + "prd.ben_year = " + benefitYear + " AND prd.ben_ann = " + anniversary + " AND "
                             + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "
-                            + "NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del "
-                            + "GROUP BY prd.ben_year, prd.ben_ann;";
+                            + "NOT p.b_del AND NOT pr.b_del AND NOT prd.b_del;";
                     resultSet = miClient.getSession().getStatement().executeQuery(sql);
                     if (resultSet.next()) {
                         payedDays = (payedDays - resultSet.getDouble("_days")); // decrement days
@@ -448,6 +465,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                     row.setBenefitAmountPayed(payedAmount);
 
                     rows.add(row);
+                    resultSet.close();
                 }
             }
 

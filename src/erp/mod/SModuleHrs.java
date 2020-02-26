@@ -35,6 +35,7 @@ import erp.mod.hrs.db.SDbLoanTypeAdjustment;
 import erp.mod.hrs.db.SDbMwzType;
 import erp.mod.hrs.db.SDbMwzTypeWage;
 import erp.mod.hrs.db.SDbPayroll;
+import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptDeduction;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
@@ -98,7 +99,7 @@ import erp.mod.hrs.view.SViewBenefit;
 import erp.mod.hrs.view.SViewBenefitTable;
 import erp.mod.hrs.view.SViewBenefitTableRow;
 import erp.mod.hrs.view.SViewBenefitVacationPending;
-import erp.mod.hrs.view.SViewCfdiPayroll;
+import erp.mod.hrs.view.SViewPayrollCfdi;
 import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
@@ -119,7 +120,7 @@ import erp.mod.hrs.view.SViewPayrollBenefitEarningComplement;
 import erp.mod.hrs.view.SViewPayrollLoanDeductionComplement;
 import erp.mod.hrs.view.SViewPayrollLoanEarningComplement;
 import erp.mod.hrs.view.SViewPayrollReceiptRecord;
-import erp.mod.hrs.view.SViewPayrollRow;
+import erp.mod.hrs.view.SViewPayrollReceipt;
 import erp.mod.hrs.view.SViewPosition;
 import erp.mod.hrs.view.SViewShift;
 import erp.mod.hrs.view.SViewSsContributionTable;
@@ -496,6 +497,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_PAY:
                 registry = new SDbPayroll();
                 break;
+            case SModConsts.HRS_PAY_RCP:
+                registry = new SDbPayrollReceipt();
+                break;
             case SModConsts.HRS_PAY_RCP_ISS:
                 registry = new SDbPayrollReceiptIssue();
                 break;
@@ -830,7 +834,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewBenefitTableRow(miClient, "Tablas prestaciones (detalle)");
                 break;
             case SModConsts.HRS_WRK_SAL:
-                view = new SViewWorkerTypeSalary(miClient, "Salarios tipo obrero");
+                view = new SViewWorkerTypeSalary(miClient, "Salarios diarios tipo obrero");
                 break;
             case SModConsts.HRS_MWZ_WAGE:
                 view = new SViewMwzTypeWage(miClient, "Salarios mínimos área geográfica");
@@ -842,7 +846,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewUmi(miClient, "UMI");
                 break;
             case SModConsts.HRS_TP_LOAN_ADJ:
-                view = new SViewLoanTypeAdjustment(miClient, "Ajuste tipo crédito/préstamo");
+                view = new SViewLoanTypeAdjustment(miClient, "Ajustes tipo crédito/préstamo");
                 break;
             case SModConsts.HRS_EMP_LOG_HIRE:
                 view = new SViewEmployeeHireLog(miClient, "Bitácora altas y bajas");
@@ -857,7 +861,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewAbsence(miClient, "Incidencias");
                 break;
             case SModConsts.HRS_LOAN:
-                view = new SViewLoan(miClient, "Control créditos/préstamos");
+                view = new SViewLoan(miClient, "Créditos/préstamos");
                 break;
             case SModConsts.HRS_EAR:
                 view = new SViewEarning(miClient, "Percepciones");
@@ -951,7 +955,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewPayroll(miClient, "Nóminas " + (subtype == SModSysConsts.HRSS_TP_PAY_WEE ? "semanales" : "quincenales"), subtype);
                 break;
             case SModConsts.HRS_PAY_RCP:
-                view = new SViewPayrollRow(miClient, "Recibos nóminas " + (subtype == SModSysConsts.HRSS_TP_PAY_WEE ? "semanales" : "quincenales"), subtype);
+                view = new SViewPayrollReceipt(miClient, "Recibos nóminas " + (subtype == SModSysConsts.HRSS_TP_PAY_WEE ? "semanales" : "quincenales"), subtype);
                 break;
             case SModConsts.HRS_PAY_RCP_EAR:
                     switch (subtype) {
@@ -959,7 +963,7 @@ public class SModuleHrs extends SGuiModule {
                             view = new SViewPayrollBenefitEarningComplement(miClient, "Ajustes prestaciones");
                             break;
                         case SModConsts.HRS_LOAN:
-                            view = new SViewPayrollLoanEarningComplement(miClient, "Incremento créditos/préstamos");
+                            view = new SViewPayrollLoanEarningComplement(miClient, "Incrementos créditos/préstamos");
                             break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -968,7 +972,7 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_PAY_RCP_DED:
                     switch (subtype) {
                         case SModConsts.HRS_LOAN:
-                            view = new SViewPayrollLoanDeductionComplement(miClient, "Decremento créditos/préstamos");
+                            view = new SViewPayrollLoanDeductionComplement(miClient, "Decrementos créditos/préstamos");
                             break;
                     default:
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -987,7 +991,7 @@ public class SModuleHrs extends SGuiModule {
                 else {
                     title = "CFDI recibos nóminas" + (params != null && params.getType() == SCfdConsts.CFDI_PAYROLL_VER_OLD ? " imp." : "");
                 }
-                view = new SViewCfdiPayroll(miClient, subtype, title, params);
+                view = new SViewPayrollCfdi(miClient, subtype, title, params);
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -1117,7 +1121,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormBenefitTable;
                 break;
             case SModConsts.HRS_WRK_SAL:
-                if (moFormWorkerTypeSalary == null) moFormWorkerTypeSalary = new SFormWorkerTypeSalary(miClient, "Salario por tipo obrero");
+                if (moFormWorkerTypeSalary == null) moFormWorkerTypeSalary = new SFormWorkerTypeSalary(miClient, "Salario diario por tipo de obrero");
                 form = moFormWorkerTypeSalary;
                 break;
             case SModConsts.HRS_MWZ_WAGE:

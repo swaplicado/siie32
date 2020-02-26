@@ -31,7 +31,48 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="jbDate">
+    <Container class="javax.swing.JPanel" name="jpAdjustment">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+        <Property name="columns" type="int" value="1"/>
+        <Property name="rows" type="int" value="2"/>
+        <Property name="verticalGap" type="int" value="1"/>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JButton" name="jbIncrementDate">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="+"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+              <Insets value="[0, 0, 0, 0]"/>
+            </Property>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[20, 11]"/>
+            </Property>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbIncrementDateActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="jbDecrementDate">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="&#x2012;"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+              <Insets value="[0, 0, 0, 0]"/>
+            </Property>
+            <Property name="opaque" type="boolean" value="true"/>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[20, 11]"/>
+            </Property>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbDecrementDateActionPerformed"/>
+          </Events>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Component class="javax.swing.JButton" name="jbSetDate">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/erp/img/cal_cal.gif"/>
@@ -42,10 +83,10 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbDateActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbSetDateActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="jbSystemDate">
+    <Component class="javax.swing.JButton" name="jbSetSystemDate">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/erp/img/cal_date_day.gif"/>
@@ -56,10 +97,10 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbSystemDateActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbSetSystemDateActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="jbSystemYearMonth">
+    <Component class="javax.swing.JButton" name="jbSetSystemYearMonth">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/erp/img/cal_date_month.gif"/>
@@ -70,10 +111,10 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbSystemYearMonthActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbSetSystemYearMonthActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="jbSystemYear">
+    <Component class="javax.swing.JButton" name="jbSetSystemYear">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/erp/img/cal_date_year.gif"/>
@@ -84,7 +125,7 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbSystemYearActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jbSetSystemYearActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

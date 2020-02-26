@@ -118,12 +118,12 @@ public class SViewEmployeeWageLog extends SGridPaneView {
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
             
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.bp", "Empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.sal", "Salario $"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.wage", "Sueldo $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.sal", "Salario diario $"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.wage", "Sueldo mensual $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_pay_name", "Periodo pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_sal_name", "Tipo salario"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_tp_emp_name", "Tipo empleado"));

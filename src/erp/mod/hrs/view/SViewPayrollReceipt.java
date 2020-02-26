@@ -33,14 +33,14 @@ import sa.lib.gui.SGuiDate;
  *
  * @author Néstor Ávalos, Juan Barajas, Alfredo Perez, Sergio Flores
  */
-public class SViewPayrollRow extends SGridPaneView implements ActionListener {
+public class SViewPayrollReceipt extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
 
     private JButton jbPrintReceipt;
     private JButton jbSendReceipt;
 
-    public SViewPayrollRow(SGuiClient client, String title, int subtype) {
+    public SViewPayrollReceipt(SGuiClient client, String title, int subtype) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_PAY_RCP, subtype, title);
         initComponentCustom();
     }

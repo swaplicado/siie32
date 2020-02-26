@@ -205,6 +205,31 @@ public class SDiotTercero {
                 (IvaNotasCréditoCompras == 0 ? "" : decimalFormat.format(IvaNotasCréditoCompras));
     }
     
+    @Override
+    public String toString() {
+        String string = "";
+        
+        string += "ValorPagosNacIva1516: " + SLibUtils.getDecimalFormatAmount().format(ValorPagosNacIva1516) + "; "; // 8
+        string += "ValorPagosNacIva15: " + SLibUtils.getDecimalFormatAmount().format(ValorPagosNacIva15) + "; "; // 9
+        string += "IvaPagadoNoAcredNac1516: " + SLibUtils.getDecimalFormatAmount().format(IvaPagadoNoAcredNac1516) + "; "; // 10
+        string += "ValorPagosNacIva1011: " + SLibUtils.getDecimalFormatAmount().format(ValorPagosNacIva1011) + "; "; // 11
+        string += "ValorPagosNacIva10: " + SLibUtils.getDecimalFormatAmount().format(ValorPagosNacIva10) + "; "; // 12
+        string += "ValorPagosNacIvaEstFront: " + SLibUtils.getDecimalFormatAmount().format(ValorPagosNacIvaEstFront) + "; "; // 13
+        string += "IvaPagadoNoAcredNac1011: " + SLibUtils.getDecimalFormatAmount().format(IvaPagadoNoAcredNac1011) + "; "; // 14
+        string += "IvaPagadoNoAcredNacEstFront: " + SLibUtils.getDecimalFormatAmount().format(IvaPagadoNoAcredNacEstFront) + "; "; // 15
+        string += "ValorPagosImpIva1516: " + SLibUtils.getDecimalFormatAmount().format(ValorPagosImpIva1516) + "; "; // 16
+        string += "IvaPagadoNoAcredImp1516: " + SLibUtils.getDecimalFormatAmount().format(IvaPagadoNoAcredImp1516) + "; "; // 17
+        string += "ValorPagosImpIva1011: " + SLibUtils.getDecimalFormatAmount().format(ValorPagosImpIva1011) + "; "; // 18
+        string += "IvaPagadoNoAcredImp1011: " + SLibUtils.getDecimalFormatAmount().format(IvaPagadoNoAcredImp1011) + "; "; // 19
+        string += "ValorPagosImpIvaExento: " + SLibUtils.getDecimalFormatAmount().format(ValorPagosImpIvaExento) + "; "; // 20
+        string += "ValorPagosNacIva0: " + SLibUtils.getDecimalFormatAmount().format(ValorPagosNacIva0) + "; "; // 21
+        string += "ValorPagosNacIvaExento: " + SLibUtils.getDecimalFormatAmount().format(ValorPagosNacIvaExento) + "; "; // 22
+        string += "IvaRetenido: " + SLibUtils.getDecimalFormatAmount().format(IvaRetenido) + "; "; // 23
+        string += "IvaNotasCréditoCompras: " + SLibUtils.getDecimalFormatAmount().format(IvaNotasCréditoCompras); // 24
+        
+        return string;
+    }
+    
     public static String getLayoutRowHeadings() {
         return "\"1. Tipo de tercero\"," +
                 "\"2. Tipo de operación\"," +

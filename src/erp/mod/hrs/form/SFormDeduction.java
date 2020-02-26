@@ -614,7 +614,7 @@ public class SFormDeduction extends SBeanForm implements ItemListener {
                 itemStateChangedDeductionComputationType();
             }
         }
-        else if (e.getSource() instanceof SBeanFieldBoolean && e.getStateChange() == ItemEvent.SELECTED) {
+        else if (e.getSource() instanceof SBeanFieldBoolean) {
             SBeanFieldBoolean field = (SBeanFieldBoolean) e.getSource();
 
             if (field == moBoolLoan) {

@@ -8,6 +8,7 @@ package erp.lib.table;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
 import erp.lib.gui.SGuiDate;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import sa.lib.SLibTimeUtils;
 
@@ -16,11 +17,9 @@ import sa.lib.SLibTimeUtils;
  * @author Sergio Flores
  */
 public class STabFilterDatePeriod extends javax.swing.JPanel {
-
+    
     private erp.client.SClientInterface miClient;
     private erp.lib.table.STableTabInterface miTableTab;
-    private int mnGuiDateType;
-
     private erp.lib.gui.SGuiDate moGuiDate;
     private erp.lib.table.STableSetting moSetting;
 
@@ -33,7 +32,8 @@ public class STabFilterDatePeriod extends javax.swing.JPanel {
     public STabFilterDatePeriod(erp.client.SClientInterface client, erp.lib.table.STableTabInterface tableTab, int guiDateType) {
         miClient = client;
         miTableTab = tableTab;
-        mnGuiDateType = guiDateType;
+        moGuiDate = new SGuiDate(miClient.getSessionXXX().getWorkingDate().getTime(), guiDateType);
+        
         initComponents();
         initComponentsExtra();
     }
@@ -47,10 +47,13 @@ public class STabFilterDatePeriod extends javax.swing.JPanel {
     private void initComponents() {
 
         jtfDate = new javax.swing.JTextField();
-        jbDate = new javax.swing.JButton();
-        jbSystemDate = new javax.swing.JButton();
-        jbSystemYearMonth = new javax.swing.JButton();
-        jbSystemYear = new javax.swing.JButton();
+        jpAdjustment = new javax.swing.JPanel();
+        jbIncrementDate = new javax.swing.JButton();
+        jbDecrementDate = new javax.swing.JButton();
+        jbSetDate = new javax.swing.JButton();
+        jbSetSystemDate = new javax.swing.JButton();
+        jbSetSystemYearMonth = new javax.swing.JButton();
+        jbSetSystemYear = new javax.swing.JButton();
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 3, 0));
 
@@ -61,151 +64,192 @@ public class STabFilterDatePeriod extends javax.swing.JPanel {
         jtfDate.setPreferredSize(new java.awt.Dimension(65, 20));
         add(jtfDate);
 
-        jbDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
-        jbDate.setToolTipText("Seleccionar fecha");
-        jbDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jbDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbDateActionPerformed(evt);
-            }
-        });
-        add(jbDate);
+        jpAdjustment.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
 
-        jbSystemDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
-        jbSystemDate.setToolTipText("Hoy");
-        jbSystemDate.setPreferredSize(new java.awt.Dimension(23, 23));
-        jbSystemDate.addActionListener(new java.awt.event.ActionListener() {
+        jbIncrementDate.setText("+");
+        jbIncrementDate.setFocusable(false);
+        jbIncrementDate.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jbIncrementDate.setPreferredSize(new java.awt.Dimension(20, 11));
+        jbIncrementDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbSystemDateActionPerformed(evt);
+                jbIncrementDateActionPerformed(evt);
             }
         });
-        add(jbSystemDate);
+        jpAdjustment.add(jbIncrementDate);
 
-        jbSystemYearMonth.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_month.gif"))); // NOI18N
-        jbSystemYearMonth.setToolTipText("Mes actual");
-        jbSystemYearMonth.setPreferredSize(new java.awt.Dimension(23, 23));
-        jbSystemYearMonth.addActionListener(new java.awt.event.ActionListener() {
+        jbDecrementDate.setText("‒");
+        jbDecrementDate.setFocusable(false);
+        jbDecrementDate.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jbDecrementDate.setOpaque(true);
+        jbDecrementDate.setPreferredSize(new java.awt.Dimension(20, 11));
+        jbDecrementDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbSystemYearMonthActionPerformed(evt);
+                jbDecrementDateActionPerformed(evt);
             }
         });
-        add(jbSystemYearMonth);
+        jpAdjustment.add(jbDecrementDate);
 
-        jbSystemYear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_year.gif"))); // NOI18N
-        jbSystemYear.setToolTipText("Año actual");
-        jbSystemYear.setPreferredSize(new java.awt.Dimension(23, 23));
-        jbSystemYear.addActionListener(new java.awt.event.ActionListener() {
+        add(jpAdjustment);
+
+        jbSetDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbSetDate.setToolTipText("Seleccionar fecha");
+        jbSetDate.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbSetDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbSystemYearActionPerformed(evt);
+                jbSetDateActionPerformed(evt);
             }
         });
-        add(jbSystemYear);
+        add(jbSetDate);
+
+        jbSetSystemDate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_day.gif"))); // NOI18N
+        jbSetSystemDate.setToolTipText("Hoy");
+        jbSetSystemDate.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbSetSystemDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbSetSystemDateActionPerformed(evt);
+            }
+        });
+        add(jbSetSystemDate);
+
+        jbSetSystemYearMonth.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_month.gif"))); // NOI18N
+        jbSetSystemYearMonth.setToolTipText("Mes actual");
+        jbSetSystemYearMonth.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbSetSystemYearMonth.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbSetSystemYearMonthActionPerformed(evt);
+            }
+        });
+        add(jbSetSystemYearMonth);
+
+        jbSetSystemYear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_date_year.gif"))); // NOI18N
+        jbSetSystemYear.setToolTipText("Año actual");
+        jbSetSystemYear.setPreferredSize(new java.awt.Dimension(23, 23));
+        jbSetSystemYear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbSetSystemYearActionPerformed(evt);
+            }
+        });
+        add(jbSetSystemYear);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jbDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbDateActionPerformed
-        actionDate();
-    }//GEN-LAST:event_jbDateActionPerformed
+    private void jbSetDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSetDateActionPerformed
+        actionSetDate();
+    }//GEN-LAST:event_jbSetDateActionPerformed
 
-    private void jbSystemDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSystemDateActionPerformed
-        moGuiDate = new SGuiDate(miClient.getSessionXXX().getWorkingDate().getTime(), SLibConstants.GUI_DATE_AS_DATE);
-        moSetting.setSetting(SLibTimeUtilities.digestDate(moGuiDate));
-        miTableTab.updateSetting(moSetting);
-        renderDate();
-}//GEN-LAST:event_jbSystemDateActionPerformed
+    private void jbSetSystemDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSetSystemDateActionPerformed
+        actionSetSystemDate();
+}//GEN-LAST:event_jbSetSystemDateActionPerformed
 
-    private void jbSystemYearMonthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSystemYearMonthActionPerformed
-        moGuiDate = new SGuiDate(SLibTimeUtils.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()).getTime(), SLibConstants.GUI_DATE_AS_YEAR_MONTH);
-        moSetting.setSetting(SLibTimeUtilities.digestYearMonth(moGuiDate));
-        miTableTab.updateSetting(moSetting);
-        renderDate();
-}//GEN-LAST:event_jbSystemYearMonthActionPerformed
+    private void jbSetSystemYearMonthActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSetSystemYearMonthActionPerformed
+        actionSetSystemYearMonth();
+}//GEN-LAST:event_jbSetSystemYearMonthActionPerformed
 
-    private void jbSystemYearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSystemYearActionPerformed
-        moGuiDate = new SGuiDate(SLibTimeUtils.getEndOfYear(miClient.getSessionXXX().getWorkingDate()).getTime(), SLibConstants.GUI_DATE_AS_YEAR);
-        moSetting.setSetting(SLibTimeUtilities.digestYear(moGuiDate));
-        miTableTab.updateSetting(moSetting);
-        renderDate();
-}//GEN-LAST:event_jbSystemYearActionPerformed
+    private void jbSetSystemYearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSetSystemYearActionPerformed
+        actionSetSystemYear();
+}//GEN-LAST:event_jbSetSystemYearActionPerformed
+
+    private void jbIncrementDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbIncrementDateActionPerformed
+        actionIncrementDate();
+    }//GEN-LAST:event_jbIncrementDateActionPerformed
+
+    private void jbDecrementDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbDecrementDateActionPerformed
+        actionDecrementDate();
+    }//GEN-LAST:event_jbDecrementDateActionPerformed
 
     private void initComponentsExtra() {
-        moSetting = null;
-
-        moGuiDate = new SGuiDate(miClient.getSessionXXX().getWorkingDate().getTime(), mnGuiDateType);
-
-        switch (mnGuiDateType) {
-            case SLibConstants.GUI_DATE_AS_DATE:
-                moSetting = new STableSetting(STableConstants.SETTING_FILTER_PERIOD, SLibTimeUtilities.digestDate(moGuiDate));
-                break;
-            case SLibConstants.GUI_DATE_AS_YEAR_MONTH:
-                moSetting = new STableSetting(STableConstants.SETTING_FILTER_PERIOD, SLibTimeUtilities.digestYearMonth(moGuiDate));
-                break;
-            case SLibConstants.GUI_DATE_AS_YEAR:
-                moSetting = new STableSetting(STableConstants.SETTING_FILTER_PERIOD, SLibTimeUtilities.digestYear(moGuiDate));
-                break;
-            default:
-                mnGuiDateType = SLibConstants.GUI_DATE_AS_DATE;
-                moSetting = new STableSetting(STableConstants.SETTING_FILTER_PERIOD, SLibTimeUtilities.digestDate(moGuiDate));
-                break;
-        }
-
+        moSetting = new STableSetting(STableConstants.SETTING_FILTER_PERIOD, null);
         miTableTab.addSetting(moSetting);
-        renderDate();
+        
+        setDate(moGuiDate, false);
     }
-
-    private void renderDate() {
+    
+    private void setDate(final SGuiDate guiDate, final boolean broadcastEvent) {
+        moGuiDate = guiDate;
+        
+        int[] date = null;
+        SimpleDateFormat format = null;
+        
         switch (moGuiDate.getDataType()) {
             case SLibConstants.GUI_DATE_AS_DATE:
-                jtfDate.setText(miClient.getSessionXXX().getFormatters().getDateFormat().format(moGuiDate));
+                date = SLibTimeUtilities.digestDate(moGuiDate);
+                format = miClient.getSessionXXX().getFormatters().getDateFormat();
                 break;
             case SLibConstants.GUI_DATE_AS_YEAR_MONTH:
-                jtfDate.setText(miClient.getSessionXXX().getFormatters().getDateYearMonthFormat().format(moGuiDate));
+                date = SLibTimeUtilities.digestYearMonth(moGuiDate);
+                format = miClient.getSessionXXX().getFormatters().getDateYearMonthFormat();
                 break;
             case SLibConstants.GUI_DATE_AS_YEAR:
-                jtfDate.setText(miClient.getSessionXXX().getFormatters().getDateYearFormat().format(moGuiDate));
+                date = SLibTimeUtilities.digestYear(moGuiDate);
+                format = miClient.getSessionXXX().getFormatters().getDateYearFormat();
                 break;
             default:
-                jtfDate.setText("?");
-                break;
         }
+        
+        moSetting.setSetting(date);
+        
+        if (broadcastEvent) {
+            miTableTab.updateSetting(moSetting);
+        }
+        
+        jtfDate.setText(format.format(moGuiDate));
     }
 
-    private void actionDate() {
-        int[] date = null;
-
-        miClient.getGuiDatePeriodPickerXXX().formReset();
-        miClient.getGuiDatePeriodPickerXXX().setDate(moGuiDate);
-        miClient.getGuiDatePeriodPickerXXX().setVisible(true);
-
-        if (miClient.getGuiDatePeriodPickerXXX().getFormResult() == SLibConstants.FORM_RESULT_OK) {
-            moGuiDate = miClient.getGuiDatePeriodPickerXXX().getGuiDate();
-
-            switch (moGuiDate.getDataType()) {
-                case SLibConstants.GUI_DATE_AS_DATE:
-                    date = SLibTimeUtilities.digestDate(moGuiDate);
-                    break;
-                case SLibConstants.GUI_DATE_AS_YEAR_MONTH:
-                    date = SLibTimeUtilities.digestYearMonth(moGuiDate);
-                    break;
-                case SLibConstants.GUI_DATE_AS_YEAR:
-                    date = SLibTimeUtilities.digestYear(moGuiDate);
-                    break;
-                default:
-                    break;
-            }
-
-            if (date != null) {
-                moSetting.setSetting(date);
-                miTableTab.updateSetting(moSetting);
-                renderDate();
-            }
+    private void adjustDate(final Adjustment adjustment) {
+        Date date = null;
+        int leap = adjustment == Adjustment.Increment ? 1 : -1;
+        
+        switch (moGuiDate.getDataType()) {
+            case SLibConstants.GUI_DATE_AS_DATE:
+                date = SLibTimeUtilities.addDate(moGuiDate, 0, 0, leap);
+                break;
+            case SLibConstants.GUI_DATE_AS_YEAR_MONTH:
+                date = SLibTimeUtilities.addDate(moGuiDate, 0, leap, 0);
+                break;
+            case SLibConstants.GUI_DATE_AS_YEAR:
+                date = SLibTimeUtilities.addDate(moGuiDate, leap, 0, 0);
+                break;
+            default:
         }
+        
+        setDate(new SGuiDate(date.getTime(), moGuiDate.getDataType()), true);
+    }
+    
+    private void actionSetDate() {
+        SGuiDate guiDate = miClient.getGuiDatePeriodPickerXXX().pickDate(moGuiDate);
+
+        if (guiDate != null) {
+            setDate(guiDate, true);
+        }
+    }
+    
+    private void actionSetSystemDate() {
+        setDate(new SGuiDate(miClient.getSessionXXX().getWorkingDate().getTime(), SLibConstants.GUI_DATE_AS_DATE), true);
+    }
+    
+    private void actionSetSystemYearMonth() {
+        setDate(new SGuiDate(SLibTimeUtils.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()).getTime(), SLibConstants.GUI_DATE_AS_YEAR_MONTH), true);
+    }
+    
+    private void actionSetSystemYear() {
+        setDate(new SGuiDate(SLibTimeUtils.getEndOfYear(miClient.getSessionXXX().getWorkingDate()).getTime(), SLibConstants.GUI_DATE_AS_YEAR), true);
+    }
+    
+    private void actionIncrementDate() {
+        adjustDate(Adjustment.Increment);
+    }
+    
+    private void actionDecrementDate() {
+        adjustDate(Adjustment.Decrement);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jbDate;
-    private javax.swing.JButton jbSystemDate;
-    private javax.swing.JButton jbSystemYear;
-    private javax.swing.JButton jbSystemYearMonth;
+    private javax.swing.JButton jbDecrementDate;
+    private javax.swing.JButton jbIncrementDate;
+    private javax.swing.JButton jbSetDate;
+    private javax.swing.JButton jbSetSystemDate;
+    private javax.swing.JButton jbSetSystemYear;
+    private javax.swing.JButton jbSetSystemYearMonth;
+    private javax.swing.JPanel jpAdjustment;
     private javax.swing.JTextField jtfDate;
     // End of variables declaration//GEN-END:variables
 
@@ -215,5 +259,10 @@ public class STabFilterDatePeriod extends javax.swing.JPanel {
     
     public Date getDate() {
         return moGuiDate;
+    }
+    
+    private enum Adjustment {
+        Increment,
+        Decrement
     }
 }

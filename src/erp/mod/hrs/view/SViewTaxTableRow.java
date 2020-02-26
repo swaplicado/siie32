@@ -69,7 +69,7 @@ public class SViewTaxTableRow extends SGridPaneView {
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "t.dt_sta", "Inicio vigencia"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_1B, "tr.id_row", "#"));

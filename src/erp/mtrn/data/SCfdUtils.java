@@ -2527,7 +2527,10 @@ public abstract class SCfdUtils implements Serializable {
                     throw new Exception("Existen CFDI pendientes de respuesta del Proveedor Autorizado de Certificación (PAC).");
                 }
                 else if (cfd.getIsProcessingStorageXml()) {
-                    throw new Exception("Existen CFDI pendientes de almacenar en el disco.");
+                    throw new Exception("Existen archivos XML de CFDI por almacenar en el disco duro.");
+                }
+                else if (cfd.getIsProcessingStoragePdf()) {
+                    throw new Exception("Existen archivos PDF de CFDI por almacenar en el disco duro.");
                 }
             }
         }
@@ -3058,7 +3061,7 @@ public abstract class SCfdUtils implements Serializable {
             payrollImport = new SDbFormerPayrollImport();
 
             payrollImport.setPayrollId(hrsFormerPayroll.getPkNominaId());
-            payrollImport.setRegenerateOnlyNonStampedCfdi(isRegenerateOnlyNonStampedCfdi);
+            payrollImport.setRegenerateNonStampedCfdi(isRegenerateOnlyNonStampedCfdi);
             payrollImport.getCfdPackets().addAll(CfdPackets);
 
             SServerRequest request = new SServerRequest(SServerConstants.REQ_DB_ACTION_SAVE);
@@ -4628,74 +4631,78 @@ public abstract class SCfdUtils implements Serializable {
     }
 
     public static ArrayList<SDataCfd> getPayrollCfds(final SClientInterface client, final int typeCfd, final int[] payrollKey) throws Exception {
-        return getPayrollCfds(client, typeCfd, payrollKey, "" , SLibConsts.UNDEFINED);
-    }    
+        return getPayrollCfds(client, typeCfd, payrollKey, "" , 0);
+    }
     
-    public static ArrayList<SDataCfd> getPayrollCfds(final SClientInterface client, final int typeCfd, final int[] payrollKey, String typeDepPayroll, int orderBy) throws Exception {
-        String sql = "";
-        String sqlInner = "";
+    /**
+     * Get list of emited payroll CFDI.
+     * @param client GUI client.
+     * @param typeCfd SCfdConsts.CFDI_PAYROLL_VER_OLD or SCfdConsts.CFDI_PAYROLL_VER_CUR.
+     * @param payrollKey Primary key of payroll.
+     * @param filterDepartmentIds SQL filter of department IDs.
+     * @param orderBy SUtilConsts.PER_DOC, SUtilConsts.PER_BRR, SUtilConsts.PER_REF (department).
+     * @return
+     * @throws Exception 
+     */
+    public static ArrayList<SDataCfd> getPayrollCfds(final SClientInterface client, final int typeCfd, final int[] payrollKey, String filterDepartmentIds, int orderBy) throws Exception {
+        String sqlInnerJoins = "";
         String sqlWhere = "";
-        ResultSet resultSet = null;
-        ArrayList<SDataCfd> cfds = null;
-        SDataCfd cfd = null;
+        String sqlOrderBy = "";
                                                                                 
-        cfds = new ArrayList<SDataCfd>();
-
+        sqlWhere = "NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) ";
+        
         switch (typeCfd) {
             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
-                sqlWhere = "WHERE NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) AND c.fid_pay_pay_n = " + payrollKey[0] + (orderBy == SLibConsts.UNDEFINED ? " ORDER BY c.id_cfd " : "");
-                break;
-            case SCfdConsts.CFDI_PAYROLL_VER_CUR:
-                sqlInner = "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON "
-                            + "c.fid_pay_rcp_pay_n = pei.id_pay AND c.fid_pay_rcp_emp_n = pei.id_emp AND c.fid_pay_rcp_iss_n = pei.id_iss AND pei.b_del = 0 AND pei.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " ";
+                sqlWhere += "AND c.fid_pay_pay_n = " + payrollKey[0] + " ";
                 
-                if (orderBy == SUtilConsts.PER_DOC) {
-                    sqlInner += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
-                            + "bp.id_bp = pei.id_emp "
-                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pe ON "
-                            + "c.fid_pay_rcp_pay_n = pe.id_pay AND c.fid_pay_rcp_emp_n = pe.id_emp "
-                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON "
-                            + "dep.id_dep = pe.fk_dep ";
-                }
-                else if (orderBy == SUtilConsts.PER_BPR) {
-                    sqlInner += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
-                                + "bp.id_bp = pei.id_emp "
-                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pe ON "
-                                + "c.fid_pay_rcp_pay_n = pe.id_pay AND c.fid_pay_rcp_emp_n = pe.id_emp "
-                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON "
-                                + "dep.id_dep = pe.fk_dep ";
-                }
-                else if (orderBy == SUtilConsts.PER_REF) {
-                    sqlInner += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON "
-                                + "bp.id_bp = pei.id_emp "
-                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pe ON "
-                                + "c.fid_pay_rcp_pay_n = pe.id_pay AND c.fid_pay_rcp_emp_n = pe.id_emp "
-                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON "
-                                + "dep.id_dep = pe.fk_dep ";
-                }                
-                sqlWhere += "WHERE " ;
-                        if (typeDepPayroll.equals("")) {
-                            sqlWhere += "";
-                        }
-                        else {
-                            sqlWhere += "pe.fk_dep IN ( " +  typeDepPayroll + " ) AND ";
-                             }
-                        sqlWhere += "NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) AND c.fid_pay_rcp_pay_n = " + payrollKey[0] + 
-                        (orderBy == SUtilConsts.PER_DOC ? " ORDER BY pei.num_ser, CAST(pei.num AS UNSIGNED INTEGER), pei.id_pay, pei.id_emp, pei.id_iss " : 
-                        orderBy == SUtilConsts.PER_BPR ? " ORDER BY bp.bp, bp.id_bp " : orderBy == SUtilConsts.PER_REF ? " ORDER BY dep.code, dep.name, dep.id_dep, bp.bp, bp.id_bp " : " ORDER BY c.id_cfd ");
+                sqlOrderBy = "c.id_cfd ";
                 break;
+                
+            case SCfdConsts.CFDI_PAYROLL_VER_CUR:
+                sqlWhere += "AND c.fid_pay_rcp_pay_n = " + payrollKey[0] + " AND "
+                        + "NOT pri.b_del AND pri.fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " " +
+                        (filterDepartmentIds.isEmpty() ? "" : "AND pr.fk_dep IN ( " +  filterDepartmentIds + " ) ");
+                        
+                sqlInnerJoins = "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = c.fid_pay_rcp_pay_n AND pr.id_emp = c.fid_pay_rcp_emp_n "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = pr.id_emp "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = c.fid_pay_rcp_pay_n AND pri.id_emp = c.fid_pay_rcp_emp_n AND pri.id_iss = c.fid_pay_rcp_iss_n ";
+                
+                switch (orderBy) {
+                    case SUtilConsts.PER_DOC:
+                        sqlOrderBy = "";
+                        break;
+                    case SUtilConsts.PER_BPR:
+                        sqlOrderBy = "bp.bp, bp.id_bp, ";
+                        break;
+                    case SUtilConsts.PER_REF:
+                        sqlOrderBy = "dep.code, dep.name, dep.id_dep, bp.bp, bp.id_bp, ";
+                        break;
+                    default:
+                        sqlOrderBy = "c.id_cfd, ";
+                }
+                
+                sqlOrderBy += "pri.num_ser, CAST(pri.num AS UNSIGNED INTEGER), "
+                        + "pri.id_pay, pri.id_emp, pri.id_iss ";
+                break;
+                
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        sql = "SELECT c.id_cfd " +
-                "FROM trn_cfd AS c " + sqlInner + sqlWhere;
+        ArrayList<SDataCfd> cfds = new ArrayList<>();
 
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            cfd = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT);
+        String sql = "SELECT c.id_cfd "
+                + "FROM trn_cfd AS c "
+                + sqlInnerJoins
+                + "WHERE " + sqlWhere
+                + "ORDER BY " + sqlOrderBy;
 
-            cfds.add(cfd);
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT);
+                cfds.add(cfd);
+            }
         }
 
         return cfds;
@@ -4709,7 +4716,7 @@ public abstract class SCfdUtils implements Serializable {
 
         switch (typeCfd) {
             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
-                sqlWhere = "WHERE  fid_pay_pay_n = " + payrollReceiptKey[0] + " AND fid_pay_emp_n = " + payrollReceiptKey[1] + " AND fid_pay_bpr_n = " + payrollReceiptKey[2] + " ORDER BY id_cfd DESC LIMIT 1 ";
+                sqlWhere = "WHERE fid_pay_pay_n = " + payrollReceiptKey[0] + " AND fid_pay_emp_n = " + payrollReceiptKey[1] + " AND fid_pay_bpr_n = " + payrollReceiptKey[2] + " ORDER BY id_cfd DESC LIMIT 1 ";
                 break;
             case SCfdConsts.CFDI_PAYROLL_VER_CUR:
                 sqlWhere = "WHERE fid_pay_rcp_pay_n = " + payrollReceiptKey[0] + " AND fid_pay_rcp_emp_n = " + payrollReceiptKey[1] + " AND fid_pay_rcp_iss_n = " + payrollReceiptKey[2] + " ORDER BY id_cfd DESC LIMIT 1 ";

@@ -7,15 +7,12 @@ package erp.mod.hrs.view;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import sa.lib.SLibConsts;
-import sa.lib.SLibTimeUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
-import sa.lib.grid.SGridFilterYear;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
-import sa.lib.gui.SGuiConsts;
 
 /**
  *
@@ -23,8 +20,6 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SViewFirstDayYear extends SGridPaneView {
 
-    private SGridFilterYear moFilterYear;
-    
     public SViewFirstDayYear(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_FDY, SLibConsts.UNDEFINED, title);
         setRowButtonsEnabled(true, true, true, false, true);
@@ -32,10 +27,7 @@ public class SViewFirstDayYear extends SGridPaneView {
     }
 
     private void initComponetsCustom() {
-        moFilterYear = new SGridFilterYear(miClient, this);
-        moFilterYear.initFilter(new int[] { SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0] });
-        
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterYear);
+
     }
 
     @Override
@@ -52,9 +44,6 @@ public class SViewFirstDayYear extends SGridPaneView {
             sql += (sql.isEmpty() ? "" : "AND ") + "v.b_del = 0 ";
         }
     
-        filter = (int[]) moFiltersMap.get(SGridConsts.FILTER_YEAR).getValue();
-        sql += (sql.isEmpty() ? "" : " AND ") + ("v.id_fdy = " + ((int[]) filter)[0]) + " ";
-
         msSql = "SELECT "
                 + "v.id_fdy AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.id_fdy AS " + SDbConsts.FIELD_CODE + ", "
@@ -79,7 +68,7 @@ public class SViewFirstDayYear extends SGridPaneView {
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "v.id_fdy", "Año"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.fdy", "Primer día año"));

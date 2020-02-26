@@ -26,7 +26,8 @@ import sa.gui.util.SUtilConsts;
 public class SDbFormerPayrollImport extends SDataRegistry implements Serializable {
 
     protected int mnPayrollId;
-    protected boolean mbRegenerateOnlyNonStampedCfdi;
+    protected boolean mbImportingFromFormerSiie;
+    protected boolean mbRegenerateNonStampedCfdi;
     protected ArrayList<SCfdPacket> maCfdPackets;
 
     public SDbFormerPayrollImport() {
@@ -35,10 +36,12 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
     }
 
     public void setPayrollId(int n) { mnPayrollId = n; }
-    public void setRegenerateOnlyNonStampedCfdi(boolean b) { mbRegenerateOnlyNonStampedCfdi = b; }
+    public void setImportingFromFormerSiie(boolean b) { mbImportingFromFormerSiie = b; }
+    public void setRegenerateNonStampedCfdi(boolean b) { mbRegenerateNonStampedCfdi = b; }
 
     public int getPayrollId() { return mnPayrollId; }
-    public boolean isRegenerateOnlyNonStampedCfdi() { return mbRegenerateOnlyNonStampedCfdi; }
+    public boolean isImportingFromFormerSiie() { return mbImportingFromFormerSiie; }
+    public boolean isRegenerateNonStampedCfdi() { return mbRegenerateNonStampedCfdi; }
     public ArrayList<SCfdPacket> getCfdPackets() { return maCfdPackets; }
 
     public void setIsDeleted(boolean b) { }
@@ -66,7 +69,8 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
         super.resetRegistry();
 
         mnPayrollId = 0;
-        mbRegenerateOnlyNonStampedCfdi = false;
+        mbImportingFromFormerSiie = false;
+        mbRegenerateNonStampedCfdi = false;
         maCfdPackets = new ArrayList<>();
     }
 
@@ -83,11 +87,16 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
-            Statement statement = connection.createStatement();
+            Statement statement = null;
+            
+            if (mbImportingFromFormerSiie) {
+                statement = connection.createStatement();
 
-            String sql = "UPDATE trn_cfd SET b_con = 0 "
-                    + "WHERE fid_pay_pay_n = " + mnPayrollId + " AND fid_st_xml <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + " "; // TODO: 2018-08-31, Sergio Flores: fix this, because is called each time a CFDI from the same payroll is saved, making the other CFDI reset for b_con!
-            statement.execute(sql);
+                String sql = "UPDATE trn_cfd SET b_con = 0 "
+                        + "WHERE fid_pay_pay_n = " + mnPayrollId + " AND "
+                        + "fid_st_xml <> " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ";";
+                statement.execute(sql);
+            }
 
             for (SCfdPacket packet: maCfdPackets) {
                 if (packet.getCfdId() != SLibConstants.UNDEFINED && packet.getIsCfdConsistent()) {
@@ -104,8 +113,8 @@ public class SDbFormerPayrollImport extends SDataRegistry implements Serializabl
                 }
             }
             
-            if (mbRegenerateOnlyNonStampedCfdi) {
-                sql = "UPDATE trn_cfd AS c "
+            if (mbImportingFromFormerSiie && mbRegenerateNonStampedCfdi) {
+                String sql = "UPDATE trn_cfd AS c "
                         + "INNER JOIN hrs_sie_pay_emp AS pe ON c.fid_pay_pay_n = pe.id_pay AND c.fid_pay_emp_n = pe.id_emp AND c.fid_pay_bpr_n = pe.fid_bpr_n AND pe.b_del = 0 SET c.b_con = 1 "
                         + "WHERE c.fid_pay_pay_n = " + mnPayrollId + " AND c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " ";
                 statement.execute(sql);

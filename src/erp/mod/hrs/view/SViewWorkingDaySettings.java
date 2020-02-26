@@ -73,7 +73,7 @@ public class SViewWorkingDaySettings extends SGridPaneView {
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "pay.name", "Periodo pago"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.wrk_hrs_day", "Horas jornada"));

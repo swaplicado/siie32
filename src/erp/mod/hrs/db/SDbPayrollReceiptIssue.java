@@ -39,8 +39,8 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     protected int mnPkIssueId;
     protected String msNumberSeries;
     protected int mnNumber;
-    protected Date mtDateIssue;
-    protected Date mtDatePayment;
+    protected Date mtDateOfIssue;
+    protected Date mtDateOfPayment;
     protected String msBankAccount;
     protected String msUuidRelated;
     protected double mdEarnings_r;
@@ -68,8 +68,8 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     public void setPkIssueId(int n) { mnPkIssueId = n; }
     public void setNumberSeries(String s) { msNumberSeries = s; }
     public void setNumber(int n) { mnNumber = n; }
-    public void setDateIssue(Date t) { mtDateIssue = t; }
-    public void setDatePayment(Date t) { mtDatePayment = t; }
+    public void setDateOfIssue(Date t) { mtDateOfIssue = t; }
+    public void setDateOfPayment(Date t) { mtDateOfPayment = t; }
     public void setBankAccount(String s) { msBankAccount = s; }
     public void setUuidRelated(String s) { msUuidRelated = s; }
     public void setEarnings_r(double d) { mdEarnings_r = d; }
@@ -89,8 +89,8 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
     public int getPkIssueId() { return mnPkIssueId; }
     public String getNumberSeries() { return msNumberSeries; }
     public int getNumber() { return mnNumber; }
-    public Date getDateIssue() { return mtDateIssue; }
-    public Date getDatePayment() { return mtDatePayment; }
+    public Date getDateOfIssue() { return mtDateOfIssue; }
+    public Date getDateOfPayment() { return mtDateOfPayment; }
     public String getBankAccount() { return msBankAccount; }
     public String getUuidRelated() { return msUuidRelated; }
     public double getEarnings_r() { return mdEarnings_r; }
@@ -152,8 +152,8 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
         mnPkIssueId = 0;
         msNumberSeries = "";
         mnNumber = 0;
-        mtDateIssue = null;
-        mtDatePayment = null;
+        mtDateOfIssue = null;
+        mtDateOfPayment = null;
         msBankAccount = "";
         msUuidRelated = "";
         mdEarnings_r = 0;
@@ -218,8 +218,8 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
             mnPkIssueId = resultSet.getInt("id_iss");
             msNumberSeries = resultSet.getString("num_ser");
             mnNumber = resultSet.getInt("num");
-            mtDateIssue = resultSet.getDate("dt_iss");
-            mtDatePayment = resultSet.getDate("dt_pay");
+            mtDateOfIssue = resultSet.getDate("dt_iss");
+            mtDateOfPayment = resultSet.getDate("dt_pay");
             msBankAccount = resultSet.getString("bank_acc");
             msUuidRelated = resultSet.getString("uuid_rel");
             mdEarnings_r = resultSet.getDouble("ear_r");
@@ -274,8 +274,8 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
                     mnPkIssueId + ", " + 
                     "'" + msNumberSeries + "', " + 
                     mnNumber + ", " + 
-                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateIssue) + "', " + 
-                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDatePayment) + "', " + 
+                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateOfIssue) + "', " + 
+                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateOfPayment) + "', " + 
                     "'" + msBankAccount + "', " + 
                     "'" + msUuidRelated + "', " + 
                     mdEarnings_r + ", " + 
@@ -302,8 +302,8 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
                     */
                     "num_ser = '" + msNumberSeries + "', " +
                     "num = " + mnNumber + ", " +
-                    "dt_iss = '" + SLibUtils.DbmsDateFormatDate.format(mtDateIssue) + "', " +
-                    "dt_pay = '" + SLibUtils.DbmsDateFormatDate.format(mtDatePayment) + "', " +
+                    "dt_iss = '" + SLibUtils.DbmsDateFormatDate.format(mtDateOfIssue) + "', " +
+                    "dt_pay = '" + SLibUtils.DbmsDateFormatDate.format(mtDateOfPayment) + "', " +
                     "bank_acc = '" + msBankAccount + "', " +
                     "uuid_rel = '" + msUuidRelated + "', " +
                     "ear_r = " + mdEarnings_r + ", " +
@@ -334,8 +334,8 @@ public class SDbPayrollReceiptIssue extends SDbRegistryUser {
         registry.setPkIssueId(this.getPkIssueId());
         registry.setNumberSeries(this.getNumberSeries());
         registry.setNumber(this.getNumber());
-        registry.setDateIssue(this.getDateIssue());
-        registry.setDatePayment(this.getDatePayment());
+        registry.setDateOfIssue(this.getDateOfIssue());
+        registry.setDateOfPayment(this.getDateOfPayment());
         registry.setBankAccount(this.getBankAccount());
         registry.setUuidRelated(this.getUuidRelated());
         registry.setEarnings_r(this.getEarnings_r());

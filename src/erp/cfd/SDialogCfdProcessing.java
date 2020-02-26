@@ -403,12 +403,14 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                             SDbPayrollReceiptIssue receiptIssue = (SDbPayrollReceiptIssue) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP_ISS, key);
 
                             if (receiptIssue.getNumber() != 0) {
+                                // preserve already defined number:
                                 number = receiptIssue.getNumber();
                             }
                             else {
+                                // generate a new number:
                                 number = SHrsUtils.getPayrollReceiptNextNumber(miClient.getSession(), receiptIssue.getNumberSeries());
                                 receiptIssue.setNumber(number); // update memory
-                                receiptIssue.saveField(miClient.getSession().getStatement(), key, SDbPayrollReceiptIssue.FIELD_NUMBER, number); // update persistent storage as well
+                                receiptIssue.saveField(miClient.getSession().getStatement(), receiptIssue.getPrimaryKey(), SDbPayrollReceiptIssue.FIELD_NUMBER, number); // update persistent storage as well
                             }
 
                             SHrsCfdUtils.computeSignCfdi(miClient.getSession(), key);

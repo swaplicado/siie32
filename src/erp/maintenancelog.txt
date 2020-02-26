@@ -1,9 +1,25 @@
 ================================================================================
-SIIE 3.2 159.0/ 2020-02-10
+SIIE 3.2 159.0/ 2020-02-26
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de captura en recibos de nóminas de monto Subsidio para el empleo efectivamente entregado al trabajador.
-1) Implementación de selección en recibos de nóminas de Tipo otro pago en captura de percepciones Otros pagos.
+2) Implementación de selección en recibos de nóminas de Tipo otro pago en captura de percepciones Otros pagos.
+3) Para CFDI de nóminas cancelados corrección a:
+    creación de registro de emisión de CFDI de nóminas;
+    íconos de estatus de cancelación en columnas en vistas;
+    selección de CFDI para envío vía mail; y
+    estatus de emisión de CFDI de nóminas en asistente de timbrado.
+4) Implementación botones para incrementar y decrementar fechas y períodos en filtros fecha-período.
+5) Adición de días programados vía incidencias en cárdex de vacaciones.
+6) Implementación de validación en el pago de nóminas a empleados asimilados.
+7) Implementación de filtros de tipo de régimen de contratación para la selección masiva de empleados al crear nóminas.
+
+================================================================================
+SIIE 3.2 157.1/ 2020-02-11
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Restauración de la lectura de registros erp.mod.hrs.db.SDbPayrollReceipt en erp.mod.SModuleHrs,
+    por remoción involuntaria del caso (case) correspondiente en el conmutador (switch) de instanciación de objetos de registros de este módulo.
 
 ================================================================================
 SIIE 3.2 157.0/ 2020-02-05

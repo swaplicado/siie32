@@ -245,7 +245,7 @@ public class SViewAbsence extends SGridPaneView implements ActionListener {
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "bp.bp", "Empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt", "Fecha registro"));

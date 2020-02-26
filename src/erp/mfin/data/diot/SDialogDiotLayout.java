@@ -75,7 +75,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
         jftDateEnd = new javax.swing.JFormattedTextField();
         jbPickDateEnd = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
-        jckExcludeTotalZeros = new javax.swing.JCheckBox();
+        jckExcludeTotallyZero = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
         jPanel14 = new javax.swing.JPanel();
         jrbFormatCsv = new javax.swing.JRadioButton();
@@ -135,9 +135,9 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jckExcludeTotalZeros.setText("Excluir terceros totalmente en cero");
-        jckExcludeTotalZeros.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel15.add(jckExcludeTotalZeros);
+        jckExcludeTotallyZero.setText("Excluir terceros totalmente en cero");
+        jckExcludeTotallyZero.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel15.add(jckExcludeTotallyZero);
 
         jPanel6.add(jPanel15);
 
@@ -220,7 +220,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
         moFieldDateStart.setFieldValue(SLibTimeUtilities.getBeginOfMonth(miClient.getSessionXXX().getWorkingDate()));
         moFieldDateEnd.setFieldValue(SLibTimeUtilities.getEndOfMonth(miClient.getSessionXXX().getWorkingDate()));
-        jckExcludeTotalZeros.setSelected(true);
+        jckExcludeTotallyZero.setSelected(true);
         jrbFormatCsv.setSelected(true);
                 
         SFormUtilities.createActionMap(rootPane, this, "actionPerformedPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
@@ -236,7 +236,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
             String layout = new SDiotLayout(miClient, 
                     moFieldDateStart.getDate(), 
                     moFieldDateEnd.getDate()).getLayout(jrbFormatPipe.isSelected() ? SDiotLayout.FORMAT_PIPE : SDiotLayout.FORMAT_CSV,
-                    jckExcludeTotalZeros.isSelected());
+                    jckExcludeTotallyZero.isSelected());
             
             String fileExt = jrbFormatPipe.isSelected() ? ".txt" : ".csv";
             SimpleDateFormat periodFormat = new SimpleDateFormat("yyyy-MM");
@@ -317,7 +317,7 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
     private javax.swing.JButton jbPickDateEnd;
     private javax.swing.JButton jbPickDateStart;
     private javax.swing.JButton jbSave;
-    private javax.swing.JCheckBox jckExcludeTotalZeros;
+    private javax.swing.JCheckBox jckExcludeTotallyZero;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateStart;
     private javax.swing.JLabel jlDateEnd;

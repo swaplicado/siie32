@@ -30,8 +30,9 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     protected double mdTotalNet;
 
     protected String msNumberSeries;
-    protected Date mtDateIssue;
-    protected Date mtDatePayment;
+    protected Date mtDateOfIssue;
+    protected Date mtDateOfPayment;
+    /** Besides serving as payment type ID, it is a flag to determine if receipt has been already selected to be emmited, when this type is different from <code>SDataConstantsSys.TRNU_TP_PAY_SYS_NA</code>. */
     protected int mnPaymentTypeSysId;
     protected String msPaymentTypeSys;
     protected String msUuidToSubstitute;
@@ -53,8 +54,8 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
         mdTotalDeductions = 0;
         mdTotalNet = 0;
         msNumberSeries = "";
-        mtDateIssue = null;
-        mtDatePayment = null;
+        mtDateOfIssue = null;
+        mtDateOfPayment = null;
         mnPaymentTypeSysId = 0;
         msPaymentTypeSys = "";
         msUuidToSubstitute = "";
@@ -69,8 +70,8 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
         mvValues.add(mdTotalDeductions);
         mvValues.add(mdTotalNet);
         mvValues.add(msNumberSeries);
-        mvValues.add(mtDateIssue);
-        mvValues.add(mtDatePayment);
+        mvValues.add(mtDateOfIssue);
+        mvValues.add(mtDateOfPayment);
         mvValues.add(msPaymentTypeSys);
         mvValues.add(msUuidToSubstitute);
     }
@@ -84,6 +85,7 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public void setDateStart(Date t) { mtDateStart = t; }
     public void setDateEnd(Date t) { mtDateEnd = t; }
     public void setNotes(String s) { msNotes = s; }
+    /** Besides setting payment type ID, it is a flag to determine if receipt has been already selected to be emmited, when this type is different from <code>SDataConstantsSys.TRNU_TP_PAY_SYS_NA</code>. */
     public void setFkPaymentTypeId(int n) { mnFkPaymentTypeId = n; }
     public void setEmployeeNumber(String s) { msEmployeeNumber = s; }
     public void setEmployeeName(String s) { msEmployeeName = s; }
@@ -91,8 +93,8 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public void setTotalDeductions(double d) { mdTotalDeductions = d; }
     public void setTotalNet(double d) { mdTotalNet = d; }
     public void setNumberSeries(String s) { msNumberSeries = s; }
-    public void setDateIssue(Date t) { mtDateIssue = t; }
-    public void setDatePayment(Date t) { mtDatePayment = t; }
+    public void setDateOfIssue(Date t) { mtDateOfIssue = t; }
+    public void setDateOfPayment(Date t) { mtDateOfPayment = t; }
     public void setPaymentTypeSysId(int n) { mnPaymentTypeSysId = n; }
     public void setPaymentTypeSys(String s) { msPaymentTypeSys = s; }
     public void setUuidToSubstitute(String s) { msUuidToSubstitute = s; }
@@ -106,6 +108,7 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public Date getDateStart() { return mtDateStart; }
     public Date getDateEnd() { return mtDateEnd; }
     public String getNotes() { return msNotes; }
+    /** Besides getting payment type ID, it is a flag to determine if receipt has been already selected to be emmited, when this type is different from <code>SDataConstantsSys.TRNU_TP_PAY_SYS_NA</code>. */
     public int getFkPaymentTypeId() { return mnFkPaymentTypeId; }
     public String getEmployeeNumber() { return msEmployeeNumber ; }
     public String getEmployeeName() { return msEmployeeName ; }
@@ -113,12 +116,16 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public double getTotalDeductions() { return mdTotalDeductions ; }
     public double getTotalNet() { return mdTotalNet ; }
     public String getNumberSeries() { return msNumberSeries ; }
-    public Date getDateIssue() { return mtDateIssue; }
-    public Date getDatePayment() { return mtDatePayment; }
+    public Date getDateOfIssue() { return mtDateOfIssue; }
+    public Date getDateOfPayment() { return mtDateOfPayment; }
     public int getPaymentTypeSysId() { return mnPaymentTypeSysId; }
     public String getPaymentTypeSys() { return msPaymentTypeSys ; }
     public String getUuidToSubstitute() { return msUuidToSubstitute; }
-    
+
+    /**
+     * Get primary key of issue of payroll receipt.
+     * @return 
+     */
     @Override
     public int[] getRowPrimaryKey() {
         return new int[] { mnPkPayrollId, mnPkEmployeeId, mnPkIssueId };

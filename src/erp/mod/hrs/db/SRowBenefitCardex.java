@@ -15,23 +15,29 @@ import sa.lib.grid.SGridRow;
  */
 public class SRowBenefitCardex implements SGridRow {
 
-    private int mnRowType;
+    private int mnBenefitType;
     private int mnBenefitYear;
     private int mnBenefitAnniversary;
     private double mdProportional;
     private double mdBenefitBonusPct;
     private int mnBenefitDays;
+    private double mdBenefitDaysScheduled;
     private double mdBenefitDaysPayed;
     private double mdBenefitAmount;
     private double mdBenefitAmountPayed;
 
-    public SRowBenefitCardex(int rowType) {
-        mnRowType = rowType;
+    /**
+     * Creates new row of benefit cardex.
+     * @param benefitType Type of benefit. SModSysConsts.HRSS_TP_BEN_...
+     */
+    public SRowBenefitCardex(int benefitType) {
+        mnBenefitType = benefitType;
         mnBenefitYear = 0;
         mnBenefitAnniversary = 0;
         mdProportional = 0;
         mdBenefitBonusPct = 0;
         mnBenefitDays = 0;
+        mdBenefitDaysScheduled = 0;
         mdBenefitDaysPayed = 0;
         mdBenefitAmount = 0;
         mdBenefitAmountPayed = 0;
@@ -42,17 +48,19 @@ public class SRowBenefitCardex implements SGridRow {
     public void setProportional(double d) { mdProportional = d; }
     public void setBenefitBonusPct(double d) { mdBenefitBonusPct = d; }
     public void setBenefitDays(int n) { mnBenefitDays = n; }
+    public void setBenefitDaysScheduled(double d) { mdBenefitDaysScheduled = d; }
     public void setBenefitDaysPayed(double d) { mdBenefitDaysPayed = d; }
     public void setBenefitAmount(double d) { mdBenefitAmount = d; }
     public void setBenefitAmountPayed(double d) { mdBenefitAmountPayed = d; }
 
-    public int getRowType() { return mnRowType; }
+    public int getBenefitType() { return mnBenefitType; }
     public int getBenefitYear() { return mnBenefitYear; }
     public int getBenefitAnniversary() { return mnBenefitAnniversary; }
     public double getProportional() { return mdProportional; }
     public double getBenefitBonusPct() { return mdBenefitBonusPct; }
     public int getBenefitDays() { return mnBenefitDays; }
     public double getBenefitDaysProportional() { return mnBenefitDays * mdProportional; }
+    public double getBenefitDaysScheduled() { return mdBenefitDaysScheduled; }
     public double getBenefitDaysPayed() { return mdBenefitDaysPayed; }
     public double getBenefitDaysToPay() { return getBenefitDaysProportional() - mdBenefitDaysPayed; }
     public double getBenefitAmount() { return mdBenefitAmount; }
@@ -115,19 +123,22 @@ public class SRowBenefitCardex implements SGridRow {
             default:
         }
         
-        if (mnRowType == SModSysConsts.HRSS_TP_BEN_VAC) {
+        if (mnBenefitType == SModSysConsts.HRSS_TP_BEN_VAC) {
             switch(row) {
                 case 4:
-                    value = mdBenefitDaysPayed;
+                    value = mdBenefitDaysScheduled;
                     break;
                 case 5:
+                    value = mdBenefitDaysPayed;
+                    break;
+                case 6:
                     value = getBenefitDaysToPay();
                     break;
                 default:
             }
         }
         else {
-            if (mnRowType == SModSysConsts.HRSS_TP_BEN_ANN_BON) {
+            if (mnBenefitType == SModSysConsts.HRSS_TP_BEN_ANN_BON) {
                 switch(row) {
                     case 4:
                         value = mdBenefitAmount;
@@ -144,7 +155,7 @@ public class SRowBenefitCardex implements SGridRow {
                     default:
                 }
             }
-            else if (mnRowType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
+            else if (mnBenefitType == SModSysConsts.HRSS_TP_BEN_VAC_BON) {
                 switch(row) {
                     case 4:
                         value = mdBenefitBonusPct;

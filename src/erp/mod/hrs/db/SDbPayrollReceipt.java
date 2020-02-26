@@ -103,8 +103,6 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     protected ArrayList<SDbPayrollReceiptDeduction> maChildPayrollReceiptDeductions;
     protected ArrayList<SDbAbsenceConsumption> maChildAbsenceConsumptions;
     
-    protected Date mtAuxDateOfIssue;
-    
     public SDbPayrollReceipt() {
         super(SModConsts.HRS_PAY_RCP);
     }
@@ -122,13 +120,14 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         for (SDbPayrollReceiptEarning child : maChildPayrollReceiptEarnings) {
             mdEarningsExemption_r += child.getAmountExempt();
             mdEarningsTaxable_r += child.getAmountTaxable();
-            mdEarnings_r += child.getAmount_r();
+            mdEarnings_r = SLibUtils.roundAmount(mdEarnings_r + child.getAmount_r());
         }
         
-        for (SDbPayrollReceiptDeduction payrollReceiptDeduction : maChildPayrollReceiptDeductions) {
-            mdDeductions_r += payrollReceiptDeduction.getAmount_r();
+        for (SDbPayrollReceiptDeduction child : maChildPayrollReceiptDeductions) {
+            mdDeductions_r = SLibUtils.roundAmount(mdDeductions_r + child.getAmount_r());
         }
-        mdPayment_r = mdEarnings_r - mdDeductions_r;
+        
+        mdPayment_r = SLibUtils.roundAmount(mdEarnings_r - mdDeductions_r);
     }
     
     private void requiredCfd() {
@@ -140,8 +139,8 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         }
         
         if (!mbCfdRequired) {
-            for (SDbPayrollReceiptDeduction payrollReceiptDeduction : maChildPayrollReceiptDeductions) {
-                if (payrollReceiptDeduction.getAmount_r() != 0) {
+            for (SDbPayrollReceiptDeduction child : maChildPayrollReceiptDeductions) {
+                if (child.getAmount_r() != 0) {
                     mbCfdRequired = true;
                     break;
                 }
@@ -330,51 +329,52 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public ArrayList<SDbPayrollReceiptDeduction> getChildPayrollReceiptDeductions() { return maChildPayrollReceiptDeductions; }
     public ArrayList<SDbAbsenceConsumption> getChildAbsenceConsumption() { return maChildAbsenceConsumptions; }
     
-    public void setAuxDateOfIssue(Date t) { mtAuxDateOfIssue = t; }
-
-    public Date getAuxDateOfIssue() { return mtAuxDateOfIssue; }
-    
-    public void createPayrollReceiptIssue(final SGuiSession session) throws Exception {
-        int issueId = 0;
-        String numberSerie = "";
-        int number = 0;
+    /**
+     * Create and update payroll receipt issue.
+     * @param session GUI session.
+     * @param dateOfIssue Date of issue.
+     * @throws Exception 
+     */
+    public void updatePayrollReceiptIssue(final SGuiSession session, final Date dateOfIssue) throws Exception {
+        String series = ((SDbConfig) session.readRegistry(SModConsts.HRS_CFG, new int[] { 1 })).getNumberSeries();
         int paymentSystemType = SDataConstantsSys.TRNU_TP_PAY_SYS_NA;
-        
-        SDbPayrollReceiptIssue payrollReceiptIssues = null;
+        Date effectiveDateOfIssue = dateOfIssue;
         
         if (moChildPayrollReceiptIssue != null && moChildPayrollReceiptIssue.getFkReceiptStatusId() != SModSysConsts.TRNS_ST_DPS_ANNULED) {
-            issueId = moChildPayrollReceiptIssue.getPkIssueId();
-            numberSerie = moChildPayrollReceiptIssue.getNumberSeries();
-            number = moChildPayrollReceiptIssue.getNumber();
-            mtAuxDateOfIssue = moChildPayrollReceiptIssue.getDateIssue();
+            // issue exist and is not annuled, preserve basic data:
+            series = moChildPayrollReceiptIssue.getNumberSeries();
             paymentSystemType = moChildPayrollReceiptIssue.getFkPaymentSystemTypeId();
+            effectiveDateOfIssue = moChildPayrollReceiptIssue.getDateOfIssue();
         }
         
         if (moChildPayrollReceiptIssue == null || moChildPayrollReceiptIssue.getFkReceiptStatusId() != SModSysConsts.TRNS_ST_DPS_EMITED) {
-            payrollReceiptIssues = new SDbPayrollReceiptIssue();
+            if (moChildPayrollReceiptIssue == null || moChildPayrollReceiptIssue.getFkReceiptStatusId() == SModSysConsts.TRNS_ST_DPS_ANNULED) {
+                moChildPayrollReceiptIssue = new SDbPayrollReceiptIssue(); // creating receipt issue
+                
+                moChildPayrollReceiptIssue.setPkPayrollId(mnPkPayrollId);
+                moChildPayrollReceiptIssue.setPkEmployeeId(mnPkEmployeeId);
+                //moChildPayrollReceiptIssue.setPkIssueId(...); // set when saved
+                moChildPayrollReceiptIssue.setNumberSeries(series); // updated when CFDI generated
+                moChildPayrollReceiptIssue.setNumber(0); // updated when CFDI generated
+            }
             
-            payrollReceiptIssues.setPkPayrollId(mnPkPayrollId);
-            payrollReceiptIssues.setPkEmployeeId(mnPkEmployeeId);
-            payrollReceiptIssues.setPkIssueId(issueId);
-            payrollReceiptIssues.setNumberSeries(numberSerie); // update when generate CFDI
-            payrollReceiptIssues.setNumber(number); // update when generate CFDI
-            payrollReceiptIssues.setDateIssue(mtAuxDateOfIssue); // update when generate CFDI
-            payrollReceiptIssues.setDatePayment(mtAuxDateOfIssue); // update when generate CFDI
-            payrollReceiptIssues.setBankAccount(""); // update when generate CFDI
-            payrollReceiptIssues.setEarnings_r(mdEarnings_r);
-            payrollReceiptIssues.setDeductions_r(mdDeductions_r);
-            payrollReceiptIssues.setPayment_r(mdPayment_r);
-            payrollReceiptIssues.setDeleted(false);
-            payrollReceiptIssues.setFkReceiptStatusId(SModSysConsts.TRNS_ST_DPS_EMITED);
-            payrollReceiptIssues.setFkBankId_n(SLibConsts.UNDEFINED); // update when generate CFDI
-            payrollReceiptIssues.setFkPaymentSystemTypeId(paymentSystemType); // update when generate CFDI
+            moChildPayrollReceiptIssue.setDateOfIssue(effectiveDateOfIssue); // updated when CFDI generated
+            moChildPayrollReceiptIssue.setDateOfPayment(effectiveDateOfIssue); // updated when CFDI generated
+            moChildPayrollReceiptIssue.setBankAccount(""); // updated when CFDI generated
+            moChildPayrollReceiptIssue.setEarnings_r(mdEarnings_r);
+            moChildPayrollReceiptIssue.setDeductions_r(mdDeductions_r);
+            moChildPayrollReceiptIssue.setPayment_r(mdPayment_r);
+            moChildPayrollReceiptIssue.setDeleted(false);
+            moChildPayrollReceiptIssue.setFkReceiptStatusId(SModSysConsts.TRNS_ST_DPS_EMITED);
+            moChildPayrollReceiptIssue.setFkBankId_n(0); // updated when CFDI generated
+            moChildPayrollReceiptIssue.setFkPaymentSystemTypeId(paymentSystemType); // updated when CFDI generated
             /* Update when save the registry.
             payrollReceiptIssues.setFkUserInsertId(0);
             payrollReceiptIssues.setFkUserUpdateId(0);
             payrollReceiptIssues.setTsUserInsert(null);
             payrollReceiptIssues.setTsUserUpdate(null);
             */
-            payrollReceiptIssues.save(session);
+            moChildPayrollReceiptIssue.save(session);
         }
     }
     
@@ -512,8 +512,6 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
-        mtAuxDateOfIssue = null;
-
         maChildPayrollReceiptEarnings = new ArrayList<>();
         maChildPayrollReceiptDeductions = new ArrayList<>();
         maChildAbsenceConsumptions = new ArrayList<>();
@@ -670,9 +668,8 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                 
                 resultSet = statement.executeQuery(msSql);
                 if (resultSet.next()) {
-                    moChildPayrollReceiptIssue = new SDbPayrollReceiptIssue();
+                    moChildPayrollReceiptIssue = new SDbPayrollReceiptIssue(); // reading receipt issue
                     moChildPayrollReceiptIssue.read(session, new int[] { mnPkPayrollId, mnPkEmployeeId, resultSet.getInt(1) });
-                    mtAuxDateOfIssue = moChildPayrollReceiptIssue.getDateIssue();
                 }
             }
 
@@ -690,6 +687,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         if (mbRegistryNew) {
             verifyRegistryNew(session);
         }
+        
         computeReceiptValue();
         requiredCfd();
         

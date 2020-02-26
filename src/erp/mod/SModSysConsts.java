@@ -885,6 +885,7 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_SEN_BON = 22;   // Seniority Bonus 
     public static final int HRSS_TP_EAR_SET = 23;       // Settlement
     public static final int HRSS_TP_EAR_CMP = 25;       // Compensation
+    public static final int HRSS_TP_EAR_ASS_INC = 46;   // Assimilated income
     public static final int HRSS_TP_EAR_OTH = 999;      // Other payments that are not income
 
     public static final int HRSS_TP_OTH_PAY_NON = 0;                // Tax Refund of Overpayed Tax

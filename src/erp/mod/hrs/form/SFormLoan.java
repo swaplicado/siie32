@@ -304,7 +304,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentPercentage.setText("Porcentaje salario:*");
+        jlPaymentPercentage.setText("Porcentaje salario diario:*");
         jlPaymentPercentage.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel11.add(jlPaymentPercentage);
         jPanel11.add(moDecPaymentPercentage);

@@ -379,7 +379,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlSalary.setText("Salario:");
+        jlSalary.setText("Salario diario:");
         jlSalary.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel18.add(jlSalary);
 
@@ -396,8 +396,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jftDateChangeSalary.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel18.add(jftDateChangeSalary);
 
-        jlWage.setText("Sueldo:");
-        jlWage.setPreferredSize(new java.awt.Dimension(75, 23));
+        jlWage.setText("Sueldo mensual:");
+        jlWage.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel18.add(jlWage);
 
         jtfWage.setEditable(false);

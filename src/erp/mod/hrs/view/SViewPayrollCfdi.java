@@ -15,7 +15,6 @@ import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsFormerPayroll;
-import erp.mod.hrs.db.SHrsFormerUtils;
 import erp.mod.hrs.db.SHrsPayrollAnnul;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.form.SDialogFormerPayrollDate;
@@ -53,7 +52,7 @@ import sa.lib.gui.SGuiParams;
  *
  * @author Juan Barajas, Claudio Peña, Sergio Flores
  */
-public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
+public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
     private JButton jbReemitPayroll;
@@ -72,7 +71,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
     private SDialogAnnulCfdi moDialogAnnulCfdi;
     private SDialogFormerPayrollDate moDialogFormerPayrollDate;
   
-    public SViewCfdiPayroll(SGuiClient client, int subType, String title, SGuiParams params) {
+    public SViewPayrollCfdi(SGuiClient client, int subType, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_SIE_PAY, subType, title, params);
         setRowButtonsEnabled(false, false, false, false, mnGridSubtype == SModConsts.VIEW_SC_SUM);
         jtbFilterDeleted.setEnabled(false);
@@ -147,6 +146,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbDeactivateControlFlags);
     }
 
+    @SuppressWarnings("deprecation")
     private void actionReemitPayroll() {
         SDataFormerPayroll formerPayroll = null;
         SHrsFormerPayroll hrsFormerPayroll = null;
@@ -173,7 +173,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                         moDialogFormerPayrollDate.setVisible(true);
 
                         if (moDialogFormerPayrollDate.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                            hrsFormerPayroll = SHrsFormerUtils.readHrsFormerPayroll((SClientInterface) miClient, miClient.getSession().getStatement(),
+                            hrsFormerPayroll = erp.mod.hrs.db.SHrsFormerUtils.readHrsFormerPayroll((SClientInterface) miClient, miClient.getSession().getStatement(),
                                     ((int []) gridRow.getRowPrimaryKey())[0], miClient.getSession().getConfigCompany().getCompanyId(), moDialogFormerPayrollDate.getDateEmission(), moDialogFormerPayrollDate.getDatePayment());
                             SCfdUtils.computeCfdiPayroll((SClientInterface) miClient, hrsFormerPayroll, moDialogFormerPayrollDate.isRegenerateOnlyNonStampedCfdi());
 
@@ -305,7 +305,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                 }
                 else {
                     try {
-                        receiptIssues = new ArrayList<SDataPayrollReceiptIssue>();
+                        receiptIssues = new ArrayList<>();
                         
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
                             cfds = SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey());
@@ -315,7 +315,7 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                             }
                         }
                         else {
-                            cfds = new ArrayList<SDataCfd>();
+                            cfds = new ArrayList<>();
                             cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
                             
                             if (cfd != null) {
@@ -872,8 +872,8 @@ public class SViewCfdiPayroll extends SGridPaneView implements ActionListener {
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON v.fk_tp_pay = tp.id_tp_pay "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " AS tpsht ON v.fk_tp_pay_sht = tpsht.id_tp_pay_sht "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pe ON v.id_pay = pe.id_pay AND pe.b_del = 0 "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON pe.id_pay = pei.id_pay AND pe.id_emp = pei.id_emp AND pei.b_del = 0 " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? "" : " AND pei.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ")
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_PAY_SYS) + " AS tpsys ON pei.fk_tp_pay_sys = tpsys.id_tp_pay_sys "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON pe.id_pay = pei.id_pay AND pe.id_emp = pei.id_emp AND pei.b_del = 0 " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? "" : " AND pei.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ")
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_PAY_SYS) + " AS tpsys ON pei.fk_tp_pay_sys = tpsys.id_tp_pay_sys "
                         + "WHERE v.b_del = 0 " + (sql.isEmpty() ? "" : "AND " + sql)
                         + "GROUP BY v.id_pay, v.per_year, v.per, v.num, pay_type, v.dt_sta, v.dt_end " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pei.id_iss " : "")
                         + "ORDER BY v.per_year, v.per, pay_type ,v.num, v.id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pei.id_iss " : "")

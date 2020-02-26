@@ -16,6 +16,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -520,10 +522,10 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moTextNumber);
         moFields.addField(moDateDateStart);
         moFields.addField(moDateDateEnd);
-        //moFields.addField(moIntAnniversaryYear);  it is not editable
-        //moFields.addField(moIntDaysBenefit);      it is not editable
-        //moFields.addField(moIntDaysScheduled);    it is not editable
-        //moFields.addField(moIntDaysPayed);        it is not editable
+        //moFields.addField(moIntAnniversaryYear);  read-only field
+        //moFields.addField(moIntDaysBenefit);      read-only field
+        //moFields.addField(moIntDaysScheduled);    read-only field
+        //moFields.addField(moIntDaysPayed);        read-only field
         moFields.addField(moIntDaysEffective);
         moFields.addField(moTextNotes);
 
@@ -714,6 +716,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
             moTextNumber.setEditable(false);
             moDateDateStart.setEditable(false);
             moDateDateEnd.setEditable(false);
+            moDateDateEnd.setNextButton(null);
             
             moTextNumber.resetField();
             moDateDateStart.resetField();
@@ -730,10 +733,11 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
             moTextNumber.setEditable(true);
             moDateDateStart.setEditable(true);
             moDateDateEnd.setEditable(true);
+            moDateDateEnd.setNextButton(jbGoNext);
             
             jbGoNext.setEnabled(true);
             
-            jlAbsenceClassHelp.setText("¡Se consume en días " + (SDbAbsenceClass.consumesCalendarDays(moKeyAbsenceClass.getValue()[0]) ? SDbAbsenceClass.CALENDAR : SDbAbsenceClass.BUSINESS) + "!");
+            jlAbsenceClassHelp.setText("¡Se consume mediante días " + (SDbAbsenceClass.consumesCalendarDays(moKeyAbsenceClass.getValue()[0]) ? SDbAbsenceClass.CALENDAR : SDbAbsenceClass.BUSINESS) + "!");
         }
     }
     
@@ -755,6 +759,24 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
         jbGoBack.addActionListener(this);
         moKeyEmployee.addItemListener(this);
         moKeyAbsenceClass.addItemListener(this);
+        
+        jsAnniversary.getEditor().addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                System.out.println("keyTyped!");
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                System.out.println("keyPressed!");
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                System.out.println("keyReleaed!");
+            }
+        });
         jsAnniversary.addChangeListener(this);
     }
 

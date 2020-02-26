@@ -215,13 +215,22 @@ public class SDbPayroll extends SDbRegistryUser {
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceipts() { return maChildPayrollReceipts; }
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceiptsToDelete() { return maChildPayrollReceiptsToDelete; }
     
-    public void createPayrollReceiptIssues(final SGuiSession session) throws Exception {
+    /**
+     * Create or update payroll receipt issues when payroll is closed.
+     * @param session
+     * @throws Exception 
+     */
+    public void updatePayrollReceiptIssues(final SGuiSession session) throws Exception {
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
-            payrollReceipt.setAuxDateOfIssue(mtDateEnd);
-            payrollReceipt.createPayrollReceiptIssue(session);
+            payrollReceipt.updatePayrollReceiptIssue(session, mtDateEnd);
         }
     }
     
+    /**
+     * Update payroll receipt issues when payroll is opened.
+     * @param session
+     * @throws Exception 
+     */
     public void updatePayrollReceiptIssuesAsNewOnes(final SGuiSession session) throws Exception {
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceipts) {
             payrollReceipt.updatePayrollReceiptIssueAsNewOne(session);
@@ -550,7 +559,6 @@ public class SDbPayroll extends SDbRegistryUser {
         for (SDbPayrollReceipt payrollReceipt : maChildPayrollReceiptsToDelete) {
             payrollReceipt.setDeleted(true);
             payrollReceipt.setPkPayrollId(mnPkPayrollId);
-            payrollReceipt.setAuxDateOfIssue(mtDateEnd);
             payrollReceipt.save(session);
         }
         

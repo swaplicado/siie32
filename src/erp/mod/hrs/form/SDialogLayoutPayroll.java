@@ -405,10 +405,10 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     }
 
     private void populateEmployees() {
-        ArrayList<SRowPayrollEmployee> employeesAvailable = null;
+        ArrayList<SRowPayrollEmployee> rowPayrollEmployees = null;
         
         try {
-            employeesAvailable = SHrsPayrollUtils.obtainRowPayrollEmployeesAvailable(miClient.getSession(), mnPayrollId);
+            rowPayrollEmployees = SHrsPayrollUtils.obtainRowPayrollEmployees(miClient.getSession(), mnPayrollId);
             
             // prepare bank filter:
             
@@ -417,8 +417,8 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
             
             // process bank filter:
             
-            for (SRowPayrollEmployee employee : employeesAvailable) {
-                if (employee.getBank().isEmpty()) {
+            for (SRowPayrollEmployee row : rowPayrollEmployees) {
+                if (row.getBank().isEmpty()) {
                     if (!isEmptyBankAdded) {
                         isEmptyBankAdded = true;
                         banks.add(0, new SGuiItem(new int[] { 0 }, SHrsConsts.EMPTY_BANK)); // add empty bank just after label item
@@ -428,14 +428,14 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
                     boolean add = true;
                     
                     for (SGuiItem bank : banks) {
-                        if (bank.getPrimaryKey()[0] == employee.getBankId()) {
+                        if (bank.getPrimaryKey()[0] == row.getBankId()) {
                             add = false;
                             break;
                         }
                     }
                     
                     if (add) {
-                        banks.add(new SGuiItem(new int[] { employee.getBankId() }, employee.getBank()));
+                        banks.add(new SGuiItem(new int[] { row.getBankId() }, row.getBank()));
                     }
                 }
             }
@@ -453,7 +453,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
             SLibUtils.showException(this, e);
         }
 
-        moGridPaneEmployeesAvailable.populateGrid(new Vector<>(employeesAvailable));
+        moGridPaneEmployeesAvailable.populateGrid(new Vector<>(rowPayrollEmployees));
         moGridPaneEmployeesSelected.populateGrid(new Vector<>());
         
         computeTotals();

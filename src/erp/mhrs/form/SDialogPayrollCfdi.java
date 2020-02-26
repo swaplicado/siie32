@@ -21,6 +21,7 @@ import erp.mhrs.data.SHrsPayrollEmployeeReceipt;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayroll;
+import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mtrn.data.SDataCfd;
 import java.awt.BorderLayout;
@@ -40,7 +41,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas
+ * @author Sergio Flores, Juan Barajas, Sergio Flores
  */
 public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListSelectionListener {
 
@@ -49,24 +50,24 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
 
     private final erp.client.SClientInterface miClient;
+    private final ArrayList<SHrsPayrollEmployeeReceipt> maHrsPayrollEmployeeReceipts;
     private erp.lib.form.SFormField moFieldDateIssue;
     private erp.lib.form.SFormField moFieldDatePayment;
     private erp.lib.form.SFormField moFieldCfdiRelatedUuid;
     private erp.lib.table.STablePaneGrid moTablePaneReceiptAvailable;
     private erp.lib.table.STablePaneGrid moTablePaneReceiptSelected;
-    private final ArrayList<SHrsPayrollEmployeeReceipt> maHrsPayrollEmployeeReceipt;
     private erp.mod.hrs.db.SDbConfig moConfig;
-    private java.util.ArrayList<int[]> manPayrollEmployeeReceipts;
+    private java.util.ArrayList<int[]> manPayrollEmployeeReceiptKeys;
     private erp.mhrs.form.SDialogPayrollCfdiPicker moPayrollCfdiPicker;
 
     /** Creates new form SDialogPayrollCfdi
      * @param client
-     * @param hrsPayrollEmployeeReceipt */
-    public SDialogPayrollCfdi(erp.client.SClientInterface client, ArrayList<SHrsPayrollEmployeeReceipt> hrsPayrollEmployeeReceipt) {
+     * @param hrsPayrollEmployeeReceipts
+     */
+    public SDialogPayrollCfdi(erp.client.SClientInterface client, ArrayList<SHrsPayrollEmployeeReceipt> hrsPayrollEmployeeReceipts) {
         super(client.getFrame(), true);
         miClient = client;
-        maHrsPayrollEmployeeReceipt = hrsPayrollEmployeeReceipt;
-        manPayrollEmployeeReceipts = new ArrayList<>();
+        maHrsPayrollEmployeeReceipts = hrsPayrollEmployeeReceipts;
         initComponents();
         initComponentsExtra();
     }
@@ -428,7 +429,7 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
             }
             else {
                 try {
-                    if (maHrsPayrollEmployeeReceipt != null) {
+                    if (maHrsPayrollEmployeeReceipts != null) {
                         populatePayroll();
                     }
                 }
@@ -474,13 +475,13 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
     
     @SuppressWarnings("unchecked")
     private void populatePayroll() {
-        ArrayList<SHrsPayrollEmployeeReceipt> rowsSelected = null;
-        
-        if (!maHrsPayrollEmployeeReceipt.isEmpty()) {
-            jtfPayrollPeriod.setText(SLibUtils.DecimalFormatCalendarYear.format(maHrsPayrollEmployeeReceipt.get(0).getPeriodYear()) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(maHrsPayrollEmployeeReceipt.get(0).getPeriod()));
-            jtfPayrollNumber.setText(SDbPayroll.getPaymentTypeAbbr(maHrsPayrollEmployeeReceipt.get(0).getFkPaymentTypeId()) + " " + maHrsPayrollEmployeeReceipt.get(0).getPayrollNumber());
-            jtfPayrollDates.setText(SLibUtils.DateFormatDate.format(maHrsPayrollEmployeeReceipt.get(0).getDateStart()) + " - " + SLibUtils.DateFormatDate.format(maHrsPayrollEmployeeReceipt.get(0).getDateEnd()));
-            jtfPayrollNotes.setText(maHrsPayrollEmployeeReceipt.get(0).getNotes());
+        if (!maHrsPayrollEmployeeReceipts.isEmpty()) {
+            SHrsPayrollEmployeeReceipt receiptSample = maHrsPayrollEmployeeReceipts.get(0);
+            
+            jtfPayrollPeriod.setText(SLibUtils.DecimalFormatCalendarYear.format(receiptSample.getPeriodYear()) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(receiptSample.getPeriod()));
+            jtfPayrollNumber.setText(SDbPayroll.getPaymentTypeAbbr(receiptSample.getFkPaymentTypeId()) + " " + receiptSample.getPayrollNumber());
+            jtfPayrollDates.setText(SLibUtils.DateFormatDate.format(receiptSample.getDateStart()) + " - " + SLibUtils.DateFormatDate.format(receiptSample.getDateEnd()));
+            jtfPayrollNotes.setText(receiptSample.getNotes());
             
             jtfPayrollPeriod.setCaretPosition(0);
             jtfPayrollNumber.setCaretPosition(0);
@@ -488,54 +489,60 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
             jtfPayrollNotes.setCaretPosition(0);
 
             try {
-                rowsSelected = new ArrayList<>();
-                
-                for (SHrsPayrollEmployeeReceipt row : maHrsPayrollEmployeeReceipt) {
-                    row.prepareTableRow();
-                    Object field = SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { row.getPaymentTypeSysId() }, SLibConstants.FIELD_TYPE_TEXT);
-
-                    row.setPaymentTypeSys((String) field);
-                    if (row.getPaymentTypeSysId() == SDataConstantsSys.TRNU_TP_PAY_SYS_NA) {
-                        moTablePaneReceiptAvailable.addTableRow(row);   // receipt has not been added yet (2019-03-12, Sergio Flores: WTF! A bizarre solution!)
+                for (SHrsPayrollEmployeeReceipt receipt : maHrsPayrollEmployeeReceipts) {
+                    receipt.setPaymentTypeSys((String) SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { receipt.getPaymentTypeSysId() }, SLibConstants.FIELD_TYPE_TEXT));
+                    receipt.prepareTableRow();
+                    
+                    if (receipt.getPaymentTypeSysId() == SDataConstantsSys.TRNU_TP_PAY_SYS_NA) {
+                        moTablePaneReceiptAvailable.addTableRow(receipt); // receipt not selected yet (2019-03-12, Sergio Flores: WTF! A bizarre solution!)
                     }
                     else {
-                        rowsSelected.add(row);                          // receipt had been added already
+                        moTablePaneReceiptSelected.addTableRow(receipt); // receipt previously selected
                     }
                 }
                 
                 moTablePaneReceiptAvailable.renderTableRows();
                 moTablePaneReceiptAvailable.setTableRowSelection(0);
 
-                if (!rowsSelected.isEmpty()) {
-                    for (SHrsPayrollEmployeeReceipt row : rowsSelected) {
-                        row.prepareTableRow();
-                        moTablePaneReceiptSelected.addTableRow(row);
-                    }
-                    moTablePaneReceiptSelected.renderTableRows();
-                    moTablePaneReceiptSelected.setTableRowSelection(moTablePaneReceiptSelected.getTableGuiRowCount() - 1);
-                }
+                moTablePaneReceiptSelected.renderTableRows();
+                moTablePaneReceiptSelected.setTableRowSelection(0);
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
             }
         }
+        
         computeTotals();
     }
     
     @SuppressWarnings("unchecked")
     private void computePayroll() throws java.lang.Exception {
-        SDbPayrollReceiptIssue receiptIssue = new SDbPayrollReceiptIssue();
+        manPayrollEmployeeReceiptKeys = new ArrayList<>();
         
         for (STableRow row : moTablePaneReceiptSelected.getGridRows()) {
             SHrsPayrollEmployeeReceipt receipt = (SHrsPayrollEmployeeReceipt) row;
-            int[] receiptKey = receipt.getRowPrimaryKey();
+            int[] issueKey = receipt.getRowPrimaryKey(); // primary key of issue of payroll receipt
             
-            receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_NUMBER_SERIES, receipt.getNumberSeries());
-            receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_DATE_ISSUE, receipt.getDateIssue());
-            receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_DATE_PAYMENT, receipt.getDatePayment());
-            receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_TYPE_PAYMENT_SYS, receipt.getPaymentTypeSysId());
-            receiptIssue.saveField(miClient.getSession().getStatement(), receiptKey, SDbPayrollReceiptIssue.FIELD_TYPE_UUID_RELATED, receipt.getUuidToSubstitute());
-            manPayrollEmployeeReceipts.add(receiptKey);
+            SDbPayrollReceiptIssue payrollReceiptIssue = (SDbPayrollReceiptIssue) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP_ISS, issueKey); // only for massive updating of issuing data of receipts about to be issued
+            
+            if (!payrollReceiptIssue.isCfdEditable()) {
+                throw new Exception("El recibo de '" + receipt.getEmployeeName() + "' no es modificable.");
+            }
+            else {
+                if (payrollReceiptIssue.isCfdAnnulled()) {
+                    // create a new payroll receipt issue:
+                    SDbPayrollReceipt payrollReceipt = (SDbPayrollReceipt) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP, issueKey);
+                    payrollReceipt.updatePayrollReceiptIssue(miClient.getSession(), receipt.getDateOfIssue());
+                    issueKey = payrollReceipt.getChildPayrollReceiptIssue().getPrimaryKey();
+                }
+            }
+            
+            payrollReceiptIssue.saveField(miClient.getSession().getStatement(), issueKey, SDbPayrollReceiptIssue.FIELD_NUMBER_SERIES, receipt.getNumberSeries());
+            payrollReceiptIssue.saveField(miClient.getSession().getStatement(), issueKey, SDbPayrollReceiptIssue.FIELD_DATE_ISSUE, receipt.getDateOfIssue());
+            payrollReceiptIssue.saveField(miClient.getSession().getStatement(), issueKey, SDbPayrollReceiptIssue.FIELD_DATE_PAYMENT, receipt.getDateOfPayment());
+            payrollReceiptIssue.saveField(miClient.getSession().getStatement(), issueKey, SDbPayrollReceiptIssue.FIELD_TYPE_PAYMENT_SYS, receipt.getPaymentTypeSysId());
+            payrollReceiptIssue.saveField(miClient.getSession().getStatement(), issueKey, SDbPayrollReceiptIssue.FIELD_TYPE_UUID_RELATED, receipt.getUuidToSubstitute());
+            manPayrollEmployeeReceiptKeys.add(issueKey);
         }
     }
 
@@ -579,8 +586,8 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
                 
                 row = (SHrsPayrollEmployeeReceipt) moTablePaneReceiptAvailable.getSelectedTableRow();
                 row.setNumberSeries(moConfig.getNumberSeries());
-                row.setDateIssue(moFieldDateIssue.getDate());
-                row.setDatePayment(moFieldDatePayment.getDate());
+                row.setDateOfIssue(moFieldDateIssue.getDate());
+                row.setDateOfPayment(moFieldDatePayment.getDate());
                 row.setPaymentTypeSysId(paymentType);
                 row.setPaymentTypeSys((String) field);
                 row.setUuidToSubstitute(moFieldCfdiRelatedUuid.getString());
@@ -760,8 +767,8 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
         return mnFormResult;
     }
 
-    public ArrayList<int[]> getPayrollEmployeeReceipts() {
-        return manPayrollEmployeeReceipts;
+    public ArrayList<int[]> getPayrollEmployeeReceiptKeys() {
+        return manPayrollEmployeeReceiptKeys;
     }
 
     @Override

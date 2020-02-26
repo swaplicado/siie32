@@ -326,9 +326,9 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         return incapacidad;
     }
     
-    private cfd.ver3.nom12.DElementOtroPago createElementOtroPago12(final String tipo, final String clave, final String concepto, final double importe) {
+    private cfd.ver3.nom12.DElementOtroPago createElementOtroPago12(final String tipoOtroPago, final String clave, final String concepto, final double importe) {
         cfd.ver3.nom12.DElementOtroPago otroPago = new cfd.ver3.nom12.DElementOtroPago();
-        otroPago.getAttTipoOtroPago().setString(tipo);
+        otroPago.getAttTipoOtroPago().setString(tipoOtroPago);
         otroPago.getAttClave().setString(SLibUtils.textToXml(clave));
         otroPago.getAttConcepto().setString(SLibUtils.textToXml(concepto));
         otroPago.getAttImporte().setDouble(importe);
@@ -345,25 +345,26 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         cfd.ver3.nom12.DElementOtroPago otroPago = null;
 
         if (concept.getTotalImporte() != 0 || concept.getXtaSubsidioEmpleo() != 0) {
-            String conceptText = "";
-            String otherPaymentType = "";
+            String conceptoOtroPago = "";
             
             switch (concept.getClaveOficial()) {
                 case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
-                    conceptText = SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY_EFF; // to preserve text case according to oficially suggested text
-                    otherPaymentType = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB }, SDbRegistry.FIELD_CODE);
+                    conceptoOtroPago = SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY_EFF; // to preserve text case according to oficially suggested text
                     break;
                     
                 case SModSysConsts.HRSS_TP_EAR_OTH:
-                    conceptText = concept.getConcepto();
-                    otherPaymentType = (String) miClient.getSession().readField(SModConsts.HRSS_TP_OTH_PAY, new int[] { SModSysConsts.HRSS_TP_OTH_PAY_OTH }, SDbRegistry.FIELD_CODE);
+                    conceptoOtroPago = concept.getConcepto();
                     break;
                     
                 default:
             }
             
-            if (!otherPaymentType.isEmpty()) {
-                otroPago = createElementOtroPago12(otherPaymentType, DCfdVer3Utils.formatAttributeValueAsKey(composeKey(concept.getClaveEmpresa(), 3)), conceptText, concept.getTotalImporte());
+            if (!conceptoOtroPago.isEmpty()) { // guarantee than only real other payments are processed
+                otroPago = createElementOtroPago12(
+                        concept.getXtaClaveTipoOtroPago(), 
+                        DCfdVer3Utils.formatAttributeValueAsKey(composeKey(concept.getClaveEmpresa(), 3)), 
+                        conceptoOtroPago, 
+                        concept.getTotalImporte());
                 
                 if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
                     otroPago.setEltSubsidioEmpleo(createElementSubsidioEmpleo12(concept.getXtaSubsidioEmpleo()));
@@ -557,21 +558,21 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         // Validate recruitment scheme:
         
         if (isTypeContractForEmployment() && !isRecruitmentSchemeForEmployment()) {
-            throw new Exception("El tipo régimen no corresponde a una relación laboral subordinada.");
+            throw new Exception("El tipo régimen de contratación del empleado en el CFDI no corresponde a una relación laboral subordinada.");
         }
         
         if (!isTypeContractForEmployment() && isRecruitmentSchemeForEmployment()) {
-            throw new Exception("El tipo régimen no corresponde a un esquema insubordinado.");
+            throw new Exception("El tipo régimen de contratación del empleado en el CFDI no corresponde a un esquema insubordinado.");
         }
         
         receptor.getAttTipoRegimen().setString((String) miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { mnTipoRegimen }, SDbRegistry.FIELD_CODE));
         
         // Validate length the account bank:
         
-        if (msCuentaBancaria.length() > 0) {
+        if (!msCuentaBancaria.isEmpty()) {
             if (msCuentaBancaria.length() != SDataConstantsSys.BPSS_BPB_BANK_ACC_TEL && msCuentaBancaria.length() != SDataConstantsSys.BPSS_BPB_BANK_ACC_NUM &&
                     msCuentaBancaria.length() != SDataConstantsSys.BPSS_BPB_BANK_ACC_TRJ && msCuentaBancaria.length() != SDataConstantsSys.BPSS_BPB_BANK_ACC_CBE) {
-                throw new Exception("La longitud de la cuenta bancaria es incorrecto.");
+                throw new Exception("La cuenta bancaria del empleado '" + msCuentaBancaria + "' tiene una longitud incorrecta: " + msCuentaBancaria.length() + ".");
             }
 
             if (msCuentaBancaria.length() == SDataConstantsSys.BPSS_BPB_BANK_ACC_CBE) {

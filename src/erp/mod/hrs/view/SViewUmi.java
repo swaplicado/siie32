@@ -63,7 +63,7 @@ public class SViewUmi extends SGridPaneView {
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sta", "Inicio vigencia"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "v.amt", "Valor UMI $"));

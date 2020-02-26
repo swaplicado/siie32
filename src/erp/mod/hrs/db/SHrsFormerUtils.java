@@ -25,6 +25,7 @@ import sa.lib.SLibUtils;
  * 2018-01-02, Sergio Flores:
  *  Implementation of payroll into CFDI 3.3.
  */
+@Deprecated
 public abstract class SHrsFormerUtils {
 
     /**
