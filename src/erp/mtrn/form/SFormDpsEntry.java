@@ -5950,6 +5950,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setValue(int type, java.lang.Object value) {
         String currencyCode = "";
         

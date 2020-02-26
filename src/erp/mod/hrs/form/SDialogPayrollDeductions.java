@@ -247,6 +247,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
         enableFields(false);
     }
     
+    @SuppressWarnings("unchecked")
     private void setPayroll(SHrsPayroll payroll) {
         moHrsPayroll = payroll;
 
@@ -573,6 +574,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setValue(final int type, final Object value) {
         try {
             switch (type) {

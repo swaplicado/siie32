@@ -54,7 +54,6 @@ import erp.mod.hrs.db.SHrsFormerConceptIncident;
 import erp.mod.hrs.db.SHrsFormerPayroll;
 import erp.mod.hrs.db.SHrsFormerReceipt;
 import erp.mod.hrs.db.SHrsFormerReceiptConcept;
-import erp.mod.hrs.db.SHrsFormerUtils;
 import erp.mtrn.form.SDialogRestoreCfdi;
 import erp.print.SDataConstantsPrint;
 import erp.server.SServerConstants;
@@ -416,6 +415,7 @@ public abstract class SCfdUtils implements Serializable {
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     private static void validateHrsFormerReceipts(SClientInterface client, SHrsFormerPayroll hrsFormerPayroll, SHrsFormerPayroll hrsFormerPayrollXml, final boolean isRegenerateOnlyNonStampedCfdi) throws Exception {
         // Validate payroll receipts consistent:
 
@@ -451,8 +451,8 @@ public abstract class SCfdUtils implements Serializable {
                                     receipt.getTotalNeto() == receiptXml.getTotalNeto() && receipt.getTotalPercepciones() == receiptXml.getTotalPercepciones() &&
                                     receipt.getTotalRetenciones() == receiptXml.getTotalRetenciones() && receipt.getTipoJornada().compareTo(receiptXml.getTipoJornada()) == 0 &&
                                     (SLibTimeUtils.convertToDateOnly(receipt.getParentPayroll().getFecha()).compareTo(SLibTimeUtils.convertToDateOnly(SLibTimeUtils.createDate(2016, 7, 15))) > 0 ?
-                                    SHrsFormerUtils.getPaymentMethodCode(client, receipt.getMetodoPago()).compareTo(receiptXml.getMetodoPagoAux()) == 0 : 
-                                    SHrsFormerUtils.getPaymentMethodName(client, receipt.getMetodoPago()).compareTo(receiptXml.getMetodoPagoAux()) == 0);
+                                    erp.mod.hrs.db.SHrsFormerUtils.getPaymentMethodCode(client, receipt.getMetodoPago()).compareTo(receiptXml.getMetodoPagoAux()) == 0 : 
+                                    erp.mod.hrs.db.SHrsFormerUtils.getPaymentMethodName(client, receipt.getMetodoPago()).compareTo(receiptXml.getMetodoPagoAux()) == 0);
                         }
 
                         if (isFound) {

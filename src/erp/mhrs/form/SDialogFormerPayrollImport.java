@@ -36,7 +36,6 @@ import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsFormerConsts;
 import erp.mod.hrs.db.SHrsFormerPayroll;
-import erp.mod.hrs.db.SHrsFormerUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -536,10 +535,11 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void connectOdbc() {
         try {
             if (moConnectionOdbc == null || moConnectionOdbc.isClosed()) {
-                moConnectionOdbc = SHrsFormerUtils.getConnectionOdbc(miClient);
+                moConnectionOdbc = erp.mod.hrs.db.SHrsFormerUtils.getConnectionOdbc(miClient);
             }
         }
         catch (Exception e) {
@@ -910,7 +910,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         return entry;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "deprecation"})
     private void computePayroll() throws java.lang.Exception {
         int nType = 0;
         int nMoveId = 0;
@@ -1295,7 +1295,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
 
         // Obtain payroll structure:
 
-        moHrsFormerPayroll = SHrsFormerUtils.readHrsFormerPayroll((SClientInterface) miClient, miClient.getSession().getStatement(), mnPayrollId, miClient.getSession().getConfigCompany().getCompanyId(), moFieldDate.getDate(), moFieldDatePayment.getDate());
+        moHrsFormerPayroll = erp.mod.hrs.db.SHrsFormerUtils.readHrsFormerPayroll((SClientInterface) miClient, miClient.getSession().getStatement(), mnPayrollId, miClient.getSession().getConfigCompany().getCompanyId(), moFieldDate.getDate(), moFieldDatePayment.getDate());
         SCfdUtils.computeCfdiPayroll(miClient, moHrsFormerPayroll, false); // generate all CFDI
 
         miClient.getGuiModule(SDataConstants.MOD_FIN).refreshCatalogues(SDataConstants.FIN_REC);
@@ -1528,6 +1528,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
     private javax.swing.JTextField jtfRecordNumber;
     // End of variables declaration//GEN-END:variables
 
+    @SuppressWarnings("unchecked")
     public void resetForm() {
         mnFormResult = SLibConstants.UNDEFINED;
         mbFirstTime = true;

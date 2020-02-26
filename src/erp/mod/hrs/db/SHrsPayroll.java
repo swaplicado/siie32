@@ -68,8 +68,8 @@ public class SHrsPayroll {
         maAutomaticDeductions = new ArrayList<>();
         maEmployees = new ArrayList<>();
         maHrsReceipts = new ArrayList<>();
-        moEarningComputationTypesMap = new HashMap();
-        moDeductionComputationTypesMap = new HashMap();
+        moEarningComputationTypesMap = new HashMap<>();
+        moDeductionComputationTypesMap = new HashMap<>();
     }
 
     /*

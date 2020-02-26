@@ -388,6 +388,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         itemStateChangedLayout();
     }
 
+    @SuppressWarnings("unchecked")
     private void populateLayoutBank() {
         Vector<SGuiItem> items = new Vector<>();
 
@@ -404,6 +405,7 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void populateEmployees() {
         ArrayList<SRowPayrollEmployee> rowPayrollEmployees = null;
         

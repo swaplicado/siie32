@@ -807,6 +807,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public String getComprobanteMetodoDePago() { // CFDI 3.2
         String formaPago = "";
 

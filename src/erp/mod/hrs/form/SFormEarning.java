@@ -901,6 +901,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void setRegistry(SDbRegistry registry) throws Exception {
         moRegistry = (SDbEarning) registry;
 
@@ -977,6 +978,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public SDbRegistry getRegistry() throws Exception {
         SDbEarning registry = moRegistry.clone();
 

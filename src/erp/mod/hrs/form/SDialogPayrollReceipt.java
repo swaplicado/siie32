@@ -1872,6 +1872,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setValue(final int type, final Object value) {
         switch (type) {
             case SGuiConsts.PARAM_REQ_PAY:
