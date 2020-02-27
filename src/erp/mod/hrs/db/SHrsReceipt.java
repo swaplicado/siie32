@@ -20,7 +20,7 @@ import sa.lib.db.SDbConsts;
  * @author Néstor Ávalos, Juan Barajas, Sergio Flores
  * 2019-01-29, Sergio Flores: Corrección al cálculo de parte exenta en percepciones. Debe estar en en función de UMA desde 2017.
  * 2019-06-07, Sergio Flores: Implementación compensación Subsidio para el empleo pagado en exceso contra ISR.
- *  Al implementarse el dato informativo en CFDI de Subsdio para el empleo causado, la conmensación del pago en exceso dejó de hacerse contra ISR.
+ *  Al implementarse el dato informativo en CFDI de Subsdio para el empleo causado, la conmpensación del pago en exceso dejó de hacerse contra ISR.
  */
 public class SHrsReceipt {
 
@@ -781,9 +781,9 @@ public class SHrsReceipt {
     private void computeReceiptSsContribution() throws Exception {
         double sscComputed = 0;
         SHrsReceiptDeduction hrsReceiptDeductionSscNew = null;
-        SDbPayroll payroll = moHrsPayroll.getPayroll();
+        SDbPayroll payroll = moHrsPayroll.getPayroll(); // convenience variable
         
-        if (payroll.isSsContribution()) {
+        if (payroll.isSsContribution() && !moHrsEmployee.getEmployee().isAssimilable()) {  // assimilables are not elegible for SS contribution
             // Validate configuration of SS contribution:
 
             if (moHrsPayroll.getConfig().getFkDeductionSsContributionId_n() == 0) {

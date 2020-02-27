@@ -1591,14 +1591,17 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                 return;
             }
             
+            // validate assimilated employees:
+            
             SDbEmployee employee = moHrsReceipt.getHrsEmployee().getEmployee(); // convenience variable
 
             if (employee.isAssimilable() && moEarning.getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_ASS_INC) {
                 // this message is duplicated as is in method validateForm(), please synchronize any change!
                 miClient.showMsgBoxWarning(employee.getAuxEmployeeName() + ", "
-                + "cuyo régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
+                + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
                 + "no puede tener percepciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_EAR, new int[] { SModSysConsts.HRSS_TP_EAR_ASS_INC }, SDbRegistry.FIELD_NAME) + "'.");
                 moTextEarningCode.requestFocus();
+                return;
             }
         
             // confirm multiple earnings of the same type:
@@ -1648,6 +1651,19 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                             }
                         }
                     }
+                }
+                
+                // validate assimilated employees:
+                
+                SDbEmployee employee = moHrsReceipt.getHrsEmployee().getEmployee(); // convenience variable
+
+                if (employee.isAssimilable() && moDeduction.getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_TAX) {
+                    // this message is duplicated as is in method validateForm(), please synchronize any change!
+                    miClient.showMsgBoxWarning(employee.getAuxEmployeeName() + ", "
+                        + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
+                        + "no puede tener deducciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_DED, new int[] { SModSysConsts.HRSS_TP_DED_TAX }, SDbRegistry.FIELD_NAME) + "'.");
+                    moTextDeductionCode.requestFocus();
+                    return;
                 }
                 
                 // confirm multiple deductions of the same type:
@@ -1860,10 +1876,23 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                 if (hrsReceiptEarning.getEarning().getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_ASS_INC) {
                     // this message is duplicated as is in method actionAddEarning(), please synchronize any change!
                     validation.setMessage(employee.getAuxEmployeeName() + ", "
-                    + "cuyo régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
+                    + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
                     + "no puede tener percepciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_EAR, new int[] { SModSysConsts.HRSS_TP_EAR_ASS_INC }, SDbRegistry.FIELD_NAME) + "'.");
                     validation.setComponent(moTextEarningCode);
                     break;
+                }
+            }
+            
+            if (validation.isValid()) {
+                for (SHrsReceiptDeduction hrsReceiptDeduction : moHrsReceipt.getHrsReceiptDeductions()) {
+                    if (hrsReceiptDeduction.getDeduction().getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_TAX) {
+                        // this message is duplicated as is in method actionAddDeduction(), please synchronize any change!
+                        validation.setMessage(employee.getAuxEmployeeName() + ", "
+                        + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
+                        + "no puede tener deducciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_DED, new int[] { SModSysConsts.HRSS_TP_DED_TAX }, SDbRegistry.FIELD_NAME) + "'.");
+                        validation.setComponent(moTextEarningCode);
+                        break;
+                    }
                 }
             }
         }

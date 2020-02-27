@@ -8,7 +8,7 @@ import java.util.Date;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     
@@ -25,6 +25,8 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     
     protected String msEmployeeNumber;
     protected String msEmployeeName;
+    protected int mnDepartmentId;
+    protected String msDepartment;
     protected double mdTotalEarnings;
     protected double mdTotalDeductions;
     protected double mdTotalNet;
@@ -50,6 +52,8 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
         mnFkPaymentTypeId = 0;
         msEmployeeNumber = "";
         msEmployeeName = "";
+        mnDepartmentId = 0;
+        msDepartment = "";
         mdTotalEarnings = 0;
         mdTotalDeductions = 0;
         mdTotalNet = 0;
@@ -74,6 +78,7 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
         mvValues.add(mtDateOfPayment);
         mvValues.add(msPaymentTypeSys);
         mvValues.add(msUuidToSubstitute);
+        mvValues.add(msDepartment);
     }
 
     public void setPkPayrollId(int n) { mnPkPayrollId = n; }
@@ -89,6 +94,8 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public void setFkPaymentTypeId(int n) { mnFkPaymentTypeId = n; }
     public void setEmployeeNumber(String s) { msEmployeeNumber = s; }
     public void setEmployeeName(String s) { msEmployeeName = s; }
+    public void setDepartmentId(int n) { mnDepartmentId = n; }
+    public void setDepartment(String s) { msDepartment = s; }
     public void setTotalEarnings(double d) { mdTotalEarnings = d; }
     public void setTotalDeductions(double d) { mdTotalDeductions = d; }
     public void setTotalNet(double d) { mdTotalNet = d; }
@@ -110,8 +117,10 @@ public class SHrsPayrollEmployeeReceipt extends erp.lib.table.STableRow {
     public String getNotes() { return msNotes; }
     /** Besides getting payment type ID, it is a flag to determine if receipt has been already selected to be emmited, when this type is different from <code>SDataConstantsSys.TRNU_TP_PAY_SYS_NA</code>. */
     public int getFkPaymentTypeId() { return mnFkPaymentTypeId; }
-    public String getEmployeeNumber() { return msEmployeeNumber ; }
-    public String getEmployeeName() { return msEmployeeName ; }
+    public String getEmployeeNumber() { return msEmployeeNumber; }
+    public String getEmployeeName() { return msEmployeeName; }
+    public int getDepartmentId() { return mnDepartmentId; }
+    public String getDepartment() { return msDepartment; }
     public double getTotalEarnings() { return mdTotalEarnings ; }
     public double getTotalDeductions() { return mdTotalDeductions ; }
     public double getTotalNet() { return mdTotalNet ; }

@@ -68,8 +68,8 @@ public abstract class SHrsCfdUtils {
         ArrayList<SHrsPayrollEmployeeReceipt> receipts = new ArrayList<>();
         
         String sql = "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, "
-                + "pr.id_emp, bp.bp, emp.num AS _emp_num, pr.ear_r, pr.ded_r, pr.pay_r, "
-                + "pri.id_iss, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, pri.dt_iss, pri.dt_pay " 
+                + "pr.id_emp, bp.bp AS _emp_name, emp.num AS _emp_num, dep.name AS _dep_name, pr.fk_dep, pr.ear_r, pr.ded_r, pr.pay_r, "
+                + "pri.id_iss, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, pri.dt_iss, pri.dt_pay "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON "
@@ -80,13 +80,14 @@ public abstract class SHrsCfdUtils {
                 + " ORDER BY pri1.id_iss DESC LIMIT 1) "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = pr.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
                 + "WHERE p.id_pay = " + payrollId + " AND p.b_del = 0 AND pr.b_del = 0 AND pr.b_cfd_req = 1 AND "
                 + "NOT EXISTS (SELECT * "
                 + " FROM " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " "
                 + "WHERE fid_pay_rcp_pay_n = pri.id_pay AND fid_pay_rcp_emp_n = pri.id_emp AND fid_pay_rcp_iss_n = pri.id_iss) "
                 + "UNION "
                 + "SELECT p.id_pay, p.per_year, p.per, p.num, p.dt_sta, p.dt_end, p.nts, p.fk_tp_pay, "
-                + "pr.id_emp, bp.bp, emp.num AS _emp_num, pr.ear_r, pr.ded_r, pr.pay_r, "
+                + "pr.id_emp, bp.bp AS _emp_name, emp.num AS _emp_num, dep.name AS _dep_name, pr.fk_dep, pr.ear_r, pr.ded_r, pr.pay_r, "
                 + "pri.id_iss, pri.num_ser, pri.num, pri.uuid_rel, pri.fk_tp_pay_sys, pri.dt_iss, pri.dt_pay "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
@@ -97,10 +98,11 @@ public abstract class SHrsCfdUtils {
                 + " ORDER BY pri1.id_iss DESC LIMIT 1) "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS emp ON emp.id_emp = pr.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = emp.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS dep ON dep.id_dep = pr.fk_dep "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON pri.id_pay = c.fid_pay_rcp_pay_n AND pri.id_emp = c.fid_pay_rcp_emp_n AND pri.id_iss = c.fid_pay_rcp_iss_n AND "
                 + "(c.fid_st_xml IN (" + SDataConstantsSys.TRNS_ST_DPS_NEW + " , " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ") OR c.uuid = '') "
                 + "WHERE p.id_pay = " + payrollId + " AND p.b_del = 0 AND pr.b_del = 0 "
-                + "ORDER BY id_pay, bp, id_emp, id_iss ";
+                + "ORDER BY _emp_name, id_emp, id_iss ";
         
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
@@ -117,7 +119,9 @@ public abstract class SHrsCfdUtils {
                 receipt.setNotes(resultSet.getString("nts"));
                 receipt.setFkPaymentTypeId(resultSet.getInt("fk_tp_pay"));
                 receipt.setEmployeeNumber(resultSet.getString("_emp_num"));
-                receipt.setEmployeeName(resultSet.getString("bp"));
+                receipt.setEmployeeName(resultSet.getString("_emp_name"));
+                receipt.setDepartmentId(resultSet.getInt("fk_dep"));
+                receipt.setDepartment(resultSet.getString("_dep_name"));
                 receipt.setTotalEarnings(resultSet.getDouble("ear_r"));
                 receipt.setTotalDeductions(resultSet.getDouble("ded_r"));
                 receipt.setTotalNet(resultSet.getDouble("pay_r"));

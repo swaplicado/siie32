@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 159.2/ 2020-02-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a selección de empleados y recibos de nómina disponibles al capturar nóminas, generar CFDI y generar layouts bancarios para dispersión de nóminas.
+2) Implementación de filtro por departamento al seleccionar recibos disponibles al generar CFDI.
+
+================================================================================
 SIIE 3.2 159.1/ 2020-02-26
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

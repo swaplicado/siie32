@@ -24,7 +24,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.JButton;
@@ -173,8 +172,8 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
         jPanel8.add(moKeyBankFilter);
 
         jlBankFilterHint.setForeground(java.awt.SystemColor.textInactiveText);
-        jlBankFilterHint.setText("(al seleccionar empleados)");
-        jlBankFilterHint.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlBankFilterHint.setText("(Aplica al seleccionar recibos disponibles en grupo)");
+        jlBankFilterHint.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel8.add(jlBankFilterHint);
 
         jPanel16.add(jPanel8);
@@ -322,19 +321,15 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                int col = 0;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
-                SGridColumnForm[] columns = new SGridColumnForm[7];
 
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Empleado", 200);
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Deducciones $");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Alcance neto $");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Banco");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Cuenta bancaria");
-
-                gridColumnsForm.addAll(Arrays.asList((SGridColumnForm[]) columns));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Empleado", 200));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Deducciones $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Alcance neto $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Banco"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Cuenta bancaria"));
 
                 return gridColumnsForm;
             }
@@ -352,19 +347,15 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
             @Override
             public ArrayList<SGridColumnForm> createGridColumns() {
-                int col = 0;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
-                SGridColumnForm[] columns = new SGridColumnForm[7];
 
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Empleado", 200);
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Deducciones $");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Alcance neto $");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Banco");
-                columns[col++] = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Cuenta bancaria");
-
-                gridColumnsForm.addAll(Arrays.asList((SGridColumnForm[]) columns));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_S, "Empleado", 200));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_BPR, "Clave"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Percepciones $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Deducciones $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Alcance neto $"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Banco"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "Cuenta bancaria"));
 
                 return gridColumnsForm;
             }
@@ -558,20 +549,26 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
 
         int from = 0;
         int rows = moGridPaneEmployeesAvailable.getTable().getRowCount();
+        int processed = 0;
 
         for (int row = 0; row < rows; row++) {
             moGridPaneEmployeesAvailable.setSelectedGridRow(from);
             
-            if (moKeyBankFilter.getSelectedIndex() > 0) {
-                if (!((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getBank().equals(bank)) {
-                    from++;
-                    continue;
+            if (moKeyBankFilter.getSelectedIndex() > 0 && !((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getBank().equals(bank)) {
+                from++; // skip current row and go next
+            }
+            else {
+                if (actionPerformedAdd()) {
+                    processed++;
+                }
+                else {
+                    from++; // skip current row and go next
                 }
             }
-
-            if (!actionPerformedAdd()) {
-                from++;
-            }
+        }
+        
+        if (processed == 0) {
+            miClient.showMsgBoxWarning("¡No se agregó ningún recibo disponible!");
         }
     }
 
@@ -609,13 +606,23 @@ public class SDialogLayoutPayroll extends SBeanFormDialog implements ActionListe
     }
 
     private void actionPerformedRemoveAll() {
-        moGridPaneEmployeesSelected.setSelectedGridRow(0);
-
-        while (moGridPaneEmployeesSelected.getSelectedGridRow() != null) {
-            if (!actionPerformedRemove()) {
-                break;
+        int from = 0;
+        int rows = moGridPaneEmployeesSelected.getTable().getRowCount();
+        int processed = 0;
+        
+        for (int row = 0; row < rows; row++) {
+            moGridPaneEmployeesSelected.setSelectedGridRow(from);
+            
+            if (actionPerformedRemove()) {
+                processed++;
             }
-            moGridPaneEmployeesSelected.setSelectedGridRow(0);
+            else {
+                from++; // skip current row and go next
+            }
+        }
+        
+        if (processed == 0) {
+            miClient.showMsgBoxWarning("¡No se removió ningún recibo seleccionado!");
         }
     }
     

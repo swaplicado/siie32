@@ -738,25 +738,21 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel32.add(jlDummy01);
 
         jbReceiptAdd.setText(">");
-        jbReceiptAdd.setToolTipText("Agregar");
         jbReceiptAdd.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jbReceiptAdd.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel32.add(jbReceiptAdd);
 
         jbReceiptAddAll.setText(">>");
-        jbReceiptAddAll.setToolTipText("Agregar todos");
         jbReceiptAddAll.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jbReceiptAddAll.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel32.add(jbReceiptAddAll);
 
         jbReceiptRemove.setText("<");
-        jbReceiptRemove.setToolTipText("Remover");
         jbReceiptRemove.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jbReceiptRemove.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel32.add(jbReceiptRemove);
 
         jbReceiptRemoveAll.setText("<<");
-        jbReceiptRemoveAll.setToolTipText("Remover todos");
         jbReceiptRemoveAll.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jbReceiptRemoveAll.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel32.add(jbReceiptRemoveAll);
@@ -1532,15 +1528,56 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
     }
 
-    private boolean actionReceiptAdd() {
+    private HashSet<Integer> createRecruitmentSchemesTypesSet() {
+        HashSet<Integer> recruitmentSchemesTypesSet = new HashSet<>();
+
+        if (moBoolFilterWages.isSelected()) {
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
+        }
+        if (moBoolFilterAssimilated.isSelected()) {
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO);
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV);
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD);
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL);
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO);
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA);
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH);
+        }
+        if (moBoolFilterRetirees.isSelected()) {
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET);
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_PEN);
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET_PEN);
+        }
+        if (moBoolFilterOthers.isSelected()) {
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_COMP);
+            recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_OTH);
+        }
+        
+        return recruitmentSchemesTypesSet;
+    }
+
+    /**
+     * Add receipt.
+     * @param recruitmentSchemesTypesSet Set of types of recruitment schemes. Can be <code>null</code>.
+     * @return <code>true</code> if receipt added, otherwise <code>false</code>.
+     */
+    private boolean actionReceiptAdd(final HashSet<Integer> recruitmentSchemesTypesSet) {
         boolean added = true;
 
         if (mbIsReadOnly) {
-            miClient.showMsgBoxWarning("No se puede agregar el recibo, la nómina es de solo lectura.");
+            miClient.showMsgBoxWarning("No se puede agregar el empleado, la nómina es de solo lectura.");
         }
         else if (moGridPaneEmployeesAvailable.getSelectedGridRow() == null) {
             miClient.showMsgBoxWarning(SGridConsts.MSG_SELECT_ROW);
             moGridPaneEmployeesAvailable.getTable().requestFocusInWindow();
+        }
+        else if (recruitmentSchemesTypesSet != null && recruitmentSchemesTypesSet.isEmpty()) {
+            miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFilter) + "'.");
+            moBoolFilterWages.requestFocusInWindow();
+        }
+        else if (recruitmentSchemesTypesSet != null && !recruitmentSchemesTypesSet.contains(((SRowPayrollEmployee) moGridPaneEmployeesAvailable.getSelectedGridRow()).getRecruitmentSchemeTypeId())) {
+            miClient.showMsgBoxInformation("¡No se agregó el empleado, no cumple con los filtros seleccionados!");
+            moBoolFilterWages.requestFocusInWindow();
         }
         else {
             try {
@@ -1588,36 +1625,14 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         return added;
     }
-
+    
     private void actionReceiptAddAll() {
         int rows = moGridPaneEmployeesAvailable.getTable().getRowCount();
         
         if (rows > 0) {
             // prepare filters of recruitment scheme types:
             
-            HashSet<Integer> recruitmentSchemesTypesSet = new HashSet<>();
-
-            if (moBoolFilterWages.isSelected()) {
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_WAG);
-            }
-            if (moBoolFilterAssimilated.isSelected()) {
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO);
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV);
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD);
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL);
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO);
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA);
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH);
-            }
-            if (moBoolFilterRetirees.isSelected()) {
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET);
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_PEN);
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_RET_PEN);
-            }
-            if (moBoolFilterOthers.isSelected()) {
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_COMP);
-                recruitmentSchemesTypesSet.add(SModSysConsts.HRSS_TP_REC_SCHE_OTH);
-            }
+            HashSet<Integer> recruitmentSchemesTypesSet = createRecruitmentSchemesTypesSet();
 
             if (recruitmentSchemesTypesSet.isEmpty()) {
                 miClient.showMsgBoxInformation(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlFilter) + "'.");
@@ -1641,11 +1656,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                             index++; // skip current row and go next
                         }
                         else {
-                            if (!actionReceiptAdd()) {
-                                index++; // skip current row and go next
+                            if (actionReceiptAdd(null)) {
+                                processed++;
                             }
                             else {
-                                processed++;
+                                index++; // skip current row and go next
                             }
                         }
                     }
@@ -1658,7 +1673,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
 
                 if (processed == 0) {
-                    miClient.showMsgBoxInformation("¡No se agregó ningún empleado disponible!");
+                    miClient.showMsgBoxWarning("¡No se agregó ningún empleado!");
                 }
             }
         }
@@ -1730,11 +1745,11 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     // select top row:
                     moGridPanePayrollReceipts.setSelectedGridRow(index);
 
-                    if (!actionReceiptRemove()) {
-                        index++; // skip current row and go next
+                    if (actionReceiptRemove()) {
+                        processed++;
                     }
                     else {
-                        processed++;
+                        index++; // skip current row and go next
                     }
                 }
             }
@@ -1746,7 +1761,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             }
             
             if (processed == 0) {
-                miClient.showMsgBoxInformation("¡No se removió ningún recibo de nómina!");
+                miClient.showMsgBoxWarning("¡No se removió ningún recibo!");
             }
         }
     }
@@ -2264,7 +2279,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     actionGoTabReceipts();
                 }
                 else if (button == jbReceiptAdd) {
-                    actionReceiptAdd();
+                    actionReceiptAdd(createRecruitmentSchemesTypesSet());
                 }
                 else if (button == jbReceiptAddAll) {
                     actionReceiptAddAll();
