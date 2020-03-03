@@ -304,7 +304,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     
                     // extract complement:
 
-                    int numberEntry = 0;
+                    int numberPago = 0;
+                    int factoringFeeEntry = 0;
                     int[] paymentEntryDocTypes = new int[] { SCfdPaymentEntryDoc.TYPE_INT, SCfdPaymentEntryDoc.TYPE_FEE, SCfdPaymentEntryDoc.TYPE_FEE_VAT };
 
                     if (comprobante.getEltOpcComplemento() != null) {
@@ -315,7 +316,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                 DElementPagos pagos = (DElementPagos) element;
 
                                 for (DElementPagosPago pago : pagos.getEltPagos()) {
-                                    numberEntry++;
+                                    numberPago++;
 
                                     // read current payment's currency ID:
 
@@ -329,7 +330,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                     resultSet = statement.executeQuery(sql);
                                     if (!resultSet.next()) {
                                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n"
-                                                + "Moneda " + pago.getAttMonedaP().getString() + " del pago #" + numberEntry + ".");
+                                                + "Moneda " + pago.getAttMonedaP().getString() + " del pago #" + numberPago + ".");
                                     }
                                     else {
                                         currencyId = resultSet.getInt(1);
@@ -343,17 +344,21 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
                                     sql = "SELECT ety_type, fid_rec_year, fid_rec_per, fid_rec_bkc, fid_rec_tp_rec, fid_rec_num, fid_acc_cash_cob_n, fid_acc_cash_acc_cash_n "
                                             + "FROM trn_cfd_fin_rec "
-                                            + "WHERE id_cfd = " + moDbmsDataCfd.getPkCfdId() + " AND id_ety = " + numberEntry + ";";
+                                            + "WHERE id_cfd = " + moDbmsDataCfd.getPkCfdId() + " AND id_ety = " + numberPago + ";";
                                     resultSet = statement.executeQuery(sql);
                                     if (!resultSet.next()) {
                                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n"
-                                                + "Póliza contable del pago #" + numberEntry + ".");
+                                                + "Póliza contable del pago #" + numberPago + ".");
                                     }
                                     else {
                                         record = new SDataRecord();
                                         record.read(new Object[] { resultSet.getInt("fid_rec_year"), resultSet.getInt("fid_rec_per"), resultSet.getInt("fid_rec_bkc"), resultSet.getString("fid_rec_tp_rec"), resultSet.getInt("fid_rec_num") }, statementAux);
                                         
                                         paymentEntryType = resultSet.getInt("ety_type");
+                                        
+                                        if (paymentEntryType == SCfdPaymentEntry.TYPE_FACTORING_FEE) {
+                                            factoringFeeEntry++; // to guess (WTF!) type of document payment entry
+                                        }
                                         
                                         if (resultSet.getInt("fid_acc_cash_cob_n") != 0 && resultSet.getInt("fid_acc_cash_acc_cash_n") != 0) {
                                             accountCashDestKey = new int[] { resultSet.getInt("fid_acc_cash_cob_n"), resultSet.getInt("fid_acc_cash_acc_cash_n") };
@@ -363,7 +368,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                     // add XML payment:
 
                                     SCfdPaymentEntry paymentEntry = new SCfdPaymentEntry(
-                                            numberEntry, 
+                                            numberPago, 
                                             paymentEntryType, 
                                             pago.getAttFechaPago().getDatetime(), 
                                             pago.getAttFormaDePagoP().getString(), 
@@ -389,10 +394,10 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
                                     // get XML related documents of XML payments:
 
-                                    int numberDocRel = 0;
+                                    int numberDoctoRelacionado = 0;
 
                                     for (DElementDoctoRelacionado doctoRelacionado : pago.getEltDoctoRelacionados()) {
-                                        numberDocRel++;
+                                        numberDoctoRelacionado++;
 
                                         // read DPS:
                                         
@@ -415,7 +420,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                         if (!resultSet.next()) {
                                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + "\n"
                                                     + "Comprobante " + STrnUtils.formatDocNumber(doctoRelacionado.getAttSerie().getString(), doctoRelacionado.getAttFolio().getString()) + ", "
-                                                    + doctoRelacionado.getAttIdDocumento().getString() + ", del documento #" + numberDocRel + ", del pago #" + numberEntry + ".");
+                                                    + doctoRelacionado.getAttIdDocumento().getString() + ", del documento #" + numberDoctoRelacionado + ", del pago #" + numberPago + ".");
                                         }
                                         else {
                                             dps = new SDataDps();
@@ -438,7 +443,8 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                                 By now there is no way to identify if specific payment is for interests, fees or VAT of fees.
                                                 It is assumed that the type that is more frecuent is interests, then fees, then VAT of fees.
                                                 */
-                                                paymentEntryDocType = paymentEntryDocTypes[numberDocRel - 1];  // XXX improve this, precision of data recovered is error prone!
+                                                int index = factoringFeeEntry - 1;  // XXX improve this, precision of data recovered is error prone!
+                                                paymentEntryDocType = index < paymentEntryDocTypes.length ? paymentEntryDocTypes[index] : SCfdPaymentEntryDoc.TYPE_INT;
                                                 break;
                                                 
                                             default:
@@ -448,7 +454,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                                         SCfdPaymentEntryDoc paymentEntryDoc = new SCfdPaymentEntryDoc(
                                                 paymentEntry, 
                                                 dps, 
-                                                numberDocRel, 
+                                                numberDoctoRelacionado, 
                                                 paymentEntryDocType, 
                                                 doctoRelacionado.getAttNumParcialidad().getInteger(), 
                                                 doctoRelacionado.getAttImpSaldoAnt().getDouble(), 
