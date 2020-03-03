@@ -373,7 +373,7 @@ public abstract class SHrsCfdUtils {
                             hrsFormerReceiptConcept.setTotalExento(dAmountEarExe);
                             hrsFormerReceiptConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
                             hrsFormerReceiptConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
-                            hrsFormerReceiptConcept.setXtaClaveTipoOtroPago(resultSetAux.getString("f_top_code"));
+                            hrsFormerReceiptConcept.setXtaClaveTipoOtroPago(resultSetAux.getString("f_top_code")); // code of type of other payment when earning is 'other payment', not when is tax subsidy!
 
                             switch (hrsFormerReceiptConcept.getClaveOficial()) {
                                 case SModSysConsts.HRSS_TP_EAR_OVR_TME:
@@ -407,6 +407,7 @@ public abstract class SHrsCfdUtils {
                                     else if (dTaxSubPayrollComp > 0) {
                                         hrsFormerReceiptConcept.setXtaSubsidioEmpleo(dTaxSubPayrollComp);
                                     }
+                                    hrsFormerReceiptConcept.setXtaClaveTipoOtroPago(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo);// code of type of other payment when earning is tax subsidy!
                                     break;
 
                                 default:
@@ -434,6 +435,7 @@ public abstract class SHrsCfdUtils {
                         hrsFormerReceiptConcept.setPkTipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_TAX_SUBSIDY[0]);
                         hrsFormerReceiptConcept.setPkSubtipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_TAX_SUBSIDY[1]);
                         hrsFormerReceiptConcept.setXtaSubsidioEmpleo(dTaxSubPayrollComp);
+                        hrsFormerReceiptConcept.setXtaClaveTipoOtroPago(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo);// code of type of other payment when earning is tax subsidy!
 
                         hrsFormerReceipt.getChildConcepts().add(hrsFormerReceiptConcept);
 

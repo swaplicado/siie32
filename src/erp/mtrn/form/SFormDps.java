@@ -615,6 +615,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel104 = new javax.swing.JPanel();
         jlCfdCceTotalUsd = new javax.swing.JLabel();
         jtfCfdCceTotalUsd = new javax.swing.JTextField();
+        jbCfdCceCalcTotalUsd = new javax.swing.JButton();
         jPanel106 = new javax.swing.JPanel();
         jPanel121 = new javax.swing.JPanel();
         jlCfdCceFkBizPartnerAddressee = new javax.swing.JLabel();
@@ -2139,6 +2140,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfCfdCceTotalUsd.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel104.add(jtfCfdCceTotalUsd);
 
+        jbCfdCceCalcTotalUsd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/gui/img/icon_cal.gif"))); // NOI18N
+        jbCfdCceCalcTotalUsd.setToolTipText("Calcular total USD");
+        jbCfdCceCalcTotalUsd.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel104.add(jbCfdCceCalcTotalUsd);
+
         jPanel96.add(jPanel104);
 
         jPanel106.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -3185,6 +3191,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbFkCarrierId_n.addActionListener(this);
         jbFkVehicleId_n.addActionListener(this);
         jbFkProductionOrderId_n.addActionListener(this);
+        jbCfdCceCalcTotalUsd.addActionListener(this);
         jbLoadFileXml.addActionListener(this);
         jbDeleteFileXml.addActionListener(this);
         jbCfdiCfdiRelated.addActionListener(this);
@@ -3471,6 +3478,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfCfdCceExchangeRateUsd.setFocusable(enableFields && !isCurrencyUsd);
         jtfCfdCceTotalUsd.setEnabled(enableFields && !isCurrencyUsd);
         jtfCfdCceTotalUsd.setFocusable(enableFields && !isCurrencyUsd);
+        jbCfdCceCalcTotalUsd.setEnabled(enableFields && !isCurrencyUsd);
         jcbCfdCceFkBizPartnerAddressee.setEnabled(enableFields);
         jcbCfdCceFkAddresseeBizPartner.setEnabled(enableFields);
         jcbCfdCceFkAddresseeBizPartnerBranch.setEnabled(enableFields && jcbCfdCceFkAddresseeBizPartnerBranch.getSelectedIndex() > 0);
@@ -4013,7 +4021,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (isCurrencyUsd()) {
                 moFieldCfdCceExchangeRateUsd.setFieldValue(moFieldExchangeRate.getDouble());
             }
-            moDps.getDbmsDataDpsCfd().setCfdCceTipoCambioUSD(SLibUtils.getDecimalFormatExchangeRate().format(moFieldCfdCceExchangeRateUsd.getDouble()));
+            moDps.getDbmsDataDpsCfd().setCfdCceTipoCambioUsd(SLibUtils.getDecimalFormatExchangeRate().format(moFieldCfdCceExchangeRateUsd.getDouble()));
         }
         
         // calculate and display document's value:
@@ -4520,7 +4528,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfQuantityTotal.setText(miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(quantity));
         
         if (isCfdIntCommerceRequired()) {
-            moFieldCfdCceTotalUsd.setFieldValue(SLibUtils.parseDouble(moDps.getDbmsDataDpsCfd().getCfdCceTotalUSD()));
+            moFieldCfdCceTotalUsd.setFieldValue(SLibUtils.parseDouble(moDps.getDbmsDataDpsCfd().getCfdCceTotalUsd()));
         }
     }
 
@@ -5035,7 +5043,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             jcbFkIncotermId.setEnabled(true);
             jbFkIncotermId.setEnabled(true);
+            
+            int[] spotSrcKey = moFieldFkSpotSrcId_n.getKeyAsIntArray(); // preserve original value
+            int[] spotDesKey = moFieldFkSpotDesId_n.getKeyAsIntArray(); // preserve original value
             itemStateChangedFkIncotermId();
+            moFieldFkSpotSrcId_n.setFieldValue(spotSrcKey); // restore original value
+            moFieldFkSpotDesId_n.setFieldValue(spotDesKey); // restore original value
+            
             //jcbFkSpotSrcId_n.setEnabled(...); // status already set by previous call to method itemChangeFkIncotermId()
             //jcbFkSpotDesId_n.setEnabled(...); // status already set by previous call to method itemChangeFkIncotermId()
             
@@ -7215,6 +7229,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moPaneGridNotes.setTableRowSelection(0);
         }
     }
+    
+    private void actionCfdCceCalcTotalUsd() {
+        double xrtUsd = moFieldCfdCceExchangeRateUsd.getDouble();
+        moFieldCfdCceTotalUsd.setFieldValue(SLibUtils.roundAmount(xrtUsd == 0 ? 0.0 : moDps.getTotal_r() / xrtUsd));
+        jtfCfdCceTotalUsd.requestFocusInWindow();
+    }
 
     private void actionLoadFileXml() {
         FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
@@ -8122,6 +8142,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbBizPartnerBalance;
     private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbCfdCceCalcTotalUsd;
     private javax.swing.JButton jbCfdiCfdiRelated;
     private javax.swing.JButton jbComputeTotal;
     private javax.swing.JButton jbDate;
@@ -9454,8 +9475,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     moFieldCfdCceCertificateOrigin.setFieldValue(SLibUtils.parseInt(moDps.getDbmsDataDpsCfd().getCfdCceCertificadoOrigen()));
                     moFieldCfdCceNumberCertificateOrigin.setFieldValue(moDps.getDbmsDataDpsCfd().getCfdCceNumCertificadoOrigen());
                     moFieldCfdCceSubdivision.setFieldValue(SLibUtils.parseInt(moDps.getDbmsDataDpsCfd().getCfdCceSubdivision()));
-                    moFieldCfdCceExchangeRateUsd.setFieldValue(SLibUtils.parseDouble(moDps.getDbmsDataDpsCfd().getCfdCceTipoCambioUSD()));
-                    moFieldCfdCceTotalUsd.setFieldValue(SLibUtils.parseDouble(moDps.getDbmsDataDpsCfd().getCfdCceTotalUSD()));
+                    moFieldCfdCceExchangeRateUsd.setFieldValue(SLibUtils.parseDouble(moDps.getDbmsDataDpsCfd().getCfdCceTipoCambioUsd()));
+                    moFieldCfdCceTotalUsd.setFieldValue(SLibUtils.parseDouble(moDps.getDbmsDataDpsCfd().getCfdCceTotalUsd()));
                     
                     moFieldCfdCceBizPartnerAddressee.setFieldValue(new int[] { moDps.getFkBizPartnerAddresseeId_n() });
                     moFieldCfdCceAddresseeBizPartner.setFieldValue(new int[] { moDps.getFkAddresseeBizPartnerId_nr() });
@@ -9701,8 +9722,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 dpsCfd.setCfdCceCertificadoOrigen("" + moFieldCfdCceCertificateOrigin.getInteger());
                 dpsCfd.setCfdCceNumCertificadoOrigen(moFieldCfdCceNumberCertificateOrigin.getString());
                 dpsCfd.setCfdCceSubdivision("" + moFieldCfdCceSubdivision.getInteger());
-                dpsCfd.setCfdCceTipoCambioUSD(SLibUtils.getDecimalFormatExchangeRate().format(moFieldCfdCceExchangeRateUsd.getDouble()));
-                dpsCfd.setCfdCceTotalUSD(DCfdUtils.AmountFormat.format(moFieldCfdCceTotalUsd.getDouble()));
+                dpsCfd.setCfdCceTipoCambioUsd(SLibUtils.getDecimalFormatExchangeRate().format(moFieldCfdCceExchangeRateUsd.getDouble()));
+                dpsCfd.setCfdCceTotalUsd(DCfdUtils.AmountFormat.format(moFieldCfdCceTotalUsd.getDouble()));
                 if (moBizPartnerBranchAddress.getDbmsDataCountry().getCountryGroup().compareTo(SDataConstantsSys.TRNS_CFD_CAT_CTY_GRP_UE) == 0) {
                     dpsCfd.setCfdCceNumeroExportadorConfiable(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsCategorySettingsCo().getNumberExporter());
                 }
@@ -9921,6 +9942,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
             else if (button == jbFkVehicleId_n) {
                 actionFkVehicleId_n();
+            }
+            else if (button == jbCfdCceCalcTotalUsd) {
+                actionCfdCceCalcTotalUsd();
             }
             else if (button == jbLoadFileXml) {
                 actionLoadFileXml();

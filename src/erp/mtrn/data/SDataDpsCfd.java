@@ -48,8 +48,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     protected String msCfdCceCertificadoOrigen; 
     protected String msCfdCceNumCertificadoOrigen;
     protected String msCfdCceSubdivision;
-    protected String msCfdCceTipoCambioUSD;
-    protected String msCfdCceTotalUSD;
+    protected String msCfdCceTipoCambioUsd;
+    protected String msCfdCceTotalUsd;
     protected String msCfdCceNumeroExportadorConfiable;
     protected String msCfdCceIncoterm;
     
@@ -79,8 +79,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public void setCfdCceCertificadoOrigen(String s) { msCfdCceCertificadoOrigen = s; }
     public void setCfdCceNumCertificadoOrigen(String s) { msCfdCceNumCertificadoOrigen = s; }
     public void setCfdCceSubdivision(String s) { msCfdCceSubdivision = s; }
-    public void setCfdCceTipoCambioUSD(String s) { msCfdCceTipoCambioUSD = s; }
-    public void setCfdCceTotalUSD(String s) { msCfdCceTotalUSD = s; }
+    public void setCfdCceTipoCambioUsd(String s) { msCfdCceTipoCambioUsd = s; }
+    public void setCfdCceTotalUsd(String s) { msCfdCceTotalUsd = s; }
     public void setCfdCceNumeroExportadorConfiable(String s) { msCfdCceNumeroExportadorConfiable = s; }
     public void setCfdCceIncoterm(String s) { msCfdCceIncoterm = s; }
 
@@ -106,8 +106,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
     public String getCfdCceCertificadoOrigen() { return msCfdCceCertificadoOrigen; }
     public String getCfdCceNumCertificadoOrigen() { return msCfdCceNumCertificadoOrigen; }
     public String getCfdCceSubdivision() { return msCfdCceSubdivision; }
-    public String getCfdCceTipoCambioUSD() { return msCfdCceTipoCambioUSD; }
-    public String getCfdCceTotalUSD() { return msCfdCceTotalUSD; }
+    public String getCfdCceTipoCambioUsd() { return msCfdCceTipoCambioUsd; }
+    public String getCfdCceTotalUsd() { return msCfdCceTotalUsd; }
     public String getCfdCceNumeroExportadorConfiable() { return msCfdCceNumeroExportadorConfiable; }
     public String getCfdCceIncoterm() { return msCfdCceIncoterm; }
     
@@ -168,8 +168,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
             cfdCce.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).setValue(msCfdCceCertificadoOrigen);
             cfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).setValue(msCfdCceNumCertificadoOrigen);
             cfdCce.getAttribute(SXmlDpsCfdCce.ATT_SUB).setValue(msCfdCceSubdivision);
-            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).setValue(msCfdCceTipoCambioUSD);
-            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).setValue(msCfdCceTotalUSD);
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).setValue(msCfdCceTipoCambioUsd);
+            cfdCce.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).setValue(msCfdCceTotalUsd);
             cfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).setValue(msCfdCceNumeroExportadorConfiable);
             cfdCce.getAttribute(SXmlDpsCfdCce.ATT_INCOTERM).setValue(msCfdCceIncoterm);
 
@@ -210,8 +210,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
                     msCfdCceCertificadoOrigen = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_CERT_ORIG).getValue().toString();
                     msCfdCceNumCertificadoOrigen = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_CERT_ORIG).getValue().toString();
                     msCfdCceSubdivision = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_SUB).getValue().toString();
-                    msCfdCceTipoCambioUSD = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).getValue().toString();
-                    msCfdCceTotalUSD = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).getValue().toString();
+                    msCfdCceTipoCambioUsd = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TP_CAMB).getValue().toString();
+                    msCfdCceTotalUsd = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_TOT_USD).getValue().toString();
                     msCfdCceNumeroExportadorConfiable = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_NUM_EXP_CONF).getValue().toString();
                     msCfdCceIncoterm = dpsCfdCce.getAttribute(SXmlDpsCfdCce.ATT_INCOTERM).getValue().toString();
                     break;
@@ -257,8 +257,8 @@ public class SDataDpsCfd extends erp.lib.data.SDataRegistry implements java.io.S
         msCfdCceCertificadoOrigen = "";
         msCfdCceNumCertificadoOrigen = "";
         msCfdCceSubdivision = "";
-        msCfdCceTipoCambioUSD = "";
-        msCfdCceTotalUSD = "";
+        msCfdCceTipoCambioUsd = "";
+        msCfdCceTotalUsd = "";
         msCfdCceNumeroExportadorConfiable = "";
         msCfdCceIncoterm = "";
     }

@@ -1291,7 +1291,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         if (moDbmsDataDpsCfd != null) {
             int decs = DCfdUtils.AmountFormat.getMaximumFractionDigits();
             int decsExr = SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits();
-            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD()), decsExr);
+            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUsd()), decsExr);
             double valueMxn = 0;
             double valueUsd = 0;
 
@@ -1302,7 +1302,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
             }
             
-            moDbmsDataDpsCfd.setCfdCceTotalUSD(DCfdUtils.AmountFormat.format(valueUsd));
+            moDbmsDataDpsCfd.setCfdCceTotalUsd(DCfdUtils.AmountFormat.format(valueUsd));
         }
     }
     
@@ -4722,11 +4722,11 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
             comercioExterior.getAttIncoterm().setString(moDbmsDataDpsCfd.getCfdCceIncoterm());
             comercioExterior.getAttSubdivision().setInteger(SLibUtils.parseInt(moDbmsDataDpsCfd.getCfdCceSubdivision()));
             //comercioExterior.getAttObservaciones(...);    // optional, not implemented
-            comercioExterior.getAttTipoCambioUSD().setDouble(DCfdUtils.AmountFormat.parse(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD()).doubleValue());
-            comercioExterior.getAttTotalUSD().setDouble(DCfdUtils.AmountFormat.parse(moDbmsDataDpsCfd.getCfdCceTotalUSD()).doubleValue());
+            comercioExterior.getAttTipoCambioUSD().setDouble(DCfdUtils.AmountFormat.parse(moDbmsDataDpsCfd.getCfdCceTipoCambioUsd()).doubleValue());
+            comercioExterior.getAttTotalUSD().setDouble(DCfdUtils.AmountFormat.parse(moDbmsDataDpsCfd.getCfdCceTotalUsd()).doubleValue());
             comercioExterior.setEltMercancias(new cfd.ver3.cce11.DElementMercancias());
 
-            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUSD()), SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits());
+            double exr = SLibUtils.round(SLibUtils.parseDouble(moDbmsDataDpsCfd.getCfdCceTipoCambioUsd()), SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits());
             
             for (SDataDpsEntry dpsEntry : mvDbmsDpsEntries) {
                 if (dpsEntry.isAccountable()) {
