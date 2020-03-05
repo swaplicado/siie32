@@ -2389,8 +2389,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     SLibUtils.showException(this, e);
                 }
                 
-                boolean isNotDefinedBizPartner = (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0) && (jcbOccasionalFiscalId.isEnabled() && moFieldOccasionalFiscalId.getString().isEmpty());
-                boolean mustBeDefinedItem = (mbIsItemRequired || SLibUtilities.belongsTo(mnOptionsItemType, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ, SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ })); // convenience variable
+                boolean isNotDefinedBizPartner = jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0 && jcbOccasionalFiscalId.isEnabled() && moFieldOccasionalFiscalId.getString().isEmpty();
+                boolean mustBeDefinedItem = mbIsItemRequired || SLibUtilities.belongsTo(mnOptionsItemType, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ, SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ }); // convenience variable
                 boolean isDefinedItemAux = jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0;
                 boolean isDefinedUnits = jtfUnits.isEnabled() && moFieldUnits.getDouble() != 0d;
                 
