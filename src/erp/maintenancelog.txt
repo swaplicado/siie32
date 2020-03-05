@@ -1,5 +1,5 @@
 ================================================================================
-SIIE 3.2 160.0/ 2020-03-05
+SIIE 3.2 161.0/ 2020-03-05
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de campo RFC de asociado de negocios ocasional (para incluir terceros no registrados como asociados de negocios en la generación de los layout de la DIOT.)
