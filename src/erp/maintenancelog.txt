@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 161.1/ 2020-03-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a las validaciones de captura de renglones de pólizas contables para los campos asociado de negocios, impuesto, item, item auxiliar y unidades.
+
+================================================================================
 SIIE 3.2 161.0/ 2020-03-05
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

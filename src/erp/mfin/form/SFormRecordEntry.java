@@ -1044,7 +1044,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             // Check if it is necesary to enable business partner fields:
 
             if (oAccountMajor.getIsRequiredBizPartner() || isAccSysBizPartnerAll || isAccSysPurchases || isAccClsPurchases || isAccSysSales || isAccClsSales || isAccSysTax || isDiotAccount) {
-                if (isAccSysBizPartnerAll || isAccSysPurchases && isAccClsPurchases || isAccSysSales && isAccClsSales) {
+                if (isAccSysBizPartnerAll || (isAccSysPurchases && isAccClsPurchases) || (isAccSysSales && isAccClsSales)) {
                     mbIsBizPartnerRequired = true;
                     jlFkBizPartnerId_nr.setText(LABEL_BIZ_PARTNER + ": *");
                 }
@@ -2375,12 +2375,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 validation.setComponent(moPanelFkAccountId.getFieldAccount().getComponent());
             }
             else {
-                boolean isBizPartnerUndefined = (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0) && (jcbOccasionalFiscalId.isEnabled() && moFieldOccasionalFiscalId.getString().isEmpty());
-                boolean isItemUndefined = jcbFkItemId_n.isEnabled() && jcbFkItemId_n.getSelectedIndex() <= 0;
-                boolean mustItemBeDefined = (mbIsItemRequired || SLibUtilities.belongsTo(mnOptionsItemType, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ, SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ }));
-                
+                SDataTax tax = null;
+                if (jcbFkTaxId_n.getSelectedIndex() > 0) {
+                    tax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, moFieldFkTaxId_n.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+                }
+
                 boolean isDiotAccount = false;
-                
                 try {
                     isDiotAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getDataAccountMajor()) || 
                             SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getCurrentInputAccount());
@@ -2389,25 +2389,24 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     SLibUtils.showException(this, e);
                 }
                 
-                SDataTax tax = null;
+                boolean isNotDefinedBizPartner = (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0) && (jcbOccasionalFiscalId.isEnabled() && moFieldOccasionalFiscalId.getString().isEmpty());
+                boolean mustBeDefinedItem = (mbIsItemRequired || SLibUtilities.belongsTo(mnOptionsItemType, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ, SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ })); // convenience variable
+                boolean isDefinedItemAux = jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0;
+                boolean isDefinedUnits = jtfUnits.isEnabled() && moFieldUnits.getDouble() != 0d;
                 
-                if (jcbFkTaxId_n.getSelectedIndex() > 0) {
-                    tax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, moFieldFkTaxId_n.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
-                }
-
-                if (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0 && jcbOccasionalFiscalId.isEnabled() && !moFieldOccasionalFiscalId.getString().isEmpty()) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "', pero no ambos.");
+                if (mbIsBizPartnerRequired && jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "'.");
                     validation.setComponent(jcbFkBizPartnerId_nr);
                 }
-                else if (mbIsBizPartnerRequired && isBizPartnerUndefined) {
+                else if (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0 && jcbOccasionalFiscalId.isEnabled() && !moFieldOccasionalFiscalId.getString().isEmpty()) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "', pero no para ambos.");
+                    validation.setComponent(jcbFkBizPartnerId_nr);
+                }
+                else if (isNotDefinedBizPartner && isDiotAccount && miClient.showMsgBoxConfirm("¿Está seguro que no desea proporcionar un valor para el campo '" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'?") != JOptionPane.YES_OPTION) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
                     validation.setComponent(jcbFkBizPartnerId_nr);
                 }
-                else if (isDiotAccount && isBizPartnerUndefined && miClient.showMsgBoxConfirm("¿Está seguro que no desea proporcionar un valor para el campo '" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'?") != JOptionPane.YES_OPTION) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
-                    validation.setComponent(jcbFkBizPartnerId_nr);
-                }
-                else if (!mbIsTaxRequired && jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0 && isBizPartnerUndefined) {
+                else if (isNotDefinedBizPartner && jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
                     validation.setComponent(jcbFkBizPartnerId_nr);
                 }
@@ -2423,19 +2422,11 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkEntityId_n.getText() + "'.");
                     validation.setComponent(jcbFkEntityId_n);
                 }
-                else if (mustItemBeDefined && isItemUndefined) {
+                else if ((jcbFkItemId_n.isEnabled() && jcbFkItemId_n.getSelectedIndex() <= 0) && (mustBeDefinedItem || isDefinedItemAux || isDefinedUnits)) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemId_n.getText() + "'.");
                     validation.setComponent(jcbFkItemId_n);
                 }
-                else if (isItemUndefined && jtfUnits.isEnabled() && moFieldUnits.getDouble() != 0d) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemId_n.getText() + "'.");
-                    validation.setComponent(jcbFkItemId_n);
-                }
-                else if (isItemUndefined && jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemId_n.getText() + "'.");
-                    validation.setComponent(jcbFkItemId_n);
-                }
-                else if (jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0 && jtfUnits.isEnabled() && moFieldUnits.getDouble() != 0d) {
+                else if (isDefinedItemAux && isDefinedUnits) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_NOT_REQ + "'" + jtfUnits.getToolTipText() + "'.");
                     validation.setComponent(jtfUnits);
                 }
