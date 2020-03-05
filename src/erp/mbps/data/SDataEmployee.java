@@ -34,7 +34,7 @@ import sa.lib.db.SDbConsts;
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
  * - erp.mod.hrs.db.SDbEmployee
- * All of them also make raw SQL insertions.
+ * All of them also make raw SQL queries, insertions or updates.
  */
 
 /**
@@ -89,6 +89,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected int mnFkCatalogueMaritalStatusTypeId;
     protected int mnFkCatalogueEducationClassId;
     protected int mnFkCatalogueEducationTypeId;
+    protected int mnFkSourceCompanyId;
     protected int mnFkBankId_n;
     protected int mnFkGroceryServiceId;
     protected int mnFkUserInsertId;
@@ -108,25 +109,22 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected javax.swing.ImageIcon moXtaImageIconPhoto_n;
     protected javax.swing.ImageIcon moXtaImageIconSignature_n;
     
-    private void createWageLog(Connection connection, Date date) {
-        String sql = "";
-        ResultSet resultSet = null;
-        int nLogId = 0;
-
-        try {
-            nLogId = 0;
-
-            sql = "SELECT COALESCE(MAX(id_log), 0) + 1 FROM hrs_emp_log_wage WHERE id_emp = " + mnPkEmployeeId + " ";
-
-            resultSet = connection.createStatement().executeQuery(sql);
+    private void createWageLog(Connection connection, Date date) throws Exception {
+        try (Statement statement = connection.createStatement()) {
+            int logId = 0;
+            
+            String sql = "SELECT COALESCE(MAX(id_log), 0) + 1 "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_WAGE) + " "
+                    + "WHERE id_emp = " + mnPkEmployeeId + ";";
+            
+            ResultSet resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
-                nLogId = resultSet.getInt(1);
+                logId = resultSet.getInt(1);
             }
-
-            connection.createStatement().execute(sql);
-
-            sql = "INSERT INTO hrs_emp_log_wage VALUES (" + mnPkEmployeeId + ", " +
-                    nLogId + ", " +
+            
+            sql = "INSERT INTO " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_WAGE) + " VALUES (" + 
+                    mnPkEmployeeId + ", " +
+                    logId + ", " +
                     "'" + SLibUtils.DbmsDateFormatDate.format(date) + "', " +
                     mdSalary + ", " +
                     mdWage + ", " +
@@ -139,55 +137,45 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                     mnFkDepartmentId + ", " +
                     mnFkPositionId + ", " +
                     mnFkShiftId + ", " +
+                    mnFkContractTypeId+ ", " +
                     mnFkRecruitmentSchemeTypeId + ", " +
                     mnFkPositionRiskTypeId + ", " +
+                    mnFkWorkingDayTypeId + ", " +
                     (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
                     "NOW()" + ", " +
-                    "NOW()" + " " +
-                    ")";
-
-            connection.createStatement().execute(sql);
-        }
-        catch (java.lang.Exception e) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
-            SLibUtilities.printOutException(this, e);
+                    "NOW()" + ");";
+            
+            statement.execute(sql);
         }
     }
 
-    private void createSalarySscBaseLog(Connection connection, Date date) {
-        String sql = "";
-        ResultSet resultSet = null;
-        int nLogId = 0;
-
-        try {
-            nLogId = 0;
-
-            sql = "SELECT COALESCE(MAX(id_log), 0) + 1 FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " WHERE id_emp = " + mnPkEmployeeId + " ";
-            resultSet = connection.createStatement().executeQuery(sql);
+    private void createSalarySscBaseLog(Connection connection, Date date) throws Exception {
+        try (Statement statement = connection.createStatement()) {
+            int logId = 0;
+            
+            String sql = "SELECT COALESCE(MAX(id_log), 0) + 1 "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " "
+                    + "WHERE id_emp = " + mnPkEmployeeId + ";";
+            
+            ResultSet resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
-                nLogId = resultSet.getInt(1);
+                logId = resultSet.getInt(1);
             }
-
-            connection.createStatement().execute(sql);
-
-            sql = "INSERT INTO " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " VALUES (" + mnPkEmployeeId + ", " +
-                    nLogId + ", " +
+            
+            sql = "INSERT INTO " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " VALUES (" + 
+                    mnPkEmployeeId + ", " +
+                    logId + ", " +
                     "'" + SLibUtils.DbmsDateFormatDate.format(date) + "', " +
                     mdSalarySscBase + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
                     "NOW()" + ", " +
-                    "NOW()" + " " +
-                    ")";
-
-            connection.createStatement().execute(sql);
-        }
-        catch (java.lang.Exception e) {
-            mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;
-            SLibUtilities.printOutException(this, e);
+                    "NOW()" + ");";
+            
+            statement.execute(sql);
         }
     }
 
@@ -241,6 +229,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setFkCatalogueMaritalStatusTypeId(int n) { mnFkCatalogueMaritalStatusTypeId = n; }
     public void setFkCatalogueEducationClassId(int n) { mnFkCatalogueEducationClassId = n; }
     public void setFkCatalogueEducationTypeId(int n) { mnFkCatalogueEducationTypeId = n; }
+    public void setFkSourceCompanyId(int n) { mnFkSourceCompanyId = n; }
     public void setFkBankId_n(int n) { mnFkBankId_n = n; }
     public void setFkGroceryServiceId(int n) { mnFkGroceryServiceId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -306,6 +295,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public int getFkCatalogueMaritalStatusTypeId() { return mnFkCatalogueMaritalStatusTypeId; }
     public int getFkCatalogueEducationClassId() { return mnFkCatalogueEducationClassId; }
     public int getFkCatalogueEducationTypeId() { return mnFkCatalogueEducationTypeId; }
+    public int getFkSourceCompanyId() { return mnFkSourceCompanyId; }
     public int getFkBankId_n() { return mnFkBankId_n; }
     public int getFkGroceryServiceId() { return mnFkGroceryServiceId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -432,6 +422,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mnFkCatalogueMaritalStatusTypeId = 0;
         mnFkCatalogueEducationClassId = 0;
         mnFkCatalogueEducationTypeId = 0;
+        mnFkSourceCompanyId = 0;
         mnFkBankId_n = 0;
         mnFkGroceryServiceId = 0;
         mnFkUserInsertId = 0;
@@ -520,6 +511,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mnFkCatalogueMaritalStatusTypeId = resultSet.getInt("fk_tp_cat_mar");
                 mnFkCatalogueEducationClassId = resultSet.getInt("fk_cl_cat_edu");
                 mnFkCatalogueEducationTypeId = resultSet.getInt("fk_tp_cat_edu");
+                mnFkSourceCompanyId = resultSet.getInt("fk_src_com");
                 mnFkBankId_n = resultSet.getInt("fk_bank_n");
                 mnFkGroceryServiceId = resultSet.getInt("fk_grocery_srv");
                 mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
@@ -658,6 +650,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         mnFkCatalogueMaritalStatusTypeId + ", " + 
                         mnFkCatalogueEducationClassId + ", " + 
                         mnFkCatalogueEducationTypeId + ", " + 
+                        mnFkSourceCompanyId + ", " + 
                         (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
                         mnFkGroceryServiceId + ", " + 
                         mnFkUserInsertId + ", " +
@@ -716,6 +709,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "fk_tp_cat_mar = " + mnFkCatalogueMaritalStatusTypeId + ", " +
                         "fk_cl_cat_edu = " + mnFkCatalogueEducationClassId + ", " +
                         "fk_tp_cat_edu = " + mnFkCatalogueEducationTypeId + ", " +
+                        "fk_src_com = " + mnFkSourceCompanyId + ", " +
                         "fk_bank_n = " + (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
                         "fk_grocery_srv = " + mnFkGroceryServiceId + ", " +
                         //"fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -836,21 +830,21 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
             if (mdAuxSalary != 0) {
                 if (mtAuxDateSalary == null) {
-                    throw new Exception("Fecha no disponible");
+                    throw new Exception("La fecha de última actualización de 'salario diario' no ha sido definida.");
                 }
                 createWageLog(connection, mtAuxDateSalary);
             }
 
             if (mdAuxWage != 0) {
                 if (mtAuxDateWage == null) {
-                    throw new Exception("Fecha no disponible");
+                    throw new Exception("La fecha de última actualización de 'sueldo mensual' no ha sido definida.");
                 }
                 createWageLog(connection, mtAuxDateWage);
             }
 
             if (mdAuxSalarySscBase != 0) {
                 if (mtAuxDateSalarySscBase == null) {
-                    throw new Exception("Fecha no disponible");
+                    throw new Exception("La fecha de última actualización de 'Salario Base de Cotización (SBC)' no ha sido definida.");
                 }
                 createSalarySscBaseLog(connection, mtAuxDateSalarySscBase);
             }

@@ -11,10 +11,6 @@ package erp.mod.fin.db;
  */
 public class SFinConsts {
 
-    public static final int LEN_RFC_PER = 13;
-    public static final int LEN_RFC_ORG = 12;
-    public static final int LEN_CURP = 18;
-
     public static final int LAY_BANK_HSBC = 1;
     public static final int LAY_BANK_SANT = 2;
     public static final int LAY_BANK_BBAJ = 3;

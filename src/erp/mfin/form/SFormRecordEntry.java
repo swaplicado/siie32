@@ -5,6 +5,7 @@
 
 package erp.mfin.form;
 
+import cfd.DCfdConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataReadDescriptions;
@@ -58,6 +59,8 @@ import sa.lib.xml.SXmlUtils;
  * @author Sergio Flores
  */
 public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
+    
+    private static final String LABEL_BIZ_PARTNER = "Asoc. negocios";
 
     private int mnFormType;
     private int mnFormResult;
@@ -73,6 +76,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private erp.mitm.data.SDataItem moItem;
     private erp.lib.form.SFormField moFieldConcept;
     private erp.lib.form.SFormField moFieldFkBizPartnerId_nr;
+    private erp.lib.form.SFormField moFieldOccasionalFiscalId;
     private erp.lib.form.SFormField moFieldReference;
     private erp.lib.form.SFormField moFieldIsReferenceTax;
     private erp.lib.form.SFormField moFieldFkTaxId_n;
@@ -143,12 +147,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jlFkBizPartnerId_nr = new javax.swing.JLabel();
         jcbFkBizPartnerId_nr = new javax.swing.JComboBox<SFormComponentItem>();
         jbFkBizPartnerId_nr = new javax.swing.JButton();
-        jtfIsBizPartnerRequired = new javax.swing.JTextField();
+        jlOccasionalFiscalId = new javax.swing.JLabel();
+        jcbOccasionalFiscalId = new javax.swing.JComboBox();
         jPanel5 = new javax.swing.JPanel();
         jlReference = new javax.swing.JLabel();
         jtfReference = new javax.swing.JTextField();
         jbReference = new javax.swing.JButton();
-        jlDummy01 = new javax.swing.JLabel();
         jckIsReferenceTax = new javax.swing.JCheckBox();
         jPanel6 = new javax.swing.JPanel();
         jlFkTaxId_n = new javax.swing.JLabel();
@@ -265,8 +269,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlConcept.setText("Concepto de la partida: *");
-        jlConcept.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlConcept.setText("Concepto partida: *");
+        jlConcept.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel2.add(jlConcept);
 
         jtfConcept.setText("ACCOUNT");
@@ -277,8 +281,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkBizPartnerId_nr.setText("Asociado de negocios:");
-        jlFkBizPartnerId_nr.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFkBizPartnerId_nr.setText("Asoc. negocios:");
+        jlFkBizPartnerId_nr.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlFkBizPartnerId_nr);
 
         jcbFkBizPartnerId_nr.setMaximumRowCount(16);
@@ -291,17 +295,21 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbFkBizPartnerId_nr.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel4.add(jbFkBizPartnerId_nr);
 
-        jtfIsBizPartnerRequired.setEditable(false);
-        jtfIsBizPartnerRequired.setFocusable(false);
-        jtfIsBizPartnerRequired.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel4.add(jtfIsBizPartnerRequired);
+        jlOccasionalFiscalId.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlOccasionalFiscalId.setText("RFC ocasional:");
+        jlOccasionalFiscalId.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel4.add(jlOccasionalFiscalId);
+
+        jcbOccasionalFiscalId.setEditable(true);
+        jcbOccasionalFiscalId.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel4.add(jcbOccasionalFiscalId);
 
         jpSettings.add(jPanel4);
 
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlReference.setText("Repositorio contable:");
-        jlReference.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlReference.setText("Reposit. contable:");
+        jlReference.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlReference);
 
         jtfReference.setText("REF");
@@ -314,10 +322,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbReference.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel5.add(jbReference);
 
-        jlDummy01.setPreferredSize(new java.awt.Dimension(25, 23));
-        jPanel5.add(jlDummy01);
-
         jckIsReferenceTax.setText("Aplican impuestos");
+        jckIsReferenceTax.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jckIsReferenceTax.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel5.add(jckIsReferenceTax);
 
@@ -326,7 +332,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkTaxId_n.setText("Impuesto: *");
-        jlFkTaxId_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFkTaxId_n.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlFkTaxId_n);
 
         jcbFkTaxId_n.setPreferredSize(new java.awt.Dimension(300, 23));
@@ -354,7 +360,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkEntityId_n.setText("Entidad: *");
-        jlFkEntityId_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFkEntityId_n.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlFkEntityId_n);
 
         jcbFkEntityId_n.setPreferredSize(new java.awt.Dimension(300, 23));
@@ -378,7 +384,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkItemId_n.setText("Ítem: *");
-        jlFkItemId_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFkItemId_n.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.add(jlFkItemId_n);
 
         jcbFkItemId_n.setMaximumRowCount(16);
@@ -409,7 +415,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkItemAuxId_n.setText("Ítem auxiliar:");
-        jlFkItemAuxId_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFkItemAuxId_n.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlFkItemAuxId_n);
 
         jcbFkItemAuxId_n.setMaximumRowCount(16);
@@ -426,8 +432,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkDps.setText("Docto. de compras-ventas:");
-        jlFkDps.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFkDps.setText("Docto. (factura):");
+        jlFkDps.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel10.add(jlFkDps);
 
         jtfFkDps.setEditable(false);
@@ -437,12 +443,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel10.add(jtfFkDps);
 
         jbFkDps.setText("...");
-        jbFkDps.setToolTipText("Seleccionar documento de compras-ventas");
+        jbFkDps.setToolTipText("Seleccionar documento (factura) de compras-ventas");
         jbFkDps.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jbFkDps);
 
         jbFkDpsRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
-        jbFkDpsRemove.setToolTipText("Remover documento de compras-ventas");
+        jbFkDpsRemove.setToolTipText("Remover documento (factura) de compras-ventas");
         jbFkDpsRemove.setFocusable(false);
         jbFkDpsRemove.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jbFkDpsRemove);
@@ -450,7 +456,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jlDummy02.setPreferredSize(new java.awt.Dimension(25, 23));
         jPanel10.add(jlDummy02);
 
-        jlFkDpsAdj.setText("Docto. aj. compras-ventas:");
+        jlFkDpsAdj.setText("Docto. ajuste (nota crédito):");
         jlFkDpsAdj.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.add(jlFkDpsAdj);
 
@@ -461,12 +467,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel10.add(jtfFkDpsAdj);
 
         jbFkDpsAdj.setText("...");
-        jbFkDpsAdj.setToolTipText("Seleccionar documento de ajuste de compras-ventas");
+        jbFkDpsAdj.setToolTipText("Seleccionar documento de ajuste (nota crédito) de compras-ventas");
         jbFkDpsAdj.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jbFkDpsAdj);
 
         jbFkDpsAdjRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
-        jbFkDpsAdjRemove.setToolTipText("Remover documento de ajuste de compras-ventas");
+        jbFkDpsAdjRemove.setToolTipText("Remover documento de ajuste (nota crédito) de compras-ventas");
         jbFkDpsAdjRemove.setFocusable(false);
         jbFkDpsAdjRemove.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel10.add(jbFkDpsAdjRemove);
@@ -476,7 +482,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFileXml.setText("Archivo XML:");
-        jlFileXml.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFileXml.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlFileXml);
 
         jtfFileXml.setEditable(false);
@@ -514,7 +520,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
         jlFkYearId_n.setText("Ejercicio contable:");
-        jlFkYearId_n.setPreferredSize(new java.awt.Dimension(150, 23));
+        jlFkYearId_n.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlFkYearId_n);
 
         jtfFkYearId_n.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -719,7 +725,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        setSize(new java.awt.Dimension(816, 679));
+        setSize(new java.awt.Dimension(816, 639));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -755,6 +761,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         moFieldConcept.setLengthMax(100);
         moFieldFkBizPartnerId_nr = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkBizPartnerId_nr, jlFkBizPartnerId_nr);
         moFieldFkBizPartnerId_nr.setPickerButton(jbFkBizPartnerId_nr);
+        moFieldOccasionalFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jcbOccasionalFiscalId, jlOccasionalFiscalId);
+        moFieldOccasionalFiscalId.setLengthMin(DCfdConsts.LEN_RFC_ORG);
+        moFieldOccasionalFiscalId.setLengthMax(DCfdConsts.LEN_RFC_PER);
         moFieldReference = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfReference, jlReference);
         moFieldReference.setLengthMax(15);
         moFieldReference.setPickerButton(jbReference);
@@ -795,6 +804,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         mvFields.add(moFieldConcept);
         mvFields.add(moFieldFkBizPartnerId_nr);
+        mvFields.add(moFieldOccasionalFiscalId);
         mvFields.add(moFieldReference);
         mvFields.add(moFieldIsReferenceTax);
         mvFields.add(moFieldFkTaxId_n);
@@ -930,7 +940,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         mbIsBizPartnerRequired = false;
         mbIsItemRequired = false;
         mbIsTaxRequired = false;
-        jtfIsBizPartnerRequired.setText("");
+        jlFkBizPartnerId_nr.setText(LABEL_BIZ_PARTNER + ":");
         bgTax.clearSelection();
 
         /*
@@ -953,6 +963,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             jlFkBizPartnerId_nr.setEnabled(false);
             jcbFkBizPartnerId_nr.setEnabled(false);
             jbFkBizPartnerId_nr.setEnabled(false);
+            jlOccasionalFiscalId.setEnabled(false);
+            jcbOccasionalFiscalId.setEnabled(false);
             jlReference.setEnabled(false);
             jtfReference.setEnabled(false);
             jbReference.setEnabled(false);
@@ -1034,12 +1046,14 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             if (oAccountMajor.getIsRequiredBizPartner() || isAccSysBizPartnerAll || isAccSysPurchases || isAccClsPurchases || isAccSysSales || isAccClsSales || isAccSysTax || isDiotAccount) {
                 if (isAccSysBizPartnerAll || isAccSysPurchases && isAccClsPurchases || isAccSysSales && isAccClsSales) {
                     mbIsBizPartnerRequired = true;
-                    jtfIsBizPartnerRequired.setText("(Requerido)");
+                    jlFkBizPartnerId_nr.setText(LABEL_BIZ_PARTNER + ": *");
                 }
 
                 jlFkBizPartnerId_nr.setEnabled(true);
                 jcbFkBizPartnerId_nr.setEnabled(true);
                 jbFkBizPartnerId_nr.setEnabled(true);
+                jlOccasionalFiscalId.setEnabled(true);
+                jcbOccasionalFiscalId.setEnabled(true);
 
                 if (mnAccountSystemTypeId == SDataConstantsSys.FINS_TP_ACC_SYS_SUP || isAccSysPurchases || isDiotAccount) {
                     mnOptionsBizPartnerType = SDataConstants.BPSX_BP_SUP;
@@ -1082,6 +1096,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 jlFkBizPartnerId_nr.setEnabled(false);
                 jcbFkBizPartnerId_nr.setEnabled(false);
                 jbFkBizPartnerId_nr.setEnabled(false);
+                jlOccasionalFiscalId.setEnabled(false);
+                jcbOccasionalFiscalId.setEnabled(false);
             }
 
             // Check if it is necesary to enable money reference fields:
@@ -2213,6 +2229,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JComboBox<SFormComponentItem> jcbFkItemAuxId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkItemId_n;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkTaxId_n;
+    private javax.swing.JComboBox jcbOccasionalFiscalId;
     private javax.swing.JCheckBox jckIsCheckApplying;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JCheckBox jckIsExchangeDifference;
@@ -2223,7 +2240,6 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JLabel jlCreditCy;
     private javax.swing.JLabel jlDebit;
     private javax.swing.JLabel jlDebitCy;
-    private javax.swing.JLabel jlDummy01;
     private javax.swing.JLabel jlDummy02;
     private javax.swing.JLabel jlDummy03;
     private javax.swing.JLabel jlDummy11;
@@ -2243,6 +2259,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JLabel jlFkItemId_n;
     private javax.swing.JLabel jlFkTaxId_n;
     private javax.swing.JLabel jlFkYearId_n;
+    private javax.swing.JLabel jlOccasionalFiscalId;
     private javax.swing.JLabel jlReference;
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpRegistry;
@@ -2264,7 +2281,6 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JTextField jtfFkDps;
     private javax.swing.JTextField jtfFkDpsAdj;
     private javax.swing.JTextField jtfFkYearId_n;
-    private javax.swing.JTextField jtfIsBizPartnerRequired;
     private javax.swing.JTextField jtfReference;
     private javax.swing.JTextField jtfUnits;
     private javax.swing.JTextField jtfUnitsSymbol;
@@ -2359,14 +2375,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 validation.setComponent(moPanelFkAccountId.getFieldAccount().getComponent());
             }
             else {
-                SDataTax tax = null;
-                
-                if (jcbFkTaxId_n.getSelectedIndex() > 0) {
-                    tax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, moFieldFkTaxId_n.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
-                }
+                boolean isBizPartnerUndefined = (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0) && (jcbOccasionalFiscalId.isEnabled() && moFieldOccasionalFiscalId.getString().isEmpty());
+                boolean isItemUndefined = jcbFkItemId_n.isEnabled() && jcbFkItemId_n.getSelectedIndex() <= 0;
+                boolean mustItemBeDefined = (mbIsItemRequired || SLibUtilities.belongsTo(mnOptionsItemType, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ, SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ }));
                 
                 boolean isDiotAccount = false;
-
+                
                 try {
                     isDiotAccount = SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getDataAccountMajor()) || 
                             SDiotUtils.isDiotAccount(miClient.getSession().getStatement(), moPanelFkAccountId.getCurrentInputAccount());
@@ -2375,15 +2389,29 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     SLibUtils.showException(this, e);
                 }
                 
-                if (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0 && mbIsBizPartnerRequired) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "'.");
+                SDataTax tax = null;
+                
+                if (jcbFkTaxId_n.getSelectedIndex() > 0) {
+                    tax = (SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, moFieldFkTaxId_n.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
+                }
+
+                if (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0 && jcbOccasionalFiscalId.isEnabled() && !moFieldOccasionalFiscalId.getString().isEmpty()) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "', pero no ambos.");
                     validation.setComponent(jcbFkBizPartnerId_nr);
                 }
-                else if (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0 && isDiotAccount && miClient.showMsgBoxConfirm("¿Está seguro que no desea proporcionar un valor para el campo '" + jlFkBizPartnerId_nr.getText() + "'?") != JOptionPane.YES_OPTION) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "'.");
+                else if (mbIsBizPartnerRequired && isBizPartnerUndefined) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
                     validation.setComponent(jcbFkBizPartnerId_nr);
                 }
-                else if (jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() <= 0 && mbIsTaxRequired) {
+                else if (isDiotAccount && isBizPartnerUndefined && miClient.showMsgBoxConfirm("¿Está seguro que no desea proporcionar un valor para el campo '" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
+                    validation.setComponent(jcbFkBizPartnerId_nr);
+                }
+                else if (!mbIsTaxRequired && jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0 && isBizPartnerUndefined) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
+                    validation.setComponent(jcbFkBizPartnerId_nr);
+                }
+                else if (mbIsTaxRequired && jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() <= 0) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkTaxId_n.getText() + "'.");
                     validation.setComponent(jcbFkTaxId_n);
                 }
@@ -2391,24 +2419,19 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlFkTaxId_n.getText() + "'.\n" + SDataTax.ERR_MSG_VAT_TYPE + "'" + tax.getTax() + "'.");
                     validation.setComponent(jcbFkTaxId_n);
                 }
-                else if (!mbIsTaxRequired && jcbFkTaxId_n.isEnabled() && jcbFkBizPartnerId_nr.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0 && jcbFkBizPartnerId_nr.getSelectedIndex() <= 0) {
-                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "'.");
-                    validation.setComponent(jcbFkBizPartnerId_nr);
-                }
                 else if (jcbFkEntityId_n.isEnabled() && jcbFkEntityId_n.getSelectedIndex() <= 0) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkEntityId_n.getText() + "'.");
                     validation.setComponent(jcbFkEntityId_n);
                 }
-                else if (jcbFkItemId_n.isEnabled() && jcbFkItemId_n.getSelectedIndex() <= 0 && (mbIsItemRequired || SLibUtilities.belongsTo(mnOptionsItemType, new int[] {
-                        SDataConstantsSys.FINS_TP_ACC_SYS_PUR, SDataConstantsSys.FINS_TP_ACC_SYS_PUR_ADJ, SDataConstantsSys.FINS_TP_ACC_SYS_SAL, SDataConstantsSys.FINS_TP_ACC_SYS_SAL_ADJ }))) {
+                else if (mustItemBeDefined && isItemUndefined) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemId_n.getText() + "'.");
                     validation.setComponent(jcbFkItemId_n);
                 }
-                else if (jcbFkItemId_n.isEnabled() && jcbFkItemId_n.getSelectedIndex() <= 0 && jtfUnits.isEnabled() && moFieldUnits.getDouble() != 0d) {
+                else if (isItemUndefined && jtfUnits.isEnabled() && moFieldUnits.getDouble() != 0d) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemId_n.getText() + "'.");
                     validation.setComponent(jcbFkItemId_n);
                 }
-                else if (jcbFkItemId_n.isEnabled() && jcbFkItemId_n.getSelectedIndex() <= 0 && jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0) {
+                else if (isItemUndefined && jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkItemId_n.getText() + "'.");
                     validation.setComponent(jcbFkItemId_n);
                 }
@@ -2639,6 +2662,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         renderAccountSettings();
 
         moFieldFkBizPartnerId_nr.setFieldValue(new int[] { moRecordEntry.getFkBizPartnerId_nr() });
+        moFieldOccasionalFiscalId.setFieldValue(moRecordEntry.getOccasionalFiscalId());
         moFieldReference.setFieldValue(moRecordEntry.getReference());
         moFieldIsReferenceTax.setFieldValue(moRecordEntry.getIsReferenceTax());
         
@@ -2746,6 +2770,13 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         else {
             moRecordEntry.setFkBizPartnerId_nr(0);
             moRecordEntry.setFkBizPartnerBranchId_n(0);
+        }
+        
+        if (jcbOccasionalFiscalId.isEnabled() && !moFieldOccasionalFiscalId.getString().isEmpty()) {
+            moRecordEntry.setOccasionalFiscalId(moFieldOccasionalFiscalId.getString());
+        }
+        else {
+            moRecordEntry.setOccasionalFiscalId("");
         }
 
         if (jtfReference.isEnabled()) {

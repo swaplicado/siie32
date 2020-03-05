@@ -812,7 +812,7 @@ public class ImportAccountingRecordsMicroSip extends javax.swing.JFrame {
                                         "'" + sConcepto.substring(0, sConcepto.length()> 99 ? 99 : sConcepto.length()) + "', '" + sReference + "', 0, " +
                                         (dPlcCargos * dPercentage) + ", " + (dPlcAbonos * dPercentage) + ", " + dExchangeRate + ", " + dExchangeRate + ", " +
                                         (dPlcCargosCy * dPercentage) + ", " + (dPlcAbonosCy * dPercentage) + ", " +
-                                        Math.abs(dPlcUnidades) + ", 0, " + nEntryNumber + ", " + bPlcDifCambiaria + ", 1, 0, " +
+                                        Math.abs(dPlcUnidades) + ", 0, " + nEntryNumber + ", '', " + bPlcDifCambiaria + ", 1, 0, " +
                                         "'" + sFidAcc + "'," + getAccountPk(stMySqlAux, sFidAcc) + "," + (sFidCcb.length() == 0 || sFidCcb.compareTo("0") == 0 ? "NULL" : getCenterCostPk(stMySql, sFidCcb)) + ", " +
                                         "99, 1, 1, 99, " + (dPlcCargos != 0 ? "1, " : "2, ") + "1, 1, " + anSysMoveTypeKey[0] + ", " + anSysMoveTypeKey[1] + ", " +
                                         nFid_cur + ", " + (sFidCcb.length() == 0 || sFidCcb.compareTo("0") == 0 ? "NULL" : "'" + sFidCcb + "'") + ", NULL, NULL, " +

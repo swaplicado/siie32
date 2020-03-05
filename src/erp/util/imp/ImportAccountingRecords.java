@@ -764,7 +764,7 @@ public class ImportAccountingRecords extends javax.swing.JFrame {
                                         "'" + sPlcConcepto.substring(0, sPlcConcepto.length()> 99 ? 99 : sPlcConcepto.length()) + "', '" + sReference + "', 0, " +
                                         (dPlcCargos * dPercentage) + ", " + (dPlcAbonos * dPercentage) + ", " + dExchangeRate + ", " + dExchangeRate + ", " +
                                         (dPlcCargosCy * dPercentage) + ", " + (dPlcAbonosCy * dPercentage) + ", " +
-                                        Math.abs(dPlcUnidades) + ", 0, " + nEntryNumber + ", " + bPlcDifCambiaria + ", 1, 0, " +
+                                        Math.abs(dPlcUnidades) + ", 0, " + nEntryNumber + ", '', " + bPlcDifCambiaria + ", 1, 0, " +
                                         "'" + sFidAcc + "', 1, NULL, 99, 1, 1, 99, " + (dPlcCargos != 0 ? "1, " : "2, ") + "1, 1, " + anSysMoveTypeKey[0] + ", " + anSysMoveTypeKey[1] + ", " +
                                         nFid_cur + ", " + (sFidCcb.length() == 0 || sFidCcb.compareTo("0") == 0 ? "NULL" : "'" + sFidCcb + "'") + ", NULL, NULL, " +
                                         (nFid_bp_nr == 0 ? "NULL" : "" + nFid_bp_nr) + ", " + (nFid_bpb_n == 0 ? "NULL" : "" + nFid_bpb_n) + ", " + (nFid_ct_ref_n == 0 ? "NULL" : "" + nFid_ct_ref_n) + ", " +

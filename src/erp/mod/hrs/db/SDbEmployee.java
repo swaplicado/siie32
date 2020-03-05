@@ -23,7 +23,7 @@ import sa.lib.gui.SGuiSession;
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
  * - erp.mbps.data.SDataEmployee
- * All of them also make raw SQL insertions.
+ * All of them also make raw SQL queries, insertions or updates.
  */
 
 /**
@@ -84,6 +84,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected int mnFkCatalogueMaritalStatusTypeId;
     protected int mnFkCatalogueEducationClassId;
     protected int mnFkCatalogueEducationTypeId;
+    protected int mnFkSourceCompanyId;
     protected int mnFkBankId_n;
     protected int mnFkGroceryServiceId;
     /*
@@ -153,6 +154,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setFkCatalogueMaritalStatusTypeId(int n) { mnFkCatalogueMaritalStatusTypeId = n; }
     public void setFkCatalogueEducationClassId(int n) { mnFkCatalogueEducationClassId = n; }
     public void setFkCatalogueEducationTypeId(int n) { mnFkCatalogueEducationTypeId = n; }
+    public void setFkSourceCompanyId(int n) { mnFkSourceCompanyId = n; }
     public void setFkBankId_n(int n) { mnFkBankId_n = n; }
     public void setFkGroceryServiceId(int n) { mnFkGroceryServiceId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
@@ -206,6 +208,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public int getFkCatalogueMaritalStatusTypeId() { return mnFkCatalogueMaritalStatusTypeId; }
     public int getFkCatalogueEducationClassId() { return mnFkCatalogueEducationClassId; }
     public int getFkCatalogueEducationTypeId() { return mnFkCatalogueEducationTypeId; }
+    public int getFkSourceCompanyId() { return mnFkSourceCompanyId; }
     public int getFkBankId_n() { return mnFkBankId_n; }
     public int getFkGroceryServiceId() { return mnFkGroceryServiceId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
@@ -352,6 +355,7 @@ public class SDbEmployee extends SDbRegistryUser {
         mnFkCatalogueMaritalStatusTypeId = 0;
         mnFkCatalogueEducationClassId = 0;
         mnFkCatalogueEducationTypeId = 0;
+        mnFkSourceCompanyId = 0;
         mnFkBankId_n = 0;
         mnFkGroceryServiceId = 0;
         mnFkUserInsertId = 0;
@@ -397,8 +401,8 @@ public class SDbEmployee extends SDbRegistryUser {
         initRegistry();
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
-        Blob oPhoto_n;
-        Blob oSignature_n;
+        Blob oPhoto_n;      // preserve variable, although not used
+        Blob oSignature_n;  // preserve variable, although not used
 
         msSql = "SELECT * " + getSqlFromWhere(pk);
         resultSet = session.getStatement().executeQuery(msSql);
@@ -456,6 +460,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mnFkCatalogueMaritalStatusTypeId = resultSet.getInt("fk_tp_cat_mar");
             mnFkCatalogueEducationClassId = resultSet.getInt("fk_cl_cat_edu");
             mnFkCatalogueEducationTypeId = resultSet.getInt("fk_tp_cat_edu");
+            mnFkSourceCompanyId = resultSet.getInt("fk_src_com");
             mnFkBankId_n = resultSet.getInt("fk_bank_n");
             mnFkGroceryServiceId = resultSet.getInt("fk_grocery_srv");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
@@ -546,6 +551,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     mnFkCatalogueMaritalStatusTypeId + ", " + 
                     mnFkCatalogueEducationClassId + ", " + 
                     mnFkCatalogueEducationTypeId + ", " + 
+                    mnFkSourceCompanyId + ", " + 
                     (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
                     mnFkGroceryServiceId + ", " + 
                     mnFkUserInsertId + ", " + 
@@ -608,6 +614,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "fk_tp_cat_mar = " + mnFkCatalogueMaritalStatusTypeId + ", " +
                     "fk_cl_cat_edu = " + mnFkCatalogueEducationClassId + ", " +
                     "fk_tp_cat_edu = " + mnFkCatalogueEducationTypeId + ", " +
+                    "fk_src_com = " + mnFkSourceCompanyId + ", " +
                     "fk_bank_n = " + (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
                     "fk_grocery_srv = " + mnFkGroceryServiceId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
@@ -701,6 +708,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setFkCatalogueMaritalStatusTypeId(this.getFkCatalogueMaritalStatusTypeId());
         registry.setFkCatalogueEducationClassId(this.getFkCatalogueEducationClassId());
         registry.setFkCatalogueEducationTypeId(this.getFkCatalogueEducationTypeId());
+        registry.setFkSourceCompanyId(this.getFkSourceCompanyId());
         registry.setFkBankId_n(this.getFkBankId_n());
         registry.setFkGroceryServiceId(this.getFkGroceryServiceId());
         registry.setFkUserInsertId(this.getFkUserInsertId());

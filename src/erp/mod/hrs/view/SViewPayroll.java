@@ -373,11 +373,11 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp " 
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss " 
                 + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS _count_cfds, "
-                + "(SELECT COUNT(*) > 0 "
+                + "IF((SELECT COUNT(*) > 0 "
                 + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr " 
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp " 
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss " 
-                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND (c.b_prc_ws OR c.b_prc_sto_xml OR c.b_prc_sto_pdf)) AS _count_cfds_prc, "
+                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + " AND (c.b_prc_ws OR c.b_prc_sto_xml OR c.b_prc_sto_pdf)), " + SGridConsts.ICON_WARN + ", " + SGridConsts.ICON_NULL + ") AS _count_cfds_prc, "
                 + "(SELECT COUNT(*) > 0 "
                 + " FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r "
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON "
@@ -420,7 +420,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         column.getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
         gridColumnsViews.add(column);
         
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_count_cfds_prc", "CFDI emitidos con inconsistencias"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_count_cfds_prc", "CFDI emitidos con inconsistencias"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "v.b_clo", "Cerrada"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "_posted", "Contabilizada"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, "_usr_close", "Usr cierre"));

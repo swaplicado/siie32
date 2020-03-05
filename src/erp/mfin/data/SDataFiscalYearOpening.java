@@ -84,7 +84,7 @@ public class SDataFiscalYearOpening extends erp.lib.data.SDataRegistry implement
                     "" + mnPkYearId + ", " + mnPkPeriodId + ", " + mnPkBookkeepingCenterId + ", '" + msPkRecordTypeId + "', " + mnPkNumberId + ", " + mnPkEntryId + ", " +
                     "'SALDOS INICIALES " + mnPkYearId + "', " +
                     "'" + rs.getString("f_ref") + "', " + rs.getBoolean("b_ref_tax") + ", " +
-                    "" + debit + ", " + credit + ", " + excRate + ", " + excRate + ", " + debitCur + ", " + creditCur + ", 0, 0, " + mnPkEntryId + ", 0, 1, 0, " +
+                    "" + debit + ", " + credit + ", " + excRate + ", " + excRate + ", " + debitCur + ", " + creditCur + ", 0, 0, " + mnPkEntryId + ", '', 0, 1, 0, " +
                     "'" + rs.getString("fid_acc") + "', " +
                     "" + rs.getInt("fk_acc") + ", " +
                     "" + (rs.getInt("fid_tp_acc_r") == SDataConstantsSys.FINS_TP_ACC_BAL || rs.getInt("fk_cc_n") == 0 ? "NULL" : "" + rs.getInt("fk_cc_n")) + ", " +

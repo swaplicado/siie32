@@ -13,9 +13,10 @@ import sa.lib.SLibUtils;
  */
 public class SDiotTercero {
 
+    /** Supplier's business partner ID for an undefined one + '-' + code of DIOT other operations. */
     public static final String GLOBAL_CLAVE = 0 + "-" + SDiotConsts.OPER_OTHER;
     
-    public boolean IsCompany;
+    public boolean IsGlobal;
     public boolean IsDomestic;
     public int BizPartnerId;
     public String TipoTercero; // 1
@@ -42,6 +43,7 @@ public class SDiotTercero {
     public double ValorPagosNacIvaExento; // 22
     public double IvaRetenido; // 23
     public double IvaNotasCréditoCompras; // 24
+    public String OccasionalBizPartnerRfc; // fiscal ID (RFC) of occasional business partners that are not in catalog
     
     protected static final DecimalFormat FormatPipe;
     protected static final DecimalFormat FormatCsv;
@@ -51,59 +53,69 @@ public class SDiotTercero {
         FormatCsv = new DecimalFormat("#0.00");
     }
     
+    /**
+     * Create an empty tercero.
+     */
     public SDiotTercero() {
-        resetTercero(false, false, 0, SDiotConsts.THIRD_UNDEFINED, SDiotConsts.OPER_UNDEFINED, "", "");
+        resetTercero(false, true, 0, SDiotConsts.THIRD_UNDEF, SDiotConsts.OPER_UNDEF, "", "", "");
     }
     
+    /**
+     * Create an occasional tercero.
+     * @param tempBizPartnerRfc 
+     */
+    public SDiotTercero(final String tempBizPartnerRfc) {
+        resetTercero(false, true, 0, SDiotConsts.THIRD_DOMESTIC, SDiotConsts.OPER_OTHER, tempBizPartnerRfc, "", tempBizPartnerRfc);
+    }
+    
+    /**
+     * Create a tercero from a business partener.
+     * @param client
+     * @param bizPartner 
+     */
     public SDiotTercero(final SClientInterface client, final SDataBizPartner bizPartner) {
-        if (bizPartner == null) {
-            resetTercero(false, true, 0, SDiotConsts.THIRD_GLOBAL, SDiotConsts.OPER_OTHER, DCfdConsts.RFC_GEN_NAC, "");
+        if (bizPartner == null || checkIsCompany(client, bizPartner.getPkBizPartnerId())) {
+            resetTercero(true, true, 0, SDiotConsts.THIRD_GLOBAL, SDiotConsts.OPER_OTHER, DCfdConsts.RFC_GEN_NAC, "", "");
         }
         else {
-            String tipoTercero;
-            String tipoOperación;
-            boolean isCompany = bizPartner.getPkBizPartnerId() == client.getSessionXXX().getCurrentCompany().getPkCompanyId();
-
-            if (isCompany) {
-                tipoTercero = SDiotConsts.THIRD_UNDEFINED;
-                tipoOperación = SDiotConsts.OPER_UNDEFINED;
-            }
-            else {
-                tipoTercero = bizPartner.getDiotTipoTercero(client);
-                tipoOperación = bizPartner.getDiotTipoOperación();
-            }
-
             boolean isDomestic = bizPartner.isDomestic(client);
 
-            resetTercero(isCompany, isDomestic, bizPartner.getPkBizPartnerId(), tipoTercero, tipoOperación, bizPartner.getFiscalId(), bizPartner.getFiscalFrgId());
+            resetTercero(false, isDomestic, bizPartner.getPkBizPartnerId(), bizPartner.getDiotTipoTercero(client), bizPartner.getDiotTipoOperación(), bizPartner.getFiscalId(), bizPartner.getFiscalFrgId(), "");
             
             if (!isDomestic) {
-                this.ExtNombre = bizPartner.getBizPartner();
-                this.ExtPaísResidencia = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getDiotCode();
-                this.ExtNacionalidad = this.ExtPaísResidencia;
+                String countryDiotCode = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getDbmsDataCountry().getDiotCode();
+                
+                ExtNombre = bizPartner.getBizPartner();
+                ExtPaísResidencia = countryDiotCode;
+                ExtNacionalidad = countryDiotCode;
             }
         }
     }
     
-    private void resetTercero(final boolean isCompany, final boolean isDomestic, final int bizPartnerId, final String tipoTercero, final String tipoOperación, final String rfc, final String extIdFiscal) {
-        this.IsCompany = isCompany;
-        this.IsDomestic = isDomestic;
-        this.BizPartnerId = bizPartnerId;
-        this.TipoTercero = tipoTercero;
-        this.TipoOperación = tipoOperación;
-        this.Rfc = rfc;
-        this.ExtIdFiscal = extIdFiscal;
-        this.ExtNombre = "";
-        this.ExtPaísResidencia = "";
-        this.ExtNacionalidad = "";
+    private void resetTercero(final boolean isGlobal, final boolean isDomestic, final int bizPartnerId, final String tipoTercero, final String tipoOperación, final String rfc, final String extIdFiscal, final String occasionalBizPartnerRfc) {
+        IsGlobal = isGlobal;
+        IsDomestic = isDomestic;
+        BizPartnerId = bizPartnerId;
+        TipoTercero = tipoTercero;
+        TipoOperación = tipoOperación;
+        Rfc = rfc;
+        ExtIdFiscal = extIdFiscal;
+        ExtNombre = "";
+        ExtPaísResidencia = "";
+        ExtNacionalidad = "";
+        OccasionalBizPartnerRfc = occasionalBizPartnerRfc;
     }
     
     /**
      * Get Clave of Tercero.
-     * @return BizPartnerId + "-" + TipoOperación.
+     * @return When tercero is temporal: OccasionalBizPartnerRfc + '-' + TipoOperación; otherwise: BizPartnerId + '-' + TipoOperación.
      */
     public String getClave() {
-        return BizPartnerId + "-" + TipoOperación;
+        return IsGlobal ? GLOBAL_CLAVE : ((isOccasional() ? OccasionalBizPartnerRfc : BizPartnerId) + "-" + TipoOperación);
+    }
+    
+    public boolean isOccasional() {
+        return !OccasionalBizPartnerRfc.isEmpty();
     }
     
     public boolean isTotallyZero() {
@@ -150,6 +162,7 @@ public class SDiotTercero {
      * Get DIOT layout row.
      * @param format Format of DIOT layout row. Options defined in <code>SDiotLayout</code>.
      * @return DIOT layout row.
+     * @throws java.lang.Exception
      */
     public String getLayoutRow(int format) throws Exception {
         String row = "";
@@ -255,5 +268,13 @@ public class SDiotTercero {
                 "\"22. Valor de los actos o actividades pagados por los que no se pagará el IVA (Exentos)\"," +
                 "\"23. IVA Retenido por el contribuyente\"," +
                 "\"24. IVA correspondiente a las devoluciones, descuentos y bonificaciones sobre compras\"";
+    }
+    
+    public static boolean checkIsCompany(final SClientInterface client, final int bizPartnerId) {
+        return bizPartnerId == client.getSessionXXX().getCurrentCompany().getPkCompanyId();
+    }
+    
+    public static String composeOccasionalClave(final String occasionalBizPartnerRfc) {
+        return occasionalBizPartnerRfc + "-" + SDiotConsts.OPER_OTHER;
     }
 }

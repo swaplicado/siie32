@@ -98,7 +98,7 @@ public class SDataFiscalYearClosing extends erp.lib.data.SDataRegistry implement
                     "" + mnPkYearId + ", " + mnPkPeriodId + ", " + mnPkBookkeepingCenterId + ", '" + msPkRecordTypeId + "', " + mnPkNumberId + ", " + mnAuxEntryId + ", " +
                     "'CIERRE EJERCICIO " + mnPkYearId + "', " +
                     "'', 0, " +
-                    "" + debit + ", " + credit + ", " + excRate + ", " + excRate + ", " + debitCur + ", " + creditCur + ", 0, 0, " + mnAuxEntryId + ", 0, 1, 0, " +
+                    "" + debit + ", " + credit + ", " + excRate + ", " + excRate + ", " + debitCur + ", " + creditCur + ", 0, 0, " + mnAuxEntryId + ", '', 0, 1, 0, " +
                     "'" + rs.getString("fid_acc") + "', " +
                     "" + rs.getInt("fk_acc") + ", " +
                     "" + (rs.getInt("fk_cc_n") == 0 ? "NULL" : "" + rs.getInt("fk_cc_n")) + ", " +
@@ -129,7 +129,7 @@ public class SDataFiscalYearClosing extends erp.lib.data.SDataRegistry implement
                     "" + mnPkYearId + ", " + mnPkPeriodId + ", " + mnPkBookkeepingCenterId + ", '" + msPkRecordTypeId + "', " + mnPkNumberId + ", " + mnAuxEntryId + ", " +
                     "'CIERRE EJERCICIO " + mnPkYearId + "', " +
                     "'', 0, " +
-                    "" + credit + ", " + debit + ", " + excRate + ", " + excRate + ", " + creditCur + ", " + debitCur + ", 0, 0, " + mnAuxEntryId + ", 0, 1, 0, " +
+                    "" + credit + ", " + debit + ", " + excRate + ", " + excRate + ", " + creditCur + ", " + debitCur + ", 0, 0, " + mnAuxEntryId + ", '', 0, 1, 0, " +
                     "'" + msAccountId + "', " +
                     "" + mnFkAccountId + ", " +
                     "NULL, " +  // no cost center needed

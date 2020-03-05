@@ -26,7 +26,7 @@ import sa.lib.SLibUtils;
  * - erp.util.imp.ImportAccountingRecordsMicroSip
  * - erp.mod.hrs.db.SHrsFinUtils
  * - erp.mfin.data.SDataRecord
- * All of them execute raw SQL queries and insertions.
+ * All of them execute raw SQL queries, insertions or updates.
  */
 
 /**
@@ -56,6 +56,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     protected double mdUnits;
     protected int mnUserId;
     protected int mnSortingPosition;
+    protected java.lang.String msOccasionalFiscalId;
     protected boolean mbIsExchangeDifference;
     protected boolean mbIsSystem;
     protected boolean mbIsDeleted;
@@ -169,6 +170,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public void setUnits(double d) { mdUnits = d; }
     public void setUserId(int n) { mnUserId = n; }
     public void setSortingPosition(int n) { mnSortingPosition = n; }
+    public void setOccasionalFiscalId(java.lang.String s) { msOccasionalFiscalId = s; }
     public void setIsExchangeDifference(boolean b) { mbIsExchangeDifference = b; }
     public void setIsSystem(boolean b) { mbIsSystem = b; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
@@ -240,6 +242,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public double getUnits() { return mdUnits; }
     public int getUserId() { return mnUserId; }
     public int getSortingPosition() { return mnSortingPosition; }
+    public java.lang.String getOccasionalFiscalId() { return msOccasionalFiscalId; }
     public boolean getIsExchangeDifference() { return mbIsExchangeDifference; }
     public boolean getIsSystem() { return mbIsSystem; }
     public boolean getIsDeleted() { return mbIsDeleted; }
@@ -421,6 +424,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         mdUnits = 0;
         mnUserId = 0;
         mnSortingPosition = 0;
+        msOccasionalFiscalId = "";
         mbIsExchangeDifference = false;
         mbIsSystem = false;
         mbIsDeleted = false;
@@ -558,6 +562,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 mdUnits = resultSet.getDouble("re.units");
                 mnUserId = resultSet.getInt("re.usr_id");
                 mnSortingPosition = resultSet.getInt("re.sort_pos");
+                msOccasionalFiscalId = resultSet.getString("re.occ_fiscal_id");
                 mbIsExchangeDifference = resultSet.getBoolean("re.b_exc_diff");
                 mbIsSystem = resultSet.getBoolean("re.b_sys");
                 mbIsDeleted = resultSet.getBoolean("re.b_del");
@@ -794,7 +799,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkPeriodId);
             callableStatement.setInt(nParam++, mnPkBookkeepingCenterId);
@@ -813,6 +818,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
             callableStatement.setDouble(nParam++, mdUnits);
             callableStatement.setInt(nParam++, mnUserId);
             callableStatement.setInt(nParam++, mnSortingPosition);
+            callableStatement.setString(nParam++, msOccasionalFiscalId);
             callableStatement.setBoolean(nParam++, mbIsExchangeDifference);
             callableStatement.setBoolean(nParam++, mbIsSystem);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
@@ -934,6 +940,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         clone.setUnits(mdUnits);
         clone.setUserId(mnUserId);
         clone.setSortingPosition(mnSortingPosition);
+        clone.setOccasionalFiscalId(msOccasionalFiscalId);
         clone.setIsExchangeDifference(mbIsExchangeDifference);
         clone.setIsSystem(mbIsSystem);
         clone.setIsDeleted(mbIsDeleted);

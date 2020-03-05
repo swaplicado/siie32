@@ -1,5 +1,15 @@
 ================================================================================
-SIIE 3.2 159.4/ 2020-03-03
+SIIE 3.2 160.0/ 2020-03-05
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de campo RFC de asociado de negocios ocasional (para incluir terceros no registrados como asociados de negocios en la generación de los layout de la DIOT.)
+2) Tratamiento de asociados de negocios no definidos o la empresa misma como proveedor global en la generación de los layout de la DIOT.
+3) Incorporación del RFC ocasional a la generación de los layout de la DIOT.
+4) Adición del campo Empresa Origen en el catálogo de empleados.
+5) Adición de columna ícono para advertir al usuario de inconsistencias en vista nóminas.
+
+================================================================================
+SIIE 3.2 159.4/ 2020-03-04
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Corrección a lectura de CFDI de recepción de pagos con pagos mediante factoraje desde renglones de pólizas contables.

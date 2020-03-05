@@ -163,6 +163,10 @@ public class SDiotLayout {
         moVatsMap.clear();
         moBizPartnersMap.clear();
         
+        // add default VAT to map of taxes:
+        
+        addVat((SDataTax) SDataUtilities.readRegistry(miClient, SDataConstants.FINU_TAX, vatDefaultPk, SLibConstants.EXEC_MODE_VERBOSE));
+        
         // iterate through all DIOT accounts set up in company's configuration:
         
         ArrayList<SDiotAccount> diotAccounts = new ArrayList<>();
@@ -327,19 +331,49 @@ public class SDiotLayout {
                 
                 // process out business partner:
                 
+                boolean isCompany = false;
+                
                 if (bizPartner == null) {
                     entriesWithoutBizPartner++;
                 }
-                else if (bizPartner.getPkBizPartnerId() == miClient.getSessionXXX().getCurrentCompany().getPkCompanyId()) {
-                    entriesForCompany++;
+                else {
+                    isCompany = SDiotTercero.checkIsCompany(miClient, bizPartner.getPkBizPartnerId());
+                    if (isCompany) {
+                        entriesForCompany++;
+                    }
                 }
                 
                 // get DIOT Tercero:
                 
-                SDiotTercero tercero = tercerosMap.get(bizPartner == null ? SDiotTercero.GLOBAL_CLAVE : bizPartner.getDiotTerceroClave());
+                String terceroClave;
+                String occasionalFiscalId = resultSet.getString("re.occ_fiscal_id");
+                
+                if (bizPartner == null) {
+                    if (!occasionalFiscalId.isEmpty()) {
+                        terceroClave = SDiotTercero.composeOccasionalClave(occasionalFiscalId);
+                    }
+                    else {
+                        terceroClave = SDiotTercero.GLOBAL_CLAVE; // business partner is undefined, the global third
+                    }
+                }
+                else {
+                    if (isCompany) {
+                        terceroClave = SDiotTercero.GLOBAL_CLAVE; // when business partner in current entry is the company itself, then third is treated as the global one
+                    }
+                    else {
+                        terceroClave = bizPartner.getDiotTerceroClave();
+                    }
+                }
+                
+                SDiotTercero tercero = tercerosMap.get(terceroClave);
                 
                 if (tercero == null) {
-                    tercero = new SDiotTercero(miClient, bizPartner);
+                    if (!occasionalFiscalId.isEmpty()) {
+                        tercero = new SDiotTercero(occasionalFiscalId);
+                    }
+                    else {
+                        tercero = new SDiotTercero(miClient, bizPartner);
+                    }
                     tercerosMap.put(tercero.getClave(), tercero);
                 }
                 
@@ -355,12 +389,12 @@ public class SDiotLayout {
                         double paymentAmount = 0;
                         double paymentRatio = 0;
                         double transactionAmount = 0;
-                        SDiotAccounting diotAccounting = null;
+                        SDiotAccountingTxn diotAccountingTxn = null;
                         
                         if (diotAccount.IsConfigParamAccount) {
                             // extract net total and VAT debits and credits:
 
-                            diotAccounting = new SDiotAccounting(
+                            diotAccountingTxn = new SDiotAccountingTxn(
                                     statementAux, 
                                     resultSet.getInt("re.usr_id"), 
                                     createFinRecordKey(resultSet, "re"), 
@@ -368,9 +402,9 @@ public class SDiotLayout {
                                     dps
                             );
 
-                            paymentAmount = diotAccounting.getPaymentAmount();
+                            paymentAmount = diotAccountingTxn.getPaymentAmount();
                             paymentRatio = dps == null || dps.getTotal_r() == 0 ? 1.0 : paymentAmount / dps.getTotal_r();
-                            transactionAmount = SLibUtils.roundAmount(diotAccounting.getEntryDpsSubtotal(SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT, (int[]) vat.getPrimaryKey()) * paymentRatio);
+                            transactionAmount = SLibUtils.roundAmount(diotAccountingTxn.getEntryDpsSubtotal(SDataConstantsSys.FINS_TP_SYS_MOV_TAX_DBT, (int[]) vat.getPrimaryKey()) * paymentRatio);
                         }
                         else {
                             transactionAmount = vatAmount;
@@ -411,7 +445,7 @@ public class SDiotLayout {
                             // check if current VAT is not asigned explicitly to other third tax causings:
                             
                             ArrayList<SDiotTercero> tercerosToProcess = new ArrayList<>();
-                            HashSet<Integer> causingIds = diotAccounting != null ? diotAccounting.getThirdTaxCausings((int[]) vat.getPrimaryKey()) : new HashSet<>();
+                            HashSet<Integer> causingIds = diotAccountingTxn != null ? diotAccountingTxn.getThirdTaxCausings((int[]) vat.getPrimaryKey()) : new HashSet<>();
                             
                             for (Integer causingId : causingIds) {
                                 SDataBizPartner bizPartnerCausing = getBizPartner(causingId);
@@ -459,8 +493,8 @@ public class SDiotLayout {
                                     }
                                     else {
                                         // VAT corresponds to a third tax causing:
-                                        vatToProcess = SLibUtils.roundAmount(diotAccounting.getThirdTax(terceroToProcess.BizPartnerId, (int[]) vat.getPrimaryKey()) * paymentRatio);
-                                        terceroExempt = SLibUtils.roundAmount(diotAccounting.getThirdTaxSubtotal(terceroToProcess.BizPartnerId, (int[]) vat.getPrimaryKey()) * paymentRatio);
+                                        vatToProcess = SLibUtils.roundAmount(diotAccountingTxn.getThirdTax(terceroToProcess.BizPartnerId, (int[]) vat.getPrimaryKey()) * paymentRatio);
+                                        terceroExempt = SLibUtils.roundAmount(diotAccountingTxn.getThirdTaxSubtotal(terceroToProcess.BizPartnerId, (int[]) vat.getPrimaryKey()) * paymentRatio);
                                     }
 
                                     vatProcessed = SLibUtils.roundAmount(vatProcessed + vatToProcess);
@@ -564,7 +598,7 @@ public class SDiotLayout {
                     else if (debit < 0 || credit > 0) {
                         // VAT creditable of purchases adjustments & VAT creditable settlements:
                         
-                        if (bizPartner == null || tercero.IsCompany) {
+                        if (tercero.IsGlobal) {
                             // VAT creditable settlement:
                             
                             Double settlement = vatSettlementsMap.get(vat);
@@ -605,7 +639,7 @@ public class SDiotLayout {
                     else if (debit > 0 || credit < 0) {
                         // VAT creditable withheld of purchases adjustments & VAT creditable withheld settlements:
                         
-                        if (bizPartner == null || tercero.IsCompany) {
+                        if (tercero.IsGlobal) {
                             // VAT creditable withheld settlement:
                             
                             Double withheldSettlement = vatWithheldSettlementsMap.get(vat);
@@ -697,7 +731,7 @@ public class SDiotLayout {
                 totallyZero++;
             }
             
-            if (tercero.IsCompany) {
+            if (tercero.IsGlobal) {
                 if (terceroCompany == null) {
                     terceroCompany = tercero;
                 }

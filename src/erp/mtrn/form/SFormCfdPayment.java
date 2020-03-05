@@ -1367,8 +1367,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldPayOperation = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayOperation, jlPayOperation);
         moFieldPayOperation.setLengthMax(100);
         moFieldPayAccountSrcFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountSrcFiscalId, jlPayAccountFiscalId);
-        moFieldPayAccountSrcFiscalId.setLengthMin(SFinConsts.LEN_RFC_ORG);
-        moFieldPayAccountSrcFiscalId.setLengthMax(SFinConsts.LEN_RFC_PER);
+        moFieldPayAccountSrcFiscalId.setLengthMin(DCfdConsts.LEN_RFC_ORG);
+        moFieldPayAccountSrcFiscalId.setLengthMax(DCfdConsts.LEN_RFC_PER);
         moFieldPayAccountSrcFiscalId.setPickerButton(jbPayAccountSrcPick);
         moFieldPayAccountSrcNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountSrcNumber, jlPayAccountNumber);
         moFieldPayAccountSrcNumber.setLengthMin(10);
@@ -1377,8 +1377,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         moFieldPayAccountSrcEntity = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountSrcEntity, jlPayAccountEntity);
         moFieldPayAccountSrcEntity.setLengthMax(300);
         moFieldPayAccountDestFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountDestFiscalId, jlPayAccountFiscalId);
-        moFieldPayAccountDestFiscalId.setLengthMin(SFinConsts.LEN_RFC_ORG);
-        moFieldPayAccountDestFiscalId.setLengthMax(SFinConsts.LEN_RFC_PER);
+        moFieldPayAccountDestFiscalId.setLengthMin(DCfdConsts.LEN_RFC_ORG);
+        moFieldPayAccountDestFiscalId.setLengthMax(DCfdConsts.LEN_RFC_PER);
         moFieldPayAccountDestFiscalId.setPickerButton(jbPayAccountDestPick);
         moFieldPayAccountDestNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPayAccountDestNumber, jlPayAccountNumber);
         moFieldPayAccountDestNumber.setLengthMin(10);
@@ -2570,10 +2570,10 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlPayRecord.getText() + "'.");
                 jbPayRecordPick.requestFocusInWindow();
             }
-            else if (!moFieldPayAccountSrcFiscalId.getString().isEmpty() && moFieldPayAccountSrcFiscalId.getString().length() != SFinConsts.LEN_RFC_ORG && !moFieldPayAccountSrcFiscalId.getString().equals(DCfdConsts.RFC_GEN_INT)) {
+            else if (!moFieldPayAccountSrcFiscalId.getString().isEmpty() && moFieldPayAccountSrcFiscalId.getString().length() != DCfdConsts.LEN_RFC_ORG && !moFieldPayAccountSrcFiscalId.getString().equals(DCfdConsts.RFC_GEN_INT)) {
                 valid = false;
                 miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + SGuiUtils.getLabelName(jlPayAccountFiscalId) + ", " + SGuiUtils.getLabelName(jlPayAccountSrc) + "':\n"
-                        + "debe ser de longitud " + SFinConsts.LEN_RFC_ORG + " o contener el valor '" + DCfdConsts.RFC_GEN_INT + "'.");
+                        + "debe ser de longitud " + DCfdConsts.LEN_RFC_ORG + " o contener el valor '" + DCfdConsts.RFC_GEN_INT + "'.");
                 jtfPayAccountSrcFiscalId.requestFocusInWindow();
             }
             else if (isPayerForeign() && moFieldPayAccountSrcEntity.getString().isEmpty()) {
@@ -2609,9 +2609,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                         miClient.showMsgBoxWarning("El RFC de " + jcbPayFactoringBank.getToolTipText() + " está vacio.");
                         jcbPayFactoringBank.requestFocusInWindow();
                     }
-                    else if (factoringBank.getFiscalId().length() != SFinConsts.LEN_RFC_ORG) {
+                    else if (factoringBank.getFiscalId().length() != DCfdConsts.LEN_RFC_ORG) {
                         valid = false;
-                        miClient.showMsgBoxWarning("El RFC de " + jcbPayFactoringBank.getToolTipText() + " (" + factoringBank.getFiscalId() + ") debe ser de longitud " + SFinConsts.LEN_RFC_ORG + ".");
+                        miClient.showMsgBoxWarning("El RFC de " + jcbPayFactoringBank.getToolTipText() + " (" + factoringBank.getFiscalId() + ") debe ser de longitud " + DCfdConsts.LEN_RFC_ORG + ".");
                         jcbPayFactoringBank.requestFocusInWindow();
                     }
                 }
@@ -2702,7 +2702,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                 moPaymentEntry.AccountDestKey = null;
             }
             else {
-                moPaymentEntry.AccountDestFiscalId = moFieldPayAccountDestFiscalId.getString().length() != SFinConsts.LEN_RFC_ORG ? "" : moFieldPayAccountDestFiscalId.getString();
+                moPaymentEntry.AccountDestFiscalId = moFieldPayAccountDestFiscalId.getString().length() != DCfdConsts.LEN_RFC_ORG ? "" : moFieldPayAccountDestFiscalId.getString();
                 moPaymentEntry.AccountDestNumber = moFieldPayAccountDestNumber.getString();
                 moPaymentEntry.AccountDestKey = moFieldPayAccountDest.getKeyAsIntArray();
             }
@@ -3653,8 +3653,8 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                             moPaneGridPayments.setTableRowSelection(index);
                             break;
                         }
-                        else if (paymentEntry.AuxFactoringBankFiscalId.length() != SFinConsts.LEN_RFC_ORG) {
-                            validation.setMessage("En el pago #" + paymentEntry.Number + " el RFC de " + jcbPayFactoringBank.getToolTipText() + " (" + paymentEntry.AuxFactoringBankFiscalId + ") debe ser de longitud " + SFinConsts.LEN_RFC_ORG + ".");
+                        else if (paymentEntry.AuxFactoringBankFiscalId.length() != DCfdConsts.LEN_RFC_ORG) {
+                            validation.setMessage("En el pago #" + paymentEntry.Number + " el RFC de " + jcbPayFactoringBank.getToolTipText() + " (" + paymentEntry.AuxFactoringBankFiscalId + ") debe ser de longitud " + DCfdConsts.LEN_RFC_ORG + ".");
                             validation.setComponent(jcbPayFactoringBank);
                             moPaneGridPayments.setTableRowSelection(index);
                             break;

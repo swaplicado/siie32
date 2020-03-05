@@ -6,16 +6,19 @@ package erp.mfin.data.diot;
  */
 public abstract class SDiotConsts {
     
-    public static final String OPER_UNDEFINED = "00";
+    public static final String OPER_UNDEF = "00";
     public static final String OPER_SERVICES = "03";
     public static final String OPER_LEASING = "06";
     public static final String OPER_OTHER = "85";
     
-    public static final String THIRD_UNDEFINED = "00";
+    public static final String THIRD_UNDEF = "00";
     public static final String THIRD_DOMESTIC = "04";
     public static final String THIRD_INTERNATIONAL = "05";
     public static final String THIRD_GLOBAL = "15";
+    
     public static final String THIRD_GLOBAL_NAME = "Proveedor Global";
+    
+    public static final String NA = "NA";
     
     /** VAT type: Exempt. */
     public static final String VAT_TYPE_EXEMPT = "Exent";

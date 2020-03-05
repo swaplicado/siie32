@@ -17,7 +17,7 @@ import sa.lib.SLibUtils;
  *
  * @author Sergio Flores
  */
-public class SDiotAccounting {
+public class SDiotAccountingTxn {
     
     private Statement miStatement;
     private int mnEntryUserId;
@@ -37,7 +37,7 @@ public class SDiotAccounting {
      * @param dps
      * @throws Exception 
      */
-    public SDiotAccounting(final Statement statement, final int entryUserId, final Object[] recordKey, final int[] bkkNumberKey, final SDataDps dps) throws Exception {
+    public SDiotAccountingTxn(final Statement statement, final int entryUserId, final Object[] recordKey, final int[] bkkNumberKey, final SDataDps dps) throws Exception {
         miStatement = statement;
         mnEntryUserId = entryUserId;
         maoRecordKey = recordKey;

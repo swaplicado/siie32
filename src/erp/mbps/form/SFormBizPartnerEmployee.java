@@ -4,6 +4,7 @@
  */
 package erp.mbps.form;
 
+import cfd.DCfdConsts;
 import erp.SErpConsts;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -1423,24 +1424,16 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldLastname2.setLengthMax(49);
         moFieldLastname2.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFiscalId, jlFiscalId);
-        moFieldFiscalId.setLengthMin(13);
-        moFieldFiscalId.setLengthMax(13);
+        moFieldFiscalId.setLengthMin(DCfdConsts.LEN_RFC_PER);
+        moFieldFiscalId.setLengthMax(DCfdConsts.LEN_RFC_PER);
         moFieldFiscalId.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldAlternativeId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jftAlternativeId, jlAlternativeId);
-        moFieldAlternativeId.setLengthMin(18);
-        moFieldAlternativeId.setLengthMax(18);
+        moFieldAlternativeId.setLengthMin(DCfdConsts.LEN_CURP);
+        moFieldAlternativeId.setLengthMax(DCfdConsts.LEN_CURP);
         moFieldAlternativeId.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldEmail = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfEmail, jlEmail);
-        moFieldEmail.setLengthMax(50);
-        moFieldEmail.setAutoCaseType(SLibConstants.UNDEFINED);
-        moFieldEmail.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
-        moFieldIsDeleted.setTabbedPaneIndex(0, jTabbedPane1);
-
-        // Employee:
-
         moFieldSocialSecurityNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSocialSecurityNumber, jlSocialSecurityNumber);
-        moFieldSocialSecurityNumber.setLengthMax(11);
+        moFieldSocialSecurityNumber.setLengthMin(DCfdConsts.LEN_SS_NUM);
+        moFieldSocialSecurityNumber.setLengthMax(DCfdConsts.LEN_SS_NUM);
         moFieldSocialSecurityNumber.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFkBank_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkBank_n, jlFkBank_n);
         moFieldFkBank_n.setTabbedPaneIndex(0, jTabbedPane1);
@@ -1452,8 +1445,17 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldGroceryServiceAccount = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfGroceryServiceAccount, jlGroceryServiceAccount);
         moFieldGroceryServiceAccount.setLengthMax(20);
         moFieldGroceryServiceAccount.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldEmail = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfEmail, jlEmail);
+        moFieldEmail.setLengthMax(50);
+        moFieldEmail.setAutoCaseType(SLibConstants.UNDEFINED);
+        moFieldEmail.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldIsActive = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsActive);
         moFieldIsActive.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
+        moFieldIsDeleted.setTabbedPaneIndex(0, jTabbedPane1);
+
+        // Employee:
+
         moFieldDateBenefits = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateBenefits, jlDateBenefits);
         moFieldDateBenefits.setPickerButton(jbDateBenefits);
         moFieldDateBenefits.setTabbedPaneIndex(0, jTabbedPane1);
@@ -1917,6 +1919,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         SFormValidation validation = formValidate();
 
         if (validation.getIsError()) {
+            if (validation.getTabbedPaneIndex() != -1) {
+                jTabbedPane1.setSelectedIndex(validation.getTabbedPaneIndex());
+            }
             if (validation.getComponent() != null) {
                 validation.getComponent().requestFocus();
             }
@@ -2547,6 +2552,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
                 validation.setIsError(true);
                 validation.setComponent(((erp.lib.form.SFormField) mvFields.get(i)).getComponent());
+                validation.setTabbedPaneIndex(((erp.lib.form.SFormField) mvFields.get(i)).getTabbedPaneIndex());
                 break;
             }
         }
@@ -2558,6 +2564,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     if (miClient.showMsgBoxConfirm("El valor del campo '" + jtfBizPartner_Ro.getToolTipText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
                         validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jtfBizPartner_Ro.getToolTipText() + "'.");
                         validation.setComponent(jtfFirstname);
+                        validation.setTabbedPaneIndex(0);
                     }
                 }
 
@@ -2567,6 +2574,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                         if (miClient.showMsgBoxConfirm("El valor del campo '" + jlFiscalId.getText() + "' ya existe, ¿desea conservalo?") == JOptionPane.NO_OPTION) {
                             validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlFiscalId.getText() + "'.");
                             validation.setComponent(jtfFiscalId);
+                            validation.setTabbedPaneIndex(0);
                         }
                     }
 
@@ -2574,26 +2582,31 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                         if (!moFieldBankAccount.getString().isEmpty() && jcbFkBank_n.getSelectedIndex() <= 0) {
                             validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlFkBank_n.getText() + "'.");
                             validation.setComponent(jcbFkBank_n);
+                            validation.setTabbedPaneIndex(0);
                         }
                         else if (!moFieldGroceryServiceAccount.getString().isEmpty() && jcbFkGroceryService.getSelectedIndex() <= 0) {
                             validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlFkGroceryService.getText() + "'.");
                             validation.setComponent(jcbFkGroceryService);
+                            validation.setTabbedPaneIndex(0);
                         }
                         else {
                             if (!SLibUtils.belongsTo(moFieldFkRecruitmentSchemeType.getKeyAsIntArray()[0],
                                     new int[] { SModSysConsts.HRSS_TP_REC_SCHE_ASS_COO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_CIV, SModSysConsts.HRSS_TP_REC_SCHE_ASS_BRD, 
                                         SModSysConsts.HRSS_TP_REC_SCHE_ASS_SAL, SModSysConsts.HRSS_TP_REC_SCHE_ASS_PRO, SModSysConsts.HRSS_TP_REC_SCHE_ASS_SHA, SModSysConsts.HRSS_TP_REC_SCHE_ASS_OTH })) {
-                                if (moFieldSocialSecurityNumber.getString().length() < 11) {
-                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSocialSecurityNumber.getText() + "'.");
+                                if (moFieldSocialSecurityNumber.getString().isEmpty()) {
+                                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlSocialSecurityNumber.getText() + "'.");
                                     validation.setComponent(jtfSocialSecurityNumber);                                
+                                    validation.setTabbedPaneIndex(0);
                                 }
                                 else if (moFieldSalarySscBase.getDouble() == 0) {
                                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSalarySscBase.getText() + "'.");
                                     validation.setComponent(jtfSalarySscBase);                                
+                                    validation.setTabbedPaneIndex(0);
                                 }
                                 else if (moFieldDateChangeSalarySscBase.getDate() == null) {
                                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlSalarySscBase.getText() + "' (fecha).");
                                     validation.setComponent(jftDateChangeSalarySscBase);                                
+                                    validation.setTabbedPaneIndex(0);
                                 }
                             }
 
@@ -2603,6 +2616,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                                     if (!msg.isEmpty()) {
                                         validation.setMessage(msg);
                                         validation.setComponent(jtfEmail);
+                                        validation.setTabbedPaneIndex(0);
                                     }
                                 }
 
@@ -2610,6 +2624,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                                     if (SHrsEmployeeUtils.isContractExpirationRequired(moFieldFkContractType.getKeyAsIntArray()[0]) && moFieldContractExpiration.getDate() == null) {
                                         validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + jlContractExpiration.getText() + "'.");
                                         validation.setComponent(jftContractExpiration);
+                                        validation.setTabbedPaneIndex(0);
                                     }
                                 }
                             }
@@ -2665,6 +2680,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                             if (dates.get(field).getDate() == null) {
                                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeDateBirth) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
                                 validation.setComponent(dates.get(field).getComponent());
+                                validation.setTabbedPaneIndex(1);
                                 break;
                             }
                         }
@@ -2672,6 +2688,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                             if (names.get(field).getString().isEmpty()) {
                                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeName) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
                                 validation.setComponent(names.get(field).getComponent());
+                                validation.setTabbedPaneIndex(1);
                                 break;
                             }
                         }
@@ -2679,6 +2696,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                             if (names.get(field).getString().isEmpty()) {
                                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeName) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
                                 validation.setComponent(names.get(field).getComponent());
+                                validation.setTabbedPaneIndex(1);
                                 break;
                             }
                         }
@@ -2686,14 +2704,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                             if (names.get(field).getString().isEmpty()) {
                                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRelativeName) + "' " + SGuiUtils.getLabelName(relatives.get(field)) + ".");
                                 validation.setComponent(names.get(field).getComponent());
+                                validation.setTabbedPaneIndex(1);
                                 break;
                             }
                         }
-                    }
-
-                    if (!validation.getIsError()) {
-                        validation = moPanelBizPartnerBranchAddress.formValidate();
-                        jTabbedPane1.setSelectedIndex(1);
                     }
                 }
 
@@ -2710,6 +2724,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                                 "fecha del RFC (" + miClient.getSessionXXX().getFormatters().getDateFormat().format(tDateRfc) + ").");
                         jTabbedPane1.setSelectedIndex(1);
                         validation.setComponent(jftDateBirth);
+                        validation.setTabbedPaneIndex(0);
                     }
                 }
             }
@@ -3069,6 +3084,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moEmployee.setFkCatalogueMaritalStatusTypeId(moFieldFkCatalogueMaritalStatusType.getKeyAsIntArray()[1]);
         moEmployee.setFkCatalogueEducationClassId(moFieldFkCatalogueEducationType.getKeyAsIntArray()[0]);
         moEmployee.setFkCatalogueEducationTypeId(moFieldFkCatalogueEducationType.getKeyAsIntArray()[1]);
+        moEmployee.setFkSourceCompanyId(miClient.getSessionXXX().getCurrentCompany().getPkCompanyId()); // XXX 2020-03-04, Sergio Flores: Improve this!
         moEmployee.setFkBankId_n(moFieldFkBank_n.getKeyAsIntArray()[0]);
         moEmployee.setFkGroceryServiceId(moFieldFkGroceryService.getKeyAsIntArray()[0]);
 

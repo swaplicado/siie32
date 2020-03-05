@@ -775,8 +775,8 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
         SRowEmployee row = null;
 
         mvRecords.clear();
-        moFormerPayroll.getDbmsDataFormerPayrollEmp().clear();
-        moFormerPayroll.getDbmsDataFormerPayrollMove().clear();
+        moFormerPayroll.getDbmsDataFormerPayrollEmps().clear();
+        moFormerPayroll.getDbmsDataFormerPayrollMoves().clear();
 
         for (int i = 0; i < moTablePaneEmpSelected.getTableGuiRowCount(); i++) {
             add = true;
@@ -835,7 +835,7 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
             formerPayrollEmp.setFkRecordTypeId((String) recordKey[3]);
             formerPayrollEmp.setFkNumberId((Integer) recordKey[4]);
 
-            moFormerPayroll.getDbmsDataFormerPayrollEmp().add(formerPayrollEmp);
+            moFormerPayroll.getDbmsDataFormerPayrollEmps().add(formerPayrollEmp);
         }
     }
 
@@ -1264,11 +1264,11 @@ public class SDialogFormerPayrollImport extends javax.swing.JDialog implements j
                     oPayrollMove.setFkNumberId(oRecord.getPkNumberId());
                     oPayrollMove.setFkEntryId(++nEntryId);
 
-                    moFormerPayroll.getDbmsDataFormerPayrollMove().add(oPayrollMove);
+                    moFormerPayroll.getDbmsDataFormerPayrollMoves().add(oPayrollMove);
                 }
             }
 
-            moFormerPayroll.getAuxDataRecord().add(oRecord);
+            moFormerPayroll.getAuxDataRecords().add(oRecord);
         }
 
         moFormerPayroll.setDatePayment(moFieldDatePayment.getDate());

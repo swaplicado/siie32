@@ -18,12 +18,12 @@ import sa.lib.gui.SGuiSession;
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
  * - erp.mbps.data.SDataEmployee
- * All of them also make raw SQL insertions.
+ * All of them also make raw SQL queries, insertions or updates.
  */
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbEmployeeWageLog extends SDbRegistryUser {
 
@@ -41,8 +41,10 @@ public class SDbEmployeeWageLog extends SDbRegistryUser {
     protected int mnFkDepartmentId;
     protected int mnFkPositionId;
     protected int mnFkShiftId;
+    protected int mnFkContractTypeId;
     protected int mnFkRecruitmentSchemeTypeId;
     protected int mnFkPositionRiskTypeId;
+    protected int mnFkWorkingDayTypeId;
     protected int mnFkBankId_n;
     /*
     protected int mnFkUserInsertId;
@@ -69,8 +71,10 @@ public class SDbEmployeeWageLog extends SDbRegistryUser {
     public void setFkDepartmentId(int n) { mnFkDepartmentId = n; }
     public void setFkPositionId(int n) { mnFkPositionId = n; }
     public void setFkShiftId(int n) { mnFkShiftId = n; }
+    public void setFkContractTypeId(int n) { mnFkContractTypeId = n; }
     public void setFkRecruitmentSchemeTypeId(int n) { mnFkRecruitmentSchemeTypeId = n; }
     public void setFkPositionRiskTypeId(int n) { mnFkPositionRiskTypeId = n; }
+    public void setFkWorkingDayTypeId(int n) { mnFkWorkingDayTypeId = n; }
     public void setFkBankId_n(int n) { mnFkBankId_n = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
@@ -91,8 +95,10 @@ public class SDbEmployeeWageLog extends SDbRegistryUser {
     public int getFkDepartmentId() { return mnFkDepartmentId; }
     public int getFkPositionId() { return mnFkPositionId; }
     public int getFkShiftId() { return mnFkShiftId; }
+    public int getFkContractTypeId() { return mnFkContractTypeId; }
     public int getFkRecruitmentSchemeTypeId() { return mnFkRecruitmentSchemeTypeId; }
     public int getFkPositionRiskTypeId() { return mnFkPositionRiskTypeId; }
+    public int getFkWorkingDayTypeId() { return mnFkWorkingDayTypeId; }
     public int getFkBankId_n() { return mnFkBankId_n; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
@@ -128,8 +134,10 @@ public class SDbEmployeeWageLog extends SDbRegistryUser {
         mnFkDepartmentId = 0;
         mnFkPositionId = 0;
         mnFkShiftId = 0;
+        mnFkContractTypeId = 0;
         mnFkRecruitmentSchemeTypeId = 0;
         mnFkPositionRiskTypeId = 0;
+        mnFkWorkingDayTypeId = 0;
         mnFkBankId_n = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
@@ -193,8 +201,10 @@ public class SDbEmployeeWageLog extends SDbRegistryUser {
             mnFkDepartmentId = resultSet.getInt("fk_dep");
             mnFkPositionId = resultSet.getInt("fk_pos");
             mnFkShiftId = resultSet.getInt("fk_sht");
+            mnFkContractTypeId = resultSet.getInt("fk_tp_con");
             mnFkRecruitmentSchemeTypeId = resultSet.getInt("fk_tp_rec_sche");
             mnFkPositionRiskTypeId = resultSet.getInt("fk_tp_pos_risk");
+            mnFkWorkingDayTypeId = resultSet.getInt("fk_tp_work_day");
             mnFkBankId_n = resultSet.getInt("fk_bank_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
@@ -233,8 +243,10 @@ public class SDbEmployeeWageLog extends SDbRegistryUser {
                     mnFkDepartmentId + ", " + 
                     mnFkPositionId + ", " + 
                     mnFkShiftId + ", " + 
+                    mnFkContractTypeId + ", " + 
                     mnFkRecruitmentSchemeTypeId + ", " + 
                     mnFkPositionRiskTypeId + ", " + 
+                    mnFkWorkingDayTypeId + ", " + 
                     (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
@@ -262,8 +274,10 @@ public class SDbEmployeeWageLog extends SDbRegistryUser {
                     "fk_dep = " + mnFkDepartmentId + ", " +
                     "fk_pos = " + mnFkPositionId + ", " +
                     "fk_sht = " + mnFkShiftId + ", " +
+                    "fk_tp_con = " + mnFkContractTypeId + ", " +
                     "fk_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId + ", " +
                     "fk_tp_pos_risk = " + mnFkPositionRiskTypeId + ", " +
+                    "fk_tp_work_day = " + mnFkWorkingDayTypeId + ", " +
                     "fk_bank_n = " + (mnFkBankId_n == SLibConsts.UNDEFINED ? "NULL" : mnFkBankId_n) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
@@ -295,8 +309,10 @@ public class SDbEmployeeWageLog extends SDbRegistryUser {
         registry.setFkDepartmentId(this.getFkDepartmentId());
         registry.setFkPositionId(this.getFkPositionId());
         registry.setFkShiftId(this.getFkShiftId());
+        registry.setFkContractTypeId(this.getFkContractTypeId());
         registry.setFkRecruitmentSchemeTypeId(this.getFkRecruitmentSchemeTypeId());
         registry.setFkPositionRiskTypeId(this.getFkPositionRiskTypeId());
+        registry.setFkWorkingDayTypeId(this.getFkWorkingDayTypeId());
         registry.setFkBankId_n(this.getFkBankId_n());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());

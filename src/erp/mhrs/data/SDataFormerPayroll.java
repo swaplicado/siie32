@@ -43,17 +43,17 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
 
-    protected java.util.Vector<erp.mhrs.data.SDataFormerPayrollEmp> mvDbmsDataFormerPayrollEmp;
-    protected java.util.Vector<erp.mhrs.data.SDataFormerPayrollMove> mvDbmsDataFormerPayrollMove;
+    protected java.util.Vector<erp.mhrs.data.SDataFormerPayrollEmp> mvDbmsDataFormerPayrollEmps;
+    protected java.util.Vector<erp.mhrs.data.SDataFormerPayrollMove> mvDbmsDataFormerPayrollMoves;
 
-    protected java.util.Vector<erp.mfin.data.SDataRecord> mvAuxDataRecord;
+    protected java.util.Vector<erp.mfin.data.SDataRecord> mvAuxDataRecords;
 
     public SDataFormerPayroll() {
         super(SDataConstants.HRS_SIE_PAY);
 
-        mvDbmsDataFormerPayrollEmp = new Vector<>();
-        mvDbmsDataFormerPayrollMove = new Vector<>();
-        mvAuxDataRecord = new Vector<>();
+        mvDbmsDataFormerPayrollEmps = new Vector<>();
+        mvDbmsDataFormerPayrollMoves = new Vector<>();
+        mvAuxDataRecords = new Vector<>();
 
         reset();
     }
@@ -100,9 +100,9 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
     public java.util.Date getUserDeleteTs() { return mtUserDeleteTs; }
 
-    public java.util.Vector<erp.mhrs.data.SDataFormerPayrollEmp> getDbmsDataFormerPayrollEmp() { return mvDbmsDataFormerPayrollEmp; }
-    public java.util.Vector<erp.mhrs.data.SDataFormerPayrollMove> getDbmsDataFormerPayrollMove() { return mvDbmsDataFormerPayrollMove; }
-    public java.util.Vector<erp.mfin.data.SDataRecord> getAuxDataRecord() { return mvAuxDataRecord; }
+    public java.util.Vector<erp.mhrs.data.SDataFormerPayrollEmp> getDbmsDataFormerPayrollEmps() { return mvDbmsDataFormerPayrollEmps; }
+    public java.util.Vector<erp.mhrs.data.SDataFormerPayrollMove> getDbmsDataFormerPayrollMoves() { return mvDbmsDataFormerPayrollMoves; }
+    public java.util.Vector<erp.mfin.data.SDataRecord> getAuxDataRecords() { return mvAuxDataRecords; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -139,9 +139,9 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
         mtUserEditTs = null;
         mtUserDeleteTs = null;
 
-        mvDbmsDataFormerPayrollEmp.clear();
-        mvDbmsDataFormerPayrollMove.clear();
-        mvAuxDataRecord.clear();
+        mvDbmsDataFormerPayrollEmps.clear();
+        mvDbmsDataFormerPayrollMoves.clear();
+        mvAuxDataRecords.clear();
     }
 
     @Override
@@ -194,7 +194,7 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
-                        mvDbmsDataFormerPayrollEmp.add(emp);
+                        mvDbmsDataFormerPayrollEmps.add(emp);
                     }
                 }
 
@@ -208,7 +208,7 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                     }
                     else {
-                        mvDbmsDataFormerPayrollMove.add(move);
+                        mvDbmsDataFormerPayrollMoves.add(move);
                     }
                 }
 
@@ -268,7 +268,7 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
             else {
                 // Save aswell accounting records:
 
-                for (SDataRecord record : mvAuxDataRecord) {
+                for (SDataRecord record : mvAuxDataRecords) {
                     if (record.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
@@ -276,7 +276,7 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
 
                 // Save aswell employees:
 
-                for (SDataFormerPayrollEmp emp : mvDbmsDataFormerPayrollEmp) {
+                for (SDataFormerPayrollEmp emp : mvDbmsDataFormerPayrollEmps) {
                     emp.setPkPayrollId(mnPkPayrollId);
                     if (emp.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
@@ -285,7 +285,7 @@ public class SDataFormerPayroll extends erp.lib.data.SDataRegistry implements ja
 
                 // Save aswell employee moves:
 
-                for (SDataFormerPayrollMove move : mvDbmsDataFormerPayrollMove) {
+                for (SDataFormerPayrollMove move : mvDbmsDataFormerPayrollMoves) {
                     move.setPkPayrollId(mnPkPayrollId);
                     if (move.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);

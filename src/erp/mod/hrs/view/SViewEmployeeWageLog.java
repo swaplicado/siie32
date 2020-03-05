@@ -19,7 +19,7 @@ import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SViewEmployeeWageLog extends SGridPaneView {
 
@@ -93,8 +93,10 @@ public class SViewEmployeeWageLog extends SGridPaneView {
                 + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " WHERE id_dep = v.fk_dep) AS f_dep_name, "
                 + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_POS) + " WHERE id_pos = v.fk_pos) AS f_pos_name, "
                 + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_SHT) + " WHERE id_sht = v.fk_sht) AS f_sht_name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_CON) + " WHERE id_tp_con = v.fk_tp_con) AS f_con_name, "
                 + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " WHERE id_tp_rec_sche = v.fk_tp_rec_sche) AS f_rec_sche_name, "
                 + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_POS_RISK) + " WHERE id_tp_pos_risk = v.fk_tp_pos_risk) AS f_pos_risk_name, "
+                + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_WORK_DAY) + " WHERE id_tp_work_day = v.fk_tp_work_day) AS f_work_day_name, "
                 + "bank.name, "
                 + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
                 + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
@@ -131,6 +133,8 @@ public class SViewEmployeeWageLog extends SGridPaneView {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_dep_name", "Departamento"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_pos_name", "Puesto"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_sht_name", "Turno"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_work_day_name", "Tipo jornada"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_con_name", "Tipo contrato"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_rec_sche_name", "Régimen contratación"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_pos_risk_name", "Riesgo trabajo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "f_tp_mwz_name", "Área geográfica"));
