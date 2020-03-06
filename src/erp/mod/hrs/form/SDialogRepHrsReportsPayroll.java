@@ -34,7 +34,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     protected SDbPayroll moPayroll;
     protected int mnPayrollId;
     protected int mnPaymentTypeId;
-    protected SPanelHrsDepartaments moPanelHrsDepartaments;
+    protected SPanelHrsDepartments moPanelHrsDepartments;
     
     /**
      * Creates new form SDialogRepHrsReportsPayroll
@@ -329,9 +329,9 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         moRadOrderByNameEmployee.setSelected(true);
         moRadOrderByNameDepartament.setSelected(true);
         
-        moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
+        moPanelHrsDepartments = new SPanelHrsDepartments(miClient);
 
-        jpDepartments.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+        jpDepartments.add(moPanelHrsDepartments, BorderLayout.CENTER);
 
         moFields.setFormButton(jbPrint);
         
@@ -445,7 +445,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         SGuiValidation validation = moFields.validateFields();
         
         if (validation.isValid()) {
-            validation = moPanelHrsDepartaments.validatePanel();
+            validation = moPanelHrsDepartments.validatePanel();
         }
         
         return validation;
@@ -463,10 +463,10 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         try {
             moParamsMap = miClient.createReportParams();
             
-            sDepartamentsId = (String) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_KEY);
-            sDepartamentsName = (String) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ITEM);
+            sDepartamentsId = (String) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_KEY);
+            sDepartamentsName = (String) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_ITEM);
             moParamsMap.put("sSqlWhereDepartaments", sDepartamentsId.isEmpty() ? "" : " AND dep.id_dep IN(" + sDepartamentsId + ") ");
-            moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
+            moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
             moParamsMap.put("sPayrollType", moPayroll.getNumber() + "  " + (String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { moPayroll.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
 
             if (moRadReportPrePayroll.isSelected()) {

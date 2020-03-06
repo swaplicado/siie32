@@ -35,7 +35,7 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
     public static int EMP_STATUS_ACT = 1;
     public static int EMP_STATUS_INA = 2;
     
-    private SPanelHrsDepartaments moPanelHrsDepartaments;
+    private SPanelHrsDepartments moPanelHrsDepartments;
     private SPanelHrsFilterPayrollStatus moPanelHrsFilterPayrollStatus;
     
     /**
@@ -418,7 +418,7 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 960, 600);
         
-        moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
+        moPanelHrsDepartments = new SPanelHrsDepartments(miClient);
         moPanelHrsFilterPayrollStatus = new SPanelHrsFilterPayrollStatus(miClient);
 
         moRadReportTypePayEmp.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypePayEmp.getText()), true);
@@ -443,7 +443,7 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
         moRadOrderByNumDepartament.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNumDepartament.getText()), false);
         moRadOrderByNameDepartament.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNameDepartament.getText()), true);
 
-        jpDepartments.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+        jpDepartments.add(moPanelHrsDepartments, BorderLayout.CENTER);
         jpFilterStatusPay.remove(jlFilterStatusPayTemp);
         jpFilterStatusPay.add(moPanelHrsFilterPayrollStatus, BorderLayout.CENTER);
         moPanelHrsFilterPayrollStatus.setSelectedAll();
@@ -623,7 +623,7 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
             }
             
             if (validation.isValid()) {
-                validation = moPanelHrsDepartaments.validatePanel();
+                validation = moPanelHrsDepartments.validatePanel();
             }
         }
 
@@ -642,8 +642,8 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
         bizPartnerCompany = new SDataBizPartner();
         bizPartnerCompany.read(new int[] { ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId() }, miClient.getSession().getStatement());
         
-        sDepartamentsId = (String) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_KEY);
-        sDepartamentsName = (String) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ITEM);
+        sDepartamentsId = (String) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_KEY);
+        sDepartamentsName = (String) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_ITEM);
         
         moParamsMap = miClient.createReportParams();
         
@@ -692,7 +692,7 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
         moParamsMap.put("sEarning", !moKeyEarning.isEnabled() ? "(TODAS)" : moKeyEarning.getSelectedIndex() > 0 ? moKeyEarning.getSelectedItem() : "(TODAS)");
         moParamsMap.put("sDeduction", !moKeyDeduction.isEnabled() ? "(TODAS)" : moKeyDeduction.getSelectedIndex() > 0 ? moKeyDeduction.getSelectedItem() : "(TODAS)");
         moParamsMap.put("sPaymentType", moKeyPaymentType.getSelectedIndex() > 0 ? moKeyPaymentType.getSelectedItem() : "(TODOS)");
-        moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
+        moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
         
         moParamsMap.put("bIsEarDedOnly", moRadReportTypePayEmp.isSelected());
         moParamsMap.put("sColumnsEar", getColumSelect(1));

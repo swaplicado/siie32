@@ -27,7 +27,7 @@ import sa.lib.gui.bean.SBeanFieldRadio;
  */
 public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements ChangeListener {
     
-    protected SPanelHrsDepartaments moPanelHrsDepartaments;
+    protected SPanelHrsDepartments moPanelHrsDepartments;
     private SPanelHrsFilterPayrollStatus moPanelHrsFilterPayrollStatus;
     
     /**
@@ -208,7 +208,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 800, 500);
         
-        moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
+        moPanelHrsDepartments = new SPanelHrsDepartments(miClient);
         moPanelHrsFilterPayrollStatus = new SPanelHrsFilterPayrollStatus(miClient);
 
         moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
@@ -220,7 +220,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
 
-        jpDepartments.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+        jpDepartments.add(moPanelHrsDepartments, BorderLayout.CENTER);
         jpFilterStatusPay.remove(jlFilterStatusPayTemp);
         jpFilterStatusPay.add(moPanelHrsFilterPayrollStatus, BorderLayout.CENTER);
         moPanelHrsFilterPayrollStatus.setSelectedAll();
@@ -297,7 +297,7 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
             }
             
             if (validation.isValid()) {
-                validation = moPanelHrsDepartaments.validatePanel();
+                validation = moPanelHrsDepartments.validatePanel();
             }
         }
                 
@@ -319,10 +319,10 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
 
         moParamsMap.put("dPayrollTaxRate", config.getPayrollTaxRate());
         
-        sDepartamentsId = (String) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_KEY);
-        sDepartamentsName = (String) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ITEM);
+        sDepartamentsId = (String) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_KEY);
+        sDepartamentsName = (String) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_ITEM);
         moParamsMap.put("sSqlWhereDepartaments", sDepartamentsId.isEmpty() ? "" : " AND rcp.fk_dep IN(" + sDepartamentsId + ") ");
-        moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
+        moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
         
         if (moRadFilterTypePeriod.isSelected()) {
             sSqlWhere = " AND p.per_year = " + moIntPeriodYear.getValue() + " AND p.per BETWEEN " + moIntPeriodStart.getValue() + " AND " + moIntPeriodEnd.getValue() + " ";            

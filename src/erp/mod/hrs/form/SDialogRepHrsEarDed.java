@@ -29,7 +29,7 @@ import sa.lib.gui.bean.SBeanFieldRadio;
  */
 public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeListener, ItemListener {
     
-    protected SPanelHrsDepartaments moPanelHrsDepartaments;
+    protected SPanelHrsDepartments moPanelHrsDepartments;
     
     /**
      * Creates new form SDialogRepHrsEarDed
@@ -238,7 +238,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 800, 500);
         
-        moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
+        moPanelHrsDepartments = new SPanelHrsDepartments(miClient);
 
         moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
         moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
@@ -251,7 +251,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
         moKeyEarningDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningDeduction.getText()), false);
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
 
-        jpDepartments.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+        jpDepartments.add(moPanelHrsDepartments, BorderLayout.CENTER);
 
         moFields.addField(moRadFilterTypePeriod);
         moFields.addField(moRadFilterTypeDate);
@@ -348,7 +348,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
             }
             
             if (validation.isValid()) {
-                validation = moPanelHrsDepartaments.validatePanel();
+                validation = moPanelHrsDepartments.validatePanel();
             }
         }
 
@@ -362,10 +362,10 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
         
         moParamsMap = miClient.createReportParams();
         
-        sDepartamentsId = (String) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_KEY);
-        sDepartamentsName = (String) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ITEM);
+        sDepartamentsId = (String) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_KEY);
+        sDepartamentsName = (String) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_ITEM);
         moParamsMap.put("sSqlWhereDepartaments", sDepartamentsId.isEmpty() ? "" : " AND dep.id_dep IN(" + sDepartamentsId + ") ");
-        moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
+        moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
         
         if (moRadFilterTypePeriod.isSelected()) {
             moParamsMap.put("bByPeriod", true);

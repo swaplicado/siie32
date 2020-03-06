@@ -35,7 +35,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
     
-    protected SPanelHrsDepartaments moPanelHrsDepartaments;
+    protected SPanelHrsDepartments moPanelHrsDepartments;
    
     /**
      * Creates new form SDialogVacationsFileCsv
@@ -120,14 +120,14 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 560, 350);
         
-        moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
+        moPanelHrsDepartments = new SPanelHrsDepartments(miClient);
         
         jbSave.setText("Guardar");
 
         moDateDateCut.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCut.getText()), true);
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
 
-        jPanel6.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+        jPanel6.add(moPanelHrsDepartments, BorderLayout.CENTER);
         
         moFields.addField(moDateDateCut);
         moFields.addField(moKeyPaymentType);
@@ -159,8 +159,8 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
                 File file = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
                 BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
         
-                sDepartamentsId = (String) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_KEY);
-                sDepartamentsName = (String) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ITEM);
+                sDepartamentsId = (String) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_KEY);
+                sDepartamentsName = (String) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_ITEM);
                 dateCut = "'" + SLibUtils.DbmsDateFormatDate.format(moDateDateCut.getValue()) + "' ";
                 
                 buffer = ((SClientInterface)miClient).getSessionXXX().getCompany().getCompany() + "\n";
@@ -178,7 +178,7 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
 
                 bw.write(SLibUtilities.textToAscii(buffer));
                 
-                //moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartaments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
+                //moParamsMap.put("sDepartaments", sDepartamentsName.isEmpty() || (boolean) moPanelHrsDepartments.getValue(SGuiConsts.PARAM_ROWS) ? "(TODOS)" : sDepartamentsName + " ");
                 
                 sql = "SELECT bp.id_bp AS f_id_1, " +
                         "IF(!emp.b_act, 0, TIMESTAMPDIFF(YEAR,emp.dt_ben, " + dateCut + ")) AS f_id_2, " +
@@ -284,7 +284,7 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
         SGuiValidation validation = moFields.validateFields();
 
         if (validation.isValid()) {
-            validation = moPanelHrsDepartaments.validatePanel();
+            validation = moPanelHrsDepartments.validatePanel();
         }
                 
         

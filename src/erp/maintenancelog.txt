@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 161.2/ 2020-03-06
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la validación de captura de renglones de pólizas contables, en lo referente a la obligatoriredad de especificar un asociado de negocios si el campo impuesto está habilitado y con un valor seleccionado.
+2) Renombramiento de páneles de selección de departamentos para reportes del Módulo de Recursos Humanos.
+
+================================================================================
 SIIE 3.2 161.1/ 2020-03-06
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

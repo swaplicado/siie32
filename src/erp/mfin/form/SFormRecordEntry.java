@@ -2406,7 +2406,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
                     validation.setComponent(jcbFkBizPartnerId_nr);
                 }
-                else if (isNotDefinedBizPartner && jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0) {
+                else if (isNotDefinedBizPartner && jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0 && miClient.showMsgBoxConfirm("¿Está seguro que no desea proporcionar un valor para el campo '" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'?") != JOptionPane.YES_OPTION) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkBizPartnerId_nr.getText() + "' o '" + jlOccasionalFiscalId.getText() + "'.");
                     validation.setComponent(jcbFkBizPartnerId_nr);
                 }

@@ -23,7 +23,7 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
 
     private int mnOrderByType;
     private int[] payrollKeyNum;
-    private SPanelHrsDepartmentsArea moPanelHrsDepartments;
+    private SPanelHrsDepartmentsWithReceipts moPanelHrsDepartmentsWithReceipts;
     
     /**
      * Creates new form SDialogPrintOrderPayroll
@@ -154,7 +154,7 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
     private void initComponentsCustom() throws Exception {
         SGuiUtils.setWindowBounds(this, 640, 400);
         
-        moPanelHrsDepartments = new SPanelHrsDepartmentsArea(miClient, payrollKeyNum);
+        moPanelHrsDepartmentsWithReceipts = new SPanelHrsDepartmentsWithReceipts(miClient, payrollKeyNum);
 
         jbSave.setText("Aceptar");
         
@@ -163,7 +163,7 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
         moRadOrderByEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByEmployee.getText()), false);
         moRadOrderByDepartament.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByDepartament.getText()), false);
         
-        jpDepartments.add(moPanelHrsDepartments, BorderLayout.CENTER);
+        jpDepartments.add(moPanelHrsDepartmentsWithReceipts, BorderLayout.CENTER);
 
         moFields.addField(moIntNumCopies);
         moFields.addField(moRadOrderByNumber);
@@ -190,7 +190,7 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
       
         if (validation.isValid()) {
             if (validation.isValid()) {
-                validation = moPanelHrsDepartments.validatePanel();
+                validation = moPanelHrsDepartmentsWithReceipts.validatePanel();
             }
         }
 
@@ -235,11 +235,11 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
     }
     
     public Object getString(String typeDep) {       
-        if (moPanelHrsDepartments.mbIsSelectedAll) {
+        if (moPanelHrsDepartmentsWithReceipts.mbIsSelectedAll) {
             return typeDep = "";
         }
         else {
-            return moPanelHrsDepartments.msDepartamentsSelectedsId;            
+            return moPanelHrsDepartmentsWithReceipts.msDepartamentsSelectedsId;            
         }
     }
 }

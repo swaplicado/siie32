@@ -6,8 +6,7 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
-import erp.mod.hrs.db.SHrsCfdUtils;
-import erp.mod.hrs.db.SRowDepartmentPanelArea;
+import erp.mod.hrs.db.SRowDepartamentPanel;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,9 +32,9 @@ import sa.lib.gui.bean.SBeanPanel;
 
 /**
  *
- * @author Juan Barajas, Claudio Peña
+ * @author Juan Barajas, Sergio Flores
  */
-public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener, ActionListener {
+public class SPanelHrsDepartments extends SBeanPanel implements ItemListener, ActionListener {
 
     protected SGridPaneForm moGridDepartamentsRow;
     protected JButton mjbSelectAll;
@@ -45,17 +44,13 @@ public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener
     protected boolean mbIsSelectedAll;
     protected String msDepartamentsSelectedsId;
     protected String msDepartamentsSelectedsName;
-    private int[] payrollKeyNum ;
-
     
     /**
-     * Creates new form SPanelHrsDepartaments
-     * @param client
-     * @param payrollKey
+     * Creates new form SPanelHrsDepartments
+     * @param client GUI client.
      */
-    public SPanelHrsDepartmentsArea(final SGuiClient client, final int[] payrollKey) {
+    public SPanelHrsDepartments(final SGuiClient client) {
         setPanelSettings(client);
-        payrollKeyNum = payrollKey;
         initComponents();
         initComponentsCustom();
     }
@@ -109,13 +104,13 @@ public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener
                 SGridColumnForm columnForm = null;
                 ArrayList<SGridColumnForm> gridColumnsForm = new ArrayList<>();
 
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Código departamento", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Departamento", 350));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Num. de nominas", 150));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "Código departamento"));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_L, "Departamento"));
                 columnForm = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Seleccionado", moGridDepartamentsRow.getTable().getDefaultEditor(Boolean.class));
-
                 columnForm.setEditable(true);
                 gridColumnsForm.add(columnForm);
+                
+                //moGridEmployeeRow.getTable().getDefaultEditor(Boolean.class).addCellEditorListener(SDialogPayrollEarnings.this);
                 
                 return gridColumnsForm;
             }
@@ -127,6 +122,7 @@ public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener
         moGridDepartamentsRow.setForm(null);
         moGridDepartamentsRow.setPaneFormOwner(null);
         jpDepartaments.add(moGridDepartamentsRow, BorderLayout.CENTER);
+        //mvFormGrids.add(moGridDepartamentsRow);
         
         populateDepartaments();
         itemStateChangedSelectAll(true);
@@ -141,14 +137,17 @@ public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener
         }
         populateDepartaments();
     }
-        
+    
+    
     private void getDepartaments() {
-        SRowDepartmentPanelArea payRow = null;
+        SRowDepartamentPanel payRow = null;
+        msDepartamentsSelectedsId = "";
+        msDepartamentsSelectedsName = "";
         mnNumberDepartamentsSelects = 0;
         mbIsSelectedAll = false;
         
         for (SGridRow row : moGridDepartamentsRow.getModel().getGridRows()) {
-            payRow = (SRowDepartmentPanelArea) row;
+            payRow = (SRowDepartamentPanel) row;
             
             if (payRow.isSelected()) {
                 msDepartamentsSelectedsId += (msDepartamentsSelectedsId.length() == 0 ? "" : ", ") + payRow.getDepartamentId();
@@ -156,15 +155,15 @@ public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener
                 mnNumberDepartamentsSelects++;
             }
         }
-
+        
         mbIsSelectedAll = mnNumberDepartamentsSelects == moGridDepartamentsRow.getModel().getRowCount();
     }
     
     private void itemStateChangedSelectAll(boolean selected) {
-        SRowDepartmentPanelArea payRow = null;
+        SRowDepartamentPanel payRow = null;
         
         for (SGridRow row : moGridDepartamentsRow.getModel().getGridRows()) {
-            payRow = (SRowDepartmentPanelArea) row;
+            payRow = (SRowDepartamentPanel) row;
             payRow.setIsSelected(selected);
         }
         moGridDepartamentsRow.renderGridRows();
@@ -174,8 +173,8 @@ public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener
     private void populateDepartaments() {
         String sql = "";
         ResultSet resultSet = null;
-        Vector<SGridRow> rows = new Vector<>();
-        SRowDepartmentPanelArea department = null;
+        Vector<SGridRow> rows = new Vector<SGridRow>();
+        SRowDepartamentPanel departament = null;
         
         moGridDepartamentsRow.getModel().clearGridRows();
         moGridDepartamentsRow.getModel().clearGrid();
@@ -188,13 +187,12 @@ public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener
 
             resultSet = miClient.getSession().getStatement().getConnection().createStatement().executeQuery(sql);
             while (resultSet.next()) {
-                department = new SRowDepartmentPanelArea(resultSet.getInt("id_dep"));
+                departament = new SRowDepartamentPanel(resultSet.getInt("id_dep"));
 
-                department.setDepartamentCode(resultSet.getString("code"));
-                department.setDepartamentName(resultSet.getString("name"));                
-                department.setNumNom(SHrsCfdUtils.getCfdCountByDepartment(miClient.getSession(), payrollKeyNum[0], resultSet.getInt("id_dep")));
+                departament.setDepartamentCode(resultSet.getString("code"));
+                departament.setDepartamentName(resultSet.getString("name"));
 
-                rows.add(department);
+                rows.add(departament);
             }
         }
         catch (Exception e) {
@@ -247,14 +245,14 @@ public class SPanelHrsDepartmentsArea extends SBeanPanel implements ItemListener
                 validation.setComponent(mjbSelectAll);
             }
         }
-
+        
         return validation;
     }
-
+    
     @Override
     public Object getValue(int type) {
         Object value = null;
-
+        
         switch(type) {
             case SGuiConsts.PARAM_KEY:
                 value = msDepartamentsSelectedsId;
