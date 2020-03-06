@@ -25,7 +25,7 @@ import sa.lib.gui.bean.SBeanFieldRadio;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeListener, ItemListener {
     
@@ -84,7 +84,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
         jPanel14 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel3 = new javax.swing.JPanel();
+        jpDepartments = new javax.swing.JPanel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
@@ -96,7 +96,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moRadGroupFilterType.add(moRadFilterTypePeriod);
-        moRadFilterTypePeriod.setText("Por periodo");
+        moRadFilterTypePeriod.setText("Por período");
         jPanel4.add(moRadFilterTypePeriod);
 
         moRadGroupFilterType.add(moRadFilterTypeDate);
@@ -117,7 +117,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
 
         jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPeriodStart.setText("Periodo inicial:*");
+        jlPeriodStart.setText("Período inicial:*");
         jlPeriodStart.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel36.add(jlPeriodStart);
         jPanel36.add(moIntPeriodStart);
@@ -126,7 +126,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
 
         jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPeriodEnd.setText("Periodo final:*");
+        jlPeriodEnd.setText("Período final:*");
         jlPeriodEnd.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel37.add(jlPeriodEnd);
         jPanel37.add(moIntPeriodEnd);
@@ -160,7 +160,6 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
         moKeyEmployee.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel13.add(moKeyEmployee);
 
-        jtbEmployeeActive.setIcon(new javax.swing.ImageIcon("C:\\Users\\JBarajas\\Documents\\NetBeansProjects_8\\sa-lib-10\\src\\sa\\lib\\img\\swi_filter_on.gif")); // NOI18N
         jtbEmployeeActive.setToolTipText("Filtrar eliminados");
         jtbEmployeeActive.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel13.add(jtbEmployeeActive);
@@ -180,7 +179,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentType.setText("Periodo pago:");
+        jlPaymentType.setText("Período pago:");
         jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlPaymentType);
 
@@ -193,8 +192,9 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel3.setLayout(new java.awt.BorderLayout());
-        jPanel1.add(jPanel3, java.awt.BorderLayout.CENTER);
+        jpDepartments.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar departamentos:"));
+        jpDepartments.setLayout(new java.awt.BorderLayout());
+        jPanel1.add(jpDepartments, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -207,7 +207,6 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel37;
@@ -221,6 +220,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
     private javax.swing.JLabel jlPeriodEnd;
     private javax.swing.JLabel jlPeriodStart;
     private javax.swing.JLabel jlYear;
+    private javax.swing.JPanel jpDepartments;
     private javax.swing.JToggleButton jtbEmployeeActive;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
@@ -235,33 +235,6 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
     private javax.swing.ButtonGroup moRadGroupFilterType;
     // End of variables declaration//GEN-END:variables
 
-    private void actionEmpStatusStateChange() {
-        if (jtbEmployeeActive.isSelected()) {
-            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_off.gif")));
-        }
-        else {
-            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_on.gif")));
-        }
-        populateEmployee();
-    }
-    
-    private void actionEnableFields() {
-        if (moRadFilterTypePeriod.isSelected()) {
-            moIntPeriodYear.setEnabled(true);
-            moIntPeriodStart.setEnabled(true);    
-            moIntPeriodEnd.setEnabled(true);
-            moDateDateStart.setEnabled(false);
-            moDateDateEnd.setEnabled(false);
-        }
-        else if (moRadFilterTypeDate.isSelected()) {
-            moIntPeriodYear.setEnabled(false);
-            moIntPeriodStart.setEnabled(false);    
-            moIntPeriodEnd.setEnabled(false);
-            moDateDateStart.setEnabled(true);
-            moDateDateEnd.setEnabled(true);
-        }
-    }
-    
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 800, 500);
         
@@ -278,7 +251,7 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
         moKeyEarningDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningDeduction.getText()), false);
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
 
-        jPanel3.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+        jpDepartments.add(moPanelHrsDepartaments, BorderLayout.CENTER);
 
         moFields.addField(moRadFilterTypePeriod);
         moFields.addField(moRadFilterTypeDate);
@@ -317,6 +290,33 @@ public class SDialogRepHrsEarDed extends SBeanDialogReport implements ChangeList
         actionEnableFields();
     }
 
+    private void actionEmpStatusStateChange() {
+        if (jtbEmployeeActive.isSelected()) {
+            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_off.gif")));
+        }
+        else {
+            jtbEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/sa/lib/img/swi_filter_on.gif")));
+        }
+        populateEmployee();
+    }
+    
+    private void actionEnableFields() {
+        if (moRadFilterTypePeriod.isSelected()) {
+            moIntPeriodYear.setEnabled(true);
+            moIntPeriodStart.setEnabled(true);    
+            moIntPeriodEnd.setEnabled(true);
+            moDateDateStart.setEnabled(false);
+            moDateDateEnd.setEnabled(false);
+        }
+        else if (moRadFilterTypeDate.isSelected()) {
+            moIntPeriodYear.setEnabled(false);
+            moIntPeriodStart.setEnabled(false);    
+            moIntPeriodEnd.setEnabled(false);
+            moDateDateStart.setEnabled(true);
+            moDateDateEnd.setEnabled(true);
+        }
+    }
+    
     private void populateEmployee() {
         if (jtbEmployeeActive.isSelected()) {
             miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, new SGuiParams(SGuiConsts.PARAM_REGS_ACT));

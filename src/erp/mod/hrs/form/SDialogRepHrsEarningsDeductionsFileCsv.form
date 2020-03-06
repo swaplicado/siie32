@@ -43,7 +43,9 @@
         </Constraint>
       </Constraints>
 
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout">
+        <Property name="verticalGap" type="int" value="5"/>
+      </Layout>
       <SubComponents>
         <Container class="javax.swing.JPanel" name="jPanel2">
           <Constraints>
@@ -55,6 +57,7 @@
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
             <Property name="columns" type="int" value="1"/>
             <Property name="rows" type="int" value="5"/>
+            <Property name="verticalGap" type="int" value="5"/>
           </Layout>
           <SubComponents>
             <Container class="javax.swing.JPanel" name="jPanel35">
@@ -85,7 +88,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlPaymentType">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Periodo pago:"/>
+                    <Property name="text" type="java.lang.String" value="Per&#xed;odo pago:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
                     </Property>
@@ -104,7 +107,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                 <Property name="alignment" type="int" value="0"/>
-                <Property name="verticalGap" type="int" value="2"/>
+                <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
                 <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadShowEarDed">
@@ -124,7 +127,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                 <Property name="alignment" type="int" value="0"/>
-                <Property name="verticalGap" type="int" value="2"/>
+                <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
                 <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadShowEar">
@@ -148,7 +151,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
                 <Property name="alignment" type="int" value="0"/>
-                <Property name="verticalGap" type="int" value="2"/>
+                <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
                 <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadShowDed">
@@ -177,7 +180,9 @@
             </Constraint>
           </Constraints>
 
-          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout">
+            <Property name="verticalGap" type="int" value="5"/>
+          </Layout>
           <SubComponents>
             <Container class="javax.swing.JPanel" name="jPanel5">
               <Properties>
@@ -189,13 +194,15 @@
                 </Constraint>
               </Constraints>
 
-              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout">
+                <Property name="verticalGap" type="int" value="5"/>
+              </Layout>
               <SubComponents>
-                <Container class="javax.swing.JPanel" name="jPanel10">
+                <Container class="javax.swing.JPanel" name="jPanel8">
                   <Properties>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                       <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                        <TitledBorder title="Ordenamiento departamento:"/>
+                        <TitledBorder title="Ordenamiento del empleado:"/>
                       </Border>
                     </Property>
                   </Properties>
@@ -208,6 +215,45 @@
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                     <Property name="columns" type="int" value="1"/>
                     <Property name="rows" type="int" value="2"/>
+                    <Property name="verticalGap" type="int" value="5"/>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNumEmployee">
+                      <Properties>
+                        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                          <ComponentRef name="moGroupOrderByEmployee"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="N&#xfa;mero del empleado"/>
+                      </Properties>
+                    </Component>
+                    <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNameEmployee">
+                      <Properties>
+                        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                          <ComponentRef name="moGroupOrderByEmployee"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" value="Nombre del empleado"/>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="jPanel10">
+                  <Properties>
+                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                      <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                        <TitledBorder title="Ordenamiento del departamento:"/>
+                      </Border>
+                    </Property>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
+                      <BorderConstraints direction="Center"/>
+                    </Constraint>
+                  </Constraints>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
+                    <Property name="columns" type="int" value="1"/>
+                    <Property name="rows" type="int" value="2"/>
+                    <Property name="verticalGap" type="int" value="5"/>
                   </Layout>
                   <SubComponents>
                     <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNumDepartament">
@@ -215,7 +261,7 @@
                         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                           <ComponentRef name="moGroupOrderByDepartament"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="N&#xfa;mero del departamento"/>
+                        <Property name="text" type="java.lang.String" value="C&#xf3;digo del departamento"/>
                       </Properties>
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNameDepartament">
@@ -226,54 +272,6 @@
                         <Property name="text" type="java.lang.String" value="Nombre del departamento"/>
                       </Properties>
                     </Component>
-                  </SubComponents>
-                </Container>
-                <Container class="javax.swing.JPanel" name="jPanel19">
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                      <BorderConstraints direction="Center"/>
-                    </Constraint>
-                  </Constraints>
-
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
-                  <SubComponents>
-                    <Container class="javax.swing.JPanel" name="jPanel8">
-                      <Properties>
-                        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                            <TitledBorder title="Ordenamiento empleado:"/>
-                          </Border>
-                        </Property>
-                      </Properties>
-                      <Constraints>
-                        <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-                          <BorderConstraints direction="North"/>
-                        </Constraint>
-                      </Constraints>
-
-                      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
-                        <Property name="columns" type="int" value="1"/>
-                        <Property name="rows" type="int" value="2"/>
-                      </Layout>
-                      <SubComponents>
-                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNumEmployee">
-                          <Properties>
-                            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                              <ComponentRef name="moGroupOrderByEmployee"/>
-                            </Property>
-                            <Property name="text" type="java.lang.String" value="N&#xfa;mero del empleado"/>
-                          </Properties>
-                        </Component>
-                        <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNameEmployee">
-                          <Properties>
-                            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                              <ComponentRef name="moGroupOrderByEmployee"/>
-                            </Property>
-                            <Property name="text" type="java.lang.String" value="Nombre del empleado"/>
-                          </Properties>
-                        </Component>
-                      </SubComponents>
-                    </Container>
                   </SubComponents>
                 </Container>
               </SubComponents>

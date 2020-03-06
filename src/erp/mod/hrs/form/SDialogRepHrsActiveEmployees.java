@@ -14,7 +14,7 @@ import sa.lib.gui.bean.SBeanDialogReport;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
    
@@ -58,7 +58,7 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
         moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel2.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
@@ -82,10 +82,10 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setLayout(new java.awt.BorderLayout());
+        jPanel4.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento empleado:"));
-        jPanel8.setLayout(new java.awt.GridLayout(2, 1));
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del empleado:"));
+        jPanel8.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         moGroupOrderByEmployee.add(moRadOrderByNumEmployee);
         moRadOrderByNumEmployee.setText("Número del empleado");
@@ -99,11 +99,11 @@ public class SDialogRepHrsActiveEmployees extends SBeanDialogReport {
 
         jPanel19.setLayout(new java.awt.BorderLayout());
 
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento departamento:"));
-        jPanel10.setLayout(new java.awt.GridLayout(2, 1));
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del departamento:"));
+        jPanel10.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
-        moRadOrderByNumDepartament.setText("Número del departamento");
+        moRadOrderByNumDepartament.setText("Código del departamento");
         jPanel10.add(moRadOrderByNumDepartament);
 
         moGroupOrderByDepartament.add(moRadOrderByNameDepartament);

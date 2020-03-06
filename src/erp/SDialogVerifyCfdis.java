@@ -6,9 +6,7 @@ package erp;
 
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
-import erp.mod.hrs.form.*;
 import erp.mod.SModConsts;
-import erp.mod.hrs.utils.SCsvFileManager;
 import erp.mod.hrs.utils.SReceiptsR;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
@@ -31,14 +29,13 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.event.ActionListener {
     
     private static final String COMMA_DELIMITER = ",";
     private static final int UUID = 0;
     
-    protected SPanelHrsDepartaments moPanelHrsDepartaments;
     protected String msCsvPath;
     protected String msCsvGenPath;
    
@@ -82,7 +79,7 @@ public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.even
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFileGen.setText("Generar Archivo:*");
+        jlFileGen.setText("Generar archivo:*");
         jlFileGen.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlFileGen);
 
@@ -167,6 +164,7 @@ public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.even
             JOptionPane.showMessageDialog(this, "Debe seleccionar un directorio para guardar el archivo");
             return;
         }
+        
         BufferedReader fileReader = null;
         
         try {
@@ -218,10 +216,12 @@ public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.even
 
     @Override
     public void addAllListeners() {
+        
     }
 
     @Override
     public void removeAllListeners() {
+        
     }
     
     @Override
@@ -231,6 +231,7 @@ public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.even
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
+        
     }
 
     @Override
@@ -255,6 +256,7 @@ public class SDialogVerifyCfdis extends SBeanFormDialog implements java.awt.even
     public void actionSave() {
         if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
+                
             }
         }
     }

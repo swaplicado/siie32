@@ -39,7 +39,9 @@
         </Constraint>
       </Constraints>
 
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout">
+        <Property name="verticalGap" type="int" value="5"/>
+      </Layout>
       <SubComponents>
         <Container class="javax.swing.JPanel" name="jPanel2">
           <Constraints>
@@ -101,13 +103,15 @@
             </Constraint>
           </Constraints>
 
-          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout">
+            <Property name="verticalGap" type="int" value="5"/>
+          </Layout>
           <SubComponents>
             <Container class="javax.swing.JPanel" name="jPanel8">
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                    <TitledBorder title="Ordenamiento empleado:"/>
+                    <TitledBorder title="Ordenamiento del empleado:"/>
                   </Border>
                 </Property>
               </Properties>
@@ -120,6 +124,7 @@
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                 <Property name="columns" type="int" value="1"/>
                 <Property name="rows" type="int" value="2"/>
+                <Property name="verticalGap" type="int" value="5"/>
               </Layout>
               <SubComponents>
                 <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNumEmployee">
@@ -153,7 +158,7 @@
                   <Properties>
                     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                       <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                        <TitledBorder title="Ordenamiento departamento:"/>
+                        <TitledBorder title="Ordenamiento del departamento:"/>
                       </Border>
                     </Property>
                   </Properties>
@@ -166,6 +171,7 @@
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                     <Property name="columns" type="int" value="1"/>
                     <Property name="rows" type="int" value="2"/>
+                    <Property name="verticalGap" type="int" value="5"/>
                   </Layout>
                   <SubComponents>
                     <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNumDepartament">
@@ -173,7 +179,7 @@
                         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                           <ComponentRef name="moGroupOrderByDepartament"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="N&#xfa;mero del departamento"/>
+                        <Property name="text" type="java.lang.String" value="C&#xf3;digo del departamento"/>
                       </Properties>
                     </Component>
                     <Component class="sa.lib.gui.bean.SBeanFieldRadio" name="moRadOrderByNameDepartament">

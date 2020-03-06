@@ -27,7 +27,7 @@ import sa.lib.gui.bean.SBeanFieldRadio;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements ChangeListener, ItemListener {
     
@@ -78,7 +78,6 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         jPanel8 = new javax.swing.JPanel();
         moBoolShowGroupDepartament = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel7 = new javax.swing.JPanel();
-        jPanel9 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
@@ -95,18 +94,17 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         jPanel14 = new javax.swing.JPanel();
         moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel19 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
         moRadOrderByNumDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel3 = new javax.swing.JPanel();
+        jpDepartments = new javax.swing.JPanel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel1.setLayout(new java.awt.BorderLayout(5, 5));
 
         jPanel5.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros nómina:"));
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos de la nómina:"));
         jPanel6.setLayout(new java.awt.GridLayout(3, 1));
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -118,7 +116,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         moIntPeriodYear.setEditable(false);
         jPanel10.add(moIntPeriodYear);
 
-        jlPaymentType.setText("Periodo pago:");
+        jlPaymentType.setText("Período pago:");
         jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel10.add(jlPaymentType);
 
@@ -171,9 +169,6 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
 
         jPanel7.setLayout(new java.awt.BorderLayout());
 
-        jPanel9.setPreferredSize(new java.awt.Dimension(100, 135));
-        jPanel9.setLayout(new java.awt.BorderLayout());
-
         jPanel13.setLayout(new java.awt.BorderLayout());
 
         jPanel4.setLayout(new java.awt.BorderLayout());
@@ -214,28 +209,28 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
 
         jPanel4.add(jPanel12, java.awt.BorderLayout.WEST);
 
-        jPanel16.setBorder(javax.swing.BorderFactory.createTitledBorder("Tipo reporte:"));
+        jPanel16.setBorder(javax.swing.BorderFactory.createTitledBorder("Tipo de reporte:"));
         jPanel16.setLayout(new java.awt.GridLayout(5, 1));
 
         jbGrpReportType.add(moRadReportTypeEmpDep);
         moRadReportTypeEmpDep.setSelected(true);
-        moRadReportTypeEmpDep.setText("Por empleado - depto.");
-        moRadReportTypeEmpDep.setPreferredSize(new java.awt.Dimension(150, 23));
+        moRadReportTypeEmpDep.setText("Por empleado y departamento");
+        moRadReportTypeEmpDep.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel16.add(moRadReportTypeEmpDep);
 
         jbGrpReportType.add(moRadReportTypeDepEmp);
-        moRadReportTypeDepEmp.setText("Por depto. - empleado");
-        moRadReportTypeDepEmp.setPreferredSize(new java.awt.Dimension(150, 23));
+        moRadReportTypeDepEmp.setText("Por departamento y empleado");
+        moRadReportTypeDepEmp.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel16.add(moRadReportTypeDepEmp);
 
         jPanel4.add(jPanel16, java.awt.BorderLayout.CENTER);
 
         jPanel13.add(jPanel4, java.awt.BorderLayout.WEST);
 
-        jPanel2.setLayout(new java.awt.GridLayout(2, 0));
+        jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel14.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento empleado:"));
-        jPanel14.setLayout(new java.awt.GridLayout(2, 1));
+        jPanel14.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del empleado:"));
+        jPanel14.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         moGroupOrderByEmployee.add(moRadOrderByNumEmployee);
         moRadOrderByNumEmployee.setText("Número del empleado");
@@ -246,15 +241,13 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         moRadOrderByNameEmployee.setText("Nombre del empleado");
         jPanel14.add(moRadOrderByNameEmployee);
 
-        jPanel2.add(jPanel14);
+        jPanel2.add(jPanel14, java.awt.BorderLayout.NORTH);
 
-        jPanel19.setLayout(new java.awt.BorderLayout());
-
-        jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento departamento:"));
-        jPanel15.setLayout(new java.awt.GridLayout(2, 1));
+        jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del departamento:"));
+        jPanel15.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
-        moRadOrderByNumDepartament.setText("Número del departamento");
+        moRadOrderByNumDepartament.setText("Código del departamento");
         jPanel15.add(moRadOrderByNumDepartament);
 
         moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
@@ -262,18 +255,15 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         moRadOrderByNameDepartament.setText("Nombre del departamento");
         jPanel15.add(moRadOrderByNameDepartament);
 
-        jPanel19.add(jPanel15, java.awt.BorderLayout.NORTH);
-
-        jPanel2.add(jPanel19);
+        jPanel2.add(jPanel15, java.awt.BorderLayout.SOUTH);
 
         jPanel13.add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        jPanel9.add(jPanel13, java.awt.BorderLayout.CENTER);
+        jPanel7.add(jPanel13, java.awt.BorderLayout.NORTH);
 
-        jPanel7.add(jPanel9, java.awt.BorderLayout.NORTH);
-
-        jPanel3.setLayout(new java.awt.BorderLayout());
-        jPanel7.add(jPanel3, java.awt.BorderLayout.CENTER);
+        jpDepartments.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar departamentos:"));
+        jpDepartments.setLayout(new java.awt.BorderLayout());
+        jPanel7.add(jpDepartments, java.awt.BorderLayout.CENTER);
 
         jPanel1.add(jPanel7, java.awt.BorderLayout.CENTER);
 
@@ -289,15 +279,12 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.ButtonGroup jbGrpReport;
     private javax.swing.ButtonGroup jbGrpReportType;
     private javax.swing.JLabel jlDateEnd;
@@ -305,6 +292,7 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlPayrollNumber;
     private javax.swing.JLabel jlYear;
+    private javax.swing.JPanel jpDepartments;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowGroupDepartament;
     private javax.swing.ButtonGroup moGroupOrderByDepartament;
     private javax.swing.ButtonGroup moGroupOrderByEmployee;
@@ -326,6 +314,29 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
     private sa.lib.gui.bean.SBeanFieldText moTextDateStart;
     private sa.lib.gui.bean.SBeanFieldText moTextPaymentType;
     // End of variables declaration//GEN-END:variables
+
+    private void initComponentsCustom() {
+        SGuiUtils.setWindowBounds(this, 880, 550);
+        
+        moRadReportPrePayroll.addChangeListener(this);
+        moRadReportPayroll.addChangeListener(this);
+        moRadReportListEarning.addChangeListener(this);
+        moRadReportListDeductions.addChangeListener(this);
+        moRadReportPayrollSummary.addChangeListener(this);
+        
+        moBoolShowGroupDepartament.addItemListener(this);
+        moBoolShowGroupDepartament.setSelected(true);
+        moRadOrderByNameEmployee.setSelected(true);
+        moRadOrderByNameDepartament.setSelected(true);
+        
+        moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
+
+        jpDepartments.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+
+        moFields.setFormButton(jbPrint);
+        
+        reloadCatalogues();
+    }
 
     private void actionEnableShowGroupDepartament() {
         if (moRadReportListEarning.isSelected() || moRadReportListDeductions.isSelected() || moRadReportPayrollSummary.isSelected()) {
@@ -425,30 +436,8 @@ public class SDialogRepHrsReportsPayroll extends SBeanDialogReport implements Ch
         moTextDateEnd.setValue(SLibUtils.DateFormatDate.format(moPayroll.getDateEnd()));
     }
     
-    private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 800, 500);
-        
-        moRadReportPrePayroll.addChangeListener(this);
-        moRadReportPayroll.addChangeListener(this);
-        moRadReportListEarning.addChangeListener(this);
-        moRadReportListDeductions.addChangeListener(this);
-        moRadReportPayrollSummary.addChangeListener(this);
-        
-        moBoolShowGroupDepartament.addItemListener(this);
-        moBoolShowGroupDepartament.setSelected(true);
-        moRadOrderByNameEmployee.setSelected(true);
-        moRadOrderByNameDepartament.setSelected(true);
-        
-        moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
-
-        jPanel3.add(moPanelHrsDepartaments, BorderLayout.CENTER);
-
-        moFields.setFormButton(jbPrint);
-        
-        reloadCatalogues();
-    }
-
     public void reloadCatalogues() {
+        
     }
 
     @Override

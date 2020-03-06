@@ -32,7 +32,7 @@ import sa.lib.gui.bean.SBeanPanel;
 
 /**
  *
- * @author JBarajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener, ActionListener {
 
@@ -47,6 +47,7 @@ public class SPanelHrsDepartaments extends SBeanPanel implements ItemListener, A
     
     /**
      * Creates new form SPanelHrsDepartaments
+     * @param client GUI client.
      */
     public SPanelHrsDepartaments(final SGuiClient client) {
         setPanelSettings(client);

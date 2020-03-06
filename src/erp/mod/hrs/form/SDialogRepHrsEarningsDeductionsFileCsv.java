@@ -32,7 +32,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog implements ChangeListener {
    
@@ -78,18 +78,17 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
         moKeyDeduction = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        jPanel10 = new javax.swing.JPanel();
-        moRadOrderByNumDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
-        moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel19 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel10 = new javax.swing.JPanel();
+        moRadOrderByNumDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
+        moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel2.setLayout(new java.awt.GridLayout(5, 1));
+        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
 
         jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -102,7 +101,7 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentType.setText("Periodo pago:");
+        jlPaymentType.setText("Período pago:");
         jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlPaymentType);
 
@@ -111,7 +110,7 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
 
         jPanel2.add(jPanel14);
 
-        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 2));
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moGroupFilterTypeEarDed.add(moRadShowEarDed);
         moRadShowEarDed.setText("Percepciones y deducciones");
@@ -120,7 +119,7 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
 
         jPanel2.add(jPanel21);
 
-        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 2));
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moGroupFilterTypeEarDed.add(moRadShowEar);
         moRadShowEar.setText("Percepciones");
@@ -131,7 +130,7 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
 
         jPanel2.add(jPanel15);
 
-        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 2));
+        jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moGroupFilterTypeEarDed.add(moRadShowDed);
         moRadShowDed.setText("Deducciones");
@@ -144,28 +143,13 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setLayout(new java.awt.BorderLayout());
+        jPanel4.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel5.setToolTipText("");
-        jPanel5.setLayout(new java.awt.BorderLayout());
+        jPanel5.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento departamento:"));
-        jPanel10.setLayout(new java.awt.GridLayout(2, 1));
-
-        moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
-        moRadOrderByNumDepartament.setText("Número del departamento");
-        jPanel10.add(moRadOrderByNumDepartament);
-
-        moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
-        moRadOrderByNameDepartament.setText("Nombre del departamento");
-        jPanel10.add(moRadOrderByNameDepartament);
-
-        jPanel5.add(jPanel10, java.awt.BorderLayout.NORTH);
-
-        jPanel19.setLayout(new java.awt.BorderLayout());
-
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento empleado:"));
-        jPanel8.setLayout(new java.awt.GridLayout(2, 1));
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del empleado:"));
+        jPanel8.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         moGroupOrderByEmployee.add(moRadOrderByNumEmployee);
         moRadOrderByNumEmployee.setText("Número del empleado");
@@ -175,9 +159,20 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
         moRadOrderByNameEmployee.setText("Nombre del empleado");
         jPanel8.add(moRadOrderByNameEmployee);
 
-        jPanel19.add(jPanel8, java.awt.BorderLayout.NORTH);
+        jPanel5.add(jPanel8, java.awt.BorderLayout.NORTH);
 
-        jPanel5.add(jPanel19, java.awt.BorderLayout.CENTER);
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del departamento:"));
+        jPanel10.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
+        moRadOrderByNumDepartament.setText("Código del departamento");
+        jPanel10.add(moRadOrderByNumDepartament);
+
+        moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
+        moRadOrderByNameDepartament.setText("Nombre del departamento");
+        jPanel10.add(moRadOrderByNameDepartament);
+
+        jPanel5.add(jPanel10, java.awt.BorderLayout.CENTER);
 
         jPanel4.add(jPanel5, java.awt.BorderLayout.NORTH);
 
@@ -192,7 +187,6 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel17;
-    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel35;
@@ -217,6 +211,43 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
     private sa.lib.gui.bean.SBeanFieldRadio moRadShowEar;
     private sa.lib.gui.bean.SBeanFieldRadio moRadShowEarDed;
     // End of variables declaration//GEN-END:variables
+
+    private void initComponentsCustom() {
+        SGuiUtils.setWindowBounds(this, 720, 450);
+        
+        jbSave.setText("Guardar");
+
+        moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
+        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
+        moRadShowEarDed.setBooleanSettings(SGuiUtils.getLabelName(moRadShowEarDed.getText()), true);
+        moRadShowEar.setBooleanSettings(SGuiUtils.getLabelName(moRadShowEar.getText()), false);
+        moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(moRadShowEar.getText()), false);
+        moRadShowDed.setBooleanSettings(SGuiUtils.getLabelName(moRadShowDed.getText()), false);
+        moKeyDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(moRadShowDed.getText()), false);
+        
+        moFields.addField(moIntPeriodYear);
+        moFields.addField(moKeyPaymentType);
+        moFields.addField(moRadShowEarDed);
+        moFields.addField(moRadShowEar);
+        moFields.addField(moKeyEarning);
+        moFields.addField(moRadShowDed);
+        moFields.addField(moKeyDeduction);
+        moFields.addField(moRadOrderByNumEmployee);
+        moFields.addField(moRadOrderByNameEmployee);
+        moFields.addField(moRadOrderByNumDepartament);
+        moFields.addField(moRadOrderByNameDepartament);
+        
+        moFields.setFormButton(jbSave);
+        moRadShowEarDed.setSelected(true);
+        moRadOrderByNameEmployee.setSelected(true);
+        moRadOrderByNameDepartament.setSelected(true);
+        
+        moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
+        
+        reloadCatalogues();
+        addAllListeners();
+        actionEnableFieldsEarDed();
+    }
 
     private void actionEnableFieldsEarDed() {
         moKeyEarning.setEnabled(moRadShowEarDed.isSelected() || moRadShowEar.isSelected());
@@ -247,7 +278,7 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
 
     private ArrayList<Integer> getPayrollNumbers() throws Exception {
         String sql = "";
-        ArrayList<Integer> anPayrollNumbers = new ArrayList<Integer>();
+        ArrayList<Integer> anPayrollNumbers = new ArrayList<>();
         ResultSet resultSet = null;
         Statement statement = miClient.getSession().getDatabase().getConnection().createStatement();
 
@@ -278,7 +309,7 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
         double dAmount = 0;
         double dTotalAmount = 0;
         Cursor cursor = getCursor();
-        ArrayList<Integer> anNumberPayroll = new ArrayList<Integer>();
+        ArrayList<Integer> anNumberPayroll = new ArrayList<>();
 
         try {
             miClient.getFileChooser().setSelectedFile(new File(getTitle() + " " + ((SClientInterface) miClient).getSessionXXX().getFormatters().getFileNameDatetimeFormat().format(new java.util.Date()) + ".csv"));
@@ -412,43 +443,6 @@ public class SDialogRepHrsEarningsDeductionsFileCsv extends SBeanFormDialog impl
         
     }
     
-    private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 720, 450);
-        
-        jbSave.setText("Guardar");
-
-        moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
-        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
-        moRadShowEarDed.setBooleanSettings(SGuiUtils.getLabelName(moRadShowEarDed.getText()), true);
-        moRadShowEar.setBooleanSettings(SGuiUtils.getLabelName(moRadShowEar.getText()), false);
-        moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(moRadShowEar.getText()), false);
-        moRadShowDed.setBooleanSettings(SGuiUtils.getLabelName(moRadShowDed.getText()), false);
-        moKeyDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(moRadShowDed.getText()), false);
-        
-        moFields.addField(moIntPeriodYear);
-        moFields.addField(moKeyPaymentType);
-        moFields.addField(moRadShowEarDed);
-        moFields.addField(moRadShowEar);
-        moFields.addField(moKeyEarning);
-        moFields.addField(moRadShowDed);
-        moFields.addField(moKeyDeduction);
-        moFields.addField(moRadOrderByNumEmployee);
-        moFields.addField(moRadOrderByNameEmployee);
-        moFields.addField(moRadOrderByNumDepartament);
-        moFields.addField(moRadOrderByNameDepartament);
-        
-        moFields.setFormButton(jbSave);
-        moRadShowEarDed.setSelected(true);
-        moRadOrderByNameEmployee.setSelected(true);
-        moRadOrderByNameDepartament.setSelected(true);
-        
-        moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
-        
-        reloadCatalogues();
-        addAllListeners();
-        actionEnableFieldsEarDed();
-    }
-
     @Override
     public void addAllListeners() {
         moRadShowEarDed.addChangeListener(this);

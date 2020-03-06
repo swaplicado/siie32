@@ -541,7 +541,7 @@ public class SModuleHrs extends SGuiModule {
                         + "ORDER BY sort ";
                 break;
             case SModConsts.HRSS_TP_PAY:
-                settings = new SGuiCatalogueSettings("Tipo periodo pago", 1);
+                settings = new SGuiCatalogueSettings("Tipo período pago", 1);
                 sql = "SELECT id_tp_pay AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
@@ -1294,16 +1294,16 @@ public class SModuleHrs extends SGuiModule {
                 guiReport = new SGuiReport("reps/hrs_pre_pay.jasper", "Prenómina");
                 break;
             case SModConsts.HRSR_EAR:
-                guiReport = new SGuiReport("reps/hrs_pay_ear_aux.jasper", "Percepciones por periodo");
+                guiReport = new SGuiReport("reps/hrs_pay_ear_aux.jasper", "Percepciones por período");
                 break;
             case SModConsts.HRSR_DED:
-                guiReport = new SGuiReport("reps/hrs_pay_ded_aux.jasper", "Deducciones por periodo");
+                guiReport = new SGuiReport("reps/hrs_pay_ded_aux.jasper", "Deducciones por período");
                 break;
             case SModConsts.HRSR_EAR_EMP:
-                guiReport = new SGuiReport("reps/hrs_pay_ear_aux.jasper", "Percepciones por empleado por periodo");
+                guiReport = new SGuiReport("reps/hrs_pay_ear_aux.jasper", "Percepciones por empleado por período");
                 break;
             case SModConsts.HRSR_DED_EMP:
-                guiReport = new SGuiReport("reps/hrs_pay_ded_aux.jasper", "Deducciones por empleado por periodo");
+                guiReport = new SGuiReport("reps/hrs_pay_ded_aux.jasper", "Deducciones por empleado por período");
                 break;
             case SModConsts.HRSR_PAY_TAX:
                 guiReport = new SGuiReport("reps/hrs_pay_tax.jasper", "Impuesto sobre nóminas");
@@ -1324,7 +1324,7 @@ public class SModuleHrs extends SGuiModule {
                 guiReport = new SGuiReport("reps/hrs_pay_list_ded.jasper", "Listado de deducciones");
                 break;
             case SModConsts.HRSR_ACT_EMP:
-                guiReport = new SGuiReport("reps/hrs_emp_act_by_period.jasper", "Reporte de empleados activos por periodo");
+                guiReport = new SGuiReport("reps/hrs_emp_act_by_period.jasper", "Reporte de empleados activos por período");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

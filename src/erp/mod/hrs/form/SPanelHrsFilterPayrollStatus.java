@@ -13,7 +13,7 @@ import sa.lib.gui.bean.SBeanPanel;
 
 /**
  *
- * @author JBarajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SPanelHrsFilterPayrollStatus extends SBeanPanel {
 
@@ -57,12 +57,12 @@ public class SPanelHrsFilterPayrollStatus extends SBeanPanel {
 
         moGroupStatus.add(moRadUndef);
         moRadUndef.setText("Todas");
-        moRadUndef.setPreferredSize(new java.awt.Dimension(75, 23));
+        moRadUndef.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel1.add(moRadUndef);
 
         moGroupStatus.add(moRadClose);
         moRadClose.setText("Cerradas");
-        moRadClose.setPreferredSize(new java.awt.Dimension(75, 23));
+        moRadClose.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel1.add(moRadClose);
 
         moGroupStatus.add(moRadOpen);

@@ -31,7 +31,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
     
@@ -70,7 +70,7 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
         jPanel6 = new javax.swing.JPanel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel2.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
@@ -85,7 +85,7 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentType.setText("Periodo pago:");
+        jlPaymentType.setText("Período pago:");
         jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlPaymentType);
 
@@ -96,6 +96,7 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar departamentos:"));
         jPanel6.setLayout(new java.awt.BorderLayout());
         jPanel1.add(jPanel6, java.awt.BorderLayout.CENTER);
 
@@ -115,6 +116,28 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
     private sa.lib.gui.bean.SBeanFieldKey moKeyPaymentType;
     private javax.swing.ButtonGroup moRadGroupFilterType;
     // End of variables declaration//GEN-END:variables
+
+    private void initComponentsCustom() {
+        SGuiUtils.setWindowBounds(this, 560, 350);
+        
+        moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
+        
+        jbSave.setText("Guardar");
+
+        moDateDateCut.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCut.getText()), true);
+        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
+
+        jPanel6.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+        
+        moFields.addField(moDateDateCut);
+        moFields.addField(moKeyPaymentType);
+        
+        moFields.setFormButton(jbSave);
+        
+        moDateDateCut.setValue(miClient.getSession().getCurrentDate());
+        
+        reloadCatalogues();
+    }
 
     private void computeReport() {
         String sql = "";
@@ -234,28 +257,6 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
         
     }
     
-    private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 480, 300);
-        
-        moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
-        
-        jbSave.setText("Guardar");
-
-        moDateDateCut.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCut.getText()), true);
-        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
-
-        jPanel6.add(moPanelHrsDepartaments, BorderLayout.CENTER);
-        
-        moFields.addField(moDateDateCut);
-        moFields.addField(moKeyPaymentType);
-        
-        moFields.setFormButton(jbSave);
-        
-        moDateDateCut.setValue(miClient.getSession().getCurrentDate());
-        
-        reloadCatalogues();
-    }
-
     @Override
     public void addAllListeners() {
     }

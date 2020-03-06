@@ -91,6 +91,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         jlPaymentType = new javax.swing.JLabel();
         moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
         jpFilterStatusPay = new javax.swing.JPanel();
+        jlFilterStatusPayTemp = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
@@ -101,14 +102,14 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel2.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moRadGroupFilterType.add(moRadFilterTypePeriod);
-        moRadFilterTypePeriod.setText("Por periodo");
+        moRadFilterTypePeriod.setText("Por período");
         jPanel3.add(moRadFilterTypePeriod);
 
         moRadGroupFilterType.add(moRadFilterTypeDate);
@@ -170,7 +171,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentType.setText("Periodo pago:");
+        jlPaymentType.setText("Período pago:");
         jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlPaymentType);
 
@@ -180,14 +181,18 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         jPanel2.add(jPanel14);
 
         jpFilterStatusPay.setLayout(new java.awt.BorderLayout());
+
+        jlFilterStatusPayTemp.setText("<Temporal label. Preserve if for panel to be added!>");
+        jpFilterStatusPay.add(jlFilterStatusPayTemp, java.awt.BorderLayout.CENTER);
+
         jPanel2.add(jpFilterStatusPay);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setLayout(new java.awt.BorderLayout());
+        jPanel4.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento empleado:"));
-        jPanel8.setLayout(new java.awt.GridLayout(2, 1));
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del empleado:"));
+        jPanel8.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         moGroupOrderByEmployee.add(moRadOrderByNumEmployee);
         moRadOrderByNumEmployee.setText("Número del empleado");
@@ -201,8 +206,8 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
 
         jPanel19.setLayout(new java.awt.BorderLayout());
 
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento departamento:"));
-        jPanel10.setLayout(new java.awt.GridLayout(2, 1));
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Ordenamiento del departamento:"));
+        jPanel10.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
         moRadOrderByNumDepartament.setText("Código del departamento");
@@ -237,6 +242,7 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     private javax.swing.JPanel jPanel8;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
+    private javax.swing.JLabel jlFilterStatusPayTemp;
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlPeriodEnd;
     private javax.swing.JLabel jlPeriodStart;
@@ -259,6 +265,63 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumDepartament;
     private sa.lib.gui.bean.SBeanFieldRadio moRadOrderByNumEmployee;
     // End of variables declaration//GEN-END:variables
+
+    private void initComponentsCustom() {
+        SGuiUtils.setWindowBounds(this, 800, 500);
+        
+        moPanelHrsFilterPayrollStatus = new SPanelHrsFilterPayrollStatus(miClient);
+        jpFilterStatusPay.remove(jlFilterStatusPayTemp);
+        jpFilterStatusPay.add(moPanelHrsFilterPayrollStatus, BorderLayout.CENTER);
+        moPanelHrsFilterPayrollStatus.setSelectedAll();
+        
+        jbSave.setText("Guardar");
+
+        moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
+        moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
+        moRadFilterTypeDatePay.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDatePay.getText()), false);
+        moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
+        moIntPeriodStart.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()));
+        moIntPeriodEnd.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()));
+        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
+        moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
+        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
+        
+        moFields.addField(moRadFilterTypePeriod);
+        moFields.addField(moRadFilterTypeDate);
+        moFields.addField(moRadFilterTypeDatePay);
+        
+        moFields.addField(moIntPeriodYear);
+        moFields.addField(moIntPeriodStart);
+        moFields.addField(moIntPeriodEnd);
+        moFields.addField(moDateDateStart);
+        moFields.addField(moDateDateEnd);
+        moFields.addField(moKeyPaymentType);
+        moFields.addField(moRadOrderByNumEmployee);
+        moFields.addField(moRadOrderByNameEmployee);
+        moFields.addField(moRadOrderByNumDepartament);
+        moFields.addField(moRadOrderByNameDepartament);
+        
+        moFields.setFormButton(jbSave);
+        
+        moRadFilterTypePeriod.addChangeListener(this);
+        moRadFilterTypeDate.addChangeListener(this);
+        moRadFilterTypeDatePay.addChangeListener(this);
+        
+        Date start = SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate());
+        Date end = SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate());
+        
+        moRadFilterTypePeriod.setSelected(true);
+        moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
+        moIntPeriodStart.setValue(SLibTimeUtils.digestMonth(start)[1]);
+        moIntPeriodEnd.setValue(SLibTimeUtils.digestMonth(end)[1]);
+        moDateDateStart.setValue(start);
+        moDateDateEnd.setValue(end);
+        moRadOrderByNameEmployee.setSelected(true);
+        moRadOrderByNameDepartament.setSelected(true);
+        
+        reloadCatalogues();
+        actionEnableFields();
+    }
 
     private void actionEnableFields() {
         if (moRadFilterTypePeriod.isSelected()) {
@@ -550,62 +613,6 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
         }
     }
     
-    private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 720, 450);
-        
-        moPanelHrsFilterPayrollStatus = new SPanelHrsFilterPayrollStatus(miClient);
-        jpFilterStatusPay.add(moPanelHrsFilterPayrollStatus, BorderLayout.CENTER);
-        moPanelHrsFilterPayrollStatus.setSelectedAll();
-        
-        jbSave.setText("Guardar");
-
-        moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
-        moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
-        moRadFilterTypeDatePay.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDatePay.getText()), false);
-        moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
-        moIntPeriodStart.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()));
-        moIntPeriodEnd.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()));
-        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
-        moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
-        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
-        
-        moFields.addField(moRadFilterTypePeriod);
-        moFields.addField(moRadFilterTypeDate);
-        moFields.addField(moRadFilterTypeDatePay);
-        
-        moFields.addField(moIntPeriodYear);
-        moFields.addField(moIntPeriodStart);
-        moFields.addField(moIntPeriodEnd);
-        moFields.addField(moDateDateStart);
-        moFields.addField(moDateDateEnd);
-        moFields.addField(moKeyPaymentType);
-        moFields.addField(moRadOrderByNumEmployee);
-        moFields.addField(moRadOrderByNameEmployee);
-        moFields.addField(moRadOrderByNumDepartament);
-        moFields.addField(moRadOrderByNameDepartament);
-        
-        moFields.setFormButton(jbSave);
-        
-        moRadFilterTypePeriod.addChangeListener(this);
-        moRadFilterTypeDate.addChangeListener(this);
-        moRadFilterTypeDatePay.addChangeListener(this);
-        
-        Date start = SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate());
-        Date end = SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate());
-        
-        moRadFilterTypePeriod.setSelected(true);
-        moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
-        moIntPeriodStart.setValue(SLibTimeUtils.digestMonth(start)[1]);
-        moIntPeriodEnd.setValue(SLibTimeUtils.digestMonth(end)[1]);
-        moDateDateStart.setValue(start);
-        moDateDateEnd.setValue(end);
-        moRadOrderByNameEmployee.setSelected(true);
-        moRadOrderByNameDepartament.setSelected(true);
-        
-        reloadCatalogues();
-        actionEnableFields();
-    }
-
     @Override
     public void addAllListeners() {
     }

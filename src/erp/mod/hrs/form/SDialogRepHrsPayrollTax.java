@@ -23,7 +23,7 @@ import sa.lib.gui.bean.SBeanFieldRadio;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements ChangeListener {
     
@@ -72,21 +72,22 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         jPanel12 = new javax.swing.JPanel();
         jlDateEnd = new javax.swing.JLabel();
         moDateDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
-        jpFilterStatusPay = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         moKeyPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel4 = new javax.swing.JPanel();
+        jpFilterStatusPay = new javax.swing.JPanel();
+        jlFilterStatusPayTemp = new javax.swing.JLabel();
+        jpDepartments = new javax.swing.JPanel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
 
         jPanel2.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moRadGroupFilterType.add(moRadFilterTypePeriod);
-        moRadFilterTypePeriod.setText("Por periodo");
+        moRadFilterTypePeriod.setText("Por período");
         jPanel3.add(moRadFilterTypePeriod);
 
         moRadGroupFilterType.add(moRadFilterTypeDate);
@@ -146,12 +147,9 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
 
         jPanel2.add(jPanel12);
 
-        jpFilterStatusPay.setLayout(new java.awt.BorderLayout());
-        jPanel2.add(jpFilterStatusPay);
-
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaymentType.setText("Periodo pago:");
+        jlPaymentType.setText("Período pago:");
         jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlPaymentType);
 
@@ -160,10 +158,18 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
 
         jPanel2.add(jPanel14);
 
+        jpFilterStatusPay.setLayout(new java.awt.BorderLayout());
+
+        jlFilterStatusPayTemp.setText("<Temporal label. Preserve if for panel to be added!>");
+        jpFilterStatusPay.add(jlFilterStatusPayTemp, java.awt.BorderLayout.CENTER);
+
+        jPanel2.add(jpFilterStatusPay);
+
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel4.setLayout(new java.awt.BorderLayout());
-        jPanel1.add(jPanel4, java.awt.BorderLayout.CENTER);
+        jpDepartments.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar departamentos:"));
+        jpDepartments.setLayout(new java.awt.BorderLayout());
+        jPanel1.add(jpDepartments, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -178,13 +184,14 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel37;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
+    private javax.swing.JLabel jlFilterStatusPayTemp;
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlPeriodEnd;
     private javax.swing.JLabel jlPeriodStart;
     private javax.swing.JLabel jlYear;
+    private javax.swing.JPanel jpDepartments;
     private javax.swing.JPanel jpFilterStatusPay;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
@@ -198,33 +205,8 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
     private javax.swing.ButtonGroup moRadGroupFilterType;
     // End of variables declaration//GEN-END:variables
 
-    public void actionEnableFields() {
-        if (moRadFilterTypePeriod.isSelected()) {
-            moIntPeriodYear.setEnabled(true);
-            moIntPeriodStart.setEnabled(true);    
-            moIntPeriodEnd.setEnabled(true);
-            moDateDateStart.setEnabled(false);
-            moDateDateEnd.setEnabled(false);
-            moPanelHrsFilterPayrollStatus.setSelectedAll();
-        }
-        else if (moRadFilterTypeDate.isSelected() || moRadFilterTypeDatePay.isSelected()) {
-            moIntPeriodYear.setEnabled(false);
-            moIntPeriodStart.setEnabled(false);    
-            moIntPeriodEnd.setEnabled(false);
-            moDateDateStart.setEnabled(true);
-            moDateDateEnd.setEnabled(true);
-            
-            if (moRadFilterTypeDatePay.isSelected()) {
-                moPanelHrsFilterPayrollStatus.setSelectedClose();
-            }
-            else {
-                moPanelHrsFilterPayrollStatus.setSelectedAll();
-            }
-        }
-    }
-    
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 720, 450);
+        SGuiUtils.setWindowBounds(this, 800, 500);
         
         moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
         moPanelHrsFilterPayrollStatus = new SPanelHrsFilterPayrollStatus(miClient);
@@ -238,7 +220,8 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
         moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
 
-        jPanel4.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+        jpDepartments.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+        jpFilterStatusPay.remove(jlFilterStatusPayTemp);
         jpFilterStatusPay.add(moPanelHrsFilterPayrollStatus, BorderLayout.CENTER);
         moPanelHrsFilterPayrollStatus.setSelectedAll();
         
@@ -269,6 +252,31 @@ public class SDialogRepHrsPayrollTax extends SBeanDialogReport implements Change
         actionEnableFields();
     }
 
+    public void actionEnableFields() {
+        if (moRadFilterTypePeriod.isSelected()) {
+            moIntPeriodYear.setEnabled(true);
+            moIntPeriodStart.setEnabled(true);    
+            moIntPeriodEnd.setEnabled(true);
+            moDateDateStart.setEnabled(false);
+            moDateDateEnd.setEnabled(false);
+            moPanelHrsFilterPayrollStatus.setSelectedAll();
+        }
+        else if (moRadFilterTypeDate.isSelected() || moRadFilterTypeDatePay.isSelected()) {
+            moIntPeriodYear.setEnabled(false);
+            moIntPeriodStart.setEnabled(false);    
+            moIntPeriodEnd.setEnabled(false);
+            moDateDateStart.setEnabled(true);
+            moDateDateEnd.setEnabled(true);
+            
+            if (moRadFilterTypeDatePay.isSelected()) {
+                moPanelHrsFilterPayrollStatus.setSelectedClose();
+            }
+            else {
+                moPanelHrsFilterPayrollStatus.setSelectedAll();
+            }
+        }
+    }
+    
     public void reloadCatalogues() {
         miClient.getSession().populateCatalogue(moKeyPaymentType, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
     }

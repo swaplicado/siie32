@@ -4,7 +4,6 @@
  */
 package erp;
 
-import erp.mod.hrs.form.*;
 import erp.mod.SModConsts;
 import erp.mod.hrs.utils.SCsvFileManager;
 import erp.mod.hrs.utils.SInputData;
@@ -26,11 +25,10 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.ActionListener {
     
-    protected SPanelHrsDepartaments moPanelHrsDepartaments;
     protected String msCsvPath;
     protected String msCsvGenPath;
     
@@ -103,7 +101,7 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlFileGen.setText("Generar Archivo:*");
+        jlFileGen.setText("Generar archivo:*");
         jlFileGen.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlFileGen);
 
@@ -149,7 +147,7 @@ public class SDialogCfdR extends SBeanFormDialog implements java.awt.event.Actio
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDateCut.setText("Cargar Archivo:*");
+        jlDateCut.setText("Cargar archivo:*");
         jlDateCut.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jlDateCut);
 

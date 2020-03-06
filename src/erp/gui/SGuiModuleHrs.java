@@ -41,7 +41,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas
+ * @author Sergio Flores, Juan Barajas, Sergio Flores
  */
 public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -142,13 +142,13 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiImpCfdiSendingLog;
     
     private javax.swing.JMenu jmRep;
-    private javax.swing.JMenuItem jmiRepPayrollEarningsDeductions;
     private javax.swing.JMenuItem jmiRepPayrollEarnings;
     private javax.swing.JMenuItem jmiRepPayrollEarningsByEmployee;
     private javax.swing.JMenuItem jmiRepPayrollDeductions;
     private javax.swing.JMenuItem jmiRepPayrollDeductionsByEmployee;
-    private javax.swing.JMenuItem jmiRepPayrollTax;
     private javax.swing.JMenuItem jmiRepPayrollAux;
+    private javax.swing.JMenuItem jmiRepPayrollEarningsDeductions;
+    private javax.swing.JMenuItem jmiRepPayrollTax;
     private javax.swing.JMenuItem jmiRepPayrollWageSalaryFileCsv;
     private javax.swing.JMenuItem jmiRepPayrollEarDedFileCsv;
     private javax.swing.JMenuItem jmiRepVacationsFileCsv;
@@ -228,11 +228,11 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatWorkerType = new JMenuItem("Tipos de obrero");
         jmiCatEmployeeDismissType = new JMenuItem("Tipos de baja");
         jmiCatMwzType = new JMenuItem("Áreas geográficas");
-        jmiCatWorkerTypeSalary = new JMenuItem("Salarios diarios por tipo de obrero");
-        jmiCatLoanTypeAdjustment = new JMenuItem("Ajustes por tipo de crédito/préstamo");
         jmiCatMwzTypeWage = new JMenuItem("Salarios mínimos de áreas geográficas");
         jmiCatUma = new JMenuItem("Unidades de Medida y Actualización (UMA)");
         jmiCatUmi = new JMenuItem("Unidades Mixtas INFONAVIT (UMI)");
+        jmiCatWorkerTypeSalary = new JMenuItem("Salarios diarios por tipo de obrero");
+        jmiCatLoanTypeAdjustment = new JMenuItem("Ajustes por tipo de crédito/préstamo");
         jmiCatAbsenceType = new JMenuItem("Tipos de incidencia");
         jmiCatAbsenceClass = new JMenuItem("Clases de incidencia");
 
@@ -244,7 +244,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatEmployeeHireLog);
         jmCat.add(jmiCatEmployeeWageLog);
         jmCat.add(jmiCatEmployeeSscBaseLog);
-        //jmCat.add(jmiCatEmployeeSscBaseUpdate); XXX (2016-10-25) jbarajas is necesary revision
+        jmCat.add(jmiCatEmployeeSscBaseUpdate);
         jmCat.addSeparator();
         jmCat.add(jmiCatEarnings);
         jmCat.add(jmiCatDeductions);
@@ -375,28 +375,27 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmImp.add(jmImpCfdi);
 
         jmRep = new JMenu("Reportes");
-        jmiRepPayrollEarningsDeductions = new JMenuItem("Percepciones y deducciones por periodo...");
-        jmiRepPayrollEarnings = new JMenuItem("Percepciones por periodo...");
-        jmiRepPayrollEarningsByEmployee = new JMenuItem("Percepciones por empleado por periodo...");
-        jmiRepPayrollDeductions = new JMenuItem("Deducciones por periodo...");
-        jmiRepPayrollDeductionsByEmployee = new JMenuItem("Deducciones por empleado por periodo...");
-        jmiRepPayrollTax = new JMenuItem("Impuesto sobre nóminas...");
+        jmiRepPayrollEarnings = new JMenuItem("Percepciones por período...");
+        jmiRepPayrollEarningsByEmployee = new JMenuItem("Percepciones por empleado por período...");
+        jmiRepPayrollDeductions = new JMenuItem("Deducciones por período...");
+        jmiRepPayrollDeductionsByEmployee = new JMenuItem("Deducciones por empleado por período...");
         jmiRepPayrollAux = new JMenuItem("Auxiliares de nóminas...");
+        jmiRepPayrollEarningsDeductions = new JMenuItem("Percepciones y deducciones por período...");
+        jmiRepPayrollTax = new JMenuItem("Impuesto sobre nóminas...");
         jmiRepPayrollWageSalaryFileCsv = new JMenuItem("Archivo CSV para declaración informativa de sueldos y salarios...");
         jmiRepPayrollEarDedFileCsv = new JMenuItem("Archivo CSV de percepciones y deducciones en el ejercicio...");
         jmiRepVacationsFileCsv = new JMenuItem("Archivo CSV de vacaciones pendientes...");
-        jmiRepEmployeeActiveByPeriod = new JMenuItem("Reporte de empleados activos por periodo...");
+        jmiRepEmployeeActiveByPeriod = new JMenuItem("Reporte de empleados activos por período...");
         
-        jmRep.add(jmiRepPayrollTax);
-        jmRep.addSeparator();
-        jmRep.add(jmiRepPayrollEarningsDeductions);
-        /*
-        jmRep.add(jmiRepPayrollEarnings);
-        jmRep.add(jmiRepPayrollEarningsByEmployee);
-        jmRep.add(jmiRepPayrollDeductions);
-        jmRep.add(jmiRepPayrollDeductionsByEmployee);
-        */
+        //jmRep.add(jmiRepPayrollEarnings);
+        //jmRep.add(jmiRepPayrollEarningsByEmployee);
+        //jmRep.add(jmiRepPayrollDeductions);
+        //jmRep.add(jmiRepPayrollDeductionsByEmployee);
+        //jmRep.addSeparator();
         jmRep.add(jmiRepPayrollAux);
+        jmRep.add(jmiRepPayrollEarningsDeductions);
+        jmRep.addSeparator();
+        jmRep.add(jmiRepPayrollTax);
         jmRep.addSeparator();
         jmRep.add(jmiRepPayrollWageSalaryFileCsv);
         jmRep.add(jmiRepPayrollEarDedFileCsv);
@@ -489,13 +488,13 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiImpCfdiStampSignPending.addActionListener(this);
         jmiImpCfdiSendingLog.addActionListener(this);
         
-        jmiRepPayrollEarningsDeductions.addActionListener(this);
         jmiRepPayrollEarnings.addActionListener(this);
-        jmiRepPayrollDeductions.addActionListener(this);
         jmiRepPayrollEarningsByEmployee.addActionListener(this);
+        jmiRepPayrollDeductions.addActionListener(this);
         jmiRepPayrollDeductionsByEmployee.addActionListener(this);
-        jmiRepPayrollTax.addActionListener(this);
         jmiRepPayrollAux.addActionListener(this);
+        jmiRepPayrollEarningsDeductions.addActionListener(this);
+        jmiRepPayrollTax.addActionListener(this);
         jmiRepPayrollWageSalaryFileCsv.addActionListener(this);
         jmiRepPayrollEarDedFileCsv.addActionListener(this);
         jmiRepVacationsFileCsv.addActionListener(this);
@@ -569,13 +568,13 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiBenAdvanceSettlement.setEnabled(isPermissionPay || isPermissionPayWee || isPermissionPayFor);
         
         jmPay.setEnabled(isPermissionPay || isPermissionPayWee || isPermissionPayFor);
-        jmPayCfdi.setEnabled(isPermissionPay);
         jmiPayPayrollWeekly.setEnabled(isPermissionPay || isPermissionPayWee);
         jmiPayPayrollWeeklyRec.setEnabled(isPermissionPay || isPermissionPayWee);
         jmiPayPayrollFortnightly.setEnabled(isPermissionPay || isPermissionPayFor);
         jmiPayPayrollFortnightlyRowRec.setEnabled(isPermissionPay || isPermissionPayFor);
         jmiPayCfdiPayroll.setEnabled(isPermissionPay);
         jmiPayCfdiPayrollRec.setEnabled(isPermissionPay);
+        jmPayCfdi.setEnabled(isPermissionPay);
         jmiPayCfdiStampSign.setEnabled(isPermissionPay);
         jmiPayCfdiStampSignPending.setEnabled(isPermissionPay);
         jmiPayCfdiSendingLog.setEnabled(isPermissionPay);
@@ -598,18 +597,22 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiImpCfdiPayroll.setEnabled(true);
         jmiImpCfdiPayrollDetail.setEnabled(true);
         jmImpCfdi.setEnabled(true);
+        jmiImpCfdiStampSign.setEnabled(true);
+        jmiImpCfdiStampSignPending.setEnabled(true);
+        jmiImpCfdiSendingLog.setEnabled(true);
         
         jmRep.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_REP).HasRight);
-        jmiRepPayrollEarningsDeductions.setEnabled(true);
         jmiRepPayrollEarnings.setEnabled(true);
-        jmiRepPayrollDeductions.setEnabled(true);
         jmiRepPayrollEarningsByEmployee.setEnabled(true);
+        jmiRepPayrollDeductions.setEnabled(true);
         jmiRepPayrollDeductionsByEmployee.setEnabled(true);
-        jmiRepPayrollTax.setEnabled(true);
         jmiRepPayrollAux.setEnabled(true);
+        jmiRepPayrollEarningsDeductions.setEnabled(true);
+        jmiRepPayrollTax.setEnabled(true);
         jmiRepPayrollWageSalaryFileCsv.setEnabled(true);
         jmiRepPayrollEarDedFileCsv.setEnabled(true);
         jmiRepVacationsFileCsv.setEnabled(true);
+        jmiRepEmployeeActiveByPeriod.setEnabled(true);
         
         // GUI configuration:
         
@@ -1035,26 +1038,26 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiImpCfdiSendingLog) {
                 showView(SDataConstants.TRN_CFD_SND_LOG, SCfdConsts.CFDI_PAYROLL_VER_OLD);
             }
-            else if (item == jmiRepPayrollEarningsDeductions) {
-                new SDialogRepHrsEarningDeduction((SGuiClient) miClient, "Percepciones y deducciones por periodo").setFormVisible(true);
-            }
             else if (item == jmiRepPayrollEarnings) {
-                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_EAR, "Percepciones por periodo").setFormVisible(true);
-            }
-            else if (item == jmiRepPayrollDeductions) {
-                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_DED, "Deducciones por periodo").setFormVisible(true);
+                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_EAR, "Percepciones por período").setFormVisible(true);
             }
             else if (item == jmiRepPayrollEarningsByEmployee) {
-                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_EAR_EMP, "Percepciones por empleado por periodo").setFormVisible(true);
+                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_EAR_EMP, "Percepciones por empleado por período").setFormVisible(true);
+            }
+            else if (item == jmiRepPayrollDeductions) {
+                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_DED, "Deducciones por período").setFormVisible(true);
             }
             else if (item == jmiRepPayrollDeductionsByEmployee) {
-                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_DED_EMP, "Deducciones por empleado por periodo").setFormVisible(true);
-            }
-            else if (item == jmiRepPayrollTax) {
-                new SDialogRepHrsPayrollTax((SGuiClient) miClient, "Impuesto sobre nóminas").setFormVisible(true);
+                new SDialogRepHrsEarDed((SGuiClient) miClient, SModConsts.HRSR_DED_EMP, "Deducciones por empleado por período").setFormVisible(true);
             }
             else if (item == jmiRepPayrollAux) {
                new SDialogRepHrsAuxPayroll((SGuiClient) miClient, "Auxiliares de nóminas").setFormVisible(true);
+            }
+            else if (item == jmiRepPayrollEarningsDeductions) {
+                new SDialogRepHrsEarningDeduction((SGuiClient) miClient, "Percepciones y deducciones por período").setFormVisible(true);
+            }
+            else if (item == jmiRepPayrollTax) {
+                new SDialogRepHrsPayrollTax((SGuiClient) miClient, "Impuesto sobre nóminas").setFormVisible(true);
             }
             else if (item == jmiRepPayrollWageSalaryFileCsv) {
                 new SDialogRepHrsPayrollWageSalaryFileCsv((SGuiClient) miClient, "Archivo CSV para declaración informativa de sueldos y salarios").setFormVisible(true);
@@ -1066,7 +1069,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                 new SDialogRepVacationsFileCsv((SGuiClient) miClient, "Archivo CSV de vacaciones pendientes").setFormVisible(true);
             }
             else if (item == jmiRepEmployeeActiveByPeriod) {
-                new SDialogRepHrsActiveEmployees((SGuiClient) miClient, "Reporte de empleados activos por periodo").setFormVisible(true);
+                new SDialogRepHrsActiveEmployees((SGuiClient) miClient, "Reporte de empleados activos por período").setFormVisible(true);
             }
         }
     }

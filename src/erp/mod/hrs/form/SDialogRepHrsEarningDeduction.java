@@ -27,7 +27,7 @@ import sa.lib.gui.bean.SBeanFieldRadio;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements ChangeListener, ItemListener {
     
@@ -79,7 +79,6 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moRadReportTypeDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel27 = new javax.swing.JPanel();
         moRadReportTypeDepartamentEmp = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel29 = new javax.swing.JPanel();
         jPanel23 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
@@ -124,6 +123,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jlDateEnd = new javax.swing.JLabel();
         moDateDateEnd = new sa.lib.gui.bean.SBeanFieldDate();
         jpFilterStatusPay = new javax.swing.JPanel();
+        jlFilterStatusPayTemp = new javax.swing.JLabel();
         jPanel9 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         moRadOrderByNumEmployee = new sa.lib.gui.bean.SBeanFieldRadio();
@@ -132,7 +132,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jPanel10 = new javax.swing.JPanel();
         moRadOrderByNumDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadOrderByNameDepartament = new sa.lib.gui.bean.SBeanFieldRadio();
-        jPanel3 = new javax.swing.JPanel();
+        jpDepartments = new javax.swing.JPanel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel1.setLayout(new java.awt.BorderLayout(0, 5));
@@ -191,9 +191,6 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jPanel27.add(moRadReportTypeDepartamentEmp);
 
         jPanel22.add(jPanel27);
-
-        jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-        jPanel22.add(jPanel29);
 
         jPanel24.add(jPanel22, java.awt.BorderLayout.NORTH);
 
@@ -300,7 +297,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         moGroupFilterDateType.add(moRadFilterTypePeriod);
-        moRadFilterTypePeriod.setText("Por periodo");
+        moRadFilterTypePeriod.setText("Por período");
         jPanel4.add(moRadFilterTypePeriod);
 
         moGroupFilterDateType.add(moRadFilterTypeDate);
@@ -326,7 +323,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
 
         jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPeriodStart.setText("Periodo inicial:*");
+        jlPeriodStart.setText("Período inicial:*");
         jlPeriodStart.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel36.add(jlPeriodStart);
         jPanel36.add(moIntPeriodStart);
@@ -335,7 +332,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
 
         jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPeriodEnd.setText("Periodo final:*");
+        jlPeriodEnd.setText("Período final:*");
         jlPeriodEnd.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel37.add(jlPeriodEnd);
         jPanel37.add(moIntPeriodEnd);
@@ -361,6 +358,10 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jPanel6.add(jPanel12);
 
         jpFilterStatusPay.setLayout(new java.awt.BorderLayout());
+
+        jlFilterStatusPayTemp.setText("<Temporal label. Preserve if for panel to be added!>");
+        jpFilterStatusPay.add(jlFilterStatusPayTemp, java.awt.BorderLayout.CENTER);
+
         jPanel6.add(jpFilterStatusPay);
 
         jPanel7.add(jPanel6, java.awt.BorderLayout.NORTH);
@@ -386,7 +387,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jPanel10.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
         moGroupOrderByDepartament.add(moRadOrderByNumDepartament);
-        moRadOrderByNumDepartament.setText("Número del departamento");
+        moRadOrderByNumDepartament.setText("Código del departamento");
         jPanel10.add(moRadOrderByNumDepartament);
 
         moGroupOrderByDepartament.add(moRadOrderByNameDepartament);
@@ -403,8 +404,9 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
-        jPanel3.setLayout(new java.awt.BorderLayout());
-        jPanel1.add(jPanel3, java.awt.BorderLayout.CENTER);
+        jpDepartments.setBorder(javax.swing.BorderFactory.createTitledBorder("Seleccionar departamentos:"));
+        jpDepartments.setLayout(new java.awt.BorderLayout());
+        jPanel1.add(jpDepartments, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -431,8 +433,6 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
     private javax.swing.JPanel jPanel28;
-    private javax.swing.JPanel jPanel29;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel37;
@@ -445,10 +445,12 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlEmployee;
+    private javax.swing.JLabel jlFilterStatusPayTemp;
     private javax.swing.JLabel jlPaymentType;
     private javax.swing.JLabel jlPeriodEnd;
     private javax.swing.JLabel jlPeriodStart;
     private javax.swing.JLabel jlYear;
+    private javax.swing.JPanel jpDepartments;
     private javax.swing.JPanel jpFilterStatusPay;
     private javax.swing.JToggleButton jtbEmployeeActive;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateEnd;
@@ -486,6 +488,104 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     private sa.lib.gui.bean.SBeanFieldRadio moRadShowEar;
     private sa.lib.gui.bean.SBeanFieldRadio moRadShowEarDed;
     // End of variables declaration//GEN-END:variables
+
+    private void initComponentsCustom() {
+        SGuiUtils.setWindowBounds(this, 1024, 640);
+        
+        mnFilterEmpStatus = SLibConsts.UNDEFINED;
+        moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
+        moPanelHrsFilterPayrollStatus = new SPanelHrsFilterPayrollStatus(miClient);
+
+        moRadReportTypeEarDed.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypeEarDed.getText()), true);
+        moRadReportTypeEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypeEmployee.getText()), false);
+        moRadReportTypeEmployeeDep.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypeEmployeeDep.getText()), false);
+        moRadReportTypeDepartament.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypeDepartament.getText()), false);
+        moRadReportTypeDepartamentEmp.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypeDepartamentEmp.getText()), false);
+        moRadShowEarDed.setBooleanSettings(SGuiUtils.getLabelName(moRadShowEarDed.getText()), true);
+        moRadShowEar.setBooleanSettings(SGuiUtils.getLabelName(moRadShowEar.getText()), false);
+        moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(moRadShowEar.getText()), false);
+        moRadShowDed.setBooleanSettings(SGuiUtils.getLabelName(moRadShowDed.getText()), false);
+        moKeyDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(moRadShowDed.getText()), false);
+        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
+        moKeyEmployee.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployee.getText()), false);
+        moRadIsSummary.setBooleanSettings(SGuiUtils.getLabelName(moRadIsSummary.getText()), true);
+        moRadIsDetailPayroll.setBooleanSettings(SGuiUtils.getLabelName(moRadIsDetailPayroll.getText()), false);
+        moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
+        moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
+        moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
+        moIntPeriodStart.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()));
+        moIntPeriodEnd.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()));
+        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
+        moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
+        moRadOrderByNumEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNumEmployee.getText()), false);
+        moRadOrderByNameEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNameEmployee.getText()), true);
+        moRadOrderByNumDepartament.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNumDepartament.getText()), false);
+        moRadOrderByNameDepartament.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNameDepartament.getText()), true);
+
+        jpDepartments.add(moPanelHrsDepartaments, BorderLayout.CENTER);
+        jpFilterStatusPay.remove(jlFilterStatusPayTemp);
+        jpFilterStatusPay.add(moPanelHrsFilterPayrollStatus, BorderLayout.CENTER);
+        moPanelHrsFilterPayrollStatus.setSelectedAll();
+
+        moFields.addField(moRadReportTypeEarDed);
+        moFields.addField(moRadReportTypeEmployee);
+        moFields.addField(moRadReportTypeEmployeeDep);
+        moFields.addField(moRadReportTypeDepartament);
+        moFields.addField(moRadReportTypeDepartamentEmp);
+        moFields.addField(moRadShowEarDed);
+        moFields.addField(moRadShowEar);
+        moFields.addField(moKeyEarning);
+        moFields.addField(moRadShowDed);
+        moFields.addField(moKeyDeduction);
+        moFields.addField(moKeyPaymentType);
+        moFields.addField(moKeyEmployee);
+        moFields.addField(moRadIsSummary);
+        moFields.addField(moRadIsDetailPayroll);
+        moFields.addField(moRadFilterTypePeriod);
+        moFields.addField(moRadFilterTypeDate);
+        moFields.addField(moIntPeriodYear);
+        moFields.addField(moIntPeriodStart);
+        moFields.addField(moIntPeriodEnd);
+        moFields.addField(moDateDateStart);
+        moFields.addField(moDateDateEnd);
+        moFields.addField(moRadOrderByNumEmployee);
+        moFields.addField(moRadOrderByNameEmployee);
+        moFields.addField(moRadOrderByNumDepartament);
+        moFields.addField(moRadOrderByNameDepartament);
+
+        moFields.setFormButton(jbPrint);
+
+        moRadReportTypeEmployee.addChangeListener(this);
+        moRadReportTypeEarDed.addChangeListener(this);
+        moRadFilterTypePeriod.addChangeListener(this);
+        moRadFilterTypeDate.addChangeListener(this);
+        moRadFilterTypeDatePay.addChangeListener(this);
+        
+        moRadShowEarDed.addChangeListener(this);
+        moRadShowEar.addChangeListener(this);
+        moRadShowDed.addChangeListener(this);
+        
+        jtbEmployeeActive.setSelected(true); // prevent trigger event selecting toggle button before adding listener
+        jtbEmployeeActive.addItemListener(this);
+        
+        moRadReportTypeEarDed.setSelected(true);
+        moRadShowEarDed.setSelected(true);
+        moRadFilterTypePeriod.setSelected(true);
+        moRadOrderByNameEmployee.setSelected(true);
+        moRadOrderByNameDepartament.setSelected(true);
+        
+        moRadIsSummary.setSelected(true);
+        
+        moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
+        moIntPeriodStart.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
+        moIntPeriodEnd.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
+        moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
+        moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
+        
+        reloadCatalogues();
+        actionEnableFieldsDates();
+        actionEnableFieldsEarDed();
+    }
 
     private void actionEmpStatusStateChange() {
         populateEmployee();
@@ -645,103 +745,6 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         return orderBy;
     }
     
-    private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 1024, 640);
-        
-        mnFilterEmpStatus = SLibConsts.UNDEFINED;
-        moPanelHrsDepartaments = new SPanelHrsDepartaments(miClient);
-        moPanelHrsFilterPayrollStatus = new SPanelHrsFilterPayrollStatus(miClient);
-
-        moRadReportTypeEarDed.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypeEarDed.getText()), true);
-        moRadReportTypeEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypeEmployee.getText()), false);
-        moRadReportTypeEmployeeDep.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypeEmployeeDep.getText()), false);
-        moRadReportTypeDepartament.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypeDepartament.getText()), false);
-        moRadReportTypeDepartamentEmp.setBooleanSettings(SGuiUtils.getLabelName(moRadReportTypeDepartamentEmp.getText()), false);
-        moRadShowEarDed.setBooleanSettings(SGuiUtils.getLabelName(moRadShowEarDed.getText()), true);
-        moRadShowEar.setBooleanSettings(SGuiUtils.getLabelName(moRadShowEar.getText()), false);
-        moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(moRadShowEar.getText()), false);
-        moRadShowDed.setBooleanSettings(SGuiUtils.getLabelName(moRadShowDed.getText()), false);
-        moKeyDeduction.setKeySettings(miClient, SGuiUtils.getLabelName(moRadShowDed.getText()), false);
-        moKeyPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaymentType.getText()), false);
-        moKeyEmployee.setKeySettings(miClient, SGuiUtils.getLabelName(jlEmployee.getText()), false);
-        moRadIsSummary.setBooleanSettings(SGuiUtils.getLabelName(moRadIsSummary.getText()), true);
-        moRadIsDetailPayroll.setBooleanSettings(SGuiUtils.getLabelName(moRadIsDetailPayroll.getText()), false);
-        moRadFilterTypePeriod.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypePeriod.getText()), true);
-        moRadFilterTypeDate.setBooleanSettings(SGuiUtils.getLabelName(moRadFilterTypeDate.getText()), false);
-        moIntPeriodYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear.getText()));
-        moIntPeriodStart.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodStart.getText()));
-        moIntPeriodEnd.setCalendarSettings(SGuiUtils.getLabelName(jlPeriodEnd.getText()));
-        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
-        moDateDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
-        moRadOrderByNumEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNumEmployee.getText()), false);
-        moRadOrderByNameEmployee.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNameEmployee.getText()), true);
-        moRadOrderByNumDepartament.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNumDepartament.getText()), false);
-        moRadOrderByNameDepartament.setBooleanSettings(SGuiUtils.getLabelName(moRadOrderByNameDepartament.getText()), true);
-
-        jPanel3.add(moPanelHrsDepartaments, BorderLayout.CENTER);
-        jpFilterStatusPay.add(moPanelHrsFilterPayrollStatus, BorderLayout.CENTER);
-        moPanelHrsFilterPayrollStatus.setSelectedAll();
-
-        moFields.addField(moRadReportTypeEarDed);
-        moFields.addField(moRadReportTypeEmployee);
-        moFields.addField(moRadReportTypeEmployeeDep);
-        moFields.addField(moRadReportTypeDepartament);
-        moFields.addField(moRadReportTypeDepartamentEmp);
-        moFields.addField(moRadShowEarDed);
-        moFields.addField(moRadShowEar);
-        moFields.addField(moKeyEarning);
-        moFields.addField(moRadShowDed);
-        moFields.addField(moKeyDeduction);
-        moFields.addField(moKeyPaymentType);
-        moFields.addField(moKeyEmployee);
-        moFields.addField(moRadIsSummary);
-        moFields.addField(moRadIsDetailPayroll);
-        moFields.addField(moRadFilterTypePeriod);
-        moFields.addField(moRadFilterTypeDate);
-        moFields.addField(moIntPeriodYear);
-        moFields.addField(moIntPeriodStart);
-        moFields.addField(moIntPeriodEnd);
-        moFields.addField(moDateDateStart);
-        moFields.addField(moDateDateEnd);
-        moFields.addField(moRadOrderByNumEmployee);
-        moFields.addField(moRadOrderByNameEmployee);
-        moFields.addField(moRadOrderByNumDepartament);
-        moFields.addField(moRadOrderByNameDepartament);
-
-        moFields.setFormButton(jbPrint);
-
-        moRadReportTypeEmployee.addChangeListener(this);
-        moRadReportTypeEarDed.addChangeListener(this);
-        moRadFilterTypePeriod.addChangeListener(this);
-        moRadFilterTypeDate.addChangeListener(this);
-        moRadFilterTypeDatePay.addChangeListener(this);
-        
-        moRadShowEarDed.addChangeListener(this);
-        moRadShowEar.addChangeListener(this);
-        moRadShowDed.addChangeListener(this);
-        
-        jtbEmployeeActive.setSelected(true); // prevent trigger event selecting toggle button before adding listener
-        jtbEmployeeActive.addItemListener(this);
-        
-        moRadReportTypeEarDed.setSelected(true);
-        moRadShowEarDed.setSelected(true);
-        moRadFilterTypePeriod.setSelected(true);
-        moRadOrderByNameEmployee.setSelected(true);
-        moRadOrderByNameDepartament.setSelected(true);
-        
-        moRadIsSummary.setSelected(true);
-        
-        moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
-        moIntPeriodStart.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
-        moIntPeriodEnd.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
-        moDateDateStart.setValue(SLibTimeUtils.getBeginOfYear(miClient.getSession().getCurrentDate()));
-        moDateDateEnd.setValue(SLibTimeUtils.getEndOfYear(miClient.getSession().getCurrentDate()));
-        
-        reloadCatalogues();
-        actionEnableFieldsDates();
-        actionEnableFieldsEarDed();
-    }
-
     private void populateEmployee() {
         if (jtbEmployeeActive.isSelected()) {
             miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
