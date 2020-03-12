@@ -7,6 +7,7 @@ Sergio Abraham FLORES GUTIÉRREZ
     a) ampliación del número máximo de percepciones y deducciones, de 10 a 13;
     b) impresión directa del contenido de los nodos Subsidio Al Empleo y Compensación de Saldos a Favor en la descripción de los conceptos de percepciones.
 3) Implementación de lectura de los nodos Compensación de Saldos a Favor en el CFDI de nóminas y Complemento de Comercio Exterior desde el XML del CFDI.
+4) Implementación de despliegue de la clave primaria de documentos en su forma de captura. Para propósitos de soporte técnico principalmente.
 
 ================================================================================
 SIIE 3.2 161.2/ 2020-03-06

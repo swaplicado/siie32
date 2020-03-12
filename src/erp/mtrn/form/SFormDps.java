@@ -745,16 +745,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbCfdiCfdiRelated = new javax.swing.JButton();
         jlCfdiCfdiRelatedHint = new javax.swing.JLabel();
         jpControls = new javax.swing.JPanel();
+        jpControlsPk = new javax.swing.JPanel();
+        jtfPkRo = new javax.swing.JTextField();
         jpControlsRecord = new javax.swing.JPanel();
         jpControlsButtons = new javax.swing.JPanel();
+        jpControlsButtonsWest = new javax.swing.JPanel();
+        jlQuantityTotal = new javax.swing.JLabel();
+        jtfQuantityTotal = new javax.swing.JTextField();
         jpControlsButtonsCenter = new javax.swing.JPanel();
         jbEdit = new javax.swing.JButton();
         jbEditHelp = new javax.swing.JButton();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
-        jPanel80 = new javax.swing.JPanel();
-        jlQuantityTotal = new javax.swing.JLabel();
-        jtfQuantityTotal = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Documento de compras-ventas"); // NOI18N
@@ -2686,12 +2688,36 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         getContentPane().add(jpDocument, java.awt.BorderLayout.CENTER);
 
-        jpControls.setLayout(new java.awt.GridLayout(1, 2));
+        jpControls.setLayout(new java.awt.BorderLayout(5, 0));
+
+        jpControlsPk.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jtfPkRo.setEditable(false);
+        jtfPkRo.setText("2001-999999");
+        jtfPkRo.setEnabled(false);
+        jtfPkRo.setFocusable(false);
+        jtfPkRo.setPreferredSize(new java.awt.Dimension(75, 23));
+        jpControlsPk.add(jtfPkRo);
+
+        jpControls.add(jpControlsPk, java.awt.BorderLayout.WEST);
 
         jpControlsRecord.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-        jpControls.add(jpControlsRecord);
+        jpControls.add(jpControlsRecord, java.awt.BorderLayout.CENTER);
 
-        jpControlsButtons.setLayout(new java.awt.BorderLayout());
+        jpControlsButtons.setLayout(new java.awt.BorderLayout(5, 0));
+
+        jlQuantityTotal.setText("Cantidad total:");
+        jlQuantityTotal.setPreferredSize(new java.awt.Dimension(80, 23));
+        jpControlsButtonsWest.add(jlQuantityTotal);
+
+        jtfQuantityTotal.setEditable(false);
+        jtfQuantityTotal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        jtfQuantityTotal.setText("0.000");
+        jtfQuantityTotal.setFocusable(false);
+        jtfQuantityTotal.setPreferredSize(new java.awt.Dimension(100, 23));
+        jpControlsButtonsWest.add(jtfQuantityTotal);
+
+        jpControlsButtons.add(jpControlsButtonsWest, java.awt.BorderLayout.WEST);
 
         jpControlsButtonsCenter.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
@@ -2715,20 +2741,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jpControlsButtons.add(jpControlsButtonsCenter, java.awt.BorderLayout.CENTER);
 
-        jlQuantityTotal.setText("Cantidad total:");
-        jlQuantityTotal.setPreferredSize(new java.awt.Dimension(80, 23));
-        jPanel80.add(jlQuantityTotal);
-
-        jtfQuantityTotal.setEditable(false);
-        jtfQuantityTotal.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfQuantityTotal.setText("0.000");
-        jtfQuantityTotal.setFocusable(false);
-        jtfQuantityTotal.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel80.add(jtfQuantityTotal);
-
-        jpControlsButtons.add(jPanel80, java.awt.BorderLayout.WEST);
-
-        jpControls.add(jpControlsButtons);
+        jpControls.add(jpControlsButtons, java.awt.BorderLayout.EAST);
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
@@ -4572,6 +4585,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moPanelRecord.setRecordKey(moDps.getDbmsRecordKey());
     }
 
+    private void renderPk() {
+        jtfPkRo.setText(moDps.getIsRegistryNew() || moDps.getIsCopied() ? "" : moDps.getPkYearId() + "-" + moDps.getPkDocId());
+        jtfPkRo.setCaretPosition(0);
+    }
+
     private void renderBizPartner() {
         String[] address = null;
         int nFkRecAddressFormatTypeId_n = 0;
@@ -4778,7 +4796,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
         }
     }
-
+    
     private void setExchangeRate(final int idCurrency, final SFormField field) {
         double rate = 0;
 
@@ -8118,7 +8136,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jPanel78;
     private javax.swing.JPanel jPanel79;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel80;
     private javax.swing.JPanel jPanel81;
     private javax.swing.JPanel jPanel82;
     private javax.swing.JPanel jPanel83;
@@ -8352,6 +8369,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JPanel jpControls;
     private javax.swing.JPanel jpControlsButtons;
     private javax.swing.JPanel jpControlsButtonsCenter;
+    private javax.swing.JPanel jpControlsButtonsWest;
+    private javax.swing.JPanel jpControlsPk;
     private javax.swing.JPanel jpControlsRecord;
     private javax.swing.JPanel jpCurrency;
     private javax.swing.JPanel jpDocument;
@@ -8423,6 +8442,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfFkDpsStatusValidityRo;
     private javax.swing.JTextField jtfNumber;
     private javax.swing.JTextField jtfNumberReference;
+    private javax.swing.JTextField jtfPkRo;
     private javax.swing.JTextField jtfPrepaymentsCy;
     private javax.swing.JTextField jtfPrepaymentsCyCurRo;
     private javax.swing.JTextField jtfQuantityTotal;
@@ -8458,6 +8478,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moDps = createNewDps(null);
         setBizPartner(keyBp, keyBpb, keyBpbAdd);
         renderRecordAutomatic();
+        renderPk();
 
         for (STableRow row : moPaneGridEntries.getGridRows()) {
             entry = (SDataDpsEntry) row.getData();
@@ -8582,6 +8603,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         renderDpsStatus();
         renderRecordManual();
         renderRecordAutomatic();
+        renderPk();
         
         renderBizPartner();
         
@@ -9418,13 +9440,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         renderDpsStatus();
         renderRecordManual();
         renderRecordAutomatic();
+        renderPk();
         
         renderDateMaturity();
         renderSalesAgentBizPartner(moDps.getFkSalesAgentBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentBizPartnerId_n() });
         renderSalesAgent(moDps.getFkSalesAgentId_n() == 0 ? null : new int[] { moDps.getFkSalesAgentId_n() });
         renderSalesSupervisorBizPartner(moDps.getFkSalesSupervisorBizPartnerId_n() == 0 ? null : new int[] { moDps.getFkSalesSupervisorBizPartnerId_n() });
         renderSalesSupervisor(moDps.getFkSalesSupervisorId_n() == 0 ? null : new int[] { moDps.getFkSalesSupervisorId_n() });
-
+        
         jckDateDoc.setSelected(!moDps.getDate().equals(moDps.getDateDoc()));
         jckDateStartCredit.setSelected(!moDps.getDate().equals(moDps.getDateStartCredit()));
         jckRecordUser.setSelected(!moDps.getIsRecordAutomatic());
