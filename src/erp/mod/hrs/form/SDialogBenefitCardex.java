@@ -433,9 +433,9 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                     double payedAmount = 0;
                     
                     sql = "SELECT SUM(pre.unt_all) AS _days, SUM(pre.amt_r) AS _amount "
-                            + "FROM hrs_pay AS p "
-                            + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                            + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                             + "WHERE pr.id_emp = " + moEmployee.getPkEmployeeId() + " AND pre.fk_tp_ben = " + mnFormSubtype + " AND "
                             + "pre.ben_year = " + benefitYear + " AND pre.ben_ann = " + anniversary + " AND "
                             + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "
@@ -447,9 +447,9 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
                     }
                     
                     sql = "SELECT SUM(prd.unt_all) AS _days, SUM(prd.amt_r) AS _amount "
-                            + "FROM hrs_pay AS p "
-                            + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                            + "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
                             + "WHERE pr.id_emp = " + moEmployee.getPkEmployeeId() + " AND prd.fk_tp_ben = " + mnFormSubtype + " AND "
                             + "prd.ben_year = " + benefitYear + " AND prd.ben_ann = " + anniversary + " AND "
                             + "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "' AND "

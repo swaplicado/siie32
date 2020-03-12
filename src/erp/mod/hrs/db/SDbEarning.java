@@ -10,7 +10,6 @@ import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.HashMap;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -24,14 +23,15 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbEarning extends SDbRegistryUser {
     
-    public static final HashMap<Integer, String> AuxAmountLabels = new HashMap<>();
-    public static final HashMap<Integer, String> AuxAmountHints = new HashMap<>();
+    public static final String TAX_SUB_LABEL = "Subsidio efectivo";
+    public static final String TAX_SUB_HINT = SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY_EFF;
+    public static final String OTH_TAX_BAL_LABEL_BAL = "Saldo a favor";
+    public static final String OTH_TAX_BAL_LABEL_REM_BAL = "Remanente saldo";
+    public static final String OTH_TAX_BAL_LABEL_YEAR = "Año saldo";
+    public static final String OTH_TAX_BAL_HINT_BAL = "Saldo a favor del trabajador determinado por el patrón en períodos o ejercicios anteriores";
+    public static final String OTH_TAX_BAL_HINT_REM_BAL = "Remanente del saldo a favor del trabajador";
+    public static final String OTH_TAX_BAL_HINT_YEAR = "Año en que se determinó el saldo a favor del trabajador";
     
-    static {
-        AuxAmountLabels.put(SModSysConsts.HRSS_TP_EAR_TAX_SUB, "Subsidio efectivo");
-        AuxAmountHints.put(SModSysConsts.HRSS_TP_EAR_TAX_SUB, SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY_EFF);
-    }
-
     protected int mnPkEarningId;
     protected String msCode;
     protected String msName;

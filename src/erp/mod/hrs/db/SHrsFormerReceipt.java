@@ -320,7 +320,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         cfd.ver3.nom12.DElementIncapacidad incapacidad =  new cfd.ver3.nom12.DElementIncapacidad();
         
         incapacidad.getAttDiasIncapacidad().setInteger((int) concept.getCantidad());
-        incapacidad.getAttTipoIncapacidad().setString(concept.getXtaClaveIncapacidad());
+        incapacidad.getAttTipoIncapacidad().setString(concept.getXtaIncapacidadClave());
         incapacidad.getAttImporteMonetario().setDouble(concept.getTotalImporte());
         
         return incapacidad;
@@ -339,6 +339,14 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         cfd.ver3.nom12.DElementSubsidioEmpleo subsidioEmpleo = new cfd.ver3.nom12.DElementSubsidioEmpleo();
         subsidioEmpleo.getAttSubsidioCausado().setDouble(subsidioCausado);
         return subsidioEmpleo;
+    }
+    
+    private cfd.ver3.nom12.DElementCompensacionSaldosFavor createElementCompensacionSaldosFavor12(final double saldoAFavor, final double saldoAFavorRemanente, final int año) {
+        cfd.ver3.nom12.DElementCompensacionSaldosFavor compensacionSaldosFavor = new cfd.ver3.nom12.DElementCompensacionSaldosFavor();
+        compensacionSaldosFavor.getAttSaldoFavor().setDouble(saldoAFavor);
+        compensacionSaldosFavor.getAttAño().setInteger(año);
+        compensacionSaldosFavor.getAttRemanenteSalFav().setDouble(saldoAFavorRemanente);
+        return compensacionSaldosFavor;
     }
     
     private cfd.ver3.nom12.DElementOtroPago createElementEarningOtherPayment(final SHrsFormerReceiptConcept concept) {
@@ -361,13 +369,27 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
             
             if (!conceptoOtroPago.isEmpty()) { // guarantee than only real other payments are processed
                 otroPago = createElementOtroPago12(
-                        concept.getXtaClaveTipoOtroPago(), 
+                        concept.getXtaTipoOtroPagoClave(), 
                         DCfdVer3Utils.formatAttributeValueAsKey(composeKey(concept.getClaveEmpresa(), 3)), 
                         conceptoOtroPago, 
                         concept.getTotalImporte());
                 
-                if (concept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
-                    otroPago.setEltSubsidioEmpleo(createElementSubsidioEmpleo12(concept.getXtaSubsidioEmpleo()));
+                switch (concept.getClaveOficial()) {
+                    case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
+                        otroPago.setEltSubsidioEmpleo(createElementSubsidioEmpleo12(concept.getXtaSubsidioEmpleo()));
+                        break;
+                        
+                    case SModSysConsts.HRSS_TP_EAR_OTH:
+                        switch (concept.getXtaTipoOtroPagoId()) {
+                            case SModSysConsts.HRSS_TP_OTH_PAY_TAX_BAL:
+                                otroPago.setEltCompensacionSaldosFavor(createElementCompensacionSaldosFavor12(concept.getXtaCompSaldoAFavor(), concept.getXtaCompSaldoAFavorRemanente(), concept.getXtaCompAño()));
+                                break;
+                                
+                            default:
+                        }
+                        break;
+                        
+                    default:
                 }
             }
         }

@@ -24,8 +24,12 @@ public class SHrsFormerReceiptConcept {
     protected double mdTotalExento;
     
     protected double mdXtaSubsidioEmpleo;
-    protected String msXtaClaveIncapacidad;
-    protected String msXtaClaveTipoOtroPago;
+    protected double mdXtaCompSaldoAFavor;
+    protected double mdXtaCompSaldoAFavorRemanente;
+    protected int mnXtaCompAño;
+    protected String msXtaIncapacidadClave;
+    protected String msXtaTipoOtroPagoClave;
+    protected int mnXtaTipoOtroPagoId;
     protected boolean mbAuxFound;
 
     protected SHrsFormerConceptExtraTime moChildExtraTime;
@@ -43,8 +47,12 @@ public class SHrsFormerReceiptConcept {
         mdTotalExento = 0;
         
         mdXtaSubsidioEmpleo = 0;
-        msXtaClaveIncapacidad = "";
-        msXtaClaveTipoOtroPago = "";
+        mdXtaCompSaldoAFavor = 0;
+        mdXtaCompSaldoAFavorRemanente = 0;
+        mnXtaCompAño = 0;
+        msXtaIncapacidadClave = "";
+        msXtaTipoOtroPagoClave = "";
+        mnXtaTipoOtroPagoId = 0;
         mbAuxFound = false;
 
         moChildExtraTime = new SHrsFormerConceptExtraTime();
@@ -62,8 +70,12 @@ public class SHrsFormerReceiptConcept {
     public void setTotalExento(double d) { mdTotalExento = d; }
     
     public void setXtaSubsidioEmpleo(double d) { mdXtaSubsidioEmpleo = d; }
-    public void setXtaClaveIncapacidad(String s) { msXtaClaveIncapacidad = s; }
-    public void setXtaClaveTipoOtroPago(String s) { msXtaClaveTipoOtroPago = s; }
+    public void setXtaCompSaldoAFavor(double d) { mdXtaCompSaldoAFavor = d; }
+    public void setXtaCompSaldoAFavorRemanente(double d) { mdXtaCompSaldoAFavorRemanente = d; }
+    public void setXtaCompAño(int n) { mnXtaCompAño = n; }
+    public void setXtaIncapacidadClave(String s) { msXtaIncapacidadClave = s; }
+    public void setXtaTipoOtroPagoClave(String s) { msXtaTipoOtroPagoClave = s; }
+    public void setXtaTipoOtroPagoId(int n) { mnXtaTipoOtroPagoId = n; }
     public void setAuxFound(boolean b) { mbAuxFound = b; }
 
     public void setChildExtraTime(SHrsFormerConceptExtraTime o) { moChildExtraTime = o; }
@@ -79,8 +91,12 @@ public class SHrsFormerReceiptConcept {
     public double getTotalExento() { return mdTotalExento; }
     
     public double getXtaSubsidioEmpleo() { return mdXtaSubsidioEmpleo; }
-    public String getXtaClaveIncapacidad() { return msXtaClaveIncapacidad; }
-    public String getXtaClaveTipoOtroPago() { return msXtaClaveTipoOtroPago; }
+    public double getXtaCompSaldoAFavor() { return mdXtaCompSaldoAFavor; }
+    public double getXtaCompSaldoAFavorRemanente() { return mdXtaCompSaldoAFavorRemanente; }
+    public int getXtaCompAño() { return mnXtaCompAño; }
+    public String getXtaIncapacidadClave() { return msXtaIncapacidadClave; }
+    public String getXtaTipoOtroPagoClave() { return msXtaTipoOtroPagoClave; }
+    public int getXtaTipoOtroPagoId() { return mnXtaTipoOtroPagoId; }
     public boolean isAuxFound() { return mbAuxFound; }
     
     public SHrsFormerConceptExtraTime getChildExtraTime() { return moChildExtraTime; }

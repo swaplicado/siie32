@@ -259,23 +259,19 @@ public class SViewLoan extends SGridPaneView implements ActionListener {
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON "
                 + "v.fk_usr_upd = uu.id_usr "
                 + "LEFT OUTER JOIN (SELECT pre.fk_loan_emp_n AS _id_emp, pre.fk_loan_loan_n AS _id_loan, COALESCE(SUM(pre.amt_r), 0) AS _inc "
-                + "FROM hrs_pay AS p "
-                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
-                + "WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT pr.b_del AND NOT pre.b_del AND pre.fk_loan_emp_n IS NOT NULL "
-                + (dateCutForPayroll.isEmpty() ? "" : dateCutForPayroll)
-                + "GROUP BY pre.fk_loan_emp_n, pre.fk_loan_loan_n "
-                + "ORDER BY pre.fk_loan_emp_n, pre.fk_loan_loan_n) "
-                + "AS incs ON incs._id_emp = v.id_emp AND incs._id_loan = v.id_loan "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_EAR) + " AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                + " WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT pr.b_del AND NOT pre.b_del AND pre.fk_loan_emp_n IS NOT NULL " + (dateCutForPayroll.isEmpty() ? "" : dateCutForPayroll)
+                + " GROUP BY pre.fk_loan_emp_n, pre.fk_loan_loan_n "
+                + " ORDER BY pre.fk_loan_emp_n, pre.fk_loan_loan_n) AS incs ON incs._id_emp = v.id_emp AND incs._id_loan = v.id_loan "
                 + "LEFT OUTER JOIN (SELECT prd.fk_loan_emp_n AS _id_emp, prd.fk_loan_loan_n AS _id_loan, COALESCE(SUM(prd.amt_r), 0) AS _dec, MAX(p.dt_end) AS _last_move "
-                + "FROM hrs_pay AS p "
-                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                + "INNER JOIN hrs_pay_rcp_ded AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
-                + "WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT PR.b_del AND NOT prd.b_del AND prd.fk_loan_emp_n IS NOT NULL "
-                + (dateCutForPayroll.isEmpty() ? "" : dateCutForPayroll)
-                + "GROUP BY prd.fk_loan_emp_n, prd.fk_loan_loan_n "
-                + "ORDER BY prd.fk_loan_emp_n, prd.fk_loan_loan_n) "
-                + "AS decs ON decs._id_emp = v.id_emp AND decs._id_loan = v.id_loan "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_DED) + " AS prd ON prd.id_pay = pr.id_pay AND prd.id_emp = pr.id_emp "
+                + " WHERE (p.id_pay = 0 OR NOT p.b_del) AND NOT PR.b_del AND NOT prd.b_del AND prd.fk_loan_emp_n IS NOT NULL " + (dateCutForPayroll.isEmpty() ? "" : dateCutForPayroll)
+                + " GROUP BY prd.fk_loan_emp_n, prd.fk_loan_loan_n "
+                + " ORDER BY prd.fk_loan_emp_n, prd.fk_loan_loan_n) AS decs ON decs._id_emp = v.id_emp AND decs._id_loan = v.id_loan "
                 + (sql.isEmpty() ? "" : "WHERE " + sql + dateCutForLoan) + sqlHaving
                 + "ORDER BY bp.bp, v.id_emp, vt.name, v.num, v.id_loan, vtp.name ";
     }

@@ -336,7 +336,8 @@ public abstract class SHrsCfdUtils {
                             "CASE WHEN pre.unt >= 0 AND pre.unt <= 1 THEN 1 ELSE pre.unt END END AS f_conc_qty, " +
                             "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " THEN " +
                             "CASE WHEN pre.unt >= 0 AND pre.unt <= 1 THEN 1 ELSE pre.unt END ELSE 0 END AS f_conc_hrs, ec.code AS f_conc_unid, " +
-                            "pre.b_aut AS f_aut, pre.b_usr AS f_usr, pre.amt_taxa AS f_conc_mont_grav, pre.amt_exem AS f_conc_mont_ext, pre.aux_amt, pre.fk_ear, top.code AS f_top_code, " +
+                            "pre.b_aut AS f_aut, pre.b_usr AS f_usr, pre.amt_taxa AS f_conc_mont_grav, pre.amt_exem AS f_conc_mont_ext, " +
+                            "pre.aux_amt1, pre.aux_amt2, pre.aux_val, pre.fk_ear, pre.fk_tp_oth_pay, top.code AS f_top_code, " +
                             "" + SCfdConsts.CFDI_PAYROLL_PERCEPTION_PERCEPTION[0] + " AS f_conc_tp, " +
                             "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " AND e.unt_fac = " + SHrsConsts.OVER_TIME_2X + " THEN " + SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1] + " ELSE " +
                             "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " AND e.unt_fac = " + SHrsConsts.OVER_TIME_3X + " THEN " + SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_TRIPLE[1] + " ELSE " + 
@@ -373,7 +374,8 @@ public abstract class SHrsCfdUtils {
                             hrsFormerReceiptConcept.setTotalExento(dAmountEarExe);
                             hrsFormerReceiptConcept.setPkTipoConcepto(resultSetAux.getInt("f_conc_tp"));
                             hrsFormerReceiptConcept.setPkSubtipoConcepto(resultSetAux.getInt("f_conc_stp"));
-                            hrsFormerReceiptConcept.setXtaClaveTipoOtroPago(resultSetAux.getString("f_top_code")); // code of type of other payment when earning is 'other payment', not when is tax subsidy!
+                            hrsFormerReceiptConcept.setXtaTipoOtroPagoClave(resultSetAux.getString("f_top_code")); // code of type of other payment when earning is precisely 'other payment', note that when earning is 'tax subsidy' there is not any type of other payment in database registry!
+                            hrsFormerReceiptConcept.setXtaTipoOtroPagoId(resultSetAux.getInt("pre.fk_tp_oth_pay"));
 
                             switch (hrsFormerReceiptConcept.getClaveOficial()) {
                                 case SModSysConsts.HRSS_TP_EAR_OVR_TME:
@@ -395,21 +397,33 @@ public abstract class SHrsCfdUtils {
 
                                     resultSetAuxInc = statementAuxInc.executeQuery(sql);
                                     if (resultSetAuxInc.next()) {
-                                        hrsFormerReceiptConcept.setXtaClaveIncapacidad(resultSetAuxInc.getString("tpd.code"));
+                                        hrsFormerReceiptConcept.setXtaIncapacidadClave(resultSetAuxInc.getString("tpd.code"));
                                     }
                                     break;
 
                                 case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
                                     bTaxSubFound = true;
-                                    if (resultSetAux.getDouble("pre.aux_amt") > 0) {
-                                        hrsFormerReceiptConcept.setXtaSubsidioEmpleo(resultSetAux.getDouble("pre.aux_amt"));
+                                    if (resultSetAux.getDouble("pre.aux_amt1") > 0) {
+                                        hrsFormerReceiptConcept.setXtaSubsidioEmpleo(resultSetAux.getDouble("pre.aux_amt1"));
                                     }
                                     else if (dTaxSubPayrollComp > 0) {
                                         hrsFormerReceiptConcept.setXtaSubsidioEmpleo(dTaxSubPayrollComp);
                                     }
-                                    hrsFormerReceiptConcept.setXtaClaveTipoOtroPago(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo);// code of type of other payment when earning is tax subsidy!
+                                    hrsFormerReceiptConcept.setXtaTipoOtroPagoClave(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo);// code of type of other payment when earning is tax subsidy!
                                     break;
 
+                                case SModSysConsts.HRSS_TP_EAR_OTH:
+                                    switch (hrsFormerReceiptConcept.getXtaTipoOtroPagoId()) {
+                                        case SModSysConsts.HRSS_TP_OTH_PAY_TAX_BAL:
+                                            hrsFormerReceiptConcept.setXtaCompSaldoAFavor(resultSetAux.getDouble("pre.aux_amt1"));
+                                            hrsFormerReceiptConcept.setXtaCompSaldoAFavorRemanente(resultSetAux.getDouble("pre.aux_amt2"));
+                                            hrsFormerReceiptConcept.setXtaCompAño(resultSetAux.getInt("pre.aux_val"));
+                                            break;
+                                            
+                                        default:
+                                    }
+                                    break;
+                                    
                                 default:
                             }
 
@@ -435,7 +449,7 @@ public abstract class SHrsCfdUtils {
                         hrsFormerReceiptConcept.setPkTipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_TAX_SUBSIDY[0]);
                         hrsFormerReceiptConcept.setPkSubtipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_TAX_SUBSIDY[1]);
                         hrsFormerReceiptConcept.setXtaSubsidioEmpleo(dTaxSubPayrollComp);
-                        hrsFormerReceiptConcept.setXtaClaveTipoOtroPago(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo);// code of type of other payment when earning is tax subsidy!
+                        hrsFormerReceiptConcept.setXtaTipoOtroPagoClave(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo);// code of type of other payment when earning is tax subsidy!
 
                         hrsFormerReceipt.getChildConcepts().add(hrsFormerReceiptConcept);
 

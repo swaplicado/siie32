@@ -32,7 +32,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     protected double mdAmount_r;
     protected double mdAmountExempt;
     protected double mdAmountTaxable;
-    protected double mdAuxiliarAmount;
+    protected double mdAuxiliarAmount1;
+    protected double mdAuxiliarAmount2;
+    protected double mdAuxiliarValue;
     protected int mnBenefitYear;
     protected int mnBenefitAnniversary;
     protected boolean mbAlternativeTaxCalculation;
@@ -75,7 +77,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public void setAmount_r(double d) { mdAmount_r = d; }
     public void setAmountExempt(double d) { mdAmountExempt = d; }
     public void setAmountTaxable(double d) { mdAmountTaxable = d; }
-    public void setAuxiliarAmount(double d) { mdAuxiliarAmount = d; }
+    public void setAuxiliarAmount1(double d) { mdAuxiliarAmount1 = d; }
+    public void setAuxiliarAmount2(double d) { mdAuxiliarAmount2 = d; }
+    public void setAuxiliarValue(double d) { mdAuxiliarValue = d; }
     public void setBenefitYear(int n) { mnBenefitYear = n; }
     public void setBenefitAnniversary(int n) { mnBenefitAnniversary = n; }
     public void setAlternativeTaxCalculation(boolean b) { mbAlternativeTaxCalculation = b; }
@@ -108,7 +112,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public double getAmount_r() { return mdAmount_r; }
     public double getAmountExempt() { return mdAmountExempt; }
     public double getAmountTaxable() { return mdAmountTaxable; }
-    public double getAuxiliarAmount() { return mdAuxiliarAmount; }
+    public double getAuxiliarAmount1() { return mdAuxiliarAmount1; }
+    public double getAuxiliarAmount2() { return mdAuxiliarAmount2; }
+    public double getAuxiliarValue() { return mdAuxiliarValue; }
     public int getBenefitYear() { return mnBenefitYear; }
     public int getBenefitAnniversary() { return mnBenefitAnniversary; }
     public boolean isAlternativeTaxCalculation() { return mbAlternativeTaxCalculation; }
@@ -159,7 +165,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         mdAmount_r = 0;
         mdAmountExempt = 0;
         mdAmountTaxable = 0;
-        mdAuxiliarAmount = 0;
+        mdAuxiliarAmount1 = 0;
+        mdAuxiliarAmount2 = 0;
+        mdAuxiliarValue = 0;
         mnBenefitYear = 0;
         mnBenefitAnniversary = 0;
         mbAlternativeTaxCalculation = false;
@@ -236,7 +244,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
             mdAmount_r = resultSet.getDouble("amt_r");
             mdAmountExempt = resultSet.getDouble("amt_exem");
             mdAmountTaxable = resultSet.getDouble("amt_taxa");
-            mdAuxiliarAmount = resultSet.getDouble("aux_amt");
+            mdAuxiliarAmount1 = resultSet.getDouble("aux_amt1");
+            mdAuxiliarAmount2 = resultSet.getDouble("aux_amt2");
+            mdAuxiliarValue = resultSet.getDouble("aux_val");
             mnBenefitYear = resultSet.getInt("ben_year");
             mnBenefitAnniversary = resultSet.getInt("ben_ann");
             mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
@@ -305,7 +315,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     mdAmount_r + ", " + 
                     mdAmountExempt + ", " + 
                     mdAmountTaxable + ", " + 
-                    mdAuxiliarAmount + ", " + 
+                    mdAuxiliarAmount1 + ", " + 
+                    mdAuxiliarAmount2 + ", " + 
+                    mdAuxiliarValue + ", " + 
                     mnBenefitYear + ", " + 
                     mnBenefitAnniversary + ", " + 
                     (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
@@ -343,7 +355,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     "amt_r = " + mdAmount_r + ", " +
                     "amt_exem = " + mdAmountExempt + ", " +
                     "amt_taxa = " + mdAmountTaxable + ", " +
-                    "aux_amt = " + mdAuxiliarAmount + ", " +
+                    "aux_amt1 = " + mdAuxiliarAmount1 + ", " +
+                    "aux_amt2 = " + mdAuxiliarAmount2 + ", " +
+                    "aux_val = " + mdAuxiliarValue + ", " +
                     "ben_year = " + mnBenefitYear + ", " +
                     "ben_ann = " + mnBenefitAnniversary + ", " +
                     "b_alt_tax = " + (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
@@ -396,7 +410,9 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         registry.setAmount_r(this.getAmount_r());
         registry.setAmountExempt(this.getAmountExempt());
         registry.setAmountTaxable(this.getAmountTaxable());
-        registry.setAuxiliarAmount(this.getAuxiliarAmount());
+        registry.setAuxiliarAmount1(this.getAuxiliarAmount1());
+        registry.setAuxiliarAmount2(this.getAuxiliarAmount2());
+        registry.setAuxiliarValue(this.getAuxiliarValue());
         registry.setBenefitYear(this.getBenefitYear());
         registry.setBenefitAnniversary(this.getBenefitAnniversary());
         registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());

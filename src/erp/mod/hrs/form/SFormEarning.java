@@ -740,22 +740,22 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         else {
             switch (moKeyEarningComputationType.getValue()[0]) {
                 case SModSysConsts.HRSS_TP_EAR_COMP_AMT:
-                    jlEarningComputationTypeHelp.setText("Monto directo");
+                    jlEarningComputationTypeHelp.setText("Monto directo.");
                     break;
                 case SModSysConsts.HRSS_TP_EAR_COMP_DAYS:
-                    jlEarningComputationTypeHelp.setText("En función de un número de días de salario base");
+                    jlEarningComputationTypeHelp.setText("En función de un número de días de salario base.");
                     break;
                 case SModSysConsts.HRSS_TP_EAR_COMP_HRS:
-                    jlEarningComputationTypeHelp.setText("En función de un número de horas de hora de salario base");
+                    jlEarningComputationTypeHelp.setText("En función de un número de horas de hora de salario base.");
                     break;
                 case SModSysConsts.HRSS_TP_EAR_COMP_PCT_DAY:
-                    jlEarningComputationTypeHelp.setText("En función de un porcentaje de un salario base");
+                    jlEarningComputationTypeHelp.setText("En función de un porcentaje de un salario base.");
                     break;
                 case SModSysConsts.HRSS_TP_EAR_COMP_PCT_HR:
-                    jlEarningComputationTypeHelp.setText("En función de un porcentaje de una hora de salario base");
+                    jlEarningComputationTypeHelp.setText("En función de un porcentaje de una hora de salario base.");
                     break;
                 case SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME:
-                    jlEarningComputationTypeHelp.setText("En función de un porcentaje sobre el monto de sueldos y salarios");
+                    jlEarningComputationTypeHelp.setText("En función de un porcentaje sobre el monto de sueldos y salarios.");
                     break;
                 default:
                     jlEarningComputationTypeHelp.setText("?");
@@ -763,21 +763,13 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         }
     }
 
-    private void itemStateChangedLoan() {
-        boolean enable = moBoolLoan.getValue();
-        moKeyLoanType.setEnabled(enable);
-        if (!enable) {
-            moKeyLoanType.setValue(new int[] { SModSysConsts.HRSS_TP_LOAN_NON });
-        }
-    }
-
     private void itemStateChangedEarningComputationType() {
         if (moKeyEarningComputationType.getSelectedIndex() > 0) {
             if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_AMT) {
                 moDecPayPercentage.setEnabled(false);
-                moDecPayPercentage.setValue(0d);
+                moDecPayPercentage.resetField();
                 moDecUnitsMaximumWeek.setEnabled(false);
-                moDecUnitsMaximumWeek.setValue(0d);
+                moDecUnitsMaximumWeek.resetField();
                 moBoolDaysWorked.setSelected(false);
                 moBoolDaysWorked.setEnabled(false);
                 moBoolDaysWorkedBased.setSelected(false);
@@ -799,14 +791,12 @@ public class SFormEarning extends SBeanForm implements ItemListener {
                     moBoolDaysWorkedBased.setEnabled(false);
                 }
                 
-                if (moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PCT_DAY ||
-                        moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PCT_HR ||
-                        moKeyEarningComputationType.getValue()[0] == SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME) {
+                if (SLibUtils.belongsTo(moKeyEarningComputationType.getValue()[0], new int[] { SModSysConsts.HRSS_TP_EAR_COMP_PCT_DAY, SModSysConsts.HRSS_TP_EAR_COMP_PCT_HR, SModSysConsts.HRSS_TP_EAR_COMP_PCT_INCOME })) {
                     moDecPayPercentage.setEnabled(true);
                 }
                 else {
                     moDecPayPercentage.setEnabled(false);
-                    moDecPayPercentage.setValue(0d);
+                    moDecPayPercentage.resetField();
                 }
             }
         }
@@ -818,6 +808,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         if (moKeyEarningExemptionType.getSelectedIndex() > 0) {
             if (moKeyEarningExemptionType.getValue()[0] != SModSysConsts.HRSS_TP_EAR_EXEM_PER) {
                 moDecExemptionMwz.setEnabled(true);
+                
                 moDecExemptionSalaryEqualsMwzPercentage.setEnabled(false);
                 moDecExemptionSalaryEqualsMwzLimit.setEnabled(false);
                 moDecExemptionSalaryGreaterMwzPercentage.setEnabled(false);
@@ -830,6 +821,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
             else {
                 moDecExemptionMwz.setEnabled(false);
                 moDecExemptionMwz.setValue(0d);
+                
                 moDecExemptionSalaryEqualsMwzPercentage.setEnabled(true);
                 moDecExemptionSalaryEqualsMwzLimit.setEnabled(true);
                 moDecExemptionSalaryGreaterMwzPercentage.setEnabled(true);
@@ -850,21 +842,35 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         }
     }
     
-    private void itemStateChangedEarningType() {
+    private void itemStateChangedEarningType(final boolean resetDefaultOtherPaymentType) {
         moKeyOtherPaymentType.setEnabled(false);
-        moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_NON });
         
-        if (moKeyEarningType.getSelectedIndex() > 0) {
+        if (moKeyEarningType.getSelectedIndex() <= 0) {
+            moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_NON });
+        }
+        else {
             switch (moKeyEarningType.getValue()[0]) {
                 case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
-                    moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB });
+                    moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB }); // the very single available option
                     break;
                 case SModSysConsts.HRSS_TP_EAR_OTH:
                     moKeyOtherPaymentType.setEnabled(true);
-                    moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_OTH });
+                    if (resetDefaultOtherPaymentType) {
+                        moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_OTH }); // the default option
+                    }
                     break;
                 default:
+                    moKeyOtherPaymentType.setValue(new int[] { SModSysConsts.HRSS_TP_OTH_PAY_NON });
             }
+        }
+    }
+
+    private void itemStateChangedLoan() {
+        boolean enable = moBoolLoan.getValue();
+        moKeyLoanType.setEnabled(enable);
+        
+        if (!enable) {
+            moKeyLoanType.setValue(new int[] { SModSysConsts.HRSS_TP_LOAN_NON });
         }
     }
 
@@ -951,15 +957,11 @@ public class SFormEarning extends SBeanForm implements ItemListener {
         moBoolPayrollTax.setValue(moRegistry.isPayrollTax());
         moBoolAlternativeTaxCalculation.setValue(moRegistry.isAlternativeTaxCalculation());
         moKeyEarningType.setValue(new int[] { moRegistry.getFkEarningTypeId() });
-        itemStateChangedEarningType();
         moKeyOtherPaymentType.setValue(new int[] { moRegistry.getFkOtherPaymentTypeId() });
         moKeyEarningComputationType.setValue(new int[] { moRegistry.getFkEarningComputationTypeId() });
-        itemStateChangedEarningComputationType();
         moKeyEarningExemptionType.setValue(new int[] { moRegistry.getFkEarningExemptionTypeId() });
-        itemStateChangedEarningExemptionType();
         moKeyEarningExemptionTypeYear.setValue(new int[] { moRegistry.getFkEarningExemptionTypeYearId() });
         moBoolLoan.setValue(moRegistry.isLoan());
-        itemStateChangedLoan();
         moKeyLoanType.setValue(new int[] { moRegistry.getFkLoanTypeId() });
         moKeyBenefitType.setValue(new int[] { moRegistry.getFkBenefitTypeId() });
         moKeyAccountingConfigurationType.setValue(new int[] { moRegistry.getFkAccountingConfigurationTypeId() });
@@ -969,11 +971,19 @@ public class SFormEarning extends SBeanForm implements ItemListener {
 
         setFormEditable(true);
         
-        itemStateChangedEarningType();
         itemStateChangedEarningComputationType();
         itemStateChangedEarningExemptionType();
+        itemStateChangedEarningExemptionTypeYear();
+        itemStateChangedEarningType(false);
         itemStateChangedLoan();
-
+        
+        if (moRegistry.isRegistryNew()) {
+            
+        }
+        else {
+            
+        }
+        
         addAllListeners();
     }
 
@@ -1098,7 +1108,7 @@ public class SFormEarning extends SBeanForm implements ItemListener {
                 itemStateChangedEarningExemptionTypeYear();
             }
             else if (comboBox == moKeyEarningType) {
-                itemStateChangedEarningType();
+                itemStateChangedEarningType(true);
             }
         }
         else if (e.getSource() instanceof JCheckBox) {

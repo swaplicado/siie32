@@ -739,25 +739,21 @@ public abstract class SHrsUtils {
      * @throws SQLException 
      */
     private static ArrayList<Integer> prepareSqlQueryHigh(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String dateIni = formatter.format(dateApplicationIni);
-        String dateEnd = formatter.format(dateApplicationEnd);
-        String sqlId = "";
-        ResultSet resultSet = null;
-        int[] employeeId = null;
+        ArrayList<Integer> employeeIds = new ArrayList<>();
 
-        sqlId = "SELECT id_emp FROM hrs_emp_log_hire " 
-                + "WHERE dt_hire >= '" + dateIni + "' AND dt_hire <= '" + dateEnd + "' "
-                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_ACTIVE ;
+        String sql = "SELECT id_emp "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " 
+                + "WHERE dt_hire >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationIni) + "' AND "
+                + "dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
+                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_ACTIVE + ";";
 
-        resultSet = client.getSession().getStatement().executeQuery(sqlId);
-        ArrayList<Integer> resultsId = new ArrayList<>();
-
-        while (resultSet.next()) {
-          resultsId.add(resultSet.getInt("id_emp"));                  
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                employeeIds.add(resultSet.getInt("id_emp"));                  
+            }
         }
         
-        return resultsId;
+        return employeeIds;
     }
     
     /**
@@ -769,24 +765,21 @@ public abstract class SHrsUtils {
      * @throws SQLException 
      */
     private static ArrayList<Integer> prepareSqlQueryMod(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String dateIni = formatter.format(dateApplicationIni);
-        String dateEnd = formatter.format(dateApplicationEnd);
-        String sqlId = "";
-        ResultSet resultSet = null;
-        int[] employeeId = null;
+        ArrayList<Integer> employeeIds = new ArrayList<>();
 
-        sqlId = "SELECT id_emp FROM hrs_emp_log_sal_ssc " 
-                + "WHERE dt >= '" + dateIni + "' AND dt <= '" + dateEnd + "' " 
-                + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del ";        
+        String sql = "SELECT id_emp "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " " 
+                + "WHERE dt >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationIni) + "' AND "
+                + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' " 
+                + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del;";
 
-        resultSet = client.getSession().getStatement().executeQuery(sqlId);
-        ArrayList<Integer> resultsId = new ArrayList<>();
-
-        while (resultSet.next()) {
-          resultsId.add(resultSet.getInt("id_emp"));                  
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                employeeIds.add(resultSet.getInt("id_emp"));                  
+            }
         }
-        return resultsId;
+        
+        return employeeIds;
     }
     
     /**
@@ -798,24 +791,21 @@ public abstract class SHrsUtils {
      * @throws SQLException 
      */
     private static ArrayList<Integer> prepareSqlQueryLow(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String dateIni = formatter.format(dateApplicationIni);
-        String dateEnd = formatter.format(dateApplicationEnd);
-        String sqlId = "";
-        ResultSet resultSet = null;
-        int[] employeeId = null;
+        ArrayList<Integer> employeeIds = new ArrayList<>();
 
-        sqlId = "SELECT id_emp FROM hrs_emp_log_hire "
-                + "WHERE dt_dis_n >= '" + dateIni + "' AND dt_dis_n <= '" + dateEnd + "' "
-                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + " "; 
+        String sql = "SELECT id_emp "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " "
+                + "WHERE dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationIni) + "' AND "
+                + "dt_dis_n <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
+                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + ";"; 
 
-        resultSet = client.getSession().getStatement().executeQuery(sqlId);
-        ArrayList<Integer> resultsId = new ArrayList<>();
-
-        while (resultSet.next()) {
-          resultsId.add(resultSet.getInt("id_emp"));                  
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                employeeIds.add(resultSet.getInt("id_emp"));                  
+            }
         }
-        return resultsId;
+        
+        return employeeIds;
     }
      
     /**
@@ -1121,7 +1111,6 @@ public abstract class SHrsUtils {
                             type = resultSetHeader.getString("Tipe");
                         }
 
-
                     buffer += param.substring(0, 10); // (Employer registration)
                     buffer += param.substring(10); // (Digit verifier of R.P)
                     buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Social Security number)
@@ -1229,46 +1218,53 @@ public abstract class SHrsUtils {
     }
 
     /**
+     * Get payroll next number.
      * @param session User GUI session.
      * @param year Payroll year.
      * @param paymentType Payroll payment type (constants defined in class <code>SModSysConsts</code>, HRSS_TP_PAY).
-     * @param tpPaySht Type of paysheet
+     * @param payrollSheetType Type of payroll sheet.
      * @return Payroll next number of provided payment type.
+     * @throws java.lang.Exception
      */
-    public static int getPayrollNextNumber(final SGuiSession session, final int year, final int paymentType, final int tpPaySht) throws Exception {
+    public static int getPayrollNextNumber(final SGuiSession session, final int year, final int paymentType, final int payrollSheetType) throws Exception {
         int nextNumber = 0;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT COALESCE(MAX(num), 0) + 1 "
+        String sql = "SELECT COALESCE(MAX(num), 0) + 1 "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
-                + "WHERE per_year = " + year + " AND fk_tp_pay = " + paymentType + " AND b_del = 0 "
-                + (tpPaySht != SModSysConsts.HRSS_TP_PAY_SHT_EXT ? "AND fk_tp_pay_sht = " + tpPaySht : "");
+                + "WHERE per_year = " + year + " AND fk_tp_pay = " + paymentType + " AND NOT b_del"
+                + (payrollSheetType != SModSysConsts.HRSS_TP_PAY_SHT_EXT ? " AND fk_tp_pay_sht = " + payrollSheetType : "") + ";";
 
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            nextNumber = resultSet.getInt(1);
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                nextNumber = resultSet.getInt(1);
+            }
         }
 
         return validatePayrollNumber(session, year, nextNumber, paymentType);
     }
     
+    /**
+     * Get payroll receipt next number.
+     * @param session GUI session.
+     * @param series Receipt number series.
+     * @return
+     * @throws Exception 
+     */
     public static int getPayrollReceiptNextNumber(final SGuiSession session, final String series) throws Exception {
         int number = 0;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT MAX(CONVERT(num, UNSIGNED INTEGER)) + 1 AS f_num "
+        String sql = "SELECT MAX(CONVERT(num, UNSIGNED INTEGER)) + 1 AS f_num "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " "
-                + "WHERE num_ser = '" + series + "' AND b_del = 0 ";
+                + "WHERE num_ser = '" + series + "' AND NOT b_del;";
 
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            if (resultSet.getObject("f_num") != null) {
-                number = resultSet.getInt("f_num");
-            }
-            else {
-                number = 1;
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                if (resultSet.getObject("f_num") != null) {
+                    number = resultSet.getInt("f_num");
+                }
+                else {
+                    number = 1;
+                }
             }
         }
 
@@ -1276,25 +1272,23 @@ public abstract class SHrsUtils {
     }
 
     public static ArrayList<SDataPayrollReceiptIssue> getPayrollReceiptIssues(final SGuiSession session, final int[] payrollKey) throws Exception {
-        String sql = "";
-        ResultSet resultSet = null;
-        ArrayList<SDataPayrollReceiptIssue> receiptIssues = null;
-        SDataPayrollReceiptIssue receiptIssue = null;
+        ArrayList<SDataPayrollReceiptIssue> receiptIssues = new ArrayList<>();
 
-        receiptIssues = new ArrayList<>();
-
-        sql = "SELECT id_pay, id_emp, id_iss " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " " + 
-                "WHERE id_pay = " + payrollKey[0] + " AND b_del = 0 AND fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " ORDER BY id_iss ";
+        String sql = "SELECT id_pay, id_emp, id_iss "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " "
+                + "WHERE id_pay = " + payrollKey[0] + " AND NOT b_del AND fk_st_rcp = "  + SModSysConsts.TRNS_ST_DPS_EMITED + " "
+                + "ORDER BY id_pay, id_emp, id_iss;";
         
-        resultSet = session.getStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            receiptIssue = new SDataPayrollReceiptIssue();
-            
-            if (receiptIssue.read(new int[] { resultSet.getInt("id_pay"), resultSet.getInt("id_emp"), resultSet.getInt("id_iss") }, session.getStatement().getConnection().createStatement()) != SLibConstants.DB_ACTION_READ_OK) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                SDataPayrollReceiptIssue receiptIssue = new SDataPayrollReceiptIssue();
+                
+                if (receiptIssue.read(new int[] { resultSet.getInt("id_pay"), resultSet.getInt("id_emp"), resultSet.getInt("id_iss") }, session.getStatement().getConnection().createStatement()) != SLibConstants.DB_ACTION_READ_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                }
+                
+                receiptIssues.add(receiptIssue);
             }
-            receiptIssues.add(receiptIssue);
         }
 
         return receiptIssues;
@@ -1309,7 +1303,6 @@ public abstract class SHrsUtils {
      */
     public static int validatePayrollNumber(final SGuiSession session, final int year, final int number, final int paymentType) throws Exception {
         int validNumber = 0;
-        Date lastPeriod[] = null;
 
         if (number <= 1) {
             validNumber = 1;        // payroll number equal or less than 1 is set to 1, regardless of payment type
@@ -1365,6 +1358,7 @@ public abstract class SHrsUtils {
         else if (dateEnd.compareTo(config.getDateOperations()) < 0) {
             throw new Exception("La fecha final de la nómina '" + SLibUtils.DateFormatDate.format(dateEnd) + "', debe ser posterior o igual a la fecha de inicio de operaciones de la empresa '" + SLibUtils.DateFormatDate.format(config.getDateOperations()) + "'.");
         }
+        
         return true;
     }
     
@@ -1421,24 +1415,22 @@ public abstract class SHrsUtils {
     }
     
     public static boolean validateEmployeeHireLog(final SGuiSession session, final int employeeId, final boolean isHire) throws Exception {
-        String sql = "";
-        ResultSet resultSet = null;
-
-        sql = "SELECT COUNT(id_log) AS f_count " +
+        String sql = "SELECT COUNT(id_log) AS f_count " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " +
-            "WHERE b_del = 0 AND id_emp = " + employeeId + " AND dt_dis_n IS NULL ";
+            "WHERE NOT b_del AND id_emp = " + employeeId + " AND dt_dis_n IS NULL;";
         
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            if (isHire && resultSet.getInt("f_count") > 0) {
-                throw new Exception("Inconsistencia en la secuencia cronológica de movimientos en la bitácora de altas/bajas,\n existe al menos un movimiento de alta sin su baja correspondiente.");
-            }
-            else if (!isHire) {
-                if (resultSet.getInt("f_count") > 1) {
-                    throw new Exception("Inconsistencia en la secuencia cronológica de movimientos en la bitácora de altas/bajas,\n existe más de un movimiento de alta sin su baja correspondiente.");
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                if (isHire && resultSet.getInt("f_count") > 0) {
+                    throw new Exception("Inconsistencia en la secuencia cronológica de movimientos en la bitácora de altas/bajas,\n existe al menos un movimiento de alta sin su baja correspondiente.");
                 }
-                else if (resultSet.getInt("f_count") == 0) {
-                    throw new Exception("No existe ningún movimiento de alta previo.");
+                else if (!isHire) {
+                    if (resultSet.getInt("f_count") > 1) {
+                        throw new Exception("Inconsistencia en la secuencia cronológica de movimientos en la bitácora de altas/bajas,\n existe más de un movimiento de alta sin su baja correspondiente.");
+                    }
+                    else if (resultSet.getInt("f_count") == 0) {
+                        throw new Exception("No existe ningún movimiento de alta previo.");
+                    }
                 }
             }
         }
@@ -1496,11 +1488,12 @@ public abstract class SHrsUtils {
 
         String sql = "SELECT id_wds "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_WDS) + " "
-                + "WHERE NOT b_del AND fk_tp_pay = " + paymentType + " ";
+                + "WHERE NOT b_del AND fk_tp_pay = " + paymentType + ";";
 
-        ResultSet resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            workingDaySettings = (SDbWorkingDaySettings) session.readRegistry(SModConsts.HRS_WDS, new int[] { resultSet.getInt(1) });
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                workingDaySettings = (SDbWorkingDaySettings) session.readRegistry(SModConsts.HRS_WDS, new int[] { resultSet.getInt(1) });
+            }
         }
 
         return workingDaySettings;
@@ -1813,15 +1806,17 @@ public abstract class SHrsUtils {
 
         String sql = "SELECT id_ben "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
-                + "WHERE b_del = 0 AND fk_ear = " + earningId + " AND "
+                + "WHERE NOT b_del AND fk_ear = " + earningId + " AND "
                 + "dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutoff) + "' AND "
                 + "(fk_tp_pay_n IS NULL" + (paymentType == 0 ? "" : " OR fk_tp_pay_n = " + paymentType) + ") "
                 + "ORDER BY fk_tp_pay_n DESC, dt_sta DESC, id_ben " // priority to requested payment type, if any, and then the most recent starting date
                 + "LIMIT 1;";
-        ResultSet resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            benefitTable = new SDbBenefitTable();
-            benefitTable.read(session, new int[] { resultSet.getInt("id_ben") });
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                benefitTable = new SDbBenefitTable();
+                benefitTable.read(session, new int[] { resultSet.getInt("id_ben") });
+            }
         }
         
         if (benefitTable == null) {
@@ -1841,18 +1836,18 @@ public abstract class SHrsUtils {
      */
     public static SDbBenefitTable getBenefitTableByDeduction(final SGuiSession session, final int deductionId, final Date dateCutoff) throws Exception {
         SDbBenefitTable benefitTable = null;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT id_ben "
+        String sql = "SELECT id_ben "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
-            + "WHERE b_del = 0 AND fk_ded_n = " + deductionId + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutoff) + "' "
+            + "WHERE NOT b_del AND fk_ded_n = " + deductionId + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutoff) + "' "
             + "ORDER BY dt_sta DESC, id_ben "
             + "LIMIT 1;";
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            benefitTable = new SDbBenefitTable();
-            benefitTable.read(session, new int[] { resultSet.getInt("id_ben") });
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                benefitTable = new SDbBenefitTable();
+                benefitTable.read(session, new int[] { resultSet.getInt("id_ben") });
+            }
         }
 
         return benefitTable;
@@ -1860,15 +1855,17 @@ public abstract class SHrsUtils {
     
     public static String getDisabilityName(final SGuiClient client, final String codeToFind) throws Exception {
         String disabilityName = null;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT name " +
-                "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_DIS) + " " +
-                "WHERE code = '" + codeToFind + "' ORDER BY code, id_tp_dis LIMIT 1 ";
-        resultSet = client.getSession().getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            disabilityName = resultSet.getString("name");
+        String sql = "SELECT name "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_DIS) + " "
+                + "WHERE code = '" + codeToFind + "' "
+                + "ORDER BY code, id_tp_dis "
+                + "LIMIT 1;";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                disabilityName = resultSet.getString("name");
+            }
         }
 
         return disabilityName;
@@ -1912,17 +1909,17 @@ public abstract class SHrsUtils {
      */
     public static int getRecentTaxTable(final SGuiSession session, final Date start) throws SQLException, Exception {
         int tableId = 0;
-        String sql = "";
-        ResultSet resultSet = null;
 
-        sql = "SELECT id_tax "
+        String sql = "SELECT id_tax "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_TAX) + " "
-            + "WHERE b_del = 0 AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
+            + "WHERE NOT b_del AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
             + "ORDER BY dt_sta DESC, id_tax "
             + "LIMIT 1;";
-        resultSet = session.getStatement().executeQuery(sql);
-        if (resultSet.next()) {
-            tableId = resultSet.getInt(1);
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                tableId = resultSet.getInt(1);
+            }
         }
 
         return tableId;
@@ -1942,7 +1939,7 @@ public abstract class SHrsUtils {
 
         sql = "SELECT id_tax_sub "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_TAX_SUB) + " "
-            + "WHERE b_del = 0 AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
+            + "WHERE NOT b_del AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
             + "ORDER BY dt_sta DESC, id_tax_sub "
             + "LIMIT 1;";
         resultSet = session.getStatement().executeQuery(sql);
@@ -1967,7 +1964,7 @@ public abstract class SHrsUtils {
 
         sql = "SELECT id_ssc "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_SSC) + " "
-            + "WHERE b_del = 0 AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
+            + "WHERE NOT b_del AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(start) + "' "
             + "ORDER BY dt_sta DESC, id_ssc "
             + "LIMIT 1;";
         resultSet = session.getStatement().executeQuery(sql);
@@ -1985,7 +1982,7 @@ public abstract class SHrsUtils {
 
         sql = "SELECT id_ben "
             + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_BEN) + " "
-            + "WHERE b_del = 0 AND fk_tp_ben = " + benefitType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutoff) + "' "
+            + "WHERE NOT b_del AND fk_tp_ben = " + benefitType + " AND dt_sta <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutoff) + "' "
             + (paymentType == 0 ? "AND fk_tp_pay_n IS NULL" : "AND (fk_tp_pay_n IS NULL OR fk_tp_pay_n = " + paymentType + ")") + " "
             + "ORDER BY dt_sta DESC, id_ben "
             + "LIMIT 1;";
@@ -3419,7 +3416,7 @@ public abstract class SHrsUtils {
             switch (newAccountingType) {
                 case SModSysConsts.HRSS_TP_ACC_GBL:
                     // attempt to recover existing registry (if any, it would have been deleted):
-                    accountingEarning = (SDbAccountingEarning) session.readRegistry(SModConsts.HRS_ACC_EAR, new int[] { earningId, newAccountingType, 0 });
+                    accountingEarning = (SDbAccountingEarning) session.readRegistry(SModConsts.HRS_ACC_EAR, new int[] { earningId, newAccountingType, 0 }, SDbConsts.MODE_STEALTH);
 
                     // create new registry if needed:
                     if (accountingEarning.getQueryResultId() != SDbConsts.READ_OK) {
@@ -3455,7 +3452,7 @@ public abstract class SHrsUtils {
                             }
                             else {
                                 // attempt to recover existing registry (if any, it would have been deleted):
-                                accountingEarning = (SDbAccountingEarning) session.readRegistry(SModConsts.HRS_ACC_EAR, new int[] { earningId, newAccountingType, resultSet.getInt("id_dep") });
+                                accountingEarning = (SDbAccountingEarning) session.readRegistry(SModConsts.HRS_ACC_EAR, new int[] { earningId, newAccountingType, resultSet.getInt("id_dep") }, SDbConsts.MODE_STEALTH);
                                 
                                 // create new registry if needed:
                                 if (accountingEarning.getQueryResultId() != SDbConsts.READ_OK) {
@@ -3498,7 +3495,7 @@ public abstract class SHrsUtils {
                             }
                             else {
                                 // attempt to recover existing registry (if any, it would have been deleted):
-                                accountingEarning = (SDbAccountingEarning) session.readRegistry(SModConsts.HRS_ACC_EAR, new int[] { earningId, newAccountingType, resultSet.getInt("id_emp") });
+                                accountingEarning = (SDbAccountingEarning) session.readRegistry(SModConsts.HRS_ACC_EAR, new int[] { earningId, newAccountingType, resultSet.getInt("id_emp") }, SDbConsts.MODE_STEALTH);
                                 
                                 // create new registry if needed:
                                 if (accountingEarning.getQueryResultId() != SDbConsts.READ_OK) {
@@ -3552,7 +3549,7 @@ public abstract class SHrsUtils {
             switch (newAccountingType) {
                 case SModSysConsts.HRSS_TP_ACC_GBL:
                     // attempt to recover existing registry (if any, it would have been deleted):
-                    accountingDeduction = (SDbAccountingDeduction) session.readRegistry(SModConsts.HRS_ACC_DED, new int[] { deductionId, newAccountingType, 0 });
+                    accountingDeduction = (SDbAccountingDeduction) session.readRegistry(SModConsts.HRS_ACC_DED, new int[] { deductionId, newAccountingType, 0 }, SDbConsts.MODE_STEALTH);
                     
                     // create new registry if needed:
                     if (accountingDeduction.getQueryResultId() != SDbConsts.READ_OK) {
@@ -3588,7 +3585,7 @@ public abstract class SHrsUtils {
                             }
                             else {
                                 // attempt to recover existing registry (if any, it would have been deleted):
-                                accountingDeduction = (SDbAccountingDeduction) session.readRegistry(SModConsts.HRS_ACC_DED, new int[] { deductionId, newAccountingType, resultSet.getInt("id_dep") });
+                                accountingDeduction = (SDbAccountingDeduction) session.readRegistry(SModConsts.HRS_ACC_DED, new int[] { deductionId, newAccountingType, resultSet.getInt("id_dep") }, SDbConsts.MODE_STEALTH);
                                 
                                 // create new registry if needed:
                                 if (accountingDeduction.getQueryResultId() != SDbConsts.READ_OK) {
@@ -3631,7 +3628,7 @@ public abstract class SHrsUtils {
                             }
                             else {
                                 // attempt to recover existing registry (if any, it would have been deleted):
-                                accountingDeduction = (SDbAccountingDeduction) session.readRegistry(SModConsts.HRS_ACC_DED, new int[] { deductionId, newAccountingType, resultSet.getInt("id_emp") });
+                                accountingDeduction = (SDbAccountingDeduction) session.readRegistry(SModConsts.HRS_ACC_DED, new int[] { deductionId, newAccountingType, resultSet.getInt("id_emp") }, SDbConsts.MODE_STEALTH);
                                 
                                 // create new registry if needed:
                                 if (accountingDeduction.getQueryResultId() != SDbConsts.READ_OK) {

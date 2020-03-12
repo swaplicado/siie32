@@ -12,28 +12,35 @@ import erp.mod.hrs.db.SHrsEmployeeDays;
 import erp.mod.hrs.db.SHrsReceiptEarning;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
+import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFieldDecimal;
+import sa.lib.gui.bean.SBeanFieldKey;
 import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListener {
-    
-    private static final String LABEL_AUX_AMT = "Monto auxiliar";
+public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListener, FocusListener {
     
     private final SHrsReceiptEarning moHrsReceiptEarning;
     private final SHrsEmployeeDays moHrsEmployeeDays;
     private double mdOriginalUnitsAlleged;
     private double mdOriginalAmount;
-    private double mdOriginalAuxAmount;
+    private double mdOriginalAuxValue;
+    private double mdOriginalAuxAmount1;
+    private double mdOriginalAuxAmount2;
+    private int mnOriginalOtherPaymentType;
 
     /**
      * Creates new form SDialogPayrollEarning
@@ -66,8 +73,8 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
         moTextEarningCode = new sa.lib.gui.bean.SBeanFieldText();
         moTextEarningName = new sa.lib.gui.bean.SBeanFieldText();
         jPanel16 = new javax.swing.JPanel();
-        jlOtherPayment = new javax.swing.JLabel();
-        moKeyOtherPayment = new sa.lib.gui.bean.SBeanFieldKey();
+        jlOtherPaymentType = new javax.swing.JLabel();
+        moKeyOtherPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel13 = new javax.swing.JPanel();
         jlUnitsAlleged = new javax.swing.JLabel();
         moCompUnitsAlleged = new sa.lib.gui.bean.SBeanCompoundField();
@@ -83,10 +90,18 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
         jPanel14 = new javax.swing.JPanel();
         jlAmount = new javax.swing.JLabel();
         moCurAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jPanel18 = new javax.swing.JPanel();
+        jlAuxValue = new javax.swing.JLabel();
+        moCompAuxValue = new sa.lib.gui.bean.SBeanCompoundField();
+        jlAuxValueHint = new javax.swing.JLabel();
         jPanel17 = new javax.swing.JPanel();
-        jlAuxAmount = new javax.swing.JLabel();
-        moCurAuxAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
-        jlAuxAmountHint = new javax.swing.JLabel();
+        jlAuxAmount1 = new javax.swing.JLabel();
+        moCurAuxAmount1 = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlAuxAmount1Hint = new javax.swing.JLabel();
+        jPanel19 = new javax.swing.JPanel();
+        jlAuxAmount2 = new javax.swing.JLabel();
+        moCurAuxAmount2 = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlAuxAmount2Hint = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jckUserEdited = new javax.swing.JCheckBox();
         jckAutomatic = new javax.swing.JCheckBox();
@@ -96,7 +111,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(9, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -105,25 +120,25 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
         jPanel7.add(jlEarning);
 
         moTextEarningCode.setEditable(false);
-        moTextEarningCode.setText("sBeanFieldText1");
-        moTextEarningCode.setPreferredSize(new java.awt.Dimension(50, 23));
+        moTextEarningCode.setText("TEXT");
+        moTextEarningCode.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel7.add(moTextEarningCode);
 
         moTextEarningName.setEditable(false);
-        moTextEarningName.setText("sBeanFieldText1");
-        moTextEarningName.setPreferredSize(new java.awt.Dimension(250, 23));
+        moTextEarningName.setText("TEXT");
+        moTextEarningName.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel7.add(moTextEarningName);
 
         jPanel2.add(jPanel7);
 
         jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlOtherPayment.setText("Tipo otro pago:*");
-        jlOtherPayment.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel16.add(jlOtherPayment);
+        jlOtherPaymentType.setText("Tipo otro pago:*");
+        jlOtherPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel16.add(jlOtherPaymentType);
 
-        moKeyOtherPayment.setPreferredSize(new java.awt.Dimension(400, 23));
-        jPanel16.add(moKeyOtherPayment);
+        moKeyOtherPaymentType.setPreferredSize(new java.awt.Dimension(500, 23));
+        jPanel16.add(moKeyOtherPaymentType);
 
         jPanel2.add(jPanel16);
 
@@ -169,27 +184,57 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAmount.setText("Monto:*");
+        jlAmount.setText("Monto:");
         jlAmount.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlAmount);
         jPanel14.add(moCurAmount);
 
         jPanel2.add(jPanel14);
 
+        jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAuxValue.setText("Valor auxiliar:");
+        jlAuxValue.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel18.add(jlAuxValue);
+        jPanel18.add(moCompAuxValue);
+
+        jlAuxValueHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAuxValueHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlAuxValueHint.setToolTipText("Valor auxiliar");
+        jlAuxValueHint.setPreferredSize(new java.awt.Dimension(20, 23));
+        jPanel18.add(jlAuxValueHint);
+
+        jPanel2.add(jPanel18);
+
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlAuxAmount.setText("Monto auxiliar:");
-        jlAuxAmount.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel17.add(jlAuxAmount);
-        jPanel17.add(moCurAuxAmount);
+        jlAuxAmount1.setText("Monto auxiliar:");
+        jlAuxAmount1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel17.add(jlAuxAmount1);
+        jPanel17.add(moCurAuxAmount1);
 
-        jlAuxAmountHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlAuxAmountHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
-        jlAuxAmountHint.setToolTipText("Monto auxiliar");
-        jlAuxAmountHint.setPreferredSize(new java.awt.Dimension(20, 23));
-        jPanel17.add(jlAuxAmountHint);
+        jlAuxAmount1Hint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAuxAmount1Hint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlAuxAmount1Hint.setToolTipText("Monto auxiliar");
+        jlAuxAmount1Hint.setPreferredSize(new java.awt.Dimension(20, 23));
+        jPanel17.add(jlAuxAmount1Hint);
 
         jPanel2.add(jPanel17);
+
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlAuxAmount2.setText("Monto auxiliar:");
+        jlAuxAmount2.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel19.add(jlAuxAmount2);
+        jPanel19.add(moCurAuxAmount2);
+
+        jlAuxAmount2Hint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAuxAmount2Hint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
+        jlAuxAmount2Hint.setToolTipText("Monto auxiliar");
+        jlAuxAmount2Hint.setPreferredSize(new java.awt.Dimension(20, 23));
+        jPanel19.add(jlAuxAmount2Hint);
+
+        jPanel2.add(jPanel19);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -217,6 +262,8 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -226,31 +273,37 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
     private javax.swing.JCheckBox jckUserEdited;
     private javax.swing.JLabel jlAmount;
     private javax.swing.JLabel jlAmountUnit;
-    private javax.swing.JLabel jlAuxAmount;
-    private javax.swing.JLabel jlAuxAmountHint;
+    private javax.swing.JLabel jlAuxAmount1;
+    private javax.swing.JLabel jlAuxAmount1Hint;
+    private javax.swing.JLabel jlAuxAmount2;
+    private javax.swing.JLabel jlAuxAmount2Hint;
+    private javax.swing.JLabel jlAuxValue;
+    private javax.swing.JLabel jlAuxValueHint;
     private javax.swing.JLabel jlEarning;
     private javax.swing.JLabel jlFactorAmount;
-    private javax.swing.JLabel jlOtherPayment;
+    private javax.swing.JLabel jlOtherPaymentType;
     private javax.swing.JLabel jlUnits;
     private javax.swing.JLabel jlUnitsAlleged;
+    private sa.lib.gui.bean.SBeanCompoundField moCompAuxValue;
     private sa.lib.gui.bean.SBeanCompoundField moCompUnits;
     private sa.lib.gui.bean.SBeanCompoundField moCompUnitsAlleged;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAmount;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAmountUnit;
-    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAuxAmount;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAuxAmount1;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAuxAmount2;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecFactorAmount;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyOtherPayment;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyOtherPaymentType;
     private sa.lib.gui.bean.SBeanFieldText moTextEarningCode;
     private sa.lib.gui.bean.SBeanFieldText moTextEarningName;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 560, 350);
+        SGuiUtils.setWindowBounds(this, 640, 400);
 
         jbSave.setText("Aceptar");
 
         moTextEarningName.setTextSettings(SGuiUtils.getLabelName(jlEarning.getText()), 255, 0);
-        moKeyOtherPayment.setKeySettings(miClient, SGuiUtils.getLabelName(jlOtherPayment), true);
+        moKeyOtherPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlOtherPaymentType), true);
         moCompUnitsAlleged.setCompoundFieldSettings(miClient);
         moCompUnitsAlleged.getField().setDecimalSettings(SGuiUtils.getLabelName(jlUnitsAlleged.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, true);
         moCompUnitsAlleged.getField().setValue(0d);
@@ -259,72 +312,129 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
         moCompUnits.getField().setDecimalSettings(SGuiUtils.getLabelName(jlUnits.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, true);
         moCompUnits.getField().setValue(0d);
         moCompUnits.setCompoundText("");
-        moCurAmountUnit.setCompoundFieldSettings(miClient);
-        moCurAmountUnit.getField().setDecimalSettings(SGuiUtils.getLabelName(jlAmountUnit.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false);
-        moDecFactorAmount.setDecimalSettings(SGuiUtils.getLabelName(jlFactorAmount.getText()), SGuiConsts.GUI_TYPE_DEC, false);
+        moCurAmountUnit.setCompoundFieldSettings(miClient); // read only
+        moCurAmountUnit.getField().setDecimalSettings(SGuiUtils.getLabelName(jlAmountUnit.getText()), SGuiConsts.GUI_TYPE_DEC_AMT_UNIT, false); // read only
+        moDecFactorAmount.setDecimalSettings(SGuiUtils.getLabelName(jlFactorAmount.getText()), SGuiConsts.GUI_TYPE_DEC, false); // read only
         moCurAmount.setCompoundFieldSettings(miClient);
-        moCurAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, true);
-        moCurAuxAmount.setCompoundFieldSettings(miClient);
-        moCurAuxAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlAuxAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moCurAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false); // yes!, is NOT mandatory!
+        moCompAuxValue.setCompoundFieldSettings(miClient);
+        moCompAuxValue.getField().setDecimalSettings(SGuiUtils.getLabelName(jlAuxValue.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moCurAuxAmount1.setCompoundFieldSettings(miClient);
+        moCurAuxAmount1.getField().setDecimalSettings(SGuiUtils.getLabelName(jlAuxAmount1.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moCurAuxAmount2.setCompoundFieldSettings(miClient);
+        moCurAuxAmount2.getField().setDecimalSettings(SGuiUtils.getLabelName(jlAuxAmount2.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
 
-        moFields.addField(moKeyOtherPayment);
+        moFields.addField(moKeyOtherPaymentType);
         moFields.addField(moCompUnitsAlleged.getField());
         moFields.addField(moCompUnits.getField());
         moFields.addField(moCurAmountUnit.getField());
         moFields.addField(moDecFactorAmount);
         moFields.addField(moCurAmount.getField());
-        moFields.addField(moCurAuxAmount.getField());
+        moFields.addField(moCompAuxValue.getField());
+        moFields.addField(moCurAuxAmount1.getField());
+        moFields.addField(moCurAuxAmount2.getField());
 
         moFields.setFormButton(jbSave);
 
+        /* PLEASE KEEP THE CALLING ORDER OF THE FOLLOWING METHODS! */
+        removeAllListeners();
         reloadCatalogues();
         
         renderEarning();
         
         addAllListeners();
+        /* PLEASE KEEP THE CALLING ORDER OF THE PREVIOUS METHODS! */
+    }
+    
+    private void resetFieldsAux() {
+        jlAuxValue.setText(SDialogPayrollReceipt.LABEL_AUX_VAL + ":");
+        jlAuxValue.setEnabled(false);
+        jlAuxValueHint.setToolTipText(null);
+        jlAuxValueHint.setEnabled(false);
+        moCompAuxValue.setEnabled(false); // field rarely used; preferable disabling it when not used
+        moCompAuxValue.getField().setMandatory(false);
+        moCompAuxValue.setCompoundText("");
+        moCompAuxValue.getField().setGuiType(SGuiConsts.GUI_TYPE_DEC_AMT);
+        moCompAuxValue.getField().setMinDouble(0);
+        moCompAuxValue.getField().setMaxDouble(Double.MAX_VALUE);
+        moCompAuxValue.getField().resetField();
+        
+        jlAuxAmount1.setText(SDialogPayrollReceipt.LABEL_AUX_AMT + ":");
+        jlAuxAmount1.setEnabled(false);
+        jlAuxAmount1Hint.setToolTipText(null);
+        jlAuxAmount1Hint.setEnabled(false);
+        moCurAuxAmount1.setEnabled(false); // field rarely used; preferable disabling it when not used
+        moCurAuxAmount1.getField().setMandatory(false);
+        moCurAuxAmount1.getField().resetField();
+        
+        jlAuxAmount2.setText(SDialogPayrollReceipt.LABEL_AUX_AMT + ":");
+        jlAuxAmount2.setEnabled(false);
+        jlAuxAmount2Hint.setToolTipText(null);
+        jlAuxAmount2Hint.setEnabled(false);
+        moCurAuxAmount2.setEnabled(false); // field rarely used; preferable disabling it when not used
+        moCurAuxAmount2.getField().setMandatory(false);
+        moCurAuxAmount2.getField().resetField();
     }
     
     private void renderEarning() {
         SDbEarning earning = moHrsReceiptEarning.getEarning(); // convenience variable
         SDbPayrollReceiptEarning payrollReceiptEarning = moHrsReceiptEarning.getPayrollReceiptEarning(); // convenience variable
         
+        // preserve original values:
+        
         mdOriginalUnitsAlleged = payrollReceiptEarning.getUnitsAlleged();
         mdOriginalAmount = payrollReceiptEarning.getAmount_r();
-        mdOriginalAuxAmount = payrollReceiptEarning.getAuxiliarAmount();
+        mdOriginalAuxValue = payrollReceiptEarning.getAuxiliarValue();
+        mdOriginalAuxAmount1 = payrollReceiptEarning.getAuxiliarAmount1();
+        mdOriginalAuxAmount2 = payrollReceiptEarning.getAuxiliarAmount2();
+        mnOriginalOtherPaymentType = payrollReceiptEarning.getFkOtherPaymentTypeId();
+        
+        // render earning:
         
         moTextEarningCode.setValue(earning.getCode());
         moTextEarningName.setValue(earning.getName());
         
-        moKeyOtherPayment.setValue(new int[] { payrollReceiptEarning.getFkOtherPaymentTypeId() });
-        moKeyOtherPayment.setEnabled(earning.getFkEarningTypeId() == SModSysConsts.HRSS_TP_EAR_OTH);
-        
-        boolean editable = moHrsReceiptEarning.getEarning().areUnitsModifiable();
+        boolean unitsEditable = moHrsReceiptEarning.getEarning().areUnitsModifiable();
         String earningUnit = moHrsReceiptEarning.getHrsReceipt().getHrsPayroll().getEarningComputationTypesMap().get(earning.getFkEarningComputationTypeId());
         
         moCompUnitsAlleged.getField().setValue(payrollReceiptEarning.getUnitsAlleged());
+        moCompUnitsAlleged.getField().setEditable(unitsEditable);
         moCompUnitsAlleged.setCompoundText(earningUnit);
-        moCompUnitsAlleged.getField().setEditable(editable);
         
         moCompUnits.getField().setValue(payrollReceiptEarning.getUnits());
+        moCompUnits.getField().setEditable(unitsEditable);
         moCompUnits.setCompoundText(earningUnit);
-        moCompUnits.getField().setEditable(editable);
         
-        moCurAmountUnit.getField().setValue(payrollReceiptEarning.getAmountUnitary());
-        moDecFactorAmount.setValue(payrollReceiptEarning.getFactorAmount());
+        moCurAmountUnit.getField().setValue(payrollReceiptEarning.getAmountUnitary()); // read only
+        moDecFactorAmount.setValue(payrollReceiptEarning.getFactorAmount()); // read only
+        
         moCurAmount.getField().setValue(payrollReceiptEarning.getAmount_r());
+        moCurAmount.getField().setEditable(!unitsEditable);
+
+        // resetting of specialized fields:
+        moKeyOtherPaymentType.setEnabled(false);
+        moKeyOtherPaymentType.setValue(new int[] { payrollReceiptEarning.getFkOtherPaymentTypeId() }); // may trigger an item-state-changed event
+        itemStateChangedKeyOtherPayment(); // force triggering an item-state-changed event
         
-        moCurAuxAmount.getField().setValue(payrollReceiptEarning.getAuxiliarAmount());
-        if (earning.getFkEarningTypeId() == SModSysConsts.HRSS_TP_EAR_TAX_SUB) {
-            jlAuxAmount.setText(SDbEarning.AuxAmountLabels.get(SModSysConsts.HRSS_TP_EAR_TAX_SUB) + ":");
-            jlAuxAmountHint.setToolTipText(SDbEarning.AuxAmountHints.get(SModSysConsts.HRSS_TP_EAR_TAX_SUB));
-            jlAuxAmountHint.setEnabled(true);
-            moCurAuxAmount.setEditable(true);
-        }
-        else {
-            jlAuxAmount.setText(LABEL_AUX_AMT + ":");
-            jlAuxAmountHint.setToolTipText(null);
-            jlAuxAmountHint.setEnabled(false);
-            moCurAuxAmount.setEditable(false);
+        switch (earning.getFkEarningTypeId()) {
+            case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
+                jlAuxAmount1.setText(SDbEarning.TAX_SUB_LABEL + ":");
+                jlAuxAmount1.setEnabled(true);
+                jlAuxAmount1Hint.setToolTipText(SDbEarning.TAX_SUB_HINT);
+                jlAuxAmount1Hint.setEnabled(true);
+                moCurAuxAmount1.setEnabled(true); // field rarely used; preferable disabling it when used
+                moCurAuxAmount1.getField().setMandatory(false); // yes!, is NOT mandatory!
+                
+                moCurAuxAmount1.getField().setValue(payrollReceiptEarning.getAuxiliarAmount1());
+                break;
+                
+            case SModSysConsts.HRSS_TP_EAR_OTH:
+                moKeyOtherPaymentType.setEnabled(earning.getFkOtherPaymentTypeId() == SModSysConsts.HRSS_TP_EAR_OTH);
+                
+                moCompAuxValue.getField().setValue(payrollReceiptEarning.getAuxiliarValue());
+                moCurAuxAmount1.getField().setValue(payrollReceiptEarning.getAuxiliarAmount1());
+                moCurAuxAmount2.getField().setValue(payrollReceiptEarning.getAuxiliarAmount2());
+                break;
         }
         
         jckUserEdited.setSelected(payrollReceiptEarning.isUserEdited());
@@ -343,9 +453,48 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
         moCurAmount.getField().setValue(amount);
     }
     
+    private void itemStateChangedKeyOtherPayment() {
+        resetFieldsAux();
+        
+        if (moKeyOtherPaymentType.getSelectedIndex() > 0) {
+            switch (moKeyOtherPaymentType.getValue()[0]) {
+                case SModSysConsts.HRSS_TP_OTH_PAY_TAX_BAL:
+                    int year = SLibTimeUtils.digestYear(moHrsReceiptEarning.getHrsReceipt().getHrsPayroll().getPayroll().getDateEnd())[0];
+                    jlAuxValue.setText(SDbEarning.OTH_TAX_BAL_LABEL_YEAR + ":*");
+                    jlAuxValue.setEnabled(true);
+                    jlAuxValueHint.setToolTipText(SDbEarning.OTH_TAX_BAL_HINT_YEAR);
+                    jlAuxValueHint.setEnabled(true);
+                    moCompAuxValue.setEnabled(true); // field rarely used; preferable disabling it when used
+                    moCompAuxValue.getField().setMandatory(true); // yes!, is mandatory!
+                    moCompAuxValue.setCompoundText("");
+                    moCompAuxValue.getField().setDecimalFormat(SLibUtils.DecimalFormatCalendarYear);
+                    moCompAuxValue.getField().setMinDouble(year - 1);
+                    moCompAuxValue.getField().setMaxDouble(year);
+                    moCompAuxValue.getField().setValue((double) year);
+                    
+                    jlAuxAmount1.setText(SDbEarning.OTH_TAX_BAL_LABEL_BAL + ":*");
+                    jlAuxAmount1.setEnabled(true);
+                    jlAuxAmount1Hint.setToolTipText(SDbEarning.OTH_TAX_BAL_HINT_BAL);
+                    jlAuxAmount1Hint.setEnabled(true);
+                    moCurAuxAmount1.setEnabled(true); // field rarely used; preferable disabling it when used
+                    moCurAuxAmount1.getField().setMandatory(true); // yes!, is mandatory!
+
+                    jlAuxAmount2.setText(SDbEarning.OTH_TAX_BAL_LABEL_REM_BAL + ":");
+                    jlAuxAmount2.setEnabled(true);
+                    jlAuxAmount2Hint.setToolTipText(SDbEarning.OTH_TAX_BAL_HINT_REM_BAL);
+                    jlAuxAmount2Hint.setEnabled(true);
+                    moCurAuxAmount2.setEnabled(true); // field rarely used; preferable disabling it when used
+                    moCurAuxAmount2.getField().setMandatory(false); // yes!, is NOT mandatory!
+                    break;
+                    
+                default:
+            }
+        }
+    }
+    
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyOtherPayment, SModConsts.HRSS_TP_OTH_PAY, 0, null);
+        miClient.getSession().populateCatalogue(moKeyOtherPaymentType, SModConsts.HRSS_TP_OTH_PAY, 0, null);
     }
 
     @Override
@@ -357,15 +506,9 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + SGuiUtils.getLabelName(jlUnits) + "'" + SGuiConsts.ERR_MSG_FIELD_VAL_GREAT_EQUAL + "'" + SGuiUtils.getLabelName(jlUnitsAlleged) + "'.");
                 validation.setComponent(moCompUnits.getField().getComponent());
             }
-            else if (moKeyOtherPayment.isEnabled()) {
-                if (moKeyOtherPayment.getSelectedIndex() <= 0) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlOtherPayment) + "'.");
-                    validation.setComponent(moKeyOtherPayment);
-                }
-                else if (moKeyOtherPayment.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NON) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlOtherPayment) + "'.");
-                    validation.setComponent(moKeyOtherPayment);
-                }
+            else if (moKeyOtherPaymentType.isEnabled() && moKeyOtherPaymentType.getValue()[0] == SModSysConsts.HRSS_TP_OTH_PAY_NON) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlOtherPaymentType) + "'.");
+                validation.setComponent(moKeyOtherPaymentType);
             }
         }
         
@@ -376,6 +519,16 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
     public void actionSave() {
         if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
+                // special-case validations:
+                
+                if (moCurAmount.getField().getValue() == 0 && miClient.showMsgBoxConfirm(SGuiConsts.MSG_CNF_FIELD_VAL_ + "'" + moCurAmount.getField().getFieldName() + "'" + SGuiConsts.MSG_CNF_FIELD_VAL_UNDEF) != JOptionPane.YES_OPTION) {
+                    miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + moCurAmount.getField().getFieldName() + "'. ");
+                    moCurAmount.getField().getComponent().requestFocus();
+                    return;
+                }
+                
+                // save:
+                
                 SDbEarning earning = moHrsReceiptEarning.getEarning(); // convenience variable
                 SDbPayrollReceiptEarning payrollReceiptEarning = moHrsReceiptEarning.getPayrollReceiptEarning(); // convenience variable
                 
@@ -390,13 +543,19 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
                 }
 
                 payrollReceiptEarning.setAmount_r(moCurAmount.getField().getValue());
-                payrollReceiptEarning.setAuxiliarAmount(moCurAuxAmount.getField().getValue());
+                
+                payrollReceiptEarning.setFkOtherPaymentTypeId(moKeyOtherPaymentType.getValue()[0]);
+                payrollReceiptEarning.setAuxiliarValue(moCompAuxValue.getField().getValue());
+                payrollReceiptEarning.setAuxiliarAmount1(moCurAuxAmount1.getField().getValue());
+                payrollReceiptEarning.setAuxiliarAmount2(moCurAuxAmount2.getField().getValue());
                 
                 if (!payrollReceiptEarning.isUserEdited()) {
-                    payrollReceiptEarning.setUserEdited(
-                            mdOriginalUnitsAlleged != moCompUnitsAlleged.getField().getValue() || 
+                    payrollReceiptEarning.setUserEdited(mdOriginalUnitsAlleged != moCompUnitsAlleged.getField().getValue() ||
                             mdOriginalAmount != moCurAmount.getField().getValue() ||
-                            mdOriginalAuxAmount != moCurAuxAmount.getField().getValue()
+                            mdOriginalAuxValue != moCompAuxValue.getField().getValue() ||
+                            mdOriginalAuxAmount1 != moCurAuxAmount1.getField().getValue() ||
+                            mdOriginalAuxAmount2 != moCurAuxAmount2.getField().getValue() ||
+                            mnOriginalOtherPaymentType != moKeyOtherPaymentType.getValue()[0]
                     );
                 }
                 
@@ -414,12 +573,14 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
 
     @Override
     public void addAllListeners() {
+        moKeyOtherPaymentType.addItemListener(this);
         moCompUnitsAlleged.getField().getComponent().addFocusListener(this);
         moCompUnits.getField().getComponent().addFocusListener(this);
     }
 
     @Override
     public void removeAllListeners() {
+        moKeyOtherPaymentType.removeItemListener(this);
         moCompUnitsAlleged.getField().getComponent().removeFocusListener(this);
         moCompUnits.getField().getComponent().removeFocusListener(this);
     }
@@ -432,6 +593,17 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements FocusListe
     @Override
     public SDbRegistry getRegistry() throws Exception {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (e.getSource() instanceof SBeanFieldKey && e.getStateChange() == ItemEvent.SELECTED) {
+            SBeanFieldKey field = (SBeanFieldKey) e.getSource();
+            
+            if (field == moKeyOtherPaymentType) {
+                itemStateChangedKeyOtherPayment();
+            }
+        }
     }
 
     @Override
