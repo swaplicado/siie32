@@ -429,7 +429,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
         jPanel14.setLayout(new java.awt.BorderLayout());
 
-        jPanel4.setPreferredSize(new java.awt.Dimension(100, 275));
+        jPanel4.setPreferredSize(new java.awt.Dimension(100, 300));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
         jpEarnings.setBorder(javax.swing.BorderFactory.createTitledBorder("Percepciones:"));
@@ -1681,7 +1681,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private void actionPickDeduction() {
         miClient.getSession().showOptionPicker(SModConsts.HRS_DED, SLibConsts.UNDEFINED, null, moTextDeductionCode);
         
-        if (moTextDeductionCode.getValue().isEmpty()) {
+        if (!moTextDeductionCode.getValue().isEmpty()) {
             actionLoadDeduction(false);
         }
     }
@@ -1763,7 +1763,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private void actionAddDeduction() {
         try {
             if (moDeduction == null) {
-                miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(moTextEarningCode.getToolTipText()) + "'.");
+                miClient.showMsgBoxWarning(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(moTextDeductionCode.getToolTipText()) + "'.");
                 moTextDeductionCode.requestFocusInWindow();
             }
             else {
