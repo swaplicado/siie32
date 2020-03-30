@@ -205,6 +205,7 @@ public class SDialogRepVacationsFileCsv extends SBeanFormDialog {
                         "IF(!emp.b_act, 0, (SELECT COALESCE(SUM(unt_all), 0) FROM hrs_pay_rcp_ear WHERE b_del = 0 AND ben_ann <> 0 AND ben_ann > TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + ") AND fk_tp_ben = " + SModSysConsts.HRSS_TP_BEN_VAC + " AND id_emp = emp.id_emp)) AS f_payed_unt_oth, " +
                         "IF(!emp.b_act OR TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + " ) = 0, 0, IF(ear.ben_ann <> TIMESTAMPDIFF(YEAR,emp.dt_ben," + dateCut + " ), SUM(ear.amt_r), 0))  AS f_payed_amt_oth " +
                         "FROM erp.hrsu_emp AS emp " +
+                        "INNER JOIN hrs_emp_member AS empm ON empm.id_emp = emp.id_emp " +
                         "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
                         "INNER JOIN hrs_ben AS v " +
                         "INNER JOIN hrs_ben_row AS vr ON v.id_ben = vr.id_ben " +

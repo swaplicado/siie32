@@ -644,6 +644,7 @@ public abstract class SModConsts {
     public static final int HRS_UMA = 2063073;
     public static final int HRS_UMI = 2063074;
     public static final int HRS_TP_LOAN_ADJ = 2063076;
+    public static final int HRS_EMP_MEMBER = 2063080;
     public static final int HRS_EMP_LOG_HIRE = 2063081;
     public static final int HRS_EMP_LOG_WAGE = 2063082;
     public static final int HRS_EMP_LOG_SAL_SSC = 2063083;
@@ -1209,6 +1210,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_UMA, "hrs_uma");
         TablesMap.put(HRS_UMI, "hrs_umi");
         TablesMap.put(HRS_TP_LOAN_ADJ, "hrs_tp_loan_adj");
+        TablesMap.put(HRS_EMP_MEMBER, "hrs_emp_member");
         TablesMap.put(HRS_EMP_LOG_HIRE, "hrs_emp_log_hire");
         TablesMap.put(HRS_EMP_LOG_WAGE, "hrs_emp_log_wage");
         TablesMap.put(HRS_EMP_LOG_SAL_SSC, "hrs_emp_log_sal_ssc");

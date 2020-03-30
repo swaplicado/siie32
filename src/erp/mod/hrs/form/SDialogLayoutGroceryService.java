@@ -567,7 +567,7 @@ public class SDialogLayoutGroceryService extends sa.lib.gui.bean.SBeanFormDialog
                 for (SDbPayrollReceipt payrollReceipt : moPayroll.getChildPayrollReceipts()) {
                     SDbEmployee employee = moEmployeesMap.get(payrollReceipt.getPkEmployeeId());
                     if (employee.getFkGroceryServiceId() == groceryService.getId()) {
-                        Receipt receipt = new Receipt(new int[] { employee.getPkEmployeeId() }, employee.getNumber(), employee.getAuxEmployeeName());
+                        Receipt receipt = new Receipt(new int[] { employee.getPkEmployeeId() }, employee.getNumber(), employee.getXtaEmployeeName());
                         receipt.setAccount(employee.getGroceryServiceAccount());
                         receipt.setAmount(payrollReceipt.getPayment_r());
                         rows.add(receipt);

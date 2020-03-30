@@ -533,6 +533,7 @@ public abstract class SDataReadTableRows {
                         "FROM erp.bpsu_bp AS bp " +
                         "INNER JOIN erp.bpsu_bp_ct AS ct ON bp.id_bp = ct.id_bp AND bp.b_del = 0 " +
                         "INNER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp AND e.b_mfg_ope = 1 " +
+                        "INNER JOIN hrs_emp_member AS em ON e.id_emp = em.id_emp " +
                         "ORDER BY bp.bp, bp.id_bp ";
                 break;
 

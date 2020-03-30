@@ -539,7 +539,7 @@ public class SDialogPayrollReceiptSsc extends SBeanFormDialog implements ActionL
         String sql = "";
         ResultSet resultSet = null;
         ResultSet resultSetAux = null;
-        Vector<SGridRow> rows = new Vector<SGridRow>();
+        Vector<SGridRow> rows = new Vector<>();
         Statement statement = null;
         Statement statementAux = null;
         
@@ -554,6 +554,7 @@ public class SDialogPayrollReceiptSsc extends SBeanFormDialog implements ActionL
             sql = "SELECT e.num, e.id_emp, e.sal_ssc, bp.bp, d.code, d.name, "
                     + "IF(e.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + ", e.sal, (e.wage * " + SHrsConsts.YEAR_MONTHS + " / " + SHrsConsts.YEAR_DAYS + ")) AS _sd " 
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = e.id_emp "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON bp.id_bp = e.id_emp "
                     + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS d ON d.id_dep = e.fk_dep "
                     + "WHERE bp.b_del = 0 AND e.b_act = 1 "

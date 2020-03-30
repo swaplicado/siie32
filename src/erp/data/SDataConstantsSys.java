@@ -87,6 +87,8 @@ public abstract class SDataConstantsSys {
 
     public static final String CFG_PARAM_DIOT_ACCOUNTS = "DIOT_ACCOUNTS";
     public static final String CFG_PARAM_DIOT_VAT_DEFAULT = "DIOT_VAT_DEFAULT";
+    public static final String CFG_PARAM_HRS_EMPLOYEES_CRUD = "HRS_EMPLOYEES_CRUD";
+    public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     
     public static final int CFGX_IVM_FIFO = 1;
     

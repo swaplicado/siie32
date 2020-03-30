@@ -99,7 +99,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.lib.form.SFormField moFieldDateBirth;
     private erp.lib.form.SFormField moFieldDateBenefits;
     private erp.lib.form.SFormField moFieldDateLastHire;
-    private erp.lib.form.SFormField moFieldDateLastDismiss_n;
+    private erp.lib.form.SFormField moFieldDateLastDismissal_n;
     private erp.lib.form.SFormField moFieldFkPaymentType;
     private erp.lib.form.SFormField moFieldFkSalaryType;
     private erp.lib.form.SFormField moFieldSalary;
@@ -254,8 +254,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftDateLastHire = new javax.swing.JFormattedTextField();
         jbDateLastHire = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
-        jlDateLastDismiss_n = new javax.swing.JLabel();
-        jftDateLastDismiss_n = new javax.swing.JFormattedTextField();
+        jlDateLastDismissal_n = new javax.swing.JLabel();
+        jftDateLastDismissal_n = new javax.swing.JFormattedTextField();
         jPanel28 = new javax.swing.JPanel();
         jlFkPaymentType = new javax.swing.JLabel();
         jcbFkPaymentType = new javax.swing.JComboBox<SFormComponentItem>();
@@ -735,16 +735,16 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlDateLastDismiss_n.setText("Última baja:");
-        jlDateLastDismiss_n.setEnabled(false);
-        jlDateLastDismiss_n.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel9.add(jlDateLastDismiss_n);
+        jlDateLastDismissal_n.setText("Última baja:");
+        jlDateLastDismissal_n.setEnabled(false);
+        jlDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel9.add(jlDateLastDismissal_n);
 
-        jftDateLastDismiss_n.setEditable(false);
-        jftDateLastDismiss_n.setText("yyyy/mm/dd");
-        jftDateLastDismiss_n.setFocusable(false);
-        jftDateLastDismiss_n.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel9.add(jftDateLastDismiss_n);
+        jftDateLastDismissal_n.setEditable(false);
+        jftDateLastDismissal_n.setText("yyyy/mm/dd");
+        jftDateLastDismissal_n.setFocusable(false);
+        jftDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel9.add(jftDateLastDismissal_n);
 
         jPanel3.add(jPanel9);
 
@@ -1462,9 +1462,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldDateLastHire = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateLastHire, jlDateLastHire);
         moFieldDateLastHire.setPickerButton(jbDateLastHire);
         moFieldDateLastHire.setTabbedPaneIndex(0, jTabbedPane1);
-        moFieldDateLastDismiss_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateLastDismiss_n, jlDateLastDismiss_n);
-        //moFieldDateLastDismiss_n.setPickerButton(...);
-        moFieldDateLastDismiss_n.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldDateLastDismissal_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateLastDismissal_n, jlDateLastDismissal_n);
+        moFieldDateLastDismissal_n.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFkPaymentType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkPaymentType, jlFkPaymentType);
         moFieldFkPaymentType.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFkSalaryType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSalaryType, jlFkSalaryType);
@@ -1607,7 +1606,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mvFields.add(moFieldIsDeleted);
         mvFields.add(moFieldDateBenefits);
         mvFields.add(moFieldDateLastHire);
-        mvFields.add(moFieldDateLastDismiss_n);
+        mvFields.add(moFieldDateLastDismissal_n);
         mvFields.add(moFieldFkPaymentType);
         mvFields.add(moFieldFkSalaryType);
         mvFields.add(moFieldSalary);
@@ -2337,7 +2336,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JFormattedTextField jftDateChangeSalary;
     private javax.swing.JFormattedTextField jftDateChangeSalarySscBase;
     private javax.swing.JFormattedTextField jftDateChangeWage;
-    private javax.swing.JFormattedTextField jftDateLastDismiss_n;
+    private javax.swing.JFormattedTextField jftDateLastDismissal_n;
     private javax.swing.JFormattedTextField jftDateLastHire;
     private javax.swing.JFormattedTextField jftMateDateBirth;
     private javax.swing.JFormattedTextField jftNumber;
@@ -2352,7 +2351,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlContractExpirationHint;
     private javax.swing.JLabel jlDateBenefits;
     private javax.swing.JLabel jlDateBirth;
-    private javax.swing.JLabel jlDateLastDismiss_n;
+    private javax.swing.JLabel jlDateLastDismissal_n;
     private javax.swing.JLabel jlDateLastHire;
     private javax.swing.JLabel jlEmail;
     private javax.swing.JLabel jlFirstname;
@@ -2801,7 +2800,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldDateBenefits.setFieldValue(moEmployee.getDateBenefits());
             focusLostDateBenefits();
             moFieldDateLastHire.setFieldValue(moEmployee.getDateLastHire());
-            moFieldDateLastDismiss_n.setFieldValue(moEmployee.getDateLastDismiss_n());
+            moFieldDateLastDismissal_n.setFieldValue(moEmployee.getDateLastDismissal_n());
             moFieldFkPaymentType.setFieldValue(new int[] { moEmployee.getFkPaymentTypeId() });
             itemStateChangePaymentType();
             moFieldFkSalaryType.setFieldValue(new int[] { moEmployee.getFkSalaryTypeId() });
@@ -2991,11 +2990,13 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         if (moEmployee == null) {
             moEmployee = new SDataEmployee();
+            moEmployee.setFkSourceCompanyId(miClient.getSessionXXX().getCurrentCompany().getPkCompanyId()); // set source company
             moEmployee.setFkUserInsertId(miClient.getSession().getUser().getPkUserId());
 
             moBizPartner.setDbmsDataEmployee(moEmployee);
         }
         else {
+            //moEmployee.setFkSourceCompanyId(...); // source company is immutable!
             moEmployee.setFkUserUpdateId(miClient.getSession().getUser().getPkUserId());
         }
 
@@ -3007,7 +3008,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moEmployee.setDateBirth(moFieldDateBirth.getDate());
         moEmployee.setDateBenefits(moFieldDateBenefits.getDate());
         moEmployee.setDateLastHire(moFieldDateLastHire.getDate());
-        moEmployee.setDateLastDismiss_n(moFieldDateLastDismiss_n.getDate());
+        moEmployee.setDateLastDismissal_n(moFieldDateLastDismissal_n.getDate());
         
         // update of business partner name MUST BE SET HERE, DO NOT MOVE!, that is just after father and mother surenames and forename already has been set in SDataEmployee!
         String formerBizPartner = moBizPartner.getBizPartner();
@@ -3084,7 +3085,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moEmployee.setFkCatalogueMaritalStatusTypeId(moFieldFkCatalogueMaritalStatusType.getKeyAsIntArray()[1]);
         moEmployee.setFkCatalogueEducationClassId(moFieldFkCatalogueEducationType.getKeyAsIntArray()[0]);
         moEmployee.setFkCatalogueEducationTypeId(moFieldFkCatalogueEducationType.getKeyAsIntArray()[1]);
-        moEmployee.setFkSourceCompanyId(miClient.getSessionXXX().getCurrentCompany().getPkCompanyId()); // XXX 2020-03-04, Sergio Flores: Improve this!
+        //moEmployee.setFkSourceCompanyId(...); // source company set above in this method!
         moEmployee.setFkBankId_n(moFieldFkBank_n.getKeyAsIntArray()[0]);
         moEmployee.setFkGroceryServiceId(moFieldFkGroceryService.getKeyAsIntArray()[0]);
 

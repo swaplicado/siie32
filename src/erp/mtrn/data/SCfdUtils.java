@@ -441,9 +441,9 @@ public abstract class SCfdUtils implements Serializable {
                                     receipt.getCuentaBancaria().compareTo(receiptXml.getCuentaBancaria()) == 0 && receipt.getTipoContrato().compareTo(receiptXml.getTipoContrato()) == 0 &&
                                     receipt.getFechaPago().compareTo(receiptXml.getFechaPago()) == 0 && receipt.getFechaFinalPago().compareTo(receiptXml.getFechaFinalPago()) == 0 &&
                                     receipt.getFechaInicialPago().compareTo(receiptXml.getFechaInicialPago()) == 0 && receipt.getFechaInicioRelLaboral().compareTo(receiptXml.getFechaInicioRelLaboral()) == 0 &&
-                                    receipt.getNumDiasPagados() == receiptXml.getNumDiasPagados() && receipt.getCurp().compareTo(receiptXml.getCurp()) == 0 &&
+                                    receipt.getNumDiasPagados() == receiptXml.getNumDiasPagados() && receipt.getEmpleadoCurp().compareTo(receiptXml.getEmpleadoCurp()) == 0 &&
                                     receipt.getTipoRegimen() == receiptXml.getTipoRegimen() && receipt.getNumSeguridadSocial().compareTo(receiptXml.getNumSeguridadSocial()) == 0 &&
-                                    receipt.getNumEmpleado().compareTo(receiptXml.getNumEmpleado()) == 0 && receipt.getRegistroPatronal().compareTo(receiptXml.getRegistroPatronal()) == 0 &&
+                                    receipt.getEmpleadoNum().compareTo(receiptXml.getEmpleadoNum()) == 0 && receipt.getRegistroPatronal().compareTo(receiptXml.getRegistroPatronal()) == 0 &&
                                     receipt.getPuesto().compareTo(receiptXml.getPuesto()) == 0 && receipt.getRiesgoPuesto() == receiptXml.getRiesgoPuesto() &&
                                     receipt.getDepartamento().compareTo(receiptXml.getDepartamento()) == 0 && receipt.getPeriodicidadPago().compareTo(receiptXml.getPeriodicidadPago()) == 0 &&
                                     receipt.getSalarioBaseCotApor() == receiptXml.getSalarioBaseCotApor() && receipt.getSalarioDiarioIntegrado() == receiptXml.getSalarioDiarioIntegrado() &&

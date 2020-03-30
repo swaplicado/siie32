@@ -17,8 +17,8 @@ import sa.lib.gui.SGuiSession;
 
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
-  * - erp.mbps.data.SDataEmployee
-  * - erp.mod.hrs.db.SHrsAccounting
+ * - erp.mbps.data.SDataEmployee
+ * - erp.mod.hrs.db.SHrsAccounting
  * All of them also make raw SQL insertions.
  */
 
@@ -132,7 +132,7 @@ public class SDbAccountingDeduction extends SDbRegistryUser {
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
-        
+
         msAuxDeduction = "";
         msAuxReference = "";
         msAuxTable = "";
@@ -159,6 +159,7 @@ public class SDbAccountingDeduction extends SDbRegistryUser {
 
     @Override
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
+        
     }
 
     @Override
@@ -189,7 +190,7 @@ public class SDbAccountingDeduction extends SDbRegistryUser {
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
-            
+
             msSql = "SELECT name FROM hrs_ded WHERE id_ded = " + mnPkDeductionId;
             resultSet = session.getStatement().executeQuery(msSql);
             if (!resultSet.next()) {
@@ -198,7 +199,7 @@ public class SDbAccountingDeduction extends SDbRegistryUser {
             else {
                 msAuxDeduction = resultSet.getString("name");
             }
-            
+
             switch (mnPkAccountingTypeId) {
                 case SModSysConsts.HRSS_TP_ACC_GBL:
                     msSql = "";
@@ -210,9 +211,8 @@ public class SDbAccountingDeduction extends SDbRegistryUser {
                     msSql = "SELECT bp AS f_ref FROM erp.bpsu_bp WHERE id_bp = " + mnPkReferenceId;
                     break;
                 default:
-                    break;
             }
-            
+
             if (!msSql.isEmpty()) {
                 resultSet = session.getStatement().executeQuery(msSql);
                 if (!resultSet.next()) {
@@ -305,7 +305,7 @@ public class SDbAccountingDeduction extends SDbRegistryUser {
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
-        
+
         registry.setRegistryNew(true);
         return registry;
     }

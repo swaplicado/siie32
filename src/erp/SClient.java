@@ -107,7 +107,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 162.0"; // fecha release: 2020-03-12
+    public static final String APP_RELEASE = "3.2 163.1"; // fecha release: 2020-03-30
     public static final String APP_COPYRIGHT = "2007-2020";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -116,6 +116,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     public static final String VENDOR_PHONE = "(443) 204-1032";
     public static final String VENDOR_WEBSITE = "www.swaplicado.com.mx";
     public static final String VENDOR_MAIL = "contacto@swaplicado.com.mx";
+    
+    public static final String ERR_PARAMS_APP_READING = "No fue posible leer los parámetros de configuración del sistema.";
 
     private boolean mbFirstActivation;
     private boolean mbLoggedIn;
@@ -752,6 +754,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         moParamsApp = new SParamsApp();
         if (!moParamsApp.read()) {
+            showMsgBoxError(ERR_PARAMS_APP_READING);
             System.exit(-1);    // there is no way of connecting to an ERP Server
         }
 
@@ -855,7 +858,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private ArrayList<SSrvCompany> readCompanies() {
         String sql = "";
         ResultSet resultSet = null;
-        ArrayList<SSrvCompany> companies = new ArrayList<SSrvCompany>();
+        ArrayList<SSrvCompany> companies = new ArrayList<>();
 
         try {
             sql = "SELECT id_co, co FROM " + SModConsts.TablesMap.get(SModConsts.CFGU_CO) + " WHERE b_del = 0 ORDER BY co, id_co ";

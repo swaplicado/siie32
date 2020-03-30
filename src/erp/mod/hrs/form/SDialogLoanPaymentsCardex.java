@@ -416,7 +416,7 @@ public class SDialogLoanPaymentsCardex extends SBeanFormDialog {
         
         employee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { moLoan.getPkEmployeeId() });
         
-        moTextEmployeeName.setValue(employee.getAuxEmployeeName());
+        moTextEmployeeName.setValue(employee.getXtaEmployeeName());
         moTextLoanType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_LOAN, new int[] { moLoan.getFkLoanTypeId() }, SDbRegistryUser.FIELD_NAME));
         moTextLoanPaymentType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_LOAN_PAY, new int[] { moLoan.getFkLoanPaymentTypeId() }, SDbRegistryUser.FIELD_NAME));
         moTextDateStart.setValue(SLibUtils.DateFormatDate.format(moLoan.getDateStart()));

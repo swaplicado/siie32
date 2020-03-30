@@ -251,9 +251,9 @@ public class SDialogPayrollCfdiPicker extends javax.swing.JDialog implements erp
         }
         else {
             SDbEmployee employee = (SDbEmployee) miClient.getSession().readRegistry(SModConsts.HRSU_EMP, new int[] { mnEmployeeId });
-            jtfEmployeeName.setText(employee.getAuxEmployeeName());
+            jtfEmployeeName.setText(employee.getXtaEmployeeName());
             jtfEmployeeNumber.setText(employee.getNumber());
-            jtfEmployeeFiscalId.setText(employee.getAuxFiscalId());
+            jtfEmployeeFiscalId.setText(employee.getXtaEmployeeRfc());
             jtfEmployeeName.setCaretPosition(0);
             jtfEmployeeNumber.setCaretPosition(0);
             jtfEmployeeFiscalId.setCaretPosition(0);

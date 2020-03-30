@@ -300,24 +300,11 @@ public class SViewBenefitVacationPending extends SGridPaneView implements Action
                 + "e.num AS " + SDbConsts.FIELD_CODE + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON b.id_bp = e.id_emp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON b.id_bp = em.id_emp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS d ON e.fk_dep = d.id_dep "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON e.fk_tp_pay = tp.id_tp_pay "
                 + "WHERE " + sql
                 + "ORDER BY b.bp, b.id_bp;";
-
-        try {
-            /*
-            IMPORTANT!:
-            Probably due to de SQL session variables created on the fly,
-            this SQL query works fine only after the second time it is executed consecutively.
-            So, this execution is needed, trior to the very moment this view is about to be displayed!
-            WEIRD BUT TRUE!
-            */
-            //miClient.getSession().getStatement().execute(msSql); // only this way this view's query works properly!
-        }
-        catch (Exception e) {
-            SLibUtils.showException(this, e);
-        }
     }
 
     @Override

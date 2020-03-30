@@ -353,11 +353,18 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         
         String sql = "SELECT e.id_emp "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
-                + "WHERE NOT e.b_del AND (e.fk_tp_pay = " + paymentType + (payrollId == 0 ? "" : " OR e.id_emp IN ("
+                + "WHERE NOT e.b_del AND (e.fk_tp_pay = " + paymentType + " "
+                + (payrollId == 0 ? 
+                "AND e.id_emp IN ("
+                + " SELECT em.id_emp "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em "
+                + " ORDER BY em.id_emp) " :
+                "OR e.id_emp IN ("
                 + " SELECT pr.id_emp "
                 + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
-                + " WHERE p.id_pay = " + payrollId + " AND NOT pr.b_del)") + ") "
+                + " WHERE p.id_pay = " + payrollId + " AND NOT pr.b_del "
+                + " ORDER BY pr.id_emp)") + ") "
                 + "ORDER BY e.id_emp;";
 
         try (ResultSet resultSet = miStatement.executeQuery(sql)) {
@@ -632,7 +639,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         for (SDbEmployeeHireLog entry : employeeHireLogs) {
             hiredDays += SLibTimeUtils.countPeriodDays(
                     entry.getDateHire().compareTo(dateStart) <= 0 ? dateStart : entry.getDateHire(), 
-                    entry.getDateDismissed_n() == null || entry.getDateDismissed_n().compareTo(dateEnd) >= 0 ? dateEnd : entry.getDateDismissed_n());
+                    entry.getDateDismissal_n() == null || entry.getDateDismissal_n().compareTo(dateEnd) >= 0 ? dateEnd : entry.getDateDismissal_n());
         }
         
         return hiredDays;
@@ -710,7 +717,7 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         for (SDbEmployeeHireLog entry : employeeHireLogs) {
             businessDays += SHrsUtils.countBusinessDays(
                     entry.getDateHire().compareTo(dateStart) <= 0 ? dateStart : entry.getDateHire(), 
-                    entry.getDateDismissed_n() == null || entry.getDateDismissed_n().compareTo(dateEnd) >= 0 ? dateEnd : entry.getDateDismissed_n(), 
+                    entry.getDateDismissal_n() == null || entry.getDateDismissal_n().compareTo(dateEnd) >= 0 ? dateEnd : entry.getDateDismissal_n(), 
                     moWorkingDaySettingsMap.get(paymentType), 
                     readHolidays(dateStart, dateEnd));
         }

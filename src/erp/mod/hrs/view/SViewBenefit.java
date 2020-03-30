@@ -496,6 +496,7 @@ public class SViewBenefit extends SGridPaneView implements ActionListener {
                 // # main query's source tables:
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON e.id_emp = bp.id_bp "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = bp.id_bp "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON e.fk_tp_pay = tp.id_tp_pay "
                 + ""
                 // # retrieve current benefit payed:

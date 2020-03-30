@@ -17,9 +17,9 @@ import sa.lib.gui.SGuiSession;
  *
  * @author Sergio Flores
  */
-public class SDbEmployeeDismissType extends SDbRegistryUser {
+public class SDbEmployeeDismissalType extends SDbRegistryUser {
 
-    protected int mnPkEmployeeDismissTypeId;
+    protected int mnPkEmployeeDismissalTypeId;
     protected String msCode;
     protected String msName;
     /*
@@ -31,11 +31,11 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
 
-    public SDbEmployeeDismissType() {
+    public SDbEmployeeDismissalType() {
         super(SModConsts.HRSU_TP_EMP_DIS);
     }
 
-    public void setPkEmployeeDismissTypeId(int n) { mnPkEmployeeDismissTypeId = n; }
+    public void setPkEmployeeDismissalTypeId(int n) { mnPkEmployeeDismissalTypeId = n; }
     public void setCode(String s) { msCode = s; }
     public void setName(String s) { msName = s; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -45,7 +45,7 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
 
-    public int getPkEmployeeDismissTypeId() { return mnPkEmployeeDismissTypeId; }
+    public int getPkEmployeeDismissalTypeId() { return mnPkEmployeeDismissalTypeId; }
     public String getCode() { return msCode; }
     public String getName() { return msName; }
     public boolean isDeleted() { return mbDeleted; }
@@ -57,19 +57,19 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
 
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkEmployeeDismissTypeId = pk[0];
+        mnPkEmployeeDismissalTypeId = pk[0];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkEmployeeDismissTypeId };
+        return new int[] { mnPkEmployeeDismissalTypeId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
 
-        mnPkEmployeeDismissTypeId = 0;
+        mnPkEmployeeDismissalTypeId = 0;
         msCode = "";
         msName = "";
         mbDeleted = false;
@@ -87,7 +87,7 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_tp_emp_dis = " + mnPkEmployeeDismissTypeId + " ";
+        return "WHERE id_tp_emp_dis = " + mnPkEmployeeDismissalTypeId + " ";
     }
 
     @Override
@@ -99,12 +99,12 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
         ResultSet resultSet = null;
 
-        mnPkEmployeeDismissTypeId = 0;
+        mnPkEmployeeDismissalTypeId = 0;
 
         msSql = "SELECT COALESCE(MAX(id_tp_emp_dis), 0) + 1 FROM " + getSqlTable() + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
-            mnPkEmployeeDismissTypeId = resultSet.getInt(1);
+            mnPkEmployeeDismissalTypeId = resultSet.getInt(1);
         }
     }
 
@@ -122,7 +122,7 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkEmployeeDismissTypeId = resultSet.getInt("id_tp_emp_dis");
+            mnPkEmployeeDismissalTypeId = resultSet.getInt("id_tp_emp_dis");
             msCode = resultSet.getString("code");
             msName = resultSet.getString("name");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -151,7 +151,7 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
-                    mnPkEmployeeDismissTypeId + ", " +
+                    mnPkEmployeeDismissalTypeId + ", " +
                     "'" + msCode + "', " +
                     "'" + msName + "', " +
                     (mbDeleted ? 1 : 0) + ", " +
@@ -166,7 +166,7 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
             mnFkUserUpdateId = session.getUser().getPkUserId();
 
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                    //"id_tp_emp_dis = " + mnPkEmployeeDismissTypeId + ", " +
+                    //"id_tp_emp_dis = " + mnPkEmployeeDismissalTypeId + ", " +
                     "code = '" + msCode + "', " +
                     "name = '" + msName + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -184,10 +184,10 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
     }
 
     @Override
-    public SDbEmployeeDismissType clone() throws CloneNotSupportedException {
-        SDbEmployeeDismissType registry = new SDbEmployeeDismissType();
+    public SDbEmployeeDismissalType clone() throws CloneNotSupportedException {
+        SDbEmployeeDismissalType registry = new SDbEmployeeDismissalType();
 
-        registry.setPkEmployeeDismissTypeId(this.getPkEmployeeDismissTypeId());
+        registry.setPkEmployeeDismissalTypeId(this.getPkEmployeeDismissalTypeId());
         registry.setCode(this.getCode());
         registry.setName(this.getName());
         registry.setDeleted(this.isDeleted());

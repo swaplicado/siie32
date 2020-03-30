@@ -145,8 +145,8 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jPanel19 = new javax.swing.JPanel();
         jlSalarySscBase = new javax.swing.JLabel();
         moDecSalarySscBase = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jlDateLastDismiss_n = new javax.swing.JLabel();
-        moTextDateLastDismiss_n = new sa.lib.gui.bean.SBeanFieldText();
+        jlDateLastDismissal_n = new javax.swing.JLabel();
+        moTextDateLastDismissal_n = new sa.lib.gui.bean.SBeanFieldText();
         jlWorkingHoursDay = new javax.swing.JLabel();
         moIntWorkingHoursDay = new sa.lib.gui.bean.SBeanFieldInteger();
         jLabel1 = new javax.swing.JLabel();
@@ -392,14 +392,14 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moDecSalarySscBase.setPreferredSize(new java.awt.Dimension(85, 23));
         jPanel19.add(moDecSalarySscBase);
 
-        jlDateLastDismiss_n.setText("Última baja:");
-        jlDateLastDismiss_n.setPreferredSize(new java.awt.Dimension(95, 23));
-        jPanel19.add(jlDateLastDismiss_n);
+        jlDateLastDismissal_n.setText("Última baja:");
+        jlDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(95, 23));
+        jPanel19.add(jlDateLastDismissal_n);
 
-        moTextDateLastDismiss_n.setEditable(false);
-        moTextDateLastDismiss_n.setText("TEXT");
-        moTextDateLastDismiss_n.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel19.add(moTextDateLastDismiss_n);
+        moTextDateLastDismissal_n.setEditable(false);
+        moTextDateLastDismissal_n.setText("TEXT");
+        moTextDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel19.add(moTextDateLastDismissal_n);
 
         jlWorkingHoursDay.setText("Horas jornada:");
         jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -697,7 +697,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private javax.swing.JLabel jlAlternativeId;
     private javax.swing.JLabel jlDateBenefits;
     private javax.swing.JLabel jlDateBirth;
-    private javax.swing.JLabel jlDateLastDismiss_n;
+    private javax.swing.JLabel jlDateLastDismissal_n;
     private javax.swing.JLabel jlDateLastHire;
     private javax.swing.JLabel jlDeductionLoan_n;
     private javax.swing.JLabel jlDeductionValue;
@@ -747,7 +747,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private sa.lib.gui.bean.SBeanFieldText moTextAlternativeId;
     private sa.lib.gui.bean.SBeanFieldText moTextDateBenefits;
     private sa.lib.gui.bean.SBeanFieldText moTextDateBirth;
-    private sa.lib.gui.bean.SBeanFieldText moTextDateLastDismiss_n;
+    private sa.lib.gui.bean.SBeanFieldText moTextDateLastDismissal_n;
     private sa.lib.gui.bean.SBeanFieldText moTextDateLastHire;
     private sa.lib.gui.bean.SBeanFieldText moTextDeductionCode;
     private sa.lib.gui.bean.SBeanFieldText moTextDeductionName;
@@ -781,7 +781,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moTextDateBirth.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moTextDateBenefits.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moTextDateLastHire.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
-        moTextDateLastDismiss_n.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
+        moTextDateLastDismissal_n.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moTextDepartament.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moTextPosition.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moTextShift.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
@@ -1066,10 +1066,10 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private void renderEmployee() {
         SDbEmployee employee = moHrsReceipt.getHrsEmployee().getEmployee();
         
-        moTextName.setValue(employee.getAuxEmployeeName());
+        moTextName.setValue(employee.getXtaEmployeeName());
         moTextNumber.setValue(employee.getNumber());
-        moTextFiscalId.setValue(employee.getAuxFiscalId());
-        moTextAlternativeId.setValue(employee.getAuxAlternativeId());
+        moTextFiscalId.setValue(employee.getXtaEmployeeRfc());
+        moTextAlternativeId.setValue(employee.getXtaEmployeeCurp());
         moTextSocialSecurityNumber.setValue(employee.getSocialSecurityNumber());
         moTextPaymentType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { employee.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
         moDecSalary.setValue(employee.getSalary());
@@ -1078,7 +1078,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moTextDateBirth.setValue(SLibUtils.DateFormatDate.format(employee.getDateBirth()));
         moTextDateBenefits.setValue(SLibUtils.DateFormatDate.format(employee.getDateBenefits()));
         moTextDateLastHire.setValue(SLibUtils.DateFormatDate.format(employee.getDateLastHire()));
-        moTextDateLastDismiss_n.setValue(employee.getDateLastDismiss_n() != null ? SLibUtils.DateFormatDate.format(employee.getDateLastDismiss_n()) : "");
+        moTextDateLastDismissal_n.setValue(employee.getDateLastDismissal_n() != null ? SLibUtils.DateFormatDate.format(employee.getDateLastDismissal_n()) : "");
         moTextSalaryType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { employee.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
         moTextEmployeeType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { employee.getFkEmployeeTypeId() }, SDbRegistry.FIELD_NAME));
         moTextWorkerType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { employee.getFkWorkerTypeId() }, SDbRegistry.FIELD_NAME));
@@ -1187,7 +1187,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         }
         
         if (!moHrsReceipt.getHrsEmployee().getEmployee().isActive()) {
-            dateCutOff = moHrsReceipt.getHrsEmployee().getEmployee().getDateLastDismiss_n();
+            dateCutOff = moHrsReceipt.getHrsEmployee().getEmployee().getDateLastDismissal_n();
             
             if (benefitType != SModSysConsts.HRSS_TP_BEN_ANN_BON && !SLibTimeUtils.isBelongingToPeriod(dateCutOff, moHrsReceipt.getHrsPayroll().getPayroll().getDateStart(), moHrsReceipt.getHrsPayroll().getPayroll().getDateEnd())) {
                 dateCutOff = moHrsReceipt.getHrsPayroll().getPayroll().getDateEnd();
@@ -1731,7 +1731,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
                     if (employee.isAssimilable() && moEarning.getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_ASS_INC) {
                         // this message is duplicated as is in method validateForm(), please synchronize any change!
-                        miClient.showMsgBoxWarning(employee.getAuxEmployeeName() + ", "
+                        miClient.showMsgBoxWarning(employee.getXtaEmployeeName() + ", "
                         + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
                         + "no puede tener percepciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_EAR, new int[] { SModSysConsts.HRSS_TP_EAR_ASS_INC }, SDbRegistry.FIELD_NAME) + "'.");
                         moTextEarningCode.requestFocus();
@@ -1811,7 +1811,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
                     if (employee.isAssimilable() && moDeduction.getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_TAX) {
                         // this message is duplicated as is in method validateForm(), please synchronize any change!
-                        miClient.showMsgBoxWarning(employee.getAuxEmployeeName() + ", "
+                        miClient.showMsgBoxWarning(employee.getXtaEmployeeName() + ", "
                             + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
                             + "no puede tener deducciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_DED, new int[] { SModSysConsts.HRSS_TP_DED_TAX }, SDbRegistry.FIELD_NAME) + "'.");
                         moTextDeductionCode.requestFocus();
@@ -2071,7 +2071,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             for (SHrsReceiptEarning hrsReceiptEarning : moHrsReceipt.getHrsReceiptEarnings()) {
                 if (hrsReceiptEarning.getEarning().getFkEarningTypeId() != SModSysConsts.HRSS_TP_EAR_ASS_INC) {
                     // this message is duplicated as is in method actionAddEarning(), please synchronize any change!
-                    validation.setMessage(employee.getAuxEmployeeName() + ", "
+                    validation.setMessage(employee.getXtaEmployeeName() + ", "
                     + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
                     + "no puede tener percepciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_EAR, new int[] { SModSysConsts.HRSS_TP_EAR_ASS_INC }, SDbRegistry.FIELD_NAME) + "'.");
                     validation.setComponent(moTextEarningCode);
@@ -2083,7 +2083,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
                 for (SHrsReceiptDeduction hrsReceiptDeduction : moHrsReceipt.getHrsReceiptDeductions()) {
                     if (hrsReceiptDeduction.getDeduction().getFkDeductionTypeId() != SModSysConsts.HRSS_TP_DED_TAX) {
                         // this message is duplicated as is in method actionAddDeduction(), please synchronize any change!
-                        validation.setMessage(employee.getAuxEmployeeName() + ", "
+                        validation.setMessage(employee.getXtaEmployeeName() + ", "
                         + "cuyo tipo de régimen de contratación es '" + miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { employee.getFkRecruitmentSchemeTypeId() }, SDbRegistry.FIELD_NAME) + "',\n"
                         + "no puede tener deducciones distintas a '" + miClient.getSession().readField(SModConsts.HRSS_TP_DED, new int[] { SModSysConsts.HRSS_TP_DED_TAX }, SDbRegistry.FIELD_NAME) + "'.");
                         validation.setComponent(moTextEarningCode);

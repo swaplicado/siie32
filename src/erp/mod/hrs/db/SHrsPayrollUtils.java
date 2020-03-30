@@ -30,6 +30,7 @@ public abstract class SHrsPayrollUtils {
 
         String sql = "SELECT b.bp, e.num, e.id_emp, e.b_act, e.fk_tp_rec_sche, trs.code, trs.name " +
                 "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e " +
+                "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON em.id_emp = e.id_emp " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON b.id_bp = e.id_emp " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " AS trs ON trs.id_tp_rec_sche = e.fk_tp_rec_sche " + // taken from employee
                 "WHERE NOT e.b_del AND NOT b.b_del AND e.fk_tp_pay = " + paymentType + " " +
@@ -109,7 +110,7 @@ public abstract class SHrsPayrollUtils {
             row.setPkEmployeeId(hrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId());
             row.setFkPaymentTypeId(hrsReceipt.getPayrollReceipt().getFkPaymentTypeId());
             row.setNumber(hrsReceipt.getHrsEmployee().getEmployee().getNumber());
-            row.setName(hrsReceipt.getHrsEmployee().getEmployee().getAuxEmployeeName());
+            row.setName(hrsReceipt.getHrsEmployee().getEmployee().getXtaEmployeeName());
             row.setActive(hrsReceipt.getPayrollReceipt().isActive());
             row.setRecruitmentSchemeTypeId(recruitmentSchemeTypeId);
             row.setRecruitmentSchemeType(recruitmentScheme);

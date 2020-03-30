@@ -30,7 +30,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     protected int mnPkEmployeeId;
     protected Date mtDateBenefits;
     protected Date mtDateLastHire;
-    protected Date mtDateLastDismiss_n;
+    protected Date mtDateLastDismissal_n;
     protected double mdSalary;
     protected double mdWage;
     protected double mdSalarySscBase;
@@ -176,7 +176,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public void setPkEmployeeId(int n) { mnPkEmployeeId = n; }
     public void setDateBenefits(Date t) { mtDateBenefits = t; }
     public void setDateLastHire(Date t) { mtDateLastHire = t; }
-    public void setDateLastDismiss_n(Date t) { mtDateLastDismiss_n = t; }
+    public void setDateLastDismissal_n(Date t) { mtDateLastDismissal_n = t; }
     public void setSalary(double d) { mdSalary = d; }
     public void setWage(double d) { mdWage = d; }
     public void setSalarySscBase(double d) { mdSalarySscBase = d; }
@@ -251,7 +251,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public Date getDateBenefits() { return mtDateBenefits; }
     public Date getDateLastHire() { return mtDateLastHire; }
-    public Date getDateLastDismiss_n() { return mtDateLastDismiss_n; }
+    public Date getDateLastDismissal_n() { return mtDateLastDismissal_n; }
     public double getSalary() { return mdSalary; }
     public double getWage() { return mdWage; }
     public double getSalarySscBase() { return mdSalarySscBase; }
@@ -446,7 +446,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         mnPkEmployeeId = 0;
         mtDateBenefits = null;
         mtDateLastHire = null;
-        mtDateLastDismiss_n = null;
+        mtDateLastDismissal_n = null;
         mdSalary = 0;
         mdWage = 0;
         mdSalarySscBase = 0;
@@ -557,7 +557,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
             mnPkEmployeeId = resultSet.getInt("id_emp");
             mtDateBenefits = resultSet.getDate("dt_ben");
             mtDateLastHire = resultSet.getDate("dt_hire");
-            mtDateLastDismiss_n = resultSet.getDate("dt_dis_n");
+            mtDateLastDismissal_n = resultSet.getDate("dt_dis_n");
             mdSalary = resultSet.getDouble("sal");
             mdWage = resultSet.getDouble("wage");
             mdSalarySscBase = resultSet.getDouble("sal_ssc");
@@ -707,7 +707,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     mnPkEmployeeId + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastHire) + "', " + 
-                    (mtDateLastDismiss_n == null ? "null" :  "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismiss_n) + "'") + ", " +
+                    (mtDateLastDismissal_n == null ? "null" :  "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismissal_n) + "'") + ", " +
                     mdSalary + ", " + 
                     mdWage + ", " + 
                     mdSalarySscBase + ", " + 
@@ -786,7 +786,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
                     "id_emp = " + mnPkEmployeeId + ", " +
                     "dt_ben = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " +
                     "dt_hire = '" + SLibUtils.DbmsDateFormatDate.format(mtDateLastHire) + "', " +
-                    "dt_dis_n = " + (mtDateLastDismiss_n == null ? "null" :  "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismiss_n) + "'") + ", " +
+                    "dt_dis_n = " + (mtDateLastDismissal_n == null ? "null" :  "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismissal_n) + "'") + ", " +
                     "sal = " + mdSalary + ", " +
                     "wage = " + mdWage + ", " +
                     "sal_ssc = " + mdSalarySscBase + ", " +
@@ -898,7 +898,7 @@ public class SDbPayrollReceipt extends SDbRegistryUser {
         registry.setPkEmployeeId(this.getPkEmployeeId());
         registry.setDateBenefits(this.getDateBenefits());
         registry.setDateLastHire(this.getDateLastHire());
-        registry.setDateLastDismiss_n(this.getDateLastDismiss_n());
+        registry.setDateLastDismissal_n(this.getDateLastDismissal_n());
         registry.setSalary(this.getSalary());
         registry.setWage(this.getWage());
         registry.setSalarySscBase(this.getSalarySscBase());

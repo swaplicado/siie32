@@ -1522,7 +1522,7 @@ public class SHrsReceipt {
         
         for (SDbEmployeeHireLog hireLog : moHrsEmployee.getEmployeeHireLogs()) {
             Date dateStart = hireLog.getDateHire().compareTo(moHrsEmployee.getPeriodStart()) <= 0 ? moHrsEmployee.getPeriodStart() : hireLog.getDateHire();
-            Date dateEnd = hireLog.getDateDismissed_n() == null ? moHrsEmployee.getPeriodEnd() : hireLog.getDateDismissed_n().compareTo(moHrsEmployee.getPeriodEnd()) >= 0 ? moHrsEmployee.getPeriodEnd() : hireLog.getDateDismissed_n();
+            Date dateEnd = hireLog.getDateDismissal_n() == null ? moHrsEmployee.getPeriodEnd() : hireLog.getDateDismissal_n().compareTo(moHrsEmployee.getPeriodEnd()) >= 0 ? moHrsEmployee.getPeriodEnd() : hireLog.getDateDismissal_n();
             
             int periodDays = (int) SLibTimeUtils.getDaysDiff(dateEnd, dateStart);
             

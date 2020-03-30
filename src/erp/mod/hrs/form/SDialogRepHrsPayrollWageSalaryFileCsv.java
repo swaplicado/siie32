@@ -489,9 +489,10 @@ public class SDialogRepHrsPayrollWageSalaryFileCsv extends SBeanFormDialog imple
                         "FROM hrs_pay AS p " +
                         "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay " +
                         "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp " +
-                        (!moRadFilterTypeDatePay.isSelected() ?  "" : " INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp "
-                        + "AND rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' "
-                        + "AND '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
+                        (!moRadFilterTypeDatePay.isSelected() ?  "" :
+                        "INNER JOIN hrs_pay_rcp_iss AS rcp_iss ON rcp_iss.id_pay = pr.id_pay AND rcp_iss.id_emp = pr.id_emp AND " +
+                        "rcp_iss.dt_pay BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moDateDateStart.getValue()) + "' AND  '" + SLibUtils.DbmsDateFormatDate.format(moDateDateEnd.getValue()) + "' AND " +
+                        "rcp_iss.b_del = 0 AND rcp_iss.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ") +
                         "INNER JOIN erp.hrsu_emp AS e ON e.id_emp = pre.id_emp " +
                         "INNER JOIN erp.bpsu_bp AS b ON b.id_bp = pre.id_emp " +
                         "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = e.fk_dep " +

@@ -10,10 +10,13 @@ import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SHrsEmployeeDays;
 import erp.mod.hrs.db.SHrsReceiptEarning;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
@@ -31,7 +34,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Juan Barajas, Sergio Flores
  */
-public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListener, FocusListener {
+public class SDialogPayrollEarning extends SBeanFormDialog implements ActionListener, ItemListener, FocusListener {
     
     private final SHrsReceiptEarning moHrsReceiptEarning;
     private final SHrsEmployeeDays moHrsEmployeeDays;
@@ -90,6 +93,9 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
         jPanel14 = new javax.swing.JPanel();
         jlAmount = new javax.swing.JLabel();
         moCurAmount = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jlAmountOriginal = new javax.swing.JLabel();
+        moCurAmountOriginal = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jbCopyAmountOriginal = new javax.swing.JButton();
         jPanel18 = new javax.swing.JPanel();
         jlAuxValue = new javax.swing.JLabel();
         moCompAuxValue = new sa.lib.gui.bean.SBeanCompoundField();
@@ -189,6 +195,19 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
         jPanel14.add(jlAmount);
         jPanel14.add(moCurAmount);
 
+        jlAmountOriginal.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlAmountOriginal.setText("Monto original:");
+        jlAmountOriginal.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel14.add(jlAmountOriginal);
+
+        moCurAmountOriginal.setEditable(false);
+        jPanel14.add(moCurAmountOriginal);
+
+        jbCopyAmountOriginal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_copy.gif"))); // NOI18N
+        jbCopyAmountOriginal.setToolTipText("Copiar monto original");
+        jbCopyAmountOriginal.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel14.add(jbCopyAmountOriginal);
+
         jPanel2.add(jPanel14);
 
         jPanel18.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -269,9 +288,11 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JButton jbCopyAmountOriginal;
     private javax.swing.JCheckBox jckAutomatic;
     private javax.swing.JCheckBox jckUserEdited;
     private javax.swing.JLabel jlAmount;
+    private javax.swing.JLabel jlAmountOriginal;
     private javax.swing.JLabel jlAmountUnit;
     private javax.swing.JLabel jlAuxAmount1;
     private javax.swing.JLabel jlAuxAmount1Hint;
@@ -288,6 +309,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
     private sa.lib.gui.bean.SBeanCompoundField moCompUnits;
     private sa.lib.gui.bean.SBeanCompoundField moCompUnitsAlleged;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAmount;
+    private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAmountOriginal;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAmountUnit;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAuxAmount1;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAuxAmount2;
@@ -317,6 +339,8 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
         moDecFactorAmount.setDecimalSettings(SGuiUtils.getLabelName(jlFactorAmount.getText()), SGuiConsts.GUI_TYPE_DEC, false); // read only
         moCurAmount.setCompoundFieldSettings(miClient);
         moCurAmount.getField().setDecimalSettings(SGuiUtils.getLabelName(jlAmount.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false); // yes!, is NOT mandatory!
+        moCurAmountOriginal.setCompoundFieldSettings(miClient);
+        moCurAmountOriginal.getField().setDecimalSettings(SGuiUtils.getLabelName(jlAmountOriginal.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false); // read-only field
         moCompAuxValue.setCompoundFieldSettings(miClient);
         moCompAuxValue.getField().setDecimalSettings(SGuiUtils.getLabelName(jlAuxValue.getText()), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moCurAuxAmount1.setCompoundFieldSettings(miClient);
@@ -330,6 +354,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
         moFields.addField(moCurAmountUnit.getField());
         moFields.addField(moDecFactorAmount);
         moFields.addField(moCurAmount.getField());
+        //moFields.addField(moCurAmountOriginal.getField()); // read-only field
         moFields.addField(moCompAuxValue.getField());
         moFields.addField(moCurAuxAmount1.getField());
         moFields.addField(moCurAuxAmount2.getField());
@@ -409,7 +434,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
         moDecFactorAmount.setValue(payrollReceiptEarning.getFactorAmount()); // read only
         
         moCurAmount.getField().setValue(payrollReceiptEarning.getAmount_r());
-        moCurAmount.getField().setEditable(!unitsEditable);
+        moCurAmountOriginal.getField().setValue(payrollReceiptEarning.getAmount_r()); // read only
 
         // resetting of specialized fields:
         moKeyOtherPaymentType.setEnabled(false);
@@ -441,16 +466,21 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
         jckAutomatic.setSelected(payrollReceiptEarning.isAutomatic());
     }
     
-    private void actionCalculateUnits() {
+    private void calculateUnits() {
         double units = moHrsEmployeeDays.computeEarningUnits(moCompUnitsAlleged.getField().getValue(), moHrsReceiptEarning.getEarning());
         moCompUnits.getField().setValue(units);
         
-        actionCalculateAmount();
+        calculateAmount();
     }
     
-    private void actionCalculateAmount() {
+    private void calculateAmount() {
         double amount = SHrsEmployeeDays.computeEarningAmount(moCompUnits.getField().getValue(), moCurAmountUnit.getField().getValue(), moHrsReceiptEarning.getEarning());
         moCurAmount.getField().setValue(amount);
+    }
+    
+    private void actionPerformedCopyAmountOriginal() {
+        moCurAmount.getField().setValue(mdOriginalAmount);
+        moCurAmount.getField().getComponent().requestFocusInWindow();
     }
     
     private void itemStateChangedKeyOtherPayment() {
@@ -573,6 +603,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
 
     @Override
     public void addAllListeners() {
+        jbCopyAmountOriginal.addActionListener(this);
         moKeyOtherPaymentType.addItemListener(this);
         moCompUnitsAlleged.getField().getComponent().addFocusListener(this);
         moCompUnits.getField().getComponent().addFocusListener(this);
@@ -580,6 +611,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
 
     @Override
     public void removeAllListeners() {
+        jbCopyAmountOriginal.removeActionListener(this);
         moKeyOtherPaymentType.removeItemListener(this);
         moCompUnitsAlleged.getField().getComponent().removeFocusListener(this);
         moCompUnits.getField().getComponent().removeFocusListener(this);
@@ -593,6 +625,17 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
     @Override
     public SDbRegistry getRegistry() throws Exception {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+            
+            if (button == jbCopyAmountOriginal) {
+                actionPerformedCopyAmountOriginal();
+            }
+        }
     }
 
     @Override
@@ -617,10 +660,10 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ItemListen
             SBeanFieldDecimal decimalField = (SBeanFieldDecimal) e.getSource();
 
             if (decimalField == moCompUnits.getField().getComponent()) {
-                actionCalculateAmount();
+                calculateAmount();
             }
             else if (decimalField == moCompUnitsAlleged.getField().getComponent()) {
-                actionCalculateUnits();
+                calculateUnits();
             }
         }
     }

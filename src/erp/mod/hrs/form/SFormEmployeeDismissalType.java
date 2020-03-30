@@ -5,7 +5,7 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
-import erp.mod.hrs.db.SDbEmployeeDismissType;
+import erp.mod.hrs.db.SDbEmployeeDismissalType;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -19,14 +19,14 @@ import sa.lib.gui.bean.SBeanForm;
  *
  * @author Sergio Flores
  */
-public class SFormEmployeeDismissType extends SBeanForm {
+public class SFormEmployeeDismissalType extends SBeanForm {
 
-    private SDbEmployeeDismissType moRegistry;
+    private SDbEmployeeDismissalType moRegistry;
 
     /**
      * Creates new form SFormEmployeeDismissType
      */
-    public SFormEmployeeDismissType(SGuiClient client, String title) {
+    public SFormEmployeeDismissalType(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSU_TP_EMP_DIS, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -56,7 +56,7 @@ public class SFormEmployeeDismissType extends SBeanForm {
 
         jPanel2.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCode.setText("Código:*");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -67,7 +67,7 @@ public class SFormEmployeeDismissType extends SBeanForm {
 
         jPanel2.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlName.setText("Nombre:*");
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -124,7 +124,7 @@ public class SFormEmployeeDismissType extends SBeanForm {
 
     @Override
     public void setRegistry(SDbRegistry registry) throws Exception {
-        moRegistry = (SDbEmployeeDismissType) registry;
+
 
         mnFormResult = SLibConsts.UNDEFINED;
         mbFirstActivation = true;
@@ -151,7 +151,7 @@ public class SFormEmployeeDismissType extends SBeanForm {
 
     @Override
     public SDbRegistry getRegistry() throws Exception {
-        SDbEmployeeDismissType registry = moRegistry.clone();
+        SDbEmployeeDismissalType registry = moRegistry.clone();
 
         if (registry.isRegistryNew()) { }
 

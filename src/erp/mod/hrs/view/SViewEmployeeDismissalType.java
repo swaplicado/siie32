@@ -18,9 +18,9 @@ import sa.lib.gui.SGuiClient;
  *
  * @author Juan Barajas
  */
-public class SViewEmployeeDismissType extends SGridPaneView {
+public class SViewEmployeeDismissalType extends SGridPaneView {
 
-    public SViewEmployeeDismissType(SGuiClient client, String title) {
+    public SViewEmployeeDismissalType(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRSU_TP_EMP_DIS, SLibConsts.UNDEFINED, title);
         setRowButtonsEnabled(true, true, true, false, true);
     }

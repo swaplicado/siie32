@@ -1,4 +1,17 @@
 ================================================================================
+SIIE 3.2 163.1/ 2020-03-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de separación de empleados por empresa, con opción a sincronizar empleados entre empresas complementarias (sibling-companies.)
+2) Exportación de empleados dados de baja a otras empresas con Módulo de Recursos Humanos.
+
+================================================================================
+SIIE 3.2 163.0/ 2020-03-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de requisitos del error nom164 al emitir nóminas, relacionado con el número de registro patronal del emisor de CFDI de nóminas de asimilados.
+
+================================================================================
 SIIE 3.2 162.0/ 2020-03-12
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
