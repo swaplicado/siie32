@@ -317,10 +317,11 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
                     hrsEmployeeHireLog.setIsAuxForceFirstHiring(true); // to emulate a first-higing movement
                     hrsEmployeeHireLog.setIsAuxModification(false);
                     hrsEmployeeHireLog.setIsAuxCorrection(false);
-                    hrsEmployeeHireLog.setAuxFormerEmployerConnection(miClient.getSession().getStatement().getConnection()); // former employer connection
+                    hrsEmployeeHireLog.setAuxFormerEmployerConnection(miClient.getSession().getStatement().getConnection()); // former employer connection (in current user session)
                     
                     moEmployee.setActive(true); // re-active this inactive employee
                     moEmployee.setDateLastHire(moDateDate.getValue());
+                    moEmployee.setFkSourceCompanyId(moKeyNewEmployer.getValue()[0]);
                     
                     moEmployee.setAuxHireLogDate(moDateDate.getValue());
                     moEmployee.setAuxHireLogNotes(SGuiUtils.getLabelName(jlNewEmployer).toUpperCase());
