@@ -1118,6 +1118,25 @@
                                 </Property>
                               </Properties>
                             </Component>
+                            <Component class="javax.swing.JButton" name="jbShowPrepayroll">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Ver pren&#xf3;mina"/>
+                                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                                  <Insets value="[2, 0, 2, 0]"/>
+                                </Property>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbCleanPrepayroll">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Limpiar"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[75, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
                           </SubComponents>
                         </Container>
                       </SubComponents>

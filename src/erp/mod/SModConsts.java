@@ -630,6 +630,7 @@ public abstract class SModConsts {
     public static final int HRS_FDY = 2063012;
     public static final int HRS_HOL = 2063013;
     public static final int HRS_WDS = 2063015;
+    public static final int HRS_PRE_PAY_CUT_CAL = 2063016;
     public static final int HRS_TAX = 2063021;
     public static final int HRS_TAX_ROW = 2063022;
     public static final int HRS_TAX_SUB = 2063031;
@@ -688,6 +689,7 @@ public abstract class SModConsts {
     public static final int HRSX_ABS_MOV = 2064101;
     public static final int HRSX_SSC_UPD = 2064102;
     public static final int HRSX_EAR_SSC = 2064103;
+    public static final int HRSX_IMPORT_CAP = 2064110;
     public static final int HRSX_LAYOUT_SUA_HIRE = 1;
     public static final int HRSX_LAYOUT_SUA_SSC = 2;
     public static final int HRSX_LAYOUT_SUA_DISMISS = 3;

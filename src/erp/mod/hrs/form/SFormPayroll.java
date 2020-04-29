@@ -6,13 +6,17 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SDbAbsence;
 import erp.mod.hrs.db.SDbAbsenceConsumption;
 import erp.mod.hrs.db.SDbConfig;
+import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
+import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SDbWorkingDaySettings;
 import erp.mod.hrs.db.SHrsConsts;
+import erp.mod.hrs.db.SHrsEmployeeDays;
 import erp.mod.hrs.db.SHrsPayroll;
 import erp.mod.hrs.db.SHrsPayrollDataProvider;
 import erp.mod.hrs.db.SHrsPayrollUtils;
@@ -20,7 +24,12 @@ import erp.mod.hrs.db.SHrsReceipt;
 import erp.mod.hrs.db.SHrsReceiptDeduction;
 import erp.mod.hrs.db.SHrsReceiptEarning;
 import erp.mod.hrs.db.SHrsUtils;
+import erp.mod.hrs.db.SRowCAPImported;
 import erp.mod.hrs.db.SRowPayrollEmployee;
+import erp.mod.hrs.link.pub.SShareData;
+import erp.mod.hrs.link.utils.SPrepayroll;
+import erp.mod.hrs.link.utils.SPrepayrollRow;
+import erp.mod.hrs.utils.SPrepayrollUtils;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -31,7 +40,10 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -237,6 +249,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel40 = new javax.swing.JPanel();
         jbReceiptCaptureEarnings = new javax.swing.JButton();
         jbReceiptCaptureDeductions = new javax.swing.JButton();
+        jbShowPrepayroll = new javax.swing.JButton();
+        jbCleanPrepayroll = new javax.swing.JButton();
         jpAvailableEmployees = new javax.swing.JPanel();
         jlTotalAvailables = new javax.swing.JLabel();
         jpControlsReceipts = new javax.swing.JPanel();
@@ -719,6 +733,15 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbReceiptCaptureDeductions.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel40.add(jbReceiptCaptureDeductions);
 
+        jbShowPrepayroll.setText("Ver prenómina");
+        jbShowPrepayroll.setMargin(new java.awt.Insets(2, 0, 2, 0));
+        jbShowPrepayroll.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel40.add(jbShowPrepayroll);
+
+        jbCleanPrepayroll.setText("Limpiar");
+        jbCleanPrepayroll.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel40.add(jbCleanPrepayroll);
+
         jpControls.add(jPanel40, java.awt.BorderLayout.EAST);
 
         jPanel5.add(jpControls, java.awt.BorderLayout.NORTH);
@@ -827,6 +850,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JButton jbCleanPrepayroll;
     private javax.swing.JButton jbEditDates;
     private javax.swing.JButton jbEditFiscalYear;
     private javax.swing.JButton jbEditNumber;
@@ -840,6 +864,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JButton jbReceiptCaptureEarnings;
     private javax.swing.JButton jbReceiptRemove;
     private javax.swing.JButton jbReceiptRemoveAll;
+    private javax.swing.JButton jbShowPrepayroll;
     private javax.swing.JButton jbTaxSubsidyOptionChange;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
@@ -1145,6 +1170,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             jbTaxSubsidyOptionChange.setEnabled(enable);
             jbReceiptCaptureEarnings.setEnabled(enable);
             jbReceiptCaptureDeductions.setEnabled(enable);
+            jbShowPrepayroll.setEnabled(enable);
+            jbCleanPrepayroll.setEnabled(enable);
             moRadViewEmployeesActive.setEnabled(!mbIsReadOnly);
             moRadViewEmployeesAll.setEnabled(!mbIsReadOnly);
             moBoolFilterWages.setEnabled(!mbIsReadOnly);
@@ -1821,6 +1848,267 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             SLibUtils.printException(this, e);
         }
     }
+    
+    /**
+     * Llama al método que realiza la ptición al checador y muestra en pantalla lo que ha obtenido
+     */
+    private void actionShowPrepayroll() {
+        HashMap<Integer, SRowPayrollEmployee> selectedEmployeesIds = new HashMap<>();
+        
+        for (int i = 0; i < moGridPanePayrollReceipts.getModel().getRowCount(); i++) {
+            SRowPayrollEmployee row = (SRowPayrollEmployee) moGridPanePayrollReceipts.getGridRow(i);
+            selectedEmployeesIds.put(row.getPkEmployeeId(), row);
+        }
+        
+        if (selectedEmployeesIds.isEmpty()) {
+            miClient.showMsgBoxError("No hay empleados seleccionados");
+            return;
+        }
+        
+        if (moRegistry.getPkPayrollId() == 0) {
+            miClient.showMsgBoxWarning("Debe guardar la nómina para continuar");
+            return;
+        }
+        
+        ArrayList<Integer> list = new ArrayList();
+        list.addAll(selectedEmployeesIds.keySet());
+        
+        Date dates[] = null;
+        if (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE) {
+            int cutDay = moConfig.getPrePayWeekCutDay();
+            int weekLag = moConfig.getPrePayWeekLag();
+            
+            if (cutDay == 0) {
+                miClient.showMsgBoxError("No existe configuración para día de corte");
+                return;
+            }
+            
+            dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateStart.getValue(), weekLag);
+        }
+        else {
+            dates = SPrepayrollUtils.getPrepayrollDateRangeByTable(miClient, mnFormSubtype, moIntPeriodYear.getValue(), moIntNumber.getValue());
+            if (dates == null || dates[0] == null || dates[1] == null) {
+                miClient.showMsgBoxError("No se pudieron obtener fechas para prenómina");
+                return;
+            }
+        }
+        
+        miClient.showMsgBoxInformation("Espere...");
+        
+        SShareData sd = new SShareData();
+        SPrepayroll ppayroll = sd.getCAPData(dates[0], dates[1], list, mnFormSubtype, moConfig.getTimeClockPol());
+        
+        if (ppayroll == null) {
+            miClient.showMsgBoxError("Ucurrió un error al importar la prenómina");
+            return;
+        }
+        
+        // Vista previa de la importación
+        SDialogCAPImported importsDialog = new SDialogCAPImported(miClient, "Importación desde CAP");
+        
+        importsDialog.setlPpRows(ppayroll.getRows());
+        importsDialog.setlReceiptRows(selectedEmployeesIds);
+        importsDialog.setStartDate(SLibUtils.DbmsDateFormatDate.format(dates[0]));
+        importsDialog.setEndDate(SLibUtils.DbmsDateFormatDate.format(dates[1]));
+        importsDialog.setPrepayrollMode(moConfig.getTimeClockPol());
+        importsDialog.setCutOffDay(moConfig.getPrePayWeekCutDay());
+        importsDialog.initView();
+        importsDialog.setVisible(true);
+        
+        this.removeByImportation(selectedEmployeesIds);
+        ArrayList<SRowCAPImported> lImported = importsDialog.getlGridRows();
+        this.addPerceptAndDeductByImportation(lImported, selectedEmployeesIds, ppayroll.getRows());
+    }
+    
+    /**
+     * Obtiene los datos de la prenómina de los renglones recibidos desde CAP
+     * 
+     * @param lImported
+     * @param selectedEmployeesIds
+     * @param ppRows 
+     */
+    private void addPerceptAndDeductByImportation(ArrayList<SRowCAPImported> lImported, 
+                                        HashMap<Integer, SRowPayrollEmployee> selectedEmployeesIds, List<SPrepayrollRow> ppRows) {
+        
+        boolean isConfigured = true;
+        if (moConfig.getFkEarningHolidayId_n() == 0) {
+            miClient.showMsgBoxError("No Existe configuración para la percepción de días festivos");
+            isConfigured = false;
+        }
+        if (moConfig.getFkEarningOvertime2Id_n() == 0) {
+            miClient.showMsgBoxError("No Existe configuración para la percepción de horas extras");
+            isConfigured = false;
+        }
+        if (moConfig.getFkEarningOvertime3Id_n() == 0) {
+            miClient.showMsgBoxError("No Existe configuración para la percepción de horas extras triples");
+            isConfigured = false;
+        }
+        if (moConfig.getFkEarningDayOffId_n() == 0) {
+            miClient.showMsgBoxError("No Existe configuración para la percepción de días de descanso trabajados");
+            isConfigured = false;
+        }
+        if (!isConfigured) {
+            return;
+        }
+        
+        for (SRowCAPImported sRowCAPImported : lImported) {
+            SHrsReceipt receipt = selectedEmployeesIds.get(sRowCAPImported.getEmployeeId()).getHrsReceipt();
+            
+            if (sRowCAPImported.getExtraTime() > 0d) {
+                int perceptionId = 0;
+                double factor = sRowCAPImported.getExtraTime();
+                
+                if (moConfig.getTimeClockPol() == SHrsConsts.PPAYROLL_POL_LIMITED_DATA) {
+                    perceptionId = moConfig.getFkEarningOvertime2Id_n();
+                }
+                else {
+                    perceptionId = moConfig.getFkEarningOvertime3Id_n();
+                }
+                
+                this.addPerception(receipt, perceptionId, factor);
+            }
+            
+            if (sRowCAPImported.getHolidays() > 0) {
+                this.addPerception(receipt, moConfig.getFkEarningHolidayId_n(), sRowCAPImported.getHolidays());
+            }
+            
+            if (sRowCAPImported.getSundays() > 0) {
+                this.addPerception(receipt, moConfig.getFkEarningSunBonusId_n(), sRowCAPImported.getSundays());
+            }
+            
+            if (sRowCAPImported.getDaysOff() > 0) {
+                this.addPerception(receipt, moConfig.getFkEarningDayOffId_n(), sRowCAPImported.getDaysOff());
+            }
+            
+            if (sRowCAPImported.getAbsences() > 0) {
+                SPrepayrollRow row = null;
+                for (SPrepayrollRow ppRow : ppRows) {
+                    if (ppRow.getEmployee_id() == sRowCAPImported.getEmployeeId()) {
+                        row = ppRow;
+                        break;
+                    }
+                }
+                
+                this.adjustNormalPerception(receipt, row);
+            }
+        }
+    }
+    
+    /**
+     * Ajusta la percepción normal en base a las faltas que el CAP haya detectado
+     * 
+     * @param receipt
+     * @param ppRow 
+     */
+    private void adjustNormalPerception(SHrsReceipt receipt, SPrepayrollRow ppRow) {
+        ArrayList<SDbAbsence> abss = SPrepayrollUtils.getAbsencesFromNoWorkedDays(miClient, ppRow, miClient.getSession().getCurrentDate(), moRegistry.getPkPayrollId());
+        ArrayList<SDbAbsenceConsumption> consms = SPrepayrollUtils.getConsumptionsFromAbs(abss);
+        receipt.getAbsenceConsumptions().addAll(consms);
+    }
+    
+    /**
+     * Agregar Percepción
+     * 
+     * @param receipt
+     * @param earningId
+     * @param dFactor 
+     */
+    private void addPerception(SHrsReceipt receipt, int earningId, double dFactor) {
+        SDbEarning earning = (SDbEarning) miClient.getSession().readRegistry(SModConsts.HRS_EAR, new int[] { earningId });
+        SHrsEmployeeDays hrsEmployeeDays = receipt.getHrsEmployee().createEmployeeDays();
+        
+        double unitsAlleged = 0d;
+        double amountUnitAlleged = 0d;
+        
+        if (earning.isBasedOnUnits()) {
+            unitsAlleged = dFactor;
+            amountUnitAlleged = 0d;
+        }
+        else {
+//            unitsAlleged = 1;
+//            amountUnitAlleged = moCompEarningValue.getField().getValue();
+        }
+        
+        SDbPayrollReceiptEarning prearning = receipt.getHrsPayroll().createPayrollReceiptEarning(
+                receipt, earning, hrsEmployeeDays, null, 
+                unitsAlleged, amountUnitAlleged, false, 0, 0, receipt.getHrsReceiptEarnings().size() + 1);
+        
+        // consider specialized inputs:
+        prearning.setTimeClockSourced(true);
+        prearning.setFkOtherPaymentTypeId(0);
+        prearning.setAuxiliarValue(0d);
+        prearning.setAuxiliarAmount1(0d);
+        prearning.setAuxiliarAmount2(0d);
+            
+        SHrsReceiptEarning hrsReceiptEarning = new SHrsReceiptEarning();
+        hrsReceiptEarning.setHrsReceipt(receipt);
+        hrsReceiptEarning.setEarning(earning);
+        hrsReceiptEarning.setPayrollReceiptEarning(prearning);
+
+        receipt.addHrsReceiptEarning(hrsReceiptEarning);
+    }
+    
+    /**
+     * "Limpia" los datos importados desde CAP para solo dejar la nómina tal cual la realiza siie
+     * 
+     * @param selectedEmployeesIds 
+     */
+    private void removeByImportation(HashMap<Integer, SRowPayrollEmployee> selectedEmployeesIds) {
+        for (Map.Entry<Integer, SRowPayrollEmployee> entry : selectedEmployeesIds.entrySet()) {
+            SRowPayrollEmployee rpe = entry.getValue();
+            int moveId = 0;
+            ArrayList<Integer> earningMovs = new ArrayList();
+            ArrayList<Integer> deductionMovs = new ArrayList();
+            ArrayList<SDbAbsenceConsumption> consms = new ArrayList();
+            
+            for (SHrsReceiptEarning hrsReceiptEarningToRemove : rpe.getHrsReceipt().getHrsReceiptEarnings()) {
+                if (hrsReceiptEarningToRemove.getPayrollReceiptEarning().isTimeClockSourced()) {
+                    moveId = hrsReceiptEarningToRemove.getPayrollReceiptEarning().getPkMoveId();
+                    earningMovs.add(moveId);
+                }
+            }
+            
+            for (int mov : earningMovs) {
+                rpe.getHrsReceipt().removeHrsReceiptEarning(mov);
+            }
+            
+            for (SHrsReceiptDeduction hrsReceiptEarningToRemove : rpe.getHrsReceipt().getHrsReceiptDeductions()) {
+                if (hrsReceiptEarningToRemove.getPayrollReceiptDeduction().isTimeClockSourced()) {
+                    moveId = hrsReceiptEarningToRemove.getPayrollReceiptDeduction().getPkMoveId();
+                    deductionMovs.add(moveId);
+                }
+            }
+            
+            for (Integer deductionMov : deductionMovs) {
+                rpe.getHrsReceipt().removeHrsReceiptDeduction(deductionMov);
+            }
+            
+            for (SDbAbsenceConsumption cons : rpe.getHrsReceipt().getAbsenceConsumptions()) {
+                if (cons.isAuxIsClockSourced()) {
+                    consms.add(cons);
+                }
+            }
+            
+            for (SDbAbsenceConsumption consm : consms) {
+                rpe.getHrsReceipt().getAbsenceConsumptions().remove(consm);
+            }
+        }
+        
+        SPrepayrollUtils.deleteAbsenceByImportation(miClient, moRegistry.getPkPayrollId());
+        
+        miClient.showMsgBoxInformation("Realizado");
+    }
+    
+    private void actionCleanPrepayroll() {
+        HashMap<Integer, SRowPayrollEmployee> selectedEmployeesIds = new HashMap<>();
+        
+        for (int i = 0; i < moGridPanePayrollReceipts.getModel().getRowCount(); i++) {
+            SRowPayrollEmployee row = (SRowPayrollEmployee) moGridPanePayrollReceipts.getGridRow(i);
+            selectedEmployeesIds.put(row.getPkEmployeeId(), row);
+        }
+        
+        this.removeByImportation(selectedEmployeesIds);
+    }
 
     private void focusLostPeriodYear() throws Exception {
         if (moIntPeriodYear.getValue() < SLibTimeConsts.YEAR_MIN) {
@@ -1923,6 +2211,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbReceiptRemoveAll.addActionListener(this);
         jbReceiptCaptureEarnings.addActionListener(this);
         jbReceiptCaptureDeductions.addActionListener(this);
+        jbShowPrepayroll.addActionListener(this);
+        jbCleanPrepayroll.addActionListener(this);
         jbTaxSubsidyOptionChange.addActionListener(this);
         
         moRadNormal.addItemListener(this);
@@ -1963,6 +2253,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbReceiptRemoveAll.removeActionListener(this);
         jbReceiptCaptureEarnings.removeActionListener(this);
         jbReceiptCaptureDeductions.removeActionListener(this);
+        jbShowPrepayroll.removeActionListener(this);
+        jbCleanPrepayroll.removeActionListener(this);
         jbTaxSubsidyOptionChange.removeActionListener(this);
 
         moRadNormal.removeItemListener(this);
@@ -2295,6 +2587,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
                 else if (button == jbReceiptCaptureDeductions) {
                     actionReceiptCaptureDeductions();
+                }
+                else if (button == jbShowPrepayroll) {
+                    actionShowPrepayroll();
+                }
+                else if (button == jbCleanPrepayroll) {
+                    actionCleanPrepayroll();
                 }
             }
         }

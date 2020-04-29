@@ -31,6 +31,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     protected double mdAmount_r;
     protected int mnBenefitYear;
     protected int mnBenefitAnniversary;
+    protected boolean mbTimeClockSourced;
     protected boolean mbUserEdited;
     protected boolean mbAutomatic;
     //protected boolean mbDeleted;
@@ -65,6 +66,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public void setAmount_r(double d) { mdAmount_r = d; }
     public void setBenefitYear(int n) { mnBenefitYear = n; }
     public void setBenefitAnniversary(int n) { mnBenefitAnniversary = n; }
+    public void setTimeClockSourced(boolean b) { mbTimeClockSourced = b; }
     public void setUserEdited(boolean b) { mbUserEdited = b; }
     public void setAutomatic(boolean b) { mbAutomatic = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
@@ -93,6 +95,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public double getAmount_r() { return mdAmount_r; }
     public int getBenefitYear() { return mnBenefitYear; }
     public int getBenefitAnniversary() { return mnBenefitAnniversary; }
+    public boolean isTimeClockSourced() { return mbTimeClockSourced; }
     public boolean isUserEdited() { return mbUserEdited; }
     public boolean isAutomatic() { return mbAutomatic; }
     public boolean isDeleted() { return mbDeleted; }
@@ -139,6 +142,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         mdAmount_r = 0;
         mnBenefitYear = 0;
         mnBenefitAnniversary = 0;
+        mbTimeClockSourced = false;
         mbUserEdited = false;
         mbAutomatic = false;
         mbDeleted = false;
@@ -210,6 +214,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
             mdAmount_r = resultSet.getDouble("amt_r");
             mnBenefitYear = resultSet.getInt("ben_year");
             mnBenefitAnniversary = resultSet.getInt("ben_ann");
+            mbTimeClockSourced = resultSet.getBoolean("b_time_clock");
             mbUserEdited = resultSet.getBoolean("b_usr");
             mbAutomatic = resultSet.getBoolean("b_aut");
             mbDeleted = resultSet.getBoolean("b_del");
@@ -272,6 +277,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     mdAmount_r + ", " + 
                     mnBenefitYear + ", " + 
                     mnBenefitAnniversary + ", " + 
+                    (mbTimeClockSourced ? 1 : 0) + ", " + 
                     (mbUserEdited ? 1 : 0) + ", " + 
                     (mbAutomatic ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
@@ -305,6 +311,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     "amt_r = " + mdAmount_r + ", " +
                     "ben_year = " + mnBenefitYear + ", " +
                     "ben_ann = " + mnBenefitAnniversary + ", " +
+                    "b_time_clock = " + (mbTimeClockSourced ? 1 : 0) + ", " +
                     "b_usr = " + (mbUserEdited ? 1 : 0) + ", " +
                     "b_aut = " + (mbAutomatic ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
@@ -351,6 +358,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         registry.setAmount_r(this.getAmount_r());
         registry.setBenefitYear(this.getBenefitYear());
         registry.setBenefitAnniversary(this.getBenefitAnniversary());
+        registry.setTimeClockSourced(this.isTimeClockSourced());
         registry.setUserEdited(this.isUserEdited());
         registry.setAutomatic(this.isAutomatic());
         registry.setDeleted(this.isDeleted());

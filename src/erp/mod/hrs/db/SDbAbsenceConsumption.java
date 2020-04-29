@@ -42,6 +42,7 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
     protected Date mtAuxDateStart;
     protected Date mtAuxDateEnd;
     protected int mnAuxEffectiveDays;
+    protected boolean mbAuxIsClockSourced;
     
     protected SDbAbsence moParentAbsence;
 
@@ -86,6 +87,9 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
     public Date getAuxDateStart() { return mtAuxDateStart; }
     public Date getAuxDateEnd() { return mtAuxDateEnd; }
     public int getAuxEffectiveDays() { return mnAuxEffectiveDays; }
+
+    public boolean isAuxIsClockSourced() { return mbAuxIsClockSourced; }
+    public void setAuxIsClockSourced(boolean mbAuxIsClockSourced) { this.mbAuxIsClockSourced = mbAuxIsClockSourced; }
     
     public void setParentAbsence(SDbAbsence o) { moParentAbsence = o; }
     

@@ -68,6 +68,10 @@ public class SHrsConsts {
     
     public static final String ERR_PERIOD_DATE_INVALID = "Fecha inválida en el período.";
     
+    public static final int PPAYROLL_POL_ALL_DATA = 1;
+    public static final int PPAYROLL_POL_LIMITED_DATA = 2;
+    public static final int PPAYROLL_POL_OTHER_DATA = 3;
+    
     public static final HashMap<Integer, Integer> BanksHrsToFin = new HashMap<>();
     public static final HashMap<Integer, Integer> BanksFinToHrs = new HashMap<>();
     
