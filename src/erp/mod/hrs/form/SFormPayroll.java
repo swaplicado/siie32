@@ -4,6 +4,11 @@
  */
 package erp.mod.hrs.form;
 
+import erp.client.SClientInterface;
+import erp.data.SDataConstants;
+import erp.data.SDataUtilities;
+import erp.lib.SLibConstants;
+import erp.mcfg.data.SDataCompany;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbAbsence;
@@ -1894,10 +1899,14 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             }
         }
         
-        miClient.showMsgBoxInformation("Espere...");
+        this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        SDataCompany company = (SDataCompany) SDataUtilities.readRegistry((SClientInterface) miClient, 
+                                                    SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId()}, 
+                                                    SLibConstants.EXEC_MODE_SILENT);
+        String sCompanyKey = company.getKey();
         
         SShareData sd = new SShareData();
-        SPrepayroll ppayroll = sd.getCAPData(dates[0], dates[1], list, mnFormSubtype, moConfig.getTimeClockPol());
+        SPrepayroll ppayroll = sd.getCAPData(dates[0], dates[1], list, mnFormSubtype, moConfig.getTimeClockPol(), sCompanyKey);
         
         if (ppayroll == null) {
             miClient.showMsgBoxError("Ucurrió un error al importar la prenómina");
@@ -1913,14 +1922,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         dialog.setEndDate(SLibUtils.DbmsDateFormatDate.format(dates[1]));
         dialog.setPrepayrollMode(moConfig.getTimeClockPol());
         dialog.setCutOffDay(moConfig.getPrePayWeekCutDay());
+        dialog.setCompanyKey(sCompanyKey);
         dialog.initView();
         dialog.setVisible(true);
         
         if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-            this.removeByImportation(selectedEmployeesIds);
+            this.removeByImportation(selectedEmployeesIds, false);
             ArrayList<SRowTimeClock> rows = dialog.getlGridRows();
             this.addPerceptAndDeductByImportation(rows, selectedEmployeesIds, ppayroll.getRows());
         }
+        
+        this.setCursor(Cursor.getDefaultCursor());
     }
     
     /**
@@ -2056,7 +2068,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
      * 
      * @param selectedEmployeesIds 
      */
-    private void removeByImportation(HashMap<Integer, SRowPayrollEmployee> selectedEmployeesIds) {
+    private void removeByImportation(HashMap<Integer, SRowPayrollEmployee> selectedEmployeesIds, boolean showMessage) {
         for (Map.Entry<Integer, SRowPayrollEmployee> entry : selectedEmployeesIds.entrySet()) {
             SRowPayrollEmployee rpe = entry.getValue();
             int moveId = 0;
@@ -2099,7 +2111,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         
         SPrepayrollUtils.deleteAbsenceByImportation(miClient, moRegistry.getPkPayrollId());
         
-        miClient.showMsgBoxInformation("Realizado");
+        if (showMessage)
+            miClient.showMsgBoxInformation("Realizado");
     }
     
     private void actionClearPrepayroll() {
@@ -2110,7 +2123,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             selectedEmployeesIds.put(row.getPkEmployeeId(), row);
         }
         
-        this.removeByImportation(selectedEmployeesIds);
+        this.removeByImportation(selectedEmployeesIds, true);
     }
 
     private void focusLostPeriodYear() throws Exception {

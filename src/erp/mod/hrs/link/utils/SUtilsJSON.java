@@ -67,11 +67,11 @@ public class SUtilsJSON {
             return jsonInString2;
     }
     
-    public static void writeJSON(String startDate, String endDate, String jsonString) {
+    public static void writeJSON(String startDate, String endDate, String jsonString, String companyKey) {
         try {
             DateFormat dft = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
             
-            BufferedWriter writer = new BufferedWriter(new FileWriter(SShareData.PATH_JSON_DIR + startDate + "_" + endDate +
+            BufferedWriter writer = new BufferedWriter(new FileWriter(SShareData.PATH_JSON_DIR + companyKey + "/jsons/" + startDate + "_" + endDate +
                     "__" + dft.format(new Date()) + ".json"));
             
             writer.write(jsonString);
@@ -82,14 +82,14 @@ public class SUtilsJSON {
         }
     }
     
-    public static void writeCSV(String startDate, String endDate, List<String> dataLines, String fileHeader) {
+    public static void writeCSV(String startDate, String endDate, List<String> dataLines, String fileHeader, String companyKey) {
         final String NEW_LINE_SEPARATOR = "\n";
         DateFormat dft = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         
         FileWriter fileWriter = null;
         
         try {
-            fileWriter = new FileWriter(new File(SShareData.PATH_CSV_DIR + startDate + "_" + endDate +
+            fileWriter = new FileWriter(new File(SShareData.PATH_CSV_DIR + companyKey + "/csvs/" + startDate + "_" + endDate +
                                         "__" + dft.format(new Date()) + ".csv"));
 
             //Write the CSV file header

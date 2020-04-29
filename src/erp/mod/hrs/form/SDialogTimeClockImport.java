@@ -41,6 +41,7 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
     private ArrayList<SRowTimeClock> lGridRows;
     private String msStartDate;
     private String msEndDate;
+    private String msCompanyKey;
     private int mnPrepayrollMode;
 
     /**
@@ -326,6 +327,10 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
     public void setPrepayrollMode(int mnPrepayrollMode) {
         this.mnPrepayrollMode = mnPrepayrollMode;
     }
+
+    public void setCompanyKey(String msCompanyKey) {
+        this.msCompanyKey = msCompanyKey;
+    }
     
     public void setCutOffDay(int day) {
         String sDay = "";
@@ -362,22 +367,47 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
     
     @Override
     public void actionSave() {
-        List<String> dataLines = new ArrayList<>();
+        if (jbSave.isEnabled()) {
+            if (SGuiUtils.computeValidation(miClient, validateForm())) {
+                boolean save = true;
+                SDbRegistry registry = null;
+                if (miFormOwner != null) {
+                    try {
+                        registry = getRegistry();
+                        if (registry != null) {
+                            if (registry.getFormAction() == SGuiConsts.FORM_ACTION_NEW) {
+                                save = miFormOwner.validateRegistryNew(registry);
+                            }
+                            else {
+                                save = miFormOwner.validateRegistryEdit(registry);
+                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
+                }
+                if (save) {
+                    List<String> dataLines = new ArrayList<>();
         
-        for (SRowTimeClock lGridRow : lGridRows) {
-            dataLines.add(lGridRow.getNumEmployee() + "," +
-                            lGridRow.getEmployee().replaceAll(",", "") + "," +
-                            lGridRow.getAbsences() + "," +
-                            lGridRow.getExtraTime() + "," +
-                            lGridRow.getSundays() + "," +
-                            lGridRow.getHolidays()
-                                    );
+                    for (SRowTimeClock lGridRow : lGridRows) {
+                        dataLines.add(lGridRow.getNumEmployee() + "," +
+                                        lGridRow.getEmployee().replaceAll(",", "") + "," +
+                                        lGridRow.getAbsences() + "," +
+                                        lGridRow.getExtraTime() + "," +
+                                        lGridRow.getSundays() + "," +
+                                        lGridRow.getHolidays()
+                                                );
+                    }
+
+                    String fileHeader = "Num,Empleado,Faltas,Horas extra,Domingos,Festivos";
+
+                    SUtilsJSON.writeCSV(msStartDate, msEndDate, dataLines, fileHeader, msCompanyKey);
+                    
+                    mnFormResult = SGuiConsts.FORM_RESULT_OK;
+                    dispose();
+                }
+            }
         }
-        
-        String fileHeader = "Num,Empleado,Faltas,Horas extra,Domingos,Festivos";
-        
-        SUtilsJSON.writeCSV(msStartDate, msEndDate, dataLines, fileHeader);
-        
-        this.setVisible(false);
     }
 }

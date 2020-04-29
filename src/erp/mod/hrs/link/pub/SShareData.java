@@ -33,8 +33,8 @@ import java.sql.SQLException;
  */
 public class SShareData {
     
-    public static String PATH_JSON_DIR = "prenomina/jsons/";
-    public static String PATH_CSV_DIR = "prenomina/csvs/";
+    public static String PATH_JSON_DIR = "prenomina/";
+    public static String PATH_CSV_DIR = "prenomina/";
     
     /**
      * 
@@ -95,7 +95,8 @@ public class SShareData {
     }
     
     
-    public SPrepayroll getCAPData(Date tStartDate, Date tEndDate, ArrayList<Integer> lEmployees, int payType, int dataType) {
+    public SPrepayroll getCAPData(Date tStartDate, Date tEndDate, ArrayList<Integer> lEmployees, 
+                                    int payType, int dataType, String companyKey) {
         try {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
             
@@ -128,7 +129,7 @@ public class SShareData {
                 ObjectMapper mapper = new ObjectMapper();
                 SPrepayroll prepayroll = mapper.readValue(responseBody, SPrepayroll.class);
                 
-                SUtilsJSON.writeJSON(startDate, endDate, responseBody);
+                SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey);
                 
                 return prepayroll;
             }
