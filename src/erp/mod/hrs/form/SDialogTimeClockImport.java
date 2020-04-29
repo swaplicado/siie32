@@ -7,7 +7,7 @@ package erp.mod.hrs.form;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbAbsence;
 import erp.mod.hrs.db.SHrsConsts;
-import erp.mod.hrs.db.SRowCAPImported;
+import erp.mod.hrs.db.SRowTimeClock;
 import erp.mod.hrs.db.SRowPayrollEmployee;
 import erp.mod.hrs.link.utils.SPrepayrollRow;
 import erp.mod.hrs.link.utils.SUtilsJSON;
@@ -33,12 +33,12 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Edwin Carmona
  */
-public class SDialogCAPImported extends SBeanFormDialog {
+public class SDialogTimeClockImport extends SBeanFormDialog {
     protected SDbAbsence moAbsence;
     private SGridPaneForm moGridImportedRows;
     private List<SPrepayrollRow> lPpRows;
     private HashMap<Integer, SRowPayrollEmployee> lReceiptRows;
-    private ArrayList<SRowCAPImported> lGridRows;
+    private ArrayList<SRowTimeClock> lGridRows;
     private String msStartDate;
     private String msEndDate;
     private int mnPrepayrollMode;
@@ -48,7 +48,7 @@ public class SDialogCAPImported extends SBeanFormDialog {
      * @param client
      * @param title
      */
-    public SDialogCAPImported(SGuiClient client, String title) {
+    public SDialogTimeClockImport(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_IMPORT_CAP, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -229,7 +229,7 @@ public class SDialogCAPImported extends SBeanFormDialog {
         
         try {
             for (SPrepayrollRow ppRow : lPpRows) {
-                SRowCAPImported row = new SRowCAPImported();
+                SRowTimeClock row = new SRowTimeClock();
                 
                 row.setEmployeeId(ppRow.getEmployee_id());
                 row.setNumEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getNumber());
@@ -319,7 +319,7 @@ public class SDialogCAPImported extends SBeanFormDialog {
         moTextDateEnd.setText(msEndDate);
     }
 
-    public ArrayList<SRowCAPImported> getlGridRows() {
+    public ArrayList<SRowTimeClock> getlGridRows() {
         return lGridRows;
     }
 
@@ -364,7 +364,7 @@ public class SDialogCAPImported extends SBeanFormDialog {
     public void actionSave() {
         List<String> dataLines = new ArrayList<>();
         
-        for (SRowCAPImported lGridRow : lGridRows) {
+        for (SRowTimeClock lGridRow : lGridRows) {
             dataLines.add(lGridRow.getNumEmployee() + "," +
                             lGridRow.getEmployee().replaceAll(",", "") + "," +
                             lGridRow.getAbsences() + "," +

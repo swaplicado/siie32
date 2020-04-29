@@ -5,14 +5,13 @@
 
 package erp.mod.hrs.db;
 
-import java.util.Date;
 import sa.lib.grid.SGridRow;
 
 /**
  *
  * @author Edwin Carmona
  */
-public class SRowCAPImported implements SGridRow {
+public class SRowTimeClock implements SGridRow {
 
     protected int mnEmployeeId;
     protected String msNumEmployee;
@@ -23,7 +22,7 @@ public class SRowCAPImported implements SGridRow {
     protected int mnHolidays;
     protected int mnDaysOff;
 
-    public SRowCAPImported() {
+    public SRowTimeClock() {
         mnEmployeeId = 0;
         msNumEmployee = "";
         msEmployee = "";
