@@ -1134,15 +1134,15 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
             moFieldTelAreaCode01.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelAreaCode01());
             moFieldTelNumber01.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelNumber01());
             moFieldTelExt01.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelExt01());
-            moFieldFkTelephoneType01Id.setFieldValue(new int[] { moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getPkTelephoneType01Id() });
+            moFieldFkTelephoneType01Id.setFieldValue(new int[] { moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getFkTelephoneType01Id() });
             moFieldTelAreaCode02.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelAreaCode02());
             moFieldTelNumber02.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelNumber02());
             moFieldTelExt02.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelExt02());
-            moFieldFkTelephoneType02Id.setFieldValue(new int[] { moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getPkTelephoneType02Id() });
+            moFieldFkTelephoneType02Id.setFieldValue(new int[] { moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getFkTelephoneType02Id() });
             moFieldTelAreaCode03.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelAreaCode03());
             moFieldTelNumber03.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelNumber03());
             moFieldTelExt03.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getTelExt03());
-            moFieldFkTelephoneType03Id.setFieldValue(new int[] { moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getPkTelephoneType03Id() });
+            moFieldFkTelephoneType03Id.setFieldValue(new int[] { moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getFkTelephoneType03Id() });
             moFieldEmail.setFieldValue(moBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(0).getEmail01());
 
             for (i = 1; i < moBizPartnerBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
@@ -1229,17 +1229,17 @@ public class SPanelBizPartnerBranch extends javax.swing.JPanel implements erp.li
         contact.setTelAreaCode01(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelAreaCode01.getString());
         contact.setTelNumber01(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelNumber01.getString());
         contact.setTelExt01(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelExt01.getString());
-        contact.setPkTelephoneType01Id(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType01Id.getKeyAsIntArray()[0]);
+        contact.setFkTelephoneType01Id(moFieldFkTelephoneType01Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType01Id.getKeyAsIntArray()[0]);
         contact.setTelAreaCode02(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelAreaCode02.getString());
         contact.setTelNumber02(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelNumber02.getString());
         contact.setTelExt02(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelExt02.getString());
-        contact.setPkTelephoneType02Id(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType02Id.getKeyAsIntArray()[0]);
+        contact.setFkTelephoneType02Id(moFieldFkTelephoneType02Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType02Id.getKeyAsIntArray()[0]);
         contact.setTelAreaCode03(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelAreaCode03.getString());
         contact.setTelNumber03(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelNumber03.getString());
         contact.setTelExt03(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] <= SDataConstantsSys.BPSS_TP_TEL_NA ? "" : moFieldTelExt03.getString());
-        contact.setPkTelephoneType03Id(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType03Id.getKeyAsIntArray()[0]);
+        contact.setFkTelephoneType03Id(moFieldFkTelephoneType03Id.getKeyAsIntArray()[0] == 0 ? SDataConstantsSys.BPSS_TP_TEL_NA : moFieldFkTelephoneType03Id.getKeyAsIntArray()[0]);
         contact.setEmail01(moFieldEmail.getString());
-        contact.setPkContactTypeId(SDataConstantsSys.BPSS_TP_CON_ADM);
+        contact.setFkContactTypeId(SDataConstantsSys.BPSS_TP_CON_ADM);
         contact.setFkUserNewId(moBizPartnerBranch.getFkUserNewId());
         contact.setFkUserEditId(moBizPartnerBranch.getFkUserEditId());
         moBizPartnerBranch.getDbmsBizPartnerBranchContacts().add(contact);

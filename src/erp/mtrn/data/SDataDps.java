@@ -15,7 +15,7 @@ import cfd.DCfdTaxes;
 import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.DElementParent;
-import cfd.ext.amece71.DElementAdditionalReferenceIdentification;
+import cfd.ext.amece71.DElementAdditionalInformationReferenceIdentification;
 import cfd.ext.bachoco.DElementLineItem;
 import cfd.ext.elektra.DElementAp;
 import cfd.ext.elektra.DElementDetailItems;
@@ -4591,7 +4591,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         
         payment.getEltPaymentIdentification().getEltEntityType().setValue(entityType);
-        payment.getEltPaymentIdentification().getEltCreatorIdentification().setValue(msNumberSeries + msNumber);
+        payment.getEltPaymentIdentification().getEltUniqueCreatorIdentification().setValue(msNumberSeries + msNumber);
         
         // element special instruction code:
         
@@ -4618,7 +4618,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         // element additional information:
         
-        payment.getEltAdditionalInformation().getEltReferenceIdentification().getAttType().setString(DElementAdditionalReferenceIdentification.TYPE_ATZ);
+        payment.getEltAdditionalInformation().getEltReferenceIdentification().getAttType().setString(DElementAdditionalInformationReferenceIdentification.TYPE_ATZ);
         payment.getEltAdditionalInformation().getEltReferenceIdentification().setValue("0");
         
         // element buyer:
@@ -4634,10 +4634,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         // element ship to:
         
         payment.getEltShipTo().getEltGln().setValue(amc71XmlHeader.CompanyBranch.CompanyBranchGln);
-        payment.getEltShipTo().getEltNameAddress().getEltName().setValue(amc71XmlHeader.CompanyBranch.ShipToName);
-        payment.getEltShipTo().getEltNameAddress().getEltStreetAddressOne().setValue(amc71XmlHeader.CompanyBranch.ShipToAddress);
-        payment.getEltShipTo().getEltNameAddress().getEltCity().setValue(amc71XmlHeader.CompanyBranch.ShipToCity);
-        payment.getEltShipTo().getEltNameAddress().getEltPostalCode().setValue(amc71XmlHeader.CompanyBranch.ShipToPostalCode);
+        payment.getEltShipTo().getEltNameAndAddress().getEltName().setValue(amc71XmlHeader.CompanyBranch.ShipToName);
+        payment.getEltShipTo().getEltNameAndAddress().getEltStreetAddressOne().setValue(amc71XmlHeader.CompanyBranch.ShipToAddress);
+        payment.getEltShipTo().getEltNameAndAddress().getEltCity().setValue(amc71XmlHeader.CompanyBranch.ShipToCity);
+        payment.getEltShipTo().getEltNameAndAddress().getEltPostalCode().setValue(amc71XmlHeader.CompanyBranch.ShipToPostalCode);
         
         // element currency:
         
@@ -4657,13 +4657,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }
         
-        payment.getEltCurrency().getAttCurrencyISOCode().setOption(moneda);
+        payment.getEltCurrency().getAttCurrencyIsoCode().setOption(moneda);
         payment.getEltCurrency().getEltCurrencyFunction().setValue("BILLING_CURRENCY");
         payment.getEltCurrency().getEltRateOfChange().setValue(SAddendaUtils.DecimalFormatAmount.format(mdExchangeRate));
         
         // element payment terms:
         
-        payment.getEltPaymentTerms().getEltNetPayment().getEltTimePeriod().getEltTimePeriodDue().getEltValue().setValue("" + mnDaysOfCredit);
+        payment.getEltPaymentTerms().getEltNetPayment().getEltPaymentTimePeriod().getEltTimePeriodDue().getEltValue().setValue("" + mnDaysOfCredit);
         
         // elements line item:
         
@@ -4693,7 +4693,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 lineItem.getEltTotalLineAmount().getEltGrossAmount().getEltAmount().setValue(SAddendaUtils.DecimalFormatAmount.format(dpsEntry.getSubtotalProvisionalCy_r()));
                 lineItem.getEltTotalLineAmount().getEltNetAmount().getEltAmount().setValue(SAddendaUtils.DecimalFormatAmount.format(dpsEntry.getSubtotalCy_r()));
                 
-                payment.getEltItems().getEltHijosLineItem().add(lineItem);
+                payment.getEltItems().getEltLineItems().add(lineItem);
             }
         }
         

@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 163.4/ 2020-04-29
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de nota de exportador confiable, si aplica, en impresión de facturas de ventas de exportación.
+2) Revisión nombres de métodos en clase de contactos de sucursales de asociados de negocios.
+3) Cambios en clase de documentos por revisión de nombres de clases de addenda AMECE 7.1.
+
+================================================================================
 SIIE 3.2 163.3/ 2020-04-02
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
