@@ -1198,6 +1198,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_FDY, "hrs_fdy");
         TablesMap.put(HRS_HOL, "hrs_hol");
         TablesMap.put(HRS_WDS, "hrs_wds");
+        TablesMap.put(HRS_PRE_PAY_CUT_CAL, "hrs_pre_pay_cut_cal");
         TablesMap.put(HRS_TAX, "hrs_tax");
         TablesMap.put(HRS_TAX_ROW, "hrs_tax_row");
         TablesMap.put(HRS_TAX_SUB, "hrs_tax_sub");

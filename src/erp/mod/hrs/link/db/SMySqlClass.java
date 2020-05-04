@@ -5,23 +5,37 @@
  */
 package erp.mod.hrs.link.db;
 
+import erp.SParamsApp;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Edwin Carmona
  */
 public class SMySqlClass {
+    SParamsApp moParamsApp;
+    public static String msConnFilePath;
     
-    public String gdbPort = "3306"; 
-    public String gserverHost = "192.168.1.233"; 
-    public String gdb = "erp"; 
-    public String guser = "root"; 
-    public String gpass = "msroot"; 
+    public SMySqlClass() {
+        moParamsApp = new SParamsApp(msConnFilePath);
+
+        if (moParamsApp.read()) {
+            gdbPort = moParamsApp.getDatabasePortSrv();
+            gserverHost = moParamsApp.getDatabaseHostSrv();
+            gdb = moParamsApp.getDatabaseName();
+            guser = moParamsApp.getDatabaseUser();
+            gpass = moParamsApp.getDatabasePswd();
+        }
+    }
+    
+    private String gdbPort = "3306";
+    private String gserverHost = "192.168.1.233";
+    private String gdb = "erp";
+    private String guser = "root";
+    private String gpass = "msroot";
+    
     Connection conn = null;
     
     public Connection connect(String serverHost, String dbPort, String db, String user, String pass) throws ClassNotFoundException, SQLException {
@@ -44,4 +58,10 @@ public class SMySqlClass {
 
         return null;
     }
+
+    public static void setConnFilePath(String msConnFilePath) {
+        SMySqlClass.msConnFilePath = msConnFilePath;
+    }
+    
+    
 }

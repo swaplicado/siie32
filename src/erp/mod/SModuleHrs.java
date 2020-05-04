@@ -40,6 +40,7 @@ import erp.mod.hrs.db.SDbPayrollReceiptDeduction;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SDbPosition;
+import erp.mod.hrs.db.SDbPrePayrollCutoffCalendar;
 import erp.mod.hrs.db.SDbShift;
 import erp.mod.hrs.db.SDbSsContributionTable;
 import erp.mod.hrs.db.SDbSsContributionTableRow;
@@ -63,6 +64,7 @@ import erp.mod.hrs.form.SFormAutomaticEarnings;
 import erp.mod.hrs.form.SFormBenefitAdjustmentEarning;
 import erp.mod.hrs.form.SFormBenefitTable;
 import erp.mod.hrs.form.SFormConfig;
+import erp.mod.hrs.form.SFormCutoffCalendar;
 import erp.mod.hrs.form.SFormDeduction;
 import erp.mod.hrs.form.SFormDepartment;
 import erp.mod.hrs.form.SFormEarning;
@@ -122,6 +124,7 @@ import erp.mod.hrs.view.SViewPayrollLoanEarningComplement;
 import erp.mod.hrs.view.SViewPayrollReceiptRecord;
 import erp.mod.hrs.view.SViewPayrollReceipt;
 import erp.mod.hrs.view.SViewPosition;
+import erp.mod.hrs.view.SViewPrePayrollCutoffCalendar;
 import erp.mod.hrs.view.SViewShift;
 import erp.mod.hrs.view.SViewSsContributionTable;
 import erp.mod.hrs.view.SViewSsContributionTableRow;
@@ -171,6 +174,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormShift moFormShift;
     private SFormConfig moFormConfig;
     private SFormWorkingDaySettings moFormWorkingDaySettings;
+    private SFormCutoffCalendar moFormCutoffCalendar;
     private SFormFirstDayYear moFormFirstDayYear;
     private SFormHoliday moFormHoliday;
     private SFormTaxTable moFormTaxTable;
@@ -409,6 +413,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_WDS:
                 registry = new SDbWorkingDaySettings();
+                break;
+            case SModConsts.HRS_PRE_PAY_CUT_CAL:
+                registry = new SDbPrePayrollCutoffCalendar();
                 break;
             case SModConsts.HRS_TAX:
                 registry = new SDbTaxTable();
@@ -819,6 +826,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_WDS:
                 view = new SViewWorkingDaySettings(miClient, "Días laborables");
                 break;
+            case SModConsts.HRS_PRE_PAY_CUT_CAL:
+                view = new SViewPrePayrollCutoffCalendar(miClient, "Calendario de fechas de corte");
+                break;
             case SModConsts.HRS_TAX:
                 view = new SViewTaxTable(miClient, "Tablas impuesto");
                 break;
@@ -1113,6 +1123,10 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_WDS:
                 if (moFormWorkingDaySettings == null) moFormWorkingDaySettings = new SFormWorkingDaySettings(miClient, "Días laborables");
                 form = moFormWorkingDaySettings;
+                break;
+            case SModConsts.HRS_PRE_PAY_CUT_CAL:
+                if (moFormCutoffCalendar == null) moFormCutoffCalendar = new SFormCutoffCalendar(miClient, "Calendario de cortes prenómina");
+                form = moFormCutoffCalendar;
                 break;
             case SModConsts.HRS_TAX:
                 if (moFormTaxTable == null) moFormTaxTable = new SFormTaxTable(miClient, "Tabla de impuesto");

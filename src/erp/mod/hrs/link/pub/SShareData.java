@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.mod.hrs.link.db.SMySqlClass;
 import java.sql.SQLException;
 
 /**
@@ -35,6 +36,10 @@ public class SShareData {
     
     public static String PATH_JSON_DIR = "prenomina/";
     public static String PATH_CSV_DIR = "prenomina/";
+    
+    public void setConnectionFilePath(String path) {
+        SMySqlClass.setConnFilePath(path);
+    }
     
     /**
      * 
