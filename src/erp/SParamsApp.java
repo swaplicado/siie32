@@ -38,11 +38,6 @@ public class SParamsApp implements java.io.Serializable {
     public SParamsApp() {
         reset();
     }
-    
-    public SParamsApp(String auxPath) {
-        FILE_NAME = auxPath + FILE_NAME;
-        reset();
-    }
 
     private void reset() {
         msErpInstance = "";
