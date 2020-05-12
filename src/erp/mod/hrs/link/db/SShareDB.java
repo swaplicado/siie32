@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class SShareDB {
 
-    private ArrayList<SCompany> getDatabasesWithPayroll() throws SQLException, ClassNotFoundException {
+    private ArrayList<SCompany> getDatabasesWithPayroll() throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");
         if (conn == null) {
@@ -64,7 +64,7 @@ public class SShareDB {
         return lBds;
     }
 
-    private String getMainDatabase() throws SQLException, ClassNotFoundException {
+    private String getMainDatabase() throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");
         if (conn == null) {
@@ -97,14 +97,56 @@ public class SShareDB {
 
         return "";
     }
+    
+    public ArrayList<SDepartment> getDepartments(String strDate) throws SQLException, ClassNotFoundException, SConfigException {
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", "", "", "");
+
+        if (conn == null) {
+            return null;
+        }
+        
+        String query = "SELECT * FROM erp.hrsu_dep "
+                        + "WHERE "
+                        + "    (ts_usr_ins >= '" + strDate + "' "
+                        + "        OR ts_usr_upd >= '" + strDate + "')";
+        
+        ArrayList<SDepartment> lDepts = null;
+
+        
+        Statement st = conn.createStatement();
+        ResultSet res = st.executeQuery(query);
+
+        lDepts = new ArrayList();
+        SDepartment dept = null;
+        while (res.next()) {
+            dept = new SDepartment();
+
+            dept.id_department = res.getInt("id_dep");
+            dept.dept_code = res.getString("code");
+            dept.dept_name = res.getString("name");
+            dept.is_deleted = res.getBoolean("b_del");
+            dept.is_system = res.getBoolean("b_sys");
+
+            lDepts.add(dept);
+        }
+
+        conn.close();
+        st.close();
+        res.close();
+
+        return lDepts;
+    }
 
     /**
      *
      * @param strDate
      *
      * @return
+     * @throws java.sql.SQLException
+     * @throws java.lang.ClassNotFoundException
      */
-    public ArrayList<SEmployee> getEmployees(String strDate) throws SQLException, ClassNotFoundException {
+    public ArrayList<SEmployee> getEmployees(String strDate) throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");
 
@@ -125,6 +167,7 @@ public class SShareDB {
                 + "    e.dt_dis_n, "
                 + "    e.b_uni AS x_time, "
                 + "    e.fk_tp_pay, "
+                + "    e.fk_dep, "
                 + "    e.b_act, "
                 + "    e.b_del "
                 + "FROM "
@@ -155,6 +198,7 @@ public class SShareDB {
                 emp.leave_date = res.getString("dt_dis_n");
                 emp.extra_time = res.getBoolean("x_time");
                 emp.way_pay = res.getInt("fk_tp_pay");
+                emp.dept_rh_id = res.getInt("fk_dep");
                 emp.is_active = res.getBoolean("b_act");
                 emp.is_deleted = res.getBoolean("b_del");
 
@@ -174,7 +218,7 @@ public class SShareDB {
         return lEmps;
     }
     
-    private ArrayList<SEmployee> assignCompany(ArrayList<SEmployee> lEmps) throws SQLException, ClassNotFoundException {
+    private ArrayList<SEmployee> assignCompany(ArrayList<SEmployee> lEmps) throws SQLException, ClassNotFoundException, SConfigException {
         ArrayList<SCompany> companies = this.getDatabasesWithPayroll();
         ArrayList<HashMap<Integer, Integer>> ids = new ArrayList();
         for (SCompany company : companies) {
@@ -193,7 +237,7 @@ public class SShareDB {
         return lEmps;
     }
     
-    private HashMap<Integer, Integer> getEmployeesFromCompany(SCompany company) throws SQLException, ClassNotFoundException {
+    private HashMap<Integer, Integer> getEmployeesFromCompany(SCompany company) throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", company.getDatabase_nm(), "", "");
         
@@ -226,13 +270,13 @@ public class SShareDB {
         return lEmpIds;
     }
 
-    public ArrayList<SHoliday> getAllHolidays(String lastSyncDate) throws SQLException, ClassNotFoundException {
+    public ArrayList<SHoliday> getAllHolidays(String lastSyncDate) throws SQLException, ClassNotFoundException, SConfigException {
         String mainDataBase = this.getMainDatabase();
 
         return this.getHolidays(lastSyncDate, mainDataBase);
     }
 
-    private ArrayList<SHoliday> getHolidays(String strDate, String dbName) throws SQLException, ClassNotFoundException {
+    private ArrayList<SHoliday> getHolidays(String strDate, String dbName) throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", dbName, "", "");
         
@@ -286,13 +330,13 @@ public class SShareDB {
         return lHolidays;
     }
 
-    public ArrayList<SFirstDayYear> getAllFirstDayOfYear(String lastSyncDate) throws SQLException, ClassNotFoundException {
+    public ArrayList<SFirstDayYear> getAllFirstDayOfYear(String lastSyncDate) throws SQLException, ClassNotFoundException, SConfigException {
         String mainDataBase = this.getMainDatabase();
 
         return this.getFirstDayOfYear(lastSyncDate, mainDataBase);
     }
 
-    private ArrayList<SFirstDayYear> getFirstDayOfYear(String strDate, String dbName) throws SQLException, ClassNotFoundException {
+    private ArrayList<SFirstDayYear> getFirstDayOfYear(String strDate, String dbName) throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", dbName, "", "");
         
@@ -340,7 +384,7 @@ public class SShareDB {
         return lFDYs;
     }
 
-    public ArrayList<SAbsence> getAllAbsences(String lastSyncDate) throws SQLException, ClassNotFoundException {
+    public ArrayList<SAbsence> getAllAbsences(String lastSyncDate) throws SQLException, ClassNotFoundException, SConfigException {
         ArrayList<SCompany> dbs = this.getDatabasesWithPayroll();
 
         if (dbs == null) {
@@ -355,7 +399,7 @@ public class SShareDB {
         return lAbss;
     }
 
-    private ArrayList<SAbsence> getAbsences(String strDate, String dbName) throws SQLException, ClassNotFoundException {
+    private ArrayList<SAbsence> getAbsences(String strDate, String dbName) throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", dbName, "", "");
         

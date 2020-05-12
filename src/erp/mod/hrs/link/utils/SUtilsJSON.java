@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import erp.mod.hrs.link.db.SShareDB;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.pub.SShareData;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -39,8 +40,10 @@ public class SUtilsJSON {
      * 
      * https://mkyong.com/java/jackson-2-convert-java-object-to-from-json/
      * @throws java.sql.SQLException
+     * @throws java.lang.ClassNotFoundException
+     * @throws com.fasterxml.jackson.core.JsonProcessingException
      */
-    public static String getData(String lastSyncDate) throws SQLException, ClassNotFoundException, JsonProcessingException {
+    public static String getData(String lastSyncDate) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
             ObjectMapper mapper = new ObjectMapper();
             mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
             
@@ -49,6 +52,7 @@ public class SUtilsJSON {
             SRootJSON objResponse = new SRootJSON();
             
             objResponse.last_sync_date = lastSyncDate;
+            objResponse.departments = sDb.getDepartments(lastSyncDate);
             objResponse.employees = sDb.getEmployees(lastSyncDate);
             objResponse.holidays = sDb.getAllHolidays(lastSyncDate);
             objResponse.fdys = sDb.getAllFirstDayOfYear(lastSyncDate);

@@ -5,11 +5,13 @@
  */
 package erp.mod.hrs.link.db;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  *
@@ -17,11 +19,34 @@ import java.util.logging.Logger;
  */
 public class SMySqlClass {
     
-    public String gdbPort = "3306"; 
-    public String gserverHost = "192.168.1.233"; 
-    public String gdb = "erp"; 
-    public String guser = "root"; 
-    public String gpass = "msroot"; 
+    public static String jsonConn;
+
+    public SMySqlClass() throws SConfigException {
+        if (jsonConn == null || jsonConn.isEmpty()) {
+            throw new SConfigException("No se recibió archivo JSON de configuración");
+        }
+        
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            
+            SDbConnection conn = mapper.readValue(jsonConn, SDbConnection.class);
+            
+            this.gserverHost = conn.getDbHost();
+            this.gdbPort = conn.getDbPort();
+            this.gdb = conn.getDbName();
+            this.guser = conn.getDbUser();
+            this.gpass = conn.getDbPass();
+        }
+        catch (IOException ex) {
+            Logger.getLogger(SMySqlClass.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public String gdbPort; 
+    public String gserverHost; 
+    public String gdb; 
+    public String guser; 
+    public String gpass; 
     Connection conn = null;
     
     public Connection connect(String serverHost, String dbPort, String db, String user, String pass) throws ClassNotFoundException, SQLException {
@@ -43,5 +68,13 @@ public class SMySqlClass {
         } 
 
         return null;
+    }
+
+    public static String getJsonConn() {
+        return jsonConn;
+    }
+
+    public static void setJsonConn(String jsonConn) {
+        SMySqlClass.jsonConn = jsonConn;
     }
 }

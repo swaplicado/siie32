@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import java.sql.SQLException;
 
@@ -37,8 +38,8 @@ public class SShareData {
     public static String PATH_JSON_DIR = "prenomina/";
     public static String PATH_CSV_DIR = "prenomina/";
     
-    public void setConnectionFilePath(String path) {
-        SMySqlClass.setConnFilePath(path);
+    public void setJsonConn(String sjon) {
+        SMySqlClass.setJsonConn(sjon);
     }
     
     /**
@@ -91,7 +92,7 @@ public class SShareData {
      * @throws com.fasterxml.jackson.core.JsonProcessingException
 
      */
-    public String getSiieData(String sLastSyncDate) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException {
+    public String getSiieData(String sLastSyncDate) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
         SimpleDateFormat formatterd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         Date tLastSyncDate = formatterd.parse(sLastSyncDate);

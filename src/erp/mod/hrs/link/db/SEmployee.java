@@ -19,6 +19,7 @@ public class SEmployee {
     int company_id;
     boolean extra_time;
     int way_pay;
+    int dept_rh_id;
     boolean is_active;
     boolean is_deleted;
 
@@ -92,6 +93,14 @@ public class SEmployee {
 
     public void setWay_pay(int way_pay) {
         this.way_pay = way_pay;
+    }
+
+    public int getDept_rh_id() {
+        return dept_rh_id;
+    }
+
+    public void setDept_rh_id(int dept_rh_id) {
+        this.dept_rh_id = dept_rh_id;
     }
 
     public boolean isIs_active() {
