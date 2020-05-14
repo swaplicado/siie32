@@ -231,7 +231,7 @@ public class SHrsFormerPayroll {
 
                             hrsFormerReceipt.getChildConcepts().add(conceptPayment);
 
-                            if (nomina.getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger() == SModSysConsts.HRSS_TP_EAR_OVR_TME) {
+                            if (nomina.getEltPercepciones().getEltHijosPercepcion().get(i).getAttTipoPercepcion().getInteger() == SModSysConsts.HRSS_TP_EAR_OVER_TIME) {
                                 SHrsFormerConceptExtraTime conceptExtraTime = new SHrsFormerConceptExtraTime();
 
                                 for (int j = 0; j < nomina.getEltHorasExtras().getEltHijosHorasExtra().size(); j++) {

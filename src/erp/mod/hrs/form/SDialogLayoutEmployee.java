@@ -32,8 +32,6 @@ import sa.lib.gui.bean.SBeanFormDialog;
 public class SDialogLayoutEmployee extends SBeanFormDialog implements FocusListener, ActionListener {
 
     public static Date moDateValueApplication;
-    
-    private int mnFkLayoutTypeEmployee;
     private int mnLayoutSua;
     
     /**
@@ -76,7 +74,8 @@ public class SDialogLayoutEmployee extends SBeanFormDialog implements FocusListe
         jPanel15.setMaximumSize(new java.awt.Dimension(450, 350));
         jPanel15.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel16.setMaximumSize(new java.awt.Dimension(450, 350));
+        jPanel16.setMaximumSize(new java.awt.Dimension(550, 450));
+        jPanel16.setMinimumSize(new java.awt.Dimension(289, 185));
         jPanel16.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
         jtfMode.setEditable(false);
@@ -140,7 +139,7 @@ public class SDialogLayoutEmployee extends SBeanFormDialog implements FocusListe
                 break;
             default:
         }
-        
+
         SGuiUtils.setWindowBounds(this, 450, 300);
 
         moDateValueApplication = miClient.getSession().getCurrentDate();
@@ -149,12 +148,12 @@ public class SDialogLayoutEmployee extends SBeanFormDialog implements FocusListe
 
         moDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart.getText()), true);
         moDateEnd.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateEnd.getText()), true);
-        
+
         moFields.addField(moDateStart);
         moFields.addField(moDateEnd);
 
         moFields.setFormButton(jbSave);
-                
+
         populateLayoutType();
         removeAllListeners();
         addAllListeners();
@@ -185,14 +184,22 @@ public class SDialogLayoutEmployee extends SBeanFormDialog implements FocusListe
     
     @Override
     public SGuiValidation validateForm() {
-        String msg = "";
         SGuiValidation validation = moFields.validateFields();
         
-        msg = SGuiUtilities.validateDateRange(moDateStart.getValue(), moDateEnd.getValue());
-
-        if (!msg.isEmpty()) {
+        if (moDateStart.getValue() == null ) {
+            validation.setMessage("Debe poner una fecha inicial"); 
+            validation.setComponent(moDateStart);
+        }
+        else if (moDateEnd.getValue() == null ) {
+            validation.setMessage("Debe poner una fecha final");
+            validation.setComponent(moDateEnd);         
+        }
+        else {
+            String msg = SGuiUtilities.validateDateRange(moDateStart.getValue(), moDateEnd.getValue());
+            if (!msg.isEmpty()) {
                 validation.setMessage(msg);
                 validation.setComponent(moDateStart);  
+            }
         }
         
         return validation;

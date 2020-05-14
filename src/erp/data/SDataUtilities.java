@@ -16,6 +16,7 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
 import erp.mbps.data.SDataBizPartnerBranchContact;
+import erp.mbps.data.SDataEmployee;
 import erp.mbps.data.SProcBizPartnerBizAreaVal;
 import erp.mbps.data.SProcBizPartnerBranchAddressVal;
 import erp.mbps.data.SProcBizPartnerFiscalIdVal;
@@ -776,7 +777,9 @@ public abstract class SDataUtilities {
             case SDataConstants.MFG_EXP_ETY:
                 registry = new SDataExplotionMaterialsEntry();
                 break;
-
+            case SModConsts.HRSU_EMP:
+                registry = new SDataEmployee();
+                break;
             case SDataConstants.HRS_SIE_PAY:
                 registry = new SDataFormerPayroll();
                 break;

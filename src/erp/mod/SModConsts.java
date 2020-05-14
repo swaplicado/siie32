@@ -305,6 +305,7 @@ public abstract class SModConsts {
     public static final int FINX_ACC_CASH_BANK = 2014002;
 
     public static final int FINR_CSH_FLW_EXP = 2015001;
+    public static final int FINR_MAS_PRI = 2015002;
     public static final int FINR_DPS_TAX_PEND = 2015011;
     public static final int FINR_LAY_BANK = 2015021;
 
@@ -683,6 +684,7 @@ public abstract class SModConsts {
     public static final int HRSX_BEN_VAC_PEND = 2064056;
     public static final int HRSX_EMP_INT = 2064061;     // employees integral
     public static final int HRSX_EMP_CON_EXP = 2064066; // employees contract expiration
+    public static final int HRSX_EMP_MASSIVE_UPD_SSC = 2063071;
     public static final int HRSX_LOAN_PAY = 2064091;
     public static final int HRSX_ABS_MOV = 2064101;
     public static final int HRSX_SSC_UPD = 2064102;

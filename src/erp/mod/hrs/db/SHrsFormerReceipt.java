@@ -630,17 +630,17 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
                                 cfd.ver3.nom12.DElementPercepcion percepcion = createElementEarning(concept);
 
                                 switch (concept.getClaveOficial()) {
-                                    case SModSysConsts.HRSS_TP_EAR_OVR_TME:
+                                    case SModSysConsts.HRSS_TP_EAR_OVER_TIME:
                                         percepcion.getEltHijosHorasExtra().add(createElementEarningOverTime(concept));
                                         break;
 
-                                    case SModSysConsts.HRSS_TP_EAR_DIS:
+                                    case SModSysConsts.HRSS_TP_EAR_DISAB:
                                         incapacidades.getEltHijosIncapacidad().add(createElementEarningDisability(concept));
                                         break;
 
-                                    case SModSysConsts.HRSS_TP_EAR_SEN_BON:
-                                    case SModSysConsts.HRSS_TP_EAR_SET:
-                                    case SModSysConsts.HRSS_TP_EAR_CMP:
+                                    case SModSysConsts.HRSS_TP_EAR_SEN_BONUS:
+                                    case SModSysConsts.HRSS_TP_EAR_SETT:
+                                    case SModSysConsts.HRSS_TP_EAR_COMP:
                                         dTotalSeparacionIndemnizacionGravado = SLibUtils.roundAmount(dTotalSeparacionIndemnizacionGravado + percepcion.getAttImporteGravado().getDouble());
                                         dTotalSeparacionIndemnizacionExento = SLibUtils.roundAmount(dTotalSeparacionIndemnizacionExento + percepcion.getAttImporteExento().getDouble());
                                         break;
@@ -648,7 +648,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
                                     default:
                                 }
 
-                                if (!SLibUtils.belongsTo(concept.getClaveOficial(), new int[] { SModSysConsts.HRSS_TP_EAR_SEN_BON, SModSysConsts.HRSS_TP_EAR_SET, SModSysConsts.HRSS_TP_EAR_CMP })) { 
+                                if (!SLibUtils.belongsTo(concept.getClaveOficial(), new int[] { SModSysConsts.HRSS_TP_EAR_SEN_BONUS, SModSysConsts.HRSS_TP_EAR_SETT, SModSysConsts.HRSS_TP_EAR_COMP })) { 
                                     dTotalSueldos = SLibUtils.roundAmount(dTotalSueldos + (percepcion.getAttImporteGravado().getDouble() + percepcion.getAttImporteExento().getDouble()));
                                 }
 

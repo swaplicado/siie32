@@ -1144,53 +1144,6 @@ public abstract class SHrsUtils {
         }
     }
 
-    public static void updateEmployeeSBC(SGuiClient client, int layoutSuaType, int idEmployeSBC, Date dateSystem) {
-        ResultSet resultSetHeader = null;
-        Statement statement = null;
-        int id_emp = 0;
-        int nLogId = 0;
-        int id_Emp = idEmployeSBC;
-        int b_del = 0;
-        double sal = 0;
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String currentDate = formatter.format(dateSystem);
-        String sql = "";
-        String usr_upd = "";
-        String usr_ins = "";
-             
-        try {
-            statement = client.getSession().getStatement();
-                         
-                sql = "SELECT COALESCE(MAX(id_log), 0) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " WHERE id_emp = " + id_Emp ;
-                resultSetHeader = client.getSession().getStatement().executeQuery(sql);
-                    if (resultSetHeader.next()) {
-                        nLogId = resultSetHeader.getInt(1);
-                    }
-                    // Comente el update para que no cambie nada en la BD
-/*
-                sql = "UPDATE " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " SET " +
-                    "id_emp = '" + id_emp + "', " +
-                    "id_log = '" + nLogId + "', " +
-                    "dt = '" + currentDate + "', " +
-//                    "dt = '" + SLibUtils.DbmsDateFormatDate.format(dt) + "', " +
-                    "sal_ssc = '" + sal + "', " +
-                    "b_del = '" + b_del + "', " +
-                    "fk_usr_ins = '" + usr_ins + "', " +
-                    "fk_usr_upd = '" + usr_upd + "', " +
-                    "ts_usr_ins = " + "NOW()" + ", " +
-                    "ts_usr_upd = " + "NOW()" + " " +
-                    "WHERE id_emp = " + id_emp + " AND id_log = " + nLogId;
-
-                    client.getSession().getStatement().execute(sql);
-                    */
-                    client.showMsgBoxInformation("SBC actualizados");
-
-        }
-        catch (SQLException e) {
-            SLibUtilities.renderException(STableUtilities.class.getName(), e);
-        }
-    }
-    
     /**
      * Checks if period is anniversary of provided date.
      * @param anniversary
