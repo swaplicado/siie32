@@ -497,7 +497,7 @@ public class SDataParamsCompany extends erp.lib.data.SDataRegistry implements ja
                 mbIsLastSearchItemPreserved = resultSet.getBoolean("b_last_search_item");
                 mbIsExchangeRatePurPreserved = resultSet.getBoolean("b_keep_exc_rate_pur");
                 mbIsExchangeRateSalPreserved = resultSet.getBoolean("b_keep_exc_rate_sal");
-                mbIsLotApprovalRequired = resultSet.getBoolean("b_lot_apr");;                
+                mbIsLotApprovalRequired = resultSet.getBoolean("b_lot_apr");
                 mbIsPaymentMonday = resultSet.getBoolean("b_pay_mon");
                 mbIsPaymentTuesday = resultSet.getBoolean("b_pay_tue");
                 mbIsPaymentWednesday = resultSet.getBoolean("b_pay_wed");

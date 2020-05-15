@@ -135,8 +135,8 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jlDateLastHire = new javax.swing.JLabel();
         jftDateLastHire = new javax.swing.JFormattedTextField();
         jLabel7 = new javax.swing.JLabel();
-        jlDateLastDismiss_n = new javax.swing.JLabel();
-        jftDateLastDismiss_n = new javax.swing.JFormattedTextField();
+        jlDateLastDismissal_n = new javax.swing.JLabel();
+        jftDateLastDismissal_n = new javax.swing.JFormattedTextField();
         jPanel18 = new javax.swing.JPanel();
         jlSalary = new javax.swing.JLabel();
         jtfSalary = new javax.swing.JTextField();
@@ -235,18 +235,17 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jpFilter.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         gpbFilter.add(jtbStatusEmployeeActive);
-        jtbStatusEmployeeActive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif"))); // NOI18N
-        jtbStatusEmployeeActive.setSelected(true);
+        jtbStatusEmployeeActive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif"))); // NOI18N
         jtbStatusEmployeeActive.setPreferredSize(new java.awt.Dimension(23, 23));
         jpFilter.add(jtbStatusEmployeeActive);
 
         gpbFilter.add(jtbStatusEmployeeInactive);
-        jtbStatusEmployeeInactive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif"))); // NOI18N
+        jtbStatusEmployeeInactive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif"))); // NOI18N
         jtbStatusEmployeeInactive.setPreferredSize(new java.awt.Dimension(23, 23));
         jpFilter.add(jtbStatusEmployeeInactive);
 
         gpbFilter.add(jtbStatusEmployeeAll);
-        jtbStatusEmployeeAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
+        jtbStatusEmployeeAll.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif"))); // NOI18N
         jtbStatusEmployeeAll.setPreferredSize(new java.awt.Dimension(23, 23));
         jpFilter.add(jtbStatusEmployeeAll);
 
@@ -365,15 +364,15 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jLabel7.setPreferredSize(new java.awt.Dimension(20, 23));
         jPanel15.add(jLabel7);
 
-        jlDateLastDismiss_n.setText("Última baja:");
-        jlDateLastDismiss_n.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel15.add(jlDateLastDismiss_n);
+        jlDateLastDismissal_n.setText("Última baja:");
+        jlDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel15.add(jlDateLastDismissal_n);
 
-        jftDateLastDismiss_n.setEditable(false);
-        jftDateLastDismiss_n.setText("yyyy/mm/dd");
-        jftDateLastDismiss_n.setFocusable(false);
-        jftDateLastDismiss_n.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel15.add(jftDateLastDismiss_n);
+        jftDateLastDismissal_n.setEditable(false);
+        jftDateLastDismissal_n.setText("yyyy/mm/dd");
+        jftDateLastDismissal_n.setFocusable(false);
+        jftDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel15.add(jftDateLastDismissal_n);
 
         jPanel7.add(jPanel15);
 
@@ -847,7 +846,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JFormattedTextField jftDateChangeSalary;
     private javax.swing.JFormattedTextField jftDateChangeSalarySscBase;
     private javax.swing.JFormattedTextField jftDateChangeWage;
-    private javax.swing.JFormattedTextField jftDateLastDismiss_n;
+    private javax.swing.JFormattedTextField jftDateLastDismissal_n;
     private javax.swing.JFormattedTextField jftDateLastHire;
     private javax.swing.JLabel jlAlternativeId;
     private javax.swing.JLabel jlAnnualBonus;
@@ -860,7 +859,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private javax.swing.JLabel jlBenefitProp;
     private javax.swing.JLabel jlDateBenefits;
     private javax.swing.JLabel jlDateBirth;
-    private javax.swing.JLabel jlDateLastDismiss_n;
+    private javax.swing.JLabel jlDateLastDismissal_n;
     private javax.swing.JLabel jlDateLastHire;
     private javax.swing.JLabel jlDicL;
     private javax.swing.JLabel jlDisL;
@@ -1015,15 +1014,15 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         try {
             if (jtbStatusEmployeeActive.isSelected()) {
                 mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ACT;
-                jtbStatusEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
+                jtbStatusEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif")));
             }
             else if (jtbStatusEmployeeInactive.isSelected()) {
                 mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_INA;
-                jtbStatusEmployeeInactive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif")));
+                jtbStatusEmployeeInactive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif")));
             }
             else if (jtbStatusEmployeeAll.isSelected()) {
                 mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ALL;
-                jtbStatusEmployeeAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")));
+                jtbStatusEmployeeAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif")));
             }
             populateEmployee();
         }
@@ -1062,7 +1061,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
     private ArrayList<SDbBenefitTable> getBenefitTable(int benefitTableType) throws Exception {
         int benefitId = 0;
         SDbBenefitTable benfitTables = null;
-        ArrayList<SDbBenefitTable> aBenefitTables = new ArrayList<SDbBenefitTable>();
+        ArrayList<SDbBenefitTable> aBenefitTables = new ArrayList<>();
         HashSet<Integer> requiredPaymentType = new HashSet<>();
         
         requiredPaymentType.add(SModSysConsts.HRSS_TP_PAY_WEE);
@@ -1128,6 +1127,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         sql = "SELECT emp.*, CAST(emp.num AS UNSIGNED INTEGER) AS _emp_num, bp.bp, dep.name, ct.code, tp.code, pay.name, a.street, a.street_num_ext, a.street_num_int, a.neighborhood, a.reference, " +
                 "a.locality, a.county, a.state, a.zip_code, a.po_box, IF(cty.cty IS NULL, 'MÉXICO', cty.cty) AS f_cty " +
                 "FROM erp.hrsu_emp AS emp " +
+                "INNER JOIN hrs_emp_member AS empm ON empm.id_emp = emp.id_emp " +
                 "INNER JOIN erp.hrsu_dep AS dep ON dep.id_dep = emp.fk_dep " +
                 "INNER JOIN erp.hrsu_tp_emp AS ct ON ct.id_tp_emp = emp.fk_tp_emp " +
                 "INNER JOIN erp.hrsu_tp_wrk AS tp ON tp.id_tp_wrk = emp.fk_tp_wrk " +
@@ -1185,7 +1185,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
         jftDateBirth.setText(" / / ");
         jftDateBenefits.setText(" / / ");
         jftDateLastHire.setText(" / / ");
-        jftDateLastDismiss_n.setText(" / / ");
+        jftDateLastDismissal_n.setText(" / / ");
         jtfBank.setText("");
         jtfBankAccount.setText("");
         jtfSex.setText("");
@@ -1241,7 +1241,7 @@ public class SPanelQueryIntegralEmployee extends javax.swing.JPanel implements S
             jftDateBirth.setText(SLibUtils.DateFormatDate.format(employee.getDateBirth()));
             jftDateBenefits.setText(SLibUtils.DateFormatDate.format(employee.getDateBenefits()));
             jftDateLastHire.setText(SLibUtils.DateFormatDate.format(employee.getDateLastHire()));
-            jftDateLastDismiss_n.setText(employee.getDateLastDismiss_n() == null ? " / / " : SLibUtils.DateFormatDate.format(employee.getDateLastDismiss_n()));
+            jftDateLastDismissal_n.setText(employee.getDateLastDismissal_n() == null ? " / / " : SLibUtils.DateFormatDate.format(employee.getDateLastDismissal_n()));
             jtfSalary.setText(SLibUtils.DecimalFormatValue2D.format(employee.getSalary()));
             jftDateChangeSalary.setText(SLibUtils.DateFormatDate.format(employee.getDateSalary()));
             jtfWage.setText(SLibUtils.DecimalFormatValue2D.format(employee.getWage()));

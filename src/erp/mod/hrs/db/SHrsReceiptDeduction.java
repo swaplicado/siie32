@@ -221,7 +221,7 @@ public class SHrsReceiptDeduction implements SGridRow, Comparable {
             case INPUT_BY_DED:
                 switch (row) {
                     case 0: // employee name
-                        value = moHrsReceipt.getHrsEmployee().getEmployee().getAuxEmployeeName();
+                        value = moHrsReceipt.getHrsEmployee().getEmployee().getXtaEmployeeName();
                         break;
                     case 1: // value alleged (units alleged), EDITABLE!
                         value = moPayrollReceiptDeduction.getUnitsAlleged();

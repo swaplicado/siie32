@@ -7,49 +7,56 @@ package erp.mod.hrs.db;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores
+ * @author Edwin Carmona
  */
-public class SDbEmployeeDismissType extends SDbRegistryUser {
+public class SDbPrePayrollCutoffCalendar extends SDbRegistryUser {
 
-    protected int mnPkEmployeeDismissTypeId;
-    protected String msCode;
-    protected String msName;
+    protected int PkCalendarId;
+    protected int mnYear;
+    protected int mnNumber;
+    protected Date mtDateCutoff;
+    
+    protected int mnFkPaymentTypeId;
+
     /*
     protected boolean mbDeleted;
-    protected boolean mbSystem;
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
 
-    public SDbEmployeeDismissType() {
-        super(SModConsts.HRSU_TP_EMP_DIS);
+    public SDbPrePayrollCutoffCalendar() {
+        super(SModConsts.HRS_PRE_PAY_CUT_CAL);
     }
 
-    public void setPkEmployeeDismissTypeId(int n) { mnPkEmployeeDismissTypeId = n; }
-    public void setCode(String s) { msCode = s; }
-    public void setName(String s) { msName = s; }
+    public void setPkTaxTableId(int n) { PkCalendarId = n; }
+    public void setYear(int n) { mnYear = n; }
+    public void setNumber(int n) { mnNumber = n; }
+    public void setDateCutoff(Date t) { mtDateCutoff = t; }
     public void setDeleted(boolean b) { mbDeleted = b; }
-    public void setSystem(boolean b) { mbSystem = b; }
+    public void setFkPaymentTypeId(int n) { mnFkPaymentTypeId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
 
-    public int getPkEmployeeDismissTypeId() { return mnPkEmployeeDismissTypeId; }
-    public String getCode() { return msCode; }
-    public String getName() { return msName; }
+    public int getPkTaxTableId() { return PkCalendarId; }
+    public int getYear() { return mnYear; }
+    public int getNumber() { return mnNumber; }
+    public Date getDateCutoff() { return mtDateCutoff; }
     public boolean isDeleted() { return mbDeleted; }
-    public boolean isSystem() { return mbSystem; }
+    public int getFkPaymentTypeId() { return mnFkPaymentTypeId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
@@ -57,23 +64,24 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
 
     @Override
     public void setPrimaryKey(int[] pk) {
-        mnPkEmployeeDismissTypeId = pk[0];
+        PkCalendarId = pk[0];
     }
 
     @Override
     public int[] getPrimaryKey() {
-        return new int[] { mnPkEmployeeDismissTypeId };
+        return new int[] { PkCalendarId };
     }
 
     @Override
     public void initRegistry() {
         initBaseRegistry();
 
-        mnPkEmployeeDismissTypeId = 0;
-        msCode = "";
-        msName = "";
+        PkCalendarId = 0;
+        mnYear = 0;
+        mnNumber = 0;
+        mtDateCutoff = null;
         mbDeleted = false;
-        mbSystem = false;
+        mnFkPaymentTypeId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
@@ -87,29 +95,30 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
 
     @Override
     public String getSqlWhere() {
-        return "WHERE id_tp_emp_dis = " + mnPkEmployeeDismissTypeId + " ";
+        return "WHERE id_cal = " + PkCalendarId + " ";
     }
 
     @Override
     public String getSqlWhere(int[] pk) {
-        return "WHERE id_tp_emp_dis = " + pk[0] + " ";
+        return "WHERE id_cal = " + pk[0] + " ";
     }
 
     @Override
     public void computePrimaryKey(SGuiSession session) throws SQLException, Exception {
         ResultSet resultSet = null;
 
-        mnPkEmployeeDismissTypeId = 0;
+        PkCalendarId = 0;
 
-        msSql = "SELECT COALESCE(MAX(id_tp_emp_dis), 0) + 1 FROM " + getSqlTable() + " ";
+        msSql = "SELECT COALESCE(MAX(id_cal), 0) + 1 FROM " + getSqlTable() + " ";
         resultSet = session.getStatement().executeQuery(msSql);
         if (resultSet.next()) {
-            mnPkEmployeeDismissTypeId = resultSet.getInt(1);
+            PkCalendarId = resultSet.getInt(1);
         }
     }
 
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
+        Statement statement = null;
         ResultSet resultSet = null;
 
         initRegistry();
@@ -122,15 +131,18 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
             throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
         }
         else {
-            mnPkEmployeeDismissTypeId = resultSet.getInt("id_tp_emp_dis");
-            msCode = resultSet.getString("code");
-            msName = resultSet.getString("name");
+            PkCalendarId = resultSet.getInt("id_cal");
+            mnYear = resultSet.getInt("year");
+            mnNumber = resultSet.getInt("num");
+            mtDateCutoff = resultSet.getDate("dt_cut");
             mbDeleted = resultSet.getBoolean("b_del");
-            mbSystem = resultSet.getBoolean("b_sys");
+            mnFkPaymentTypeId = resultSet.getInt("fk_tp_pay");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
+
+            // Finish registry reading:
 
             mbRegistryNew = false;
         }
@@ -146,16 +158,16 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
         if (mbRegistryNew) {
             computePrimaryKey(session);
             mbDeleted = false;
-            mbSystem = false;
             mnFkUserInsertId = session.getUser().getPkUserId();
             mnFkUserUpdateId = SUtilConsts.USR_NA_ID;
 
             msSql = "INSERT INTO " + getSqlTable() + " VALUES (" +
-                    mnPkEmployeeDismissTypeId + ", " +
-                    "'" + msCode + "', " +
-                    "'" + msName + "', " +
+                    PkCalendarId + ", " +
+                    mnYear + ", " +
+                    mnNumber + ", " +
+                    "'" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "', " +
                     (mbDeleted ? 1 : 0) + ", " +
-                    (mbSystem ? 1 : 0) + ", " +
+                    mnFkPaymentTypeId + ", " +
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
                     "NOW()" + ", " +
@@ -166,11 +178,11 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
             mnFkUserUpdateId = session.getUser().getPkUserId();
 
             msSql = "UPDATE " + getSqlTable() + " SET " +
-                    //"id_tp_emp_dis = " + mnPkEmployeeDismissTypeId + ", " +
-                    "code = '" + msCode + "', " +
-                    "name = '" + msName + "', " +
+                    //"id_cal = " + PkCalendarId + ", " +
+                    "year = " + mnYear + ", " +
+                    "num = " + mnNumber + ", " +
+                    "dt_cut = '" + SLibUtils.DbmsDateFormatDate.format(mtDateCutoff) + "', " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                    "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -179,19 +191,22 @@ public class SDbEmployeeDismissType extends SDbRegistryUser {
         }
 
         session.getStatement().execute(msSql);
+
+        // Finish registry saving:
+
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
 
     @Override
-    public SDbEmployeeDismissType clone() throws CloneNotSupportedException {
-        SDbEmployeeDismissType registry = new SDbEmployeeDismissType();
+    public SDbPrePayrollCutoffCalendar clone() throws CloneNotSupportedException {
+        SDbPrePayrollCutoffCalendar registry = new SDbPrePayrollCutoffCalendar();
 
-        registry.setPkEmployeeDismissTypeId(this.getPkEmployeeDismissTypeId());
-        registry.setCode(this.getCode());
-        registry.setName(this.getName());
+        registry.setPkTaxTableId(this.getPkTaxTableId());
+        registry.setYear(this.getYear());
+        registry.setNumber(this.getNumber());
+        registry.setDateCutoff(this.getDateCutoff());
         registry.setDeleted(this.isDeleted());
-        registry.setSystem(this.isSystem());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());

@@ -41,10 +41,10 @@ public class SDataBizPartnerBranchContact extends erp.lib.data.SDataRegistry imp
     protected java.lang.String msSkype01;
     protected java.lang.String msSkype02;
     protected boolean mbIsDeleted;
-    protected int mnPkContactTypeId;
-    protected int mnPkTelephoneType01Id;
-    protected int mnPkTelephoneType02Id;
-    protected int mnPkTelephoneType03Id;
+    protected int mnFkContactTypeId;
+    protected int mnFkTelephoneType01Id;
+    protected int mnFkTelephoneType02Id;
+    protected int mnFkTelephoneType03Id;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -90,10 +90,10 @@ public class SDataBizPartnerBranchContact extends erp.lib.data.SDataRegistry imp
     public void setSkype01(java.lang.String s) { msSkype01 = s; }
     public void setSkype02(java.lang.String s) { msSkype02 = s; }
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
-    public void setPkContactTypeId(int n) { mnPkContactTypeId = n; }
-    public void setPkTelephoneType01Id(int n) { mnPkTelephoneType01Id = n; }
-    public void setPkTelephoneType02Id(int n) { mnPkTelephoneType02Id = n; }
-    public void setPkTelephoneType03Id(int n) { mnPkTelephoneType03Id = n; }
+    public void setFkContactTypeId(int n) { mnFkContactTypeId = n; }
+    public void setFkTelephoneType01Id(int n) { mnFkTelephoneType01Id = n; }
+    public void setFkTelephoneType02Id(int n) { mnFkTelephoneType02Id = n; }
+    public void setFkTelephoneType03Id(int n) { mnFkTelephoneType03Id = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -125,10 +125,10 @@ public class SDataBizPartnerBranchContact extends erp.lib.data.SDataRegistry imp
     public java.lang.String getSkype01() { return msSkype01; }
     public java.lang.String getSkype02() { return msSkype02; }
     public boolean getIsDeleted() { return mbIsDeleted; }
-    public int getPkContactTypeId() { return mnPkContactTypeId; }
-    public int getPkTelephoneType01Id() { return mnPkTelephoneType01Id; }
-    public int getPkTelephoneType02Id() { return mnPkTelephoneType02Id; }
-    public int getPkTelephoneType03Id() { return mnPkTelephoneType03Id; }
+    public int getFkContactTypeId() { return mnFkContactTypeId; }
+    public int getFkTelephoneType01Id() { return mnFkTelephoneType01Id; }
+    public int getFkTelephoneType02Id() { return mnFkTelephoneType02Id; }
+    public int getFkTelephoneType03Id() { return mnFkTelephoneType03Id; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -197,10 +197,10 @@ public class SDataBizPartnerBranchContact extends erp.lib.data.SDataRegistry imp
         msSkype01 = "";
         msSkype02 = "";
         mbIsDeleted = false;
-        mnPkContactTypeId = 0;
-        mnPkTelephoneType01Id = 0;
-        mnPkTelephoneType02Id = 0;
-        mnPkTelephoneType03Id = 0;
+        mnFkContactTypeId = 0;
+        mnFkTelephoneType01Id = 0;
+        mnFkTelephoneType02Id = 0;
+        mnFkTelephoneType03Id = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -276,10 +276,10 @@ public class SDataBizPartnerBranchContact extends erp.lib.data.SDataRegistry imp
                 msSkype01 = resultSet.getString("bpb_con.skype_01");
                 msSkype02 = resultSet.getString("bpb_con.skype_02");
                 mbIsDeleted = resultSet.getBoolean("bpb_con.b_del");
-                mnPkContactTypeId = resultSet.getInt("bpb_con.fid_tp_con");
-                mnPkTelephoneType01Id = resultSet.getInt("bpb_con.fid_tp_tel_01");
-                mnPkTelephoneType02Id = resultSet.getInt("bpb_con.fid_tp_tel_02");
-                mnPkTelephoneType03Id = resultSet.getInt("bpb_con.fid_tp_tel_03");
+                mnFkContactTypeId = resultSet.getInt("bpb_con.fid_tp_con");
+                mnFkTelephoneType01Id = resultSet.getInt("bpb_con.fid_tp_tel_01");
+                mnFkTelephoneType02Id = resultSet.getInt("bpb_con.fid_tp_tel_02");
+                mnFkTelephoneType03Id = resultSet.getInt("bpb_con.fid_tp_tel_03");
                 mnFkUserNewId = resultSet.getInt("bpb_con.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("bpb_con.fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("bpb_con.fid_usr_del");
@@ -350,10 +350,10 @@ public class SDataBizPartnerBranchContact extends erp.lib.data.SDataRegistry imp
             callableStatement.setString(nParam++, msSkype01);
             callableStatement.setString(nParam++, msSkype02);
             callableStatement.setBoolean(nParam++, mbIsDeleted);
-            callableStatement.setInt(nParam++, mnPkContactTypeId);
-            callableStatement.setInt(nParam++, mnPkTelephoneType01Id);
-            callableStatement.setInt(nParam++, mnPkTelephoneType02Id);
-            callableStatement.setInt(nParam++, mnPkTelephoneType03Id);
+            callableStatement.setInt(nParam++, mnFkContactTypeId);
+            callableStatement.setInt(nParam++, mnFkTelephoneType01Id);
+            callableStatement.setInt(nParam++, mnFkTelephoneType02Id);
+            callableStatement.setInt(nParam++, mnFkTelephoneType03Id);
             callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

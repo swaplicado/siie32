@@ -188,8 +188,8 @@ public class SHrsFormerPayroll {
                     cfd.ver3.nom11.DElementNomina nomina = ((cfd.ver3.nom11.DElementNomina) element);
                     
                     hrsFormerReceipt.setRegistroPatronal(nomina.getAttRegistroPatronal().getString());
-                    hrsFormerReceipt.setNumEmpleado(nomina.getAttNumEmpleado().getString());
-                    hrsFormerReceipt.setCurp(nomina.getAttCurp().getString());
+                    hrsFormerReceipt.setEmpleadoNum(nomina.getAttNumEmpleado().getString());
+                    hrsFormerReceipt.setEmpleadoCurp(nomina.getAttCurp().getString());
                     hrsFormerReceipt.setTipoRegimen(nomina.getAttTipoRegimen().getInteger());
                     hrsFormerReceipt.setNumSeguridadSocial(nomina.getAttNumSeguridadSocial().getString());
                     hrsFormerReceipt.setFechaPago(nomina.getAttFechaPago().getDate());

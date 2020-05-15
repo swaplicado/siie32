@@ -24,7 +24,7 @@ import erp.mod.hrs.db.SDbDeduction;
 import erp.mod.hrs.db.SDbDepartment;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbEmployee;
-import erp.mod.hrs.db.SDbEmployeeDismissType;
+import erp.mod.hrs.db.SDbEmployeeDismissalType;
 import erp.mod.hrs.db.SDbEmployeeHireLog;
 import erp.mod.hrs.db.SDbEmployeeType;
 import erp.mod.hrs.db.SDbEmployeeWageLog;
@@ -41,6 +41,7 @@ import erp.mod.hrs.db.SDbPayrollReceiptDeduction;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SDbPosition;
+import erp.mod.hrs.db.SDbPrePayrollCutoffCalendar;
 import erp.mod.hrs.db.SDbShift;
 import erp.mod.hrs.db.SDbSsContributionTable;
 import erp.mod.hrs.db.SDbSsContributionTableRow;
@@ -64,10 +65,11 @@ import erp.mod.hrs.form.SFormAutomaticEarnings;
 import erp.mod.hrs.form.SFormBenefitAdjustmentEarning;
 import erp.mod.hrs.form.SFormBenefitTable;
 import erp.mod.hrs.form.SFormConfig;
+import erp.mod.hrs.form.SFormCutoffCalendar;
 import erp.mod.hrs.form.SFormDeduction;
 import erp.mod.hrs.form.SFormDepartment;
 import erp.mod.hrs.form.SFormEarning;
-import erp.mod.hrs.form.SFormEmployeeDismissType;
+import erp.mod.hrs.form.SFormEmployeeDismissalType;
 import erp.mod.hrs.form.SFormEmployeeType;
 import erp.mod.hrs.form.SFormFirstDayYear;
 import erp.mod.hrs.form.SFormHoliday;
@@ -104,7 +106,7 @@ import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
 import erp.mod.hrs.view.SViewEarning;
-import erp.mod.hrs.view.SViewEmployeeDismissType;
+import erp.mod.hrs.view.SViewEmployeeDismissalType;
 import erp.mod.hrs.view.SViewEmployeeHireLog;
 import erp.mod.hrs.view.SViewEmployeeType;
 import erp.mod.hrs.view.SViewEmployeeWageLog;
@@ -123,6 +125,7 @@ import erp.mod.hrs.view.SViewPayrollLoanEarningComplement;
 import erp.mod.hrs.view.SViewPayrollReceipt;
 import erp.mod.hrs.view.SViewPayrollReceiptRecord;
 import erp.mod.hrs.view.SViewPosition;
+import erp.mod.hrs.view.SViewPrePayrollCutoffCalendar;
 import erp.mod.hrs.view.SViewShift;
 import erp.mod.hrs.view.SViewSsContributionTable;
 import erp.mod.hrs.view.SViewSsContributionTableRow;
@@ -163,7 +166,7 @@ public class SModuleHrs extends SGuiModule {
 
     private SFormAbsenceClass moFormAbsenceClass;
     private SFormAbsenceType moFormAbsenceType;
-    private SFormEmployeeDismissType moFormEmployeeDismissType;
+    private SFormEmployeeDismissalType moFormEmployeeDismissalType;
     private SFormEmployeeType moFormEmployeeType;
     private SFormWorkerType moFormWorkerType;
     private SFormMwzType moFormMwzType;
@@ -172,6 +175,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormShift moFormShift;
     private SFormConfig moFormConfig;
     private SFormWorkingDaySettings moFormWorkingDaySettings;
+    private SFormCutoffCalendar moFormCutoffCalendar;
     private SFormFirstDayYear moFormFirstDayYear;
     private SFormHoliday moFormHoliday;
     private SFormTaxTable moFormTaxTable;
@@ -376,7 +380,7 @@ public class SModuleHrs extends SGuiModule {
                 registry = new SDbAbsenceType();
                 break;
             case SModConsts.HRSU_TP_EMP_DIS:
-                registry = new SDbEmployeeDismissType();
+                registry = new SDbEmployeeDismissalType();
                 break;
             case SModConsts.HRSU_TP_EMP:
                 registry = new SDbEmployeeType();
@@ -410,6 +414,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_WDS:
                 registry = new SDbWorkingDaySettings();
+                break;
+            case SModConsts.HRS_PRE_PAY_CUT_CAL:
+                registry = new SDbPrePayrollCutoffCalendar();
                 break;
             case SModConsts.HRS_TAX:
                 registry = new SDbTaxTable();
@@ -705,9 +712,19 @@ public class SModuleHrs extends SGuiModule {
                 settings = new SGuiCatalogueSettings("Empleado", 1);
                 sql = "SELECT e.id_emp AS " + SDbConsts.FIELD_ID + "1, bp.bp AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " AS e "
+                        + (params == null || params.getType() == SGuiConsts.PARAM_REGS_ACT ? 
+                        "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON e.id_emp = em.id_emp " :
+                        "")
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON e.id_emp = bp.id_bp "
-                        + "WHERE "
-                        + (params == null ? " bp.b_del = 0 AND e.b_del = 0 AND e.b_act = 1 " : (params.getType() == SGuiConsts.PARAM_REGS_ACT ? "bp.b_del = 0 AND e.b_del = 0 " : "bp.b_del = 0 AND e.b_del = 0 AND e.b_act = 1 "))
+                        + "WHERE NOT bp.b_del AND NOT e.b_del AND "
+                        + (params == null || params.getType() == SGuiConsts.PARAM_REGS_ACT ? 
+                        "e.b_act " : 
+                        "e.id_emp IN ("
+                        + "SELECT DISTINCT pr.id_emp "
+                        + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                        + "WHERE NOT p.b_del AND NOT pr.b_del "
+                        + "ORDER BY pr.id_emp) ")
                         + "ORDER BY bp.bp, e.id_emp ";
                 break;
             case SModConsts.HRS_TAX:
@@ -778,7 +795,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewAbsenceType(miClient, "Tipos incidencia");
                 break;
             case SModConsts.HRSU_TP_EMP_DIS:
-                view = new SViewEmployeeDismissType(miClient, "Tipos baja");
+                view = new SViewEmployeeDismissalType(miClient, "Tipos baja");
                 break;
             case SModConsts.HRSU_TP_EMP:
                 view = new SViewEmployeeType(miClient, "Tipos empleado");
@@ -809,6 +826,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_WDS:
                 view = new SViewWorkingDaySettings(miClient, "Días laborables");
+                break;
+            case SModConsts.HRS_PRE_PAY_CUT_CAL:
+                view = new SViewPrePayrollCutoffCalendar(miClient, "Calendario de fechas de corte");
                 break;
             case SModConsts.HRS_TAX:
                 view = new SViewTaxTable(miClient, "Tablas impuesto");
@@ -1062,8 +1082,8 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormAbsenceType;
                 break;
             case SModConsts.HRSU_TP_EMP_DIS:
-                if (moFormEmployeeDismissType == null) moFormEmployeeDismissType = new SFormEmployeeDismissType(miClient, "Tipo de baja");
-                form = moFormEmployeeDismissType;
+                if (moFormEmployeeDismissalType == null) moFormEmployeeDismissalType = new SFormEmployeeDismissalType(miClient, "Tipo de baja");
+                form = moFormEmployeeDismissalType;
                 break;
             case SModConsts.HRSU_TP_EMP:
                 if (moFormEmployeeType == null) moFormEmployeeType = new SFormEmployeeType(miClient, "Tipo de empleado");
@@ -1104,6 +1124,10 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_WDS:
                 if (moFormWorkingDaySettings == null) moFormWorkingDaySettings = new SFormWorkingDaySettings(miClient, "Días laborables");
                 form = moFormWorkingDaySettings;
+                break;
+            case SModConsts.HRS_PRE_PAY_CUT_CAL:
+                if (moFormCutoffCalendar == null) moFormCutoffCalendar = new SFormCutoffCalendar(miClient, "Calendario de cortes prenómina");
+                form = moFormCutoffCalendar;
                 break;
             case SModConsts.HRS_TAX:
                 if (moFormTaxTable == null) moFormTaxTable = new SFormTaxTable(miClient, "Tabla de impuesto");
@@ -1334,3 +1358,4 @@ public class SModuleHrs extends SGuiModule {
         return guiReport;
     }
 }
+

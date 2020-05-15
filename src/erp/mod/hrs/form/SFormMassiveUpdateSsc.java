@@ -239,19 +239,20 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
     private void initComponentsExtra() throws Exception {
         mtDateEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(mnYear, mnMonthEnd));
 
+        mvFields = new Vector<>();
+        mjbSelectAll = new JButton("Seleccionar todos");
+        mjbDeselectAll = new JButton("Deseleccionar todos");
+        mjbReset = new JButton("Reiniciar");
+
+        mjbSelectAll.addActionListener(this);
+        mjbDeselectAll.addActionListener(this);
+        mjbReset.addActionListener(this);
+
         mbIsSelectedAll = false;
         msEmployeeSelectedsId = "";
-        
-        jtfYear.setText(mnYear + "");
-        jtfBimestre.setText(mnBimester + "");
+        jtfYear.setText("" + mnYear + "");
+        jtfBimestre.setText("" + mnBimester + "");
         jftDateCut.setText(SLibUtils.DateFormatDate.format(mtDateEnd));
-        
-        mvFields = new Vector<>();
-        
-        moFieldDateChangeSalary = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateChangeSsc, jlDateChangeSsc);
-        moFieldDateChangeSalary.setPickerButton(jbDateChangeSscPicker);
-        
-        mvFields.add(moFieldDateChangeSalary);
 
         try {
             maEarnings = SSscUtils.getEarningPaidInPeriod(miClient.getSession(), mnYear, mnMonthStart, mnMonthEnd);
@@ -317,18 +318,15 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         moGridSbcEmployees.setForm(null);
         moGridSbcEmployees.setPaneFormOwner(null);
         
+        moFieldDateChangeSalary = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateChangeSsc, jlDateCut);
+        moFieldDateChangeSalary.setPickerButton(jbDateChangeSscPicker);
+
+        mtDateEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(mnYear, mnMonthEnd));
+        
         dataEmployeeDetail(mtDateEnd, mnYear);
         jpEmployeeSBC.add(moGridSbcEmployees, BorderLayout.CENTER);
 
         employeeSelectAll(true);
-        
-        mjbSelectAll = new JButton("Seleccionar todos");
-        mjbDeselectAll = new JButton("Deseleccionar todos");
-        mjbReset = new JButton("Reiniciar");
-
-        mjbSelectAll.addActionListener(this);
-        mjbDeselectAll.addActionListener(this);
-        mjbReset.addActionListener(this);
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
@@ -574,7 +572,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 auxEmployee++;
                 auxEarning++;
 
-                row.getEmployee().getAuxEmployeeName();
+                row.getEmployee().getXtaEmployeeName();
                 row.getEmployee().getNumber();
                 row.getEmployee().getDateBenefits();
                 row.getEmployee().getPkEmployeeId();

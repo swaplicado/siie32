@@ -56,6 +56,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCfgBenefitTableRow;
     private javax.swing.JMenuItem jmiCfgFirstDayYear;
     private javax.swing.JMenuItem jmiCfgHoliday;
+    private javax.swing.JMenuItem jmiCfgCutoffCalendar;
     private javax.swing.JMenuItem jmiCfgWorkingDaySettings;
     private javax.swing.JMenu jmCfgBkkEarning;
     private javax.swing.JMenuItem jmiCfgBkkEarningGlobal;
@@ -173,6 +174,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgBenefitTableRow = new JMenuItem("Tablas de prestaciones a detalle");
         jmiCfgFirstDayYear = new JMenuItem("Primer día del año");
         jmiCfgHoliday = new JMenuItem("Días feriados");
+        jmiCfgCutoffCalendar = new JMenuItem("Calendario fechas de corte");
         jmiCfgWorkingDaySettings = new JMenuItem("Días laborables");
         jmCfgBkkEarning = new JMenu("Configuración contable de percepciones");
         jmiCfgBkkEarningGlobal = new JMenuItem("Globales");
@@ -197,6 +199,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg.addSeparator();
         jmCfg.add(jmiCfgFirstDayYear);
         jmCfg.add(jmiCfgHoliday);
+        jmCfg.add(jmiCfgCutoffCalendar);
         jmCfg.add(jmiCfgWorkingDaySettings);
         jmCfg.addSeparator();
         jmCfgBkkEarning.add(jmiCfgBkkEarningGlobal);
@@ -413,6 +416,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgBenefitTableRow.addActionListener(this);
         jmiCfgFirstDayYear.addActionListener(this);
         jmiCfgHoliday.addActionListener(this);
+        jmiCfgCutoffCalendar.addActionListener(this);
         jmiCfgWorkingDaySettings.addActionListener(this);
         jmiCfgBkkEarningGlobal.addActionListener(this);
         jmiCfgBkkEarningDepartament.addActionListener(this);
@@ -510,6 +514,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgBenefitTableRow.setEnabled(true);
         jmiCfgFirstDayYear.setEnabled(true);
         jmiCfgHoliday.setEnabled(true);
+        jmiCfgCutoffCalendar.setEnabled(true);
         jmiCfgWorkingDaySettings.setEnabled(true);
         jmiCfgConfig.setEnabled(true);
         jmCfgBkkEarning.setEnabled(true);
@@ -823,6 +828,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCfgHoliday) {
                 miClient.getSession().showView(SModConsts.HRS_HOL, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCfgCutoffCalendar) {
+                miClient.getSession().showView(SModConsts.HRS_PRE_PAY_CUT_CAL, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCfgWorkingDaySettings) {
                 miClient.getSession().showView(SModConsts.HRS_WDS, SLibConsts.UNDEFINED, null);

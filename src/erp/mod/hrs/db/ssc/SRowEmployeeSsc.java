@@ -148,7 +148,7 @@ public class SRowEmployeeSsc implements SGridRow {
 
     @Override
     public String getRowName() {
-        return moEmployee.getAuxEmployeeName();
+        return moEmployee.getXtaEmployeeName();
     }
 
     @Override
@@ -178,7 +178,7 @@ public class SRowEmployeeSsc implements SGridRow {
         if (col < COLS_FIXED) {
             switch(col) {
                 case 0:
-                    value = moEmployee.getAuxEmployeeName();
+                    value = moEmployee.getXtaEmployeeName();
                     break;
                 case 1:
                     value = moEmployee.getNumber();

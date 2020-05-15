@@ -90,8 +90,8 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
         jPanel12 = new javax.swing.JPanel();
         jlDateBenefit = new javax.swing.JLabel();
         moDateBenefitDate = new sa.lib.gui.bean.SBeanFieldDate();
-        jlDateLastDismiss_n = new javax.swing.JLabel();
-        moDateLastDismiss_n = new sa.lib.gui.bean.SBeanFieldDate();
+        jlDateLastDismissal_n = new javax.swing.JLabel();
+        moDateLastDismissal_n = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel11 = new javax.swing.JPanel();
         jlDateBase = new javax.swing.JLabel();
         moDateBaseDate = new sa.lib.gui.bean.SBeanFieldDate();
@@ -160,10 +160,10 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
         jPanel12.add(jlDateBenefit);
         jPanel12.add(moDateBenefitDate);
 
-        jlDateLastDismiss_n.setText("Fecha última baja:");
-        jlDateLastDismiss_n.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jlDateLastDismiss_n);
-        jPanel12.add(moDateLastDismiss_n);
+        jlDateLastDismissal_n.setText("Fecha última baja:");
+        jlDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlDateLastDismissal_n);
+        jPanel12.add(moDateLastDismissal_n);
 
         jPanel2.add(jPanel12);
 
@@ -336,7 +336,7 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
     private javax.swing.JLabel jlDateBase;
     private javax.swing.JLabel jlDateBenefit;
     private javax.swing.JLabel jlDateCutoff;
-    private javax.swing.JLabel jlDateLastDismiss_n;
+    private javax.swing.JLabel jlDateLastDismissal_n;
     private javax.swing.JLabel jlDaysElapsed;
     private javax.swing.JLabel jlDaysPayed;
     private javax.swing.JLabel jlDaysPending;
@@ -352,7 +352,7 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
     private sa.lib.gui.bean.SBeanFieldDate moDateBaseDate;
     private sa.lib.gui.bean.SBeanFieldDate moDateBenefitDate;
     private sa.lib.gui.bean.SBeanFieldDate moDateCutoff;
-    private sa.lib.gui.bean.SBeanFieldDate moDateLastDismiss_n;
+    private sa.lib.gui.bean.SBeanFieldDate moDateLastDismissal_n;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecBenefitTableBonusPercentage;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecDaysPayed;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecDaysPending;
@@ -374,7 +374,7 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
 
         moTextBenefit.setTextSettings(SGuiUtils.getLabelName(jlDateBase.getText()), 150);
         moDateBenefitDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateBenefit.getText()), true);
-        moDateLastDismiss_n.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateLastDismiss_n.getText()), false);
+        moDateLastDismissal_n.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateLastDismissal_n.getText()), false);
         moDateBaseDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateBase.getText()), true);
         moDateCutoff.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateCutoff.getText()), true);
         moIntSeniority.setIntegerSettings(SGuiUtils.getLabelName(jlSeniority), SGuiConsts.GUI_TYPE_INT, false);
@@ -397,7 +397,7 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
         
         moFields.addField(moTextBenefit);
         moFields.addField(moDateBenefitDate);
-        moFields.addField(moDateLastDismiss_n);
+        moFields.addField(moDateLastDismissal_n);
         moFields.addField(moDateBaseDate);
         moFields.addField(moDateCutoff);
         moFields.addField(moIntSeniority);
@@ -420,7 +420,7 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
         
         moTextBenefit.setEditable(false);
         moDateBenefitDate.setEditable(false);
-        moDateLastDismiss_n.setEditable(false);
+        moDateLastDismissal_n.setEditable(false);
         moDateBaseDate.setEditable(false);
         moIntSeniority.setEditable(false);
         moIntSeniorityDays.setEditable(false);
@@ -537,9 +537,9 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
                 moDateCutoff.requestFocus();
                 throw new Exception(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateBase) + "'.");
             }
-            else if (!moEmployee.isActive() && mtDateCutoff.compareTo(moDateLastDismiss_n.getValue()) > 0) {
+            else if (!moEmployee.isActive() && mtDateCutoff.compareTo(moDateLastDismissal_n.getValue()) > 0) {
                 moDateCutoff.requestFocus();
-                throw new Exception(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateLastDismiss_n) + "'.");
+                throw new Exception(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateLastDismissal_n) + "'.");
             }
             else {
                 setBenefitAnniv(benefitAnniv);
@@ -612,7 +612,7 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
             else {
                 mnBenefitAnnivLimit = benefitAnniv;
             }
-            moDateLastDismiss_n.setValue(moEmployee.getDateLastDismiss_n());
+            moDateLastDismissal_n.setValue(moEmployee.getDateLastDismissal_n());
         }
         else {
             mnBenefitAnnivLimit = 100;
@@ -745,8 +745,8 @@ public class SDialogPayrollBenefit extends SBeanFormDialog implements ActionList
                     validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_GREAT_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateBase) + "'.");
                     validation.setComponent(moDateCutoff);
                 }
-                else if (!moEmployee.isActive() && mtDateCutoff.compareTo(moDateLastDismiss_n.getValue()) > 0) {
-                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateLastDismiss_n) + "'.");
+                else if (!moEmployee.isActive() && mtDateCutoff.compareTo(moDateLastDismissal_n.getValue()) > 0) {
+                    validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlDateCutoff) + "'" + SGuiConsts.ERR_MSG_FIELD_DATE_LESS_EQUAL + "la '" + SGuiUtils.getLabelName(jlDateLastDismissal_n) + "'.");
                     validation.setComponent(moDateCutoff);
                 }
                 else if ((Integer) jsAnniversary.getValue() == 0) {

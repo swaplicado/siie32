@@ -667,7 +667,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     for (int j = 0; j < branch.getDbmsBizPartnerBranchContacts().size(); j++) {
                         contact = branch.getDbmsBizPartnerBranchContacts().get(j);
 
-                        if (contactType != SLibConstants.UNDEFINED && contact.getPkContactTypeId() == contactType) {
+                        if (contactType != SLibConstants.UNDEFINED && contact.getFkContactTypeId() == contactType) {
                             mails = contact.getEmail01();
 
                             if (mails.isEmpty()) {
@@ -675,7 +675,7 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                             }
                             break;
                         }
-                        else if (contact.getPkContactTypeId() == anTypesContact[i] && !contact.getIsDeleted()) {
+                        else if (contact.getFkContactTypeId() == anTypesContact[i] && !contact.getIsDeleted()) {
                             mails = contact.getEmail01();
 
                             if (mails.isEmpty()) {

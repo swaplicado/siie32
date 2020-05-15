@@ -1683,7 +1683,7 @@ public abstract class SHrsUtils {
     public static SDbEarning getEarningForLoanType(final SGuiClient client, final int loanType) throws Exception {
         return getEarningForType(client, SModConsts.HRSS_TP_LOAN, loanType);
     }
-
+    
     /**
      * Get deduction by provided type of registry.
      * @param client GUI client.
@@ -1743,6 +1743,46 @@ public abstract class SHrsUtils {
      */
     public static SDbDeduction getDeductionForLoanType(final SGuiClient client, final int loanType) throws Exception {
         return getDeductionForType(client, SModConsts.HRSS_TP_LOAN, loanType);
+    }
+
+    /**
+     * Get deletion status of requested earning.
+     * @param statement Database statement.
+     * @param earningId ID of earning.
+     * @return Deletion status.
+     * @throws Exception 
+     */
+    public static boolean isEarningDeleted(final Statement statement, final int earningId) throws Exception {
+        boolean deleted = false;
+        String sql = "SELECT b_del FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " WHERE id_ear = " + earningId + ";";
+        
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                deleted = resultSet.getBoolean(1);
+            }
+        }
+        
+        return deleted;
+    }
+
+    /**
+     * Get deletion status of requested deduction.
+     * @param statement Database statement.
+     * @param deductionId ID of deduction.
+     * @return Deletion status.
+     * @throws Exception 
+     */
+    public static boolean isDeductionDeleted(final Statement statement, final int deductionId) throws Exception {
+        boolean deleted = false;
+        String sql = "SELECT b_del FROM " + SModConsts.TablesMap.get(SModConsts.HRS_DED) + " WHERE id_ded = " + deductionId + ";";
+        
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                deleted = resultSet.getBoolean(1);
+            }
+        }
+        
+        return deleted;
     }
 
     /**
@@ -2408,12 +2448,12 @@ public abstract class SHrsUtils {
             if (hireLog.getDateHire().compareTo(dateStart) <= 0) {
                 daysHired += SLibTimeUtils.countPeriodDays(
                         dateStart, 
-                        hireLog.getDateDismissed_n() == null ? dateEnd : hireLog.getDateDismissed_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissed_n());
+                        hireLog.getDateDismissal_n() == null ? dateEnd : hireLog.getDateDismissal_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissal_n());
             }
             else if (hireLog.getDateHire().compareTo(dateStart) >= 0) {
                 daysHired += SLibTimeUtils.countPeriodDays(
                         hireLog.getDateHire(),
-                        hireLog.getDateDismissed_n() == null ? dateEnd : hireLog.getDateDismissed_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissed_n());
+                        hireLog.getDateDismissal_n() == null ? dateEnd : hireLog.getDateDismissal_n().compareTo(dateEnd) >= 0 ? dateEnd : hireLog.getDateDismissal_n());
             }
         }
         
@@ -2490,7 +2530,7 @@ public abstract class SHrsUtils {
         try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
             if (resultSet.next() && resultSet.getInt("_count") == 1) {
                 SDbEmployeeHireLog employeeHireLog = (SDbEmployeeHireLog) session.readRegistry(SModConsts.HRS_EMP_LOG_HIRE, new int[] { employeeId, resultSet.getInt("_max_id_log") }, SDbConsts.MODE_STEALTH);
-                isFirtsHire = employeeHireLog.getDateDismissed_n() == null;
+                isFirtsHire = employeeHireLog.getDateDismissal_n() == null;
             }
         }
         
@@ -2512,29 +2552,32 @@ public abstract class SHrsUtils {
                 employeeHireLog = getEmployeeLastDismiss(session, employeeId, 0, "");
             }
 
-            SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(null, session);
+            SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(session);
+            
             hrsEmployeeHireLog.setPkEmployeeId(employeeHireLog.getPkEmployeeId());
-            hrsEmployeeHireLog.setDateLastHire(employeeHireLog.getDateHire());
+            hrsEmployeeHireLog.setLastHireDate(employeeHireLog.getDateHire());
             hrsEmployeeHireLog.setIsHire(!employee.isActive());
             hrsEmployeeHireLog.setDeleted(employeeHireLog.isDeleted());
-            hrsEmployeeHireLog.setDateLastHire(employeeHireLog.getDateHire());
-            hrsEmployeeHireLog.setNotesHire(employeeHireLog.getNotesHire());
-            hrsEmployeeHireLog.setDateLastDismiss_n(employeeHireLog.getDateDismissed_n());
-            hrsEmployeeHireLog.setNotesDismissed(employeeHireLog.getNotesDismissed());
-            hrsEmployeeHireLog.setFkDismissedType(employeeHireLog.getFkEmployeeDismissTypeId());
+            hrsEmployeeHireLog.setLastHireDate(employeeHireLog.getDateHire());
+            hrsEmployeeHireLog.setLastHireNotes(employeeHireLog.getNotesHire());
+            hrsEmployeeHireLog.setLastDismissalDate_n(employeeHireLog.getDateDismissal_n());
+            hrsEmployeeHireLog.setLastDismissalNotes(employeeHireLog.getNotesDismissal());
+            hrsEmployeeHireLog.setFkDismissalType(employeeHireLog.getFkEmployeeDismissalTypeId());
             hrsEmployeeHireLog.setFkUserInsertId(employeeHireLog.getFkUserInsertId());
             hrsEmployeeHireLog.setFkUserUpdateId(employeeHireLog.getFkUserUpdateId());
 
-            hrsEmployeeHireLog.setIsFirtsHire(false);
-            hrsEmployeeHireLog.setIsCorrection(true);
+            hrsEmployeeHireLog.setIsAuxFirstHiring(false);
+            hrsEmployeeHireLog.setIsAuxForceFirstHiring(false);
+            hrsEmployeeHireLog.setIsAuxModification(false);
+            hrsEmployeeHireLog.setIsAuxCorrection(true);
 
             if (employee.isActive()) {
                 hrsEmployeeHireLog.setDeleted(true);
             }
             else {
-                hrsEmployeeHireLog.setDateLastDismiss_n(null);
-                hrsEmployeeHireLog.setNotesDismissed("");
-                hrsEmployeeHireLog.setFkDismissedType(SModSysConsts.HRSU_TP_EMP_DIS_NON); 
+                hrsEmployeeHireLog.setLastDismissalDate_n(null);
+                hrsEmployeeHireLog.setLastDismissalNotes("");
+                hrsEmployeeHireLog.setFkDismissalType(SModSysConsts.HRSU_TP_EMP_DIS_NON); 
             }
             
             hrsEmployeeHireLog.save();
@@ -2544,25 +2587,24 @@ public abstract class SHrsUtils {
     }
     
     public static boolean editHireLog(final SGuiSession session, final SDbEmployeeHireLog employeeHireLog) throws Exception {
-        SHrsEmployeeHireLog hrsEmployeeHireLog;
-        
-        hrsEmployeeHireLog = new SHrsEmployeeHireLog(null,session);
+        SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(session);
 
         hrsEmployeeHireLog.setPkEmployeeId(employeeHireLog.getPkEmployeeId());
-        hrsEmployeeHireLog.setDateLastHire(employeeHireLog.getDateHire());
+        hrsEmployeeHireLog.setLastHireDate(employeeHireLog.getDateHire());
         hrsEmployeeHireLog.setIsHire(employeeHireLog.isHired());
         hrsEmployeeHireLog.setDeleted(employeeHireLog.isDeleted());
-        hrsEmployeeHireLog.setDateLastHire(employeeHireLog.getDateHire());
-        hrsEmployeeHireLog.setNotesHire(employeeHireLog.getNotesHire());
-        hrsEmployeeHireLog.setDateLastDismiss_n(employeeHireLog.getDateDismissed_n());
-        hrsEmployeeHireLog.setNotesDismissed(employeeHireLog.getNotesDismissed());
-        hrsEmployeeHireLog.setFkDismissedType(employeeHireLog.getFkEmployeeDismissTypeId());
+        hrsEmployeeHireLog.setLastHireDate(employeeHireLog.getDateHire());
+        hrsEmployeeHireLog.setLastHireNotes(employeeHireLog.getNotesHire());
+        hrsEmployeeHireLog.setLastDismissalDate_n(employeeHireLog.getDateDismissal_n());
+        hrsEmployeeHireLog.setLastDismissalNotes(employeeHireLog.getNotesDismissal());
+        hrsEmployeeHireLog.setFkDismissalType(employeeHireLog.getFkEmployeeDismissalTypeId());
         hrsEmployeeHireLog.setFkUserInsertId(employeeHireLog.getFkUserInsertId());
         hrsEmployeeHireLog.setFkUserUpdateId(employeeHireLog.getFkUserUpdateId());
 
-        hrsEmployeeHireLog.setIsFirtsHire(false);
-        hrsEmployeeHireLog.setIsCorrection(false);
-        hrsEmployeeHireLog.setIsEdit(true);
+        hrsEmployeeHireLog.setIsAuxFirstHiring(false);
+        hrsEmployeeHireLog.setIsAuxForceFirstHiring(false);
+        hrsEmployeeHireLog.setIsAuxModification(true);
+        hrsEmployeeHireLog.setIsAuxCorrection(false);
         
         hrsEmployeeHireLog.save();
         
@@ -3423,7 +3465,10 @@ public abstract class SHrsUtils {
                 case SModSysConsts.HRSS_TP_ACC_EMP:
                     // process all employees:
                     
-                    sql = "SELECT id_emp, fk_dep FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " ORDER BY id_emp;";
+                    sql = "SELECT e.id_emp, e.fk_dep "
+                            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON e.id_emp = em.id_emp "
+                            + "ORDER BY e.id_emp;";
                     try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
                         while (resultSet.next()) {
                             accountingEarning = null;
@@ -3435,7 +3480,7 @@ public abstract class SHrsUtils {
                                         break;
                                         
                                     case SModSysConsts.HRSS_TP_ACC_DEP:
-                                        accountingEarning = createAccountingEarningForDepartament(earningId, oldAccountingEarnings, resultSet.getInt("fk_dep"));
+                                        accountingEarning = createAccountingEarningForDepartament(earningId, oldAccountingEarnings, resultSet.getInt("e.fk_dep"));
                                         break;
                                         
                                     default:
@@ -3444,15 +3489,15 @@ public abstract class SHrsUtils {
                             
                             if (accountingEarning != null) {
                                 accountingEarning.setPkAccountingTypeId(newAccountingType);
-                                accountingEarning.setPkReferenceId(resultSet.getInt("id_emp"));
+                                accountingEarning.setPkReferenceId(resultSet.getInt("e.id_emp"));
                             }
                             else {
                                 // attempt to recover existing registry (if any, it would have been deleted):
-                                accountingEarning = (SDbAccountingEarning) session.readRegistry(SModConsts.HRS_ACC_EAR, new int[] { earningId, newAccountingType, resultSet.getInt("id_emp") }, SDbConsts.MODE_STEALTH);
+                                accountingEarning = (SDbAccountingEarning) session.readRegistry(SModConsts.HRS_ACC_EAR, new int[] { earningId, newAccountingType, resultSet.getInt("e.id_emp") }, SDbConsts.MODE_STEALTH);
                                 
                                 // create new registry if needed:
                                 if (accountingEarning.getQueryResultId() != SDbConsts.READ_OK) {
-                                    accountingEarning = createAccountingEarning(earningId, newAccountingType, resultSet.getInt("id_emp"));
+                                    accountingEarning = createAccountingEarning(earningId, newAccountingType, resultSet.getInt("e.id_emp"));
                                 }
                             }
                             
@@ -3556,7 +3601,10 @@ public abstract class SHrsUtils {
                 case SModSysConsts.HRSS_TP_ACC_EMP:
                     // process all employees:
                     
-                    sql = "SELECT id_emp, fk_dep FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " ORDER BY id_emp;";
+                    sql = "SELECT e.id_emp, e.fk_dep "
+                            + "FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e "
+                            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON e.id_emp = em.id_emp "
+                            + "ORDER BY e.id_emp;";
                     try (ResultSet resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql)) {
                         while (resultSet.next()) {
                             accountingDeduction = null;
@@ -3568,7 +3616,7 @@ public abstract class SHrsUtils {
                                         break;
                                         
                                     case SModSysConsts.HRSS_TP_ACC_DEP:
-                                        accountingDeduction = createAccountingDeductionForDepartament(deductionId, oldAccountingDeductions, resultSet.getInt("fk_dep"));
+                                        accountingDeduction = createAccountingDeductionForDepartament(deductionId, oldAccountingDeductions, resultSet.getInt("e.fk_dep"));
                                         break;
                                         
                                     default:
@@ -3577,15 +3625,15 @@ public abstract class SHrsUtils {
                             
                             if (accountingDeduction != null) {
                                 accountingDeduction.setPkAccountingTypeId(newAccountingType);
-                                accountingDeduction.setPkReferenceId(resultSet.getInt("id_emp"));
+                                accountingDeduction.setPkReferenceId(resultSet.getInt("e.id_emp"));
                             }
                             else {
                                 // attempt to recover existing registry (if any, it would have been deleted):
-                                accountingDeduction = (SDbAccountingDeduction) session.readRegistry(SModConsts.HRS_ACC_DED, new int[] { deductionId, newAccountingType, resultSet.getInt("id_emp") }, SDbConsts.MODE_STEALTH);
+                                accountingDeduction = (SDbAccountingDeduction) session.readRegistry(SModConsts.HRS_ACC_DED, new int[] { deductionId, newAccountingType, resultSet.getInt("e.id_emp") }, SDbConsts.MODE_STEALTH);
                                 
                                 // create new registry if needed:
                                 if (accountingDeduction.getQueryResultId() != SDbConsts.READ_OK) {
-                                    accountingDeduction = createAccountingDeduction(deductionId, newAccountingType, resultSet.getInt("id_emp"));
+                                    accountingDeduction = createAccountingDeduction(deductionId, newAccountingType, resultSet.getInt("e.id_emp"));
                                 }
                             }
                             

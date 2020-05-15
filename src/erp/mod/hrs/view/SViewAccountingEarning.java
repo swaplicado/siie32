@@ -117,11 +117,13 @@ public class SViewAccountingEarning extends SGridPaneView implements ActionListe
                 + "v.id_tp_acc = vt.id_tp_acc ";
         if (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_DEP) {
             msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_DEP) + " AS ref ON "
-                + "v.id_ref = ref.id_dep ";
+                    + "v.id_ref = ref.id_dep ";
         }
         else if (mnGridSubtype == SModSysConsts.HRSS_TP_ACC_EMP) {
             msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS ref ON "
-                + "v.id_ref = ref.id_bp ";
+                    + "v.id_ref = ref.id_bp "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON "
+                    + "ref.id_bp = em.id_emp ";
         }
         msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS ac ON "
                 + "v.fk_acc = ac.pk_acc "

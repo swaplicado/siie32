@@ -27,7 +27,7 @@ import sa.lib.gui.SGuiSession;
  */
 
 /**
- *
+ * Used mainly in re-hiring and dismissal operations.
  * @author Juan Barajas, Sergio Flores
  */
 public class SDbEmployee extends SDbRegistryUser {
@@ -44,7 +44,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected Date mtDateBirth;
     protected Date mtDateBenefits;
     protected Date mtDateLastHire;
-    protected Date mtDateLastDismiss_n;
+    protected Date mtDateLastDismissal_n;
     protected double mdSalary;
     protected double mdWage;
     protected double mdSalarySscBase;
@@ -94,15 +94,17 @@ public class SDbEmployee extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
     
-    protected boolean mbAuxActive;
-    protected String msAuxEmployeeName;
-    protected String msAuxEmployeeProperName;
-    protected String msAuxFiscalId;
-    protected String msAuxAlternativeId;
-    protected SDbEmployeeHireLog moXtaEmployeeHireLog;
-    protected Date mtXtaDate;
-    protected int mnXtaEmployeeDismissTypeId;
-    protected String msXtaNotes;
+    protected boolean mbOldActive; // immutable member
+    
+    protected String msXtaEmployeeName;
+    protected String msXtaEmployeeProperName;
+    protected String msXtaEmployeeRfc;
+    protected String msXtaEmployeeCurp;
+    
+    protected Date mtAuxHireLogDate;
+    protected String msAuxHireLogNotes;
+    protected int mnAuxEmployeeDismissalTypeId;
+    protected SHrsEmployeeHireLog moAuxHrsEmployeeHireLog;
     
     public SDbEmployee() {
         super(SModConsts.HRSU_EMP);
@@ -116,7 +118,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setDateBirth(Date t) { mtDateBirth = t; }
     public void setDateBenefits(Date t) { mtDateBenefits = t; }
     public void setDateLastHire(Date t) { mtDateLastHire = t; }
-    public void setDateLastDismiss_n(Date t) { mtDateLastDismiss_n = t; }
+    public void setDateLastDismissal_n(Date t) { mtDateLastDismissal_n = t; }
     public void setSalary(double d) { mdSalary = d; }
     public void setWage(double d) { mdWage = d; }
     public void setSalarySscBase(double d) { mdSalarySscBase = d; }
@@ -170,7 +172,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public Date getDateBirth() { return mtDateBirth; }
     public Date getDateBenefits() { return mtDateBenefits; }
     public Date getDateLastHire() { return mtDateLastHire; }
-    public Date getDateLastDismiss_n() { return mtDateLastDismiss_n; }
+    public Date getDateLastDismissal_n() { return mtDateLastDismissal_n; }
     public double getSalary() { return mdSalary; }
     public double getWage() { return mdWage; }
     public double getSalarySscBase() { return mdSalarySscBase; }
@@ -216,25 +218,25 @@ public class SDbEmployee extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
-    public void setAuxActive(boolean b) { mbAuxActive = b; }
-    public void setAuxEmployeeName(String s) { msAuxEmployeeName = s; }
-    public void setAuxEmployeePropername(String s) { msAuxEmployeeProperName = s; }
-    public void setAuxFiscalId(String s) { msAuxFiscalId = s; }
-    public void setAuxAlternativeId(String s) { msAuxAlternativeId = s; }
-    public void setXtaEmployeeHireLog(SDbEmployeeHireLog o) { moXtaEmployeeHireLog = o; }
-    public void setXtaDate(Date t) { mtXtaDate = t; }
-    public void setXtaEmployeeDismissTypeId(int n) { mnXtaEmployeeDismissTypeId = n; }
-    public void setXtaNotes(String s) { msXtaNotes = s; }
+    public void setXtaEmployeeName(String s) { msXtaEmployeeName = s; }
+    public void setXtaEmployeePropername(String s) { msXtaEmployeeProperName = s; }
+    public void setXtaEmployeeRfc(String s) { msXtaEmployeeRfc = s; }
+    public void setXtaEmployeeCurp(String s) { msXtaEmployeeCurp = s; }
     
-    public boolean isAuxActive() { return mbAuxActive; }
-    public String getAuxEmployeeName() { return msAuxEmployeeName; }
-    public String getAuxEmployeeProperName() { return msAuxEmployeeProperName; }
-    public String getAuxFiscalId() { return msAuxFiscalId; }
-    public String getAuxAlternativeId() { return msAuxAlternativeId; }
-    public SDbEmployeeHireLog getXtaEmployeeHireLog() { return moXtaEmployeeHireLog; }
-    public Date getXtaDate() { return mtXtaDate; }
-    public int getXtaEmployeeDismissTypeId() { return mnXtaEmployeeDismissTypeId; }
-    public String getXtaNotes() { return msXtaNotes; }
+    public String getXtaEmployeeName() { return msXtaEmployeeName; }
+    public String getXtaEmployeeProperName() { return msXtaEmployeeProperName; }
+    public String getXtaEmployeeRfc() { return msXtaEmployeeRfc; }
+    public String getXtaEmployeeCurp() { return msXtaEmployeeCurp; }
+    
+    public void setAuxHireLogDate(Date t) { mtAuxHireLogDate = t; }
+    public void setAuxHireLogNotes(String s) { msAuxHireLogNotes = s; }
+    public void setAuxEmployeeDismissalTypeId(int n) { mnAuxEmployeeDismissalTypeId = n; }
+    public void setAuxHrsEmployeeHireLog(SHrsEmployeeHireLog o) { moAuxHrsEmployeeHireLog = o; }
+    
+    public Date getAuxHireLogDate() { return mtAuxHireLogDate; }
+    public String getAuxHireLogNotes() { return msAuxHireLogNotes; }
+    public int getAuxEmployeeDismissalTypeId() { return mnAuxEmployeeDismissalTypeId; }
+    public SHrsEmployeeHireLog getAuxHrsEmployeeHireLog() { return moAuxHrsEmployeeHireLog; }
     
     public boolean isAssimilable() {
         return SLibUtils.belongsTo(mnFkRecruitmentSchemeTypeId, new int[] { 
@@ -317,7 +319,7 @@ public class SDbEmployee extends SDbRegistryUser {
         mtDateBirth = null;
         mtDateBenefits = null;
         mtDateLastHire = null;
-        mtDateLastDismiss_n = null;
+        mtDateLastDismissal_n = null;
         mdSalary = 0;
         mdWage = 0;
         mdSalarySscBase = 0;
@@ -363,15 +365,17 @@ public class SDbEmployee extends SDbRegistryUser {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
-        mbAuxActive = false;
-        msAuxEmployeeName = "";
-        msAuxEmployeeProperName = "";
-        msAuxFiscalId = "";
-        msAuxAlternativeId = "";
-        moXtaEmployeeHireLog = null;
-        mtXtaDate = null;
-        mnXtaEmployeeDismissTypeId = 0;
-        msXtaNotes = "";
+        mbOldActive = false;
+        
+        msXtaEmployeeName = "";
+        msXtaEmployeeProperName = "";
+        msXtaEmployeeRfc = "";
+        msXtaEmployeeCurp = "";
+        
+        mtAuxHireLogDate = null;
+        msAuxHireLogNotes = "";
+        mnAuxEmployeeDismissalTypeId = 0;
+        moAuxHrsEmployeeHireLog = null;
     }
 
     @Override
@@ -401,8 +405,8 @@ public class SDbEmployee extends SDbRegistryUser {
         initRegistry();
         initQueryMembers();
         mnQueryResultId = SDbConsts.READ_ERROR;
-        Blob oPhoto_n;      // preserve variable, although not used
-        Blob oSignature_n;  // preserve variable, although not used
+        Blob oPhoto_n;      // although not used, preserve variable
+        Blob oSignature_n;  // although not used, preserve variable
 
         msSql = "SELECT * " + getSqlFromWhere(pk);
         resultSet = session.getStatement().executeQuery(msSql);
@@ -418,7 +422,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mtDateBirth = resultSet.getDate("dt_bir");
             mtDateBenefits = resultSet.getDate("dt_ben");
             mtDateLastHire = resultSet.getDate("dt_hire");
-            mtDateLastDismiss_n = resultSet.getDate("dt_dis_n");
+            mtDateLastDismissal_n = resultSet.getDate("dt_dis_n");
             mdSalary = resultSet.getDouble("sal");
             mdWage = resultSet.getDouble("wage");
             mdSalarySscBase = resultSet.getDouble("sal_ssc");
@@ -468,7 +472,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
             mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
 
-            mbAuxActive = mbActive;
+            mbOldActive = mbActive;
             
             msSql = "SELECT bp, lastname, firstname, fiscal_id, alt_id FROM erp.bpsu_bp WHERE id_bp = " + mnPkEmployeeId;
             resultSet = session.getStatement().executeQuery(msSql);
@@ -476,10 +480,10 @@ public class SDbEmployee extends SDbRegistryUser {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
             }
             else {
-                msAuxEmployeeName = resultSet.getString("bp");
-                msAuxEmployeeProperName = resultSet.getString("firstname") + " " + resultSet.getString("lastname");
-                msAuxFiscalId = resultSet.getString("fiscal_id");
-                msAuxAlternativeId = resultSet.getString("alt_id");
+                msXtaEmployeeName = resultSet.getString("bp");
+                msXtaEmployeeProperName = resultSet.getString("firstname") + " " + resultSet.getString("lastname");
+                msXtaEmployeeRfc = resultSet.getString("fiscal_id");
+                msXtaEmployeeCurp = resultSet.getString("alt_id");
             }
             
             mbRegistryNew = false;
@@ -492,8 +496,8 @@ public class SDbEmployee extends SDbRegistryUser {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
-        PreparedStatement preparedStatementmagePhoto_n = null;
-        PreparedStatement preparedStatementmageSignature_n = null;
+        PreparedStatement preparedStatementmagePhoto_n = null;      // although not used, preserve variable
+        PreparedStatement preparedStatementmageSignature_n = null;  // although not used, preserve variable
 
         if (mbRegistryNew) {
             verifyRegistryNew(session);
@@ -513,7 +517,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastHire) + "', " + 
-                    (mtDateLastDismiss_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismiss_n) + "'") + ", " + 
+                    (mtDateLastDismissal_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismissal_n) + "'") + ", " + 
                     mdSalary + ", " + 
                     mdWage + ", " + 
                     mdSalarySscBase + ", " + 
@@ -574,7 +578,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "dt_bir = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " +
                     "dt_ben = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " +
                     "dt_hire = '" + SLibUtils.DbmsDateFormatDate.format(mtDateLastHire) + "', " +
-                    "dt_dis_n = " + (mtDateLastDismiss_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismiss_n) + "'") + ", " +
+                    "dt_dis_n = " + (mtDateLastDismissal_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismissal_n) + "'") + ", " +
                     "sal = " + mdSalary + ", " +
                     "wage = " + mdWage + ", " +
                     "sal_ssc = " + mdSalarySscBase + ", " +
@@ -626,32 +630,35 @@ public class SDbEmployee extends SDbRegistryUser {
         
         session.getStatement().execute(msSql);
 
-        if (mbRegistryNew || mbActive != mbAuxActive) {
-            //createHireLog(session);
-            
-            SHrsEmployeeHireLog employeeHireLog = new SHrsEmployeeHireLog(null, session);
+        if (mbRegistryNew || mbActive != mbOldActive) {
+            SHrsEmployeeHireLog hrsEmployeeHireLog = moAuxHrsEmployeeHireLog != null ? moAuxHrsEmployeeHireLog : new SHrsEmployeeHireLog(session); // spreads log entries to all sibling companies
                 
-            employeeHireLog.setPkEmployeeId(mnPkEmployeeId);
-            employeeHireLog.setDateLastHire(mtDateLastHire);
-            //employeeHireLog.setDateLastDismiss_n(null);
-            employeeHireLog.setIsHire(mbActive);
-            employeeHireLog.setDeleted(mbDeleted);
-            employeeHireLog.setFkDismissedType(SModSysConsts.HRSU_TP_EMP_DIS_NON);
-            employeeHireLog.setFkUserInsertId(mnFkUserInsertId);
-            employeeHireLog.setFkUserUpdateId(mnFkUserUpdateId);
+            hrsEmployeeHireLog.setPkEmployeeId(mnPkEmployeeId);
             
-            employeeHireLog.setIsFirtsHire(false);
             if (mbActive) {
-                employeeHireLog.setDateLastHire(mtXtaDate);
-                employeeHireLog.setNotesHire(msXtaNotes);
+                hrsEmployeeHireLog.setIsHire(true);
+                hrsEmployeeHireLog.setLastHireDate(mtAuxHireLogDate);
+                hrsEmployeeHireLog.setLastHireNotes(msAuxHireLogNotes);
+                hrsEmployeeHireLog.setFkDismissalType(SModSysConsts.HRSU_TP_EMP_DIS_NON);
             }
             else {
-                employeeHireLog.setDateLastDismiss_n(mtXtaDate);
-                employeeHireLog.setNotesDismissed(msXtaNotes);
+                hrsEmployeeHireLog.setIsHire(false);
+                hrsEmployeeHireLog.setLastDismissalDate_n(mtAuxHireLogDate);
+                hrsEmployeeHireLog.setLastDismissalNotes(msAuxHireLogNotes);
+                hrsEmployeeHireLog.setFkDismissalType(mnAuxEmployeeDismissalTypeId);
             }
-            employeeHireLog.setIsHire(mbActive);
-            employeeHireLog.setFkDismissedType(mnXtaEmployeeDismissTypeId);
-            employeeHireLog.save();
+            
+            hrsEmployeeHireLog.setDeleted(mbDeleted);
+            hrsEmployeeHireLog.setFkUserInsertId(mnFkUserInsertId);
+            hrsEmployeeHireLog.setFkUserUpdateId(SUtilConsts.USR_NA_ID);
+            
+            hrsEmployeeHireLog.setIsAuxFirstHiring(mbRegistryNew);
+            //employeeHireLog.setIsAuxForceFirstHiring(...);
+            //employeeHireLog.setIsAuxModification(...);
+            //employeeHireLog.setIsAuxCorrection(...);
+            //employeeHireLog.setAuxFormerEmployerConnection(...);
+            
+            hrsEmployeeHireLog.save();
         }
         
         mbRegistryNew = false;
@@ -670,7 +677,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setDateBirth(this.getDateBirth());
         registry.setDateBenefits(this.getDateBenefits());
         registry.setDateLastHire(this.getDateLastHire());
-        registry.setDateLastDismiss_n(this.getDateLastDismiss_n());
+        registry.setDateLastDismissal_n(this.getDateLastDismissal_n());
         registry.setSalary(this.getSalary());
         registry.setWage(this.getWage());
         registry.setSalarySscBase(this.getSalarySscBase());
@@ -715,6 +722,17 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
+        
+        registry.mbOldActive = this.mbOldActive;
+
+        registry.setXtaEmployeeName(this.getXtaEmployeeName());
+        registry.setXtaEmployeePropername(this.getXtaEmployeeProperName());
+        registry.setXtaEmployeeRfc(this.getXtaEmployeeRfc());
+        registry.setXtaEmployeeCurp(this.getXtaEmployeeCurp());
+
+        registry.setAuxHireLogDate(this.getAuxHireLogDate());
+        registry.setAuxHireLogNotes(this.getAuxHireLogNotes());
+        registry.setAuxEmployeeDismissalTypeId(this.getAuxEmployeeDismissalTypeId());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

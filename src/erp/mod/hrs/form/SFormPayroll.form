@@ -1118,6 +1118,28 @@
                                 </Property>
                               </Properties>
                             </Component>
+                            <Component class="javax.swing.JButton" name="jbLoadPrepayroll">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Cargar pren&#xf3;mina"/>
+                                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                                  <Insets value="[2, 0, 2, 0]"/>
+                                </Property>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[110, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JButton" name="jbClearPrepayroll">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Quitar pren&#xf3;mina"/>
+                                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+                                  <Insets value="[2, 0, 2, 0]"/>
+                                </Property>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[110, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
                           </SubComponents>
                         </Container>
                       </SubComponents>

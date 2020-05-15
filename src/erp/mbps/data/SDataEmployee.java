@@ -10,7 +10,6 @@ import erp.lib.SLibUtilities;
 import erp.mhrs.data.SDataEmployeeRelatives;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.hrs.db.SHrsAccounting;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsEmployeeHireLog;
 import java.awt.Graphics;
@@ -38,7 +37,7 @@ import sa.lib.db.SDbConsts;
  */
 
 /**
- *
+ * Used mainly in CRUD operations on employees.
  * @author Juan Barajas, Sergio Flores
  */
 public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io.Serializable {
@@ -51,7 +50,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected Date mtDateBirth;
     protected Date mtDateBenefits;
     protected Date mtDateLastHire;
-    protected Date mtDateLastDismiss_n;
+    protected Date mtDateLastDismissal_n;
     protected double mdSalary;
     protected double mdWage;
     protected double mdSalarySscBase;
@@ -99,12 +98,14 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
     protected SDataEmployeeRelatives moChildRelatives;
     
-    protected double mdAuxSalary;
-    protected double mdAuxWage;
-    protected double mdAuxSalarySscBase;
-    protected Date mtAuxDateSalary;
-    protected Date mtAuxDateWage;
-    protected Date mtAuxDateSalarySscBase;
+    protected boolean mbOldActive; // immutable member
+    
+    protected double mdAuxNewSalary;
+    protected double mdAuxNewWage;
+    protected double mdAuxNewSalarySscBase;
+    protected Date mtAuxNewDateSalary;
+    protected Date mtAuxNewDateWage;
+    protected Date mtAuxNewDateSalarySscBase;
 
     protected javax.swing.ImageIcon moXtaImageIconPhoto_n;
     protected javax.swing.ImageIcon moXtaImageIconSignature_n;
@@ -191,7 +192,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setDateBirth(Date t) { mtDateBirth = t; }
     public void setDateBenefits(Date t) { mtDateBenefits = t; }
     public void setDateLastHire(Date t) { mtDateLastHire = t; }
-    public void setDateLastDismiss_n(Date t) { mtDateLastDismiss_n = t; }
+    public void setDateLastDismissal_n(Date t) { mtDateLastDismissal_n = t; }
     public void setSalary(double d) { mdSalary = d; }
     public void setWage(double d) { mdWage = d; }
     public void setSalarySscBase(double d) { mdSalarySscBase = d; }
@@ -239,12 +240,12 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
     public void setChildRelatives(SDataEmployeeRelatives o) { moChildRelatives = o; }
     
-    public void setAuxSalary(double d) { mdAuxSalary = d; }
-    public void setAuxWage(double d) { mdAuxWage = d; }
-    public void setAuxSalarySscBase(double d) { mdAuxSalarySscBase = d; }
-    public void setAuxDateSalary(Date t) { mtAuxDateSalary = t; }
-    public void setAuxDateWage(Date t) { mtAuxDateWage = t; }
-    public void setAuxDateSalarySscBase(Date t) { mtAuxDateSalarySscBase = t; }
+    public void setAuxSalary(double d) { mdAuxNewSalary = d; }
+    public void setAuxWage(double d) { mdAuxNewWage = d; }
+    public void setAuxSalarySscBase(double d) { mdAuxNewSalarySscBase = d; }
+    public void setAuxDateSalary(Date t) { mtAuxNewDateSalary = t; }
+    public void setAuxDateWage(Date t) { mtAuxNewDateWage = t; }
+    public void setAuxDateSalarySscBase(Date t) { mtAuxNewDateSalarySscBase = t; }
     
     public void setXtaImageIconPhoto_n(javax.swing.ImageIcon o) { moXtaImageIconPhoto_n = o; }
     public void setXtaImageIconSignature_n(javax.swing.ImageIcon o) { moXtaImageIconSignature_n = o; }
@@ -257,7 +258,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public Date getDateBirth() { return mtDateBirth; }
     public Date getDateBenefits() { return mtDateBenefits; }
     public Date getDateLastHire() { return mtDateLastHire; }
-    public Date getDateLastDismiss_n() { return mtDateLastDismiss_n; }
+    public Date getDateLastDismissal_n() { return mtDateLastDismissal_n; }
     public double getSalary() { return mdSalary; }
     public double getWage() { return mdWage; }
     public double getSalarySscBase() { return mdSalarySscBase; }
@@ -305,12 +306,12 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
 
     public SDataEmployeeRelatives getChildRelatives() { return moChildRelatives; }
     
-    public double getAuxSalary() { return mdAuxSalary; }
-    public double getAuxWage() { return mdAuxWage; }
-    public double getAuxSalarySscBase() { return mdAuxSalarySscBase; }
-    public Date getAuxDateSalary() { return mtAuxDateSalary; }
-    public Date getAuxDateWage() { return mtAuxDateWage; }
-    public Date getAuxDateSalarySscBase() { return mtAuxDateSalarySscBase; }
+    public double getAuxSalary() { return mdAuxNewSalary; }
+    public double getAuxWage() { return mdAuxNewWage; }
+    public double getAuxSalarySscBase() { return mdAuxNewSalarySscBase; }
+    public Date getAuxDateSalary() { return mtAuxNewDateSalary; }
+    public Date getAuxDateWage() { return mtAuxNewDateWage; }
+    public Date getAuxDateSalarySscBase() { return mtAuxNewDateSalarySscBase; }
     
     public javax.swing.ImageIcon getXtaImageIconPhoto_n() { return moXtaImageIconPhoto_n; }
     public javax.swing.ImageIcon getXtaImageIconSignature_n() { return moXtaImageIconSignature_n; }
@@ -384,7 +385,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mtDateBirth = null;
         mtDateBenefits = null;
         mtDateLastHire = null;
-        mtDateLastDismiss_n = null;
+        mtDateLastDismissal_n = null;
         mdSalary = 0;
         mdWage = 0;
         mdSalarySscBase = 0;
@@ -432,12 +433,12 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         
         moChildRelatives = null;
 
-        mdAuxSalary = 0;
-        mdAuxWage = 0;
-        mdAuxSalarySscBase = 0;
-        mtAuxDateSalary = null;
-        mtAuxDateWage = null;
-        mtAuxDateSalarySscBase = null;
+        mdAuxNewSalary = 0;
+        mdAuxNewWage = 0;
+        mdAuxNewSalarySscBase = 0;
+        mtAuxNewDateSalary = null;
+        mtAuxNewDateWage = null;
+        mtAuxNewDateSalarySscBase = null;
         
         moXtaImageIconPhoto_n = null;
         moXtaImageIconSignature_n = null;
@@ -469,7 +470,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mtDateBirth = resultSet.getDate("dt_bir");
                 mtDateBenefits = resultSet.getDate("dt_ben");
                 mtDateLastHire = resultSet.getDate("dt_hire");
-                mtDateLastDismiss_n = resultSet.getDate("dt_dis_n");
+                mtDateLastDismissal_n = resultSet.getDate("dt_dis_n");
                 mdSalary = resultSet.getDouble("sal");
                 mdWage = resultSet.getDouble("wage");
                 mdSalarySscBase = resultSet.getDouble("sal_ssc");
@@ -518,6 +519,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
                 mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
                 mtTsUserUpdate = resultSet.getTimestamp("ts_usr_upd");
+                
+                mbOldActive = mbActive;
 
                 if (oPhoto_n != null) {
                     moXtaImageIconPhoto_n = SLibUtilities.convertBlobToImageIcon(oPhoto_n);
@@ -612,7 +615,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " + 
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " +
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastHire) + "', " +
-                        (mtDateLastDismiss_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismiss_n) + "'") + ", " +
+                        (mtDateLastDismissal_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismissal_n) + "'") + ", " +
                         mdSalary + ", " +
                         mdWage + ", " +
                         mdSalarySscBase + ", " +
@@ -669,7 +672,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "dt_bir = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBirth) + "', " +
                         "dt_ben = '" + SLibUtils.DbmsDateFormatDate.format(mtDateBenefits) + "', " +
                         "dt_hire = '" + SLibUtils.DbmsDateFormatDate.format(mtDateLastHire) + "', " +
-                        "dt_dis_n = " + (mtDateLastDismiss_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismiss_n) + "'") + ", " +
+                        "dt_dis_n = " + (mtDateLastDismissal_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateLastDismissal_n) + "'") + ", " +
                         "sal = " + mdSalary + ", " +
                         "wage = " + mdWage + ", " +
                         "sal_ssc = " + mdSalarySscBase + ", " +
@@ -811,55 +814,47 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 statement.execute(sql);
             }
             
-            if (mbIsRegistryNew) {
-                //createHireLog(connection); // XXX jbarajas 09/02/2016 create hire log in all companies with enable payroll module 
-                SHrsEmployeeHireLog employeeHireLog = new SHrsEmployeeHireLog(connection, null);
+            if (mbIsRegistryNew || mbActive != mbOldActive) {
+                SHrsEmployeeHireLog hrsEmployeeHireLog = new SHrsEmployeeHireLog(connection); // spreads log entries to all sibling companies
                 
-                employeeHireLog.setPkEmployeeId(mnPkEmployeeId);
-                employeeHireLog.setDateLastHire(mtDateLastHire);
-                //employeeHireLog.setDateLastDismiss_n(null);
-                employeeHireLog.setIsHire(mbActive);
-                employeeHireLog.setDeleted(mbDeleted);
-                employeeHireLog.setFkDismissedType(SModSysConsts.HRSU_TP_EMP_DIS_NON);
-                employeeHireLog.setFkUserInsertId(mnFkUserInsertId);
-                employeeHireLog.setFkUserUpdateId(mnFkUserUpdateId);
-                employeeHireLog.setIsFirtsHire(true);
+                hrsEmployeeHireLog.setPkEmployeeId(mnPkEmployeeId);
+                hrsEmployeeHireLog.setLastHireDate(mtDateLastHire);
+                hrsEmployeeHireLog.setLastHireNotes("");
+                hrsEmployeeHireLog.setLastDismissalDate_n(mtDateLastDismissal_n); // within an employee registration, it must be null
+                hrsEmployeeHireLog.setLastDismissalNotes("");
+                hrsEmployeeHireLog.setIsHire(mbActive);
+                hrsEmployeeHireLog.setDeleted(mbDeleted);
+                hrsEmployeeHireLog.setFkDismissalType(SModSysConsts.HRSU_TP_EMP_DIS_NON);
+                hrsEmployeeHireLog.setFkUserInsertId(mnFkUserInsertId);
+                hrsEmployeeHireLog.setFkUserUpdateId(mnFkUserUpdateId);
                 
-                employeeHireLog.save();
+                hrsEmployeeHireLog.setIsAuxFirstHiring(mbIsRegistryNew);
+                //employeeHireLog.setIsAuxForceFirstHiring(...);
+                //employeeHireLog.setIsAuxModification(...);
+                //employeeHireLog.setIsAuxCorrection(...);
+                
+                hrsEmployeeHireLog.save();
             }
 
-            if (mdAuxSalary != 0) {
-                if (mtAuxDateSalary == null) {
+            if (mdAuxNewSalary != 0) {
+                if (mtAuxNewDateSalary == null) {
                     throw new Exception("La fecha de última actualización de 'salario diario' no ha sido definida.");
                 }
-                createWageLog(connection, mtAuxDateSalary);
+                createWageLog(connection, mtAuxNewDateSalary);
             }
 
-            if (mdAuxWage != 0) {
-                if (mtAuxDateWage == null) {
+            if (mdAuxNewWage != 0) {
+                if (mtAuxNewDateWage == null) {
                     throw new Exception("La fecha de última actualización de 'sueldo mensual' no ha sido definida.");
                 }
-                createWageLog(connection, mtAuxDateWage);
+                createWageLog(connection, mtAuxNewDateWage);
             }
 
-            if (mdAuxSalarySscBase != 0) {
-                if (mtAuxDateSalarySscBase == null) {
+            if (mdAuxNewSalarySscBase != 0) {
+                if (mtAuxNewDateSalarySscBase == null) {
                     throw new Exception("La fecha de última actualización de 'Salario Base de Cotización (SBC)' no ha sido definida.");
                 }
-                createSalarySscBaseLog(connection, mtAuxDateSalarySscBase);
-            }
-        
-            if (mbIsRegistryNew) {
-                //createAccountingEarningConfiguration(connection);
-                //createAccountingDeductionConfiguration(connection); // XXX jbarajas 09/02/2016 create accounting earning and deducction configuration in all companies with enable payroll module
-                SHrsAccounting accounting = new SHrsAccounting(connection, null);
-                
-                accounting.setAccountingType(SModSysConsts.HRSS_TP_ACC_EMP);
-                accounting.setPkReferenceId(mnPkEmployeeId);
-                accounting.setFkUserInsertId(mnFkUserInsertId);
-                accounting.setFkUserUpdateId(mnFkUserUpdateId);
-            
-                accounting.save();
+                createSalarySscBaseLog(connection, mtAuxNewDateSalarySscBase);
             }
 
             mbIsRegistryNew = false;

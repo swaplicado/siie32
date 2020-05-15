@@ -133,6 +133,8 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
         moIntBimester.setMinInteger(1);
         moIntBimester.setMaxInteger(6);
         
+        moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
+        
         moFields.addField(moIntPeriodYear);
         moFields.addField(moIntBimester);
       
@@ -155,9 +157,7 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
         super.windowClosed();
         
         try {
-            if (mnFormResult == SGuiConsts.FORM_RESULT_OK) {
-                moFormMassiveUpdateSsc.setVisible(true);
-            }
+
         }
         catch (Exception ex) {
             Logger.getLogger(SDialogMassiveUpdateSscPeriod.class.getName()).log(Level.SEVERE, null, ex);
@@ -196,23 +196,20 @@ public class SDialogMassiveUpdateSscPeriod extends SBeanFormDialog implements Fo
     }
     
     @Override
-    public void actionSave() {
+     public void actionSave() {
        if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
-                //dispose();
+                dispose();
 
                 try {
                     setCursor(new Cursor(Cursor.WAIT_CURSOR));
                     moFormMassiveUpdateSsc = new SFormMassiveUpdateSsc((SClientInterface) miClient, moIntPeriodYear.getValue(), moIntBimester.getValue());
                     moFormMassiveUpdateSsc.formReset();
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     Logger.getLogger(SDialogMassiveUpdateSscPeriod.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                finally {
-                    setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                }
                 
+                moFormMassiveUpdateSsc.setVisible(true);
                 mnFormResult = SGuiConsts.FORM_RESULT_OK;
                 dispose();
             }

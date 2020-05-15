@@ -1237,12 +1237,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                             if (oContact == null) {
                                 for (i = 0; i < oBizPartnerBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
-                                    if (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getPkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_PUR && !oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
+                                    if (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_PUR && !oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
                                         sContact = oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
                                                 (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
                                                 oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
                                     }
-                                    else if (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getPkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
+                                    else if (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
                                         sContact = oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
                                                 (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
                                                 oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
@@ -1422,12 +1422,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                         if (oContact == null) {
                             for (i = 0; i < oBizPartnerBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
-                                if (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getPkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_PUR && !oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
+                                if (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_PUR && !oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
                                     sContact = oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
                                             (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
                                             oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
                                 }
-                                else if (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getPkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
+                                else if (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
                                     sContact = oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
                                             (oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
                                             oBizPartnerBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();

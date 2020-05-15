@@ -722,7 +722,7 @@
                             <Property name="verticalGap" type="int" value="0"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JLabel" name="jlDateLastDismiss_n">
+                            <Component class="javax.swing.JLabel" name="jlDateLastDismissal_n">
                               <Properties>
                                 <Property name="text" type="java.lang.String" value="&#xda;ltima baja:"/>
                                 <Property name="enabled" type="boolean" value="false"/>
@@ -731,7 +731,7 @@
                                 </Property>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JFormattedTextField" name="jftDateLastDismiss_n">
+                            <Component class="javax.swing.JFormattedTextField" name="jftDateLastDismissal_n">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="text" type="java.lang.String" value="yyyy/mm/dd"/>

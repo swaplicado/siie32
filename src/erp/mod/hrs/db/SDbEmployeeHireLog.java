@@ -23,7 +23,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDbEmployeeHireLog extends SDbRegistryUser {
 
@@ -31,18 +31,19 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
     protected int mnPkLogId;
     protected Date mtDateHire;
     protected String msNotesHire;
-    protected Date mtDateDismissed_n;
-    protected String msNotesDismissed;
+    protected Date mtDateDismissal_n;
+    protected String msNotesDismissal;
     protected boolean mbHired;
     //protected boolean mbDeleted;
-    protected int mnFkEmployeeDismissTypeId;
+    protected int mnFkEmployeeDismissalTypeId;
     /*
     protected int mnFkUserInsertId;
     protected int mnFkUserUpdateId;
     protected Date mtTsUserInsert;
     protected Date mtTsUserUpdate;
     */
-    protected String msAuxTable;
+    
+    protected String msAuxSchema;
 
     public SDbEmployeeHireLog() {
         super(SModConsts.HRS_EMP_LOG_HIRE);
@@ -52,33 +53,33 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
     public void setPkLogId(int n) { mnPkLogId = n; }
     public void setDateHire(Date t) { mtDateHire = t; }
     public void setNotesHire(String s) { msNotesHire = s; }
-    public void setDateDismissed_n(Date t) { mtDateDismissed_n = t; }
-    public void setNotesDismissed(String s) { msNotesDismissed = s; }
+    public void setDateDismissal_n(Date t) { mtDateDismissal_n = t; }
+    public void setNotesDismissal(String s) { msNotesDismissal = s; }
     public void setHired(boolean b) { mbHired = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
-    public void setFkEmployeeDismissTypeId(int n) { mnFkEmployeeDismissTypeId = n; }
+    public void setFkEmployeeDismissalTypeId(int n) { mnFkEmployeeDismissalTypeId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
     public void setTsUserInsert(Date t) { mtTsUserInsert = t; }
     public void setTsUserUpdate(Date t) { mtTsUserUpdate = t; }
     
-    public void setAuxTable(String s) { msAuxTable = s; }
+    public void setAuxSchema(String s) { msAuxSchema = s; }
 
     public int getPkEmployeeId() { return mnPkEmployeeId; }
     public int getPkLogId() { return mnPkLogId; }
     public Date getDateHire() { return mtDateHire; }
     public String getNotesHire() { return msNotesHire; }
-    public Date getDateDismissed_n() { return mtDateDismissed_n; }
-    public String getNotesDismissed() { return msNotesDismissed; }
+    public Date getDateDismissal_n() { return mtDateDismissal_n; }
+    public String getNotesDismissal() { return msNotesDismissal; }
     public boolean isHired() { return mbHired; }
     public boolean isDeleted() { return mbDeleted; }
-    public int getFkEmployeeDismissTypeId() { return mnFkEmployeeDismissTypeId; }
+    public int getFkEmployeeDismissalTypeId() { return mnFkEmployeeDismissalTypeId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
     
-    public String getAuxTable() { return msAuxTable; }
+    public String getAuxSchema() { return msAuxSchema; }
 
     @Override
     public void setPrimaryKey(int[] pk) {
@@ -99,22 +100,22 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
         mnPkLogId = 0;
         mtDateHire = null;
         msNotesHire = "";
-        mtDateDismissed_n = null;
-        msNotesDismissed = "";
+        mtDateDismissal_n = null;
+        msNotesDismissal = "";
         mbHired = false;
         mbDeleted = false;
-        mnFkEmployeeDismissTypeId = 0;
+        mnFkEmployeeDismissalTypeId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
         
-        msAuxTable = "";
+        msAuxSchema = "";
     }
 
     @Override
     public String getSqlTable() {
-        return (msAuxTable.isEmpty() ? "" : (msAuxTable + ".")) + SModConsts.TablesMap.get(mnRegistryType);
+        return (msAuxSchema.isEmpty() ? "" : (msAuxSchema + ".")) + SModConsts.TablesMap.get(mnRegistryType);
     }
 
     @Override
@@ -158,11 +159,11 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
             mnPkLogId = resultSet.getInt("id_log");
             mtDateHire = resultSet.getDate("dt_hire");
             msNotesHire = resultSet.getString("nts_hire");
-            mtDateDismissed_n = resultSet.getDate("dt_dis_n");
-            msNotesDismissed = resultSet.getString("nts_dis");
+            mtDateDismissal_n = resultSet.getDate("dt_dis_n");
+            msNotesDismissal = resultSet.getString("nts_dis");
             mbHired = resultSet.getBoolean("b_hire");
             mbDeleted = resultSet.getBoolean("b_del");
-            mnFkEmployeeDismissTypeId = resultSet.getInt("fk_tp_emp_dis");
+            mnFkEmployeeDismissalTypeId = resultSet.getInt("fk_tp_emp_dis");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -190,11 +191,11 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
                     mnPkLogId + ", " + 
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateHire) + "', " + 
                     "'" + msNotesHire + "', " + 
-                    (mtDateDismissed_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateDismissed_n)+ "' ") + ", " + 
-                    "'" + msNotesDismissed + "', " + 
+                    (mtDateDismissal_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateDismissal_n)+ "' ") + ", " + 
+                    "'" + msNotesDismissal + "', " + 
                     (mbHired ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
-                    mnFkEmployeeDismissTypeId + ", " + 
+                    mnFkEmployeeDismissalTypeId + ", " + 
                     mnFkUserInsertId + ", " + 
                     mnFkUserUpdateId + ", " + 
                     "NOW()" + ", " +
@@ -211,11 +212,11 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
                     */
                     "dt_hire = '" + SLibUtils.DbmsDateFormatDate.format(mtDateHire) + "', " +
                     "nts_hire = '" + msNotesHire + "', " +
-                    "dt_dis_n = " + (mtDateDismissed_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateDismissed_n)+ "' ") + ", " +
-                    "nts_dis = '" + msNotesDismissed + "', " +
+                    "dt_dis_n = " + (mtDateDismissal_n == null ? null : "'" + SLibUtils.DbmsDateFormatDate.format(mtDateDismissal_n)+ "' ") + ", " +
+                    "nts_dis = '" + msNotesDismissal + "', " +
                     "b_hire = " + (mbHired ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
-                    "fk_tp_emp_dis = " + mnFkEmployeeDismissTypeId + ", " +
+                    "fk_tp_emp_dis = " + mnFkEmployeeDismissalTypeId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +
@@ -236,15 +237,17 @@ public class SDbEmployeeHireLog extends SDbRegistryUser {
         registry.setPkLogId(this.getPkLogId());
         registry.setDateHire(this.getDateHire());
         registry.setNotesHire(this.getNotesHire());
-        registry.setDateDismissed_n(this.getDateDismissed_n());
-        registry.setNotesDismissed(this.getNotesDismissed());
+        registry.setDateDismissal_n(this.getDateDismissal_n());
+        registry.setNotesDismissal(this.getNotesDismissal());
         registry.setHired(this.isHired());
         registry.setDeleted(this.isDeleted());
-        registry.setFkEmployeeDismissTypeId(this.getFkEmployeeDismissTypeId());
+        registry.setFkEmployeeDismissalTypeId(this.getFkEmployeeDismissalTypeId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());
         registry.setTsUserInsert(this.getTsUserInsert());
         registry.setTsUserUpdate(this.getTsUserUpdate());
+        
+        registry.setAuxSchema(this.getAuxSchema());
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;

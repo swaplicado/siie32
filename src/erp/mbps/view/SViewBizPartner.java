@@ -16,11 +16,13 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mbps.form.SDialogBizPartnerExport;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SDbEmployeeHireLog;
 import erp.mod.hrs.db.SHrsUtils;
 import erp.mod.hrs.form.SDialogEmployeeHireLog;
+import erp.mod.hrs.form.SDialogEmployerSubstitution;
 import erp.table.SFilterConstants;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
@@ -86,6 +88,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         int levelRightEdit = SDataConstantsSys.UNDEFINED;
         int levelRightEditCategory = SDataConstantsSys.UNDEFINED;
         int levelRightCreateCategory = SDataConstantsSys.UNDEFINED;
+        boolean employeesCrudEnabled = false;
         
         mbHasRightEmpWage = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight;
         mbIsViewEmployees = SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstants.BPSX_BP_EMP, SDataConstants.BPSX_BP_EMP_CON_EXP });
@@ -93,7 +96,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         
         moTabFilterDeleted = new STabFilterDeleted(this);
         
-        jbBizPartnerExport = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_BP_EXPORT), "Exportar a otra categoría", this);
+        jbBizPartnerExport = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_BP_EXPORT), "Exportar a otra " + (mbIsViewEmployees ? "empresa" : "categoría"), this);
         jbBizPartnerExport.setEnabled(false);
         
         addTaskBarUpperSeparator();
@@ -101,6 +104,13 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
         addTaskBarUpperComponent(jbBizPartnerExport);
         
         if (mbIsViewEmployees) {
+            try {
+                employeesCrudEnabled = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_EMPLOYEES_CRUD)) == 1;
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+            
             jcbFilterDepartament = new javax.swing.JComboBox();
             jcbFilterDepartament.setToolTipText("Filtrar departamento");
             jcbFilterDepartament.setPreferredSize(new java.awt.Dimension(250, 23));
@@ -110,7 +120,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
             jbStatusEmployeeChange = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_switch.gif")), "Cambiar estatus alta-baja", this);
             jbStatusEmployeeModify = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_edit.gif")), "Modificar última alta o baja", this);
             jbStatusEmployeeDelete = SGridUtils.createButton(new ImageIcon(getClass().getResource("/sa/lib/img/cmd_std_delete_tmp.gif")), "Revertir última alta o baja", this);
-                        
+            
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(jcbFilterDepartament);
             addTaskBarUpperComponent(jbClearFilterDepartament);
@@ -480,11 +490,17 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
         levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP).Level;
 
-        jbNew.setEnabled((levelRightCreateCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && mnTabTypeAux01 != SDataConstants.BPSU_BP);
-        jbEdit.setEnabled((levelRightEditCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && mnTabTypeAux01 != SDataConstants.BPSU_BP);
+        jbNew.setEnabled(((levelRightCreateCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && mnTabTypeAux01 != SDataConstants.BPSU_BP) && (!mbIsViewEmployees || employeesCrudEnabled));
+        jbEdit.setEnabled(((levelRightEditCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && mnTabTypeAux01 != SDataConstants.BPSU_BP) && (!mbIsViewEmployees || employeesCrudEnabled));
         jbDelete.setEnabled(false);
-        jbBizPartnerExport.setEnabled(levelRightEditCategory >= SUtilConsts.LEV_AUTHOR && !mbIsViewBizPartnersSimple);
+        jbBizPartnerExport.setEnabled(levelRightEditCategory >= SUtilConsts.LEV_AUTHOR && (!mbIsViewBizPartnersSimple || mbIsViewEmployees));
         moDialogBizPartnerExport = new SDialogBizPartnerExport(miClient);
+        
+        if (mbIsViewEmployees) {
+            jbStatusEmployeeChange.setEnabled(employeesCrudEnabled);
+            jbStatusEmployeeModify.setEnabled(employeesCrudEnabled);
+            jbStatusEmployeeDelete.setEnabled(employeesCrudEnabled);
+        }
 
         mvSuscriptors.add(mnTabTypeAux01);
         mvSuscriptors.add(SDataConstants.USRU_USR);
@@ -633,19 +649,30 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
     }
 
     public void actionBizPartnerExport() {
-        int nBizPartnerCategoryId = 0;
-
         if (jbBizPartnerExport.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null) {
-                moDialogBizPartnerExport.formReset();
-                moDialogBizPartnerExport.formRefreshCatalogues();
-                moDialogBizPartnerExport.setValue(mnBizPartnerCategory, moTablePane.getSelectedTableRow().getPrimaryKey());
-                moDialogBizPartnerExport.setFormVisible(true);
-
-                if (moDialogBizPartnerExport.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    nBizPartnerCategoryId = (Integer)  moDialogBizPartnerExport.getValue(mnBizPartnerCategory);
-                    if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showFormForCopy(nBizPartnerCategoryId, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
+                if (mbIsViewEmployees) {
+                    SDialogEmployerSubstitution dialog = new SDialogEmployerSubstitution(miClient.getSession().getClient(), "Sustitución patronal");
+                    dialog.setValue(SModConsts.HRSU_EMP, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    dialog.resetForm();
+                    dialog.setVisible(true);
+                    if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                        SDbEmployee employee = (SDbEmployee) dialog.getValue(SModConsts.HRSU_EMP);
+                        miClient.getSession().saveRegistry(employee);
                         miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                    }
+                }
+                else {
+                    moDialogBizPartnerExport.formReset();
+                    moDialogBizPartnerExport.formRefreshCatalogues();
+                    moDialogBizPartnerExport.setValue(mnBizPartnerCategory, moTablePane.getSelectedTableRow().getPrimaryKey());
+                    moDialogBizPartnerExport.setFormVisible(true);
+
+                    if (moDialogBizPartnerExport.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                        int bizPartnerCategoryId = (Integer)  moDialogBizPartnerExport.getValue(mnBizPartnerCategory);
+                        if (miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).showFormForCopy(bizPartnerCategoryId, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
+                            miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
+                        }
                     }
                 }
             }
@@ -661,7 +688,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
                 if (moDialogEmployeeHireLog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     try {
-                        SDbEmployee employee = (SDbEmployee) moDialogEmployeeHireLog.getValue(SGuiConsts.PARAM_BPR);
+                        SDbEmployee employee = (SDbEmployee) moDialogEmployeeHireLog.getValue(SModConsts.HRSU_EMP);
                         employee.save(miClient.getSession());
                     }
                     catch (Exception e) {
@@ -683,7 +710,7 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
 
                 if (moDialogEmployeeHireLog.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                     try {
-                        SDbEmployeeHireLog employeeHireLog = (SDbEmployeeHireLog)  moDialogEmployeeHireLog.getValue(SGuiConsts.PARAM_KEY);
+                        SDbEmployeeHireLog employeeHireLog = (SDbEmployeeHireLog)  moDialogEmployeeHireLog.getValue(SModConsts.HRS_EMP_LOG_HIRE);
                         
                         if (SHrsUtils.editHireLog(miClient.getSession(), employeeHireLog)) {
                             miClient.getGuiModule(SDataConstants.GLOBAL_CAT_BPS).refreshCatalogues(mnTabTypeAux01);
@@ -784,16 +811,13 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 "img_pho_n IS NOT NULL AS _with_img_pho, img_sig_n IS NOT NULL AS _with_img_sig, ") +
                 "bp.fid_usr_new, bp.fid_usr_edit, bp.fid_usr_del, bp.ts_new, bp.ts_edit, bp.ts_del, un.usr, ue.usr, ud.usr " +
                 "FROM erp.bpsu_bp AS bp " +
-                "INNER JOIN erp.bpss_tp_bp_idy AS tp_bp ON " +
-                "bp.fid_tp_bp_idy = tp_bp.id_tp_bp_idy " +
-                "INNER JOIN erp.finu_tax_idy AS tax_tp ON " +
-                "bp.fid_tax_idy = tax_tp.id_tax_idy " +
-                "INNER JOIN erp.usru_usr AS un ON " +
-                "bp.fid_usr_new = un.id_usr " +
-                "INNER JOIN erp.usru_usr AS ue ON " +
-                "bp.fid_usr_edit = ue.id_usr " +
-                "INNER JOIN erp.usru_usr AS ud ON " +
-                "bp.fid_usr_del = ud.id_usr " + (mbIsViewBizPartnersSimple ? "" :
+                (!mbIsViewEmployees ? "" : "INNER JOIN hrs_emp_member AS em ON bp.id_bp = em.id_emp ") +
+                "INNER JOIN erp.bpss_tp_bp_idy AS tp_bp ON bp.fid_tp_bp_idy = tp_bp.id_tp_bp_idy " +
+                "INNER JOIN erp.finu_tax_idy AS tax_tp ON bp.fid_tax_idy = tax_tp.id_tax_idy " +
+                "INNER JOIN erp.usru_usr AS un ON bp.fid_usr_new = un.id_usr " +
+                "INNER JOIN erp.usru_usr AS ue ON bp.fid_usr_edit = ue.id_usr " +
+                "INNER JOIN erp.usru_usr AS ud ON bp.fid_usr_del = ud.id_usr " + 
+                (mbIsViewBizPartnersSimple ? "" :
                 "INNER JOIN erp.bpsu_bp_ct AS bp_ct ON bp.id_bp = bp_ct.id_bp AND bp_ct.fid_ct_bp = " + mnBizPartnerCategory + " " + sqlCategoryWhere +
                 "INNER JOIN erp.bpss_ct_bp AS ct ON bp_ct.fid_ct_bp = ct.id_ct_bp " +
                 "INNER JOIN erp.bpsu_tp_bp AS tp ON bp_ct.fid_ct_bp = tp.id_ct_bp AND bp_ct.fid_tp_bp = tp.id_tp_bp " +
@@ -845,10 +869,10 @@ public class SViewBizPartner extends erp.lib.table.STableTab implements java.awt
                 actionStatusEmployeeDelete();
             }
             else if (button == jbClearFilterPaymentType) {
-                    actionClearFilterPaymentType();
+                actionClearFilterPaymentType();
             }
             else if (button == jbClearFilterDepartament) {
-                    actionClearFilterDepartament();
+                actionClearFilterDepartament();
             }
         }
     }

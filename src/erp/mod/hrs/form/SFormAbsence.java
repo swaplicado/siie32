@@ -548,7 +548,7 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
             jtfDateBenefits.setText(SLibUtils.DateFormatDate.format(moEmployee.getDateBenefits()));
             jtfSeniority.setText(SLibTimeUtils.formatAge(moEmployee.getDateBenefits(), miClient.getSession().getSystemDate()));
             jtfDateLastHire.setText(SLibUtils.DateFormatDate.format(moEmployee.getDateLastHire()));
-            jtfDateLastDismiss.setText(moEmployee.getDateLastDismiss_n() == null ? "" : SLibUtils.DateFormatDate.format(moEmployee.getDateLastDismiss_n()));
+            jtfDateLastDismiss.setText(moEmployee.getDateLastDismissal_n() == null ? "" : SLibUtils.DateFormatDate.format(moEmployee.getDateLastDismissal_n()));
             jtfPaymentType.setText(miClient.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { moEmployee.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME).toString());
         }
     }
@@ -984,21 +984,21 @@ public class SFormAbsence extends SBeanForm implements ActionListener, ItemListe
                                     int daysToSchedule = (int) anniversary.getValue() - daysScheduled;
                                     
                                     if (daysToPay > 0) {
-                                        String baseMessage = "En el aniversario " + anniversary.getBenefitAnn() + " del empleado " + moEmployee.getAuxEmployeeName() + ",\n"
+                                        String baseMessage = "En el aniversario " + anniversary.getBenefitAnn() + " del empleado " + moEmployee.getXtaEmployeeName() + ",\n"
                                                 + "correspondiente al año " + anniversaryYear + ", de un total de " + ((int) anniversary.getValue()) + " días de vacaciones,\n";
                                         if (daysToSchedule > 0) {
                                             if (miClient.showMsgBoxConfirm(baseMessage
                                                     + (daysToPay == 1 ? "queda 1 día" : "quedan " + daysToPay + " días") + " de vacaciones por pagar, y\n"
                                                     + (daysToSchedule == 1 ? "queda 1 día" : "quedan " + daysToSchedule + " días") + " de vacaciones por programar.\n"
                                                     + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                                                throw new Exception("Se debería programar y pagar las vacaciones de aniversarios previos del empleado " + moEmployee.getAuxEmployeeName() + ".");
+                                                throw new Exception("Se debería programar y pagar las vacaciones de aniversarios previos del empleado " + moEmployee.getXtaEmployeeName() + ".");
                                             }
                                         }
                                         else {
                                             if (miClient.showMsgBoxConfirm(baseMessage
                                                     + (daysToPay == 1 ? "queda 1 día" : "quedan " + daysToPay + " días") + " de vacaciones por pagar.\n"
                                                     + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
-                                                throw new Exception("Se debería pagar las vacaciones de aniversarios previos del empleado " + moEmployee.getAuxEmployeeName() + ".");
+                                                throw new Exception("Se debería pagar las vacaciones de aniversarios previos del empleado " + moEmployee.getXtaEmployeeName() + ".");
                                             }
                                         }
                                     }

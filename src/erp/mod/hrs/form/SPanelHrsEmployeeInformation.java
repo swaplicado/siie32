@@ -86,8 +86,8 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
         jPanel19 = new javax.swing.JPanel();
         jlSalarySscBase = new javax.swing.JLabel();
         moDecSalarySscBase = new sa.lib.gui.bean.SBeanFieldDecimal();
-        jlDateLastDismiss_n = new javax.swing.JLabel();
-        moTextDateLastDismiss_n = new sa.lib.gui.bean.SBeanFieldText();
+        jlDateLastDismissal_n = new javax.swing.JLabel();
+        moTextDateLastDismissal_n = new sa.lib.gui.bean.SBeanFieldText();
         jlWorkingHoursDay = new javax.swing.JLabel();
         moIntWorkingHoursDay = new sa.lib.gui.bean.SBeanFieldInteger();
         jLabel1 = new javax.swing.JLabel();
@@ -248,12 +248,12 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
         moDecSalarySscBase.setFocusable(false);
         jPanel19.add(moDecSalarySscBase);
 
-        jlDateLastDismiss_n.setText("Última baja:");
-        jlDateLastDismiss_n.setPreferredSize(new java.awt.Dimension(95, 23));
-        jPanel19.add(jlDateLastDismiss_n);
+        jlDateLastDismissal_n.setText("Última baja:");
+        jlDateLastDismissal_n.setPreferredSize(new java.awt.Dimension(95, 23));
+        jPanel19.add(jlDateLastDismissal_n);
 
-        moTextDateLastDismiss_n.setText("sBeanFieldText1");
-        jPanel19.add(moTextDateLastDismiss_n);
+        moTextDateLastDismissal_n.setText("sBeanFieldText1");
+        jPanel19.add(moTextDateLastDismissal_n);
 
         jlWorkingHoursDay.setText("Horas jornada:");
         jlWorkingHoursDay.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -292,7 +292,7 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
         moTextDateBirth.resetField();
         moTextDateBenefits.resetField();
         moTextDateLastHire.resetField();
-        moTextDateLastDismiss_n.resetField();
+        moTextDateLastDismissal_n.resetField();
         moTextDepartament.resetField();
         moTextPosition.resetField();
         moTextShift.resetField();
@@ -311,7 +311,7 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
             resetPanel();
         }
         else {
-            moTextName.setValue(moEmployee.getAuxEmployeeName());
+            moTextName.setValue(moEmployee.getXtaEmployeeName());
             moTextNumber.setValue(moEmployee.getNumber());
             moTextPaymentType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { moEmployee.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME));
             moDecSalary.setValue(moEmployee.getSalary());
@@ -320,7 +320,7 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
             moTextDateBirth.setValue(SLibUtils.DateFormatDate.format(moEmployee.getDateBirth()));
             moTextDateBenefits.setValue(SLibUtils.DateFormatDate.format(moEmployee.getDateBenefits()));
             moTextDateLastHire.setValue(SLibUtils.DateFormatDate.format(moEmployee.getDateLastHire()));
-            moTextDateLastDismiss_n.setValue(moEmployee.getDateLastDismiss_n() != null ? SLibUtils.DateFormatDate.format(moEmployee.getDateLastDismiss_n()) : "");
+            moTextDateLastDismissal_n.setValue(moEmployee.getDateLastDismissal_n() != null ? SLibUtils.DateFormatDate.format(moEmployee.getDateLastDismissal_n()) : "");
             moTextDepartament.setValue(miClient.getSession().readField(SModConsts.HRSU_DEP, new int[] { moEmployee.getFkDepartmentId() }, SDbRegistry.FIELD_NAME));
             moTextPosition.setValue(miClient.getSession().readField(SModConsts.HRSU_POS, new int[] { moEmployee.getFkPositionId() }, SDbRegistry.FIELD_NAME));
             moTextShift.setValue(miClient.getSession().readField(SModConsts.HRSU_SHT, new int[] { moEmployee.getFkShiftId() }, SDbRegistry.FIELD_NAME));
@@ -328,8 +328,8 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
             moTextSalaryType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_SAL, new int[] { moEmployee.getFkSalaryTypeId() }, SDbRegistry.FIELD_NAME));
             moTextEmployeeType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_EMP, new int[] { moEmployee.getFkEmployeeTypeId() }, SDbRegistry.FIELD_NAME));
             moTextWorkerType.setValue(miClient.getSession().readField(SModConsts.HRSU_TP_WRK, new int[] { moEmployee.getFkWorkerTypeId() }, SDbRegistry.FIELD_NAME));
-            moTextFiscalId.setValue(moEmployee.getAuxFiscalId());
-            moTextAlternativeId.setValue(moEmployee.getAuxAlternativeId());
+            moTextFiscalId.setValue(moEmployee.getXtaEmployeeRfc());
+            moTextAlternativeId.setValue(moEmployee.getXtaEmployeeCurp());
             moTextSocialSecurityNumber.setValue(moEmployee.getSocialSecurityNumber());
             moTextRecruitmentSchemeType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_REC_SCHE, new int[] { moEmployee.getFkRecruitmentSchemeTypeId()}, SDbRegistry.FIELD_NAME));
         }
@@ -345,7 +345,7 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
         moTextDateBirth.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moTextDateBenefits.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moTextDateLastHire.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
-        moTextDateLastDismiss_n.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
+        moTextDateLastDismissal_n.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moTextDepartament.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moTextPosition.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moTextShift.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
@@ -367,7 +367,7 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
         moTextDateBirth.setEditable(false);
         moTextDateBenefits.setEditable(false);
         moTextDateLastHire.setEditable(false);
-        moTextDateLastDismiss_n.setEditable(false);
+        moTextDateLastDismissal_n.setEditable(false);
         moTextDepartament.setEditable(false);
         moTextPosition.setEditable(false);
         moTextShift.setEditable(false);
@@ -395,7 +395,7 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
     private javax.swing.JLabel jlAlternativeId;
     private javax.swing.JLabel jlDateBenefits;
     private javax.swing.JLabel jlDateBirth;
-    private javax.swing.JLabel jlDateLastDismiss_n;
+    private javax.swing.JLabel jlDateLastDismissal_n;
     private javax.swing.JLabel jlDateLastHire;
     private javax.swing.JLabel jlDepartament;
     private javax.swing.JLabel jlEmployeeType;
@@ -420,7 +420,7 @@ public class SPanelHrsEmployeeInformation extends SBeanPanel {
     private sa.lib.gui.bean.SBeanFieldText moTextAlternativeId;
     private sa.lib.gui.bean.SBeanFieldText moTextDateBenefits;
     private sa.lib.gui.bean.SBeanFieldText moTextDateBirth;
-    private sa.lib.gui.bean.SBeanFieldText moTextDateLastDismiss_n;
+    private sa.lib.gui.bean.SBeanFieldText moTextDateLastDismissal_n;
     private sa.lib.gui.bean.SBeanFieldText moTextDateLastHire;
     private sa.lib.gui.bean.SBeanFieldText moTextDepartament;
     private sa.lib.gui.bean.SBeanFieldText moTextEmployeeType;

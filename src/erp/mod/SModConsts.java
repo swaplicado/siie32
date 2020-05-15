@@ -631,6 +631,7 @@ public abstract class SModConsts {
     public static final int HRS_FDY = 2063012;
     public static final int HRS_HOL = 2063013;
     public static final int HRS_WDS = 2063015;
+    public static final int HRS_PRE_PAY_CUT_CAL = 2063016;
     public static final int HRS_TAX = 2063021;
     public static final int HRS_TAX_ROW = 2063022;
     public static final int HRS_TAX_SUB = 2063031;
@@ -645,6 +646,7 @@ public abstract class SModConsts {
     public static final int HRS_UMA = 2063073;
     public static final int HRS_UMI = 2063074;
     public static final int HRS_TP_LOAN_ADJ = 2063076;
+    public static final int HRS_EMP_MEMBER = 2063080;
     public static final int HRS_EMP_LOG_HIRE = 2063081;
     public static final int HRS_EMP_LOG_WAGE = 2063082;
     public static final int HRS_EMP_LOG_SAL_SSC = 2063083;
@@ -689,6 +691,7 @@ public abstract class SModConsts {
     public static final int HRSX_ABS_MOV = 2064101;
     public static final int HRSX_SSC_UPD = 2064102;
     public static final int HRSX_EAR_SSC = 2064103;
+    public static final int HRSX_IMPORT_CAP = 2064110;
     public static final int HRSX_LAYOUT_SUA_HIRE = 1;
     public static final int HRSX_LAYOUT_SUA_SSC = 2;
     public static final int HRSX_LAYOUT_SUA_DISMISS = 3;
@@ -1197,6 +1200,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_FDY, "hrs_fdy");
         TablesMap.put(HRS_HOL, "hrs_hol");
         TablesMap.put(HRS_WDS, "hrs_wds");
+        TablesMap.put(HRS_PRE_PAY_CUT_CAL, "hrs_pre_pay_cut_cal");
         TablesMap.put(HRS_TAX, "hrs_tax");
         TablesMap.put(HRS_TAX_ROW, "hrs_tax_row");
         TablesMap.put(HRS_TAX_SUB, "hrs_tax_sub");
@@ -1211,6 +1215,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_UMA, "hrs_uma");
         TablesMap.put(HRS_UMI, "hrs_umi");
         TablesMap.put(HRS_TP_LOAN_ADJ, "hrs_tp_loan_adj");
+        TablesMap.put(HRS_EMP_MEMBER, "hrs_emp_member");
         TablesMap.put(HRS_EMP_LOG_HIRE, "hrs_emp_log_hire");
         TablesMap.put(HRS_EMP_LOG_WAGE, "hrs_emp_log_wage");
         TablesMap.put(HRS_EMP_LOG_SAL_SSC, "hrs_emp_log_sal_ssc");

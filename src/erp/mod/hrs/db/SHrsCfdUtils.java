@@ -285,8 +285,8 @@ public abstract class SHrsCfdUtils {
                     hrsFormerReceipt.setAuxEmpleadoId(receiptKey[1]);
                     hrsFormerReceipt.setPkSucursalEmpleadoId(resultSetClient.getInt("bpb.id_bpb"));
                     hrsFormerReceipt.setRegistroPatronal(client.getSessionXXX().getParamsCompany().getRegistrySs());
-                    hrsFormerReceipt.setNumEmpleado(SLibUtilities.textTrim(resultSet.getString("f_emp_num")));
-                    hrsFormerReceipt.setCurp(SLibUtilities.textTrim(resultSet.getString("f_emp_curp")));
+                    hrsFormerReceipt.setEmpleadoNum(SLibUtilities.textTrim(resultSet.getString("f_emp_num")));
+                    hrsFormerReceipt.setEmpleadoCurp(SLibUtilities.textTrim(resultSet.getString("f_emp_curp")));
                     hrsFormerReceipt.setTipoRegimen(resultSet.getInt("f_emp_reg_tp"));
                     hrsFormerReceipt.setNumSeguridadSocial(SLibUtilities.textTrim(resultSet.getString("f_emp_nss")));
                     hrsFormerReceipt.setFechaPago(resultSet.getDate("pri.dt_pay"));

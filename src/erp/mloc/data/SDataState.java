@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 import sa.gui.util.SUtilConsts;
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SDataState extends erp.lib.data.SDataRegistry implements java.io.Serializable {
     
@@ -159,7 +159,7 @@ public class SDataState extends erp.lib.data.SDataRegistry implements java.io.Se
                 mbIsDeleted = false;
                 mnFkUserEditId = SUtilConsts.USR_NA_ID;
                 
-                sql = "INSERT INTO erp.hrsu_emp VALUES (" +
+                sql = "INSERT INTO erp.locu_sta VALUES (" +
                         mnPkStateId + ", " +
                         "'" + msState + "', " +
                         "'" + msStateLan + "', " +
@@ -177,7 +177,7 @@ public class SDataState extends erp.lib.data.SDataRegistry implements java.io.Se
             }
             else {
 
-                sql = "UPDATE erp.hrsu_emp SET " +
+                sql = "UPDATE erp.locu_sta SET " +
                         //"id_sta = " + mnPkStateId + ", " +
                         "sta = '" + msState + "', " +
                         "sta_lan = '" + msStateLan + "', " +

@@ -10,12 +10,6 @@ import cfd.DElement;
 import cfd.ver2.DAttributeOptionFormaDePago;
 import cfd.ver2.DAttributeOptionTipoDeComprobante;
 import cfd.ver3.DCfdVer3Utils;
-//import cfd.ver3.nom11.DElementDeduccion;
-//import cfd.ver3.nom11.DElementDeducciones;
-//import cfd.ver3.nom11.DElementPercepcion;
-//import cfd.ver3.nom11.DElementPercepciones;
-//import cfd.ver3.nom12.DElementIncapacidad;
-//import cfd.ver3.nom12.DElementSeparacionIndemnizacion;
 import cfd.ver33.DCfdi33Catalogs;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataConcepto;
@@ -52,8 +46,8 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     protected int mnPkEmpleadoId;
     protected int mnPkSucursalEmpleadoId;
     protected String msRegistroPatronal;
-    protected String msNumEmpleado;
-    protected String msCurp;
+    protected String msEmpleadoNum;
+    protected String msEmpleadoCurp;
     protected int mnTipoRegimen;
     protected String msTipoRegimen;
     protected String msNumSeguridadSocial;
@@ -105,8 +99,8 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         mnPkEmpleadoId = 0;
         mnPkSucursalEmpleadoId = 0;
         msRegistroPatronal = "";
-        msNumEmpleado = "";
-        msCurp = "";
+        msEmpleadoNum = "";
+        msEmpleadoCurp = "";
         mnTipoRegimen = 0;
         msTipoRegimen = "";
         msNumSeguridadSocial = "";
@@ -156,8 +150,8 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public void setPkEmpleadoId(int n) { mnPkEmpleadoId = n; }
     public void setPkSucursalEmpleadoId(int n) { mnPkSucursalEmpleadoId = n; }
     public void setRegistroPatronal(String s) { msRegistroPatronal = s; }
-    public void setNumEmpleado(String s) { msNumEmpleado = s; }
-    public void setCurp(String s) { msCurp = s; }
+    public void setEmpleadoNum(String s) { msEmpleadoNum = s; }
+    public void setEmpleadoCurp(String s) { msEmpleadoCurp = s; }
     public void setTipoRegimen(int n) { mnTipoRegimen = n; }
     public void setTipoRegimen(String s) { msTipoRegimen = s; }
     public void setNumSeguridadSocial(String s) { msNumSeguridadSocial = s; }
@@ -204,8 +198,8 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     public int getPkEmpleadoId() { return mnPkEmpleadoId; }
     public int getPkSucursalEmpleadoId() { return mnPkSucursalEmpleadoId; }
     public String getRegistroPatronal() { return msRegistroPatronal; }
-    public String getNumEmpleado() { return msNumEmpleado; }
-    public String getCurp() { return msCurp; }
+    public String getEmpleadoNum() { return msEmpleadoNum; }
+    public String getEmpleadoCurp() { return msEmpleadoCurp; }
     public int getTipoRegimen() { return mnTipoRegimen; }
     public String getNumSeguridadSocial() { return msNumSeguridadSocial; }
     public Date getFechaPago() { return mtFechaPago; }
@@ -412,8 +406,8 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         cfd.ver3.nom11.DElementHorasExtras horasExtras = new cfd.ver3.nom11.DElementHorasExtras();
 
         nomina.getAttRegistroPatronal().setString(msRegistroPatronal);
-        nomina.getAttNumEmpleado().setString(msNumEmpleado);
-        nomina.getAttCurp().setString(msCurp);
+        nomina.getAttNumEmpleado().setString(msEmpleadoNum);
+        nomina.getAttCurp().setString(msEmpleadoCurp);
         nomina.getAttTipoRegimen().setInteger(mnTipoRegimen);
         nomina.getAttNumSeguridadSocial().setString(msNumSeguridadSocial);
         nomina.getAttFechaPago().setDate(mtFechaPago);
@@ -546,25 +540,29 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         nomina.getAttFechaFinalPago().setDate(mtFechaFinalPago);
         nomina.getAttNumDiasPagados().setDouble(mdNumDiasPagados == 0d ? DCfdi33Catalogs.DIAS_PAG_MIN : mdNumDiasPagados);
         
-        // Create node Emisor:
+        // Emisor & Receptor:
         
         if (isTypeContractForEmployment()) {
             //emisor.getAttCurp().setString(...); // individuals as employeer not yet supported!
-            emisor.getAttRegistroPatronal().setString(DCfdVer3Utils.formatAttributeValueAsKey(msRegistroPatronal));
             //emisor.getAttRfcPatronOrigen().setString(...); // labor outsourcing not yet supported!
             
-            // Create node Receptor:
-            
-            receptor.getAttNumSeguridadSocial().setString(msNumSeguridadSocial);
-            receptor.getAttFechaInicioRelLaboral().setDate(mtFechaInicioRelLaboral);
-            receptor.getAttAntiguedad().setString("P" + (mnAntiguedad < 0 ? 0 : mnAntiguedad) + "W");
-            receptor.getAttRiesgoPuesto().setString("" + mnRiesgoPuesto);
-            receptor.getAttSalarioBaseCotApor().setDouble(mdSalarioBaseCotApor);
+            if (!msNumSeguridadSocial.isEmpty()) {
+                emisor.getAttRegistroPatronal().setString(DCfdVer3Utils.formatAttributeValueAsKey(msRegistroPatronal));
+
+                // Receptor:
+
+                receptor.getAttNumSeguridadSocial().setString(msNumSeguridadSocial);
+                receptor.getAttFechaInicioRelLaboral().setDate(mtFechaInicioRelLaboral);
+                receptor.getAttAntiguedad().setString("P" + (mnAntiguedad < 0 ? 0 : mnAntiguedad) + "W");
+                receptor.getAttRiesgoPuesto().setString("" + mnRiesgoPuesto);
+                receptor.getAttSalarioBaseCotApor().setDouble(mdSalarioBaseCotApor);
+                receptor.getAttSalarioDiarioIntegrado().setDouble(mdSalarioDiarioIntegrado);
+            }
         }
         
-        // Complement node Receptor:
+        // Complement Receptor:
         
-        receptor.getAttCurp().setString(msCurp);
+        receptor.getAttCurp().setString(msEmpleadoCurp);
         receptor.getAttTipoContrato().setString(msTipoContrato);
         receptor.getAttSindicalizado().setString(msSindicalizado);
         
@@ -572,7 +570,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
             receptor.getAttTipoJornada().setString(msTipoJornada);
         }
         
-        receptor.getAttNumEmpleado().setString(DCfdVer3Utils.formatAttributeValueAsKey(msNumEmpleado));
+        receptor.getAttNumEmpleado().setString(DCfdVer3Utils.formatAttributeValueAsKey(msEmpleadoNum));
         receptor.getAttDepartamento().setString(SLibUtils.textToXml(msDepartamento));
         receptor.getAttPuesto().setString(SLibUtils.textToXml(msPuesto));
         receptor.getAttPeriodicidadPago().setString(msPeriodicidadPago);
@@ -603,7 +601,6 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
             receptor.getAttCuentaBancaria().setString(msCuentaBancaria);
         }
         
-        receptor.getAttSalarioDiarioIntegrado().setDouble(mdSalarioDiarioIntegrado);
         receptor.getAttClaveEntFed().setString(msClaveEstado);
         
         // Payments and discounts:

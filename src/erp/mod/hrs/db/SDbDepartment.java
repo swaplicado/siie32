@@ -8,10 +8,8 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
-import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -34,78 +32,6 @@ public class SDbDepartment extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
 
-    private ArrayList<SDbAccountingEarning> createAccountingEarningConfiguration(final SGuiSession session) throws Exception {
-        ResultSet resultSet = null;
-        String sql = "";
-        ArrayList<SDbAccountingEarning> aAccountingEarning = new ArrayList<SDbAccountingEarning>();
-        SDbAccountingEarning accountingEarning = null;
-        
-        sql = "SELECT DISTINCT id_ear, b_del FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_EAR) + " " +
-                "WHERE id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " ";
-                    
-        resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            accountingEarning = new SDbAccountingEarning();
-
-            accountingEarning.setPkEarningId(resultSet.getInt("id_ear"));
-            accountingEarning.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_DEP);
-            accountingEarning.setPkReferenceId(mnPkDepartmentId);
-            accountingEarning.setDeleted(resultSet.getBoolean("b_del"));
-            accountingEarning.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-            accountingEarning.setFkCostCenterId_n(SLibConsts.UNDEFINED);
-            accountingEarning.setFkItemId_n(SLibConsts.UNDEFINED);
-            accountingEarning.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
-            accountingEarning.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
-            accountingEarning.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
-            /*
-            accountingEarning.setFkUserInsertId();
-            accountingEarning.setFkUserUpdateId();
-            accountingEarning.setTsUserInsert();
-            accountingEarning.setTsUserUpdate();
-            */
-            
-            aAccountingEarning.add(accountingEarning);
-        }
-        
-        return aAccountingEarning;
-    }
-    
-    private ArrayList<SDbAccountingDeduction> createAccountingDeductionConfiguration(final SGuiSession session) throws Exception {
-        ResultSet resultSet = null;
-        String sql = "";
-        ArrayList<SDbAccountingDeduction> aAccountingDeduction = new ArrayList<SDbAccountingDeduction>();
-        SDbAccountingDeduction accountingDeduction = null;
-        
-        sql = "SELECT DISTINCT id_ded, b_del FROM " + SModConsts.TablesMap.get(SModConsts.HRS_ACC_DED) + " " +
-                "WHERE id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " ";
-                    
-        resultSet = session.getStatement().getConnection().createStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            accountingDeduction = new SDbAccountingDeduction();
-
-            accountingDeduction.setPkDeductionId(resultSet.getInt("id_ded"));
-            accountingDeduction.setPkAccountingTypeId(SModSysConsts.HRSS_TP_ACC_DEP);
-            accountingDeduction.setPkReferenceId(mnPkDepartmentId);
-            accountingDeduction.setDeleted(resultSet.getBoolean("b_del"));
-            accountingDeduction.setFkAccountId(SModSysConsts.FIN_ACC_NA);
-            accountingDeduction.setFkCostCenterId_n(SLibConsts.UNDEFINED);
-            accountingDeduction.setFkItemId_n(SLibConsts.UNDEFINED);
-            accountingDeduction.setFkBizPartnerId_n(SLibConsts.UNDEFINED);
-            accountingDeduction.setFkTaxBasicId_n(SLibConsts.UNDEFINED);
-            accountingDeduction.setFkTaxTaxId_n(SLibConsts.UNDEFINED);
-            /*
-            accountingDeduction.setFkUserInsertId();
-            accountingDeduction.setFkUserUpdateId();
-            accountingDeduction.setTsUserInsert();
-            accountingDeduction.setTsUserUpdate();
-            */
-
-            aAccountingDeduction.add(accountingDeduction);
-        }
-        
-        return aAccountingDeduction;
-    }
-    
     public SDbDepartment() {
         super(SModConsts.HRSU_DEP);
     }
@@ -217,8 +143,6 @@ public class SDbDepartment extends SDbRegistryUser {
     public void save(SGuiSession session) throws SQLException, Exception {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
-        ArrayList<SDbAccountingEarning> aAccountingEarning = null;
-        ArrayList<SDbAccountingDeduction> aAccountingDeductions = null;
 
         if (mbRegistryNew) {
             computePrimaryKey(session);
@@ -258,18 +182,7 @@ public class SDbDepartment extends SDbRegistryUser {
         session.getStatement().execute(msSql);
         
         if (mbRegistryNew) {
-            /*
-            aAccountingEarning = createAccountingEarningConfiguration(session);
-            aAccountingDeductions = createAccountingDeductionConfiguration(session);
-            
-            for (SDbAccountingEarning accountingEarning : aAccountingEarning) {
-                accountingEarning.save(session);
-            }
-            for (SDbAccountingDeduction accountingDeduction : aAccountingDeductions) {
-                accountingDeduction.save(session);
-            }
-            */
-            SHrsAccounting accounting = new SHrsAccounting(null, session);
+            SHrsAccounting accounting = new SHrsAccounting(session);
                 
             accounting.setAccountingType(SModSysConsts.HRSS_TP_ACC_DEP);
             accounting.setPkReferenceId(mnPkDepartmentId);

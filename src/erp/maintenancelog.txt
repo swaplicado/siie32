@@ -1,4 +1,43 @@
 ================================================================================
+SIIE 3.2 164.0/ 2020-04-29
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Implementación de carga de prenómina desde reloj checador a recibos de nómina.
+
+================================================================================
+SIIE 3.2 163.4/ 2020-04-29
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de nota de exportador confiable, si aplica, en impresión de facturas de ventas de exportación.
+2) Revisión nombres de métodos en clase de contactos de sucursales de asociados de negocios.
+3) Cambios en clase de documentos por revisión de nombres de clases de addenda AMECE 7.1.
+
+================================================================================
+SIIE 3.2 163.3/ 2020-04-02
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de actualización de la empresa fuente en empleados al exportarse a otra empresa (sustitución patronal).
+
+================================================================================
+SIIE 3.2 163.2/ 2020-03-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la búsqueda de deducciones mediante su código en la forma de captura de recibos de nómina.
+
+================================================================================
+SIIE 3.2 163.1/ 2020-03-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de separación de empleados por empresa, con opción a sincronizar empleados entre empresas complementarias (sibling-companies.)
+2) Exportación de empleados dados de baja a otras empresas con Módulo de Recursos Humanos.
+
+================================================================================
+SIIE 3.2 163.0/ 2020-03-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de requisitos del error nom164 al emitir nóminas, relacionado con el número de registro patronal del emisor de CFDI de nóminas de asimilados.
+
+================================================================================
 SIIE 3.2 162.0/ 2020-03-12
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

@@ -551,7 +551,7 @@ public class SDialogBenefitCardex extends SBeanFormDialog implements ListSelecti
         mnBenefitsTableId = benefitsTableId;
         mtDateCutoff = dateCutoff;
         
-        moTextEmployeeName.setValue(moEmployee.getAuxEmployeeName());
+        moTextEmployeeName.setValue(moEmployee.getXtaEmployeeName());
         moTextEmployeeNumber.setValue(moEmployee.getNumber());
         moDecDailyPayment.setValue(mdDailyPayment);
         moTextBenefitType.setValue(miClient.getSession().readField(SModConsts.HRSS_TP_BEN, new int[] { mnFormSubtype }, SDbRegistryUser.FIELD_NAME));

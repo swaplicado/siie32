@@ -11,7 +11,6 @@ import erp.mod.SModSysConsts;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.swing.ImageIcon;
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -39,9 +38,9 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
     private SPanelHrsFilterPayrollStatus moPanelHrsFilterPayrollStatus;
     
     /**
-     * Creates new form SDialogRepHrsEarningDeduction
-     * @param client
-     * @param title
+     * Creates new form SDialogRepHrsAuxPayroll
+     * @param client GUI client.
+     * @param title Dialog title.
      */
     public SDialogRepHrsAuxPayroll(SGuiClient client, String title) {
         setFormSettings(client, SModConsts.HRSR_PAY_AUX, SLibConsts.UNDEFINED, title);
@@ -211,11 +210,14 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
         jlEmployee.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlEmployee);
 
-        moKeyEmployee.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyEmployee.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel13.add(moKeyEmployee);
 
+        jtbEmployeeActive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif"))); // NOI18N
+        jtbEmployeeActive.setSelected(true);
         jtbEmployeeActive.setToolTipText("Filtrar eliminados");
         jtbEmployeeActive.setPreferredSize(new java.awt.Dimension(23, 23));
+        jtbEmployeeActive.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
         jPanel13.add(jtbEmployeeActive);
 
         jPanel5.add(jPanel13);
@@ -416,7 +418,7 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 960, 600);
+        SGuiUtils.setWindowBounds(this, 1000, 625);
         
         moPanelHrsDepartments = new SPanelHrsDepartments(miClient);
         moPanelHrsFilterPayrollStatus = new SPanelHrsFilterPayrollStatus(miClient);
@@ -483,13 +485,12 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
         
         jtbEmployeeActive.addItemListener(this);
         
+        jtbEmployeeActive.setSelected(true);
         moRadReportTypePayEmp.setSelected(true);
         moRadShowEarDed.setSelected(true);
         moRadFilterTypePeriod.setSelected(true);
         moRadOrderByNameEmployee.setSelected(true);
         moRadOrderByNameDepartament.setSelected(true);
-        
-        jtbEmployeeActive.setSelected(false);
         
         moIntPeriodYear.setValue(miClient.getSession().getCurrentYear());
         moIntPeriodStart.setValue(SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate())[1]);
@@ -502,13 +503,7 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
         actionEnableFieldsEarDed();
     }
 
-    private void actionEmpStatusStateChange() {
-        if (jtbEmployeeActive.isSelected()) {
-            jtbEmployeeActive.setSelectedIcon(new ImageIcon(this.getClass().getResource("/sa/lib/img/swi_filter_off.gif")));
-        }
-        else {
-            jtbEmployeeActive.setSelectedIcon(new ImageIcon(this.getClass().getResource("/sa/lib/img/swi_filter_on.gif")));
-        }
+    private void itemStateChangedEmployeeActive() {
         populateEmployee();
     }
     
@@ -591,16 +586,11 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
     }
     
     private void populateEmployee() {
-        if (jtbEmployeeActive.isSelected()) {
-            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, new SGuiParams(SGuiConsts.PARAM_REGS_ACT));
-        }
-        else {
-            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
-        }
+        miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, 0, 
+                new SGuiParams(jtbEmployeeActive.isSelected() ? SGuiConsts.PARAM_REGS_ACT : SGuiConsts.PARAM_REGS_ALL));
     }
 
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyEarning, SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyDeduction, SModConsts.HRS_DED, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyPaymentType, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
@@ -733,7 +723,7 @@ public class SDialogRepHrsAuxPayroll extends SBeanDialogReport implements Change
             JToggleButton toggleButton = (JToggleButton) e.getSource();
 
             if (toggleButton == jtbEmployeeActive) {
-                actionEmpStatusStateChange();
+                itemStateChangedEmployeeActive();
             }
         }
     }

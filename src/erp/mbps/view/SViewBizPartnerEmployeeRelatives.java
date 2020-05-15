@@ -14,6 +14,7 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.SModConsts;
 import erp.table.SFilterConstants;
 import java.awt.Dimension;
@@ -59,11 +60,19 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
     private void initComponents() {
         int levelRightEdit = SDataConstantsSys.UNDEFINED;
         int levelRightEditCategory = SDataConstantsSys.UNDEFINED;
+        boolean employeesCrudEnabled = false;
 
+        try {
+            employeesCrudEnabled = SLibUtils.parseInt(SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_EMPLOYEES_CRUD)) == 1;
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+        
         moTabFilterDeleted = new STabFilterDeleted(this);
         bgViewEmployee = new ButtonGroup();
         
-        jtbViewEmployeeActive = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif")));
+        jtbViewEmployeeActive = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
         jtbViewEmployeeActive.setPreferredSize(new Dimension(23, 23));
         jtbViewEmployeeActive.addActionListener(this);
         jtbViewEmployeeActive.setToolTipText("Ver activos");
@@ -71,13 +80,13 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         
         jtbViewEmployeeActive.setSelected(true);
         
-        jtbViewEmployeeInactive = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif")));
+        jtbViewEmployeeInactive = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif")));
         jtbViewEmployeeInactive.setPreferredSize(new Dimension(23, 23));
         jtbViewEmployeeInactive.addActionListener(this);
         jtbViewEmployeeInactive.setToolTipText("Ver inactivos");
         bgViewEmployee.add(jtbViewEmployeeInactive);
         
-        jtbViewEmployeeAll = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif")));
+        jtbViewEmployeeAll = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")));
         jtbViewEmployeeAll.setPreferredSize(new Dimension(23, 23));
         jtbViewEmployeeAll.addActionListener(this);
         jtbViewEmployeeAll.setToolTipText("Ver todos");
@@ -192,7 +201,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP).Level;
 
         jbNew.setEnabled(false);
-        jbEdit.setEnabled(levelRightEditCategory >=  SUtilConsts.LEV_AUTHOR || levelRightEdit >=  SUtilConsts.LEV_AUTHOR);
+        jbEdit.setEnabled((levelRightEditCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && employeesCrudEnabled);
         jbDelete.setEnabled(false);
         mvSuscriptors.add(SDataConstants.USRU_USR);
         mvSuscriptors.add(SDataConstants.BPSX_BP_EMP);
@@ -240,15 +249,15 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
     private void itemStateChangedViewEmployee() {
         if (jtbViewEmployeeActive.isSelected()) {
             mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ACT;
-            jtbViewEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_off.gif")));
+            jtbViewEmployeeActive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_act_on.gif")));
         }
         else if (jtbViewEmployeeInactive.isSelected()) {
             mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_INA;
-            jtbViewEmployeeInactive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_off.gif")));
+            jtbViewEmployeeInactive.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/icon_std_po_ina_on.gif")));
         }
         else if (jtbViewEmployeeAll.isSelected()) {
             mnFilterStatusEmployee = SGridFilterPanelEmployee.EMP_STATUS_ALL;
-            jtbViewEmployeeAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif")));
+            jtbViewEmployeeAll.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif")));
         }
         populateTable();
     }
@@ -361,12 +370,10 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
                 "PERIOD_DIFF(DATE_FORMAT(NOW(), '%Y%m'), DATE_FORMAT(er.son_dt_bir_5_n, '%Y%m')) / 12 AS _son5_age, " +
                 "(er.son_1 <> '' OR er.son_2 <> '' OR er.son_3 <> '' OR er.son_4 <> '' OR er.son_5 <> '') _parent " +
                 "FROM erp.bpsu_bp AS bp " +
-                "INNER JOIN erp.usru_usr AS un ON " +
-                "bp.fid_usr_new = un.id_usr " +
-                "INNER JOIN erp.usru_usr AS ue ON " +
-                "bp.fid_usr_edit = ue.id_usr " +
-                "INNER JOIN erp.usru_usr AS ud ON " +
-                "bp.fid_usr_del = ud.id_usr " +
+                "INNER JOIN hrs_emp_member AS em ON bp.id_bp = em.id_emp " +
+                "INNER JOIN erp.usru_usr AS un ON bp.fid_usr_new = un.id_usr " +
+                "INNER JOIN erp.usru_usr AS ue ON bp.fid_usr_edit = ue.id_usr " +
+                "INNER JOIN erp.usru_usr AS ud ON bp.fid_usr_del = ud.id_usr " +
                 "LEFT OUTER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp " +
                 "LEFT OUTER JOIN erp.hrss_tp_pay AS pay ON e.fk_tp_pay = pay.id_tp_pay " +
                 "LEFT OUTER JOIN erp.hrsu_tp_emp AS emp ON e.fk_tp_emp = emp.id_tp_emp " +

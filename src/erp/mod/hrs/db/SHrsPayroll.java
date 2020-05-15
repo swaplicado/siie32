@@ -304,7 +304,7 @@ public class SHrsPayroll {
                 Date dateCutOff;
 
                 if (!employee.isActive()) {
-                    dateCutOff = employee.getDateLastDismiss_n();
+                    dateCutOff = employee.getDateLastDismissal_n();
 
                     if (!SLibTimeUtils.isBelongingToPeriod(dateCutOff, dateStart, dateEnd)) {
                         dateCutOff = dateEnd;
@@ -861,7 +861,7 @@ public class SHrsPayroll {
         payrollReceipt.setPkEmployeeId(hrsEmployee.getEmployee().getPkEmployeeId());
         payrollReceipt.setDateBenefits(hrsEmployee.getEmployee().getDateBenefits());
         payrollReceipt.setDateLastHire(hrsEmployee.getEmployee().getDateLastHire());
-        payrollReceipt.setDateLastDismiss_n(hrsEmployee.getEmployee().getDateLastDismiss_n());
+        payrollReceipt.setDateLastDismissal_n(hrsEmployee.getEmployee().getDateLastDismissal_n());
         payrollReceipt.setSalary(hrsEmployee.getEmployee().getSalary());
         payrollReceipt.setWage(hrsEmployee.getEmployee().getWage());
         payrollReceipt.setSalarySscBase(hrsEmployee.getEmployee().getSalarySscBase());

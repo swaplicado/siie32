@@ -249,10 +249,11 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         jlEmployee.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel13.add(jlEmployee);
 
-        moKeyEmployee.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyEmployee.setPreferredSize(new java.awt.Dimension(350, 23));
         jPanel13.add(moKeyEmployee);
 
         jtbEmployeeActive.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_off.gif"))); // NOI18N
+        jtbEmployeeActive.setSelected(true);
         jtbEmployeeActive.setToolTipText("Filtrar eliminados");
         jtbEmployeeActive.setPreferredSize(new java.awt.Dimension(23, 23));
         jtbEmployeeActive.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_filter_on.gif"))); // NOI18N
@@ -565,9 +566,9 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         moRadShowEar.addChangeListener(this);
         moRadShowDed.addChangeListener(this);
         
-        jtbEmployeeActive.setSelected(true); // prevent trigger event selecting toggle button before adding listener
         jtbEmployeeActive.addItemListener(this);
         
+        jtbEmployeeActive.setSelected(true);
         moRadReportTypeEarDed.setSelected(true);
         moRadShowEarDed.setSelected(true);
         moRadFilterTypePeriod.setSelected(true);
@@ -587,7 +588,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
         actionEnableFieldsEarDed();
     }
 
-    private void actionEmpStatusStateChange() {
+    private void itemStateChangedEmployeeActive() {
         populateEmployee();
     }
     
@@ -746,19 +747,14 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
     }
     
     private void populateEmployee() {
-        if (jtbEmployeeActive.isSelected()) {
-            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
-        }
-        else {
-            miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, new SGuiParams(SGuiConsts.PARAM_REGS_ACT));
-        }
+        miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, 0, 
+                new SGuiParams(jtbEmployeeActive.isSelected() ? SGuiConsts.PARAM_REGS_ACT : SGuiConsts.PARAM_REGS_ALL));
     }
 
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyEmployee, erp.mod.SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyEarning, SModConsts.HRS_EAR, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyDeduction, SModConsts.HRS_DED, SLibConsts.UNDEFINED, null);
-        miClient.getSession().populateCatalogue(moKeyPaymentType, SModConsts.HRSS_TP_PAY, SLibConsts.UNDEFINED, null);
+        miClient.getSession().populateCatalogue(moKeyEarning, SModConsts.HRS_EAR, 0, null);
+        miClient.getSession().populateCatalogue(moKeyDeduction, SModConsts.HRS_DED, 0, null);
+        miClient.getSession().populateCatalogue(moKeyPaymentType, SModConsts.HRSS_TP_PAY, 0, null);
         populateEmployee();
     }
 
@@ -905,7 +901,7 @@ public class SDialogRepHrsEarningDeduction extends SBeanDialogReport implements 
             JToggleButton toggleButton = (JToggleButton) e.getSource();
 
             if (toggleButton == jtbEmployeeActive) {
-                actionEmpStatusStateChange();
+                itemStateChangedEmployeeActive();
             }
         }
     }
