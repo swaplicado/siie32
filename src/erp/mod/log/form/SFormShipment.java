@@ -276,7 +276,7 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
         jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCompanyBranch.setText("Sucursal:*");
-        jlCompanyBranch.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlCompanyBranch.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel21.add(jlCompanyBranch);
 
         moKeyCompanyBranch.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -287,7 +287,7 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlShipmentType.setText("Tipo embarque:*");
-        jlShipmentType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlShipmentType.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel25.add(jlShipmentType);
 
         moKeyShipmentType.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -298,7 +298,7 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
         jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDeliveryType.setText("Tipo entrega:*");
-        jlDeliveryType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDeliveryType.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel26.add(jlDeliveryType);
 
         moKeyDeliveryType.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -309,7 +309,7 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNumber.setText("Folio:");
-        jlNumber.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlNumber.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel24.add(jlNumber);
         jPanel24.add(moTextNumber);
 
@@ -318,7 +318,7 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
         jPanel30.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDate.setText("Fecha:*");
-        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDate.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel30.add(jlDate);
         jPanel30.add(moDateDate);
 
@@ -326,8 +326,8 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
 
         jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlIncoterm.setText("Incoterm:*");
-        jlIncoterm.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlIncoterm.setText("Entrega (Incoterm):*");
+        jlIncoterm.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel39.add(jlIncoterm);
 
         moKeyIncoterm.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -338,7 +338,7 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSpotSource.setText("Lugar origen:*");
-        jlSpotSource.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlSpotSource.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel27.add(jlSpotSource);
 
         moKeySpotSource.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -349,7 +349,7 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlSpotDestiny.setText("Lugar destino:*");
-        jlSpotDestiny.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlSpotDestiny.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel28.add(jlSpotDestiny);
 
         moKeySpotDestiny.setPreferredSize(new java.awt.Dimension(200, 23));
@@ -360,7 +360,7 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlModeOfTransportationType.setText("Tipo modo transp.:*");
-        jlModeOfTransportationType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlModeOfTransportationType.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel29.add(jlModeOfTransportationType);
 
         moKeyModeOfTransportationType.setPreferredSize(new java.awt.Dimension(200, 23));

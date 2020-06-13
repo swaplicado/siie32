@@ -161,7 +161,7 @@ public class SViewShipmentDpsCost extends SGridPaneView implements ActionListene
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
         SGridColumnView[] columns = new SGridColumnView[mnGridSubtype == SModConsts.VIEW_ST_PEND ? 34 : 40];
 
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, SDbConsts.FIELD_NAME, "Folio embarque");
@@ -170,7 +170,7 @@ public class SViewShipmentDpsCost extends SGridPaneView implements ActionListene
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "f_cob_code", "Sucursal embarque");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "f_ship_code", "Tipo embarque");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "dly.code", "Tipo entrega");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "f_inc_code", "Incoterm");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "f_inc_code", "Entrega (Incoterm)");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "f_src_code", "Lugar origen");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "f_des_code", "Lugar destino");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, "f_sal_num", "Folio fac vta");

@@ -58,6 +58,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 import javax.swing.AbstractAction;
@@ -115,8 +116,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private erp.lib.form.SFormField moFieldSalesPriceUnitaryCy;
     private erp.lib.form.SFormField moFieldSalesFreightUnitaryCy;
     private erp.lib.form.SFormField moFieldIsSalesFreightRequired;
+    private erp.lib.form.SFormField moFieldIsSalesFreightAddPrice;
     private erp.lib.form.SFormField moFieldIsSalesFreightConfirm;
-    private erp.lib.form.SFormField moFieldIsSalesFreightAdd;
     private erp.lib.form.SFormField moFieldDiscountEntryCy;
     private erp.lib.form.SFormField moFieldDiscountDocCy;
     private erp.lib.form.SFormField moFieldSurplusPercentage;
@@ -297,7 +298,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlSalesPriceUnitaryCy = new javax.swing.JLabel();
         jtfSalesPriceUnitaryCy = new javax.swing.JTextField();
         jtfSalesPriceUnitaryCyCurrencyKeyRo = new javax.swing.JTextField();
-        jckIsSalesFreightConfirm = new javax.swing.JCheckBox();
+        jckIsSalesFreightAddPrice = new javax.swing.JCheckBox();
         jPanel21 = new javax.swing.JPanel();
         jlOriginalDiscountUnitaryCy = new javax.swing.JLabel();
         jtfOriginalDiscountUnitaryCy = new javax.swing.JTextField();
@@ -307,7 +308,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jlSalesFreightUnitaryCy = new javax.swing.JLabel();
         jtfSalesFreightUnitaryCy = new javax.swing.JTextField();
         jtfSalesFreightUnitaryCyCurrencyKeyRo = new javax.swing.JTextField();
-        jckIsSalesFreightAdd = new javax.swing.JCheckBox();
+        jckIsSalesFreightConfirm = new javax.swing.JCheckBox();
         jPanel24 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
@@ -811,13 +812,13 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel23.add(jtfUnitSymbolRo);
 
         jckAuxPreserveQuantity.setText("Preservar cant. equivalente");
-        jckAuxPreserveQuantity.setToolTipText("Evitar calcular la cant. equivalente en función de la configuración del ítem");
-        jckAuxPreserveQuantity.setPreferredSize(new java.awt.Dimension(233, 23));
+        jckAuxPreserveQuantity.setToolTipText("Evitar calcular la cantidad equivalente en función de la configuración del ítem");
+        jckAuxPreserveQuantity.setPreferredSize(new java.awt.Dimension(218, 23));
         jPanel23.add(jckAuxPreserveQuantity);
 
-        jckIsSalesFreightRequired.setText("Requiere flete");
-        jckIsSalesFreightRequired.setEnabled(false);
-        jckIsSalesFreightRequired.setPreferredSize(new java.awt.Dimension(100, 23));
+        jckIsSalesFreightRequired.setText("Definir flete u.");
+        jckIsSalesFreightRequired.setToolTipText("Definir el flete unitario");
+        jckIsSalesFreightRequired.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel23.add(jckIsSalesFreightRequired);
 
         jPanel4.add(jPanel23);
@@ -849,12 +850,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel20.add(jLabel10);
 
         jlSalesPriceUnitaryCy.setText("Precio u.:");
-        jlSalesPriceUnitaryCy.setPreferredSize(new java.awt.Dimension(60, 23));
+        jlSalesPriceUnitaryCy.setPreferredSize(new java.awt.Dimension(55, 23));
         jPanel20.add(jlSalesPriceUnitaryCy);
 
         jtfSalesPriceUnitaryCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfSalesPriceUnitaryCy.setText("0,000,000.0000");
-        jtfSalesPriceUnitaryCy.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfSalesPriceUnitaryCy.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel20.add(jtfSalesPriceUnitaryCy);
 
         jtfSalesPriceUnitaryCyCurrencyKeyRo.setEditable(false);
@@ -863,9 +864,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfSalesPriceUnitaryCyCurrencyKeyRo.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel20.add(jtfSalesPriceUnitaryCyCurrencyKeyRo);
 
-        jckIsSalesFreightConfirm.setText("Confirmar flete");
-        jckIsSalesFreightConfirm.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel20.add(jckIsSalesFreightConfirm);
+        jckIsSalesFreightAddPrice.setText("Agregar flete u.");
+        jckIsSalesFreightAddPrice.setToolTipText("Agregar el flete unitario al precio unitario");
+        jckIsSalesFreightAddPrice.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel20.add(jckIsSalesFreightAddPrice);
 
         jPanel4.add(jPanel20);
 
@@ -886,7 +888,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfOriginalDiscountUnitaryCyCurrencyKeyRo.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel21.add(jtfOriginalDiscountUnitaryCyCurrencyKeyRo);
 
-        jbPriceHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif"))); // NOI18N
+        jbPriceHistory.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif"))); // NOI18N
+        jbPriceHistory.setToolTipText("Ver historial de precios");
         jbPriceHistory.setFocusable(false);
         jbPriceHistory.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel21.add(jbPriceHistory);
@@ -895,12 +898,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jPanel21.add(jLabel12);
 
         jlSalesFreightUnitaryCy.setText("Flete u.:");
-        jlSalesFreightUnitaryCy.setPreferredSize(new java.awt.Dimension(60, 23));
+        jlSalesFreightUnitaryCy.setPreferredSize(new java.awt.Dimension(55, 23));
         jPanel21.add(jlSalesFreightUnitaryCy);
 
         jtfSalesFreightUnitaryCy.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfSalesFreightUnitaryCy.setText("0,000,000.0000");
-        jtfSalesFreightUnitaryCy.setPreferredSize(new java.awt.Dimension(125, 23));
+        jtfSalesFreightUnitaryCy.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel21.add(jtfSalesFreightUnitaryCy);
 
         jtfSalesFreightUnitaryCyCurrencyKeyRo.setEditable(false);
@@ -909,9 +912,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jtfSalesFreightUnitaryCyCurrencyKeyRo.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel21.add(jtfSalesFreightUnitaryCyCurrencyKeyRo);
 
-        jckIsSalesFreightAdd.setText("Adicionar flete");
-        jckIsSalesFreightAdd.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel21.add(jckIsSalesFreightAdd);
+        jckIsSalesFreightConfirm.setText("Confirmar flete u.");
+        jckIsSalesFreightConfirm.setToolTipText("Confirmar si hay que agregar el flete unitario al precio unitario al guardar");
+        jckIsSalesFreightConfirm.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel21.add(jckIsSalesFreightConfirm);
 
         jPanel4.add(jPanel21);
 
@@ -2280,8 +2284,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldSalesFreightUnitaryCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSalesFreightUnitaryCy, jlSalesFreightUnitaryCy);
         moFieldSalesFreightUnitaryCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormat());
         moFieldIsSalesFreightRequired = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSalesFreightRequired);
+        moFieldIsSalesFreightAddPrice = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSalesFreightAddPrice);
         moFieldIsSalesFreightConfirm = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSalesFreightConfirm);
-        moFieldIsSalesFreightAdd = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsSalesFreightAdd);
         moFieldDiscountEntryCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfDiscountEntryCy, jlDiscountEntry);
         moFieldDiscountEntryCy.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsValueFormat());
         moFieldDiscountDocCy = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfDiscountDocCy, jlDiscountDoc);
@@ -2424,8 +2428,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         mvFields.add(moFieldSalesPriceUnitaryCy);
         mvFields.add(moFieldSalesFreightUnitaryCy);
         mvFields.add(moFieldIsSalesFreightRequired);
+        mvFields.add(moFieldIsSalesFreightAddPrice);
         mvFields.add(moFieldIsSalesFreightConfirm);
-        mvFields.add(moFieldIsSalesFreightAdd);
         mvFields.add(moFieldDiscountEntryCy);
         mvFields.add(moFieldDiscountDocCy);
         mvFields.add(moFieldSurplusPercentage);
@@ -2658,7 +2662,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jckIsDiscountUnitaryPercentage.addItemListener(this);
         jckIsDiscountEntryPercentage.addItemListener(this);
         jckIsDiscountDocApplying.addItemListener(this);
-        jckIsSalesFreightAdd.addItemListener(this);
+        jckIsSalesFreightRequired.addItemListener(this);
+        jckIsSalesFreightAddPrice.addItemListener(this);
         jckIsSurplusPercentageApplying.addItemListener(this);
         jckIsTaxesAutomaticApplying.addItemListener(this);
         jcbFkItemId.addItemListener(this);
@@ -2767,9 +2772,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
     private boolean isTextFieldFoTotal(javax.swing.JTextField textField) {
         return textField == jtfDiscountUnitaryPercentage || textField == jtfDiscountEntryPercentage ||
-                textField == jtfOriginalQuantity || textField == jtfOriginalPriceUnitaryCy || 
-                textField == jtfOriginalDiscountUnitaryCy || textField == jtfDiscountEntryCy || textField == jtfDiscountDocCy ||
-                textField == jtfSalesPriceUnitaryCy || textField == jtfSalesFreightUnitaryCy;
+                textField == jtfOriginalQuantity ||
+                textField == jtfSalesPriceUnitaryCy || textField == jtfSalesFreightUnitaryCy ||
+                textField == jtfOriginalPriceUnitaryCy || textField == jtfOriginalDiscountUnitaryCy ||
+                textField == jtfDiscountEntryCy || textField == jtfDiscountDocCy;
     }
     
     private boolean isTextFieldForContract(javax.swing.JTextField textField) {
@@ -2830,7 +2836,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moDpsEntry.setSalesFreightUnitaryCy(moFieldSalesFreightUnitaryCy.getDouble());
         moDpsEntry.setIsSalesFreightRequired(moFieldIsSalesFreightRequired.getBoolean());
         moDpsEntry.setIsSalesFreightConfirm(moFieldIsSalesFreightConfirm.getBoolean());
-        moDpsEntry.setIsSalesFreightAdd(moFieldIsSalesFreightAdd.getBoolean());
+        moDpsEntry.setIsSalesFreightAdd(moFieldIsSalesFreightAddPrice.getBoolean());
 
         moDpsEntry.setDiscountEntryCy(moFieldDiscountEntryCy.getDouble());
         moDpsEntry.setDiscountDocCy(moFieldDiscountDocCy.getDouble());
@@ -2871,6 +2877,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                     moParamDps.getIsDiscountDocPercentage(), moParamDps.getDiscountDocPercentage(), moParamDps.getExchangeRate());
             
             if (moFieldIsSalesFreightRequired.getBoolean()) {
+                // original price unitary has just been updated in previous call to method SDataDpsEntry.calculateTotal(), so reflect its new value:
                 moFieldOriginalPriceUnitaryCy.setDouble(moDpsEntry.getOriginalPriceUnitaryCy());
             }
 
@@ -3048,9 +3055,38 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfPriceUnitaryReal_rRo.setText(formatValueUnitary.format(moDpsEntry.getPriceUnitaryReal_r()));
         }
     }
+    
+    private void updateItemPrice(final boolean updateItemDiscount) {
+        if (moParamsItemPriceList == null || !moParamsItemPriceList.isItemPriceFound()) {
+            moFieldOriginalPriceUnitaryCy.setFieldValue(0d);
+            if (updateItemDiscount) {
+                moFieldOriginalDiscountUnitaryCy.setFieldValue(0d);
+            }
+        }
+        else {
+            if (moParamsItemPriceList.getCurrencyId() == moParamDps.getFkCurrencyId()) {
+                moFieldOriginalPriceUnitaryCy.setFieldValue(moParamsItemPriceList.getItemPrice());
+                if (updateItemDiscount) {
+                    moFieldOriginalDiscountUnitaryCy.setFieldValue(moParamsItemPriceList.getItemDiscount());
+                }
+            }
+            else if (moParamsItemPriceList.getCurrencyId() == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
+                moFieldOriginalPriceUnitaryCy.setFieldValue(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemPrice() / moParamDps.getExchangeRate());
+                if (updateItemDiscount) {
+                    moFieldOriginalDiscountUnitaryCy.setFieldValue(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemDiscount() / moParamDps.getExchangeRate());
+                }
+            }
+            else {
+                moFieldOriginalPriceUnitaryCy.setFieldValue(0d);
+                if (updateItemDiscount) {
+                    moFieldOriginalDiscountUnitaryCy.setFieldValue(0d);
+                }
+            }
+        }
+    }
 
-    private void renderItem(boolean preserveFields, boolean calculate) {
-        mbUpdatingForm = true;
+    private void renderItem(boolean preserveFields, boolean recalculate) {
+        mbUpdatingForm = true; // prevent from triggering of multiple item-state-changed events
 
         boolean isDiscRetailChain = false;
         Object keyItem = null;
@@ -3078,12 +3114,14 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldFkTaxRegionId.setFieldValue(keyTaxRegion);
             moFieldOperationsType.setFieldValue(keyOperationsType);
         }
+        
+        // Reset other controls:
 
+        moPanelFkCostCenterId_n.resetPanel();
+        
         // Default values:
 
-        jbItemBizPartnerDescription.setEnabled(false);
         moFieldIsTaxesAutomaticApplying.setFieldValue(true);
-        moPanelFkCostCenterId_n.resetPanel();
 
         // Render item:
 
@@ -3119,6 +3157,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfConcept.setEditable(false);
             jtfConcept.setFocusable(false);
             jbConcept.setEnabled(false);
+            jbItemBizPartnerDescription.setEnabled(false);
             jcbFkOriginalUnitId.setEnabled(false);
             jbFkOriginalUnitId.setEnabled(false);
 
@@ -3147,8 +3186,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfSalesFreightUnitaryCy.setFocusable(false);
             jtfSalesFreightUnitaryCy.setEnabled(false); // yes, enable/disable this text field
             jtfSalesFreightUnitaryCyCurrencyKeyRo.setEnabled(false); // yes, enable/disable this text field
+            jckIsSalesFreightRequired.setEnabled(false);
+            jckIsSalesFreightAddPrice.setEnabled(false);
             jckIsSalesFreightConfirm.setEnabled(false);
-            jckIsSalesFreightAdd.setEnabled(false);
             
             jtfDiscountEntryCy.setEditable(false);
             jtfDiscountEntryCy.setFocusable(false);
@@ -3186,37 +3226,46 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moParamsItemPriceList = null;
         }
         else {
-            // Item concept:
+            // Item concept code and description:
 
-            String itemConcept = "";
+            String conceptKey = "";
+            String concept = "";
+            int unitId = 0;
             
-            if (moParamDps.getFkLanguajeId() != miClient.getSessionXXX().getParamsErp().getFkLanguageId()) {
-                for (SDataItemForeignLanguage description : moItem.getDbmsItemForeignLanguageDescriptions()) {
-                    if (moParamDps.getFkLanguajeId() == description.getPkLanguageId() && !description.getIsDeleted()) {
-                        itemConcept = description.getItem().length() <= moFieldConcept.getLengthMax() ? description.getItem() : description.getItemShort();
-                        break;
-                    }
-                }
-            }
-
-            String bpItemKey = "";
-            int bpItemUnitId = 0;
+            // custom item description fo business-partner:
+            
+            jbItemBizPartnerDescription.setEnabled(false);
             
             if (moParamBizPartner.getDbmsItemBizPartnerDescription().size() > 0) {
                 for (SDataItemBizPartnerDescription description : moParamBizPartner.getDbmsItemBizPartnerDescription()) {
                     if (moItem.getPkItemId() == description.getPkItemId() && description.getIsItemDescription() && !description.getIsDeleted()) {
-                        bpItemKey = description.getKey();
-                        itemConcept = description.getItem().length() <= moFieldConcept.getLengthMax() ? description.getItem() : description.getItemShort();
-                        bpItemUnitId = description.getFkUnitId();
+                        conceptKey = description.getKey();
+                        concept = description.getItem().length() <= moFieldConcept.getLengthMax() ? description.getItem() : description.getItemShort();
+                        unitId = description.getFkUnitId();
 
                         jbItemBizPartnerDescription.setEnabled(true);
                         break;
                     }
                 }
             }
+            
+            if (concept.isEmpty()) {
+                // custom item description for language:
+                
+                if (moParamDps.getFkLanguajeId() != miClient.getSessionXXX().getParamsErp().getFkLanguageId()) {
+                    for (SDataItemForeignLanguage description : moItem.getDbmsItemForeignLanguageDescriptions()) {
+                        if (moParamDps.getFkLanguajeId() == description.getPkLanguageId() && !description.getIsDeleted()) {
+                            concept = description.getItem().length() <= moFieldConcept.getLengthMax() ? description.getItem() : description.getItemShort();
+                            break;
+                        }
+                    }
+                }
 
-            if (itemConcept.isEmpty()) {
-                itemConcept = moItem.getItem().length() <= moFieldConcept.getLengthMax() ? moItem.getItem() : moItem.getItemShort();
+                if (concept.isEmpty()) {
+                    // default item description from catalog:
+                    
+                    concept = moItem.getItem().length() <= moFieldConcept.getLengthMax() ? moItem.getItem() : moItem.getItemShort();
+                }
             }
 
             // Initialize original unit combo box:
@@ -3237,6 +3286,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             // Initialize surplus default:
 
             jckIsSurplusPercentageApplying.setSelected(false);
+            
             if (moItem.getSurplusPercentage() > 0) {
                 jckIsSurplusPercentageApplying.setSelected(true);
                 activateSurplusPercentage();
@@ -3260,9 +3310,9 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
             jckIsBulk.setSelected(moItem.getIsBulk());
 
-            moFieldConceptKey.setFieldValue(bpItemKey.isEmpty() ? moItem.getKey() : bpItemKey);
-            moFieldConcept.setFieldValue(itemConcept);
-            moFieldFkOriginalUnitId.setFieldValue(new int[] { bpItemUnitId == 0 ? moItem.getFkUnitId() : bpItemUnitId });
+            moFieldConceptKey.setFieldValue(!conceptKey.isEmpty() ? conceptKey : moItem.getKey());
+            moFieldConcept.setFieldValue(concept);
+            moFieldFkOriginalUnitId.setFieldValue(new int[] { unitId != 0 ? unitId : moItem.getFkUnitId() });
             moFieldIsInventoriable.setFieldValue(moItem.getIsInventoriable());
             moFieldIsPrepayment.setFieldValue(moItem.getIsPrepayment());
 
@@ -3298,88 +3348,57 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 jtfDiscountDocPercentageRo.setText("");
             }
 
-            // Obtain item price and discount from prices lists:
+            // Obtain item price and discount from price lists:
 
             try {
-                moParamsItemPriceList = SDataUtilities.obtainItemPrice(
-                        miClient, moParamBizPartner.getPkBizPartnerId(), moParamDps.getFkBizPartnerBranchId(),
-                        (moParamDps.isForSales() ? moParamBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerCategoryId() : moParamBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerCategoryId()),
-                        (moParamDps.isForSales() ? moParamBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerTypeId() : moParamBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerTypeId()),
-                        moParamDps.getFkDpsCategoryId(), moParamDps.getDateDoc(), moItem.getPkItemId(), moParamDps.getFkCurrencyId());
+                // lookup item price by document currency or by local currency when document currency is not local currency:
                 
-                if (!moParamsItemPriceList.isItemPriceFound() && !miClient.getSession().getSessionCustom().isLocalCurrency(new int[] { moParamDps.getFkCurrencyId() })) {
-                    // if price was not found and document currency is not local currency:
-                    moParamsItemPriceList = SDataUtilities.obtainItemPrice(
-                            miClient, moParamBizPartner.getPkBizPartnerId(), moParamDps.getFkBizPartnerBranchId(),
+                ArrayList<Integer> lookupCurrencies = new ArrayList<>();
+                
+                lookupCurrencies.add(moParamDps.getFkCurrencyId());
+                
+                if (moParamDps.getFkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) {
+                    lookupCurrencies.add(miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
+                }
+                
+                moParamsItemPriceList = null;
+                
+                for (Integer currency : lookupCurrencies) {
+                    moParamsItemPriceList = SDataUtilities.obtainItemPrice(miClient, 
+                            moParamBizPartner.getPkBizPartnerId(), moParamDps.getFkBizPartnerBranchId(),
                             (moParamDps.isForSales() ? moParamBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerCategoryId() : moParamBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerCategoryId()),
                             (moParamDps.isForSales() ? moParamBizPartner.getDbmsCategorySettingsCus().getFkBizPartnerTypeId() : moParamBizPartner.getDbmsCategorySettingsSup().getFkBizPartnerTypeId()),
-                            moParamDps.getFkDpsCategoryId(), moParamDps.getDateDoc(), moItem.getPkItemId(), miClient.getSession().getSessionCustom().getLocalCurrencyKey()[0]);
+                            moParamDps.getFkDpsCategoryId(), moParamDps.getDateDoc(), moItem.getPkItemId(), currency);
+                    
+                    if (moParamsItemPriceList.isItemPriceFound()) {
+                        break;
+                    }
                 }
                 
-                /*
-                 Check document currency:
-                 Is document and list is local, the value is the same
-                 Is document and list is foreign and equals, the value is the same
-                 Is document is foreign and list is local, the value divides
-                 Is document is and list they are not the same, the value is 0
-                 Is document is local and list is foreign, the value is 0  
-                */
-                if (moParamDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) { // Currency local and document they are equals
-                    moFieldOriginalPriceUnitaryCy.setFieldValue(moParamsItemPriceList.getItemPrice());
-                    moFieldOriginalDiscountUnitaryCy.setFieldValue(moParamsItemPriceList.getItemDiscount());
-                }
-                else if (moParamDps.getFkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) { 
-                    if (moParamDps.getFkCurrencyId() == moParamsItemPriceList.getCurrencyId()) {// Is document and list is foreign and equals, the value is the same
-                        moFieldOriginalPriceUnitaryCy.setFieldValue(moParamsItemPriceList.getItemPrice());
-                        moFieldOriginalDiscountUnitaryCy.setFieldValue(moParamsItemPriceList.getItemDiscount());
-                    }
-                    else if (moParamDps.getFkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId() && 
-                            moParamsItemPriceList.getCurrencyId() == miClient.getSessionXXX().getParamsErp().getFkCurrencyId()) { // Is document is foreign and list is local, the value divides
-                        moFieldOriginalPriceUnitaryCy.setFieldValue(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemPrice() / moParamDps.getExchangeRate());
-                        moFieldOriginalDiscountUnitaryCy.setFieldValue(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemDiscount() / moParamDps.getExchangeRate());
-                    }
-                    else if (moParamDps.getFkCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId() &&  // Is document is foreign and list is local, the value divides 
-                            moParamsItemPriceList.getCurrencyId() != miClient.getSessionXXX().getParamsErp().getFkCurrencyId() &&
-                            moParamsItemPriceList.getCurrencyId() != moParamDps.getFkCurrencyId()) {
-                        moFieldOriginalPriceUnitaryCy.setFieldValue(0d);
-                        moFieldOriginalDiscountUnitaryCy.setFieldValue(0d);
-                    }
-                    else {
-                        moFieldOriginalPriceUnitaryCy.setFieldValue(0d);
-                        moFieldOriginalDiscountUnitaryCy.setFieldValue(0d);
-                    }
-                }
-                else {
-                    moFieldOriginalPriceUnitaryCy.setFieldValue(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemPrice() * moParamDps.getExchangeRate());
-                    moFieldOriginalDiscountUnitaryCy.setFieldValue(moParamDps.getExchangeRate() == 0 ? 0 : moParamsItemPriceList.getItemDiscount() * moParamDps.getExchangeRate());
-                }
+                updateItemPrice(true);
             }
             catch (Exception e) {
                 SLibUtilities.printOutException(this, e);
             }
             
-            if (isSalesFreightRequired()) {
-                moFieldSalesPriceUnitaryCy.setFieldValue(moFieldOriginalPriceUnitaryCy.getDouble()); // copy original price unitary
-                moFieldSalesFreightUnitaryCy.setFieldValue(0d);
-                moFieldIsSalesFreightRequired.setFieldValue(true);
-                moFieldIsSalesFreightConfirm.setFieldValue(false);
-                moFieldIsSalesFreightAdd.setFieldValue(true);
-            }
+            // prepare setting sales freight if needed:
+            
+            moFieldIsSalesFreightRequired.setFieldValue(isSalesFreightRequirable());
 
             enableItemFields();
         }
         
         renderFieldsStatus();
 
-        if (calculate) {
+        if (recalculate) {
             calculateTotal(); // actually this clears all entry's value fields
         }
 
         mbUpdatingForm = false;
     }
 
-    private void renderItemBizPartnerDescription(int[] key) {
-        moDataItemBizPartnerDescription = (SDataItemBizPartnerDescription) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_CFG_ITEM_BP, key, SLibConstants.EXEC_MODE_SILENT);
+    private void renderItemBizPartnerDescription(int[] itemBizPartnerDescriptionKey) {
+        moDataItemBizPartnerDescription = (SDataItemBizPartnerDescription) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_CFG_ITEM_BP, itemBizPartnerDescriptionKey, SLibConstants.EXEC_MODE_SILENT);
 
         moFieldConceptKey.setFieldValue(moDataItemBizPartnerDescription.getKey());
         moFieldConcept.setFieldValue(moDataItemBizPartnerDescription.getItem());
@@ -3410,6 +3429,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         itemStateIsDiscountUnitaryPercentage(false);
         itemStateIsDiscountEntryPercentage(false);
         itemStateIsDiscountDocApplying(false);
+        itemStateIsSalesFreightRequired(false);
+        itemStateIsSalesFreightAddPrice(false);
         itemStateIsSurplusPercentageApplying(false);
         itemStateIsTaxesAutomaticApplying(false);
         renderOriginalUnitSymbol();
@@ -3420,49 +3441,54 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         if (moDpsEntry.getContractPriceMonth() != 0 && moDpsEntry.getContractPriceMonth() != 0) {
             return false; // price set by contract
         }
-        else if (moParamDps.isForSales() && moItem.isClassSalesProduct()) {
-            // sales document and a product is being sold:
-            
-            if (mbRightMktPriceListSales || mbRightSalPriceChange) {
-                return true; // user can set or edit prices
-            }
-            else {
-                switch (miClient.getSessionXXX().getParamsCompany().getPricePolicyForSales()) {
-                    case SDataParamsCompany.PRICE_POLICY_NOT_RESTRICTED:
-                        if (moParamsItemPriceList == null || (!moParamsItemPriceList.isItemPriceFound() || (moParamsItemPriceList.isItemPriceFound() && moParamsItemPriceList.getItemPrice() == 0))) {
-                            return true; // no price list available or price not found or found but zero
-                        }
-                        else {
-                            return false; // preserve price found
-                        }
-                    
-                    case SDataParamsCompany.PRICE_POLICY_PRICE_REQUIRED:
-                        return false; // price should be set
-                        
-                    default:
+        else if (moItem == null) {
+            return false; // no item available
+        }
+        else {
+            if (moParamDps.isForSales() && moItem.isClassSalesProduct()) {
+                // sales document and a product is being sold:
+
+                if (mbRightMktPriceListSales || mbRightSalPriceChange) {
+                    return true; // user can set or edit prices
+                }
+                else {
+                    switch (miClient.getSessionXXX().getParamsCompany().getPricePolicyForSales()) {
+                        case SDataParamsCompany.PRICE_POLICY_NOT_RESTRICTED:
+                            if (moParamsItemPriceList == null || (!moParamsItemPriceList.isItemPriceFound() || (moParamsItemPriceList.isItemPriceFound() && moParamsItemPriceList.getItemPrice() == 0))) {
+                                return true; // no price list available or price not found or found but zero
+                            }
+                            else {
+                                return false; // preserve price found
+                            }
+
+                        case SDataParamsCompany.PRICE_POLICY_PRICE_REQUIRED:
+                            return false; // price should be set
+
+                        default:
+                    }
                 }
             }
-        }
-        else if (moParamDps.isForPurchases() && moItem.isClassPurchasesConsumable()) {
-            // purchases document and a consumable is being purchased:
-            
-            if (mbRightMktPriceListPurchases || mbRightPurPriceChange) {
-                return true; // user can set or edit prices
-            }
-            else {
-                switch (miClient.getSessionXXX().getParamsCompany().getPricePolicyForPurchases()) {
-                    case SDataParamsCompany.PRICE_POLICY_NOT_RESTRICTED:
-                        if (moParamsItemPriceList == null || (!moParamsItemPriceList.isItemPriceFound() || (moParamsItemPriceList.isItemPriceFound() && moParamsItemPriceList.getItemPrice() == 0))) {
-                            return true; // no price list available or price not found or found but zero
-                        }
-                        else {
-                            return false; // preserve price found
-                        }
-                    
-                    case SDataParamsCompany.PRICE_POLICY_PRICE_REQUIRED:
-                        return false; // price should be set
-                        
-                    default:
+            else if (moParamDps.isForPurchases() && moItem.isClassPurchasesConsumable()) {
+                // purchases document and a consumable is being purchased:
+
+                if (mbRightMktPriceListPurchases || mbRightPurPriceChange) {
+                    return true; // user can set or edit prices
+                }
+                else {
+                    switch (miClient.getSessionXXX().getParamsCompany().getPricePolicyForPurchases()) {
+                        case SDataParamsCompany.PRICE_POLICY_NOT_RESTRICTED:
+                            if (moParamsItemPriceList == null || (!moParamsItemPriceList.isItemPriceFound() || (moParamsItemPriceList.isItemPriceFound() && moParamsItemPriceList.getItemPrice() == 0))) {
+                                return true; // no price list available or price not found or found but zero
+                            }
+                            else {
+                                return false; // preserve price found
+                            }
+
+                        case SDataParamsCompany.PRICE_POLICY_PRICE_REQUIRED:
+                            return false; // price should be set
+
+                        default:
+                    }
                 }
             }
         }
@@ -3473,8 +3499,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private void enableItemFields() {
         if (moItem != null) {
             // Validate if user can modify unitary price and unitary discount:
-            
-            boolean isSalesFreightRequired = isSalesFreightRequired();
 
             if (!isPriceEditable()) {
                 mbAllowDiscount = false;
@@ -3494,8 +3518,8 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             else {
                 mbAllowDiscount = true;
 
-                jtfOriginalPriceUnitaryCy.setEditable(!isSalesFreightRequired);
-                jtfOriginalPriceUnitaryCy.setFocusable(!isSalesFreightRequired);
+                jtfOriginalPriceUnitaryCy.setEditable(true);
+                jtfOriginalPriceUnitaryCy.setFocusable(true);
                 jtfOriginalDiscountUnitaryCy.setEditable(true);
                 jtfOriginalDiscountUnitaryCy.setFocusable(true);
                 jtfDiscountEntryCy.setEditable(true);
@@ -3506,20 +3530,19 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 jbOriginalPriceUnitaryCyWizard.setEnabled(true);
                 jbPriceHistory.setEnabled(true);
             }
-            
-            jlSalesPriceUnitaryCy.setEnabled(isSalesFreightRequired);
-            jtfSalesPriceUnitaryCy.setEditable(isSalesFreightRequired);
-            jtfSalesPriceUnitaryCy.setFocusable(isSalesFreightRequired);
-            jtfSalesPriceUnitaryCy.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field
-            jtfSalesPriceUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field
-            jlSalesFreightUnitaryCy.setEnabled(isSalesFreightRequired);
-            jtfSalesFreightUnitaryCy.setEditable(isSalesFreightRequired);
-            jtfSalesFreightUnitaryCy.setFocusable(isSalesFreightRequired);
-            jtfSalesFreightUnitaryCy.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field
-            jtfSalesFreightUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field
-            jckIsSalesFreightConfirm.setEnabled(isSalesFreightRequired);
-            jckIsSalesFreightAdd.setEnabled(isSalesFreightRequired);
 
+            boolean isSalesFreightAllowed = isSalesFreightAllowed();
+            
+            jckIsSalesFreightRequired.setEnabled(isSalesFreightAllowed);
+            jlSalesPriceUnitaryCy.setEnabled(isSalesFreightAllowed);
+            jtfSalesPriceUnitaryCy.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
+            jtfSalesPriceUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
+            jlSalesFreightUnitaryCy.setEnabled(isSalesFreightAllowed);
+            jtfSalesFreightUnitaryCy.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
+            jtfSalesFreightUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field
+            
+            itemStateIsSalesFreightRequired(false);
+            
             if (moItem.getIsFreeDiscountUnitary()) {
                 jckIsDiscountUnitaryPercentage.setEnabled(false);
             }
@@ -3701,19 +3724,20 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 Date amc71PurchaseOrderDate = null;
                 String amc71Barcode = "";
                 
-                try {
-                    SAddendaAmc71XmlLine amc71XmlLine = new SAddendaAmc71XmlLine();
-                    amc71XmlLine.decodeJson(moDpsEntry.getDbmsAddJsonData());
-                    
-                    amc71PurchaseOrder = amc71XmlLine.PurchaseOrder;
-                    amc71PurchaseOrderDate = amc71XmlLine.PurchaseOrderDate;
-                    amc71Barcode = amc71XmlLine.Barcode;
-                }
-                catch (Exception e) {
-                    SLibUtilities.renderException(this, e);
+                if (!moDpsEntry.getDbmsAddJsonData().isEmpty()) {
+                    try {
+                        SAddendaAmc71XmlLine amc71XmlLine = new SAddendaAmc71XmlLine();
+                        amc71XmlLine.decodeJson(moDpsEntry.getDbmsAddJsonData());
+
+                        amc71PurchaseOrder = amc71XmlLine.PurchaseOrder;
+                        amc71PurchaseOrderDate = amc71XmlLine.PurchaseOrderDate;
+                        amc71Barcode = amc71XmlLine.Barcode;
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
                 }
                 
-                //jcbAddGenBarcode.setSelectedItem(amc71Barcode);
                 moFieldAddGenBarcode.setFieldValue(amc71Barcode);
                 moFieldAddAmc71PurchaseOrder.setFieldValue(amc71PurchaseOrder);
                 moFieldAddAmc71PurchaseOrderDate.setFieldValue(amc71PurchaseOrderDate);
@@ -3808,19 +3832,20 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbPriceHistory.setEnabled(false);
             jckAuxPreserveQuantity.setEnabled(false);
             
-            boolean isSalesFreightRequired = isSalesFreightRequired();
-            jlSalesPriceUnitaryCy.setEnabled(isSalesFreightRequired);
+            boolean isSalesFreightAllowed = isSalesFreightAllowed();
+            jlSalesPriceUnitaryCy.setEnabled(isSalesFreightAllowed);
             jtfSalesPriceUnitaryCy.setEditable(false);
             jtfSalesPriceUnitaryCy.setFocusable(false);
-            jtfSalesPriceUnitaryCy.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field, to improve user visual experience
-            jtfSalesPriceUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field, to improve user visual experience
-            jlSalesFreightUnitaryCy.setEnabled(isSalesFreightRequired);
+            jtfSalesPriceUnitaryCy.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field, to improve user visual experience
+            jtfSalesPriceUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field, to improve user visual experience
+            jlSalesFreightUnitaryCy.setEnabled(isSalesFreightAllowed);
             jtfSalesFreightUnitaryCy.setEditable(false);
             jtfSalesFreightUnitaryCy.setFocusable(false);
-            jtfSalesFreightUnitaryCy.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field, to improve user visual experience
-            jtfSalesFreightUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field, to improve user visual experience
+            jtfSalesFreightUnitaryCy.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field, to improve user visual experience
+            jtfSalesFreightUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field, to improve user visual experience
+            jckIsSalesFreightRequired.setEnabled(false);
+            jckIsSalesFreightAddPrice.setEnabled(false);
             jckIsSalesFreightConfirm.setEnabled(false);
-            jckIsSalesFreightAdd.setEnabled(false);
 
             jtfDiscountEntryCy.setEditable(false);
             jtfDiscountEntryCy.setFocusable(false);
@@ -3943,6 +3968,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jbOk.setEnabled(true);
 
             enableItemFields();
+            
             renderFieldsStatus();
         }
     }
@@ -3958,7 +3984,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moPaneTaxes.setTableRowSelection(index);
     }
 
-    private void itemStateIsDiscountUnitaryPercentage(boolean calculate) {
+    private void itemStateIsDiscountUnitaryPercentage(boolean recalculate) {
         if (moFieldIsDiscountUnitaryPercentage.getBoolean()) {
             jtfDiscountUnitaryPercentage.setEditable(mbAllowDiscount);
             jtfDiscountUnitaryPercentage.setFocusable(mbAllowDiscount);
@@ -3976,12 +4002,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldDiscountUnitaryPercentage.setFieldValue(0d);
         }
 
-        if (calculate) {
+        if (recalculate) {
             calculateTotal();
         }
     }
 
-    private void itemStateIsDiscountEntryPercentage(boolean calculate) {
+    private void itemStateIsDiscountEntryPercentage(boolean recalculate) {
         if (moFieldIsDiscountEntryPercentage.getBoolean()) {
             jtfDiscountEntryPercentage.setEditable(mbAllowDiscount);
             jtfDiscountEntryPercentage.setFocusable(mbAllowDiscount);
@@ -3999,12 +4025,12 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moFieldDiscountEntryPercentage.setFieldValue(0d);
         }
 
-        if (calculate) {
+        if (recalculate) {
             calculateTotal();
         }
     }
 
-    private void itemStateIsDiscountDocApplying(boolean calculate) {
+    private void itemStateIsDiscountDocApplying(boolean recalculate) {
         if (moFieldIsDiscountDocApplying.getBoolean()) {
             jtfDiscountDocCy.setEditable(moParamDps == null ? false : !moParamDps.getIsDiscountDocPercentage() && mbAllowDiscount);
             jtfDiscountDocCy.setFocusable(moParamDps == null ? false : !moParamDps.getIsDiscountDocPercentage() && mbAllowDiscount);
@@ -4017,18 +4043,80 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             jtfDiscountDocPercentageRo.setText("");
         }
 
-        if (calculate) {
+        if (recalculate) {
             calculateTotal();
         }
     }
     
-    private void itemStateIsSalesFreightAdd(boolean calculate) {
-        if (calculate) {
+    private void itemStateIsSalesFreightRequired(boolean recalculate) {
+        boolean isPriceEditable = isPriceEditable();
+        
+        if (moFieldIsSalesFreightRequired.getBoolean()) {
+            // enable/disable related fields:
+            
+            jtfOriginalPriceUnitaryCy.setEditable(false);
+            jtfOriginalPriceUnitaryCy.setFocusable(false);
+            
+            jtfSalesPriceUnitaryCy.setEditable(isPriceEditable);
+            jtfSalesPriceUnitaryCy.setFocusable(isPriceEditable);
+            jtfSalesFreightUnitaryCy.setEditable(true);
+            jtfSalesFreightUnitaryCy.setFocusable(true);
+            
+            jckIsSalesFreightAddPrice.setEnabled(true);
+            jckIsSalesFreightConfirm.setEnabled(true);
+            
+            // set suitable values:
+            
+            if (recalculate) {
+                moFieldSalesPriceUnitaryCy.setFieldValue(moFieldOriginalPriceUnitaryCy.getDouble());
+                moFieldSalesFreightUnitaryCy.setFieldValue(0d);
+            }
+            
+            moFieldIsSalesFreightAddPrice.setFieldValue(true);
+            moFieldIsSalesFreightConfirm.setFieldValue(false);
+        }
+        else {
+            // enable/disable related fields:
+            
+            jtfOriginalPriceUnitaryCy.setEditable(isPriceEditable);
+            jtfOriginalPriceUnitaryCy.setFocusable(isPriceEditable);
+            
+            jtfSalesPriceUnitaryCy.setEditable(false);
+            jtfSalesPriceUnitaryCy.setFocusable(false);
+            jtfSalesFreightUnitaryCy.setEditable(false);
+            jtfSalesFreightUnitaryCy.setFocusable(false);
+            
+            jckIsSalesFreightAddPrice.setEnabled(false);
+            jckIsSalesFreightConfirm.setEnabled(false);
+            
+            // set suitable values:
+            
+            if (recalculate) {
+                if (moParamsItemPriceList != null && moParamsItemPriceList.isItemPriceFound()) {
+                    // reset price previously found:
+                    updateItemPrice(false);
+                }
+                else {
+                    // preserve price already set:
+                    moFieldOriginalPriceUnitaryCy.setFieldValue(SLibUtils.roundAmount(moFieldSalesPriceUnitaryCy.getDouble() + (moFieldIsSalesFreightAddPrice.getBoolean() ? moFieldSalesFreightUnitaryCy.getDouble() : 0d)));
+                }
+
+                moFieldSalesPriceUnitaryCy.setFieldValue(0d);
+                moFieldSalesFreightUnitaryCy.setFieldValue(0d);
+            }
+            
+            moFieldIsSalesFreightAddPrice.setFieldValue(false);
+            moFieldIsSalesFreightConfirm.setFieldValue(false);
+        }
+    }
+    
+    private void itemStateIsSalesFreightAddPrice(boolean recalculate) {
+        if (recalculate) {
             calculateTotal();
         }
     }
 
-    private void itemStateIsSurplusPercentageApplying(boolean calculate) {
+    private void itemStateIsSurplusPercentageApplying(boolean recalculate) {
         if (jckIsSurplusPercentageApplying.isSelected()) {
             jtfSurplusPercentage.setEditable(true);
             jtfSurplusPercentage.setFocusable(true);
@@ -4041,15 +4129,15 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         }
     }
 
-    private void itemStateIsTaxesAutomaticApplying(boolean calculate) {
+    private void itemStateIsTaxesAutomaticApplying(boolean recalculate) {
         setTaxesColumnEditable(!jckIsTaxesAutomaticApplying.isSelected());
 
-        if (calculate && jckIsTaxesAutomaticApplying.isSelected()) {
+        if (recalculate && jckIsTaxesAutomaticApplying.isSelected()) {
             calculateTotal();
         }
     }
 
-    private void itemChangedFkItemId(boolean calculate) {
+    private void itemChangedFkItemId(boolean recalculate) {
         if (jcbFkItemId.getSelectedIndex() <= 0) {
             moItem = null;
         }
@@ -4057,7 +4145,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             moItem = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldFkItemId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_VERBOSE);
         }
 
-        renderItem(true, calculate);
+        renderItem(true, recalculate);
     }
 
     private void itemChangedFkOriginalUnitId() {
@@ -4736,7 +4824,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
     private javax.swing.JCheckBox jckIsInventoriable;
     private javax.swing.JCheckBox jckIsPrepayment;
     private javax.swing.JCheckBox jckIsPriceConfirm;
-    private javax.swing.JCheckBox jckIsSalesFreightAdd;
+    private javax.swing.JCheckBox jckIsSalesFreightAddPrice;
     private javax.swing.JCheckBox jckIsSalesFreightConfirm;
     private javax.swing.JCheckBox jckIsSalesFreightRequired;
     private javax.swing.JCheckBox jckIsSurplusPercentageApplying;
@@ -4942,7 +5030,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
      * Public methods
      */
     
-    private boolean isSalesFreightRequired() {
+    private boolean isSalesFreightAllowed() {
+        return moParamDps != null && moParamDps.isForSales() && moItem != null && (moItem.getIsSalesFreightRequired() || moItem.isClassSalesProduct());
+    }
+    
+    private boolean isSalesFreightRequirable() {
         return moParamDps != null && moParamDps.isForSales() && moItem != null && moItem.getIsSalesFreightRequired();
     }
     
@@ -4958,19 +5050,22 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         jbPriceUnitaryCyWizard.setEnabled(false);
         */
         
-        boolean isSalesFreightRequired = isSalesFreightRequired();
-        jlSalesPriceUnitaryCy.setEnabled(isSalesFreightRequired);
-        jtfSalesPriceUnitaryCy.setEditable(isSalesFreightRequired && asSource);
-        jtfSalesPriceUnitaryCy.setFocusable(isSalesFreightRequired && asSource);
-        jtfSalesPriceUnitaryCy.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field
-        jtfSalesPriceUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field
-        jlSalesFreightUnitaryCy.setEnabled(isSalesFreightRequired);
-        jtfSalesFreightUnitaryCy.setEditable(isSalesFreightRequired && asSource);
-        jtfSalesFreightUnitaryCy.setFocusable(isSalesFreightRequired && asSource);
-        jtfSalesFreightUnitaryCy.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field
-        jtfSalesFreightUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightRequired); // yes, enable/disable this text field
-        jckIsSalesFreightConfirm.setEnabled(isSalesFreightRequired && asSource);
-        jckIsSalesFreightAdd.setEnabled(isSalesFreightRequired && asSource);
+        /*
+        boolean isSalesFreightAllowed = isSalesFreightAllowed();
+        jlSalesPriceUnitaryCy.setEnabled(isSalesFreightAllowed);
+        jtfSalesPriceUnitaryCy.setEditable(false);
+        jtfSalesPriceUnitaryCy.setFocusable(false);
+        jtfSalesPriceUnitaryCy.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field, to improve user visual experience
+        jtfSalesPriceUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field, to improve user visual experience
+        jlSalesFreightUnitaryCy.setEnabled(isSalesFreightAllowed);
+        jtfSalesFreightUnitaryCy.setEditable(false);
+        jtfSalesFreightUnitaryCy.setFocusable(false);
+        jtfSalesFreightUnitaryCy.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field, to improve user visual experience
+        jtfSalesFreightUnitaryCyCurrencyKeyRo.setEnabled(isSalesFreightAllowed); // yes, enable/disable this text field, to improve user visual experience
+        jckIsSalesFreightRequired.setEnabled(false);
+        jckIsSalesFreightAddPrice.setEnabled(false);
+        jckIsSalesFreightConfirm.setEnabled(false);
+        */
         
         /*
         jtfDiscountEntryCy.setEditable(false);
@@ -5258,6 +5353,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
 
         moPaneTaxes.createTable();
         moPaneTaxes.clearTableRows();
+        
         moPaneCommissions.createTable();
         moPaneCommissions.clearTableRows();
 
@@ -5412,10 +5508,10 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlSalesFreightUnitaryCy.getText() + "'.");
                 validation.setComponent(jtfSalesFreightUnitaryCy);
             }
-            else if (moFieldIsSalesFreightRequired.getBoolean() && moFieldSalesFreightUnitaryCy.getDouble() != 0d && !moFieldIsSalesFreightAdd.getBoolean() &&
-                    miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar deseleccionado el campo '" + jckIsSalesFreightAdd.getText() + "'?") != JOptionPane.YES_OPTION) {
-                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_OPTION_SELECT + "'" + jckIsSalesFreightAdd.getText() + "'.");
-                validation.setComponent(jckIsSalesFreightAdd);
+            else if (moFieldIsSalesFreightRequired.getBoolean() && moFieldSalesFreightUnitaryCy.getDouble() != 0d && !moFieldIsSalesFreightAddPrice.getBoolean() &&
+                    miClient.showMsgBoxConfirm("¿Está seguro que se desea dejar deseleccionado el campo '" + jckIsSalesFreightAddPrice.getText() + "'?") != JOptionPane.YES_OPTION) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_OPTION_SELECT + "'" + jckIsSalesFreightAddPrice.getText() + "'.");
+                validation.setComponent(jckIsSalesFreightAddPrice);
             }
             else if (moFieldIsSalesFreightConfirm.getBoolean() &&
                     miClient.showMsgBoxConfirm("Favor de confirmar que el valor del campo '" + jlSalesFreightUnitaryCy.getText() + "' es correcto.") != JOptionPane.YES_OPTION) {
@@ -5688,7 +5784,6 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moDpsEntry = (SDataDpsEntry) registry;
 
         moFieldFkItemId.setFieldValue(new int[] { moDpsEntry.getFkItemId() });
-
         itemChangedFkItemId(false);
 
         moFieldConceptKey.setFieldValue(moDpsEntry.getConceptKey());
@@ -5703,19 +5798,19 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldOriginalPriceUnitaryCy.setFieldValue(moDpsEntry.getOriginalPriceUnitaryCy());
         moFieldOriginalDiscountUnitaryCy.setFieldValue(moDpsEntry.getOriginalDiscountUnitaryCy());
         
-        if (isSalesFreightRequired() && !moDpsEntry.getIsSalesFreightRequired()) {
+        if (isSalesFreightRequirable() && !moDpsEntry.getIsSalesFreightRequired()) {
             moFieldSalesPriceUnitaryCy.setFieldValue(moFieldOriginalPriceUnitaryCy.getDouble()); // copy original price unitary
             moFieldSalesFreightUnitaryCy.setFieldValue(0d);
             moFieldIsSalesFreightRequired.setFieldValue(true);
+            moFieldIsSalesFreightAddPrice.setFieldValue(true);
             moFieldIsSalesFreightConfirm.setFieldValue(false);
-            moFieldIsSalesFreightAdd.setFieldValue(true);
         }
         else {
             moFieldSalesPriceUnitaryCy.setFieldValue(moDpsEntry.getSalesPriceUnitaryCy());
             moFieldSalesFreightUnitaryCy.setFieldValue(moDpsEntry.getSalesFreightUnitaryCy());
             moFieldIsSalesFreightRequired.setFieldValue(moDpsEntry.getIsSalesFreightRequired());
             moFieldIsSalesFreightConfirm.setFieldValue(moDpsEntry.getIsSalesFreightConfirm());
-            moFieldIsSalesFreightAdd.setFieldValue(moDpsEntry.getIsSalesFreightAdd());
+            moFieldIsSalesFreightAddPrice.setFieldValue(moDpsEntry.getIsSalesFreightAdd());
         }
         
         moFieldDiscountEntryCy.setFieldValue(moDpsEntry.getDiscountEntryCy());
@@ -5780,7 +5875,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moPaneCommissions.renderTableRows();
         moPaneCommissions.setTableRowSelection(0);
 
-        for (SDataDpsEntryNotes notes : moDpsEntry.getDbmsEntryNotes()) {
+         for (SDataDpsEntryNotes notes : moDpsEntry.getDbmsEntryNotes()) {
             if (notes.getPkNotesId() != SLibConstants.UNDEFINED) {
                 moPaneGridNotes.addTableRow(new SDataDpsEntryNotesRow(notes.clone()));
             }
@@ -5816,7 +5911,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             enablePriceContractFields(moDpsEntry.getIsPriceVariable());
         }
 
-        if (moParamDps.isDocumentOrAdjustmentSal()) {
+        if (moParamDps.isDocumentOrAdjustmentSal() && mbEnableDataAddenda) {
             jTabbedPane.setEnabledAt(TAB_CFD_ADD, true);
             setAddendaData();
         }
@@ -6215,7 +6310,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
         }
     }
-    
+
     @Override
     public void itemStateChanged(java.awt.event.ItemEvent e) {
         if (!mbResetingForm && !mbUpdatingForm) {
@@ -6231,8 +6326,11 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 else if (checkBox == jckIsDiscountDocApplying) {
                     itemStateIsDiscountDocApplying(true);
                 }
-                else if (checkBox == jckIsSalesFreightAdd) {
-                    itemStateIsSalesFreightAdd(true);
+                else if (checkBox == jckIsSalesFreightRequired) {
+                    itemStateIsSalesFreightRequired(true);
+                }
+                else if (checkBox == jckIsSalesFreightAddPrice) {
+                    itemStateIsSalesFreightAddPrice(true);
                 }
                 else if (checkBox == jckIsSurplusPercentageApplying) {
                     itemStateIsSurplusPercentageApplying(true);
@@ -6255,7 +6353,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
             }
             else if (e.getSource() instanceof javax.swing.JComboBox && e.getStateChange() == ItemEvent.SELECTED) {
                 JComboBox comboBox = (JComboBox)  e.getSource();
-
+                
                 if (comboBox == jcbFkItemId) {
                     itemChangedFkItemId(true);
                 }

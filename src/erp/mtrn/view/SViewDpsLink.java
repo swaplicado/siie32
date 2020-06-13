@@ -199,7 +199,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         mjbPrintContractMoves.setEnabled(isViewForEstimateCon());
 
         aoKeyFields = new STableField[2];
-        aoTableColumns = new STableColumn[!isViewForDocEntries() ? 17 : 27];
+        aoTableColumns = new STableColumn[isViewForDocEntries() ? 29 : 17];
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_year");
@@ -288,6 +288,10 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
             aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
             aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_price_u", SLibRpnArgumentType.OPERAND));
             aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.MULTIPLICATION, SLibRpnArgumentType.OPERATOR));
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "sales_price_u_cur", "Precio u. (s/flete) mon $", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
+            aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "sales_freight_u_cur", "Flete u. mon $", STableConstants.WIDTH_VALUE_2X);
+            aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
         }
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_dn_code", "Naturaleza doc.", STableConstants.WIDTH_CODE_DOC);
 
@@ -544,6 +548,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
                 "de.qty AS f_qty, de.orig_qty AS f_orig_qty, " +
                 "CASE WHEN de.qty = 0 THEN 0 ELSE de.stot_cur_r / de.qty END AS f_price_u, " +
                 "CASE WHEN de.orig_qty = 0 THEN 0 ELSE de.stot_cur_r / de.orig_qty END AS f_orig_price_u, " +
+                "de.sales_price_u_cur, de.sales_freight_u_cur, " +
                 "i.item_key, i.item, ig.igen, u.symbol AS f_unit, uo.symbol AS f_orig_unit, " +
                 "COALESCE((SELECT SUM(ds.qty) FROM trn_dps_dps_supply AS ds, trn_dps_ety AS xde, trn_dps AS xd " +
                 "WHERE ds.id_src_year = de.id_year AND ds.id_src_doc = de.id_doc AND ds.id_src_ety = de.id_ety AND " +

@@ -1,4 +1,13 @@
 ================================================================================
+SIIE 3.2 164.1/ 2020-06-12
+Sergio Abraham FLORES GUTIERREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la definición de precio unitario y flete unitario, habilitándolo para todos los productos, independientemente que el ítem tenga la opción correspondiente seleccionada.
+1.1) Adaptación del formato de impresión de contratos, para unidad original y para toneladas, en cuanto a la incorporación del precio unitario sin flete y flete unitario.
+2) Mejoramiento a la captura de Incoterms, para hacerlos obligatorios exclusivamente en facturas y notas de crédito de cuentas por cobrar.
+3) Corrección a la carga de valores históricos de addenda AMECE 7.1 para GLN empresa y GLN sucursal de entrega.
+
+================================================================================
 SIIE 3.2 164.0/ 2020-04-29
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------

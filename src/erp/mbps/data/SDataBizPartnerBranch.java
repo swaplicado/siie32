@@ -586,7 +586,7 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
         return address;
     }
 
-    public erp.mbps.data.SDataBizPartnerBranchContact getDbmsBizPartnerBranchContacts(int[] pk) {
+    public erp.mbps.data.SDataBizPartnerBranchContact getDbmsBizPartnerBranchContact(int[] pk) {
         SDataBizPartnerBranchContact contact = null;
 
         for (int i = 0; i < mvDbmsBizPartnerBranchContacts.size(); i++) {

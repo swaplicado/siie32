@@ -181,7 +181,7 @@ public class SModuleLog extends SGuiModule {
                         + "ORDER BY sort, name ";
                 break;
             case SModConsts.LOGS_INC:
-                settings = new SGuiCatalogueSettings("Incoterm", 1, 1);
+                settings = new SGuiCatalogueSettings("Entrega (Incoterm)", 1, 1);
                 settings.setCodeApplying(true);
                 sql = "SELECT id_inc AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + ", code AS " + SDbConsts.FIELD_CODE + ", "
                         + "fid_tp_dly AS " + SDbConsts.FIELD_FK + "1 "
