@@ -7,7 +7,7 @@ package erp.mod;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public abstract class SModSysConsts {
 
@@ -878,14 +878,19 @@ public abstract class SModSysConsts {
     */
     
     public static final int HRSS_TP_EAR_EAR = 1;        // Earnings
-    public static final int HRSS_TP_EAR_DIS = 14;       // Disability
-    /** No longer belongs to oficial catalog, but preserved active for convenience because it is used internally by system. */
+    public static final int HRSS_TP_EAR_ANN_BONUS = 2;  // Bonus
+    public static final int HRSS_TP_EAR_PTU = 3;        // PTU
+    public static final int HRSS_TP_EAR_SAVINGS = 6;    // Savings bank
+    public static final int HRSS_TP_EAR_DISAB = 14;     // Disability
+    /** No longer belongs to oficial catalog, but preserved active for convenience because it is used internally by system. */    
     public static final int HRSS_TP_EAR_TAX_SUB = 17;   // Tax Subsidy
-    public static final int HRSS_TP_EAR_OVR_TME = 19;   // Overtime
-    public static final int HRSS_TP_EAR_VAC_BON = 21;   // Vacation Bonus
-    public static final int HRSS_TP_EAR_SEN_BON = 22;   // Seniority Bonus 
-    public static final int HRSS_TP_EAR_SET = 23;       // Settlement
-    public static final int HRSS_TP_EAR_CMP = 25;       // Compensation
+    public static final int HRSS_TP_EAR_OVER_TIME = 19; // Overtime
+    public static final int HRSS_TP_EAR_SUN_BONUS = 20; // Sunday Bonus
+    public static final int HRSS_TP_EAR_VAC_BONUS = 21; // Vacation Bonus
+    public static final int HRSS_TP_EAR_SEN_BONUS = 22; // Seniority Bonus 
+    public static final int HRSS_TP_EAR_SETT = 23;      // Settlement
+    public static final int HRSS_TP_EAR_COMP = 25;      // Compensation
+    public static final int HRSS_TP_EAR_FOOD = 29;      // Food
     public static final int HRSS_TP_EAR_ASS_INC = 46;   // Assimilated income
     public static final int HRSS_TP_EAR_OTH = 999;      // Other payments that are not income
 

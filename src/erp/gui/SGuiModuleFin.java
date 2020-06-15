@@ -99,6 +99,7 @@ import erp.mod.fin.db.SFiscalAccounts;
 import erp.mod.fin.form.SDialogDpsExchangeDif;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
+import erp.mod.fin.form.SDialogMassPrintingCFDI;
 import erp.mod.fin.form.SDialogRepCashFlowExpected;
 import erp.mod.fin.form.SDialogRepFinStatements;
 import erp.mod.fin.form.SDialogRepMovsFileCvs;
@@ -273,6 +274,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiQryCashFlowPaysSupSum;
     private javax.swing.JMenuItem jmiQryCashFlowPaysSupDet;
     private javax.swing.JMenuItem jmiRepCashFlowExpected;
+    private javax.swing.JMenuItem jmiMassPrintingCFDI;
     private javax.swing.JMenu jmRepAccIncExp;
     private javax.swing.JMenuItem jmiRepAccIncNet;
     private javax.swing.JMenuItem jmiRepAccIncNetAdj;
@@ -641,6 +643,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiQryCashFlowPaysSupSum = new JMenuItem("Consulta de pagos por periodo");
         jmiQryCashFlowPaysSupDet = new JMenuItem("Consulta de pagos por periodo a detalle");
         jmiRepCashFlowExpected = new JMenuItem("Reporte de ingresos y egresos esperados por periodo...");
+        jmiMassPrintingCFDI = new JMenuItem("Impresión masiva CFDI");
         
         jmRepAccIncExp = new JMenu("Reportes de ingresos y egresos contables");
         jmiRepAccIncNet = new JMenuItem("Reporte de ingresos contables netos");
@@ -757,6 +760,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRep.add(jmRepAccIncExp);
         
         jmRep.add(jmiRepCashFlowExpected);
+        jmRep.add(jmiMassPrintingCFDI);
 
         jmRep.addSeparator();
         
@@ -905,6 +909,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiQryCashFlowPaysSupSum.addActionListener(this);
         jmiQryCashFlowPaysSupDet.addActionListener(this);
         jmiRepCashFlowExpected.addActionListener(this);
+        jmiMassPrintingCFDI.addActionListener(this);
         jmiRepAccIncNet.addActionListener(this);
         jmiRepAccIncNetAdj.addActionListener(this);
         jmiRepFileCsvInc.addActionListener(this);
@@ -1058,6 +1063,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepCashFlow.setEnabled(hasRightRep);
         jmRepAccIncExp.setEnabled(hasRightRep);
         jmiRepCashFlowExpected.setEnabled(hasRightRep);;
+        jmiMassPrintingCFDI.setEnabled(hasRightRep);;
         jmiRepLedgerAccount.setEnabled(hasRightRep);
         jmiRepLedgerCostCenter.setEnabled(hasRightRep);
         jmiRepConceptAdmin.setEnabled(hasRightRep);
@@ -2153,6 +2159,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiRepCashFlowExpected) {
                 new SDialogRepCashFlowExpected(miClient.getSession().getClient(), SModConsts.FINR_CSH_FLW_EXP, SDataRepConstants.REP_CSH_FLW_EXP).setVisible(true);
+            }
+            else if (item == jmiMassPrintingCFDI) {
+                new SDialogMassPrintingCFDI(miClient.getSession().getClient(), SModConsts.FINR_MAS_PRI, SDataRepConstants.REP_MAS_PRI).setVisible(true);
             }
             else if (item == jmiRepAccIncNet) {
                 new SDialogRepMovsIncExp(miClient.getSession().getClient(), SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.QRY_SUM,"Reporte de ingresos contables netos").setVisible(true);

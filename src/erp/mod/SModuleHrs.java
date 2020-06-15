@@ -28,6 +28,7 @@ import erp.mod.hrs.db.SDbEmployeeDismissalType;
 import erp.mod.hrs.db.SDbEmployeeHireLog;
 import erp.mod.hrs.db.SDbEmployeeType;
 import erp.mod.hrs.db.SDbEmployeeWageLog;
+import erp.mod.hrs.db.SDbEmployeeWageSscBaseLog;
 import erp.mod.hrs.db.SDbFirstDayYear;
 import erp.mod.hrs.db.SDbHoliday;
 import erp.mod.hrs.db.SDbLoan;
@@ -101,7 +102,6 @@ import erp.mod.hrs.view.SViewBenefit;
 import erp.mod.hrs.view.SViewBenefitTable;
 import erp.mod.hrs.view.SViewBenefitTableRow;
 import erp.mod.hrs.view.SViewBenefitVacationPending;
-import erp.mod.hrs.view.SViewPayrollCfdi;
 import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
@@ -119,10 +119,11 @@ import erp.mod.hrs.view.SViewMwzType;
 import erp.mod.hrs.view.SViewMwzTypeWage;
 import erp.mod.hrs.view.SViewPayroll;
 import erp.mod.hrs.view.SViewPayrollBenefitEarningComplement;
+import erp.mod.hrs.view.SViewPayrollCfdi;
 import erp.mod.hrs.view.SViewPayrollLoanDeductionComplement;
 import erp.mod.hrs.view.SViewPayrollLoanEarningComplement;
-import erp.mod.hrs.view.SViewPayrollReceiptRecord;
 import erp.mod.hrs.view.SViewPayrollReceipt;
+import erp.mod.hrs.view.SViewPayrollReceiptRecord;
 import erp.mod.hrs.view.SViewPosition;
 import erp.mod.hrs.view.SViewPrePayrollCutoffCalendar;
 import erp.mod.hrs.view.SViewShift;
@@ -466,7 +467,7 @@ public class SModuleHrs extends SGuiModule {
                 registry = new SDbEmployeeWageLog();
                 break;
             case SModConsts.HRS_EMP_LOG_SAL_SSC:
-                registry = new SDbMwzTypeWage();
+                registry = new SDbEmployeeWageSscBaseLog();
                 break;
             case SModConsts.HRS_LOAN:
                 registry = new SDbLoan();
@@ -1357,3 +1358,4 @@ public class SModuleHrs extends SGuiModule {
         return guiReport;
     }
 }
+
