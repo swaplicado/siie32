@@ -20,7 +20,10 @@ import sa.lib.SLibUtils;
 public class SCfdDataConcepto {
     
     public static final int LEN_DESCRIPCION = 1000;
+    private static final int INT_COMMERCE_DECS = 2;
     
+    protected int mnCfdType;
+    protected boolean mbHasIntCommerceComplement;
     protected String msClaveProdServ;
     protected String msNoIdentificacion;
     protected double mdCantidad;
@@ -30,12 +33,16 @@ public class SCfdDataConcepto {
     protected double mdValorUnitario;
     protected double mdImporte;
     protected double mdDescuento;
-    
-    protected int mnCfdiType;
-    
     protected ArrayList<SCfdDataImpuesto> maImpuestosXml;
     
-    public SCfdDataConcepto() {
+    /**
+     * Creates a CFD Concepto XML node.
+     * @param cfdType CFD type. Supported options any constant in SDataConstantsSys.TRNS_TP_CFD_...
+     * Helps formatting some of the attributes of the Concepto XML node, according of the type of CFD provided.
+     */
+    public SCfdDataConcepto(final int cfdType) {
+        mnCfdType = cfdType;
+        mbHasIntCommerceComplement = false;
         msClaveProdServ = "";
         msNoIdentificacion = "";
         mdCantidad = 0;
@@ -45,10 +52,56 @@ public class SCfdDataConcepto {
         mdValorUnitario = 0;
         mdImporte = 0;
         mdDescuento = 0;
-        mnCfdiType = 0;
         maImpuestosXml = new ArrayList<>();
     }
     
+    /*
+     * Private methods
+     */
+    
+    /**
+     * Remove trailing zeros from decimal part.
+     * @param decValue Decimal value as text.
+     * @param requiredDecs Minimum required decimals.
+     * @return 
+     */
+    private String removeTrailingZeros(final String decValue, final int requiredDecs) {
+        int pointIndex = decValue.lastIndexOf('.');
+        String newDecValue = decValue;
+        
+        /*
+        Decimal value as text: 15042.150000
+        Minimum required decimals: 2
+        
+        value: 15042.1500
+        index: 0123456789
+        */
+        
+        if (pointIndex != -1) {
+            int trailingZeros = 0;
+            
+            for (int index = decValue.length() - 1; index > (pointIndex + requiredDecs); index--) {
+                if (decValue.charAt(index) == '0') {
+                    trailingZeros++;
+                }
+                else {
+                    break;
+                }
+            }
+            
+            if (trailingZeros > 0) {
+                newDecValue = newDecValue.substring(0, decValue.length() - trailingZeros);
+            }
+        }
+        
+        return newDecValue;
+    }
+    
+    /*
+     * Public methods
+     */
+    
+    public void setHasIntCommerceComplement(boolean b) { mbHasIntCommerceComplement = b; }
     public void setClaveProdServ(String s) { msClaveProdServ = s; }
     public void setNoIdentificacion(String s) { msNoIdentificacion = s; }
     public void setCantidad(double d) { mdCantidad = d; }
@@ -58,12 +111,9 @@ public class SCfdDataConcepto {
     public void setValorUnitario(double d) { mdValorUnitario = d; }
     public void setImporte(double d) { mdImporte = d; }
     public void setDescuento(double d) { mdDescuento = d; }
-    /**
-     * Helps in formatting some of the attributes of XML node, according of the type of CFDI provided.
-     * @param n Valid values limited to constants defined in SDataConstantsSys.TRNS_TP_CFD_...
-     */
-    public void setCfdiType(int n) { mnCfdiType = n; }
     
+    public boolean hasIntCommerceComplement() { return mbHasIntCommerceComplement; }
+    public int getCfdType() { return mnCfdType; }
     public String getClaveProdServ() { return msClaveProdServ; }
     public String getNoIdentificacion() { return msNoIdentificacion; }
     public double getCantidad() { return mdCantidad; }
@@ -73,7 +123,6 @@ public class SCfdDataConcepto {
     public double getValorUnitario() { return mdValorUnitario; }
     public double getImporte() { return mdImporte; }
     public double getDescuento() { return mdDescuento; }
-    public int getCfdiType() { return mnCfdiType; }
     
     public ArrayList<SCfdDataImpuesto> getCfdDataImpuestos() { return maImpuestosXml; }
     
@@ -152,27 +201,41 @@ public class SCfdDataConcepto {
         
         concepto.getAttClaveProdServ().setString(msClaveProdServ);
         concepto.getAttNoIdentificacion().setString(msNoIdentificacion);
-        concepto.getAttUnidad().setString(msUnidad);
-        concepto.getAttClaveUnidad().setString(msClaveUnidad);
-        
         concepto.getAttCantidad().setDouble(mdCantidad);
-        if (SLibUtils.belongsTo(mnCfdiType, new int[] { SDataConstantsSys.TRNS_TP_CFD_PAY_REC, SDataConstantsSys.TRNS_TP_CFD_PAYROLL })) {
-            concepto.getAttCantidad().setDecimals(0);
-        }
-        
+        concepto.getAttClaveUnidad().setString(msClaveUnidad);
+        concepto.getAttUnidad().setString(msUnidad);
         concepto.getAttDescripcion().setString(msDescripcion);
-        
         concepto.getAttValorUnitario().setDouble(mdValorUnitario);
-        if (mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_PAY_REC) {
-            concepto.getAttValorUnitario().setDecimals(0);
-        }
-        
         concepto.getAttImporte().setDouble(mdImporte);
-        if (mnCfdiType == SDataConstantsSys.TRNS_TP_CFD_PAY_REC) {
-            concepto.getAttImporte().setDecimals(0);
-        }
-        
         concepto.getAttDescuento().setDouble(mdDescuento);
+        
+        if (mbHasIntCommerceComplement) {
+            String valorOriginal;
+            String valorIntCommerce;
+            
+            valorOriginal = concepto.getAttValorUnitario().getAttributeForOriginalString();
+            valorOriginal = valorOriginal.substring(0, valorOriginal.length() - 1);
+            valorIntCommerce = removeTrailingZeros(valorOriginal, INT_COMMERCE_DECS);
+            
+            if (valorIntCommerce.length() < valorOriginal.length()) {
+                concepto.getAttValorUnitario().setDecimals(concepto.getAttValorUnitario().getDecimals() - (valorOriginal.length() - valorIntCommerce.length()));
+            }
+        }
+        else {
+            switch (mnCfdType) {
+                case SDataConstantsSys.TRNS_TP_CFD_INV:
+                    break;
+                case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
+                    concepto.getAttCantidad().setDecimals(0);
+                    concepto.getAttValorUnitario().setDecimals(0);
+                    concepto.getAttImporte().setDecimals(0);
+                    break;
+                case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
+                    concepto.getAttCantidad().setDecimals(0);
+                    break;
+                default:
+            }
+        }
         
         // Taxes:
             

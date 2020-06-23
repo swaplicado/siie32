@@ -4988,13 +4988,13 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     switch (dpsEntryTax.getDbmsCfdTaxId()) {
                                         case SModSysConsts.FINS_CFD_TAX_IVA: // IVA
                                             impuesto.setImpuestoTipo(SModSysConsts.FINS_TP_TAX_CHARGED);
-                                            impuesto.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_IVA);
+                                            impuesto.setImpuesto(DAttributeOptionImpuestoTraslado.CFD_IVA);
                                             
                                             tasa = dpsEntryTax.getPercentage();
                                             break;
                                         case SModSysConsts.FINS_CFD_TAX_IEPS: // IEPS
                                             impuesto.setImpuestoTipo(SModSysConsts.FINS_TP_TAX_CHARGED);
-                                            impuesto.setImpuesto(DAttributeOptionImpuestoRetencion.CFD_NO_DEFINIDO);
+                                            impuesto.setImpuesto(DAttributeOptionImpuestoTraslado.CFD_IEPS);
                                             
                                             tasa = dpsEntryTax.getPercentage();
                                             break;
@@ -5272,7 +5272,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     throw new Exception("La unidad '" + dpsEntry.getDbmsUnitSymbol() + "' no tiene código de unidad aduana.");
                 }
                 
-                SCfdDataConcepto concepto = new SCfdDataConcepto();
+                SCfdDataConcepto concepto = new SCfdDataConcepto(SDataConstantsSys.TRNS_TP_CFD_INV);
                 
                 if (dpsEntry.getDbmsComplement() == null) {
                     //use original data of current document entry:

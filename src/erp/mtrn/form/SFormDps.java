@@ -4052,6 +4052,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     /**
      * Populates combo boxes that depends on current business partner.
      */
+    @SuppressWarnings("unchecked")
     private void populateComboBoxesBizPartner() {
         // populate combo box for INCOTERM, set delivery type aswell:
         
@@ -4801,7 +4802,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         double rate = 0;
 
         try {
-            rate = SDataUtilities.obtainExchangeRate(miClient, idCurrency, moFieldDateDoc.getDate());
+            rate = SDataUtilities.obtainExchangeRate(miClient, idCurrency, moFieldDate.getDate());
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
@@ -8800,6 +8801,38 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 catch (Exception e) {
                     SLibUtilities.printOutException(this, e);
                     validation.setMessage(e.toString());
+                }
+            }
+            
+            // validate exchange rate:
+            
+            if (!validation.getIsError() && !miClient.getSession().getSessionCustom().isLocalCurrency(moFieldFkCurrencyId.getKeyAsIntArray())) {
+                if (SLibUtils.roundAmount(moFieldExchangeRate.getDouble()) == 1d && 
+                        miClient.showMsgBoxConfirm("¡La moneda del documento es '" + moFieldFkCurrencyId.getString() + "'!\n"
+                                + "¿Es correcto que el valor del campo '" + jlExchangeRate.getText() + "' sea " + SLibUtils.getDecimalFormatExchangeRate().format(1d) + "?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlExchangeRate.getText() + "'.");
+                    validation.setComponent(jtfExchangeRate);
+                }
+                else {
+                    double xrt = 0;
+
+                    try {
+                        xrt = SDataUtilities.obtainExchangeRate(miClient, moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldDate.getDate());
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
+                    
+                    if (xrt != 0d) {
+                        int decs = SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits();
+                        
+                        if (SLibUtils.round(Math.abs(SLibUtils.round(xrt, decs) - SLibUtils.round(moFieldExchangeRate.getDouble(), decs)), decs) >= 0.0001 &&
+                                miClient.showMsgBoxConfirm("¡El tipo de cambio del día " + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + " para '" + moFieldFkCurrencyId.getString() + "' es " + SLibUtils.getDecimalFormatExchangeRate().format(xrt) + "!\n"
+                                        + "¿Es correcto que el valor del campo '" + jlExchangeRate.getText() + "' sea " + SLibUtils.getDecimalFormatExchangeRate().format(moFieldExchangeRate.getDouble()) + "?") != JOptionPane.YES_OPTION) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlExchangeRate.getText() + "'.");
+                            validation.setComponent(jtfExchangeRate);
+                        }
+                    }
                 }
             }
             

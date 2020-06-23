@@ -3851,11 +3851,11 @@ public abstract class SCfdUtils implements Serializable {
             comprobante.setEltOpcCfdiRelacionados(cfdiRelacionados);
         }
         
-        boolean hasIntCommerceNode = false; // this info is required at this point to properly set data of nodes Emisor and Receptor
+        boolean hasIntCommerceComplement = false; // this info is required at this point to properly set data of nodes Emisor and Receptor
         cfd.DElement elementComplement = xmlCfdi.getElementComplemento();
 
         if (elementComplement != null) {
-            hasIntCommerceNode = ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior") != null;
+            hasIntCommerceComplement = ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior") != null;
         }
         
         // Emisor:
@@ -3863,10 +3863,10 @@ public abstract class SCfdUtils implements Serializable {
         SDbCfdBizPartner emisor = new SDbCfdBizPartner(client);
         emisor.setBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
         emisor.setExpeditionBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
-        emisor.setIsEmisor(true, hasIntCommerceNode);
+        emisor.setIsEmisor(true, hasIntCommerceComplement);
 
         SCfdDataBizPartner emisorCfd = emisor.getCfdDataBizPartner();
-        emisorCfd.setIsCfdiWithIntCommerce(hasIntCommerceNode);
+        emisorCfd.setIsCfdiWithIntCommerce(hasIntCommerceComplement);
         emisorCfd.setVersion(DCfdConsts.CFDI_VER_33);
         emisorCfd.setCfdiType(xmlCfdi.getCfdType());
 
@@ -3874,7 +3874,7 @@ public abstract class SCfdUtils implements Serializable {
         
         elementEmisor.getAttRegimenFiscal().setString(xmlCfdi.getEmisorRegimenFiscal());
         
-        if (hasIntCommerceNode) {
+        if (hasIntCommerceComplement) {
             ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltEmisor(emisorCfd.createRootElementEmisorIntCommerce());
         }
 
@@ -3886,7 +3886,7 @@ public abstract class SCfdUtils implements Serializable {
         receptor.setBizPartnerIds(xmlCfdi.getReceptorId(), xmlCfdi.getReceptorSucursalId());
 
         SCfdDataBizPartner receptorCfd = receptor.getCfdDataBizPartner();
-        receptorCfd.setIsCfdiWithIntCommerce(hasIntCommerceNode);
+        receptorCfd.setIsCfdiWithIntCommerce(hasIntCommerceComplement);
         receptorCfd.setVersion(DCfdConsts.CFDI_VER_33);
         receptorCfd.setCfdiType(xmlCfdi.getCfdType());
 
@@ -3894,7 +3894,7 @@ public abstract class SCfdUtils implements Serializable {
         
         elementReceptor.getAttUsoCFDI().setString(xmlCfdi.getReceptorUsoCFDI());
         
-        if (hasIntCommerceNode) {
+        if (hasIntCommerceComplement) {
             ((cfd.ver3.cce11.DElementComercioExterior) ((cfd.ver33.DElementComplemento) elementComplement).extractChildElements("cce11:ComercioExterior")).setEltReceptor(receptorCfd.createRootElementReceptorIntCommerce());
             
             if (xmlCfdi.getDestinatarioId() != 0) {
@@ -3905,7 +3905,7 @@ public abstract class SCfdUtils implements Serializable {
                     destinatario.setBizPartnerIds(xmlCfdi.getDestinatarioId(), xmlCfdi.getDestinatarioSucursalId(), xmlCfdi.getDestinatarioDomicilioId());
 
                     SCfdDataBizPartner destinatarioCfd = destinatario.getCfdDataBizPartner();
-                    destinatarioCfd.setIsCfdiWithIntCommerce(hasIntCommerceNode);
+                    destinatarioCfd.setIsCfdiWithIntCommerce(hasIntCommerceComplement);
                     destinatarioCfd.setVersion(DCfdConsts.CFDI_VER_33);
                     destinatarioCfd.setCfdiType(xmlCfdi.getCfdType());
 
@@ -3924,6 +3924,7 @@ public abstract class SCfdUtils implements Serializable {
         // Conceptos:
 
         for (SCfdDataConcepto concept : xmlCfdi.getElementsConcepto()) {
+            concept.setHasIntCommerceComplement(hasIntCommerceComplement);
             comprobante.getEltConceptos().getEltConceptos().add(concept.createRootElementConcept33());
         }
 

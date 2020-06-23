@@ -1,4 +1,17 @@
 ================================================================================
+SIIE 3.2 164.3/ 2020-06-23
+Sergio Abraham FLORES GUTIERREZ
+--------------------------------------------------------------------------------
+1) Ajuste a la integración del XML de CFDI factura electrónica con Complemento de Recepción de Pagos para limitar el número de decimales en el valor unitario del concepto. La recomendación es hacerlo hasta las centésimas (dos decimales.)
+
+================================================================================
+SIIE 3.2 164.2/ 2020-06-20
+Sergio Abraham FLORES GUTIERREZ
+--------------------------------------------------------------------------------
+1) Corrección a consulta vista control de gratificación anual por error en límites de escalonamientos por aniversarios, originalmente implementados de forma parcial, para hacerlo en base a aniversarios completos.
+2) Mejoramiento a validación de tipo de cambio en captura de documentos para confirmar que sea 1.0000 con moneda extranjera, y confirmar tipo de cambio distinto al de sistema si es distinto.
+
+================================================================================
 SIIE 3.2 164.1/ 2020-06-12
 Sergio Abraham FLORES GUTIERREZ
 --------------------------------------------------------------------------------

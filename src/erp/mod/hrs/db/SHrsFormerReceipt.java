@@ -941,7 +941,7 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
     
     @Override
     public ArrayList<SCfdDataConcepto> getElementsConcepto() { // CFDI 3.2 & 3.3
-        SCfdDataConcepto concepto = new SCfdDataConcepto();
+        SCfdDataConcepto concepto = new SCfdDataConcepto(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
         concepto.setClaveProdServ(DCfdi33Catalogs.ClaveProdServServsSueldosSalarios);
         concepto.setNoIdentificacion("");
         concepto.setCantidad(1);
@@ -951,7 +951,6 @@ public class SHrsFormerReceipt implements SCfdXmlCfdi32, SCfdXmlCfdi33 {
         concepto.setValorUnitario(mdTotalPercepciones);
         concepto.setImporte(mdTotalPercepciones);
         concepto.setDescuento(mdTotalDeducciones);
-        concepto.setCfdiType(SDataConstantsSys.TRNS_TP_CFD_PAYROLL);
 
         ArrayList<SCfdDataConcepto> conceptos = new ArrayList<>();
         conceptos.add(concepto);
