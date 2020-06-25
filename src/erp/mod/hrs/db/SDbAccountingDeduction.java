@@ -17,7 +17,6 @@ import sa.lib.gui.SGuiSession;
 
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
- * - erp.mbps.data.SDataEmployee
  * - erp.mod.hrs.db.SHrsAccounting
  * All of them also make raw SQL insertions.
  */

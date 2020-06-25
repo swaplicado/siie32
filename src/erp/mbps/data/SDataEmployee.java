@@ -832,6 +832,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 //employeeHireLog.setIsAuxForceFirstHiring(...);
                 //employeeHireLog.setIsAuxModification(...);
                 //employeeHireLog.setIsAuxCorrection(...);
+                //employeeHireLog.setAuxFormerEmployerConnection(...);
                 
                 hrsEmployeeHireLog.save();
             }

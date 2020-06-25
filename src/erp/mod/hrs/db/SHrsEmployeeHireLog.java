@@ -7,9 +7,11 @@ package erp.mod.hrs.db;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 
@@ -40,7 +42,6 @@ public class SHrsEmployeeHireLog {
     protected Connection moAuxFormerEmployerConnection;
     
     private SHrsEmployeeHireLog(final Connection connection, final SGuiSession session) {
-        
         moConnection = connection;
         moSession = session;
         
@@ -80,7 +81,7 @@ public class SHrsEmployeeHireLog {
      * @param session GUI session (for new framework of Software Aplicado, SA-Lib 1.0).
      */
     public SHrsEmployeeHireLog(final SGuiSession session) {
-        this(null, session);
+        this(session.getDatabase().getConnection(), session);
     }
 
     public void setPkEmployeeHireLogId(int n) { mnPkEmployeeHireLogId = n; }
@@ -168,25 +169,35 @@ public class SHrsEmployeeHireLog {
         
         for (String schema : schemas) {
             if (mbIsAuxFirstHiring || mbIsAuxForceFirstHiring) {
-                // bizarre, but member moConnection should be instantiated:
-
-                String sql = "INSERT INTO " + schema + "." + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " VALUES (" +
-                        mnPkEmployeeId + ", " +
-                        "1, " +
-                        "'" + SLibUtils.DbmsDateFormatDate.format(mtLastHireDate) + "', " +
-                        "'" + msLastHireNotes + "', " +
-                        (mtLastDismissalDate_n == null ? "NULL ," : "'" + SLibUtils.DbmsDateFormatDate.format(mtLastDismissalDate_n) + "', ") +
-                        "'" + msLastDismissalNotes + "', " +
-                        (mbIsHire ? 1 : 0) + ", " +
-                        (mbDeleted ? 1 : 0) + ", " +
-                        mnFkDismissalType + ", " +
-                        mnFkUserInsertId + ", " +
-                        mnFkUserUpdateId + ", " +
-                        "NOW()" + ", " +
-                        "NOW()" + " " +
-                        ")";
+                // bizarre, but member moConnection should have been previously set:
 
                 try (Statement statement = connection.createStatement()) {
+                    int logId = 0;
+                    String sql = "SELECT COALESCE(MAX(id_log), 0) + 1 "
+                            + "FROM " + schema + "." + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " "
+                            + "WHERE id_emp = " + mnPkEmployeeId + " ";
+                    
+                    ResultSet resultSet = statement.executeQuery(sql);
+                    if (resultSet.next()) {
+                        logId = resultSet.getInt(1);
+                    }
+
+                    sql = "INSERT INTO " + schema + "." + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " VALUES (" +
+                            mnPkEmployeeId + ", " +
+                            logId + ", " +
+                            "'" + SLibUtils.DbmsDateFormatDate.format(mtLastHireDate) + "', " +
+                            "'" + msLastHireNotes + "', " +
+                            (mtLastDismissalDate_n == null ? "NULL ," : "'" + SLibUtils.DbmsDateFormatDate.format(mtLastDismissalDate_n) + "', ") +
+                            "'" + msLastDismissalNotes + "', " +
+                            (mbIsHire ? 1 : 0) + ", " +
+                            (mbDeleted ? 1 : 0) + ", " +
+                            mnFkDismissalType + ", " +
+                            mnFkUserInsertId + ", " +
+                            mnFkUserUpdateId + ", " +
+                            "NOW()" + ", " +
+                            "NOW()" + " " +
+                            ")";
+
                     statement.execute(sql);
 
                     // insert employee membership into current company:
@@ -194,7 +205,7 @@ public class SHrsEmployeeHireLog {
                 }
             }
             else {
-                // bizarre, but member moSession should be instantiated:
+                // bizarre, but member moSession should have been previously set:
 
                 SDbEmployee employee = null;
                 SDbEmployeeHireLog oldEmployeeHireLog = null;
@@ -260,6 +271,7 @@ public class SHrsEmployeeHireLog {
                     }
 
                     newEmployeeHireLog.setPkEmployeeId(mnPkEmployeeId);
+                    
                     if (mbIsHire) {
                         if (mbIsAuxCorrection) {
                             newEmployeeHireLog.setDateDismissal_n(mtLastDismissalDate_n);
@@ -312,11 +324,16 @@ public class SHrsEmployeeHireLog {
 
             accounting.setAccountingType(SModSysConsts.HRSS_TP_ACC_EMP);
             accounting.setPkReferenceId(mnPkEmployeeId);
-            accounting.setFkUserInsertId(mnFkUserInsertId);
-            accounting.setFkUserUpdateId(mnFkUserUpdateId);
             
-            accounting.setAuxFormerEmployerConnection(moAuxFormerEmployerConnection);
-
+            if (mnFkUserInsertId == SUtilConsts.USR_NA_ID && mnFkUserUpdateId != SUtilConsts.USR_NA_ID) {
+                accounting.setFkUserInsertId(mnFkUserUpdateId);
+                accounting.setFkUserUpdateId(SUtilConsts.USR_NA_ID);
+            }
+            else {
+                accounting.setFkUserInsertId(mnFkUserInsertId);
+                accounting.setFkUserUpdateId(SUtilConsts.USR_NA_ID);
+            }
+            
             accounting.save();
         }
         

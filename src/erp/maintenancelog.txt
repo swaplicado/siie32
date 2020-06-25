@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 164.4/ 2020-06-24
+Sergio Abraham FLORES GUTIERREZ
+--------------------------------------------------------------------------------
+1) Corrección a la funcionalidad de sustutución patronal puesto que no hacía las inserciones de configuraciones de contabilización de percepciones y deducciones por empleado en la base de datos correcta.
+
+================================================================================
 SIIE 3.2 164.3/ 2020-06-23
 Sergio Abraham FLORES GUTIERREZ
 --------------------------------------------------------------------------------
