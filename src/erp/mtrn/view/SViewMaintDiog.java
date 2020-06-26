@@ -528,10 +528,10 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 "INNER JOIN trn_maint_user_supv AS supv ON iog.fid_maint_user_supv = supv.id_maint_user_supv ";
                 if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
                    msSql +=  "INNER JOIN trn_diog_ety AS ioge ON ioge.id_year = iog.id_year AND ioge.id_doc = iog.id_doc " +
-                            "INNER JOIN trn_diog_nts AS iogn ON iogn.id_year = iog.id_year AND iogn.id_doc = iog.id_doc " +
-                            "INNER JOIN erp.itmu_item AS i ON i.id_item = ioge.fid_item " +
-                            "INNER JOIN erp.itmu_unit AS unit ON unit.id_unit = ioge.fid_unit " +
-                            "INNER JOIN trn_maint_area AS maint ON maint.id_maint_area = ioge.fid_maint_area ";
+                           "INNER JOIN erp.itmu_item AS i ON i.id_item = ioge.fid_item " +
+                           "INNER JOIN erp.itmu_unit AS unit ON unit.id_unit = ioge.fid_unit " +
+                           "INNER JOIN trn_maint_area AS maint ON maint.id_maint_area = ioge.fid_maint_area " +
+                           "LEFT JOIN trn_diog_nts AS iogn ON iogn.id_year = iog.id_year AND iogn.id_doc = iog.id_doc ";
                 }
                 msSql += "INNER JOIN erp.usru_usr AS un ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_new = un.id_usr " +
                 "INNER JOIN erp.usru_usr AS ue ON " + (mnTabTypeAux02 == SUtilConsts.PER_DOC ? "iog" : "ioge") + ".fid_usr_edit = ue.id_usr " +
