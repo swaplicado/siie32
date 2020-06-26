@@ -712,7 +712,7 @@ public class SModuleHrs extends SGuiModule {
                 settings = new SGuiCatalogueSettings("Empleado", 1);
                 sql = "SELECT e.id_emp AS " + SDbConsts.FIELD_ID + "1, bp.bp AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " AS e "
-                        + (params == null || params.getType() == SGuiConsts.PARAM_REGS_ACT ? 
+                        + ((params == null || params.getType() == SGuiConsts.PARAM_REGS_ACT) && subtype != SModConsts.TRN_MAINT_USER ? 
                         "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_MEMBER) + " AS em ON e.id_emp = em.id_emp " :
                         "")
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON e.id_emp = bp.id_bp "
