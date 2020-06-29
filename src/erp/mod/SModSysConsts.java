@@ -798,7 +798,6 @@ public abstract class SModSysConsts {
     public static final int LOGS_INC_DES = 23;
     public static final int LOGS_INC_DEQ = 24;
     public static final int LOGS_INC_LAB = 101;
-    public static final int LOGS_INC_CTE = 102;
 
     public static final int FIELD_MONTH_JANUARY = 1;
     public static final int FIELD_MONTH_FEBRUARY = 2;
