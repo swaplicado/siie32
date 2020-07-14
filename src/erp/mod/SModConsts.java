@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Claudio Peña, Sergio Flores, Isabel Servín
  */
 public abstract class SModConsts {
 
@@ -186,6 +186,7 @@ public abstract class SModConsts {
     public static final int ITMU_ITEM_BARC = 1052007;
     public static final int ITMU_CFG_ITEM_LAN = 1052008;
     public static final int ITMU_CFG_ITEM_BP = 1052009;
+    public static final int ITMU_MATCH_ITEM_CPT_BP = 1052021;
 
     public static final int ITMU_TP_LEV = 1052501;
     public static final int ITMU_TP_UNIT = 1052502;
@@ -825,6 +826,7 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_ITEM_BARC, "erp.itmu_item_barc");
         TablesMap.put(ITMU_CFG_ITEM_LAN, "erp.itmu_cfg_item_lan");
         TablesMap.put(ITMU_CFG_ITEM_BP, "erp.itmu_cfg_item_bp");
+        TablesMap.put(ITMU_MATCH_ITEM_CPT_BP, "erp.itmu_match_item_cpt_bp");
 
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
         TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");

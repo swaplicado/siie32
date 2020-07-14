@@ -8,6 +8,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
@@ -16,7 +17,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Isabel Servín
  */
 public abstract class SBpsUtils {
 
@@ -100,12 +101,13 @@ public abstract class SBpsUtils {
     
     /**
      * Get business partner ID by fiscal ID and business partner category.
-     * @param session GUI session.
-     * @param fiscalId String
-     * @param bizPartnerCategory int
-     * @return 
+     * @param statement Statement of database connection.
+     * @param fiscalId Fiscal ID of business partner.
+     * @param fiscalForeignId Foreign fiscal ID of business partner.
+     * @param bizPartnerCategory Business parter category (constants defined in SDataConstantsSys.BPSS_CT_BP_...) Can be zero to omit filtering in query.
+     * @return Business partner ID when found, otherwise zero.
      */
-    public static int getBizParterIdByFiscalId(final SGuiSession session, final String fiscalId, final int bizPartnerCategory) {
+    public static int getBizParterIdByFiscalId(final Statement statement, final String fiscalId, final String fiscalForeignId, final int bizPartnerCategory) {
         String sql = "";
         ResultSet resultSet = null;
         int bizPartnerId = 0;
@@ -113,9 +115,11 @@ public abstract class SBpsUtils {
         try {
             sql = "SELECT b.id_bp FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b "
                   + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON b.id_bp = bc.id_bp "  
-                  + "WHERE b.fiscal_id = '" + fiscalId + "' AND bc.id_ct_bp = " + bizPartnerCategory + " ";
+                  + "WHERE b.fiscal_id = '" + fiscalId + "' "
+                  + (bizPartnerCategory != 0 ? "AND bc.id_ct_bp = " + bizPartnerCategory + " " : "")
+                  + (!"".equals(fiscalForeignId) ? "AND b.fiscal_id = '" + fiscalForeignId + "' " : "") ;
             
-            resultSet = session.getStatement().executeQuery(sql);
+            resultSet = statement.executeQuery(sql);
             if (resultSet.next()) {
                 bizPartnerId = resultSet.getInt(1);
             }

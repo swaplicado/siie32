@@ -1,4 +1,17 @@
 ================================================================================
+SIIE 3.2 169.0/ 2020-07-14
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Implementación de un nuevo option picker para el tipo de operación en las clases erp.form.SFormOptionPicker y erp.data.SDataReadTableRows.
+2) Implementación del visor de CFDI.
+3) Implementación de dos nuevos botones en la vista de documentos, para facturas de compras, para importar un CFDI desde su XML.
+4) Creación de la clase erp.mtrn.data.cfd.SCfdRenderer y los formularios erp.mtrn.form.SDialogCfdiImport y erp.mtrn.form.SDialogCfdiPurchaseOrder
+    para el empate de los conceptos de un CFDI con los conceptos de SIIE, asi como opcionalmente con su orden de compra.
+5) Creación de la clase erp.mitm.data.SDataMatchingItemBizPartnerConcept con el objetivo de manejar la información de estos empates.
+6) Creación de la clase erp.mitm.data.SItemUtilities.
+7) Refactorización general del código fuente.
+
+================================================================================
 SIIE 3.2 163.3/ 2020-04-02
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

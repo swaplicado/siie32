@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores, Isabel Servín
  */
 public abstract class SDataConstants {
 
@@ -554,6 +554,7 @@ public abstract class SDataConstants {
     public static final int TRNX_TP_DPS = 207606;
     public static final int TRNX_SAL_PUR_TOT = 207607;
     public static final int TRNX_SAL_PUR_GLB = 207608;
+    public static final int TRNX_OPE_TYPE = 207609;
     // XXX
 
     public static final int TRNX_MFG_ORD = 207620;

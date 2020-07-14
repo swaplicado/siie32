@@ -10,6 +10,7 @@ import erp.data.SDataConstantsSys;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mitm.data.SItemUtilities;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.STrnConsts;
 import java.sql.CallableStatement;
@@ -427,7 +428,7 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setDbmsItemRef_n(java.lang.String s) { msDbmsItemRef_n = s; }
     public void setDbmsItemBrandId(int n) { mnDbmsItemBrandId = n; }
     public void setDbmsItemBrand(java.lang.String s) { msDbmsItemBrand = s; }
-    public void setDbmsItemClaveProdServ (java.lang.String s) { msDbmsItemClaveProdServ = s; }
+    public void setDbmsItemClaveProdServ(java.lang.String s) { msDbmsItemClaveProdServ = s; }
     public void setDbmsUnidadClave(java.lang.String s) { msDbmsUnidadClave = s; }
     public void setDbmsOriginalUnidadClave(java.lang.String s) { msDbmsOriginalUnidadClave = s; }
     public void setDbmsTariff(java.lang.String s) { msDbmsTariff = s; }
@@ -917,16 +918,8 @@ public class SDataDpsEntry extends erp.lib.data.SDataRegistry implements java.io
                 statementAux = statement.getConnection().createStatement();
                 
                 // Read code SAT item:
-
-                sql = "SELECT code FROM erp.itms_cfd_prod_serv " +
-                        "WHERE id_cfd_prod_serv = " + (nCveProdSerItem_n == SLibConstants.UNDEFINED ? nCveProdSerIgen : nCveProdSerItem_n) + " ";
                 
-                resultSet = statementAux.executeQuery(sql);
-                if (resultSet.next()) {
-                    msDbmsItemClaveProdServ = resultSet.getString("code");
-                }
-                
-                statementAux = statement.getConnection().createStatement();
+                msDbmsItemClaveProdServ = SItemUtilities.getClaveProdServ(statementAux, nCveProdSerItem_n != 0 ? nCveProdSerItem_n : nCveProdSerIgen);
 
                 // Read aswell entry notes:
 

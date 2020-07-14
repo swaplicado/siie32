@@ -43,6 +43,8 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerAddressee;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCertificate;
+import erp.mfin.data.SDataTax;
+import erp.mfin.data.diot.SDiotConsts;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mloc.data.SLocUtils;
 import erp.mmkt.data.SDataCustomerBranchConfig;
@@ -111,7 +113,7 @@ import views.core.soap.services.apps.UUIDS;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Alfredo Pérez, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Alfredo Pérez, Claudio Peña, Sergio Flores, Isabel Servín
  * 
  * Maintenance Log:
  * 2018-01-02, Sergio Flores:
@@ -2468,7 +2470,14 @@ public abstract class SCfdUtils implements Serializable {
         return calendar.getTime();
     }
 
-    public static boolean validateEmisorXmlExpenses(final SClientInterface client, final String fileXml) throws Exception {
+    /**
+     * 
+     * @param client
+     * @param cfdiFilePath
+     * @return
+     * @throws Exception 
+     */
+    public static boolean validateCfdiReceptor(final SClientInterface client, final String cfdiFilePath) throws Exception {
         DocumentBuilder docBuilder = null;
         Document doc = null;
         Node node = null;
@@ -2477,10 +2486,10 @@ public abstract class SCfdUtils implements Serializable {
         String xml = "";
         
         try {
-            xml = SXmlUtils.readXml(fileXml);
+            xml = SXmlUtils.readXml(cfdiFilePath);
         } 
         catch(Exception e) {
-            throw new Exception("El XML no es válido");
+            throw new Exception("El CFDI proporcionado es inválido:\n" + e.getMessage());
         }
         
         docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -2511,15 +2520,15 @@ public abstract class SCfdUtils implements Serializable {
 
                 }
             }
-                          
+            
             if (client.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId().compareTo(receptorXml) != 0) {
-                throw new Exception("El receptor del archivo XML no es la empresa '" + client.getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner() + "'.");
+                throw new Exception("El receptor del comprobante no es la empresa '" + client.getSessionXXX().getCompany().getDbmsDataCompany().getBizPartner() + "'.");
             }
         }
         
         return true;
     }
-
+    
     public static boolean existsCfdiPending(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
         if (cfds != null) {
             for (SDataCfd cfd : cfds) {
@@ -2651,7 +2660,7 @@ public abstract class SCfdUtils implements Serializable {
                     case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
                         cfdPrint.printCfdi32(cfd, printMode, dps);
                         break;
-                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33:
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33://
                         cfdPrint.printCfdi33(cfd, printMode, dps);
                         break;
                     default:
@@ -2697,6 +2706,7 @@ public abstract class SCfdUtils implements Serializable {
         }
         else {
             if (canPrint(cfd, isSaveInProcess)) {
+                //
                 computePrintCfd(client, cfd, cfdSubtype, printMode, numberCopies);
             }
         }
@@ -3999,6 +4009,127 @@ public abstract class SCfdUtils implements Serializable {
         validateCorrectnessXml(comprobante);
 
         return comprobante;
+    }
+    
+    /**
+     * Obtiene el impuesto trasladado de SIIE a partir de un ConceptoImpuestoTraslado obtenido de un CFDI.
+     * @param client Cliente SIIE.
+     * @param traslado Impuesto trasladado del CFDI.
+     * @return Una instancia de la clase <code>erp.mfin.data.SDataTax</code>.
+     * @throws Exception 
+     */
+    public static erp.mfin.data.SDataTax obtainTaxCharged(final erp.client.SClientInterface client, final cfd.ver33.DElementConceptoImpuestoTraslado traslado) throws Exception {
+        int cfdTaxId = 0;
+        
+        switch (traslado.getAttImpuesto().getString()) {
+            case DCfdi33Catalogs.IMP_IVA:
+                cfdTaxId = SModSysConsts.FINS_CFD_TAX_IVA;
+                break;
+            case DCfdi33Catalogs.IMP_ISR:
+                cfdTaxId = SModSysConsts.FINS_CFD_TAX_ISR;
+                break;
+            case DCfdi33Catalogs.IMP_IEPS:
+                throw new Exception("El impuesto trasladado en el concepto no está soportado: '" + traslado.getAttImpuesto().getString() + "'.");
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n"
+                        + "El impuesto trasladado en el concepto es desconocido: '" + traslado.getAttImpuesto().getString() + "'.");
+        }
+        
+        String vatType = "";
+        
+        switch (traslado.getAttTipoFactor().getString()) {
+            case DCfdi33Catalogs.FAC_TP_TASA:
+                break;
+            case DCfdi33Catalogs.FAC_TP_CUOTA:
+                throw new Exception("El tipo de factor del impuesto trasladado en el concepto no está soportado: '" + traslado.getAttTipoFactor().getString() + "'.");
+            case DCfdi33Catalogs.FAC_TP_EXENTO:
+                vatType = SDiotConsts.VAT_TYPE_EXEMPT;
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n"
+                        + "El tipo de factor del impuesto trasladado en el concepto es desconocido: '" + traslado.getAttTipoFactor().getString() + "'.");
+        }
+        
+        SDataTax tax = null;
+        
+        String sql = "SELECT t.id_tax_bas, t.id_tax "
+                + "FROM erp.finu_tax AS t "
+                + "INNER JOIN erp.finu_tax_bas AS tb ON tb.id_tax_bas = t.id_tax_bas "
+                + "WHERE NOT t.b_del AND NOT tb.b_del AND "
+                + "tb.fid_cfd_tax = " + cfdTaxId + " AND " + (vatType.isEmpty() ? "NOT t.vat_type = '" + SDiotConsts.VAT_TYPE_EXEMPT 
+                + "' AND " : "t.vat_type = '" + vatType + "' AND ")
+                + "ROUND(t.per, 4) = " + SLibUtils.DecimalFormatValue4D.format(traslado.getAttTasaOCuota().getDouble()) + " AND "
+                + "t.fid_tp_tax = " + SModSysConsts.FINS_TP_TAX_CHARGED + ";";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()){
+                int[] key = new int[] { resultSet.getInt("t.id_tax_bas"), resultSet.getInt("t.id_tax") };
+                tax = new SDataTax();
+                tax.read(key, client.getSession().getStatement());
+            }
+        }
+        
+        return tax;
+    }
+    
+    /**
+     * Obtiene impuesto retenido de SIIE a partir de un ConceptoImpuestoRetencion obtenido de un CFDI.
+     * @param client Cliente SIIE.
+     * @param retención Impuesto retenido del CFDI.
+     * @return Una instancia de la clase <code>erp.mfin.data.SDataTax</code>.
+     * @throws Exception 
+     */
+    public static erp.mfin.data.SDataTax obtainTaxRetained(final erp.client.SClientInterface client, final cfd.ver33.DElementConceptoImpuestoRetencion retención) throws Exception {
+        int cfdTaxId = 0;
+        
+        switch (retención.getAttImpuesto().getString()) {
+            case DCfdi33Catalogs.IMP_IVA:
+                cfdTaxId = SModSysConsts.FINS_CFD_TAX_IVA;
+                break;
+            case DCfdi33Catalogs.IMP_ISR:
+                cfdTaxId = SModSysConsts.FINS_CFD_TAX_ISR;
+                break;
+            case DCfdi33Catalogs.IMP_IEPS:
+                throw new Exception("El impuesto trasladado en el concepto no está soportado: '" + retención.getAttImpuesto().getString() + "'.");
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n"
+                        + "El impuesto trasladado en el concepto es desconocido: '" + retención.getAttImpuesto().getString() + "'.");
+        }
+        
+        String vatType = "";
+        
+        switch (retención.getAttTipoFactor().getString()) {
+            case DCfdi33Catalogs.FAC_TP_TASA:
+                break;
+            case DCfdi33Catalogs.FAC_TP_CUOTA:
+                throw new Exception("El tipo de factor del impuesto trasladado en el concepto no está soportado: '" + retención.getAttTipoFactor().getString() + "'.");
+            case DCfdi33Catalogs.FAC_TP_EXENTO:
+                vatType = SDiotConsts.VAT_TYPE_EXEMPT;
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\n"
+                        + "El tipo de factor del impuesto trasladado en el concepto es desconocido: '" + retención.getAttTipoFactor().getString() + "'.");
+        }
+        
+        SDataTax tax = null;
+        
+        String sql = "SELECT t.id_tax_bas, t.id_tax "
+                + "FROM erp.finu_tax AS t "
+                + "INNER JOIN erp.finu_tax_bas AS tb ON tb.id_tax_bas = t.id_tax_bas "
+                + "WHERE NOT t.b_del AND NOT tb.b_del AND "
+                + "tb.fid_cfd_tax = " + cfdTaxId + " AND " + (vatType.isEmpty() ? "" : "t.vat_type = '" + vatType + "' AND ")
+                + "ROUND(t.per, 4) = " + SLibUtils.DecimalFormatValue4D.format(retención.getAttTasaOCuota().getDouble()) + " AND "
+                + "t.fid_tp_tax = " + SModSysConsts.FINS_TP_TAX_RETAINED + ";";
+        
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()){
+                int[] key = new int[] { resultSet.getInt("t.id_tax_bas"), resultSet.getInt("t.id_tax") };
+                tax = new SDataTax();
+                tax.read(key, client.getSession().getStatement());
+            }
+        }
+        
+        return tax;
     }
     
     /**
