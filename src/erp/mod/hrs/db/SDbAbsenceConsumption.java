@@ -175,7 +175,6 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         ResultSet resultSet = null;
-        SDbAbsence absence = null;
 
         initRegistry();
         initQueryMembers();
@@ -204,6 +203,8 @@ public class SDbAbsenceConsumption extends SDbRegistryUser implements SGridRow {
             // Read parent registry:
             
             moParentAbsence = (SDbAbsence) session.readRegistry(SModConsts.HRS_ABS, new int[] { mnPkEmployeeId, mnPkAbsenceId });
+            
+            this.mbAuxIsClockSourced = moParentAbsence.isTimeClockSourced();
             
             mbRegistryNew = false;
         }

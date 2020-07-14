@@ -58,6 +58,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCfgHoliday;
     private javax.swing.JMenuItem jmiCfgCutoffCalendar;
     private javax.swing.JMenuItem jmiCfgWorkingDaySettings;
+    private javax.swing.JMenuItem jmiCfgConditionalEarning;
     private javax.swing.JMenu jmCfgBkkEarning;
     private javax.swing.JMenuItem jmiCfgBkkEarningGlobal;
     private javax.swing.JMenuItem jmiCfgBkkEarningDepartament;
@@ -111,6 +112,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiPayPayrollWeeklyRec;
     private javax.swing.JMenuItem jmiPayPayrollFortnightly;
     private javax.swing.JMenuItem jmiPayPayrollFortnightlyRowRec;
+    private javax.swing.JMenuItem jmiPayPayrollRecImportedEarnings;
     private javax.swing.JMenuItem jmiPayCfdiPayroll;
     private javax.swing.JMenuItem jmiPayCfdiPayrollRec;
     private javax.swing.JMenu jmPayCfdi;
@@ -176,6 +178,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgHoliday = new JMenuItem("Días feriados");
         jmiCfgCutoffCalendar = new JMenuItem("Calendario fechas de corte");
         jmiCfgWorkingDaySettings = new JMenuItem("Días laborables");
+        jmiCfgConditionalEarning = new JMenuItem("Percepciones cond.");
         jmCfgBkkEarning = new JMenu("Configuración contable de percepciones");
         jmiCfgBkkEarningGlobal = new JMenuItem("Globales");
         jmiCfgBkkEarningDepartament = new JMenuItem("Por departamento");
@@ -201,6 +204,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCfg.add(jmiCfgHoliday);
         jmCfg.add(jmiCfgCutoffCalendar);
         jmCfg.add(jmiCfgWorkingDaySettings);
+        jmCfg.add(jmiCfgConditionalEarning);
         jmCfg.addSeparator();
         jmCfgBkkEarning.add(jmiCfgBkkEarningGlobal);
         jmCfgBkkEarning.add(jmiCfgBkkEarningDepartament);
@@ -302,6 +306,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayPayrollWeeklyRec = new JMenuItem("Recibos de nóminas semanales");
         jmiPayPayrollFortnightly = new JMenuItem("Nóminas quincenales");
         jmiPayPayrollFortnightlyRowRec = new JMenuItem("Recibos de nóminas quincenales");
+        jmiPayPayrollRecImportedEarnings = new JMenuItem("Percepciones semanales importadas");
         jmiPayCfdiPayroll = new JMenuItem("CFDI de nóminas");
         jmiPayCfdiPayrollRec = new JMenuItem("CFDI de recibos de nóminas");
         jmPayCfdi = new JMenu("Comprobantes fiscales digitales");
@@ -327,6 +332,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.addSeparator();
         jmPay.add(jmiPayPayrollFortnightly);
         jmPay.add(jmiPayPayrollFortnightlyRowRec);
+        jmPay.addSeparator();
+        jmPay.add(jmiPayPayrollRecImportedEarnings);
         jmPay.addSeparator();
         jmPay.add(jmiPayCfdiPayroll);
         jmPay.add(jmiPayCfdiPayrollRec);
@@ -418,6 +425,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgHoliday.addActionListener(this);
         jmiCfgCutoffCalendar.addActionListener(this);
         jmiCfgWorkingDaySettings.addActionListener(this);
+        jmiCfgConditionalEarning.addActionListener(this);
         jmiCfgBkkEarningGlobal.addActionListener(this);
         jmiCfgBkkEarningDepartament.addActionListener(this);
         jmiCfgBkkEarningEmployee.addActionListener(this);
@@ -466,6 +474,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayPayrollWeeklyRec.addActionListener(this);
         jmiPayPayrollFortnightly.addActionListener(this);
         jmiPayPayrollFortnightlyRowRec.addActionListener(this);
+        jmiPayPayrollRecImportedEarnings.addActionListener(this);
         jmiPayCfdiPayroll.addActionListener(this);
         jmiPayCfdiPayrollRec.addActionListener(this);
         jmiPayCfdiStampSign.addActionListener(this);
@@ -516,6 +525,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgHoliday.setEnabled(true);
         jmiCfgCutoffCalendar.setEnabled(true);
         jmiCfgWorkingDaySettings.setEnabled(true);
+        jmiCfgConditionalEarning.setEnabled(true);
         jmiCfgConfig.setEnabled(true);
         jmCfgBkkEarning.setEnabled(true);
         jmiCfgBkkEarningGlobal.setEnabled(true);
@@ -577,6 +587,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayPayrollWeeklyRec.setEnabled(isPermissionPay || isPermissionPayWee);
         jmiPayPayrollFortnightly.setEnabled(isPermissionPay || isPermissionPayFor);
         jmiPayPayrollFortnightlyRowRec.setEnabled(isPermissionPay || isPermissionPayFor);
+        jmiPayPayrollRecImportedEarnings.setEnabled(isPermissionPay || isPermissionPayFor);
         jmiPayCfdiPayroll.setEnabled(isPermissionPay);
         jmiPayCfdiPayrollRec.setEnabled(isPermissionPay);
         jmPayCfdi.setEnabled(isPermissionPay);
@@ -835,6 +846,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCfgWorkingDaySettings) {
                 miClient.getSession().showView(SModConsts.HRS_WDS, SLibConsts.UNDEFINED, null);
             }
+            else if (item == jmiCfgConditionalEarning) {
+                miClient.getSession().showView(SModConsts.HRS_COND_EAR, SLibConsts.UNDEFINED, null);
+            }
             else if (item == jmiCfgBkkEarningGlobal) {
                 miClient.getSession().showView(SModConsts.HRS_ACC_EAR, SModSysConsts.HRSS_TP_ACC_GBL, null);
             }
@@ -969,6 +983,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiPayPayrollFortnightlyRowRec) {
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP, SModSysConsts.HRSS_TP_PAY_FOR, null);
+            }
+            else if (item == jmiPayPayrollRecImportedEarnings) {
+                miClient.getSession().showView(SModConsts.HRS_PAY_RCP_IMPORT, SModSysConsts.HRSS_TP_PAY_WEE, null);
             }
             else if (item == jmiPayCfdiPayroll) {
                 miClient.getSession().showView(SModConsts.HRS_SIE_PAY, SModConsts.VIEW_SC_SUM, new SGuiParams(SCfdConsts.CFDI_PAYROLL_VER_CUR));

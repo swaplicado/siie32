@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 164.8/ 2020-07-14
+Edwin CARMONA
+--------------------------------------------------------------------------------
+1) Obtención de información de CAP para calcular vales y bonos automáticamente.
+2) Obtención de información de CAP para realizar prenómina.
+3) Vista de percepciones determinadas por reloj checador.
+4) Modificación a la forma de captura de nóminas para integración de proceso de cálculo de prenómina y vales.
+5) Bitácoras de importación de prenómina y vales en formato JSON y CSV.
+
+================================================================================
 SIIE 3.2 164.7/ 2020-06-29
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------

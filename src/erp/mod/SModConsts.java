@@ -610,6 +610,7 @@ public abstract class SModConsts {
     public static final int HRSS_TP_DIS = 2061075;
     public static final int HRSS_TP_DAY = 2061081;
     public static final int HRSS_BANK = 2061091;
+    public static final int HRSS_BONUS = 2061093;
     public static final int HRSS_GROCERY_SRV = 2061096;
 
     public static final int HRSU_CL_ABS = 2062001;
@@ -655,12 +656,14 @@ public abstract class SModConsts {
     public static final int HRS_ABS_CNS = 2063102;
     public static final int HRS_EAR = 2063111;
     public static final int HRS_DED = 2063112;
+    public static final int HRS_COND_EAR = 2063120;
     public static final int HRS_AUT_EAR = 2063121;
     public static final int HRS_AUT_DED = 2063122;
     public static final int HRS_ACC_EAR = 2063131;
     public static final int HRS_ACC_DED = 2063132;
     public static final int HRS_PAY = 2063201;
     public static final int HRS_PAY_RCP = 2063211;
+    public static final int HRS_PAY_RCP_IMPORT = 2063215;
     public static final int HRS_PAY_RCP_ISS = 2063216;
     public static final int HRS_PAY_RCP_DAY = 2063221;
     public static final int HRS_PAY_RCP_EAR = 2063231;
@@ -1179,6 +1182,7 @@ public abstract class SModConsts {
         TablesMap.put(HRSS_TP_DIS, "erp.hrss_tp_dis");
         TablesMap.put(HRSS_TP_DAY, "erp.hrss_tp_day");
         TablesMap.put(HRSS_BANK, "erp.hrss_bank");
+		TablesMap.put(HRSS_BONUS, "erp.hrss_bonus");
         TablesMap.put(HRSS_GROCERY_SRV, "erp.hrss_grocery_srv");
 
         TablesMap.put(HRSU_CL_ABS, "erp.hrsu_cl_abs");
@@ -1224,6 +1228,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_ABS_CNS, "hrs_abs_cns");
         TablesMap.put(HRS_EAR, "hrs_ear");
         TablesMap.put(HRS_DED, "hrs_ded");
+        TablesMap.put(HRS_COND_EAR, "hrs_cond_ear");
         TablesMap.put(HRS_AUT_EAR, "hrs_aut_ear");
         TablesMap.put(HRS_AUT_DED, "hrs_aut_ded");
         TablesMap.put(HRS_ACC_EAR, "hrs_acc_ear");

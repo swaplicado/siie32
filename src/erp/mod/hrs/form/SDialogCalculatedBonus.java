@@ -6,15 +6,14 @@ package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbAbsence;
-import erp.mod.hrs.db.SHrsConsts;
-import erp.mod.hrs.db.SRowTimeClock;
-import erp.mod.hrs.db.SRowPayrollEmployee;
-import erp.mod.hrs.link.utils.SPrepayrollRow;
+import erp.mod.hrs.db.SRowBonus;
 import erp.mod.hrs.link.utils.SUtilsJSON;
+import erp.mod.hrs.utils.SEarnConfiguration;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -33,23 +32,22 @@ import sa.lib.gui.bean.SBeanFormDialog;
  *
  * @author Edwin Carmona
  */
-public class SDialogTimeClockImport extends SBeanFormDialog {
+public class SDialogCalculatedBonus extends SBeanFormDialog {
     protected SDbAbsence moAbsence;
-    private SGridPaneForm moGridImportedRows;
-    private List<SPrepayrollRow> lPpRows;
-    private HashMap<Integer, SRowPayrollEmployee> lReceiptRows;
-    private ArrayList<SRowTimeClock> lGridRows;
+    private SGridPaneForm moGridBonusRows;
+    private HashMap<Integer, ArrayList<SEarnConfiguration>> lBonusConfigRows;
+    private ArrayList<SRowBonus> lGridRows;
     private String msStartDate;
     private String msEndDate;
     private String msCompanyKey;
-    private int mnPrepayrollMode;
+    private String msBonus;
 
     /**
      * Creates new form SDialogAbsenceMovesCardex
      * @param client
      * @param title
      */
-    public SDialogTimeClockImport(SGuiClient client, String title) {
+    public SDialogCalculatedBonus(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.HRSX_IMPORT_CAP, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -69,9 +67,10 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
         jPanel10 = new javax.swing.JPanel();
         jlDateStart = new javax.swing.JLabel();
         moTextDateStart = new sa.lib.gui.bean.SBeanFieldText();
-        jlDummy = new javax.swing.JLabel();
         jlDateEnd = new javax.swing.JLabel();
         moTextDateEnd = new sa.lib.gui.bean.SBeanFieldText();
+        jlBonus = new javax.swing.JLabel();
+        moTextBonus = new sa.lib.gui.bean.SBeanFieldText();
         jPanel6 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jlCutoffDay = new javax.swing.JLabel();
@@ -98,20 +97,28 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
         jlDateStart.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel10.add(jlDateStart);
 
+        moTextDateStart.setEditable(false);
         moTextDateStart.setText("sBeanFieldText7");
         moTextDateStart.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel10.add(moTextDateStart);
-
-        jlDummy.setPreferredSize(new java.awt.Dimension(80, 23));
-        jPanel10.add(jlDummy);
 
         jlDateEnd.setText("Fecha final:");
         jlDateEnd.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jlDateEnd);
 
+        moTextDateEnd.setEditable(false);
         moTextDateEnd.setText("sBeanFieldText7");
         moTextDateEnd.setPreferredSize(new java.awt.Dimension(65, 23));
         jPanel10.add(moTextDateEnd);
+
+        jlBonus.setText("Bono a pagar:");
+        jlBonus.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel10.add(jlBonus);
+
+        moTextBonus.setEditable(false);
+        moTextBonus.setText("sBeanFieldText7");
+        moTextBonus.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel10.add(moTextBonus);
 
         jPanel4.add(jPanel10);
 
@@ -127,6 +134,7 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
         jlCutoffDay.setRequestFocusEnabled(false);
         jPanel11.add(jlCutoffDay);
 
+        moTextCutoffDay.setEditable(false);
         moTextCutoffDay.setText("sBeanFieldText1");
         jPanel11.add(moTextCutoffDay);
 
@@ -136,7 +144,7 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
 
         jPanel1.add(jPanel12, java.awt.BorderLayout.NORTH);
 
-        jpPrepayroll.setBorder(javax.swing.BorderFactory.createTitledBorder("Prenómina:"));
+        jpPrepayroll.setBorder(javax.swing.BorderFactory.createTitledBorder("Bonos:"));
         jpPrepayroll.setLayout(new java.awt.BorderLayout());
         jPanel1.add(jpPrepayroll, java.awt.BorderLayout.CENTER);
         jpPrepayroll.getAccessibleContext().setAccessibleName("Prenómina");
@@ -150,8 +158,8 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-        mnFormResult = SGuiConsts.FORM_RESULT_CANCEL;
         dispose();
+        mnFormResult = SGuiConsts.FORM_RESULT_CANCEL;
     }//GEN-LAST:event_closeDialog
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
@@ -160,11 +168,12 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JLabel jlBonus;
     private javax.swing.JLabel jlCutoffDay;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateStart;
-    private javax.swing.JLabel jlDummy;
     private javax.swing.JPanel jpPrepayroll;
+    private sa.lib.gui.bean.SBeanFieldText moTextBonus;
     private sa.lib.gui.bean.SBeanFieldText moTextCutoffDay;
     private sa.lib.gui.bean.SBeanFieldText moTextDateEnd;
     private sa.lib.gui.bean.SBeanFieldText moTextDateStart;
@@ -180,7 +189,7 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
         moTextDateEnd.setTextSettings(SGuiUtils.getLabelName(jlDateEnd.getText()), 25);
         moTextCutoffDay.setTextSettings(SGuiUtils.getLabelName(jlCutoffDay.getText()), 25);
 
-        moGridImportedRows = new SGridPaneForm(miClient, SModConsts.HRSX_ABS_MOV, SLibConsts.UNDEFINED, "Importación desde CAP") {
+        moGridBonusRows = new SGridPaneForm(miClient, SModConsts.HRSX_ABS_MOV, SLibConsts.UNDEFINED, "Importación desde CAP") {
             @Override
             public void initGrid() {
                 setRowButtonsEnabled(false);
@@ -192,17 +201,17 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
 
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Num", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Faltas", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Hr. Extra", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Domingos", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Festivos", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Descansos", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "Percepción", 100));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, "T. Bono", 100));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Monto", 100));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Con bono", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Comentarios", 200));
 
                 return gridColumnsForm;
             }
         };
 
-        jpPrepayroll.add(moGridImportedRows, BorderLayout.CENTER);
+        jpPrepayroll.add(moGridBonusRows, BorderLayout.CENTER);
         
         moTextDateStart.setEditable(false);
         moTextDateEnd.setEditable(false);
@@ -218,24 +227,29 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
         lGridRows = new ArrayList();
         
         try {
-            for (SPrepayrollRow ppRow : lPpRows) {
-                SRowTimeClock row = new SRowTimeClock();
+            for (Map.Entry<Integer, ArrayList<SEarnConfiguration>> entry : lBonusConfigRows.entrySet()) {
+                ArrayList<SEarnConfiguration> configs = entry.getValue();
                 
-                row.setEmployeeId(ppRow.getEmployee_id());
-                row.setNumEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getNumber());
-                row.setEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getName());
-                row.setAbsences(ppRow.getAbsences());
-                row.setExtraTime(mnPrepayrollMode == SHrsConsts.PPAYROLL_POL_LIMITED_DATA ? ppRow.getDouble_overtime(): ppRow.getTriple_overtime());
-                row.setSundays(ppRow.getSundays());
-                row.setDaysOff(ppRow.getDaysOff());
-                
-                rows.add(row);
-                lGridRows.add(row);
+                for (SEarnConfiguration sEarnConfiguration : configs) {
+                    SRowBonus row = new SRowBonus();
+                    
+                    row.setEmployeeId(entry.getKey());
+                    row.setNumEmployee(sEarnConfiguration.getNumEmployee());
+                    row.setEmployee(sEarnConfiguration.getEmployee());
+                    row.setEarning(sEarnConfiguration.getEarning());
+                    row.setBonus(sEarnConfiguration.getBonus());
+                    row.setAmount(sEarnConfiguration.getAmount());
+                    row.setHasBonus(sEarnConfiguration.isHasWon() > 0d);
+                    row.setComments(sEarnConfiguration.getComments());
+                    
+                    rows.add(row);
+                    lGridRows.add(row);
+                }
             }
 
-            moGridImportedRows.populateGrid(rows);
-            moGridImportedRows.clearSortKeys();
-            moGridImportedRows.setSelectedGridRow(0);
+            moGridBonusRows.populateGrid(rows);
+            moGridBonusRows.clearSortKeys();
+            moGridBonusRows.setSelectedGridRow(0);
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -291,12 +305,8 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void setlPpRows(List<SPrepayrollRow> lPpRows) {
-        this.lPpRows = lPpRows;
-    }
-
-    public void setlReceiptRows(HashMap<Integer, SRowPayrollEmployee> lReceiptRows) {
-        this.lReceiptRows = lReceiptRows;
+    public void setlReceiptRows(HashMap<Integer, ArrayList<SEarnConfiguration>> lBcRows) {
+        this.lBonusConfigRows = lBcRows;
     }
 
     public void setStartDate(String msStartDate) {
@@ -309,16 +319,13 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
         moTextDateEnd.setText(msEndDate);
     }
 
-    public ArrayList<SRowTimeClock> getlGridRows() {
-        return lGridRows;
-    }
-
-    public void setPrepayrollMode(int mnPrepayrollMode) {
-        this.mnPrepayrollMode = mnPrepayrollMode;
-    }
-
     public void setCompanyKey(String msCompanyKey) {
         this.msCompanyKey = msCompanyKey;
+    }
+
+    public void setBonus(String msBonus) {
+        this.msBonus = msBonus;
+        moTextBonus.setValue(this.msBonus);
     }
     
     public void setCutOffDay(int day) {
@@ -379,19 +386,20 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
                 if (save) {
                     List<String> dataLines = new ArrayList<>();
         
-                    for (SRowTimeClock lGridRow : lGridRows) {
-                        dataLines.add(lGridRow.getNumEmployee() + "," +
+                    for (SRowBonus lGridRow : lGridRows) {
+                        dataLines.add(lGridRow.getEmployeeId()+ "," +
+                                        lGridRow.getNumEmployee() + "," +
                                         lGridRow.getEmployee().replaceAll(",", "") + "," +
-                                        lGridRow.getAbsences() + "," +
-                                        lGridRow.getExtraTime() + "," +
-                                        lGridRow.getSundays() + "," +
-                                        lGridRow.getHolidays()
+                                        lGridRow.getEarning ()+ "," +
+                                        lGridRow.getBonus()+ "," +
+                                        lGridRow.getAmount()+ "," +
+                                        lGridRow.getComments().replaceAll(",", "")
                                                 );
                     }
 
-                    String fileHeader = "Num,Empleado,Faltas,Horas extra,Domingos,Festivos";
+                    String fileHeader = "idEmpleado,Num,Empleado,Percepcion,Bono,Monto,Comentarios";
 
-                    SUtilsJSON.writeCSV(msStartDate, msEndDate, dataLines, fileHeader, msCompanyKey, SUtilsJSON.PREPAYROLL);
+                    SUtilsJSON.writeCSV(msStartDate, msEndDate, dataLines, fileHeader, msCompanyKey, SUtilsJSON.VOUCHER);
                     
                     mnFormResult = SGuiConsts.FORM_RESULT_OK;
                     dispose();

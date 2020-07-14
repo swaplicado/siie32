@@ -50,6 +50,7 @@ public class SDbPayroll extends SDbRegistryUser {
     //protected boolean mbDeleted;
     protected int mnFkPaymentTypeId;
     protected int mnFkPaysheetTypeId;
+    protected int mnFkPaysheetCustomTypeId;
     protected int mnFkMwzTypeId;
     protected int mnFkMwzReferenceTypeId;
     protected int mnFkTaxComputationTypeId;
@@ -150,6 +151,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkPaymentTypeId(int n) { mnFkPaymentTypeId = n; }
     public void setFkPaysheetTypeId(int n) { mnFkPaysheetTypeId = n; }
+    public void setFkPaysheetCustomTypeId(int n) { mnFkPaysheetCustomTypeId = n; }
     public void setFkMwzTypeId(int n) { mnFkMwzTypeId = n; }
     public void setFkMwzReferenceTypeId(int n) { mnFkMwzReferenceTypeId = n; }
     public void setFkTaxComputationTypeId(int n) { mnFkTaxComputationTypeId = n; }
@@ -186,6 +188,7 @@ public class SDbPayroll extends SDbRegistryUser {
     public boolean isDeleted() { return mbDeleted; }
     public int getFkPaymentTypeId() { return mnFkPaymentTypeId; }
     public int getFkPaysheetTypeId() { return mnFkPaysheetTypeId; }
+    public int getFkPaysheetCustomTypeId() { return mnFkPaysheetCustomTypeId; }
     public int getFkMwzTypeId() { return mnFkMwzTypeId; }
     public int getFkMwzReferenceTypeId() { return mnFkMwzReferenceTypeId; }
     public int getFkTaxComputationTypeId() { return mnFkTaxComputationTypeId; }
@@ -320,6 +323,7 @@ public class SDbPayroll extends SDbRegistryUser {
         mbDeleted = false;
         mnFkPaymentTypeId = 0;
         mnFkPaysheetTypeId = 0;
+        mnFkPaysheetCustomTypeId = 0;
         mnFkMwzTypeId = 0;
         mnFkMwzReferenceTypeId = 0;
         mnFkTaxComputationTypeId = 0;
@@ -413,6 +417,7 @@ public class SDbPayroll extends SDbRegistryUser {
             mbDeleted = resultSet.getBoolean("p.b_del");
             mnFkPaymentTypeId = resultSet.getInt("p.fk_tp_pay");
             mnFkPaysheetTypeId = resultSet.getInt("fk_tp_pay_sht");
+            mnFkPaysheetCustomTypeId = resultSet.getInt("fk_tp_pay_sht_cus");
             mnFkMwzTypeId = resultSet.getInt("p.fk_tp_mwz");
             mnFkMwzReferenceTypeId = resultSet.getInt("p.fk_tp_mwz_ref");
             mnFkTaxComputationTypeId = resultSet.getInt("p.fk_tp_tax_comp");
@@ -496,6 +501,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     (mbDeleted ? 1 : 0) + ", " +
                     mnFkPaymentTypeId + ", " +
                     mnFkPaysheetTypeId + ", " +
+                    mnFkPaysheetCustomTypeId + ", " +
                     mnFkMwzTypeId + ", " +
                     mnFkMwzReferenceTypeId + ", " +
                     mnFkTaxComputationTypeId + ", " +
@@ -537,6 +543,7 @@ public class SDbPayroll extends SDbRegistryUser {
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_tp_pay = " + mnFkPaymentTypeId + ", " +
                     "fk_tp_pay_sht = " + mnFkPaysheetTypeId + ", " +
+                    "fk_tp_pay_sht_cus = " + mnFkPaysheetCustomTypeId + ", " +
                     "fk_tp_mwz = " + mnFkMwzTypeId + ", " +
                     "fk_tp_mwz_ref = " + mnFkMwzReferenceTypeId + ", " +
                     "fk_tp_tax_comp = " + mnFkTaxComputationTypeId + ", " +
@@ -601,6 +608,7 @@ public class SDbPayroll extends SDbRegistryUser {
         registry.setDeleted(this.isDeleted());
         registry.setFkPaymentTypeId(this.getFkPaymentTypeId());
         registry.setFkPaysheetTypeId(this.getFkPaysheetTypeId());
+        registry.setFkPaysheetCustomTypeId(this.getFkPaysheetCustomTypeId());
         registry.setFkMwzTypeId(this.getFkMwzTypeId());
         registry.setFkMwzReferenceTypeId(this.getFkMwzReferenceTypeId());
         registry.setFkTaxComputationTypeId(this.getFkTaxComputationTypeId());

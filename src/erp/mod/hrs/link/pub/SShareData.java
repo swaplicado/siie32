@@ -37,6 +37,8 @@ public class SShareData {
     
     public static String PATH_JSON_DIR = "prenomina/";
     public static String PATH_CSV_DIR = "prenomina/";
+    public static String PATH_JSON_DESP_DIR = "vales/";
+    public static String PATH_CSV_DESP_DIR = "vales/";
     
     public void setJsonConn(String sjon) {
         SMySqlClass.setJsonConn(sjon);
@@ -90,6 +92,7 @@ public class SShareData {
      * @throws java.sql.SQLException
      * @throws java.lang.ClassNotFoundException
      * @throws com.fasterxml.jackson.core.JsonProcessingException
+     * @throws erp.mod.hrs.link.db.SConfigException
 
      */
     public String getSiieData(String sLastSyncDate) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
@@ -100,7 +103,16 @@ public class SShareData {
         return SUtilsJSON.getData(sLastSyncDate);
     }
     
-    
+    /**
+     * 
+     * @param tStartDate
+     * @param tEndDate
+     * @param lEmployees
+     * @param payType
+     * @param dataType Policy for requesting information from external time clock: 1 = all; 2 = official; 3 = non-official
+     * @param companyKey
+     * @return 
+     */
     public SPrepayroll getCAPData(Date tStartDate, Date tEndDate, ArrayList<Integer> lEmployees, 
                                     int payType, int dataType, String companyKey) {
         try {
@@ -135,7 +147,7 @@ public class SShareData {
                 ObjectMapper mapper = new ObjectMapper();
                 SPrepayroll prepayroll = mapper.readValue(responseBody, SPrepayroll.class);
                 
-                SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey);
+                SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey, SUtilsJSON.PREPAYROLL);
                 
                 return prepayroll;
             }

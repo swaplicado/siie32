@@ -19,4 +19,5 @@ public class SRootJSON {
     ArrayList<SHoliday> holidays;
     ArrayList<SFirstDayYear> fdys;
     ArrayList<SAbsence> absences;
+    ArrayList<SPrepayCutCalendar> cuts;
 }

@@ -30,6 +30,9 @@ import java.util.logging.Logger;
  */
 public class SUtilsJSON {
     
+    public static final int VOUCHER = 1;
+    public static final int PREPAYROLL = 2;
+    
     /**
      * Consulta los elementos en la base de datos y los transforma a un 
      * objeto JSON
@@ -42,6 +45,7 @@ public class SUtilsJSON {
      * @throws java.sql.SQLException
      * @throws java.lang.ClassNotFoundException
      * @throws com.fasterxml.jackson.core.JsonProcessingException
+     * @throws erp.mod.hrs.link.db.SConfigException
      */
     public static String getData(String lastSyncDate) throws SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
             ObjectMapper mapper = new ObjectMapper();
@@ -57,25 +61,37 @@ public class SUtilsJSON {
             objResponse.holidays = sDb.getAllHolidays(lastSyncDate);
             objResponse.fdys = sDb.getAllFirstDayOfYear(lastSyncDate);
             objResponse.absences = sDb.getAllAbsences(lastSyncDate);
-            
-            // Java objects to JSON file
-            // mapper.writeValue(new File("c:\\test\\staff.json"), staff);
-            
-            // Java objects to JSON string - compact-print
-//            String jsonString = mapper.writeValueAsString(staff);
-//            System.out.println(jsonString);
+            objResponse.cuts = sDb.getAllCutsCalendar(lastSyncDate);
             
             // Java objects to JSON string - pretty-print
             String jsonInString2 = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(objResponse);
-//            System.out.println(jsonInString2);
             return jsonInString2;
     }
     
-    public static void writeJSON(String startDate, String endDate, String jsonString, String companyKey) {
+    /**
+     * Escribe la bitácora de JSON
+     * 
+     * @param startDate
+     * @param endDate
+     * @param jsonString
+     * @param companyKey nombre de la carpeta donde se guardará el archivo
+     * @param option pueden ser VOUCHER o PREPAYROLL
+     */
+    public static void writeJSON(String startDate, String endDate, String jsonString, String companyKey, int option) {
         try {
             DateFormat dft = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
             
-            BufferedWriter writer = new BufferedWriter(new FileWriter(SShareData.PATH_JSON_DIR + companyKey + "/jsons/" + startDate + "_" + endDate +
+            String directory = "";
+            switch (option) {
+                case VOUCHER:
+                    directory = SShareData.PATH_JSON_DESP_DIR;
+                    break;
+                case PREPAYROLL:
+                    directory = SShareData.PATH_JSON_DIR;
+                    break;
+            }
+            
+            BufferedWriter writer = new BufferedWriter(new FileWriter(directory + companyKey + "/jsons/" + startDate + "_" + endDate +
                     "__" + dft.format(new Date()) + ".json"));
             
             writer.write(jsonString);
@@ -86,14 +102,34 @@ public class SUtilsJSON {
         }
     }
     
-    public static void writeCSV(String startDate, String endDate, List<String> dataLines, String fileHeader, String companyKey) {
+    /**
+     * Escribir bitácora de CSV
+     * 
+     * @param startDate
+     * @param endDate
+     * @param dataLines
+     * @param fileHeader
+     * @param companyKey
+     * @param option VOUCHER o PREPAYROLL
+     */
+    public static void writeCSV(String startDate, String endDate, List<String> dataLines, String fileHeader, String companyKey, int option) {
         final String NEW_LINE_SEPARATOR = "\n";
         DateFormat dft = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         
         FileWriter fileWriter = null;
         
         try {
-            fileWriter = new FileWriter(new File(SShareData.PATH_CSV_DIR + companyKey + "/csvs/" + startDate + "_" + endDate +
+            String directory = "";
+            switch (option) {
+                case VOUCHER:
+                    directory = SShareData.PATH_CSV_DESP_DIR;
+                    break;
+                case PREPAYROLL:
+                    directory = SShareData.PATH_CSV_DIR;
+                    break;
+            }
+                    
+            fileWriter = new FileWriter(new File(directory + companyKey + "/csvs/" + startDate + "_" + endDate +
                                         "__" + dft.format(new Date()) + ".csv"));
 
             //Write the CSV file header
@@ -103,7 +139,6 @@ public class SUtilsJSON {
             fileWriter.append(NEW_LINE_SEPARATOR);
 
             //Write a new Ingredient object list to the CSV file
-            
             for (String dataLine : dataLines) {
                 fileWriter.append(dataLine);
                 fileWriter.append(NEW_LINE_SEPARATOR);
