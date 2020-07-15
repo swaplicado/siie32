@@ -477,7 +477,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                     
                     int idReceptor = getDbmsDataReceptorId(statement, moDbmsDataCfd.getPkCfdId());
                     
-                    if (idReceptor == 0) {
+                    if (idReceptor == 0) { 
                         // CFDI could not be found in accounting, so try to get receptor ID by its fiscal ID:
                         sql = "SELECT id_bp "
                                 + "FROM erp.bpsu_bp "
@@ -488,6 +488,9 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
                         resultSet = statement.executeQuery(sql);
                         if (!resultSet.next()) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+                        else {
+                            idReceptor = resultSet.getInt(1);
                         }
                     }
 

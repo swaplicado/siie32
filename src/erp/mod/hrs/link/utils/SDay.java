@@ -15,7 +15,7 @@ public class SDay {
     
     private String dt_date;
     private int holiday_id;
-    private boolean is_absence;
+    private int num_absences;
     private boolean is_sunday;
     private int n_days_off;
     private List<SAbsenceKey> events;
@@ -36,12 +36,12 @@ public class SDay {
         this.holiday_id = holiday_id;
     }
 
-    public boolean isIs_absence() {
-        return is_absence;
+    public int getNum_absences() {
+        return num_absences;
     }
 
-    public void setIs_absence(boolean is_absence) {
-        this.is_absence = is_absence;
+    public void setNum_absences(int num_absences) {
+        this.num_absences = num_absences;
     }
 
     public boolean isIs_sunday() {

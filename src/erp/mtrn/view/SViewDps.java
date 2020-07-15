@@ -36,6 +36,7 @@ import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.STrnUtilities;
+import erp.mtrn.data.cfd.SCfdRenderer;
 import erp.mtrn.form.SDialogAnnulCfdi;
 import erp.mtrn.form.SDialogContractAnalysis;
 import erp.mtrn.form.SDialogDpsFinder;
@@ -57,7 +58,10 @@ import java.util.Map;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
@@ -66,7 +70,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Alfredo Pérez, Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Alfredo Pérez, Sergio Flores, Isabel Servín
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -74,7 +78,7 @@ import sa.lib.gui.SGuiParams;
  * Estimates, contracts and credit notes are independent.
  */
 public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
-
+    
     private javax.swing.JButton jbAnnul;
     private javax.swing.JButton jbImport;
     private javax.swing.JButton jbCopy;
@@ -102,6 +106,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbGetCfdiStatus;
     private javax.swing.JButton jbSendCfdi;
     private javax.swing.JButton jbResetPacFlags;
+    private javax.swing.JButton jbImportCfdiWithOutPurchaseOrder;
+    private javax.swing.JButton jbImportCfdiWithPurchaseOrder;
     private javax.swing.JButton jbRestoreSignXml;
     private javax.swing.JButton jbRestoreAckCancellation;
     private erp.table.STabFilterUsers moTabFilterUser;
@@ -220,6 +226,16 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbCopy.setPreferredSize(new Dimension(23, 23));
         jbCopy.addActionListener(this);
         jbCopy.setToolTipText("Copiar documento");
+        
+        jbImportCfdiWithOutPurchaseOrder = new JButton(miClient.getImageIcon(SLibConstants.ICON_QUERY_DOC));
+        jbImportCfdiWithOutPurchaseOrder.setPreferredSize(new Dimension(23, 23));
+        jbImportCfdiWithOutPurchaseOrder.addActionListener(this);
+        jbImportCfdiWithOutPurchaseOrder.setToolTipText("Importar CFDI sin orden de compra");
+        
+        jbImportCfdiWithPurchaseOrder = new JButton(miClient.getImageIcon(SLibConstants.ICON_QUERY_DOC));
+        jbImportCfdiWithPurchaseOrder.setPreferredSize(new Dimension(23, 23));
+        jbImportCfdiWithPurchaseOrder.addActionListener(this);
+        jbImportCfdiWithPurchaseOrder.setToolTipText("Importar CFDI con orden de compra");
 
         jbChangeDeliveryAddress = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_loc.gif")));
         jbChangeDeliveryAddress.setPreferredSize(new Dimension(23, 23));
@@ -350,7 +366,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbResetPacFlags.setPreferredSize(new Dimension(23, 23));
         jbResetPacFlags.addActionListener(this);
         jbResetPacFlags.setToolTipText("Limpiar inconsistencias de timbrado o cancelación del CFDI");
-
+        
         moTabFilterUser = new STabFilterUsers(miClient, this);
         moTabFilterUser.removeButtonUser();
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
@@ -384,6 +400,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbImport);
         addTaskBarUpperComponent(jbCopy);
+        addTaskBarUpperComponent(jbImportCfdiWithOutPurchaseOrder);
+        addTaskBarUpperComponent(jbImportCfdiWithPurchaseOrder);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperSeparator();
@@ -430,6 +448,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbAnnul.setEnabled(mbHasRightAnnul && mbHasRightEdit && (mbIsDoc || mbIsDocAdj));
         jbImport.setEnabled(mbHasRightNew && createImportFinder);
         jbCopy.setEnabled(mbHasRightNew && !mbIsDocAdj);
+        jbImportCfdiWithOutPurchaseOrder.setEnabled(mbHasRightNew); 
+        jbImportCfdiWithPurchaseOrder.setEnabled(mbHasRightNew); 
         jbChangeDeliveryAddress.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
         jbChangeAgentSupervisor.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
         jbSetDeliveryDate.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
@@ -825,6 +845,47 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     SDataUtilities.showDpsRecord(miClient, (SDataDps) miClient.getGuiModule(gui).getRegistry());
                 }
             }
+        }
+    }
+    
+    private void actionImportCfdi(boolean withPurchaseOrder) {
+        SDataDps purchaseOrderDps = null; 
+        FileFilter filter = new FileNameExtensionFilter("XML file", "xml");
+        miClient.getFileChooser().repaint();
+        miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
+        miClient.getFileChooser().setFileFilter(filter);
+        
+        if (withPurchaseOrder) {
+            moDialogDpsFinder.formReset();
+            moDialogDpsFinder.setValue(SLibConstants.VALUE_FILTER_KEY, getDpsClassPreviousKey());
+            moDialogDpsFinder.setVisible(true);
+
+            if (moDialogDpsFinder.getFormResult() == SLibConstants.FORM_RESULT_OK) {
+                purchaseOrderDps = (SDataDps) moDialogDpsFinder.getValue(SDataConstants.TRN_DPS);
+            }
+        }
+        
+        try {
+            if (!withPurchaseOrder  || (withPurchaseOrder && purchaseOrderDps != null)) {
+                if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
+                    if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
+                        SCfdRenderer renderer = new SCfdRenderer(miClient);
+                        SDataDps dpsRendered = renderer.renderCfdi(miClient.getFileChooser().getSelectedFile().getAbsolutePath(), purchaseOrderDps, mbIsCategoryPur ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+                        if (dpsRendered != null){
+                            //SFormDps moFormDps = new SFormDps(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR);
+                            //moFormDps.setRegistry((SDataRegistry) dps);
+                            //moFormDps.setFormVisible(true);
+                        }
+                    }
+                    else {
+                        miClient.showMsgBoxInformation("El archivo solo puede ser XML.");
+                    }
+                }
+                miClient.getFileChooser().resetChoosableFileFilters();
+            }
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
         }
     }
     
@@ -1917,7 +1978,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
            }
         }
     }
-
+    
     public void publicActionPrint() {
         actionPrint(false);
     }
@@ -2086,6 +2147,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbCopy) {
                     actionCopy();
+                }
+                else if (button == jbImportCfdiWithOutPurchaseOrder){
+                    actionImportCfdi(false);
+                }
+                else if (button == jbImportCfdiWithPurchaseOrder){
+                    actionImportCfdi(true);
                 }
                 else if (button == jbChangeDeliveryAddress) {
                     actionChangeDeliveryAddress();

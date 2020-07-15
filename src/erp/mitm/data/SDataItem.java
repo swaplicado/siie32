@@ -288,6 +288,19 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         return id;
     }
     
+    public int getCfdProdServId() {
+        int id = 0;
+        
+        if (mnFkCfdProdServId_n != 0) {
+            id = mnFkCfdProdServId_n;
+        }
+        else if (moDbmsDataItemGeneric != null) {
+            id = moDbmsDataItemGeneric.getFkCfdProdServId();
+        }
+        
+        return id;
+    }
+    
     public boolean isClassSalesProduct() {
         return SLibUtilities.compareKeys(moDbmsDataItemGeneric.getItemClassKey(), SDataConstantsSys.ITMS_CL_ITEM_SAL_PRO);
     }

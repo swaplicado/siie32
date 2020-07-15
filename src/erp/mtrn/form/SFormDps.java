@@ -4004,7 +4004,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void calculateTotal() {
+    private void calculateTotal() {//
         int i = 0;
         double quantity = 0;
         SDataDpsEntry entry = null;
@@ -7262,7 +7262,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         try {
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
                 if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
-                    if (SCfdUtils.validateEmisorXmlExpenses(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
+                    if (SCfdUtils.validateCfdiReceptor(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
                         moFieldCfdiXmlFile.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
                         msFileXmlJustLoaded = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
                     }
@@ -9304,7 +9304,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                     if (!validation.getIsError()) {
                         // credit status of business partner:
-                        
+   
                         if (!isBizPartnerCreditOk(moBizPartnerCategory.getEffectiveRiskTypeId(), false)) {
                             validation.setIsError(true);
                             validation.setComponent(jftDate);

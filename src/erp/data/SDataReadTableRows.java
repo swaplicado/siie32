@@ -19,6 +19,7 @@ import erp.server.SServerRequest;
 import erp.server.SServerResponse;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Vector;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibUtils;
@@ -26,7 +27,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public abstract class SDataReadTableRows {
 
@@ -2649,7 +2650,32 @@ public abstract class SDataReadTableRows {
                         + "GROUP BY dps.id_year, dps.id_doc "
                         + "ORDER BY tp.code, _num, dps.dt, dps.id_year, dps.id_doc ";
                 break;
-
+                
+            case SDataConstants.TRNX_OPE_TYPE:
+                aoPkFields = new STableField[1];
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_KEY, "_id");
+                
+                i = 0;
+                aoQueryFields = new STableField[1];
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "_name");
+                
+                HashMap<Integer, String> map = null;
+                
+                switch ((Integer) filterKey) {
+                    case SDataConstantsSys.TRNX_TP_DPS_DOC:
+                        map = SDataConstantsSys.OperationsTypesOpsMap;
+                        break;
+                    case SDataConstantsSys.TRNX_TP_DPS_ADJ:
+                        map = SDataConstantsSys.OperationsTypesAdjMap;
+                        break;
+                    default:
+                }
+                sSql = "";
+                for (Integer key : map.keySet()) {
+                    sSql += (sSql.isEmpty() ? "" : "UNION ") + "SELECT " + key + " AS _id, '" + map.get(key) + "' AS _name ";
+                }
+                break;
+                
             default:
                 piClient.showMsgBoxWarning(SLibConstants.MSG_ERR_UTIL_UNKNOWN_OPTION);
         }

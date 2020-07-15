@@ -38,6 +38,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     //protected boolean mbSystem;
     protected int mnFkDeductionTypeId;
     protected int mnFkDeductionId;
+    protected int mnFkBonusId;
     protected int mnFkBenefitTypeId;
     protected int mnFkLoanEmployeeId_n;
     protected int mnFkLoanLoanId_n;
@@ -73,6 +74,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public void setSystem(boolean b) { mbSystem = b; }
     public void setFkDeductionTypeId(int n) { mnFkDeductionTypeId = n; }
     public void setFkDeductionId(int n) { mnFkDeductionId = n; }
+    public void setFkBonusId(int n) { mnFkBonusId = n; }
     public void setFkBenefitTypeId(int n) { mnFkBenefitTypeId = n; }
     public void setFkLoanEmployeeId_n(int n) { mnFkLoanEmployeeId_n = n; }
     public void setFkLoanLoanId_n(int n) { mnFkLoanLoanId_n = n; }
@@ -102,6 +104,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public boolean isSystem() { return mbSystem; }
     public int getFkDeductionTypeId() { return mnFkDeductionTypeId; }
     public int getFkDeductionId() { return mnFkDeductionId; }
+    public int getFkBonusId() { return mnFkBonusId; }
     public int getFkBenefitTypeId() { return mnFkBenefitTypeId; }
     public int getFkLoanEmployeeId_n() { return mnFkLoanEmployeeId_n; }
     public int getFkLoanLoanId_n() { return mnFkLoanLoanId_n; }
@@ -149,6 +152,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         mbSystem = false;
         mnFkDeductionTypeId = 0;
         mnFkDeductionId = 0;
+        mnFkBonusId = 0;
         mnFkBenefitTypeId = 0;
         mnFkLoanEmployeeId_n = 0;
         mnFkLoanLoanId_n = 0;
@@ -221,6 +225,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkDeductionTypeId = resultSet.getInt("fk_tp_ded");
             mnFkDeductionId = resultSet.getInt("fk_ded");
+            mnFkBonusId = resultSet.getInt("fk_bonus");
             mnFkBenefitTypeId = resultSet.getInt("fk_tp_ben");
             mnFkLoanEmployeeId_n = resultSet.getInt("fk_loan_emp_n");
             mnFkLoanLoanId_n = resultSet.getInt("fk_loan_loan_n");
@@ -283,7 +288,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     mnFkDeductionTypeId + ", " + 
-                    mnFkDeductionId + ", " + 
+                    (mnFkDeductionId == 0 ? 1 : mnFkDeductionId) + ", " + 
+                    (mnFkBonusId == 0 ? 1 : mnFkBonusId) + ", " + 
                     mnFkBenefitTypeId + ", " + 
                     (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +
@@ -318,6 +324,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ded = " + mnFkDeductionTypeId + ", " +
                     "fk_ded = " + mnFkDeductionId + ", " +
+                    "fk_bonus = " + (mnFkBonusId == 0 ? 1 : mnFkBonusId) + ", " +
                     "fk_tp_ben = " + mnFkBenefitTypeId + ", " +
                     "fk_loan_emp_n = " + (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     "fk_loan_loan_n = " + (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +
@@ -365,6 +372,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         registry.setSystem(this.isSystem());
         registry.setFkDeductionTypeId(this.getFkDeductionTypeId());
         registry.setFkDeductionId(this.getFkDeductionId());
+        registry.setFkBonusId(this.getFkBonusId());
         registry.setFkBenefitTypeId(this.getFkBenefitTypeId());
         registry.setFkLoanEmployeeId_n(this.getFkLoanEmployeeId_n());
         registry.setFkLoanLoanId_n(this.getFkLoanLoanId_n());

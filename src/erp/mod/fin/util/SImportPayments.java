@@ -275,7 +275,7 @@ public class SImportPayments {
             row.setPkDepositId(index);
             row.setDateDeposit(SImportPayments.stringToDateTime(str[LAY_RIC_DATE].trim(), str[LAY_RIC_TIME].trim()));
             
-            bizPartnerId = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession(), str[LAY_RIC_REF1_REFERENCE].trim().substring(0, str[LAY_RIC_REF1_REFERENCE].trim().length()-1), SModSysConsts.BPSS_CT_BP_CUS);
+            bizPartnerId = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), str[LAY_RIC_REF1_REFERENCE].trim().substring(0, str[LAY_RIC_REF1_REFERENCE].trim().length()-1), "", SModSysConsts.BPSS_CT_BP_CUS);
             
             if (bizPartnerId != SLibConstants.UNDEFINED) {
                 bizPartner = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.BPSU_BP, new int[] { bizPartnerId }, SLibConstants.EXEC_MODE_VERBOSE);

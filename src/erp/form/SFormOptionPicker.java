@@ -34,7 +34,7 @@ import javax.swing.JTextField;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.form.SFormOptionPickerInterface, java.awt.event.ActionListener {
 
@@ -842,7 +842,13 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Sucursal empresa", 150);
                 setTitle("Seleccionar documento de compras-ventas");
                 break;
-
+            
+            case SDataConstants.TRNX_OPE_TYPE:
+                aoTableColumns = new STableColumnForm[1];
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo de operación", 300);
+                setTitle("Seleccionar tipo de operación");
+                break;
+                
             case SDataConstants.MKTU_TP_CUS:
                 aoTableColumns = new STableColumnForm[1];
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo de cliente", 200);
@@ -1073,7 +1079,7 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
     }
 
     @Override
-    public void formRefreshOptionPane() {
+    public void formRefreshOptionPane() { 
         Vector<STableRow> vTableRows = SDataReadTableRows.getTableRows(miClient, mnOptionType, moFilterKey);
 
         jtfSeek.setText("");

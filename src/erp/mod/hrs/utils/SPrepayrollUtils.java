@@ -16,8 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import sa.lib.gui.SGuiClient;
@@ -29,6 +27,16 @@ import sa.lib.gui.SGuiSession;
  */
 public class SPrepayrollUtils {
     
+    /**
+     * Obtiene las fechas de corte de semana o quincena basado en la tabla de base 
+     * de datos.
+     * 
+     * @param client
+     * @param payType
+     * @param year
+     * @param payrollNumber
+     * @return 
+     */
     public static Date[] getPrepayrollDateRangeByTable(SGuiClient client, final int payType, final int year, final int payrollNumber) {
         int numAux = 0;
         int yearAux = 0;
@@ -131,18 +139,27 @@ public class SPrepayrollUtils {
             weekday = calDate.get(Calendar.DAY_OF_WEEK);
         }
         
-        Date tStart = (Date) calDate.getTime().clone();
-        calDate.add(Calendar.DATE, 6); // se multiplican los días por las semanas de retraso
-        Date tEnd = calDate.getTime();
+        Date tEnd = (Date) calDate.getTime().clone();
+        calDate.add(Calendar.DATE, -6);
+        Date tStart = calDate.getTime();
         
         return new Date[] {tStart, tEnd};
     }
     
+    /**
+     * Crea las ausencias por inasistencia sin permiso
+     * 
+     * @param client
+     * @param row
+     * @param captureDt
+     * @param payrollId
+     * @return 
+     */
     public static ArrayList<SDbAbsence> getAbsencesFromNoWorkedDays(SGuiClient client, SPrepayrollRow row, Date captureDt, int payrollId) {
         ArrayList<SDbAbsence> absences = new ArrayList();
 
         for (SDay day : row.getDays()) {
-            if (day.isIs_absence()) {
+            for (int i = 0; i < day.getNum_absences(); i++) {
                 SDbAbsence abs = SPrepayrollUtils.createAbsence(client.getSession(), row.getEmployee_id(), captureDt, day.getDt_date(), payrollId);
                 absences.add(abs);
             }
@@ -151,6 +168,16 @@ public class SPrepayrollUtils {
         return absences;
     }
     
+    /**
+     * Crea las ausencias correspondientes a las faltas que reportó el checador
+     * 
+     * @param session
+     * @param emp
+     * @param captureDate
+     * @param date
+     * @param payrollId
+     * @return 
+     */
     private static SDbAbsence createAbsence(SGuiSession session, int emp, Date captureDate, String date, int payrollId) {
         try {
             SDbAbsence abs = new SDbAbsence();
@@ -189,6 +216,12 @@ public class SPrepayrollUtils {
         return null;
     }
     
+    /**
+     * Crea los consumos que corresponen a las ausencias creadas por las faltas que determinó el checador
+     * 
+     * @param abss
+     * @return 
+     */
     public static ArrayList<SDbAbsenceConsumption> getConsumptionsFromAbs(ArrayList<SDbAbsence> abss) {
         ArrayList<SDbAbsenceConsumption> consms = new ArrayList();
         for (SDbAbsence abs : abss) {
@@ -219,19 +252,68 @@ public class SPrepayrollUtils {
         return consms;
     }
     
-    public static void deleteAbsenceByImportation(SGuiClient client, final int payrollId) {
+    /**
+     * Elimina los consumos y las ausencias creadas por reporte del reloj checador
+     * 
+     * @param client
+     * @param payrollId 
+     */
+    public static void deleteAbsencesAndConsumptionsByImportation(SGuiClient client, final int payrollId) {
         try {
-            String sql = "DELETE " +
+            String sqlIds = "SELECT id_abs " +
                     "FROM " +
                     "    hrs_abs " +
                     "WHERE " +
                     "    fk_src_pay_n = " + payrollId + " AND b_time_clock = TRUE;";
             
+            ResultSet resultIds = client.getSession().getStatement().
+                    getConnection().createStatement().
+                    executeQuery(sqlIds);
+            
+            ArrayList<String> ids = new ArrayList();
+            while (resultIds.next()) {
+                ids.add(resultIds.getString("id_abs"));
+            }
+            
+            if (ids.isEmpty()) {
+                return;
+            }
+            
+            StringBuilder stringIds = new StringBuilder("");
+        
+            //iterate through ArrayList
+            for(String id : ids){
+                //append ArrayList element followed by comma
+                stringIds.append(id).append(",");
+            }
+
+            //convert StringBuffer to String
+            String strList = stringIds.toString();
+
+            //remove last comma from String if you want
+            if( strList.length() > 0 )
+                strList = strList.substring(0, strList.length() - 1);
+            
+            String sql = "DELETE FROM hrs_abs_cns " +
+                            "WHERE " +
+                            "id_abs IN (" + strList + ");";
+            
             client.getSession().getStatement().
                     getConnection().createStatement().
                     executeUpdate(sql);
+            
+            String sql1 = "DELETE " +
+                    "FROM " +
+                    "    hrs_abs " +
+                    "WHERE " +
+                    "id_abs IN (" + strList + ");";
+            
+            client.getSession().getStatement().
+                    getConnection().createStatement().
+                    executeUpdate(sql1);
 
-        } catch (SQLException ex) {
+        }
+        catch (SQLException ex) {
             Logger.getLogger(SPrepayrollUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
