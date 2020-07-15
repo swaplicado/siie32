@@ -251,7 +251,7 @@ public class SViewShipmentDelivery extends SGridPaneView implements ActionListen
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
         int cols = 0;
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
         SGridColumnView[] columns = null;
 
         cols = mnGridMode == SModConsts.VIEW_SC_DET ? 30 : 18;
@@ -264,7 +264,7 @@ public class SViewShipmentDelivery extends SGridPaneView implements ActionListen
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "cob.code", "Sucursal");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "ship.code", "Tipo embarque");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "dly.code", "Tipo entrega");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "inc.code", "Incoterm");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "inc.code", "Entrega (Incoterm)");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "src.code", "Lugar origen");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "des.code", "Lugar destino");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "f_car_code", "Tipo trans");

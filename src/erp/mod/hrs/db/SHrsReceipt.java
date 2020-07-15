@@ -31,6 +31,7 @@ public class SHrsReceipt {
     private final ArrayList<SHrsReceiptEarning> maHrsReceiptEarnings;
     private final ArrayList<SHrsReceiptDeduction> maHrsReceiptDeductions;
     private final ArrayList<SHrsBenefit> maHrsBenefits;
+    private ArrayList<SDbAbsence> absencesFromClock;
 
     public SHrsReceipt() {
         moHrsPayroll = null;
@@ -949,6 +950,7 @@ public class SHrsReceipt {
     public void setHrsPayroll(SHrsPayroll o) { moHrsPayroll = o; }
     public void setHrsEmployee(SHrsEmployee o) { moHrsEmployee = o; }
     public void setPayrollReceipt(SDbPayrollReceipt o)  { moPayrollReceipt = o; }
+    public void setAbsencesFromClock(ArrayList<SDbAbsence> absencesFromClock) { this.absencesFromClock = absencesFromClock;}
 
     public SHrsPayroll getHrsPayroll() { return moHrsPayroll; }
     public SHrsEmployee getHrsEmployee() { return moHrsEmployee; }
@@ -957,6 +959,7 @@ public class SHrsReceipt {
     public ArrayList<SHrsReceiptEarning> getHrsReceiptEarnings() { return maHrsReceiptEarnings; }
     public ArrayList<SHrsReceiptDeduction> getHrsReceiptDeductions() { return maHrsReceiptDeductions; }
     public ArrayList<SHrsBenefit> getHrsBenefits() { return maHrsBenefits; }
+    public ArrayList<SDbAbsence> getAbsencesFromClock() { return absencesFromClock; }
 
     @SuppressWarnings("unchecked")
     public void renumberHrsReceiptEarnings() {

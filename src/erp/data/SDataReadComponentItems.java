@@ -1638,7 +1638,7 @@ public abstract class SDataReadComponentItems {
                         "FROM " + SModConsts.TablesMap.get(catalogue) +  " " +
                         "WHERE b_del = 0 AND (id_inc =  " + SModSysConsts.LOGS_INC_NA + (pk == null ? "" : " OR fid_tp_dly = " + ((int[]) pk)[0]) + ") " +
                         "ORDER BY sort ";
-                text = "INCOTERM";
+                text = "entrega (Incoterm)";
                 isComplementApplying = true;
                 break;
             case SModConsts.LOGU_TP_VEH:

@@ -1904,10 +1904,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         contact.setSkype01("");
         contact.setSkype02("");
         contact.setIsDeleted(false);
-        contact.setPkContactTypeId(SDataConstantsSys.BPSS_TP_CON_ADM);
-        contact.setPkTelephoneType01Id(SDataConstantsSys.BPSS_TP_TEL_NA);
-        contact.setPkTelephoneType02Id(SDataConstantsSys.BPSS_TP_TEL_NA);
-        contact.setPkTelephoneType03Id(SDataConstantsSys.BPSS_TP_TEL_NA);
+        contact.setFkContactTypeId(SDataConstantsSys.BPSS_TP_CON_ADM);
+        contact.setFkTelephoneType01Id(SDataConstantsSys.BPSS_TP_TEL_NA);
+        contact.setFkTelephoneType02Id(SDataConstantsSys.BPSS_TP_TEL_NA);
+        contact.setFkTelephoneType03Id(SDataConstantsSys.BPSS_TP_TEL_NA);
         contact.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
         contact.setFkUserEditId(miClient.getSession().getUser().getPkUserId());
 

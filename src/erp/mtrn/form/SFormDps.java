@@ -1821,7 +1821,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel50.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel50.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlFkIncotermId.setText("Incoterm: *");
+        jlFkIncotermId.setText("Entrega (Incoterm): *");
         jlFkIncotermId.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel50.add(jlFkIncotermId);
 
@@ -1829,7 +1829,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel50.add(jcbFkIncotermId);
 
         jbFkIncotermId.setText("...");
-        jbFkIncotermId.setToolTipText("Seleccionar Incoterm");
+        jbFkIncotermId.setToolTipText("Seleccionar entrega (Incoterm)");
         jbFkIncotermId.setFocusable(false);
         jbFkIncotermId.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel50.add(jbFkIncotermId);
@@ -4052,6 +4052,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     /**
      * Populates combo boxes that depends on current business partner.
      */
+    @SuppressWarnings("unchecked")
     private void populateComboBoxesBizPartner() {
         // populate combo box for INCOTERM, set delivery type aswell:
         
@@ -4801,7 +4802,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         double rate = 0;
 
         try {
-            rate = SDataUtilities.obtainExchangeRate(miClient, idCurrency, moFieldDateDoc.getDate());
+            rate = SDataUtilities.obtainExchangeRate(miClient, idCurrency, moFieldDate.getDate());
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
@@ -4971,7 +4972,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jbFkVehicleId_n.setEnabled(false);
             jcbDriver.setEnabled(false);
             jcbPlate.setEnabled(false);
-            
             jtfTicket.setEditable(false);
             jtfTicket.setFocusable(false);
             
@@ -5068,24 +5068,23 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moFieldFkSpotSrcId_n.setFieldValue(spotSrcKey); // restore original value
             moFieldFkSpotDesId_n.setFieldValue(spotDesKey); // restore original value
             
-            //jcbFkSpotSrcId_n.setEnabled(...); // status already set by previous call to method itemChangeFkIncotermId()
-            //jcbFkSpotDesId_n.setEnabled(...); // status already set by previous call to method itemChangeFkIncotermId()
+            //jcbFkSpotSrcId_n.setEnabled(...); // status already set by previous call to method itemStateChangedFkIncotermId()
+            //jcbFkSpotDesId_n.setEnabled(...); // status already set by previous call to method itemStateChangedFkIncotermId()
             
             jcbFkModeOfTransportationTypeId.setEnabled(true);
             jbFkModeOfTransportationTypeId.setEnabled(true);
             
             jcbFkCarrierTypeId.setEnabled(true);
-            itemStateChangedFkCarrierTypeId();            // invokes method itemChangeFkVehicleTypeId_n()
-            //jcbFkCarrierId_n.setEnabled(...);     // status already set by previous call to method itemChangeFkCarrierTypeId()
-            //jbFkCarrierId_n.setEnabled(...);      // status already set by previous call to method itemChangeFkCarrierTypeId()
-            //jcbFkVehicleTypeId_n.setEnabled(...); // status already set by previous call to method itemChangeFkCarrierTypeId()
-            //jcbFkVehicleId_n.setEnabled(...);     // status already set by previous call to method itemChangeFkCarrierTypeId()
+            itemStateChangedFkCarrierTypeId();      // invokes method itemChangeFkVehicleTypeId_n()
+            //jcbFkCarrierId_n.setEnabled(...);     // status already set by previous call to method itemStateChangedFkCarrierTypeId()
+            //jbFkCarrierId_n.setEnabled(...);      // status already set by previous call to method itemStateChangedFkCarrierTypeId()
+            //jcbFkVehicleTypeId_n.setEnabled(...); // status already set by previous call to method itemStateChangedFkCarrierTypeId()
+            //jcbFkVehicleId_n.setEnabled(...);     // status already set by previous call to method itemChangeFkVehicleTypeId_n()
             //jbFkVehicleId_n.setEnabled(...);      // status already set by previous call to method itemChangeFkVehicleTypeId_n()
-            //jcbDriver.setEnabled(...);            // status already set by previous call to method itemChangeFkCarrierTypeId()
-            //jcbPlate.setEnabled(...);             // status already set by previous call to method itemChangeFkCarrierTypeId()
-            
-            jtfTicket.setEditable(true);
-            jtfTicket.setFocusable(true);
+            //jcbDriver.setEnabled(...);            // status already set by previous call to method itemStateChangedFkCarrierTypeId()
+            //jcbPlate.setEnabled(...);             // status already set by previous call to method itemStateChangedFkCarrierTypeId()
+            //jtfTicket.setEditable(...);           // status already set by previous call to method itemStateChangedFkCarrierTypeId()
+            //jtfTicket.setFocusable(...);          // status already set by previous call to method itemStateChangedFkCarrierTypeId()
             
             jlFkProductionOrderId_n.setEnabled(mbIsSales);
             jcbFkProductionOrderId_n.setEnabled(mbIsSales);
@@ -7667,11 +7666,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             SFormUtilities.populateComboBox(miClient, jcbFkSpotSrcId_n, SModConsts.LOGU_SPOT_COB, new int[] { moDps != null ? moDps.getFkCompanyBranchId() : ((SSessionCustom) miClient.getSession().getSessionCustom()).getCurrentBranchKey()[0] });
             SFormUtilities.populateComboBox(miClient, jcbFkSpotDesId_n, SModConsts.LOGU_SPOT, new Object[] { filterTypeSpot, mnDeliveryType });
 
-            if (jcbFkSpotSrcId_n.getItemCount() == 2) {
+            if (jcbFkSpotSrcId_n.getItemCount() >= 2) {
+                // select the FIRST option:
                 jcbFkSpotSrcId_n.setSelectedIndex(1);
             }
 
             if (jcbFkSpotDesId_n.getItemCount() == 2) {
+                // select the UNIQUE option:
                 jcbFkSpotDesId_n.setSelectedIndex(1);
             }
         }
@@ -7687,6 +7688,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jcbFkVehicleTypeId_n.setEnabled(enableTypeVehicle);
         jcbDriver.setEnabled(enableTypeVehicle);
         jcbPlate.setEnabled(enableTypeVehicle);
+        jtfTicket.setEditable(enableTypeVehicle);
+        jtfTicket.setFocusable(enableTypeVehicle);
         
         if (!enableCarrier) {
             moFieldFkCarrierId_n.setFieldValue(null);
@@ -7696,6 +7699,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             moFieldFkVehicleTypeId_n.setFieldValue(null);
             moFieldDriver.setFieldValue("");
             moFieldPlate.setFieldValue("");
+            moFieldTicket.setFieldValue("");
         }
         
         itemStateChangedFkVehicleTypeId_n();
@@ -7720,7 +7724,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     }
 
     private void itemStateChangedAddAmc71SupplierGln() {
-        String originalCompanyGln = moFieldAddAmc71CompanyGln.getString(); // preserve original value
+        String oldCompanyGln = moFieldAddAmc71CompanyGln.getString(); // preserve original value
         
         jcbAddAmc71CompanyGln.removeAllItems();
         
@@ -7738,13 +7742,15 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
         }
         
-        moFieldAddAmc71CompanyGln.setFieldValue(originalCompanyGln); // restore original value
+        if (jcbAddAmc71CompanyGln.getItemCount() == 0) {
+            moFieldAddAmc71CompanyGln.setFieldValue(oldCompanyGln); // restore original value
+        }
         
         itemStateChangedAddAmc71CompanyGln();
     }
     
     private void itemStateChangedAddAmc71CompanyGln() {
-        String originalCompanyBranchGln = moFieldAddAmc71CompanyBranchGln.getString(); // preserve original value
+        String oldCompanyBranchGln = moFieldAddAmc71CompanyBranchGln.getString(); // preserve original value
         
         jcbAddAmc71CompanyBranchGln.removeAllItems();
         
@@ -7768,7 +7774,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
         }
         
-        moFieldAddAmc71CompanyBranchGln.setFieldValue(originalCompanyBranchGln); // restore original value
+        if (jcbAddAmc71CompanyBranchGln.getItemCount() == 0) {
+            moFieldAddAmc71CompanyBranchGln.setFieldValue(oldCompanyBranchGln); // restore original value
+        }
         
         itemStateChangedAddAmc71CompanyBranchGln();
     }
@@ -8796,6 +8804,38 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
             }
             
+            // validate exchange rate:
+            
+            if (!validation.getIsError() && !miClient.getSession().getSessionCustom().isLocalCurrency(moFieldFkCurrencyId.getKeyAsIntArray())) {
+                if (SLibUtils.roundAmount(moFieldExchangeRate.getDouble()) == 1d && 
+                        miClient.showMsgBoxConfirm("¡La moneda del documento es '" + moFieldFkCurrencyId.getString() + "'!\n"
+                                + "¿Es correcto que el valor del campo '" + jlExchangeRate.getText() + "' sea " + SLibUtils.getDecimalFormatExchangeRate().format(1d) + "?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlExchangeRate.getText() + "'.");
+                    validation.setComponent(jtfExchangeRate);
+                }
+                else {
+                    double xrt = 0;
+
+                    try {
+                        xrt = SDataUtilities.obtainExchangeRate(miClient, moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldDate.getDate());
+                    }
+                    catch (Exception e) {
+                        SLibUtilities.renderException(this, e);
+                    }
+                    
+                    if (xrt != 0d) {
+                        int decs = SLibUtils.getDecimalFormatExchangeRate().getMaximumFractionDigits();
+                        
+                        if (SLibUtils.round(Math.abs(SLibUtils.round(xrt, decs) - SLibUtils.round(moFieldExchangeRate.getDouble(), decs)), decs) >= 0.0001 &&
+                                miClient.showMsgBoxConfirm("¡El tipo de cambio del día " + SLibUtils.DateFormatDate.format(moFieldDate.getDate()) + " para '" + moFieldFkCurrencyId.getString() + "' es " + SLibUtils.getDecimalFormatExchangeRate().format(xrt) + "!\n"
+                                        + "¿Es correcto que el valor del campo '" + jlExchangeRate.getText() + "' sea " + SLibUtils.getDecimalFormatExchangeRate().format(moFieldExchangeRate.getDouble()) + "?") != JOptionPane.YES_OPTION) {
+                            validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlExchangeRate.getText() + "'.");
+                            validation.setComponent(jtfExchangeRate);
+                        }
+                    }
+                }
+            }
+            
             // validate other all purpose fields:
             
             if (!validation.getIsError()) {
@@ -8879,7 +8919,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else {
                     // validate shipping information if Incoterm has been set:
                     
-                    if (moFieldFkIncotermId.getKeyAsIntArray()[0] != SModSysConsts.LOGS_INC_NA) {
+                    if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment) && !moBizPartner.isDomestic(miClient) && moFieldFkIncotermId.getKeyAsIntArray()[0] == SModSysConsts.LOGS_INC_NA) {
+                        validation.setMessage("Se debe ingresar un valor diferente para el campo '" + jlFkIncotermId.getText() + "'.");
+                        validation.setComponent(jcbFkIncotermId);
+                        jTabbedPane.setSelectedIndex(TAB_MKT);
+                    }
+                    else if (moFieldFkIncotermId.getKeyAsIntArray()[0] != SModSysConsts.LOGS_INC_NA) {
                         if (jcbFkSpotSrcId_n.isEnabled() && jcbFkSpotSrcId_n.getSelectedIndex() <= 0) {
                             validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jlFkSpotSrcId_n.getText() + "'.");
                             validation.setComponent(jcbFkSpotSrcId_n);

@@ -715,7 +715,7 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 2));
 
-        jlIncoterm.setText("Incoterm:");
+        jlIncoterm.setText("Entrega (Incoterm):");
         jlIncoterm.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel14.add(jlIncoterm);
 
@@ -754,8 +754,8 @@ public class SDialogContractAnalysis extends javax.swing.JDialog implements erp.
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-1199)/2, (screenSize.height-650)/2, 1199, 650);
+        setSize(new java.awt.Dimension(1199, 650));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated

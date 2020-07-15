@@ -39,6 +39,7 @@ import erp.mod.hrs.db.SHrsUtils;
 import erp.print.SDataConstantsPrint;
 import java.io.ByteArrayInputStream;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -756,7 +757,7 @@ public class SCfdPrint {
         SDataBizPartnerBranch receptorBranch = receptor.getDbmsBizPartnerBranch(new int[] { dps.getFkBizPartnerBranchId() });
         SDataBizPartnerBranchAddress receptorBranchAddress = receptorBranch.getDbmsBizPartnerBranchAddressOfficial();
         SDataBizPartnerBranchAddress receptorBranchAddressDelivery = dps.getFkBizPartnerBranchAddressId() == 1 ? null : receptorBranch.getDbmsBizPartnerBranchAddress(new int[] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() });
-        boolean isLocalLan = dps.getFkLanguajeId() == miClient.getSessionXXX().getParamsErp().getFkLanguageId();
+        boolean isLocalLanguage = dps.getFkLanguajeId() == miClient.getSessionXXX().getParamsErp().getFkLanguageId();
         
         paramsMap.put("sRecDomCalleOpc", receptorBranchAddress.getStreet());
         paramsMap.put("sRecDomNoExteriorOpc", receptorBranchAddress.getStreetNumberExt());
@@ -766,7 +767,7 @@ public class SCfdPrint {
         paramsMap.put("sRecDomReferenciaOpc", receptorBranchAddress.getReference());
         paramsMap.put("sRecDomMunicipioOpc", receptorBranchAddress.getCounty());
         paramsMap.put("sRecDomEstadoOpc", receptorBranchAddress.getState().toUpperCase());
-        paramsMap.put("sRecDomPais", (isLocalLan ? receptorBranchAddress.getDbmsDataCountry().getCountry() : receptorBranchAddress.getDbmsDataCountry().getCountryLan()).toUpperCase());
+        paramsMap.put("sRecDomPais", (isLocalLanguage ? receptorBranchAddress.getDbmsDataCountry().getCountry() : receptorBranchAddress.getDbmsDataCountry().getCountryLan()).toUpperCase());
         paramsMap.put("sRecDomCodigoPostalOpc", receptorBranchAddress.getZipCode());
         paramsMap.put("nFkRecAddressFormatTypeId_n", receptorBranch.getFkAddressFormatTypeId_n() != SLibConsts.UNDEFINED ? receptorBranch.getFkAddressFormatTypeId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n());
         
@@ -780,7 +781,7 @@ public class SCfdPrint {
             paramsMap.put("sRecEntReferenciaOpc", receptorBranchAddressDelivery.getReference());
             paramsMap.put("sRecEntMunicipioOpc", receptorBranchAddressDelivery.getCounty());
             paramsMap.put("sRecEntEstadoOpc", receptorBranchAddressDelivery.getState().toUpperCase());
-            paramsMap.put("sRecEntPais", (isLocalLan ? receptorBranchAddressDelivery.getDbmsDataCountry().getCountry() : receptorBranchAddressDelivery.getDbmsDataCountry().getCountryLan()).toUpperCase());
+            paramsMap.put("sRecEntPais", (isLocalLanguage ? receptorBranchAddressDelivery.getDbmsDataCountry().getCountry() : receptorBranchAddressDelivery.getDbmsDataCountry().getCountryLan()).toUpperCase());
             paramsMap.put("sRecEntCodigoPostalOpc", receptorBranchAddressDelivery.getZipCode());
         }
         
@@ -883,8 +884,10 @@ public class SCfdPrint {
         paramsMap.put("sAddUnidadPesoBruto", dps.getAuxCfdParams().getUnidadPesoBruto());
         paramsMap.put("sAddUnidadPesoNeto", dps.getAuxCfdParams().getUnidadPesoBruto());
 
-        paramsMap.put("sAddPagFecha", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(dps.getDate()).toUpperCase());
-        paramsMap.put("sAddPagFechaDeVencimiento", miClient.getSessionXXX().getFormatters().getDateTextFormat().format(SLibTimeUtilities.addDate(dps.getDateStartCredit(), 0, 0, dps.getDaysOfCredit())).toUpperCase());
+        SimpleDateFormat dateFormatLong = new SimpleDateFormat("dd 'de' MMMMM 'de' yyyy");
+        
+        paramsMap.put("sAddPagFecha", dateFormatLong.format(dps.getDate()).toUpperCase());
+        paramsMap.put("sAddPagFechaDeVencimiento", dateFormatLong.format(SLibTimeUtilities.addDate(dps.getDateStartCredit(), 0, 0, dps.getDaysOfCredit())).toUpperCase());
         paramsMap.put("dAddPagImporte", dps.getTotalCy_r());
         paramsMap.put("sAddPagClaveMoneda", dps.getDbmsCurrencyKey());
         paramsMap.put("dAddPagInteresMoratorio", dps.getAuxCfdParams().getInterestDelayRate());
@@ -901,6 +904,7 @@ public class SCfdPrint {
         }
         
         // adds product/service and unit keys from XML:
+        
         ArrayList<String> productKeys = new ArrayList<>();
         ArrayList<String> unitKeys = new ArrayList<>();
         
@@ -911,6 +915,35 @@ public class SCfdPrint {
         
         paramsMap.put("saCfdiProdServKeys", productKeys);
         paramsMap.put("saCfdiUnitKeys",  unitKeys);
+        
+        // add leyend of reliable exporter when needed:
+        
+        String numberExporter = emisor.getDbmsCategorySettingsCo().getNumberExporter();
+        
+        if (!receptor.isDomestic(miClient) && !numberExporter.isEmpty() && !numberExporter.equals("0")) {
+            SDataBizPartnerBranch branch = emisorBranchIssue != null ? emisorBranchIssue : emisorBranch;
+            SDataBizPartnerBranchAddress address = emisorBranchAddressIssue != null ? emisorBranchAddressIssue : emisorBranchAddress;
+            SDataBizPartnerBranchContact admor = branch.getDbmsBizPartnerBranchContactByType(SDataConstantsSys.BPSS_TP_CON_ADM, false);
+            
+            String leyend = "\"El exportador de los productos incluidos en el presente documento " + numberExporter + " declara que, "
+                    + "salvo indicación en sentido contrario, estos productos gozan de un origen preferencial "
+                    + SLibUtils.textProperCase(address.getDbmsDataCountry().getCountry()) + ".\"";
+            String placeAddress = 
+                    SLibUtils.textProperCase(address.getLocality()) + ", "
+                    + SLibUtils.textProperCase(address.getState()) + ", "
+                    + SLibUtils.textProperCase(address.getDbmsDataCountry().getCountry()) + ", "
+                    + "a " + dateFormatLong.format(dps.getDate());
+            String company = emisor.getBizPartner();
+            
+            paramsMap.put("sCceExportadorLeyenda", leyend);
+            paramsMap.put("sCceExportadorLugarFecha", placeAddress);
+            paramsMap.put("sCceExportadorEmpresa", company);
+            
+            if (admor != null) {
+                paramsMap.put("sCceExportadorResponsable", SLibUtils.textProperCase(admor.getContact()));
+                paramsMap.put("sCceExportadorResponsableCargo", SLibUtils.textProperCase(admor.getCharge()));
+            }
+        }
         
         computeReport(cfd, SDataConstantsSys.REP_TRN_CFDI_33, paramsMap, printMode, 1);
     }

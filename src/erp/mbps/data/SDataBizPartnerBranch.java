@@ -130,6 +130,25 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
     public java.util.Vector<erp.lib.form.SFormComponentItem> getDnsForDps() { return mvDnsForDps; }
     public java.util.Vector<erp.lib.form.SFormComponentItem> getDnsForDiog() { return mvDnsForDiog; }
 
+    /**
+     * Get contact by contact type.
+     * @param contactType Contact type (constants defined in SDataConstantsSys.BPSS_TP_CON_...)
+     * @param includeDefaultContact Include the default contact when searching a matching contact.
+     * @return First contact found of given contact type.
+     */
+    public erp.mbps.data.SDataBizPartnerBranchContact getDbmsBizPartnerBranchContactByType(final int contactType, final boolean includeDefaultContact) {
+        SDataBizPartnerBranchContact contact = null;
+        
+        for (SDataBizPartnerBranchContact bpbc : mvDbmsBizPartnerBranchContacts) {
+            if (bpbc.getFkContactTypeId() == contactType && ((includeDefaultContact && bpbc.getPkContactId() == 1) || (!includeDefaultContact && bpbc.getPkContactId() != 1))) {
+                contact = bpbc;
+                break;
+            }
+        }
+        
+        return contact;
+    }
+    
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
         mnPkBizPartnerBranchId = ((int[]) pk)[0];
@@ -567,7 +586,7 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
         return address;
     }
 
-    public erp.mbps.data.SDataBizPartnerBranchContact getDbmsBizPartnerBranchContacts(int[] pk) {
+    public erp.mbps.data.SDataBizPartnerBranchContact getDbmsBizPartnerBranchContact(int[] pk) {
         SDataBizPartnerBranchContact contact = null;
 
         for (int i = 0; i < mvDbmsBizPartnerBranchContacts.size(); i++) {

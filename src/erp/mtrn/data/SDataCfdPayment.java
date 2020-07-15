@@ -818,7 +818,7 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
 
     @Override
     public ArrayList<SCfdDataConcepto> getElementsConcepto() throws Exception {
-        SCfdDataConcepto concepto = new SCfdDataConcepto();
+        SCfdDataConcepto concepto = new SCfdDataConcepto(SDataConstantsSys.TRNS_TP_CFD_PAY_REC);
         concepto.setClaveProdServ(DCfdi33Catalogs.ClaveProdServServsFacturacion);
         concepto.setNoIdentificacion("");
         concepto.setCantidad(1);
@@ -828,7 +828,6 @@ public class SDataCfdPayment extends erp.lib.data.SDataRegistry implements java.
         concepto.setValorUnitario(0);
         concepto.setImporte(0);
         concepto.setDescuento(0);
-        concepto.setCfdiType(SDataConstantsSys.TRNS_TP_CFD_PAY_REC);
 
         ArrayList<SCfdDataConcepto> conceptos = new ArrayList<>();
         conceptos.add(concepto);

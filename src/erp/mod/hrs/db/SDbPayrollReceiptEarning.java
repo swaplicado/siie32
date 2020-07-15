@@ -38,12 +38,14 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     protected int mnBenefitYear;
     protected int mnBenefitAnniversary;
     protected boolean mbAlternativeTaxCalculation;
+    protected boolean mbTimeClockSourced;
     protected boolean mbUserEdited;
     protected boolean mbAutomatic;
     //protected boolean mbDeleted;
     //protected boolean mbSystem;
     protected int mnFkEarningTypeId;
     protected int mnFkEarningId;
+    protected int mnFkBonusId;
     protected int mnFkBenefitTypeId;
     protected int mnFkLoanEmployeeId_n;
     protected int mnFkLoanLoanId_n;
@@ -83,12 +85,14 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public void setBenefitYear(int n) { mnBenefitYear = n; }
     public void setBenefitAnniversary(int n) { mnBenefitAnniversary = n; }
     public void setAlternativeTaxCalculation(boolean b) { mbAlternativeTaxCalculation = b; }
+    public void setTimeClockSourced(boolean b) { mbTimeClockSourced = b; }
     public void setUserEdited(boolean b) { mbUserEdited = b; }
     public void setAutomatic(boolean b) { mbAutomatic = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
     public void setFkEarningTypeId(int n) { mnFkEarningTypeId = n; }
     public void setFkEarningId(int n) { mnFkEarningId = n; }
+    public void setFkBonusId(int n) { mnFkBonusId = n; }
     public void setFkBenefitTypeId(int n) { mnFkBenefitTypeId = n; }
     public void setFkLoanEmployeeId_n(int n) { mnFkLoanEmployeeId_n = n; }
     public void setFkLoanLoanId_n(int n) { mnFkLoanLoanId_n = n; }
@@ -118,12 +122,14 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
     public int getBenefitYear() { return mnBenefitYear; }
     public int getBenefitAnniversary() { return mnBenefitAnniversary; }
     public boolean isAlternativeTaxCalculation() { return mbAlternativeTaxCalculation; }
+    public boolean isTimeClockSourced() { return mbTimeClockSourced; }
     public boolean isUserEdited() { return mbUserEdited; }
     public boolean isAutomatic() { return mbAutomatic; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
     public int getFkEarningTypeId() { return mnFkEarningTypeId; }
     public int getFkEarningId() { return mnFkEarningId; }
+    public int getFkBonusId() { return mnFkBonusId; }
     public int getFkBenefitTypeId() { return mnFkBenefitTypeId; }
     public int getFkLoanEmployeeId_n() { return mnFkLoanEmployeeId_n; }
     public int getFkLoanLoanId_n() { return mnFkLoanLoanId_n; }
@@ -171,12 +177,14 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         mnBenefitYear = 0;
         mnBenefitAnniversary = 0;
         mbAlternativeTaxCalculation = false;
+        mbTimeClockSourced = false;
         mbUserEdited = false;
         mbAutomatic = false;
         mbDeleted = false;
         mbSystem = false;
         mnFkEarningTypeId = 0;
         mnFkEarningId = 0;
+        mnFkBonusId = 0;
         mnFkBenefitTypeId = 0;
         mnFkLoanEmployeeId_n = 0;
         mnFkLoanLoanId_n = 0;
@@ -250,12 +258,14 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
             mnBenefitYear = resultSet.getInt("ben_year");
             mnBenefitAnniversary = resultSet.getInt("ben_ann");
             mbAlternativeTaxCalculation = resultSet.getBoolean("b_alt_tax");
+            mbTimeClockSourced = resultSet.getBoolean("b_time_clock");
             mbUserEdited = resultSet.getBoolean("b_usr");
             mbAutomatic = resultSet.getBoolean("b_aut");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkEarningTypeId = resultSet.getInt("fk_tp_ear");
             mnFkEarningId = resultSet.getInt("fk_ear");
+            mnFkBonusId = resultSet.getInt("fk_bonus");
             mnFkBenefitTypeId = resultSet.getInt("fk_tp_ben");
             mnFkLoanEmployeeId_n = resultSet.getInt("fk_loan_emp_n");
             mnFkLoanLoanId_n = resultSet.getInt("fk_loan_loan_n");
@@ -321,12 +331,14 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     mnBenefitYear + ", " + 
                     mnBenefitAnniversary + ", " + 
                     (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
+                    (mbTimeClockSourced ? 1 : 0) + ", " +
                     (mbUserEdited ? 1 : 0) + ", " + 
                     (mbAutomatic ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     mnFkEarningTypeId + ", " + 
                     mnFkEarningId + ", " + 
+                    (mnFkBonusId == 0 ? 1 : mnFkBonusId) + ", " + 
                     mnFkBenefitTypeId + ", " + 
                     (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +
@@ -361,12 +373,14 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     "ben_year = " + mnBenefitYear + ", " +
                     "ben_ann = " + mnBenefitAnniversary + ", " +
                     "b_alt_tax = " + (mbAlternativeTaxCalculation ? 1 : 0) + ", " +
+                    "b_time_clock = " + (mbTimeClockSourced ? 1 : 0) + ", " +
                     "b_usr = " + (mbUserEdited ? 1 : 0) + ", " +
                     "b_aut = " + (mbAutomatic ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ear = " + mnFkEarningTypeId + ", " +
                     "fk_ear = " + mnFkEarningId + ", " +
+                    "fk_bonus = " + (mnFkBonusId == 0 ? 1 : mnFkBonusId) + ", " +
                     "fk_tp_ben = " + mnFkBenefitTypeId + ", " +
                     "fk_loan_emp_n = " + (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     "fk_loan_loan_n = " + (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +
@@ -416,12 +430,13 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         registry.setBenefitYear(this.getBenefitYear());
         registry.setBenefitAnniversary(this.getBenefitAnniversary());
         registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());
-        registry.setUserEdited(this.isUserEdited());
+        registry.setTimeClockSourced(this.isTimeClockSourced());
         registry.setAutomatic(this.isAutomatic());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkEarningTypeId(this.getFkEarningTypeId());
         registry.setFkEarningId(this.getFkEarningId());
+        registry.setFkBonusId(this.getFkBonusId());
         registry.setFkBenefitTypeId(this.getFkBenefitTypeId());
         registry.setFkLoanEmployeeId_n(this.getFkLoanEmployeeId_n());
         registry.setFkLoanLoanId_n(this.getFkLoanLoanId_n());

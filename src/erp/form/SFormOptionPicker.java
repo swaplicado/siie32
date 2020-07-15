@@ -907,7 +907,7 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
                 aoTableColumns = new STableColumnForm[2];
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Incoterm", 300);
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código", 100);
-                setTitle("Seleccionar Incoterm");
+                setTitle("Seleccionar entrega (Incoterm)");
                 break;
 
            case SModConsts.LOGU_TP_VEH:

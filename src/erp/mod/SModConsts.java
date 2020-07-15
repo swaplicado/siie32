@@ -306,6 +306,7 @@ public abstract class SModConsts {
     public static final int FINX_ACC_CASH_BANK = 2014002;
 
     public static final int FINR_CSH_FLW_EXP = 2015001;
+    public static final int FINR_MAS_PRI = 2015002;
     public static final int FINR_DPS_TAX_PEND = 2015011;
     public static final int FINR_LAY_BANK = 2015021;
 
@@ -610,6 +611,7 @@ public abstract class SModConsts {
     public static final int HRSS_TP_DIS = 2061075;
     public static final int HRSS_TP_DAY = 2061081;
     public static final int HRSS_BANK = 2061091;
+    public static final int HRSS_BONUS = 2061093;
     public static final int HRSS_GROCERY_SRV = 2061096;
 
     public static final int HRSU_CL_ABS = 2062001;
@@ -631,6 +633,7 @@ public abstract class SModConsts {
     public static final int HRS_FDY = 2063012;
     public static final int HRS_HOL = 2063013;
     public static final int HRS_WDS = 2063015;
+    public static final int HRS_PRE_PAY_CUT_CAL = 2063016;
     public static final int HRS_TAX = 2063021;
     public static final int HRS_TAX_ROW = 2063022;
     public static final int HRS_TAX_SUB = 2063031;
@@ -654,12 +657,14 @@ public abstract class SModConsts {
     public static final int HRS_ABS_CNS = 2063102;
     public static final int HRS_EAR = 2063111;
     public static final int HRS_DED = 2063112;
+    public static final int HRS_COND_EAR = 2063120;
     public static final int HRS_AUT_EAR = 2063121;
     public static final int HRS_AUT_DED = 2063122;
     public static final int HRS_ACC_EAR = 2063131;
     public static final int HRS_ACC_DED = 2063132;
     public static final int HRS_PAY = 2063201;
     public static final int HRS_PAY_RCP = 2063211;
+    public static final int HRS_PAY_RCP_IMPORT = 2063215;
     public static final int HRS_PAY_RCP_ISS = 2063216;
     public static final int HRS_PAY_RCP_DAY = 2063221;
     public static final int HRS_PAY_RCP_EAR = 2063231;
@@ -685,10 +690,12 @@ public abstract class SModConsts {
     public static final int HRSX_BEN_VAC_PEND = 2064056;
     public static final int HRSX_EMP_INT = 2064061;     // employees integral
     public static final int HRSX_EMP_CON_EXP = 2064066; // employees contract expiration
+    public static final int HRSX_EMP_MASSIVE_UPD_SSC = 2063071;
     public static final int HRSX_LOAN_PAY = 2064091;
     public static final int HRSX_ABS_MOV = 2064101;
     public static final int HRSX_SSC_UPD = 2064102;
     public static final int HRSX_EAR_SSC = 2064103;
+    public static final int HRSX_IMPORT_CAP = 2064110;
     public static final int HRSX_LAYOUT_SUA_HIRE = 1;
     public static final int HRSX_LAYOUT_SUA_SSC = 2;
     public static final int HRSX_LAYOUT_SUA_DISMISS = 3;
@@ -1177,6 +1184,7 @@ public abstract class SModConsts {
         TablesMap.put(HRSS_TP_DIS, "erp.hrss_tp_dis");
         TablesMap.put(HRSS_TP_DAY, "erp.hrss_tp_day");
         TablesMap.put(HRSS_BANK, "erp.hrss_bank");
+		TablesMap.put(HRSS_BONUS, "erp.hrss_bonus");
         TablesMap.put(HRSS_GROCERY_SRV, "erp.hrss_grocery_srv");
 
         TablesMap.put(HRSU_CL_ABS, "erp.hrsu_cl_abs");
@@ -1198,6 +1206,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_FDY, "hrs_fdy");
         TablesMap.put(HRS_HOL, "hrs_hol");
         TablesMap.put(HRS_WDS, "hrs_wds");
+        TablesMap.put(HRS_PRE_PAY_CUT_CAL, "hrs_pre_pay_cut_cal");
         TablesMap.put(HRS_TAX, "hrs_tax");
         TablesMap.put(HRS_TAX_ROW, "hrs_tax_row");
         TablesMap.put(HRS_TAX_SUB, "hrs_tax_sub");
@@ -1221,6 +1230,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_ABS_CNS, "hrs_abs_cns");
         TablesMap.put(HRS_EAR, "hrs_ear");
         TablesMap.put(HRS_DED, "hrs_ded");
+        TablesMap.put(HRS_COND_EAR, "hrs_cond_ear");
         TablesMap.put(HRS_AUT_EAR, "hrs_aut_ear");
         TablesMap.put(HRS_AUT_DED, "hrs_aut_ded");
         TablesMap.put(HRS_ACC_EAR, "hrs_acc_ear");

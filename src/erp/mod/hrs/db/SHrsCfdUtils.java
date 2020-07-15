@@ -332,15 +332,15 @@ public abstract class SHrsCfdUtils {
                     // Obtain perceptions:
 
                     sql = "SELECT e.id_ear AS f_conc_id, e.code AS f_conc_cve, e.name_abbr AS f_conc, e.fk_tp_ear AS f_conc_cfdi, e.unt_fac, " +
-                            "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " THEN CASE WHEN pre.unt >= 0 AND pre.unt < " + SHrsConsts.OVER_TIME_2X_MAX_DAY + " THEN 1 ELSE pre.unt / " + SHrsConsts.OVER_TIME_2X_MAX_DAY + " END ELSE " +
+                            "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVER_TIME + " THEN CASE WHEN pre.unt >= 0 AND pre.unt < " + SHrsConsts.OVER_TIME_2X_MAX_DAY + " THEN 1 ELSE pre.unt / " + SHrsConsts.OVER_TIME_2X_MAX_DAY + " END ELSE " +
                             "CASE WHEN pre.unt >= 0 AND pre.unt <= 1 THEN 1 ELSE pre.unt END END AS f_conc_qty, " +
-                            "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " THEN " +
+                            "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVER_TIME + " THEN " +
                             "CASE WHEN pre.unt >= 0 AND pre.unt <= 1 THEN 1 ELSE pre.unt END ELSE 0 END AS f_conc_hrs, ec.code AS f_conc_unid, " +
                             "pre.b_aut AS f_aut, pre.b_usr AS f_usr, pre.amt_taxa AS f_conc_mont_grav, pre.amt_exem AS f_conc_mont_ext, " +
                             "pre.aux_amt1, pre.aux_amt2, pre.aux_val, pre.fk_ear, pre.fk_tp_oth_pay, top.code AS f_top_code, " +
                             "" + SCfdConsts.CFDI_PAYROLL_PERCEPTION_PERCEPTION[0] + " AS f_conc_tp, " +
-                            "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " AND e.unt_fac = " + SHrsConsts.OVER_TIME_2X + " THEN " + SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1] + " ELSE " +
-                            "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVR_TME + " AND e.unt_fac = " + SHrsConsts.OVER_TIME_3X + " THEN " + SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_TRIPLE[1] + " ELSE " + 
+                            "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVER_TIME + " AND e.unt_fac = " + SHrsConsts.OVER_TIME_2X + " THEN " + SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_DOUBLE[1] + " ELSE " +
+                            "CASE WHEN e.fk_tp_ear = " + SModSysConsts.HRSS_TP_EAR_OVER_TIME + " AND e.unt_fac = " + SHrsConsts.OVER_TIME_3X + " THEN " + SCfdConsts.CFDI_PAYROLL_PERCEPTION_EXTRA_TIME_TRIPLE[1] + " ELSE " + 
                             "" + SCfdConsts.CFDI_PAYROLL_PERCEPTION_PERCEPTION[1] + " END END AS f_conc_stp " +
                             "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
                             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay AND pr.b_del = 0 " +
@@ -368,7 +368,7 @@ public abstract class SHrsCfdUtils {
                             hrsFormerReceiptConcept.setClaveEmpresa(SLibUtilities.textTrim(resultSetAux.getString("f_conc_cve")));
                             hrsFormerReceiptConcept.setClaveOficial(resultSetAux.getInt("f_conc_cfdi"));
                             hrsFormerReceiptConcept.setConcepto(SLibUtilities.textTrim(resultSetAux.getString("f_conc")));
-                            hrsFormerReceiptConcept.setCantidad(hrsFormerReceiptConcept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_OVR_TME ? Math.ceil(resultSetAux.getDouble("f_conc_qty")) : resultSetAux.getDouble("f_conc_qty"));
+                            hrsFormerReceiptConcept.setCantidad(hrsFormerReceiptConcept.getClaveOficial() == SModSysConsts.HRSS_TP_EAR_OVER_TIME ? Math.ceil(resultSetAux.getDouble("f_conc_qty")) : resultSetAux.getDouble("f_conc_qty"));
                             hrsFormerReceiptConcept.setHoras_r(resultSetAux.getInt("f_conc_hrs"));
                             hrsFormerReceiptConcept.setTotalGravado(dAmountEarTax);
                             hrsFormerReceiptConcept.setTotalExento(dAmountEarExe);
@@ -378,7 +378,7 @@ public abstract class SHrsCfdUtils {
                             hrsFormerReceiptConcept.setXtaTipoOtroPagoId(resultSetAux.getInt("pre.fk_tp_oth_pay"));
 
                             switch (hrsFormerReceiptConcept.getClaveOficial()) {
-                                case SModSysConsts.HRSS_TP_EAR_OVR_TME:
+                                case SModSysConsts.HRSS_TP_EAR_OVER_TIME:
                                     hrsFormerConceptExtraTime = new SHrsFormerConceptExtraTime();
                                     hrsFormerConceptExtraTime.setTipoHoras(resultSetAux.getInt("unt_fac") == SHrsConsts.OVER_TIME_2X ? SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_DOUBLE : SCfdConsts.CFDI_PAYROLL_EXTRA_TIME_TYPE_TRIPLE);
                                     hrsFormerConceptExtraTime.setDias(hrsFormerReceiptConcept.getCantidad());
@@ -388,7 +388,7 @@ public abstract class SHrsCfdUtils {
                                     hrsFormerReceiptConcept.setChildExtraTime(hrsFormerConceptExtraTime);
                                     break;
 
-                                case SModSysConsts.HRSS_TP_EAR_DIS:
+                                case SModSysConsts.HRSS_TP_EAR_DISAB:
                                     sql = "SELECT tpd.code " +
                                             "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EAR) + " AS e " +
                                             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_ABS) + " AS tpa ON e.fk_cl_abs_n = tpa.id_cl_abs AND e.fk_tp_abs_n = tpa.id_tp_abs " +

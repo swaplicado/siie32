@@ -5,12 +5,7 @@
 package erp.mod.log.view;
 
 import erp.client.SClientInterface;
-import erp.data.SDataConstants;
-import erp.data.SDataConstantsSys;
-import erp.data.SDataUtilities;
-import erp.data.SProcConstants;
 import erp.lib.SLibConstants;
-import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.log.db.SDbShipment;
@@ -20,7 +15,6 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import sa.lib.SLibUtils;
@@ -303,7 +297,7 @@ public class SViewShipmentBill extends SGridPaneView implements ActionListener {
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         int col = 0;
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
         SGridColumnView[] columns = new SGridColumnView[mnGridSubtype == SModConsts.VIEW_ST_PEND ? 30 : 36];
 
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_REG_NUM, SDbConsts.FIELD_NAME, "Folio");
@@ -312,7 +306,7 @@ public class SViewShipmentBill extends SGridPaneView implements ActionListener {
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "cob.code", "Sucursal");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "ship.code", "Tipo embarque");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "dly.code", "Tipo entrega");
-        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "inc.code", "Incoterm");
+        columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "inc.code", "Entrega (Incoterm)");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "src.code", "Lugar origen");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "des.code", "Lugar destino");
         columns[col++] = new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "f_car_code", "Tipo trans");

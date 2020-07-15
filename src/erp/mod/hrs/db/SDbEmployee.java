@@ -649,8 +649,15 @@ public class SDbEmployee extends SDbRegistryUser {
             }
             
             hrsEmployeeHireLog.setDeleted(mbDeleted);
-            hrsEmployeeHireLog.setFkUserInsertId(mnFkUserInsertId);
-            hrsEmployeeHireLog.setFkUserUpdateId(SUtilConsts.USR_NA_ID);
+            
+            if (mbRegistryNew) {
+                hrsEmployeeHireLog.setFkUserInsertId(mnFkUserInsertId);
+                hrsEmployeeHireLog.setFkUserUpdateId(SUtilConsts.USR_NA_ID);
+            }
+            else {
+                hrsEmployeeHireLog.setFkUserInsertId(SUtilConsts.USR_NA_ID);
+                hrsEmployeeHireLog.setFkUserUpdateId(mnFkUserUpdateId);
+            }
             
             hrsEmployeeHireLog.setIsAuxFirstHiring(mbRegistryNew);
             //employeeHireLog.setIsAuxForceFirstHiring(...);

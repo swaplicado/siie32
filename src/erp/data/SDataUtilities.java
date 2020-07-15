@@ -16,11 +16,13 @@ import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mbps.data.SDataBizPartnerBranchAddress;
 import erp.mbps.data.SDataBizPartnerBranchBankAccount;
 import erp.mbps.data.SDataBizPartnerBranchContact;
+import erp.mbps.data.SDataEmployee;
 import erp.mbps.data.SProcBizPartnerBizAreaVal;
 import erp.mbps.data.SProcBizPartnerBranchAddressVal;
 import erp.mbps.data.SProcBizPartnerFiscalIdVal;
 import erp.mbps.data.SProcBizPartnerTypeVal;
 import erp.mbps.data.SProcBizPartnerVal;
+import erp.mcfg.data.SDataCompany;
 import erp.mcfg.data.SDataCompanyBranchEntity;
 import erp.mcfg.data.SDataCurrency;
 import erp.mcfg.data.SDataLanguage;
@@ -595,6 +597,7 @@ public abstract class SDataUtilities {
      * @param dataType Data type (constants defined in erp.data.SDataConstants).
      * @param pk Primary key of desired registry.
      * @param executionMode  Execution mode (constants defined in SLibConstants.EXEC_MODE_...).
+     * @return SDataRegistry
      */
     public static erp.lib.data.SDataRegistry readRegistry(erp.client.SClientInterface client, int dataType, java.lang.Object pk, int executionMode) {
         SServerRequest request = null;
@@ -602,6 +605,9 @@ public abstract class SDataUtilities {
         SDataRegistry registry = null;
 
         switch (dataType) {
+            case SDataConstants.CFGU_CO:
+                registry = new SDataCompany();
+                break;
             case SDataConstants.CFGU_COB_ENT:
                 registry = new SDataCompanyBranchEntity();
                 break;
@@ -776,7 +782,9 @@ public abstract class SDataUtilities {
             case SDataConstants.MFG_EXP_ETY:
                 registry = new SDataExplotionMaterialsEntry();
                 break;
-
+            case SModConsts.HRSU_EMP:
+                registry = new SDataEmployee();
+                break;
             case SDataConstants.HRS_SIE_PAY:
                 registry = new SDataFormerPayroll();
                 break;
@@ -3041,9 +3049,6 @@ public abstract class SDataUtilities {
                 break;
             case SDataConstantsSys.REP_TRN_ORD_GDS:
                 name = "reps/trn_dps_order_goods.jasper";
-                break;
-            case SDataConstantsSys.REP_TRN_CON_FIX:
-                name = "reps/trn_con.jasper";
                 break;
             case SDataConstantsSys.REP_TRN_PS_ITEM_UNIT_PRICE:
                 name = "reps/trn_ps_item_price.jasper";

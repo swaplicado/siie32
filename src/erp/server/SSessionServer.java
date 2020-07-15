@@ -40,9 +40,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
@@ -53,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.Vector;
-import javax.imageio.ImageIO;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -941,13 +938,6 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         }
 
         return oResponse;
-    }
-
-    public static byte[] converterBufferedImageToByteArray(BufferedImage bufferedImage) throws IOException {
-        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "jpg", byteArrayOS);
-
-        return  byteArrayOS.toByteArray();
     }
 
     @Override

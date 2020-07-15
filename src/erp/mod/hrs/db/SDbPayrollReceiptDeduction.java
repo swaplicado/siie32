@@ -31,12 +31,14 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     protected double mdAmount_r;
     protected int mnBenefitYear;
     protected int mnBenefitAnniversary;
+    protected boolean mbTimeClockSourced;
     protected boolean mbUserEdited;
     protected boolean mbAutomatic;
     //protected boolean mbDeleted;
     //protected boolean mbSystem;
     protected int mnFkDeductionTypeId;
     protected int mnFkDeductionId;
+    protected int mnFkBonusId;
     protected int mnFkBenefitTypeId;
     protected int mnFkLoanEmployeeId_n;
     protected int mnFkLoanLoanId_n;
@@ -65,12 +67,14 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public void setAmount_r(double d) { mdAmount_r = d; }
     public void setBenefitYear(int n) { mnBenefitYear = n; }
     public void setBenefitAnniversary(int n) { mnBenefitAnniversary = n; }
+    public void setTimeClockSourced(boolean b) { mbTimeClockSourced = b; }
     public void setUserEdited(boolean b) { mbUserEdited = b; }
     public void setAutomatic(boolean b) { mbAutomatic = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
     public void setFkDeductionTypeId(int n) { mnFkDeductionTypeId = n; }
     public void setFkDeductionId(int n) { mnFkDeductionId = n; }
+    public void setFkBonusId(int n) { mnFkBonusId = n; }
     public void setFkBenefitTypeId(int n) { mnFkBenefitTypeId = n; }
     public void setFkLoanEmployeeId_n(int n) { mnFkLoanEmployeeId_n = n; }
     public void setFkLoanLoanId_n(int n) { mnFkLoanLoanId_n = n; }
@@ -93,12 +97,14 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
     public double getAmount_r() { return mdAmount_r; }
     public int getBenefitYear() { return mnBenefitYear; }
     public int getBenefitAnniversary() { return mnBenefitAnniversary; }
+    public boolean isTimeClockSourced() { return mbTimeClockSourced; }
     public boolean isUserEdited() { return mbUserEdited; }
     public boolean isAutomatic() { return mbAutomatic; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
     public int getFkDeductionTypeId() { return mnFkDeductionTypeId; }
     public int getFkDeductionId() { return mnFkDeductionId; }
+    public int getFkBonusId() { return mnFkBonusId; }
     public int getFkBenefitTypeId() { return mnFkBenefitTypeId; }
     public int getFkLoanEmployeeId_n() { return mnFkLoanEmployeeId_n; }
     public int getFkLoanLoanId_n() { return mnFkLoanLoanId_n; }
@@ -139,12 +145,14 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         mdAmount_r = 0;
         mnBenefitYear = 0;
         mnBenefitAnniversary = 0;
+        mbTimeClockSourced = false;
         mbUserEdited = false;
         mbAutomatic = false;
         mbDeleted = false;
         mbSystem = false;
         mnFkDeductionTypeId = 0;
         mnFkDeductionId = 0;
+        mnFkBonusId = 0;
         mnFkBenefitTypeId = 0;
         mnFkLoanEmployeeId_n = 0;
         mnFkLoanLoanId_n = 0;
@@ -210,12 +218,14 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
             mdAmount_r = resultSet.getDouble("amt_r");
             mnBenefitYear = resultSet.getInt("ben_year");
             mnBenefitAnniversary = resultSet.getInt("ben_ann");
+            mbTimeClockSourced = resultSet.getBoolean("b_time_clock");
             mbUserEdited = resultSet.getBoolean("b_usr");
             mbAutomatic = resultSet.getBoolean("b_aut");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
             mnFkDeductionTypeId = resultSet.getInt("fk_tp_ded");
             mnFkDeductionId = resultSet.getInt("fk_ded");
+            mnFkBonusId = resultSet.getInt("fk_bonus");
             mnFkBenefitTypeId = resultSet.getInt("fk_tp_ben");
             mnFkLoanEmployeeId_n = resultSet.getInt("fk_loan_emp_n");
             mnFkLoanLoanId_n = resultSet.getInt("fk_loan_loan_n");
@@ -272,12 +282,14 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     mdAmount_r + ", " + 
                     mnBenefitYear + ", " + 
                     mnBenefitAnniversary + ", " + 
+                    (mbTimeClockSourced ? 1 : 0) + ", " + 
                     (mbUserEdited ? 1 : 0) + ", " + 
                     (mbAutomatic ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     mnFkDeductionTypeId + ", " + 
-                    mnFkDeductionId + ", " + 
+                    (mnFkDeductionId == 0 ? 1 : mnFkDeductionId) + ", " + 
+                    (mnFkBonusId == 0 ? 1 : mnFkBonusId) + ", " + 
                     mnFkBenefitTypeId + ", " + 
                     (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +
@@ -305,12 +317,14 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     "amt_r = " + mdAmount_r + ", " +
                     "ben_year = " + mnBenefitYear + ", " +
                     "ben_ann = " + mnBenefitAnniversary + ", " +
+                    "b_time_clock = " + (mbTimeClockSourced ? 1 : 0) + ", " +
                     "b_usr = " + (mbUserEdited ? 1 : 0) + ", " +
                     "b_aut = " + (mbAutomatic ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ded = " + mnFkDeductionTypeId + ", " +
                     "fk_ded = " + mnFkDeductionId + ", " +
+                    "fk_bonus = " + (mnFkBonusId == 0 ? 1 : mnFkBonusId) + ", " +
                     "fk_tp_ben = " + mnFkBenefitTypeId + ", " +
                     "fk_loan_emp_n = " + (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     "fk_loan_loan_n = " + (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +
@@ -351,12 +365,14 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
         registry.setAmount_r(this.getAmount_r());
         registry.setBenefitYear(this.getBenefitYear());
         registry.setBenefitAnniversary(this.getBenefitAnniversary());
+        registry.setTimeClockSourced(this.isTimeClockSourced());
         registry.setUserEdited(this.isUserEdited());
         registry.setAutomatic(this.isAutomatic());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());
         registry.setFkDeductionTypeId(this.getFkDeductionTypeId());
         registry.setFkDeductionId(this.getFkDeductionId());
+        registry.setFkBonusId(this.getFkBonusId());
         registry.setFkBenefitTypeId(this.getFkBenefitTypeId());
         registry.setFkLoanEmployeeId_n(this.getFkLoanEmployeeId_n());
         registry.setFkLoanLoanId_n(this.getFkLoanLoanId_n());

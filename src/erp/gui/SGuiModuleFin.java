@@ -212,6 +212,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinLayoutBankPendingAdvances;
     private javax.swing.JMenuItem jmiFinLayoutBankDoneAdvances;
     private javax.swing.JMenuItem jmiFinCfdPayment;
+    private javax.swing.JMenuItem jmiDownloadXml;
     private javax.swing.JMenuItem jmiFinImportPayments;
 
     private javax.swing.JMenu jmRep;
@@ -551,6 +552,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankPendingAdvances = new JMenuItem("Layouts de anticipos por pagar");
         jmiFinLayoutBankDoneAdvances = new JMenuItem("Layouts de anticipos pagados");
         jmiFinCfdPayment = new JMenuItem("CFDI recepción de pagos");
+        jmiDownloadXml = new JMenuItem("Descarga masiva XML");
         jmiFinImportPayments = new JMenuItem("Importación de pagos BBVA");
 
         jmFin.add(jmiFinExchangeRate);
@@ -571,6 +573,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.addSeparator();
         jmFin.add(jmiFinCfdPayment);
         jmiFinCfdPayment.setEnabled(false);
+        jmFin.addSeparator();
+        jmFin.add(jmiDownloadXml);
+        jmiDownloadXml.setEnabled(false);
         /* XXX Not released yet! (2018-05-03, Sergio Flores)
         jmFin.addSeparator();
         jmFin.add(jmiFinImportPayments);
@@ -846,6 +851,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankPendingAdvances.addActionListener(this);
         jmiFinLayoutBankDoneAdvances.addActionListener(this);
         jmiFinCfdPayment.addActionListener(this);
+        jmiDownloadXml.addActionListener(this);
         jmiFinImportPayments.addActionListener(this);
 
         jmiCfgAbpEntityCash.addActionListener(this);
@@ -1042,6 +1048,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankPendingAdvances.setEnabled(hasRightMoveAccCash);
         jmiFinLayoutBankDoneAdvances.setEnabled(hasRightMoveAccCash);
         jmiFinCfdPayment.setEnabled(hasRightMoveAccCash);
+        jmiDownloadXml.setEnabled(hasRightMoveAccCash);
         jmiFinImportPayments.setEnabled(hasRightMoveAccCash);
 
         jmRep.setEnabled(hasRightRep || hasRightRepStats || hasRightMoveAccCash);

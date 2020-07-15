@@ -7,6 +7,7 @@ package erp.mod.hrs.view;
 import erp.gui.grid.SGridFilterPanelEmployee;
 import erp.mod.SModConsts;
 import erp.mod.hrs.form.SDialogLayoutEmployee;
+import erp.mod.hrs.form.SDialogMassiveUpdateSscPeriod;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -31,9 +32,10 @@ import sa.lib.gui.SGuiConsts;
 public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements ActionListener{
 
     private SGridFilterPanelEmployee moFilterEmployee;
-    private JButton jbLayoutEmployeeSBC;    
-    
+    private JButton jbLayoutEmployeeSBC;
+    private JButton jbEmployeesSscPeriod;
     private SDialogLayoutEmployee moDialogLayoutEmployee;
+    private SDialogMassiveUpdateSscPeriod moDialogMassiveUpdateSscPeriod;
 
     public SViewEmployeeWageSscBaseLog(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.HRS_EMP_LOG_SAL_SSC, SLibConsts.UNDEFINED, title);
@@ -50,17 +52,35 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
         jbLayoutEmployeeSBC = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout modificación SBC de empleados", this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeSBC);
         
+        jbEmployeesSscPeriod = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif")), "Actualización de SBC de empleados", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbEmployeesSscPeriod);
+
     }
-    
+
     private void actionLayoutEmployeeSBC() {
         if (jbLayoutEmployeeSBC.isEnabled()) {
-                try {
-                    moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_SSC);
-                    moDialogLayoutEmployee.resetForm();
-                    moDialogLayoutEmployee.setVisible(true);
+            try {
+                moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_SSC);
+                moDialogLayoutEmployee.resetForm();
+                moDialogLayoutEmployee.setVisible(true);
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }
+    }
+ 
+    private void actionEmployeesSscPeriod() {
+        if (jbEmployeesSscPeriod.isEnabled()) {
+            try {
+                if (moDialogMassiveUpdateSscPeriod == null) {
+                    moDialogMassiveUpdateSscPeriod = new SDialogMassiveUpdateSscPeriod(miClient, "Actualización de SBC de empleados");
                 }
-                catch (Exception e) {
-                    SLibUtils.showException(this, e);
+                moDialogMassiveUpdateSscPeriod.resetForm();
+                moDialogMassiveUpdateSscPeriod.setVisible(true);
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
             }
         }
     }
@@ -131,7 +151,7 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
+        ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<SGridColumnView>();
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.bp", "Empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
@@ -144,7 +164,7 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
 
         return gridColumnsViews;
     }
-
+    
     @Override
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
@@ -152,7 +172,7 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
         moSuscriptionsSet.add(SModConsts.BPSU_BP);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
     }
-
+       
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JButton) {
@@ -160,6 +180,9 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
 
             if (button == jbLayoutEmployeeSBC) {
                 actionLayoutEmployeeSBC();
+            }            
+            else if (button == jbEmployeesSscPeriod) {
+                actionEmployeesSscPeriod();
             }
         }
     }

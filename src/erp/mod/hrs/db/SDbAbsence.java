@@ -33,10 +33,12 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     protected int mnBenefitsYear;
     protected int mnBenefitsAnniversary;
     protected String msNotes;
+    protected boolean mbTimeClockSourced;
     protected boolean mbClosed;
     //protected boolean mbDeleted;
     protected int mnFkAbsenceClassId;
     protected int mnFkAbsenceTypeId;
+    protected int mnFkSourcePayrollId_n;
     protected int mnFkUserClosedId;
     /*
     protected int mnFkUserInsertId;
@@ -83,10 +85,12 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public void setBenefitsYear(int n) { mnBenefitsYear = n; }
     public void setBenefitsAnniversary(int n) { mnBenefitsAnniversary = n; }
     public void setNotes(String s) { msNotes = s; }
+    public void setTimeClockSourced(boolean b) { mbTimeClockSourced = b; }
     public void setClosed(boolean b) { mbClosed = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setFkAbsenceClassId(int n) { mnFkAbsenceClassId = n; }
     public void setFkAbsenceTypeId(int n) { mnFkAbsenceTypeId = n; }
+    public void setFkSourcePayrollId_n(int n) { mnFkSourcePayrollId_n = n; }
     public void setFkUserClosedId(int n) { mnFkUserClosedId = n; }
     public void setFkUserInsertId(int n) { mnFkUserInsertId = n; }
     public void setFkUserUpdateId(int n) { mnFkUserUpdateId = n; }
@@ -104,10 +108,12 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
     public int getBenefitsYear() { return mnBenefitsYear; }
     public int getBenefitsAnniversary() { return mnBenefitsAnniversary; }
     public String getNotes() { return msNotes; }
+    public boolean isTimeClockSourced() { return mbTimeClockSourced; }
     public boolean isClosed() { return mbClosed; }
     public boolean isDeleted() { return mbDeleted; }
     public int getFkAbsenceClassId() { return mnFkAbsenceClassId; }
     public int getFkAbsenceTypeId() { return mnFkAbsenceTypeId; }
+    public int getFkSourcePayrollId_n() { return mnFkSourcePayrollId_n; }
     public int getFkUserClosedId() { return mnFkUserClosedId; }
     public int getFkUserInsertId() { return mnFkUserInsertId; }
     public int getFkUserUpdateId() { return mnFkUserUpdateId; }
@@ -247,10 +253,12 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         mnBenefitsYear = 0;
         mnBenefitsAnniversary = 0;
         msNotes = "";
+        mbTimeClockSourced = false;
         mbClosed = false;
         mbDeleted = false;
         mnFkAbsenceClassId = 0;
         mnFkAbsenceTypeId = 0;
+        mnFkSourcePayrollId_n = 0;
         mnFkUserClosedId = 0;
         mnFkUserInsertId = 0;
         mnFkUserUpdateId = 0;
@@ -321,10 +329,12 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
             mnBenefitsYear = resultSet.getInt("ben_year");
             mnBenefitsAnniversary = resultSet.getInt("ben_ann");
             msNotes = resultSet.getString("nts");
+            mbTimeClockSourced = resultSet.getBoolean("b_time_clock");
             mbClosed = resultSet.getBoolean("b_clo");
             mbDeleted = resultSet.getBoolean("b_del");
             mnFkAbsenceClassId = resultSet.getInt("fk_cl_abs");
             mnFkAbsenceTypeId = resultSet.getInt("fk_tp_abs");
+            mnFkSourcePayrollId_n = resultSet.getInt("fk_src_pay_n");
             mnFkUserClosedId = resultSet.getInt("fk_usr_clo");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
@@ -371,10 +381,12 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                     mnBenefitsYear + ", " + 
                     mnBenefitsAnniversary + ", " + 
                     "'" + msNotes + "', " +
+                    (mbTimeClockSourced ? 1 : 0) + ", " +
                     (mbClosed ? 1 : 0) + ", " +
                     (mbDeleted ? 1 : 0) + ", " +
                     mnFkAbsenceClassId + ", " +
                     mnFkAbsenceTypeId + ", " +
+                    mnFkSourcePayrollId_n + ", " +
                     mnFkUserClosedId + ", " +
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
@@ -399,10 +411,12 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
                     "ben_year = " + mnBenefitsYear + ", " +
                     "ben_ann = " + mnBenefitsAnniversary + ", " +
                     "nts = '" + msNotes + "', " +
+                    "b_time_clock = " + (mbTimeClockSourced ? 1 : 0) + ", " +
                     "b_clo = " + (mbClosed ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_cl_abs = " + mnFkAbsenceClassId + ", " +
                     "fk_tp_abs = " + mnFkAbsenceTypeId + ", " +
+                    "fk_src_pay_n = " + mnFkSourcePayrollId_n + ", " +
                     "fk_usr_clo = " + mnFkUserClosedId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
@@ -413,6 +427,14 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         }
 
         session.getStatement().execute(msSql);
+        SDbAbsenceType absenceType = (SDbAbsenceType) session.readRegistry(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId });
+        msXtaAbsenceClass = (String) session.readField(SModConsts.HRSU_CL_ABS, new int[] { mnFkAbsenceClassId }, SDbAbsenceClass.FIELD_NAME);
+        msXtaAbsenceType = (String) session.readField(SModConsts.HRSU_TP_ABS, new int[] { mnFkAbsenceClassId, mnFkAbsenceTypeId }, SDbAbsenceType.FIELD_NAME);
+
+        if (absenceType != null) {
+            mbXtaAbsenceTypePayable = absenceType.isPayable();
+        }
+            
         mbRegistryNew = false;
         mnQueryResultId = SDbConsts.SAVE_OK;
     }
@@ -431,10 +453,12 @@ public class SDbAbsence extends SDbRegistryUser implements SGridRow {
         registry.setBenefitsYear(this.getBenefitsYear());
         registry.setBenefitsAnniversary(this.getBenefitsAnniversary());
         registry.setNotes(this.getNotes());
+        registry.setTimeClockSourced(this.isTimeClockSourced());
         registry.setClosed(this.isClosed());
         registry.setDeleted(this.isDeleted());
         registry.setFkAbsenceClassId(this.getFkAbsenceClassId());
         registry.setFkAbsenceTypeId(this.getFkAbsenceTypeId());
+        registry.setFkSourcePayrollId_n(this.getFkSourcePayrollId_n());
         registry.setFkUserClosedId(this.getFkUserClosedId());
         registry.setFkUserInsertId(this.getFkUserInsertId());
         registry.setFkUserUpdateId(this.getFkUserUpdateId());

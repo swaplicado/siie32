@@ -314,7 +314,7 @@ public class SHrsPayroll {
                     dateCutOff = dateEnd;
                 }
 
-                SDbEarning earning = getEarningByType(SModSysConsts.HRSS_TP_EAR_VAC_BON);
+                SDbEarning earning = getEarningByType(SModSysConsts.HRSS_TP_EAR_VAC_BONUS);
                 SDbBenefitTable dbBenefitTableVacBon = getBenefitTable(SModSysConsts.HRSS_TP_BEN_VAC_BON, dateEnd, moPayroll.getFkPaymentTypeId());
                 SDbBenefitTable deBenefitTableVac = getBenefitTable(SModSysConsts.HRSS_TP_BEN_VAC, dateEnd, moPayroll.getFkPaymentTypeId());
                 ArrayList<SHrsBenefitTableAnniversary> hrsBenefitTableAnniversarysVacBon = getBenefitTableAnniversary(dbBenefitTableVacBon.getPkBenefitId());

@@ -12,6 +12,76 @@ Isabel Danae GARCÍA SERVÍN
 7) Refactorización general del código fuente.
 
 ================================================================================
+SIIE 3.2 164.8/ 2020-07-14
+Edwin CARMONA
+--------------------------------------------------------------------------------
+1) Obtención de información de CAP para calcular vales y bonos automáticamente.
+2) Obtención de información de CAP para realizar prenómina.
+3) Vista de percepciones determinadas por reloj checador.
+4) Modificación a la forma de captura de nóminas para integración de proceso de cálculo de prenómina y vales.
+5) Bitácoras de importación de prenómina y vales en formato JSON y CSV.
+
+================================================================================
+SIIE 3.2 164.7/ 2020-06-29
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Complementos y mejoras de salario base contización.
+
+================================================================================
+SIIE 3.2 164.6/ 2020-06-26
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección a la consulta vistas de invetarios a detalle.
+
+================================================================================
+SIIE 3.2 164.5/ 2020-06-25
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la consulta de empleados en la forma de captura de empleados del Submódulo Mantenimiento del Módulo Inventarios.
+
+================================================================================
+SIIE 3.2 164.4/ 2020-06-24
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la funcionalidad de sustutución patronal puesto que no hacía las inserciones de configuraciones de contabilización de percepciones y deducciones por empleado en la base de datos correcta.
+
+================================================================================
+SIIE 3.2 164.3/ 2020-06-23
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Ajuste a la integración del XML de CFDI factura electrónica con Complemento de Recepción de Pagos para limitar el número de decimales en el valor unitario del concepto. La recomendación es hacerlo hasta las centésimas (dos decimales.)
+
+================================================================================
+SIIE 3.2 164.2/ 2020-06-20
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a consulta vista control de gratificación anual por error en límites de escalonamientos por aniversarios, originalmente implementados de forma parcial, para hacerlo en base a aniversarios completos.
+2) Mejoramiento a validación de tipo de cambio en captura de documentos para confirmar que sea 1.0000 con moneda extranjera, y confirmar tipo de cambio distinto al de sistema si es distinto.
+
+================================================================================
+SIIE 3.2 164.1/ 2020-06-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la definición de precio unitario y flete unitario, habilitándolo para todos los productos, independientemente que el ítem tenga la opción correspondiente seleccionada.
+1.1) Adaptación del formato de impresión de contratos, para unidad original y para toneladas, en cuanto a la incorporación del precio unitario sin flete y flete unitario.
+2) Mejoramiento a la captura de Incoterms, para hacerlos obligatorios exclusivamente en facturas y notas de crédito de cuentas por cobrar.
+3) Corrección a la carga de valores históricos de addenda AMECE 7.1 para GLN empresa y GLN sucursal de entrega.
+
+================================================================================
+SIIE 3.2 164.0/ 2020-04-29
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Implementación de carga de prenómina desde reloj checador a recibos de nómina.
+
+================================================================================
+SIIE 3.2 163.4/ 2020-04-29
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de nota de exportador confiable, si aplica, en impresión de facturas de ventas de exportación.
+2) Revisión nombres de métodos en clase de contactos de sucursales de asociados de negocios.
+3) Cambios en clase de documentos por revisión de nombres de clases de addenda AMECE 7.1.
+
+================================================================================
 SIIE 3.2 163.3/ 2020-04-02
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

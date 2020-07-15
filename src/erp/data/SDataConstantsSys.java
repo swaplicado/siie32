@@ -1613,7 +1613,6 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_BAL_AGI = 207022;
     public static final int REP_TRN_BPS_MOV_DPS = 207023;
     public static final int REP_TRN_ORD_GDS = 207024;
-    public static final int REP_TRN_CON_FIX = 207025;
     public static final int REP_TRN_PS_ITEM_UNIT_PRICE = 207026;
     public static final int REP_TRN_DPS_BPS_DETAIL = 207027;
     public static final int REP_TRN_DPS_MOV = 207028;

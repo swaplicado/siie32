@@ -266,7 +266,7 @@ public class SFormMaintUser extends SBeanForm implements ActionListener {
     public void reloadCatalogues() {
         switch (mnFormSubtype) {
             case SModSysConsts.TRNX_TP_MAINT_USER_EMPLOYEE:
-                miClient.getSession().populateCatalogue(moKeyMaintUser, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
+                miClient.getSession().populateCatalogue(moKeyMaintUser, SModConsts.HRSU_EMP, SModConsts.TRN_MAINT_USER, null);
                 break;
             case SModSysConsts.TRNX_TP_MAINT_USER_CONTRACTOR:
             case SModSysConsts.TRNX_TP_MAINT_USER_TOOLS_MAINT_PROV:

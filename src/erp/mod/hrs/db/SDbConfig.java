@@ -29,6 +29,11 @@ public class SDbConfig extends SDbRegistryUser {
     protected String msSsSubbranch;
     protected String msBajioAffinityGroup;
     protected double mdPayrollTaxRate;
+    protected int mnPrePayrollWeeklyCutoffDayWeek; //Pre payroll weekly cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
+    protected int mnPrePayrollWeeklyWeeksLag;
+    protected int mnPrePayrollVarWeeklyCutoffDayWeek; //Pre payroll weekly cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
+    protected int mnPrePayrollVarWeeklyWeeksLag;
+    protected int mnTimeClockPolicy;
     protected boolean mbFortnightStandard;
     protected boolean mbAutoVacationBonus;
     protected boolean mbTaxSubsidyEarning;
@@ -45,6 +50,11 @@ public class SDbConfig extends SDbRegistryUser {
     protected int mnFkEarningTaxSubsidyId_n;
     protected int mnFkEarningTaxSubsidyCompensatedId_n;
     protected int mnFkEarningSsContributionId_n;
+    protected int mnFkEarningOvertime_2_Id_n;
+    protected int mnFkEarningOvertime_3_Id_n;
+    protected int mnFkEarningHolidayId_n;
+    protected int mnFkEarningDayOffId_n;
+    protected int mnFkEarningSunBonusId_n;
     protected int mnFkDeductionTaxId_n;
     protected int mnFkDeductionTaxSubsidyId_n;
     protected int mnFkDeductionSsContributionId_n;
@@ -67,6 +77,11 @@ public class SDbConfig extends SDbRegistryUser {
     public void setSsSubbranch(String s) { msSsSubbranch = s; }
     public void setBajioAffinityGroup(String s) { msBajioAffinityGroup = s; }
     public void setPayrollTaxRate(double d) { mdPayrollTaxRate = d; }
+    public void setPrePayWeekCutDay(int n) { mnPrePayrollWeeklyCutoffDayWeek = n; }
+    public void setPrePayWeekLag(int n) { mnPrePayrollWeeklyWeeksLag = n; }
+    public void setPrePayVarWeekCutDay(int n) { mnPrePayrollVarWeeklyCutoffDayWeek = n; }
+    public void setPrePayVarWeekLag(int n) { mnPrePayrollVarWeeklyWeeksLag = n; }
+    public void setTimeClockPol(int n) { mnTimeClockPolicy = n; }
     public void setFortnightStandard(boolean b) { mbFortnightStandard = b; }
     public void setAutoVacationBonus(boolean b) { mbAutoVacationBonus = b; }
     public void setTaxSubsidyEarning(boolean b) { mbTaxSubsidyEarning = b; }
@@ -83,6 +98,11 @@ public class SDbConfig extends SDbRegistryUser {
     public void setFkEarningTaxSubsidyId_n(int n) { mnFkEarningTaxSubsidyId_n = n; }
     public void setFkEarningTaxSubsidyCompensatedId_n(int n) { mnFkEarningTaxSubsidyCompensatedId_n = n; }
     public void setFkEarningSsContributionId_n(int n) { mnFkEarningSsContributionId_n = n; }
+    public void setFkEarningOvertime2Id_n(int n) { mnFkEarningOvertime_2_Id_n = n; }
+    public void setFkEarningOvertime3Id_n(int n) { mnFkEarningOvertime_3_Id_n = n; }
+    public void setFkEarningHolidayId_n(int n) { mnFkEarningHolidayId_n = n; }
+    public void setFkEarningDayOffId_n(int n) { mnFkEarningDayOffId_n = n; }
+    public void setFkEarningSunBonusId_n(int n) { mnFkEarningSunBonusId_n = n; }
     public void setFkDeductionTaxId_n(int n) { mnFkDeductionTaxId_n = n; }
     public void setFkDeductionTaxSubsidyId_n(int n) { mnFkDeductionTaxSubsidyId_n = n; }
     public void setFkDeductionSsContributionId_n(int n) { mnFkDeductionSsContributionId_n = n; }
@@ -99,6 +119,14 @@ public class SDbConfig extends SDbRegistryUser {
     public String getSsSubbranch() { return msSsSubbranch; }
     public String getBajioAffinityGroup() { return msBajioAffinityGroup; }
     public double getPayrollTaxRate() { return mdPayrollTaxRate; }
+    /**
+     * Pre payroll weekly cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
+     */
+    public int getPrePayWeekCutDay() { return mnPrePayrollWeeklyCutoffDayWeek; }
+    public int getPrePayWeekLag() { return mnPrePayrollWeeklyWeeksLag; }
+    public int getPrePayVarWeekCutDay() { return mnPrePayrollVarWeeklyCutoffDayWeek; }
+    public int getPrePayVarWeekLag() { return mnPrePayrollVarWeeklyWeeksLag; }
+    public int getTimeClockPol() { return mnTimeClockPolicy; }
     public boolean isFortnightStandard() { return mbFortnightStandard; }
     public boolean isAutoVacationBonus() { return mbAutoVacationBonus; }
     public boolean isTaxSubsidyEarning() { return mbTaxSubsidyEarning; }
@@ -115,6 +143,11 @@ public class SDbConfig extends SDbRegistryUser {
     public int getFkEarningTaxSubsidyId_n() { return mnFkEarningTaxSubsidyId_n; }
     public int getFkEarningTaxSubsidyCompensatedId_n() { return mnFkEarningTaxSubsidyCompensatedId_n; }
     public int getFkEarningSsContributionId_n() { return mnFkEarningSsContributionId_n; }
+    public int getFkEarningOvertime2Id_n() { return mnFkEarningOvertime_2_Id_n; }
+    public int getFkEarningOvertime3Id_n() { return mnFkEarningOvertime_3_Id_n; }
+    public int getFkEarningHolidayId_n() { return mnFkEarningHolidayId_n; }
+    public int getFkEarningDayOffId_n() { return mnFkEarningDayOffId_n; }
+    public int getFkEarningSunBonusId_n() { return mnFkEarningSunBonusId_n; }
     public int getFkDeductionTaxId_n() { return mnFkDeductionTaxId_n; }
     public int getFkDeductionTaxSubsidyId_n() { return mnFkDeductionTaxSubsidyId_n; }
     public int getFkDeductionSsContributionId_n() { return mnFkDeductionSsContributionId_n; }
@@ -145,6 +178,11 @@ public class SDbConfig extends SDbRegistryUser {
         msSsSubbranch = "";
         msBajioAffinityGroup = "";
         mdPayrollTaxRate = 0;
+        mnPrePayrollWeeklyCutoffDayWeek = 0;
+        mnPrePayrollWeeklyWeeksLag = 0;
+        mnPrePayrollVarWeeklyCutoffDayWeek = 0;
+        mnPrePayrollVarWeeklyWeeksLag = 0;
+        mnTimeClockPolicy = 0;
         mbFortnightStandard = false;
         mbAutoVacationBonus = false;
         mbTaxSubsidyEarning = false;
@@ -161,6 +199,11 @@ public class SDbConfig extends SDbRegistryUser {
         mnFkEarningTaxSubsidyId_n = 0;
         mnFkEarningTaxSubsidyCompensatedId_n = 0;
         mnFkEarningSsContributionId_n = 0;
+        mnFkEarningOvertime_2_Id_n = 0;
+        mnFkEarningOvertime_3_Id_n = 0;
+        mnFkEarningHolidayId_n = 0;
+        mnFkEarningDayOffId_n = 0;
+        mnFkEarningSunBonusId_n = 0;
         mnFkDeductionTaxId_n = 0;
         mnFkDeductionTaxSubsidyId_n = 0;
         mnFkDeductionSsContributionId_n = 0;
@@ -212,6 +255,11 @@ public class SDbConfig extends SDbRegistryUser {
             msSsSubbranch = resultSet.getString("ss_subbra");
             msBajioAffinityGroup = resultSet.getString("baj_aff_grp");
             mdPayrollTaxRate = resultSet.getDouble("pay_tax_rate");
+            mnPrePayrollWeeklyCutoffDayWeek = resultSet.getInt("pre_pay_wee_cut_day_wee");
+            mnPrePayrollWeeklyWeeksLag = resultSet.getInt("pre_pay_wee_wee_lag");
+            mnPrePayrollVarWeeklyCutoffDayWeek = resultSet.getInt("pre_pay_wee_var_cut_day_wee");
+            mnPrePayrollVarWeeklyWeeksLag = resultSet.getInt("pre_pay_wee_var_wee_lag");
+            mnTimeClockPolicy = resultSet.getInt("time_clock_pol");
             mbFortnightStandard = resultSet.getBoolean("b_for_std");
             mbAutoVacationBonus = resultSet.getBoolean("b_auto_vac_bon");
             mbTaxSubsidyEarning = resultSet.getBoolean("b_tax_sub_ear");
@@ -228,6 +276,11 @@ public class SDbConfig extends SDbRegistryUser {
             mnFkEarningTaxSubsidyId_n = resultSet.getInt("fk_ear_tax_sub_n");
             mnFkEarningTaxSubsidyCompensatedId_n = resultSet.getInt("fk_ear_tax_sub_comp_n");
             mnFkEarningSsContributionId_n = resultSet.getInt("fk_ear_ssc_n");
+            mnFkEarningOvertime_2_Id_n = resultSet.getInt("fk_ear_overtime_2_n");
+            mnFkEarningOvertime_3_Id_n = resultSet.getInt("fk_ear_overtime_3_n");
+            mnFkEarningHolidayId_n = resultSet.getInt("fk_ear_holiday_n");
+            mnFkEarningDayOffId_n = resultSet.getInt("fk_ear_day_off_n");
+            mnFkEarningSunBonusId_n = resultSet.getInt("fk_ear_sun_bonus_n");
             mnFkDeductionTaxId_n = resultSet.getInt("fk_ded_tax_n");
             mnFkDeductionTaxSubsidyId_n = resultSet.getInt("fk_ded_tax_sub_n");
             mnFkDeductionSsContributionId_n = resultSet.getInt("fk_ded_ssc_n");
@@ -265,6 +318,11 @@ public class SDbConfig extends SDbRegistryUser {
                     "'" + msSsSubbranch + "', " + 
                     "'" + msBajioAffinityGroup + "', " + 
                     mdPayrollTaxRate + ", " + 
+                    mnPrePayrollWeeklyCutoffDayWeek + ", " + 
+                    mnPrePayrollWeeklyWeeksLag + ", " + 
+                    mnPrePayrollVarWeeklyCutoffDayWeek + ", " + 
+                    mnPrePayrollVarWeeklyWeeksLag + ", " + 
+                    mnTimeClockPolicy + ", " + 
                     (mbFortnightStandard ? 1 : 0) + ", " + 
                     (mbAutoVacationBonus ? 1 : 0) + ", " + 
                     (mbTaxSubsidyEarning ? 1 : 0) + ", " +
@@ -281,6 +339,11 @@ public class SDbConfig extends SDbRegistryUser {
                     (mnFkEarningTaxSubsidyId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyId_n) + ", " +
                     (mnFkEarningTaxSubsidyCompensatedId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyCompensatedId_n) + ", " +
                     (mnFkEarningSsContributionId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningSsContributionId_n) + ", " +
+                    (mnFkEarningOvertime_2_Id_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningOvertime_2_Id_n) + ", " +
+                    (mnFkEarningOvertime_3_Id_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningOvertime_3_Id_n) + ", " +
+                    (mnFkEarningHolidayId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningHolidayId_n) + ", " +
+                    (mnFkEarningDayOffId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningDayOffId_n) + ", " +
+                    (mnFkEarningSunBonusId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningSunBonusId_n) + ", " +
                     (mnFkDeductionTaxId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkDeductionTaxId_n) + ", " +
                     (mnFkDeductionTaxSubsidyId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkDeductionTaxSubsidyId_n) + ", " +
                     (mnFkDeductionSsContributionId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkDeductionSsContributionId_n) + ", " +
@@ -302,6 +365,11 @@ public class SDbConfig extends SDbRegistryUser {
                     "ss_subbra = '" + msSsSubbranch + "', " +
                     "baj_aff_grp = '" + msBajioAffinityGroup + "', " +
                     "pay_tax_rate = " + mdPayrollTaxRate + ", " +
+                    "pre_pay_wee_cut_day_wee = " + mnPrePayrollWeeklyCutoffDayWeek + ", " + 
+                    "pre_pay_wee_wee_lag = " + mnPrePayrollWeeklyWeeksLag + ", " + 
+                    "pre_pay_wee_var_cut_day_wee = " + mnPrePayrollVarWeeklyCutoffDayWeek + ", " + 
+                    "pre_pay_wee_var_wee_lag = " + mnPrePayrollVarWeeklyWeeksLag + ", " + 
+                    "time_clock_pol = " + mnTimeClockPolicy + ", " + 
                     "b_for_std = " + (mbFortnightStandard ? 1 : 0) + ", " +
                     "b_auto_vac_bon = " + (mbAutoVacationBonus ? 1 : 0) + ", " +
                     "b_tax_sub_ear = " + (mbTaxSubsidyEarning ? 1 : 0) + ", " +
@@ -318,6 +386,11 @@ public class SDbConfig extends SDbRegistryUser {
                     "fk_ear_tax_sub_n = " + (mnFkEarningTaxSubsidyId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyId_n) + ", " +
                     "fk_ear_tax_sub_comp_n = " + (mnFkEarningTaxSubsidyCompensatedId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningTaxSubsidyCompensatedId_n) + ", " +
                     "fk_ear_ssc_n = " + (mnFkEarningSsContributionId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningSsContributionId_n) + ", " +
+                    "fk_ear_overtime_2_n = " + (mnFkEarningOvertime_2_Id_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningOvertime_2_Id_n) + ", " +
+                    "fk_ear_overtime_3_n = " + (mnFkEarningOvertime_3_Id_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningOvertime_3_Id_n) + ", " +
+                    "fk_ear_holiday_n = " + (mnFkEarningHolidayId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningHolidayId_n) + ", " +
+                    "fk_ear_day_off_n = " + (mnFkEarningDayOffId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningDayOffId_n) + ", " +
+                    "fk_ear_sun_bonus_n = " + (mnFkEarningSunBonusId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkEarningSunBonusId_n) + ", " +
                     "fk_ded_tax_n = " + (mnFkDeductionTaxId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkDeductionTaxId_n) + ", " +
                     "fk_ded_tax_sub_n = " + (mnFkDeductionTaxSubsidyId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkDeductionTaxSubsidyId_n) + ", " +
                     "fk_ded_ssc_n = " + (mnFkDeductionSsContributionId_n == SLibConsts.UNDEFINED ? "NULL" : "" + mnFkDeductionSsContributionId_n) + ", " +
@@ -345,6 +418,11 @@ public class SDbConfig extends SDbRegistryUser {
         registry.setSsSubbranch(this.getSsSubbranch());
         registry.setBajioAffinityGroup(this.getBajioAffinityGroup());
         registry.setPayrollTaxRate(this.getPayrollTaxRate());
+        registry.setPrePayWeekCutDay(this.getPrePayWeekCutDay());
+        registry.setPrePayWeekLag(this.getPrePayWeekLag());
+        registry.setPrePayVarWeekCutDay(this.getPrePayVarWeekCutDay());
+        registry.setPrePayVarWeekLag(this.getPrePayVarWeekLag());
+        registry.setTimeClockPol(this.getTimeClockPol());
         registry.setFortnightStandard(this.isFortnightStandard());
         registry.setAutoVacationBonus(this.isAutoVacationBonus());
         registry.setTaxSubsidyEarning(this.isTaxSubsidyEarning());
@@ -361,6 +439,11 @@ public class SDbConfig extends SDbRegistryUser {
         registry.setFkEarningTaxSubsidyId_n(this.getFkEarningTaxSubsidyId_n());
         registry.setFkEarningTaxSubsidyCompensatedId_n(this.getFkEarningTaxSubsidyCompensatedId_n());
         registry.setFkEarningSsContributionId_n(this.getFkEarningSsContributionId_n());
+        registry.setFkEarningOvertime2Id_n(this.getFkEarningOvertime2Id_n());
+        registry.setFkEarningOvertime3Id_n(this.getFkEarningOvertime3Id_n());
+        registry.setFkEarningHolidayId_n(this.getFkEarningHolidayId_n());
+        registry.setFkEarningDayOffId_n(this.getFkEarningDayOffId_n());
+        registry.setFkEarningSunBonusId_n(this.getFkEarningSunBonusId_n());
         registry.setFkDeductionTaxId_n(this.getFkDeductionTaxId_n());
         registry.setFkDeductionTaxSubsidyId_n(this.getFkDeductionTaxSubsidyId_n());
         registry.setFkDeductionSsContributionId_n(this.getFkDeductionSsContributionId_n());

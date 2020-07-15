@@ -14,6 +14,7 @@ import erp.mod.hrs.db.SHrsEmployeeUtils;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.JOptionPane;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
@@ -31,7 +32,8 @@ import sa.lib.gui.bean.SBeanFormDialog;
  */
 public class SDialogEmployerSubstitution extends SBeanFormDialog {
     
-    private static final String ERR_EMP_ACT = "¡El empleado debe estar inactivo para ser exportado a otra(s) empresa(s)!";
+    private static final String ERR_EMP_ACTTIVE = "¡El empleado debe estar inactivo para ser exportado a otra(s) empresa(s)!";
+    private static final String WAR_NO_ROLLBACK = "¡Esta operación no puede ser revertida!";
 
     protected SDbEmployee moEmployee;
 
@@ -153,11 +155,11 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
         
         moEmployee = null;
 
-        moDateDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate.getText()), true);
         moKeyNewEmployer.setKeySettings(miClient, SGuiUtils.getLabelName(jlNewEmployer.getText()), true);
+        moDateDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate.getText()), true);
 
-        moFields.addField(moDateDate);
         moFields.addField(moKeyNewEmployer);
+        moFields.addField(moDateDate);
 
         moFields.setFormButton(jbSave);
 
@@ -171,10 +173,10 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
             jtfEmployee.setCaretPosition(0);
             
             if (moEmployee.isActive()) {
-                jtfWarning.setText(ERR_EMP_ACT);
+                jtfWarning.setText(ERR_EMP_ACTTIVE);
             }
             else {
-                jtfWarning.setText("¡Esta operación no puede ser revertida!");
+                jtfWarning.setText(WAR_NO_ROLLBACK);
             }
             jtfWarning.setCaretPosition(0);
         }
@@ -237,7 +239,12 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
         
         if (validation.isValid()) {
             if (moEmployee.isActive()) {
-                validation.setMessage(ERR_EMP_ACT);
+                validation.setMessage(ERR_EMP_ACTTIVE);
+            }
+            else if (miClient.showMsgBoxConfirm("¿Está seguro que desea cambiar a '" + jtfEmployee.getText() + "' a '" + moKeyNewEmployer.getSelectedItem().getItem() + "'?\n"
+                    + "Fecha de alta: " + SLibUtils.DateFormatDate.format(moDateDate.getValue()) + ".\n"
+                    + WAR_NO_ROLLBACK) != JOptionPane.YES_OPTION) {
+                validation.setMessage("Favor de revisar los datos de la sustitución patronal.");
             }
         }
         
@@ -324,7 +331,7 @@ public class SDialogEmployerSubstitution extends SBeanFormDialog {
                     moEmployee.setFkSourceCompanyId(moKeyNewEmployer.getValue()[0]);
                     
                     moEmployee.setAuxHireLogDate(moDateDate.getValue());
-                    moEmployee.setAuxHireLogNotes(SGuiUtils.getLabelName(jlNewEmployer).toUpperCase());
+                    moEmployee.setAuxHireLogNotes(getTitle().toUpperCase());
                     moEmployee.setAuxEmployeeDismissalTypeId(SModSysConsts.HRSU_TP_EMP_DIS_NON);
                     moEmployee.setAuxHrsEmployeeHireLog(hrsEmployeeHireLog);
 
