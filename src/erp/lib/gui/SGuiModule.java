@@ -33,24 +33,34 @@ public abstract class SGuiModule {
     protected erp.client.SClientInterface miClient;
     protected int mnModuleType;
 
+    // form members:
     protected java.lang.Object moLastSavedPrimaryKey;
     protected erp.lib.data.SDataRegistry moRegistry;
     protected erp.lib.form.SFormInterface miForm;
     protected java.awt.Cursor moCursor;
     protected java.util.Vector<sa.lib.srv.SSrvLock> mvIndependentLocks;
+    
+    // form option pickers:
     protected java.util.Vector<erp.lib.form.SFormOptionPickerInterface> mvOptionPickers;
+    
+    // form complement:
     protected java.lang.Object moFormComplement;
     protected int mnCurrentUserPrivilegeLevel;
     protected boolean mbIsFormReadOnly;
+    
+    // auxiliar registry for creating registries on the fly and passing them to forms:
+    protected erp.lib.data.SDataRegistry moAuxRegistry;
 
     public SGuiModule(erp.client.SClientInterface client, int type) {
         miClient = client;
         mnModuleType = type;
 
-        mvIndependentLocks = new Vector<sa.lib.srv.SSrvLock>();
-        mvOptionPickers = new Vector<erp.lib.form.SFormOptionPickerInterface>();
+        mvIndependentLocks = new Vector<>();
+        mvOptionPickers = new Vector<>();
+        
         clearFormMembers();
         clearFormComplement();
+        moAuxRegistry = null;
     }
 
     protected void clearFormMembers() {
@@ -189,6 +199,11 @@ public abstract class SGuiModule {
                     }
                 }
             }
+        }
+        else if (moAuxRegistry != null) {
+            miForm.setRegistry(moAuxRegistry);
+            miForm.formClearRegistry();
+            moAuxRegistry = null;
         }
 
         // Show form to user:
@@ -523,12 +538,14 @@ public abstract class SGuiModule {
     public void setFormComplement(java.lang.Object o) { moFormComplement = o; }
     public void setCurrentUserPrivilegeLevel(int n) { mnCurrentUserPrivilegeLevel = n; }
     public void setIsFormReadOnly(boolean b) { mbIsFormReadOnly = b; }
+    public void setAuxRegistry(erp.lib.data.SDataRegistry o) { moAuxRegistry = o; }
 
     public java.lang.Object getLastSavedPrimaryKey() { return moLastSavedPrimaryKey; }
     public erp.lib.data.SDataRegistry getRegistry() { return moRegistry; }
     public java.lang.Object getFormComplement() { return moFormComplement; }
     public int getCurrentUserPrivilegeLevel() { return mnCurrentUserPrivilegeLevel; }
     public boolean getIsFormReadOnly() { return mbIsFormReadOnly; }
+    public erp.lib.data.SDataRegistry getAuxRegistry() { return moAuxRegistry; }
 
     public void refreshCatalogues(int suscriptor) {
         int i = 0;
