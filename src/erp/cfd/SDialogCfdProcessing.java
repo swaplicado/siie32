@@ -17,7 +17,6 @@ import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsCfdUtils;
 import erp.mod.hrs.db.SHrsUtils;
-import erp.mtrn.data.SCfdPrintThread;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
@@ -53,7 +52,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
     protected boolean mbValidateStamp;
     
     protected boolean mbFirstTime;
-    protected int mnSubtypeCfd;
+    protected int mnCfdSubtype;
     protected int mnNumberCopies;
     protected int mnDpsAnnulmentType;
     
@@ -454,6 +453,14 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
         moIntCfdToProcess.setValue(maCfds.size());
         
         if (maCfds != null) {
+            // clear data set of SCfdUtils when CFD type is payroll:
+            
+            if (!maCfds.isEmpty() && maCfds.get(0).getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+                SCfdUtils.DataSet.remove(SModConsts.HRS_PAY); // payroll will be set in method SCfdUtils.computePrintCfd()
+            }
+            
+            // process CFD:
+            
             for (SDataCfd cfd : maCfds) {
                 cfdProcessed++;
 
@@ -470,7 +477,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                         throw new Exception("Not supported yet!");
                         
                     case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
-                        switch (mnSubtypeCfd) {
+                        switch (mnCfdSubtype) {
                             case SCfdConsts.CFDI_PAYROLL_VER_OLD:
                                 formerPayrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
                                 series = formerPayrollEmp.getNumberSeries();
@@ -497,59 +504,62 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                 try {
                     switch (mnFormSubtype) {
                         case SCfdConsts.PROC_REQ_STAMP:
-                            SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false, false);
+                            SCfdUtils.signCfdi(miClient, cfd, mnCfdSubtype, false, false);
                             detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Timbrado.\n";
                             break;
                             
                         case SCfdConsts.PROC_REQ_ANNUL:
-                            SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
+                            SCfdUtils.cancelCfdi(miClient, cfd, mnCfdSubtype, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                             detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Anulado.\n";
                             break;
                             
                         case SCfdConsts.PROC_PRT_DOC:
-                            SCfdPrintThread thread = new SCfdPrintThread(miClient, cfd, mnSubtypeCfd, SDataConstantsPrint.PRINT_MODE_PRINT, mnNumberCopies, this);
+                            /* TODO: 2020-07-22, Sergio Flores: Check if this code must be removed definitetly.
+                            SCfdPrintThread thread = new SCfdPrintThread(miClient, cfd, mnCfdSubtype, SDataConstantsPrint.PRINT_MODE_PRINT, mnNumberCopies, this);
                             thread.startThread();
                             thread.join();
+                            */
+                            SCfdUtils.printCfd(miClient, cfd, mnCfdSubtype, SDataConstantsPrint.PRINT_MODE_PRINT, mnNumberCopies, false);
                             detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Impreso.\n";
                             break;
                             
                         case SCfdConsts.PROC_PRT_DOCS:
-                            SCfdUtils.printCfd(miClient, cfd, mnSubtypeCfd, SDataConstantsPrint.PRINT_MODE_PRINT, mnNumberCopies, false);
+                            SCfdUtils.printCfd(miClient, cfd, mnCfdSubtype, SDataConstantsPrint.PRINT_MODE_PRINT, mnNumberCopies, false);
                             detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Impreso.\n";
                             break;
                             
                         case SCfdConsts.PROC_PRT_ACK_ANNUL:
-                            SCfdUtils.printCfdCancelAck(miClient, cfd, SDataConstantsPrint.PRINT_MODE_PRINT, mnSubtypeCfd);
+                            SCfdUtils.printCfdCancelAck(miClient, cfd, SDataConstantsPrint.PRINT_MODE_PRINT, mnCfdSubtype);
                             detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Impreso.\n";
                             break;
                             
                         case SCfdConsts.PROC_SND_DOC:
-                            SCfdUtils.sendCfd(miClient, cfd.getFkCfdTypeId(), cfd, mnSubtypeCfd, false, false, true);
+                            SCfdUtils.sendCfd(miClient, cfd.getFkCfdTypeId(), cfd, mnCfdSubtype, false, false, true);
                             detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Enviado.\n";
                             break;
                             
                         case SCfdConsts.PROC_REQ_STAMP_AND_SND:
                             if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                                SCfdUtils.signAndSendCfdi(miClient, cfd, mnSubtypeCfd, false, false);
+                                SCfdUtils.signAndSendCfdi(miClient, cfd, mnCfdSubtype, false, false);
                             }
                             else {
-                                SCfdUtils.signCfdi(miClient, cfd, mnSubtypeCfd, false, false);
+                                SCfdUtils.signCfdi(miClient, cfd, mnCfdSubtype, false, false);
                             }
                             detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Timbrado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                             break;
                             
                         case SCfdConsts.PROC_REQ_ANNUL_AND_SND:
                             if (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs()) {
-                                SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnSubtypeCfd, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
+                                SCfdUtils.cancelAndSendCfdi(miClient, cfd, mnCfdSubtype, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                             }
                             else {
-                                SCfdUtils.cancelCfdi(miClient, cfd, mnSubtypeCfd, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
+                                SCfdUtils.cancelCfdi(miClient, cfd, mnCfdSubtype, mtAnnulmentDate, mbValidateStamp, false, mnDpsAnnulmentType);
                             }
                             detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Anulado" + (miClient.getSessionXXX().getParamsCompany().getIsCfdiSendingAutomaticHrs() ? " y enviado.\n" : ".\n");
                             break;
                             
                         case SCfdConsts.PROC_REQ_VERIFY:
-                            SCfdUtils.validateCfdi(miClient, cfd, mnSubtypeCfd, false);
+                            SCfdUtils.validateCfdi(miClient, cfd, mnCfdSubtype, false);
                             detailMessage += (series.isEmpty() ? "" : series + "-") + number + ": Verificado.\n";
                             break;
                             
@@ -615,7 +625,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
         mnStampsAvailable = stampsAvailable;
         mtAnnulmentDate = annulmentDate;
         mbValidateStamp = validateStamp;
-        mnSubtypeCfd = cfdSubtype;
+        mnCfdSubtype = cfdSubtype;
         mnDpsAnnulmentType = dpsAnnulmentType;
     }
     

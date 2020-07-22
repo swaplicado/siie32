@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 171.0/ 2020-07-22
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la funcionalidad de impresión masiva de recibos de nómina para evitar la lectura sucesiva de la nómina en la impresión de cada recibo de nómina.
+
+================================================================================
 SIIE 3.2 169.0/ 2020-07-14
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
@@ -13,7 +19,7 @@ Isabel Danae GARCÍA SERVÍN
 
 ================================================================================
 SIIE 3.2 164.8/ 2020-07-14
-Edwin CARMONA
+Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Obtención de información de CAP para calcular vales y bonos automáticamente.
 2) Obtención de información de CAP para realizar prenómina.

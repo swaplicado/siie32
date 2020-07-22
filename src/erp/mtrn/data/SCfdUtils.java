@@ -51,6 +51,7 @@ import erp.mmkt.data.SDataCustomerBranchConfig;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbFormerPayrollImport;
+import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SHrsFormerConceptExtraTime;
 import erp.mod.hrs.db.SHrsFormerConceptIncident;
 import erp.mod.hrs.db.SHrsFormerPayroll;
@@ -80,6 +81,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import javax.mail.MessagingException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -128,21 +130,23 @@ public abstract class SCfdUtils implements Serializable {
     private static final String TXT_SIGN_SEND = "Timbrar y enviar CFDI";
     
     public static final String TXT_SEND_DPS = "Enviar documento";
-
+    
+    public static final HashMap<Integer, Object> DataSet = new HashMap<>();
+    
     /*
      * Private static methods:
      */
-
+    
     public static SDataCfdPacType getPacConfiguration(final SClientInterface client, final int cfdTypeId) {
         SDataCfdPacType cfdPacType = null;
-
+        
         try {
             cfdPacType = (SDataCfdPacType) SDataUtilities.readRegistry(client, SDataConstants.TRN_TP_CFD_PAC, new int[] { cfdTypeId }, SLibConstants.EXEC_MODE_SILENT);
         }
         catch (Exception e) {
             SLibUtils.showException(SCfdUtils.class.getName(), e);
         }
-
+        
         return cfdPacType;
     }
 
@@ -2687,6 +2691,15 @@ public abstract class SCfdUtils implements Serializable {
                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                         }
                         else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
+                            // read payroll only once for all CFD because is a really lengty operation:
+                            SDbPayroll payroll = (SDbPayroll) SCfdUtils.DataSet.get(SModConsts.HRS_PAY);
+                            if (payroll == null) {
+                                payroll = new SDbPayroll();
+                                payroll.read(client.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n() });
+                                SCfdUtils.DataSet.put(SModConsts.HRS_PAY, payroll);
+                            }
+                            
+                            // proceed with CFD printing:
                             cfdPrint.printPayrollReceipt33_12(cfd, printMode, numberCopies, cfdSubtype);
                         }
                         break;
@@ -2706,7 +2719,6 @@ public abstract class SCfdUtils implements Serializable {
         }
         else {
             if (canPrint(cfd, isSaveInProcess)) {
-                //
                 computePrintCfd(client, cfd, cfdSubtype, printMode, numberCopies);
             }
         }
