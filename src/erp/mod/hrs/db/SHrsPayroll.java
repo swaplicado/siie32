@@ -176,6 +176,7 @@ public class SHrsPayroll {
         payrollReceiptEarning.setFkLoanLoanId_n(loanLoanId_n);
         payrollReceiptEarning.setFkLoanTypeId_n(loanEmployeeId_n != 0 && loanLoanId_n != 0 ? earning.getFkLoanTypeId() : 0);
         payrollReceiptEarning.setFkOtherPaymentTypeId(earning.getFkOtherPaymentTypeId());
+        payrollReceiptEarning.setFkBonusId(1);
         /*
         payrollReceiptEarning.setFkUserInsertId(...);
         payrollReceiptEarning.setFkUserUpdateId(...);
@@ -232,6 +233,7 @@ public class SHrsPayroll {
         payrollReceiptDeduction.setFkLoanEmployeeId_n(loanEmployeeId_n);
         payrollReceiptDeduction.setFkLoanLoanId_n(loanLoanId_n);
         payrollReceiptDeduction.setFkLoanTypeId_n(loanEmployeeId_n != 0 && loanLoanId_n != 0 ? deduction.getFkLoanTypeId() : 0);
+        payrollReceiptDeduction.setFkBonusId(1);
         /*
         payrollReceiptDeduction.setFkUserInsertId(...);
         payrollReceiptDeduction.setFkUserUpdateId(...);

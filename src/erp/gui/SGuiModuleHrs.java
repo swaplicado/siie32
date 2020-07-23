@@ -88,6 +88,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatEmployeeDismissType;
     private javax.swing.JMenuItem jmiCatMwzType;
     private javax.swing.JMenuItem jmiCatMwzTypeWage;
+    private javax.swing.JMenuItem jmiCatPaysheetCustomType;
     private javax.swing.JMenuItem jmiCatUma;
     private javax.swing.JMenuItem jmiCatUmi;
     private javax.swing.JMenuItem jmiCatWorkerTypeSalary;
@@ -236,6 +237,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeDismissType = new JMenuItem("Tipos de baja");
         jmiCatMwzType = new JMenuItem("Áreas geográficas");
         jmiCatMwzTypeWage = new JMenuItem("Salarios mínimos de áreas geográficas");
+        jmiCatPaysheetCustomType = new JMenuItem("Tipos de nómina personalizados");
         jmiCatUma = new JMenuItem("Unidades de Medida y Actualización (UMA)");
         jmiCatUmi = new JMenuItem("Unidades Mixtas INFONAVIT (UMI)");
         jmiCatWorkerTypeSalary = new JMenuItem("Salarios diarios por tipo de obrero");
@@ -266,6 +268,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.addSeparator();
         jmCat.add(jmiCatMwzType);
         jmCat.add(jmiCatMwzTypeWage);
+        jmCat.add(jmiCatPaysheetCustomType);
         jmCat.add(jmiCatUma);
         jmCat.add(jmiCatUmi);
         jmCat.add(jmiCatWorkerTypeSalary);
@@ -452,6 +455,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeDismissType.addActionListener(this);
         jmiCatMwzType.addActionListener(this);
         jmiCatMwzTypeWage.addActionListener(this);
+        jmiCatPaysheetCustomType.addActionListener(this);
         jmiCatUma.addActionListener(this);
         jmiCatUmi.addActionListener(this);
         jmiCatWorkerTypeSalary.addActionListener(this);
@@ -559,6 +563,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeDismissType.setEnabled(true);
         jmiCatMwzType.setEnabled(true);
         jmiCatMwzTypeWage.setEnabled(true);
+        jmiCatPaysheetCustomType.setEnabled(true);
         jmiCatUma.setEnabled(true);
         jmiCatUmi.setEnabled(true);
         jmiCatWorkerTypeSalary.setEnabled(true);
@@ -923,6 +928,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCatMwzTypeWage) {
                 miClient.getSession().showView(SModConsts.HRS_MWZ_WAGE, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCatPaysheetCustomType) {
+                miClient.getSession().showView(SModConsts.HRSU_TP_PAY_SHT_CUS, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatUma) {
                 miClient.getSession().showView(SModConsts.HRS_UMA, SLibConsts.UNDEFINED, null);

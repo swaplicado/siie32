@@ -41,6 +41,7 @@ import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptDeduction;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
+import erp.mod.hrs.db.SDbPaysheetCustomType;
 import erp.mod.hrs.db.SDbPosition;
 import erp.mod.hrs.db.SDbPrePayrollCutoffCalendar;
 import erp.mod.hrs.db.SDbShift;
@@ -82,6 +83,7 @@ import erp.mod.hrs.form.SFormLoanTypeAdjustment;
 import erp.mod.hrs.form.SFormMwzType;
 import erp.mod.hrs.form.SFormMwzTypeWage;
 import erp.mod.hrs.form.SFormPayroll;
+import erp.mod.hrs.form.SFormPaysheetCustomType;
 import erp.mod.hrs.form.SFormPosition;
 import erp.mod.hrs.form.SFormShift;
 import erp.mod.hrs.form.SFormSsContributionTable;
@@ -104,8 +106,8 @@ import erp.mod.hrs.view.SViewBenefit;
 import erp.mod.hrs.view.SViewBenefitTable;
 import erp.mod.hrs.view.SViewBenefitTableRow;
 import erp.mod.hrs.view.SViewBenefitVacationPending;
-												
-										 
+
+
 import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
@@ -130,6 +132,7 @@ import erp.mod.hrs.view.SViewPayrollLoanEarningComplement;
 import erp.mod.hrs.view.SViewPayrollReceipt;
 import erp.mod.hrs.view.SViewPayrollReceiptRecord;
 import erp.mod.hrs.view.SViewPayrollReceiptImportedEarnings;
+import erp.mod.hrs.view.SViewPaysheetCustomType;
 import erp.mod.hrs.view.SViewPosition;
 import erp.mod.hrs.view.SViewPrePayrollCutoffCalendar;
 import erp.mod.hrs.view.SViewShift;
@@ -181,7 +184,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormShift moFormShift;
     private SFormConfig moFormConfig;
     private SFormWorkingDaySettings moFormWorkingDaySettings;
-	private SFormConditionalEarning moFormConditionalEarning;
+    private SFormConditionalEarning moFormConditionalEarning;
     private SFormCutoffCalendar moFormCutoffCalendar;
     private SFormFirstDayYear moFormFirstDayYear;
     private SFormHoliday moFormHoliday;
@@ -191,6 +194,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormBenefitTable moFormBenefitTable;
     private SFormWorkerTypeSalary moFormWorkerTypeSalary;
     private SFormMwzTypeWage moFormMwzTypeWage;
+    private SFormPaysheetCustomType moForPaysheetCustomType;
     private SFormUma moFormUma;
     private SFormUmi moFormUmi;
     private SFormLoanTypeAdjustment moFormLoanTypeAdjustment;
@@ -404,6 +408,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSU_TP_MWZ:
                 registry = new SDbMwzType();
+                break;
+            case SModConsts.HRSU_TP_PAY_SHT_CUS:
+                registry = new SDbPaysheetCustomType();
                 break;
             case SModConsts.HRSU_DEP:
                 registry = new SDbDepartment();
@@ -715,6 +722,11 @@ public class SModuleHrs extends SGuiModule {
                 sql = "SELECT id_tp_mwz AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY name, id_tp_mwz ";
                 break;
+            case SModConsts.HRSU_TP_PAY_SHT_CUS:
+                settings = new SGuiCatalogueSettings("Tipo Nómina Pers.", 1);
+                sql = "SELECT id_tp_pay_sht_cus AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY name, id_tp_pay_sht_cus ";
+                break;
             case SModConsts.HRSU_DEP:
                 settings = new SGuiCatalogueSettings("Departamento", 1);
                 sql = "SELECT id_dep AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
@@ -827,6 +839,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSU_TP_MWZ:
                 view = new SViewMwzType(miClient, "Áreas geográficas");
+                break;
+            case SModConsts.HRSU_TP_PAY_SHT_CUS:
+                view = new SViewPaysheetCustomType(miClient, "Tipos de nómina personalizados");
                 break;
             case SModConsts.HRSU_DEP:
                 view = new SViewDepartment(miClient, "Departamentos");
@@ -1124,6 +1139,10 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSU_TP_MWZ:
                 if (moFormMwzType == null) moFormMwzType = new SFormMwzType(miClient, "Área geográfica");
                 form = moFormMwzType;
+                break;
+            case SModConsts.HRSU_TP_PAY_SHT_CUS:
+                if (moForPaysheetCustomType == null) moForPaysheetCustomType = new SFormPaysheetCustomType(miClient, "Tipo nómina personalizado");
+                form = moForPaysheetCustomType;
                 break;
             case SModConsts.HRSU_DEP:
                 if (moFormDepartment == null) moFormDepartment = new SFormDepartment(miClient, "Departamento");

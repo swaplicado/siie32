@@ -65,6 +65,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected java.sql.Blob moImageSignature_n;
     protected boolean mbUnionized;
     protected boolean mbMfgOperator;
+    protected boolean mbOvertime;
     protected boolean mbActive;
     protected boolean mbDeleted;
     protected boolean mbSystem;
@@ -207,6 +208,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setImageSignature_n(java.sql.Blob o) { moImageSignature_n = o; }
     public void setUnionized(boolean b) { mbUnionized = b; }
     public void setMfgOperator(boolean b) { mbMfgOperator = b; }
+    public void setIsOverTime(boolean b) { mbOvertime = b; }
     public void setActive(boolean b) { mbActive = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
@@ -273,6 +275,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public java.sql.Blob getImageSignature_n() { return moImageSignature_n; }
     public boolean isUnionized() { return mbUnionized; }
     public boolean isMfgOperator() { return mbMfgOperator; }
+    public boolean isOvertime() { return mbOvertime; }
     public boolean isActive() { return mbActive; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
@@ -400,6 +403,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         moImageSignature_n = null;
         mbUnionized = false;
         mbMfgOperator = false;
+        mbOvertime = false;
         mbActive = false;
         mbDeleted = false;
         mbSystem = false;
@@ -489,6 +493,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 oSignature_n = resultSet.getBlob("img_sig_n");
                 mbUnionized = resultSet.getBoolean("b_uni");
                 mbMfgOperator = resultSet.getBoolean("b_mfg_ope");
+                mbOvertime = resultSet.getBoolean("b_overtime");
                 mbActive = resultSet.getBoolean("b_act");
                 mbDeleted = resultSet.getBoolean("b_del");
                 mbSystem = resultSet.getBoolean("b_sys");
@@ -630,6 +635,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "NULL, " +
                         (mbUnionized ? 1 : 0) + ", " + 
                         (mbMfgOperator ? 1 : 0) + ", " + 
+                        (mbOvertime ? 1 : 0) + ", " + 
                         (mbActive ? 1 : 0) + ", " +
                         (mbDeleted ? 1 : 0) + ", " +
                         (mbSystem ? 1 : 0) + ", " +
@@ -689,6 +695,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         */
                         "b_uni = " + (mbUnionized ? 1 : 0) + ", " +
                         "b_mfg_ope = " + (mbMfgOperator ? 1 : 0) + ", " +
+                        "b_overtime = " + (mbOvertime ? 1 : 0) + ", " +
                         "b_act = " + (mbActive ? 1 : 0) + ", " +
                         "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                         "b_sys = " + (mbSystem ? 1 : 0) + ", " +

@@ -132,12 +132,15 @@ public class SDbConditionalEarning extends SDbRegistryUser {
         }
     }
     
-    public int validateUnique(SGuiSession session) throws SQLException, Exception {
+    private int existsKey(SGuiSession session) throws SQLException, Exception {
         ResultSet resultSet = null;
 
-        String smsSql = "SELECT id_cond_ear FROM " + getSqlTable() + " WHERE fk_scope = " + mnFkScopeId 
-                + " AND fk_ref = " + mnFkReferenceId + " AND fk_ear = " + mnFkEarningId + " "
-                + "AND dt_sta = '"+ SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "'; ";
+        String smsSql = "SELECT id_cond_ear FROM " + getSqlTable() + " WHERE "
+                + " fk_scope = " + mnFkScopeId 
+                + " AND fk_ref = " + mnFkReferenceId 
+                + " AND fk_ear = " + mnFkEarningId
+                + " AND fk_bonus = " + mnFkBonusId
+                + " AND dt_sta = '"+ SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "'; ";
         
         resultSet = session.getStatement().executeQuery(smsSql);
         if (resultSet.next()) {
@@ -186,10 +189,10 @@ public class SDbConditionalEarning extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
-        int r = this.validateUnique(session);
+        int primaryKeyId = this.existsKey(session);
         
-        if (r > 0 && r != mnPkConditionalEarningId)  {
-            mnPkConditionalEarningId = r;
+        if (primaryKeyId > 0 && primaryKeyId != mnPkConditionalEarningId)  {
+            mnPkConditionalEarningId = primaryKeyId;
         }
 
         if (mbRegistryNew) {
@@ -212,8 +215,8 @@ public class SDbConditionalEarning extends SDbRegistryUser {
                     (mbDeleted ? 1 : 0) + ", " + 
                     mnFkEarningId + ", " + 
                     mnFkScopeId + ", " + 
-                    (mnFkReferenceId > 0 ? mnFkReferenceId : "0") + ", " +
-                    (mnFkBonusId > 0 ? mnFkBonusId : "0") + ", " +
+                    mnFkReferenceId + ", " +
+                    mnFkBonusId + ", " +
                     mnFkUserInsertId + ", " +
                     mnFkUserUpdateId + ", " +
                     "NOW()" + ", " +
@@ -235,8 +238,8 @@ public class SDbConditionalEarning extends SDbRegistryUser {
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "fk_ear = " + mnFkEarningId + ", " +
                     "fk_scope = " + mnFkScopeId + ", " +
-                    "fk_ref = " + (mnFkReferenceId > 0 ? mnFkReferenceId : "0") + ", " +
-                    "fk_bonus = " + (mnFkBonusId > 0 ? mnFkBonusId : "0") + ", " +
+                    "fk_ref = " + mnFkReferenceId + ", " +
+                    "fk_bonus = " + mnFkBonusId + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                     "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                     //"ts_usr_ins = " + "NOW()" + ", " +

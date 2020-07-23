@@ -6,8 +6,10 @@ package erp.mod.hrs.form;
 
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
+import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCompany;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -185,6 +187,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel16 = new javax.swing.JPanel();
         jlNotes = new javax.swing.JLabel();
         moTextNotes = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel31 = new javax.swing.JPanel();
+        jlPaysheetCustomType = new javax.swing.JLabel();
+        moKeyPaysheetCustomType = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel17 = new javax.swing.JPanel();
         moRadNormal = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel43 = new javax.swing.JPanel();
@@ -289,7 +294,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel7.setLayout(new java.awt.GridLayout(1, 2, 5, 0));
 
-        jPanel6.setLayout(new java.awt.GridLayout(13, 1, 0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(14, 1, 0, 5));
 
         jPanel8.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -441,6 +446,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel16.add(moTextNotes);
 
         jPanel6.add(jPanel16);
+
+        jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlPaysheetCustomType.setText("Tipo personalizado:*");
+        jlPaysheetCustomType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel31.add(jlPaysheetCustomType);
+
+        moKeyPaysheetCustomType.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel31.add(moKeyPaysheetCustomType);
+
+        jPanel6.add(jPanel31);
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -847,6 +863,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
+    private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel35;
@@ -896,6 +913,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JLabel jlNotes;
     private javax.swing.JLabel jlNumber;
     private javax.swing.JLabel jlPaymentType;
+    private javax.swing.JLabel jlPaysheetCustomType;
     private javax.swing.JLabel jlPeriod;
     private javax.swing.JLabel jlReceiptDays;
     private javax.swing.JLabel jlSsContribution;
@@ -948,6 +966,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private sa.lib.gui.bean.SBeanFieldInteger moIntWorkingDays;
     private sa.lib.gui.bean.SBeanFieldKey moKeyMwzReferenceType;
     private sa.lib.gui.bean.SBeanFieldKey moKeyMwzType;
+    private sa.lib.gui.bean.SBeanFieldKey moKeyPaysheetCustomType;
     private sa.lib.gui.bean.SBeanFieldKey moKeySsContribution;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTax;
     private sa.lib.gui.bean.SBeanFieldKey moKeyTaxComputationType;
@@ -986,6 +1005,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moIntPeriod.setMaxInteger(SHrsConsts.YEAR_MONTHS);
         moIntReceiptDays.setIntegerSettings(SGuiUtils.getLabelName(jlReceiptDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moIntWorkingDays.setIntegerSettings(SGuiUtils.getLabelName(jlWorkingDays.getText()), SGuiConsts.GUI_TYPE_INT, true);
+        moKeyPaysheetCustomType.setKeySettings(miClient, SGuiUtils.getLabelName(jlPaysheetCustomType.getText()), true);
         moTextNotes.setTextSettings(SGuiUtils.getLabelName(jlNotes.getText()), 255, 0);
         moRadNormal.setBooleanSettings(SGuiUtils.getLabelName(moRadNormal.getText()), false);
         moRadSpecial.setBooleanSettings(SGuiUtils.getLabelName(moRadSpecial.getText()), false);
@@ -1027,6 +1047,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moFields.addField(moIntPeriod);
         moFields.addField(moIntReceiptDays); // is read-only
         moFields.addField(moIntWorkingDays); // is read-only
+        moFields.addField(moKeyPaysheetCustomType);
         moFields.addField(moTextNotes);
         moFields.addField(moRadNormal);
         moFields.addField(moRadSpecial);
@@ -1177,6 +1198,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
             }
             
+            moKeyPaysheetCustomType.setEnabled(enable);
             moTextNotes.setEnabled(enable);
             moKeyTaxComputationType.setEnabled(enable);
             moKeyTax.setEnabled(enable);
@@ -1312,6 +1334,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         payroll.setFkPaymentTypeId(mnFormSubtype);
         payroll.setFkPaysheetTypeId(getPaysheetTypeId());
 
+        if (moKeyPaysheetCustomType.getSelectedIndex() > 0) {
+            payroll.setFkPaysheetCustomTypeId(moKeyPaysheetCustomType.getValue()[0]);
+        }
+        
         if (moKeyMwzType.getSelectedIndex() > 0) {
             payroll.setFkMwzTypeId(moKeyMwzType.getValue()[0]);
         }
@@ -1937,8 +1963,21 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                                                     SLibConstants.EXEC_MODE_SILENT);
         String sCompanyKey = company.getKey();
         
+        String urls = "";
+        String url = "";
+        try {
+            //localhost:8080/CAP/public/api/prepayroll
+
+            urls = SCfgUtils.getParamValue(miClient.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_CAP);
+            String arrayUrls[] = urls.split(";");
+            url = arrayUrls[0];
+        }
+        catch (Exception ex) {
+            Logger.getLogger(SFormPayroll.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         SShareData sd = new SShareData();
-        SPrepayroll ppayroll = sd.getCAPData(dates[0], dates[1], list, mnFormSubtype, moConfig.getTimeClockPol(), sCompanyKey);
+        SPrepayroll ppayroll = sd.getCAPData(url, dates[0], dates[1], list, mnFormSubtype, moConfig.getTimeClockPol(), sCompanyKey);
         
         if (ppayroll == null) {
             miClient.showMsgBoxError("Ucurrió un error al importar la prenómina");
@@ -1946,8 +1985,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
         
         // Acomodar la lista para los periodos distintos de faltas y percepciones
-        if (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE && moConfig.getPrePayWeekCutDay() != moConfig.getPrePayVarWeekCutDay()) {
-            int cutDay = moConfig.getPrePayVarWeekCutDay();
+        if (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE && moConfig.getPrePayWeekCutDay() != moConfig.getPrePayWeekVarCutDay()) {
+            int cutDay = moConfig.getPrePayWeekVarCutDay();
             int weekLag = moConfig.getPrePayVarWeekLag();
             Date datesVar[] = null;
 
@@ -1958,7 +1997,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             // obtener faltas
             datesVar = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateStart.getValue(), weekLag);
-            SPrepayroll ppayrollVar = sd.getCAPData(datesVar[0], datesVar[1], list, mnFormSubtype, moConfig.getTimeClockPol(), sCompanyKey);
+            SPrepayroll ppayrollVar = sd.getCAPData(url, datesVar[0], datesVar[1], list, mnFormSubtype, moConfig.getTimeClockPol(), sCompanyKey);
 
             if (ppayrollVar == null) {
                 miClient.showMsgBoxError("Ocurrió un problema al realizar la petición al sistema externo.");
@@ -2475,6 +2514,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moRadViewEmployeesActive.addItemListener(this);
         moRadViewEmployeesAll.addItemListener(this);
 
+        moKeyPaysheetCustomType.addItemListener(this);
         moKeyMwzType.addItemListener(this);
         moKeyMwzReferenceType.addItemListener(this);
         moKeyTaxComputationType.addItemListener(this);
@@ -2518,6 +2558,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moRadViewEmployeesActive.removeItemListener(this);
         moRadViewEmployeesAll.removeItemListener(this);
         
+        moKeyPaysheetCustomType.removeItemListener(this);
         moKeyMwzType.removeItemListener(this);
         moKeyMwzReferenceType.removeItemListener(this);
         moKeyTaxComputationType.removeItemListener(this);
@@ -2537,6 +2578,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
     @Override
     public void reloadCatalogues() {
+        miClient.getSession().populateCatalogue(moKeyPaysheetCustomType, SModConsts.HRSU_TP_PAY_SHT_CUS, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyMwzType, SModConsts.HRSU_TP_MWZ, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyMwzReferenceType, SModConsts.HRSU_TP_MWZ, SLibConsts.UNDEFINED, null);
         miClient.getSession().populateCatalogue(moKeyTaxComputationType, SModConsts.HRSS_TP_TAX_COMP, SLibConsts.UNDEFINED, null);
@@ -2589,6 +2631,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             // Set payroll settings:
 
+            moKeyPaysheetCustomType.setValue(new int[] { moRegistry.getFkPaysheetCustomTypeId() });
             moKeyTaxComputationType.setValue(new int[] { moRegistry.getFkTaxComputationTypeId() });
             moKeyMwzType.setValue(new int[] { moRegistry.getFkMwzTypeId() });
             moKeyMwzReferenceType.setValue(new int[] { moRegistry.getFkMwzReferenceTypeId() });
@@ -2787,6 +2830,15 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                                     break;
                                 }
                             }
+                        }
+                    }
+                    
+                    if (validation.isValid()) {
+                        if (! SHrsUtils.isValidByCombinationExists(miClient.getSession(), 
+                                moRegistry.getPkPayrollId(), moIntPeriodYear.getValue(), moIntNumber.getValue(), 
+                                mnFormSubtype, this.getPaysheetTypeId(), moKeyPaysheetCustomType.getValue()[0])) {
+                            validation.setMessage("Ya existe una nómina con el mismo año, número, tipo, periodicidad y tipo personalizado");
+                            validation.setComponent(moKeyPaysheetCustomType);
                         }
                     }
                 }

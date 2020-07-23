@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import java.sql.SQLException;
@@ -113,15 +114,13 @@ public class SShareData {
      * @param companyKey
      * @return 
      */
-    public SPrepayroll getCAPData(Date tStartDate, Date tEndDate, ArrayList<Integer> lEmployees, 
+    public SPrepayroll getCAPData(String sURL, Date tStartDate, Date tEndDate, ArrayList<Integer> lEmployees, 
                                     int payType, int dataType, String companyKey) {
         try {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
             
             String employees = lEmployees.stream().map(Object::toString)
                                                 .collect(Collectors.joining(","));
-            
-            String url = "http://localhost:9090/cap/public/api/prepayroll";
             
             String charset = java.nio.charset.StandardCharsets.UTF_8.name();
             String startDate = df.format(tStartDate);
@@ -135,7 +134,7 @@ public class SShareData {
                                     URLEncoder.encode(dataType + "", charset)
                             );
             
-            URLConnection connection = new URL(url + "?" + query).openConnection();
+            URLConnection connection = new URL(sURL + "?" + query).openConnection();
             connection.setRequestProperty("Accept-Charset", charset);
             connection.setRequestProperty("Content-Type", "application/json");
             InputStream response = connection.getInputStream();
