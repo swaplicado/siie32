@@ -71,7 +71,7 @@
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextCode">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
+                    <Property name="text" type="java.lang.String" value="TEXT"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -93,7 +93,7 @@
                 </Component>
                 <Component class="sa.lib.gui.bean.SBeanFieldText" name="moTextName">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="sBeanFieldText1"/>
+                    <Property name="text" type="java.lang.String" value="TEXT"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[200, 23]"/>
                     </Property>
@@ -108,15 +108,21 @@
                 <Property name="verticalGap" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="jlOneOff">
+                <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBoolOneOff">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="&#xda;nico:*"/>
-                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[100, 23]"/>
-                    </Property>
+                    <Property name="text" type="java.lang.String" value="Irrepetible"/>
                   </Properties>
                 </Component>
-                <Component class="sa.lib.gui.bean.SBeanFieldBoolean" name="moBolOneOff">
+                <Component class="javax.swing.JLabel" name="jlOneOffHint">
+                  <Properties>
+                    <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                      <Color blue="6d" green="6d" id="Text Inactive Text" palette="2" red="6d" type="palette"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="No se permitir&#xe1; repetir el n&#xfa;mero de n&#xf3;minas para este mismo tipo"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[350, 23]"/>
+                    </Property>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>

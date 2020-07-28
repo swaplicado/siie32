@@ -106,8 +106,6 @@ import erp.mod.hrs.view.SViewBenefit;
 import erp.mod.hrs.view.SViewBenefitTable;
 import erp.mod.hrs.view.SViewBenefitTableRow;
 import erp.mod.hrs.view.SViewBenefitVacationPending;
-
-
 import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
@@ -169,7 +167,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SModuleHrs extends SGuiModule {
 
@@ -683,7 +681,7 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRSS_BONUS:
                 settings = new SGuiCatalogueSettings("Bono", 1);
-                sql = "SELECT id_bonus AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
+                sql = "SELECT id_bonus AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
             case SModConsts.HRSS_GROCERY_SRV:
@@ -723,8 +721,8 @@ public class SModuleHrs extends SGuiModule {
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY name, id_tp_mwz ";
                 break;
             case SModConsts.HRSU_TP_PAY_SHT_CUS:
-                settings = new SGuiCatalogueSettings("Tipo Nómina Pers.", 1);
-                sql = "SELECT id_tp_pay_sht_cus AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                settings = new SGuiCatalogueSettings("Tipo nómina empresa", 1);
+                sql = "SELECT id_tp_pay_sht_cus AS " + SDbConsts.FIELD_ID + "1, CONCAT(name, ' (', code, ')') AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY name, id_tp_pay_sht_cus ";
                 break;
             case SModConsts.HRSU_DEP:
@@ -841,7 +839,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewMwzType(miClient, "Áreas geográficas");
                 break;
             case SModConsts.HRSU_TP_PAY_SHT_CUS:
-                view = new SViewPaysheetCustomType(miClient, "Tipos de nómina personalizados");
+                view = new SViewPaysheetCustomType(miClient, "Tipos nómina empresa");
                 break;
             case SModConsts.HRSU_DEP:
                 view = new SViewDepartment(miClient, "Departamentos");
@@ -865,7 +863,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewWorkingDaySettings(miClient, "Días laborables");
                 break;
             case SModConsts.HRS_COND_EAR:
-                view = new SViewConditionalEarning(miClient, "Percepciones condicionadas");
+                view = new SViewConditionalEarning(miClient, "Percepciones condicionales");
                 break;
             case SModConsts.HRS_PRE_PAY_CUT_CAL:
                 view = new SViewPrePayrollCutoffCalendar(miClient, "Calendario de fechas de corte");
@@ -1141,7 +1139,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormMwzType;
                 break;
             case SModConsts.HRSU_TP_PAY_SHT_CUS:
-                if (moForPaysheetCustomType == null) moForPaysheetCustomType = new SFormPaysheetCustomType(miClient, "Tipo nómina personalizado");
+                if (moForPaysheetCustomType == null) moForPaysheetCustomType = new SFormPaysheetCustomType(miClient, "Tipo de nómina de la empresa");
                 form = moForPaysheetCustomType;
                 break;
             case SModConsts.HRSU_DEP:
@@ -1173,7 +1171,7 @@ public class SModuleHrs extends SGuiModule {
                 form = moFormWorkingDaySettings;
                 break;
             case SModConsts.HRS_COND_EAR:
-                if (moFormConditionalEarning == null) moFormConditionalEarning = new SFormConditionalEarning(miClient, "Percepcion condicionada");
+                if (moFormConditionalEarning == null) moFormConditionalEarning = new SFormConditionalEarning(miClient, "Percepción condicional");
                 form = moFormConditionalEarning;
                 break;
             case SModConsts.HRS_PRE_PAY_CUT_CAL:

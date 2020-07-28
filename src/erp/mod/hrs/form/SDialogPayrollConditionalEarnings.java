@@ -22,16 +22,16 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
-public class SDialogPayrollCondEarnings extends SBeanFormDialog implements FocusListener, ActionListener {
+public class SDialogPayrollConditionalEarnings extends SBeanFormDialog implements FocusListener, ActionListener {
     
     private ArrayList<Integer> mlBonusIds;
     
     /**
-     * Creates new form SDialogLayoutEmployee
+     * Creates new form SDialogPayrollConditionalEarnings
      */
-    public SDialogPayrollCondEarnings(SGuiClient client, String title) {
+    public SDialogPayrollConditionalEarnings(SGuiClient client, String title) {
         setFormSettings(client, SModConsts.HRSX_PAY_LAY, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -69,7 +69,7 @@ public class SDialogPayrollCondEarnings extends SBeanFormDialog implements Focus
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBonus.setText("Elige bono a pagar:*");
+        jlBonus.setText("Bono:*");
         jlBonus.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlBonus);
 

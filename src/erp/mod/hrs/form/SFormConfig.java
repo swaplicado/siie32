@@ -9,6 +9,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbDeduction;
 import erp.mod.hrs.db.SDbEarning;
+import erp.mod.hrs.db.SHrsConsts;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -20,7 +21,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Sergio Flores
  */
 public class SFormConfig extends SBeanForm {
 
@@ -71,29 +72,30 @@ public class SFormConfig extends SBeanForm {
         moBoolBankAccountUse = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel8 = new javax.swing.JPanel();
         jPanel37 = new javax.swing.JPanel();
-        jlCutoffDayWeek = new javax.swing.JLabel();
-        moIntCutoffDayWeek = new sa.lib.gui.bean.SBeanFieldInteger();
-        jlCutoffVarDayWeek = new javax.swing.JLabel();
-        moIntCutoffVarDayWeek = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlPrePayrollWeeklyCutoffDayWeek = new javax.swing.JLabel();
+        moIntPrePayrollWeeklyCutoffDayWeek = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlPrePayrollWeeklyCutoffDayWeekHint = new javax.swing.JLabel();
+        jlPrePayrollWeeklyWeeksLag = new javax.swing.JLabel();
+        moIntPrePayrollWeeklyWeeksLag = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel43 = new javax.swing.JPanel();
-        jlDelayWeeks = new javax.swing.JLabel();
-        moIntDelayWeeks = new sa.lib.gui.bean.SBeanFieldInteger();
-        jlDelayVarWeeks = new javax.swing.JLabel();
-        moIntDelayVarWeeks = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlPrePayrollWeeklyVarCutoffDayWeek = new javax.swing.JLabel();
+        moIntPrePayrollWeeklyVarCutoffDayWeek = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlPrePayrollWeeklyVarCutoffDayWeekHint = new javax.swing.JLabel();
+        jlPrePayrollWeeklyVarWeeksLag = new javax.swing.JLabel();
+        moIntPrePayrollWeeklyVarWeeksLag = new sa.lib.gui.bean.SBeanFieldInteger();
         jPanel44 = new javax.swing.JPanel();
-        jlTimeClockPol = new javax.swing.JLabel();
-        moIntTimeClockPol = new sa.lib.gui.bean.SBeanFieldInteger();
-        jLabel1 = new javax.swing.JLabel();
-        jlFirstDayWeekHelp1 = new javax.swing.JLabel();
-        jPanel38 = new javax.swing.JPanel();
-        jlEarningHolidays_n = new javax.swing.JLabel();
-        moKeyEarningHolidays_n = new sa.lib.gui.bean.SBeanFieldKey();
+        jlTimeClockPolicy = new javax.swing.JLabel();
+        moIntTimeClockPolicy = new sa.lib.gui.bean.SBeanFieldInteger();
+        jlTimeClockPolHint = new javax.swing.JLabel();
         jPanel39 = new javax.swing.JPanel();
         jlEarningOvTime2_n = new javax.swing.JLabel();
         moKeyEarningOvTime2_n = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel40 = new javax.swing.JPanel();
         jlEarningOvTime3_n = new javax.swing.JLabel();
         moKeyEarningOvTime3_n = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel38 = new javax.swing.JPanel();
+        jlEarningHolidays_n = new javax.swing.JLabel();
+        moKeyEarningHolidays_n = new sa.lib.gui.bean.SBeanFieldKey();
         jPanel41 = new javax.swing.JPanel();
         jlEarningDayOff_n = new javax.swing.JLabel();
         moKeyEarningDayOff_n = new sa.lib.gui.bean.SBeanFieldKey();
@@ -161,7 +163,7 @@ public class SFormConfig extends SBeanForm {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(1, 2));
+        jPanel2.setLayout(new java.awt.BorderLayout());
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración general:"));
         jPanel6.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
@@ -185,8 +187,8 @@ public class SFormConfig extends SBeanForm {
         jPanel9.add(moIntFirstDayWeek);
 
         jlFirstDayWeekHelp.setForeground(new java.awt.Color(109, 109, 109));
-        jlFirstDayWeekHelp.setText("(1=Dom, 2=Lun, ..., 7=Sáb)");
-        jlFirstDayWeekHelp.setPreferredSize(new java.awt.Dimension(200, 23));
+        jlFirstDayWeekHelp.setText("1=Do, 2=Lun, ..., 7=Sá");
+        jlFirstDayWeekHelp.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jlFirstDayWeekHelp);
 
         jPanel6.add(jPanel9);
@@ -243,81 +245,77 @@ public class SFormConfig extends SBeanForm {
 
         jPanel6.add(jPanel32);
 
-        jPanel2.add(jPanel6);
+        jPanel2.add(jPanel6, java.awt.BorderLayout.CENTER);
 
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Configuración prenómina:"));
         jPanel8.setLayout(new java.awt.GridLayout(8, 1, 0, 5));
 
         jPanel37.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCutoffDayWeek.setText("Corte día semana:*");
-        jlCutoffDayWeek.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel37.add(jlCutoffDayWeek);
+        jlPrePayrollWeeklyCutoffDayWeek.setText("Corte semanal percep. normal:*");
+        jlPrePayrollWeeklyCutoffDayWeek.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel37.add(jlPrePayrollWeeklyCutoffDayWeek);
 
-        moIntCutoffDayWeek.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel37.add(moIntCutoffDayWeek);
+        moIntPrePayrollWeeklyCutoffDayWeek.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel37.add(moIntPrePayrollWeeklyCutoffDayWeek);
 
-        jlCutoffVarDayWeek.setText("Corte día variable:*");
-        jlCutoffVarDayWeek.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel37.add(jlCutoffVarDayWeek);
+        jlPrePayrollWeeklyCutoffDayWeekHint.setForeground(new java.awt.Color(109, 109, 109));
+        jlPrePayrollWeeklyCutoffDayWeekHint.setText("1=Do, 2=Lun, ..., 7=Sá");
+        jlPrePayrollWeeklyCutoffDayWeekHint.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel37.add(jlPrePayrollWeeklyCutoffDayWeekHint);
 
-        moIntCutoffVarDayWeek.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel37.add(moIntCutoffVarDayWeek);
+        jlPrePayrollWeeklyWeeksLag.setText("Semanas desfase percep. normal:*");
+        jlPrePayrollWeeklyWeeksLag.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel37.add(jlPrePayrollWeeklyWeeksLag);
+
+        moIntPrePayrollWeeklyWeeksLag.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel37.add(moIntPrePayrollWeeklyWeeksLag);
 
         jPanel8.add(jPanel37);
 
         jPanel43.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlDelayWeeks.setText("Semanas de desplaz.:*");
-        jlDelayWeeks.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel43.add(jlDelayWeeks);
+        jlPrePayrollWeeklyVarCutoffDayWeek.setText("Corte semanal percep. variables:*");
+        jlPrePayrollWeeklyVarCutoffDayWeek.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel43.add(jlPrePayrollWeeklyVarCutoffDayWeek);
 
-        moIntDelayWeeks.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel43.add(moIntDelayWeeks);
+        moIntPrePayrollWeeklyVarCutoffDayWeek.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel43.add(moIntPrePayrollWeeklyVarCutoffDayWeek);
 
-        jlDelayVarWeeks.setText("Semanas var. de desplaz.:*");
-        jlDelayVarWeeks.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel43.add(jlDelayVarWeeks);
+        jlPrePayrollWeeklyVarCutoffDayWeekHint.setForeground(new java.awt.Color(109, 109, 109));
+        jlPrePayrollWeeklyVarCutoffDayWeekHint.setText("1=Do, 2=Lun, ..., 7=Sá");
+        jlPrePayrollWeeklyVarCutoffDayWeekHint.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel43.add(jlPrePayrollWeeklyVarCutoffDayWeekHint);
 
-        moIntDelayVarWeeks.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel43.add(moIntDelayVarWeeks);
+        jlPrePayrollWeeklyVarWeeksLag.setText("Semanas desfase percep. variables:*");
+        jlPrePayrollWeeklyVarWeeksLag.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel43.add(jlPrePayrollWeeklyVarWeeksLag);
+
+        moIntPrePayrollWeeklyVarWeeksLag.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel43.add(moIntPrePayrollWeeklyVarWeeksLag);
 
         jPanel8.add(jPanel43);
 
         jPanel44.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlTimeClockPol.setText("Política reloj checador:*");
-        jlTimeClockPol.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel44.add(jlTimeClockPol);
+        jlTimeClockPolicy.setText("Política reloj checador:*");
+        jlTimeClockPolicy.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel44.add(jlTimeClockPolicy);
 
-        moIntTimeClockPol.setPreferredSize(new java.awt.Dimension(50, 23));
-        jPanel44.add(moIntTimeClockPol);
+        moIntTimeClockPolicy.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel44.add(moIntTimeClockPolicy);
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel44.add(jLabel1);
-
-        jlFirstDayWeekHelp1.setForeground(new java.awt.Color(109, 109, 109));
-        jlFirstDayWeekHelp1.setText("(1=Dom, 2=Lun, ..., 7=Sáb)");
-        jlFirstDayWeekHelp1.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel44.add(jlFirstDayWeekHelp1);
+        jlTimeClockPolHint.setForeground(new java.awt.Color(109, 109, 109));
+        jlTimeClockPolHint.setText("1=Todo, 2=Oficial, 3=No-oficial");
+        jlTimeClockPolHint.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel44.add(jlTimeClockPolHint);
 
         jPanel8.add(jPanel44);
 
-        jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
-
-        jlEarningHolidays_n.setText("Percep. festivos:");
-        jlEarningHolidays_n.setPreferredSize(new java.awt.Dimension(125, 23));
-        jPanel38.add(jlEarningHolidays_n);
-
-        moKeyEarningHolidays_n.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel38.add(moKeyEarningHolidays_n);
-
-        jPanel8.add(jPanel38);
-
         jPanel39.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlEarningOvTime2_n.setText("Percep. t. extra doble:");
-        jlEarningOvTime2_n.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlEarningOvTime2_n.setText("Percep. tiempo extra doble:");
+        jlEarningOvTime2_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel39.add(jlEarningOvTime2_n);
 
         moKeyEarningOvTime2_n.setPreferredSize(new java.awt.Dimension(300, 23));
@@ -327,8 +325,8 @@ public class SFormConfig extends SBeanForm {
 
         jPanel40.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlEarningOvTime3_n.setText("Percep. t. extra triple:");
-        jlEarningOvTime3_n.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlEarningOvTime3_n.setText("Percep. tiempo extra triple:");
+        jlEarningOvTime3_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel40.add(jlEarningOvTime3_n);
 
         moKeyEarningOvTime3_n.setPreferredSize(new java.awt.Dimension(300, 23));
@@ -336,10 +334,21 @@ public class SFormConfig extends SBeanForm {
 
         jPanel8.add(jPanel40);
 
+        jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        jlEarningHolidays_n.setText("Percep. días festivos:");
+        jlEarningHolidays_n.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel38.add(jlEarningHolidays_n);
+
+        moKeyEarningHolidays_n.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel38.add(moKeyEarningHolidays_n);
+
+        jPanel8.add(jPanel38);
+
         jPanel41.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlEarningDayOff_n.setText("Percep. descanso:");
-        jlEarningDayOff_n.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlEarningDayOff_n.setText("Percep. días descanso:");
+        jlEarningDayOff_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel41.add(jlEarningDayOff_n);
 
         moKeyEarningDayOff_n.setPreferredSize(new java.awt.Dimension(300, 23));
@@ -349,8 +358,8 @@ public class SFormConfig extends SBeanForm {
 
         jPanel42.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlEarningSunday_n.setText("Percep. prima dom.:");
-        jlEarningSunday_n.setPreferredSize(new java.awt.Dimension(125, 23));
+        jlEarningSunday_n.setText("Percep. prima dominical:");
+        jlEarningSunday_n.setPreferredSize(new java.awt.Dimension(175, 23));
         jPanel42.add(jlEarningSunday_n);
 
         moKeyEarningSunday_n.setPreferredSize(new java.awt.Dimension(300, 23));
@@ -358,7 +367,7 @@ public class SFormConfig extends SBeanForm {
 
         jPanel8.add(jPanel42);
 
-        jPanel2.add(jPanel8);
+        jPanel2.add(jPanel8, java.awt.BorderLayout.EAST);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
@@ -429,7 +438,7 @@ public class SFormConfig extends SBeanForm {
         jlBajioAffinityGroup.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel29.add(jlBajioAffinityGroup);
 
-        moTextBajioAffinityGroup.setText("sBeanFieldText1");
+        moTextBajioAffinityGroup.setText("TEXT");
         jPanel29.add(moTextBajioAffinityGroup);
 
         jlBajioAffinityGroupHelp.setForeground(new java.awt.Color(109, 109, 109));
@@ -445,7 +454,7 @@ public class SFormConfig extends SBeanForm {
         jlCfdiNumberSeries.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel33.add(jlCfdiNumberSeries);
 
-        moTextCfdiNumberSeries.setText("sBeanFieldText1");
+        moTextCfdiNumberSeries.setText("TEXT");
         jPanel33.add(moTextCfdiNumberSeries);
 
         jPanel15.add(jPanel33);
@@ -456,7 +465,7 @@ public class SFormConfig extends SBeanForm {
         jlSsSubbranch.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel34.add(jlSsSubbranch);
 
-        moTextSsSubbranch.setText("sBeanFieldText1");
+        moTextSsSubbranch.setText("TEXT");
         jPanel34.add(moTextSsSubbranch);
 
         jPanel15.add(jPanel34);
@@ -579,7 +588,6 @@ public class SFormConfig extends SBeanForm {
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -628,14 +636,10 @@ public class SFormConfig extends SBeanForm {
     private javax.swing.JLabel jlBajioAffinityGroupHelp;
     private javax.swing.JLabel jlBank;
     private javax.swing.JLabel jlCfdiNumberSeries;
-    private javax.swing.JLabel jlCutoffDayWeek;
-    private javax.swing.JLabel jlCutoffVarDayWeek;
     private javax.swing.JLabel jlDateOperations;
     private javax.swing.JLabel jlDeductionSsContribution_n;
     private javax.swing.JLabel jlDeductionTaxSubsidy_n;
     private javax.swing.JLabel jlDeductionTax_n;
-    private javax.swing.JLabel jlDelayVarWeeks;
-    private javax.swing.JLabel jlDelayWeeks;
     private javax.swing.JLabel jlEarningDayOff_n;
     private javax.swing.JLabel jlEarningEarning_n;
     private javax.swing.JLabel jlEarningHolidays_n;
@@ -649,14 +653,20 @@ public class SFormConfig extends SBeanForm {
     private javax.swing.JLabel jlEarningVacations_n;
     private javax.swing.JLabel jlFirstDayWeek;
     private javax.swing.JLabel jlFirstDayWeekHelp;
-    private javax.swing.JLabel jlFirstDayWeekHelp1;
     private javax.swing.JLabel jlLimitMwzReference;
     private javax.swing.JLabel jlMwzReferenceType;
     private javax.swing.JLabel jlMwzType;
     private javax.swing.JLabel jlPayrollTaxRate;
+    private javax.swing.JLabel jlPrePayrollWeeklyCutoffDayWeek;
+    private javax.swing.JLabel jlPrePayrollWeeklyCutoffDayWeekHint;
+    private javax.swing.JLabel jlPrePayrollWeeklyVarCutoffDayWeek;
+    private javax.swing.JLabel jlPrePayrollWeeklyVarCutoffDayWeekHint;
+    private javax.swing.JLabel jlPrePayrollWeeklyVarWeeksLag;
+    private javax.swing.JLabel jlPrePayrollWeeklyWeeksLag;
     private javax.swing.JLabel jlSsSubbranch;
     private javax.swing.JLabel jlTaxComputationType;
-    private javax.swing.JLabel jlTimeClockPol;
+    private javax.swing.JLabel jlTimeClockPolHint;
+    private javax.swing.JLabel jlTimeClockPolicy;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolAutoVacationBonus;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolBankAccountUse;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolFortnightStandard;
@@ -664,13 +674,13 @@ public class SFormConfig extends SBeanForm {
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolTaxSubsidyEarning;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateOperations;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecPayrollTaxRate;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntCutoffDayWeek;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntCutoffVarDayWeek;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntDelayVarWeeks;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntDelayWeeks;
     private sa.lib.gui.bean.SBeanFieldInteger moIntFirstDayWeek;
     private sa.lib.gui.bean.SBeanFieldInteger moIntLimitMwzReference;
-    private sa.lib.gui.bean.SBeanFieldInteger moIntTimeClockPol;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntPrePayrollWeeklyCutoffDayWeek;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntPrePayrollWeeklyVarCutoffDayWeek;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntPrePayrollWeeklyVarWeeksLag;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntPrePayrollWeeklyWeeksLag;
+    private sa.lib.gui.bean.SBeanFieldInteger moIntTimeClockPolicy;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBank;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDeductionSsContribution_n;
     private sa.lib.gui.bean.SBeanFieldKey moKeyDeductionTaxSubsidy_n;
@@ -700,7 +710,7 @@ public class SFormConfig extends SBeanForm {
         moDateDateOperations.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateOperations), true);
         moIntFirstDayWeek.setIntegerSettings(SGuiUtils.getLabelName(jlFirstDayWeek.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moIntFirstDayWeek.setMinInteger(1);
-        moIntFirstDayWeek.setMaxInteger(7);
+        moIntFirstDayWeek.setMaxInteger(SHrsConsts.WEEK_DAYS);
         moIntLimitMwzReference.setIntegerSettings(SGuiUtils.getLabelName(jlLimitMwzReference.getText()), SGuiConsts.GUI_TYPE_INT, true);
         moIntLimitMwzReference.setMinInteger(1);
         moIntLimitMwzReference.setMaxInteger(100);
@@ -727,22 +737,20 @@ public class SFormConfig extends SBeanForm {
         moKeyDeductionTaxSubsidy_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeductionTaxSubsidy_n), false);
         moKeyDeductionSsContribution_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlDeductionSsContribution_n), false);
         
-        moIntCutoffDayWeek.setIntegerSettings(SGuiUtils.getLabelName(jlCutoffDayWeek.getText()), SGuiConsts.GUI_TYPE_INT, true);
-        moIntCutoffDayWeek.setMaxInteger(7);
-        moIntCutoffDayWeek.setMinInteger(1);
-        moIntDelayWeeks.setIntegerSettings(SGuiUtils.getLabelName(jlDelayWeeks.getText()), SGuiConsts.GUI_TYPE_INT, true);
-        moIntDelayWeeks.setMinInteger(1);
-        moIntCutoffVarDayWeek.setIntegerSettings(SGuiUtils.getLabelName(jlCutoffVarDayWeek.getText()), SGuiConsts.GUI_TYPE_INT, true);
-        moIntCutoffVarDayWeek.setMaxInteger(7);
-        moIntCutoffVarDayWeek.setMinInteger(1);
-        moIntDelayVarWeeks.setIntegerSettings(SGuiUtils.getLabelName(jlDelayVarWeeks.getText()), SGuiConsts.GUI_TYPE_INT, true);
-        moIntDelayVarWeeks.setMinInteger(1);
-        moIntTimeClockPol.setIntegerSettings(SGuiUtils.getLabelName(jlTimeClockPol.getText()), SGuiConsts.GUI_TYPE_INT, true);
-        moIntTimeClockPol.setMaxInteger(3);
-        moIntTimeClockPol.setMinInteger(1);
-        moKeyEarningHolidays_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningHolidays_n), false);
+        moIntPrePayrollWeeklyCutoffDayWeek.setIntegerSettings(SGuiUtils.getLabelName(jlPrePayrollWeeklyCutoffDayWeek.getText()), SGuiConsts.GUI_TYPE_INT, true);
+        moIntPrePayrollWeeklyCutoffDayWeek.setMinInteger(1);
+        moIntPrePayrollWeeklyCutoffDayWeek.setMaxInteger(SHrsConsts.WEEK_DAYS);
+        moIntPrePayrollWeeklyVarCutoffDayWeek.setIntegerSettings(SGuiUtils.getLabelName(jlPrePayrollWeeklyVarCutoffDayWeek.getText()), SGuiConsts.GUI_TYPE_INT, true);
+        moIntPrePayrollWeeklyVarCutoffDayWeek.setMinInteger(1);
+        moIntPrePayrollWeeklyVarCutoffDayWeek.setMaxInteger(SHrsConsts.WEEK_DAYS);
+        moIntPrePayrollWeeklyWeeksLag.setIntegerSettings(SGuiUtils.getLabelName(jlPrePayrollWeeklyWeeksLag.getText()), SGuiConsts.GUI_TYPE_INT, false);
+        moIntPrePayrollWeeklyVarWeeksLag.setIntegerSettings(SGuiUtils.getLabelName(jlPrePayrollWeeklyVarWeeksLag.getText()), SGuiConsts.GUI_TYPE_INT, false);
+        moIntTimeClockPolicy.setIntegerSettings(SGuiUtils.getLabelName(jlTimeClockPolicy.getText()), SGuiConsts.GUI_TYPE_INT, true);
+        moIntTimeClockPolicy.setMinInteger(SModSysConsts.HRS_CFG_TIME_CLOCK_POL_ALL);
+        moIntTimeClockPolicy.setMaxInteger(SModSysConsts.HRS_CFG_TIME_CLOCK_POL_NON_OFF);
         moKeyEarningOvTime2_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningOvTime2_n), false);
         moKeyEarningOvTime3_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningOvTime3_n), false);
+        moKeyEarningHolidays_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningHolidays_n), false);
         moKeyEarningDayOff_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningDayOff_n), false);
         moKeyEarningSunday_n.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarningSunday_n), false);
 
@@ -772,14 +780,14 @@ public class SFormConfig extends SBeanForm {
         moFields.addField(moKeyDeductionTaxSubsidy_n);
         moFields.addField(moKeyDeductionSsContribution_n);
         
-        moFields.addField(moIntCutoffDayWeek);
-        moFields.addField(moIntDelayWeeks);
-        moFields.addField(moIntCutoffVarDayWeek);
-        moFields.addField(moIntDelayVarWeeks);
-        moFields.addField(moIntTimeClockPol);
-        moFields.addField(moKeyEarningHolidays_n);
+        moFields.addField(moIntPrePayrollWeeklyCutoffDayWeek);
+        moFields.addField(moIntPrePayrollWeeklyVarCutoffDayWeek);
+        moFields.addField(moIntPrePayrollWeeklyWeeksLag);
+        moFields.addField(moIntPrePayrollWeeklyVarWeeksLag);
+        moFields.addField(moIntTimeClockPolicy);
         moFields.addField(moKeyEarningOvTime2_n);
         moFields.addField(moKeyEarningOvTime3_n);
+        moFields.addField(moKeyEarningHolidays_n);
         moFields.addField(moKeyEarningDayOff_n);
         moFields.addField(moKeyEarningSunday_n);
 
@@ -864,15 +872,15 @@ public class SFormConfig extends SBeanForm {
         moKeyDeductionTaxSubsidy_n.setValue(new int[] { moRegistry.getFkDeductionTaxSubsidyId_n() });
         moKeyDeductionSsContribution_n.setValue(new int[] { moRegistry.getFkDeductionSsContributionId_n() });
         
-        moIntCutoffDayWeek.setValue(moRegistry.getPrePayWeekCutDay());
-        moIntDelayWeeks.setValue(moRegistry.getPrePayWeekLag());
-        moIntCutoffVarDayWeek.setValue(moRegistry.getPrePayWeekVarCutDay());
-        moIntDelayVarWeeks.setValue(moRegistry.getPrePayVarWeekLag());
-        moIntTimeClockPol.setValue(moRegistry.getTimeClockPol());
+        moIntPrePayrollWeeklyCutoffDayWeek.setValue(moRegistry.getPrePayrollWeeklyCutoffDayWeek());
+        moIntPrePayrollWeeklyVarCutoffDayWeek.setValue(moRegistry.PrePayrollWeeklyVarCutoffDayWeek());
+        moIntPrePayrollWeeklyWeeksLag.setValue(moRegistry.getPrePayrollWeeklyWeeksLag());
+        moIntPrePayrollWeeklyVarWeeksLag.setValue(moRegistry.PrePayrollWeeklyVarWeeksLag());
+        moIntTimeClockPolicy.setValue(moRegistry.getTimeClockPolicy());
         
-        moKeyEarningHolidays_n.setValue(new int[] { moRegistry.getFkEarningHolidayId_n() });
         moKeyEarningOvTime2_n.setValue(new int[] { moRegistry.getFkEarningOvertime2Id_n() });
         moKeyEarningOvTime3_n.setValue(new int[] { moRegistry.getFkEarningOvertime3Id_n() });
+        moKeyEarningHolidays_n.setValue(new int[] { moRegistry.getFkEarningHolidayId_n() });
         moKeyEarningDayOff_n.setValue(new int[] { moRegistry.getFkEarningDayOffId_n() });
         moKeyEarningSunday_n.setValue(new int[] { moRegistry.getFkEarningSunBonusId_n()});
 
@@ -900,6 +908,11 @@ public class SFormConfig extends SBeanForm {
         registry.setSsSubbranch(moTextSsSubbranch.getValue());
         registry.setBajioAffinityGroup(moTextBajioAffinityGroup.getValue());
         registry.setPayrollTaxRate(moDecPayrollTaxRate.getValue());
+        registry.setPrePayrollWeeklyCutoffDayWeek(moIntPrePayrollWeeklyCutoffDayWeek.getValue());
+        registry.setPrePayrollWeeklyWeeksLag(moIntPrePayrollWeeklyWeeksLag.getValue());
+        registry.setPrePayrollWeeklyVarCutoffDayWeek(moIntPrePayrollWeeklyVarCutoffDayWeek.getValue());
+        registry.setPrePayrollWeeklyVarWeeksLag(moIntPrePayrollWeeklyVarWeeksLag.getValue());
+        registry.setTimeClockPolicy(moIntTimeClockPolicy.getValue());
         registry.setFortnightStandard(moBoolFortnightStandard.getValue());
         registry.setAutoVacationBonus(moBoolAutoVacationBonus.getValue());
         registry.setTaxSubsidyEarning(moBoolTaxSubsidyEarning.getValue());
@@ -918,13 +931,6 @@ public class SFormConfig extends SBeanForm {
         registry.setFkDeductionTaxId_n(moKeyDeductionTax_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyDeductionTax_n.getValue()[0]);
         registry.setFkDeductionTaxSubsidyId_n(moKeyDeductionTaxSubsidy_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyDeductionTaxSubsidy_n.getValue()[0]);
         registry.setFkDeductionSsContributionId_n(moKeyDeductionSsContribution_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyDeductionSsContribution_n.getValue()[0]);
-        
-        registry.setPrePayWeekCutDay(moIntCutoffDayWeek.getValue());
-        registry.setPrePayWeekLag(moIntDelayWeeks.getValue());
-        registry.setPrePayWeekVarCutDay(moIntCutoffVarDayWeek.getValue());
-        registry.setPrePayVarWeekLag(moIntDelayVarWeeks.getValue());
-        registry.setTimeClockPol(moIntTimeClockPol.getValue());
-        
         registry.setFkEarningHolidayId_n(moKeyEarningHolidays_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningHolidays_n.getValue()[0]);
         registry.setFkEarningOvertime2Id_n(moKeyEarningOvTime2_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningOvTime2_n.getValue()[0]);
         registry.setFkEarningOvertime3Id_n(moKeyEarningOvTime3_n.getSelectedIndex() <= 0 ? SLibConsts.UNDEFINED : moKeyEarningOvTime3_n.getValue()[0]);

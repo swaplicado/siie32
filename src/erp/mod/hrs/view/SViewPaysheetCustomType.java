@@ -16,7 +16,7 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SViewPaysheetCustomType extends SGridPaneView {
 
@@ -68,7 +68,7 @@ public class SViewPaysheetCustomType extends SGridPaneView {
 
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_M, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, "b_one_off", "Único"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "b_one_off", "Irrepetible"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_DEL, SGridConsts.COL_TITLE_IS_DEL));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_S, SDbConsts.FIELD_IS_SYS, SGridConsts.COL_TITLE_IS_SYS));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_USR, SDbConsts.FIELD_USER_INS_NAME, SGridConsts.COL_TITLE_USER_INS_NAME));

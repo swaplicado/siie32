@@ -288,7 +288,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     mnFkDeductionTypeId + ", " + 
-                    (mnFkDeductionId == 0 ? 1 : mnFkDeductionId) + ", " + 
+                    mnFkDeductionId + ", " + 
                     mnFkBonusId + ", " + 
                     mnFkBenefitTypeId + ", " + 
                     (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +

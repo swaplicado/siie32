@@ -1806,17 +1806,34 @@ public abstract class STrnUtilities {
         boolean send = false;
         
         try {
-            String mails = "";
-            SDbMms mms = getMms(client, SModSysConsts.CFGS_TP_MMS_CFD);
-
-            if (mms.getQueryResultId() != SDbConsts.READ_OK) {
-                throw new Exception("Se carece de correo-e para envío de documentos.");
+            int[] mmsTypes = null;
+            
+            if (cfd.getFkCfdTypeId() == SDataConstantsSys.TRNS_TP_CFD_PAYROLL) {
+                // for sending payroll try with MMS for payroll, otherwise for CFD:
+                mmsTypes = new int[] { SModSysConsts.CFGS_TP_MMS_PAYROLL, SModSysConsts.CFGS_TP_MMS_CFD };
             }
             else {
-                mails = getMailToSendForCfd(client, bizPartnerId, bizPartnerBranchId, contactType);
+                // for sending CFD try with MMS for CFD only:
+                mmsTypes = new int[] { SModSysConsts.CFGS_TP_MMS_CFD };
+            }
+            
+            SDbMms mms = null;
+            
+            for (int mmsType : mmsTypes) {
+                mms = getMms(client, mmsType);
+                if (mms.getQueryResultId() == SDbConsts.READ_OK) {
+                    break;
+                }
+            }
+
+            if (mms == null || mms.getQueryResultId() != SDbConsts.READ_OK) {
+                throw new Exception("No existe una configuración de correo-e para el envío de este tipo de documento o comprobante.");
+            }
+            else {
+                String mails = getMailToSendForCfd(client, bizPartnerId, bizPartnerBranchId, contactType);
 
                 if (mails.isEmpty()) {
-                    throw new Exception("El receptor carece de correo-e para recepción de documentos.");
+                    throw new Exception("El receptor no cuenta con correo-e para la recepción de documentos o comprobantes.");
                 }
                 else {
                     String docNumber = "";
@@ -1989,10 +2006,10 @@ public abstract class STrnUtilities {
     /**
      * Obtain configuration of Mail Messaging Service the type specific.
      * @param client ERP Client interface.
-     * @param typeMms Type of Mail Messaging Service.
+     * @param mmsType Type of Mail Messaging Service.
      * @return Configuration registry.
      */
-    public static SDbMms getMms(final SClientInterface client, final int typeMms) {
+    public static SDbMms getMms(final SClientInterface client, final int mmsType) {
         String sql = "";
         ResultSet resultSet = null;
         SDbMms mms = null;
@@ -2000,7 +2017,7 @@ public abstract class STrnUtilities {
         try {
             mms = new SDbMms();
 
-            sql = "SELECT id_mms FROM cfg_mms WHERE fk_tp_mms = " + typeMms + " and b_del = 0 ORDER BY id_mms DESC ";
+            sql = "SELECT id_mms FROM cfg_mms WHERE fk_tp_mms = " + mmsType + " and b_del = 0 ORDER BY id_mms DESC ";
 
             resultSet = client.getSession().getStatement().executeQuery(sql);
             if (resultSet.next()) {

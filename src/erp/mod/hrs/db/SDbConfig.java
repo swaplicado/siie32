@@ -17,7 +17,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores
+ * @author Néstor Ávalos, Edwin Carmona, Sergio Flores
  */
 public class SDbConfig extends SDbRegistryUser {
 
@@ -29,10 +29,10 @@ public class SDbConfig extends SDbRegistryUser {
     protected String msSsSubbranch;
     protected String msBajioAffinityGroup;
     protected double mdPayrollTaxRate;
-    protected int mnPrePayrollWeeklyCutoffDayWeek; //Pre payroll weekly cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
-    protected int mnPrePayrollWeeklyWeeksLag;
-    protected int mnPrePayrollWeeklyVariableCutoffDayWeek; //Pre payroll weekly cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
-    protected int mnPrePayrollWeeklyVariableWeeksLag;
+    protected int mnPrePayrollWeeklyCutoffDayWeek;  // Pre payroll weekly (regular income) cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
+    protected int mnPrePayrollWeeklyWeeksLag;       // Pre payroll weekly (regular income) weeks lag: 0 = current week; 1 = one week behind; and so forth.
+    protected int mnPrePayrollWeeklyVariableCutoffDayWeek;  // Pre payroll weekly (variable income) cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
+    protected int mnPrePayrollWeeklyVariableWeeksLag;       // Pre payroll weekly (variable income) weeks lag: 0 = current week; 1 = one week behind; and so forth.
     protected int mnTimeClockPolicy;
     protected boolean mbFortnightStandard;
     protected boolean mbAutoVacationBonus;
@@ -77,11 +77,11 @@ public class SDbConfig extends SDbRegistryUser {
     public void setSsSubbranch(String s) { msSsSubbranch = s; }
     public void setBajioAffinityGroup(String s) { msBajioAffinityGroup = s; }
     public void setPayrollTaxRate(double d) { mdPayrollTaxRate = d; }
-    public void setPrePayWeekCutDay(int n) { mnPrePayrollWeeklyCutoffDayWeek = n; }
-    public void setPrePayWeekLag(int n) { mnPrePayrollWeeklyWeeksLag = n; }
-    public void setPrePayWeekVarCutDay(int n) { mnPrePayrollWeeklyVariableCutoffDayWeek = n; }
-    public void setPrePayVarWeekLag(int n) { mnPrePayrollWeeklyVariableWeeksLag = n; }
-    public void setTimeClockPol(int n) { mnTimeClockPolicy = n; }
+    public void setPrePayrollWeeklyCutoffDayWeek(int n) { mnPrePayrollWeeklyCutoffDayWeek = n; }
+    public void setPrePayrollWeeklyWeeksLag(int n) { mnPrePayrollWeeklyWeeksLag = n; }
+    public void setPrePayrollWeeklyVarCutoffDayWeek(int n) { mnPrePayrollWeeklyVariableCutoffDayWeek = n; }
+    public void setPrePayrollWeeklyVarWeeksLag(int n) { mnPrePayrollWeeklyVariableWeeksLag = n; }
+    public void setTimeClockPolicy(int n) { mnTimeClockPolicy = n; }
     public void setFortnightStandard(boolean b) { mbFortnightStandard = b; }
     public void setAutoVacationBonus(boolean b) { mbAutoVacationBonus = b; }
     public void setTaxSubsidyEarning(boolean b) { mbTaxSubsidyEarning = b; }
@@ -122,11 +122,11 @@ public class SDbConfig extends SDbRegistryUser {
     /**
      * Pre payroll weekly cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
      */
-    public int getPrePayWeekCutDay() { return mnPrePayrollWeeklyCutoffDayWeek; }
-    public int getPrePayWeekLag() { return mnPrePayrollWeeklyWeeksLag; }
-    public int getPrePayWeekVarCutDay() { return mnPrePayrollWeeklyVariableCutoffDayWeek; }
-    public int getPrePayVarWeekLag() { return mnPrePayrollWeeklyVariableWeeksLag; }
-    public int getTimeClockPol() { return mnTimeClockPolicy; }
+    public int getPrePayrollWeeklyCutoffDayWeek() { return mnPrePayrollWeeklyCutoffDayWeek; }
+    public int getPrePayrollWeeklyWeeksLag() { return mnPrePayrollWeeklyWeeksLag; }
+    public int PrePayrollWeeklyVarCutoffDayWeek() { return mnPrePayrollWeeklyVariableCutoffDayWeek; }
+    public int PrePayrollWeeklyVarWeeksLag() { return mnPrePayrollWeeklyVariableWeeksLag; }
+    public int getTimeClockPolicy() { return mnTimeClockPolicy; }
     public boolean isFortnightStandard() { return mbFortnightStandard; }
     public boolean isAutoVacationBonus() { return mbAutoVacationBonus; }
     public boolean isTaxSubsidyEarning() { return mbTaxSubsidyEarning; }
@@ -418,11 +418,11 @@ public class SDbConfig extends SDbRegistryUser {
         registry.setSsSubbranch(this.getSsSubbranch());
         registry.setBajioAffinityGroup(this.getBajioAffinityGroup());
         registry.setPayrollTaxRate(this.getPayrollTaxRate());
-        registry.setPrePayWeekCutDay(this.getPrePayWeekCutDay());
-        registry.setPrePayWeekLag(this.getPrePayWeekLag());
-        registry.setPrePayWeekVarCutDay(this.getPrePayWeekVarCutDay());
-        registry.setPrePayVarWeekLag(this.getPrePayVarWeekLag());
-        registry.setTimeClockPol(this.getTimeClockPol());
+        registry.setPrePayrollWeeklyCutoffDayWeek(this.getPrePayrollWeeklyCutoffDayWeek());
+        registry.setPrePayrollWeeklyWeeksLag(this.getPrePayrollWeeklyWeeksLag());
+        registry.setPrePayrollWeeklyVarCutoffDayWeek(this.PrePayrollWeeklyVarCutoffDayWeek());
+        registry.setPrePayrollWeeklyVarWeeksLag(this.PrePayrollWeeklyVarWeeksLag());
+        registry.setTimeClockPolicy(this.getTimeClockPolicy());
         registry.setFortnightStandard(this.isFortnightStandard());
         registry.setAutoVacationBonus(this.isAutoVacationBonus());
         registry.setTaxSubsidyEarning(this.isTaxSubsidyEarning());

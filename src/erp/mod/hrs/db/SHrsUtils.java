@@ -65,7 +65,7 @@ import sa.lib.prt.SPrtUtils;
 
 /**
  *
- * @author Juan Barajas, Alfredo Perez, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Alfredo Perez, Claudio Peña, Edwin Carmona, Sergio Flores
  */
 public abstract class SHrsUtils {
     
@@ -1390,37 +1390,37 @@ public abstract class SHrsUtils {
         
         return true;
     }
+    
+    /**
+     * Check if payroll uniqueness is fullfilled.
+     * @param session
+     * @param payrollId
+     * @param periodYear
+     * @param number
+     * @param paymentTypeId
+     * @param paysheetTypeId
+     * @param paysheetCustomTypeId
+     * @return
+     * @throws Exception 
+     */
+    public static boolean isPayrollUniquenessFullfilled(final SGuiSession session, final int payrollId, final int periodYear, final int number, final int paymentTypeId, final int paysheetTypeId, final int paysheetCustomTypeId) throws Exception {
+        boolean isValid = true;
+        SDbPaysheetCustomType paysheetCustomType = (SDbPaysheetCustomType) session.readRegistry(SModConsts.HRSU_TP_PAY_SHT_CUS, new int[] { paysheetCustomTypeId });
         
-    public static boolean isValidByCombinationExists(final SGuiSession session, final int idPay, final int year, final int number, final int payType, final int shtPay, final int customType) throws Exception {
-        String sqlTypeCus = "SELECT " +
-                            "    b_one_off " +
-                            "FROM " +
-                            "    " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_PAY_SHT_CUS) + " " +
-                            "WHERE " +
-                            "    id_tp_pay_sht_cus = " + customType +  ";";
-        
-        boolean oneOff = false;
-        try (ResultSet resultSetTypeC = session.getDatabase().getConnection().createStatement().executeQuery(sqlTypeCus)) {
-            if (resultSetTypeC.next()) {
-                oneOff = resultSetTypeC.getBoolean("b_one_off");
-            }
-        }
-        
-        if (! oneOff) return true;
-        
-        String sql = "SELECT COUNT(id_pay) AS f_count "
-                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
-                + " WHERE NOT b_del AND fis_year = " + year + " AND fk_tp_pay = " + payType 
-                + " AND fk_tp_pay_sht = " + shtPay + "  AND fk_tp_pay_sht_cus = " + customType 
-                + " AND num = " + number + " AND id_pay <> " + idPay + ";";
+        if (paysheetCustomType.isOneOff()) {
+            String sql = "SELECT COUNT(*) "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
+                    + "WHERE NOT b_del AND id_pay <> " + payrollId + " AND per_year = " + periodYear + " AND num = " + number + " AND "
+                    + "fk_tp_pay = " + paymentTypeId + " AND fk_tp_pay_sht = " + paysheetTypeId + "  AND fk_tp_pay_sht_cus = " + paysheetCustomTypeId + ";";
 
-        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
-            if (resultSet.next()) {
-                return false;
+            try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    isValid = false;
+                }
             }
         }
         
-        return true;
+        return isValid;
     }
 
     /**

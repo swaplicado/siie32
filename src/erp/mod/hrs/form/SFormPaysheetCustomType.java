@@ -17,7 +17,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SFormPaysheetCustomType extends SBeanForm {
 
@@ -51,8 +51,8 @@ public class SFormPaysheetCustomType extends SBeanForm {
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
         jPanel6 = new javax.swing.JPanel();
-        jlOneOff = new javax.swing.JLabel();
-        moBolOneOff = new sa.lib.gui.bean.SBeanFieldBoolean();
+        moBoolOneOff = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jlOneOffHint = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -65,7 +65,7 @@ public class SFormPaysheetCustomType extends SBeanForm {
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel4.add(jlCode);
 
-        moTextCode.setText("sBeanFieldText1");
+        moTextCode.setText("TEXT");
         jPanel4.add(moTextCode);
 
         jPanel2.add(jPanel4);
@@ -76,7 +76,7 @@ public class SFormPaysheetCustomType extends SBeanForm {
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlName);
 
-        moTextName.setText("sBeanFieldText1");
+        moTextName.setText("TEXT");
         moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel5.add(moTextName);
 
@@ -84,10 +84,13 @@ public class SFormPaysheetCustomType extends SBeanForm {
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlOneOff.setText("Único:*");
-        jlOneOff.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel6.add(jlOneOff);
-        jPanel6.add(moBolOneOff);
+        moBoolOneOff.setText("Irrepetible");
+        jPanel6.add(moBoolOneOff);
+
+        jlOneOffHint.setForeground(java.awt.SystemColor.textInactiveText);
+        jlOneOffHint.setText("No se permitirá repetir el número de nóminas para este mismo tipo");
+        jlOneOffHint.setPreferredSize(new java.awt.Dimension(350, 23));
+        jPanel6.add(jlOneOffHint);
 
         jPanel2.add(jPanel6);
 
@@ -104,8 +107,8 @@ public class SFormPaysheetCustomType extends SBeanForm {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JLabel jlCode;
     private javax.swing.JLabel jlName;
-    private javax.swing.JLabel jlOneOff;
-    private sa.lib.gui.bean.SBeanFieldBoolean moBolOneOff;
+    private javax.swing.JLabel jlOneOffHint;
+    private sa.lib.gui.bean.SBeanFieldBoolean moBoolOneOff;
     private sa.lib.gui.bean.SBeanFieldText moTextCode;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     // End of variables declaration//GEN-END:variables
@@ -113,13 +116,13 @@ public class SFormPaysheetCustomType extends SBeanForm {
     private void initComponentsCustom() {
         SGuiUtils.setWindowBounds(this, 480, 300);
 
-        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode.getText()), 10);
-        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName.getText()), 50);
-        moBolOneOff.setBooleanSettings(SGuiUtils.getLabelName(jlOneOff.getText()), false);
+        moTextCode.setTextSettings(SGuiUtils.getLabelName(jlCode), 10);
+        moTextName.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
+        moBoolOneOff.setBooleanSettings(SGuiUtils.getLabelName(moBoolOneOff.getText()), false);
 
         moFields.addField(moTextCode);
         moFields.addField(moTextName);
-        moFields.addField(moBolOneOff);
+        moFields.addField(moBoolOneOff);
 
         moFields.setFormButton(jbSave);
     }
@@ -151,7 +154,7 @@ public class SFormPaysheetCustomType extends SBeanForm {
 
         if (moRegistry.isRegistryNew()) {
             moRegistry.initPrimaryKey();
-            moRegistry.setSystem(false);    // all editable registries are non-system
+            moRegistry.setSystem(false); // all editable registries are non-system
             jtfRegistryKey.setText("");
         }
         else {
@@ -160,7 +163,7 @@ public class SFormPaysheetCustomType extends SBeanForm {
 
         moTextName.setValue(moRegistry.getName());
         moTextCode.setValue(moRegistry.getCode());
-        moBolOneOff.setValue(moRegistry.isOneOff());
+        moBoolOneOff.setValue(moRegistry.isOneOff());
 
         setFormEditable(true);
 
@@ -175,7 +178,7 @@ public class SFormPaysheetCustomType extends SBeanForm {
 
         registry.setName(moTextName.getValue());
         registry.setCode(moTextCode.getValue());
-        registry.setOneOff(moBolOneOff.getValue());
+        registry.setOneOff(moBoolOneOff.getValue());
 
         return registry;
     }

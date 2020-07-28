@@ -85,7 +85,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas, Néstor Ávalos, Sergio Flores, Edwin Carmona, Sergio Flores
+ * @author Juan Barajas, Néstor Ávalos, Edwin Carmona, Sergio Flores
  */
 public class SFormPayroll extends SBeanForm implements ActionListener, ItemListener, FocusListener, ChangeListener {
 
@@ -184,9 +184,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel13 = new javax.swing.JPanel();
         jlWorkingDays = new javax.swing.JLabel();
         moIntWorkingDays = new sa.lib.gui.bean.SBeanFieldInteger();
-        jPanel16 = new javax.swing.JPanel();
-        jlNotes = new javax.swing.JLabel();
-        moTextNotes = new sa.lib.gui.bean.SBeanFieldText();
         jPanel31 = new javax.swing.JPanel();
         jlPaysheetCustomType = new javax.swing.JLabel();
         moKeyPaysheetCustomType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -196,6 +193,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moRadSpecial = new sa.lib.gui.bean.SBeanFieldRadio();
         jPanel45 = new javax.swing.JPanel();
         moRadExtraordinary = new sa.lib.gui.bean.SBeanFieldRadio();
+        jPanel16 = new javax.swing.JPanel();
+        jlNotes = new javax.swing.JLabel();
+        moTextNotes = new sa.lib.gui.bean.SBeanFieldText();
         jPanel21 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jlTaxComputationType = new javax.swing.JLabel();
@@ -263,11 +263,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         moBoolFilterRetirees = new sa.lib.gui.bean.SBeanFieldBoolean();
         moBoolFilterOthers = new sa.lib.gui.bean.SBeanFieldBoolean();
         jPanel40 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
         jbReceiptCaptureEarnings = new javax.swing.JButton();
         jbReceiptCaptureDeductions = new javax.swing.JButton();
         jbLoadPrepayroll = new javax.swing.JButton();
         jbClearPrepayroll = new javax.swing.JButton();
-        jbPayrollP = new javax.swing.JButton();
+        jPanel33 = new javax.swing.JPanel();
+        jbAddPayrollBonus = new javax.swing.JButton();
         jpAvailableEmployees = new javax.swing.JPanel();
         jlTotalAvailables = new javax.swing.JLabel();
         jpControlsReceipts = new javax.swing.JPanel();
@@ -300,7 +302,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPaymentType.setText("Período de pago:");
-        jlPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlPaymentType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel8.add(jlPaymentType);
 
         jtfPaymentType.setEditable(false);
@@ -315,7 +317,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlYear.setText("Año nómina:*");
-        jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlYear.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel35.add(jlYear);
         jPanel35.add(moIntPeriodYear);
 
@@ -329,7 +331,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel42.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFiscalYear.setText("Año fiscal:*");
-        jlFiscalYear.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlFiscalYear.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel42.add(jlFiscalYear);
         jPanel42.add(moIntFiscalYear);
 
@@ -344,7 +346,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlNumber.setText("Número nómina:*");
-        jlNumber.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlNumber.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel9.add(jlNumber);
         jPanel9.add(moIntNumber);
 
@@ -363,7 +365,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateStart.setText("Fecha inicial:*");
-        jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDateStart.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel10.add(jlDateStart);
         jPanel10.add(moDateDateStart);
 
@@ -384,7 +386,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDateEnd.setText("Fecha final:*");
-        jlDateEnd.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDateEnd.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel11.add(jlDateEnd);
         jPanel11.add(moDateDateEnd);
 
@@ -403,7 +405,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlPeriod.setText("Período nómina:*");
-        jlPeriod.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlPeriod.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel36.add(jlPeriod);
         jPanel36.add(moIntPeriod);
 
@@ -417,7 +419,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlReceiptDays.setText("Días nómina:");
-        jlReceiptDays.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlReceiptDays.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel12.add(jlReceiptDays);
 
         moIntReceiptDays.setEditable(false);
@@ -428,7 +430,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlWorkingDays.setText("Días laborables:");
-        jlWorkingDays.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlWorkingDays.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel13.add(jlWorkingDays);
 
         moIntWorkingDays.setEditable(false);
@@ -436,24 +438,13 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
         jPanel6.add(jPanel13);
 
-        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
-
-        jlNotes.setText("Notas:");
-        jlNotes.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel16.add(jlNotes);
-
-        moTextNotes.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel16.add(moTextNotes);
-
-        jPanel6.add(jPanel16);
-
         jPanel31.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPaysheetCustomType.setText("Tipo personalizado:*");
-        jlPaysheetCustomType.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlPaysheetCustomType.setText("Tipo nómina empresa:*");
+        jlPaysheetCustomType.setPreferredSize(new java.awt.Dimension(125, 23));
         jPanel31.add(jlPaysheetCustomType);
 
-        moKeyPaysheetCustomType.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyPaysheetCustomType.setPreferredSize(new java.awt.Dimension(225, 23));
         jPanel31.add(moKeyPaysheetCustomType);
 
         jPanel6.add(jPanel31);
@@ -484,6 +475,17 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jPanel45.add(moRadExtraordinary);
 
         jPanel6.add(jPanel45);
+
+        jPanel16.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlNotes.setText("Notas:");
+        jlNotes.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel16.add(jlNotes);
+
+        moTextNotes.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel16.add(moTextNotes);
+
+        jPanel6.add(jPanel16);
 
         jPanel7.add(jPanel6);
 
@@ -749,31 +751,39 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jpControls.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel40.setPreferredSize(new java.awt.Dimension(550, 33));
-        jPanel40.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel40.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jbReceiptCaptureEarnings.setText("Capturar percepciones");
         jbReceiptCaptureEarnings.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbReceiptCaptureEarnings.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel40.add(jbReceiptCaptureEarnings);
+        jPanel1.add(jbReceiptCaptureEarnings);
 
         jbReceiptCaptureDeductions.setText("Capturar deducciones");
         jbReceiptCaptureDeductions.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbReceiptCaptureDeductions.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel40.add(jbReceiptCaptureDeductions);
+        jPanel1.add(jbReceiptCaptureDeductions);
 
         jbLoadPrepayroll.setText("Cargar prenómina");
         jbLoadPrepayroll.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbLoadPrepayroll.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel40.add(jbLoadPrepayroll);
+        jPanel1.add(jbLoadPrepayroll);
 
         jbClearPrepayroll.setText("Quitar prenómina");
         jbClearPrepayroll.setMargin(new java.awt.Insets(2, 0, 2, 0));
         jbClearPrepayroll.setPreferredSize(new java.awt.Dimension(110, 23));
-        jPanel40.add(jbClearPrepayroll);
+        jPanel1.add(jbClearPrepayroll);
 
-        jbPayrollP.setText("Nómina...");
-        jbPayrollP.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel40.add(jbPayrollP);
+        jPanel40.add(jPanel1);
+
+        jPanel33.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jbAddPayrollBonus.setText("Agregar bonos nómina");
+        jbAddPayrollBonus.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel33.add(jbAddPayrollBonus);
+
+        jPanel40.add(jPanel33);
 
         jpControls.add(jPanel40, java.awt.BorderLayout.EAST);
 
@@ -840,6 +850,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.ButtonGroup bgPayrollType;
     private javax.swing.ButtonGroup bgViewEmployees;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -865,6 +876,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
+    private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
@@ -884,6 +896,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JButton jbAddPayrollBonus;
     private javax.swing.JButton jbClearPrepayroll;
     private javax.swing.JButton jbEditDates;
     private javax.swing.JButton jbEditFiscalYear;
@@ -893,7 +906,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private javax.swing.JButton jbGetNextNumber;
     private javax.swing.JButton jbGoTabReceipts;
     private javax.swing.JButton jbLoadPrepayroll;
-    private javax.swing.JButton jbPayrollP;
     private javax.swing.JButton jbReceiptAdd;
     private javax.swing.JButton jbReceiptAddAll;
     private javax.swing.JButton jbReceiptCaptureDeductions;
@@ -1198,7 +1210,6 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
             }
             
-            moKeyPaysheetCustomType.setEnabled(enable);
             moTextNotes.setEnabled(enable);
             moKeyTaxComputationType.setEnabled(enable);
             moKeyTax.setEnabled(enable);
@@ -1212,7 +1223,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             jbReceiptCaptureDeductions.setEnabled(enable);
             jbLoadPrepayroll.setEnabled(enable);
             jbClearPrepayroll.setEnabled(enable);
-            jbPayrollP.setEnabled(enable);
+            jbAddPayrollBonus.setEnabled(enable);
             moRadViewEmployeesActive.setEnabled(!mbIsReadOnly);
             moRadViewEmployeesAll.setEnabled(!mbIsReadOnly);
             moBoolFilterWages.setEnabled(!mbIsReadOnly);
@@ -1244,6 +1255,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             jbGetNextNumber.setEnabled(true);
             jbEditDates.setEnabled(true);
             jbEditPeriod.setEnabled(true);
+            moKeyPaysheetCustomType.setEnabled(true);
             moRadNormal.setEnabled(true);
             moRadSpecial.setEnabled(true);
             moRadExtraordinary.setEnabled(true);
@@ -1255,6 +1267,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             jbGetNextNumber.setEnabled(mbIsCopyingPayroll);
             jbEditDates.setEnabled(mbIsCopyingPayroll);
             jbEditPeriod.setEnabled(mbIsCopyingPayroll);
+            moKeyPaysheetCustomType.setEnabled(mbIsCopyingPayroll);
             moRadNormal.setEnabled(mbIsCopyingPayroll);
             moRadSpecial.setEnabled(mbIsCopyingPayroll);
             moRadExtraordinary.setEnabled(mbIsCopyingPayroll);
@@ -1939,8 +1952,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         
         Date dates[] = null;
         if (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE) {
-            int cutDay = moConfig.getPrePayWeekCutDay();
-            int weekLag = moConfig.getPrePayWeekLag();
+            int cutDay = moConfig.getPrePayrollWeeklyCutoffDayWeek();
+            int weekLag = moConfig.getPrePayrollWeeklyWeeksLag();
             
             if (cutDay == 0) {
                 miClient.showMsgBoxError("No existe configuración para día de corte");
@@ -1977,7 +1990,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
         
         SShareData sd = new SShareData();
-        SPrepayroll ppayroll = sd.getCAPData(url, dates[0], dates[1], list, mnFormSubtype, moConfig.getTimeClockPol(), sCompanyKey);
+        SPrepayroll ppayroll = sd.getCAPData(url, dates[0], dates[1], list, mnFormSubtype, moConfig.getTimeClockPolicy(), sCompanyKey);
         
         if (ppayroll == null) {
             miClient.showMsgBoxError("Ucurrió un error al importar la prenómina");
@@ -1985,9 +1998,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
         
         // Acomodar la lista para los periodos distintos de faltas y percepciones
-        if (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE && moConfig.getPrePayWeekCutDay() != moConfig.getPrePayWeekVarCutDay()) {
-            int cutDay = moConfig.getPrePayWeekVarCutDay();
-            int weekLag = moConfig.getPrePayVarWeekLag();
+        if (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE && moConfig.getPrePayrollWeeklyCutoffDayWeek() != moConfig.PrePayrollWeeklyVarCutoffDayWeek()) {
+            int cutDay = moConfig.PrePayrollWeeklyVarCutoffDayWeek();
+            int weekLag = moConfig.PrePayrollWeeklyVarWeeksLag();
             Date datesVar[] = null;
 
             if (cutDay == 0) {
@@ -1997,7 +2010,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
 
             // obtener faltas
             datesVar = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateStart.getValue(), weekLag);
-            SPrepayroll ppayrollVar = sd.getCAPData(url, datesVar[0], datesVar[1], list, mnFormSubtype, moConfig.getTimeClockPol(), sCompanyKey);
+            SPrepayroll ppayrollVar = sd.getCAPData(url, datesVar[0], datesVar[1], list, mnFormSubtype, moConfig.getTimeClockPolicy(), sCompanyKey);
 
             if (ppayrollVar == null) {
                 miClient.showMsgBoxError("Ocurrió un problema al realizar la petición al sistema externo.");
@@ -2022,8 +2035,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         dialog.setlReceiptRows(selectedEmployeesIds);
         dialog.setStartDate(SLibUtils.DbmsDateFormatDate.format(dates[0]));
         dialog.setEndDate(SLibUtils.DbmsDateFormatDate.format(dates[1]));
-        dialog.setPrepayrollMode(moConfig.getTimeClockPol());
-        dialog.setCutOffDay(moConfig.getPrePayWeekCutDay());
+        dialog.setPrepayrollMode(moConfig.getTimeClockPolicy());
+        dialog.setCutOffDay(moConfig.getPrePayrollWeeklyCutoffDayWeek());
         dialog.setCompanyKey(sCompanyKey);
         dialog.initView();
         dialog.setVisible(true);
@@ -2082,7 +2095,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 int perceptionId = 0;
                 double factor = timeClockRow.getExtraTime();
                 
-                if (moConfig.getTimeClockPol() == SHrsConsts.PPAYROLL_POL_LIMITED_DATA) {
+                if (moConfig.getTimeClockPolicy() == SHrsConsts.PPAYROLL_POL_LIMITED_DATA) {
                     perceptionId = moConfig.getFkEarningOvertime2Id_n();
                 }
                 else {
@@ -2259,101 +2272,104 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         computeReceipts();
     }
     
-    private void actionPayEarnings() {
-        SDialogPayrollCondEarnings dialog = new SDialogPayrollCondEarnings(miClient, "Pago de otras percepciones");
+    private void actionAddPayrollBonus() {
+        SDialogPayrollConditionalEarnings dialog = new SDialogPayrollConditionalEarnings(miClient, "Bonos de nómina");
         dialog.setFormVisible(true);
         
-        ArrayList<Integer> bonusIds = dialog.getBonusIds();
-        for (Integer bonusId : bonusIds) {
-            if (maBonusPayed.contains(bonusId)) {
-                miClient.showMsgBoxError("Este bono ya está contemplado en la nómina, si desea calcularlo"
-                        + " de nuevo pase todos los recibos al lado izquierdo e inténtelo de nuevo");
-                return;
-            }
-        }
-        
-        ArrayList<Integer> empIds = new ArrayList<>();
-        
-        for (int i = 0; i < moGridPaneEmployeesAvailable.getModel().getRowCount(); i++) {
-            SRowPayrollEmployee row = (SRowPayrollEmployee) moGridPaneEmployeesAvailable.getGridRow(i);
-            empIds.add(row.getPkEmployeeId());
-        }
-        for (int i = 0; i < moGridPanePayrollReceipts.getModel().getRowCount(); i++) {
-            SRowPayrollEmployee row = (SRowPayrollEmployee) moGridPanePayrollReceipts.getGridRow(i);
-            empIds.add(row.getPkEmployeeId());
-        }
-        
-        try {
-            Date dates[] = null;
-            if (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE) {
-                int cutDay = moConfig.getPrePayWeekCutDay();
-                int weekLag = moConfig.getPrePayWeekLag();
+        if (dialog.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+            ArrayList<Integer> bonusIds = dialog.getBonusIds();
 
-                if (cutDay == 0) {
-                    miClient.showMsgBoxError("No existe configuración para día de corte");
-                    return;
-                }
-
-                dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateStart.getValue(), weekLag);
-            }
-            else {
-                dates = SPrepayrollUtils.getPrepayrollDateRangeByTable(miClient, mnFormSubtype, moIntPeriodYear.getValue(), moIntNumber.getValue());
-                if (dates == null || dates[0] == null || dates[1] == null) {
-                    miClient.showMsgBoxError("No se pudieron obtener fechas para prenómina");
+            for (Integer bonusId : bonusIds) {
+                if (maBonusPayed.contains(bonusId)) {
+                    miClient.showMsgBoxError("Este bono ya está contemplado en la nómina.\n"
+                            + "Si desea calcularlo de nuevo pase todos los recibos al lado izquierdo e inténtelo de otra vez.");
                     return;
                 }
             }
-            
-            SDataCompany company = (SDataCompany) SDataUtilities.readRegistry((SClientInterface) miClient, 
-                                                    SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId()}, 
-                                                    SLibConstants.EXEC_MODE_SILENT);
-            String sCompanyKey = company.getKey();
-            
-            HashMap<Integer, ArrayList<SEarnConfiguration>> list;
-            list = SPayrollUtils.process(miClient, empIds, bonusIds, dates[0], dates[1], mnFormSubtype, sCompanyKey);
-            
-            if (list == null) {
-                miClient.showMsgBoxError("Ocurrió un problema al realizar la petición al sistema externo.");
-                return;
+
+            ArrayList<Integer> empIds = new ArrayList<>();
+
+            for (int i = 0; i < moGridPaneEmployeesAvailable.getModel().getRowCount(); i++) {
+                SRowPayrollEmployee row = (SRowPayrollEmployee) moGridPaneEmployeesAvailable.getGridRow(i);
+                empIds.add(row.getPkEmployeeId());
             }
-            
-            // Mostrar pantalla de info previa
-            SDialogCalculatedBonus dialogB = new SDialogCalculatedBonus(miClient, "Importación de prenómina desde reloj checador");
-            
-            dialogB.setlReceiptRows(list);
-            dialogB.setStartDate(SLibUtils.DbmsDateFormatDate.format(dates[0]));
-            dialogB.setEndDate(SLibUtils.DbmsDateFormatDate.format(dates[1]));
-            dialogB.setCutOffDay(moConfig.getPrePayWeekCutDay());
-            dialogB.setBonus("Vales");
-            dialogB.setCompanyKey(sCompanyKey);
-            dialogB.initView();
-            dialogB.setVisible(true);
-        
-            if (dialogB.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                for (Integer bonusId : bonusIds) {
-                    if (bonusId != 1) {
-                        maBonusPayed.add(bonusId);
+            for (int i = 0; i < moGridPanePayrollReceipts.getModel().getRowCount(); i++) {
+                SRowPayrollEmployee row = (SRowPayrollEmployee) moGridPanePayrollReceipts.getGridRow(i);
+                empIds.add(row.getPkEmployeeId());
+            }
+
+            try {
+                Date dates[] = null;
+                if (mnFormSubtype == SModSysConsts.HRSS_TP_PAY_WEE) {
+                    int cutDay = moConfig.getPrePayrollWeeklyCutoffDayWeek();
+                    int weekLag = moConfig.getPrePayrollWeeklyWeeksLag();
+
+                    if (cutDay == 0) {
+                        miClient.showMsgBoxError("No existe configuración para día de corte");
+                        return;
+                    }
+
+                    dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateStart.getValue(), weekLag);
+                }
+                else {
+                    dates = SPrepayrollUtils.getPrepayrollDateRangeByTable(miClient, mnFormSubtype, moIntPeriodYear.getValue(), moIntNumber.getValue());
+                    if (dates == null || dates[0] == null || dates[1] == null) {
+                        miClient.showMsgBoxError("No se pudieron obtener fechas para prenómina");
+                        return;
                     }
                 }
-                for (Map.Entry<Integer, ArrayList<SEarnConfiguration>> entry : list.entrySet()) {
-                    // Determinar si el empleado se agrega o no
-                    ArrayList<SEarnConfiguration> gainedEarnings = new ArrayList<>();
-                    for (SEarnConfiguration earnConf : entry.getValue()) {
-                        if (earnConf.isHasWon() > 0d) {
-                            gainedEarnings.add(earnConf);
+
+                SDataCompany company = (SDataCompany) SDataUtilities.readRegistry((SClientInterface) miClient, 
+                                                        SDataConstants.CFGU_CO, new int[] { miClient.getSession().getConfigCompany().getCompanyId()}, 
+                                                        SLibConstants.EXEC_MODE_SILENT);
+                String sCompanyKey = company.getKey();
+
+                HashMap<Integer, ArrayList<SEarnConfiguration>> list;
+                list = SPayrollUtils.process(miClient, empIds, bonusIds, dates[0], dates[1], mnFormSubtype, sCompanyKey);
+
+                if (list == null) {
+                    miClient.showMsgBoxError("Ocurrió un problema al realizar la petición al sistema externo.");
+                    return;
+                }
+
+                // Mostrar pantalla de info previa
+                SDialogCalculatedBonus dialogB = new SDialogCalculatedBonus(miClient, "Importación de prenómina desde reloj checador");
+
+                dialogB.setlReceiptRows(list);
+                dialogB.setStartDate(SLibUtils.DbmsDateFormatDate.format(dates[0]));
+                dialogB.setEndDate(SLibUtils.DbmsDateFormatDate.format(dates[1]));
+                dialogB.setCutOffDay(moConfig.getPrePayrollWeeklyCutoffDayWeek());
+                dialogB.setBonus("Vales");
+                dialogB.setCompanyKey(sCompanyKey);
+                dialogB.initView();
+                dialogB.setVisible(true);
+
+                if (dialogB.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                    for (Integer bonusId : bonusIds) {
+                        if (bonusId != 1) {
+                            maBonusPayed.add(bonusId);
                         }
                     }
-                    
-                    if (! gainedEarnings.isEmpty()) {
-                        this.addReceiptAndPerception(entry.getKey(), gainedEarnings);
+                    for (Map.Entry<Integer, ArrayList<SEarnConfiguration>> entry : list.entrySet()) {
+                        // Determinar si el empleado se agrega o no
+                        ArrayList<SEarnConfiguration> gainedEarnings = new ArrayList<>();
+                        for (SEarnConfiguration earnConf : entry.getValue()) {
+                            if (earnConf.isHasWon() > 0d) {
+                                gainedEarnings.add(earnConf);
+                            }
+                        }
+
+                        if (! gainedEarnings.isEmpty()) {
+                            this.addReceiptAndPerception(entry.getKey(), gainedEarnings);
+                        }
                     }
+
+                    computeReceipts();
                 }
-                
-                computeReceipts();
             }
-        }
-        catch (SQLException ex) {
-            Logger.getLogger(SFormPayroll.class.getName()).log(Level.SEVERE, null, ex);
+            catch (SQLException ex) {
+                Logger.getLogger(SFormPayroll.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     
@@ -2505,7 +2521,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbReceiptCaptureDeductions.addActionListener(this);
         jbLoadPrepayroll.addActionListener(this);
         jbClearPrepayroll.addActionListener(this);
-        jbPayrollP.addActionListener(this);
+        jbAddPayrollBonus.addActionListener(this);
         jbTaxSubsidyOptionChange.addActionListener(this);
         
         moRadNormal.addItemListener(this);
@@ -2549,7 +2565,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         jbReceiptCaptureDeductions.removeActionListener(this);
         jbLoadPrepayroll.removeActionListener(this);
         jbClearPrepayroll.removeActionListener(this);
-        jbPayrollP.removeActionListener(this);
+        jbAddPayrollBonus.removeActionListener(this);
         jbTaxSubsidyOptionChange.removeActionListener(this);
 
         moRadNormal.removeItemListener(this);
@@ -2834,10 +2850,10 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                     }
                     
                     if (validation.isValid()) {
-                        if (! SHrsUtils.isValidByCombinationExists(miClient.getSession(), 
+                        if (!SHrsUtils.isPayrollUniquenessFullfilled(miClient.getSession(), 
                                 moRegistry.getPkPayrollId(), moIntPeriodYear.getValue(), moIntNumber.getValue(), 
                                 mnFormSubtype, this.getPaysheetTypeId(), moKeyPaysheetCustomType.getValue()[0])) {
-                            validation.setMessage("Ya existe una nómina con el mismo año, número, tipo, periodicidad y tipo personalizado");
+                            validation.setMessage("Ya existe una nómina del mismo año, número, periodicidad y tipo.");
                             validation.setComponent(moKeyPaysheetCustomType);
                         }
                     }
@@ -2905,8 +2921,8 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 else if (button == jbClearPrepayroll) {
                     actionClearPrepayroll();
                 }
-                else if (button == jbPayrollP) {
-                    actionPayEarnings();
+                else if (button == jbAddPayrollBonus) {
+                    actionAddPayrollBonus();
                 }
             }
         }

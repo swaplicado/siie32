@@ -15,7 +15,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SDbPaysheetCustomType extends SDbRegistryUser {
     
@@ -177,7 +177,7 @@ public class SDbPaysheetCustomType extends SDbRegistryUser {
                     */
                     "code = '" + msCode + "', " +
                     "name = '" + msName + "', " +
-                    "b_del = " + (mbOneOff ? 1 : 0) + ", " +
+                    "b_one_off = " + (mbOneOff ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_del = " + (mbSystem ? 1 : 0) + ", " +
                     //"fk_usr_ins = " + mnFkUserInsertId + ", " +

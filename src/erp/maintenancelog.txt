@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 172.0/ 2020-07-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Revisión y corrección nuevas funcionalidades relacionadas con prenóminas.
+2) Implementación de servicio de mensajería mail para recibos de nómina diferenciado de CFDI en general.
+3) Implementación de acceso de solo lectura al submódulo de inventarios de mantenimiento.
+
+================================================================================
 SIIE 3.2 171.0/ 2020-07-22
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

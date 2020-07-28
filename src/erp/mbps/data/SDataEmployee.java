@@ -38,7 +38,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  * Used mainly in CRUD operations on employees.
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -208,7 +208,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setImageSignature_n(java.sql.Blob o) { moImageSignature_n = o; }
     public void setUnionized(boolean b) { mbUnionized = b; }
     public void setMfgOperator(boolean b) { mbMfgOperator = b; }
-    public void setIsOverTime(boolean b) { mbOvertime = b; }
+    public void setOvertime(boolean b) { mbOvertime = b; }
     public void setActive(boolean b) { mbActive = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }

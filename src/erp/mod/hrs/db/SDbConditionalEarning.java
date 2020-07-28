@@ -16,7 +16,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
 public class SDbConditionalEarning extends SDbRegistryUser {
 
@@ -42,6 +42,42 @@ public class SDbConditionalEarning extends SDbRegistryUser {
     public SDbConditionalEarning() {
         super(SModConsts.HRS_COND_EAR);
     }
+    
+    /*
+     * Private methods
+     */
+
+    /**
+     * Get existing ID. If other equivalent registries exist, only the first one will be recovered.
+     * @param session
+     * @return
+     * @throws SQLException
+     * @throws Exception 
+     */
+    private int getExistingId(SGuiSession session) throws SQLException, Exception {
+        int id = 0;
+        
+        String sql = "SELECT id_cond_ear "
+                + "FROM " + getSqlTable() + " "
+                + "WHERE fk_ear = " + mnFkEarningId + " AND "
+                + "fk_scope = " + mnFkScopeId + " AND "
+                + "fk_ref = " + mnFkReferenceId + " AND "
+                + "fk_bonus = " + mnFkBonusId + " AND "
+                + "dt_sta = '"+ SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' "
+                + "ORDER BY id_cond_ear;";
+        
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+        }
+        
+        return id;
+    }
+
+    /*
+     * Public methods
+     */
 
     public void setPkCondEarningId(int n) { mnPkConditionalEarningId = n; }
     public void setStartDate(Date t) { mtDateStart = t; }
@@ -132,24 +168,6 @@ public class SDbConditionalEarning extends SDbRegistryUser {
         }
     }
     
-    private int existsKey(SGuiSession session) throws SQLException, Exception {
-        ResultSet resultSet = null;
-
-        String smsSql = "SELECT id_cond_ear FROM " + getSqlTable() + " WHERE "
-                + " fk_scope = " + mnFkScopeId 
-                + " AND fk_ref = " + mnFkReferenceId 
-                + " AND fk_ear = " + mnFkEarningId
-                + " AND fk_bonus = " + mnFkBonusId
-                + " AND dt_sta = '"+ SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "'; ";
-        
-        resultSet = session.getStatement().executeQuery(smsSql);
-        if (resultSet.next()) {
-            return resultSet.getInt(1);
-        }
-        
-        return 0;
-    }
-
     @Override
     public void read(SGuiSession session, int[] pk) throws SQLException, Exception {
         ResultSet resultSet = null;
@@ -189,10 +207,10 @@ public class SDbConditionalEarning extends SDbRegistryUser {
         initQueryMembers();
         mnQueryResultId = SDbConsts.SAVE_ERROR;
         
-        int primaryKeyId = this.existsKey(session);
+        int existingId = getExistingId(session);
         
-        if (primaryKeyId > 0 && primaryKeyId != mnPkConditionalEarningId)  {
-            mnPkConditionalEarningId = primaryKeyId;
+        if (existingId != 0 && existingId != mnPkConditionalEarningId)  {
+            mnPkConditionalEarningId = existingId; // if other equivalent registries exist, only the first one will be updated
         }
 
         if (mbRegistryNew) {
