@@ -131,25 +131,19 @@ public abstract class SCfdUtils implements Serializable {
     
     public static final String TXT_SEND_DPS = "Enviar documento";
     
+    /** Key CFD for be used in DataSet as key to identify CFD massive processing case: stamping or printing. */
+    public static final int KEY_CFD = 900000;
+    /** For identifying CFD massive processing case of stamping. When a CFD is being stamped, must be recovered from storage to be issued. */
+    public static final int KEY_CFD_STAMPING = 900001;
+    /** For identifying any CFD massive processing case different from stamping. When a CFD is being processed, for instance, when being printed, may be recovered from memory, if available, to be issued. */
+    public static final int KEY_CFD_PROCESSING = 900002;
+    
     public static final HashMap<Integer, Object> DataSet = new HashMap<>();
     
     /*
      * Private static methods:
      */
     
-    public static SDataCfdPacType getPacConfiguration(final SClientInterface client, final int cfdTypeId) {
-        SDataCfdPacType cfdPacType = null;
-        
-        try {
-            cfdPacType = (SDataCfdPacType) SDataUtilities.readRegistry(client, SDataConstants.TRN_TP_CFD_PAC, new int[] { cfdTypeId }, SLibConstants.EXEC_MODE_SILENT);
-        }
-        catch (Exception e) {
-            SLibUtils.showException(SCfdUtils.class.getName(), e);
-        }
-        
-        return cfdPacType;
-    }
-
     private static boolean canCfdiCancelWebService(final SClientInterface client, final SDataCfd cfd, final int pacId) throws Exception {
         SDataCfdPacType cfdPacType = null;
         SDataPac pac = null;
@@ -664,18 +658,18 @@ public abstract class SCfdUtils implements Serializable {
             switch (dataCfd.getFkCfdTypeId()) {
                 case SDataConstantsSys.TRNS_TP_CFD_INV:
                     registryKey = new int[] { dataCfd.getFkDpsYearId_n(), dataCfd.getFkDpsDocId_n() };
-                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, registryKey, 1000 * 60);   // 1 minute timeout
+                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRN_DPS, registryKey, 1000 * 60); // 1 minute timeout
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
                     registryKey = new int[] { dataCfd.getPkCfdId() };
-                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, registryKey, 1000 * 60);  // 1 minute timeout
+                    lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.TRNX_CFD_PAY_REC, registryKey, 1000 * 60); // 1 minute timeout
                     break;
                     
                 case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                     if (cfdSubtype == SCfdConsts.CFDI_PAYROLL_VER_CUR) {
                         registryKey = new int[] { dataCfd.getFkPayrollReceiptPayrollId_n(), dataCfd.getFkPayrollReceiptEmployeeId_n(), dataCfd.getFkPayrollReceiptIssueId_n() };
-                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, registryKey, 1000 * 60);   // 1 minute timeout
+                        lock = SSrvUtils.gainLock(client.getSession(), client.getSessionXXX().getCompany().getPkCompanyId(), SModConsts.HRS_PAY_RCP_ISS, registryKey, 1000 * 60); // 1 minute timeout
                     }
                     break;
                 default:
@@ -837,13 +831,13 @@ public abstract class SCfdUtils implements Serializable {
                         // read again CFD for printing:
                         // XXX NOTE: 2018-02-24, Sergio Flores: Check why is read again the CFD registry:
                         
-                        SDataCfd dataCfdForPrinting = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, dataCfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                        printCfd(client, dataCfdForPrinting, cfdSubtype, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, true);
+                        SDataCfd cfdForPrinting = (SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, dataCfd.getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                        printCfd(client, cfdForPrinting, cfdSubtype, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, true);
 
                         // set flag PDF as correct:
 
-                        dataCfdForPrinting.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_PRC_STO_PDF, false);
-                        dataCfdForPrinting.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_PRC_USR, client.getSession().getUser().getPkUserId());
+                        cfdForPrinting.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_PRC_STO_PDF, false);
+                        cfdForPrinting.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_PRC_USR, client.getSession().getUser().getPkUserId());
                     }
                 }
             }
@@ -2438,9 +2432,38 @@ public abstract class SCfdUtils implements Serializable {
         return valid;
     }
     
+    /**
+     * Check if request if for stamping or annulment.
+     * @param request Options defined in erp.cfd.SCfdConsts.
+     * @return 
+     */
+    private static boolean isRequestForStamping(final int request) {
+        return SLibUtils.belongsTo(request, new int[] {
+            SCfdConsts.REQ_STAMP, SCfdConsts.REQ_STAMP_SEND, 
+            SCfdConsts.REQ_ANNUL, SCfdConsts.REQ_ANNUL_SEND
+        });
+    }
+    
     /*
      * Public static methods:
      */
+    
+    /**
+     * Init data set for processing a payroll.
+     * @param request Options defined in erp.cfd.SCfdConsts.
+     */
+    public static void initDataSetForPayroll(final int request) {
+        SCfdUtils.DataSet.remove(SModConsts.HRS_PAY); // payroll registry will be read and set in method SCfdUtils.computePrintCfd() when processing the first CFD
+        SCfdUtils.DataSet.put(SCfdUtils.KEY_CFD, isRequestForStamping(request) ? SCfdUtils.KEY_CFD_STAMPING : SCfdUtils.KEY_CFD_PROCESSING);
+    }
+    
+    /**
+     * Reset data set when processing a payroll.
+     */
+    public static void resetDataSetForPayroll() {
+        SCfdUtils.DataSet.remove(SModConsts.HRS_PAY);
+        SCfdUtils.DataSet.remove(SCfdUtils.KEY_CFD);
+    }
     
     public static float getCfdVersion(final int xmlType) {
         float version = 0;
@@ -2458,6 +2481,19 @@ public abstract class SCfdUtils implements Serializable {
         return version;
     }
     
+    public static SDataCfdPacType getPacConfiguration(final SClientInterface client, final int cfdTypeId) {
+        SDataCfdPacType cfdPacType = null;
+        
+        try {
+            cfdPacType = (SDataCfdPacType) SDataUtilities.readRegistry(client, SDataConstants.TRN_TP_CFD_PAC, new int[] { cfdTypeId }, SLibConstants.EXEC_MODE_SILENT);
+        }
+        catch (Exception e) {
+            SLibUtils.showException(SCfdUtils.class.getName(), e);
+        }
+        
+        return cfdPacType;
+    }
+
     /**
      * Composes a full datetime object from provided date and current time.
      * @param date Provided date.
@@ -2691,12 +2727,14 @@ public abstract class SCfdUtils implements Serializable {
                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                         }
                         else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
-                            // read payroll only once for all CFD because is a really lengty operation:
+                            // prevent from reading payroll multiple times because is a really lengthy operation:
                             SDbPayroll payroll = (SDbPayroll) SCfdUtils.DataSet.get(SModConsts.HRS_PAY);
+                            
                             if (payroll == null) {
-                                payroll = new SDbPayroll();
-                                payroll.read(client.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n() });
-                                SCfdUtils.DataSet.put(SModConsts.HRS_PAY, payroll);
+                                payroll = (SDbPayroll) client.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { cfd.getFkPayrollReceiptPayrollId_n() });
+                                
+                                // prepare data set of CFD utilities:
+                                SCfdUtils.DataSet.put(SModConsts.HRS_PAY, payroll); // payroll registry will be used in method SCfdPrint.printPayrollReceipt33_12()
                             }
                             
                             // proceed with CFD printing:
@@ -2738,7 +2776,7 @@ public abstract class SCfdUtils implements Serializable {
         }
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsPrintable.size() + " documentos?") == JOptionPane.YES_OPTION) {
-                SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de impresión", SCfdConsts.PROC_PRT_DOC);
+                SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de impresión", SCfdConsts.REQ_PRINT_DOC);
                 dialog.setFormParams(client, cfdsPrintable, null, 0, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialog.setNumberCopies(numberCopies);
                 dialog.setVisible(true);
@@ -3223,7 +3261,7 @@ public abstract class SCfdUtils implements Serializable {
             else {
                 if (existsCfdiEmitInconsist(client, cfdsVerify)) {
                     int stampsAvailable = getStampsAvailable(client, cfdsVerify.get(0).getFkCfdTypeId(), cfdsVerify.get(0).getTimestamp(), 0);
-                    SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de verificación", SCfdConsts.PROC_REQ_VERIFY);
+                    SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de verificación", SCfdConsts.REQ_VERIFY);
                     dialog.setFormParams(client, cfdsVerify, null, stampsAvailable, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                     dialog.setVisible(true);
                 }
@@ -4424,7 +4462,7 @@ public abstract class SCfdUtils implements Serializable {
 
                     if (existsCfdiEmitInconsist(client, cfdsValidate)) {
                         if (signed) {
-                            SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de timbrado", SCfdConsts.PROC_REQ_STAMP);
+                            SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de timbrado", SCfdConsts.REQ_STAMP);
                             dialog.setFormParams(client, cfdsAux, null, stampsAvailable, null, signNeeded, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialog.setVisible(true);
                         }
@@ -4470,7 +4508,7 @@ public abstract class SCfdUtils implements Serializable {
 
                     if (existsCfdiEmitInconsist(client, cfdsValidate)) {
                         if (signedSent) {
-                            SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de timbrado y envío", SCfdConsts.PROC_REQ_STAMP_AND_SND);
+                            SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de timbrado y envío", SCfdConsts.REQ_STAMP_SEND);
                             dialog.setFormParams(client, cfdsAux, null, stampsAvailable, null, signNeeded, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialog.setVisible(true);
                         }
@@ -4514,7 +4552,7 @@ public abstract class SCfdUtils implements Serializable {
                     }
 
                     if (cancel && client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                        SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de anulación", SCfdConsts.PROC_REQ_ANNUL);
+                        SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de anulación", SCfdConsts.REQ_ANNUL);
                         dialog.setFormParams(client, cfdsAux, null, stampsAvailable, cancellationDate, validateStamp, subtypeCfd, tpDpsAnn);
                         dialog.setVisible(true);
                     }
@@ -4557,7 +4595,7 @@ public abstract class SCfdUtils implements Serializable {
                     }
 
                     if (cancel && client.showMsgBoxConfirm("La anulación de un CFDI no puede revertirse.\n " + SGuiConsts.MSG_CNF_CONT) == JOptionPane.YES_OPTION) {
-                        SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de anulación y envío", SCfdConsts.PROC_REQ_ANNUL_AND_SND);
+                        SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de anulación y envío", SCfdConsts.REQ_ANNUL_SEND);
                         dialog.setFormParams(client, cfdsAux, null, stampsAvailable, cancellationDate, validateStamp, subtypeCfd, tpDpsAnn);
                         dialog.setVisible(true);
                     }
@@ -4591,7 +4629,7 @@ public abstract class SCfdUtils implements Serializable {
         }
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea imprimir " + cfdsAux.size() + " acuses de cancelación?") == JOptionPane.YES_OPTION) {
-                SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de impresión de acuses de cancelación", SCfdConsts.PROC_PRT_ACK_ANNUL);
+                SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de impresión de acuses de cancelación", SCfdConsts.REQ_PRINT_ANNUL_ACK);
                 dialog.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd, subtypeCfd);
                 dialog.setVisible(true);
             }
@@ -4744,7 +4782,7 @@ public abstract class SCfdUtils implements Serializable {
         }
         else {
             if (client.showMsgBoxConfirm("¿Está seguro que desea enviar por correo-e " + cfdsAux.size() + " documentos?") == JOptionPane.YES_OPTION) {
-                SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de envío", SCfdConsts.PROC_SND_DOC);
+                SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de envío", SCfdConsts.REQ_SEND_DOC);
                 dialog.setFormParams(client, cfdsAux, null, 0, null, false, subtypeCfd, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                 dialog.setVisible(true);
             }

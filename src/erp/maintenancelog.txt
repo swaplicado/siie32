@@ -1,4 +1,10 @@
 ================================================================================
+SIIE 3.2 172.1/ 2020-07-30
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la funcionalidad de timbrado masivo de recibos de nómina para evitar la lectura sucesiva de la nómina en la impresión de cada recibo de nómina.
+
+================================================================================
 SIIE 3.2 172.0/ 2020-07-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

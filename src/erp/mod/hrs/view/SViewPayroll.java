@@ -21,7 +21,6 @@ import erp.mod.hrs.form.SDialogLayoutGroceryService;
 import erp.mod.hrs.form.SDialogLayoutPayroll;
 import erp.mod.hrs.form.SDialogRepHrsReportsPayroll;
 import erp.mtrn.data.SCfdUtils;
-import erp.print.SDataConstantsPrint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -184,7 +183,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
 
                         if (payrollCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                             int stampsAvailable = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, miClient.getSession().getCurrentDate(), SLibConsts.UNDEFINED);
-                            SDialogCfdProcessing dialog = new SDialogCfdProcessing(miClient, "Procesamiento de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
+                            SDialogCfdProcessing dialog = new SDialogCfdProcessing(miClient, "Procesamiento de timbrado y envío", SCfdConsts.REQ_STAMP);
                             dialog.setFormParams((SClientInterface) miClient, null, payrollCfdi.getPayrollEmployeeReceiptKeys(), stampsAvailable, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialog.setVisible(true);
                         }
@@ -246,7 +245,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 }
                 else if (miClient.showMsgBoxConfirm("¿Está seguro que desea enviar vía mail los recibos de nómina?") == JOptionPane.YES_OPTION) {
                     try {
-                        SHrsUtils.sendPayrollReceipts(miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, gridRow.getRowPrimaryKey());
+                        SHrsUtils.sendPayrollReceipts(miClient, gridRow.getRowPrimaryKey()[0]);
                     } 
                     catch (Exception e) {
                         SLibUtils.showException(this, e);

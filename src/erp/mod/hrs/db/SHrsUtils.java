@@ -2281,10 +2281,9 @@ public abstract class SHrsUtils {
         }
     }
     
-    public static void sendPayrollReceipts(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws Exception {
+    public static void sendPayrollReceipts(final SGuiClient client, final int payrollId) throws Exception {
+        SDbPayroll payroll = (SDbPayroll) client.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { payrollId });
         ArrayList<SDbPayrollReceipt> payrollReceipts = new ArrayList<>();
-        SDbPayroll payroll = new SDbPayroll();
-        payroll.read(client.getSession(), new int[] { payrollKey[0] });
         
         for (SDbPayrollReceipt payrollReceipt : payroll.getChildPayrollReceipts()) {
             if (!payrollReceipt.isDeleted()) {
@@ -2292,7 +2291,7 @@ public abstract class SHrsUtils {
             }
         }
         
-        SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de envío", SCfdConsts.PROC_REQ_SEND_CFD_PAYROLL);
+        SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de envío", SCfdConsts.REQ_SEND_PAYROLL);
         dialog.setFormParams((SClientInterface) client, null, null, 0, null, true, 0, SModSysConsts.TRNU_TP_DPS_ANN_NA);
         dialog.setPayrollReceipts(payrollReceipts);
         dialog.setVisible(true);
