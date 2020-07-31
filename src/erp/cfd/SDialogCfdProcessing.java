@@ -13,6 +13,7 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsCfdUtils;
@@ -348,42 +349,59 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
      * @throws Exception 
      */
     private void sendPayrollReceipts() throws Exception {
-        int cfdProcessed = 0;
-        int cfdProcessedOk = 0;
-        int cfdProcessedWrong = 0;
-        String detailMessage = "";
-        
-        moIntCfdToProcess.setValue(maPayrollReceipts.size());
-        jtfWarningMessage.setText("");
-        
-        for (SDbPayrollReceipt payrollReceipt : maPayrollReceipts) {
-            SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { payrollReceipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
-            String recipient = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
-            HashMap<String, Object> map = SHrsUtils.createPayrollReceiptMap((SGuiClient) miClient, payrollReceipt.getPrimaryKey(), SDataConstantsPrint.PRINT_MODE_PDF_FILE);
-            File pdf = SHrsUtils.createPayrollReceipt((SGuiClient) miClient, map);
+        if (maPayrollReceipts != null) {
+            int cfdProcessed = 0;
+            int cfdProcessedOk = 0;
+            int cfdProcessedWrong = 0;
+            String detailMessage = "";
+
+            moIntCfdToProcess.setValue(maPayrollReceipts.size());
+            jtfWarningMessage.setText("");
             
-            cfdProcessed++;
-        
-            if (pdf != null) {
-                String subject = "Envío de recibo de nómina";
-                String body = "Se adjunta recibo de nómina en formato PDF.";
-                boolean sent = STrnUtilities.sendMailPdf(miClient, SModSysConsts.CFGS_TP_MMS_CFD, pdf, subject, body, recipient);
-                    
-                if (sent) {
-                    cfdProcessedOk++;
-                    detailMessage += "Recibo enviado.\n";
+            try {
+                SCfdUtils.initDataSetForPayroll(mnFormSubtype);
+                
+                if (!maPayrollReceipts.isEmpty()) {
+                    SDbPayroll payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { maPayrollReceipts.get(0).getPkPayrollId() });
+                    SCfdUtils.DataSet.put(SModConsts.HRS_PAY, payroll); // payroll registry will be used in method SHrsUtils.createPayrollReceiptMap()
                 }
-                else {
-                    cfdProcessedWrong++;
-                    detailMessage += "No se ha enviado.\n";
+
+                for (SDbPayrollReceipt payrollReceipt : maPayrollReceipts) {
+                    SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { payrollReceipt.getPkEmployeeId() }, SLibConstants.EXEC_MODE_SILENT);
+                    String recipient = bizPartner.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0).getEmail01();
+                    HashMap<String, Object> map = SHrsUtils.createPayrollReceiptMap((SGuiClient) miClient, payrollReceipt.getPrimaryKey(), SDataConstantsPrint.PRINT_MODE_PDF_FILE);
+                    File pdf = SHrsUtils.createPayrollReceipt((SGuiClient) miClient, map);
+
+                    cfdProcessed++;
+
+                    if (pdf != null) {
+                        String subject = "Envío de recibo de nómina";
+                        String body = "Se adjunta recibo de nómina en formato PDF.";
+                        boolean sent = STrnUtilities.sendMailPdf(miClient, SModSysConsts.CFGS_TP_MMS_CFD, pdf, subject, body, recipient);
+
+                        if (sent) {
+                            cfdProcessedOk++;
+                            detailMessage += "Recibo enviado.\n";
+                        }
+                        else {
+                            cfdProcessedWrong++;
+                            detailMessage += "No se ha enviado.\n";
+                        }
+                    }
+                    else {
+                        cfdProcessedWrong++;
+                        detailMessage += "No se creó el archivo PDF.\n";
+                    }
+
+                    updateForm(cfdProcessed, cfdProcessedOk, cfdProcessedWrong, detailMessage);
                 }
             }
-            else {
-                cfdProcessedWrong++;
-                detailMessage += "No se creó el archivo PDF.\n";
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
             }
-            
-            updateForm(cfdProcessed, cfdProcessedOk, cfdProcessedWrong, detailMessage);
+            finally {
+                SCfdUtils.resetDataSetForPayroll();
+            }
         }
     }
     

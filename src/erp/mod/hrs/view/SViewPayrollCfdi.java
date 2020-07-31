@@ -535,7 +535,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 else if (!gridRow.isUpdatable()) {
                     miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
                 }
-                else if (miClient.showMsgBoxConfirm("¿Está seguro que desea enviar vía mail " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "los recibos de nómina" : "el recibo de nómina") + "?") == JOptionPane.YES_OPTION) {
+                else if (miClient.showMsgBoxConfirm("¿Está seguro que desea enviar vía mail " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "los" : "el") + " CFDI de nómina?") == JOptionPane.YES_OPTION) {
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
                             SCfdUtils.sendCfd((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey()), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));

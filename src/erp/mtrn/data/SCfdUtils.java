@@ -2728,6 +2728,7 @@ public abstract class SCfdUtils implements Serializable {
                         }
                         else if (DCfdUtils.getVersionPayrollComplement(cfd.getDocXml()) == DCfdVer3Consts.VER_NOM_12) {
                             // prevent from reading payroll multiple times because is a really lengthy operation:
+                            
                             SDbPayroll payroll = (SDbPayroll) SCfdUtils.DataSet.get(SModConsts.HRS_PAY);
                             
                             if (payroll == null) {
