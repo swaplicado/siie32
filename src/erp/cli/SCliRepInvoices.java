@@ -11,6 +11,7 @@ import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.STrnUtilities;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,15 +38,27 @@ public class SCliRepInvoices {
     private static final int ARG_IDX_PERIOD_END = 4; // required
     private static final int ARG_IDX_MAILS_TO = 5; // required
     private static final int ARG_IDX_MAILS_BCC = 6; // optional
+    private static final int DOC_CLASS_INV_ID = 3;
+    private static final int DOC_CLASS_CN_ID = 5;
     private static final String DPS_CATEGORY_SAL = "S";
     private static final String DPS_CATEGORY_PUR = "P";
     private static final String PERIOD_TODAY = "TODAY";
-    private static final String PERIOD_YESTERDAY = "YESTERDAY";
+    private static final String ZERO = "&nbsp;&nbsp;-&nbsp;&nbsp;";
     private static final int ROW_GRP_HDR = 1;
     private static final int ROW_GRP_FTR = 2;
     private static final int ROW_ROW = 3;
     private static final int ROW_TOT_CUR = 4;
     private static final int ROW_TOT_LOC_CUR = 5;
+    private static final DecimalFormat FormatInteger = new DecimalFormat("#,##0;(#,##0)");
+    private static final DecimalFormat FormatAmount = new DecimalFormat("#,##0.00;(#,##0.00)");
+    private static final DecimalFormat FormatAmountUnit = new DecimalFormat("#,##0.0000;(#,##0.0000)");
+    private static final DecimalFormat FormatQuantity = new DecimalFormat("#,##0.000;(#,##0.000)");
+    private static HashMap<Integer, String> DocClasses = new HashMap<>();
+    
+    static {
+        DocClasses.put(SDataConstantsSys.TRNS_CL_DPS_SAL_DOC[1], "Factura");
+        DocClasses.put(SDataConstantsSys.TRNS_CL_DPS_SAL_ADJ[1], "Nota de crédito");
+    }
     
     private String[] maArgs;
     private SDbDatabase moDatabase;
@@ -74,8 +87,8 @@ public class SCliRepInvoices {
      * @param args Expected arguments:
      * index 0: mailer option ('I');
      * index 1: category: sales ('S') or purchases ('P');
-     * index 2: period start date in format "yyyy-MM-dd";
-     * index 3: period end date in format "yyyy-MM-dd";
+     * index 2: period start date in format "yyyy-MM-dd" or TODAY[{+|-}n];
+     * index 3: period end date in format "yyyy-MM-dd" or TODAY[{+|-}n];
      * index 4: TO recepients separated by semicolon;
      * index 5: (optional) BCC recepients separated by semicolon.
      * @param database Database.
@@ -87,6 +100,30 @@ public class SCliRepInvoices {
         initMembers();
     }
     
+    /**
+     * Get shift days in dynamic date.
+     * @param date Dynamic date in format TODAY{+|-}n
+     * @return Shift days in dynamic date.
+     */
+    private int getShiftDays(final String date) {
+        int shiftDays = 0;
+        int posPlus = date.indexOf('+');
+        int posMinus = date.indexOf('-');
+        
+        if (posPlus != -1) {
+            shiftDays = SLibUtils.parseInt(date.substring(posPlus + 1, date.length()));
+        }
+        else if (posMinus != -1) {
+            shiftDays = -SLibUtils.parseInt(date.substring(posMinus + 1, date.length()));
+        }
+        
+        return shiftDays;
+    }
+    
+    /**
+     * Initialize members.
+     * @throws Exception 
+     */
     @SuppressWarnings("unchecked")
     private void initMembers() throws Exception {
         if (maArgs.length < ARGS_REQ) {
@@ -121,36 +158,23 @@ public class SCliRepInvoices {
             }
             
             Date today = null;
-            Date yesterday = null;
             
-            switch (msArgPeriodStart) {
-                case PERIOD_TODAY:
-                    today = SLibTimeUtils.convertToDateOnly(new Date());
-                    mtPeriodStart = today;
-                    break;
-                case PERIOD_YESTERDAY:
-                    yesterday = SLibTimeUtils.addDate(new Date(), 0, 0, -1);
-                    mtPeriodStart = yesterday;
-                    break;
-                default:
-                    mtPeriodStart = SLibUtils.DbmsDateFormatDate.parse(msArgPeriodStart);
+            if (msArgPeriodStart.contains(PERIOD_TODAY)) {
+                today = SLibTimeUtils.convertToDateOnly(new Date());
+                mtPeriodStart = SLibTimeUtils.addDate(today, 0, 0, getShiftDays(msArgPeriodStart));
+            }
+            else {
+                mtPeriodStart = SLibUtils.DbmsDateFormatDate.parse(msArgPeriodStart);
             }
             
-            switch (msArgPeriodEnd) {
-                case PERIOD_TODAY:
-                    if (today == null) {
-                        today = SLibTimeUtils.convertToDateOnly(new Date());
-                    }
-                    mtPeriodEnd = today;
-                    break;
-                case PERIOD_YESTERDAY:
-                    if (yesterday == null) {
-                        yesterday = SLibTimeUtils.addDate(new Date(), 0, 0, -1);
-                    }
-                    mtPeriodEnd = yesterday;
-                    break;
-                default:
-                    mtPeriodEnd = SLibUtils.DbmsDateFormatDate.parse(msArgPeriodEnd);
+            if (msArgPeriodEnd.contains(PERIOD_TODAY)) {
+                if (today == null) {
+                    today = SLibTimeUtils.convertToDateOnly(new Date());
+                }
+                mtPeriodEnd = SLibTimeUtils.addDate(today, 0, 0, getShiftDays(msArgPeriodEnd));
+            }
+            else {
+                mtPeriodEnd = SLibUtils.DbmsDateFormatDate.parse(msArgPeriodEnd);
             }
 
             maRecipientsTo = new ArrayList<>(Arrays.asList(SLibUtils.textExplode(msArgMailsTo, ";")));
@@ -264,22 +288,26 @@ public class SCliRepInvoices {
         String subject = "[" + SClient.APP_NAME + "] " + msDpsCategoryName + " " + SLibUtils.DateFormatDate.format(mtPeriodStart);
         
         if (!mtPeriodStart.equals(mtPeriodEnd)) {
-            subject += "-" + SLibUtils.DateFormatDate.format(mtPeriodEnd);
+            subject += " - " + SLibUtils.DateFormatDate.format(mtPeriodEnd);
         }
         
         return SMailUtils.encodeSubjectUtf8(subject);
     }
     
+    private String formatInteger(final int integer) {
+        return integer == 0 ? ZERO : FormatInteger.format(integer);
+    }
+    
     private String formatAmount(final double amount) {
-        return amount == 0d ? "-" : SLibUtils.getDecimalFormatAmount().format(amount);
+        return amount == 0d ? ZERO : FormatAmount.format(amount);
     }
     
     private String formatAmountUnit(final double amountUnit) {
-        return amountUnit == 0d ? "-" : SLibUtils.getDecimalFormatAmountUnitary().format(amountUnit);
+        return amountUnit == 0d ? ZERO : FormatAmountUnit.format(amountUnit);
     }
     
     private String formatQuantity(final double quantity) {
-        return quantity == 0d ? "-" : SLibUtils.getDecimalFormatQuantity().format(quantity);
+        return quantity == 0d ? ZERO : FormatQuantity.format(quantity);
     }
     
     private String composeMailBodyHtmlHead() throws Exception {
@@ -288,8 +316,11 @@ public class SCliRepInvoices {
         
         head += "<style>\n";
         
-        head += ".right {"
-                + "text-align: right;"
+        head += ".number {"
+                + " text-align: right;"
+                + "} "
+                + ".center {"
+                + " text-align: center;"
                 + "} "
                 + ".warning {"
                 + " font-size: 0.75em;"
@@ -324,6 +355,7 @@ public class SCliRepInvoices {
                 + " padding: 2px;"
                 + " text-align: center;"
                 + " background-color: Gainsboro;"
+                + " white-space: nowrap;"
                 + "} "
                 + "td {"
                 + " padding: 2px;"
@@ -338,29 +370,32 @@ public class SCliRepInvoices {
                 + " padding-bottom: 10px;"
                 + " font-weight: bold;"
                 + "} "
-                + "td.grpftrright {"
+                + "td.grpftrnumber {"
                 + " padding-top: 5px;"
                 + " padding-bottom: 5px;"
                 + " font-weight: bold;"
                 + " text-align: right;"
+                + " white-space: nowrap;"
                 + "} "
                 + "td.totcur {"
                 + " padding-top: 10px;"
                 + " font-weight: bold;"
                 + "} "
-                + "td.totcurright {"
+                + "td.totcurnumber {"
                 + " padding-top: 10px;"
                 + " font-weight: bold;"
                 + " text-align: right;"
+                + " white-space: nowrap;"
                 + "} "
                 + "td.totloccur {"
                 + " padding-top: 10px;"
                 + " font-weight: bold;"
                 + "} "
-                + "td.totloccurright {"
+                + "td.totloccurnumber {"
                 + " padding-top: 10px;"
                 + " font-weight: bold;"
                 + " text-align: right;"
+                + " white-space: nowrap;"
                 + "}\n";
         
         head += "</style>\n";
@@ -398,16 +433,16 @@ public class SCliRepInvoices {
             html += "<td class=\"" + ccsClass + "\" colspan=\"2\">" + SLibUtils.textToHtml(row.Concept) + "</td>";
         }
         
-        html += "<td class=\"" + ccsClass + "right\">" + formatAmount(row.TotGross) + "</td>";
-        html += "<td class=\"" + ccsClass + "right\">" + formatAmount(row.TotReturns) + "</td>";
-        html += "<td class=\"" + ccsClass + "right\">" + formatAmount(row.TotDiscounts) + "</td>";
-        html += "<td class=\"" + ccsClass + "right\">" + formatAmount(row.getTotNet()) + "</td>";
+        html += "<td class=\"" + ccsClass + "number\">" + formatAmount(row.TotGross) + "</td>";
+        html += "<td class=\"" + ccsClass + "number\">" + formatAmount(row.TotReturns) + "</td>";
+        html += "<td class=\"" + ccsClass + "number\">" + formatAmount(row.TotDiscounts) + "</td>";
+        html += "<td class=\"" + ccsClass + "number\">" + formatAmount(row.getTotNet()) + "</td>";
         html += "<td class=\"" + ccsClass + "\">" + SLibUtils.textToHtml(row.Currency) + "</td>";
-        html += "<td class=\"" + ccsClass + "right\">" + formatQuantity(row.QtyGross) + "</td>";
-        html += "<td class=\"" + ccsClass + "right\">" + formatQuantity(row.QtyReturns) + "</td>";
-        html += "<td class=\"" + ccsClass + "right\">" + formatQuantity(row.getQtyNet()) + "</td>";
+        html += "<td class=\"" + ccsClass + "number\">" + formatQuantity(row.QtyGross) + "</td>";
+        html += "<td class=\"" + ccsClass + "number\">" + formatQuantity(row.QtyReturns) + "</td>";
+        html += "<td class=\"" + ccsClass + "number\">" + formatQuantity(row.getQtyNet()) + "</td>";
         html += "<td class=\"" + ccsClass + "\">" + SLibUtils.textToHtml(row.Unit) + "</td>";
-        html += "<td class=\"" + ccsClass + "right\">" + (row.UnitId == 0 ? "-" : formatAmountUnit(row.getAvgPrice())) + "</td>";
+        html += "<td class=\"" + ccsClass + "number\">" + (row.UnitId == 0 ? ZERO : formatAmountUnit(row.getAvgPrice())) + "</td>";
         
         html += "</tr>\n";
         
@@ -415,14 +450,83 @@ public class SCliRepInvoices {
     }
     
     private String composeHtmlDocsInfo() throws Exception {
-        String html = "";
+        DocClass docClassInv = new DocClass(DOC_CLASS_INV_ID);
+        DocClass docClassCn = new DocClass(DOC_CLASS_CN_ID);
         
-        /*
-        Comprobante   Cantidad Vigentes          Cancelados
-                               C/timbre S/timbre C/timbre S/timbre
-        Facturas          9        9        9        9        9
-        Notas crédito     9        9        9        9        9
-        */
+        String sql = "SELECT "
+                + "d.fid_cl_dps, d.fid_st_dps, dst.st_dps, c.fid_st_xml, cst.st_dps, COUNT(*) AS _count "
+                + "FROM trn_dps AS d "
+                + "INNER JOIN trn_cfd AS c ON c.fid_dps_year_n = d.id_year AND c.fid_dps_doc_n = d.id_doc "
+                + "INNER JOIN erp.trns_st_dps AS dst ON dst.id_st_dps = d.fid_st_dps "
+                + "INNER JOIN erp.trns_st_dps AS cst ON cst.id_st_dps = c.fid_st_xml "
+                + "WHERE NOT d.b_del AND d.fid_ct_dps = " + manDpsClassKeyInv[0] + " AND "
+                + "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' "
+                + "GROUP BY d.fid_cl_dps, d.fid_st_dps, c.fid_st_xml "
+                + "ORDER BY d.fid_cl_dps, d.fid_st_dps, c.fid_st_xml;";
+        
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                DocClass docClass = null;
+                
+                switch (resultSet.getInt("d.fid_cl_dps")) {
+                    case DOC_CLASS_INV_ID:
+                        docClass = docClassInv;
+                        break;
+                        
+                    case DOC_CLASS_CN_ID:
+                        docClass = docClassCn;
+                        break;
+                        
+                    default:
+                }
+                
+                switch (resultSet.getInt("d.fid_st_dps")) {
+                    case SDataConstantsSys.TRNS_ST_DPS_NEW:
+                    case SDataConstantsSys.TRNS_ST_DPS_EMITED:
+                        switch (resultSet.getInt("c.fid_st_xml")) {
+                            case SDataConstantsSys.TRNS_ST_DPS_NEW:
+                                docClass.DocsNew = resultSet.getInt("_count");
+                                break;
+                            case SDataConstantsSys.TRNS_ST_DPS_EMITED:
+                                docClass.DocsEmited = resultSet.getInt("_count");
+                                break;
+                            default:
+                        }
+                        break;
+                        
+                    case SDataConstantsSys.TRNS_ST_DPS_ANNULED:
+                        docClass.DocsAnnulled = resultSet.getInt("_count");
+                        break;
+                        
+                    default:
+                }
+            }
+        }
+        
+        String html = "<br>\n";
+        
+        html += "<h3>Comprobantes</h3>\n";
+        
+        html += "<table>\n";
+        html += "<tr>"
+                + "<th>Comprobante</th>"
+                + "<th>S/timbre</th>"
+                + "<th>C/timbre</th>"
+                + "<th>Cancelados</th>"
+                + "</tr>\n";
+        html += "<tr>"
+                + "<td>" + SLibUtils.textToHtml(DocClasses.get(DOC_CLASS_INV_ID)) + "</td>"
+                + "<td class=\"center\">" + formatInteger(docClassInv.DocsNew) + "</td>"
+                + "<td class=\"center\">" + formatInteger(docClassInv.DocsEmited) + "</td>"
+                + "<td class=\"center\">" + formatInteger(docClassInv.DocsAnnulled) + "</td>"
+                + "</tr>\n";
+        html += "<tr>"
+                + "<td>" + SLibUtils.textToHtml(DocClasses.get(DOC_CLASS_CN_ID)) + "</td>"
+                + "<td class=\"center\">" + formatInteger(docClassCn.DocsNew) + "</td>"
+                + "<td class=\"center\">" + formatInteger(docClassCn.DocsEmited) + "</td>"
+                + "<td class=\"center\">" + formatInteger(docClassCn.DocsAnnulled) + "</td>"
+                + "</tr>\n";
+        html += "</table>\n";
         
         return html;
     }
@@ -436,7 +540,7 @@ public class SCliRepInvoices {
         body += "<h1>" + SLibUtils.textToHtml(msCompanyName) + "</h1>\n";
         body += "<h2>" + msDpsCategoryName + " " + SLibUtils.DateFormatDate.format(mtPeriodStart);
         if (!mtPeriodStart.equals(mtPeriodEnd)) {
-            body += "-" + SLibUtils.DateFormatDate.format(mtPeriodEnd);
+            body += " - " + SLibUtils.DateFormatDate.format(mtPeriodEnd);
         }
         body += "</h2>\n";
         
@@ -465,6 +569,7 @@ public class SCliRepInvoices {
         String curItemText = "";
         int curCurrencyId = 0;
         int curUnitId = 0;
+        boolean dataFound = false;
         HashMap<Integer, String> mapCurrencies = new HashMap<>();
         HashMap<Integer, String> mapUnits = new HashMap<>();
         HashMap<Integer, Row> mapRowSubtotals = new HashMap<>(); // key is currency ID
@@ -478,6 +583,7 @@ public class SCliRepInvoices {
         
         try (ResultSet resultSet = miStatement.executeQuery(sql)) {
             while (resultSet.next()) {
+                dataFound = true;
                 if (curItemId != resultSet.getInt("id_item")) {
                     if (curItemId != 0) {
                         // render subtotals of last item
@@ -552,21 +658,30 @@ public class SCliRepInvoices {
                 body += composeHtmlTableRow(row, ROW_GRP_FTR);
             }
             
-            // render totals
-            
-            body += "<tr><td class=\"grphdr\" colspan=\"12\">" + SLibUtils.textToHtml("TOTALES") + "</td></tr>\n";
-            
-            for (Row row : mapRowTotals.values()) {
-                body += composeHtmlTableRow(row, ROW_TOT_CUR);
-            }
-            
-            if (mapRowTotals.size() > 1 || !mapRowTotals.containsKey(mnLocalCurrencyId)) {
-                body += composeHtmlTableRow(rowLocalTotal, ROW_TOT_LOC_CUR);
+            if (dataFound) {
+                // render totals
+
+                body += "<tr><td class=\"grphdr\" colspan=\"12\">" + SLibUtils.textToHtml("TOTALES") + "</td></tr>\n";
+
+                for (Row row : mapRowTotals.values()) {
+                    body += composeHtmlTableRow(row, ROW_TOT_CUR);
+                }
+
+                if (mapRowTotals.size() > 1 || !mapRowTotals.containsKey(mnLocalCurrencyId)) {
+                    body += composeHtmlTableRow(rowLocalTotal, ROW_TOT_LOC_CUR);
+                }
             }
         }
 
         // end of table
         body += "</table>";
+        
+        if (dataFound) {
+            body += composeHtmlDocsInfo();
+        }
+        else {
+            body += "<p><strong>" + SLibUtils.textToHtml("¡No se encontró información para " + (mtPeriodStart.equals(mtPeriodEnd) ? "la fecha solicitada" : "el período solicitado") + "!") + "</strong></p>\n";
+        }
         
         body += "<br>";
         body += STrnUtilities.composeMailFooter("warning");
@@ -638,15 +753,31 @@ public class SCliRepInvoices {
         }
         
         public double getTotNet() {
-            return SLibUtils.roundAmount(TotGross - TotReturns - TotDiscounts);
+            // returns and discounts are negative values:
+            return SLibUtils.roundAmount(TotGross + TotReturns + TotDiscounts);
         }
         
         public double getQtyNet() {
-            return QtyGross - QtyReturns;
+            // returns are negative values:
+            return QtyGross + QtyReturns;
         }
         
         public double getAvgPrice() {
             return getQtyNet() == 0d ? 0d : getTotNet() / getQtyNet();
+        }
+    }
+    
+    private class DocClass {
+        public int DocClassId;
+        public int DocsNew;
+        public int DocsEmited;
+        public int DocsAnnulled;
+        
+        public DocClass(final int docClassId) {
+            DocClassId = docClassId;
+            DocsNew = 0;
+            DocsEmited = 0;
+            DocsAnnulled = 0;
         }
     }
 }
