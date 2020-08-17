@@ -4966,4 +4966,24 @@ public abstract class SCfdUtils implements Serializable {
 
         return true;
     }
+    
+    /**
+     * Obtiene el ID del CFDI a través del UUID.
+     * @param client Cliente GUI.
+     * @param uuid UUID.
+     * @return ID del CFDI si fue encontrado, de lo contrario cero.
+     * @throws java.lang.Exception 
+     */
+    public static int getCfdIdByUuid(final SClientInterface client, final String uuid) throws Exception {
+        int cfdId = 0;
+        
+        String sql = "SELECT id_cfd FROM trn_cfd WHERE uuid = '" + uuid + "';";
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                cfdId = resultSet.getInt(1);
+            }
+        }
+        
+        return cfdId;
+    }
 }

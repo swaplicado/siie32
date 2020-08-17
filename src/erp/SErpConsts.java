@@ -7,10 +7,12 @@ package erp;
 
 /**
  *
- * @author JBarajas
+ * @author Juan Barajas, Isabel Servín
  */
 public abstract class SErpConsts {
     
     public static final int IMG_MAX_SIZE = 1024 * 512;
+    public static final int VAL_QTY_MAX_DECS = 8;
+    public static final int VAL_PRC_UNT_MAX_DECS = 8;
     public static final String ELLIPSIS = "...";
 }

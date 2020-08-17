@@ -40,17 +40,13 @@ public final class SRowCfdiTaxImport extends erp.lib.table.STableRow {
             case SModSysConsts.FINS_TP_TAX_CHARGED:
                 cfd.ver33.DElementConceptoImpuestoTraslado oTraslado = moImpuestos.getEltOpcImpuestosTrasladados().getEltImpuestoTrasladados().get(mnRow);
                 mvValues.add("Trasladado");
-                mvValues.add(oTraslado.getAttImpuesto().getString().equals(DCfdi33Catalogs.IMP_ISR) ? "ISR" :
-                        oTraslado.getAttImpuesto().getString().equals(DCfdi33Catalogs.IMP_IVA) ? "IVA" :
-                            oTraslado.getAttImpuesto().getString().equals(DCfdi33Catalogs.IMP_IEPS) ? "IEPS" : "");
+                mvValues.add(DCfdi33Catalogs.Impuesto.get(oTraslado.getAttImpuesto().getString()));
                 mvValues.add(SLibUtils.DecimalFormatPercentage2D.format(oTraslado.getAttTasaOCuota().getDouble()));
                 break;
             case SModSysConsts.FINS_TP_TAX_RETAINED:
                 cfd.ver33.DElementConceptoImpuestoRetencion oRetenciones = moImpuestos.getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones().get(mnRow);
                 mvValues.add("Retenido");
-                mvValues.add(oRetenciones.getAttImpuesto().getString().equals("001") ? "ISR" :
-                        oRetenciones.getAttImpuesto().getString().equals("002") ? "IVA" :
-                            oRetenciones.getAttImpuesto().getString().equals("003") ? "IEPS" : "");
+                mvValues.add(DCfdi33Catalogs.Impuesto.get(oRetenciones.getAttImpuesto().getString()));
                 mvValues.add(SLibUtils.DecimalFormatPercentage2D.format(oRetenciones.getAttTasaOCuota().getDouble()));
                 break;
             default:

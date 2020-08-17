@@ -4,7 +4,7 @@
  */
 
 /*
- * SDialogDpsLink.java
+ * SDialogCfdiPurchaseOrder.java
  *
  * Created on 27/05/2020, 02:58:00 PM
  */
@@ -15,8 +15,7 @@ import cfd.ver33.DElementConcepto;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
-import erp.lib.SLibTimeUtilities;
-import erp.lib.SLibUtilities;
+import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.lib.table.STableColumnForm;
@@ -26,48 +25,57 @@ import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsDpsLink;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
-import erp.mtrn.data.SGuiDpsLink;
+import erp.mtrn.data.SRowCfdiImport;
 import erp.mtrn.data.STrnDpsUtilities;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 import sa.lib.SLibUtils;
 
 /**
  *
  * @author Isabel Servín
  */
-public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
+public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener {
 
-    public static final int VALUE_TYPE_CFDI_CONCEPTO = 1;
-    public static final int VALUE_TYPE_FACTOR_CONV = 2;
+    public static final int VALUE_TYPE_PURCHASE_ORDER_ENTRIES = 1;
+    public static final int VALUE_TYPE_ROW_CFDI = 2;
+    public static final int VALUE_TYPE_ENTRY_DPS_DPS_LINK = 3;
+    public static final int VALUE_TYPE_FACTOR_CONV = 4;
     
     private static final int COL_QTY_TO_BE_LINKED = 7;
     private static final int COL_QTY_TO_LINK = 8;
 
-    private erp.client.SClientInterface miClient;
-    private int mnOptionType;
+    private java.util.Vector<SFormField> mvFields;
+    private final erp.client.SClientInterface miClient;
+    
     private int mnFormResult;
     private int mnFormStatus;
+    
+    private double mdConvFactor;
+    private double mdEquivalentQuantity;
+    
     private boolean mbFirstTime;
-    private boolean isOrder;
+    private erp.lib.form.SFormField moFieldConvFact;
     private erp.lib.table.STablePane moTablePane;
 
-    private int[] manParamDpsDestinyPk;
-    private erp.mtrn.data.SDataDps moParamDpsSource;
+    private erp.mtrn.data.SDataDps moParamPurchaseOrder;
     private erp.mtrn.form.SPanelDps moPanelDps;
+    private erp.mitm.data.SDataItem moParamItemSource;
     
-    private SGuiDpsLink moGuiDpsLink;
     private DElementConcepto moConcepto;
-
-    /** Creates new form SDialogDpsLink */
+    private HashMap<String, Double> moPurchaseOrderEntriesMap;
+    
+    /** Creates new form SDialogDpsLink
+     * @param client */
     public SDialogCfdiPurchaseOrder(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient =  client;
-        mnOptionType = SDataConstants.TRNX_DPS_LINKS;
         initComponents();
         initComponentsExtra();
     }
@@ -86,9 +94,6 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
         jlPanelDps = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jpOptions = new javax.swing.JPanel();
-        jPanel13 = new javax.swing.JPanel();
-        jbSetEverything = new javax.swing.JButton();
-        jbSetNothing = new javax.swing.JButton();
         jpOrder = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jlNoIdentificacion = new javax.swing.JLabel();
@@ -97,7 +102,8 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
         jlUnidad = new javax.swing.JLabel();
         jlUnitSat = new javax.swing.JLabel();
         jlCantidad = new javax.swing.JLabel();
-        jlConvertionFactor = new javax.swing.JLabel();
+        jlConvFactor = new javax.swing.JLabel();
+        jlCantidadEquivalente = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jtfNoIdentificacion = new javax.swing.JTextField();
         jtfDescripcion = new javax.swing.JTextField();
@@ -105,7 +111,8 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
         jtfUnidad = new javax.swing.JTextField();
         jtfUnidadSat = new javax.swing.JTextField();
         jtfCantidad = new javax.swing.JTextField();
-        jtfConvertionFactor = new javax.swing.JTextField();
+        jtfConvFactor = new javax.swing.JTextField();
+        jtfCantidadEquivalente = new javax.swing.JTextField();
         jpControls = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -136,21 +143,6 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
         jpOptions.setBorder(javax.swing.BorderFactory.createTitledBorder("Partidas del documento disponibles para vinculación:"));
         jpOptions.setPreferredSize(new java.awt.Dimension(865, 90));
         jpOptions.setLayout(new java.awt.BorderLayout(0, 2));
-
-        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jbSetEverything.setText("Todo");
-        jbSetEverything.setToolTipText("Surtir todo");
-        jbSetEverything.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel13.add(jbSetEverything);
-
-        jbSetNothing.setText("Limpiar");
-        jbSetNothing.setToolTipText("Limpiar captura");
-        jbSetNothing.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel13.add(jbSetNothing);
-
-        jpOptions.add(jPanel13, java.awt.BorderLayout.NORTH);
-
         jPanel1.add(jpOptions, java.awt.BorderLayout.CENTER);
 
         jpOrder.setBorder(javax.swing.BorderFactory.createTitledBorder("Concepto:"));
@@ -167,24 +159,28 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
         jPanel4.add(jlDescripcion);
 
         jlProdServ.setText("ProdServ SAT:");
-        jlProdServ.setPreferredSize(new java.awt.Dimension(90, 23));
+        jlProdServ.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel4.add(jlProdServ);
 
         jlUnidad.setText("Unidad:");
-        jlUnidad.setPreferredSize(new java.awt.Dimension(90, 23));
+        jlUnidad.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel4.add(jlUnidad);
 
         jlUnitSat.setText("Unidad SAT:");
-        jlUnitSat.setPreferredSize(new java.awt.Dimension(90, 23));
+        jlUnitSat.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel4.add(jlUnitSat);
 
-        jlCantidad.setText("Cantidad:");
-        jlCantidad.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlCantidad.setText(" Cantidad:");
+        jlCantidad.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel4.add(jlCantidad);
 
-        jlConvertionFactor.setText("Fact. conversión:*");
-        jlConvertionFactor.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel4.add(jlConvertionFactor);
+        jlConvFactor.setText(" Fact. conv.:*");
+        jlConvFactor.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel4.add(jlConvFactor);
+
+        jlCantidadEquivalente.setText("Cant. equiv.:");
+        jlCantidadEquivalente.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel4.add(jlCantidadEquivalente);
 
         jpOrder.add(jPanel4);
 
@@ -202,26 +198,34 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
 
         jtfProdServ.setEnabled(false);
         jtfProdServ.setFocusable(false);
-        jtfProdServ.setPreferredSize(new java.awt.Dimension(90, 23));
+        jtfProdServ.setPreferredSize(new java.awt.Dimension(80, 23));
         jPanel5.add(jtfProdServ);
 
         jtfUnidad.setEnabled(false);
         jtfUnidad.setFocusable(false);
-        jtfUnidad.setPreferredSize(new java.awt.Dimension(90, 23));
+        jtfUnidad.setPreferredSize(new java.awt.Dimension(60, 23));
         jPanel5.add(jtfUnidad);
 
         jtfUnidadSat.setEnabled(false);
         jtfUnidadSat.setFocusable(false);
-        jtfUnidadSat.setPreferredSize(new java.awt.Dimension(90, 23));
+        jtfUnidadSat.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel5.add(jtfUnidadSat);
 
+        jtfCantidad.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jtfCantidad.setEnabled(false);
         jtfCantidad.setFocusable(false);
-        jtfCantidad.setPreferredSize(new java.awt.Dimension(100, 23));
+        jtfCantidad.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel5.add(jtfCantidad);
 
-        jtfConvertionFactor.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel5.add(jtfConvertionFactor);
+        jtfConvFactor.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jtfConvFactor.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel5.add(jtfConvFactor);
+
+        jtfCantidadEquivalente.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jtfCantidadEquivalente.setEnabled(false);
+        jtfCantidadEquivalente.setFocusable(false);
+        jtfCantidadEquivalente.setPreferredSize(new java.awt.Dimension(90, 23));
+        jPanel5.add(jtfCantidadEquivalente);
 
         jpOrder.add(jPanel5);
 
@@ -256,9 +260,16 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
 
     private void initComponentsExtra() {
         int i = 0;
-        STableColumnForm[] columns = null;
+        STableColumnForm[] columns;
 
+        moFieldConvFact = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfConvFactor, jlConvFactor);
+        moFieldConvFact.setDecimalFormat(SLibUtils.DecimalFormatValue8D);
+
+        mvFields = new Vector<>();
+        mvFields.add(moFieldConvFact);
+        
         moTablePane = new STablePane(miClient);
+        moTablePane.setDoubleClickAction(this, "actionDoubleClickOk");
         jpOptions.add(moTablePane, BorderLayout.CENTER);
 
         columns = new STableColumnForm[11];
@@ -275,7 +286,6 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Por vincular", STableConstants.WIDTH_QUANTITY);
         columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "A vincular", STableConstants.WIDTH_QUANTITY);
-        columns[i].setEditable(true);
         columns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "% excedente", STableConstants.WIDTH_PERCENTAGE);
@@ -291,9 +301,8 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
 
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
-        jbSetEverything.addActionListener(this);
-        jbSetNothing.addActionListener(this);
-        
+     
+        jtfConvFactor.addFocusListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -322,68 +331,70 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
     }
 
     private void renderDpsSourceEntries() {
-        double linked;
-        double linkedActual;
-
         moTablePane.createTable();
         moTablePane.clearTableRows();
 
-        if (moParamDpsSource != null) {
-            for (SDataDpsEntry entry : moParamDpsSource.getDbmsDpsEntries()) {
-                if (!entry.getIsDeleted()) {
-                    SDataEntryDpsDpsLink entryLink;
+        if (moParamPurchaseOrder != null) {
+            for (SDataDpsEntry entry : moParamPurchaseOrder.getDbmsDpsEntries()) {
+                if (entry.isAccountable()) {
+                    SDataEntryDpsDpsLink entryDpsDpsLink;
 
-                    linked = 0;
-                    linkedActual = 0;
+                    double linked = 0;
 
                     for (SDataDpsDpsLink link : entry.getDbmsDpsLinksAsSource()) {
-                        if (SLibUtilities.compareKeys(manParamDpsDestinyPk, link.getDbmsDestinyDpsKey())) {
-                            // Current link movements:
-                            linkedActual += link.getOriginalQuantity();
-                        }
-                        else {
-                            // Previously saved link movements:
+                        // Previously saved link movements:
 
-                            if (!link.getDbmsIsDestinyDeleted() && !link.getDbmsIsDestinyEntryDeleted() &&
-                                link.getDbmsFkDestinyStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
+                        if (!link.getDbmsIsDestinyDeleted() && !link.getDbmsIsDestinyEntryDeleted() &&
+                            link.getDbmsFkDestinyStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
 
-                                linked += link.getOriginalQuantity();
-                            }
+                            linked += link.getOriginalQuantity();
                         }
                     }
+                    
+                    Double quantity = moPurchaseOrderEntriesMap == null ? 0.0 : moPurchaseOrderEntriesMap.get(SLibUtils.textKey((int[]) entry.getPrimaryKey()));
+                    double linkedActual = quantity == null ? 0 : quantity;
+                    
+                    entryDpsDpsLink = new SDataEntryDpsDpsLink();
+                    entryDpsDpsLink.setPkYearId(entry.getPkYearId());
+                    entryDpsDpsLink.setPkDocId(entry.getPkDocId());
+                    entryDpsDpsLink.setPkEntryId(entry.getPkEntryId());
+                    entryDpsDpsLink.setSortingPosition(entry.getSortingPosition());
+                    entryDpsDpsLink.setConceptKey(entry.getConceptKey());
+                    entryDpsDpsLink.setConcept(entry.getConcept());
+                    entryDpsDpsLink.setQuantity(entry.getOriginalQuantity());
+                    entryDpsDpsLink.setUnitSymbol(entry.getDbmsOriginalUnitSymbol());
+                    entryDpsDpsLink.setQuantityLinked(linked);
+                    entryDpsDpsLink.setQuantityLinkedActual(linkedActual);
+                    entryDpsDpsLink.setQuantityToLink(0);
+                    entryDpsDpsLink.setSurplusPercentage(entry.getSurplusPercentage());
+                    entryDpsDpsLink.prepareTableRow();
+                    entryDpsDpsLink.setAuxIsEntryPriceNeeded(!entry.getDbmsEntryPrices().isEmpty());
 
-                    entryLink = new SDataEntryDpsDpsLink();
-                    entryLink.setPkYearId(entry.getPkYearId());
-                    entryLink.setPkDocId(entry.getPkDocId());
-                    entryLink.setPkEntryId(entry.getPkEntryId());
-                    entryLink.setSortingPosition(entry.getSortingPosition());
-                    entryLink.setConceptKey(entry.getConceptKey());
-                    entryLink.setConcept(entry.getConcept());
-                    entryLink.setQuantity(entry.getOriginalQuantity());
-                    entryLink.setUnitSymbol(entry.getDbmsOriginalUnitSymbol());
-                    entryLink.setQuantityLinked(linked);
-                    entryLink.setQuantityLinkedActual(linkedActual);
-                    entryLink.setQuantityToLink(0);
-                    entryLink.setSurplusPercentage(entry.getSurplusPercentage());
-                    entryLink.prepareTableRow();
-                    entryLink.setAuxIsEntryPriceNeeded(!entry.getDbmsEntryPrices().isEmpty());
-
-                    moTablePane.addTableRow(entryLink);
+                    moTablePane.addTableRow(entryDpsDpsLink);
                 }
             }
-
+            
             moTablePane.renderTableRows();
             moTablePane.setTableRowSelection(0);               
         }
     }
     
-    private void updateLink() {
-        SDataEntryDpsDpsLink entry = null;
-
-        for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
-            entry = (SDataEntryDpsDpsLink) moTablePane.getTableRow(i);
-            entry.setQuantityToLink(((Number) entry.getValues().get(COL_QTY_TO_LINK)).doubleValue());
+    private void setTableRowSelection() {
+        SDataEntryDpsDpsLink entry;
+        if (moParamItemSource != null){
+            for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
+                entry = (SDataEntryDpsDpsLink) moTablePane.getTableRow(i);
+                if (entry.getConceptKey().equals(moParamItemSource.getKey()) &&
+                        entry.getConcept().equals(moParamItemSource.getItem())){
+                    moTablePane.setTableRowSelection(i);
+                    break;
+                }
+            }
         }
+    }
+    
+    private void updateEquivalentQuantity() {
+        jtfCantidadEquivalente.setText(SLibUtils.DecimalFormatValue4D.format(Double.parseDouble(jtfCantidad.getText()) * Double.parseDouble(jtfConvFactor.getText()))); 
     }
 
     private boolean validateQuantitiesToLink() {
@@ -414,33 +425,8 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
         return !error;
     }
     
-    private void actionSetEverything() {
-        int index = moTablePane.getTable().getSelectedRow();
-        SDataEntryDpsDpsLink entry = null;
-
-        for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
-            entry = (SDataEntryDpsDpsLink) moTablePane.getTableRow(i);
-            entry.setQuantityToLink(entry.getQuantityToBeLinked());
-            entry.prepareTableRow();
-        }
-
-        moTablePane.renderTableRows();
-        moTablePane.getTable().setRowSelectionInterval(index, index);
-    }
-
-    private void actionSetNothing() {
-        int index = moTablePane.getTable().getSelectedRow();
-        SDataEntryDpsDpsLink entry = null;
-
-        for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
-            entry = (SDataEntryDpsDpsLink) moTablePane.getTableRow(i);
-            entry.setQuantityToLink(0d);
-            entry.prepareTableRow();
-            entry.setAuxSGuiDpsEntryPrice(null);
-        }
-
-        moTablePane.renderTableRows();
-        moTablePane.getTable().setRowSelectionInterval(index, index);
+    public void actionDoubleClickOk(){
+        actionOk();
     }
 
     private void actionOk() {
@@ -467,15 +453,13 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
-    private javax.swing.JButton jbSetEverything;
-    private javax.swing.JButton jbSetNothing;
     private javax.swing.JLabel jlCantidad;
-    private javax.swing.JLabel jlConvertionFactor;
+    private javax.swing.JLabel jlCantidadEquivalente;
+    private javax.swing.JLabel jlConvFactor;
     private javax.swing.JLabel jlDescripcion;
     private javax.swing.JLabel jlNoIdentificacion;
     private javax.swing.JLabel jlPanelDps;
@@ -488,7 +472,8 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
     private javax.swing.JPanel jpOptions;
     private javax.swing.JPanel jpOrder;
     private javax.swing.JTextField jtfCantidad;
-    private javax.swing.JTextField jtfConvertionFactor;
+    private javax.swing.JTextField jtfCantidadEquivalente;
+    private javax.swing.JTextField jtfConvFactor;
     private javax.swing.JTextField jtfDescripcion;
     private javax.swing.JTextField jtfNoIdentificacion;
     private javax.swing.JTextField jtfProdServ;
@@ -507,9 +492,7 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
         mnFormStatus = SLibConstants.UNDEFINED;
         mbFirstTime = true;
 
-        manParamDpsDestinyPk = null;
-        moParamDpsSource = null;
-        moGuiDpsLink = null;
+        moParamPurchaseOrder = null;
         moPanelDps.setDps(null, null);
 
         renderDpsSourceEntries();
@@ -522,175 +505,94 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
 
     @Override
     public erp.lib.form.SFormValidation formValidate() {
-        int rows = 0;
-        double totalSurplus;
-        double totalLinked;
         SFormValidation validation = new SFormValidation();
-
-        updateLink();
-
-        for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
-            SDataEntryDpsDpsLink entry = (SDataEntryDpsDpsLink) moTablePane.getTableRow(i);
-            
-            if (entry.getQuantityToLink() > 0) {
-                // Validate that quantity to link does not exceed limit:
-
-                rows++;
-                
-                if (!validation.getIsError()) {
-                    try {
-                        if (moParamDpsSource.getElementsConcepto().get(i).getValorUnitario() != moConcepto.getAttValorUnitario().getDouble()){
-                            validation.setMessage("El los precios de los conceptos del CFDI y del SIIE no coinciden!");
-                            break;
-                        }
-                    }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-                
-                // The source is order and has supplied quantities
-                
-                if (!validation.getIsError() && moParamDpsSource.isOrder()){
-                    try {
-                        double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entry.getDpsEntryKey());
-                        if (totalsupplied > entry.getQuantityToLink()) {
-                            validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
-                                    "la cantidad minima a vincular debe ser " + (totalsupplied < entry.getQuantityToBeLinked() ? "mayor o " : "") + "igual a " + 
-                                    miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalsupplied) + " ya que tiene sutidos previos.");
-                            break;
-                        }
-                    }
-                    catch (Exception e) {
-                        SLibUtils.showException(this, e);
-                    }
-                }
-                
-                // Need monthly delivery:
-
-                if (!validation.getIsError() && isOrder) {
-                    if (moGuiDpsLink.pickGuiDpsSourceEntry((int[]) moParamDpsSource.getPrimaryKey(), (int[]) entry.getDpsEntryKey()).getGuiDpsSourceEntryPrices().size() > 0) {
-                        if (entry.getAuxSGuiDpsEntryPrice() == null) {
-                            validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
-                                    "se debe seleccionar una entrega mensual.");
-                            break;
-                        }
-                    }
-                    else {
-                        validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' la partida # " + entry.getSortingPosition() + "\n" +
-                                "no tiene entregas mensuales programadas.");
-                        break;
-                    }
-                }
-                
-                if (!validation.getIsError() && entry.getAuxIsEntryPriceNeeded() && entry.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getOriginalPriceUnitaryCy() <= 0) {
-                    validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
-                            "el precio  de la entrega mensual seleccionada debe ser diferente de 0.");
-                    break;
-                }
-
-                if (entry.getSurplusPercentage() == 0) {
-                    // No surplus allowed:
-                    
-                    if (!validation.getIsError()) {
-                        if (entry.getAuxIsEntryPriceNeeded()) {
-                            // Need monthly delivery validation:
-                            
-                            if (entry.getQuantityToLink() > entry.getAuxSGuiDpsEntryPrice().obtainQtyAvailable()) {
-                                validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
-                                        "la cantidad de la columna '" + moTablePane.getTableColumn(COL_QTY_TO_LINK).getColumnTitle() + "' (" +
-                                        miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(entry.getQuantityToLink()) + " " + entry.getUnitSymbol() + "), " +
-                                        "no puede ser mayor a la cantidad pendiente de la entrega mensual seleccionada (" +
-                                        miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(entry.getAuxSGuiDpsEntryPrice().obtainQtyAvailable()) + " " + entry.getUnitSymbol() + ").");
-                                break;
-                            }
-                        }
-                        else {
-                            // Need total quantity validation:
-                            
-                            if (entry.getQuantityToLink() > entry.getQuantityToBeLinked()) {
-                                validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
-                                        "la cantidad de la columna '" + moTablePane.getTableColumn(COL_QTY_TO_LINK).getColumnTitle() + "', " +
-                                        miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(entry.getQuantityToLink()) + " " + entry.getUnitSymbol() + ", " +
-                                        "no puede ser mayor a la cantidad de la columna '" + moTablePane.getTableColumn(COL_QTY_TO_BE_LINKED).getColumnTitle() + "', " +
-                                        miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(entry.getQuantityToBeLinked()) + " " + entry.getUnitSymbol() + ".");
-                                break;
-                            }
-                        }
-                    }
-                }
-                else {
-                    // Surplus allowed:
-
-                    if (!validation.getIsError()) {
-                        if (entry.getAuxIsEntryPriceNeeded()) {
-                            // Need monthly delivery validation:
-                            
-                            Date datePrice = null;
-                            Date dateSourceDocLapsing = null;
-                            datePrice = SLibTimeUtilities.createDate(entry.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractPriceYear(), entry.getAuxSGuiDpsEntryPrice().getDataDpsEntryPrice().getContractPriceMonth());
-                            dateSourceDocLapsing = SLibTimeUtilities.createDate(SLibTimeUtilities.digestYearMonth(moParamDpsSource.getDateDocLapsing_n())[0], SLibTimeUtilities.digestYearMonth(moParamDpsSource.getDateDocLapsing_n())[1]);
-                            if (datePrice.compareTo(dateSourceDocLapsing) == 0) {
-                                
-                                // Only validate surplus when is the last delivery
-                                
-                                totalSurplus = entry.getAuxSGuiDpsEntryPrice().obtainQtyAvailable() + (entry.getQuantity() * entry.getSurplusPercentage());
-                                totalLinked = entry.getQuantityToLink();
-                                
-                                if (totalLinked > totalSurplus) {
-                                    validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
-                                        "la cantidad total vinculada, " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalLinked) + " " + entry.getUnitSymbol() + ", " +
-                                        "no puede ser mayor a " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalSurplus) + " " + entry.getUnitSymbol() + ".");
-                                    break;
-                                }
-                            }
-                            else {
-                                
-                                // For other deliveries, apply normal validation:
-                                
-                                if (entry.getQuantityToLink() > entry.getAuxSGuiDpsEntryPrice().obtainQtyAvailable()) {
-                                    validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
-                                            "la cantidad de la columna '" + moTablePane.getTableColumn(COL_QTY_TO_LINK).getColumnTitle() + "' (" +
-                                            miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(entry.getQuantityToLink()) + " " + entry.getUnitSymbol() + "), " +
-                                            "no puede ser mayor a la cantidad pendiente de la entrega mensual seleccionada (" +
-                                            miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(entry.getAuxSGuiDpsEntryPrice().obtainQtyAvailable()) + " " + entry.getUnitSymbol() + ").");
-                                    break;
-                                }
-                                
-                            }
-                        }
-                        else {
-                            // Need total quantity validation:
-                            
-                            totalSurplus = entry.getQuantity() * (1d + entry.getSurplusPercentage());
-                            totalLinked = entry.getQuantityLinked() + entry.getQuantityLinkedActual() + entry.getQuantityToLink();
-
-                            if (totalLinked > totalSurplus) {
-                                validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
-                                    "la cantidad total vinculada, " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalLinked) + " " + entry.getUnitSymbol() + ", " +
-                                    "no puede ser mayor a " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalSurplus) + " " + entry.getUnitSymbol() + ".");
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (!validation.getIsError()) {
-            if (rows == 0) {
-                validation.setMessage("Se debe especificar al menos una partida para vinculación.");
-                validation.setComponent(moTablePane.getTable());
-            }
-            else if (rows > 1) {
-                validation.setMessage("Se debe especificar solo una partida para vinculación.");
-                validation.setComponent(moTablePane.getTable());
+        
+        for (int i = 0; i < mvFields.size(); i++) {
+            if (!((erp.lib.form.SFormField) mvFields.get(i)).validateField()) {
+                validation.setIsError(true);
+                validation.setComponent(mvFields.get(i).getComponent());
+                break;
             }
         }
         
+        if (!validation.getIsError()) {
+            if (moFieldConvFact.getDouble() != 1){
+                if (miClient.showMsgBoxConfirm("El factor de conversión del concepto es diferente de 1.0,\n"
+                            + "pero está asignado a una partida de la OC.\n"
+                            + "¿Esta seguro que el factor de conversión es correcto?") != JOptionPane.YES_OPTION) {
+                    validation.setMessage("Poner el factor de conversión igual a 1.0.");
+                    validation.setComponent(jtfConvFactor);
+                }
+            }
+        }
+        
+        if (!validation.getIsError()) {
+            SDataEntryDpsDpsLink entryDpsDpsLink = (SDataEntryDpsDpsLink) moTablePane.getSelectedTableRow();
+            
+            if (entryDpsDpsLink == null) {
+                validation.setMessage(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                entryDpsDpsLink.setQuantityToLink(Double.parseDouble(jtfCantidadEquivalente.getText()));
+                
+                if (entryDpsDpsLink.getQuantityToLink() > 0) {
+                    // Validate that quantity to link does not exceed limit:
+
+                    SDataDpsEntry dpsEntry = moParamPurchaseOrder.getDbmsDpsEntry(entryDpsDpsLink.getDpsEntryKey());
+
+                    if (!SLibUtils.compareAmount(dpsEntry.getOriginalPriceUnitaryCy(), moConcepto.getAttValorUnitario().getDouble())) {
+                        validation.setMessage("El precio del concepto del CFDI $" + SLibUtils.getDecimalFormatAmountUnitary().format(moConcepto.getAttValorUnitario().getDouble()) + " "
+                                + "no coincide con el precio de la partida de la OC $" + SLibUtils.getDecimalFormatAmountUnitary().format(dpsEntry.getOriginalPriceUnitaryCy()) + ".");
+                    }
+
+                    // The source is order and has supplied quantities
+
+                    if (!validation.getIsError() && moParamPurchaseOrder.isOrder()) {
+                        try {
+                            double totalsupplied = STrnDpsUtilities.obtainEntryTotalQuantitySupplied(miClient, (int[]) entryDpsDpsLink.getDpsEntryKey());
+                            if (totalsupplied > entryDpsDpsLink.getQuantityToLink()) {
+                                validation.setMessage("Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
+                                        "la cantidad minima a vincular debe ser " + (totalsupplied < entryDpsDpsLink.getQuantityToBeLinked() ? "mayor o " : "") + "igual a " + 
+                                        SLibUtils.getDecimalFormatQuantity().format(totalsupplied) + " ya que tiene sutidos previos.");
+                            }
+                        }
+                        catch (Exception e) {
+                            SLibUtils.showException(this, e);
+                        }
+                    }
+
+                    if (!validation.getIsError()) {
+                        if (entryDpsDpsLink.getSurplusPercentage() == 0) {
+                            // No surplus allowed:
+
+                            if (entryDpsDpsLink.getQuantityToLink() > entryDpsDpsLink.getQuantityToBeLinked()) {
+                                validation.setMessage("Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
+                                        "la cantidad de la columna '" + moTablePane.getTableColumn(COL_QTY_TO_LINK).getColumnTitle() + "', " +
+                                        miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(entryDpsDpsLink.getQuantityToLink()) + " " + entryDpsDpsLink.getUnitSymbol() + ", " +
+                                        "no puede ser mayor a la cantidad de la columna '" + moTablePane.getTableColumn(COL_QTY_TO_BE_LINKED).getColumnTitle() + "', " +
+                                        miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(entryDpsDpsLink.getQuantityToBeLinked()) + " " + entryDpsDpsLink.getUnitSymbol() + ".");
+                            }
+                        }
+                        else {
+                            // Surplus allowed:
+
+                            double totalSurplus = entryDpsDpsLink.getQuantity() * (1d + entryDpsDpsLink.getSurplusPercentage());
+                            double totalLinked = entryDpsDpsLink.getQuantityLinked() + entryDpsDpsLink.getQuantityLinkedActual() + entryDpsDpsLink.getQuantityToLink();
+
+                            if (totalLinked > totalSurplus) {
+                                validation.setMessage("Para el ítem '" + entryDpsDpsLink.getConcept() + " (" + entryDpsDpsLink.getConceptKey() + ")' en la partida # " + entryDpsDpsLink.getSortingPosition() + "\n" +
+                                    "la cantidad total vinculada, " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalLinked) + " " + entryDpsDpsLink.getUnitSymbol() + ", " +
+                                    "no puede ser mayor a " + miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat().format(totalSurplus) + " " + entryDpsDpsLink.getUnitSymbol() + ".");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return validation;
     }
-
+    
     @Override
     public void setFormStatus(int status) {
         mnFormStatus = status;
@@ -721,7 +623,8 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    /**
+    /** 
+     * 
      * @param type Options accepted: SDataConstants.TRN_DPS or SDialogCfdiPurchaseOrder.VALUE_TYPE_CFDI_CONCEPTO.
      * @param value The supplied value.
      */
@@ -729,15 +632,19 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
     public void setValue(int type, Object value) {
         switch (type) {
             case SDataConstants.TRN_DPS:
-                moParamDpsSource = (SDataDps) value;
-                moPanelDps.setDps(moParamDpsSource, null);
-                
-                renderDpsSourceEntries();
+                moParamPurchaseOrder = (SDataDps) value;
+                moPanelDps.setDps(moParamPurchaseOrder, null);
                 break;
-
-            case VALUE_TYPE_CFDI_CONCEPTO:
-                moConcepto = (cfd.ver33.DElementConcepto) value;
- 
+                
+            case VALUE_TYPE_PURCHASE_ORDER_ENTRIES:
+                moPurchaseOrderEntriesMap = (HashMap<String, Double>) value;
+                break;
+                    
+            case VALUE_TYPE_ROW_CFDI:
+                SRowCfdiImport rowCfdiImport = (SRowCfdiImport) value;
+                moParamItemSource = rowCfdiImport.getItem();
+                
+                moConcepto = rowCfdiImport.getConcepto();
                 jtfNoIdentificacion.setText(moConcepto.getAttNoIdentificacion().getString());
                 jtfNoIdentificacion.setCaretPosition(0);
                 jtfDescripcion.setText(moConcepto.getAttDescripcion().getString());
@@ -748,16 +655,27 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
                 jtfUnidad.setCaretPosition(0);
                 jtfUnidadSat.setText(moConcepto.getAttClaveUnidad().getString());
                 jtfUnidadSat.setCaretPosition(0);
-                jtfCantidad.setText(moConcepto.getAttCantidad().getDouble() + "");
+                jtfCantidad.setText(SLibUtils.DecimalFormatValue4D.format(moConcepto.getAttCantidad().getDouble()));
                 jtfCantidad.setCaretPosition(0);
+                
+                mdConvFactor = rowCfdiImport.getConvFactor();
+                moFieldConvFact.setDouble(mdConvFactor);
+                
+                mdEquivalentQuantity = rowCfdiImport.getEquivalentQuantity();
+                jtfCantidadEquivalente.setText(SLibUtils.DecimalFormatValue4D.format(mdEquivalentQuantity));
+                
+                renderDpsSourceEntries();
+                setTableRowSelection();
                 break;
                 
             default:
         }
     }
-    
+            
     /**
-     * @param type Options accepted: SDataConstants.TRN_DPS_ETY or SDialogCfdiPurchaseOrder.VALUE_TYPE_FACTOR_CONV.
+     * @param type Options accepted: SDialogCfdiPurchaseOrder.VALUE_TYPE_ENTRY_DPS_DPS_LINK or 
+     * SDialogCfdiPurchaseOrder.VALUE_TYPE_FACTOR_CONV or 
+     * SDataConstants.TRN_DPS_ETY. 
      * @return 
      */
     @Override
@@ -765,19 +683,16 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
         Object value = null;
 
         switch (type) {
-            case SDataConstants.TRN_DPS_ETY:
-                Vector<SDataEntryDpsDpsLink> entries = new Vector<SDataEntryDpsDpsLink>();
-                for (int i = 0; i < moTablePane.getTableGuiRowCount(); i++) {
-                    SDataEntryDpsDpsLink entry = (SDataEntryDpsDpsLink) moTablePane.getTableRow(i);
-                    if (entry.getQuantityToLink() > 0) {
-                        entries.add(entry);
-                    }
-                }
-                value = entries.get(0); // objeto de tipo SDataDpsEntry
+            case VALUE_TYPE_ENTRY_DPS_DPS_LINK:
+                value = (SDataEntryDpsDpsLink) moTablePane.getSelectedTableRow(); // current row casted as SDataEntryDpsDpsLink
                 break;
 
             case VALUE_TYPE_FACTOR_CONV:
-                value = Double.parseDouble(jtfConvertionFactor.getText().equals("") ? "1.0" : jtfConvertionFactor.getText()); // double
+                value = moFieldConvFact.getDouble();
+                break;
+                
+            case SDataConstants.TRN_DPS_ETY:
+                value = moParamPurchaseOrder.getDbmsDpsEntry(((SDataEntryDpsDpsLink) moTablePane.getSelectedTableRow()).getDpsEntryKey());
                 break;
                 
             default:
@@ -802,12 +717,16 @@ public class SDialogCfdiPurchaseOrder extends javax.swing.JDialog implements erp
             else if (button == jbCancel) {
                 actionCancel();
             }
-            else if (button == jbSetEverything) {
-                actionSetEverything();
-            }
-            else if (button == jbSetNothing) {
-                actionSetNothing();
-            }
         }
     }
+    
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (jtfConvFactor == e.getSource()){
+            updateEquivalentQuantity();
+        }
+    }
+    
+    @Override
+    public void focusGained(FocusEvent e) {}
 }

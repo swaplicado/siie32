@@ -14,9 +14,10 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Irving Sánchez
+ * @author Irving Sánchez, Isabel Servín
  */
 public class SGuiDpsLink {
+    
     private SDataDps moDataDpsDestiny;
     private ArrayList<SGuiDps> maGuiDpsSources;
     private SClientInterface miClient;
@@ -24,7 +25,6 @@ public class SGuiDpsLink {
     public SGuiDpsLink(SClientInterface client) {
         miClient = client;
         maGuiDpsSources = new ArrayList<>();
-        
     }	
 	
     public void addDataDpsDestiny (SDataDps dataDpsDestiny) { 
@@ -35,6 +35,7 @@ public class SGuiDpsLink {
             }
         }
     }
+    
     public void addDataDpsDestinyEntry(SDataDpsEntry dataDpsDestinyEntry) {
         // TODO:
         SDataDps dpsSource = null;

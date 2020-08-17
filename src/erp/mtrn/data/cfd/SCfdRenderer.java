@@ -24,6 +24,7 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerCategory;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
+import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogCfdiImport;
 import java.awt.HeadlessException;
@@ -31,6 +32,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JButton;
@@ -54,11 +56,11 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
     
     private final SClientInterface miClient;
     private String msCfdiXml;
-    private String msCfdiFilePath;
+    private File moCfdiFile;
     private ArrayList<DElementConcepto> moConceptos;
     private HashMap<String, Object> moParamsMap;
     private JButton mjbValidate;
-    private SDataDps moDps;
+    private SDataDps moPurchaseOrder;
     private SDataDps moDpsRendered;
     private int mnBizCategory; 
     private JDialog moCfdiViewer;
@@ -75,35 +77,34 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
     
     /**
      * Obtiene un archivo xml para la vista previa en PDF y el empate de conceptos.
-     * @param filePath
+     * @param file
      * @param dps si es nulo, significa que no tiene orden de compra.
      * @param category
      * @return Dps renderizado
      * @throws Exception
      */
-    public SDataDps renderCfdi(String filePath, SDataDps dps, int category) throws Exception {
+    public SDataDps renderCfdi(File file, SDataDps dps, int category) throws Exception {
         try {
-            msCfdiXml = SXmlUtils.readXml(filePath); 
+            msCfdiXml = SXmlUtils.readXml(file.getAbsolutePath()); 
         } 
         catch (Exception e) {
             throw new Exception("El XML no es válido.");
         }
         
-        msCfdiFilePath = filePath;
-        moDps = dps;
+        moCfdiFile = file; 
+        moPurchaseOrder = dps;
         mnBizCategory = category;
         createParamsMap();
         showCfdi();
-        //validateCfdi(mscfdiFilePath); preservar, se usa para pruebas
         return moDpsRendered;
     }
       
-    private void validateCfdi(String cfdiFilePath) throws Exception{
+    private void validateCfdi(File cfdiFile) throws Exception{
         SFormValidation validation = new SFormValidation();
         // obtener CFDI: 
         
         try {
-            msCfdiXml = SXmlUtils.readXml(cfdiFilePath);
+            msCfdiXml = SXmlUtils.readXml(cfdiFile.getAbsolutePath());
         } 
         catch(Exception e) {
             SLibUtilities.renderException(this, e);
@@ -184,27 +185,60 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         }
         
         if (!validation.getIsError()) {
-            if (moDps == null) {
-                int[] key;
-                SDataDps dps;
-                key = SDataUtilities.obtainDpsKey(miClient, comprobante.getAttSerie().getString(), comprobante.getAttFolio().getString(), SDataConstantsSys.TRNS_CL_DPS_PUR_ORD);
-                if (key != null) {
-                    dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
-                    //moDps.poliza contable año-mes sucursal poliz, num de poliza getdbmsregisrtry
-                    Object[] primaryKey = (Object[]) dps.getDbmsRecordKey();
-                    validation.setMessage("El documento ya existe en la siguiente póliza contable:\n" +
-                        "Fecha de la póliza: " + miClient.getSessionXXX().getFormatters().getDateFormat().format(dps.getDbmsRecordDate()) + "\n" +
-                        "Período contable: " + primaryKey[0] + "-" + miClient.getSessionXXX().getFormatters().getMonthFormat().format(primaryKey[1]) + "\n" +
-                        "Número de póliza: " + primaryKey[3] + "-" + primaryKey[4]);
+            int[] key;
+            SDataDps dps;
+            key = SDataUtilities.obtainDpsKey(miClient, comprobante.getAttSerie().getString(), comprobante.getAttFolio().getString(), SDataConstantsSys.TRNS_CL_DPS_PUR_DOC);
+            if (key != null) {
+                dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
+                //moDps.poliza contable año-mes sucursal poliz, num de poliza getdbmsregisrtry
+                Object[] primaryKey = (Object[]) dps.getDbmsRecordKey();
+                validation.setMessage("El documento ya existe en la siguiente póliza contable:\n" +
+                    "Fecha de la póliza: " + miClient.getSessionXXX().getFormatters().getDateFormat().format(dps.getDbmsRecordDate()) + "\n" +
+                    "Período contable: " + primaryKey[0] + "-" + miClient.getSessionXXX().getFormatters().getMonthFormat().format(primaryKey[1]) + "\n" +
+                    "Número de póliza: " + primaryKey[3] + "-" + primaryKey[4]);
+            }
+            
+            if (!validation.getIsError()) {
+                if (comprobante.getEltOpcComplemento() != null) {
+                    for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
+                        if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
+                            cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
+                            if (SCfdUtils.getCfdIdByUuid(miClient, tfd.getAttUUID().getString()) != 0){
+                                validation.setMessage("El UUID del documento ya existe en la base de datos.");
+                            }
+                        }
+                    }
                 }
             }
-            else if (!moDps.getComprobanteFolio().equals(comprobante.getAttFolio().getString())) {
-                validation.setMessage("¡El folio de la orden de compra y el comprobante no coinciden!");
+            
+            if (!validation.getIsError() && moPurchaseOrder != null) {
+                if (moPurchaseOrder.getDate().after(comprobante.getAttFecha().getDatetime())) {
+                    validation.setMessage("El documento no puede tener una fecha anterior a la de la orden de compra. \n"
+                            + "Fecha OC: " + SLibUtils.DateFormatDate.format(moPurchaseOrder.getDate()) + "\n"
+                            + "Fecha CFDI: " + SLibUtils.DateFormatDate.format(comprobante.getAttFecha().getDatetime()));
+                }
+                if (!validation.getIsError()) {
+                    int idCur = 0;
+                    try {
+                        String sql = "SELECT id_cur FROM erp.cfgu_cur WHERE cur_key = '" + comprobante.getAttMoneda().getString() + "'";
+                        try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                            if (resultSet.next()) {
+                                idCur = resultSet.getInt(1);
+                            }
+                        }
+                    }
+                    catch (Exception e){
+                        SLibUtils.printException(this, e);
+                    }
+                    if (moPurchaseOrder.getFkCurrencyId() != idCur) {
+                        validation.setMessage("La moneda del documento no coincide con el de la orden de compra.");
+                    }
+                }
             }
-
+            
             if (!validation.getIsError()) {
                 moCfdiViewer.setVisible(false);
-                SDialogCfdiImport dialog = new SDialogCfdiImport(miClient, moDps);
+                SDialogCfdiImport dialog = new SDialogCfdiImport(miClient, moPurchaseOrder, moCfdiFile);
                 dialog.setComprobante(comprobante); 
                 dialog.setFormVisible(true);
                 moDpsRendered = dialog.getDps();
@@ -223,6 +257,10 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             
             SCfdXmlCatalogs catalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
             cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(msCfdiXml);
+            
+            if (comprobante.getVersion() != DCfdConsts.CFDI_VER_33) {
+                throw new Exception("El CFDI no corresponde a la versión 3.3.");
+            }
             
             moParamsMap.put("sCfdVersion", "" + comprobante.getVersion());
             moParamsMap.put("sCfdSerieOpc", comprobante.getAttSerie().getString());
@@ -297,7 +335,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             moCfdiViewer.setLocationRelativeTo(null);
             mjbValidate = new JButton(); 
             mjbValidate.setText("Continuar");
-            mjbValidate.setBounds(430, 3, 100, 23);
+            mjbValidate.setBounds(430, 1, 100, 25);
             mjbValidate.addActionListener(this);
             mjbValidate.setToolTipText("Continuar con la captura del CFDI");
             moCfdiViewer.add(mjbValidate);
@@ -320,7 +358,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             if (e.getSource() instanceof javax.swing.JButton) {
                 JButton button = (JButton) e.getSource();
                 if (button == mjbValidate) {
-                    validateCfdi(msCfdiFilePath);
+                    validateCfdi(moCfdiFile);
                 }
             }
         }

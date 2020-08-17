@@ -7578,7 +7578,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         else {
             // Document in foreign currency:
 
-            if (moDps != null && moDps.getIsRegistryNew() && !mbDocBeingImported) {
+            if (moDps != null && moDps.getIsRegistryNew() && !moDps.getAuxKeepExchangeRate() && !mbDocBeingImported) {
                 setExchangeRate(moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldExchangeRate);
                 setExchangeRate(moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldExchangeRateSystem);
             }
@@ -8482,49 +8482,50 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         int[] keyBpbAdd = new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() };
         SDataDpsEntry entry = null;
         SDataDpsNotes notes = null;
+        
+        if (!moDps.getAuxKeepDpsData()) {
+            moDps = createNewDps(null);
+            setBizPartner(keyBp, keyBpb, keyBpbAdd);
+            renderRecordAutomatic();
+            renderPk();
 
-        moDps = createNewDps(null);
-        setBizPartner(keyBp, keyBpb, keyBpbAdd);
-        renderRecordAutomatic();
-        renderPk();
+            for (STableRow row : moPaneGridEntries.getGridRows()) {
+                entry = (SDataDpsEntry) row.getData();
+                entry.setPkEntryId(0);
+                entry.setIsRegistryNew(true);
 
-        for (STableRow row : moPaneGridEntries.getGridRows()) {
-            entry = (SDataDpsEntry) row.getData();
-            entry.setPkEntryId(0);
-            entry.setIsRegistryNew(true);
+                entry.getDbmsDpsLinksAsDestiny().clear();
+                entry.getDbmsDpsLinksAsSource().clear();
+                entry.getDbmsDpsAdjustmentsAsDps().clear();
+                entry.getDbmsDpsAdjustmentsAsAdjustment().clear();
+                entry.setIsPriceVariable(false);
+                entry.setIsPriceConfirm(false);
+                entry.setContractPriceYear(SLibConstants.UNDEFINED);
+                entry.setContractPriceMonth(SLibConstants.UNDEFINED);
+                entry.setContractBase(0d);
+                entry.setContractFactor(0d);
+                entry.setContractFuture(0d);
 
-            entry.getDbmsDpsLinksAsDestiny().clear();
-            entry.getDbmsDpsLinksAsSource().clear();
-            entry.getDbmsDpsAdjustmentsAsDps().clear();
-            entry.getDbmsDpsAdjustmentsAsAdjustment().clear();
-            entry.setIsPriceVariable(false);
-            entry.setIsPriceConfirm(false);
-            entry.setContractPriceYear(SLibConstants.UNDEFINED);
-            entry.setContractPriceMonth(SLibConstants.UNDEFINED);
-            entry.setContractBase(0d);
-            entry.setContractFactor(0d);
-            entry.setContractFuture(0d);
-
-            for (SDataDpsEntryTax entryTax : entry.getDbmsEntryTaxes()) {
-                entryTax.setPkEntryId(0);
-                entryTax.setIsRegistryNew(true);
+                for (SDataDpsEntryTax entryTax : entry.getDbmsEntryTaxes()) {
+                    entryTax.setPkEntryId(0);
+                    entryTax.setIsRegistryNew(true);
+                }
+                for (SDataDpsEntryCommissions entryCommissions : entry.getDbmsEntryCommissions()) {
+                    entryCommissions.setPkCommissionsId(0);
+                    entryCommissions.setIsRegistryNew(true);
+                }
+                for (SDataDpsEntryNotes entryNotes : entry.getDbmsEntryNotes()) {
+                    entryNotes.setPkNotesId(0);
+                    entryNotes.setIsRegistryNew(true);
+                }
             }
-            for (SDataDpsEntryCommissions entryCommissions : entry.getDbmsEntryCommissions()) {
-                entryCommissions.setPkCommissionsId(0);
-                entryCommissions.setIsRegistryNew(true);
-            }
-            for (SDataDpsEntryNotes entryNotes : entry.getDbmsEntryNotes()) {
-                entryNotes.setPkNotesId(0);
-                entryNotes.setIsRegistryNew(true);
+
+            for (STableRow row : moPaneGridNotes.getGridRows()) {
+                notes = (SDataDpsNotes) row.getData();
+                notes.setPkNotesId(0);
+                notes.setIsRegistryNew(true);
             }
         }
-
-        for (STableRow row : moPaneGridNotes.getGridRows()) {
-            notes = (SDataDpsNotes) row.getData();
-            notes.setPkNotesId(0);
-            notes.setIsRegistryNew(true);
-        }
-
         actionEdit();
     }
 
@@ -8771,7 +8772,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 try {
                     int[] key = null;
                     
-                    if (mbIsSales || mbIsDpsEstimate || mbIsDpsOrder) {
+                    if (mbIsSales || mbIsDpsEstimate || mbIsDpsContract || mbIsDpsOrder) {
                         key = SDataUtilities.obtainDpsKey(miClient, moFieldNumberSeries.getString(), moFieldNumber.getString(), moDpsType.getPrimaryKey());
                     }
                     else {
@@ -9558,6 +9559,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             if (moDps.getDbmsDataCfd() != null) {
                 moFieldCfdiXmlFile.setFieldValue(moDps.getDbmsDataCfd().getDocXmlName());
                 msFileXmlJustLoaded = "";
+            }
+            else if (!moDps.getAuxFileXmlAbsolutePath().isEmpty()) {
+                moFieldCfdiXmlFile.setFieldValue(moDps.getAuxFileXmlName());
+                msFileXmlJustLoaded = moDps.getAuxFileXmlAbsolutePath();
             }
         }
 

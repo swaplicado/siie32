@@ -7,7 +7,7 @@ package erp.lib;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public abstract class SLibConstants {
 
@@ -94,6 +94,8 @@ public abstract class SLibConstants {
     public static final int ICON_DOC_XML_CANCEL = 1110;
     public static final int ICON_DOC_XML_SIGN = 1111;
     public static final int ICON_DOC_DELIVERY = 1112;
+    public static final int ICON_DOC_IMPORT_CFD = 1113;
+    public static final int ICON_DOC_IMPORT_CFD_ORD = 1114;
     public static final int ICON_FILTER_BP = 1201;
     public static final int ICON_FILTER_BPB = 1202;
     public static final int ICON_FILTER_DOC = 1203;
