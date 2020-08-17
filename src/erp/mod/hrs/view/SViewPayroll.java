@@ -21,7 +21,6 @@ import erp.mod.hrs.form.SDialogLayoutGroceryService;
 import erp.mod.hrs.form.SDialogLayoutPayroll;
 import erp.mod.hrs.form.SDialogRepHrsReportsPayroll;
 import erp.mtrn.data.SCfdUtils;
-import erp.print.SDataConstantsPrint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -184,7 +183,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
 
                         if (payrollCfdi.getFormResult() == SLibConstants.FORM_RESULT_OK) {
                             int stampsAvailable = SCfdUtils.getStampsAvailable((SClientInterface) miClient, SDataConstantsSys.TRNS_TP_CFD_PAYROLL, miClient.getSession().getCurrentDate(), SLibConsts.UNDEFINED);
-                            SDialogCfdProcessing dialog = new SDialogCfdProcessing(miClient, "Procesamiento de timbrado y envío", SCfdConsts.PROC_REQ_STAMP);
+                            SDialogCfdProcessing dialog = new SDialogCfdProcessing(miClient, "Procesamiento de timbrado y envío", SCfdConsts.REQ_STAMP);
                             dialog.setFormParams((SClientInterface) miClient, null, payrollCfdi.getPayrollEmployeeReceiptKeys(), stampsAvailable, null, false, SCfdConsts.CFDI_PAYROLL_VER_CUR, SModSysConsts.TRNU_TP_DPS_ANN_NA);
                             dialog.setVisible(true);
                         }
@@ -246,7 +245,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 }
                 else if (miClient.showMsgBoxConfirm("¿Está seguro que desea enviar vía mail los recibos de nómina?") == JOptionPane.YES_OPTION) {
                     try {
-                        SHrsUtils.sendPayrollReceipts(miClient, SDataConstantsPrint.PRINT_MODE_PDF_FILE, gridRow.getRowPrimaryKey());
+                        SHrsUtils.sendPayrollReceipts(miClient, gridRow.getRowPrimaryKey()[0]);
                     } 
                     catch (Exception e) {
                         SLibUtils.showException(this, e);
@@ -339,10 +338,12 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 + "v.id_pay AS " + SDbConsts.FIELD_ID + "1, "
                 + "v.num AS " + SDbConsts.FIELD_CODE + ", "
                 + "v.num AS " + SDbConsts.FIELD_NAME + ", "
+                + "v.per_year, "
                 + "v.num, "
                 + "v.dt_sta, "
                 + "v.dt_end, "
                 + "v.nts, "
+                + "tpsc.code, "
                 + "tps.name, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "v.b_clo, "
@@ -384,12 +385,13 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 + " r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num "
                 + " WHERE re.fid_pay_n = v.id_pay AND NOT r.b_del AND NOT re.b_del) AS _posted "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS v "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_PAY_SHT_CUS) + " AS tpsc ON v.fk_tp_pay_sht_cus = tpsc.id_tp_pay_sht_cus "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " AS tps ON v.fk_tp_pay_sht = tps.id_tp_pay_sht "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON v.fk_usr_clo = uc.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON v.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON v.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE " + sql)
-                + "ORDER BY v.num, tps.name, v.id_pay ";
+                + "ORDER BY v.per_year, v.num, tpsc.code, tps.name, v.id_pay ";
     }
 
     @Override
@@ -400,6 +402,7 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "v.num", "Número nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_sta", "F inicial nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "v.dt_end", "F final nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "tpsc.code", "Tipo nómina empresa"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tps.name", "Tipo nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_sum_ears", "Percepciones $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_AMT, "_sum_deds", "Deducciones $"));

@@ -18,6 +18,7 @@ import erp.mfin.data.SFinUtilities;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.STrnUtilities;
 import erp.print.SDataConstantsPrint;
 import java.io.BufferedWriter;
@@ -65,7 +66,7 @@ import sa.lib.prt.SPrtUtils;
 
 /**
  *
- * @author Juan Barajas, Alfredo Perez, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Alfredo Perez, Claudio Peña, Edwin Carmona, Sergio Flores
  */
 public abstract class SHrsUtils {
     
@@ -1390,6 +1391,38 @@ public abstract class SHrsUtils {
         
         return true;
     }
+    
+    /**
+     * Check if payroll uniqueness is fullfilled.
+     * @param session
+     * @param payrollId
+     * @param periodYear
+     * @param number
+     * @param paymentTypeId
+     * @param paysheetTypeId
+     * @param paysheetCustomTypeId
+     * @return
+     * @throws Exception 
+     */
+    public static boolean isPayrollUniquenessFullfilled(final SGuiSession session, final int payrollId, final int periodYear, final int number, final int paymentTypeId, final int paysheetTypeId, final int paysheetCustomTypeId) throws Exception {
+        boolean isValid = true;
+        SDbPaysheetCustomType paysheetCustomType = (SDbPaysheetCustomType) session.readRegistry(SModConsts.HRSU_TP_PAY_SHT_CUS, new int[] { paysheetCustomTypeId });
+        
+        if (paysheetCustomType.isOneOff()) {
+            String sql = "SELECT COUNT(*) "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " "
+                    + "WHERE NOT b_del AND id_pay <> " + payrollId + " AND per_year = " + periodYear + " AND num = " + number + " AND "
+                    + "fk_tp_pay = " + paymentTypeId + " AND fk_tp_pay_sht = " + paysheetTypeId + "  AND fk_tp_pay_sht_cus = " + paysheetCustomTypeId + ";";
+
+            try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    isValid = false;
+                }
+            }
+        }
+        
+        return isValid;
+    }
 
     /**
      * @param session User GUI session.
@@ -2057,35 +2090,31 @@ public abstract class SHrsUtils {
         return wage;
     }
 
-    public static HashMap<String, Object> createPayrollReceiptMap(final SGuiClient client, final int[] payrollKey, final int pnPrintMode) throws Exception {
+    public static HashMap<String, Object> createPayrollReceiptMap(final SGuiClient client, final int[] payrollReceiptKey, final int printMode) throws Exception {
         double dTotalPercepciones = 0;
         double dTotalDeducciones = 0;
         SDbLoan loan = null;
-        SDataBizPartner bizPartnerCompany = null;
-        SDataBizPartner bizPartnerEmployee = null;
-        SDbPayroll payroll = null;
-        SDbPayrollReceipt payrollReceipt = null;
         HashMap<String, Object> map = null;
         ArrayList<Object> aPercepciones = null;
         ArrayList<Object> aDeducciones = null;
-        DecimalFormat oFixedFormatAux = null;
 
-        payroll = new SDbPayroll();
-        payroll.read(client.getSession(), new int[] { payrollKey[0] });
+        // prevent from reading payroll multiple times because is a really lengthy operation:
         
-        for (SDbPayrollReceipt receipt : payroll.getChildPayrollReceipts()) { // TODO Improve this receipt lookup, is bizarre!
-            if (SLibUtils.compareKeys(receipt.getPrimaryKey(), new int[] { payrollKey[0], payrollKey[1] })) {
-                payrollReceipt = receipt;
-            }
-        }
+        SDbPayroll payroll = (SDbPayroll) SCfdUtils.DataSet.get(SModConsts.HRS_PAY);
 
-        bizPartnerCompany = new SDataBizPartner();
+        if (payroll == null) {
+            payroll = (SDbPayroll) client.getSession().readRegistry(SModConsts.HRS_PAY, payrollReceiptKey);
+        }
+        
+        SDbPayrollReceipt payrollReceipt = payroll.getChildPayrollReceipt(payrollReceiptKey);
+
+        SDataBizPartner bizPartnerCompany = new SDataBizPartner();
         bizPartnerCompany.read(new int[] { ((SClientInterface) client).getSessionXXX().getCompany().getPkCompanyId() }, client.getSession().getStatement());
 
-        bizPartnerEmployee = new SDataBizPartner();
+        SDataBizPartner bizPartnerEmployee = new SDataBizPartner();
         bizPartnerEmployee.read(new int[] { payrollReceipt.getPkEmployeeId() }, client.getSession().getStatement());
 
-        oFixedFormatAux = new DecimalFormat(SLibUtils.textRepeat("0", 2));
+        DecimalFormat oFixedFormatAux = new DecimalFormat(SLibUtils.textRepeat("0", 2));
 
         map = client.createReportParams();
 
@@ -2205,15 +2234,14 @@ public abstract class SHrsUtils {
     }
     
     /**
-     * Print payrroll receipt
-     * @param client Interface Client
-     * @param pnPrintMode print mode (e.g. SDataConstantsPrint.PRINT_MODE_)
-     * @param payrollKey payrroll key
+     * Print payrroll receipt.
+     * @param client GUI client.
+     * @param pnPrintMode Print mode (e.g. SDataConstantsPrint.PRINT_MODE_...).
+     * @param payrollReceiptKey Payrroll receipt key.
      * @throws Exception
      */
-    public static void printPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws Exception {
-        HashMap<String, Object> map = new HashMap<>();
-        map = createPayrollReceiptMap(client, payrollKey, pnPrintMode);
+    public static void printPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollReceiptKey) throws Exception {
+        HashMap<String, Object> map = createPayrollReceiptMap(client, payrollReceiptKey, pnPrintMode);
         
         switch (pnPrintMode) {
             case SDataConstantsPrint.PRINT_MODE_VIEWER:
@@ -2228,8 +2256,15 @@ public abstract class SHrsUtils {
         }
     }
     
-    public static void sendPayrollReceipt(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws Exception {
-        HashMap<String, Object> map = createPayrollReceiptMap(client, payrollKey, pnPrintMode);
+    /**
+     * Send payrroll receipt.
+     * @param client GUI client.
+     * @param printMode Print mode (e.g. SDataConstantsPrint.PRINT_MODE_...).
+     * @param payrollReceiptKey Payrroll receipt key.
+     * @throws Exception
+     */
+    public static void sendPayrollReceipt(final SGuiClient client, final int printMode, final int[] payrollReceiptKey) throws Exception {
+        HashMap<String, Object> map = createPayrollReceiptMap(client, payrollReceiptKey, printMode);
         File pdf = createPayrollReceipt(client, map);
         
         SDataBizPartner bizPartner  = (SDataBizPartner) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.BPSU_BP, new int[] { (Integer)map.get("nEmployeeId") }, SLibConstants.EXEC_MODE_SILENT);
@@ -2249,10 +2284,16 @@ public abstract class SHrsUtils {
         }
     }
     
-    public static void sendPayrollReceipts(final SGuiClient client, final int pnPrintMode, final int[] payrollKey) throws Exception {
+    /**
+     * Send payroll receipts by mail.
+     * TODO 2020-07-30, Sergio Flores: This method and algorith needs to be processed! There is no reason to read payroll and its receipts outside the CFD processing dialog!
+     * @param client
+     * @param payrollId
+     * @throws Exception 
+     */
+    public static void sendPayrollReceipts(final SGuiClient client, final int payrollId) throws Exception {
+        SDbPayroll payroll = (SDbPayroll) client.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { payrollId });
         ArrayList<SDbPayrollReceipt> payrollReceipts = new ArrayList<>();
-        SDbPayroll payroll = new SDbPayroll();
-        payroll.read(client.getSession(), new int[] { payrollKey[0] });
         
         for (SDbPayrollReceipt payrollReceipt : payroll.getChildPayrollReceipts()) {
             if (!payrollReceipt.isDeleted()) {
@@ -2260,7 +2301,7 @@ public abstract class SHrsUtils {
             }
         }
         
-        SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de envío", SCfdConsts.PROC_REQ_SEND_CFD_PAYROLL);
+        SDialogCfdProcessing dialog = new SDialogCfdProcessing((SClient) client, "Procesamiento de envío", SCfdConsts.REQ_SEND_PAYROLL);
         dialog.setFormParams((SClientInterface) client, null, null, 0, null, true, 0, SModSysConsts.TRNU_TP_DPS_ANN_NA);
         dialog.setPayrollReceipts(payrollReceipts);
         dialog.setVisible(true);

@@ -6,6 +6,9 @@
 package erp.mod.hrs.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.data.SDataConstantsSys;
+import erp.mcfg.data.SCfgUtils;
+import erp.mod.hrs.form.SFormPayroll;
 import erp.mod.hrs.link.db.SAbsDelays;
 import erp.mod.hrs.link.db.SDataRow;
 import erp.mod.hrs.link.utils.SUtilsJSON;
@@ -49,7 +52,19 @@ public class SPayrollUtils {
         List<Integer> idsList = new ArrayList<>();
         
         if (bonus.contains(SPayrollBonusUtils.BONUS)) {
-            SAbsDelays delaysAndAbsEmployees = SPayrollUtils.requestAbsAndDelays(configuredEmployeesIds, tStartDate, tEndDate, payType, companyKey);
+            String urls = "";
+            String url = "";
+            try {
+                //localhost:8080/CAP/public/api/prepayroll
+
+                urls = SCfgUtils.getParamValue(client.getSession().getStatement(), SDataConstantsSys.CFG_PARAM_HRS_CAP);
+                String arrayUrls[] = urls.split(";");
+                url = arrayUrls[1];
+            } catch (Exception ex) {
+                Logger.getLogger(SFormPayroll.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            SAbsDelays delaysAndAbsEmployees = SPayrollUtils.requestAbsAndDelays(url, configuredEmployeesIds, tStartDate, tEndDate, payType, companyKey);
             
             if (delaysAndAbsEmployees == null) {
                 return null;
@@ -281,14 +296,14 @@ public class SPayrollUtils {
         return confDept;
     }
     
-    private static SAbsDelays requestAbsAndDelays(ArrayList<Integer> lEmployees, Date tStartDate, Date tEndDate, int payType, String companyKey) {
+    private static SAbsDelays requestAbsAndDelays(String sURL, ArrayList<Integer> lEmployees, Date tStartDate, Date tEndDate, int payType, String companyKey) {
         try {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
             String employees = lEmployees.stream().map(Object::toString)
                     .collect(Collectors.joining(","));
 
-            String url = "http://localhost:9090/cap/public/api/absdelays";
+            String url = sURL;
 
             String charset = java.nio.charset.StandardCharsets.UTF_8.name();
             String startDate = df.format(tStartDate);

@@ -288,8 +288,8 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
                     mnFkDeductionTypeId + ", " + 
-                    (mnFkDeductionId == 0 ? 1 : mnFkDeductionId) + ", " + 
-                    (mnFkBonusId == 0 ? 1 : mnFkBonusId) + ", " + 
+                    mnFkDeductionId + ", " + 
+                    mnFkBonusId + ", " + 
                     mnFkBenefitTypeId + ", " + 
                     (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +
@@ -324,7 +324,7 @@ public class SDbPayrollReceiptDeduction extends SDbRegistryUser {
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ded = " + mnFkDeductionTypeId + ", " +
                     "fk_ded = " + mnFkDeductionId + ", " +
-                    "fk_bonus = " + (mnFkBonusId == 0 ? 1 : mnFkBonusId) + ", " +
+                    "fk_bonus = " + mnFkBonusId + ", " +
                     "fk_tp_ben = " + mnFkBenefitTypeId + ", " +
                     "fk_loan_emp_n = " + (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     "fk_loan_loan_n = " + (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +

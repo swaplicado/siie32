@@ -5,6 +5,7 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbDeduction;
 import erp.mod.hrs.db.SDbPayrollReceiptDeduction;
 import erp.mod.hrs.db.SDbPayrollReceiptDeductionComplement;
@@ -24,7 +25,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SFormLoanAdjustmentDeduction extends SBeanForm implements ItemListener {
 
@@ -283,6 +284,7 @@ public class SFormLoanAdjustmentDeduction extends SBeanForm implements ItemListe
         registry.setAutomatic(true);
         registry.setFkDeductionTypeId(deduction.getFkDeductionTypeId());
         registry.setFkDeductionId(deduction.getPkDeductionId());
+        registry.setFkBonusId(SModSysConsts.HRSS_BONUS_NON);
         registry.setFkBenefitTypeId(deduction.getFkBenefitTypeId());
         registry.setFkLoanTypeId_n(moKeyLoanType.getValue()[0]);
         registry.setFkLoanEmployeeId_n(moKeyLoan.getValue()[0]);

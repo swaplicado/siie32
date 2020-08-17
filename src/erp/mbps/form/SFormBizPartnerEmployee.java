@@ -60,7 +60,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 
@@ -118,6 +118,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.lib.form.SFormField moFieldFkShift;
     private erp.lib.form.SFormField moFieldFkWorkingDayType;
     private erp.lib.form.SFormField moFieldWorkingHoursDay;
+    private erp.lib.form.SFormField moFieldIsOvertime;
     private erp.lib.form.SFormField moFieldFkContractType;
     private erp.lib.form.SFormField moFieldContractExpiration;
     private erp.lib.form.SFormField moFieldFkRecruitmentSchemeType;
@@ -308,6 +309,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel11 = new javax.swing.JPanel();
         jlWorkingHoursDay = new javax.swing.JLabel();
         jtfWorkingHoursDay = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jckIsOvertime = new javax.swing.JCheckBox();
         jPanel27 = new javax.swing.JPanel();
         jlFkContractType = new javax.swing.JLabel();
         jcbFkContractType = new javax.swing.JComboBox<SFormComponentItem>();
@@ -959,6 +962,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfWorkingHoursDay.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel11.add(jtfWorkingHoursDay);
 
+        jLabel1.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel11.add(jLabel1);
+
+        jckIsOvertime.setText("Genera tiempo extra");
+        jPanel11.add(jckIsOvertime);
+
         jPanel4.add(jPanel11);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -1503,6 +1512,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldFkWorkingDayType.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldWorkingHoursDay = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfWorkingHoursDay, jlWorkingHoursDay);
         moFieldWorkingHoursDay.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldIsOvertime = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsOvertime);
+        moFieldIsOvertime.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldFkContractType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkContractType, jlFkContractType);
         moFieldFkContractType.setTabbedPaneIndex(0, jTabbedPane1);
         moFieldContractExpiration = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftContractExpiration, jlContractExpiration);
@@ -1625,6 +1636,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mvFields.add(moFieldFkShift);
         mvFields.add(moFieldFkWorkerType);
         mvFields.add(moFieldWorkingHoursDay);
+        mvFields.add(moFieldIsOvertime);
         mvFields.add(moFieldFkContractType);
         mvFields.add(moFieldContractExpiration);
         mvFields.add(moFieldFkRecruitmentSchemeType);
@@ -2209,6 +2221,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -2322,6 +2335,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JCheckBox jckIsActive;
     private javax.swing.JCheckBox jckIsDeleted;
     private javax.swing.JCheckBox jckIsMfgOperator;
+    private javax.swing.JCheckBox jckIsOvertime;
     private javax.swing.JCheckBox jckIsUnionized;
     private javax.swing.JCheckBox jckMateDeceased;
     private javax.swing.JCheckBox jckSonDeceased1;
@@ -2792,8 +2806,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldBankAccount.setFieldValue(moEmployee.getBankAccount());
             moFieldFkGroceryService.setFieldValue(new int[] { moEmployee.getFkGroceryServiceId() });
             moFieldGroceryServiceAccount.setFieldValue(moEmployee.getGroceryServiceAccount());
-            moFieldIsUnionized.setFieldValue(moEmployee.isUnionized());
-            moFieldIsMfgOperator.setFieldValue(moEmployee.isMfgOperator());
             moFieldIsActive.setFieldValue(moEmployee.isActive());
             moFieldDateBirth.setFieldValue(moEmployee.getDateBirth());
             focusLostDateBirth();
@@ -2815,12 +2827,15 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
             moFieldFkEmployeeType.setFieldValue(new int[] { moEmployee.getFkEmployeeTypeId() });
             moFieldFkWorkerType.setFieldValue(new int[] { moEmployee.getFkWorkerTypeId() });
+            moFieldIsUnionized.setFieldValue(moEmployee.isUnionized());
+            moFieldIsMfgOperator.setFieldValue(moEmployee.isMfgOperator());
             moFieldFkDepartment.setFieldValue(new int[] { moEmployee.getFkDepartmentId() });
             itemStateChangedDepartament();
             moFieldFkPosition.setFieldValue(new int[] { moEmployee.getFkPositionId() });
             moFieldFkShift.setFieldValue(new int[] { moEmployee.getFkShiftId() });
             moFieldFkWorkingDayType.setFieldValue(new int[] { moEmployee.getFkWorkingDayTypeId()});
             moFieldWorkingHoursDay.setFieldValue(moEmployee.getWorkingHoursDay());
+            moFieldIsOvertime.setFieldValue(moEmployee.isOvertime());
             moFieldFkContractType.setFieldValue(new int[] { moEmployee.getFkContractTypeId() });
             itemStateChangedContractType();
             moFieldContractExpiration.setFieldValue(moEmployee.getContractExpiration_n());
@@ -3038,6 +3053,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moEmployee.setDateSalarySscBase(moFieldDateChangeSalarySscBase.getDate() == null ? miClient.getSession().getCurrentDate() : moFieldDateChangeSalarySscBase.getDate());
         
         moEmployee.setWorkingHoursDay(moFieldWorkingHoursDay.getInteger());
+        moEmployee.setOvertime(moFieldIsOvertime.getBoolean());
         moEmployee.setContractExpiration_n(SHrsEmployeeUtils.isContractTypeIndefinite(moFieldFkContractType.getKeyAsIntArray()[0]) ? null : moFieldContractExpiration.getDate());
         moEmployee.setBankAccount(moFieldBankAccount.getString());
         moEmployee.setGroceryServiceAccount(moFieldGroceryServiceAccount.getString());

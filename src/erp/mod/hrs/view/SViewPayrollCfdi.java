@@ -535,7 +535,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 else if (!gridRow.isUpdatable()) {
                     miClient.showMsgBoxWarning(SDbConsts.MSG_REG_ + gridRow.getRowName() + SDbConsts.MSG_REG_NON_UPDATABLE);
                 }
-                else if (miClient.showMsgBoxConfirm("¿Está seguro que desea enviar vía mail " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "los recibos de nómina" : "el recibo de nómina") + "?") == JOptionPane.YES_OPTION) {
+                else if (miClient.showMsgBoxConfirm("¿Está seguro que desea enviar vía mail " + (mnGridSubtype == SModConsts.VIEW_SC_SUM ? "los" : "el") + " CFDI de nómina?") == JOptionPane.YES_OPTION) {
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_SUM) {
                             SCfdUtils.sendCfd((SClientInterface) miClient, SCfdUtils.getPayrollCfds((SClientInterface) miClient, (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR), gridRow.getRowPrimaryKey()), (isCfdiPayrollVersionOld() ? SCfdConsts.CFDI_PAYROLL_VER_OLD : SCfdConsts.CFDI_PAYROLL_VER_CUR));
@@ -786,7 +786,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                     + "pay_num AS " + SDbConsts.FIELD_NAME + ", "
                     + "pay_num, "
                     + "pay_year, pay_per, "
-                    + "pay_type, pay_sht_type, "
+                    + "pay_type, pay_sht_type, pay_sht_cus_type, "
                     + "dt_beg, dt_end, pay_notes, "
                     + "f_debit, f_credit, f_balance, "
                     + "count_rcps, ";
@@ -838,7 +838,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
             if (isCfdiPayrollVersionOld()) {
                 msSql += "FROM ( "
                         + "SELECT v.id_pay AS id_pay, v.pay_num, v.pay_year, v.pay_per, "
-                        + "v.pay_type AS pay_type, IF(v.b_reg, 'NORMAL', 'ESPECIAL') AS pay_sht_type, v.dt_beg, v.dt_end, '' AS pay_notes, "
+                        + "v.pay_type AS pay_type, IF(v.b_reg, 'NORMAL', 'ESPECIAL') AS pay_sht_type, '' AS pay_sth_cus_type, v.dt_beg, v.dt_end, '' AS pay_notes, "
                         + "pe.id_emp, pe.num_ser AS rcp_num_ser, pe.num AS rcp_num, "
                         + "'' AS f_dt_iss, "
                         + "'' AS f_dt_pay, "
@@ -857,7 +857,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
             else {
                 msSql += "FROM ( "
                         + "SELECT v.id_pay AS id_pay, v.num AS pay_num, v.per_year AS pay_year, v.per AS pay_per, "
-                        + "tp.name AS pay_type, v.dt_sta AS dt_beg, v.dt_end, v.nts AS pay_notes, tpsht.name AS pay_sht_type, "
+                        + "tp.name AS pay_type, v.dt_sta AS dt_beg, v.dt_end, v.nts AS pay_notes, tpsht.name AS pay_sht_type, tpshtc.code AS pay_sht_cus_type, "
                         + "pe.id_emp, pei.id_iss, pei.num_ser AS rcp_num_ser, pei.num AS rcp_num, pei.fk_st_rcp, "
                         + "pei.dt_iss AS f_dt_iss, "
                         + "pei.dt_pay AS f_dt_pay, "
@@ -868,13 +868,14 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         + "(SELECT COUNT(*) FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " WHERE b_del = 0 AND id_pay = v.id_pay GROUP BY id_pay ) AS count_rcps "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS v "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " AS tp ON v.fk_tp_pay = tp.id_tp_pay "
+                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_PAY_SHT_CUS) + " AS tpshtc ON v.fk_tp_pay_sht_cus = tpshtc.id_tp_pay_sht_cus "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " AS tpsht ON v.fk_tp_pay_sht = tpsht.id_tp_pay_sht "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pe ON v.id_pay = pe.id_pay AND pe.b_del = 0 "
                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pei ON pe.id_pay = pei.id_pay AND pe.id_emp = pei.id_emp AND pei.b_del = 0 " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? "" : " AND pei.fk_st_rcp <> " + SModSysConsts.TRNS_ST_DPS_ANNULED + " ")
                         + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_PAY_SYS) + " AS tpsys ON pei.fk_tp_pay_sys = tpsys.id_tp_pay_sys "
                         + "WHERE v.b_del = 0 " + (sql.isEmpty() ? "" : "AND " + sql)
                         + "GROUP BY v.id_pay, v.per_year, v.per, v.num, pay_type, v.dt_sta, v.dt_end " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pei.id_iss " : "")
-                        + "ORDER BY v.per_year, v.per, pay_type ,v.num, v.id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pei.id_iss " : "")
+                        + "ORDER BY v.per_year, v.per, pay_type, v.num, v.id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pei.id_iss " : "")
                         + ") AS t ";
             }
 
@@ -892,9 +893,9 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
             }
         }
         
-        msSql += "GROUP BY id_pay, pay_year, pay_per, pay_type, pay_sht_type, t.dt_beg, t.dt_end " +
+        msSql += "GROUP BY id_pay, pay_year, pay_per, pay_type, pay_sht_cus_type, pay_sht_type, t.dt_beg, t.dt_end " +
                 (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", t.id_emp, f_id_bp, c.id_cfd " : "") +
-                "ORDER BY pay_year, pay_per, pay_type, pay_num, pay_sht_type, id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", rcp_num, f_bp, f_id_bp " : "");
+                "ORDER BY pay_year, pay_per, pay_type, pay_num, pay_sht_cus_type, pay_sht_type, id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", rcp_num, f_bp, f_id_bp " : "");
     }
 
     @Override
@@ -907,6 +908,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "pay_num", "Número nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_beg", "F. inicial nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "dt_end", "F. final nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "pay_sht_cus_type", "Tipo nómina empresa"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "pay_sht_type", "Tipo nómina"));
         if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
             gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_ICON, "_ico", "Estatus CFD"));

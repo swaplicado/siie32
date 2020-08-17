@@ -7,7 +7,7 @@ package erp.mod;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Sergio Flores
  */
 public abstract class SModSysConsts {
 
@@ -42,6 +42,7 @@ public abstract class SModSysConsts {
     public static final int CFGS_TP_MMS_CON_SAL = 2;
     public static final int CFGS_TP_MMS_ORD_SAL = 3;
     public static final int CFGS_TP_MMS_ORD_PUR = 4;
+    public static final int CFGS_TP_MMS_PAYROLL = 6;
     public static final int CFGS_TP_MMS_FIN_PAY_AUTH_REQ = 11;
 
     public static final int CFGU_CUR_MXN = 1;
@@ -991,6 +992,11 @@ public abstract class SModSysConsts {
     public static final int HRSS_GROCERY_SRV_NON = 1;       // Non applicable
     public static final int HRSS_GROCERY_SRV_SI_VALE = 2;   // Sí Vale
 
+    public static final int HRSS_BONUS_NON = 1;                 // Non applicable
+    public static final int HRSS_BONUS_AETH_FOOD = 101;         // AETH/ Food
+    public static final int HRSS_BONUS_AETH_FOOD_KIND = 102;    // AETH/ Food In Kind
+    public static final int HRSS_BONUS_AETH_SUPER_BONUS = 103;  // AETH/ Super Bonus
+    
     public static final int HRSU_CL_ABS_ABS = 1;    // Absence
     public static final int HRSU_CL_ABS_DIS = 2;    // Disease
     public static final int HRSU_CL_ABS_VAC = 3;    // Vacation
@@ -1017,4 +1023,8 @@ public abstract class SModSysConsts {
 
     public static final int HRS_AUT_GBL = 1;
     public static final int HRS_AUT_EMP = 2;
+    
+    public static final int HRS_CFG_TIME_CLOCK_POL_ALL = 1;
+    public static final int HRS_CFG_TIME_CLOCK_POL_OFF = 2;
+    public static final int HRS_CFG_TIME_CLOCK_POL_NON_OFF = 3;
 }

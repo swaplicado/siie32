@@ -620,6 +620,7 @@ public abstract class SModConsts {
     public static final int HRSU_TP_EMP = 2062011;
     public static final int HRSU_TP_WRK = 2062012;
     public static final int HRSU_TP_MWZ = 2062021;
+    public static final int HRSU_TP_PAY_SHT_CUS = 2062025;
     public static final int HRSU_DEP = 2062031;
     public static final int HRSU_POS = 2062032;
     public static final int HRSU_SHT = 2062033;
@@ -1193,6 +1194,7 @@ public abstract class SModConsts {
         TablesMap.put(HRSU_TP_EMP, "erp.hrsu_tp_emp");
         TablesMap.put(HRSU_TP_WRK, "erp.hrsu_tp_wrk");
         TablesMap.put(HRSU_TP_MWZ, "erp.hrsu_tp_mwz");
+        TablesMap.put(HRSU_TP_PAY_SHT_CUS, "erp.hrsu_tp_pay_sht_cus");
         TablesMap.put(HRSU_DEP, "erp.hrsu_dep");
         TablesMap.put(HRSU_POS, "erp.hrsu_pos");
         TablesMap.put(HRSU_SHT, "erp.hrsu_sht");

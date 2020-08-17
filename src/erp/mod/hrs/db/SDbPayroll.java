@@ -218,6 +218,17 @@ public class SDbPayroll extends SDbRegistryUser {
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceipts() { return maChildPayrollReceipts; }
     public ArrayList<SDbPayrollReceipt> getChildPayrollReceiptsToDelete() { return maChildPayrollReceiptsToDelete; }
     
+    public SDbPayrollReceipt getChildPayrollReceipt(final int[] key) {
+        SDbPayrollReceipt payrollReceipt = null;
+        for (SDbPayrollReceipt pr : maChildPayrollReceipts) {
+            if (SLibUtils.compareKeys(key, pr.getPrimaryKey())) {
+                payrollReceipt = pr;
+                break;
+            }
+        }
+        return payrollReceipt;
+    }
+    
     /**
      * Create or update payroll receipt issues when payroll is closed.
      * @param session

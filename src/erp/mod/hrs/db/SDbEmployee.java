@@ -28,7 +28,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  * Used mainly in re-hiring and dismissal operations.
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SDbEmployee extends SDbRegistryUser {
     
@@ -59,6 +59,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected java.sql.Blob moImageSignature_n;
     protected boolean mbUnionized;
     protected boolean mbMfgOperator;
+    protected boolean mbOvertime;
     protected boolean mbActive;
     /*
     protected boolean mbDeleted;
@@ -133,6 +134,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setImageSignature_n(java.sql.Blob o) { moImageSignature_n = o; }
     public void setUnionized(boolean b) { mbUnionized = b; }
     public void setMfgOperator(boolean b) { mbMfgOperator = b; }
+    public void setOvertime(boolean b) { mbOvertime = b; }
     public void setActive(boolean b) { mbActive = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
@@ -187,6 +189,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public java.sql.Blob getImageSignature_n() { return moImageSignature_n; }
     public boolean isUnionized() { return mbUnionized; }
     public boolean isMfgOperator() { return mbMfgOperator; }
+    public boolean isOvertime() { return mbOvertime; }
     public boolean isActive() { return mbActive; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
@@ -334,6 +337,7 @@ public class SDbEmployee extends SDbRegistryUser {
         moImageSignature_n = null;
         mbUnionized = false;
         mbMfgOperator = false;
+        mbOvertime = false;
         mbActive = false;
         mbDeleted = false;
         mbSystem = false;
@@ -441,6 +445,7 @@ public class SDbEmployee extends SDbRegistryUser {
             oSignature_n = resultSet.getBlob("img_sig_n");
             mbUnionized = resultSet.getBoolean("b_uni");
             mbMfgOperator = resultSet.getBoolean("b_mfg_ope");
+            mbOvertime = resultSet.getBoolean("b_overtime");
             mbActive = resultSet.getBoolean("b_act");
             mbDeleted = resultSet.getBoolean("b_del");
             mbSystem = resultSet.getBoolean("b_sys");
@@ -532,6 +537,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "NULL, " +
                     (mbUnionized ? 1 : 0) + ", " + 
                     (mbMfgOperator ? 1 : 0) + ", " + 
+                    (mbOvertime ? 1 : 0) + ", " + 
                     (mbActive ? 1 : 0) + ", " + 
                     (mbDeleted ? 1 : 0) + ", " + 
                     (mbSystem ? 1 : 0) + ", " + 
@@ -595,6 +601,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     */
                     "b_uni = " + (mbUnionized ? 1 : 0) + ", " +
                     "b_mfg_ope = " + (mbMfgOperator ? 1 : 0) + ", " +
+                    "b_overtime = " + (mbOvertime ? 1 : 0) + ", " +
                     "b_act = " + (mbActive ? 1 : 0) + ", " +
                     "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
@@ -699,6 +706,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setImageSignature_n(this.getImageSignature_n());
         registry.setUnionized(this.isUnionized());
         registry.setMfgOperator(this.isMfgOperator());
+        registry.setOvertime(this.isOvertime());
         registry.setActive(this.isActive());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());

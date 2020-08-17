@@ -193,7 +193,7 @@ public class SShareDB {
                 + "    e.dt_ben, "
                 + "    e.dt_hire, "
                 + "    e.dt_dis_n, "
-                + "    e.b_uni AS x_time, "
+                + "    e.b_overtime, "
                 + "    e.fk_tp_pay, "
                 + "    e.fk_dep, "
                 + "    e.b_act, "
@@ -224,7 +224,7 @@ public class SShareDB {
                 emp.firstname = res.getString("firstname");
                 emp.admission_date = res.getString("dt_hire");
                 emp.leave_date = res.getString("dt_dis_n");
-                emp.extra_time = res.getBoolean("x_time");
+                emp.extra_time = res.getBoolean("b_overtime");
                 emp.way_pay = res.getInt("fk_tp_pay");
                 emp.dept_rh_id = res.getInt("fk_dep");
                 emp.is_active = res.getBoolean("b_act");

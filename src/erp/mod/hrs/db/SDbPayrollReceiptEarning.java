@@ -338,7 +338,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     (mbSystem ? 1 : 0) + ", " + 
                     mnFkEarningTypeId + ", " + 
                     mnFkEarningId + ", " + 
-                    (mnFkBonusId == 0 ? 1 : mnFkBonusId) + ", " + 
+                    mnFkBonusId + ", " + 
                     mnFkBenefitTypeId + ", " + 
                     (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +
@@ -380,7 +380,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
                     "b_sys = " + (mbSystem ? 1 : 0) + ", " +
                     "fk_tp_ear = " + mnFkEarningTypeId + ", " +
                     "fk_ear = " + mnFkEarningId + ", " +
-                    "fk_bonus = " + (mnFkBonusId == 0 ? 1 : mnFkBonusId) + ", " +
+                    "fk_bonus = " + mnFkBonusId + ", " +
                     "fk_tp_ben = " + mnFkBenefitTypeId + ", " +
                     "fk_loan_emp_n = " + (mnFkLoanEmployeeId_n > 0 ? mnFkLoanEmployeeId_n : "NULL") + ", " +
                     "fk_loan_loan_n = " + (mnFkLoanLoanId_n > 0 ? mnFkLoanLoanId_n : "NULL") + ", " +

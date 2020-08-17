@@ -5,6 +5,7 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptEarningComplement;
@@ -24,7 +25,7 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Sergio Flores
  */
 public class SFormLoanAdjustmentEarning extends SBeanForm implements ItemListener {
 
@@ -284,6 +285,7 @@ public class SFormLoanAdjustmentEarning extends SBeanForm implements ItemListene
         registry.setAlternativeTaxCalculation(earning.isAlternativeTaxCalculation());// XXX (jbarajas, 2016-04-06) articule 174 RLISR
         registry.setFkEarningTypeId(earning.getFkEarningTypeId());
         registry.setFkEarningId(earning.getPkEarningId());
+        registry.setFkBonusId(SModSysConsts.HRSS_BONUS_NON);
         registry.setFkBenefitTypeId(earning.getFkBenefitTypeId());
         registry.setFkLoanTypeId_n(moKeyLoanType.getValue()[0]);
         registry.setFkLoanEmployeeId_n(moKeyLoan.getValue()[0]);

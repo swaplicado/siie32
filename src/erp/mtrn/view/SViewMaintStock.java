@@ -24,12 +24,13 @@ import java.awt.Dimension;
 import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridUtils;  
 
 /**
  *
- * @author Sergio Flores, Gil De Jesús, Claudio Peña
+ * @author Sergio Flores, Gil De Jesús, Claudio Peña, Sergio Flores
  */
 public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -85,6 +86,8 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperSeparator();
         
+        int levelRightMaint = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_MAINT);
+        
         switch (mnTabTypeAux01) {
             case SModSysConsts.TRNX_MAINT_PART:
                 break;
@@ -97,39 +100,44 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 jbMaintLentEmpOut.setPreferredSize(new Dimension(23, 23));
                 jbMaintLentEmpOut.setToolTipText("Préstamo herramienta empleado");
                 jbMaintLentEmpOut.addActionListener(this);
+                jbMaintLentEmpOut.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
                 addTaskBarUpperComponent(jbMaintLentEmpOut);
 
                 jbMaintLentContOut = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_maint_lent_cont_out.gif")));
                 jbMaintLentContOut.setPreferredSize(new Dimension(23, 23));
                 jbMaintLentContOut.setToolTipText("Préstamo herramienta contratista");
                 jbMaintLentContOut.addActionListener(this);
+                jbMaintLentContOut.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
                 addTaskBarUpperComponent(jbMaintLentContOut);
 
                 jbMaintMaintOut = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_maint_maint_out.gif")));
                 jbMaintMaintOut.setPreferredSize(new Dimension(23, 23));
                 jbMaintMaintOut.setToolTipText("Mantenimiento herramienta");
                 jbMaintMaintOut.addActionListener(this);
+                jbMaintMaintOut.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
                 addTaskBarUpperComponent(jbMaintMaintOut);
 
                 jbMaintLostOut = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_maint_lost_out.gif")));
                 jbMaintLostOut.setPreferredSize(new Dimension(23, 23));
                 jbMaintLostOut.setToolTipText("Extravío herramienta");
                 jbMaintLostOut.addActionListener(this);
+                jbMaintLostOut.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
                 addTaskBarUpperComponent(jbMaintLostOut);
                 break;
                 
             case SModSysConsts.TRNX_MAINT_TOOL_LENT:
                 jbMaintLentEmpIn = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_maint_lent_emp_in.gif")));
-                
                 jbMaintLentEmpIn.setPreferredSize(new Dimension(23, 23));
                 jbMaintLentEmpIn.setToolTipText("Devolución herramienta empleado");
                 jbMaintLentEmpIn.addActionListener(this);
+                jbMaintLentEmpIn.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
                 addTaskBarUpperComponent(jbMaintLentEmpIn);
 
                 jbMaintLentContIn = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_stk_maint_lent_cont_in.gif")));
                 jbMaintLentContIn.setPreferredSize(new Dimension(23, 23));
                 jbMaintLentContIn.setToolTipText("Devolución herramienta contratista");
                 jbMaintLentContIn.addActionListener(this);
+                jbMaintLentContIn.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
                 addTaskBarUpperComponent(jbMaintLentContIn);
 
                 break;
@@ -139,6 +147,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 jbMaintMaintIn.setPreferredSize(new Dimension(23, 23));
                 jbMaintMaintIn.setToolTipText("Devolución herramienta mantenimiento");
                 jbMaintMaintIn.addActionListener(this);
+                jbMaintMaintIn.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
                 addTaskBarUpperComponent(jbMaintMaintIn);
                 break;
                 
@@ -147,6 +156,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 jbMaintLostIn.setPreferredSize(new Dimension(23, 23));
                 jbMaintLostIn.setToolTipText("Devolución herramienta extraviada");
                 jbMaintLostIn.addActionListener(this);
+                jbMaintLostIn.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
                 addTaskBarUpperComponent(jbMaintLostIn);
                 break;
                 
@@ -189,7 +199,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[9];
+                aoTableColumns = new STableColumn[10];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL_LOST:           
@@ -198,7 +208,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[9];
+                aoTableColumns = new STableColumn[10];
                 break;
 
             default:
@@ -369,20 +379,46 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
         
         int[] warehouseKey;
         if (mnTabTypeAux01 == SModSysConsts.TRNX_MAINT_TOOL) {
-            // special case, gather all tools warehouses
+            // special case, gather all tools warehouses:
+            
             sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "(";
+            
             warehouseKey = moMaintConfig.getKeyWarehouseToolsAvailable();
+            if (warehouseKey == null) {
+                warehouseKey = new int[2];
+                miClient.showMsgBoxWarning("No se ha configurado el almacén 'herramientas disponibles' del submódulo de mantenimiento.");
+            }            
             sqlWhere += "(s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + ") OR ";
+            
             warehouseKey = moMaintConfig.getKeyWarehouseToolsLent();
+            if (warehouseKey == null) {
+                warehouseKey = new int[2];
+                miClient.showMsgBoxWarning("No se ha configurado el almacén 'herramientas en préstamo' del submódulo de mantenimiento.");
+            }            
             sqlWhere += "(s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + ") OR ";
+            
             warehouseKey = moMaintConfig.getKeyWarehouseToolsMaint();
+            if (warehouseKey == null) {
+                warehouseKey = new int[2];
+                miClient.showMsgBoxWarning("No se ha configurado el almacén 'herramientas en mantto.' del submódulo de mantenimiento.");
+            }            
             sqlWhere += "(s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + ") OR ";
+            
             warehouseKey = moMaintConfig.getKeyWarehouseToolsLost();
+            if (warehouseKey == null) {
+                warehouseKey = new int[2];
+                miClient.showMsgBoxWarning("No se ha configurado el almacén 'herramientas extraviadas' del submódulo de mantenimiento.");
+            }            
             sqlWhere += "(s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + ")";
+            
             sqlWhere += ")";
         }
         else {
             warehouseKey = getWarehouseKey();
+            if (warehouseKey == null) {
+                warehouseKey = new int[2];
+                miClient.showMsgBoxWarning("No se han configurado los almacenes del submódulo de mantenimiento.");
+            }            
             sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " ";
         }
         

@@ -5,14 +5,11 @@
 package erp.mod.hrs.form;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConditionalEarning;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
@@ -25,9 +22,9 @@ import sa.lib.gui.bean.SBeanForm;
 
 /**
  *
- * @author Edwin Carmona
+ * @author Edwin Carmona, Sergio Flores
  */
-public class SFormConditionalEarning extends SBeanForm implements ActionListener, ItemListener {
+public class SFormConditionalEarning extends SBeanForm implements ItemListener {
 
     private SDbConditionalEarning moRegistry;
 
@@ -52,8 +49,7 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jPanel9 = new javax.swing.JPanel();
-        jpRow = new javax.swing.JPanel();
+        jpRegistry = new javax.swing.JPanel();
         jPanel25 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jlEarning = new javax.swing.JLabel();
@@ -71,11 +67,11 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
         jlDateStart = new javax.swing.JLabel();
         moDateDateStart = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel27 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        moAmount = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlAmount = new javax.swing.JLabel();
+        moDecAmount = new sa.lib.gui.bean.SBeanFieldDecimal();
         jPanel28 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        moPercentage = new sa.lib.gui.bean.SBeanFieldDecimal();
+        jlPercentage = new javax.swing.JLabel();
+        moDecPercentage = new sa.lib.gui.bean.SBeanFieldDecimal();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -83,17 +79,14 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
             }
         });
 
-        jPanel9.setLayout(new java.awt.BorderLayout());
-        getContentPane().add(jPanel9, java.awt.BorderLayout.NORTH);
+        jpRegistry.setBorder(javax.swing.BorderFactory.createTitledBorder("Percepciones:"));
+        jpRegistry.setLayout(new java.awt.BorderLayout());
 
-        jpRow.setBorder(javax.swing.BorderFactory.createTitledBorder("Percepciones:"));
-        jpRow.setLayout(new java.awt.BorderLayout());
+        jPanel25.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
-        jPanel25.setLayout(new java.awt.GridLayout(7, 1));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
-
-        jlEarning.setText("Percepción:");
+        jlEarning.setText("Percepción:*");
         jlEarning.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel5.add(jlEarning);
 
@@ -102,9 +95,9 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
 
         jPanel25.add(jPanel5);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlBonus.setText("Bono:");
+        jlBonus.setText("Bono:*");
         jlBonus.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlBonus);
 
@@ -115,7 +108,7 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
 
         jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlScopeId.setText("Alcance:*");
+        jlScopeId.setText("Ámbito:*");
         jlScopeId.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel14.add(jlScopeId);
 
@@ -135,9 +128,9 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
 
         jPanel25.add(jPanel13);
 
-        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlDateStart.setText("Fecha inicio*:");
+        jlDateStart.setText("Fecha inicio:*");
         jlDateStart.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel24.add(jlDateStart);
 
@@ -146,27 +139,27 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
 
         jPanel25.add(jPanel24);
 
-        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jLabel2.setText("Monto:");
-        jLabel2.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel27.add(jLabel2);
-        jPanel27.add(moAmount);
+        jlAmount.setText("Monto:");
+        jlAmount.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel27.add(jlAmount);
+        jPanel27.add(moDecAmount);
 
         jPanel25.add(jPanel27);
 
-        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING));
+        jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jLabel3.setText("Pocentaje:");
-        jLabel3.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel28.add(jLabel3);
-        jPanel28.add(moPercentage);
+        jlPercentage.setText("Pocentaje:");
+        jlPercentage.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel28.add(jlPercentage);
+        jPanel28.add(moDecPercentage);
 
         jPanel25.add(jPanel28);
 
-        jpRow.add(jPanel25, java.awt.BorderLayout.NORTH);
+        jpRegistry.add(jPanel25, java.awt.BorderLayout.NORTH);
 
-        getContentPane().add(jpRow, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jpRegistry, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -175,8 +168,6 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel24;
@@ -185,50 +176,64 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
     private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel9;
+    private javax.swing.JLabel jlAmount;
     private javax.swing.JLabel jlBonus;
     private javax.swing.JLabel jlDateStart;
     private javax.swing.JLabel jlEarning;
+    private javax.swing.JLabel jlPercentage;
     private javax.swing.JLabel jlReference;
     private javax.swing.JLabel jlScopeId;
-    private javax.swing.JPanel jpRow;
-    private sa.lib.gui.bean.SBeanFieldDecimal moAmount;
+    private javax.swing.JPanel jpRegistry;
     private sa.lib.gui.bean.SBeanFieldDate moDateDateStart;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecAmount;
+    private sa.lib.gui.bean.SBeanFieldDecimal moDecPercentage;
     private sa.lib.gui.bean.SBeanFieldKey moKeyBonus;
     private sa.lib.gui.bean.SBeanFieldKey moKeyEarning;
     private sa.lib.gui.bean.SBeanFieldKey moKeyReference;
     private sa.lib.gui.bean.SBeanFieldKey moKeyScope;
-    private sa.lib.gui.bean.SBeanFieldDecimal moPercentage;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 660, 400);
+        SGuiUtils.setWindowBounds(this, 640, 400);
 
         moKeyEarning.setKeySettings(miClient, SGuiUtils.getLabelName(jlEarning.getText()), true);
         moKeyBonus.setKeySettings(miClient, SGuiUtils.getLabelName(jlBonus.getText()), true);
         moKeyScope.setKeySettings(miClient, SGuiUtils.getLabelName(jlScopeId.getText()), true);
         moKeyReference.setKeySettings(miClient, SGuiUtils.getLabelName(jlReference.getText()), true);
-        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart), false);
+        moDateDateStart.setDateSettings(miClient, SGuiUtils.getLabelName(jlDateStart), true);
+        moDecAmount.setDecimalSettings(SGuiUtils.getLabelName(jlAmount), SGuiConsts.GUI_TYPE_DEC_AMT, false);
+        moDecPercentage.setDecimalSettings(SGuiUtils.getLabelName(jlPercentage), SGuiConsts.GUI_TYPE_DEC_PER_DISC, false);
 
         moFields.addField(moKeyEarning);
         moFields.addField(moKeyBonus);
         moFields.addField(moKeyScope);
         moFields.addField(moKeyReference);
         moFields.addField(moDateDateStart);
+        moFields.addField(moDecAmount);
+        moFields.addField(moDecPercentage);
+        
+        moFields.setFormButton(jbSave);
     }
 
     private void itemStateChangedScope() {
-        switch (moKeyScope.getSelectedItem().getPrimaryKey()[0]) {
-            case 2:
-                miClient.getSession().populateCatalogue(moKeyReference, SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, null);
-                break;
-            case 3:
-                miClient.getSession().populateCatalogue(moKeyReference, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
-                break;
-            default:
-                moKeyReference.setSelectedItem(new int[] { 0 });
-                moKeyReference.setEnabled(false);
-                break;
+        if (moKeyScope.getSelectedIndex() <= 0) {
+            moKeyReference.removeAllItems();
+            moKeyReference.setEnabled(false);
+        }
+        else {
+            switch (moKeyScope.getSelectedItem().getPrimaryKey()[0]) {
+                case SModSysConsts.HRSS_TP_ACC_DEP:
+                    miClient.getSession().populateCatalogue(moKeyReference, SModConsts.HRSU_DEP, SLibConsts.UNDEFINED, null);
+                    moKeyReference.setEnabled(true);
+                    break;
+                case SModSysConsts.HRSS_TP_ACC_EMP:
+                    miClient.getSession().populateCatalogue(moKeyReference, SModConsts.HRSU_EMP, SLibConsts.UNDEFINED, null);
+                    moKeyReference.setEnabled(true);
+                    break;
+                default:
+                    moKeyReference.removeAllItems();
+                    moKeyReference.setEnabled(false);
+            }
         }
     }
     
@@ -237,8 +242,8 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
         moKeyScope.setSelectedItem(null);
         moKeyEarning.setValue(null);
         moKeyBonus.setValue(null);
-        moAmount.setValue(0d);
-        moPercentage.setValue(0d);
+        moDecAmount.setValue(0d);
+        moDecPercentage.setValue(0d);
     }
     
     @Override
@@ -274,23 +279,30 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
         reloadCatalogues();
         
         if (moRegistry.isRegistryNew()) {
-            moKeyScope.setValue(new int[] { 2 });
+            moRegistry.initPrimaryKey();
+            jtfRegistryKey.setText("");
         }
         else {
-            moKeyEarning.setValue(new int[] { moRegistry.getFkEarningId()});
-            moKeyBonus.setValue(new int[] { moRegistry.getFkBonusId()});
-            moKeyScope.setValue(new int[] { moRegistry.getFkScopeId() });
-            moDateDateStart.setValue(moRegistry.getStartDate());
-            moAmount.setValue(moRegistry.getAmount());
-            moPercentage.setValue(moRegistry.getPercentage());
+            jtfRegistryKey.setText(SLibUtils.textKey(moRegistry.getPrimaryKey()));
         }
         
+        moKeyEarning.setValue(new int[] { moRegistry.getFkEarningId()});
+        moKeyBonus.setValue(new int[] { moRegistry.getFkBonusId()});
+        moKeyScope.setValue(new int[] { moRegistry.getFkScopeId() });
         itemStateChangedScope();
         moKeyReference.setValue(new int[] { moRegistry.getFkReferenceId() });
+        moDateDateStart.setValue(moRegistry.getStartDate());
+        moDecAmount.setValue(moRegistry.getAmount());
+        moDecPercentage.setValue(moRegistry.getPercentage());
         
-        jtfRegistryKey.setText(moRegistry.getPrimaryKey()[0] + "");
-
         setFormEditable(true);
+        
+        if (moRegistry.isRegistryNew()) {
+        }
+        else {
+        }
+        
+        moKeyReference.setEnabled(moKeyScope.getSelectedIndex() > 0 && moKeyScope.getValue()[0] > SModSysConsts.HRSS_TP_ACC_GBL);
 
         addAllListeners();
     }
@@ -301,13 +313,13 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
 
         if (registry.isRegistryNew()) {}
         
-        registry.setAmount(moAmount.getValue());
-        registry.setPercentage(moPercentage.getValue());
-        registry.setFkEarningId(moKeyEarning.getValue()[0]);
-        registry.setFkBonusId(moKeyBonus.getValue()[0]);
-        registry.setFkScopeId(moKeyScope.getValue()[0]);
-        registry.setFkReferenceId(moKeyReference.getValue().length == 0 ? 0 : moKeyReference.getValue()[0]);
         registry.setStartDate(moDateDateStart.getValue());
+        registry.setAmount(moDecAmount.getValue());
+        registry.setPercentage(moDecPercentage.getValue());
+        registry.setFkEarningId(moKeyEarning.getValue()[0]);
+        registry.setFkScopeId(moKeyScope.getValue()[0]);
+        registry.setFkReferenceId(moKeyScope.getSelectedIndex() > 0 && moKeyScope.getValue()[0] > SModSysConsts.HRSS_TP_ACC_GBL ? moKeyReference.getValue()[0] : 0);
+        registry.setFkBonusId(moKeyBonus.getValue()[0]);
         
         return registry;
     }
@@ -315,18 +327,23 @@ public class SFormConditionalEarning extends SBeanForm implements ActionListener
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        
+        if (validation.isValid()) {
+            if (moDecAmount.getValue() == 0 && moDecPercentage.getValue() == 0) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlAmount) + "' o '" + SGuiUtils.getLabelName(jlPercentage) + "'.");
+                validation.setComponent(moDecAmount);
+            }
+            else if (moDecAmount.getValue() != 0 && moDecPercentage.getValue() != 0) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlAmount) + "' o '" + SGuiUtils.getLabelName(jlPercentage) + "', pero no para ambos simultáneamente.");
+                validation.setComponent(moDecAmount);
+            }
+            else if (moKeyScope.getValue()[0] == SModSysConsts.HRSS_TP_ACC_DEP && moKeyReference.getValue()[0] == SModSysConsts.HRSU_DEP_NON){
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlReference) + "'.");
+                validation.setComponent(moKeyReference);
+            }
+        }
 
         return validation;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() instanceof JButton) {
-            JButton button = (JButton) e.getSource();
-        }
-        else if (e.getSource() instanceof JTextField) {
-            JTextField textField = (JTextField) e.getSource();
-        }
     }
 
     @Override
