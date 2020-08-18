@@ -1,4 +1,16 @@
 ================================================================================
+SIIE 3.2 172.4/ 2020-08-17
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Conclusión del desarrollo para la importación de documentos desde un XML con orden de compra y sin orden de compra.
+2) Adición de las variables SErpConsts.VAL_QTY_MAX_DECS y SErpConsts.VAL_PRC_UNT_MAX_DECS.
+3) Adición de las variables SDataDps.mbAuxKeepDpsData, SDataDps.mbAuxKeepExchangeRate, 
+    SDataDps.msAuxFileXmlAbsolutePath y SDataDps.msAuxFileXmlName como auxiliares en la importación de documentos.
+4) Creación del método SCfdUtils.getCfdIdByUuid() para la obtencion del ID del CFDI a travez del UUID.
+5) Modificación de la clase de CFDI de recepción de pagos (erp.mtrn.form.SFormCfdPayment) 
+    para que la fecha de recepción pueda ser cambiada en cualquier momento.
+
+================================================================================
 SIIE 3.2 172.3/ 2020-08-06
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

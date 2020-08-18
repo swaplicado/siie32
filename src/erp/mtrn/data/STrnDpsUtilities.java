@@ -60,6 +60,9 @@ public abstract class STrnDpsUtilities {
 
     /**
      * Checks if source order is authorized.
+     * @param client GUI client.
+     * @param dps DPS.
+     * @return 
      */
     public static boolean isDpsAuthorized(final SClientInterface client, final SDataDps dps) {
         boolean authorized = true;

@@ -101,13 +101,13 @@ import sa.lib.xml.SXmlUtils;
 /**
  * SIIE Client.
  * 
- * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Sergio Flores
+ * @author  Sergio Flores, Uriel Castañeda, Juan Barajas, Sergio Flores, Isabel Servín
  * @version 3.2
  */
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 172.3"; // fecha release: 2020-08-06
+    public static final String APP_RELEASE = "3.2 172.4"; // fecha release: 2020-08-17
     public static final String APP_COPYRIGHT = "2007-2020";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -186,6 +186,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
     private ImageIcon moIconDocSupplyNo;
     private ImageIcon moIconDocType;
     private ImageIcon moIconDocImport;
+    private ImageIcon moIconDocImportCfd;
+    private ImageIcon moIconDocImportCfdOrd;
     private ImageIcon moIconDocOpen;
     private ImageIcon moIconDocClose;
     private ImageIcon moIconDocXml;
@@ -718,6 +720,8 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         moIconDocSupplyNo = new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_supply_rev.gif"));
         moIconDocType = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_type.gif"));
         moIconDocImport = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import.gif"));
+        moIconDocImportCfd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd.gif"));
+        moIconDocImportCfdOrd = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_import_cfd_ord.gif"));
         moIconDocOpen = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_open.gif"));
         moIconDocClose = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_close.gif"));
         moIconDocXml = new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"));
@@ -2052,6 +2056,12 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
                 break;
             case SLibConstants.ICON_DOC_IMPORT:
                 imageIcon = moIconDocImport;
+                break;
+            case SLibConstants.ICON_DOC_IMPORT_CFD:
+                imageIcon = moIconDocImportCfd;
+                break;
+            case SLibConstants.ICON_DOC_IMPORT_CFD_ORD:
+                imageIcon = moIconDocImportCfdOrd;
                 break;
             case SLibConstants.ICON_DOC_OPEN:
                 imageIcon = moIconDocOpen;

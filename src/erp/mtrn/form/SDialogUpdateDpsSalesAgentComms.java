@@ -250,7 +250,7 @@ public class SDialogUpdateDpsSalesAgentComms extends javax.swing.JDialog impleme
             jtfSalesSupervisorRo.setCaretPosition(0);
         }
     }
-
+    
     private void actionOk() {
         SFormValidation validation = formValidate();
 
