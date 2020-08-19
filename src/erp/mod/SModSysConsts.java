@@ -877,22 +877,24 @@ public abstract class SModSysConsts {
     public static final int HRSS_TP_EAR_EXEM_WCB_SEN = 43;  // Wage Contribution Base Seniority
     */
     
-    public static final int HRSS_TP_EAR_EAR = 1;        // Earnings
-    public static final int HRSS_TP_EAR_ANN_BONUS = 2;  // Bonus
-    public static final int HRSS_TP_EAR_PTU = 3;        // PTU
-    public static final int HRSS_TP_EAR_SAVINGS = 6;    // Savings bank
-    public static final int HRSS_TP_EAR_DISAB = 14;     // Disability
+    public static final int HRSS_TP_EAR_EAR = 1;            // Earnings
+    public static final int HRSS_TP_EAR_ANN_BONUS = 2;      // Bonus
+    public static final int HRSS_TP_EAR_PTU = 3;            // PTU
+    public static final int HRSS_TP_EAR_SAVINGS = 6;        // Savings bank
+    public static final int HRSS_TP_EAR_REWARD_PUNCT = 10;  // Reward for punctuality
+    public static final int HRSS_TP_EAR_DISAB = 14;         // Disability
     /** No longer belongs to oficial catalog, but preserved active for convenience because it is used internally by system. */    
-    public static final int HRSS_TP_EAR_TAX_SUB = 17;   // Tax Subsidy
-    public static final int HRSS_TP_EAR_OVER_TIME = 19; // Overtime
-    public static final int HRSS_TP_EAR_SUN_BONUS = 20; // Sunday Bonus
-    public static final int HRSS_TP_EAR_VAC_BONUS = 21; // Vacation Bonus
-    public static final int HRSS_TP_EAR_SEN_BONUS = 22; // Seniority Bonus 
-    public static final int HRSS_TP_EAR_SETT = 23;      // Settlement
-    public static final int HRSS_TP_EAR_COMP = 25;      // Compensation
-    public static final int HRSS_TP_EAR_FOOD = 29;      // Food
-    public static final int HRSS_TP_EAR_ASS_INC = 46;   // Assimilated income
-    public static final int HRSS_TP_EAR_OTH = 999;      // Other payments that are not income
+    public static final int HRSS_TP_EAR_TAX_SUB = 17;       // Tax Subsidy
+    public static final int HRSS_TP_EAR_OVER_TIME = 19;     // Overtime
+    public static final int HRSS_TP_EAR_SUN_BONUS = 20;     // Sunday Bonus
+    public static final int HRSS_TP_EAR_VAC_BONUS = 21;     // Vacation Bonus
+    public static final int HRSS_TP_EAR_SEN_BONUS = 22;     // Seniority Bonus 
+    public static final int HRSS_TP_EAR_SETT = 23;          // Settlement
+    public static final int HRSS_TP_EAR_COMP = 25;          // Compensation
+    public static final int HRSS_TP_EAR_FOOD = 29;          // Food
+    public static final int HRSS_TP_EAR_ASS_INC = 46;       // Assimilated income
+    public static final int HRSS_TP_EAR_REWARD_ATTEND = 49; // Reward for attendance
+    public static final int HRSS_TP_EAR_OTH = 999;          // Other payments that are not income
 
     public static final int HRSS_TP_OTH_PAY_NON = 0;                // Tax Refund of Overpayed Tax
     public static final int HRSS_TP_OTH_PAY_TAX_REF_OPT = 1;        // Tax Refund of Overpayed Tax
