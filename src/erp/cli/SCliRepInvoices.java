@@ -224,7 +224,7 @@ public class SCliRepInvoices {
     private String composeSql() {
         String sql = "SELECT "
                 + "item_key, item, id_item, unit_symbol, id_unit, "
-                + "bp, bp_comm, id_bp, cur_key, id_cur, "
+                + "bp, bp_comm, id_bp, cur_key, id_cur, _price, "
                 + "SUM(CASE WHEN fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_NA + " THEN _qty ELSE 0.00 END) AS _qty_inv, "
                 + "SUM(CASE WHEN fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_NA + " THEN _stot_cur_r ELSE 0.00 END) AS _stot_cur_r_inv, "
                 + "SUM(CASE WHEN fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_NA + " THEN _stot_r ELSE 0.00 END) AS _stot_r_inv, "
@@ -238,7 +238,7 @@ public class SCliRepInvoices {
                 + "FROM ("
                 + "SELECT "
                 + "i.item_key, i.item, i.id_item, u.symbol AS unit_symbol, u.id_unit, "
-                + "bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj, "
+                + "bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj, de.price_u_cur AS _price, "
                 + "SUM(de.qty) AS _qty, "
                 + "SUM(de.stot_cur_r) AS _stot_cur_r, SUM(de.stot_r) AS _stot_r "
                 + "FROM "
@@ -250,14 +250,15 @@ public class SCliRepInvoices {
                 + "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit "
                 + "WHERE NOT d.b_del AND NOT de.b_del AND "
                 + "d.fid_ct_dps = " + manDpsClassKeyInv[0] + " AND d.fid_cl_dps = " + manDpsClassKeyInv[1] + " AND "
-                + "d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND "
-                + "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' "
+                + "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                + "d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND de.fid_tp_dps_ety <> " + SDataConstantsSys.TRNS_TP_DPS_ETY_VIRT + " "
                 + "GROUP BY "
-                + "i.item_key, i.item, i.id_item, u.symbol, u.id_unit, bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj "
+                + "i.item_key, i.item, i.id_item, u.symbol, u.id_unit, "
+                + "bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj, de.price_u_cur "
                 + "UNION ALL "
                 + "SELECT "
                 + "i.item_key, i.item, i.id_item, u.symbol AS unit_symbol, u.id_unit, "
-                + "bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj, "
+                + "bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj, de.price_u_cur AS _price, "
                 + "SUM(CASE WHEN de.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " THEN -de.qty ELSE 0.0 END) AS _qty, "
                 + "SUM(-de.stot_cur_r) AS _stot_cur_r, SUM(-de.stot_r) AS _stot_r "
                 + "FROM "
@@ -269,17 +270,21 @@ public class SCliRepInvoices {
                 + "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit "
                 + "WHERE "
                 + "NOT d.b_del AND NOT de.b_del AND d.fid_ct_dps = " + manDpsClassKeyCn[0] + " AND d.fid_cl_dps = " + manDpsClassKeyCn[1] + " AND "
-                + "d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND "
-                + "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' "
+                + "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                + "d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND de.fid_tp_dps_ety <> " + SDataConstantsSys.TRNS_TP_DPS_ETY_VIRT + " "
                 + "GROUP BY "
-                + "i.item_key, i.item, i.id_item, u.symbol, u.id_unit, bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj "
+                + "i.item_key, i.item, i.id_item, u.symbol, u.id_unit, "
+                + "bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj, de.price_u_cur "
                 + "ORDER BY "
-                + "item_key, item, id_item, unit_symbol, id_unit, bp, bp_comm, id_bp, cur_key, id_cur, fid_tp_dps_adj "
+                + "item_key, item, id_item, unit_symbol, id_unit, "
+                + "bp, bp_comm, id_bp, cur_key, id_cur, fid_tp_dps_adj, _price "
                 + ") AS t "
                 + "GROUP BY "
-                + "item_key, item, id_item, unit_symbol, id_unit, bp, bp_comm, id_bp, cur_key, id_cur "
+                + "item_key, item, id_item, unit_symbol, id_unit, "
+                + "bp, bp_comm, id_bp, cur_key, id_cur, _price "
                 + "ORDER BY "
-                + "item_key, item, id_item, unit_symbol, id_unit, bp, bp_comm, id_bp, cur_key, id_cur;";
+                + "item_key, item, id_item, unit_symbol, id_unit, "
+                + "bp, bp_comm, id_bp, cur_key, id_cur, _price;";
         
         return sql;
     }
@@ -442,7 +447,7 @@ public class SCliRepInvoices {
         html += "<td class=\"" + ccsClass + "number\">" + formatQuantity(row.QtyReturns) + "</td>";
         html += "<td class=\"" + ccsClass + "number\">" + formatQuantity(row.getQtyNet()) + "</td>";
         html += "<td class=\"" + ccsClass + "\">" + SLibUtils.textToHtml(row.Unit) + "</td>";
-        html += "<td class=\"" + ccsClass + "number\">" + (row.UnitId == 0 ? ZERO : formatAmountUnit(row.getAvgPrice())) + "</td>";
+        html += "<td class=\"" + ccsClass + "number\">" + (row.UnitId == 0 ? ZERO : formatAmountUnit(rowLevel == ROW_ROW ? row.Price : row.getAvgPrice())) + "</td>";
         
         html += "</tr>\n";
         
@@ -560,7 +565,7 @@ public class SCliRepInvoices {
         body += "<th>Cant. devs.</th>";
         body += "<th>Cant. neta</th>";
         body += "<th>Unidad</th>";
-        body += "<th>Precio prom. $</th>";
+        body += "<th>Precio $</th>";
         body += "</tr>\n";
         
         // rows of table
@@ -575,7 +580,7 @@ public class SCliRepInvoices {
         HashMap<Integer, Row> mapRowSubtotals = new HashMap<>(); // key is currency ID
         HashMap<Integer, Row> mapRowTotals = new HashMap<>(); // key is currency ID
         HashSet<Integer> setItemUnits = new HashSet<>(); // element is unit ID
-        Row rowLocalTotal = new Row("TOTAL MONEDA LOCAL", mnLocalCurrencyId, msLocalCurrencyCode, 0, "");
+        Row rowLocalTotal = new Row("TOTAL MONEDA LOCAL", mnLocalCurrencyId, msLocalCurrencyCode, 0, "", 0);
         
         mapCurrencies.put(mnLocalCurrencyId, msLocalCurrencyCode);
         
@@ -618,7 +623,7 @@ public class SCliRepInvoices {
                 
                 setItemUnits.add(curUnitId);
                 
-                Row row = new Row(resultSet.getString("bp"), curCurrencyId, mapCurrencies.get(curCurrencyId), curUnitId, mapUnits.get(curUnitId));
+                Row row = new Row(resultSet.getString("bp"), curCurrencyId, mapCurrencies.get(curCurrencyId), curUnitId, mapUnits.get(curUnitId), resultSet.getDouble("_price"));
                 row.TotGross = resultSet.getDouble("_stot_cur_r_inv");
                 row.TotReturns = resultSet.getDouble("_stot_cur_r_cn_ret");
                 row.TotDiscounts = resultSet.getDouble("_stot_cur_r_cn_disc");
@@ -629,7 +634,7 @@ public class SCliRepInvoices {
                 
                 Row rowSubtotal = mapRowSubtotals.get(curCurrencyId);
                 if (rowSubtotal == null) {
-                    rowSubtotal = new Row(curItemText + " " + mapCurrencies.get(curCurrencyId), curCurrencyId, mapCurrencies.get(curCurrencyId), 0, "");
+                    rowSubtotal = new Row(curItemText + " " + mapCurrencies.get(curCurrencyId), curCurrencyId, mapCurrencies.get(curCurrencyId), 0, "", 0);
                     mapRowSubtotals.put(curCurrencyId, rowSubtotal);
                 }
                 rowSubtotal.add(resultSet.getDouble("_stot_cur_r_inv"), resultSet.getDouble("_stot_cur_r_cn_ret"), resultSet.getDouble("_stot_cur_r_cn_disc"), 
@@ -637,7 +642,7 @@ public class SCliRepInvoices {
                 
                 Row rowTotal = mapRowTotals.get(curCurrencyId);
                 if (rowTotal == null) {
-                    rowTotal = new Row("TOTAL " + mapCurrencies.get(curCurrencyId), curCurrencyId, mapCurrencies.get(curCurrencyId), 0, "");
+                    rowTotal = new Row("TOTAL " + mapCurrencies.get(curCurrencyId), curCurrencyId, mapCurrencies.get(curCurrencyId), 0, "", 0);
                     mapRowTotals.put(curCurrencyId, rowTotal);
                 }
                 rowTotal.add(resultSet.getDouble("_stot_cur_r_inv"), resultSet.getDouble("_stot_cur_r_cn_ret"), resultSet.getDouble("_stot_cur_r_cn_disc"), 
@@ -725,18 +730,20 @@ public class SCliRepInvoices {
         public String Currency;
         public int UnitId;
         public String Unit;
+        public double Price;
         public double TotGross;
         public double TotReturns;
         public double TotDiscounts;
         public double QtyGross;
         public double QtyReturns;
         
-        public Row(final String concept, final int currencyId, final String currency, final int unitId, final String unit) {
+        public Row(final String concept, final int currencyId, final String currency, final int unitId, final String unit, final double price) {
             Concept = concept;
             CurrencyId = currencyId;
             Currency = currency;
             UnitId = unitId;
             Unit = unit;
+            Price = price;
             TotGross = 0;
             TotReturns = 0;
             TotDiscounts = 0;
