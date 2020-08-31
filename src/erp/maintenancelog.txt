@@ -1,4 +1,17 @@
 ================================================================================
+SIIE 3.2 174.0/ 2020-08-27
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Cambio a política de tiempo extra mediante adición de campo numérico para elegir una entre múltiples opciones.
+2) Implementación de cálculo acumulado de ISR por separado de acuerdo al tipo de régimen de contratación.
+
+================================================================================
+SIIE 3.2 173.0/ 2020-08-27
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Corrección a generación de inventarios iniciales de herramientas mediante adición de usuario y supervisión de mantenimiento al cárdex de almacén.
+
+================================================================================
 SIIE 3.2 172.5/ 2020-08-18
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

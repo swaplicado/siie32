@@ -17,7 +17,7 @@ public class SEmployee {
     String admission_date;
     String leave_date;
     int company_id;
-    boolean extra_time;
+    int overtime_policy;
     int way_pay;
     int dept_rh_id;
     boolean is_active;
@@ -79,12 +79,12 @@ public class SEmployee {
         this.company_id = company_id;
     }
 
-    public boolean isExtra_time() {
-        return extra_time;
+    public int getOvertime_policy() {
+        return overtime_policy;
     }
 
-    public void setExtra_time(boolean extra_time) {
-        this.extra_time = extra_time;
+    public void setOvertime_policy(int overtime_policy) {
+        this.overtime_policy = overtime_policy;
     }
 
     public int getWay_pay() {

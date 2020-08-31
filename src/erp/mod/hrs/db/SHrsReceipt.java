@@ -49,7 +49,7 @@ public class SHrsReceipt {
      */
 
     /**
-     * Compute all earnings from this receipt.
+     * Compute all earnings of this receipt.
      */
     private void computeEarnings() {
         for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
@@ -67,7 +67,7 @@ public class SHrsReceipt {
     }
 
     /**
-     * Compute the given array of earnings as a group.
+     * Compute the given array of earnings as a whole.
      * @param hrsReceiptEarnings Array of earnings. At least one earning is expected.
      * @throws Exception
      */
@@ -181,7 +181,7 @@ public class SHrsReceipt {
     }
     
     /**
-     * Compute exemption of all earnings of this receipt by grouping them into arrays.
+     * Compute tax exemption of all earnings of this receipt by processing and grouping them by ID of earning into independent arrays.
      * @throws Exception 
      */
     private void computeEarningsExemption() throws Exception {

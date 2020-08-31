@@ -23,9 +23,10 @@ public class SHrsConsts {
     public static final int MONTH_FORTNIGHTS = 2;
     public static final int WEEK_DAYS = 7;
     public static final int FORTNIGHT_FIXED_DAYS = 15;
-    public static final int OVER_TIME_2X = 2;
-    public static final int OVER_TIME_2X_MAX_DAY = 3;
-    public static final int OVER_TIME_3X = 3;
+    public static final int OVERTIME_2X = 2;
+    public static final int OVERTIME_2X_MAX_DAYS = 3;
+    public static final int OVERTIME_3X = 3;
+    public static final int WORKING_DAY_HOURS = 8;
     public static final float MONTH_DAYS = (float) YEAR_DAYS / YEAR_MONTHS;
     public static final float MONTH_DAYS_FIXED = 30.42f;
 
@@ -62,6 +63,14 @@ public class SHrsConsts {
     public static final String TXT_PAY_PER_REF_SD = "SD";
     public static final String TXT_PAY_PER_REF_SBC = "SBC";
     public static final String TXT_PAY_PER_REF_OTRO = "OTRO";
+    
+    public static final int OVERTIME_NEVER = 0;
+    public static final int OVERTIME_ALLWAYS = 1;
+    public static final int OVERTIME_SOMETIMES = 2;
+    
+    public static final String TXT_OVERTIME_NEVER = "Nunca";
+    public static final String TXT_OVERTIME_ALLWAYS = "Siempre";
+    public static final String TXT_OVERTIME_SOMETIMES = "Ocasionalmente";
     
     public static final String EMPTY_BANK = "(SIN BANCO)";
     public static final String CFD_SERIES = "NOM";

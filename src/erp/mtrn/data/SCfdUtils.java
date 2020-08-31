@@ -135,8 +135,10 @@ public abstract class SCfdUtils implements Serializable {
     public static final int KEY_CFD = 900000;
     /** For identifying CFD massive processing case of stamping. When a CFD is being stamped, must be recovered from storage to be issued. */
     public static final int KEY_CFD_STAMPING = 900001;
-    /** For identifying any CFD massive processing case different from stamping. When a CFD is being processed, for instance, when being printed, may be recovered from memory, if available, to be issued. */
+    /** For identifying any CFD massive processing case that different from stamping. When a CFD is being processed, for instance, when being printed, may be recovered from memory, if available, to be issued. */
     public static final int KEY_CFD_PROCESSING = 900002;
+    /** For identifying a shared issuer (in fact the very curent company in user session) on a CFD massive processing case of stamping. */
+    public static final int KEY_CFD_ISSUER = 900100;
     
     public static final HashMap<Integer, Object> DataSet = new HashMap<>();
     
@@ -2453,8 +2455,10 @@ public abstract class SCfdUtils implements Serializable {
      * @param request Options defined in erp.cfd.SCfdConsts.
      */
     public static void initDataSetForPayroll(final int request) {
-        SCfdUtils.DataSet.remove(SModConsts.HRS_PAY); // payroll registry will be read and set in method SCfdUtils.computePrintCfd() when processing the first CFD
+        SCfdUtils.DataSet.remove(SModConsts.HRS_PAY); // payroll registry will be read and set in method computePrintCfd() when processing the first CFD
         SCfdUtils.DataSet.put(SCfdUtils.KEY_CFD, isRequestForStamping(request) ? SCfdUtils.KEY_CFD_STAMPING : SCfdUtils.KEY_CFD_PROCESSING);
+        
+        SCfdUtils.DataSet.remove(SCfdUtils.KEY_CFD_ISSUER); // registry of business partner for company will be read and set in method SDbCfdBizPartner.getCfdDataBizPartner() when processing the first CFD
     }
     
     /**
@@ -2463,6 +2467,8 @@ public abstract class SCfdUtils implements Serializable {
     public static void resetDataSetForPayroll() {
         SCfdUtils.DataSet.remove(SModConsts.HRS_PAY);
         SCfdUtils.DataSet.remove(SCfdUtils.KEY_CFD);
+        
+        SCfdUtils.DataSet.remove(SCfdUtils.KEY_CFD_ISSUER);
     }
     
     public static float getCfdVersion(final int xmlType) {
@@ -3583,6 +3589,7 @@ public abstract class SCfdUtils implements Serializable {
         return xmlWithOutNode;
     }
 
+    @Deprecated
     public static cfd.DElement createCfdRootElement(final SClientInterface client, final SCfdXmlCfdi32 xmlCfd) throws Exception {
         double dTotalImptoRetenido = 0;
         double dTotalImptoTrasladado = 0;
@@ -3624,7 +3631,7 @@ public abstract class SCfdUtils implements Serializable {
 
         emisor = new SDbCfdBizPartner(client);
         emisor.setBizPartnerIds(xmlCfd.getEmisorId(), xmlCfd.getEmisorSucursalId());
-        emisor.setIsEmisor(true, false);
+        emisor.setIssuer(true, false);
 
         asociadoNegocios = emisor.getCfdDataBizPartner();
         asociadoNegocios.setVersion(fVersion);
@@ -3704,6 +3711,7 @@ public abstract class SCfdUtils implements Serializable {
         return comprobante;
     }
 
+    @Deprecated
     public static cfd.DElement createCfdi32RootElement(final SClientInterface client, final SCfdXmlCfdi32 xmlCfdi) throws Exception {
         double dTotalImptoRetenido = 0;
         double dTotalImptoTrasladado = 0;
@@ -3757,8 +3765,8 @@ public abstract class SCfdUtils implements Serializable {
         
         emisor = new SDbCfdBizPartner(client);
         emisor.setBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
-        emisor.setExpeditionBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
-        emisor.setIsEmisor(true, hasIntCommerceNode);
+        emisor.setIssuingBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
+        emisor.setIssuer(true, hasIntCommerceNode);
 
         asociadoNegocios = emisor.getCfdDataBizPartner();
         asociadoNegocios.setIsCfdiWithIntCommerce(hasIntCommerceNode);
@@ -3923,8 +3931,8 @@ public abstract class SCfdUtils implements Serializable {
         
         SDbCfdBizPartner emisor = new SDbCfdBizPartner(client);
         emisor.setBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
-        emisor.setExpeditionBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
-        emisor.setIsEmisor(true, hasIntCommerceComplement);
+        emisor.setIssuingBizPartnerIds(xmlCfdi.getEmisorId(), xmlCfdi.getEmisorSucursalId());
+        emisor.setIssuer(true, hasIntCommerceComplement);
 
         SCfdDataBizPartner emisorCfd = emisor.getCfdDataBizPartner();
         emisorCfd.setIsCfdiWithIntCommerce(hasIntCommerceComplement);

@@ -59,13 +59,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected Date mtDateSalarySscBase;
     protected int mnWorkingHoursDay;
     protected Date mtContractExpiration_n;
+    protected int mnOvertimePolicy;
     protected String msBankAccount;
     protected String msGroceryServiceAccount;
     protected java.sql.Blob moImagePhoto_n;
     protected java.sql.Blob moImageSignature_n;
     protected boolean mbUnionized;
     protected boolean mbMfgOperator;
-    protected boolean mbOvertime;
     protected boolean mbActive;
     protected boolean mbDeleted;
     protected boolean mbSystem;
@@ -202,13 +202,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setDateSalarySscBase(Date t) { mtDateSalarySscBase = t; }
     public void setWorkingHoursDay(int n) { mnWorkingHoursDay = n; }
     public void setContractExpiration_n(Date t) { mtContractExpiration_n = t; }
+    public void setOvertimePolicy(int n) { mnOvertimePolicy = n; }
     public void setBankAccount(String s) { msBankAccount = s; }
     public void setGroceryServiceAccount(String s) { msGroceryServiceAccount = s; }
     public void setImagePhoto_n(java.sql.Blob o) { moImagePhoto_n = o; }
     public void setImageSignature_n(java.sql.Blob o) { moImageSignature_n = o; }
     public void setUnionized(boolean b) { mbUnionized = b; }
     public void setMfgOperator(boolean b) { mbMfgOperator = b; }
-    public void setOvertime(boolean b) { mbOvertime = b; }
     public void setActive(boolean b) { mbActive = b; }
     public void setDeleted(boolean b) { mbDeleted = b; }
     public void setSystem(boolean b) { mbSystem = b; }
@@ -269,13 +269,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public Date getDateSalarySscBase() { return mtDateSalarySscBase; }
     public int getWorkingHoursDay() { return mnWorkingHoursDay; }
     public Date getContractExpiration_n() { return mtContractExpiration_n; }
+    public int getOvertimePolicy() { return mnOvertimePolicy; }
     public String getBankAccount() { return msBankAccount; }
     public String getGroceryServiceAccount() { return msGroceryServiceAccount; }
     public java.sql.Blob getImagePhoto_n() { return moImagePhoto_n; }
     public java.sql.Blob getImageSignature_n() { return moImageSignature_n; }
     public boolean isUnionized() { return mbUnionized; }
     public boolean isMfgOperator() { return mbMfgOperator; }
-    public boolean isOvertime() { return mbOvertime; }
     public boolean isActive() { return mbActive; }
     public boolean isDeleted() { return mbDeleted; }
     public boolean isSystem() { return mbSystem; }
@@ -397,13 +397,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mtDateSalarySscBase = null;
         mnWorkingHoursDay = 0;
         mtContractExpiration_n = null;
+        mnOvertimePolicy = 0;
         msBankAccount = "";
         msGroceryServiceAccount = "";
         moImagePhoto_n = null;
         moImageSignature_n = null;
         mbUnionized = false;
         mbMfgOperator = false;
-        mbOvertime = false;
         mbActive = false;
         mbDeleted = false;
         mbSystem = false;
@@ -483,6 +483,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mtDateSalarySscBase = resultSet.getDate("dt_sal_ssc");
                 mnWorkingHoursDay = resultSet.getInt("wrk_hrs_day");
                 mtContractExpiration_n = resultSet.getDate("con_exp_n");
+                mnOvertimePolicy = resultSet.getInt("overtime");
                 msBankAccount = resultSet.getString("bank_acc");
                 msGroceryServiceAccount = resultSet.getString("grocery_srv_acc");
                 /*
@@ -493,7 +494,6 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 oSignature_n = resultSet.getBlob("img_sig_n");
                 mbUnionized = resultSet.getBoolean("b_uni");
                 mbMfgOperator = resultSet.getBoolean("b_mfg_ope");
-                mbOvertime = resultSet.getBoolean("b_overtime");
                 mbActive = resultSet.getBoolean("b_act");
                 mbDeleted = resultSet.getBoolean("b_del");
                 mbSystem = resultSet.getBoolean("b_sys");
@@ -629,13 +629,13 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " + 
                         mnWorkingHoursDay + ", " +
                         (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " + 
+                        mnOvertimePolicy + ", " + 
                         "'" + msBankAccount + "', " + 
                         "'" + msGroceryServiceAccount + "', " +
                         "NULL, " +
                         "NULL, " +
                         (mbUnionized ? 1 : 0) + ", " + 
                         (mbMfgOperator ? 1 : 0) + ", " + 
-                        (mbOvertime ? 1 : 0) + ", " + 
                         (mbActive ? 1 : 0) + ", " +
                         (mbDeleted ? 1 : 0) + ", " +
                         (mbSystem ? 1 : 0) + ", " +
@@ -687,6 +687,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "dt_sal_ssc = '" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " +
                         "wrk_hrs_day = " + mnWorkingHoursDay + ", " +
                         "con_exp_n = " + (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " +
+                        "overtime = " + mnOvertimePolicy + ", " +
                         "bank_acc = '" + msBankAccount + "', " +
                         "grocery_srv_acc = '" + msGroceryServiceAccount + "', " +
                         /*
@@ -695,7 +696,6 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         */
                         "b_uni = " + (mbUnionized ? 1 : 0) + ", " +
                         "b_mfg_ope = " + (mbMfgOperator ? 1 : 0) + ", " +
-                        "b_overtime = " + (mbOvertime ? 1 : 0) + ", " +
                         "b_act = " + (mbActive ? 1 : 0) + ", " +
                         "b_del = " + (mbDeleted ? 1 : 0) + ", " +
                         "b_sys = " + (mbSystem ? 1 : 0) + ", " +
