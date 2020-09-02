@@ -5,25 +5,19 @@
 package erp.mod.hrs.view;
 
 import erp.mod.SModConsts;
-import erp.mod.hrs.db.SHrsUtils;
-import erp.print.SDataConstantsPrint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import sa.lib.SLibRpnArgument;
 import sa.lib.SLibRpnArgumentType;
 import sa.lib.SLibRpnOperator;
-import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterDatePeriod;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
-import sa.lib.grid.SGridRowView;
 import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
@@ -54,13 +48,8 @@ public class SViewPayrollReceiptImportedEarnings extends SGridPaneView implement
         
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
-        
-        jbPrintReceipt = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_print.gif")), "Imprimir recibo nómina", this);
-        jbSendReceipt = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar recibo nómina vía mail", this);
 
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbPrintReceipt);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSendReceipt);
     }
     
     /*
@@ -116,7 +105,7 @@ public class SViewPayrollReceiptImportedEarnings extends SGridPaneView implement
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uc ON p.fk_usr_clo = uc.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON p.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON p.fk_usr_upd = uu.id_usr "
-                + (sql.isEmpty() ? "" : "WHERE NOT p.b_del AND NOT pr.b_del AND " + sql)
+                + (sql.isEmpty() ? "" : "WHERE NOT p.b_del AND NOT pr.b_del AND (pre.fk_bonus > 1 OR PRE.b_time_clock = TRUE) AND " + sql)
                 + "ORDER BY p.num, tps.name, bp.bp, pr.id_pay, pr.id_emp ";
     }
 

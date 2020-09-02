@@ -87,8 +87,12 @@ public class SShareDB {
         if (conn == null) {
             return "";
         }
+        
+        if (mdb.getMainBb() == 0) {
+            throw new SConfigException("No hay configuración de base de datos principal");
+        }
 
-        int idDataBase = 1211;
+        int idDataBase = mdb.getMainBb();
 
         String query = "SELECT "
                 + "    bd "
