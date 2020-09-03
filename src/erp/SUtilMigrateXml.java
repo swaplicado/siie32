@@ -18,6 +18,9 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import sa.lib.gui.SGuiConsts;
 
 /**
+ * Clase desechable, de un solo uso.
+ * El propósito era exportar los XML de CFDI de SIIE al DBMS BaseX.
+ * Esta funcionalidad de contar con los XML en BaseX no está terminada ni debidamente planteada.
  *
  * @author Antonio Ortega
  */

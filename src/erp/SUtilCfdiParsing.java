@@ -22,7 +22,10 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 
 /**
- *
+ * Clase desechable, de un solo uso.
+ * El propósito fue completar la información del XML del CFDI que ahora está directamente en la tabla erp_com.trn_cfd,
+ * debido a que dichos datos fueron agregados posteriormente a la creación de dicha tabla, y los registros iniciales no contaban con ellos.
+ * 
  * @author Juan Barajas
  */
 public class SUtilCfdiParsing extends javax.swing.JFrame {
