@@ -57,7 +57,7 @@ public class SPayrollBonusUtils {
     public static double hasSuperBonus(SGuiClient client, int idEmployee, Date referenceDate) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(referenceDate);
-        calendar.add(Calendar.DAY_OF_MONTH, (-28 * 2));
+        calendar.add(Calendar.MONTH, -2);
         
         try {
             String sql = "SELECT  " +

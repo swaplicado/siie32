@@ -77,6 +77,9 @@ import sa.lib.grid.SGridPaneForm;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiField;
+import sa.lib.gui.SGuiModule;
+import sa.lib.gui.SGuiParams;
+import sa.lib.gui.SGuiSession;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFieldInteger;
@@ -118,6 +121,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private boolean mbIsReadOnly;
     private boolean mbIsCopyingPayroll;
     private boolean mbIsWithTaxSubsidy;
+    private boolean mbAuxOpenRegAgain;
     /**
      * Creates new form SFormPayroll
      * @param client
@@ -1943,7 +1947,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
         
         if (moRegistry.getPkPayrollId() == 0) {
-            miClient.showMsgBoxWarning("Debe guardar la nómina para continuar");
+            if (miClient.showMsgBoxConfirm("Debe guardar la nómina para continuar.\n"
+                    + "¿Desea guardarla y abrirla de nuevo?") == JOptionPane.YES_OPTION) {
+                mbAuxOpenRegAgain = true;
+                this.actionSave();
+            }
+            
             return;
         }
         
@@ -1987,6 +1996,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
         catch (Exception ex) {
             Logger.getLogger(SFormPayroll.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if (miClient.showMsgBoxConfirm("Se cargará la prenómina correspondiente al periodo: " + 
+                SLibUtils.DateFormatDate.format(dates[0]) + " - " + SLibUtils.DateFormatDate.format(dates[1]) + 
+                ".\n¿Desea continuar?\nEste proceso puede demorar algunos minutos.") != JOptionPane.YES_OPTION) {
+            return;
         }
         
         SShareData sd = new SShareData();
@@ -2203,7 +2218,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
      * @param selectedEmployeesIds 
      */
     private void removeByImportation(boolean showMessage) {
-        boolean hasAbsences = false;
+        if (mbIsReadOnly) {
+            miClient.showMsgBoxWarning("No se puede agregar el empleado, la nómina es de solo lectura.");
+            return;
+        }
+        
+        int rowIndex = -1;
         for (int i = 0; i < moGridPanePayrollReceipts.getModel().getRowCount(); i++) {
             SRowPayrollEmployee rpe = (SRowPayrollEmployee) moGridPanePayrollReceipts.getGridRow(i);
             int moveId = -1;
@@ -2254,13 +2274,22 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 rpe.getHrsReceipt().getAbsenceConsumptions().remove(consm);
             }
             
-            hasAbsences = consms.size() > 0;
+            if (consms.size() > 0) {
+                rowIndex = i;
+                break;
+            }
+        }
+        
+        if (rowIndex > -1) {
+            moGridPanePayrollReceipts.setSelectedGridRow(rowIndex);
+            this.actionReceiptRemove();
+            this.removeByImportation(false);
         }
         
         SPrepayrollUtils.deleteAbsencesAndConsumptionsByImportation(miClient, moRegistry.getPkPayrollId());
-        if (hasAbsences) {
-            actionReceiptRemoveAll();
-        }
+//        if (hasAbsences) {
+//            actionReceiptRemoveAll();
+//        }
         if (showMessage) {
             miClient.showMsgBoxInformation("Realizado");
         }
@@ -2611,6 +2640,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         mbFirstActivation = true;
         mbIsReadOnly = false;
         mbIsWithTaxSubsidy = true;
+        mbAuxOpenRegAgain = false;
         maPayrollReceiptsDeleted.clear();
         
         removeAllListeners();
@@ -2780,6 +2810,16 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         registry.getChildPayrollReceiptsToDelete().addAll(maPayrollReceiptsDeleted);
         
         registry.setFkPaysheetCustomTypeId(1);
+        
+        if (mbAuxOpenRegAgain) {
+            SGuiParams params = new SGuiParams();
+            registry.computePrimaryKey(miClient.getSession());
+            params.setKey(registry.getPrimaryKey());
+            
+            registry.setPostSaveTarget(miClient.getSession().getModule(SModConsts.MOD_HRS_N, SLibConsts.UNDEFINED));
+            registry.setPostSaveMethod(registry.getPostSaveTarget().getClass().getMethod("showForm", int.class, int.class, SGuiParams.class));
+            registry.setPostSaveMethodArgs(new Object[] { mnFormType, mnFormSubtype, params });
+        }
 
         return registry;
     }
