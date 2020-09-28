@@ -2010,8 +2010,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_ARE) {
-                if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
-                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func = " + ((Integer) setting.getSetting()) + " ";
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }

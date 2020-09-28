@@ -13,6 +13,8 @@ import erp.data.SDataReadDescriptions;
 import erp.lib.SLibConstants;
 import erp.lib.table.STableSetting;
 import erp.mtrn.form.SDialogFilterFunctionalArea;
+import erp.mtrn.utils.STrnFunAreasUtils;
+import java.util.ArrayList;
 
 /**
  *
@@ -28,6 +30,7 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
     private int mnDataType;
     private int[] manDataFilter;
     private int mnFunctionalAreaId;
+    private String msFunctionalAreasIds;
 
     /** Creates new form STabFilterFunctionalArea */
     public STabFilterFunctionalArea(erp.client.SClientInterface client, erp.lib.table.STableTab tableTab, int dataType) {
@@ -100,13 +103,44 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
             renderText();
 
-            moSetting.setSetting(mnFunctionalAreaId);
+            moSetting.setSetting(msFunctionalAreasIds);
             moTab.updateSetting(moSetting);
         }
     }
 
     private void renderText() {
-        jtfFunctionalArea.setText(mnFunctionalAreaId == SLibConstants.UNDEFINED ? SLibConstants.TXT_ALL : SDataReadDescriptions.getCatalogueDescription(miClient, mnDataType, new int[] { mnFunctionalAreaId }, SLibConstants.DESCRIPTION_CODE));
+        String text = "";
+        String codes = "";
+        msFunctionalAreasIds = "";
+        ArrayList<String> lFunctionalAreasIds = null;
+        ArrayList<String> lFunctionalAreasCodes = null;
+        if (mnFunctionalAreaId == SLibConstants.UNDEFINED) {
+            lFunctionalAreasIds = STrnFunAreasUtils.getFunctionalAreasOfUser(miClient, miClient.getSessionXXX().getUser().getPkUserId(), STrnFunAreasUtils.FUN_AREA_ID, "");
+            
+            if (lFunctionalAreasIds.isEmpty()) {
+                text = SLibConstants.TXT_ALL;                
+            }
+            else {
+                for (String id : lFunctionalAreasIds) {
+                    msFunctionalAreasIds += id + ", ";
+                }
+                
+                msFunctionalAreasIds = msFunctionalAreasIds.substring(0, msFunctionalAreasIds.length() - 2);
+                
+                lFunctionalAreasCodes = STrnFunAreasUtils.getFunctionalAreasOfUser(miClient, miClient.getSessionXXX().getUser().getPkUserId(), STrnFunAreasUtils.FUN_AREA_CODE, "");
+                for (String code : lFunctionalAreasCodes) {
+                    codes += code + ", ";
+                }
+                
+                text = codes.substring(0, codes.length() - 2);
+            }
+        }
+        else {
+            text = SDataReadDescriptions.getCatalogueDescription(miClient, mnDataType, new int[] { mnFunctionalAreaId }, SLibConstants.DESCRIPTION_CODE);
+            msFunctionalAreasIds = "" + mnFunctionalAreaId;
+        }
+        
+        jtfFunctionalArea.setText(text);
         jtfFunctionalArea.setCaretPosition(0);
     }
 
