@@ -225,7 +225,7 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
                 row.setNumEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getNumber());
                 row.setEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getName());
                 row.setAbsences(ppRow.getAbsences());
-                row.setExtraTime(mnPrepayrollMode == SHrsConsts.PPAYROLL_POL_LIMITED_DATA ? ppRow.getDouble_overtime(): ppRow.getTriple_overtime());
+                row.setOvertime(mnPrepayrollMode == SHrsConsts.PPAYROLL_POL_LIMITED_DATA ? ppRow.getDouble_overtime(): ppRow.getTriple_overtime());
                 row.setSundays(ppRow.getSundays());
                 row.setDaysOff(ppRow.getDaysOff());
                 
@@ -383,13 +383,14 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
                         dataLines.add(lGridRow.getNumEmployee() + "," +
                                         lGridRow.getEmployee().replaceAll(",", "") + "," +
                                         lGridRow.getAbsences() + "," +
-                                        lGridRow.getExtraTime() + "," +
+                                        lGridRow.getOvertime() + "," +
                                         lGridRow.getSundays() + "," +
+                                        lGridRow.getDaysOff() + "," +
                                         lGridRow.getHolidays()
                                                 );
                     }
 
-                    String fileHeader = "Num,Empleado,Faltas,Horas extra,Domingos,Festivos";
+                    String fileHeader = "Num,Empleado,Faltas,Horas extra,Prima Dominical,Descansos,Festivos";
 
                     SUtilsJSON.writeCSV(msStartDate, msEndDate, dataLines, fileHeader, msCompanyKey, SUtilsJSON.PREPAYROLL);
                     
