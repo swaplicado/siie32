@@ -9,21 +9,15 @@ import erp.data.SDataConstants;
 import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.form.SDialogRecordPicker;
-import erp.mod.SModConsts;
-import erp.mod.fin.db.SDpsExchangeDif;
+import erp.mod.fin.db.SFinDpsExchangeRateDiff;
 import erp.mod.fin.db.SFinConsts;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.Date;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
@@ -38,18 +32,19 @@ import sa.lib.srv.SSrvUtils;
 
 /**
  *
- * @author Gerardo Hernández, Uriel Castañeda
+ * @author Gerardo Hernández, Uriel Castañeda, Isabel Servín
  */
-public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionListener, ItemListener, ChangeListener {
+public class SDialogDpsExchangeRateDiff extends SBeanFormDialog implements ActionListener {
 
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
     private erp.mfin.data.SDataRecord moRecord;
-    private Date mtEndOfMonth;
     
     /**
      * Creates new form SDialogValuationBalances
+     * @param client
+     * @param title
      */
-    public SDialogDpsExchangeDif(SGuiClient client, String title) {
+    public SDialogDpsExchangeRateDiff(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, title);
         initComponents();
         initComponentsCustom();
@@ -67,26 +62,23 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
-        jlYear = new javax.swing.JLabel();
-        moCalYear = new sa.lib.gui.bean.SBeanFieldCalendarYear();
+        jlDate = new javax.swing.JLabel();
+        moDateDate = new sa.lib.gui.bean.SBeanFieldDate();
         jPanel12 = new javax.swing.JPanel();
-        jlPeriod = new javax.swing.JLabel();
-        moCalPeriod = new sa.lib.gui.bean.SBeanFieldCalendarMonth();
-        jPanel13 = new javax.swing.JPanel();
-        jlCurrency = new javax.swing.JLabel();
-        moKeyCurrency = new sa.lib.gui.bean.SBeanFieldKey();
-        jPanel11 = new javax.swing.JPanel();
         jlRecord = new javax.swing.JLabel();
         moTextRecordDate = new sa.lib.gui.bean.SBeanFieldText();
         moTextRecordBkc = new sa.lib.gui.bean.SBeanFieldText();
         moTextRecordNumber = new sa.lib.gui.bean.SBeanFieldText();
         jbPickRecord = new javax.swing.JButton();
         moTextRecordBranch = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel13 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel11 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros para determinar diferencias:"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros para generar diferencias cambiarias:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setToolTipText("");
         jPanel2.setMinimumSize(new java.awt.Dimension(211, 130));
         jPanel2.setName(""); // NOI18N
         jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
@@ -95,10 +87,10 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
         jPanel10.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlYear.setText("Año:*");
-        jlYear.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel10.add(jlYear);
-        jPanel10.add(moCalYear);
+        jlDate.setText("Fecha corte:*");
+        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel10.add(jlDate);
+        jPanel10.add(moDateDate);
 
         jPanel2.add(jPanel10);
 
@@ -106,10 +98,37 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
         jPanel12.setRequestFocusEnabled(false);
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPeriod.setText("Mes:*");
-        jlPeriod.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel12.add(jlPeriod);
-        jPanel12.add(moCalPeriod);
+        jlRecord.setText("Póliza contable:*");
+        jlRecord.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel12.add(jlRecord);
+
+        moTextRecordDate.setEditable(false);
+        moTextRecordDate.setText("01/01/2000");
+        moTextRecordDate.setToolTipText("Fecha de la póliza contable");
+        moTextRecordDate.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel12.add(moTextRecordDate);
+
+        moTextRecordBkc.setEditable(false);
+        moTextRecordBkc.setText("BKC");
+        moTextRecordBkc.setToolTipText("Centro contable de la póliza contable");
+        moTextRecordBkc.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel12.add(moTextRecordBkc);
+
+        moTextRecordNumber.setEditable(false);
+        moTextRecordNumber.setText("TP-000001");
+        moTextRecordNumber.setToolTipText("Número de la póliza contable");
+        jPanel12.add(moTextRecordNumber);
+
+        jbPickRecord.setText("...");
+        jbPickRecord.setToolTipText("Seleccionar póliza contable");
+        jbPickRecord.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel12.add(jbPickRecord);
+
+        moTextRecordBranch.setEditable(false);
+        moTextRecordBranch.setText("BRA");
+        moTextRecordBranch.setToolTipText("Sucursal de la empresa");
+        moTextRecordBranch.setPreferredSize(new java.awt.Dimension(35, 23));
+        jPanel12.add(moTextRecordBranch);
 
         jPanel2.add(jPanel12);
 
@@ -117,48 +136,19 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
         jPanel13.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCurrency.setText("Moneda:*");
-        jlCurrency.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel13.add(jlCurrency);
-
-        moKeyCurrency.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel13.add(moKeyCurrency);
+        jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel1.setText("NOTA 1: se ajustarán todas las cuentas liquidadas hasta la fecha de corte.");
+        jLabel1.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel13.add(jLabel1);
 
         jPanel2.add(jPanel13);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlRecord.setText("Póliza contable:*");
-        jlRecord.setPreferredSize(new java.awt.Dimension(100, 23));
-        jPanel11.add(jlRecord);
-
-        moTextRecordDate.setEditable(false);
-        moTextRecordDate.setText("01/01/2000");
-        moTextRecordDate.setToolTipText("Fecha de la póliza contable");
-        moTextRecordDate.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel11.add(moTextRecordDate);
-
-        moTextRecordBkc.setEditable(false);
-        moTextRecordBkc.setText("BKC");
-        moTextRecordBkc.setToolTipText("Centro contable de la póliza contable");
-        moTextRecordBkc.setPreferredSize(new java.awt.Dimension(35, 23));
-        jPanel11.add(moTextRecordBkc);
-
-        moTextRecordNumber.setEditable(false);
-        moTextRecordNumber.setText("TP-000001");
-        moTextRecordNumber.setToolTipText("Número de la póliza contable");
-        jPanel11.add(moTextRecordNumber);
-
-        jbPickRecord.setText("...");
-        jbPickRecord.setToolTipText("Seleccionar póliza contable");
-        jbPickRecord.setPreferredSize(new java.awt.Dimension(23, 23));
-        jPanel11.add(jbPickRecord);
-
-        moTextRecordBranch.setEditable(false);
-        moTextRecordBranch.setText("BRA");
-        moTextRecordBranch.setToolTipText("Sucursal de la empresa");
-        moTextRecordBranch.setPreferredSize(new java.awt.Dimension(35, 23));
-        jPanel11.add(moTextRecordBranch);
+        jLabel2.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel2.setText("NOTA 2: se afectarán cuentas de asociados de negocios.");
+        jLabel2.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel11.add(jLabel2);
 
         jPanel2.add(jPanel11);
 
@@ -169,6 +159,8 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -176,13 +168,9 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JButton jbPickRecord;
-    private javax.swing.JLabel jlCurrency;
-    private javax.swing.JLabel jlPeriod;
+    private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlRecord;
-    private javax.swing.JLabel jlYear;
-    private sa.lib.gui.bean.SBeanFieldCalendarMonth moCalPeriod;
-    private sa.lib.gui.bean.SBeanFieldCalendarYear moCalYear;
-    private sa.lib.gui.bean.SBeanFieldKey moKeyCurrency;
+    private sa.lib.gui.bean.SBeanFieldDate moDateDate;
     private sa.lib.gui.bean.SBeanFieldText moTextRecordBkc;
     private sa.lib.gui.bean.SBeanFieldText moTextRecordBranch;
     private sa.lib.gui.bean.SBeanFieldText moTextRecordDate;
@@ -194,8 +182,6 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
      */
     
     private void initComponentsCustom() {
-        int[] period = SLibTimeUtils.digestMonth(miClient.getSession().getCurrentDate());
-        
         SGuiUtils.setWindowBounds(this, 480, 300);
         
         try {
@@ -208,20 +194,12 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
         
         moDialogRecordPicker = new SDialogRecordPicker((SClientInterface) miClient, SDataConstants.FINX_REC_USER);
         
-        moCalYear.setCalendarSettings(SGuiUtils.getLabelName(jlYear));
-        moCalPeriod.setCalendarSettings(SGuiUtils.getLabelName(jlPeriod));
-        moKeyCurrency.setKeySettings(miClient, SGuiUtils.getLabelName(jlCurrency.getText()), true);
+        moDateDate.setDateSettings(miClient, SGuiUtils.getLabelName(jlDate), true);
         
-        moFields.addField(moCalYear);
-        moFields.addField(moCalPeriod);
-        moFields.addField(moKeyCurrency);
+        moFields.addField(moDateDate);
         moFields.setFormButton(jbSave);
         
-        moCalYear.setValue(period[0]);
-        moCalPeriod.setValue(period[1]);
-        defineDate();
-        
-        reloadCatalogues();
+        moDateDate.setValue(SLibTimeUtils.getEndOfMonth(miClient.getSession().getCurrentDate()));
         
         renderRecord();
         
@@ -229,16 +207,19 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
     }
     
     private void validateCompanyConfig() throws Exception {
-        if (!SDataUtilities.validateAccountSyntax(((SClientInterface) miClient).getSessionXXX().getParamsCompany().getFkAccountDifferenceIncomeId_n())) {
-            throw new Exception(SFinConsts.MSG_ERR_GUI_CFG_DIFF_ACC);
+        SDataParamsCompany paramsCompany = ((SClientInterface) miClient).getSessionXXX().getParamsCompany(); // convenience variable
+        if (!SDataUtilities.validateAccountSyntax(paramsCompany.getFkAccountDifferenceIncomeId_n())) {
+            throw new Exception(SFinConsts.MSG_ERR_GUI_CFG_DIFF_ACC + " (Ingresos)");
         }
-        else if (!SDataUtilities.validateAccountSyntax(((SClientInterface) miClient).getSessionXXX().getParamsCompany().getFkCostCenterDifferenceIncomeId_n())) {
-            throw new Exception(SFinConsts.MSG_ERR_GUI_CFG_DIFF_CC);
+        else if (!SDataUtilities.validateAccountSyntax(paramsCompany.getFkCostCenterDifferenceIncomeId_n())) {
+            throw new Exception(SFinConsts.MSG_ERR_GUI_CFG_DIFF_CC + " (Ingresos)");
         }
-    }
-    
-    private void defineDate() {
-        mtEndOfMonth = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(moCalYear.getValue(), moCalPeriod.getValue()));
+        else if (!SDataUtilities.validateAccountSyntax(paramsCompany.getFkAccountDifferenceExpenseId_n())) {
+            throw new Exception(SFinConsts.MSG_ERR_GUI_CFG_DIFF_ACC + " (Egresos)");
+        }
+        else if (!SDataUtilities.validateAccountSyntax(paramsCompany.getFkCostCenterDifferenceExpenseId_n())) {
+            throw new Exception(SFinConsts.MSG_ERR_GUI_CFG_DIFF_CC + " (Egresos)");
+        }
     }
     
     private void renderRecord() {
@@ -262,7 +243,7 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
         String message = "";
         
         moDialogRecordPicker.formReset();
-        moDialogRecordPicker.setFilterKey(mtEndOfMonth);
+        moDialogRecordPicker.setFilterKey(moDateDate.getValue());
         moDialogRecordPicker.formRefreshOptionPane();
         if (moRecord != null) {
             moDialogRecordPicker.setSelectedPrimaryKey(moRecord.getPrimaryKey());
@@ -298,14 +279,6 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
         }
     }
 
-    private void stateChangedYear() {
-        defineDate();
-    }
-    
-    private void stateChangedPeriod() {
-        defineDate();
-    }
-    
     /*
      * Public methods
      */
@@ -317,22 +290,16 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
     @Override
     public void addAllListeners() {
         jbPickRecord.addActionListener(this);
-        moKeyCurrency.addItemListener(this);
-        moCalYear.addChangeListener(this);
-        moCalPeriod.addChangeListener(this);
     }
 
     @Override
     public void removeAllListeners() {
         jbPickRecord.removeActionListener(this);
-        moKeyCurrency.removeItemListener(this);
-        moCalYear.getModel().removeChangeListener(null);
-        moCalPeriod.getModel().removeChangeListener(null);
     }
 
     @Override
     public void reloadCatalogues() {
-        miClient.getSession().populateCatalogue(moKeyCurrency, SModConsts.CFGU_CUR, SLibConsts.UNDEFINED, null);
+        
     }
 
     @Override
@@ -354,20 +321,6 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
                 validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRecord.getText()) + "'.");
                 validation.setComponent(jbPickRecord);
             }
-            else if (moRecord.getPkYearId() != moCalYear.getValue()){
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlRecord.getText() + "' " + 
-                        SGuiConsts.ERR_MSG_FIELD_DATE_EQUAL + " " + SLibUtils.DecimalFormatCalendarYear.format(moCalYear.getValue()) + "."));
-                validation.setComponent(jbPickRecord);
-            }
-            else if (moRecord.getPkPeriodId() != moCalPeriod.getValue()){
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlRecord.getText() + "' " + 
-                        SGuiConsts.ERR_MSG_FIELD_DATE_EQUAL + " " + SLibUtils.DecimalFormatCalendarMonth.format(moCalPeriod.getValue()) + "."));
-                validation.setComponent(jbPickRecord);
-            }
-            else if (miClient.getSession().getSessionCustom().isLocalCurrency(moKeyCurrency.getValue())) {
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlCurrency) + "'.");
-                validation.setComponent(moKeyCurrency);
-            }
         }
         
         return validation;
@@ -375,28 +328,24 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
 
     @Override
     public void actionSave() {
-        String msg = "";
+        String msg;
         SSrvLock lock = null;
-        SDpsExchangeDif sbe = null;
+        SFinDpsExchangeRateDiff dpsExchangeRateDiff;
         
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
-            msg = "Se determina la diferencia cambiaria con los siguientes parámetros:\n" +
-                    "- periodo : " + moRecord.getRecordPeriod() + "\n" + 
-                    "- fecha: " + SLibUtils.DateFormatDate.format(mtEndOfMonth) + "\n" +
-                    "- " + SGuiUtils.getLabelName(jlCurrency) + ": " + moKeyCurrency.getSelectedItem().getItem() + "\n" +
+            msg = "Se determinarán las diferencias cambiarias con los siguientes parámetros:\n" +
+                    "- período contable: " + moRecord.getRecordPeriod() + "\n" + 
+                    "- fecha de corte: " + SLibUtils.DateFormatDate.format(moDateDate.getValue()) + "\n" +
                     SGuiConsts.MSG_CNF_CONT;
             
             if (miClient.showMsgBoxConfirm(msg) == JOptionPane.YES_OPTION) {
                 try {
                     lock = SSrvUtils.gainLock(miClient.getSession(), ((SClientInterface) miClient).getSessionXXX().getCompany().getPkCompanyId(), SDataConstants.FIN_REC, moRecord.getPrimaryKey(), moRecord.getRegistryTimeout());
-                    
-                    sbe = new SDpsExchangeDif(miClient);
-                    sbe.setRecYear(moCalYear.getValue());
-                    sbe.setRecPeriod(moCalPeriod.getValue());
-                    sbe.setEndOfMonth(mtEndOfMonth);
-                    sbe.setCurrencyId(moKeyCurrency.getValue()[0]);
-                    sbe.setRecord(moRecord);
-                    sbe.save();
+                    dpsExchangeRateDiff = new SFinDpsExchangeRateDiff(miClient);
+                    dpsExchangeRateDiff.setRecYear(SLibTimeUtils.digestYear(moDateDate.getValue())[0]);
+                    dpsExchangeRateDiff.setEndOfMonth(moDateDate.getValue());
+                    dpsExchangeRateDiff.setRecord(moRecord);
+                    dpsExchangeRateDiff.save();
                     
                     miClient.showMsgBoxInformation(SLibConsts.MSG_PROCESS_FINISHED);
                     
@@ -430,33 +379,4 @@ public class SDialogDpsExchangeDif extends SBeanFormDialog implements ActionList
             }
         }
     }
-    
-        @Override
-    public void itemStateChanged(ItemEvent e) {
-        if (e.getSource() instanceof JComboBox) {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                JComboBox comboBox = (JComboBox) e.getSource();
-            }
-        }
-    }
-
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        if (e.getSource() instanceof sa.lib.gui.bean.SBeanFieldCalendarMonth) {
-            sa.lib.gui.bean.SBeanFieldCalendarMonth sBeanCalMonth = (sa.lib.gui.bean.SBeanFieldCalendarMonth) e.getSource();
-            
-            if (sBeanCalMonth == moCalPeriod) {
-                stateChangedPeriod();
-            }
-        }
-        
-        if (e.getSource() instanceof sa.lib.gui.bean.SBeanFieldCalendarYear) {
-            sa.lib.gui.bean.SBeanFieldCalendarYear sBeanCalYear = (sa.lib.gui.bean.SBeanFieldCalendarYear) e.getSource();
-            
-            if (sBeanCalYear == moCalYear) {
-                stateChangedYear();
-            }
-        }    
-    }
-  
 }

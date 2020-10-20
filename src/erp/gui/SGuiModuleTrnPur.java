@@ -49,8 +49,10 @@ import erp.mtrn.form.SDialogRepSalesPurchasesJournal;
 import erp.mtrn.form.SDialogRepSalesPurchasesNet;
 import erp.mtrn.form.SDialogRepSalesPurchasesPriceUnitary;
 import erp.mtrn.form.SFormBizPartnerBlocking;
+import erp.mtrn.form.SFormCfdiMassiveValidation;
 import erp.mtrn.form.SFormDncDocumentNumberSeries;
 import erp.mtrn.form.SFormDps;
+import erp.mtrn.form.SFormDpsEdit;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -62,7 +64,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Sergio Flores, Isabel Servín
  */
 public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -198,9 +200,11 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenuItem jmiRepTrnContractBackorderStock;
     private javax.swing.JSeparator jsRepContract;
     private javax.swing.JMenuItem jmiRepTrnUnitaryCosts;
-
+    private javax.swing.JMenuItem jmiCfdiMassiveValidation;
+    
     private erp.mtrn.form.SFormDps moFormDps;
     private erp.mtrn.form.SFormDps moFormDpsRo;
+    private erp.mtrn.form.SFormDpsEdit moFormDpsEdit;
     private erp.mtrn.form.SFormBizPartnerBlocking moFormBizPartnerBlocking;
     private erp.mtrn.form.SFormDncDocumentNumberSeries moFormDncDocumentNumberSeriesDps;
     private erp.mtrn.form.SFormDncDocumentNumberSeries moFormDncDocumentNumberSeriesDiog;
@@ -359,6 +363,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPrice = new JMenuItem("Precios de compras");
         jmiDpsPriceHist = new JMenuItem("Historial de precios de compras");
         jmiDpsDocRemission = new JMenuItem("Facturas vs. remisiones");
+        jmiCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI...");
         jmDps.add(jmiDpsDoc);
         jmDps.add(jmiDpsEntry);
         jmDps.add(jmiDpsEntryRef);
@@ -379,6 +384,8 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.add(jmiDpsPriceHist);
         jmDps.addSeparator();
         jmDps.add(jmiDpsDocRemission);
+        jmDps.addSeparator();
+        jmDps.add(jmiCfdiMassiveValidation);
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de compras");
@@ -616,6 +623,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPrice.addActionListener(this);
         jmiDpsPriceHist.addActionListener(this);
         jmiDpsDocRemission.addActionListener(this);
+        jmiCfdiMassiveValidation.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
         jmiDpsAdjDocAnn.addActionListener(this);
         jmiStkDvyPend.addActionListener(this);
@@ -734,6 +742,7 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsPrice.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsPriceHist.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsDocRemission.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
+        jmiCfdiMassiveValidation.setEnabled(true);
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
@@ -947,6 +956,15 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
                         moFormDpsRo = new SFormDps(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR);
                     }
                     miForm = moFormDpsRo;
+                    if (pk != null) {
+                        moRegistry = new SDataDps();
+                    }
+                    break;
+                case SDataConstants.TRNX_DPS_EDIT:
+                    if (moFormDpsEdit == null) {
+                        moFormDpsEdit = new SFormDpsEdit(miClient);
+                    }
+                    miForm = moFormDpsEdit;
                     if (pk != null) {
                         moRegistry = new SDataDps();
                     }
@@ -1501,6 +1519,9 @@ public class SGuiModuleTrnPur extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if (item == jmiDpsDocRemission) {
                 showView(SDataConstants.TRNX_DOC_REMISSION, SDataConstantsSys.TRNS_CT_DPS_PUR);
+            }
+            else if(item == jmiCfdiMassiveValidation){
+                new SFormCfdiMassiveValidation(miClient, SDataConstantsSys.TRNS_CT_DPS_PUR).setVisible(true);
             }
             else if (item == jmiOrdersFunctionalArea) {
                  miClient.getSession().showView(SModConsts.TRNX_ORD_LIM_MAX, SModConsts.CFGU_FUNC, new SGuiParams(SModSysConsts.TRNS_CT_DPS_PUR));

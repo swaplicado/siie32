@@ -413,7 +413,6 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     mvDbmsItemBizPartnerDescription = description.getDbmsItemBizPartnerDescriptions();
                 }
 
-
                 // Read aswell customer configuration, if exists:
 
                 if (mbIsCustomer) {

@@ -5,7 +5,9 @@
 
 package erp.mtrn.view;
 
+import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
@@ -16,11 +18,12 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
 import erp.mod.SModConsts;
+import sa.lib.SLibUtils;
 import sa.lib.grid.SGridConsts;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -116,21 +119,31 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
                 }
             }
         }
-
+        
+        String complementaryDbName = "";
+        
+        try {
+            complementaryDbName = SClientUtils.getComplementaryDdName((SClientInterface) miClient);
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+        
          msSql = "SELECT d.dt AS f_dt, dt.code AS f_tp_doc, tp.tp_cfd, " + (!isCfdiSignPending() ? "vt.pac AS f_pac, " : "") +
                  "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, cob.code AS f_cob, dx.uuid, " +
                  "IF(d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
                  //"IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(dx.uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + STableConstants.ICON_XML_SIGN + ") AS f_ico_xml " +
-                 "IF(dx.ts IS NULL OR dx.doc_xml = '', " + STableConstants.ICON_NULL  + ", " + /* not is CFD not is CFDI */
+                 "IF(dx.ts IS NULL OR xc.doc_xml = '', " + STableConstants.ICON_NULL  + ", " + /* not is CFD not is CFDI */
                  "IF(dx.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR dx.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + /* is CFD */
                  "IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(dx.uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + /* CFDI pending sign */
-                 "IF(LENGTH(dx.ack_can_xml) = 0 AND dx.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + /* CFDI signed, canceled only SIIE */
-                 "IF(LENGTH(dx.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " + /* CFDI canceled with cancellation acknowledgment in XML format */
-                 "IF(dx.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + /* CFDI canceled with cancellation acknowledgment in PDF format */
+                 "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + /* CFDI signed, canceled only SIIE */
+                 "IF(LENGTH(xc.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " + /* CFDI canceled with cancellation acknowledgment in XML format */
+                 "IF(xc.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + /* CFDI canceled with cancellation acknowledgment in PDF format */
                  STableConstants.ICON_XML_SIGN + " " + /* CFDI signed, canceled only SIIE */
                  ")))))) AS f_ico_xml " +
                  "FROM trn_dps AS d " +
-                 "INNER JOIN trn_cfd AS dx ON d.id_year = dx.fid_dps_year_n AND d.id_doc = dx.fid_dps_doc_n ";
+                 "INNER JOIN trn_cfd AS dx ON d.id_year = dx.fid_dps_year_n AND d.id_doc = dx.fid_dps_doc_n " + 
+                 "LEFT OUTER JOIN " + complementaryDbName + ".trn_cfd AS xc ON dx.id_cfd = xc.id_cfd ";
          
          if (!isCfdiSignPending()) {
              msSql += "INNER JOIN trn_sign AS xs ON dx.id_cfd = xs.fid_cfd_n " +
@@ -151,14 +164,15 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
                  (isCfdiPayrollVersionOld() ? "IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
                  "IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + ", " + STableConstants.ICON_XML_PEND + ", " + STableConstants.ICON_XML_SIGN + ") AS f_ico_xml " :
                  "IF(hr.fk_st_rcp = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
-                 "IF(dx.ts IS NULL OR dx.doc_xml = '', " + STableConstants.ICON_NULL  + ", " /* without icon (not have CFDI associated) */ +
+                 "IF(dx.ts IS NULL OR xc.doc_xml = '', " + STableConstants.ICON_NULL  + ", " /* without icon (not have CFDI associated) */ +
                  "IF(dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(dx.uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " /* CFDI pending sign */ +
-                 "IF(LENGTH(dx.ack_can_xml) = 0 AND dx.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN + ", " /* CFDI signed, canceled only SIIE */ +
-                 "IF(LENGTH(dx.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " /* CFDI canceled with cancellation acknowledgment in XML format */ +
-                 "IF(dx.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " /* CFDI canceled with cancellation acknowledgment in PDF format */ +
+                 "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN + ", " /* CFDI signed, canceled only SIIE */ +
+                 "IF(LENGTH(xc.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " /* CFDI canceled with cancellation acknowledgment in XML format */ +
+                 "IF(xc.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " /* CFDI canceled with cancellation acknowledgment in PDF format */ +
                  SGridConsts.ICON_XML_ISSU + "" /* CFDI signed, canceled only SIIE */ +
                  "))))) AS f_ico_xml ") +
-                 "FROM trn_cfd AS dx ";
+                 "FROM trn_cfd AS dx " + 
+                 "INNER JOIN " + complementaryDbName + ".trn_cfd AS xc ON dx.id_cfd = xc.id_cfd ";
          
          if (!isCfdiSignPending()) {
              msSql += "INNER JOIN trn_sign AS xs ON dx.id_cfd = xs.fid_cfd_n " +

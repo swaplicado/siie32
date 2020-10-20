@@ -1850,13 +1850,13 @@ public class SDialogCfdiImport extends javax.swing.JDialog implements java.awt.e
         
         moDpsNew.setFkCompanyBranchId(miClient.getSessionXXX().getCurrentCompanyBranchId());
         moDpsNew.setFkFunctionalAreaId(SModSysConsts.CFGU_FUNC_NON);
-        moDpsNew.setFkBizPartnerId_r(moBizPartnerReceptor.getPkBizPartnerId());
-        moDpsNew.setFkBizPartnerBranchId(moBizPartnerReceptor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
-        moDpsNew.setFkBizPartnerBranchAddressId(moBizPartnerReceptor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        moDpsNew.setFkBizPartnerId_r(moBizPartnerEmisor.getPkBizPartnerId());
+        moDpsNew.setFkBizPartnerBranchId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        moDpsNew.setFkBizPartnerBranchAddressId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
         
-        moDpsNew.setFkBizPartnerAltId_r(moBizPartnerReceptor.getPkBizPartnerId()); 
-        moDpsNew.setFkBizPartnerBranchAltId(moBizPartnerReceptor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
-        moDpsNew.setFkBizPartnerBranchAddressAltId(moBizPartnerReceptor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
+        moDpsNew.setFkBizPartnerAltId_r(moBizPartnerEmisor.getPkBizPartnerId()); 
+        moDpsNew.setFkBizPartnerBranchAltId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getPkBizPartnerBranchId());
+        moDpsNew.setFkBizPartnerBranchAddressAltId(moBizPartnerEmisor.getDbmsBizPartnerBranches().get(0).getDbmsBizPartnerBranchAddresses().get(0).getPkAddressId());
         
         moDpsNew.setFkBizPartnerAddresseeId_n(0);
         moDpsNew.setFkAddresseeBizPartnerId_nr(0);
@@ -1909,8 +1909,6 @@ public class SDialogCfdiImport extends javax.swing.JDialog implements java.awt.e
             saveItemMatchBizPartner(row);
         }
         
-        moDpsNew.getDbmsDataDpsCfd().setPaymentWay(moComprobante.getAttFormaPago().getString());
-        moDpsNew.getDbmsDataDpsCfd().setPaymentMethod(moComprobante.getAttMetodoPago().getString());
         try {
             moDpsNew.calculateTotal(miClient); 
         }

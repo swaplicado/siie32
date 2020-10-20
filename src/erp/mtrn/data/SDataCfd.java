@@ -8,6 +8,7 @@ package erp.mtrn.data;
 import cfd.DCfdUtils;
 import erp.SBaseXClient;
 import erp.SBaseXUtils;
+import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
@@ -37,7 +38,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Juan Barajas, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Claudio Peña, Sergio Flores, Isabel Servín
  */
 public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -493,7 +494,10 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         reset();
 
         try {
-            sql = "SELECT * FROM trn_cfd WHERE id_cfd = " + key[0] + " ";
+            sql = "SELECT x.*, xc.doc_xml, xc.doc_xml_name, xc.ack_can_xml, xc.ack_can_pdf_n "
+                    + "FROM trn_cfd AS x "
+                    + "INNER JOIN " + SClientUtils.getComplementaryDbName(statement.getConnection()) + ".trn_cfd AS xc ON x.id_cfd = xc.id_cfd "
+                    + "WHERE x.id_cfd = " + key[0] + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT);
@@ -519,7 +523,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 //moQrCode_n = resultSet.getBlob("qrc_n"); it's cannot read a object blob (2014-03-10, jbarajas)
                 msCancellationStatus = resultSet.getString("can_st");
                 msAcknowledgmentCancellationXml = resultSet.getString("ack_can_xml");
-                //moAcknowledgmentCancellationPdf_n = resultSet.getBlob("ack_can_pdf_n"); it's cannot read a object blob (2014-09-01, jbarajas)
+                //moAcknowledgmentCancellationPdf_n = resultSet.getBlob("ack_can_pdf_n"); cannot read a object blob (2014-09-01, jbarajas)
                 msAcknowledgmentDelivery = resultSet.getString("ack_dvy");
                 msMessageDelivery = resultSet.getString("msg_dvy");
                 mbIsProcessingWebService = resultSet.getBoolean("b_prc_ws");
@@ -595,6 +599,7 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
         final int LENGTH_CURRENCY = 15;
         boolean bIsUpd = false;
         String sql = "";
+        String sqlComp;
         ResultSet resultSet = null;
         Statement statement = null;
         PreparedStatement preparedStatement = null;
@@ -632,8 +637,8 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                 */
          
                 sql = "INSERT INTO trn_cfd (id_cfd, ser, num, " +
-                        "ts, cert_num, str_signed, signature, doc_xml_uuid, doc_xml, doc_xml_name, xml_rfc_emi, xml_rfc_rec, xml_tot, xml_mon, " +
-                        "xml_tc, xml_sign_n, uuid, qrc_n, can_st, ack_can_xml, ack_can_pdf_n, ack_dvy, msg_dvy, b_prc_ws, b_prc_sto_xml, " +
+                        "ts, cert_num, str_signed, signature, doc_xml_uuid, xml_rfc_emi, xml_rfc_rec, xml_tot, xml_mon, " +
+                        "xml_tc, xml_sign_n, uuid, qrc_n, can_st, ack_dvy, msg_dvy, b_prc_ws, b_prc_sto_xml, " +
                         "b_prc_sto_pdf, b_con, fid_tp_cfd, fid_tp_xml, fid_st_xml, fid_tp_xml_dvy, fid_st_xml_dvy, fid_cob_n, fid_fact_bank_n, fid_dps_year_n, fid_dps_doc_n, " +
                         "fid_rec_year_n, fid_rec_per_n, fid_rec_bkc_n, fid_rec_tp_rec_n, fid_rec_num_n, fid_rec_ety_n, fid_pay_pay_n, fid_pay_emp_n, fid_pay_bpr_n, fid_pay_rcp_pay_n, fid_pay_rcp_emp_n, " +
                         "fid_pay_rcp_iss_n, fid_usr_prc, fid_usr_dvy, ts_prc, ts_dvy) " +
@@ -641,19 +646,25 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                         "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                        "?, ?, ?, NOW(), NOW())";
+                        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+                        "NOW(), NOW())";
+                sqlComp = "INSERT INTO " + SClientUtils.getComplementaryDbName(connection) + ".trn_cfd " +
+                        "(id_cfd, doc_xml, doc_xml_name, ack_can_xml, ack_can_pdf_n) " + 
+                        "VALUES (" + mnPkCfdId + ", ?, ?, ?, ?)";
             }
             else {
                 bIsUpd = true;
                 
                 sql = "UPDATE trn_cfd SET ser = ?, num = ?, ts = ?, cert_num = ?, str_signed = ?, signature = ?, doc_xml_uuid = ?, " +
-                        "doc_xml = ?, doc_xml_name = ?, xml_rfc_emi = ?, xml_rfc_rec = ?, xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, " +
-                        "uuid = ?, qrc_n = ?, can_st = ?, ack_can_xml = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, " +
+                        "xml_rfc_emi = ?, xml_rfc_rec = ?, xml_tot = ?, xml_mon = ?, xml_tc = ?, xml_sign_n = ?, " +
+                        "uuid = ?, qrc_n = ?, can_st = ?, ack_dvy = ?, msg_dvy = ?, b_con = ?, " +
                         "fid_tp_cfd = ?, fid_tp_xml = ?, fid_st_xml = ?, fid_tp_xml_dvy = ?, fid_st_xml_dvy = ?, fid_cob_n = ?, fid_fact_bank_n = ?, " +
                         "fid_dps_year_n = ?, fid_dps_doc_n = ?, fid_rec_year_n = ?, fid_rec_per_n = ?, fid_rec_bkc_n = ?, fid_rec_tp_rec_n = ?, fid_rec_num_n = ?, fid_rec_ety_n = ?, " +
                         "fid_pay_pay_n = ?, fid_pay_emp_n = ?, fid_pay_bpr_n = ?, fid_pay_rcp_pay_n = ?, fid_pay_rcp_emp_n = ?, fid_pay_rcp_iss_n = ?, fid_usr_dvy = ?, ts_dvy = NOW() " +
-                        "WHERE id_cfd = " + mnPkCfdId + " ";               
+                        "WHERE id_cfd = " + mnPkCfdId + " "; 
+                sqlComp = "UPDATE " + SClientUtils.getComplementaryDbName(connection) + ".trn_cfd " +
+                        "SET doc_xml = ?, doc_xml_name = ?, ack_can_xml = ? " + 
+                        "WHERE id_cfd = " + mnPkCfdId + " ";
             }
             
             parseCfdiAttributes(connection, msDocXml);
@@ -667,8 +678,6 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement.setString(index++, msStringSigned);
             preparedStatement.setString(index++, msSignature);
             preparedStatement.setString(index++, msBasexUuid);
-            preparedStatement.setString(index++, SLibUtils.textToSql(msDocXml));
-            preparedStatement.setString(index++, SLibUtils.textToSql(msDocXmlName));
             preparedStatement.setString(index++, msDocXmlRfcEmi);
             preparedStatement.setString(index++, msDocXmlRfcRec);
             preparedStatement.setDouble(index++, mdDocXmlTot);
@@ -690,11 +699,6 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement.setString(index++, msUuid);
             preparedStatement.setNull(index++, java.sql.Types.BLOB); // NOTE: 2018-05-16, Sergio Flores: QR code will not be saved anymore, it was never useful!
             preparedStatement.setString(index++, msCancellationStatus);
-            preparedStatement.setString(index++, msAcknowledgmentCancellationXml);
-            
-            if (!bIsUpd) {
-                preparedStatement.setNull(index++, java.sql.Types.BLOB); // it's cannot updated a object blob (2014-09-01, jbarajas)
-            }
             
             preparedStatement.setString(index++, msAcknowledgmentDelivery);
             preparedStatement.setString(index++, msMessageDelivery);
@@ -781,6 +785,18 @@ public class SDataCfd extends erp.lib.data.SDataRegistry implements java.io.Seri
             preparedStatement.setInt(index++, mnFkUserDeliveryId);
             
             preparedStatement.execute();            
+            
+            // Ingresar a la BD complementaria:
+            
+            index = 1;
+            preparedStatement = connection.prepareStatement(sqlComp);
+            preparedStatement.setString(index++, SLibUtils.textToSql(msDocXml));
+            preparedStatement.setString(index++, SLibUtils.textToSql(msDocXmlName));
+            preparedStatement.setString(index++, msAcknowledgmentCancellationXml);
+            if (!bIsUpd) {
+                preparedStatement.setNull(index++, java.sql.Types.BLOB); // cannot updated a object blob (2014-09-01, jbarajas)
+            }
+            preparedStatement.execute();
             
             /* XXX 2018-09-11, Sergio Flores: By now, BaseX exportation of XML is disabled, until this schema is properly evaluated and validated.
             try {

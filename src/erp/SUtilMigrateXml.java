@@ -18,7 +18,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import sa.lib.gui.SGuiConsts;
 
 /**
- *
+ * Esta clase está en proceso.
+ * Objetivo: migrar los XML de CFD y CFDI en la tabla trn_cfd (aún de la base de datos de la empresa) al DBMS BaseX.
  * @author Antonio Ortega
  */
 public class SUtilMigrateXml extends javax.swing.JFrame {

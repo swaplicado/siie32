@@ -20,9 +20,11 @@ import java.util.Date;
 import sa.gui.util.SUtilConsts;
 
 /**
- *
+ * Esta clase es obsoleta.
+ * Objetivo: importar de SIIE 1.0 los recibos de nómina para generar CFDI correspondientes.
  * @author Juan Barajas, Sergio Flores
  */
+@Deprecated
 public class SDbFormerPayrollImport extends SDataRegistry implements Serializable {
 
     protected int mnPayrollId;

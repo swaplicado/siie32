@@ -5,6 +5,8 @@
 package erp.mod.fin.db;
 
 import cfd.DCfdConsts;
+import erp.SClientUtils;
+import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
@@ -31,7 +33,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Isabel Servín
  */
 public abstract class SFiscalUtils {
 
@@ -2459,7 +2461,7 @@ public abstract class SFiscalUtils {
                     + "fald3.id_ref_1 AS f_ld3_ref1, fald3.id_ref_2 AS f_ld3_ref2, fald3.acc_code, fald3.acc_name, "
                     + "fald4.id_ref_1 AS f_ld4_ref1, fald4.id_ref_2 AS f_ld4_ref2, fald4.acc_code, fald4.acc_name, "
                     + "re.fid_dps_year_n, re.fid_dps_doc_n, doc.num_ser, doc.num, doc.dt, doc.tot_r, doc.exc_rate, doc_cur.id_cur, doc_fcur.id_fiscal_cur, doc_fcur.code, "
-                    + "@pos := INSTR(cfd.doc_xml, 'UUID=') AS f_cfd_pos, UPPER(IF(@pos = 0, '', MID(cfd.doc_xml, @pos + 6, 36))) AS f_cfd_uuid, doc_bp.fiscal_id, doc_bp.fiscal_frg_id, "
+                    + "@pos := INSTR(xc.doc_xml, 'UUID=') AS f_cfd_pos, UPPER(IF(@pos = 0, '', MID(xc.doc_xml, @pos + 6, 36))) AS f_cfd_uuid, doc_bp.fiscal_id, doc_bp.fiscal_frg_id, "
                     + "re.fid_check_wal_n, re.fid_check_n, acsh_bnk.acc_num, fbnk.id_fiscal_bank, fbnk.code, bnk_fcur.id_fiscal_cur, bnk_fcur.code, chk.num, chk.dt, chk.val, chk.benef, chk_bp.bp, chk_bp.fiscal_id "
                     + ""
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re "
@@ -2485,7 +2487,8 @@ public abstract class SFiscalUtils {
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS doc ON doc.id_year = re.fid_dps_year_n AND doc.id_doc = re.fid_dps_doc_n "
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS doc_cur ON doc_cur.id_cur = doc.fid_cur "
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FINS_FISCAL_CUR) + " AS doc_fcur ON doc_fcur.id_fiscal_cur = doc_cur.fid_fiscal_cur "
-                    + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON cfd.fid_dps_year_n = doc.id_year AND cfd.fid_dps_doc_n = doc.id_doc "
+                    + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS  ONcfd cfd.fid_dps_year_n = doc.id_year AND cfd.fid_dps_doc_n = doc.id_doc "
+                    + "LEFT OUTER JOIN " + SClientUtils.getComplementaryDdName((SClientInterface)session.getClient()) + "." + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS xc ON cfd.id_cfd = xc.id_cfd " 
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS doc_bp ON doc_bp.id_bp = doc.fid_bp_r "
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CHECK_WAL) + " AS chkw ON chkw.id_check_wal = re.fid_check_wal_n "
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC_CASH) + " AS acsh ON acsh.id_cob = chkw.fid_cob AND acsh.id_acc_cash = chkw.fid_acc_cash "
@@ -2587,6 +2590,7 @@ public abstract class SFiscalUtils {
                         "@xi := LOCATE(' TipoCambio=\"', doc_xml), @xf := LOCATE('\"', doc_xml, @xi + 13), " +
                         "IF(@xi = 0, '" + SUtilConsts.NON_APPLYING + "', UPPER(SUBSTRING(doc_xml, @xi + 13, @xf - @xi - 13))) AS f_TipoCambio " +
                         "FROM trn_cfd " +
+                        "INNER JOIN " + SClientUtils.getComplementaryDdName((SClientInterface)session.getClient()) + ".trn_cfd AS xc ON trn_cfd.id_cfd = xc.id_cfd " +
                         "WHERE " +
                         "fid_rec_year_n = " + resultSetRecEty.getInt("re.id_year") + " AND " +
                         "fid_rec_per_n = " + resultSetRecEty.getInt("re.id_per") + " AND " +
@@ -2804,7 +2808,7 @@ public abstract class SFiscalUtils {
                     + "fald3.id_ref_1 AS f_ld3_ref1, fald3.id_ref_2 AS f_ld3_ref2, fald3.acc_code, fald3.acc_name, "
                     + "fald4.id_ref_1 AS f_ld4_ref1, fald4.id_ref_2 AS f_ld4_ref2, fald4.acc_code, fald4.acc_name, "
                     + "re.fid_dps_year_n, re.fid_dps_doc_n, doc.num_ser, doc.num, doc.dt, doc.tot_r, doc.exc_rate, doc_cur.id_cur, doc_fcur.id_fiscal_cur, doc_fcur.code, "
-                    + "@pos := INSTR(cfd.doc_xml, 'UUID=') AS f_cfd_pos, UPPER(IF(@pos = 0, '', MID(cfd.doc_xml, @pos + 6, 36))) AS f_cfd_uuid, doc_bp.fiscal_id, doc_bp.fiscal_frg_id, "
+                    + "@pos := INSTR(xc.doc_xml, 'UUID=') AS f_cfd_pos, UPPER(IF(@pos = 0, '', MID(xc.doc_xml, @pos + 6, 36))) AS f_cfd_uuid, doc_bp.fiscal_id, doc_bp.fiscal_frg_id, "
                     + "re.fid_check_wal_n, re.fid_check_n, acsh_bnk.acc_num, fbnk.id_fiscal_bank, fbnk.code, bnk_fcur.id_fiscal_cur, bnk_fcur.code, chk.num, chk.dt, chk.val, chk.benef, chk_bp.bp, chk_bp.fiscal_id, "
                     + "fbnk.id_fiscal_bank, fbnk.code "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re "
@@ -2823,8 +2827,8 @@ public abstract class SFiscalUtils {
                     // link to items:
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK_DET) + " AS fald3 ON "
                     + "fald3.id_year = " + coaPeriod[0] + " AND fald3.id_per = " + coaPeriod[1] + " AND fald3.id_acc = a.pk_acc AND ("
-                    + "(fald3.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_INC + "/* AND re.debit = 0.0*/) OR "    // TODO: 2018-09-17, Sergio Flores: Remove commented query snippet if no longer needed
-                    + "(fald3.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_EXP + "/* AND re.credit = 0.0*/)) AND " // TODO: 2018-09-17, Sergio Flores: Remove commented query snippet if no longer needed
+                    + "(fald3.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_INC + ") OR "
+                    + "(fald3.id_tp_fiscal_acc_link = " + SModSysConsts.FINS_TP_FISCAL_ACC_LINK_RES_EXP + ")) AND "
                     + "fald3.id_ref_1 = re.fid_item_n AND fald3.id_ref_2 = " + SLibConsts.UNDEFINED + " "
                     // link to accounting accounts:
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK_DET) + " AS fald4 ON "
@@ -2835,6 +2839,7 @@ public abstract class SFiscalUtils {
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS doc_cur ON doc_cur.id_cur = doc.fid_cur "
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FINS_FISCAL_CUR) + " AS doc_fcur ON doc_fcur.id_fiscal_cur = doc_cur.fid_fiscal_cur "
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS cfd ON cfd.fid_dps_year_n = doc.id_year AND cfd.fid_dps_doc_n = doc.id_doc "
+                    + "LEFT OUTER JOIN " + SClientUtils.getComplementaryDdName((SClientInterface)session.getClient()) + "." + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS xc ON cfd.id_cfd = xc.id_cfd "
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS doc_bp ON doc_bp.id_bp = doc.fid_bp_r "
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_CHECK_WAL) + " AS chkw ON chkw.id_check_wal = re.fid_check_wal_n "
                     + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_ACC_CASH) + " AS acsh ON acsh.id_cob = chkw.fid_cob AND acsh.id_acc_cash = chkw.fid_acc_cash "
@@ -2937,6 +2942,7 @@ public abstract class SFiscalUtils {
                         "@xi := LOCATE(' TipoCambio=\"', doc_xml), @xf := LOCATE('\"', doc_xml, @xi + 13), " +
                         "IF(@xi = 0, '" + SUtilConsts.NON_APPLYING + "', UPPER(SUBSTRING(doc_xml, @xi + 13, @xf - @xi - 13))) AS f_TipoCambio " +
                         "FROM trn_cfd " +
+                        "INNER JOIN " + SClientUtils.getComplementaryDdName((SClientInterface)session.getClient()) + ".trn_cfd AS xc ON trn_cfd.id_cfd = xc.id_cfd " +
                         "WHERE " +
                         "fid_rec_year_n = " + resultSetRecEty.getInt("re.id_year") + " AND " +
                         "fid_rec_per_n = " + resultSetRecEty.getInt("re.id_per") + " AND " +
@@ -2944,7 +2950,7 @@ public abstract class SFiscalUtils {
                         "fid_rec_tp_rec_n = '" + resultSetRecEty.getString("re.id_tp_rec") + "' AND " +
                         "fid_rec_num_n = " + resultSetRecEty.getInt("re.id_num") + " AND " +
                         "fid_rec_ety_n = " + resultSetRecEty.getInt("re.id_ety") + " " +
-                        "ORDER BY id_cfd ";
+                        "ORDER BY trn_cfd.id_cfd ";
                 resultSetRecEtyCfd = statementRecEtyCfd.executeQuery(sql);
                 while (resultSetRecEtyCfd.next()) {
                     if (resultSetRecEtyCfd.getString("f_uuid").compareTo(SUtilConsts.NON_APPLYING) != 0) {

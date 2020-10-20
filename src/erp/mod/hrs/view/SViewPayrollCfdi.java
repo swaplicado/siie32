@@ -4,6 +4,7 @@
  */
 package erp.mod.hrs.view;
 
+import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -50,7 +51,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Juan Barajas, Claudio Peña, Sergio Flores
+ * @author Juan Barajas, Claudio Peña, Sergio Flores, Isabel Servín
  */
 public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
 
@@ -781,7 +782,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
         msSql = "";
         for (int i = 0; i < sqlLenght; i++) {
             msSql += "SELECT "
-                    + (mnGridSubtype == SModConsts.VIEW_SC_DET ? "COALESCE(id_cfd, 0) AS " : "id_pay AS ") + SDbConsts.FIELD_ID + "1, "
+                    + (mnGridSubtype == SModConsts.VIEW_SC_DET ? "COALESCE(c.id_cfd, 0) AS " : "id_pay AS ") + SDbConsts.FIELD_ID + "1, "
                     + "pay_num AS " + SDbConsts.FIELD_CODE + ", "
                     + "pay_num AS " + SDbConsts.FIELD_NAME + ", "
                     + "pay_num, "
@@ -801,9 +802,9 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         + "IF(" + (isCfdiPayrollVersionOld() ? "c.fid_st_xml = " : "fk_st_rcp = ") + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + SGridConsts.ICON_ANNUL + ", " + SGridConsts.ICON_NULL + ") AS _ico, "
                         + "IF(c.fid_st_xml IS NULL, " + SGridConsts.ICON_NULL + ", " /* not have CFDI associated */
                         + "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(c.uuid) = 0, " + SGridConsts.ICON_XML_PEND + ", " /* CFDI pending sign */
-                        + "IF(LENGTH(c.ack_can_xml) = 0 AND c.ack_can_pdf_n IS NULL, " + SGridConsts.ICON_XML_ISSU + ", " /* CFDI signed, canceled only SIIE */
-                        + "IF(LENGTH(c.ack_can_xml) != 0, " + SGridConsts.ICON_XML_ANNUL_XML + ", " /* CFDI canceled with cancellation acknowledgment in XML format */
-                        + "IF(c.ack_can_pdf_n IS NOT NULL, " + SGridConsts.ICON_XML_ANNUL_PDF + ", " /* CFDI canceled with cancellation acknowledgment in PDF format */
+                        + "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, " + SGridConsts.ICON_XML_ISSU + ", " /* CFDI signed, canceled only SIIE */
+                        + "IF(LENGTH(xc.ack_can_xml) != 0, " + SGridConsts.ICON_XML_ANNUL_XML + ", " /* CFDI canceled with cancellation acknowledgment in XML format */
+                        + "IF(xc.ack_can_pdf_n IS NOT NULL, " + SGridConsts.ICON_XML_ANNUL_PDF + ", " /* CFDI canceled with cancellation acknowledgment in PDF format */
                         + SGridConsts.ICON_XML_ISSU + " " /* CFDI signed, canceled only SIIE */
                         + "))))) AS _ico_xml, "
                         + "!c.b_con AS _inconsistent, c.b_prc_ws, c.b_prc_sto_xml, c.b_prc_sto_pdf ";
@@ -878,10 +879,20 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                         + "ORDER BY v.per_year, v.per, pay_type, v.num, v.id_pay " + (mnGridSubtype == SModConsts.VIEW_SC_DET ? ", pe.id_emp, pei.id_iss " : "")
                         + ") AS t ";
             }
+            
+            String complementaryDbName = "";
+            
+            try {
+                complementaryDbName = SClientUtils.getComplementaryDdName((SClientInterface) miClient);
+            }
+            catch (Exception e) {
+                SLibUtils.printException(this, e);
+            }
 
             msSql += (mnGridSubtype == SModConsts.VIEW_SC_DET ? "INNER JOIN " : "LEFT OUTER JOIN ") + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON "
                     + (isCfdiPayrollVersionOld() ? "t.id_pay = c.fid_pay_pay_n AND t.id_emp = c.fid_pay_emp_n " : "t.id_pay = c.fid_pay_rcp_pay_n AND t.id_emp = c.fid_pay_rcp_emp_n AND t.id_iss = c.fid_pay_rcp_iss_n ")
-                    + "AND NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) ";
+                    + "AND NOT (c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND c.b_con = 0) " 
+                    + "LEFT OUTER JOIN " + complementaryDbName + "." + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS xc ON c.id_cfd = xc.id_cfd ";
 
             if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
                 msSql += "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS b ON " + (isCfdiPayrollVersionOld() ? "t.fid_bpr_n = b.id_bp " : "t.id_emp = b.id_bp ") + 

@@ -100,7 +100,6 @@ public class SViewOrders extends SGridPaneView {
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS un ON d.fid_usr_new = un.id_usr " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ue ON d.fid_usr_edit = ue.id_usr " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ud ON d.fid_usr_del = ud.id_usr " +
-                "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n WHERE NOT d.b_del " +
                 "AND d.id_year = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' AND  bp.id_bp = " + mnBizPartherId;
     }
           

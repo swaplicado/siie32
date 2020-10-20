@@ -270,6 +270,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxKeepExchangeRate;
     protected String msAuxFileXmlAbsolutePath;
     protected String msAuxFileXmlName;
+    protected sa.lib.srv.SSrvLock moAuxUserLock;
     
     protected double mdTempCfdIvaPorcentaje;
 
@@ -1946,6 +1947,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxKeepExchangeRate(boolean b) { mbAuxKeepExchangeRate = b; }
     public void setAuxFileXmlAbsolutePath(String s) { msAuxFileXmlAbsolutePath = s; }
     public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
+    public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
 
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
@@ -1969,6 +1971,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxKeepExchangeRate() { return mbAuxKeepExchangeRate; }
     public String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
     public String getAuxFileXmlName() { return msAuxFileXmlName; }
+    public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
 
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
@@ -2158,6 +2161,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxKeepExchangeRate = false;
         msAuxFileXmlAbsolutePath = "";
         msAuxFileXmlName = "";
+        moAuxUserLock = null;
         
         mdTempCfdIvaPorcentaje = 0;
 

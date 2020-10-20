@@ -25,6 +25,7 @@ import erp.mbps.data.SDataBizPartnerCategory;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mtrn.data.SCfdUtils;
+import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogCfdiImport;
 import java.awt.HeadlessException;
@@ -49,7 +50,7 @@ import sa.lib.SLibUtils;
 import sa.lib.xml.SXmlUtils;
 
 /**
- *
+ * Muestra el CFDI y se permite la validación cuando sea necesaria ante el SAT.
  * @author Isabel Servín
  */
 public final class SCfdRenderer implements java.awt.event.ActionListener{
@@ -64,6 +65,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
     private SDataDps moDpsRendered;
     private int mnBizCategory; 
     private JDialog moCfdiViewer;
+    private boolean mbShowValidateButton;
     
     /**
      * Clase que se encarga de mostrar el CFDI y hacer las validaciones previo 
@@ -94,6 +96,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         moCfdiFile = file; 
         moPurchaseOrder = dps;
         mnBizCategory = category;
+        mbShowValidateButton = true;
         createParamsMap();
         showCfdi();
         return moDpsRendered;
@@ -112,71 +115,80 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         
         cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(msCfdiXml);
         
+        if (!validation.getIsError()) {
+            String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(comprobante).getCfdiStatus(); 
+            if (!cfdiStatus.equals("Vigente")){
+                validation.setMessage("No se puede importar el CFDI ya que su estatus es : " + cfdiStatus + ".");
+            }
+        }
+
         // validar receptor del CFDI:
         
-        String receptor;
-        
-        if (comprobante.getEltReceptor().getAttNombre() == null || comprobante.getEltReceptor().getAttNombre().getString().isEmpty()) {
-            receptor = comprobante.getEltReceptor().getAttRfc().getString();
-        }
-        else {
-            receptor = comprobante.getEltReceptor().getAttNombre().getString() + " (" + comprobante.getEltReceptor().getAttRfc().getString() + ")";
-        }
-        
-        if (!comprobante.getEltReceptor().getAttRfc().getString().equals(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId())) {
-            validation.setMessage("¡El receptor '" + receptor + "' no corresponde a la empresa!");
-        }
-        else {
-            // validar emisor del CFDI:
+        if(!validation.getIsError()) {
+            String receptor;
 
-            String emisor;
-
-            if (comprobante.getEltEmisor().getAttNombre() == null || comprobante.getEltEmisor().getAttNombre().getString().isEmpty()) {
-                emisor = comprobante.getEltEmisor().getAttRfc().getString();
+            if (comprobante.getEltReceptor().getAttNombre() == null || comprobante.getEltReceptor().getAttNombre().getString().isEmpty()) {
+                receptor = comprobante.getEltReceptor().getAttRfc().getString();
             }
             else {
-                emisor = comprobante.getEltEmisor().getAttNombre().getString() + " (" + comprobante.getEltEmisor().getAttRfc().getString() + ")";
+                receptor = comprobante.getEltReceptor().getAttNombre().getString() + " (" + comprobante.getEltReceptor().getAttRfc().getString() + ")";
             }
 
-            int idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), 
-                    comprobante.getEltEmisor().getAttRfc().getString(), "", 0);
-
-            if (idEmisor == 0) {
-                validation.setMessage("¡El emisor '" + emisor + "' no existe en los catálogos de proveedores ni de asociados de negocios!");
+            if (!comprobante.getEltReceptor().getAttRfc().getString().equals(miClient.getSessionXXX().getCompany().getDbmsDataCompany().getFiscalId())) {
+                validation.setMessage("¡El receptor '" + receptor + "' no corresponde a la empresa!");
             }
             else {
-                idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), 
-                        comprobante.getEltEmisor().getAttRfc().getString(), "", SDataConstantsSys.BPSS_CT_BP_SUP);
+                // validar emisor del CFDI:
 
-                if (idEmisor == 0) {
-                    validation.setMessage("¡El emisor '" + emisor + "' no existe en el catálogo de proveedores!");
+                String emisor;
+
+                if (comprobante.getEltEmisor().getAttNombre() == null || comprobante.getEltEmisor().getAttNombre().getString().isEmpty()) {
+                    emisor = comprobante.getEltEmisor().getAttRfc().getString();
                 }
                 else {
-                    SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, 
-                            SDataConstants.BPSU_BP, new int[] { idEmisor }, SLibConstants.EXEC_MODE_SILENT);
-                    SDataBizPartnerCategory bizPartnerCategory = bizPartner.getDbmsCategorySettingsSup(); // variable de conveniencia
+                    emisor = comprobante.getEltEmisor().getAttNombre().getString() + " (" + comprobante.getEltEmisor().getAttRfc().getString() + ")";
+                }
 
-                    if (bizPartner.getIsDeleted()) {
-                        validation.setMessage("¡El emisor '" + emisor + "' está eliminado como asociado de negocios!");
-                    }
-                    else if (bizPartnerCategory == null) {
-                        validation.setMessage("¡El emisor '" + emisor + "' no es proveedor!");
-                    }
-                    else if (bizPartnerCategory.getIsDeleted()) {
-                        validation.setMessage("¡El emisor '" + emisor + "' está eliminado como proveedor!");
-                    }
-                    else if (SDataUtilities.obtainIsBizPartnerBlocked(miClient, bizPartner.getPkBizPartnerId(), mnBizCategory)) {
-                        validation.setMessage("!El emisor '" + emisor + "' está bloqueado!");
+                int idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), 
+                        comprobante.getEltEmisor().getAttRfc().getString(), "", 0);
+
+                if (idEmisor == 0) {
+                    validation.setMessage("¡El emisor '" + emisor + "' no existe en los catálogos de proveedores ni de asociados de negocios!");
+                }
+                else {
+                    idEmisor = SBpsUtils.getBizParterIdByFiscalId(miClient.getSession().getStatement(), 
+                            comprobante.getEltEmisor().getAttRfc().getString(), "", SDataConstantsSys.BPSS_CT_BP_SUP);
+
+                    if (idEmisor == 0) {
+                        validation.setMessage("¡El emisor '" + emisor + "' no existe en el catálogo de proveedores!");
                     }
                     else {
-                        if (miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditInvoice()) {
-                            int risk = bizPartnerCategory.getEffectiveRiskTypeId();
-                            
-                            if (risk == SModSysConsts.BPSS_RISK_D_BLK) {
-                                validation.setMessage(SLibConstants.MSG_INF_BP_BLOCKED);
-                            }
-                            else if (risk == SModSysConsts.BPSS_RISK_E_TRL) {
-                                validation.setMessage(SLibConstants.MSG_INF_BP_TRIAL);
+                        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, 
+                                SDataConstants.BPSU_BP, new int[] { idEmisor }, SLibConstants.EXEC_MODE_SILENT);
+                        SDataBizPartnerCategory bizPartnerCategory = bizPartner.getDbmsCategorySettingsSup(); // variable de conveniencia
+
+                        if (bizPartner.getIsDeleted()) {
+                            validation.setMessage("¡El emisor '" + emisor + "' está eliminado como asociado de negocios!");
+                        }
+                        else if (bizPartnerCategory == null) {
+                            validation.setMessage("¡El emisor '" + emisor + "' no es proveedor!");
+                        }
+                        else if (bizPartnerCategory.getIsDeleted()) {
+                            validation.setMessage("¡El emisor '" + emisor + "' está eliminado como proveedor!");
+                        }
+                        else if (SDataUtilities.obtainIsBizPartnerBlocked(miClient, bizPartner.getPkBizPartnerId(), mnBizCategory)) {
+                            validation.setMessage("!El emisor '" + emisor + "' está bloqueado!");
+                        }
+                        else {
+                            if (miClient.getSessionXXX().getParamsErp().getIsPurchasesCreditInvoice()) {
+                                int risk = bizPartnerCategory.getEffectiveRiskTypeId();
+
+                                if (risk == SModSysConsts.BPSS_RISK_D_BLK) {
+                                    validation.setMessage(SLibConstants.MSG_INF_BP_BLOCKED);
+                                }
+                                else if (risk == SModSysConsts.BPSS_RISK_E_TRL) {
+                                    validation.setMessage(SLibConstants.MSG_INF_BP_TRIAL);
+                                }
                             }
                         }
                     }
@@ -250,6 +262,17 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         }
     }
     
+    /**
+     * Recibe un archivo xml para visualizarlo en PDF.
+     * @param xml CFDI del doc.
+     */
+    public void showCfdi(String xml){
+        mbShowValidateButton = false;
+        msCfdiXml = xml;
+        createParamsMap();
+        showCfdi();
+    }
+    
     private void createParamsMap() {
         try {
             moParamsMap = new HashMap<>();
@@ -277,7 +300,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             moParamsMap.put("dCfdTotal", comprobante.getAttTotal().getDouble());
             moParamsMap.put("sCfdMetodoDePagoOpc", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET, comprobante.getAttMetodoPago().getString()));
             moParamsMap.put("sExpedidoEn", comprobante.getAttLugarExpedicion().getString());
-            moParamsMap.put("sCfdTipoDeComprobante", comprobante.getAttTipoDeComprobante().getString());
+            moParamsMap.put("sCfdTipoDeComprobante", catalogs.composeEntryDescription(SDataConstantsSys.TRNS_CFD_CAT_CFD_TP, comprobante.getAttTipoDeComprobante().getString()));
             moParamsMap.put("oEtlOpcImpuestos", comprobante.getEltOpcImpuestos());
             
             // Emisor:
@@ -333,12 +356,14 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
             moCfdiViewer = new JDialog(new JFrame(),"CFDI", true);
             moCfdiViewer.setSize(1000,800);
             moCfdiViewer.setLocationRelativeTo(null);
-            mjbValidate = new JButton(); 
-            mjbValidate.setText("Continuar");
-            mjbValidate.setBounds(430, 1, 100, 25);
-            mjbValidate.addActionListener(this);
-            mjbValidate.setToolTipText("Continuar con la captura del CFDI");
-            moCfdiViewer.add(mjbValidate);
+            if (mbShowValidateButton) {
+                mjbValidate = new JButton(); 
+                mjbValidate.setText("Continuar");
+                mjbValidate.setBounds(430, 1, 100, 25);
+                mjbValidate.addActionListener(this);
+                mjbValidate.setToolTipText("Continuar con la captura del CFDI");
+                moCfdiViewer.add(mjbValidate);
+            }
             File fileTemplate = new File("reps/view_cfdi_33.jasper");
             JasperReport relatoriosJasper =
             (JasperReport)JRLoader.loadObject(fileTemplate);
