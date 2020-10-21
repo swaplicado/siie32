@@ -18,7 +18,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.text.DecimalFormat;
 import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -39,7 +38,7 @@ import sa.lib.srv.SSrvUtils;
 
 /**
  *
- * @author Gerardo Hernández, Uriel Castañeda
+ * @author Gerardo Hernández, Uriel Castañeda, Isabel Servín
  */
 public class SDialogValuationBalances extends SBeanFormDialog implements ActionListener, ItemListener, ChangeListener {
 
@@ -79,6 +78,7 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
         jPanel14 = new javax.swing.JPanel();
         jlExchangeRate = new javax.swing.JLabel();
         moCurExchangeRate = new sa.lib.gui.bean.SBeanCompoundFieldCurrency();
+        jLabel2 = new javax.swing.JLabel();
         jPanel11 = new javax.swing.JPanel();
         jlRecord = new javax.swing.JLabel();
         moTextRecordDate = new sa.lib.gui.bean.SBeanFieldText();
@@ -86,13 +86,17 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
         moTextRecordNumber = new sa.lib.gui.bean.SBeanFieldText();
         jbPickRecord = new javax.swing.JButton();
         moTextRecordBranch = new sa.lib.gui.bean.SBeanFieldText();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel15 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros de valuación:"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros para revaluar saldos:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setMinimumSize(new java.awt.Dimension(211, 130));
         jPanel2.setName(""); // NOI18N
-        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
         jPanel10.setMinimumSize(new java.awt.Dimension(211, 20));
         jPanel10.setPreferredSize(new java.awt.Dimension(150, 23));
@@ -109,7 +113,7 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
         jPanel12.setRequestFocusEnabled(false);
         jPanel12.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlPeriod.setText("Mes:*");
+        jlPeriod.setText("Mes de corte:*");
         jlPeriod.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel12.add(jlPeriod);
         jPanel12.add(moCalPeriod);
@@ -139,6 +143,11 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
 
         moCurExchangeRate.setCompoundText("MXN");
         jPanel14.add(moCurExchangeRate);
+
+        jLabel2.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel2.setText("(Al último día del mes de corte.)");
+        jLabel2.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel14.add(jLabel2);
 
         jPanel2.add(jPanel14);
 
@@ -178,6 +187,24 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
 
         jPanel2.add(jPanel11);
 
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel1.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel1.setText("NOTA: se ajustarán todas las cuentas con saldo hasta la fecha de corte.");
+        jLabel1.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel3.add(jLabel1);
+
+        jPanel2.add(jPanel3);
+
+        jPanel15.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel3.setForeground(java.awt.SystemColor.textInactiveText);
+        jLabel3.setText("NOTA 2: se afectarán cuentas de dinero y cuentas de asociados de negocios.");
+        jLabel3.setPreferredSize(new java.awt.Dimension(450, 23));
+        jPanel15.add(jLabel3);
+
+        jPanel2.add(jPanel15);
+
         jPanel1.add(jPanel2, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -185,13 +212,18 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JButton jbPickRecord;
     private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlExchangeRate;
@@ -388,23 +420,23 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
         SGuiValidation validation = moFields.validateFields();
 
         if (validation.isValid()) {
-            if (moRecord == null) {
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRecord.getText()) + "'.");
+            if (miClient.getSession().getSessionCustom().isLocalCurrency(moKeyCurrency.getValue())) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlCurrency) + "'.");
+                validation.setComponent(moKeyCurrency);
+            }
+            else if (moRecord == null) {
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlRecord) + "'.");
                 validation.setComponent(jbPickRecord);
             }
             else if (moRecord.getPkYearId() != moCalYear.getValue()){
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlRecord.getText() + "' " + 
-                        SGuiConsts.ERR_MSG_FIELD_DATE_EQUAL + " " + SLibUtils.DecimalFormatCalendarYear.format(moCalYear.getValue()) + "."));
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlRecord) + "' " + 
+                        SGuiConsts.ERR_MSG_FIELD_DATE_EQUAL + " " + SLibUtils.DecimalFormatCalendarYear.format(moCalYear.getValue()) + ".");
                 validation.setComponent(jbPickRecord);
             }
             else if (moRecord.getPkPeriodId() != moCalPeriod.getValue()){
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlRecord.getText() + "' " + 
-                        SGuiConsts.ERR_MSG_FIELD_DATE_EQUAL + " " + SLibUtils.DecimalFormatCalendarMonth.format(moCalPeriod.getValue()) + "."));
+                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DATE_ + "'" + SGuiUtils.getLabelName(jlRecord) + "' " + 
+                        SGuiConsts.ERR_MSG_FIELD_DATE_EQUAL + " " + SLibUtils.DecimalFormatCalendarMonth.format(moCalPeriod.getValue()) + ".");
                 validation.setComponent(jbPickRecord);
-            }
-            else if (miClient.getSession().getSessionCustom().isLocalCurrency(moKeyCurrency.getValue())) {
-                validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + SGuiUtils.getLabelName(jlCurrency) + "'.");
-                validation.setComponent(moKeyCurrency);
             }
         }
         
@@ -418,11 +450,11 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
         SValuationBalances sbe = null;
         
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
-            msg = "Se realizará la valuación de saldos con los siguientes parámetros:\n"
-                    + "- periodo: " + moRecord.getRecordPeriod() + "\n"
-                    + "- fecha: " + SLibUtils.DateFormatDate.format(mtEndOfMonth) + "\n"
+            msg = "Se realizará la revaluación de saldos con los siguientes parámetros:\n"
+                    + "- período de corte: " + moRecord.getRecordPeriod() + "\n"
+                    + "- fecha de corte: " + SLibUtils.DateFormatDate.format(mtEndOfMonth) + "\n"
                     + "- " + SGuiUtils.getLabelName(jlCurrency) + ": " + moKeyCurrency.getSelectedItem().getItem() + "\n"
-                    + "- " + SGuiUtils.getLabelName(jlExchangeRate) + ": " +  new DecimalFormat("#.0000").format(moCurExchangeRate.getField().getValue()) + "\n" +
+                    + "- " + SGuiUtils.getLabelName(jlExchangeRate) + ": " +  SLibUtils.getDecimalFormatExchangeRate().format(moCurExchangeRate.getField().getValue()) + "\n" +
                     SGuiConsts.MSG_CNF_CONT;
             
             if (miClient.showMsgBoxConfirm(msg) == JOptionPane.YES_OPTION) {

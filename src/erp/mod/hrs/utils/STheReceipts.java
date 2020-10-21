@@ -5,6 +5,8 @@
  */
 package erp.mod.hrs.utils;
 
+import erp.SClientUtils;
+import erp.client.SClientInterface;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SDbConfig;
@@ -31,8 +33,8 @@ import sa.gui.util.SUtilConsts;
 import sa.lib.gui.SGuiClient;
 
 /**
- *
- * @author Edwin Carmona
+ * Regeneración de CFDI de nóminas con dato incorrecto de Subsidio para el empleo.
+ * @author Edwin Carmona, Isabel Servín
  */
 public class STheReceipts {
     private SGuiClient miClient;
@@ -78,7 +80,7 @@ public class STheReceipts {
                             "    hpr.id_emp, " +
                             "    bb.bp, " +
                             "    tc.uuid, " +
-                            "    erp.f_get_xml_atr('cfdi:Comprobante', 'Folio=', tc.doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_folio, " +
+                            "    erp.f_get_xml_atr('cfdi:Comprobante', 'Folio=', xc.doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_folio, " +
                             "    IF(hpr.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + ", " +
                             "        hpr.sal * " + SHrsConsts.MONTH_DAYS + ", " +
                             "        hpr.wage) AS montly_sal," +
@@ -98,6 +100,8 @@ public class STheReceipts {
                             "        INNER JOIN " +
                             "    trn_cfd tc ON hpr.id_pay = tc.fid_pay_rcp_pay_n " +
                             "        AND hpr.id_emp = tc.fid_pay_rcp_emp_n " +
+                            "        LEFT OUTER JOIN " + 
+                                 SClientUtils.getComplementaryDdName((SClientInterface)miClient) + ".trn_cfd AS xc ON tc.id_cfd = xc.id_cfd " +
                             "WHERE " +
                             "        hp.fk_tp_pay_sht = 1 " +
                             "        AND NOT hp.b_del " +

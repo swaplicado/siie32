@@ -5,13 +5,14 @@
  */
 package erp;
 
+import erp.client.SClientInterface;
 import java.sql.Connection;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbDatabase;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public abstract class SClientUtils {
     
@@ -42,5 +43,25 @@ public abstract class SClientUtils {
         }
         
         return connection;
+    }
+    
+    /**
+     * Devuelve el nombre de la base de datos complementaría a partir de una conexión a base de datos.
+     * @param connection Conexión a base de datos.
+     * @return String.
+     * @throws java.lang.Exception
+     */
+    public static String getComplementaryDbName(Connection connection) throws Exception {
+        return connection.getCatalog() + "_cfd";
+    }
+    
+    /**
+     * Devuelve el nombre de la base de datos complementaria a partir de una interfaz de cliente.
+     * @param client Interfaz de cliente.
+     * @return String.
+     * @throws java.lang.Exception
+     */
+    public static String getComplementaryDdName(SClientInterface client) throws Exception {
+        return getComplementaryDbName(client.getSession().getStatement().getConnection());
     }
 }

@@ -18,7 +18,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín
  */
 public abstract class SDataReadComponentItems {
 
@@ -1472,6 +1472,11 @@ public abstract class SDataReadComponentItems {
                 sql = "SELECT id_tp_link AS f_id_1, tp_link AS f_item FROM erp.trns_tp_link WHERE b_del = 0 " +
                         "ORDER BY id_tp_link ";
                 text = "tipo de referencia";
+                break;
+            case SDataConstants.TRNS_TP_CFD:
+                lenPk = 1;
+                sql = "SELECT id_tp_cfd AS f_id_1, tp_cfd AS f_item FROM erp.trns_tp_cfd ORDER BY id_tp_cfd ";
+                text = "tipo de CFD";
                 break;
             case SDataConstants.TRNX_DPS_BAL:
                 lenPk = 2;

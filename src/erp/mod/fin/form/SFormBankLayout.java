@@ -32,6 +32,7 @@ import erp.mod.fin.db.SMoney;
 import erp.mod.fin.db.SXmlBankLayout;
 import erp.mod.fin.db.SXmlBankLayoutPayment;
 import erp.mod.fin.db.SXmlBankLayoutPaymentDoc;
+import erp.mtrn.data.SCfdUtilsHandler;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -79,7 +80,7 @@ import sa.lib.xml.SXmlElement;
 
 /**
  *
- * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Sergio Flores
+ * @author Juan Barajas, Uriel Castañeda, Alfredo Pérez, Sergio Flores, Isabel Servín
  */
 public class SFormBankLayout extends SBeanForm implements ActionListener, ItemListener, CellEditorListener {
 
@@ -137,7 +138,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private ArrayList<SDataBizPartnerBranchBankAccount> maBizPartnerBranchBankAccounts;
     private HashMap<String, ArrayList<SGuiItem>> moAgreementReferencesMap;
     private ArrayList<SSrvLock> maLocks;
-
+    
     /**
      * Creates new form SFormLayoutBank
      * @param client GUI client.
@@ -1115,7 +1116,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     "WHERE d.id_year = de.id_year AND d.id_doc = de.id_doc AND de.b_del = 0), 0) AS f_iva, "+
                     "COALESCE((SELECT SUM(tax.tax_cur) FROM trn_dps_ety AS de " +
                     "INNER JOIN trn_dps_ety_tax AS tax ON de.id_year = tax.id_year AND de.id_doc = tax.id_doc AND de.id_ety = tax.id_ety AND tax.id_tax_bas = " + SDataConstantsSys.FINU_TAX_BAS_VAT + " " +
-                    "WHERE d.id_year = de.id_year AND d.id_doc = de.id_doc AND de.b_del = 0), 0) AS f_iva_cur, ADDDATE(d.dt_start_cred, d.days_cred) AS dt_mat " +
+                    "WHERE d.id_year = de.id_year AND d.id_doc = de.id_doc AND de.b_del = 0), 0) AS f_iva_cur, ADDDATE(d.dt_start_cred, d.days_cred) AS dt_mat, " +
+                    "x.uuid AS xml_uuid, x.xml_rfc_emi, x.xml_rfc_rec, x.xml_tot, x.fid_tp_cfd AS xml_type " +
                     "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                     "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                     "r.id_year = " + SLibTimeUtils.digestYear(moDateDateDue.getValue())[0] + " AND r.b_del = 0 AND re.b_del = 0 AND " +
@@ -1128,6 +1130,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur AND d.fid_cur = " + mnDpsCurrencyId + " " + // this member is zero when associated combo box is clear, then result set will be empty
                     "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
                     "LEFT OUTER JOIN erp.bpsu_bpb_con AS bpb_con ON bpb.id_bpb = bpb_con.id_bpb AND bpb_con.id_con = " + SDataConstantsSys.BPSS_TP_CON_ADM + " " +
+                    "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " +
                     "WHERE EXISTS (SELECT * FROM erp.bpsu_bank_acc AS ac WHERE bpb.id_bpb = ac.id_bpb AND ac.fid_bank " + 
                     (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") " +
                     "GROUP BY b.id_bp, b.bp, b.fiscal_id, d.exc_rate, bct.bp_key, bpb_con.email_01, cob.code, " +
@@ -1190,6 +1193,15 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     layoutBankRow.setConcept(moTextConcept.getValue());
                     layoutBankRow.setDescription(moTextConcept.getValue());
                     layoutBankRow.setObservations("");
+                    
+                    if (resulSet.getObject("xml_uuid") != null && !resulSet.getString("xml_uuid").equals("")) {
+                        layoutBankRow.setIsXml(true);
+                        layoutBankRow.setXmlUuid(resulSet.getString("xml_uuid"));
+                        layoutBankRow.setXmlRfcEmi(resulSet.getString("xml_rfc_emi"));
+                        layoutBankRow.setXmlRfcRec(resulSet.getString("xml_rfc_rec"));
+                        layoutBankRow.setXmlTotal(resulSet.getDouble("xml_tot"));
+                        layoutBankRow.setXmlType(resulSet.getInt("xml_type"));
+                    }
                     
                     layoutBankRow.getAccountCredits().addAll(maBeneficiaryAccountGuiItems);
                     layoutBankRow.getAgreementsReferences().addAll(maAgreementsReferenceGuiItems);
@@ -2400,6 +2412,31 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         }
     }
     
+    private void getCfdSatStatus() {
+        if (miClient.showMsgBoxConfirm("Algunas facturas contienen un CFDI.\n¿Desea obtener el estatus del SAT de las facturas?") == JOptionPane.YES_OPTION){
+            try {
+                String message = "";
+                for (int i = 0; i< moGridPayments.getTable().getRowCount(); i++) {
+                    SLayoutBankRow row = (SLayoutBankRow) moGridPayments.getGridRow(i);
+                    if (row.isXml()) {
+                        String status = new SCfdUtilsHandler((SClientInterface) miClient).getCfdiSatStatus(row.getXmlType(), row.getXmlRfcEmi(), row.getXmlRfcRec(), row.getXmlUuid(), row.getXmlTotal()).getCfdiStatus() + ".\n";
+                        if (!status.equals("Vigente")) {
+                            message += row.getBizPartner() + ". ";
+                            message += "Folio: " + row.getReference() + ". ";
+                            message += "Estatus: " + status + "";
+                        }
+                    }
+                }
+                if (!message.equals("")) {
+                    miClient.showMsgBoxError("Se encontraron los siguientes errores: \n" + message);
+                }
+            }
+            catch (Exception e) {
+                miClient.showMsgBoxError(e.toString());
+            }
+        }
+    }
+    
     /*
      * Public overriden methods
      */
@@ -2710,7 +2747,18 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 }
             }
         }
-
+        
+        // Si el sat estatus no es vigente, el validation pasa a no ser válido ? 
+        if (validation.isValid()) {
+            for (int i = 0; i< moGridPayments.getTable().getRowCount(); i++) {
+                SLayoutBankRow row = (SLayoutBankRow) moGridPayments.getGridRow(i);
+                if (row.isXml()) {
+                    getCfdSatStatus();
+                    break;
+                }
+            }
+        }
+        
         return validation;
     }
 

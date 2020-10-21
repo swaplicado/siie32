@@ -7,19 +7,19 @@ package erp.mfin.data;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
-public class SDataRecordEntryRow extends erp.lib.table.STableRow {
-
-    public SDataRecordEntryRow(java.lang.Object data) {
-        moData = data;
+public final class SDataRecordEntryRow extends erp.lib.table.STableRow {
+    
+    public SDataRecordEntryRow(SDataRecordEntry entry) {
+        moData = entry;
         prepareTableRow();
     }
-
+    
     @Override
     public void prepareTableRow() {
         SDataRecordEntry entry = (SDataRecordEntry) moData;
-
+        
         mvValues.clear();
         mvValues.add(entry.getSortingPosition());
         mvValues.add(entry.getFkAccountIdXXX());
@@ -36,6 +36,15 @@ public class SDataRecordEntryRow extends erp.lib.table.STableRow {
         mvValues.add(entry.getDbmsAccountingMoveSubclass());
         mvValues.add(entry.getFkCostCenterIdXXX_n());
         mvValues.add(entry.getDbmsCostCenter_n());
+        mvValues.add(entry.getDbmsBizPartner());
+        mvValues.add(entry.getOccasionalFiscalId());
+        mvValues.add(entry.getReference());
+        mvValues.add(entry.getDbmsTax());
+        mvValues.add(entry.getDbmsEntity());
+        mvValues.add(entry.getDbmsItem());
+        mvValues.add(entry.getDbmsItemAux());
+        mvValues.add(entry.getDbmsDps());
+        mvValues.add(entry.getFkYearId_n());
         mvValues.add(entry.getAuxCheckNumber() == 0 ? "" : "" + entry.getAuxCheckNumber());
         mvValues.add(entry.getIsDeleted());
         mvValues.add(entry.getDbmsUserNew());

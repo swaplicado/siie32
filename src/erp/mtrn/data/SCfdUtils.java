@@ -21,6 +21,7 @@ import com.finkok.stamp.Incidencia;
 import com.finkok.stamp.IncidenciaArray;
 import com.finkok.stamp.StampSOAP;
 import erp.SClient;
+import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataBizPartner;
 import erp.cfd.SCfdDataConcepto;
@@ -395,7 +396,7 @@ public abstract class SCfdUtils implements Serializable {
         byte[] buffer =null;
         int read = -1;
 
-        sql = "UPDATE trn_cfd SET ack_can_pdf_n = ? " +
+        sql = "UPDATE " + SClientUtils.getComplementaryDdName(client) + ".trn_cfd SET ack_can_pdf_n = ? " +
                 "WHERE id_cfd = " + cfd.getPkCfdId() + " ";
 
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
@@ -4986,13 +4987,13 @@ public abstract class SCfdUtils implements Serializable {
         return cfds;
     }
 
-    public static InputStream getAcknowledgmentCancellationPdf(final SClientInterface client, final SDataCfd cfd) {
+    public static InputStream getAcknowledgmentCancellationPdf(final SClientInterface client, final SDataCfd cfd) throws Exception {
         String sql = "";
         ResultSet resultSet = null;
         InputStream ackCancellation = null;
 
         try {
-            sql = "SELECT ack_can_pdf_n FROM trn_cfd WHERE id_cfd = " + cfd.getPkCfdId() + " AND ack_can_pdf_n IS NOT NULL ";
+            sql = "SELECT ack_can_pdf_n FROM " + SClientUtils.getComplementaryDdName(client) + ".trn_cfd WHERE id_cfd = " + cfd.getPkCfdId() + " AND ack_can_pdf_n IS NOT NULL ";
             resultSet = client.getSession().getStatement().executeQuery(sql);
 
             if (resultSet.next()) {

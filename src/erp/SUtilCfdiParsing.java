@@ -22,12 +22,11 @@ import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiUtils;
 
 /**
- * Clase desechable, de un solo uso.
- * El propósito fue completar la información del XML del CFDI que ahora está directamente en la tabla erp_com.trn_cfd,
- * debido a que dichos datos fueron agregados posteriormente a la creación de dicha tabla, y los registros iniciales no contaban con ellos.
- * 
+ * Esta clase es obsoleta.
+ * Objetivo: completar la información del XML de CFD y CFDI disponible directamente en columnas de cada registro en trn_cfd.
  * @author Juan Barajas
  */
+@Deprecated
 public class SUtilCfdiParsing extends javax.swing.JFrame {
 
     private final static int DATA_TYPE_TEXT = 1;
@@ -303,16 +302,15 @@ public class SUtilCfdiParsing extends javax.swing.JFrame {
                 // is CFDI:
                 
                 sql = "SELECT doc_xml, " +
-                    "erp.f_get_xml_atr('cfdi:Emisor', 'rfc=', doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
-                    "erp.f_get_xml_atr('cfdi:Receptor', 'rfc=', doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
-                    "erp.f_get_xml_atr('cfdi:Comprobante', 'Total=', doc_xml, " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
-                    "erp.f_get_xml_atr('cfdi:Comprobante', 'TipoCambio=', doc_xml, " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
-                    "erp.f_get_xml_atr('cfdi:Comprobante', 'Moneda=', doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
-                    "CAST(REPLACE(erp.f_get_xml_atr('cfdi:Complemento', 'FechaTimbrado=', doc_xml, " + DATA_TYPE_DATE + "), 'T', ' ') AS DATETIME) AS _xml_timbrado, " +
-                    "erp.f_get_xml_atr('cfdi:Complemento', 'UUID=', doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_uuid " +
-                    "FROM " + tableName + ".trn_cfd " +
-                    "WHERE id_cfd = " + resultSet.getInt("id_cfd");
-                
+                        "erp.f_get_xml_atr('cfdi:Emisor', 'rfc=', doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_emisor_rfc, " +
+                        "erp.f_get_xml_atr('cfdi:Receptor', 'rfc=', doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_receptor_rfc, " +
+                        "erp.f_get_xml_atr('cfdi:Comprobante', 'Total=', doc_xml, " + DATA_TYPE_NUMBER + ") AS _xml_total, " +
+                        "erp.f_get_xml_atr('cfdi:Comprobante', 'TipoCambio=', doc_xml, " + DATA_TYPE_NUMBER + ") AS _xml_tc, " +
+                        "erp.f_get_xml_atr('cfdi:Comprobante', 'Moneda=', doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_moneda, " +
+                        "CAST(REPLACE(erp.f_get_xml_atr('cfdi:Complemento', 'FechaTimbrado=', doc_xml, " + DATA_TYPE_DATE + "), 'T', ' ') AS DATETIME) AS _xml_timbrado, " +
+                        "erp.f_get_xml_atr('cfdi:Complemento', 'UUID=', doc_xml, " + DATA_TYPE_TEXT + ") AS _xml_uuid " +
+                        "FROM " + tableName + ".trn_cfd " +
+                        "WHERE id_cfd = " + resultSet.getInt("id_cfd");
                 
                 resultSetCfdi = moDbMySql.getConnection().createStatement().executeQuery(sql);
                 

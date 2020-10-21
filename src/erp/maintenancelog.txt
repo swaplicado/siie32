@@ -1,4 +1,24 @@
 ================================================================================
+SIIE 3.2 175.0/ 2020-10-20
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección de valores relacionados con el emisor y receptor en el proceso de importacón de un XML con orden de compra y sin orden de compra.
+2) Se agregó una validación en el proceso de importación de facturas para que solo se puedan procesar las que tienen un estatus "vigente" en el SAT.
+3) Adición de un botón en la vista de facturas para visualizar el el XML del CFDI en un formato genérico en caso de que la factura cuente con él.
+4) Creación de la clase erp.mtrn.form.SFormCfdiMassiveValidation para la validación masiva del estatus de CFDI,
+    se accede en el Módulo de Egresos y CXP, en el menú de facturas.
+5) Adición de las columnas "Asociado de negocios", "RFC ocasional", "Repositorio contable", "Entidad", "Ítem", "Ítem auxiliar", "Impuesto", "Documento" y "Ejercicio contable" 
+    en la forma de captura de pólizas contables.
+6) Se agregó una opción para validar el estatus del SAT de las facturas asociadas a un layout bancario.
+7) Para disminuir el tamaño de las bases de datos de las empresas, se creó una base de datos complementaria cuyo nombre tiene como base el nombre de la base de datos principal,
+    con una terminacion "_cfd" en la cual se guardarán los XML de los CFDI y, si aplica, los acuses de cancelación respectivos.
+7.1) Adaptación del código fuente para su funcionamiento con la base de datos complementaria.
+8) Permitir modificar el ítem y el centro de costo de facturas y órdenes vinculadas entre sí mediante un nuevo botón en la vista de documentos,
+    p. ej., órdenes de compra y otras facturas del mismo proveedor vinculadas a las mismas partidas afectadas.
+9) Validación y corrección de la generación masiva de diferencias cambiarias de documentos liquidados en moneda extranjera.
+10) Validación y corrección de la generación masiva de diferencias cambiarias de revaluación de saldos de documentos en moneda extranjera y cuentas de dinero en moneda extranjera.
+
+================================================================================
 SIIE 3.2 174.3*/ 2020-09-28
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

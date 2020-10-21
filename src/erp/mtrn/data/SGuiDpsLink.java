@@ -37,7 +37,6 @@ public class SGuiDpsLink {
     }
     
     public void addDataDpsDestinyEntry(SDataDpsEntry dataDpsDestinyEntry) {
-        // TODO:
         SDataDps dpsSource = null;
         
         for (SDataDpsDpsLink destinyEntryLink : dataDpsDestinyEntry.getDbmsDpsLinksAsDestiny()) {
@@ -59,7 +58,6 @@ public class SGuiDpsLink {
     }
     
     public void addDataDpsSource(SDataDps dataDpsSource) {
-        // TODO:
         SGuiDps guiDps = null;
         SGuiDpsEntry guiDpsEntry = null;
         SGuiDpsEntryPrice guiDpsEntryPrice = null;
