@@ -88,7 +88,7 @@ public class SHrsReceipt {
         */
         
         // get earning related to given group of receipt earnings:
-        SDbEarning earning = hrsReceiptEarnings.get(0).getEarning();
+        SDbEarning earning = hrsReceiptEarnings.get(0).getEarning(); // convenience variable
         
         // check if exemption apply (standard and optional settings):
         boolean applyExemptionStd = earning.getFkEarningExemptionTypeId() != SModSysConsts.HRSS_TP_EAR_EXEM_NON; // variable improves readability!
@@ -414,14 +414,14 @@ public class SHrsReceipt {
             double earningsTaxableArt174 = 0;
 
             switch (payroll.getFkTaxComputationTypeId()) {
-                case SModSysConsts.HRSS_TP_TAX_COMP_PAY: // Payroll
+                case SModSysConsts.HRSS_TP_TAX_COMP_PAY: // tax computation type is payroll
                     earningsTaxableStd = SLibUtils.roundAmount(getTaxedEarningsStd());
                     earningsTaxableArt174 = SLibUtils.roundAmount(getTaxedEarningsArt174());
                     break;
 
-                case SModSysConsts.HRSS_TP_TAX_COMP_ANN: // Annual
-                    earningsTaxableStd = SLibUtils.roundAmount(getTaxedEarningsStd() + moHrsEmployee.getAccummulatedTaxableEarnings());
-                    earningsTaxableArt174 = SLibUtils.roundAmount(getTaxedEarningsArt174() + moHrsEmployee.getAccummulatedTaxableEarningsAlt());
+                case SModSysConsts.HRSS_TP_TAX_COMP_ANN: // tax computation type is annual
+                    earningsTaxableStd = SLibUtils.roundAmount(getTaxedEarningsStd() + moHrsEmployee.getAnnualTaxableEarnings());
+                    earningsTaxableArt174 = SLibUtils.roundAmount(getTaxedEarningsArt174() + moHrsEmployee.getAnnualTaxableEarningsArt174());
                     
                     annualTaxCompensated = moHrsEmployee.getAnnualTaxCompensated(); // should be equal to compensated annual subsidy
                     
@@ -446,7 +446,7 @@ public class SHrsReceipt {
 
             double tableFactorPayroll;
             double tableFactorAnnual;
-            SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays();
+            SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays(); // convenience variable
             double yearDaysFactor = (double) SHrsConsts.YEAR_MONTHS / ((double) SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(payroll.getFiscalYear()) ? 1d : 0d));
             
             if (payroll.isPayrollFortnightStandard()) {

@@ -254,7 +254,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatEmployeeHireLog);
         jmCat.add(jmiCatEmployeeWageLog);
         jmCat.add(jmiCatEmployeeSscBaseLog);
-        jmCat.add(jmiCatEmployeeSscBaseUpdate);
+        //jmCat.add(jmiCatEmployeeSscBaseUpdate); // 2020-10-09 Sergio Flores: this menu option is obsolete!
         jmCat.addSeparator();
         jmCat.add(jmiCatEarnings);
         jmCat.add(jmiCatDeductions);

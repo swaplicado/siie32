@@ -3987,6 +3987,27 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
     }
     
+    /**
+     * Obtener el uso de CDFI para la configuración de ítem vs. asociado de negocios.
+     * @param client
+     * @param itemId
+     * @param bizPartnerId
+     * @return
+     * @throws SQLException 
+     */
+    public static String getUseCfdi(final SClientInterface client, final int itemId, final int bizPartnerId) throws SQLException {
+        String useCfdi = "";
+
+        String sql = "SELECT cfd_use FROM erp.itmu_cfg_item_bp WHERE id_item = '" + itemId + "' AND id_bp = '" + bizPartnerId + "' " ;
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                useCfdi = resultSet.getString("cfd_use");
+            }
+        }
+        
+        return useCfdi;
+    }
+    
     /*
      * CFD and CFDI methods:
      */
@@ -5320,7 +5341,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
                 
                 double price;
-                if (dpsEntry.getSubtotalProvisionalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
+                if (requireComplementoComercioExterior() || SLibUtils.compareAmount(dpsEntry.getSubtotalProvisionalCy_r(), SLibUtils.roundAmount(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity()))) {
                     price = dpsEntry.getOriginalPriceUnitaryCy();
                 }
                 else {

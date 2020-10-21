@@ -24,7 +24,10 @@ import sa.lib.gui.SGuiSession;
 public abstract class SSscUtils {
     
     private static final double FOOD_EXEMPT_PCT = 0.4;
-    
+    private static final double OVERTIME_EXEMPT_PCT = 0.1;
+    private static final int OVERTIME_EXEMPT_DAYS_WEEK = 9;
+    private static final int OVERTIME_EXEMPT_DAYS_FORT = 18;
+
     /**
      * Obtener arreglo de tipos de percepciones excluidas para cálculo del SBC.
      * @return Arreglo de tipos de percepciones excluidas.
@@ -128,7 +131,7 @@ public abstract class SSscUtils {
                 + "e.fk_tp_ear NOT IN (" + getExcludedEarningTypesSqlList() + ") AND "
                 + "emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(bom) + "' AND emp.b_act "
                 + "ORDER BY bp.bp, pr.id_emp;" ; 
-
+        
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
@@ -174,6 +177,8 @@ public abstract class SSscUtils {
         double uma = SHrsUtils.getRecentUma(session, periodEnd);
         double foodExemptWeekly = SLibUtils.roundAmount(uma * SHrsConsts.WEEK_DAYS * FOOD_EXEMPT_PCT);
         double foodExemptFortnightly = SLibUtils.roundAmount(uma * SHrsConsts.FORTNIGHT_FIXED_DAYS * FOOD_EXEMPT_PCT);
+        double overtimeExemptWeekly = SLibUtils.roundAmount(uma * SHrsConsts.WEEK_DAYS * OVERTIME_EXEMPT_PCT);
+        double overtimeExemptFortnightly = SLibUtils.roundAmount(uma * SHrsConsts.FORTNIGHT_FIXED_DAYS * OVERTIME_EXEMPT_PCT);
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             for (SDbEmployee employee : employees) {
@@ -192,22 +197,22 @@ public abstract class SSscUtils {
                 double totalAmountExempt = 0;
                 double totalAmountTaxed = 0;
 
-                String sql = "SELECT e.id_ear, e.fk_tp_ear, pre.id_pay, pre.id_mov, pre.amt_r "
+                String sql = "SELECT e.id_ear, e.fk_tp_ear, pre.id_pay, pre.id_mov, pre.amt_r, pr.pay_hr_r, emp.wrk_hrs_day "
                         + "FROM hrs_pay AS p "
                         + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
                         + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
                         + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
+                        + "INNER JOIN erp.hrsu_emp AS emp on pre.id_emp = emp.id_emp "
                         + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del "
                         + "AND p.per_year = " + year + " AND p.per BETWEEN " + monthStart + " AND " + monthEnd + " AND "
                         + "e.fk_tp_ear NOT IN (" + getExcludedEarningTypesSqlList() + ") "
                         + "AND pre.id_emp = " + employee.getPkEmployeeId() + " "
                         + "ORDER BY e.id_ear, e.fk_tp_ear, pre.id_pay, pre.id_mov;";
                 try (ResultSet resultSet = statement.executeQuery(sql)) {
-                    while (resultSet.next()) { //xxx
+                    while (resultSet.next()) {
                         if (currentEarningId != resultSet.getInt("e.id_ear")) {
                             if (currentEarningId != 0) {
                                 SSscEarning sbcEarning = row.getSbcEarnginById(currentEarningId);
-//                                SSscEarning sbcEarning = row.getSbcEarnginById(resultSet.getInt("e.id_ear"));
                                 sbcEarning.AmountExempt = totalAmountExempt;
                                 sbcEarning.AmountTaxed = totalAmountTaxed;
                             }
@@ -219,6 +224,7 @@ public abstract class SSscUtils {
                         
                         double amountExempt = 0;
                         double amountTaxed = 0;
+                        double ssd = 0;
                         
                         switch (resultSet.getInt("e.fk_tp_ear")) {
                             case SModSysConsts.HRSS_TP_EAR_FOOD:
@@ -247,12 +253,44 @@ public abstract class SSscUtils {
                                         
                                     default:
                                 }
+                                  case SModSysConsts.HRSS_TP_EAR_OVER_TIME: //Tiempo extra
+                                        switch (employee.getFkPaymentTypeId()) {
+                                        case SModSysConsts.HRSS_TP_PAY_WEE:
+                                            if ((((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS ) + ( OVERTIME_EXEMPT_DAYS_WEEK * resultSet.getDouble("pre.amt_r"))) > 
+                                                        ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS )) +  resultSet.getDouble("pre.amt_r"))) {
+                                                    amountExempt = resultSet.getDouble("pre.amt_r");
+                                                    amountTaxed = 0;
+                                            }
+                                            else {
+                                                ssd = ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS ) + ( OVERTIME_EXEMPT_DAYS_WEEK * resultSet.getDouble("pre.amt_r"))) -
+                                                        ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS )) +  resultSet.getDouble("pre.amt_r");
+                                                amountExempt = (ssd - overtimeExemptWeekly);
+                                                amountTaxed = resultSet.getDouble("pre.amt_r") - amountExempt;
+                                            }
+                                            break;
+                                            
+                                        case SModSysConsts.HRSS_TP_PAY_FOR:
+                                            if ((((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS ) + ( OVERTIME_EXEMPT_DAYS_FORT * resultSet.getDouble("pre.amt_r"))) > 
+                                                        ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS )) +  resultSet.getDouble("pre.amt_r"))) {
+                                                    amountExempt = resultSet.getDouble("pre.amt_r");
+                                                    amountTaxed = 0;
+                                            }
+                                            else {
+                                                ssd = ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS ) + ( OVERTIME_EXEMPT_DAYS_FORT * resultSet.getDouble("pre.amt_r"))) -
+                                                        ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS )) +  resultSet.getDouble("pre.amt_r");
+                                                amountExempt = (ssd - overtimeExemptFortnightly);
+                                                amountTaxed = resultSet.getDouble("pre.amt_r") - amountExempt;
+                                            }
+                                            break;
+                                        default:
+                                    }
+                                
                                 break;
                                 
                             default:
                                 amountExempt = 0;
                                 amountTaxed = resultSet.getDouble("pre.amt_r");
-                        }
+                        }                        
                         
                         totalAmountExempt = SLibUtils.roundAmount(totalAmountExempt + amountExempt);
                         totalAmountTaxed = SLibUtils.roundAmount(totalAmountTaxed + amountTaxed);
@@ -386,5 +424,4 @@ public abstract class SSscUtils {
         }
         return bLeapYear;
     }
-    
 }

@@ -1,10 +1,22 @@
 ================================================================================
+SIIE 3.2 174.3*/ 2020-09-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la generación de CFDI con Complemento Comercio Exterior para preservar el precio unitario del concepto tal como fue definido originalmente.
+
+================================================================================
+SIIE 3.2 174.2*/ 2020-09-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Trabajo en proceso de implementación de cálculo de ISR retenido por salarios de manera diferenciada por categoría de esquema de reclutamiento.
+
+================================================================================
 SIIE 3.2 174.1/ 2020-09-02
 Edwin CARMONA
 --------------------------------------------------------------------------------
 1) Se agrega vista para opción de percepciones quincenales importadas y se agrega filtro de solo perpeciones relacionadas a un bono.
 2) Se quitan de la prenómina únicamente los empleados que tengan faltas, no todos.
-3) Se agrega id de BD principal en el JSON de configuración proveniente de CAP Link.
+3) Se agrega ID de BD principal en el JSON de configuración proveniente de CAP Link.
 4) Se guarda y abre automáticamente la nómina al dar click en el botón "cargar prenómina"
 
 ================================================================================

@@ -101,6 +101,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected String msXtaEmployeeProperName;
     protected String msXtaEmployeeRfc;
     protected String msXtaEmployeeCurp;
+    protected int mnXtaRecruitmentSchemeCat;
     
     protected Date mtAuxHireLogDate;
     protected String msAuxHireLogNotes;
@@ -225,11 +226,13 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setXtaEmployeePropername(String s) { msXtaEmployeeProperName = s; }
     public void setXtaEmployeeRfc(String s) { msXtaEmployeeRfc = s; }
     public void setXtaEmployeeCurp(String s) { msXtaEmployeeCurp = s; }
+    public void setXtaRecruitmentSchemeCat(int n) { mnXtaRecruitmentSchemeCat = n; }
     
     public String getXtaEmployeeName() { return msXtaEmployeeName; }
     public String getXtaEmployeeProperName() { return msXtaEmployeeProperName; }
     public String getXtaEmployeeRfc() { return msXtaEmployeeRfc; }
     public String getXtaEmployeeCurp() { return msXtaEmployeeCurp; }
+    public int getXtaRecruitmentSchemeCat() { return mnXtaRecruitmentSchemeCat; }
     
     public void setAuxHireLogDate(Date t) { mtAuxHireLogDate = t; }
     public void setAuxHireLogNotes(String s) { msAuxHireLogNotes = s; }
@@ -375,6 +378,7 @@ public class SDbEmployee extends SDbRegistryUser {
         msXtaEmployeeProperName = "";
         msXtaEmployeeRfc = "";
         msXtaEmployeeCurp = "";
+        mnXtaRecruitmentSchemeCat = 0;
         
         mtAuxHireLogDate = null;
         msAuxHireLogNotes = "";
@@ -479,7 +483,7 @@ public class SDbEmployee extends SDbRegistryUser {
 
             mbOldActive = mbActive;
             
-            msSql = "SELECT bp, lastname, firstname, fiscal_id, alt_id FROM erp.bpsu_bp WHERE id_bp = " + mnPkEmployeeId;
+            msSql = "SELECT bp, lastname, firstname, fiscal_id, alt_id FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " WHERE id_bp = " + mnPkEmployeeId + ";";
             resultSet = session.getStatement().executeQuery(msSql);
             if (!resultSet.next()) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
@@ -489,6 +493,15 @@ public class SDbEmployee extends SDbRegistryUser {
                 msXtaEmployeeProperName = resultSet.getString("firstname") + " " + resultSet.getString("lastname");
                 msXtaEmployeeRfc = resultSet.getString("fiscal_id");
                 msXtaEmployeeCurp = resultSet.getString("alt_id");
+            }
+            
+            msSql = "SELECT rec_sche_cat FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " WHERE id_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId+ ";";
+            resultSet = session.getStatement().executeQuery(msSql);
+            if (!resultSet.next()) {
+                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+            }
+            else {
+                mnXtaRecruitmentSchemeCat = resultSet.getInt("rec_sche_cat");
             }
             
             mbRegistryNew = false;
@@ -744,6 +757,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setXtaEmployeePropername(this.getXtaEmployeeProperName());
         registry.setXtaEmployeeRfc(this.getXtaEmployeeRfc());
         registry.setXtaEmployeeCurp(this.getXtaEmployeeCurp());
+        registry.setXtaRecruitmentSchemeCat(this.getXtaRecruitmentSchemeCat());
 
         registry.setAuxHireLogDate(this.getAuxHireLogDate());
         registry.setAuxHireLogNotes(this.getAuxHireLogNotes());

@@ -205,7 +205,7 @@ public class STheReceipts {
             hrsReceipt.setHrsPayroll(moHrsPayroll);
 
             SHrsEmployee hrsEmployee = prov.createHrsEmployee(moHrsPayroll, payroll.getPkPayrollId(), payrollReceipt.getPkEmployeeId(), 
-                                            payroll.getFiscalYear(), payroll.getPeriod(), payroll.getFiscalYear(), payroll.getDateStart(), payroll.getDateEnd(), payroll.getFkTaxComputationTypeId());
+                    payroll.getFiscalYear(), payroll.getPeriod(), payroll.getFiscalYear(), payroll.getDateStart(), payroll.getDateEnd());
             hrsEmployee.setHrsReceipt(hrsReceipt);
             hrsReceipt.setHrsEmployee(hrsEmployee);
 

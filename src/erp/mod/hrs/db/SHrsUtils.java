@@ -2425,7 +2425,7 @@ public abstract class SHrsUtils {
         return daysTableVacation;
     }
 
-    public static ArrayList<SDbEmployeeHireLog> readEmployeeHireLogs(final SGuiSession session, final Statement resultSetStatement, final int employeeId, final Date dateStart, final Date dateEnd) throws Exception {
+    public static ArrayList<SDbEmployeeHireLog> readEmployeeHireLogs(final SGuiSession session, final Statement statement, final int employeeId, final Date dateStart, final Date dateEnd) throws Exception {
         ArrayList<SDbEmployeeHireLog> employeeHireLogs = new ArrayList<>();
 
         String sql = "SELECT id_emp, id_log " +
@@ -2433,7 +2433,7 @@ public abstract class SHrsUtils {
                 "WHERE NOT b_del AND id_emp = " + employeeId + " AND dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "' AND " +
                 "(dt_dis_n IS NULL OR dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "');";
         
-        try (ResultSet resultSet = resultSetStatement.executeQuery(sql)) {
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
             while (resultSet.next()) {
                 SDbEmployeeHireLog employeeHireLog = new SDbEmployeeHireLog();
                 employeeHireLog.read(session, new int[] { resultSet.getInt("id_emp"), resultSet.getInt("id_log") });

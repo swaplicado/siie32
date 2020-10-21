@@ -4213,13 +4213,13 @@ public abstract class SCfdUtils implements Serializable {
         for (int i = 0; i < comprobante.getEltConceptos().getEltHijosConcepto().size(); i++) {
             oConcepto = comprobante.getEltConceptos().getEltHijosConcepto().get(i);
             
-            dSubtotalImporte = SLibUtils.round(oConcepto.getAttCantidad().getDouble() * oConcepto.getAttValorUnitario().getDouble(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+            dSubtotalImporte = SLibUtils.roundAmount(oConcepto.getAttCantidad().getDouble() * oConcepto.getAttValorUnitario().getDouble());
             
             if (Math.abs(oConcepto.getAttImporte().getDouble() - dSubtotalImporte) >= SLibConstants.RES_VAL_DECS) {
-                throw new Exception("El monto del cálculo del importe del concepto '" + oConcepto.getAttDescripcion().getString() + "' es incorrecto.");
+                throw new Exception("El monto del importe del concepto '" + oConcepto.getAttDescripcion().getString() + "' es incorrecto.");
             }
             
-            dSubtotalConceptos = SLibUtils.round((dSubtotalConceptos + dSubtotalImporte), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+            dSubtotalConceptos = SLibUtils.roundAmount(dSubtotalConceptos + dSubtotalImporte);
         }
         
         // validate taxes charged:
@@ -4228,7 +4228,7 @@ public abstract class SCfdUtils implements Serializable {
             for (int i = 0; i < comprobante.getEltImpuestos().getEltOpcImpuestosTrasladados().getEltHijosImpuestoTrasladado().size(); i++) {
                 oTraslado = comprobante.getEltImpuestos().getEltOpcImpuestosTrasladados().getEltHijosImpuestoTrasladado().get(i);
 
-                dTotalImptoTrasladados = SLibUtils.round((dTotalImptoTrasladados + oTraslado.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                dTotalImptoTrasladados = SLibUtils.roundAmount(dTotalImptoTrasladados + oTraslado.getAttImporte().getDouble());
             }
 
             if (Math.abs(comprobante.getEltImpuestos().getAttTotalImpuestosTrasladados().getDouble() - dTotalImptoTrasladados) >= SLibConstants.RES_VAL_DECS) {
@@ -4242,7 +4242,7 @@ public abstract class SCfdUtils implements Serializable {
             for (int i = 0; i < comprobante.getEltImpuestos().getEltOpcImpuestosRetenidos().getEltHijosImpuestoRetenido().size(); i++) {
                 oRetencion = comprobante.getEltImpuestos().getEltOpcImpuestosRetenidos().getEltHijosImpuestoRetenido().get(i);
 
-                dTotalImptoRetenidos = SLibUtils.round((dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                dTotalImptoRetenidos = SLibUtils.roundAmount(dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble());
             }
 
             if (Math.abs(comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().getDouble() - dTotalImptoRetenidos) >= SLibConstants.RES_VAL_DECS) {
@@ -4258,7 +4258,7 @@ public abstract class SCfdUtils implements Serializable {
         
         // validate total:
         
-        dTotal = SLibUtils.round((dSubtotalConceptos + dTotalImptoTrasladados - dTotalImptoRetenidos - comprobante.getAttDescuento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+        dTotal = SLibUtils.roundAmount(dSubtotalConceptos + dTotalImptoTrasladados - dTotalImptoRetenidos - comprobante.getAttDescuento().getDouble());
         
         if (Math.abs(comprobante.getAttTotal().getDouble() - dTotal) >= SLibConstants.RES_VAL_DECS) {
             throw new Exception("El monto del cálculo del total es incorrecto.");
@@ -4287,13 +4287,13 @@ public abstract class SCfdUtils implements Serializable {
         for (int i = 0; i < comprobante.getEltConceptos().getEltConceptos().size(); i++) {
             oConcepto = comprobante.getEltConceptos().getEltConceptos().get(i);
             
-            dSubtotalImporte = SLibUtils.round(oConcepto.getAttCantidad().getDouble() * oConcepto.getAttValorUnitario().getDouble(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+            dSubtotalImporte = SLibUtils.roundAmount(oConcepto.getAttCantidad().getDouble() * oConcepto.getAttValorUnitario().getDouble());
             
-            if (Math.abs(oConcepto.getAttImporte().getDouble() - dSubtotalImporte) >= SLibConstants.RES_VAL_DECS) {
-                throw new Exception("El monto del cálculo del importe del concepto '" + oConcepto.getAttDescripcion().getString() + "' es incorrecto.");
+            if (Math.abs(SLibUtils.roundAmount(oConcepto.getAttImporte().getDouble() - dSubtotalImporte)) >= SLibConstants.RES_VAL_DECS) {
+                throw new Exception("El monto del importe del concepto '" + oConcepto.getAttDescripcion().getString() + "' es incorrecto.");
             }
             
-            dSubtotalConceptos = SLibUtils.round((dSubtotalConceptos + dSubtotalImporte), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+            dSubtotalConceptos = SLibUtils.roundAmount(dSubtotalConceptos + dSubtotalImporte);
         }
         
         if (comprobante.getEltOpcImpuestos() != null) {
@@ -4302,10 +4302,10 @@ public abstract class SCfdUtils implements Serializable {
                 for (int i = 0; i < comprobante.getEltOpcImpuestos().getEltOpcImpuestosTraslados().getEltImpuestoTrasladados().size(); i++) {
                     oTraslado = comprobante.getEltOpcImpuestos().getEltOpcImpuestosTraslados().getEltImpuestoTrasladados().get(i);
 
-                    dTotalImptoTrasladados = SLibUtils.round((dTotalImptoTrasladados + oTraslado.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                    dTotalImptoTrasladados = SLibUtils.roundAmount(dTotalImptoTrasladados + oTraslado.getAttImporte().getDouble());
                 }
 
-                if (Math.abs(comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble() - dTotalImptoTrasladados) >= SLibConstants.RES_VAL_DECS) {
+                if (Math.abs(SLibUtils.roundAmount(comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble() - dTotalImptoTrasladados)) >= SLibConstants.RES_VAL_DECS) {
                     throw new Exception("La suma de los impuestos trasladados es incorrecta.");
                 }
             }
@@ -4315,23 +4315,23 @@ public abstract class SCfdUtils implements Serializable {
                 for (int i = 0; i < comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones().size(); i++) {
                     oRetencion = comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones().get(i);
 
-                    dTotalImptoRetenidos = SLibUtils.round((dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                    dTotalImptoRetenidos = SLibUtils.roundAmount(dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble());
                 }
 
-                if (Math.abs(comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble() - dTotalImptoRetenidos) >= SLibConstants.RES_VAL_DECS) {
+                if (Math.abs(SLibUtils.roundAmount(comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble() - dTotalImptoRetenidos)) >= SLibConstants.RES_VAL_DECS) {
                     throw new Exception("La suma de los impuestos retenidos es incorrecta.");
                 }
             }
         }
         
         // validate subtotal vs. subtotal concepts:
-        if (Math.abs(comprobante.getAttSubTotal().getDouble() - dSubtotalConceptos) >= SLibConstants.RES_VAL_DECS) {
+        if (Math.abs(SLibUtils.roundAmount(comprobante.getAttSubTotal().getDouble() - dSubtotalConceptos)) >= SLibConstants.RES_VAL_DECS) {
             throw new Exception("La suma de importes de los conceptos es incorrecta.");
         }
         
         // validate total:
-        dTotal = SLibUtils.round((dSubtotalConceptos + dTotalImptoTrasladados - dTotalImptoRetenidos - comprobante.getAttDescuento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-        if (Math.abs(comprobante.getAttTotal().getDouble() - dTotal) >= SLibConstants.RES_VAL_DECS) {
+        dTotal = SLibUtils.roundAmount(dSubtotalConceptos + dTotalImptoTrasladados - dTotalImptoRetenidos - comprobante.getAttDescuento().getDouble());
+        if (Math.abs(SLibUtils.roundAmount(comprobante.getAttTotal().getDouble() - dTotal)) >= SLibConstants.RES_VAL_DECS) {
             throw new Exception("El monto del cálculo del total es incorrecto.");
         }
         

@@ -1130,7 +1130,7 @@ public class SHrsPayroll {
         hrsReceipt.setHrsPayroll(this);
         
         SHrsEmployee hrsEmployee = moHrsPayrollDataProvider.createHrsEmployee(this, moPayroll.getPkPayrollId(), employeeId, 
-                payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd, taxComputationType);
+                payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd);
         hrsEmployee.setHrsReceipt(hrsReceipt);
         hrsReceipt.setHrsEmployee(hrsEmployee);
         
@@ -1191,7 +1191,7 @@ public class SHrsPayroll {
         try {
             for (SHrsReceipt hrsReceipt : maHrsReceipts) {
                 hrsReceipt.setHrsEmployee(moHrsPayrollDataProvider.computeEmployee(hrsReceipt.getHrsEmployee(), isCopy ? 0 : moPayroll.getPkPayrollId(), hrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId(),
-                        moPayroll.getPeriodYear(), moPayroll.getPeriod(), moPayroll.getFiscalYear(), moPayroll.getDateStart(), moPayroll.getDateEnd(), moPayroll.getFkTaxComputationTypeId()));
+                        moPayroll.getPeriodYear(), moPayroll.getPeriod(), moPayroll.getFiscalYear(), moPayroll.getDateStart(), moPayroll.getDateEnd()));
             }
         }
         catch (Exception e) {
