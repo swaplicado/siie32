@@ -13,11 +13,13 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mhrs.data.SDataFormerPayrollEmp;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
 import erp.mod.hrs.db.SHrsCfdUtils;
 import erp.mod.hrs.db.SHrsUtils;
+import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
@@ -411,6 +413,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
             int cfdProcessedOk = 0;
             int cfdProcessedWrong = 0;
             String detailMessage = "";
+            String series = ((SDbConfig) miClient.getSession().readRegistry(SModConsts.HRS_CFG, new int[] { 1 })).getNumberSeries();
 
             moIntCfdToProcess.setValue(maPayrollReceiptKeys.size());
             jtfWarningMessage.setText(SCfdUtils.verifyCertificateExpiration(miClient));
@@ -448,7 +451,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                         }
                     }
                     catch(Exception e) {
-                        detailMessage += "" + number + ": " + e.getMessage() + "\n";
+                        detailMessage += STrnUtils.formatDocNumber(series, "" + number) + ": " + e.getMessage() + "\n";
                         cfdProcessedWrong++;
                     }
 

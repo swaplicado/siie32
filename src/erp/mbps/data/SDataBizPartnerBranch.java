@@ -129,25 +129,6 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
 
     public java.util.Vector<erp.lib.form.SFormComponentItem> getDnsForDps() { return mvDnsForDps; }
     public java.util.Vector<erp.lib.form.SFormComponentItem> getDnsForDiog() { return mvDnsForDiog; }
-
-    /**
-     * Get contact by contact type.
-     * @param contactType Contact type (constants defined in SDataConstantsSys.BPSS_TP_CON_...)
-     * @param includeDefaultContact Include the default contact when searching a matching contact.
-     * @return First contact found of given contact type.
-     */
-    public erp.mbps.data.SDataBizPartnerBranchContact getDbmsBizPartnerBranchContactByType(final int contactType, final boolean includeDefaultContact) {
-        SDataBizPartnerBranchContact contact = null;
-        
-        for (SDataBizPartnerBranchContact bpbc : mvDbmsBizPartnerBranchContacts) {
-            if (bpbc.getFkContactTypeId() == contactType && ((includeDefaultContact && bpbc.getPkContactId() == 1) || (!includeDefaultContact && bpbc.getPkContactId() != 1))) {
-                contact = bpbc;
-                break;
-            }
-        }
-        
-        return contact;
-    }
     
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -560,25 +541,34 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
         return mtUserEditTs;
     }
 
-    public erp.mbps.data.SDataBizPartnerBranchAddress getDbmsBizPartnerBranchAddress(int[] pk) {
+    /**
+     * Get requested address.
+     * @param addressKey Address key.
+     * @return <code>SDataBizPartnerBranchAddress</code>
+     */
+    public erp.mbps.data.SDataBizPartnerBranchAddress getDbmsBizPartnerBranchAddress(final int[] addressKey) {
         SDataBizPartnerBranchAddress address = null;
-
-        for (int i = 0; i < mvDbmsBizPartnerBranchAddresses.size(); i++) {
-            if (SLibUtilities.compareKeys(pk, mvDbmsBizPartnerBranchAddresses.get(i).getPrimaryKey())) {
-                address = mvDbmsBizPartnerBranchAddresses.get(i);
+        
+        for (SDataBizPartnerBranchAddress bpba : mvDbmsBizPartnerBranchAddresses) {
+            if (bpba.getPkBizPartnerBranchId() == addressKey[0] && bpba.getPkAddressId() == addressKey[1]) {
+                address = bpba;
                 break;
             }
         }
-
+        
         return address;
     }
 
+    /**
+     * Get official address.
+     * @return <code>SDataBizPartnerBranchAddress</code>
+     */
     public erp.mbps.data.SDataBizPartnerBranchAddress getDbmsBizPartnerBranchAddressOfficial() {
         SDataBizPartnerBranchAddress address = null;
 
-        for (int i = 0; i < mvDbmsBizPartnerBranchAddresses.size(); i++) {
-            if (mvDbmsBizPartnerBranchAddresses.get(i).getFkAddressTypeId() == SDataConstantsSys.BPSS_TP_ADD_OFF) {
-                address = mvDbmsBizPartnerBranchAddresses.get(i);
+        for (SDataBizPartnerBranchAddress bpba : mvDbmsBizPartnerBranchAddresses) {
+            if (bpba.getFkAddressTypeId() == SDataConstantsSys.BPSS_TP_ADD_OFF) {
+                address = bpba;
                 break;
             }
         }
@@ -586,12 +576,17 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
         return address;
     }
 
-    public erp.mbps.data.SDataBizPartnerBranchContact getDbmsBizPartnerBranchContact(int[] pk) {
+    /**
+     * Get requested contact.
+     * @param contactKey Contact key.
+     * @return <code>SDataBizPartnerBranchContact</code>
+     */
+    public erp.mbps.data.SDataBizPartnerBranchContact getDbmsBizPartnerBranchContact(int[] contactKey) {
         SDataBizPartnerBranchContact contact = null;
 
-        for (int i = 0; i < mvDbmsBizPartnerBranchContacts.size(); i++) {
-            if (SLibUtilities.compareKeys(pk, mvDbmsBizPartnerBranchContacts.get(i).getPrimaryKey())) {
-                contact = mvDbmsBizPartnerBranchContacts.get(i);
+        for (SDataBizPartnerBranchContact bpbc : mvDbmsBizPartnerBranchContacts) {
+            if (SLibUtilities.compareKeys(contactKey, bpbc.getPrimaryKey())) {
+                contact = bpbc;
                 break;
             }
         }
@@ -599,12 +594,36 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
         return contact;
     }
 
-    public erp.mbps.data.SDataBizPartnerBranchNote getDbmsBizPartnerBranchNotes(int[] pk) {
+    /**
+     * Get contact by contact type.
+     * @param contactType Contact type (constants defined in SDataConstantsSys.BPSS_TP_CON_...)
+     * @param includeDefaultContact Include the default contact when searching a matching contact.
+     * @return First contact found of given contact type as <code>SDataBizPartnerBranchContact</code>.
+     */
+    public erp.mbps.data.SDataBizPartnerBranchContact getDbmsBizPartnerBranchContactByType(final int contactType, final boolean includeDefaultContact) {
+        SDataBizPartnerBranchContact contact = null;
+        
+        for (SDataBizPartnerBranchContact bpbc : mvDbmsBizPartnerBranchContacts) {
+            if (bpbc.getFkContactTypeId() == contactType && ((includeDefaultContact && bpbc.getPkContactId() == 1) || (!includeDefaultContact && bpbc.getPkContactId() != 1))) {
+                contact = bpbc;
+                break;
+            }
+        }
+        
+        return contact;
+    }
+    
+    /**
+     * Get requested notes.
+     * @param notesKey Notes key.
+     * @return <code>SDataBizPartnerBranchNote</code>
+     */
+    public erp.mbps.data.SDataBizPartnerBranchNote getDbmsBizPartnerBranchNotes(int[] notesKey) {
         SDataBizPartnerBranchNote notes = null;
 
-        for (int i = 0; i < mvDbmsBizPartnerBranchNotes.size(); i++) {
-            if (SLibUtilities.compareKeys(pk, mvDbmsBizPartnerBranchNotes.get(i).getPrimaryKey())) {
-                notes = mvDbmsBizPartnerBranchNotes.get(i);
+        for (SDataBizPartnerBranchNote bpbn : mvDbmsBizPartnerBranchNotes) {
+            if (SLibUtilities.compareKeys(notesKey, bpbn.getPrimaryKey())) {
+                notes = bpbn;
                 break;
             }
         }
@@ -612,12 +631,17 @@ public class SDataBizPartnerBranch extends erp.lib.data.SDataRegistry implements
         return notes;
     }
 
-    public erp.mmkt.data.SDataCustomerBranchConfig getDbmsCustomerBranchConfig(int[] pk) {
+    /**
+     * Get requested configuration.
+     * @param configKey Configuration key.
+     * @return <code>SDataCustomerBranchConfig</code>
+     */
+    public erp.mmkt.data.SDataCustomerBranchConfig getDbmsCustomerBranchConfig(int[] configKey) {
         SDataCustomerBranchConfig config = null;
 
-        for (int i = 0; i < mvDbmsCustomerBranchConfig.size(); i++) {
-            if (SLibUtilities.compareKeys(pk, mvDbmsCustomerBranchConfig.get(i).getPrimaryKey())) {
-                config = mvDbmsCustomerBranchConfig.get(i);
+        for (SDataCustomerBranchConfig cbc : mvDbmsCustomerBranchConfig) {
+            if (SLibUtilities.compareKeys(configKey, cbc.getPrimaryKey())) {
+                config = cbc;
                 break;
             }
         }

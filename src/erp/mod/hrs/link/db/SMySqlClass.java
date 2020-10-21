@@ -36,6 +36,7 @@ public class SMySqlClass {
             this.gdb = conn.getDbName();
             this.guser = conn.getDbUser();
             this.gpass = conn.getDbPass();
+            this.gmaindb = conn.getDbMainId();
         }
         catch (IOException ex) {
             Logger.getLogger(SMySqlClass.class.getName()).log(Level.SEVERE, null, ex);
@@ -46,7 +47,8 @@ public class SMySqlClass {
     public String gserverHost; 
     public String gdb; 
     public String guser; 
-    public String gpass; 
+    public String gpass;
+    public int gmaindb;
     Connection conn = null;
     
     public Connection connect(String serverHost, String dbPort, String db, String user, String pass) throws ClassNotFoundException, SQLException {
@@ -76,5 +78,9 @@ public class SMySqlClass {
 
     public static void setJsonConn(String jsonConn) {
         SMySqlClass.jsonConn = jsonConn;
+    }
+
+    public int getMainBb() {
+        return gmaindb;
     }
 }

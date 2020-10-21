@@ -725,11 +725,23 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return businessDays;
     }
 
+    /**
+     * Retrieve accumulated earnings for arguments provided.
+     * @param employeeId Employee's ID.
+     * @param periodYear Period year.
+     * @param dateStart Start date.
+     * @param dateEnd End date.
+     * @param taxComputationType Tax computation type (SModSysConsts.HRSS_TP_TAX_COMP_...).
+     * @param byEarningType Is accumulation requested by earning type instead of by earning.
+     * @param excludePayrollId ID of payroll to be excluded.
+     * @return
+     * @throws Exception 
+     */
     private ArrayList<SHrsAccumulatedEarning> createEmployeeAccumulatedEarnings(final int employeeId, final int periodYear, 
-            final Date dateStart, final Date dateEnd, final int taxComputationType, final boolean byType, final int excludePayrollId) throws Exception {
+            final Date dateStart, final Date dateEnd, final int taxComputationType, final boolean byEarningType, final int excludePayrollId) throws Exception {
         ArrayList<SHrsAccumulatedEarning> hrsAccumulatedEarnings = new ArrayList<>();
 
-        String sql = "SELECT pre.id_pay, pre.id_emp, p.per_year, " + (!byType ? "pre.fk_ear" : "pre.fk_tp_ear") + " AS f_ear, "
+        String sql = "SELECT pre.id_pay, pre.id_emp, p.per_year, " + (!byEarningType ? "pre.fk_ear" : "pre.fk_tp_ear") + " AS f_ear, "
                 + "SUM(pre.amt_r) AS f_amount, SUM(pre.amt_exem) AS f_exem, SUM(pre.amt_taxa) AS f_taxa "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
@@ -740,8 +752,8 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                     "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "'" :
                     "p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "' AND " +
                     "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "'") + " "
-                + "GROUP BY " + (!byType ? "pre.fk_ear" : "pre.fk_tp_ear") + " "
-                + "ORDER BY " + (!byType ? "pre.fk_ear" : "pre.fk_tp_ear") + ";";
+                + "GROUP BY " + (!byEarningType ? "pre.fk_ear" : "pre.fk_tp_ear") + " "
+                + "ORDER BY " + (!byEarningType ? "pre.fk_ear" : "pre.fk_tp_ear") + ";";
         
         try (ResultSet resultSet = miStatement.executeQuery(sql)) {
             while (resultSet.next()) {
@@ -753,11 +765,23 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
         return hrsAccumulatedEarnings;
     }
 
+    /**
+     * Retrieve accumulated deductions for arguments provided.
+     * @param employeeId Employee's ID.
+     * @param periodYear Period year.
+     * @param dateStart Start date.
+     * @param dateEnd End date.
+     * @param taxComputationType Tax computation type (SModSysConsts.HRSS_TP_TAX_COMP_...).
+     * @param byDeductionType Is accumulation requested by deduction type instead of by deduction.
+     * @param excludePayrollId ID of payroll to be excluded.
+     * @return
+     * @throws Exception 
+     */
     private ArrayList<SHrsAccumulatedDeduction> createEmployeeAccumulatedDeductions(final int employeeId, final int periodYear, 
-            final Date dateStart, final Date dateEnd, final int taxComputationType, final boolean byType, final int excludePayrollId) throws Exception {
+            final Date dateStart, final Date dateEnd, final int taxComputationType, final boolean byDeductionType, final int excludePayrollId) throws Exception {
         ArrayList<SHrsAccumulatedDeduction> hrsAccumulatedDeductions = new ArrayList<>();
 
-        String sql = "SELECT prd.id_pay, prd.id_emp, p.per_year, " + (!byType ? "prd.fk_ded" : "prd.fk_tp_ded") + " AS f_ded, " +
+        String sql = "SELECT prd.id_pay, prd.id_emp, p.per_year, " + (!byDeductionType ? "prd.fk_ded" : "prd.fk_tp_ded") + " AS f_ded, " +
             "SUM(prd.amt_r) AS f_amount " +
             "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p " +
             "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON " +
@@ -770,8 +794,8 @@ public class SHrsPayrollDataProvider implements SHrsDataProvider {
                 "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "'" :
                 "p.dt_sta >= '" + SLibUtils.DbmsDateFormatDate.format(dateStart) + "' AND " +
                 "p.dt_end <= '" + SLibUtils.DbmsDateFormatDate.format(dateEnd) + "'") + " " +
-            "GROUP BY " + (!byType ? "prd.fk_ded" : "prd.fk_tp_ded") + " " +
-            "ORDER BY " + (!byType ? "prd.fk_ded" : "prd.fk_tp_ded") + " ";
+            "GROUP BY " + (!byDeductionType ? "prd.fk_ded" : "prd.fk_tp_ded") + " " +
+            "ORDER BY " + (!byDeductionType ? "prd.fk_ded" : "prd.fk_tp_ded") + " ";
         
         try (ResultSet resultSet = miStatement.executeQuery(sql)) {
             while (resultSet.next()) {

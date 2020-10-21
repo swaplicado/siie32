@@ -87,8 +87,12 @@ public class SShareDB {
         if (conn == null) {
             return "";
         }
+        
+        if (mdb.getMainBb() == 0) {
+            throw new SConfigException("No hay configuración de base de datos principal");
+        }
 
-        int idDataBase = 1211;
+        int idDataBase = mdb.getMainBb();
 
         String query = "SELECT "
                 + "    bd "
@@ -193,7 +197,7 @@ public class SShareDB {
                 + "    e.dt_ben, "
                 + "    e.dt_hire, "
                 + "    e.dt_dis_n, "
-                + "    e.b_overtime, "
+                + "    e.overtime, "
                 + "    e.fk_tp_pay, "
                 + "    e.fk_dep, "
                 + "    e.b_act, "
@@ -224,7 +228,7 @@ public class SShareDB {
                 emp.firstname = res.getString("firstname");
                 emp.admission_date = res.getString("dt_hire");
                 emp.leave_date = res.getString("dt_dis_n");
-                emp.extra_time = res.getBoolean("b_overtime");
+                emp.overtime_policy = res.getInt("overtime");
                 emp.way_pay = res.getInt("fk_tp_pay");
                 emp.dept_rh_id = res.getInt("fk_dep");
                 emp.is_active = res.getBoolean("b_act");

@@ -113,6 +113,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiPayPayrollFortnightly;
     private javax.swing.JMenuItem jmiPayPayrollFortnightlyRowRec;
     private javax.swing.JMenuItem jmiPayPayrollRecImportedEarnings;
+    private javax.swing.JMenuItem jmiPayPayrollRecImportedEarningsQ;
     private javax.swing.JMenuItem jmiPayCfdiPayroll;
     private javax.swing.JMenuItem jmiPayCfdiPayrollRec;
     private javax.swing.JMenu jmPayCfdi;
@@ -309,6 +310,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayPayrollFortnightly = new JMenuItem("Nóminas quincenales");
         jmiPayPayrollFortnightlyRowRec = new JMenuItem("Recibos de nóminas quincenales");
         jmiPayPayrollRecImportedEarnings = new JMenuItem("Percepciones semanales importadas");
+        jmiPayPayrollRecImportedEarningsQ = new JMenuItem("Percepciones quincenales importadas");
         jmiPayCfdiPayroll = new JMenuItem("CFDI de nóminas");
         jmiPayCfdiPayrollRec = new JMenuItem("CFDI de recibos de nóminas");
         jmPayCfdi = new JMenu("Comprobantes fiscales digitales");
@@ -337,6 +339,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmPay.add(jmiPayPayrollFortnightlyRowRec);
         jmPay.addSeparator();
         jmPay.add(jmiPayPayrollRecImportedEarnings);
+        jmPay.add(jmiPayPayrollRecImportedEarningsQ);
         jmPay.addSeparator();
         jmPay.add(jmiPayCfdiPayroll);
         jmPay.add(jmiPayCfdiPayrollRec);
@@ -480,6 +483,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayPayrollFortnightly.addActionListener(this);
         jmiPayPayrollFortnightlyRowRec.addActionListener(this);
         jmiPayPayrollRecImportedEarnings.addActionListener(this);
+        jmiPayPayrollRecImportedEarningsQ.addActionListener(this);
         jmiPayCfdiPayroll.addActionListener(this);
         jmiPayCfdiPayrollRec.addActionListener(this);
         jmiPayCfdiStampSign.addActionListener(this);
@@ -594,6 +598,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiPayPayrollFortnightly.setEnabled(isPermissionPay || isPermissionPayFor);
         jmiPayPayrollFortnightlyRowRec.setEnabled(isPermissionPay || isPermissionPayFor);
         jmiPayPayrollRecImportedEarnings.setEnabled(isPermissionPay || isPermissionPayFor);
+        jmiPayPayrollRecImportedEarningsQ.setEnabled(isPermissionPay || isPermissionPayFor);
         jmiPayCfdiPayroll.setEnabled(isPermissionPay);
         jmiPayCfdiPayrollRec.setEnabled(isPermissionPay);
         jmPayCfdi.setEnabled(isPermissionPay);
@@ -993,6 +998,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiPayPayrollRecImportedEarnings) {
                 miClient.getSession().showView(SModConsts.HRS_PAY_RCP_IMPORT, SModSysConsts.HRSS_TP_PAY_WEE, null);
+            }
+            else if (item == jmiPayPayrollRecImportedEarningsQ) {
+                miClient.getSession().showView(SModConsts.HRS_PAY_RCP_IMPORT, SModSysConsts.HRSS_TP_PAY_FOR, null);
             }
             else if (item == jmiPayCfdiPayroll) {
                 miClient.getSession().showView(SModConsts.HRS_SIE_PAY, SModConsts.VIEW_SC_SUM, new SGuiParams(SCfdConsts.CFDI_PAYROLL_VER_CUR));

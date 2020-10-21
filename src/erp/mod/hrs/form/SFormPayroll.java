@@ -13,7 +13,6 @@ import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataCompany;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
-import erp.mod.hrs.db.SDbAbsence;
 import erp.mod.hrs.db.SDbAbsenceConsumption;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbEarning;
@@ -77,6 +76,7 @@ import sa.lib.grid.SGridPaneForm;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiField;
+import sa.lib.gui.SGuiParams;
 import sa.lib.gui.SGuiUtils;
 import sa.lib.gui.SGuiValidation;
 import sa.lib.gui.bean.SBeanFieldInteger;
@@ -118,6 +118,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
     private boolean mbIsReadOnly;
     private boolean mbIsCopyingPayroll;
     private boolean mbIsWithTaxSubsidy;
+    private boolean mbAuxOpenRegAgain;
     /**
      * Creates new form SFormPayroll
      * @param client
@@ -1943,7 +1944,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
         
         if (moRegistry.getPkPayrollId() == 0) {
-            miClient.showMsgBoxWarning("Debe guardar la nómina para continuar");
+            if (miClient.showMsgBoxConfirm("Debe guardar la nómina para continuar.\n"
+                    + "¿Desea guardarla y abrirla de nuevo?") == JOptionPane.YES_OPTION) {
+                mbAuxOpenRegAgain = true;
+                this.actionSave();
+            }
+            
             return;
         }
         
@@ -1987,6 +1993,12 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         }
         catch (Exception ex) {
             Logger.getLogger(SFormPayroll.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if (miClient.showMsgBoxConfirm("Se cargará la prenómina correspondiente al periodo: " + 
+                SLibUtils.DateFormatDate.format(dates[0]) + " - " + SLibUtils.DateFormatDate.format(dates[1]) + 
+                ".\n¿Desea continuar?\nEste proceso puede demorar algunos minutos.") != JOptionPane.YES_OPTION) {
+            return;
         }
         
         SShareData sd = new SShareData();
@@ -2047,6 +2059,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             this.addPerceptAndDeductByImportation(rows, ppayroll.getRows());
             
             computeReceipts();
+            populateRowPayrollEmployeesReceipts();
         }
         
         this.setCursor(Cursor.getDefaultCursor());
@@ -2091,9 +2104,9 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
             }
             
-            if (timeClockRow.getExtraTime() > 0d) {
+            if (timeClockRow.getOvertime() > 0d) {
                 int perceptionId = 0;
-                double factor = timeClockRow.getExtraTime();
+                double factor = timeClockRow.getOvertime();
                 
                 if (moConfig.getTimeClockPolicy() == SHrsConsts.PPAYROLL_POL_LIMITED_DATA) {
                     perceptionId = moConfig.getFkEarningOvertime2Id_n();
@@ -2139,14 +2152,15 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
      * @param ppRow 
      */
     private void adjustNormalPerception(SHrsReceipt receipt, SPrepayrollRow ppRow) {
-        ArrayList<SDbAbsence> abss = SPrepayrollUtils.getAbsencesFromNoWorkedDays(miClient, ppRow, miClient.getSession().getCurrentDate(), moRegistry.getPkPayrollId());
-        ArrayList<SDbAbsenceConsumption> consms = SPrepayrollUtils.getConsumptionsFromAbs(abss);
-        receipt.getAbsenceConsumptions().addAll(consms);
+//        ArrayList<SDbAbsence> abss = SPrepayrollUtils.getAbsencesFromNoWorkedDays(miClient, ppRow, miClient.getSession().getCurrentDate(), moRegistry.getPkPayrollId());
+//        ArrayList<SDbAbsenceConsumption> consms = SPrepayrollUtils.getConsumptionsFromAbs(abss);
+//        receipt.getAbsenceConsumptions().addAll(consms);
         
         for (SHrsReceiptEarning hrsReceiptEarning : receipt.getHrsReceiptEarnings()) {
             if (hrsReceiptEarning.getEarning().getPkEarningId() == moConfig.getFkEarningEarningId_n()) {
                 double units = hrsReceiptEarning.getPayrollReceiptEarning().getUnitsAlleged();
                 if (units >= ppRow.getAbsences()) {
+                    hrsReceiptEarning.getPayrollReceiptEarning().setTimeClockSourced(true);
                     hrsReceiptEarning.getPayrollReceiptEarning().setUnitsAlleged(units - ppRow.getAbsences());
                     hrsReceiptEarning.getPayrollReceiptEarning().setUnits(units - ppRow.getAbsences());
                 }
@@ -2203,29 +2217,19 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
      * @param selectedEmployeesIds 
      */
     private void removeByImportation(boolean showMessage) {
-        boolean hasAbsences = false;
+        if (mbIsReadOnly) {
+            miClient.showMsgBoxWarning("No se puede agregar el empleado, la nómina es de solo lectura.");
+            return;
+        }
+        
+        int rowIndex = -1;
         for (int i = 0; i < moGridPanePayrollReceipts.getModel().getRowCount(); i++) {
             SRowPayrollEmployee rpe = (SRowPayrollEmployee) moGridPanePayrollReceipts.getGridRow(i);
             int moveId = -1;
-            boolean again = true;
-            ArrayList<SDbAbsenceConsumption> consms = new ArrayList();
-            while (again) {
-                moveId = -1;
-                for (SHrsReceiptEarning hrsReceiptEarningToRemove : rpe.getHrsReceipt().getHrsReceiptEarnings()) {
-                    if (hrsReceiptEarningToRemove.getPayrollReceiptEarning().isTimeClockSourced()) {
-                        moveId = hrsReceiptEarningToRemove.getPayrollReceiptEarning().getPkMoveId();
-                        break;
-                    }
-                }
-
-                if (moveId > -1) {
-                    rpe.getHrsReceipt().removeHrsReceiptEarning(moveId);
-                }
-                else {
-                    again = false;
-                }
-            }
+            boolean again;
+//            ArrayList<SDbAbsenceConsumption> consms = new ArrayList();
             
+            // remover deducciones
             again = true;
             while (again) {
                 moveId = -1;
@@ -2244,23 +2248,56 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 }
             }
             
-            for (SDbAbsenceConsumption cons : rpe.getHrsReceipt().getAbsenceConsumptions()) {
-                if (cons.isAuxIsClockSourced()) {
-                    consms.add(cons);
+            again = true;
+            // remover percepciones
+            while (again) {
+                moveId = -1;
+                for (SHrsReceiptEarning hrsReceiptEarningToRemove : rpe.getHrsReceipt().getHrsReceiptEarnings()) {
+                    if (hrsReceiptEarningToRemove.getPayrollReceiptEarning().isTimeClockSourced()) {
+                        moveId = hrsReceiptEarningToRemove.getPayrollReceiptEarning().getPkMoveId();
+                        if (hrsReceiptEarningToRemove.getEarning().getPkEarningId() == moConfig.getFkEarningEarningId_n()) {
+                            rowIndex = i;
+                        }
+                        break;
+                    }
+                }
+
+                if (moveId > -1) {
+                    rpe.getHrsReceipt().removeHrsReceiptEarning(moveId);
+                }
+                else {
+                    again = false;
                 }
             }
             
-            for (SDbAbsenceConsumption consm : consms) {
-                rpe.getHrsReceipt().getAbsenceConsumptions().remove(consm);
-            }
+//            // remover consumos del recibo
+//            for (SDbAbsenceConsumption cons : rpe.getHrsReceipt().getAbsenceConsumptions()) {
+//                if (cons.isAuxIsClockSourced()) {
+//                    consms.add(cons);
+//                }
+//            }
+//            
+//            for (SDbAbsenceConsumption consm : consms) {
+//                rpe.getHrsReceipt().getAbsenceConsumptions().remove(consm);
+//            }
             
-            hasAbsences = consms.size() > 0;
+//            // si hubo consumos hay que remover el recibo
+//            if (consms.size() > 0) {
+//                rowIndex = i;
+//                break;
+//            }
         }
         
-        SPrepayrollUtils.deleteAbsencesAndConsumptionsByImportation(miClient, moRegistry.getPkPayrollId());
-        if (hasAbsences) {
-            actionReceiptRemoveAll();
+        if (rowIndex > -1) {
+            moGridPanePayrollReceipts.setSelectedGridRow(rowIndex);
+            this.actionReceiptRemove();
+            this.removeByImportation(false);
         }
+        
+//        SPrepayrollUtils.deleteAbsencesAndConsumptionsByImportation(miClient, moRegistry.getPkPayrollId());
+//        if (hasAbsences) {
+//            actionReceiptRemoveAll();
+//        }
         if (showMessage) {
             miClient.showMsgBoxInformation("Realizado");
         }
@@ -2611,6 +2648,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         mbFirstActivation = true;
         mbIsReadOnly = false;
         mbIsWithTaxSubsidy = true;
+        mbAuxOpenRegAgain = false;
         maPayrollReceiptsDeleted.clear();
         
         removeAllListeners();
@@ -2780,6 +2818,16 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
         registry.getChildPayrollReceiptsToDelete().addAll(maPayrollReceiptsDeleted);
         
         registry.setFkPaysheetCustomTypeId(1);
+        
+        if (mbAuxOpenRegAgain) {
+            SGuiParams params = new SGuiParams();
+            registry.computePrimaryKey(miClient.getSession());
+            params.setKey(registry.getPrimaryKey());
+            
+            registry.setPostSaveTarget(miClient.getSession().getModule(SModConsts.MOD_HRS_N, SLibConsts.UNDEFINED));
+            registry.setPostSaveMethod(registry.getPostSaveTarget().getClass().getMethod("showForm", int.class, int.class, SGuiParams.class));
+            registry.setPostSaveMethodArgs(new Object[] { mnFormType, mnFormSubtype, params });
+        }
 
         return registry;
     }
