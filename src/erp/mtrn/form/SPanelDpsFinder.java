@@ -27,11 +27,12 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.util.Vector;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña
  */
 public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.event.ActionListener, java.awt.event.FocusListener {
 
@@ -227,7 +228,7 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
         String[] asNumberDps = null;
         String sNumberSeries = "";
         String sNumber = "";
-
+        
         moDps = null;
         moPanelDps.setDps(null, null);
 
@@ -235,41 +236,57 @@ public class SPanelDpsFinder extends javax.swing.JPanel implements java.awt.even
             if (!moFieldSearchNumberDps.getString().isEmpty()) {
                 asNumberDps = SLibUtilities.textExplode(moFieldSearchNumberDps.getString(), "-");
 
-                if (asNumberDps.length > 1) {
-                    sNumberSeries = asNumberDps[0];
-                    sNumber = asNumberDps[1];
-                }
-                else {
-                    sNumber = asNumberDps[0];
-                }
-
-                if (mbIsBizPartnerRequired) {
-                    if (jcbSearchBizPartnerId.getSelectedIndex() > 0) {
-                        key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, sNumberSeries, sNumber, manParamDpsClassKey, moFieldSearchBizPartnerId.getKeyAsIntArray());
+                    if (asNumberDps.length > 1) {
+                        sNumberSeries = asNumberDps[0];
+                        sNumber = asNumberDps[1];
                     }
-                    else if ( !SLibUtilities.compareKeys(manParamDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
+                    else {
+                        sNumber = asNumberDps[0];
+                    }
+
+                    if (mbIsBizPartnerRequired) {
+                        if (jcbSearchBizPartnerId.getSelectedIndex() > 0) {
+                            key = SDataUtilities.obtainDpsKeyForBizPartner(miClient, sNumberSeries, sNumber, manParamDpsClassKey, moFieldSearchBizPartnerId.getKeyAsIntArray());
+                        }
+                        else if ( !SLibUtilities.compareKeys(manParamDpsClassKey, SDataConstantsSys.TRNS_CL_DPS_PUR_DOC)) {
+                            key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
+                        }
+                    }
+                    else {
                         key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
                     }
-                }
-                else {
-                    key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
-                }
 
-                if (key != null) {
+                    if (key != null) {
                     moDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
-                    
-                    if (mbIsBizPartnerRequired) {
-                        moFieldSearchBizPartnerId.setFieldValue(new int[] { moDps.getFkBizPartnerId_r() });
-                    }
-                    
-                    moPanelDps.setDps(moDps, null);
+                        if(moDps.getDbmsDataCfd() != null) {
+                            if (!moDps.getDbmsDataCfd().getUuid().equals("") && moDps.getDbmsDataCfd().isStamped()) {
 
-                    if (moExternalMethod != null) {
-                        moExternalMethod.invoke(moExternalObject);
+                                if (mbIsBizPartnerRequired) {
+                                    moFieldSearchBizPartnerId.setFieldValue(new int[] { moDps.getFkBizPartnerId_r() });
+                                }
+
+                                moPanelDps.setDps(moDps, null);
+
+                                if (moExternalMethod != null) {
+                                    moExternalMethod.invoke(moExternalObject);
+                                }
+                            }
+                            else {
+                                System.err.println("La factura no esta timbrada.");
+                                JOptionPane.showMessageDialog(this, "La factura seleccionada debe estar timbrada", "Error", JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        }
                     }
-                }
+                    else {
+                    key = SDataUtilities.obtainDpsKey(miClient, sNumberSeries, sNumber, manParamDpsClassKey);
+                    moDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, key, SLibConstants.EXEC_MODE_VERBOSE);
+                        if(moDps.getDbmsDataCfd() == null || moDps.getDbmsDataCfd().getUuid().isEmpty() ) {
+                            System.err.println("La factura no esta timbrada.");
+                            JOptionPane.showMessageDialog(this, "La factura seleccionada debe estar timbrada", "Error", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }
+                updateCheckLocalCurrencyStatus();
             }
-            updateCheckLocalCurrencyStatus();
         }
         catch (Exception e) {
             SLibUtilities.renderException(this, e);

@@ -125,7 +125,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         jbDateChangeSscPicker = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Actualización  de SBC de empelados");
+        setTitle("Actualización de SBC de empelados");
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
@@ -493,7 +493,10 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 "FROM hrs_ben_row AS br " +
                 "WHERE br.id_ben = @id_ben_day1 " +
                 "AND @sen_raw <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS AnnualBonusDays, " +
-                "@factorI:=(((@curr_ben_days * @curr_ben_bon_perc) + @curr_ben_days )/" + SHrsConsts.YEAR_DAYS + " + 1) as SscFactor, " +
+                "@curr_ben_days_anual:=COALESCE((SELECT br.ben_day " +
+                "FROM hrs_ben_row AS br " +
+                "WHERE br.id_ben = @id_ben_day AND @sen_raw <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS VacationsDays, " +
+                "@factorI:=(((@curr_ben_days / " + SHrsConsts.YEAR_DAYS + ") + ((@curr_ben_bon_perc * @curr_ben_days_anual ) / " + SHrsConsts.YEAR_DAYS + ")) + 1 ) AS SscFactor, " +
                 "@SbcFac:=(@curr_sal_day * @factorI) AS SbcFac, " +
                 "(@Factori * @curr_sal_day) AS SscRaw " +
                 "FROM erp.bpsu_bp AS bp " +

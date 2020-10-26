@@ -92,7 +92,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Sergio Flores, Juan Barajas, Daniel López, Sergio Flores
+ * @author Sergio Flores, Juan Barajas, Daniel López, Sergio Flores, Claudio Peña
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33 {
 
@@ -266,7 +266,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxIsNeedCfdCce;
     protected boolean mbAuxIsProcessingValidation;
     protected boolean mbAuxIsProcessingCancellation;
-    protected double mdAuxCfdIvaPorcentaje;
+    protected boolean mbAuxKeepDpsData;
+    protected boolean mbAuxKeepExchangeRate;
+    protected String msAuxFileXmlAbsolutePath;
+    protected String msAuxFileXmlName;
+    
+    protected double mdTempCfdIvaPorcentaje;
 
     protected erp.mfin.data.SDataBookkeepingNumber moDbmsDataBookkeepingNumber;
     protected erp.mtrn.data.SDataCfd moDbmsDataCfd;
@@ -1081,7 +1086,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                 "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_year_n = " + mnPkYearId + " AND re.fid_dps_doc_n = " + mnPkDocId + " AND " +
                                 "r.id_tp_rec IN ('" + SDataConstantsSys.FINU_TP_REC_FY_OPEN + "', '" + SDataConstantsSys.FINU_TP_REC_FY_END + "') ";
-                        sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento!";
+                        sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento! \nSe debe eliminar las pólizas contables de cierre o apertura de ejercicio, antes de eliminar el documento.";
                         break;
                     case 220:
                         sSql = "SELECT count(*) AS f_count " +
@@ -1937,6 +1942,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxIsNeedCfdCce(boolean b) { mbAuxIsNeedCfdCce = b; }
     public void setAuxIsProcessingValidation(boolean b) { mbAuxIsProcessingValidation = b; }
     public void setAuxIsProcessingCancellation(boolean b) { mbAuxIsProcessingCancellation = b; }
+    public void setAuxKeepDpsData(boolean b) { mbAuxKeepDpsData = b; }
+    public void setAuxKeepExchangeRate(boolean b) { mbAuxKeepExchangeRate = b; }
+    public void setAuxFileXmlAbsolutePath(String s) { msAuxFileXmlAbsolutePath = s; }
+    public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
 
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
@@ -1956,6 +1965,10 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxIsNeedCfdCce() { return mbAuxIsNeedCfdCce; }
     public boolean getAuxIsProcessingValidation() { return mbAuxIsProcessingValidation; }
     public boolean getAuxIsProcessingCancellation() { return mbAuxIsProcessingCancellation; }
+    public boolean getAuxKeepDpsData() { return mbAuxKeepDpsData; }
+    public boolean getAuxKeepExchangeRate() { return mbAuxKeepExchangeRate; }
+    public String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
+    public String getAuxFileXmlName() { return msAuxFileXmlName; }
 
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
@@ -2141,7 +2154,12 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxIsNeedCfdCce = false;
         mbAuxIsProcessingValidation = false;
         mbAuxIsProcessingCancellation = false;
-        mdAuxCfdIvaPorcentaje = 0;
+        mbAuxKeepDpsData = false;
+        mbAuxKeepExchangeRate = false;
+        msAuxFileXmlAbsolutePath = "";
+        msAuxFileXmlName = "";
+        
+        mdTempCfdIvaPorcentaje = 0;
 
         moDbmsDataBookkeepingNumber = null;
         moDbmsDataCfd = null;
@@ -3969,6 +3987,27 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
     }
     
+    /**
+     * Obtener el uso de CDFI para la configuración de ítem vs. asociado de negocios.
+     * @param client
+     * @param itemId
+     * @param bizPartnerId
+     * @return
+     * @throws SQLException 
+     */
+    public static String getUseCfdi(final SClientInterface client, final int itemId, final int bizPartnerId) throws SQLException {
+        String useCfdi = "";
+
+        String sql = "SELECT cfd_use FROM erp.itmu_cfg_item_bp WHERE id_item = '" + itemId + "' AND id_bp = '" + bizPartnerId + "' " ;
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                useCfdi = resultSet.getString("cfd_use");
+            }
+        }
+        
+        return useCfdi;
+    }
+    
     /*
      * CFD and CFDI methods:
      */
@@ -4921,7 +4960,8 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     impuestoXml.setImpuesto(DAttributeOptionImpuestoTraslado.CFD_IVA);
                     impuestoXml.setTasa(key * 100.0);
                     impuestoXml.setImporte(dImpto);
-                    mdAuxCfdIvaPorcentaje = (key * 100.0);
+                    
+                    mdTempCfdIvaPorcentaje = (key * 100.0);
 
                     impuestosXml.add(impuestoXml);
                 }
@@ -5013,7 +5053,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             impuesto.setImporte(dpsEntryTax.getTaxCy());
                             impuesto.setTipoFactor(dpsEntryTax.getDbmsTaxCalculationType());
                             
-                            mdAuxCfdIvaPorcentaje = (tasa * 100.0); // if there are more than one tax rate, this will not work properly
+                            mdTempCfdIvaPorcentaje = (tasa * 100.0); // if there are more than one tax rate, this will not work properly
                             
                             if (dpsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
                                 taxes.addTaxCharged(impuesto);
@@ -5371,19 +5411,19 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                             ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaSoriana());
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_LOREAL:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaLoreal(mdAuxCfdIvaPorcentaje));
+                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaLoreal(mdTempCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_BACHOCO:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaBachoco(mdAuxCfdIvaPorcentaje));
+                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaBachoco(mdTempCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_MODELO:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaModelo(mdAuxCfdIvaPorcentaje));
+                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaModelo(mdTempCfdIvaPorcentaje));
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_ELEKTRA:
                             ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaElektra());
                             break;
                         case SDataConstantsSys.BPSS_TP_CFD_ADD_AMECE71:
-                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaAmece71(mdAuxCfdIvaPorcentaje));
+                            ((cfd.ver3.DElementAddenda) addenda).getElements().add(computeAddendaAmece71(mdTempCfdIvaPorcentaje));
                             break;
                         default:
                             throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

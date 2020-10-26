@@ -189,7 +189,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[9];
+                aoTableColumns = new STableColumn[10];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL_LOST:           
@@ -198,7 +198,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[9];
+                aoTableColumns = new STableColumn[10];
                 break;
 
             default:
@@ -383,11 +383,16 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
         }
         else {
             warehouseKey = getWarehouseKey();
-            sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " ";
+            if (warehouseKey != null) {
+                sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " ";
+            } 
+            else {
+                sqlWhere += "";
+            }
         }
         
         msSql = "SELECT s.id_item, s.id_unit, i.item_key, i.item, u.symbol, sc.qty_min, sc.rop, sc.qty_max, " +
-                (!isMaintUserNeeded() ? "" : "COALESCE(b.id_bp, 0) AS _id_bp, COALESCE(b.bp, 'N/D') AS _bp, supv.name, MIN(d.dt) AS _diog_dt, ") +
+                (!isMaintUserNeeded() ? "" : "COALESCE(b.id_bp, 0) AS _id_bp, COALESCE(b.bp, 'N/D') AS _bp, supv.name, MIN(s.dt) AS _diog_dt, ") +
                 "IF(SUM(s.mov_in - s.mov_out) <= sc.qty_min, " + STableConstants.ICON_VIEW_LIG_RED + ", " +
                 "IF(sc.qty_min < SUM(s.mov_in - s.mov_out) AND SUM(s.mov_in - s.mov_out) <= sc.rop, "  + STableConstants.ICON_VIEW_LIG_YEL + ", " +
                 "IF(SUM(s.mov_in - s.mov_out) > sc.rop AND SUM(s.mov_in - s.mov_out) <= sc.qty_max, "  + STableConstants.ICON_VIEW_LIG_GRE + ", " +
@@ -403,9 +408,8 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 "INNER JOIN erp.itmu_unit AS u ON u.id_unit = s.id_unit " +
                 "INNER JOIN trn_stk_cfg AS sc ON sc.id_item = s.id_item AND sc.id_unit = s.id_unit AND sc.id_cob = s.id_cob AND sc.id_wh = s.id_wh " +
                 (!isMaintUserNeeded() ? "" : 
-                "INNER JOIN trn_diog AS d ON d.id_year = s.fid_diog_year AND d.id_doc = s.fid_diog_doc " +
-                "INNER JOIN trn_maint_user_supv AS supv ON d.fid_maint_user_supv = supv.id_maint_user_supv " +
-                "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = d.fid_maint_user_n ") +
+                "INNER JOIN trn_maint_user_supv AS supv ON s.fid_maint_user_supv = supv.id_maint_user_supv " +
+                "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = s.fid_maint_user_n ") +
                 "WHERE NOT s.b_del " + (sqlWhere.isEmpty() ? "" : "AND " + sqlWhere) +
                 "GROUP BY s.id_item, s.id_unit, i.item_key, i.item, u.symbol, sc.qty_min, sc.rop, sc.qty_max" +
                 (!isMaintUserNeeded() ? "" : ", b.id_bp, b.bp") + " " +

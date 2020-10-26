@@ -99,6 +99,7 @@ import erp.mod.fin.db.SFiscalAccounts;
 import erp.mod.fin.form.SDialogDpsExchangeDif;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
+import erp.mod.fin.form.SDialogMassDownloadCfdi;
 import erp.mod.fin.form.SDialogRepCashFlowExpected;
 import erp.mod.fin.form.SDialogRepFinStatements;
 import erp.mod.fin.form.SDialogRepMovsFileCvs;
@@ -119,7 +120,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -2016,6 +2017,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiFinCfdPayment) {
                 miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY_REC);
+            }
+            else if (item == jmiDownloadXml) {
+                new SDialogMassDownloadCfdi((SGuiClient) miClient).setVisible(true);
             }
             else if (item == jmiFinImportPayments) {
                 miClient.getSession().showView(SModConsts.FIN_LAY_BANK_DEP, SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY, null);

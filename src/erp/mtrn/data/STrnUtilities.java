@@ -35,6 +35,8 @@ import erp.mod.cfg.db.SDbMms;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SHrsFormerConsts;
+import static erp.mod.hrs.db.SHrsUtils.createPayrollReceipt;
+import static erp.mod.hrs.db.SHrsUtils.createPayrollReceiptMap;
 import erp.musr.data.SDataUser;
 import erp.print.SDataConstantsPrint;
 import erp.server.SServerConstants;
@@ -138,7 +140,7 @@ public abstract class STrnUtilities {
 
         return stockLot;
     }
-
+    
     /**
      * Obtains available stock on a certain year up to cut off date.
      * @param client ERP Client interface.
@@ -184,35 +186,40 @@ public abstract class STrnUtilities {
      */
     @SuppressWarnings("unchecked")
     public static Vector<STrnStockMove> obtainStockWarehouse(final SClientInterface client, final int year, final Date dateCutOff_n, final int[] warehouseKey) throws Exception {
-        String sql = "";
-        ResultSet resulSet = null;
         STrnStockMove stockMove = null;
-        Vector<STrnStockMove> stockMoves = new Vector<STrnStockMove>();
+        Vector<STrnStockMove> stockMoves = new Vector<>();
 
-        sql = "SELECT s.id_year, s.id_item, s.id_unit, s.id_lot, s.id_wh, i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, " +
-                "l.b_block, SUM(s.mov_in - s.mov_out) AS f_stk, " +
+        String sql = "SELECT s.id_item, s.id_unit, s.id_lot, " +
+                "i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, l.b_block, " +
+                "s.fid_maint_user_n, s.fid_maint_user_supv, " +
+                "SUM(s.mov_in - s.mov_out) AS f_stk, " +
                 "SUM(s.debit - s.credit) AS f_bal " +
                 "FROM trn_stk AS s " +
                 "INNER JOIN erp.itmu_item AS i ON s.id_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +
                 "INNER JOIN trn_lot AS l ON s.id_item = l.id_item AND s.id_unit = l.id_unit AND s.id_lot = l.id_lot " +
-                "WHERE s.b_del = 0 AND s.id_year = " + year + " AND s.dt <= '" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(dateCutOff_n) + "' AND s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " " +
-                "GROUP BY s.id_year, s.id_item, s.id_unit, s.id_lot, s.id_wh, l.lot, l.dt_exp_n, l.b_block, i.item_key, i.item, u.symbol " +
+                "WHERE s.b_del = 0 AND s.id_year = " + year + " AND " +
+                "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff_n) + "' AND " +
+                "s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " " +
+                "GROUP BY s.id_item, s.id_unit, s.id_lot, " +
+                "i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, l.b_block, " +
+                "s.fid_maint_user_n, s.fid_maint_user_supv " +
                 "HAVING f_stk <> 0 OR f_bal <> 0 " +
                 "ORDER BY " + (client.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") +
-                "s.id_item, u.symbol, s.id_unit, l.lot, l.dt_exp_n, l.b_block, s.id_lot ";
+                "s.id_item, u.symbol, s.id_unit, l.lot, l.dt_exp_n, l.b_block, s.id_lot, " +
+                "s.fid_maint_user_n, s.fid_maint_user_supv;";
 
-        resulSet = client.getSession().getStatement().executeQuery(sql);
-        while (resulSet.next()) {
-            stockMove = new STrnStockMove(new int[] { year, resulSet.getInt("s.id_item"), resulSet.getInt("s.id_unit"), resulSet.getInt("s.id_lot"),
-                warehouseKey[0], warehouseKey[1] }, resulSet.getDouble("f_stk"));
-
-            stockMove.setAuxLot(resulSet.getString("l.lot"));
-            stockMove.setAuxLotDateExpiration(resulSet.getDate("l.dt_exp_n"));
-            stockMove.setAuxIsLotBlocked(resulSet.getBoolean("l.b_block"));
-            stockMove.setValue(resulSet.getDouble("f_bal"));
-
-            stockMoves.add(stockMove);
+         try (ResultSet resulSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resulSet.next()) {
+                stockMove = new STrnStockMove(new int[] { year, resulSet.getInt("s.id_item"), resulSet.getInt("s.id_unit"), resulSet.getInt("s.id_lot"),
+                warehouseKey[0], warehouseKey[1] }, resulSet.getDouble("f_stk"), resulSet.getDouble("f_bal"), resulSet.getInt("s.fid_maint_user_n"),  resulSet.getInt("s.fid_maint_user_supv"));
+                
+                stockMove.setAuxLot(resulSet.getString("l.lot"));
+                stockMove.setAuxLotDateExpiration(resulSet.getDate("l.dt_exp_n"));
+                stockMove.setAuxIsLotBlocked(resulSet.getBoolean("l.b_block"));
+                
+                stockMoves.add(stockMove);
+            }
         }
 
         return stockMoves;
@@ -1901,7 +1908,11 @@ public abstract class STrnUtilities {
                     if (!isCancelled) {
                         File pdfFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName().replaceAll(".xml", ".pdf"));
                         if (!pdfFile.exists()) {
-                            throw new Exception("El archivo PDF no existe.");
+                            int[] payrollKey = {subtypeCfd, bizPartnerId};
+                            HashMap<String, Object> map = createPayrollReceiptMap((SGuiClient) client, payrollKey, SDataConstantsPrint.PRINT_MODE_PDF_FILE);
+                            File pdf = createPayrollReceipt((SGuiClient) client, map);
+                            pdfFile = pdf;
+//                            throw new Exception("El archivo PDF no existe."); // Si no existe el PDF se crea, eliminar linea
                         }
 
                         File xmlFile = new File(client.getSessionXXX().getParamsCompany().getXmlBaseDirectory() + cfd.getDocXmlName());
@@ -3207,9 +3218,7 @@ public abstract class STrnUtilities {
      */
     private static SDataDiogEntry processStockEntries(final SClientInterface client, STrnStockMove stockMove) throws java.lang.Exception {
         SDataDiogEntry diogEntry = null;
-        SDataItem item = null;
-
-        item = (SDataItem) SDataUtilities.readRegistry(client, SDataConstants.ITMU_ITEM, new int[] { stockMove.getPkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
+        SDataItem item = (SDataItem) SDataUtilities.readRegistry(client, SDataConstants.ITMU_ITEM, new int[] { stockMove.getPkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
 
         diogEntry = new SDataDiogEntry();
         diogEntry.setPkYearId(SLibConstants.UNDEFINED);
@@ -3225,7 +3234,7 @@ public abstract class STrnUtilities {
         diogEntry.setIsDeleted(false);
         diogEntry.setFkItemId(item.getPkItemId());
         diogEntry.setFkUnitId(item.getFkUnitId());
-        diogEntry.setFkOriginalUnitId(item.getFkUnitId());
+        diogEntry.setFkOriginalUnitId(item.getFkUnitId());      
 
         diogEntry.setFkDpsYearId_n(SLibConstants.UNDEFINED);
         diogEntry.setFkDpsDocId_n(SLibConstants.UNDEFINED);
@@ -3236,7 +3245,6 @@ public abstract class STrnUtilities {
         diogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
         diogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
         diogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
-        diogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
 
         diogEntry.setFkUserNewId(client.getSession().getUser().getPkUserId());
         diogEntry.setFkUserEditId(client.getSession().getUser().getPkUserId());
@@ -3262,22 +3270,21 @@ public abstract class STrnUtilities {
      * @param companyBranch company branch for Diog
      * @param warehouse warehouse for Diog
      * @param diogtype Diog type SModSysConsts.TRNS_TP_IOG_IN_ ...
-     * @param numberSerie number serie for Diog
+     * @param diogType number serie for Diog
      * @param stockMoves array list stock moves to process
      * @return object SDataDiog type
      * @throws java.lang.Exception 
      */
-    public static SDataDiog createDataDiogSystem(final SClientInterface client, final int year, final Date date, final int companyBranch, final int warehouse, final int[] diogtype, final String numberSerie, final Vector<STrnStockMove> stockMoves) throws java.lang.Exception {
+    public static SDataDiog createDataDiogSystem(final SClientInterface client, final int year, final Date date, final int companyBranch, final int warehouse, final int[] diogType, final String numberSerie, final Vector<STrnStockMove> stockMoves) throws java.lang.Exception {
         Vector<SDataDiogEntry> iogEntries = new Vector<>();
         SDataDiog iog = null;
-        
+
         iogEntries.clear();
         for (STrnStockMove stockMove : stockMoves) {
             iogEntries.add(processStockEntries(client, stockMove));
         }
         
         iog = new SDataDiog();
-
         iog.setPkYearId(year);
         iog.setPkDocId(0);
         iog.setDate(date);
@@ -3293,17 +3300,12 @@ public abstract class STrnUtilities {
         iog.setIsRecordAutomatic(false);
         iog.setIsSystem(true);
         iog.setIsDeleted(false);
-        iog.setFkDiogCategoryId(diogtype[0]);
-        iog.setFkDiogClassId(diogtype[1]);
-        iog.setFkDiogTypeId(diogtype[2]);
+        iog.setFkDiogCategoryId(diogType[0]);
+        iog.setFkDiogClassId(diogType[1]);
+        iog.setFkDiogTypeId(diogType[2]);
         iog.setFkDiogAdjustmentTypeId(SModSysConsts.TRNU_TP_IOG_ADJ_NA);
         iog.setFkCompanyBranchId(companyBranch);
         iog.setFkWarehouseId(warehouse);
-        iog.setFkMaintMovementTypeId(SModSysConsts.TRNS_TP_MAINT_MOV_NA);
-        iog.setFkMaintUserId_n(SLibConsts.UNDEFINED);
-        iog.setFkMaintUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
-        iog.setFkMaintReturnUserId_n(SLibConsts.UNDEFINED);
-        iog.setFkMaintReturnUserSupervisorId(SModSysConsts.TRN_MAINT_USER_SUPV_NA);
         iog.setFkUserShippedId(SUtilConsts.USR_NA_ID);
         iog.setFkUserAuditedId(SUtilConsts.USR_NA_ID);
         iog.setFkUserAuthorizedId(SUtilConsts.USR_NA_ID);

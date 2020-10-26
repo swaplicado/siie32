@@ -1147,7 +1147,7 @@ public abstract class SDataConstantsSys {
     public static final int[] TRNU_TP_DPS_SAL_EST = { 2, 1, 1 };
     public static final int[] TRNU_TP_DPS_SAL_CON = { 2, 1, 2 };
     public static final int[] TRNU_TP_DPS_SAL_ORD = { 2, 2, 1 };
-    public static final int[] TRNU_TP_DPS_SAL_INV = { 2, 3, 1 };
+     public static final int[] TRNU_TP_DPS_SAL_INV = { 2, 3, 1 };
     public static final int[] TRNU_TP_DPS_SAL_REM = { 2, 3, 2 };
     public static final int[] TRNU_TP_DPS_SAL_REC = { 2, 3, 3 };
     public static final int[] TRNU_TP_DPS_SAL_TIC = { 2, 3, 4 };
@@ -1613,6 +1613,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_BAL_AGI = 207022;
     public static final int REP_TRN_BPS_MOV_DPS = 207023;
     public static final int REP_TRN_ORD_GDS = 207024;
+    public static final int REP_TRN_EST = 207025;
     public static final int REP_TRN_PS_ITEM_UNIT_PRICE = 207026;
     public static final int REP_TRN_DPS_BPS_DETAIL = 207027;
     public static final int REP_TRN_DPS_MOV = 207028;

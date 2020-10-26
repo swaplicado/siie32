@@ -17,7 +17,7 @@ import java.util.Vector;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Sergio Flores
+ * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Sergio Flores, Claudio Peña
  */
 public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -30,6 +30,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     protected java.lang.String msPresentation;
     protected java.lang.String msPresentationShort;
     protected java.lang.String msCode;
+    protected java.lang.String msPartNumber;
     protected boolean mbIsInventoriable;
     protected boolean mbIsLotApplying;
     protected boolean mbIsBulk;
@@ -122,6 +123,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public void setPresentation(java.lang.String s) { msPresentation = s; }
     public void setPresentationShort(java.lang.String s) { msPresentationShort = s; }
     public void setCode(java.lang.String s) { msCode = s; }
+    public void setPartNumber(java.lang.String s) { msPartNumber = s; }
     public void setIsInventoriable(boolean b) { mbIsInventoriable = b; }
     public void setIsLotApplying(boolean b) { mbIsLotApplying = b; }
     public void setIsBulk(boolean b) { mbIsBulk = b; }
@@ -202,6 +204,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
     public java.lang.String getPresentation() { return msPresentation; }
     public java.lang.String getPresentationShort() { return msPresentationShort; }
     public java.lang.String getCode() { return msCode; }
+    public java.lang.String getPartNumber() { return msPartNumber; }
     public boolean getIsInventoriable() { return mbIsInventoriable; }
     public boolean getIsLotApplying() { return mbIsLotApplying; }
     public boolean getIsBulk() { return mbIsBulk; }
@@ -319,6 +322,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
         msPresentation = "";
         msPresentationShort = "";
         msCode = "";
+        msPartNumber = "";
         mbIsInventoriable = false;
         mbIsLotApplying = false;
         mbIsBulk = false;
@@ -422,6 +426,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                 msPresentation = resultSet.getString("present");
                 msPresentationShort = resultSet.getString("present_short");
                 msCode = resultSet.getString("code");
+                msPartNumber = resultSet.getString("part_num");
                 mbIsInventoriable = resultSet.getBoolean("b_inv");
                 mbIsLotApplying = resultSet.getBoolean("b_lot");
                 mbIsBulk = resultSet.getBoolean("b_bulk");
@@ -573,7 +578,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setString(nParam++, msKey);
             callableStatement.setString(nParam++, msItem);
@@ -583,6 +588,7 @@ public class SDataItem extends erp.lib.data.SDataRegistry implements java.io.Ser
             callableStatement.setString(nParam++, msPresentation);
             callableStatement.setString(nParam++, msPresentationShort);
             callableStatement.setString(nParam++, msCode);
+            callableStatement.setString(nParam++, msPartNumber);
             callableStatement.setBoolean(nParam++, mbIsInventoriable);
             callableStatement.setBoolean(nParam++, mbIsLotApplying);
             callableStatement.setBoolean(nParam++, mbIsBulk);

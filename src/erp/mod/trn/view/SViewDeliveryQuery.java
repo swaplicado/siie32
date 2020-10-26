@@ -69,15 +69,15 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
         mjDpsOpen.setEnabled(isProcessed());
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjDpsOpen);
         
-        mjDpsView = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), SUtilConsts.TXT_CLOSE, this);
+        mjDpsView = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")), "Ver documento", this);
         mjDpsView.setEnabled(!isProcessed());
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjDpsView);
         
-        mjDpsNotes = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_notes.gif")), SUtilConsts.TXT_CLOSE, this);
+        mjDpsNotes = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_notes.gif")), "Ver notas del documento", this);
         mjDpsNotes.setEnabled(!isProcessed());
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjDpsNotes);
         
-        mjDpsLinks = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_link.gif")), SUtilConsts.TXT_CLOSE, this);
+        mjDpsLinks = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_link.gif")), "Ver vínculos del documento", this);
         mjDpsLinks.setEnabled(!isProcessed());
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjDpsLinks);
         

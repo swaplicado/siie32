@@ -19,7 +19,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -77,7 +77,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
 
     public SDataDiogEntry() {
         super(SDataConstants.TRN_DIOG_ETY);
-        mvAuxStockMoves = new Vector<STrnStockMove>();
+        mvAuxStockMoves = new Vector<>();
         reset();
     }
 
@@ -316,7 +316,7 @@ public class SDataDiogEntry extends erp.lib.data.SDataRegistry implements java.i
                 mnFkMfgYearId_n = resultSet.getInt("de.fid_mfg_year_n");
                 mnFkMfgOrderId_n = resultSet.getInt("de.fid_mfg_ord_n");
                 mnFkMfgChargeId_n = resultSet.getInt("de.fid_mfg_chg_n");
-                mnFkMaintAreaId = resultSet.getInt("de.fid_maint_area");
+                mnFkMaintAreaId = resultSet.getInt("de.fid_maint_area");              
                 mnFkUserNewId = resultSet.getInt("de.fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("de.fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("de.fid_usr_del");

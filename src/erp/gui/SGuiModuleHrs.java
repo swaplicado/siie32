@@ -41,7 +41,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas, Sergio Flores
+ * @author Sergio Flores, Juan Barajas, Sergio Flores, Claudio Peña
  */
 public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -247,7 +247,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatEmployeeHireLog);
         jmCat.add(jmiCatEmployeeWageLog);
         jmCat.add(jmiCatEmployeeSscBaseLog);
-        jmCat.add(jmiCatEmployeeSscBaseUpdate);
+        //jmCat.add(jmiCatEmployeeSscBaseUpdate); XXX (2016-10-25) jbarajas is necesary revision
         jmCat.addSeparator();
         jmCat.add(jmiCatEarnings);
         jmCat.add(jmiCatDeductions);

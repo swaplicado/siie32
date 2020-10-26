@@ -13,7 +13,7 @@ import java.sql.ResultSet;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Claudio Peña
  */
 public class SDataBizPartnerBranchContact extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -157,6 +157,17 @@ public class SDataBizPartnerBranchContact extends erp.lib.data.SDataRegistry imp
     public java.lang.String getAuxTelephone01() { return msTelNumber01.length() == 0 ? "" : (msDbmsTelephoneType01 + " " + (msTelAreaCode01.length() == 0 ? "" : "(" + msTelAreaCode01 + ") ") + msTelNumber01 + (msTelExt01.length() == 0 ? "" : " ext. " + msTelExt01)); }
     public java.lang.String getAuxTelephone02() { return msTelNumber02.length() == 0 ? "" : (msDbmsTelephoneType02 + " " + (msTelAreaCode02.length() == 0 ? "" : "(" + msTelAreaCode02 + ") ") + msTelNumber02 + (msTelExt02.length() == 0 ? "" : " ext. " + msTelExt02)); }
     public java.lang.String getAuxTelephone03() { return msTelNumber03.length() == 0 ? "" : (msDbmsTelephoneType03 + " " + (msTelAreaCode03.length() == 0 ? "" : "(" + msTelAreaCode03 + ") ") + msTelNumber03 + (msTelExt03.length() == 0 ? "" : " ext. " + msTelExt03)); }
+
+    public java.lang.String getAuxTelephoneNumber01() { return msTelNumber01.length() == 0 ? "" : ((msTelAreaCode01.length() == 0 ? "" : "(" + msTelAreaCode01 + ") ") + msTelNumber01 + (msTelExt01.length() == 0 ? "" : " ext. " + msTelExt01)); }
+    public java.lang.String getAuxTelephoneNumber02() { return msTelNumber02.length() == 0 ? "" : ((msTelAreaCode02.length() == 0 ? "" : "(" + msTelAreaCode02 + ") ") + msTelNumber02 + (msTelExt02.length() == 0 ? "" : " ext. " + msTelExt02)); }
+    public java.lang.String getAuxTelephoneNumber03() { return msTelNumber03.length() == 0 ? "" : ((msTelAreaCode03.length() == 0 ? "" : "(" + msTelAreaCode03 + ") ") + msTelNumber03 + (msTelExt03.length() == 0 ? "" : " ext. " + msTelExt03)); }
+    
+    public java.lang.String getAuxTelephoneNumbers() {
+        String numbers = getAuxTelephoneNumber01();
+        numbers += (numbers.isEmpty() ? "" : (getAuxTelephoneNumber02().isEmpty() ? "" : ", ")) + getAuxTelephoneNumber02();
+        numbers += (numbers.isEmpty() ? "" : (getAuxTelephoneNumber03().isEmpty() ? "" : ", ")) + getAuxTelephoneNumber03();
+        return numbers;
+    }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
