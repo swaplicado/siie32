@@ -4154,37 +4154,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         moFieldCfdiCfdiUsage.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdUsoCFDI());
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * This method must be invoked every time an entry is added, edited or deleted!
-     */
-    private void updateDpsEntryCfdiSettings() throws SQLException {
-        if (!moDps.getDbmsDpsEntries().isEmpty()) {
-            for (int i = 0 ; i < moDps.getDbmsDpsEntries().size(); i++) {
-                String useCfdi = SDataDps.getUseCfdi(miClient, moDps.getDbmsDpsEntries().get(i).getFkItemId(), moBizPartnerCategory.getPkBizPartnerId());
-                if (!useCfdi.isEmpty()) {
-                    moFieldCfdiCfdiUsage.setFieldValue(useCfdi);
-                    i =  moDps.getDbmsDpsEntries().size();
-                }
-            }
-        }
-        else {
-            if (mbIsDpsAdjustment) {
-                moFieldCfdiCfdiUsage.setFieldValue(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_G02);
-            }
-            else {
-                if (isCfdIntCommerceRequired()) {
-                    moFieldCfdiCfdiUsage.setFieldValue(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01);
-                }
-                else {
-                    moFieldCfdiCfdiUsage.setFieldValue(moBizPartnerCategory.getCfdiCfdiUsage());
-                    if (jcbCfdiCfdiUsage.getSelectedIndex() <= 0) {
-                        moFieldCfdiCfdiUsage.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdUsoCFDI());
-                    }
-                }
             }        
         }
     }
