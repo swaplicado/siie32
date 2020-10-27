@@ -187,19 +187,6 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         return SLibUtilities.textTrim(mnFkBizPartnerIdentityTypeId == SDataConstantsSys.BPSS_TP_BP_IDY_ORG ? msBizPartner : msFirstname + " " + msLastname);
     }
 
-    public erp.mbps.data.SDataBizPartnerBranch getDbmsHqBranch() {
-        SDataBizPartnerBranch hq = null;
-
-        for (int i = 0; i < mvDbmsBizPartnerBranches.size(); i++) {
-            if (mvDbmsBizPartnerBranches.get(i).getFkBizPartnerBranchTypeId() == SDataConstantsSys.BPSS_TP_BPB_HQ) {
-                hq = mvDbmsBizPartnerBranches.get(i);
-                break;
-            }
-        }
-
-        return hq;
-    }
-    
     public boolean isDomestic(SClientInterface client) {
         int country = getDbmsHqBranch().getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n();
         
@@ -413,7 +400,6 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
                     mvDbmsItemBizPartnerDescription = description.getDbmsItemBizPartnerDescriptions();
                 }
 
-
                 // Read aswell customer configuration, if exists:
 
                 if (mbIsCustomer) {
@@ -625,6 +611,23 @@ public class SDataBizPartner extends erp.lib.data.SDataRegistry implements java.
         return mtUserEditTs;
     }
 
+    /**
+     * Get headquarters branch.
+     * @return <code>SDataBizPartnerBranch</code>.
+     */
+    public erp.mbps.data.SDataBizPartnerBranch getDbmsHqBranch() {
+        SDataBizPartnerBranch hqBranch = null;
+
+        for (SDataBizPartnerBranch bpb : mvDbmsBizPartnerBranches) {
+            if (bpb.getFkBizPartnerBranchTypeId() == SDataConstantsSys.BPSS_TP_BPB_HQ) {
+                hqBranch = bpb;
+                break;
+            }
+        }
+
+        return hqBranch;
+    }
+    
     public erp.mbps.data.SDataBizPartnerBranch getDbmsBizPartnerBranch(int[] pk) {
         SDataBizPartnerBranch branch = null;
 

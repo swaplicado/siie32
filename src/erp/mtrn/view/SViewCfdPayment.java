@@ -5,6 +5,7 @@
 
 package erp.mtrn.view;
 
+import erp.SClientUtils;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -38,7 +39,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  * User view for management of database registries of CFDI of Payments.
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -403,7 +404,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfd).composeMessage());
+                    miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfd).getDetailedStatus());
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -507,20 +508,30 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                 whereRe += (whereRe.isEmpty() ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter(new int[] { period[0] }, "r.dt");
             }
         }
-
+        
+        String complementaryDbName = "";
+        
+        try {
+            complementaryDbName = SClientUtils.getComplementaryDdName((SClientInterface) miClient);
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+         
         msSql = "SELECT c.id_cfd, c.ts, CONCAT(c.ser, IF(length(c.ser) = 0, '', '-'), c.num) AS _num, c.uuid, c.xml_rfc_rec, " +
                 "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS _ico, " +
                 "IF(c.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR c.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + /* is CFD */
                 "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(c.uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + /* CFDI pending sign */
-                "IF(LENGTH(c.ack_can_xml) = 0 AND c.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + /* CFDI signed, canceled only SIIE */
-                "IF(LENGTH(c.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " + /* CFDI canceled with cancellation acknowledgment in XML format */
-                "IF(c.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + /* CFDI canceled with cancellation acknowledgment in PDF format */
+                "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + /* CFDI signed, canceled only SIIE */
+                "IF(LENGTH(xc.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " + /* CFDI canceled with cancellation acknowledgment in XML format */
+                "IF(xc.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + /* CFDI canceled with cancellation acknowledgment in PDF format */
                 STableConstants.ICON_XML_SIGN + " " + /* CFDI signed, canceled only SIIE */
                 "))))) AS _ico_xml, " +
                 "cob.code AS _cob_code, " +
                 "b.bp, b.fiscal_id, " +
                 "fb.bp, fb.fiscal_id " +
                 "FROM trn_cfd AS c " +
+                "INNER JOIN " + complementaryDbName + ".trn_cfd AS xc ON c.id_cfd = xc.id_cfd " +
                 "INNER JOIN erp.bpsu_bpb AS cob ON c.fid_cob_n = cob.id_bpb " +
                 "LEFT OUTER JOIN " +
                 "(SELECT DISTINCT re.fid_cfd_n, re.fid_bp_nr " +

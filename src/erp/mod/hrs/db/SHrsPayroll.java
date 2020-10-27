@@ -172,6 +172,7 @@ public class SHrsPayroll {
         */
         payrollReceiptEarning.setFkEarningTypeId(earning.getFkEarningTypeId());
         payrollReceiptEarning.setFkEarningId(earning.getPkEarningId());
+        payrollReceiptEarning.setFkBonusId(SModSysConsts.HRSS_BONUS_NON);
         payrollReceiptEarning.setFkLoanEmployeeId_n(loanEmployeeId_n);
         payrollReceiptEarning.setFkLoanLoanId_n(loanLoanId_n);
         payrollReceiptEarning.setFkLoanTypeId_n(loanEmployeeId_n != 0 && loanLoanId_n != 0 ? earning.getFkLoanTypeId() : 0);
@@ -228,10 +229,12 @@ public class SHrsPayroll {
         */
         payrollReceiptDeduction.setFkDeductionTypeId(deduction.getFkDeductionTypeId());
         payrollReceiptDeduction.setFkDeductionId(deduction.getPkDeductionId());
+        payrollReceiptDeduction.setFkBonusId(SModSysConsts.HRSS_BONUS_NON);
         payrollReceiptDeduction.setFkBenefitTypeId(deduction.getFkBenefitTypeId());
         payrollReceiptDeduction.setFkLoanEmployeeId_n(loanEmployeeId_n);
         payrollReceiptDeduction.setFkLoanLoanId_n(loanLoanId_n);
         payrollReceiptDeduction.setFkLoanTypeId_n(loanEmployeeId_n != 0 && loanLoanId_n != 0 ? deduction.getFkLoanTypeId() : 0);
+        payrollReceiptDeduction.setFkBonusId(1);
         /*
         payrollReceiptDeduction.setFkUserInsertId(...);
         payrollReceiptDeduction.setFkUserUpdateId(...);
@@ -1127,7 +1130,7 @@ public class SHrsPayroll {
         hrsReceipt.setHrsPayroll(this);
         
         SHrsEmployee hrsEmployee = moHrsPayrollDataProvider.createHrsEmployee(this, moPayroll.getPkPayrollId(), employeeId, 
-                payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd, taxComputationType);
+                payrollYear, payrollYearPeriod, fiscalYear, dateStart, dateEnd);
         hrsEmployee.setHrsReceipt(hrsReceipt);
         hrsReceipt.setHrsEmployee(hrsEmployee);
         
@@ -1188,7 +1191,7 @@ public class SHrsPayroll {
         try {
             for (SHrsReceipt hrsReceipt : maHrsReceipts) {
                 hrsReceipt.setHrsEmployee(moHrsPayrollDataProvider.computeEmployee(hrsReceipt.getHrsEmployee(), isCopy ? 0 : moPayroll.getPkPayrollId(), hrsReceipt.getHrsEmployee().getEmployee().getPkEmployeeId(),
-                        moPayroll.getPeriodYear(), moPayroll.getPeriod(), moPayroll.getFiscalYear(), moPayroll.getDateStart(), moPayroll.getDateEnd(), moPayroll.getFkTaxComputationTypeId()));
+                        moPayroll.getPeriodYear(), moPayroll.getPeriod(), moPayroll.getFiscalYear(), moPayroll.getDateStart(), moPayroll.getDateEnd()));
             }
         }
         catch (Exception e) {

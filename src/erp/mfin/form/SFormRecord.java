@@ -44,7 +44,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author  Sergio Flores
+ * @author  Sergio Flores, Isabel Servín
  */
 public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, javax.swing.event.ListSelectionListener {
 
@@ -53,13 +53,13 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private final int CONCEPT_POLICY_CURR_ENTRY = 3;
     private final int CONCEPT_POLICY_LAST_ENTRY = 4;
 
-    private int mnFormType;
+    private final int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
 
     private erp.mfin.data.SDataRecord moRecord;
     private erp.mfin.data.SDataAccountCash moAccountCash;
@@ -85,7 +85,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private boolean mbOriginalIsDeleted;
     private java.lang.String msAuxLastEntryConcept;
 
-    /** Creates new form SFormRecord */
+    /** Creates new form SFormRecord
+     * @param client */
     public SFormRecord(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -839,7 +840,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         moPaneGridEntries.setDoubleClickAction(this, "publicActionEntryEdit");
         jpEntries.add(moPaneGridEntries, BorderLayout.CENTER);
 
-        aoTableColumns = new STableColumnForm[24];
+        aoTableColumns = new STableColumnForm[33];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "#", STableConstants.WIDTH_NUM_TINYINT);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cuenta contable", STableConstants.WIDTH_ACCOUNT_ID);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta contable", STableConstants.WIDTH_ACCOUNT);
@@ -856,6 +857,15 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Subclase movimiento", 200);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. centro costo", STableConstants.WIDTH_ACCOUNT_ID);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo", STableConstants.WIDTH_ACCOUNT);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Asociado negocios", 175);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "RFC ocasional", 75);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Repositorio contable", 75);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Impuesto", 100);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Entidad", 100);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", STableConstants.WIDTH_ITEM_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem auxiliar", STableConstants.WIDTH_ITEM);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Docto. (factura)", STableConstants.WIDTH_DOC_NUM);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Ejercicio contable", STableConstants.WIDTH_YEAR_PERIOD);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cheque", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. creación", STableConstants.WIDTH_USER);
@@ -1253,7 +1263,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 form.setFormVisible(true);
 
                 if (form.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    moPaneGridEntries.setTableRow(new SDataRecordEntryRow(form.getRegistry()), index);
+                    moPaneGridEntries.setTableRow(new SDataRecordEntryRow((SDataRecordEntry) form.getRegistry()), index);
                     renderEntries(true);
                     calculateBalance();
                     moPaneGridEntries.setTableRowSelection(index);

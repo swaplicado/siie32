@@ -37,7 +37,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Claudio Peña, Sergio Flores
  */
 public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -256,20 +256,21 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
         jbPrint.setToolTipText("Imprimir documento");
         addTaskBarUpperComponent(jbPrint);
 
+        int levelRightMaint = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_MAINT);
         int levelRightInOtherInt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_IN_INT).Level;
         int levelRightOutOtherInt = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_OUT_INT).Level;
 
         jbNew.setEnabled(false);
-        jbEdit.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR || levelRightOutOtherInt >=  SUtilConsts.LEV_AUTHOR);
-        jbDelete.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR || levelRightOutOtherInt >=  SUtilConsts.LEV_AUTHOR);
+        jbEdit.setEnabled(levelRightMaint >= SUtilConsts.LEV_AUTHOR || levelRightInOtherInt >= SUtilConsts.LEV_CAPTURE || levelRightOutOtherInt >=  SUtilConsts.LEV_CAPTURE);
+        jbDelete.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER || levelRightInOtherInt >= SUtilConsts.LEV_MANAGER || levelRightOutOtherInt >=  SUtilConsts.LEV_MANAGER);
         
-        jbAdjIn1.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR);
+        jbAdjIn1.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE || levelRightInOtherInt >= SUtilConsts.LEV_CAPTURE);
         if (isButton2Needed()) {
-            jbAdjIn2.setEnabled(levelRightInOtherInt >= SUtilConsts.LEV_AUTHOR);
+            jbAdjIn2.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE || levelRightInOtherInt >= SUtilConsts.LEV_CAPTURE);
         }
-        jbAdjOut1.setEnabled(levelRightOutOtherInt >= SUtilConsts.LEV_AUTHOR);
+        jbAdjOut1.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE || levelRightOutOtherInt >= SUtilConsts.LEV_CAPTURE);
         if (isButton2Needed()) {
-            jbAdjOut2.setEnabled(levelRightOutOtherInt >= SUtilConsts.LEV_AUTHOR);
+            jbAdjOut2.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE || levelRightOutOtherInt >= SUtilConsts.LEV_CAPTURE);
         }
         jbViewNotes.setEnabled(true);
         jbPrint.setEnabled(true);

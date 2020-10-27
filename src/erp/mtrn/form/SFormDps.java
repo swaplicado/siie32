@@ -4005,7 +4005,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
-    private void calculateTotal() {
+    private void calculateTotal() {//
         int i = 0;
         double quantity = 0;
         SDataDpsEntry entry = null;
@@ -4155,6 +4155,37 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * This method must be invoked every time an entry is added, edited or deleted!
+     */
+    private void updateDpsEntryCfdiSettings() throws SQLException {
+        if (!moDps.getDbmsDpsEntries().isEmpty()) {
+            for (int i = 0 ; i < moDps.getDbmsDpsEntries().size(); i++) {
+                String useCfdi = SDataDps.getUseCfdi(miClient, moDps.getDbmsDpsEntries().get(i).getFkItemId(), moBizPartnerCategory.getPkBizPartnerId());
+                if (!useCfdi.isEmpty()) {
+                    moFieldCfdiCfdiUsage.setFieldValue(useCfdi);
+                    i =  moDps.getDbmsDpsEntries().size();
+                }
+            }
+        }
+        else {
+            if (mbIsDpsAdjustment) {
+                moFieldCfdiCfdiUsage.setFieldValue(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_G02);
+            }
+            else {
+                if (isCfdIntCommerceRequired()) {
+                    moFieldCfdiCfdiUsage.setFieldValue(SDataConstantsSys.TRNS_CFD_CAT_CFD_USE_P01);
+                }
+                else {
+                    moFieldCfdiCfdiUsage.setFieldValue(moBizPartnerCategory.getCfdiCfdiUsage());
+                    if (jcbCfdiCfdiUsage.getSelectedIndex() <= 0) {
+                        moFieldCfdiCfdiUsage.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdUsoCFDI());
+                    }
+                }
+            }        
         }
     }
 
@@ -6142,7 +6173,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
-    private void actionEntryEdit() throws SQLException{
+    private void actionEntryEdit() throws SQLException {
         double dQuantityDes = 0;
         double dQuantityAdj = 0;
         double dQuantityPrc = 0;
@@ -6281,7 +6312,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
 
-    private void actionEntryDelete() throws SQLException  {
+    private void actionEntryDelete() throws SQLException {
         if (jbEntryDelete.isEnabled() && mnFormStatus == SLibConstants.FORM_STATUS_EDIT) {
             SDataDpsEntry entry = null;
             SDataDpsEntry entryComplementary = null;
@@ -6602,7 +6633,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                                 // Complement addenda entries:
 
                                 if (moDialogDpsLink.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                                    Vector<SDataDpsEntry> dpsSourceEntries = new Vector<SDataDpsEntry>();
+                                    Vector<SDataDpsEntry> dpsSourceEntries = new Vector<>();
 
                                     updateDpsWithCurrentFormData();
                                     adequateDatesForOrderPrevious();
@@ -7312,7 +7343,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         try {
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
                 if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
-                    if (SCfdUtils.validateEmisorXmlExpenses(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
+                    if (SCfdUtils.validateCfdiReceptor(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
                         moFieldCfdiXmlFile.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
                         msFileXmlJustLoaded = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
                     }
@@ -7628,7 +7659,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         else {
             // Document in foreign currency:
 
-            if (moDps != null && moDps.getIsRegistryNew() && !mbDocBeingImported) {
+            if (moDps != null && moDps.getIsRegistryNew() && !moDps.getAuxKeepExchangeRate() && !mbDocBeingImported) {
                 setExchangeRate(moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldExchangeRate);
                 setExchangeRate(moFieldFkCurrencyId.getKeyAsIntArray()[0], moFieldExchangeRateSystem);
             }
@@ -8532,7 +8563,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         int[] keyBpbAdd = new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() };
         SDataDpsEntry entry = null;
         SDataDpsNotes notes = null;
-
+        
         if (!moDps.getAuxKeepDpsData()) {
             moDps = createNewDps(null);
             setBizPartner(keyBp, keyBpb, keyBpbAdd);
@@ -8576,7 +8607,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 notes.setIsRegistryNew(true);
             }
         }
-
+        
         actionEdit();
     }
 
@@ -8823,7 +8854,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 try {
                     int[] key = null;
                     
-                    if (mbIsSales || mbIsDpsEstimate || mbIsDpsOrder) {
+                    if (mbIsSales || mbIsDpsEstimate || mbIsDpsContract || mbIsDpsOrder) {
                         key = SDataUtilities.obtainDpsKey(miClient, moFieldNumberSeries.getString(), moFieldNumber.getString(), moDpsType.getPrimaryKey());
                     }
                     else {
@@ -9356,7 +9387,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                     if (!validation.getIsError()) {
                         // credit status of business partner:
-                        
+   
                         if (!isBizPartnerCreditOk(moBizPartnerCategory.getEffectiveRiskTypeId(), false)) {
                             validation.setIsError(true);
                             validation.setComponent(jftDate);
@@ -10005,7 +10036,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 else if (button == jbPrepayments) {
                     actionPrepayments();
                 }
-                else if (button == jbEntryNew) { 
+                else if (button == jbEntryNew) {
                     actionEntryNew();
                 }
                 else if (button == jbEntryEdit) {
@@ -10081,8 +10112,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     actionCfdiCfdiRelated();
                 }
             }
-            catch (Exception ex) {
-                SLibUtilities.renderException(this, ex);
+            catch (SQLException se) {
+                SLibUtilities.renderException(this, se);
             }
         }
         else if (e.getSource() instanceof javax.swing.JToggleButton) {

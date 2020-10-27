@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import erp.mcfg.data.SCfgUtils;
 import erp.mod.hrs.link.db.SConfigException;
 import erp.mod.hrs.link.db.SMySqlClass;
 import java.sql.SQLException;
@@ -37,6 +38,8 @@ public class SShareData {
     
     public static String PATH_JSON_DIR = "prenomina/";
     public static String PATH_CSV_DIR = "prenomina/";
+    public static String PATH_JSON_DESP_DIR = "vales/";
+    public static String PATH_CSV_DESP_DIR = "vales/";
     
     public void setJsonConn(String sjon) {
         SMySqlClass.setJsonConn(sjon);
@@ -90,6 +93,7 @@ public class SShareData {
      * @throws java.sql.SQLException
      * @throws java.lang.ClassNotFoundException
      * @throws com.fasterxml.jackson.core.JsonProcessingException
+     * @throws erp.mod.hrs.link.db.SConfigException
 
      */
     public String getSiieData(String sLastSyncDate) throws ParseException, SQLException, ClassNotFoundException, JsonProcessingException, SConfigException {
@@ -100,16 +104,23 @@ public class SShareData {
         return SUtilsJSON.getData(sLastSyncDate);
     }
     
-    
-    public SPrepayroll getCAPData(Date tStartDate, Date tEndDate, ArrayList<Integer> lEmployees, 
+    /**
+     * 
+     * @param tStartDate
+     * @param tEndDate
+     * @param lEmployees
+     * @param payType
+     * @param dataType Policy for requesting information from external time clock: 1 = all; 2 = official; 3 = non-official
+     * @param companyKey
+     * @return 
+     */
+    public SPrepayroll getCAPData(String sURL, Date tStartDate, Date tEndDate, ArrayList<Integer> lEmployees, 
                                     int payType, int dataType, String companyKey) {
         try {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
             
             String employees = lEmployees.stream().map(Object::toString)
                                                 .collect(Collectors.joining(","));
-            
-            String url = "http://localhost:9090/cap/public/api/prepayroll";
             
             String charset = java.nio.charset.StandardCharsets.UTF_8.name();
             String startDate = df.format(tStartDate);
@@ -123,7 +134,7 @@ public class SShareData {
                                     URLEncoder.encode(dataType + "", charset)
                             );
             
-            URLConnection connection = new URL(url + "?" + query).openConnection();
+            URLConnection connection = new URL(sURL + "?" + query).openConnection();
             connection.setRequestProperty("Accept-Charset", charset);
             connection.setRequestProperty("Content-Type", "application/json");
             InputStream response = connection.getInputStream();
@@ -135,7 +146,7 @@ public class SShareData {
                 ObjectMapper mapper = new ObjectMapper();
                 SPrepayroll prepayroll = mapper.readValue(responseBody, SPrepayroll.class);
                 
-                SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey);
+                SUtilsJSON.writeJSON(startDate, endDate, responseBody, companyKey, SUtilsJSON.PREPAYROLL);
                 
                 return prepayroll;
             }

@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín
  * 
  */
 public abstract class SDataConstantsSys {
@@ -89,6 +89,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_DIOT_VAT_DEFAULT = "DIOT_VAT_DEFAULT";
     public static final String CFG_PARAM_HRS_EMPLOYEES_CRUD = "HRS_EMPLOYEES_CRUD";
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
+    public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
     
     public static final int CFGX_IVM_FIFO = 1;
     
@@ -945,6 +946,11 @@ public abstract class SDataConstantsSys {
     
     public static final int TRNS_CT_DPS_PUR = 1;
     public static final int TRNS_CT_DPS_SAL = 2;
+    
+    public static final int TRNS_CL_DPS_EST = 1;
+    public static final int TRNS_CL_DPS_ORD = 2;
+    public static final int TRNS_CL_DPS_DOC = 3;
+    public static final int TRNS_CL_DPS_ADJ = 5;
 
     public static final int[] TRNS_CL_DPS_PUR_EST = { 1, 1 };
     public static final int[] TRNS_CL_DPS_PUR_ORD = { 1, 2 };

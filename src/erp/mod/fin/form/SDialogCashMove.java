@@ -90,6 +90,8 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
 
     /**
      * Creates new form SDialogCashMove
+     * @param client
+     * @param title
      */
     public SDialogCashMove(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, title);
@@ -1169,13 +1171,13 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
             entry.setDbmsCostCenter_n("");
 
             entry.setFkItemId_n(SLibConsts.UNDEFINED);
-            entry.setXtaItemCode("");
-            entry.setXtaItem("");
+            entry.setDbmsItemCode("");
+            entry.setDbmsItem("");
 
             entry.setFkCompanyBranchId_n(moCashXXX.getPkCompanyBranchId());
             entry.setFkEntityId_n(moCashXXX.getPkAccountCashId());
-            entry.setXtaEntityCode(moCashXXX.getDbmsCompanyBranchEntity().getCode());
-            entry.setXtaEntity(moCashXXX.getDbmsCompanyBranchEntity().getEntity());
+            entry.setDbmsEntityCode(moCashXXX.getDbmsCompanyBranchEntity().getCode());
+            entry.setDbmsEntity(moCashXXX.getDbmsCompanyBranchEntity().getEntity());
 
             entry.setFkCurrencyId(manCashCurrencyKey[0]);
             entry.setDbmsCurrencyKey(moSessionCustom.getCurrencyCode(manCashCurrencyKey));
@@ -1185,8 +1187,8 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
             entry.setFkAccountingMoveSubclassId(manAccMoveSubclassKeyXXX[2]);
             entry.setFkSystemMoveClassId(manSysMoveTypeKey[0]);
             entry.setFkSystemMoveTypeId(manSysMoveTypeKey[1]);
-            entry.setXtaSystemMoveClass((String) miClient.getSession().readField(SModConsts.FINS_CL_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
-            entry.setXtaSystemMoveType((String) miClient.getSession().readField(SModConsts.FINS_TP_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
+            entry.setDbmsSystemMoveClass((String) miClient.getSession().readField(SModConsts.FINS_CL_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
+            entry.setDbmsSystemMoveType((String) miClient.getSession().readField(SModConsts.FINS_TP_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
 
             switch (moCashXXX.getFkAccountCashCategoryId()) {
                 case SModSysConsts.FINS_CT_ACC_CASH_CASH:
@@ -1357,14 +1359,14 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
                 }
                 else {
                     entry.setFkItemId_n(idItem);
-                    entry.setXtaItemCode((String) miClient.getSession().readField(SModConsts.ITMU_ITEM, new int[] { idItem }, SDbRegistry.FIELD_CODE));
-                    entry.setXtaItem((String) miClient.getSession().readField(SModConsts.ITMU_ITEM, new int[] { idItem }, SDbRegistry.FIELD_NAME));
+                    entry.setDbmsItemCode((String) miClient.getSession().readField(SModConsts.ITMU_ITEM, new int[] { idItem }, SDbRegistry.FIELD_CODE));
+                    entry.setDbmsItem((String) miClient.getSession().readField(SModConsts.ITMU_ITEM, new int[] { idItem }, SDbRegistry.FIELD_NAME));
                 }
 
                 entry.setFkCompanyBranchId_n(SLibConsts.UNDEFINED);
                 entry.setFkEntityId_n(SLibConsts.UNDEFINED);
-                entry.setXtaEntityCode("");
-                entry.setXtaEntity("");
+                entry.setDbmsEntityCode("");
+                entry.setDbmsEntity("");
 
                 entry.setFkCurrencyId(manCashCurrencyKey[0]);
                 entry.setDbmsCurrencyKey(moSessionCustom.getCurrencyCode(manCashCurrencyKey));
@@ -1374,8 +1376,8 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
                 entry.setFkAccountingMoveSubclassId(manAccMoveSubclassKeyXXX[2]);
                 entry.setFkSystemMoveClassId(manSysMoveTypeKey[0]);
                 entry.setFkSystemMoveTypeId(manSysMoveTypeKey[1]);
-                entry.setXtaSystemMoveClass((String) miClient.getSession().readField(SModConsts.FINS_CL_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
-                entry.setXtaSystemMoveType((String) miClient.getSession().readField(SModConsts.FINS_TP_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
+                entry.setDbmsSystemMoveClass((String) miClient.getSession().readField(SModConsts.FINS_CL_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
+                entry.setDbmsSystemMoveType((String) miClient.getSession().readField(SModConsts.FINS_TP_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
 
                 entry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[0]);
                 entry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[1]);
@@ -1437,13 +1439,13 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
                 entry.setDbmsCostCenter_n("");
 
                 entry.setFkItemId_n(SLibConsts.UNDEFINED);
-                entry.setXtaItemCode("");
-                entry.setXtaItem("");
+                entry.setDbmsItemCode("");
+                entry.setDbmsItem("");
 
                 entry.setFkCompanyBranchId_n(manTransferCashKey[0]);
                 entry.setFkEntityId_n(manTransferCashKey[1]);
-                entry.setXtaEntityCode((String) miClient.getSession().readField(SModConsts.CFGU_COB_ENT, manTransferCashKey, SDbRegistry.FIELD_CODE));
-                entry.setXtaEntity((String) miClient.getSession().readField(SModConsts.CFGU_COB_ENT, manTransferCashKey, SDbRegistry.FIELD_NAME));
+                entry.setDbmsEntityCode((String) miClient.getSession().readField(SModConsts.CFGU_COB_ENT, manTransferCashKey, SDbRegistry.FIELD_CODE));
+                entry.setDbmsEntity((String) miClient.getSession().readField(SModConsts.CFGU_COB_ENT, manTransferCashKey, SDbRegistry.FIELD_NAME));
 
                 entry.setFkCurrencyId(manTransferCashCurrencyKey[0]);
                 entry.setDbmsCurrencyKey(moSessionCustom.getCurrencyCode(manTransferCashCurrencyKey));
@@ -1453,8 +1455,8 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
                 entry.setFkAccountingMoveSubclassId(manAccMoveSubclassKeyXXX[2]);
                 entry.setFkSystemMoveClassId(manSysMoveTypeKey[0]);
                 entry.setFkSystemMoveTypeId(manSysMoveTypeKey[1]);
-                entry.setXtaSystemMoveClass((String) miClient.getSession().readField(SModConsts.FINS_CL_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
-                entry.setXtaSystemMoveType((String) miClient.getSession().readField(SModConsts.FINS_TP_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
+                entry.setDbmsSystemMoveClass((String) miClient.getSession().readField(SModConsts.FINS_CL_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
+                entry.setDbmsSystemMoveType((String) miClient.getSession().readField(SModConsts.FINS_TP_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
 
                 switch (SFinUtils.getCashCategoryId(miClient.getSession(), manTransferCashKey)) {
                     case SModSysConsts.FINS_CT_ACC_CASH_CASH:
@@ -1552,14 +1554,14 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
             }
             else {
                 entry.setFkItemId_n(idItem);
-                entry.setXtaItemCode((String) miClient.getSession().readField(SModConsts.ITMU_ITEM, new int[] { idItem }, SDbRegistry.FIELD_CODE));
-                entry.setXtaItem((String) miClient.getSession().readField(SModConsts.ITMU_ITEM, new int[] { idItem }, SDbRegistry.FIELD_NAME));
+                entry.setDbmsItemCode((String) miClient.getSession().readField(SModConsts.ITMU_ITEM, new int[] { idItem }, SDbRegistry.FIELD_CODE));
+                entry.setDbmsItem((String) miClient.getSession().readField(SModConsts.ITMU_ITEM, new int[] { idItem }, SDbRegistry.FIELD_NAME));
             }
 
             entry.setFkCompanyBranchId_n(SLibConsts.UNDEFINED);
             entry.setFkEntityId_n(SLibConsts.UNDEFINED);
-            entry.setXtaEntityCode("");
-            entry.setXtaEntity("");
+            entry.setDbmsEntityCode("");
+            entry.setDbmsEntity("");
 
             entry.setFkCurrencyId(keyCurrency[0]);
             entry.setDbmsCurrencyKey(moSessionCustom.getCurrencyCode(keyCurrency));
@@ -1569,8 +1571,8 @@ public class SDialogCashMove extends SBeanFormDialog implements SDialogCash, Act
             entry.setFkAccountingMoveSubclassId(manAccMoveSubclassKeyXXX[2]);
             entry.setFkSystemMoveClassId(manSysMoveTypeKey[0]);
             entry.setFkSystemMoveTypeId(manSysMoveTypeKey[1]);
-            entry.setXtaSystemMoveClass((String) miClient.getSession().readField(SModConsts.FINS_CL_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
-            entry.setXtaSystemMoveType((String) miClient.getSession().readField(SModConsts.FINS_TP_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
+            entry.setDbmsSystemMoveClass((String) miClient.getSession().readField(SModConsts.FINS_CL_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
+            entry.setDbmsSystemMoveType((String) miClient.getSession().readField(SModConsts.FINS_TP_SYS_MOV, manSysMoveTypeKey, SDbRegistry.FIELD_NAME));
 
             entry.setFkSystemAccountClassId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[0]);
             entry.setFkSystemAccountTypeId(SModSysConsts.FINS_TP_SYS_ACC_NA_NA[1]);

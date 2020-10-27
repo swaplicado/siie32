@@ -134,10 +134,12 @@ public class SViewPayrollReceipt extends SGridPaneView implements ActionListener
                 + "pr.id_emp AS " + SDbConsts.FIELD_ID + "2, "
                 + "e.num AS " + SDbConsts.FIELD_CODE + ", "
                 + "bp.bp AS " + SDbConsts.FIELD_NAME + ", "
+                + "p.per_year, "
                 + "p.num, "
                 + "p.dt_sta, "
                 + "p.dt_end, "
                 + "p.nts, "
+                + "tpsc.code, "
                 + "tps.name, "
                 + "pr.ear_r, "
                 + "pr.ded_r, "
@@ -153,6 +155,7 @@ public class SViewPayrollReceipt extends SGridPaneView implements ActionListener
                 + "ui.usr AS " + SDbConsts.FIELD_USER_INS_NAME + ", "
                 + "uu.usr AS " + SDbConsts.FIELD_USER_UPD_NAME + " "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_PAY_SHT_CUS) + " AS tpsc ON p.fk_tp_pay_sht_cus = tpsc.id_tp_pay_sht_cus "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY_SHT) + " AS tps ON p.fk_tp_pay_sht = tps.id_tp_pay_sht "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON p.id_pay = pr.id_pay "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRSU_EMP) + " AS e ON pr.id_emp = e.id_emp "
@@ -161,7 +164,7 @@ public class SViewPayrollReceipt extends SGridPaneView implements ActionListener
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON p.fk_usr_ins = ui.id_usr "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON p.fk_usr_upd = uu.id_usr "
                 + (sql.isEmpty() ? "" : "WHERE NOT p.b_del AND NOT pr.b_del AND " + sql)
-                + "ORDER BY p.num, tps.name, bp.bp, pr.id_pay, pr.id_emp ";
+                + "ORDER BY p.per_year, p.num, tpsc.code, tps.name, bp.bp, pr.id_pay, pr.id_emp ";
     }
 
     @Override
@@ -172,6 +175,7 @@ public class SViewPayrollReceipt extends SGridPaneView implements ActionListener
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "p.num", "Número nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "p.dt_sta", "F inicial nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, "p.dt_end", "F final nómina"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_CAT, "tpsc.code", "Tipo nómina empresa"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_CAT_S, "tps.name", "Tipo nómina"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, SDbConsts.FIELD_NAME, "Empleado"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_BPR, SDbConsts.FIELD_CODE, "Clave"));

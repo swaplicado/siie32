@@ -18,8 +18,9 @@ import sa.lib.db.SDbConsts;
 /**
  *
  * @author Néstor Ávalos, Juan Barajas, Sergio Flores
- * 2019-01-29, Sergio Flores: Corrección al cálculo de parte exenta en percepciones. Debe estar en en función de UMA desde 2017.
- * 2019-06-07, Sergio Flores: Implementación compensación Subsidio para el empleo pagado en exceso contra ISR.
+ * 2020-08-14 Sergio Flores: Implementación del cálculo de ISR retenido por salarios de forma independiente: sueldos y asimilados.
+ * 2019-06-07 Sergio Flores: Implementación compensación Subsidio para el empleo pagado en exceso contra ISR.
+ * 2019-01-29 Sergio Flores: Corrección al cálculo de parte exenta en percepciones. Debe estar en en función de UMA desde 2017.
  *  Al implementarse el dato informativo en CFDI de Subsdio para el empleo causado, la conmpensación del pago en exceso dejó de hacerse contra ISR.
  */
 public class SHrsReceipt {
@@ -48,39 +49,7 @@ public class SHrsReceipt {
      */
 
     /**
-     * Gets amount total taxed amount of earnings of standard calculation of income tax.
-     * @return Total amount of earnings of standard calculation of income tax.
-     */
-    private double getTaxedEarningsStd() {
-        double total = 0;
-
-        for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
-            if (!hrsReceiptEarning.getEarning().isAlternativeTaxCalculation()) {
-                total = SLibUtils.roundAmount(total + hrsReceiptEarning.getPayrollReceiptEarning().getAmountTaxable());
-            }
-        }
-
-        return total;
-    }
-    
-    /**
-     * Gets amount total taxed amount of earnings configured based on articule 174 RLISR.
-     * @return Total amount of earnings configured based on articule 174 RLISR.
-     */
-    private double getTaxedEarningsArt174() {
-        double total = 0;
-
-        for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
-            if (hrsReceiptEarning.getEarning().isAlternativeTaxCalculation()) {
-                total = SLibUtils.roundAmount(total + hrsReceiptEarning.getPayrollReceiptEarning().getAmountTaxable());
-            }
-        }
-
-        return total;
-    }
-    
-    /**
-     * Computes all earnings of this receipt.
+     * Compute all earnings of this receipt.
      */
     private void computeEarnings() {
         for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
@@ -89,9 +58,18 @@ public class SHrsReceipt {
     }
 
     /**
-     * Computes altogether the hrsReceiptEarnings of the given array of earnings as a group.
+     * Compute all deductions of this receipt.
+     */
+    private void computeDeductions() {
+        for (SHrsReceiptDeduction hrsReceiptDeduction : maHrsReceiptDeductions) {
+            hrsReceiptDeduction.computeDeduction();
+        }
+    }
+
+    /**
+     * Compute the given array of earnings as a whole.
      * @param hrsReceiptEarnings Array of earnings. At least one earning is expected.
-     * @throws Exception 
+     * @throws Exception
      */
     private void computeEarningsExemptionGroup(final ArrayList<SHrsReceiptEarning> hrsReceiptEarnings) throws Exception {
         /*
@@ -110,7 +88,7 @@ public class SHrsReceipt {
         */
         
         // get earning related to given group of receipt earnings:
-        SDbEarning earning = hrsReceiptEarnings.get(0).getEarning();
+        SDbEarning earning = hrsReceiptEarnings.get(0).getEarning(); // convenience variable
         
         // check if exemption apply (standard and optional settings):
         boolean applyExemptionStd = earning.getFkEarningExemptionTypeId() != SModSysConsts.HRSS_TP_EAR_EXEM_NON; // variable improves readability!
@@ -203,7 +181,7 @@ public class SHrsReceipt {
     }
     
     /**
-     * Computes exemption of all earnings of this receipt by grouping them in blocks of arrays.
+     * Compute tax exemption of all earnings of this receipt by processing and grouping them by ID of earning into independent arrays.
      * @throws Exception 
      */
     private void computeEarningsExemption() throws Exception {
@@ -233,16 +211,39 @@ public class SHrsReceipt {
     }
 
     /**
-     * Computes all deductions of this receipt.
+     * Get total taxed amount of earnings of standard calculation of income tax from this receipt.
+     * @return Total taxed amount of earnings of standard calculation of income tax.
      */
-    private void computeDeductions() {
-        for (SHrsReceiptDeduction hrsReceiptDeduction : maHrsReceiptDeductions) {
-            hrsReceiptDeduction.computeDeduction();
-        }
-    }
+    private double getTaxedEarningsStd() {
+        double total = 0;
 
+        for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
+            if (!hrsReceiptEarning.getEarning().isAlternativeTaxCalculation()) {
+                total = SLibUtils.roundAmount(total + hrsReceiptEarning.getPayrollReceiptEarning().getAmountTaxable());
+            }
+        }
+
+        return total;
+    }
+    
     /**
-     * Computes, adding ore removing, earning (as other payment) of $0.01 if tax subsidy was totally offset by tax.
+     * Get total taxed amount of earnings of articule-174-RLISR calculation of income tax from this receipt.
+     * @return Total taxed amount of earnings of articule-174-RLISR calculation of income tax.
+     */
+    private double getTaxedEarningsArt174() {
+        double total = 0;
+
+        for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
+            if (hrsReceiptEarning.getEarning().isAlternativeTaxCalculation()) {
+                total = SLibUtils.roundAmount(total + hrsReceiptEarning.getPayrollReceiptEarning().getAmountTaxable());
+            }
+        }
+
+        return total;
+    }
+    
+    /**
+     * Compute, adding ore removing, earning (as other payment) of $0.01 if tax subsidy was totally offset by tax.
      * Otherwise this earning (as other payment) is removed when existing.
      * @param isSubsidyOffsetTotally
      * @param dbEarningOther
@@ -295,6 +296,10 @@ public class SHrsReceipt {
         }
     }
 
+    /**
+     * Compute tax receipt.
+     * @throws Exception 
+     */
     private void computeReceiptTax() throws Exception {
         // Clear tax and subsidy existing computations from receipt:
 
@@ -409,14 +414,14 @@ public class SHrsReceipt {
             double earningsTaxableArt174 = 0;
 
             switch (payroll.getFkTaxComputationTypeId()) {
-                case SModSysConsts.HRSS_TP_TAX_COMP_PAY: // Payroll
+                case SModSysConsts.HRSS_TP_TAX_COMP_PAY: // tax computation type is payroll
                     earningsTaxableStd = SLibUtils.roundAmount(getTaxedEarningsStd());
                     earningsTaxableArt174 = SLibUtils.roundAmount(getTaxedEarningsArt174());
                     break;
 
-                case SModSysConsts.HRSS_TP_TAX_COMP_ANN: // Annual
-                    earningsTaxableStd = SLibUtils.roundAmount(getTaxedEarningsStd() + moHrsEmployee.getAccummulatedTaxableEarnings());
-                    earningsTaxableArt174 = SLibUtils.roundAmount(getTaxedEarningsArt174() + moHrsEmployee.getAccummulatedTaxableEarningsAlt());
+                case SModSysConsts.HRSS_TP_TAX_COMP_ANN: // tax computation type is annual
+                    earningsTaxableStd = SLibUtils.roundAmount(getTaxedEarningsStd() + moHrsEmployee.getAnnualTaxableEarnings());
+                    earningsTaxableArt174 = SLibUtils.roundAmount(getTaxedEarningsArt174() + moHrsEmployee.getAnnualTaxableEarningsArt174());
                     
                     annualTaxCompensated = moHrsEmployee.getAnnualTaxCompensated(); // should be equal to compensated annual subsidy
                     
@@ -441,7 +446,7 @@ public class SHrsReceipt {
 
             double tableFactorPayroll;
             double tableFactorAnnual;
-            SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays();
+            SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays(); // convenience variable
             double yearDaysFactor = (double) SHrsConsts.YEAR_MONTHS / ((double) SHrsConsts.YEAR_DAYS + (SLibTimeUtils.isLeapYear(payroll.getFiscalYear()) ? 1d : 0d));
             
             if (payroll.isPayrollFortnightStandard()) {

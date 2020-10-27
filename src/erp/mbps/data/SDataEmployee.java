@@ -38,7 +38,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  * Used mainly in CRUD operations on employees.
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -59,6 +59,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected Date mtDateSalarySscBase;
     protected int mnWorkingHoursDay;
     protected Date mtContractExpiration_n;
+    protected int mnOvertimePolicy;
     protected String msBankAccount;
     protected String msGroceryServiceAccount;
     protected java.sql.Blob moImagePhoto_n;
@@ -201,6 +202,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setDateSalarySscBase(Date t) { mtDateSalarySscBase = t; }
     public void setWorkingHoursDay(int n) { mnWorkingHoursDay = n; }
     public void setContractExpiration_n(Date t) { mtContractExpiration_n = t; }
+    public void setOvertimePolicy(int n) { mnOvertimePolicy = n; }
     public void setBankAccount(String s) { msBankAccount = s; }
     public void setGroceryServiceAccount(String s) { msGroceryServiceAccount = s; }
     public void setImagePhoto_n(java.sql.Blob o) { moImagePhoto_n = o; }
@@ -267,6 +269,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public Date getDateSalarySscBase() { return mtDateSalarySscBase; }
     public int getWorkingHoursDay() { return mnWorkingHoursDay; }
     public Date getContractExpiration_n() { return mtContractExpiration_n; }
+    public int getOvertimePolicy() { return mnOvertimePolicy; }
     public String getBankAccount() { return msBankAccount; }
     public String getGroceryServiceAccount() { return msGroceryServiceAccount; }
     public java.sql.Blob getImagePhoto_n() { return moImagePhoto_n; }
@@ -394,6 +397,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mtDateSalarySscBase = null;
         mnWorkingHoursDay = 0;
         mtContractExpiration_n = null;
+        mnOvertimePolicy = 0;
         msBankAccount = "";
         msGroceryServiceAccount = "";
         moImagePhoto_n = null;
@@ -479,6 +483,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mtDateSalarySscBase = resultSet.getDate("dt_sal_ssc");
                 mnWorkingHoursDay = resultSet.getInt("wrk_hrs_day");
                 mtContractExpiration_n = resultSet.getDate("con_exp_n");
+                mnOvertimePolicy = resultSet.getInt("overtime");
                 msBankAccount = resultSet.getString("bank_acc");
                 msGroceryServiceAccount = resultSet.getString("grocery_srv_acc");
                 /*
@@ -624,6 +629,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " + 
                         mnWorkingHoursDay + ", " +
                         (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " + 
+                        mnOvertimePolicy + ", " + 
                         "'" + msBankAccount + "', " + 
                         "'" + msGroceryServiceAccount + "', " +
                         "NULL, " +
@@ -681,6 +687,7 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "dt_sal_ssc = '" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " +
                         "wrk_hrs_day = " + mnWorkingHoursDay + ", " +
                         "con_exp_n = " + (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " +
+                        "overtime = " + mnOvertimePolicy + ", " +
                         "bank_acc = '" + msBankAccount + "', " +
                         "grocery_srv_acc = '" + msGroceryServiceAccount + "', " +
                         /*

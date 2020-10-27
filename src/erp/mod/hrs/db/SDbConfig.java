@@ -17,7 +17,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores
+ * @author Néstor Ávalos, Edwin Carmona, Sergio Flores
  */
 public class SDbConfig extends SDbRegistryUser {
 
@@ -29,8 +29,10 @@ public class SDbConfig extends SDbRegistryUser {
     protected String msSsSubbranch;
     protected String msBajioAffinityGroup;
     protected double mdPayrollTaxRate;
-    protected int mnPrePayrollWeeklyCutoffDayWeek; //Pre payroll weekly cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
-    protected int mnPrePayrollWeeklyWeeksLag;
+    protected int mnPrePayrollWeeklyCutoffDayWeek;  // Pre payroll weekly (regular income) cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
+    protected int mnPrePayrollWeeklyWeeksLag;       // Pre payroll weekly (regular income) weeks lag: 0 = current week; 1 = one week behind; and so forth.
+    protected int mnPrePayrollWeeklyVariableCutoffDayWeek;  // Pre payroll weekly (variable income) cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
+    protected int mnPrePayrollWeeklyVariableWeeksLag;       // Pre payroll weekly (variable income) weeks lag: 0 = current week; 1 = one week behind; and so forth.
     protected int mnTimeClockPolicy;
     protected boolean mbFortnightStandard;
     protected boolean mbAutoVacationBonus;
@@ -75,9 +77,11 @@ public class SDbConfig extends SDbRegistryUser {
     public void setSsSubbranch(String s) { msSsSubbranch = s; }
     public void setBajioAffinityGroup(String s) { msBajioAffinityGroup = s; }
     public void setPayrollTaxRate(double d) { mdPayrollTaxRate = d; }
-    public void setPrePayWeekCutDay(int n) { mnPrePayrollWeeklyCutoffDayWeek = n; }
-    public void setPrePayWeekLag(int n) { mnPrePayrollWeeklyWeeksLag = n; }
-    public void setTimeClockPol(int n) { mnTimeClockPolicy = n; }
+    public void setPrePayrollWeeklyCutoffDayWeek(int n) { mnPrePayrollWeeklyCutoffDayWeek = n; }
+    public void setPrePayrollWeeklyWeeksLag(int n) { mnPrePayrollWeeklyWeeksLag = n; }
+    public void setPrePayrollWeeklyVarCutoffDayWeek(int n) { mnPrePayrollWeeklyVariableCutoffDayWeek = n; }
+    public void setPrePayrollWeeklyVarWeeksLag(int n) { mnPrePayrollWeeklyVariableWeeksLag = n; }
+    public void setTimeClockPolicy(int n) { mnTimeClockPolicy = n; }
     public void setFortnightStandard(boolean b) { mbFortnightStandard = b; }
     public void setAutoVacationBonus(boolean b) { mbAutoVacationBonus = b; }
     public void setTaxSubsidyEarning(boolean b) { mbTaxSubsidyEarning = b; }
@@ -117,11 +121,12 @@ public class SDbConfig extends SDbRegistryUser {
     public double getPayrollTaxRate() { return mdPayrollTaxRate; }
     /**
      * Pre payroll weekly cutoff day: 1=Su, 2=Mo, 3=Tu, ... Sa=7
-     * @return 
      */
-    public int getPrePayWeekCutDay() { return mnPrePayrollWeeklyCutoffDayWeek; }
-    public int getPrePayWeekLag() { return mnPrePayrollWeeklyWeeksLag; }
-    public int getTimeClockPol() { return mnTimeClockPolicy; }
+    public int getPrePayrollWeeklyCutoffDayWeek() { return mnPrePayrollWeeklyCutoffDayWeek; }
+    public int getPrePayrollWeeklyWeeksLag() { return mnPrePayrollWeeklyWeeksLag; }
+    public int PrePayrollWeeklyVarCutoffDayWeek() { return mnPrePayrollWeeklyVariableCutoffDayWeek; }
+    public int PrePayrollWeeklyVarWeeksLag() { return mnPrePayrollWeeklyVariableWeeksLag; }
+    public int getTimeClockPolicy() { return mnTimeClockPolicy; }
     public boolean isFortnightStandard() { return mbFortnightStandard; }
     public boolean isAutoVacationBonus() { return mbAutoVacationBonus; }
     public boolean isTaxSubsidyEarning() { return mbTaxSubsidyEarning; }
@@ -175,6 +180,8 @@ public class SDbConfig extends SDbRegistryUser {
         mdPayrollTaxRate = 0;
         mnPrePayrollWeeklyCutoffDayWeek = 0;
         mnPrePayrollWeeklyWeeksLag = 0;
+        mnPrePayrollWeeklyVariableCutoffDayWeek = 0;
+        mnPrePayrollWeeklyVariableWeeksLag = 0;
         mnTimeClockPolicy = 0;
         mbFortnightStandard = false;
         mbAutoVacationBonus = false;
@@ -250,6 +257,8 @@ public class SDbConfig extends SDbRegistryUser {
             mdPayrollTaxRate = resultSet.getDouble("pay_tax_rate");
             mnPrePayrollWeeklyCutoffDayWeek = resultSet.getInt("pre_pay_wee_cut_day_wee");
             mnPrePayrollWeeklyWeeksLag = resultSet.getInt("pre_pay_wee_wee_lag");
+            mnPrePayrollWeeklyVariableCutoffDayWeek = resultSet.getInt("pre_pay_wee_var_cut_day_wee");
+            mnPrePayrollWeeklyVariableWeeksLag = resultSet.getInt("pre_pay_wee_var_wee_lag");
             mnTimeClockPolicy = resultSet.getInt("time_clock_pol");
             mbFortnightStandard = resultSet.getBoolean("b_for_std");
             mbAutoVacationBonus = resultSet.getBoolean("b_auto_vac_bon");
@@ -311,6 +320,8 @@ public class SDbConfig extends SDbRegistryUser {
                     mdPayrollTaxRate + ", " + 
                     mnPrePayrollWeeklyCutoffDayWeek + ", " + 
                     mnPrePayrollWeeklyWeeksLag + ", " + 
+                    mnPrePayrollWeeklyVariableCutoffDayWeek + ", " + 
+                    mnPrePayrollWeeklyVariableWeeksLag + ", " + 
                     mnTimeClockPolicy + ", " + 
                     (mbFortnightStandard ? 1 : 0) + ", " + 
                     (mbAutoVacationBonus ? 1 : 0) + ", " + 
@@ -356,6 +367,8 @@ public class SDbConfig extends SDbRegistryUser {
                     "pay_tax_rate = " + mdPayrollTaxRate + ", " +
                     "pre_pay_wee_cut_day_wee = " + mnPrePayrollWeeklyCutoffDayWeek + ", " + 
                     "pre_pay_wee_wee_lag = " + mnPrePayrollWeeklyWeeksLag + ", " + 
+                    "pre_pay_wee_var_cut_day_wee = " + mnPrePayrollWeeklyVariableCutoffDayWeek + ", " + 
+                    "pre_pay_wee_var_wee_lag = " + mnPrePayrollWeeklyVariableWeeksLag + ", " + 
                     "time_clock_pol = " + mnTimeClockPolicy + ", " + 
                     "b_for_std = " + (mbFortnightStandard ? 1 : 0) + ", " +
                     "b_auto_vac_bon = " + (mbAutoVacationBonus ? 1 : 0) + ", " +
@@ -405,9 +418,11 @@ public class SDbConfig extends SDbRegistryUser {
         registry.setSsSubbranch(this.getSsSubbranch());
         registry.setBajioAffinityGroup(this.getBajioAffinityGroup());
         registry.setPayrollTaxRate(this.getPayrollTaxRate());
-        registry.setPrePayWeekCutDay(this.getPrePayWeekCutDay());
-        registry.setPrePayWeekLag(this.getPrePayWeekLag());
-        registry.setTimeClockPol(this.getTimeClockPol());
+        registry.setPrePayrollWeeklyCutoffDayWeek(this.getPrePayrollWeeklyCutoffDayWeek());
+        registry.setPrePayrollWeeklyWeeksLag(this.getPrePayrollWeeklyWeeksLag());
+        registry.setPrePayrollWeeklyVarCutoffDayWeek(this.PrePayrollWeeklyVarCutoffDayWeek());
+        registry.setPrePayrollWeeklyVarWeeksLag(this.PrePayrollWeeklyVarWeeksLag());
+        registry.setTimeClockPolicy(this.getTimeClockPolicy());
         registry.setFortnightStandard(this.isFortnightStandard());
         registry.setAutoVacationBonus(this.isAutoVacationBonus());
         registry.setTaxSubsidyEarning(this.isTaxSubsidyEarning());

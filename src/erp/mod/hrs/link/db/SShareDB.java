@@ -20,6 +20,14 @@ import java.util.logging.Logger;
  */
 public class SShareDB {
 
+    /**
+     * Retorna las empresas de SIIE que tienen activa el módulo de nóminas
+     * 
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException 
+     */
     private ArrayList<SCompany> getDatabasesWithPayroll() throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");
@@ -64,14 +72,27 @@ public class SShareDB {
         return lBds;
     }
 
+    /**
+     * Retorna el nombre de la base de datos que se considera como principal en SIIE,
+     * para de esta tomar los catálogos que se necesitan para el sistema externo
+     * 
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException 
+     */
     private String getMainDatabase() throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");
         if (conn == null) {
             return "";
         }
+        
+        if (mdb.getMainBb() == 0) {
+            throw new SConfigException("No hay configuración de base de datos principal");
+        }
 
-        int idDataBase = 1211;
+        int idDataBase = mdb.getMainBb();
 
         String query = "SELECT "
                 + "    bd "
@@ -98,6 +119,15 @@ public class SShareDB {
         return "";
     }
     
+    /**
+     * Retorna los departamentos contemplados en SIIE
+     * 
+     * @param strDate
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException 
+     */
     public ArrayList<SDepartment> getDepartments(String strDate) throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", "", "", "");
@@ -139,7 +169,9 @@ public class SShareDB {
     }
 
     /**
-     *
+     * Retorna los empleados que hayan sido agregados o modificados en SIIE después
+     * de la fecha recibida
+     * 
      * @param strDate
      *
      * @return
@@ -165,7 +197,7 @@ public class SShareDB {
                 + "    e.dt_ben, "
                 + "    e.dt_hire, "
                 + "    e.dt_dis_n, "
-                + "    e.b_uni AS x_time, "
+                + "    e.overtime, "
                 + "    e.fk_tp_pay, "
                 + "    e.fk_dep, "
                 + "    e.b_act, "
@@ -196,7 +228,7 @@ public class SShareDB {
                 emp.firstname = res.getString("firstname");
                 emp.admission_date = res.getString("dt_hire");
                 emp.leave_date = res.getString("dt_dis_n");
-                emp.extra_time = res.getBoolean("x_time");
+                emp.overtime_policy = res.getInt("overtime");
                 emp.way_pay = res.getInt("fk_tp_pay");
                 emp.dept_rh_id = res.getInt("fk_dep");
                 emp.is_active = res.getBoolean("b_act");
@@ -218,6 +250,15 @@ public class SShareDB {
         return lEmps;
     }
     
+    /**
+     * Método que determina la empresa a la que pertenece el empleado en SIIE
+     * 
+     * @param lEmps
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException 
+     */
     private ArrayList<SEmployee> assignCompany(ArrayList<SEmployee> lEmps) throws SQLException, ClassNotFoundException, SConfigException {
         ArrayList<SCompany> companies = this.getDatabasesWithPayroll();
         ArrayList<HashMap<Integer, Integer>> ids = new ArrayList();
@@ -237,6 +278,15 @@ public class SShareDB {
         return lEmps;
     }
     
+    /**
+     * Obtiene los empleados que pertecen a una empresa en específico
+     * 
+     * @param company
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException 
+     */
     private HashMap<Integer, Integer> getEmployeesFromCompany(SCompany company) throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", company.getDatabase_nm(), "", "");
@@ -270,6 +320,17 @@ public class SShareDB {
         return lEmpIds;
     }
 
+    /**
+     * Obtiene los días festivos que se han agregado o modificado después de la 
+     * fecha recibida. Toma en cuenta la empresa considerada como principal.
+     * 
+     * @param lastSyncDate
+     * 
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException 
+     */
     public ArrayList<SHoliday> getAllHolidays(String lastSyncDate) throws SQLException, ClassNotFoundException, SConfigException {
         String mainDataBase = this.getMainDatabase();
 
@@ -330,6 +391,15 @@ public class SShareDB {
         return lHolidays;
     }
 
+    /**
+     * Obtiene el primer día del año
+     * 
+     * @param lastSyncDate
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException 
+     */
     public ArrayList<SFirstDayYear> getAllFirstDayOfYear(String lastSyncDate) throws SQLException, ClassNotFoundException, SConfigException {
         String mainDataBase = this.getMainDatabase();
 
@@ -384,6 +454,15 @@ public class SShareDB {
         return lFDYs;
     }
 
+    /**
+     * Obtiene las incidencias de los empleados agregadas o modificadas después de la fecha recibida.
+     * 
+     * @param lastSyncDate
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException 
+     */
     public ArrayList<SAbsence> getAllAbsences(String lastSyncDate) throws SQLException, ClassNotFoundException, SConfigException {
         ArrayList<SCompany> dbs = this.getDatabasesWithPayroll();
 
@@ -399,6 +478,17 @@ public class SShareDB {
         return lAbss;
     }
 
+    /**
+     * Obtiene las incidencias de una empresa en específico que hayan sido 
+     * modificadas o agregadas después de la fecha de corte
+     * 
+     * @param strDate
+     * @param dbName
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException 
+     */
     private ArrayList<SAbsence> getAbsences(String strDate, String dbName) throws SQLException, ClassNotFoundException, SConfigException {
         SMySqlClass mdb = new SMySqlClass();
         Connection conn = mdb.connect("", "", dbName, "", "");
@@ -468,6 +558,86 @@ public class SShareDB {
         }
 
         return lAbss;
+    }
+    
+    /**
+     * Obtiene las fechas de corte de las nóminas que hayan sido 
+     * modificadas o agregadas después de la fecha de corte
+     * 
+     * @param lastSyncDate
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException 
+     */
+    public ArrayList<SPrepayCutCalendar> getAllCutsCalendar(String lastSyncDate) throws SQLException, ClassNotFoundException, SConfigException {
+        String mainDataBase = this.getMainDatabase();
+
+        return this.getPrepayCutCalendar(lastSyncDate, mainDataBase);
+    }
+    
+    /**
+     * Obtiene las fechas de corte de una empresa en específico
+     * 
+     * @param strDate
+     * @param dbName
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     * @throws SConfigException 
+     */
+    private ArrayList<SPrepayCutCalendar> getPrepayCutCalendar(String strDate, String dbName) throws SQLException, ClassNotFoundException, SConfigException {
+        SMySqlClass mdb = new SMySqlClass();
+        Connection conn = mdb.connect("", "", dbName, "", "");
+        
+        if (conn == null) {
+            return null;
+        }
+
+        String query = "SELECT  "
+                + "    id_cal, "
+                + "    year, "
+                + "    num, "
+                + "    dt_cut, "
+                + "    b_del, "
+                + "    fk_tp_pay "
+                + "FROM"
+                + "    hrs_pre_pay_cut_cal"
+                + " WHERE "
+                + "    (ts_usr_ins >= '" + strDate + "' "
+                + "        OR ts_usr_upd >= '" + strDate + "');";
+
+        ArrayList<SPrepayCutCalendar> lCuts = null;
+
+        try {
+            Statement st = conn.createStatement();
+            ResultSet res = st.executeQuery(query);
+
+            lCuts = new ArrayList();
+
+            SPrepayCutCalendar cut = null;
+            while (res.next()) {
+                cut = new SPrepayCutCalendar();
+
+                cut.id_cal = res.getInt("id_cal");
+                cut.year = res.getInt("year");
+                cut.num = res.getInt("num");
+                cut.dt_cut = res.getString("dt_cut");
+                cut.fk_tp_pay = res.getInt("fk_tp_pay");
+                cut.is_deleted = res.getBoolean("b_del");
+
+                lCuts.add(cut);
+            }
+
+            conn.close();
+            st.close();
+            res.close();
+        }
+        catch (SQLException ex) {
+            Logger.getLogger(SShareDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return lCuts;
     }
 
 }

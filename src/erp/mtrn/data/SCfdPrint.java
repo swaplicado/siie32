@@ -81,10 +81,10 @@ public class SCfdPrint {
      * @param reportType
      * @param map
      * @param printMode
-     * @param numCopies
+     * @param copies
      * @throws Exception 
      */
-    private void computeReport(final erp.mtrn.data.SDataCfd cfd, final int reportType, final Map<String, Object> map, final int printMode, final int numCopies) throws Exception {
+    private void computeReport(final erp.mtrn.data.SDataCfd cfd, final int reportType, final Map<String, Object> map, final int printMode, final int copies) throws Exception {
         JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, reportType, map);
 
         switch (printMode) {
@@ -101,8 +101,8 @@ public class SCfdPrint {
                 break;
                 
             case SDataConstantsPrint.PRINT_MODE_PRINT:
-                for (int copy = 1; copy <= numCopies; copy++) {
-                    JasperPrintManager.printReport(jasperPrint, false);                    
+                for (int copy = 1; copy <= copies; copy++) {
+                    JasperPrintManager.printReport(jasperPrint, false);
                 }
                 break;
                 
@@ -939,9 +939,20 @@ public class SCfdPrint {
             paramsMap.put("sCceExportadorLugarFecha", placeAddress);
             paramsMap.put("sCceExportadorEmpresa", company);
             
+            /* XXX 2020-07-24, Sergio Flores: Código temporal para impresión de la leyenda correspondiente a Japón:
+            paramsMap.put("sCceExportadorLeyenda", "The exporter of the goods covered by this document (Authorization No. MXJPN/0201-2019) declares that, except where otherwise clearly indicated, these goods are of Mexico preferential origin under Mexico-Japan EPA.");
+            paramsMap.put("sCceExportadorLugarFecha", "Morelia, Michoacan, Mexico, July 22, 2020");
+            //paramsMap.put("sCceExportadorEmpresa", company);
+            */
+            
             if (admor != null) {
                 paramsMap.put("sCceExportadorResponsable", SLibUtils.textProperCase(admor.getContact()));
                 paramsMap.put("sCceExportadorResponsableCargo", SLibUtils.textProperCase(admor.getCharge()));
+                
+                /* XXX 2020-07-24, Sergio Flores: Código temporal para impresión de la leyenda correspondiente a Japón:
+                //paramsMap.put("sCceExportadorResponsable", SLibUtils.textProperCase(admor.getContact()));
+                paramsMap.put("sCceExportadorResponsableCargo", "Legal Representative");
+                */
             }
         }
         
@@ -1690,11 +1701,26 @@ public class SCfdPrint {
                 break;
                 
             case SCfdConsts.CFDI_PAYROLL_VER_CUR:
-                payroll = new SDbPayroll();
-                payroll.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n() });
+                // check if payroll is available in data set of SCfdUtils:
                 
-                payrollReceipt = new SDbPayrollReceipt();
-                payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
+                 payroll = (SDbPayroll) SCfdUtils.DataSet.get(SModConsts.HRS_PAY);
+                
+                if (payroll == null) {
+                    payroll = (SDbPayroll) miClient.getSession().readRegistry(SModConsts.HRS_PAY, new int[] { cfd.getFkPayrollReceiptPayrollId_n() });
+                }
+                
+                // define the best way to retrieve the payroll receipt:
+                
+                Integer keyCfd = (Integer) SCfdUtils.DataSet.get(SCfdUtils.KEY_CFD);
+                
+                if (keyCfd != null && keyCfd == SCfdUtils.KEY_CFD_PROCESSING) {
+                    // it is safe to take receipt from payroll object in memory, CFD is not been stamped:
+                    payrollReceipt = payroll.getChildPayrollReceipt(new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
+                }
+                else {
+                    // it is not safe to take receipt from memory, CFD has just been stamped:
+                    payrollReceipt = (SDbPayrollReceipt) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP, new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
+                }
                 
                 sql = "SELECT id_pay, nts AS f_pay_nts FROM hrs_pay WHERE id_pay = " + payroll.getPkPayrollId();
                 break;
@@ -2062,21 +2088,11 @@ public class SCfdPrint {
      * @throws java.lang.Exception 
      */
     public void printCancelAck(final erp.mtrn.data.SDataCfd cfd, final int printMode, final int subtypeCfd) throws java.lang.Exception {
-        Map<String, Object> map = null;
-        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = docBuilder.parse(new ByteArrayInputStream(cfd.getAcknowledgmentCancellationXml().getBytes("UTF-8")));
-        SDataDps dps = null;
-        SDataFormerPayrollEmp payrollEmp = null;
-        SDbPayrollReceipt payrollReceipt = null;
-        Node node = null;
-        Node nodeChild = null;
-        NamedNodeMap namedNodeMap = null;
-
-        map = miClient.createReportParams();
+        Map<String, Object> map = miClient.createReportParams();
 
         switch (cfd.getFkCfdTypeId()) {
             case SDataConstantsSys.TRNS_TP_CFD_INV:
-                dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
+                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, new int[] { cfd.getFkDpsYearId_n(), cfd.getFkDpsDocId_n() }, SLibConstants.EXEC_MODE_SILENT);
                 
                 map.put("sCfdiDate", dps.getDate());
                 map.put("sCfdiFolio", dps.getDpsNumber());
@@ -2090,15 +2106,12 @@ public class SCfdPrint {
             case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                 switch (subtypeCfd) {
                     case SCfdConsts.CFDI_PAYROLL_VER_OLD:
-                        payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
-                        
+                        SDataFormerPayrollEmp payrollEmp = (SDataFormerPayrollEmp) SDataUtilities.readRegistry(miClient, SDataConstants.HRS_SIE_PAY_EMP, new int[] { cfd.getFkPayrollPayrollId_n(), cfd.getFkPayrollEmployeeId_n() }, SLibConstants.EXEC_MODE_SILENT);
                         map.put("sCfdiFolio", payrollEmp.getFormerPayrollEmpNumber());
                         break;
                         
                     case SCfdConsts.CFDI_PAYROLL_VER_CUR:
-                        payrollReceipt = new SDbPayrollReceipt();
-                        payrollReceipt.read(miClient.getSession(), new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
-                        
+                        SDbPayrollReceipt payrollReceipt = (SDbPayrollReceipt) miClient.getSession().readRegistry(SModConsts.HRS_PAY_RCP, new int[] { cfd.getFkPayrollReceiptPayrollId_n(), cfd.getFkPayrollReceiptEmployeeId_n() });
                         map.put("sCfdiFolio", payrollReceipt.getChildPayrollReceiptIssue().getPayrollReceiptIssueNumber());
                         break;
                         
@@ -2113,8 +2126,14 @@ public class SCfdPrint {
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
         }
 
-        // Acknowledgment Cancellation:
+        // Acknowledgment cancellation:
 
+        Node node;
+        Node nodeChild;
+        NamedNodeMap namedNodeMap;
+        DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document doc = docBuilder.parse(new ByteArrayInputStream(cfd.getAcknowledgmentCancellationXml().getBytes("UTF-8")));
+        
         node = SXmlUtils.extractElements(doc, "CancelaCFDResult").item(0);
         if (node == null) {
             node = SXmlUtils.extractElements(doc, "ns2:CancelaCFDResult").item(0);  // try again

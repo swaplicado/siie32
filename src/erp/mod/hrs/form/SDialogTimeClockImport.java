@@ -150,7 +150,8 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
      * Closes the dialog
      */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-       actionSave();
+        mnFormResult = SGuiConsts.FORM_RESULT_CANCEL;
+        dispose();
     }//GEN-LAST:event_closeDialog
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
@@ -178,18 +179,6 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
         moTextDateStart.setTextSettings(SGuiUtils.getLabelName(jlDateStart.getText()), 25);
         moTextDateEnd.setTextSettings(SGuiUtils.getLabelName(jlDateEnd.getText()), 25);
         moTextCutoffDay.setTextSettings(SGuiUtils.getLabelName(jlCutoffDay.getText()), 25);
-        
-        /*
-        moFields.addField(moTextEmployeeName);
-        moFields.addField(moTextLoanType);
-        moFields.addField(moTextLoanPaymentType);
-        moFields.addField(moTextDateStart);
-        moFields.addField(moTextDateEnd);
-        moFields.addField(moDateDateCutOff);
-        moFields.addField(moIntEffectiveDays);
-        moFields.addField(moIntAppliedDays);
-        moFields.addField(moIntApplyDays);
-        */
 
         moGridImportedRows = new SGridPaneForm(miClient, SModConsts.HRSX_ABS_MOV, SLibConsts.UNDEFINED, "Importación desde CAP") {
             @Override
@@ -236,7 +225,7 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
                 row.setNumEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getNumber());
                 row.setEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getName());
                 row.setAbsences(ppRow.getAbsences());
-                row.setExtraTime(mnPrepayrollMode == SHrsConsts.PPAYROLL_POL_LIMITED_DATA ? ppRow.getDouble_overtime(): ppRow.getTriple_overtime());
+                row.setOvertime(mnPrepayrollMode == SHrsConsts.PPAYROLL_POL_LIMITED_DATA ? ppRow.getDouble_overtime(): ppRow.getTriple_overtime());
                 row.setSundays(ppRow.getSundays());
                 row.setDaysOff(ppRow.getDaysOff());
                 
@@ -394,15 +383,16 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
                         dataLines.add(lGridRow.getNumEmployee() + "," +
                                         lGridRow.getEmployee().replaceAll(",", "") + "," +
                                         lGridRow.getAbsences() + "," +
-                                        lGridRow.getExtraTime() + "," +
+                                        lGridRow.getOvertime() + "," +
                                         lGridRow.getSundays() + "," +
+                                        lGridRow.getDaysOff() + "," +
                                         lGridRow.getHolidays()
                                                 );
                     }
 
-                    String fileHeader = "Num,Empleado,Faltas,Horas extra,Domingos,Festivos";
+                    String fileHeader = "Num,Empleado,Faltas,Horas extra,Prima Dominical,Descansos,Festivos";
 
-                    SUtilsJSON.writeCSV(msStartDate, msEndDate, dataLines, fileHeader, msCompanyKey);
+                    SUtilsJSON.writeCSV(msStartDate, msEndDate, dataLines, fileHeader, msCompanyKey, SUtilsJSON.PREPAYROLL);
                     
                     mnFormResult = SGuiConsts.FORM_RESULT_OK;
                     dispose();

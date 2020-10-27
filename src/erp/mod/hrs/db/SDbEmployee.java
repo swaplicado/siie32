@@ -28,7 +28,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  * Used mainly in re-hiring and dismissal operations.
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SDbEmployee extends SDbRegistryUser {
     
@@ -53,6 +53,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected Date mtDateSalarySscBase;
     protected int mnWorkingHoursDay;
     protected Date mtContractExpiration_n;
+    protected int mnOvertimePolicy;
     protected String msBankAccount;
     protected String msGroceryServiceAccount;
     protected java.sql.Blob moImagePhoto_n;
@@ -100,6 +101,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected String msXtaEmployeeProperName;
     protected String msXtaEmployeeRfc;
     protected String msXtaEmployeeCurp;
+    protected int mnXtaRecruitmentSchemeCat;
     
     protected Date mtAuxHireLogDate;
     protected String msAuxHireLogNotes;
@@ -127,6 +129,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setDateSalarySscBase(Date t) { mtDateSalarySscBase = t; }
     public void setWorkingHoursDay(int n) { mnWorkingHoursDay = n; }
     public void setContractExpiration_n(Date t) { mtContractExpiration_n = t; }
+    public void setOvertimePolicy(int n) { mnOvertimePolicy = n; }
     public void setBankAccount(String s) { msBankAccount = s; }
     public void setGroceryServiceAccount(String s) { msGroceryServiceAccount = s; }
     public void setImagePhoto_n(java.sql.Blob o) { moImagePhoto_n = o; }
@@ -181,6 +184,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public Date getDateSalarySscBase() { return mtDateSalarySscBase; }
     public int getWorkingHoursDay() { return mnWorkingHoursDay; }
     public Date getContractExpiration_n() { return mtContractExpiration_n; }
+    public int getOvertimePolicy() { return mnOvertimePolicy; }
     public String getBankAccount() { return msBankAccount; }
     public String getGroceryServiceAccount() { return msGroceryServiceAccount; }
     public java.sql.Blob getImagePhoto_n() { return moImagePhoto_n; }
@@ -222,11 +226,13 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setXtaEmployeePropername(String s) { msXtaEmployeeProperName = s; }
     public void setXtaEmployeeRfc(String s) { msXtaEmployeeRfc = s; }
     public void setXtaEmployeeCurp(String s) { msXtaEmployeeCurp = s; }
+    public void setXtaRecruitmentSchemeCat(int n) { mnXtaRecruitmentSchemeCat = n; }
     
     public String getXtaEmployeeName() { return msXtaEmployeeName; }
     public String getXtaEmployeeProperName() { return msXtaEmployeeProperName; }
     public String getXtaEmployeeRfc() { return msXtaEmployeeRfc; }
     public String getXtaEmployeeCurp() { return msXtaEmployeeCurp; }
+    public int getXtaRecruitmentSchemeCat() { return mnXtaRecruitmentSchemeCat; }
     
     public void setAuxHireLogDate(Date t) { mtAuxHireLogDate = t; }
     public void setAuxHireLogNotes(String s) { msAuxHireLogNotes = s; }
@@ -328,6 +334,7 @@ public class SDbEmployee extends SDbRegistryUser {
         mtDateSalarySscBase = null;
         mnWorkingHoursDay = 0;
         mtContractExpiration_n = null;
+        mnOvertimePolicy = 0;
         msBankAccount = "";
         msGroceryServiceAccount = "";
         moImagePhoto_n = null;
@@ -371,6 +378,7 @@ public class SDbEmployee extends SDbRegistryUser {
         msXtaEmployeeProperName = "";
         msXtaEmployeeRfc = "";
         msXtaEmployeeCurp = "";
+        mnXtaRecruitmentSchemeCat = 0;
         
         mtAuxHireLogDate = null;
         msAuxHireLogNotes = "";
@@ -431,6 +439,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mtDateSalarySscBase = resultSet.getDate("dt_sal_ssc");
             mnWorkingHoursDay = resultSet.getInt("wrk_hrs_day");
             mtContractExpiration_n = resultSet.getDate("con_exp_n");
+            mnOvertimePolicy = resultSet.getInt("overtime");
             msBankAccount = resultSet.getString("bank_acc");
             msGroceryServiceAccount = resultSet.getString("grocery_srv_acc");
             /*
@@ -474,7 +483,7 @@ public class SDbEmployee extends SDbRegistryUser {
 
             mbOldActive = mbActive;
             
-            msSql = "SELECT bp, lastname, firstname, fiscal_id, alt_id FROM erp.bpsu_bp WHERE id_bp = " + mnPkEmployeeId;
+            msSql = "SELECT bp, lastname, firstname, fiscal_id, alt_id FROM " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " WHERE id_bp = " + mnPkEmployeeId + ";";
             resultSet = session.getStatement().executeQuery(msSql);
             if (!resultSet.next()) {
                 throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
@@ -484,6 +493,15 @@ public class SDbEmployee extends SDbRegistryUser {
                 msXtaEmployeeProperName = resultSet.getString("firstname") + " " + resultSet.getString("lastname");
                 msXtaEmployeeRfc = resultSet.getString("fiscal_id");
                 msXtaEmployeeCurp = resultSet.getString("alt_id");
+            }
+            
+            msSql = "SELECT rec_sche_cat FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_REC_SCHE) + " WHERE id_tp_rec_sche = " + mnFkRecruitmentSchemeTypeId+ ";";
+            resultSet = session.getStatement().executeQuery(msSql);
+            if (!resultSet.next()) {
+                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND);
+            }
+            else {
+                mnXtaRecruitmentSchemeCat = resultSet.getInt("rec_sche_cat");
             }
             
             mbRegistryNew = false;
@@ -526,6 +544,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "'" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " + 
                     mnWorkingHoursDay + ", " + 
                     (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " + 
+                    mnOvertimePolicy + ", " + 
                     "'" + msBankAccount + "', " + 
                     "'" + msGroceryServiceAccount + "', " + 
                     "NULL, " +
@@ -587,6 +606,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "dt_sal_ssc = '" + SLibUtils.DbmsDateFormatDate.format(mtDateSalarySscBase) + "', " +
                     "wrk_hrs_day = " + mnWorkingHoursDay + ", " +
                     "con_exp_n = " + (mtContractExpiration_n == null ? "NULL" : "'" + SLibUtils.DbmsDateFormatDate.format(mtContractExpiration_n) + "'") + ", " +
+                    "overtime = " + mnOvertimePolicy + ", " +
                     "bank_acc = '" + msBankAccount + "', " +
                     "grocery_srv_acc = '" + msGroceryServiceAccount + "', " +
                     /*
@@ -693,6 +713,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setDateSalarySscBase(this.getDateSalarySscBase());
         registry.setWorkingHoursDay(this.getWorkingHoursDay());
         registry.setContractExpiration_n(this.getContractExpiration_n());
+        registry.setOvertimePolicy(this.getOvertimePolicy());
         registry.setBankAccount(this.getBankAccount());
         registry.setGroceryServiceAccount(this.getGroceryServiceAccount());
         registry.setImagePhoto_n(this.getImagePhoto_n());
@@ -736,6 +757,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setXtaEmployeePropername(this.getXtaEmployeeProperName());
         registry.setXtaEmployeeRfc(this.getXtaEmployeeRfc());
         registry.setXtaEmployeeCurp(this.getXtaEmployeeCurp());
+        registry.setXtaRecruitmentSchemeCat(this.getXtaRecruitmentSchemeCat());
 
         registry.setAuxHireLogDate(this.getAuxHireLogDate());
         registry.setAuxHireLogNotes(this.getAuxHireLogNotes());

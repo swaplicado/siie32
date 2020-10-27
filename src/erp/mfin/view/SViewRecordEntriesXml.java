@@ -5,6 +5,7 @@
 
 package erp.mfin.view;
 
+import erp.SClientUtils;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -23,10 +24,11 @@ import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import java.awt.Dimension;
 import javax.swing.JButton;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas, Gerardo Hernández, Sergio Flores, Edwin Carmona
+ * @author Juan Barajas, Gerardo Hernández, Sergio Flores, Edwin Carmona, Isabel Servín
  */
 public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -185,7 +187,15 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
                 sqlSwitch = "AND re.fid_ct_sys_mov_xxx = " + SDataConstantsSys.FINS_CT_SYS_MOV_BPS + " ";
             }
         }
-
+        
+        String complementaryDbName = "";
+        try {
+            complementaryDbName = SClientUtils.getComplementaryDdName((SClientInterface) miClient);
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+         
         sql1 = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety, cfd.id_cfd, r.dt, re.concept, re.b_del, " +
                 "bkc.code AS _bkc_code, cob.code AS _cob_code, e.ent, acc.id_acc, acc.acc, " +
                 "re.debit, re.credit, re.exc_rate, re.debit_cur, re.credit_cur, cur.cur_key, " +
@@ -198,7 +208,8 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
                 "cfd.xml_mon AS _xml_moneda, " +
                 "cfd.xml_sign_n AS _xml_timbrado, " +
                 "cfd.uuid AS _xml_uuid " +
-                "FROM trn_cfd AS cfd ";
+                "FROM trn_cfd AS cfd " + 
+                "INNER JOIN "+ complementaryDbName +".trn_cfd AS xc ON cfd.id_cfd = xc.id_cfd ";
         
         sql2 = "INNER JOIN fin_rec AS r ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
                 "INNER JOIN fin_acc AS acc ON re.fid_acc = acc.id_acc " +
@@ -213,7 +224,7 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
         
         msSql = "SELECT * FROM (" +
                 sql1 + 
-                "INNER JOIN fin_rec_ety AS re ON re.id_year = cfd.fid_rec_year_n AND re.id_per = cfd.fid_rec_per_n AND re.id_bkc = cfd.fid_rec_bkc_n AND re.id_tp_rec = cfd.fid_rec_tp_rec_n AND re.id_num = cfd.fid_rec_num_n AND re.id_ety = cfd.fid_rec_ety_n AND cfd.doc_xml <> '' " +
+                "INNER JOIN fin_rec_ety AS re ON re.id_year = cfd.fid_rec_year_n AND re.id_per = cfd.fid_rec_per_n AND re.id_bkc = cfd.fid_rec_bkc_n AND re.id_tp_rec = cfd.fid_rec_tp_rec_n AND re.id_num = cfd.fid_rec_num_n AND re.id_ety = cfd.fid_rec_ety_n AND xc.doc_xml <> '' " +
                 sql2 +
                 "AND " +
                 (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? 

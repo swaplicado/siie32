@@ -19,6 +19,7 @@ import erp.mod.hrs.db.SDbAutomaticEarning;
 import erp.mod.hrs.db.SDbAutomaticEarningsAux;
 import erp.mod.hrs.db.SDbBenefitTable;
 import erp.mod.hrs.db.SDbBenefitTableRow;
+import erp.mod.hrs.db.SDbConditionalEarning;
 import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbDeduction;
 import erp.mod.hrs.db.SDbDepartment;
@@ -40,6 +41,7 @@ import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptDeduction;
 import erp.mod.hrs.db.SDbPayrollReceiptEarning;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
+import erp.mod.hrs.db.SDbPaysheetCustomType;
 import erp.mod.hrs.db.SDbPosition;
 import erp.mod.hrs.db.SDbPrePayrollCutoffCalendar;
 import erp.mod.hrs.db.SDbShift;
@@ -64,6 +66,7 @@ import erp.mod.hrs.form.SFormAutomaticDeductions;
 import erp.mod.hrs.form.SFormAutomaticEarnings;
 import erp.mod.hrs.form.SFormBenefitAdjustmentEarning;
 import erp.mod.hrs.form.SFormBenefitTable;
+import erp.mod.hrs.form.SFormConditionalEarning;
 import erp.mod.hrs.form.SFormConfig;
 import erp.mod.hrs.form.SFormCutoffCalendar;
 import erp.mod.hrs.form.SFormDeduction;
@@ -80,6 +83,7 @@ import erp.mod.hrs.form.SFormLoanTypeAdjustment;
 import erp.mod.hrs.form.SFormMwzType;
 import erp.mod.hrs.form.SFormMwzTypeWage;
 import erp.mod.hrs.form.SFormPayroll;
+import erp.mod.hrs.form.SFormPaysheetCustomType;
 import erp.mod.hrs.form.SFormPosition;
 import erp.mod.hrs.form.SFormShift;
 import erp.mod.hrs.form.SFormSsContributionTable;
@@ -119,11 +123,14 @@ import erp.mod.hrs.view.SViewMwzType;
 import erp.mod.hrs.view.SViewMwzTypeWage;
 import erp.mod.hrs.view.SViewPayroll;
 import erp.mod.hrs.view.SViewPayrollBenefitEarningComplement;
+import erp.mod.hrs.view.SViewConditionalEarning;
 import erp.mod.hrs.view.SViewPayrollCfdi;
 import erp.mod.hrs.view.SViewPayrollLoanDeductionComplement;
 import erp.mod.hrs.view.SViewPayrollLoanEarningComplement;
 import erp.mod.hrs.view.SViewPayrollReceipt;
 import erp.mod.hrs.view.SViewPayrollReceiptRecord;
+import erp.mod.hrs.view.SViewPayrollReceiptImportedEarnings;
+import erp.mod.hrs.view.SViewPaysheetCustomType;
 import erp.mod.hrs.view.SViewPosition;
 import erp.mod.hrs.view.SViewPrePayrollCutoffCalendar;
 import erp.mod.hrs.view.SViewShift;
@@ -160,7 +167,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SModuleHrs extends SGuiModule {
 
@@ -175,6 +182,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormShift moFormShift;
     private SFormConfig moFormConfig;
     private SFormWorkingDaySettings moFormWorkingDaySettings;
+    private SFormConditionalEarning moFormConditionalEarning;
     private SFormCutoffCalendar moFormCutoffCalendar;
     private SFormFirstDayYear moFormFirstDayYear;
     private SFormHoliday moFormHoliday;
@@ -184,6 +192,7 @@ public class SModuleHrs extends SGuiModule {
     private SFormBenefitTable moFormBenefitTable;
     private SFormWorkerTypeSalary moFormWorkerTypeSalary;
     private SFormMwzTypeWage moFormMwzTypeWage;
+    private SFormPaysheetCustomType moForPaysheetCustomType;
     private SFormUma moFormUma;
     private SFormUmi moFormUmi;
     private SFormLoanTypeAdjustment moFormLoanTypeAdjustment;
@@ -366,6 +375,13 @@ public class SModuleHrs extends SGuiModule {
                     public String getSqlWhere(int[] pk) { return "WHERE id_bank = " + pk[0] + " "; }
                 };
                 break;
+            case SModConsts.HRSS_BONUS:
+                registry = new SDbRegistrySysFly(type) {
+                    public void initRegistry() { }
+                    public String getSqlTable() { return SModConsts.TablesMap.get(mnRegistryType); }
+                    public String getSqlWhere(int[] pk) { return "WHERE id_bonus = " + pk[0] + " "; }
+                };
+                break;
             case SModConsts.HRSS_GROCERY_SRV:
                 registry = new SDbRegistrySysFly(type) {
                     public void initRegistry() { }
@@ -391,6 +407,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSU_TP_MWZ:
                 registry = new SDbMwzType();
                 break;
+            case SModConsts.HRSU_TP_PAY_SHT_CUS:
+                registry = new SDbPaysheetCustomType();
+                break;
             case SModConsts.HRSU_DEP:
                 registry = new SDbDepartment();
                 break;
@@ -415,6 +434,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_WDS:
                 registry = new SDbWorkingDaySettings();
                 break;
+            case SModConsts.HRS_COND_EAR:
+                registry = new SDbConditionalEarning();
+                break;  
             case SModConsts.HRS_PRE_PAY_CUT_CAL:
                 registry = new SDbPrePayrollCutoffCalendar();
                 break;
@@ -657,6 +679,11 @@ public class SModuleHrs extends SGuiModule {
                 sql = "SELECT id_bank AS " + SDbConsts.FIELD_ID + "1, CONCAT(code, ' - ', name) AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
                 break;
+            case SModConsts.HRSS_BONUS:
+                settings = new SGuiCatalogueSettings("Bono", 1);
+                sql = "SELECT id_bonus AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY sort ";
+                break;
             case SModConsts.HRSS_GROCERY_SRV:
                 settings = new SGuiCatalogueSettings("Proveedor despensa", 1);
                 sql = "SELECT id_grocery_srv AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
@@ -692,6 +719,11 @@ public class SModuleHrs extends SGuiModule {
                 settings = new SGuiCatalogueSettings("Área geográfica", 1);
                 sql = "SELECT id_tp_mwz AS " + SDbConsts.FIELD_ID + "1, name AS " + SDbConsts.FIELD_ITEM + " "
                         + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY name, id_tp_mwz ";
+                break;
+            case SModConsts.HRSU_TP_PAY_SHT_CUS:
+                settings = new SGuiCatalogueSettings("Tipo nómina empresa", 1);
+                sql = "SELECT id_tp_pay_sht_cus AS " + SDbConsts.FIELD_ID + "1, CONCAT(name, ' (', code, ')') AS " + SDbConsts.FIELD_ITEM + " "
+                        + "FROM " + SModConsts.TablesMap.get(type) + " WHERE b_del = 0 ORDER BY name, id_tp_pay_sht_cus ";
                 break;
             case SModConsts.HRSU_DEP:
                 settings = new SGuiCatalogueSettings("Departamento", 1);
@@ -806,6 +838,9 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRSU_TP_MWZ:
                 view = new SViewMwzType(miClient, "Áreas geográficas");
                 break;
+            case SModConsts.HRSU_TP_PAY_SHT_CUS:
+                view = new SViewPaysheetCustomType(miClient, "Tipos nómina empresa");
+                break;
             case SModConsts.HRSU_DEP:
                 view = new SViewDepartment(miClient, "Departamentos");
                 break;
@@ -826,6 +861,9 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_WDS:
                 view = new SViewWorkingDaySettings(miClient, "Días laborables");
+                break;
+            case SModConsts.HRS_COND_EAR:
+                view = new SViewConditionalEarning(miClient, "Percepciones condicionales");
                 break;
             case SModConsts.HRS_PRE_PAY_CUT_CAL:
                 view = new SViewPrePayrollCutoffCalendar(miClient, "Calendario de fechas de corte");
@@ -999,6 +1037,9 @@ public class SModuleHrs extends SGuiModule {
                         miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
                 }
                 break;
+            case SModConsts.HRS_PAY_RCP_IMPORT:
+                view = new SViewPayrollReceiptImportedEarnings(miClient, "Percepciones importadas " + (subtype == SModSysConsts.HRSS_TP_PAY_WEE ? "semanales" : "quincenales"), subtype);
+                break; 
             case SModConsts.HRS_ADV_SET:
                 view = new SViewAdvanceSettlement(miClient, "Control adelantos liquidación");
                 break;
@@ -1097,6 +1138,10 @@ public class SModuleHrs extends SGuiModule {
                 if (moFormMwzType == null) moFormMwzType = new SFormMwzType(miClient, "Área geográfica");
                 form = moFormMwzType;
                 break;
+            case SModConsts.HRSU_TP_PAY_SHT_CUS:
+                if (moForPaysheetCustomType == null) moForPaysheetCustomType = new SFormPaysheetCustomType(miClient, "Tipo de nómina de la empresa");
+                form = moForPaysheetCustomType;
+                break;
             case SModConsts.HRSU_DEP:
                 if (moFormDepartment == null) moFormDepartment = new SFormDepartment(miClient, "Departamento");
                 form = moFormDepartment;
@@ -1124,6 +1169,10 @@ public class SModuleHrs extends SGuiModule {
             case SModConsts.HRS_WDS:
                 if (moFormWorkingDaySettings == null) moFormWorkingDaySettings = new SFormWorkingDaySettings(miClient, "Días laborables");
                 form = moFormWorkingDaySettings;
+                break;
+            case SModConsts.HRS_COND_EAR:
+                if (moFormConditionalEarning == null) moFormConditionalEarning = new SFormConditionalEarning(miClient, "Percepción condicional");
+                form = moFormConditionalEarning;
                 break;
             case SModConsts.HRS_PRE_PAY_CUT_CAL:
                 if (moFormCutoffCalendar == null) moFormCutoffCalendar = new SFormCutoffCalendar(miClient, "Calendario de cortes prenómina");
@@ -1358,4 +1407,3 @@ public class SModuleHrs extends SGuiModule {
         return guiReport;
     }
 }
-

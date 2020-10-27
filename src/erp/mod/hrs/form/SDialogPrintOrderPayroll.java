@@ -173,6 +173,7 @@ public class SDialogPrintOrderPayroll extends SBeanFormDialog {
         moFields.setFormButton(jbSave);
         
         mnOrderByType = SLibConsts.UNDEFINED;
+        moIntNumCopies.setValue(1); // by default only one copy
         moRadOrderByNumber.setSelected(true);
 
         reloadCatalogues();

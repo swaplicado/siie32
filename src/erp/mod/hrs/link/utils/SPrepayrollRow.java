@@ -53,9 +53,7 @@ public class SPrepayrollRow {
     public int getAbsences() {
         int absences = 0;
         for (SDay day : days) {
-            if (day.isIs_absence()) {
-                absences++;
-            }
+            absences += day.getNum_absences();
         }
         
         return absences;

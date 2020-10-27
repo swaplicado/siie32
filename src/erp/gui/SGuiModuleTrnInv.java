@@ -44,7 +44,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Claudio Peña, Gil De Jesús
+ * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Claudio Peña, Gil De Jesús, Sergio Flores
  */
 public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -202,6 +202,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         boolean hasRightMfgFgDev = false;
         boolean hasRightMfgCon = false;
         boolean hasRightMaint = false;
+        int levelRightMaint = 0;
 
         jmMenuCat = new JMenu("Catálogos");
         jmiCatStockLot = new JMenuItem("Lotes");
@@ -554,6 +555,7 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         hasRightMfgFgDev = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_MFG_FG_DEV).HasRight;
         hasRightMfgCon = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_MFG_CON).HasRight;
         hasRightMaint = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_INV_MAINT).HasRight;
+        levelRightMaint = miClient.getSessionXXX().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_INV_MAINT);
 
         jmMenuCat.setEnabled(hasRightInAdj || hasRightOutAdj || hasRightOutOtherInt);
         jmMenuDpsPurSup.setEnabled(hasRightInPur);
@@ -593,6 +595,24 @@ public class SGuiModuleTrnInv extends erp.lib.gui.SGuiModule implements java.awt
         jmiIogStockValueByItem.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmiIogStockTheoricalCost.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmMenuMaint.setEnabled(hasRightMaint);
+        jmiMaintStockPart.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
+        jmiMaintStockToolAvl.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
+        jmiMaintStockToolLent.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
+        jmiMaintStockToolMaint.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
+        jmiMaintStockToolLost.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
+        jmiMaintStockTool.setEnabled(levelRightMaint >= SUtilConsts.LEV_READ);
+        jmiMaintMovementPart.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
+        jmiMaintMovementPartDetail.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
+        jmiMaintMovementTool.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
+        jmiMaintMovementToolDetail.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
+        jmiMaintMovementToolLent.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
+        jmiMaintMovementToolMaint.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
+        jmiMaintMovementToolLost.setEnabled(levelRightMaint >= SUtilConsts.LEV_CAPTURE);
+        jmiMaintUserEmployee.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
+        jmiMaintUserContractor.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
+        jmiMaintUserContractorSupv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
+        jmiMaintUserToolMaintProv.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
+        jmiMaintArea.setEnabled(levelRightMaint >= SUtilConsts.LEV_MANAGER);
         jmMenuStk.setEnabled(hasRightStock);
         jmiStkStockClosing.setEnabled(hasRightInAdj || hasRightOutAdj);
         jmMenuRep.setEnabled(hasRightReports);

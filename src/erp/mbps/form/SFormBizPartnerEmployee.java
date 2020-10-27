@@ -60,7 +60,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores
  */
 public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 
@@ -185,7 +185,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        bgOvertime = new javax.swing.ButtonGroup();
+        jTabbedPane = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel19 = new javax.swing.JPanel();
@@ -308,6 +309,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jPanel11 = new javax.swing.JPanel();
         jlWorkingHoursDay = new javax.swing.JLabel();
         jtfWorkingHoursDay = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jlOvertimePolicy = new javax.swing.JLabel();
+        jradOvertimeNever = new javax.swing.JRadioButton();
+        jradOvertimeAllways = new javax.swing.JRadioButton();
+        jradOvertimeSometimes = new javax.swing.JRadioButton();
         jPanel27 = new javax.swing.JPanel();
         jlFkContractType = new javax.swing.JLabel();
         jcbFkContractType = new javax.swing.JComboBox<SFormComponentItem>();
@@ -959,6 +965,28 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jtfWorkingHoursDay.setPreferredSize(new java.awt.Dimension(50, 23));
         jPanel11.add(jtfWorkingHoursDay);
 
+        jLabel1.setPreferredSize(new java.awt.Dimension(25, 23));
+        jPanel11.add(jLabel1);
+
+        jlOvertimePolicy.setText("Tiempo extra:");
+        jlOvertimePolicy.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel11.add(jlOvertimePolicy);
+
+        bgOvertime.add(jradOvertimeNever);
+        jradOvertimeNever.setText("Nunca");
+        jradOvertimeNever.setPreferredSize(new java.awt.Dimension(65, 23));
+        jPanel11.add(jradOvertimeNever);
+
+        bgOvertime.add(jradOvertimeAllways);
+        jradOvertimeAllways.setText("Siempre");
+        jradOvertimeAllways.setPreferredSize(new java.awt.Dimension(70, 23));
+        jPanel11.add(jradOvertimeAllways);
+
+        bgOvertime.add(jradOvertimeSometimes);
+        jradOvertimeSometimes.setText("Ocasionalmente");
+        jradOvertimeSometimes.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel11.add(jradOvertimeSometimes);
+
         jPanel4.add(jPanel11);
 
         jPanel27.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -1023,7 +1051,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel2.add(jPanel60, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane1.addTab("Datos del registro", jPanel2);
+        jTabbedPane.addTab("Datos del registro", jPanel2);
 
         jPanel35.setLayout(new java.awt.BorderLayout());
 
@@ -1351,9 +1379,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel35.add(jpBranchAddress, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane1.addTab("Datos personales", jPanel35);
+        jTabbedPane.addTab("Datos personales", jPanel35);
 
-        getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jTabbedPane, java.awt.BorderLayout.CENTER);
 
         jPanel5.setLayout(new java.awt.GridLayout(1, 2));
 
@@ -1413,179 +1441,179 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         moFieldNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jftNumber, jlNumber);
         moFieldNumber.setLengthMax(10);
-        moFieldNumber.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldNumber.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFirstname = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFirstname, jlFirstname);
         moFieldFirstname.setLengthMax(100);
-        moFieldFirstname.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFirstname.setTabbedPaneIndex(0, jTabbedPane);
         moFieldLastname1 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfLastname1, jlLastname);
         moFieldLastname1.setLengthMax(50);
-        moFieldLastname1.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldLastname1.setTabbedPaneIndex(0, jTabbedPane);
         moFieldLastname2 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfLastname2, jlLastname);
         moFieldLastname2.setLengthMax(49);
-        moFieldLastname2.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldLastname2.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFiscalId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfFiscalId, jlFiscalId);
         moFieldFiscalId.setLengthMin(DCfdConsts.LEN_RFC_PER);
         moFieldFiscalId.setLengthMax(DCfdConsts.LEN_RFC_PER);
-        moFieldFiscalId.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFiscalId.setTabbedPaneIndex(0, jTabbedPane);
         moFieldAlternativeId = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jftAlternativeId, jlAlternativeId);
         moFieldAlternativeId.setLengthMin(DCfdConsts.LEN_CURP);
         moFieldAlternativeId.setLengthMax(DCfdConsts.LEN_CURP);
-        moFieldAlternativeId.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldAlternativeId.setTabbedPaneIndex(0, jTabbedPane);
         moFieldSocialSecurityNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSocialSecurityNumber, jlSocialSecurityNumber);
         moFieldSocialSecurityNumber.setLengthMin(DCfdConsts.LEN_SS_NUM);
         moFieldSocialSecurityNumber.setLengthMax(DCfdConsts.LEN_SS_NUM);
-        moFieldSocialSecurityNumber.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldSocialSecurityNumber.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkBank_n = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkBank_n, jlFkBank_n);
-        moFieldFkBank_n.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkBank_n.setTabbedPaneIndex(0, jTabbedPane);
         moFieldBankAccount = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfBankAccount, jlBankAccount);
         moFieldBankAccount.setLengthMax(20);
-        moFieldBankAccount.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldBankAccount.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkGroceryService = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkGroceryService, jlFkGroceryService);
-        moFieldFkGroceryService.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkGroceryService.setTabbedPaneIndex(0, jTabbedPane);
         moFieldGroceryServiceAccount = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfGroceryServiceAccount, jlGroceryServiceAccount);
         moFieldGroceryServiceAccount.setLengthMax(20);
-        moFieldGroceryServiceAccount.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldGroceryServiceAccount.setTabbedPaneIndex(0, jTabbedPane);
         moFieldEmail = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfEmail, jlEmail);
         moFieldEmail.setLengthMax(50);
         moFieldEmail.setAutoCaseType(SLibConstants.UNDEFINED);
-        moFieldEmail.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldEmail.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsActive = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsActive);
-        moFieldIsActive.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldIsActive.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsDeleted = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsDeleted);
-        moFieldIsDeleted.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldIsDeleted.setTabbedPaneIndex(0, jTabbedPane);
 
         // Employee:
 
         moFieldDateBenefits = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateBenefits, jlDateBenefits);
         moFieldDateBenefits.setPickerButton(jbDateBenefits);
-        moFieldDateBenefits.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldDateBenefits.setTabbedPaneIndex(0, jTabbedPane);
         moFieldDateLastHire = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateLastHire, jlDateLastHire);
         moFieldDateLastHire.setPickerButton(jbDateLastHire);
-        moFieldDateLastHire.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldDateLastHire.setTabbedPaneIndex(0, jTabbedPane);
         moFieldDateLastDismissal_n = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateLastDismissal_n, jlDateLastDismissal_n);
-        moFieldDateLastDismissal_n.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldDateLastDismissal_n.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkPaymentType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkPaymentType, jlFkPaymentType);
-        moFieldFkPaymentType.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkPaymentType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkSalaryType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSalaryType, jlFkSalaryType);
-        moFieldFkSalaryType.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkSalaryType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldSalary = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfSalary, jlSalary);
-        moFieldSalary.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldSalary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldDateChangeSalary = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateChangeSalary, jlSalary);
         moFieldDateChangeSalary.setPickerButton(jbDateChangeSalary);
-        moFieldDateChangeSalary.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldDateChangeSalary.setTabbedPaneIndex(0, jTabbedPane);
         moFieldWage = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfWage, jlWage);
-        moFieldWage.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldWage.setTabbedPaneIndex(0, jTabbedPane);
         moFieldDateChangeWage = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateChangeWage, jlWage);
         moFieldDateChangeWage.setPickerButton(jbDateChangeWage);
-        moFieldDateChangeWage.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldDateChangeWage.setTabbedPaneIndex(0, jTabbedPane);
         moFieldSalarySscBase = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, false, jtfSalarySscBase, jlSalarySscBase);
-        moFieldSalarySscBase.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldSalarySscBase.setTabbedPaneIndex(0, jTabbedPane);
         moFieldDateChangeSalarySscBase = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftDateChangeSalarySscBase, jlSalarySscBase);
         moFieldDateChangeSalarySscBase.setPickerButton(jbDateChangeSalarySscBase);
-        moFieldDateChangeSalarySscBase.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldDateChangeSalarySscBase.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkMwzType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkMwzType, jlFkMwzType);
-        moFieldFkMwzType.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkMwzType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkEmployeeType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkEmployeeType, jlFkEmployeeType);
-        moFieldFkEmployeeType.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkEmployeeType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkWorkerType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkWorkerType, jlFkWorkerType);
-        moFieldFkWorkerType.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkWorkerType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsUnionized = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsUnionized);
-        moFieldIsUnionized.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldIsUnionized.setTabbedPaneIndex(0, jTabbedPane);
         moFieldIsMfgOperator = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckIsMfgOperator);
-        moFieldIsMfgOperator.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldIsMfgOperator.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkDepartment = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkDepartment, jlFkDepartment);
-        moFieldFkDepartment.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkDepartment.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkPosition = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkPosition, jlFkPosition);
-        moFieldFkPosition.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkPosition.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkShift = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkShift, jlFkShift);
-        moFieldFkShift.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkShift.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkWorkingDayType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbFkWorkingDayType, jlFkWorkingDayType);
-        moFieldFkWorkingDayType.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkWorkingDayType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldWorkingHoursDay = new SFormField(miClient, SLibConstants.DATA_TYPE_INTEGER, true, jtfWorkingHoursDay, jlWorkingHoursDay);
-        moFieldWorkingHoursDay.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldWorkingHoursDay.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkContractType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkContractType, jlFkContractType);
-        moFieldFkContractType.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkContractType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldContractExpiration = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftContractExpiration, jlContractExpiration);
         moFieldContractExpiration.setPickerButton(jbContractExpiration);
         moFieldFkRecruitmentSchemeType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkRecruitmentSchemeType, jlFkRecruitmentSchemeType);
-        moFieldFkRecruitmentSchemeType.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkRecruitmentSchemeType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldFkPositionRiskType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkPositionRiskType, jlFkPositionRiskType);
-        moFieldFkPositionRiskType.setTabbedPaneIndex(0, jTabbedPane1);
+        moFieldFkPositionRiskType.setTabbedPaneIndex(0, jTabbedPane);
         moFieldDateBirth = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateBirth, jlDateBirth);
         moFieldDateBirth.setPickerButton(jbDateBirth);
-        moFieldDateBirth.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldDateBirth.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFileImagePhoto = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfImagePhoto, jlImagePhoto);
-        moFieldFileImagePhoto.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldFileImagePhoto.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFileImageSignature = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfImageSignature, jlImageSignature);
-        moFieldFileImageSignature.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldFileImageSignature.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkCatalogueSexType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCatalogueSexTypeId, jlFkCatalogueSexTypeId);
-        moFieldFkCatalogueSexType.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldFkCatalogueSexType.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkCatalogueBloodTypeType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCatalogueBloodTypeTypeId, jlFkCatalogueBloodTypeTypeId);
-        moFieldFkCatalogueBloodTypeType.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldFkCatalogueBloodTypeType.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkCatalogueEducationType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCatalogueEducationTypeId, jlFkCatalogueEducationTypeId);
-        moFieldFkCatalogueEducationType.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldFkCatalogueEducationType.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFkCatalogueMaritalStatusType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkCatalogueMaritalStatusTypeId, jlFkCatalogueMaritalStatusTypeId);
-        moFieldFkCatalogueMaritalStatusType.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldFkCatalogueMaritalStatusType.setTabbedPaneIndex(1, jTabbedPane);
         moFieldMateName = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfMateName, jlMate);
         moFieldMateName.setLengthMax(50);
-        moFieldMateName.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldMateName.setTabbedPaneIndex(1, jTabbedPane);
         moFieldMateDateBirth = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftMateDateBirth, jlMate);
         moFieldMateDateBirth.setPickerButton(jbMateDateBirth);
-        moFieldMateDateBirth.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldMateDateBirth.setTabbedPaneIndex(1, jTabbedPane);
         moFieldMateSex = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkMateCatalogueSexTypeId, jlMate);
-        moFieldMateSex.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldMateSex.setTabbedPaneIndex(1, jTabbedPane);
         moFieldMateDeceased = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckMateDeceased);
-        moFieldMateDeceased.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldMateDeceased.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonName1 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSonName1, jlSon1);
         moFieldSonName1.setLengthMax(50);
-        moFieldSonName1.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonName1.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonDateBirth1 = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftSonDateBirth1, jlSon1);
         moFieldSonDateBirth1.setPickerButton(jbSonDateBirth1);
-        moFieldSonDateBirth1.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonDateBirth1.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonSex1 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatalogueSexTypeId1, jlSon1);
-        moFieldSonSex1.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonSex1.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonDeceased1 = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckSonDeceased1);
-        moFieldSonDeceased1.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonDeceased1.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonName2 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSonName2, jlSon2);
         moFieldSonName2.setLengthMax(50);
-        moFieldSonName2.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonName2.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonDateBirth2 = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftSonDateBirth2, jlSon2);
         moFieldSonDateBirth2.setPickerButton(jbSonDateBirth2);
-        moFieldSonDateBirth2.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonDateBirth2.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonSex2 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatalogueSexTypeId2, jlSon2);
-        moFieldSonSex2.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonSex2.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonDeceased2 = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckSonDeceased2);
-        moFieldSonDeceased2.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonDeceased2.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonName3 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSonName3, jlSon3);
         moFieldSonName3.setLengthMax(50);
-        moFieldSonName3.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonName3.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonDateBirth3 = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftSonDateBirth3, jlSon3);
         moFieldSonDateBirth3.setPickerButton(jbSonDateBirth3);
-        moFieldSonDateBirth3.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonDateBirth3.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonSex3 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatalogueSexTypeId3, jlSon3);
-        moFieldSonSex3.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonSex3.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonDeceased3 = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckSonDeceased3);
-        moFieldSonDeceased3.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonDeceased3.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonName4 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSonName4, jlSon4);
         moFieldSonName4.setLengthMax(50);
-        moFieldSonName4.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonName4.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonDateBirth4 = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftSonDateBirth4, jlSon4);
         moFieldSonDateBirth4.setPickerButton(jbSonDateBirth4);
-        moFieldSonDateBirth4.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonDateBirth4.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonSex4 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatalogueSexTypeId4, jlSon4);
-        moFieldSonSex4.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonSex4.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonDeceased4 = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckSonDeceased4);
-        moFieldSonDeceased4.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonDeceased4.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonName5 = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfSonName5, jlSon5);
         moFieldSonName5.setLengthMax(50);
-        moFieldSonName5.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonName5.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonDateBirth5 = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, false, jftSonDateBirth5, jlSon5);
         moFieldSonDateBirth5.setPickerButton(jbSonDateBirth5);
-        moFieldSonDateBirth5.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonDateBirth5.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonSex5 = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkSonCatalogueSexTypeId5, jlSon5);
-        moFieldSonSex5.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonSex5.setTabbedPaneIndex(1, jTabbedPane);
         moFieldSonDeceased5 = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, false, jckSonDeceased5);
-        moFieldSonDeceased5.setTabbedPaneIndex(1, jTabbedPane1);
+        moFieldSonDeceased5.setTabbedPaneIndex(1, jTabbedPane);
 
         moPanelBizPartnerBranchAddress = new SPanelBizPartnerBranchAddress(miClient);
         jpOficialAddress.add(moPanelBizPartnerBranchAddress, BorderLayout.NORTH);
@@ -1919,7 +1947,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         if (validation.getIsError()) {
             if (validation.getTabbedPaneIndex() != -1) {
-                jTabbedPane1.setSelectedIndex(validation.getTabbedPaneIndex());
+                jTabbedPane.setSelectedIndex(validation.getTabbedPaneIndex());
             }
             if (validation.getComponent() != null) {
                 validation.getComponent().requestFocus();
@@ -2209,6 +2237,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgOvertime;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -2269,7 +2299,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbContractExpiration;
     private javax.swing.JButton jbDateBenefits;
@@ -2382,6 +2412,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlLastname;
     private javax.swing.JLabel jlMate;
     private javax.swing.JLabel jlNumber;
+    private javax.swing.JLabel jlOvertimePolicy;
     private javax.swing.JLabel jlRelative;
     private javax.swing.JLabel jlRelativeDateBirth;
     private javax.swing.JLabel jlRelativeName;
@@ -2399,6 +2430,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlWorkingHoursDay;
     private javax.swing.JPanel jpBranchAddress;
     private javax.swing.JPanel jpOficialAddress;
+    private javax.swing.JRadioButton jradOvertimeAllways;
+    private javax.swing.JRadioButton jradOvertimeNever;
+    private javax.swing.JRadioButton jradOvertimeSometimes;
     private javax.swing.JTextField jtfAge;
     private javax.swing.JTextField jtfBankAccount;
     private javax.swing.JTextField jtfBizPartner_Ro;
@@ -2467,11 +2501,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldDateBirth.setFieldValue(miClient.getSessionXXX().getWorkingDate());
         moFieldDateBenefits.setFieldValue(miClient.getSessionXXX().getWorkingDate());
         moFieldDateLastHire.setFieldValue(miClient.getSessionXXX().getWorkingDate());
+        moFieldWorkingHoursDay.setFieldValue(SHrsConsts.WORKING_DAY_HOURS);
         moPanelBizPartnerBranchAddress.formReset();
         moPanelBizPartnerBranchAddress.setParamIsInMainWindow(true);
-        jTabbedPane1.setSelectedIndex(0);
-        jckIsMfgOperator.setSelected(false);
         moPanelBizPartnerBranchAddress.setFieldsEnabled(true);
+        jradOvertimeNever.setSelected(true);
+        jTabbedPane.setSelectedIndex(0);
 
         mnPkContactId = 0;
         jckIsDeleted.setEnabled(false);
@@ -2721,7 +2756,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                         validation.setMessage(SGuiConsts.ERR_MSG_FIELD_DIF + "'" + jlDateBirth.getText() + "'\n " +
                                 "La fecha de nacimiento (" + miClient.getSessionXXX().getFormatters().getDateFormat().format(moFieldDateBirth.getDate()) + ") no corresponde a la " +
                                 "fecha del RFC (" + miClient.getSessionXXX().getFormatters().getDateFormat().format(tDateRfc) + ").");
-                        jTabbedPane1.setSelectedIndex(1);
+                        jTabbedPane.setSelectedIndex(1);
                         validation.setComponent(jftDateBirth);
                         validation.setTabbedPaneIndex(0);
                     }
@@ -2792,8 +2827,6 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldBankAccount.setFieldValue(moEmployee.getBankAccount());
             moFieldFkGroceryService.setFieldValue(new int[] { moEmployee.getFkGroceryServiceId() });
             moFieldGroceryServiceAccount.setFieldValue(moEmployee.getGroceryServiceAccount());
-            moFieldIsUnionized.setFieldValue(moEmployee.isUnionized());
-            moFieldIsMfgOperator.setFieldValue(moEmployee.isMfgOperator());
             moFieldIsActive.setFieldValue(moEmployee.isActive());
             moFieldDateBirth.setFieldValue(moEmployee.getDateBirth());
             focusLostDateBirth();
@@ -2815,12 +2848,28 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
             moFieldFkEmployeeType.setFieldValue(new int[] { moEmployee.getFkEmployeeTypeId() });
             moFieldFkWorkerType.setFieldValue(new int[] { moEmployee.getFkWorkerTypeId() });
+            moFieldIsUnionized.setFieldValue(moEmployee.isUnionized());
+            moFieldIsMfgOperator.setFieldValue(moEmployee.isMfgOperator());
             moFieldFkDepartment.setFieldValue(new int[] { moEmployee.getFkDepartmentId() });
             itemStateChangedDepartament();
             moFieldFkPosition.setFieldValue(new int[] { moEmployee.getFkPositionId() });
             moFieldFkShift.setFieldValue(new int[] { moEmployee.getFkShiftId() });
             moFieldFkWorkingDayType.setFieldValue(new int[] { moEmployee.getFkWorkingDayTypeId()});
+            
             moFieldWorkingHoursDay.setFieldValue(moEmployee.getWorkingHoursDay());
+            switch (moEmployee.getOvertimePolicy()) {
+                case SHrsConsts.OVERTIME_NEVER:
+                    jradOvertimeNever.setSelected(true);
+                    break;
+                case SHrsConsts.OVERTIME_ALLWAYS:
+                    jradOvertimeAllways.setSelected(true);
+                    break;
+                case SHrsConsts.OVERTIME_SOMETIMES:
+                    jradOvertimeSometimes.setSelected(true);
+                    break;
+                default:
+            }
+            
             moFieldFkContractType.setFieldValue(new int[] { moEmployee.getFkContractTypeId() });
             itemStateChangedContractType();
             moFieldContractExpiration.setFieldValue(moEmployee.getContractExpiration_n());
@@ -3038,6 +3087,16 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moEmployee.setDateSalarySscBase(moFieldDateChangeSalarySscBase.getDate() == null ? miClient.getSession().getCurrentDate() : moFieldDateChangeSalarySscBase.getDate());
         
         moEmployee.setWorkingHoursDay(moFieldWorkingHoursDay.getInteger());
+        if (jradOvertimeNever.isSelected()) {
+            moEmployee.setOvertimePolicy(SHrsConsts.OVERTIME_NEVER);
+        }
+        else if (jradOvertimeAllways.isSelected()) {
+            moEmployee.setOvertimePolicy(SHrsConsts.OVERTIME_ALLWAYS);
+        }
+        else if (jradOvertimeSometimes.isSelected()) {
+            moEmployee.setOvertimePolicy(SHrsConsts.OVERTIME_SOMETIMES);
+        }
+        
         moEmployee.setContractExpiration_n(SHrsEmployeeUtils.isContractTypeIndefinite(moFieldFkContractType.getKeyAsIntArray()[0]) ? null : moFieldContractExpiration.getDate());
         moEmployee.setBankAccount(moFieldBankAccount.getString());
         moEmployee.setGroceryServiceAccount(moFieldGroceryServiceAccount.getString());

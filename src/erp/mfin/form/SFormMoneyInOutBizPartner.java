@@ -42,7 +42,7 @@ import sa.lib.SLibConsts;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores, Juan Barajas
+ * @author Alfonso Flores, Sergio Flores, Juan Barajas, Isabel Servín
  */
 public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 
@@ -70,6 +70,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
     private erp.mfin.data.SDataRecord moParamRecord;
     private erp.mfin.data.SDataRecordEntry moRecordEntry;
+    private erp.mbps.data.SDataBizPartner moBizPartner;
     private erp.mcfg.data.SDataCurrency moCurrencyRecord;
     private erp.mcfg.data.SDataCurrency moCurrencyBizPartner;
     private int mnParamBizPartnerCategory;
@@ -552,23 +553,23 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
 
     private void readBizPartnerCurrency() {
         int idCurrency = SLibConsts.UNDEFINED;
-        SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(
-                miClient, SDataConstants.BPSU_BP, moFieldFkBizPartnerId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);;
+        
+        moBizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldFkBizPartnerId.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
         
         moCurrencyBizPartner = null;
 
         switch(mnParamBizPartnerCategory) {
             case SDataConstants.BPSX_BP_SUP:
-                idCurrency = bizPartner.getDbmsCategorySettingsSup().getFkCurrencyId_n();
+                idCurrency = moBizPartner.getDbmsCategorySettingsSup().getFkCurrencyId_n();
                 break;
             case SDataConstants.BPSX_BP_CUS:
-                idCurrency = bizPartner.getDbmsCategorySettingsCus().getFkCurrencyId_n();
+                idCurrency = moBizPartner.getDbmsCategorySettingsCus().getFkCurrencyId_n();
                 break;
             case SDataConstants.BPSX_BP_CDR:
-                idCurrency = bizPartner.getDbmsCategorySettingsCdr().getFkCurrencyId_n();
+                idCurrency = moBizPartner.getDbmsCategorySettingsCdr().getFkCurrencyId_n();
                 break;
             case SDataConstants.BPSX_BP_DBR:
-                idCurrency = bizPartner.getDbmsCategorySettingsDbr().getFkCurrencyId_n();
+                idCurrency = moBizPartner.getDbmsCategorySettingsDbr().getFkCurrencyId_n();
                 break;
             default:
         }
@@ -789,6 +790,7 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
                 SDataConstantsSys.FINS_TP_SYS_MOV_BPS_DBR[1]);
         oEntry.setFkCurrencyId(moFieldFkBizPartnerCurrencyId.getKeyAsIntArray()[0]);
         oEntry.setFkBizPartnerId_nr(moFieldFkBizPartnerId.getKeyAsIntArray()[0]);
+        oEntry.setFkBizPartnerBranchId_n(moBizPartner.getDbmsHqBranch().getPkBizPartnerBranchId());
         
         if (jtfReference.isEnabled()) {
             oEntry.setReference(moFieldReference.getString());
@@ -937,7 +939,9 @@ public class SFormMoneyInOutBizPartner extends javax.swing.JDialog implements er
     }
 
     private void itemStateChangedBizPartner() {
-        if (moFieldFkBizPartnerId.getKeyAsIntArray()[0] > 0) {
+        moBizPartner = null;
+        
+        if (jcbFkBizPartnerId.getSelectedIndex() > 0) {
             jcbFkBizPartnerCurrencyId.setEnabled(true);
             jbFkBizPartnerCurrencyId.setEnabled(true);
             readBizPartnerCurrency();

@@ -52,16 +52,15 @@ public abstract class SCfdConsts {
     public static final String UUID_STAMP_NOT_YET = "603"; // not in the list above!
     public static final String UUID_STAMP_ALREADY = "307";
     
-    public static final int PROC_REQ_STAMP = 1;
-    public static final int PROC_REQ_ANNUL = 2;
-    public static final int PROC_PRT_DOC = 3;
-    public static final int PROC_PRT_ACK_ANNUL = 4;
-    public static final int PROC_SND_DOC = 5;
-    public static final int PROC_REQ_STAMP_AND_SND = 6;
-    public static final int PROC_REQ_ANNUL_AND_SND = 7;
-    public static final int PROC_REQ_VERIFY = 8;
-    public static final int PROC_REQ_SEND_CFD_PAYROLL = 9;
-    public static final int PROC_PRT_DOCS = 10;
+    public static final int REQ_STAMP = 1;
+    public static final int REQ_ANNUL = 2;
+    public static final int REQ_PRINT_DOC = 3;
+    public static final int REQ_PRINT_ANNUL_ACK = 4;
+    public static final int REQ_SEND_DOC = 5;
+    public static final int REQ_SEND_PAYROLL = 9;
+    public static final int REQ_STAMP_SEND = 6;
+    public static final int REQ_ANNUL_SEND = 7;
+    public static final int REQ_VERIFY = 8;
     
     public static final int CFDI_PAYROLL_PERCEPTION = 1;
     public static final int CFDI_PAYROLL_DEDUCTION = 2;

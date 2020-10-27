@@ -2020,9 +2020,9 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
     }
 
     private void enableVouFields(final boolean enable) {
-        jftVouDate.setEditable(enable);
-        jftVouDate.setFocusable(enable);
-        jbVouDatePick.setEnabled(enable);
+        jftVouDate.setEditable(true);
+        jftVouDate.setFocusable(true);
+        jbVouDatePick.setEnabled(true);
         jcbVouTaxRegime.setEnabled(enable);
         jtfVouConfirm.setEditable(enable);
         jtfVouConfirm.setFocusable(enable);

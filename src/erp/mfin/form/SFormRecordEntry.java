@@ -56,7 +56,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
     
@@ -74,6 +74,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private erp.mfin.data.SDataRecordEntry moRecordEntry;
     private erp.mfin.data.SDataRecord moRecord;
     private erp.mitm.data.SDataItem moItem;
+    private erp.mitm.data.SDataItem moItemAux;
     private erp.lib.form.SFormField moFieldConcept;
     private erp.lib.form.SFormField moFieldFkBizPartnerId_nr;
     private erp.lib.form.SFormField moFieldOccasionalFiscalId;
@@ -852,6 +853,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jcbFkEntityId_n.addItemListener(this);
         jcbFkItemId_n.addItemListener(this);
+        jcbFkItemAuxId_n.addItemListener(this);
         jcbFkCurrencyId.addItemListener(this);
         jckIsCheckApplying.addItemListener(this);
         jckIsExchangeDifference.addItemListener(this);
@@ -1719,6 +1721,15 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         }
     }
 
+    private void itemStateFkItemAuxId_n() {
+        if (!jcbFkItemAuxId_n.isEnabled() || jcbFkItemAuxId_n.getSelectedIndex() <= 0) {
+            moItemAux = null;
+        }
+        else {
+            moItemAux = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldFkItemAuxId_n.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
+        }
+    }
+    
     private void itemStateIsCheckApplying() {
         if (!jckIsCheckApplying.isSelected()) {
             jcbFkCheckId_n.setEnabled(false);
@@ -1841,7 +1852,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
                 msXmlPath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
 
-                if (SCfdUtils.validateEmisorXmlExpenses(miClient, msXmlPath)) {
+                if (SCfdUtils.validateCfdiReceptor(miClient, msXmlPath)) {
                     maCfdRecordRows.add(new SDataCfdRecordRow(maCfdRecordRows.size() + 1, 0, miClient.getFileChooser().getSelectedFile().getName(), miClient.getFileChooser().getSelectedFile().getAbsolutePath()));
                 }
             }
@@ -2757,10 +2768,14 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         if (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0) {
             moRecordEntry.setFkBizPartnerId_nr(moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0]);
             moRecordEntry.setFkBizPartnerBranchId_n(((SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldFkBizPartnerId_nr.getKey(), SLibConstants.EXEC_MODE_VERBOSE)).getDbmsHqBranch().getPkBizPartnerBranchId());
+            moRecordEntry.setDbmsBizPartnerCode(moFieldFkBizPartnerId_nr.getKey().toString());
+            moRecordEntry.setDbmsBizPartner(moFieldFkBizPartnerId_nr.getString());
         }
         else {
             moRecordEntry.setFkBizPartnerId_nr(0);
             moRecordEntry.setFkBizPartnerBranchId_n(0);
+            moRecordEntry.setDbmsBizPartnerCode("");
+            moRecordEntry.setDbmsBizPartner("");
         }
         
         if (jcbOccasionalFiscalId.isEnabled() && !moFieldOccasionalFiscalId.getString().isEmpty()) {
@@ -2782,33 +2797,45 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         if (jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0) {
             moRecordEntry.setFkTaxBasicId_n(moFieldFkTaxId_n.getKeyAsIntArray()[0]);
             moRecordEntry.setFkTaxId_n(moFieldFkTaxId_n.getKeyAsIntArray()[1]);
+            moRecordEntry.setDbmsTax(moFieldFkTaxId_n.getString());
         }
         else {
             moRecordEntry.setFkTaxBasicId_n(0);
             moRecordEntry.setFkTaxId_n(0);
+            moRecordEntry.setDbmsTax("");
         }
 
         if (jcbFkEntityId_n.isEnabled() && jcbFkEntityId_n.getSelectedIndex() > 0) {
             moRecordEntry.setFkCompanyBranchId_n(moFieldFkEntityId_n.getKeyAsIntArray()[0]);
             moRecordEntry.setFkEntityId_n(moFieldFkEntityId_n.getKeyAsIntArray()[1]);
+            moRecordEntry.setDbmsEntityCode(moFieldFkEntityId_n.getKey().toString());
+            moRecordEntry.setDbmsEntity(moFieldFkEntityId_n.getString());
         }
         else {
             moRecordEntry.setFkCompanyBranchId_n(0);
             moRecordEntry.setFkEntityId_n(0);
+            moRecordEntry.setDbmsEntityCode("");
+            moRecordEntry.setDbmsEntity("");
         }
 
         if (jcbFkItemId_n.isEnabled() && jcbFkItemId_n.getSelectedIndex() > 0) {
+            moRecordEntry.setFkItemId_n(moItem.getPkItemId());
+            moRecordEntry.setDbmsItemCode(moItem.getCode());
+            moRecordEntry.setDbmsItem(moItem.getItem());
+            
             if (jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0) {
                 moRecordEntry.setUnits(0);
-                moRecordEntry.setFkItemId_n(moItem.getPkItemId());
                 moRecordEntry.setFkUnitId_n(SModSysConsts.ITMU_UNIT_NA);
                 moRecordEntry.setFkItemAuxId_n(moFieldFkItemAuxId_n.getKeyAsIntArray()[0]);
+                moRecordEntry.setDbmsItemAuxCode(moItemAux.getCode());
+                moRecordEntry.setDbmsItemAux(moItemAux.getItem());
             }
             else {
                 moRecordEntry.setUnits(moFieldUnits.getDouble());
-                moRecordEntry.setFkItemId_n(moItem.getPkItemId());
                 moRecordEntry.setFkUnitId_n(moItem.getFkUnitId());
                 moRecordEntry.setFkItemAuxId_n(SLibConstants.UNDEFINED);
+                moRecordEntry.setDbmsItemAuxCode("");
+                moRecordEntry.setDbmsItemAux("");
             }
 
             moRecordEntry.setDbmsAccountComplement(moItem.getItem());
@@ -2818,7 +2845,11 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             moRecordEntry.setFkItemId_n(0);
             moRecordEntry.setFkUnitId_n(0);
             moRecordEntry.setFkItemAuxId_n(0);
-
+            moRecordEntry.setDbmsItemCode("");
+            moRecordEntry.setDbmsItem("");
+            moRecordEntry.setDbmsItemAuxCode("");
+            moRecordEntry.setDbmsItemAux("");
+            
             moRecordEntry.setDbmsAccountComplement("");
         }
 
@@ -2843,10 +2874,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         if (jbFkDps.isEnabled() && moEntryDps != null) {
             moRecordEntry.setFkDpsYearId_n(moEntryDps.getPkYearId());
             moRecordEntry.setFkDpsDocId_n(moEntryDps.getPkDocId());
+            moRecordEntry.setDbmsDps(moEntryDps.getDpsNumber());
         }
         else {
             moRecordEntry.setFkDpsYearId_n(0);
             moRecordEntry.setFkDpsDocId_n(0);
+            moRecordEntry.setDbmsDps("");
         }
 
         if (jbFkDpsAdj.isEnabled() && moEntryDpsAdj != null) {
@@ -3140,6 +3173,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 }
                 else if (comboBox == jcbFkItemId_n) {
                     itemStateFkItemId_n();
+                }
+                else if (comboBox == jcbFkItemAuxId_n) {
+                    itemStateFkItemAuxId_n();
                 }
                 else if (comboBox == jcbFkCurrencyId) {
                     renderCurrencySettings();

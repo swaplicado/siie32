@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Edwin Carmona, Claudio Peña, Sergio Flores, Isabel Servín
  */
 public abstract class SModConsts {
 
@@ -186,6 +186,7 @@ public abstract class SModConsts {
     public static final int ITMU_ITEM_BARC = 1052007;
     public static final int ITMU_CFG_ITEM_LAN = 1052008;
     public static final int ITMU_CFG_ITEM_BP = 1052009;
+    public static final int ITMU_MATCH_ITEM_CPT_BP = 1052021;
 
     public static final int ITMU_TP_LEV = 1052501;
     public static final int ITMU_TP_UNIT = 1052502;
@@ -610,6 +611,7 @@ public abstract class SModConsts {
     public static final int HRSS_TP_DIS = 2061075;
     public static final int HRSS_TP_DAY = 2061081;
     public static final int HRSS_BANK = 2061091;
+    public static final int HRSS_BONUS = 2061093;
     public static final int HRSS_GROCERY_SRV = 2061096;
 
     public static final int HRSU_CL_ABS = 2062001;
@@ -618,6 +620,7 @@ public abstract class SModConsts {
     public static final int HRSU_TP_EMP = 2062011;
     public static final int HRSU_TP_WRK = 2062012;
     public static final int HRSU_TP_MWZ = 2062021;
+    public static final int HRSU_TP_PAY_SHT_CUS = 2062025;
     public static final int HRSU_DEP = 2062031;
     public static final int HRSU_POS = 2062032;
     public static final int HRSU_SHT = 2062033;
@@ -655,12 +658,14 @@ public abstract class SModConsts {
     public static final int HRS_ABS_CNS = 2063102;
     public static final int HRS_EAR = 2063111;
     public static final int HRS_DED = 2063112;
+    public static final int HRS_COND_EAR = 2063120;
     public static final int HRS_AUT_EAR = 2063121;
     public static final int HRS_AUT_DED = 2063122;
     public static final int HRS_ACC_EAR = 2063131;
     public static final int HRS_ACC_DED = 2063132;
     public static final int HRS_PAY = 2063201;
     public static final int HRS_PAY_RCP = 2063211;
+    public static final int HRS_PAY_RCP_IMPORT = 2063215;
     public static final int HRS_PAY_RCP_ISS = 2063216;
     public static final int HRS_PAY_RCP_DAY = 2063221;
     public static final int HRS_PAY_RCP_EAR = 2063231;
@@ -829,6 +834,7 @@ public abstract class SModConsts {
         TablesMap.put(ITMU_ITEM_BARC, "erp.itmu_item_barc");
         TablesMap.put(ITMU_CFG_ITEM_LAN, "erp.itmu_cfg_item_lan");
         TablesMap.put(ITMU_CFG_ITEM_BP, "erp.itmu_cfg_item_bp");
+        TablesMap.put(ITMU_MATCH_ITEM_CPT_BP, "erp.itmu_match_item_cpt_bp");
 
         TablesMap.put(ITMU_TP_LEV, "erp.itmu_tp_lev");
         TablesMap.put(ITMU_TP_UNIT, "erp.itmu_tp_unit");
@@ -1179,6 +1185,7 @@ public abstract class SModConsts {
         TablesMap.put(HRSS_TP_DIS, "erp.hrss_tp_dis");
         TablesMap.put(HRSS_TP_DAY, "erp.hrss_tp_day");
         TablesMap.put(HRSS_BANK, "erp.hrss_bank");
+		TablesMap.put(HRSS_BONUS, "erp.hrss_bonus");
         TablesMap.put(HRSS_GROCERY_SRV, "erp.hrss_grocery_srv");
 
         TablesMap.put(HRSU_CL_ABS, "erp.hrsu_cl_abs");
@@ -1187,6 +1194,7 @@ public abstract class SModConsts {
         TablesMap.put(HRSU_TP_EMP, "erp.hrsu_tp_emp");
         TablesMap.put(HRSU_TP_WRK, "erp.hrsu_tp_wrk");
         TablesMap.put(HRSU_TP_MWZ, "erp.hrsu_tp_mwz");
+        TablesMap.put(HRSU_TP_PAY_SHT_CUS, "erp.hrsu_tp_pay_sht_cus");
         TablesMap.put(HRSU_DEP, "erp.hrsu_dep");
         TablesMap.put(HRSU_POS, "erp.hrsu_pos");
         TablesMap.put(HRSU_SHT, "erp.hrsu_sht");
@@ -1224,6 +1232,7 @@ public abstract class SModConsts {
         TablesMap.put(HRS_ABS_CNS, "hrs_abs_cns");
         TablesMap.put(HRS_EAR, "hrs_ear");
         TablesMap.put(HRS_DED, "hrs_ded");
+        TablesMap.put(HRS_COND_EAR, "hrs_cond_ear");
         TablesMap.put(HRS_AUT_EAR, "hrs_aut_ear");
         TablesMap.put(HRS_AUT_DED, "hrs_aut_ded");
         TablesMap.put(HRS_ACC_EAR, "hrs_acc_ear");

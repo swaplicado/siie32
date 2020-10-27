@@ -144,7 +144,7 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
 
         try {
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {
-                if (SCfdUtils.validateEmisorXmlExpenses(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
+                if (SCfdUtils.validateCfdiReceptor(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
                     maRows.add(new SDataCfdRecordRow(maRows.size() + 1, 0, miClient.getFileChooser().getSelectedFile().getName(), miClient.getFileChooser().getSelectedFile().getAbsolutePath()));
                     populateGridRows();
                 }
@@ -155,7 +155,6 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
         catch (Exception e) {
             SLibUtilities.renderException(this, e);
         }
-    
     }
     
     private void actionRowRemove () {

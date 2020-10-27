@@ -163,7 +163,7 @@ public class SFormLoan extends SBeanForm implements ItemListener, ChangeListener
         jlNumber.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel6.add(jlNumber);
 
-        moTextNumber.setText("sBeanFieldText2");
+        moTextNumber.setText("TEXT");
         jPanel6.add(moTextNumber);
 
         jPanel2.add(jPanel6);

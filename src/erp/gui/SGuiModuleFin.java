@@ -96,7 +96,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
 import erp.mod.fin.db.SFiscalAccounts;
-import erp.mod.fin.form.SDialogDpsExchangeDif;
+import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
 import erp.mod.fin.form.SDialogMassDownloadCfdi;
@@ -121,6 +121,7 @@ import sa.lib.gui.SGuiParams;
 /**
  *
  * @author Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Isabel Servín
  */
 public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -200,8 +201,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     private javax.swing.JMenu jmFin;
     private javax.swing.JMenuItem jmiFinExchangeRate;
-    private javax.swing.JMenuItem jmiFinExchangeRateAdjusment;
-    private javax.swing.JMenuItem jmiFinExchangeDifferenceDps;
+    private javax.swing.JMenuItem jmiFinValuationBalances;
+    private javax.swing.JMenuItem jmiFinDpsExchangeRateDiff;
     
     private javax.swing.JMenuItem jmiFinCashCheck;
     private javax.swing.JMenuItem jmiFinCashCounterReceipt;
@@ -541,8 +542,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin = new JMenu("Finanzas");
 
         jmiFinExchangeRate = new JMenuItem("Tipos de cambio");
-        jmiFinExchangeRateAdjusment = new JMenuItem("Valuación de saldos en moneda extranjera");
-        jmiFinExchangeDifferenceDps = new JMenuItem("Diferencias cambiarias en documentos pagados");
+        jmiFinValuationBalances = new JMenuItem("Revaluación de saldos en moneda extranjera");
+        jmiFinDpsExchangeRateDiff = new JMenuItem("Diferencias cambiarias de cuentas liquidadas en moneda extranjera");
         jmiFinCashCheck = new JMenuItem("Cheques");
         jmiFinCashCounterReceipt = new JMenuItem("Contrarrecibos");
         jsFinCash = new JPopupMenu.Separator();
@@ -558,8 +559,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmFin.add(jmiFinExchangeRate);
         jmFin.addSeparator();
-        jmFin.add(jmiFinExchangeRateAdjusment);
-        jmFin.add(jmiFinExchangeDifferenceDps);
+        jmFin.add(jmiFinValuationBalances);
+        jmFin.add(jmiFinDpsExchangeRateDiff);
         jmFin.addSeparator();
         jmFin.add(jmiFinCashCheck);
         jmFin.add(jmiFinCashCounterReceipt);
@@ -841,8 +842,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecDpsBizPartnerSup.addActionListener(this);
 
         jmiFinExchangeRate.addActionListener(this);
-        jmiFinExchangeRateAdjusment.addActionListener(this);
-        jmiFinExchangeDifferenceDps.addActionListener(this);
+        jmiFinValuationBalances.addActionListener(this);
+        jmiFinDpsExchangeRateDiff.addActionListener(this);
         jmiFinCashCheck.addActionListener(this);
         jmiFinCashCounterReceipt.addActionListener(this);
         jmiFinLayoutBank.addActionListener(this);
@@ -1985,11 +1986,11 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiFinExchangeRate) {
                 showView(SDataConstants.FIN_EXC_RATE);
             }
-            else if (item == jmiFinExchangeRateAdjusment) { //ucastaneda 15/08/2016
-                new SDialogValuationBalances(miClient.getSession().getClient(), " Ajustes por valuación de saldos en moneda extranjera.").setVisible(true);
+            else if (item == jmiFinValuationBalances) {
+                new SDialogValuationBalances(miClient.getSession().getClient(), "Revaluación de saldos en moneda extranjera").setVisible(true);
             }
-            else if (item == jmiFinExchangeDifferenceDps) {
-                new SDialogDpsExchangeDif(miClient.getSession().getClient(), "Ajustes por diferencia cambiaria al liquidar documentos.").setVisible(true);
+            else if (item == jmiFinDpsExchangeRateDiff) {
+                new SDialogDpsExchangeRateDiff(miClient.getSession().getClient(), "Diferencias cambiarias de cuentas liquidadas en moneda extranjera").setVisible(true);
             }
             else if (item == jmiFinCashCheck) {
                 showView(SDataConstants.FIN_CHECK);

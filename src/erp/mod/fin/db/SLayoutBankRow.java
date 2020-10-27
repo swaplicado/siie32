@@ -22,7 +22,7 @@ import sa.lib.gui.SGuiItem;
  * Editing bank layouts and aplicating payments in SFormBankLayout.
  * Showing bank layouts in SDialogBankLayoutCardex.
  * 
- * @author Juan Barajas, Alfredo Pérez, Sergio Flores
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín
  */
 public class SLayoutBankRow implements SGridRow {
     
@@ -87,6 +87,13 @@ public class SLayoutBankRow implements SGridRow {
     protected ArrayList<SGuiItem> maAgreementReferences;
     protected HashMap<String, String> moCodeBankAccountCredits;
     protected HashMap<String, String> moAliasBankAccountCredits;
+    
+    protected boolean mbXml;
+    protected String msXmlUuid;
+    protected String msXmlRfcEmi;
+    protected String msXmlRfcRec;
+    protected double mdXmlTotal;
+    protected int mnXmlType;
     
     /**
      * Create a new bank layout row.
@@ -154,6 +161,13 @@ public class SLayoutBankRow implements SGridRow {
         maAgreementReferences = new ArrayList<>();
         moCodeBankAccountCredits = new HashMap<>();
         moAliasBankAccountCredits = new HashMap<>();
+        
+        mbXml = false;
+        msXmlUuid = "";
+        msXmlRfcEmi = "";
+        msXmlRfcRec = "";
+        mdXmlTotal = 0;
+        mnXmlType = 0;
     }
 
     public void setTransactionType(int n) { mnTransactionType = n; }
@@ -211,6 +225,13 @@ public class SLayoutBankRow implements SGridRow {
     
     public void setExchangeRate(double exchangeRate) { moMoneyPayment.setExchangeRate(exchangeRate); }
     
+    public void setIsXml(boolean b) { mbXml = b; }
+    public void setXmlUuid(String s) { msXmlUuid = s; }
+    public void setXmlRfcEmi(String s) { msXmlRfcEmi = s; }
+    public void setXmlRfcRec(String s) { msXmlRfcRec = s; }
+    public void setXmlTotal(double d) { mdXmlTotal = d; }
+    public void setXmlType(int i) { mnXmlType = i; }
+    
     public int getRowMode() { return mnRowMode; }
     public int getTransactionType() { return mnTransactionType; }
     public int getPaymentType() { return mnPaymentType; }
@@ -266,6 +287,13 @@ public class SLayoutBankRow implements SGridRow {
     public ArrayList<SGuiItem> getAgreementsReferences() { return maAgreementReferences; }
     public HashMap<String, String> getCodeBankAccountCredits() { return moCodeBankAccountCredits; }
     public HashMap<String, String> getAliasBankAccountCredits() { return moAliasBankAccountCredits; }
+    
+    public boolean isXml() { return mbXml; }
+    public String getXmlUuid() { return msXmlUuid; }
+    public String getXmlRfcEmi() { return msXmlRfcEmi; }
+    public String getXmlRfcRec() { return msXmlRfcRec; }
+    public double getXmlTotal() { return mdXmlTotal; }
+    public int getXmlType() { return mnXmlType; }
 
     public String getBranchBankAccountCreditNumber(int[] pk, int typeLayout) {
         String account = "";

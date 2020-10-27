@@ -64,7 +64,7 @@ public class SFormHoliday extends SBeanForm {
 
         jPanel2.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
-        jPanel4.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlYear.setForeground(new java.awt.Color(0, 0, 255));
         jlYear.setText("Año:*");
@@ -76,7 +76,7 @@ public class SFormHoliday extends SBeanForm {
 
         jPanel2.add(jPanel4);
 
-        jPanel5.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlDate.setText("Día feriado:*");
         jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
@@ -85,24 +85,24 @@ public class SFormHoliday extends SBeanForm {
 
         jPanel2.add(jPanel5);
 
-        jPanel6.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlCode.setText("Código:*");
         jlCode.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel6.add(jlCode);
 
-        moTextCode.setText("sBeanFieldText1");
+        moTextCode.setText("TEXT");
         jPanel6.add(moTextCode);
 
         jPanel2.add(jPanel6);
 
-        jPanel7.setLayout(new java.awt.FlowLayout(0, 5, 0));
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlName.setText("Nombre:*");
         jlName.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlName);
 
-        moTextName.setText("sBeanFieldText1");
+        moTextName.setText("TEXT");
         moTextName.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel7.add(moTextName);
 

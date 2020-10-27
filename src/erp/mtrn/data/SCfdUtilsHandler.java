@@ -4,6 +4,7 @@
  */
 package erp.mtrn.data;
 
+import cfd.DElement;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SCfdUtilsHandler {
     
@@ -103,11 +104,55 @@ public class SCfdUtilsHandler {
         return cfdiRelatedList;
     }
     
+    /**
+     * Devuelve el estatus del SAT a traves de un SDataCfd
+     * @param cfd SDataCfd
+     * @return CfdiAckQuery
+     * @throws java.lang.Exception 
+    */
     public CfdiAckQuery getCfdiSatStatus(final SDataCfd cfd) throws Exception {
+        return getCfdiSatStatus(cfd.getFkCfdTypeId(), cfd.getDocXmlRfcEmi(), cfd.getDocXmlRfcRec(), cfd.getUuid(), cfd.getDocXmlTot());
+    }
+    
+    /**
+     * Devuelve el estatus del SAT a traves de un DElementComprobante
+     * @param cfdiComprobante DElementComprobante
+     * @return CfdiAckQuery
+     * @throws java.lang.Exception 
+    */
+    public CfdiAckQuery getCfdiSatStatus(cfd.ver33.DElementComprobante cfdiComprobante) throws Exception {
+        cfd.ver33.DElementTimbreFiscalDigital tfd = null;
+        if (cfdiComprobante.getEltOpcComplemento() != null) {
+            for (DElement element : cfdiComprobante.getEltOpcComplemento().getElements()) {
+                if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
+                    tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
+                }
+            }
+        }
+        if (tfd != null) {
+            String rfcEmisor = cfdiComprobante.getEltEmisor().getAttRfc().getString();
+            String rfcReceptor = cfdiComprobante.getEltReceptor().getAttRfc().getString();
+            double total = cfdiComprobante.getAttTotal().getDouble();
+            return getCfdiSatStatus(1, rfcEmisor, rfcReceptor, tfd.getAttUUID().getString(), total);
+        }
+        return null;
+    }
+    
+    /**
+     * Devuelve el estatus del SAT a recibiendo los parámetros necesarios para la validación.
+     * @param cfdTypeId
+     * @param rfcEmisor
+     * @param rfcReceptor
+     * @param uuid
+     * @param total
+     * @return CfdiAckQuery
+     * @throws java.lang.Exception 
+    */
+    public CfdiAckQuery getCfdiSatStatus(final int cfdTypeId, final String rfcEmisor, final String rfcReceptor, final String uuid, final double total) throws Exception {
         miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         
         CfdiAckQuery cfdiAckQuery = null;
-        SDataCfdPacType cfdPacType = SCfdUtils.getPacConfiguration(miClient, cfd.getFkCfdTypeId());
+        SDataCfdPacType cfdPacType = SCfdUtils.getPacConfiguration(miClient, cfdTypeId);
         SDataPac pac = null;
         
         if (cfdPacType != null) {
@@ -134,7 +179,7 @@ public class SCfdUtilsHandler {
                         com.finkok.facturacion.cancel.Application application = cancelSOAP.getApplication();
                         
                         views.core.soap.services.apps.AcuseSatEstatus acuseSatEstatus = application.getSatStatus(
-                                userName, userPswd, cfd.getDocXmlRfcEmi(), cfd.getDocXmlRfcRec(), cfd.getUuid(), totalFormat.format(cfd.getDocXmlTot()));
+                                userName, userPswd, rfcEmisor, rfcReceptor, uuid, totalFormat.format(total));
                         
                         if (acuseSatEstatus.getError() != null) {
                             throw new Exception(acuseSatEstatus.getError().getValue());
@@ -145,20 +190,20 @@ public class SCfdUtilsHandler {
                             String valEstado = "";
                             String valEstatusCancelacion = "";
                             
-                            if (acuseSatEstatus.getSat().getValue().getEsCancelable().getValue() != null) {
+                            if (acuseSatEstatus.getSat().getValue().getEsCancelable() != null) {
                                 valEsCancelable = acuseSatEstatus.getSat().getValue().getEsCancelable().getValue();
                             }
-                            if (acuseSatEstatus.getSat().getValue().getCodigoEstatus().getValue() != null) {
+                            if (acuseSatEstatus.getSat().getValue().getCodigoEstatus() != null) {
                                 valCodigoEstatus = acuseSatEstatus.getSat().getValue().getCodigoEstatus().getValue();
                             }
-                            if (acuseSatEstatus.getSat().getValue().getEstado().getValue() != null) {
+                            if (acuseSatEstatus.getSat().getValue().getEstado() != null) {
                                 valEstado = acuseSatEstatus.getSat().getValue().getEstado().getValue();
                             }
-                            if (acuseSatEstatus.getSat().getValue().getEstatusCancelacion().getValue() != null) {
+                            if (acuseSatEstatus.getSat().getValue().getEstatusCancelacion() != null) {
                                 valEstatusCancelacion = acuseSatEstatus.getSat().getValue().getEstatusCancelacion().getValue();
                             }
                             
-                            cfdiAckQuery = new CfdiAckQuery(cfd.getUuid(), valEsCancelable, valCodigoEstatus, valEstado, valEstatusCancelacion);
+                            cfdiAckQuery = new CfdiAckQuery(uuid, valEsCancelable, valCodigoEstatus, valEstado, valEstatusCancelacion);
                             /* XXX 2019-08-14, Sergio Flores: Se deshabilita temporalmente la consulta de CFDI relacionados 
                              * debido a cambio inesperado en los parámetros de la solicitud del web service,
                              * ahora se discurrió que deben proporcionarse el RFC y CSD del receptor. ¡Sí, el CSD del receptor! WTF!
@@ -189,7 +234,7 @@ public class SCfdUtilsHandler {
         
         return cfdiAckQuery;
     }
-    
+     
     public class CfdiAckQuery {
         public String Uuid;
         public String CancellableInfo;
@@ -219,7 +264,7 @@ public class SCfdUtilsHandler {
             else {
                 message = "Con " + CfdiRelatedList.size() + " CFDI " + (CfdiRelatedList.size() == 1 ? "relacionado" : "relacionados") + ":";
                 for (CfdiRelated cfdiRelated : CfdiRelatedList) {
-                    message += "\n- " + cfdiRelated.composeMessage();
+                    message += "\n- " + cfdiRelated.getDetailedStatus();
                 }
             }
             
@@ -227,7 +272,7 @@ public class SCfdUtilsHandler {
         }
         */
         
-        public String composeMessage() {
+        public String getDetailedStatus() {
             String message;
             
             message = "ESTATUS SAT DEL CFDI '" + Uuid + "':\n";
@@ -241,6 +286,31 @@ public class SCfdUtilsHandler {
             message += composeCfdiRelated();
             */
             return message;
+        }
+        
+        /**
+         * Obtener estatus del CFDI.
+         * @return Estatus del CFDI: "Vigente" en caso de que el CFDI esté vigente; "En proceso de cancelación" si está en proceso de cancelación.
+         */
+        public String getCfdiStatus() {
+            if (CfdiStatus.equals("Vigente") && (CancelStatus.equals("En proceso") || CancelStatus.equals("En Proceso"))) {
+                return "En proceso de cancelación";
+            }
+            return CfdiStatus;
+        }
+        
+        /**
+         * Obtener todos los datos que conforman el estatus del SAT de un CFDI.
+         * @return Un arreglo de todos los datos que conforman el estatus del SAT de un CFDI.
+         * - Estatus
+         * - Código de estatus
+         * - Información de cancelación y
+         * - Estatus de cancelación
+         * en ese orden.
+         */
+        public String[] getArrayStatus() {
+            String[] statusArray = { CfdiStatus, RetrievalInfo, CancellableInfo, CancelStatus }; 
+            return statusArray;
         }
     }
     
