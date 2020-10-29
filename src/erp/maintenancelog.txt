@@ -10,7 +10,7 @@ Jhonatan Claudio PEÑA HERNÁNDEZ
 6) Implementación de descarga masiva de CFDI.
 7) Implementación de número de parte en el catálogo de ítems y en el archivo de texto de existencias para MP Software.
 8) Implementación del cálculo y actualización masivos del SBC.
-9) Implentación del reporte de cotizaciones de productos.
+9) Implementación del reporte de cotizaciones de productos.
 
 ================================================================================
 SIIE 3.2 175.0/ 2020-10-20

@@ -139,7 +139,7 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
         jPanel23 = new javax.swing.JPanel();
         moPdf = new sa.lib.gui.bean.SBeanFieldRadio();
 
-        setTitle("Descarga masiva XML");
+        setTitle("Descarga masiva de CFDI");
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros de descarga:"));
         jPanel1.setLayout(new java.awt.BorderLayout());

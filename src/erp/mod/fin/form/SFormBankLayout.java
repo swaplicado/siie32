@@ -2412,29 +2412,34 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         }
     }
     
-    private void getCfdSatStatus() {
-        if (miClient.showMsgBoxConfirm("Algunas facturas contienen un CFDI.\n¿Desea obtener el estatus del SAT de las facturas?") == JOptionPane.YES_OPTION){
+    /**
+     * Validar opcionalmente el estatus en el SAT de los CFDI del layout.
+     * @return Cadena vacía si no hay errores, de lo contrario el mensaje conteniendo los errores encontrados.
+     */
+    private String getCfdiSatStatus() {
+        String message = "";
+        
+        if (miClient.showMsgBoxConfirm("Hay pagos relacionados con un CFDI.\n¿Desea validar el estatus del SAT de los CFDI?") == JOptionPane.YES_OPTION) {
             try {
-                String message = "";
-                for (int i = 0; i< moGridPayments.getTable().getRowCount(); i++) {
+                for (int i = 0; i < moGridPayments.getTable().getRowCount(); i++) {
                     SLayoutBankRow row = (SLayoutBankRow) moGridPayments.getGridRow(i);
                     if (row.isXml()) {
                         String status = new SCfdUtilsHandler((SClientInterface) miClient).getCfdiSatStatus(row.getXmlType(), row.getXmlRfcEmi(), row.getXmlRfcRec(), row.getXmlUuid(), row.getXmlTotal()).getCfdiStatus() + ".\n";
                         if (!status.equals("Vigente")) {
-                            message += row.getBizPartner() + ". ";
-                            message += "Folio: " + row.getReference() + ". ";
-                            message += "Estatus: " + status + "";
+                            message += (message.isEmpty() ? "" : "\n");
+                            message += row.getBizPartner() + ": ";
+                            message += "folio CFDI = " + row.getReference() + "; ";
+                            message += "estatus CFDI = " + status + ".";
                         }
                     }
-                }
-                if (!message.equals("")) {
-                    miClient.showMsgBoxError("Se encontraron los siguientes errores: \n" + message);
                 }
             }
             catch (Exception e) {
                 miClient.showMsgBoxError(e.toString());
             }
         }
+        
+        return message;
     }
     
     /*
@@ -2724,6 +2729,24 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         validation.setMessage(SGuiConsts.ERR_MSG_FIELD_REQ + "'" + SGuiUtils.getLabelName(jlLayoutPath) + "'.");
                         validation.setComponent(jbPickLayoutPath);
                     }
+                    else {
+                        boolean validateSatStatus = false;
+                        
+                        for (int i = 0; i < moGridPayments.getTable().getRowCount(); i++) {
+                            SLayoutBankRow row = (SLayoutBankRow) moGridPayments.getGridRow(i);
+                            if (row.isXml()) {
+                                validateSatStatus = true;
+                                break;
+                            }
+                        }
+                        
+                        if (validateSatStatus) {
+                            String cfdiSatStatus = getCfdiSatStatus();
+                            if (!cfdiSatStatus.isEmpty()) {
+                                validation.setMessage(cfdiSatStatus);
+                            }
+                        }
+                    }
                 }
             }
             else if (isModeForAccounting()) {
@@ -2744,17 +2767,6 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 catch (Exception e) {
                     validation.setMessage("No fue posible validar el acceso exclusivo al registro de una de las pólizas seleccionadas." + e);
                     validation.setComponent(jbCancel);
-                }
-            }
-        }
-        
-        // Si el sat estatus no es vigente, el validation pasa a no ser válido ? 
-        if (validation.isValid()) {
-            for (int i = 0; i< moGridPayments.getTable().getRowCount(); i++) {
-                SLayoutBankRow row = (SLayoutBankRow) moGridPayments.getGridRow(i);
-                if (row.isXml()) {
-                    getCfdSatStatus();
-                    break;
                 }
             }
         }
