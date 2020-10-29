@@ -113,7 +113,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores
+ * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores, Claudio Peña
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, erp.lib.form.SFormExtendedInterface {
     
@@ -4111,12 +4111,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                         else {
                             moFieldCfdiCfdiUsage.setFieldValue(moBizPartnerCategory.getCfdiCfdiUsage());
-                            if (jcbCfdiCfdiUsage.getSelectedIndex() <= 0) {
-                                moFieldCfdiCfdiUsage.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdUsoCFDI());
+                                if (jcbCfdiCfdiUsage.getSelectedIndex() <= 0) {
+                                    moFieldCfdiCfdiUsage.setFieldValue(miClient.getSessionXXX().getParamsCompany().getDbmsDataCfgCfd().getCfdUsoCFDI());
+                                }
                             }
                         }
                     }
-                }
                 
                 moFieldCfdiConfirmation.setFieldValue("");  // confirmation is unique, cannot be copied when document is being created
                 
@@ -4126,7 +4126,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             }
         }
     }
-
+    
     /**
      * This method must be invoked every time an entry is added, edited or deleted!
      */
@@ -7068,6 +7068,17 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
                                 renderEntries();
                                 calculateTotal();
+                                oDpsSource.getDbmsDataCfd().getUuid();
+                                if (mbIsDpsAdjustment) {
+                                   jcbCfdiRelationType.setSelectedIndex(1);
+                                   if (jtfCfdiCfdiRelated.getText().equals("")) {
+                                        jtfCfdiCfdiRelated.setText(oDpsSource.getDbmsDataCfd().getUuid());
+                                   }
+                                   else {
+                                       jtfCfdiCfdiRelated.setText(jtfCfdiCfdiRelated.getText() + ";" + oDpsSource.getDbmsDataCfd().getUuid());
+                                   }
+                                }              
+                                
                                 moPaneGridEntries.setTableRowSelection(moPaneGridEntries.getTableGuiRowCount() - 1);
                                 if (moPaneGridEntries.getTableGuiRowCount() > 0) {
                                     updateCurrencyFieldsStatus(false);
@@ -9072,12 +9083,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         else if (mbIsDpsInvoice && operationsAvailable && prepaymentsCy > 0 && applicationsCy == 0) {
                             if (miClient.showMsgBoxConfirm("'" + moBizPartner.getBizPartner() + "' tiene anticipos facturados a su favor por $" + SLibUtils.getDecimalFormatAmount().format(prepaymentsCy) + " " + jtfCurrencyKeyRo.getText() + ",\n"
                                     + "¿está seguro que NO desea aplicarlos en este documento?") != JOptionPane.YES_OPTION) {
-                                validation.setMessage("Se deberían aplicar anticipos facturados en este documento.");
-                                validation.setComponent(moPaneGridEntries);
-                                jTabbedPane.setSelectedIndex(TAB_ETY);
+                                    validation.setMessage("Se deberían aplicar anticipos facturados en este documento.");
+                                    validation.setComponent(moPaneGridEntries);
+                                    jTabbedPane.setSelectedIndex(TAB_ETY);
+                                }
                             }
                         }
-                    }
                     
                     // validate custom complementary shipping data:
                     
@@ -9468,7 +9479,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldFkCurrencyId.setFieldValue(new int[] { !mbIsLocalCurrency ? moDps.getFkCurrencyId() : miClient.getSessionXXX().getParamsErp().getFkCurrencyId()});
         
         // set business partner, set aswell business partner default preferences when document is new:
-        
+
         setBizPartner(new int[] { moDps.getFkBizPartnerId_r() }, new int[] { moDps.getFkBizPartnerBranchId() }, new int[] { moDps.getFkBizPartnerBranchId(), moDps.getFkBizPartnerBranchAddressId() });
         
         // check if payment way should be taken from document:

@@ -57,7 +57,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Sergio Flores
+ * @author Alfonso Flores, Juan Barajas, Cesar Orozco, Sergio Flores, Claudio Peña
  */
 public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
 
@@ -78,6 +78,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private erp.lib.form.SFormField moFieldPresentation;
     private erp.lib.form.SFormField moFieldPresentationShort;
     private erp.lib.form.SFormField moFieldCode;
+    private erp.lib.form.SFormField moFieldPartNumber;
     private erp.lib.form.SFormField moFieldItemKey;
     private erp.lib.form.SFormField moFieldIsDeleted;
     private erp.lib.form.SFormField moFieldIsInventoriable;
@@ -207,6 +208,8 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jlCode = new javax.swing.JLabel();
         jtfCode = new javax.swing.JTextField();
         jbComputeNewCode = new javax.swing.JButton();
+        jlPartNumber = new javax.swing.JLabel();
+        jtfPartNumber = new javax.swing.JTextField();
         jPanel57 = new javax.swing.JPanel();
         jlItemKey = new javax.swing.JLabel();
         jtfItemKey = new javax.swing.JTextField();
@@ -521,6 +524,13 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         jbComputeNewCode.setFocusable(false);
         jbComputeNewCode.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel56.add(jbComputeNewCode);
+
+        jlPartNumber.setText("Número de parte:");
+        jlPartNumber.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel56.add(jlPartNumber);
+
+        jtfPartNumber.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel56.add(jtfPartNumber);
 
         jPanel50.add(jPanel56);
 
@@ -1397,6 +1407,9 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldCode = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfCode, jlCode);
         moFieldCode.setLengthMax(10);
         moFieldCode.setTabbedPaneIndex(0, jTabbedPane);
+        moFieldPartNumber = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfPartNumber, jlPartNumber);
+        moFieldPartNumber.setLengthMax(20);
+        moFieldPartNumber.setTabbedPaneIndex(0, jTabbedPane);
         moFieldItemKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfItemKey, jlItemKey);
         moFieldItemKey.setLengthMax(35);
         moFieldItemKey.setTabbedPaneIndex(0, jTabbedPane);
@@ -1745,6 +1758,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
             jtfItemKey.setFocusable(false);
 
             jtfCode.setText("");
+            jtfPartNumber.setText("");
             jtfItemKey.setText("");
 
             jckIsInventoriable.setEnabled(false);
@@ -2926,6 +2940,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JLabel jlMassUnitary;
     private javax.swing.JLabel jlName;
     private javax.swing.JLabel jlNameShort;
+    private javax.swing.JLabel jlPartNumber;
     private javax.swing.JLabel jlPresent;
     private javax.swing.JLabel jlPresentShort;
     private javax.swing.JLabel jlProductionCost;
@@ -2964,6 +2979,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
     private javax.swing.JTextField jtfNameShort;
     private javax.swing.JTextField jtfNetContent;
     private javax.swing.JTextField jtfNetContentUnitary;
+    private javax.swing.JTextField jtfPartNumber;
     private javax.swing.JTextField jtfPkItemId_Ro;
     private javax.swing.JTextField jtfPresentation;
     private javax.swing.JTextField jtfPresentationShort;
@@ -3196,6 +3212,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moFieldPresentation.setFieldValue(moItem.getPresentation());
         moFieldPresentationShort.setFieldValue(moItem.getPresentationShort());
         moFieldCode.setFieldValue(moItem.getCode());
+        moFieldPartNumber.setFieldValue(moItem.getPartNumber());
         moFieldItemKey.setFieldValue(moItem.getKey());
         jtfItemNameRo.setText(moItem.getItem());
         jtfItemNameShortRo.setText(moItem.getItemShort());
@@ -3330,6 +3347,7 @@ public class SFormItem extends javax.swing.JDialog implements erp.lib.form.SForm
         moItem.setPresentation(moFieldPresentation.getString());
         moItem.setPresentationShort(moFieldPresentationShort.getString());
         moItem.setCode(moFieldCode.getString());
+        moItem.setPartNumber(moFieldPartNumber.getString());
         moItem.setKey(moFieldItemKey.getString());
         moItem.setItem(jtfItemNameRo.getText());
         moItem.setItemShort(jtfItemNameShortRo.getText());

@@ -1087,7 +1087,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                 "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_year_n = " + mnPkYearId + " AND re.fid_dps_doc_n = " + mnPkDocId + " AND " +
                                 "r.id_tp_rec IN ('" + SDataConstantsSys.FINU_TP_REC_FY_OPEN + "', '" + SDataConstantsSys.FINU_TP_REC_FY_END + "') ";
-                        sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento!";
+                        sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento!\nSe debe eliminar las pólizas contables de cierre o apertura de ejercicio, antes de eliminar el documento.";
                         break;
                     case 220:
                         sSql = "SELECT count(*) AS f_count " +
@@ -1095,7 +1095,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                 "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_adj_year_n = " + mnPkYearId + " AND re.fid_dps_adj_doc_n = " + mnPkDocId + " AND " +
                                 "r.id_tp_rec IN ('" + SDataConstantsSys.FINU_TP_REC_FY_OPEN + "', '" + SDataConstantsSys.FINU_TP_REC_FY_END + "') ";
-                        sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento de ajuste!";
+                        sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento de ajuste!\nSe debe eliminar las pólizas contables de cierre o apertura de ejercicio, antes de eliminar el documento.";
                         break;
                     case 221:
                         if (isDocument() || isAdjustment()) {

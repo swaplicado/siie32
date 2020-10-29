@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Claudio Peña
  */
 public class STrnStockMove implements java.io.Serializable {
 
@@ -24,6 +24,8 @@ public class STrnStockMove implements java.io.Serializable {
     protected double mdQuantity;
     protected double mdValue;
     protected String msSerialNumber;
+    protected int mnMaintUserId_n;
+    protected int mnMaintUserSupervisorId;
 
     protected int mnAuxRowNumber;
     protected String msAuxLot;
@@ -47,7 +49,7 @@ public class STrnStockMove implements java.io.Serializable {
      * @param quantity Stock move quantity.
      */
     public STrnStockMove(int[] moveKey, double quantity) {
-        this(moveKey, quantity, 0, "");
+        this(moveKey, quantity, 0, "", 0, 0 );
     }
 
     /**
@@ -57,7 +59,7 @@ public class STrnStockMove implements java.io.Serializable {
      * @param serialNumber Stock move serial number.
      */
     public STrnStockMove(int[] moveKey, double quantity, String serialNumber) {
-        this(moveKey, quantity, 0, serialNumber);
+        this(moveKey, quantity, 0, serialNumber, 0, 0);
     }
 
     /**
@@ -67,7 +69,11 @@ public class STrnStockMove implements java.io.Serializable {
      * @param value Stock move total value in local currency.
      */
     public STrnStockMove(int[] moveKey, double quantity, double value) {
-        this(moveKey, quantity, value, "");
+        this(moveKey, quantity, value, "", 0, 0);
+    }
+    
+    public STrnStockMove(int[] moveKey, double quantity, double value, int maintUserId_n, int maintUserSupervisorId) {
+        this(moveKey, quantity, value, "", maintUserId_n, maintUserSupervisorId);
     }
 
     /**
@@ -77,7 +83,7 @@ public class STrnStockMove implements java.io.Serializable {
      * @param value Stock move total value in local currency.
      * @param serialNumber Stock move serial number.
      */
-    public STrnStockMove(int[] moveKey, double quantity, double value, String serialNumber) {
+    public STrnStockMove(int[] moveKey, double quantity, double value, String serialNumber, int maintUserId_n, int maintUserSupervisorId) {
         mnPkYearId = moveKey[0];
         mnPkItemId = moveKey[1];
         mnPkUnitId = moveKey[2];
@@ -87,7 +93,9 @@ public class STrnStockMove implements java.io.Serializable {
         mdQuantity = quantity;
         mdValue = value;
         msSerialNumber = serialNumber;
-
+        mnMaintUserId_n = maintUserId_n;
+        mnMaintUserSupervisorId = maintUserSupervisorId;
+        
         mnAuxRowNumber = 0;
         msAuxLot = "";
         mtAuxLotDateExpiration = null;
@@ -110,6 +118,8 @@ public class STrnStockMove implements java.io.Serializable {
     public void setQuantity(double f) { mdQuantity = f; }
     public void setValue(double f) { mdValue = f; }
     public void setSerialNumber(String s) { msSerialNumber = s; }
+    public void setFkMaintUserId_n(int n) { mnMaintUserId_n = n; }
+    public void setFkMaintUserSupervisorId(int n) { mnMaintUserSupervisorId = n; }
 
     public void setAuxRowNumber(int n) { mnAuxRowNumber = n; }
     public void setAuxLot(String s) { msAuxLot = s; }
@@ -132,6 +142,8 @@ public class STrnStockMove implements java.io.Serializable {
     public double getQuantity() { return mdQuantity; }
     public double getValue() { return mdValue; }
     public String getSerialNumber() { return msSerialNumber; }
+    public int getMaintUserId_n() { return mnMaintUserId_n; }
+    public int getMaintUserSupervisorId(){ return mnMaintUserSupervisorId; }
 
     public int getAuxRowNumber() { return mnAuxRowNumber; }
     public String getAuxLot() { return msAuxLot; }
@@ -160,7 +172,7 @@ public class STrnStockMove implements java.io.Serializable {
 
     @Override
     public STrnStockMove clone() throws CloneNotSupportedException {
-        STrnStockMove move = new STrnStockMove(this.getStockMoveKey(), this.getQuantity(), this.getValue(), this.getSerialNumber());
+        STrnStockMove move = new STrnStockMove(this.getStockMoveKey(), this.getQuantity(), this.getValue(), this.getSerialNumber(), this.getMaintUserId_n(), this.getMaintUserSupervisorId());
 
         move.setAuxRowNumber(this.getAuxRowNumber());
         move.setAuxLot(this.getAuxLot());

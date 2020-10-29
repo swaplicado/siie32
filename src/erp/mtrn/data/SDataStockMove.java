@@ -9,6 +9,7 @@ import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.mod.SModSysConsts;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
@@ -22,7 +23,7 @@ import java.sql.Types;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -60,6 +61,9 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
     protected int mnFkMfgChargeId_n;
     protected int mnFkBookkeepingYearId_n;
     protected int mnFkBookkeepingNumberId_n;
+    protected int mnFkMaintMovementTypeId;
+    protected int mnFkMaintUserId_n;
+    protected int mnFkMaintUserSupervisorId;
 
     protected double mdAuxValue;
 
@@ -102,6 +106,9 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
     public void setFkMfgChargeId_n(int n) { mnFkMfgChargeId_n = n; }
     public void setFkBookkeepingYearId_n(int n) { mnFkBookkeepingYearId_n = n; }
     public void setFkBookkeepingNumberId_n(int n) { mnFkBookkeepingNumberId_n = n; }
+    public void setFkMaintMovementTypeId(int n) { mnFkMaintMovementTypeId = n; }
+    public void setFkMaintUserId_n(int n) { mnFkMaintUserId_n = n; }
+    public void setFkMaintUserSupervisorId(int n) { mnFkMaintUserSupervisorId = n; }
 
     public int getPkYearId() { return mnPkYearId; }
     public int getPkItemId() { return mnPkItemId; }
@@ -137,6 +144,9 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
     public int getFkMfgChargeId_n() { return mnFkMfgChargeId_n; }
     public int getFkBookkeepingYearId_n() { return mnFkBookkeepingYearId_n; }
     public int getFkBookkeepingNumberId_n() { return mnFkBookkeepingNumberId_n; }
+    public int getFkMaintMovementTypeId() { return mnFkMaintMovementTypeId; }
+    public int getFkMaintUserId_n() { return mnFkMaintUserId_n; }
+    public int getFkMaintUserSupervisorId() { return mnFkMaintUserSupervisorId; }
 
     public void setAuxValue(double d) { mdAuxValue = d; }
 
@@ -200,6 +210,9 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
         mnFkMfgChargeId_n = 0;
         mnFkBookkeepingYearId_n = 0;
         mnFkBookkeepingNumberId_n = 0;
+        mnFkMaintMovementTypeId = SModSysConsts.TRNS_TP_MAINT_MOV_NA ; // default value set only for preventing bugs
+        mnFkMaintUserId_n = 0;  // default value set only for preventing bugs
+        mnFkMaintUserSupervisorId = SModSysConsts.TRN_MAINT_USER_SUPV_NA;  // default value set only for preventing bugs
 
         mdAuxValue = 0;
     }
@@ -256,6 +269,9 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                 mnFkMfgChargeId_n = resultSet.getInt("fid_mfg_chg_n");
                 mnFkBookkeepingYearId_n = resultSet.getInt("fid_bkk_year_n");
                 mnFkBookkeepingNumberId_n = resultSet.getInt("fid_bkk_num_n");
+                mnFkMaintMovementTypeId = resultSet.getInt("fid_maint_mov_tp");
+                mnFkMaintUserId_n = resultSet.getInt("fid_maint_user_n");
+                mnFkMaintUserSupervisorId = resultSet.getInt("fid_maint_user_supv");
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -293,7 +309,8 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+
             callableStatement.setInt(nParam++, mnPkYearId);
             callableStatement.setInt(nParam++, mnPkItemId);
             callableStatement.setInt(nParam++, mnPkUnitId);
@@ -355,6 +372,10 @@ public class SDataStockMove extends erp.lib.data.SDataRegistry implements java.i
                 callableStatement.setNull(nParam++, Types.SMALLINT);
                 callableStatement.setNull(nParam++, Types.INTEGER);
             }
+            callableStatement.setInt(nParam++, mnFkMaintMovementTypeId);
+            if (mnFkMaintUserId_n != 0) callableStatement.setInt(nParam++, mnFkMaintUserId_n); else callableStatement.setNull(nParam++, Types.INTEGER);
+            callableStatement.setInt(nParam++, mnFkMaintUserSupervisorId);
+            
             callableStatement.registerOutParameter(nParam++, Types.INTEGER);
             callableStatement.registerOutParameter(nParam++, Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, Types.VARCHAR);

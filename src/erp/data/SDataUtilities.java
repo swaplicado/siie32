@@ -3051,6 +3051,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_TRN_ORD_GDS:
                 name = "reps/trn_dps_order_goods.jasper";
                 break;
+            case SDataConstantsSys.REP_TRN_EST:
+                name = "reps/trn_est.jasper";
+                break;
             case SDataConstantsSys.REP_TRN_PS_ITEM_UNIT_PRICE:
                 name = "reps/trn_ps_item_price.jasper";
                 break;
@@ -3123,8 +3126,6 @@ public abstract class SDataUtilities {
      * @param client ERP Client Interface.
      * @param reportType Constant defined in erp.data.SDataConstantsSys.
      * @param map Report parameters.
-     * @return 
-     * @throws java.lang.Exception
      */
     public static net.sf.jasperreports.engine.JasperPrint fillReport(erp.client.SClientInterface client, int reportType, java.util.Map<java.lang.String, java.lang.Object> map) throws java.lang.Exception {
         SServerRequest request = null;
@@ -3133,7 +3134,9 @@ public abstract class SDataUtilities {
         request = new SServerRequest(SServerConstants.REQ_REPS);
         request.setRegistryType(reportType);
         request.setPacket(map);
+        response = client.getSessionXXX().request(request);
         
+        response = client.getSessionXXX().request(request);
         response = client.getSessionXXX().request(request);
         
         if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {

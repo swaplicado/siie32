@@ -99,6 +99,7 @@ import erp.mod.fin.db.SFiscalAccounts;
 import erp.mod.fin.form.SDialogDpsExchangeRateDiff;
 import erp.mod.fin.form.SDialogFiscalAccountsConfig;
 import erp.mod.fin.form.SDialogFiscalXmlFile;
+import erp.mod.fin.form.SDialogMassDownloadCfdi;
 import erp.mod.fin.form.SDialogRepCashFlowExpected;
 import erp.mod.fin.form.SDialogRepFinStatements;
 import erp.mod.fin.form.SDialogRepMovsFileCvs;
@@ -119,7 +120,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Claudio Peña, Isabel Servín
  */
 public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -182,7 +183,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRecAudPend;
     private javax.swing.JMenuItem jmiRecAud;
     private javax.swing.JMenuItem jmiRecBal;
-    private javax.swing.JMenuItem jmiRecBalAll;// XXX (jbarajas 2016-10-26) new view for trial balance in maximo nivel
+    private javax.swing.JMenuItem jmiRecBalAll;
     private javax.swing.JMenuItem jmiRecCashAccBalountCash;
     private javax.swing.JMenuItem jmiRecCashAccBalountBank;
     private javax.swing.JMenuItem jmiRecBizPartnerBalCus;
@@ -212,7 +213,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinLayoutBankPendingAdvances;
     private javax.swing.JMenuItem jmiFinLayoutBankDoneAdvances;
     private javax.swing.JMenuItem jmiFinCfdPayment;
-    private javax.swing.JMenuItem jmiDownloadXml;
+    private javax.swing.JMenuItem jmiFinMassDownloadCfdi;
     private javax.swing.JMenuItem jmiFinImportPayments;
 
     private javax.swing.JMenu jmRep;
@@ -552,7 +553,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankPendingAdvances = new JMenuItem("Layouts de anticipos por pagar");
         jmiFinLayoutBankDoneAdvances = new JMenuItem("Layouts de anticipos pagados");
         jmiFinCfdPayment = new JMenuItem("CFDI recepción de pagos");
-        jmiDownloadXml = new JMenuItem("Descarga masiva XML");
+        jmiFinMassDownloadCfdi = new JMenuItem("Descarga masiva de CFDI...");
         jmiFinImportPayments = new JMenuItem("Importación de pagos BBVA");
 
         jmFin.add(jmiFinExchangeRate);
@@ -574,8 +575,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.add(jmiFinCfdPayment);
         jmiFinCfdPayment.setEnabled(false);
         jmFin.addSeparator();
-        jmFin.add(jmiDownloadXml);
-        jmiDownloadXml.setEnabled(false);
+        jmFin.add(jmiFinMassDownloadCfdi);
+        jmiFinMassDownloadCfdi.setEnabled(false);
         /* XXX Not released yet! (2018-05-03, Sergio Flores)
         jmFin.addSeparator();
         jmFin.add(jmiFinImportPayments);
@@ -851,7 +852,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankPendingAdvances.addActionListener(this);
         jmiFinLayoutBankDoneAdvances.addActionListener(this);
         jmiFinCfdPayment.addActionListener(this);
-        jmiDownloadXml.addActionListener(this);
+        jmiFinMassDownloadCfdi.addActionListener(this);
         jmiFinImportPayments.addActionListener(this);
 
         jmiCfgAbpEntityCash.addActionListener(this);
@@ -1048,7 +1049,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankPendingAdvances.setEnabled(hasRightMoveAccCash);
         jmiFinLayoutBankDoneAdvances.setEnabled(hasRightMoveAccCash);
         jmiFinCfdPayment.setEnabled(hasRightMoveAccCash);
-        jmiDownloadXml.setEnabled(hasRightMoveAccCash);
+        jmiFinMassDownloadCfdi.setEnabled(hasRightMoveAccCash);
         jmiFinImportPayments.setEnabled(hasRightMoveAccCash);
 
         jmRep.setEnabled(hasRightRep || hasRightRepStats || hasRightMoveAccCash);
@@ -2016,6 +2017,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiFinCfdPayment) {
                 miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY_REC);
+            }
+            else if (item == jmiFinMassDownloadCfdi) {
+                new SDialogMassDownloadCfdi((SGuiClient) miClient).setVisible(true);
             }
             else if (item == jmiFinImportPayments) {
                 miClient.getSession().showView(SModConsts.FIN_LAY_BANK_DEP, SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY, null);

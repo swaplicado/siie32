@@ -41,7 +41,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas, Edwin Carmona, Sergio Flores
+ * @author Sergio Flores, Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
