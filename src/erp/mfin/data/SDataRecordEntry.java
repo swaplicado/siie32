@@ -130,6 +130,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     protected java.lang.String msDbmsItemAux;
     protected java.lang.String msDbmsTax;
     protected java.lang.String msDbmsDps;
+    protected int mnDbmsXmlFilesNumber;
     protected java.lang.String msDbmsUserNew;
     protected java.lang.String msDbmsUserEdit;
     protected java.lang.String msDbmsUserDelete;
@@ -319,6 +320,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public void setDbmsItemAux(java.lang.String s) { msDbmsItemAux = s; }
     public void setDbmsTax(java.lang.String s) { msDbmsTax = s; }
     public void setDbmsDps(java.lang.String s) { msDbmsDps = s; }
+    public void setDbmsXmlFilesNumber(int i) { mnDbmsXmlFilesNumber = i; }
     public void setDbmsUserNew(java.lang.String s) { msDbmsUserNew = s; }
     public void setDbmsUserEdit(java.lang.String s) { msDbmsUserEdit = s; }
     public void setDbmsUserDelete(java.lang.String s) { msDbmsUserDelete = s; }
@@ -344,6 +346,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public java.lang.String getDbmsItemAux() { return msDbmsItemAux; }
     public java.lang.String getDbmsTax() { return msDbmsTax; }
     public java.lang.String getDbmsDps() { return msDbmsDps; }
+    public int getDbmsXmlFilesNumber() { return mnDbmsXmlFilesNumber; }
     public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
@@ -507,6 +510,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         msDbmsItemAux = "";
         msDbmsTax = "";
         msDbmsDps = "";
+        mnDbmsXmlFilesNumber = 0;
         moDbmsCheck = null;
         maDbmsDataCfd = new ArrayList<SDataCfd>();
 
@@ -794,6 +798,8 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                         maDbmsDataCfd.add(cfd);
                     }
                 }
+                
+                mnDbmsXmlFilesNumber = maDbmsDataCfd.size();
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;

@@ -193,6 +193,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbFileXmlRemove = new javax.swing.JButton();
         jtfXmlFilesNumber = new javax.swing.JTextField();
         jbFileXmlAdd = new javax.swing.JButton();
+        jbGetXml = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         jlFkYearId_n = new javax.swing.JLabel();
         jtfFkYearId_n = new javax.swing.JTextField();
@@ -515,6 +516,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbFileXmlAdd.setFocusable(false);
         jbFileXmlAdd.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jbFileXmlAdd);
+
+        jbGetXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"))); // NOI18N
+        jbGetXml.setToolTipText("Agregar archivos XML");
+        jbGetXml.setFocusable(false);
+        jbGetXml.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel11.add(jbGetXml);
 
         jpSettings.add(jPanel11);
 
@@ -839,6 +846,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbFkDpsRemove.addActionListener(this);
         jbFileXmlRemove.addActionListener(this);
         jbFileXmlAdd.addActionListener(this);
+        jbGetXml.addActionListener(this);
         jbFkDpsAdj.addActionListener(this);
         jbFkDpsAdjRemove.addActionListener(this);
         jbFkCurrencyId.addActionListener(this);
@@ -997,6 +1005,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             jbFileXml.setEnabled(false);
             jbFileXmlRemove.setEnabled(false);
             jbFileXmlAdd.setEnabled(false);
+            jbGetXml.setEnabled(true); 
             jlFkDpsAdj.setEnabled(false);
             jtfFkDpsAdj.setEnabled(false);
             jbFkDpsAdj.setEnabled(false);
@@ -1906,6 +1915,19 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         }
         updateFilesXmlInfo();
     }
+    
+    private void actionGetXml() {
+        try {
+            ArrayList<SDataCfd> cfds = new ArrayList();
+            maCfdRecordRows.stream().map((cfdRecordRow) -> (SDataCfd) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_CFD, new int[] { cfdRecordRow.getCfdId() }, SLibConstants.EXEC_MODE_SILENT)).forEach((cfd) -> {
+                cfds.add(cfd);
+            });
+            SCfdUtils.getXmlCfds(miClient, cfds);
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+    }
 
     private void actionFkDpsAdj() {
         SDataDps dpsAdj = null;
@@ -2231,6 +2253,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JButton jbFkItemAuxId_n;
     private javax.swing.JButton jbFkItemId_n;
     private javax.swing.JButton jbFkTaxId_n;
+    private javax.swing.JButton jbGetXml;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbReference;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkBizPartnerId_nr;
@@ -2956,6 +2979,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         if (cfds.size() > 0) {
             moRecordEntry.getDbmsDataCfds().addAll(cfds);
         }
+        
+        moRecordEntry.setDbmsXmlFilesNumber(Integer.parseInt(jtfXmlFilesNumber.getText()));
 
         return moRecordEntry;
     }
@@ -3064,6 +3089,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             }
             else if (button == jbFileXmlAdd) {
                 actionFileXmlAdd();
+            }
+            else if (button == jbGetXml) {
+                actionGetXml();
             }
             else if (button == jbFkDpsAdj) {
                 actionFkDpsAdj();

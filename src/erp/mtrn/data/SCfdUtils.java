@@ -4928,10 +4928,27 @@ public abstract class SCfdUtils implements Serializable {
         return cfd;
     }
     
+    /**
+     * Devuelve un cfd a través del tipo de cfd y el primary key del documento.
+     * @param client
+     * @param typeCfd
+     * @param cfdKey
+     * @return SDataCfd.
+     * @throws java.lang.Exception
+     */
     public static SDataCfd getCfd(final SClientInterface client, final int typeCfd, final int[] cfdKey) throws java.lang.Exception {
         return getCfd(client, typeCfd, SLibConsts.UNDEFINED, cfdKey);
     }
     
+    /**
+     * Devuelve un cfd a través del tipo de cfd, el subtipo y el primary key del documento.
+     * @param client
+     * @param typeCfd
+     * @param subtypeCfd
+     * @param cfdKey
+     * @return SDataCfd.
+     * @throws java.lang.Exception
+     */
     public static SDataCfd getCfd(final SClientInterface client, final int typeCfd, final int subtypeCfd, final int[] cfdKey) throws java.lang.Exception {
         String sql = "";
         String sqlWhere = "";
@@ -4975,6 +4992,15 @@ public abstract class SCfdUtils implements Serializable {
         return cfd;
     }
     
+    /**
+     * Devuelve una lista de cfds a través del tipo de cfd, el subtipo y el primary key de los documentos.
+     * @param client
+     * @param typeCfd
+     * @param subtypeCfd
+     * @param keysDps
+     * @return ArrayList.
+     * @throws java.lang.Exception
+     */
     public static ArrayList<SDataCfd> getCfds(final SClientInterface client, final int typeCfd, final int subtypeCfd, ArrayList<int[]> keysDps) throws java.lang.Exception {
         ArrayList<SDataCfd> cfds ;
         
@@ -4984,6 +5010,32 @@ public abstract class SCfdUtils implements Serializable {
                 cfds.add(getCfd(client, typeCfd, subtypeCfd, keysDps.get(x)));
             }
         }
+        return cfds;
+    }
+    
+    /**
+     * Devuelve los cfds de una póliza contable a través del primary key de la póliza.
+     * @param client
+     * @param cfdKey
+     * @return SDataCfd.
+     * @throws java.lang.Exception
+     */
+    public static ArrayList<SDataCfd> getCfdRecord(final SClientInterface client, final Object[] cfdKey) throws java.lang.Exception {
+        ArrayList<SDataCfd> cfds = new ArrayList<>();
+
+        String sql = "SELECT id_cfd FROM trn_cfd "
+                + "WHERE fid_rec_year_n = " + cfdKey[0] + " " 
+                + "AND fid_rec_per_n = " + cfdKey[1] + " " 
+                + "AND fid_rec_bkc_n = " + cfdKey[2] + " " 
+                + "AND fid_rec_tp_rec_n = '" + cfdKey[3] + "' " 
+                + "AND fid_rec_num_n = " + cfdKey[4] + ";" ;
+
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                cfds.add((SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT));
+            }
+        }
+
         return cfds;
     }
 

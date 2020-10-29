@@ -3123,6 +3123,8 @@ public abstract class SDataUtilities {
      * @param client ERP Client Interface.
      * @param reportType Constant defined in erp.data.SDataConstantsSys.
      * @param map Report parameters.
+     * @return 
+     * @throws java.lang.Exception
      */
     public static net.sf.jasperreports.engine.JasperPrint fillReport(erp.client.SClientInterface client, int reportType, java.util.Map<java.lang.String, java.lang.Object> map) throws java.lang.Exception {
         SServerRequest request = null;
@@ -3131,9 +3133,7 @@ public abstract class SDataUtilities {
         request = new SServerRequest(SServerConstants.REQ_REPS);
         request.setRegistryType(reportType);
         request.setPacket(map);
-        response = client.getSessionXXX().request(request);
         
-        response = client.getSessionXXX().request(request);
         response = client.getSessionXXX().request(request);
         
         if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {

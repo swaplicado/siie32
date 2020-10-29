@@ -13,6 +13,7 @@ package erp.mfin.form;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
@@ -21,16 +22,21 @@ import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mfin.data.SDataRecord;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.sql.ResultSet;
 import java.util.Date;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JRadioButton;
+import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.lib.SLibTimeUtils;
@@ -38,9 +44,9 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Isabel Servín
  */
-public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
+public final class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
 
     private int mnFormType;
     private int mnFormResult;
@@ -61,7 +67,8 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
     private erp.lib.form.SFormField moFieldNumberEnd;
     private erp.lib.form.SFormField moFieldCreator;
 
-    /** Creates new form SDialogRepRecords */
+    /** Creates new form SDialogRepRecords
+     * @param client */
     public SDialogRepRecords(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient =  client;
@@ -138,8 +145,10 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
         jPanel23 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
-        jrbPrintingCollective = new javax.swing.JRadioButton();
+        jrbOneDocumentWithoutLineBreak = new javax.swing.JRadioButton();
         jPanel24 = new javax.swing.JPanel();
+        jrbOneDocumentWithLineBreak = new javax.swing.JRadioButton();
+        jPanel26 = new javax.swing.JPanel();
         jrbPrintingIndividual = new javax.swing.JRadioButton();
         jPanel25 = new javax.swing.JPanel();
         jlCreator = new javax.swing.JLabel();
@@ -376,25 +385,34 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
         jPanel23.setBorder(javax.swing.BorderFactory.createTitledBorder("Modalidad de impresión:"));
         jPanel23.setLayout(new java.awt.BorderLayout());
 
-        jPanel3.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
+        jPanel3.setLayout(new java.awt.GridLayout(4, 1, 0, 5));
 
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        bgPrinting.add(jrbPrintingCollective);
-        jrbPrintingCollective.setText("Continua");
-        jrbPrintingCollective.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel6.add(jrbPrintingCollective);
+        bgPrinting.add(jrbOneDocumentWithoutLineBreak);
+        jrbOneDocumentWithoutLineBreak.setText("Un solo archivo sin salto de línea");
+        jrbOneDocumentWithoutLineBreak.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel6.add(jrbOneDocumentWithoutLineBreak);
 
         jPanel3.add(jPanel6);
 
         jPanel24.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        bgPrinting.add(jrbPrintingIndividual);
-        jrbPrintingIndividual.setText("Individual");
-        jrbPrintingIndividual.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel24.add(jrbPrintingIndividual);
+        bgPrinting.add(jrbOneDocumentWithLineBreak);
+        jrbOneDocumentWithLineBreak.setText("Un solo archivo con salto de línea");
+        jrbOneDocumentWithLineBreak.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel24.add(jrbOneDocumentWithLineBreak);
 
         jPanel3.add(jPanel24);
+
+        jPanel26.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        bgPrinting.add(jrbPrintingIndividual);
+        jrbPrintingIndividual.setText("Archivos individuales PDF");
+        jrbPrintingIndividual.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel26.add(jrbPrintingIndividual);
+
+        jPanel3.add(jPanel26);
 
         jPanel25.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -436,7 +454,7 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
 
         getContentPane().add(jpControls, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(736, 489));
+        setSize(new java.awt.Dimension(816, 539));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -489,8 +507,8 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
         jbCreatorPickMe.addActionListener(this);
         jrbRangeByDate.addItemListener(this);
         jrbRangeByNumber.addItemListener(this);
-        jrbPrintingCollective.addItemListener(this);
-        jrbPrintingIndividual.addItemListener(this);
+        jrbOneDocumentWithoutLineBreak.addItemListener(this);
+        jrbOneDocumentWithLineBreak.addItemListener(this);
         jcbRecordType.addItemListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
@@ -543,7 +561,7 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
                 String title;
                 Map<String, Object> map = miClient.createReportParams();
                 
-                if (jrbPrintingCollective.isSelected()) {
+                if (jrbOneDocumentWithoutLineBreak.isSelected()) {
                     title = "Listado de pólizas contables";
                     report = jrbCurrencyLocal.isSelected() ? SDataConstantsSys.REP_FIN_RECS : SDataConstantsSys.REP_FIN_RECS_CY;
                     
@@ -566,8 +584,18 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
                     map.put("sCurrencyKeyErp", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
                     map.put("sSqlAccountCash", jcbAccountCash.isEnabled() && moFieldAccountCash.getKeyAsIntArray()[0] > 0 ?
                         " AND r.fid_cob_n = " + moFieldAccountCash.getKeyAsIntArray()[0] + " AND r.fid_acc_cash_n = " + moFieldAccountCash.getKeyAsIntArray()[1] + " " : "");
+                    
+                    if (jcbCreator.getSelectedIndex() > 0) {
+                        map.put("nRecCreator", moFieldCreator.getKeyAsIntArray()[0]);
+                        map.put("sRecCreatorOperator", "="); // to apply comparison in SQL query
+                    }
+                    
+                    JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, report, map);
+                    JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
+                    jasperViewer.setTitle(title);
+                    jasperViewer.setVisible(true);
                 }
-                else {
+                else if (jrbOneDocumentWithLineBreak.isSelected()){
                     title = "Pólizas contables";
                     report = jrbCurrencyLocal.isSelected() ? SDataConstantsSys.REP_FIN_JOURNAL_VOUCHERS : SDataConstantsSys.REP_FIN_JOURNAL_VOUCHERS_CY;
                     
@@ -611,12 +639,68 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
                         
                         map.put("sSqlAccCash", "AND r.fid_cob_n = " + key[0] + " AND r.fid_acc_cash_n = " + key[1] + " ");
                     }
+                    
+                    JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, report, map);
+                    JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
+                    jasperViewer.setTitle(title);
+                    jasperViewer.setVisible(true);
                 }
+                else if (jrbPrintingIndividual.isSelected()) {
+                    miClient.getFileChooser().setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                    if (miClient.getFileChooser().showSaveDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION) {    
+                        String sql;
+                        if (jrbRangeByDate.isSelected()) {
+                            sql = "SELECT id_year, erp.lib_fix_int(id_per, 2) AS per, id_bkc, id_tp_rec, erp.lib_fix_int(id_num, 6) AS num FROM fin_rec "
+                                    + "WHERE dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateStart.getDate()) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(moFieldDateEnd.getDate()) + "' ";
+                        } 
+                        else{
+                            Date period = SLibTimeUtils.createDate(moFieldFiscalYear.getInteger(), moFieldPeriod.getInteger());                        
+                            sql = "SELECT id_year, id_per, id_bkc, id_tp_rec, id_num FROM fin_rec "
+                                    + "WHERE dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.getBeginOfMonth(period)) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.getEndOfMonth(period)) + "' ";
+                            if (moFieldNumberEnd.getInteger() > 0) {
+                                sql += "AND id_num BETWEEN " + moFieldNumberStart.getInteger() + " AND " + moFieldNumberEnd.getInteger() + " "; 
+                            }
+                        }
 
-                JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, report, map);
-                JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setTitle(title);
-                jasperViewer.setVisible(true);
+                        if (jcbCreator.getSelectedIndex() > 0) {
+                            sql += "AND fid_usr_new = " + moFieldCreator.getKeyAsIntArray()[0];
+                        }
+
+                        ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+                        while (resultSet.next()) {
+                            report = jrbCurrencyLocal.isSelected() ? SDataConstantsSys.REP_FIN_REC : SDataConstantsSys.REP_FIN_REC_CY;
+                            int year = resultSet.getInt("id_year");
+                            int nPer = resultSet.getInt("per");
+                            String sPer = resultSet.getString("per");
+                            int bkc = resultSet.getInt("id_bkc");
+                            String typeRec = resultSet.getString("id_tp_rec");
+                            int nNum = resultSet.getInt("num");
+                            String sNum = resultSet.getString("num");
+                            Object[] key = {year, nPer, bkc, typeRec, nNum};
+                            map = miClient.createReportParams();
+                            map.put("bShowDetailBackground", true);
+
+                            SDataRecord record = (SDataRecord) SDataUtilities.readRegistry(miClient, SDataConstants.FIN_REC, key, SLibConstants.EXEC_MODE_SILENT);
+
+                            map.put("nIdYear", record.getPkYearId());
+                            map.put("nIdPer", record.getPkPeriodId());
+                            map.put("nIdBkc", record.getPkBookkeepingCenterId());
+                            map.put("sIdTpRec", record.getPkRecordTypeId());
+                            map.put("nIdNum", record.getPkNumberId());
+                            map.put("tRecordDate", record.getDate());
+                            map.put("sRecordConcept", record.getConcept());
+                            map.put("nNumRecordLength", SDataConstantsSys.NUM_LEN_FIN_REC);
+                            map.put("sCompanyBranch", SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BPB, new int[] { record.getFkCompanyBranchId() }));
+                            map.put("sBkcDescrip", SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FIN_BKC, new int[] { record.getPkBookkeepingCenterId() }));
+
+                            JasperPrint jasperPrint = SDataUtilities.fillReport(miClient, report, map);
+                            File fileAux = miClient.getFileChooser().getSelectedFile();
+                            JasperExportManager.exportReportToPdfFile(jasperPrint, fileAux.getAbsolutePath() + "/" + 
+                                    year + "-" + sPer + "-" + bkc + "-" + typeRec + "-" + sNum + ".pdf");
+                        }
+                        miClient.showMsgBoxInformation("Proceso finalizado.");
+                    }
+                }
             }
             catch(Exception e) {
                 SLibUtilities.renderException(this, e);
@@ -693,19 +777,6 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
             moFieldNumberEnd.resetField();
         }
     }
-    
-    private void renderPrintingOptions() {
-        if (jrbPrintingCollective.isSelected()) {
-            jcbCreator.setEnabled(false);
-            jbCreatorPickMe.setEnabled(false);
-            
-            moFieldCreator.resetField();
-        }
-        else {
-            jcbCreator.setEnabled(true);
-            jbCreatorPickMe.setEnabled(true);
-        }
-    }
 
     private void itemStateChangedRecordType() {
         boolean enable = false;
@@ -732,14 +803,6 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
     private void itemStateChangedRangeByNumber() {
         renderRangeOptions();
     }
-    
-    private void itemStateChangedPrintingCollective() {
-        renderPrintingOptions();
-    }
-
-    private void itemStateChangedPrintingIndividual() {
-        renderPrintingOptions();
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgCurrency;
@@ -765,6 +828,7 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
+    private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -800,7 +864,8 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
     private javax.swing.JPanel jpSettings;
     private javax.swing.JRadioButton jrbCurrencyLocal;
     private javax.swing.JRadioButton jrbCurrencyOriginal;
-    private javax.swing.JRadioButton jrbPrintingCollective;
+    private javax.swing.JRadioButton jrbOneDocumentWithLineBreak;
+    private javax.swing.JRadioButton jrbOneDocumentWithoutLineBreak;
     private javax.swing.JRadioButton jrbPrintingIndividual;
     private javax.swing.JRadioButton jrbRangeByDate;
     private javax.swing.JRadioButton jrbRangeByNumber;
@@ -827,10 +892,11 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
 
         jrbRangeByDate.setSelected(true);
         jrbCurrencyLocal.setSelected(true);
-        jrbPrintingCollective.setSelected(true);
+        jrbOneDocumentWithoutLineBreak.setSelected(true);
         
         renderRangeOptions();
-        renderPrintingOptions();
+        jcbCreator.setEnabled(true);
+        jbCreatorPickMe.setEnabled(true);
         itemStateChangedRecordType();
 
         if (jcbBookKeepingCenter.getItemCount() == 2) {
@@ -974,12 +1040,6 @@ public class SDialogRepRecords extends javax.swing.JDialog implements erp.lib.fo
             }
             else if (radioButton == jrbRangeByNumber) {
                 itemStateChangedRangeByNumber();
-            }
-            else if (radioButton == jrbPrintingCollective) {
-                itemStateChangedPrintingCollective();
-            }
-            else if (radioButton == jrbPrintingIndividual) {
-                itemStateChangedPrintingIndividual();
             }
         }
     }

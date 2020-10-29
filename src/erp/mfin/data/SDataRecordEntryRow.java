@@ -5,6 +5,9 @@
 
 package erp.mfin.data;
 
+import erp.mtrn.data.SDataCfd;
+import java.util.ArrayList;
+
 /**
  *
  * @author Sergio Flores, Isabel Servín
@@ -14,6 +17,14 @@ public final class SDataRecordEntryRow extends erp.lib.table.STableRow {
     public SDataRecordEntryRow(SDataRecordEntry entry) {
         moData = entry;
         prepareTableRow();
+    }
+    
+    /**
+     * Devuelve una lista con los CFDs del registro.
+     * @return ArrayList.
+     */
+    public ArrayList<SDataCfd> getCfds() {
+        return ((SDataRecordEntry) moData).getDbmsDataCfds();
     }
     
     @Override
@@ -44,6 +55,7 @@ public final class SDataRecordEntryRow extends erp.lib.table.STableRow {
         mvValues.add(entry.getDbmsItem());
         mvValues.add(entry.getDbmsItemAux());
         mvValues.add(entry.getDbmsDps());
+        mvValues.add(entry.getDbmsXmlFilesNumber());
         mvValues.add(entry.getFkYearId_n());
         mvValues.add(entry.getAuxCheckNumber() == 0 ? "" : "" + entry.getAuxCheckNumber());
         mvValues.add(entry.getIsDeleted());
