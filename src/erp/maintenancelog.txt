@@ -1,4 +1,15 @@
 ================================================================================
+SIIE 3.2 175.2/ 2020-10-29
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregó a la vista de pólizas contables la columna "CFDI" que muestra la cantidad de CFD's en cada póliza.
+2) Se agregó a la forma de la póliza contable la columna "CFDI" que muestra la cantidad de CFD's que contiene cada renglón de la póliza.
+3) Se agregó a la vista de pólizas contables el botón "Descargar CFDI" que descarga todos los CFD's que contiene la póliza.
+4) Se agregó a la forma de la póliza contable el botón "Descargar CFDI" que descarga todos los CFD's que contiene el renglón seleccionado de la póliza.
+5) Se agregó a la forma de renglones de pólizas contables el botón "Descargar CFDI" que descarga todos los CFD's que contiene.
+6) Se implementó que en el reporte de pólizas contables, en la modalidad individual, se guarden las pólizas directamente en un directorio seleccionado.
+
+================================================================================
 SIIE 3.2 175.1/ 2020-10-27
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
