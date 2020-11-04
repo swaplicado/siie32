@@ -56,7 +56,7 @@ public class SCfdUtilsHandler {
                         com.finkok.facturacion.cancel.Application application = cancelSOAP.getApplication();
                         
                         views.core.soap.services.apps.RelatedResult relatedResult = application.getRelated(
-                                userName, userPswd, cfd.getDocXmlRfcEmi(), cfd.getUuid(), certificate.getExtraFnkPublicKeyBytes_n(), certificate.getExtraFnkPrivateKeyBytes_n());
+                                userName, userPswd, cfd.getDocXmlRfcEmi(), cfd.getDocXmlRfcRec(), cfd.getUuid(), certificate.getExtraFnkPublicKeyBytes_n(), certificate.getExtraFnkPrivateKeyBytes_n());
                         
                         if (relatedResult.getError() != null) {
                             throw new Exception(relatedResult.getError().getValue());
@@ -166,67 +166,50 @@ public class SCfdUtilsHandler {
             String userName = pac.getUser();
             String userPswd = pac.getUserPassword();
             
-            if (miClient.getSessionXXX().getParamsCompany().getIsCfdiProduction()) {
-                // environment for production is set:
-                
-                switch (pac.getPkPacId()) {
-                    case SModSysConsts.TRN_PAC_FCG:
-                        break;
-                        
-                    case SModSysConsts.TRN_PAC_FNK:
-                        DecimalFormat totalFormat = new DecimalFormat("#.00");
-                        com.finkok.facturacion.cancel.CancelSOAP cancelSOAP = new com.finkok.facturacion.cancel.CancelSOAP();
-                        com.finkok.facturacion.cancel.Application application = cancelSOAP.getApplication();
-                        
-                        views.core.soap.services.apps.AcuseSatEstatus acuseSatEstatus = application.getSatStatus(
-                                userName, userPswd, rfcEmisor, rfcReceptor, uuid, totalFormat.format(total));
-                        
-                        if (acuseSatEstatus.getError() != null) {
-                            throw new Exception(acuseSatEstatus.getError().getValue());
+            switch (pac.getPkPacId()) {
+                case SModSysConsts.TRN_PAC_FCG:
+                    break;
+
+                case SModSysConsts.TRN_PAC_FNK:
+                    DecimalFormat totalFormat = new DecimalFormat("#.00");
+                    com.finkok.facturacion.cancel.CancelSOAP cancelSOAP = new com.finkok.facturacion.cancel.CancelSOAP();
+                    com.finkok.facturacion.cancel.Application application = cancelSOAP.getApplication();
+
+                    views.core.soap.services.apps.AcuseSatEstatus acuseSatEstatus = application.getSatStatus(
+                            userName, userPswd, rfcEmisor, rfcReceptor, uuid, totalFormat.format(total));
+
+                    if (acuseSatEstatus.getError() != null) {
+                        throw new Exception(acuseSatEstatus.getError().getValue());
+                    }
+                    else {
+                        String valEsCancelable = "";
+                        String valCodigoEstatus = "";
+                        String valEstado = "";
+                        String valEstatusCancelacion = "";
+
+                        if (acuseSatEstatus.getSat().getValue().getEsCancelable() != null) {
+                            valEsCancelable = acuseSatEstatus.getSat().getValue().getEsCancelable().getValue();
                         }
-                        else {
-                            String valEsCancelable = "";
-                            String valCodigoEstatus = "";
-                            String valEstado = "";
-                            String valEstatusCancelacion = "";
-                            
-                            if (acuseSatEstatus.getSat().getValue().getEsCancelable() != null) {
-                                valEsCancelable = acuseSatEstatus.getSat().getValue().getEsCancelable().getValue();
-                            }
-                            if (acuseSatEstatus.getSat().getValue().getCodigoEstatus() != null) {
-                                valCodigoEstatus = acuseSatEstatus.getSat().getValue().getCodigoEstatus().getValue();
-                            }
-                            if (acuseSatEstatus.getSat().getValue().getEstado() != null) {
-                                valEstado = acuseSatEstatus.getSat().getValue().getEstado().getValue();
-                            }
-                            if (acuseSatEstatus.getSat().getValue().getEstatusCancelacion() != null) {
-                                valEstatusCancelacion = acuseSatEstatus.getSat().getValue().getEstatusCancelacion().getValue();
-                            }
-                            
-                            cfdiAckQuery = new CfdiAckQuery(uuid, valEsCancelable, valCodigoEstatus, valEstado, valEstatusCancelacion);
-                            /* XXX 2019-08-14, Sergio Flores: Se deshabilita temporalmente la consulta de CFDI relacionados 
-                             * debido a cambio inesperado en los parámetros de la solicitud del web service,
-                             * ahora se discurrió que deben proporcionarse el RFC y CSD del receptor. ¡Sí, el CSD del receptor! WTF!
-                            cfdiAckQuery.CfdiRelatedList.addAll(getCfdiRelated(cfd));
-                            */
+                        if (acuseSatEstatus.getSat().getValue().getCodigoEstatus() != null) {
+                            valCodigoEstatus = acuseSatEstatus.getSat().getValue().getCodigoEstatus().getValue();
                         }
-                        break;
-                        
-                    default:
-                }
-            }
-            else {
-                // environment for development is set:
-                
-                switch (pac.getPkPacId()) {
-                    case SModSysConsts.TRN_PAC_FCG:
-                        break;
-                        
-                    case SModSysConsts.TRN_PAC_FNK:
-                        break;
-                        
-                    default:
-                }
+                        if (acuseSatEstatus.getSat().getValue().getEstado() != null) {
+                            valEstado = acuseSatEstatus.getSat().getValue().getEstado().getValue();
+                        }
+                        if (acuseSatEstatus.getSat().getValue().getEstatusCancelacion() != null) {
+                            valEstatusCancelacion = acuseSatEstatus.getSat().getValue().getEstatusCancelacion().getValue();
+                        }
+
+                        cfdiAckQuery = new CfdiAckQuery(uuid, valEsCancelable, valCodigoEstatus, valEstado, valEstatusCancelacion);
+                        /* XXX 2019-08-14, Sergio Flores: Se deshabilita temporalmente la consulta de CFDI relacionados 
+                         * debido a cambio inesperado en los parámetros de la solicitud del web service,
+                         * ahora se discurrió que deben proporcionarse el RFC y CSD del receptor. ¡Sí, el CSD del receptor! WTF!
+                        cfdiAckQuery.CfdiRelatedList.addAll(getCfdiRelated(cfd));
+                        */
+                    }
+                    break;
+
+                default:
             }
         }
         
