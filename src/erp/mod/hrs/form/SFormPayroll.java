@@ -1966,7 +1966,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                 return;
             }
             
-            dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateStart.getValue(), weekLag);
+            dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
         }
         else {
             dates = SPrepayrollUtils.getPrepayrollDateRangeByTable(miClient, mnFormSubtype, moIntPeriodYear.getValue(), moIntNumber.getValue());
@@ -2021,7 +2021,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             }
 
             // obtener faltas
-            datesVar = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateStart.getValue(), weekLag);
+            datesVar = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
             SPrepayroll ppayrollVar = sd.getCAPData(url, datesVar[0], datesVar[1], list, mnFormSubtype, moConfig.getTimeClockPolicy(), sCompanyKey);
 
             if (ppayrollVar == null) {
@@ -2346,7 +2346,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
                         return;
                     }
 
-                    dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateStart.getValue(), weekLag);
+                    dates = SPrepayrollUtils.getPrepayrollDateRangeByCutDay(cutDay, moDateDateEnd.getValue(), weekLag);
                 }
                 else {
                     dates = SPrepayrollUtils.getPrepayrollDateRangeByTable(miClient, mnFormSubtype, moIntPeriodYear.getValue(), moIntNumber.getValue());
