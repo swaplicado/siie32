@@ -48,6 +48,8 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
     
     /**
      * Creates new form SDialogValuationBalances
+     * @param client
+     * @param title
      */
     public SDialogValuationBalances(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SLibConsts.UNDEFINED, SLibConsts.UNDEFINED, title);
@@ -445,13 +447,12 @@ public class SDialogValuationBalances extends SBeanFormDialog implements ActionL
 
     @Override
     public void actionSave() {
-        String msg = "";
+        String msg;
         SSrvLock lock = null;
-        SValuationBalances sbe = null;
+        SValuationBalances sbe;
         
         if (SGuiUtils.computeValidation(miClient, validateForm())) {
             msg = "Se realizará la revaluación de saldos con los siguientes parámetros:\n"
-                    + "- período de corte: " + moRecord.getRecordPeriod() + "\n"
                     + "- fecha de corte: " + SLibUtils.DateFormatDate.format(mtEndOfMonth) + "\n"
                     + "- " + SGuiUtils.getLabelName(jlCurrency) + ": " + moKeyCurrency.getSelectedItem().getItem() + "\n"
                     + "- " + SGuiUtils.getLabelName(jlExchangeRate) + ": " +  SLibUtils.getDecimalFormatExchangeRate().format(moCurExchangeRate.getField().getValue()) + "\n" +

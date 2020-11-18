@@ -491,7 +491,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbGetCfdiStatus.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbGetCfdiStatus.setEnabled((mbIsDoc || mbIsDocAdj));
         jbSendCfdi.setEnabled((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj)));
         jbRestoreSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbRestoreAckCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));

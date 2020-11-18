@@ -11,6 +11,8 @@
 
 package erp.mtrn.form;
 
+import cfd.DCfdUtils;
+import erp.SClientUtils;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -29,6 +31,7 @@ import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.Date;
 import java.util.Vector;
@@ -377,33 +380,33 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                 String sqlOrder = "";
                 switch (tipoCfd){
                     case SDataConstantsSys.TRNS_TP_CFD_INV: 
-                        sqlFolio = ", d.num_ser AS serie, d.num AS folio, d.fid_cl_dps AS tipo";
+                        sqlFolio = ", d.num_ser AS _serie, d.num AS _folio, d.fid_cl_dps AS _tipo";
                         sqlJoin = "INNER JOIN trn_dps AS d ON c.fid_dps_year_n = d.id_year AND c.fid_dps_doc_n = d.id_doc";
-                        sqlColRfc = "xml_rfc_emi"; 
-                        sqlOrder = "ORDER BY b1.bp, b2.bp, id_cfd, ts ";
+                        sqlColRfc = "c.xml_rfc_emi"; 
+                        sqlOrder = "ORDER BY b1.bp, b2.bp, c.id_cfd, c.ts ";
                         break;
                     case SDataConstantsSys.TRNS_TP_CFD_PAY_REC: 
-                        sqlFolio = ", c.ser AS serie, c.num AS folio";
-                        sqlColRfc = "xml_rfc_rec"; 
-                        sqlOrder  = "ORDER BY b2.bp, b1.bp, id_cfd, ts ";
+                        sqlFolio = ", c.ser AS _serie, c.num AS _folio";
+                        sqlColRfc = "c.xml_rfc_rec"; 
+                        sqlOrder  = "ORDER BY b2.bp, b1.bp, c.id_cfd, c.ts ";
                         break;
                     case SDataConstantsSys.TRNS_TP_CFD_PAYROLL: 
-                        sqlFolio = ", i.num_ser AS serie, i.num AS folio";
+                        sqlFolio = ", i.num_ser AS _serie, i.num AS _folio";
                         sqlJoin = "INNER JOIN hrs_pay_rcp_iss AS i ON c.fid_pay_rcp_pay_n = i.id_pay AND c.fid_pay_rcp_emp_n = i.id_emp AND c.fid_pay_rcp_iss_n = i.id_iss";
-                        sqlColRfc = "xml_rfc_rec"; 
-                        sqlOrder  = "ORDER BY b2.bp, b1.bp, id_cfd, ts ";
+                        sqlColRfc = "c.xml_rfc_rec"; 
+                        sqlOrder  = "ORDER BY b2.bp, b1.bp, c.id_cfd, c.ts ";
                         break;
                     default:
                 }
 
-                String sqlWhere = "ts BETWEEN '" + fechaInicial + "' AND '" + fechaFinal + "'";
+                String sqlWhere = "c.ts BETWEEN '" + fechaInicial + "' AND '" + fechaFinal + "'";
 
                 if (jrbVoucherCancellableWithoutAcceptance.isSelected()) {
-                    sqlWhere = "(" + sqlWhere +" AND IF (xml_tc = 0.0, xml_tot <= " + mnCant + " , (xml_tot * xml_tc) <= " + mnCant + "))"
-                            + "OR ts BETWEEN (NOW() - INTERVAL 3 DAY) AND NOW() ";    
+                    sqlWhere = "(" + sqlWhere +" AND IF (c.xml_tc = 0.0, c.xml_tot <= " + mnCant + " , (c.xml_tot * c.xml_tc) <= " + mnCant + "))"
+                            + "OR c.ts BETWEEN (NOW() - INTERVAL 3 DAY) AND NOW() ";    
                 }
                 else if (jrbVoucherCancellableWithAcceptance.isSelected()) {
-                    sqlWhere += " AND IF (xml_tc = 0.0, xml_tot > " + mnCant + " , (xml_tot * xml_tc) > " + mnCant + ")";
+                    sqlWhere += " AND IF (c.xml_tc = 0.0, c.xml_tot > " + mnCant + " , (c.xml_tot * c.xml_tc) > " + mnCant + ")";
                 }
 
                 String rfcAsocNegocio = "";
@@ -414,8 +417,9 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                 }
                 try {
                     this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                    String sql = "SELECT ts, xml_rfc_emi, xml_rfc_rec, uuid, xml_tot, b1.bp AS emisor, b2.bp AS receptor " + sqlFolio + " " +
+                    String sql = "SELECT c.ts, c.xml_rfc_emi, c.xml_rfc_rec, c.uuid, c.xml_tot, b1.bp AS emisor, b2.bp AS receptor, tc.doc_xml AS xml " + sqlFolio + " " +
                         "FROM trn_cfd AS c " +
+                        "INNER JOIN " + SClientUtils.getComplementaryDdName(miClient) + ".trn_cfd AS tc ON c.id_cfd = tc.id_cfd " +
                         "INNER JOIN erp.bpsu_bp AS b1 ON c.xml_rfc_emi = b1.fiscal_id " +
                         "INNER JOIN erp.bpsu_bp AS b2 ON c.xml_rfc_rec = b2.fiscal_id " +
                         sqlJoin + " " +
@@ -423,7 +427,11 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                         (rfcAsocNegocio.equals("") ? "" : "AND " + sqlColRfc + " = '" + rfcAsocNegocio + "' ") +
                         "AND "+ sqlWhere + " " +
                         sqlOrder + " ";
-                    try (ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql)) {
+                    
+                    Connection connection;
+                    connection = miClient.getSession().getStatement().getConnection();
+
+                    try (ResultSet resultSet = connection.createStatement().executeQuery(sql)) {
                         moResultPane.createTable();
                         moResultPane.clearTableRows();
                         boolean results = false;
@@ -431,7 +439,7 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                             results = true;
                             String tipoDoc = "";
                             if (tipoCfd == SDataConstantsSys.TRNS_TP_CFD_INV) {
-                                switch(resultSet.getInt("tipo")) {
+                                switch(resultSet.getInt("_tipo")) {
                                     case SDataConstantsSys.TRNS_CL_DPS_DOC:
                                         tipoDoc = "F";
                                         break;
@@ -441,24 +449,30 @@ public class SFormCfdiMassiveValidation extends javax.swing.JDialog implements e
                                     default: 
                                 }
                             }
-                            String folio = !resultSet.getString("serie").equals("") ? resultSet.getString("serie") + "-" + resultSet.getString("folio") : resultSet.getString("folio");
+                            
+                            String folio = !resultSet.getString("_serie").equals("") ? resultSet.getString("_serie") + "-" + resultSet.getString("_folio") : resultSet.getString("_folio");
                             String emisor = resultSet.getString("emisor");
                             String receptor = resultSet.getString("receptor");
-                            Date fecha = resultSet.getDate("ts");
-                            String rfcEmi = resultSet.getString("xml_rfc_emi");
-                            String rfcRec = resultSet.getString("xml_rfc_rec");
-                            String uuid = resultSet.getString("uuid");
+                            Date fecha = resultSet.getDate("c.ts");
+                            String rfcEmi = resultSet.getString("c.xml_rfc_emi");
+                            String rfcRec = resultSet.getString("c.xml_rfc_rec");
+                            String uuid = resultSet.getString("c.uuid");
+                            
+                            cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(resultSet.getString("xml"));
+                            float ver = comprobante.getVersion();
                             if (tipoCfd == SDataConstantsSys.TRNS_TP_CFD_INV) {
-                                addResultPaneRow(tipoDoc, folio, fecha, emisor, rfcEmi, uuid, new SCfdUtilsHandler(miClient).getCfdiSatStatus(tipoCfd, rfcEmi, rfcRec, uuid, resultSet.getDouble("xml_tot")).getArrayStatus());
+                                addResultPaneRow(tipoDoc, folio, fecha, emisor, rfcEmi, uuid, new SCfdUtilsHandler(miClient).getCfdiSatStatus(ver, rfcEmi, rfcRec, uuid, resultSet.getDouble("c.xml_tot")).getArrayStatus());
                             }
                             else {
-                                addResultPaneRow(tipoDoc, folio, fecha, receptor, rfcRec, uuid, new SCfdUtilsHandler(miClient).getCfdiSatStatus(tipoCfd, rfcEmi, rfcRec, uuid, resultSet.getDouble("xml_tot")).getArrayStatus());
+                                addResultPaneRow(tipoDoc, folio, fecha, receptor, rfcRec, uuid, new SCfdUtilsHandler(miClient).getCfdiSatStatus(ver, rfcEmi, rfcRec, uuid, resultSet.getDouble("c.xml_tot")).getArrayStatus());
                             }
                         }
+                        
                         moResultPane.renderTableRows();
                         moResultPane.setTableRowSelection(0);
+                        
                         if (!results) {
-                            miClient.showMsgBoxInformation("No se encontrarón resultados.");
+                            miClient.showMsgBoxInformation("No se encontraron CFDI a validar para los parámetros proporcionados.");
                         }
                     }
                     this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));

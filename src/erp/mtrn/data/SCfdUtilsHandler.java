@@ -4,7 +4,10 @@
  */
 package erp.mtrn.data;
 
+import cfd.DCfdConsts;
+import cfd.DCfdUtils;
 import cfd.DElement;
+import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
@@ -14,6 +17,9 @@ import erp.mod.SModSysConsts;
 import java.awt.Cursor;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import org.tempuri.ConsultaCFDIService;
+import org.tempuri.IConsultaCFDIService;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -111,36 +117,39 @@ public class SCfdUtilsHandler {
      * @throws java.lang.Exception 
     */
     public CfdiAckQuery getCfdiSatStatus(final SDataCfd cfd) throws Exception {
-        return getCfdiSatStatus(cfd.getFkCfdTypeId(), cfd.getDocXmlRfcEmi(), cfd.getDocXmlRfcRec(), cfd.getUuid(), cfd.getDocXmlTot());
+        return getCfdiSatStatus(/*cfd.getFkCfdTypeId(), */DCfdUtils.getCfdi33(cfd.getDocXml()));
     }
     
     /**
      * Devuelve el estatus del SAT a traves de un DElementComprobante
-     * @param cfdiComprobante DElementComprobante
+     * @param comprobante cfd.ver33.DElementComprobante.
      * @return CfdiAckQuery
      * @throws java.lang.Exception 
     */
-    public CfdiAckQuery getCfdiSatStatus(cfd.ver33.DElementComprobante cfdiComprobante) throws Exception {
+    public CfdiAckQuery getCfdiSatStatus(/*final int cfdTypeId, */final cfd.ver33.DElementComprobante comprobante) throws Exception {
         cfd.ver33.DElementTimbreFiscalDigital tfd = null;
-        if (cfdiComprobante.getEltOpcComplemento() != null) {
-            for (DElement element : cfdiComprobante.getEltOpcComplemento().getElements()) {
+        if (comprobante.getEltOpcComplemento() != null) {
+            for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
                 if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
                     tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
                 }
             }
         }
         if (tfd != null) {
-            String rfcEmisor = cfdiComprobante.getEltEmisor().getAttRfc().getString();
-            String rfcReceptor = cfdiComprobante.getEltReceptor().getAttRfc().getString();
-            double total = cfdiComprobante.getAttTotal().getDouble();
-            return getCfdiSatStatus(1, rfcEmisor, rfcReceptor, tfd.getAttUUID().getString(), total);
+            float ver = comprobante.getVersion();
+            String rfcEmisor = comprobante.getEltEmisor().getAttRfc().getString();
+            String rfcReceptor = comprobante.getEltReceptor().getAttRfc().getString();
+            double total = comprobante.getAttTotal().getDouble();
+            return getCfdiSatStatus(ver, rfcEmisor, rfcReceptor, tfd.getAttUUID().getString(), total);
         }
         return null;
     }
     
     /**
      * Devuelve el estatus del SAT a recibiendo los parámetros necesarios para la validación.
-     * @param cfdTypeId
+     * @param ver
+     /* @param cfdTypeId Se comentó porque ya no es necesario conocer el tipo de cfd con la nueva validación.
+     /* @param rfcProvCertif Se comentó porque ya no es necesario conocer el RFC de quien emitió el certificado.
      * @param rfcEmisor
      * @param rfcReceptor
      * @param uuid
@@ -148,8 +157,55 @@ public class SCfdUtilsHandler {
      * @return CfdiAckQuery
      * @throws java.lang.Exception 
     */
-    public CfdiAckQuery getCfdiSatStatus(final int cfdTypeId, final String rfcEmisor, final String rfcReceptor, final String uuid, final double total) throws Exception {
+    public CfdiAckQuery getCfdiSatStatus(final float ver, /*final int cfdTypeId, final String rfcProvCertif, */
+            final String rfcEmisor, final String rfcReceptor, final String uuid, final double total) throws Exception {
         miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        
+        String data = "";
+            DecimalFormat decimalFormat32 = new DecimalFormat("0000000000.000000");
+        if (ver == DCfdConsts.CFDI_VER_32){
+            
+            data += "?re=" + rfcEmisor;
+            data += "&rr=" + rfcReceptor;
+            data += "&tt=" + decimalFormat32.format(total);
+            data += "&id=" + uuid;
+        }
+        else if (ver == DCfdConsts.CFDI_VER_33){
+            DecimalFormat decimalFormat33 = new DecimalFormat("#." + SLibUtils.textRepeat("#", 6));
+            
+            data += "?id=" + (uuid == null || uuid.isEmpty() ? SLibUtils.textRepeat("0", 40) : uuid);
+            data += "&re=" + (rfcEmisor == null || rfcEmisor.isEmpty() ? SLibUtils.textRepeat("X", 13) : rfcEmisor);
+            data += "&rr=" + (rfcReceptor == null || rfcReceptor.isEmpty() ? SLibUtils.textRepeat("X", 13) : rfcReceptor);
+            data += "&tt=" + decimalFormat33.format(SLibUtils.roundAmount(total));
+        }
+        
+        ConsultaCFDIService service = new ConsultaCFDIService(); 
+        IConsultaCFDIService iService = service.getBasicHttpBindingIConsultaCFDIService();
+        org.datacontract.schemas._2004._07.sat_cfdi_negocio_consultacfdi.Acuse acuse = iService.consulta(data);
+        
+        String valEsCancelable = "";
+        String valCodigoEstatus = "";
+        String valEstado = "";
+        String valEstatusCancelacion = "";
+        
+        if (acuse != null) {
+            if (acuse.getEsCancelable() != null) {
+                valEsCancelable = acuse.getEsCancelable().getValue();
+            }
+            if (acuse.getCodigoEstatus() != null) {
+                valCodigoEstatus = acuse.getCodigoEstatus().getValue();
+            }
+            if (acuse.getEstado() != null) {
+                valEstado = acuse.getEstado().getValue();
+            }
+            if (acuse.getEstatusCancelacion() != null) {
+                valEstatusCancelacion = acuse.getEstatusCancelacion().getValue();
+            }
+        }
+        CfdiAckQuery cfdiAckQuery = new CfdiAckQuery(uuid, valEsCancelable, valCodigoEstatus, valEstado, valEstatusCancelacion);
+        
+        /* XXX 2020-11-18, Isabel Servín: Se cambió la forma en la que se validan los CFD's ante el SAT, debido a que hacerlo 
+        * a traves de FINKOK sólo se podían validar los que fueron emitidos por si mismo, por lo cual la validación era limitada.
         
         CfdiAckQuery cfdiAckQuery = null;
         SDataCfdPacType cfdPacType = SCfdUtils.getPacConfiguration(miClient, cfdTypeId);
@@ -174,9 +230,14 @@ public class SCfdUtilsHandler {
                     DecimalFormat totalFormat = new DecimalFormat("#.00");
                     com.finkok.facturacion.cancel.CancelSOAP cancelSOAP = new com.finkok.facturacion.cancel.CancelSOAP();
                     com.finkok.facturacion.cancel.Application application = cancelSOAP.getApplication();
-
-                    views.core.soap.services.apps.AcuseSatEstatus acuseSatEstatus = application.getSatStatus(
-                            userName, userPswd, rfcEmisor, rfcReceptor, uuid, totalFormat.format(total));
+                    views.core.soap.services.apps.AcuseSatEstatus acuseSatEstatus;
+                    
+                    if (rfcProvCertif.isEmpty() || rfcProvCertif.equals(pac.getPacRfc())) {
+                        acuseSatEstatus = application.getSatStatus(userName, userPswd, rfcEmisor, rfcReceptor, uuid, totalFormat.format(total));
+                    }
+                    else {
+                        acuseSatEstatus = application.getOutSatStatus(userName, userPswd, rfcEmisor, rfcReceptor, uuid, totalFormat.format(total));
+                    }
 
                     if (acuseSatEstatus.getError() != null) {
                         throw new Exception(acuseSatEstatus.getError().getValue());
@@ -205,19 +266,20 @@ public class SCfdUtilsHandler {
                          * debido a cambio inesperado en los parámetros de la solicitud del web service,
                          * ahora se discurrió que deben proporcionarse el RFC y CSD del receptor. ¡Sí, el CSD del receptor! WTF!
                         cfdiAckQuery.CfdiRelatedList.addAll(getCfdiRelated(cfd));
-                        */
+                        * /
                     }
                     break;
 
                 default:
             }
         }
+        */
         
         miClient.getFrame().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         
         return cfdiAckQuery;
     }
-     
+    
     public class CfdiAckQuery {
         public String Uuid;
         public String CancellableInfo;
@@ -276,7 +338,7 @@ public class SCfdUtilsHandler {
          * @return Estatus del CFDI: "Vigente" en caso de que el CFDI esté vigente; "En proceso de cancelación" si está en proceso de cancelación.
          */
         public String getCfdiStatus() {
-            if (CfdiStatus.equals("Vigente") && (CancelStatus.equals("En proceso") || CancelStatus.equals("En Proceso"))) {
+            if (CfdiStatus.equals(SCfdConsts.STATUS_VALID) && CancelStatus.toLowerCase().equals(SCfdConsts.STATUS_CANCEL_PROCESSING.toLowerCase())) {
                 return "En proceso de cancelación";
             }
             return CfdiStatus;

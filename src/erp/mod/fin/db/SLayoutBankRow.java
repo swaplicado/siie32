@@ -88,7 +88,8 @@ public class SLayoutBankRow implements SGridRow {
     protected HashMap<String, String> moCodeBankAccountCredits;
     protected HashMap<String, String> moAliasBankAccountCredits;
     
-    protected boolean mbXml;
+    protected boolean mbIsXml;
+    protected String msXml;
     protected String msXmlUuid;
     protected String msXmlRfcEmi;
     protected String msXmlRfcRec;
@@ -162,7 +163,8 @@ public class SLayoutBankRow implements SGridRow {
         moCodeBankAccountCredits = new HashMap<>();
         moAliasBankAccountCredits = new HashMap<>();
         
-        mbXml = false;
+        mbIsXml = false;
+        msXml = "";
         msXmlUuid = "";
         msXmlRfcEmi = "";
         msXmlRfcRec = "";
@@ -225,7 +227,8 @@ public class SLayoutBankRow implements SGridRow {
     
     public void setExchangeRate(double exchangeRate) { moMoneyPayment.setExchangeRate(exchangeRate); }
     
-    public void setIsXml(boolean b) { mbXml = b; }
+    public void setIsXml(boolean b) { mbIsXml = b; }
+    public void setXml(String s) { msXml = s; }
     public void setXmlUuid(String s) { msXmlUuid = s; }
     public void setXmlRfcEmi(String s) { msXmlRfcEmi = s; }
     public void setXmlRfcRec(String s) { msXmlRfcRec = s; }
@@ -288,7 +291,8 @@ public class SLayoutBankRow implements SGridRow {
     public HashMap<String, String> getCodeBankAccountCredits() { return moCodeBankAccountCredits; }
     public HashMap<String, String> getAliasBankAccountCredits() { return moAliasBankAccountCredits; }
     
-    public boolean isXml() { return mbXml; }
+    public boolean isXml() { return mbIsXml; }
+    public String getXml() { return msXml; }
     public String getXmlUuid() { return msXmlUuid; }
     public String getXmlRfcEmi() { return msXmlRfcEmi; }
     public String getXmlRfcRec() { return msXmlRfcRec; }
@@ -562,7 +566,7 @@ public class SLayoutBankRow implements SGridRow {
                         }
                         break;
                     case 12:
-                        value = moLayoutBankRecord.getLayoutBankRecordKey().getRecordPeriod();
+                        value = moLayoutBankRecord.getLayoutBankRecordKey() == null ? "" : moLayoutBankRecord.getLayoutBankRecordKey().getRecordPeriod();
                         break;
                     case 13:
                         value = moLayoutBankRecord.getBookkeepingCenterCode();
@@ -571,7 +575,7 @@ public class SLayoutBankRow implements SGridRow {
                         value = moLayoutBankRecord.getCompanyBranchCode();
                         break;
                     case 15:
-                        value = moLayoutBankRecord.getLayoutBankRecordKey().getRecordNumber();
+                        value = moLayoutBankRecord.getLayoutBankRecordKey() == null ? "" : moLayoutBankRecord.getLayoutBankRecordKey().getRecordNumber();
                         break;
                     case 16:
                         value = moLayoutBankRecord.getDate();

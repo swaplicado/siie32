@@ -75,7 +75,7 @@ public class SViewBankLayout extends SGridPaneView implements ActionListener {
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSend);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbBackToNew);
 	
-        if (mnGridSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY) {
+        if (mnGridSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY || mnGridSubtype == SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY) {
            getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCardex);
         }
     }

@@ -11,6 +11,7 @@ import cfd.DCfdUtils;
 import cfd.DElement;
 import cfd.ver33.DCfdi33Consts;
 import cfd.ver33.DElementConcepto;
+import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdXmlCatalogs;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -117,7 +118,7 @@ public final class SCfdRenderer implements java.awt.event.ActionListener{
         
         if (!validation.getIsError()) {
             String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(comprobante).getCfdiStatus(); 
-            if (!cfdiStatus.equals("Vigente")){
+            if (!cfdiStatus.equals(SCfdConsts.STATUS_VALID)) {
                 validation.setMessage("No se puede importar el CFDI ya que su estatus es : " + cfdiStatus + ".");
             }
         }

@@ -15,10 +15,11 @@ import java.sql.ResultSet;
  *
  * @author Juan Barajas
  */
-public class SDataPac extends erp.lib.data.SDataRegistry implements java.io.Serializable {
+public final class SDataPac extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkPacId;
     protected java.lang.String msPac;
+    protected java.lang.String msPacRfc;
     protected java.lang.String msUser;
     protected java.lang.String msUserPassword;
     protected boolean mbIsPrepayment;
@@ -39,14 +40,19 @@ public class SDataPac extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     public void setPkPacId(int n) { mnPkPacId = n; }
     public void setPac(java.lang.String s) { msPac = s; }
+    public void setPacRfc(java.lang.String s) { msPacRfc = s; }
     public void setUser(java.lang.String s) { msUser = s; }
     public void setUserPassword(java.lang.String s) { msUserPassword = s; }
     public void setIsPrepayment(boolean b) { mbIsPrepayment = b; }
     public void setIsAnnulmentEnabled(boolean b) { mbIsAnnulmentEnabled = b; }
     public void setIsChargedAnnulment(boolean b) { mbIsChargedAnnulment = b; }
+    @Override
     public void setIsDeleted(boolean b) { mbIsDeleted = b; }
+    @Override
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
+    @Override
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
+    @Override
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
     public void setUserNewTs(java.util.Date t) { mtUserNewTs = t; }
     public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
@@ -54,14 +60,19 @@ public class SDataPac extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     public int getPkPacId() { return mnPkPacId; }
     public java.lang.String getPac() { return msPac; }
+    public java.lang.String getPacRfc() { return msPacRfc; }
     public java.lang.String getUser() { return msUser; }
     public java.lang.String getUserPassword() { return msUserPassword; }
     public boolean getIsPrepayment() { return mbIsPrepayment; }
     public boolean getIsAnnulmentEnabled() { return mbIsAnnulmentEnabled; }
     public boolean getIsChargedAnnulment() { return mbIsChargedAnnulment; }
+    @Override
     public boolean getIsDeleted() { return mbIsDeleted; }
+    @Override
     public int getFkUserNewId() { return mnFkUserNewId; }
+    @Override
     public int getFkUserEditId() { return mnFkUserEditId; }
+    @Override
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
     public java.util.Date getUserNewTs() { return mtUserNewTs; }
     public java.util.Date getUserEditTs() { return mtUserEditTs; }
@@ -83,6 +94,7 @@ public class SDataPac extends erp.lib.data.SDataRegistry implements java.io.Seri
 
         mnPkPacId = 0;
         msPac = "";
+        msPacRfc = "";
         msUser = "";
         msUserPassword = "";
         mbIsPrepayment = false;
@@ -101,7 +113,7 @@ public class SDataPac extends erp.lib.data.SDataRegistry implements java.io.Seri
     public int read(java.lang.Object pk, java.sql.Statement statement) {
         int[] key = (int[]) pk;
         String sql;
-        ResultSet resultSet = null;
+        ResultSet resultSet;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
@@ -115,6 +127,7 @@ public class SDataPac extends erp.lib.data.SDataRegistry implements java.io.Seri
             else {
                 mnPkPacId = resultSet.getInt("id_pac");
                 msPac = resultSet.getString("pac");
+                msPacRfc = resultSet.getString("pac_rfc");
                 msUser = resultSet.getString("usr");
                 msUserPassword = resultSet.getString("usr_pswd");
                 mbIsPrepayment = resultSet.getBoolean("b_pre_pay");

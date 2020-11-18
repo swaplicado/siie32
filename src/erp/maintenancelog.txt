@@ -1,4 +1,12 @@
 ================================================================================
+SIIE 3.2 176.0/ 2020-11-18
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se habilitó el botón de "Ver detalle" para layouts bancarios de anticipos.
+2) Se modificó la forma en que se validan los CFD's para que se pueda realizar con cualquier certificador 
+    mediante la incorporación del WebService del SAT.
+
+================================================================================
 SIIE 3.2 175.2/ 2020-10-29
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

@@ -5,6 +5,9 @@
 
 package erp.mod.fin.form;
 
+import cfd.DCfdUtils;
+import erp.SClientUtils;
+import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -1117,7 +1120,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     "COALESCE((SELECT SUM(tax.tax_cur) FROM trn_dps_ety AS de " +
                     "INNER JOIN trn_dps_ety_tax AS tax ON de.id_year = tax.id_year AND de.id_doc = tax.id_doc AND de.id_ety = tax.id_ety AND tax.id_tax_bas = " + SDataConstantsSys.FINU_TAX_BAS_VAT + " " +
                     "WHERE d.id_year = de.id_year AND d.id_doc = de.id_doc AND de.b_del = 0), 0) AS f_iva_cur, ADDDATE(d.dt_start_cred, d.days_cred) AS dt_mat, " +
-                    "x.uuid AS xml_uuid, x.xml_rfc_emi, x.xml_rfc_rec, x.xml_tot, x.fid_tp_cfd AS xml_type " +
+                    "x.uuid AS xml_uuid, x.xml_rfc_emi, x.xml_rfc_rec, x.xml_tot, x.fid_tp_cfd AS xml_type, doc_xml " +
                     "FROM fin_rec AS r INNER JOIN fin_rec_ety AS re ON " +
                     "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                     "r.id_year = " + SLibTimeUtils.digestYear(moDateDateDue.getValue())[0] + " AND r.b_del = 0 AND re.b_del = 0 AND " +
@@ -1131,6 +1134,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
                     "LEFT OUTER JOIN erp.bpsu_bpb_con AS bpb_con ON bpb.id_bpb = bpb_con.id_bpb AND bpb_con.id_con = " + SDataConstantsSys.BPSS_TP_CON_ADM + " " +
                     "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " +
+                    "LEFT OUTER JOIN " + SClientUtils.getComplementaryDdName((SClientInterface) miClient) + ".trn_cfd AS cx ON x.id_cfd = cx.id_cfd " + 
                     "WHERE EXISTS (SELECT * FROM erp.bpsu_bank_acc AS ac WHERE bpb.id_bpb = ac.id_bpb AND ac.fid_bank " + 
                     (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") " +
                     "GROUP BY b.id_bp, b.bp, b.fiscal_id, d.exc_rate, bct.bp_key, bpb_con.email_01, cob.code, " +
@@ -1196,6 +1200,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     
                     if (resulSet.getObject("xml_uuid") != null && !resulSet.getString("xml_uuid").equals("")) {
                         layoutBankRow.setIsXml(true);
+                        layoutBankRow.setXml(resulSet.getString("doc_xml"));
                         layoutBankRow.setXmlUuid(resulSet.getString("xml_uuid"));
                         layoutBankRow.setXmlRfcEmi(resulSet.getString("xml_rfc_emi"));
                         layoutBankRow.setXmlRfcRec(resulSet.getString("xml_rfc_rec"));
@@ -1250,7 +1255,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 miClient.showMsgBoxInformation("No se encontró ningún documento para los parámetros especificados.");
             }
 
-            setCursor(cursor);
+            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }
 
@@ -2424,8 +2429,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 for (int i = 0; i < moGridPayments.getTable().getRowCount(); i++) {
                     SLayoutBankRow row = (SLayoutBankRow) moGridPayments.getGridRow(i);
                     if (row.isXml()) {
-                        String status = new SCfdUtilsHandler((SClientInterface) miClient).getCfdiSatStatus(row.getXmlType(), row.getXmlRfcEmi(), row.getXmlRfcRec(), row.getXmlUuid(), row.getXmlTotal()).getCfdiStatus() + ".\n";
-                        if (!status.equals("Vigente")) {
+                        cfd.ver33.DElementComprobante comprobante = DCfdUtils.getCfdi33(row.getXml());
+                        float ver = comprobante.getVersion();
+                        String status = new SCfdUtilsHandler((SClientInterface) miClient).getCfdiSatStatus(ver, /*row.getXmlType(), rfcProvCertif,*/ row.getXmlRfcEmi(), row.getXmlRfcRec(), row.getXmlUuid(), row.getXmlTotal()).getCfdiStatus() + ".\n";
+                        if (!status.equals(SCfdConsts.STATUS_VALID)) {
                             message += (message.isEmpty() ? "" : "\n");
                             message += row.getBizPartner() + ": ";
                             message += "folio CFDI = " + row.getReference() + "; ";
