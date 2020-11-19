@@ -4,6 +4,8 @@ Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) En la forma de recepción de pagos se agregó una función para que se asigne la cuenta de banco beneficiaria
     de manera automática de ser necesario.
+2) Se agregó un botón en la vista erp.mod.trn.view.SViewDpsSendWebService para que cuando el estado de la factura sea "rechazada" o "aceptada",
+    se pueda regresar al estado anterior, o sea, "pendiente por enviar".
 
 ================================================================================
 SIIE 3.2 176.0/ 2020-11-18
