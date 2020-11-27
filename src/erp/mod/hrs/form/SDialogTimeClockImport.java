@@ -193,7 +193,7 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CO, "Num", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "Empleado", 200));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Faltas", 50));
-                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Hr. Extra", 50));
+                gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Hr. Extra", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Domingos", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Festivos", 50));
                 gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Descansos", 50));
@@ -225,7 +225,7 @@ public class SDialogTimeClockImport extends SBeanFormDialog {
                 row.setNumEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getNumber());
                 row.setEmployee(lReceiptRows.get(ppRow.getEmployee_id()).getName());
                 row.setAbsences(ppRow.getAbsences());
-                row.setOvertime(mnPrepayrollMode == SHrsConsts.PPAYROLL_POL_LIMITED_DATA ? ppRow.getDouble_overtime(): ppRow.getTriple_overtime());
+                row.setOvertime(ppRow.getDouble_overtime());
                 row.setSundays(ppRow.getSundays());
                 row.setDaysOff(ppRow.getDaysOff());
                 
