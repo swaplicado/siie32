@@ -1,5 +1,12 @@
 ================================================================================
-SIIE 3.2 176.1/ 2020-11-19
+SIIE 3.2 176.2*/ 2020-12-08
+Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la generación de nóminas respecto a tiempos extra.
+2) Preparación de release 3.2 176.2* (parcial) porque la implementación del impuesto en la configuración de cuentas contables para asociados de negocios.
+
+================================================================================
+SIIE 3.2 176.1*/ 2020-11-19
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) En la forma de recepción de pagos se agregó una función para que se asigne la cuenta de banco beneficiaria
@@ -8,7 +15,7 @@ Isabel Danae GARCÍA SERVÍN
     se pueda regresar al estado anterior, o sea, "pendiente por enviar".
 
 ================================================================================
-SIIE 3.2 176.0/ 2020-11-18
+SIIE 3.2 176.0*/ 2020-11-18
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se habilitó el botón de "Ver detalle" para layouts bancarios de anticipos.

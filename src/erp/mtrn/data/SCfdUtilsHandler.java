@@ -202,6 +202,7 @@ public class SCfdUtilsHandler {
                 valEstatusCancelacion = acuse.getEstatusCancelacion().getValue();
             }
         }
+        
         CfdiAckQuery cfdiAckQuery = new CfdiAckQuery(uuid, valEsCancelable, valCodigoEstatus, valEstado, valEstatusCancelacion);
         
         /* XXX 2020-11-18, Isabel Servín: Se cambió la forma en la que se validan los CFD's ante el SAT, debido a que hacerlo 
