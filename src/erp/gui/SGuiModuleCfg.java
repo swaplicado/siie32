@@ -23,6 +23,7 @@ import erp.mcfg.form.SFormCompanyBranchEntity;
 import erp.mcfg.form.SFormCurrency;
 import erp.mcfg.form.SFormLanguage;
 import erp.mod.SModConsts;
+import erp.mod.hrs.form.SDialogCfdiGeneration;
 import erp.mtrn.data.SDataDiogDncCompanyBranch;
 import erp.mtrn.data.SDataDiogDncCompanyBranchEntity;
 import erp.mtrn.data.SDataDiogDocumentNumberSeries;
@@ -39,10 +40,13 @@ import erp.mtrn.form.SFormDocumentNature;
 import erp.mtrn.form.SFormDocumentNumberSeries;
 import erp.mtrn.form.SFormDocumentNumberignCenter;
 import erp.mtrn.form.SFormSystemNotes;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import sa.lib.SLibConsts;
+import sa.lib.gui.SGuiClient;
 
 /**
  *
@@ -79,6 +83,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatCompanyERP;
     private javax.swing.JMenuItem jmiCatCompany;
     private javax.swing.JMenuItem jmiCatCompanyBranchEntity;
+    private javax.swing.JMenuItem jmiImpCfdiGeneration;
 
     private erp.mcfg.form.SFormLanguage moFormLanguage;
     private erp.mcfg.form.SFormCurrency moFormCurrency;
@@ -177,6 +182,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatCompanyERP = new JMenuItem("Empresas ERP");
         jmiCatCompany = new JMenuItem("Empresas");
         jmiCatCompanyBranchEntity = new JMenuItem("Entidades de sucursales");
+        jmiImpCfdiGeneration = new JMenuItem("Generación de archivos de CFDIs");
 
         jmCat.add(jmiCatLanguage);
         jmCat.add(jmiCatCurrency);
@@ -184,6 +190,8 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatCompanyERP);
         jmCat.add(jmiCatCompany);
         jmCat.add(jmiCatCompanyBranchEntity);
+        jmCat.addSeparator();
+        jmCat.add(jmiImpCfdiGeneration);
 
         jmiCfgParamsCompany.addActionListener(this);
         jmiCfgParamsErp.addActionListener(this);
@@ -209,6 +217,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatCompanyERP.addActionListener(this);
         jmiCatCompany.addActionListener(this);
         jmiCatCompanyBranchEntity.addActionListener(this);
+        jmiImpCfdiGeneration.addActionListener(this);
 
         hasRightLanguage = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_CFG_LAN).HasRight;
         hasRightCurrency = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_CFG_CUR).HasRight;
@@ -253,6 +262,7 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatCompanyERP.setEnabled(hasRightCompany);
         jmiCatCompany.setEnabled(hasRightCompany);
         jmiCatCompanyBranchEntity.setEnabled(hasRightCompany);
+        jmiImpCfdiGeneration.setEnabled(true);
         
         // GUI configuration:
         
@@ -733,6 +743,18 @@ public class SGuiModuleCfg extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCatCompanyBranchEntity) {
                 showView(SDataConstants.CFGU_COB_ENT);
+            }
+            else if (item == jmiImpCfdiGeneration) {
+                SDialogCfdiGeneration dialog;
+                
+                try {
+                    dialog = new SDialogCfdiGeneration((SGuiClient) miClient, "Generación de archivos");
+                    dialog.resetForm();
+                    dialog.setVisible(true);
+                }
+                catch (Exception ex) {
+                    Logger.getLogger(SGuiModuleHrs.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }
