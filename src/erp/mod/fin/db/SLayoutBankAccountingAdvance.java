@@ -326,7 +326,8 @@ public class SLayoutBankAccountingAdvance {
         
         try {
             concept = createConceptRecordEntry();
-            oConfigBizPartnerOps = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(mnBizPartnerId, SModSysConsts.BPSS_CT_BP_SUP, mnBookkeepingCenterId, mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, false, moSession.getStatement()));
+            oConfigBizPartnerOps = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(mnBizPartnerId, SModSysConsts.BPSS_CT_BP_SUP, mnBookkeepingCenterId, 
+                                                            mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, false, null, moSession.getStatement()));
 
             entry = createRecordEntryAccountCash();
             entry.setConcept(concept);

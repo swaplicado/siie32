@@ -855,7 +855,8 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     oParams = (Object[]) poRequest.getPacket();
                     oResponse.setPacket(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                             (Integer) oParams[0], (Integer) oParams[1], (Integer) oParams[2],
-                            (java.util.Date) oParams[3], (Integer) oParams[4], (Boolean) oParams[5], moStatement));
+                            (java.util.Date) oParams[3], (Integer) oParams[4], (Boolean) oParams[5], 
+                            oParams[6] == null ? null : (int[]) oParams[6], moStatement));
                     break;
 
                 case SServerConstants.REQ_OBJ_FIN_ACC_ITEM:

@@ -167,12 +167,12 @@ public abstract class SFinAccountUtilities {
      */
     @SuppressWarnings("unchecked")
     public static java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> obtainBizPartnerAccountConfigs(erp.client.SClientInterface client,
-            int idBizPartner, int idBizPartnenrCategory, int idBkc, java.util.Date dateStart, int idBizPartnerAccountType, boolean isDebit) throws java.lang.Exception {
+            int idBizPartner, int idBizPartnenrCategory, int idBkc, java.util.Date dateStart, int idBizPartnerAccountType, boolean isDebit, int[] taxPk) throws java.lang.Exception {
         SServerRequest request = null;
         SServerResponse response = null;
         Vector<SFinAccountConfigEntry> accountConfigs = null;
 
-        request = new SServerRequest(SServerConstants.REQ_OBJ_FIN_ACC_BP, new Object[] { idBizPartner, idBizPartnenrCategory, idBkc, dateStart, idBizPartnerAccountType, isDebit });
+        request = new SServerRequest(SServerConstants.REQ_OBJ_FIN_ACC_BP, new Object[] { idBizPartner, idBizPartnenrCategory, idBkc, dateStart, idBizPartnerAccountType, isDebit, taxPk });
         response = client.getSessionXXX().request(request);
 
         if (response.getResponseType() != SSrvConsts.RESP_TYPE_OK) {
@@ -194,11 +194,13 @@ public abstract class SFinAccountUtilities {
      * @param dateStart Starting date.
      * @param idBizPartnerAccountType Account type. Constants defined in SDataConstantsSys class.
      * @param isDebit Is debit movement.
+     * @param pkTax pk of tax configured, can be null
      * @param statement Database connection statement.
      * @return Account and cost center configurations, if any, for parameters supplied.
      */
     public static java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> obtainBizPartnerAccountConfigs(
-            int idBizPartner, int idBizPartnerCategory, int idBkc, java.util.Date dateStart, int idBizPartnerAccountType, boolean isDebit, java.sql.Statement statement) throws java.lang.Exception {
+            int idBizPartner, int idBizPartnerCategory, int idBkc, java.util.Date dateStart, int idBizPartnerAccountType, 
+            boolean isDebit, int[] pkTax, java.sql.Statement statement) throws java.lang.Exception {
         int idAccount = 0;
         String sql = "";
         String emptyAccount = getConfigAccountFormat(statement);   // current account format is an empty account
@@ -246,7 +248,8 @@ public abstract class SFinAccountUtilities {
             sql = "SELECT abe.fid_acc, abe.fid_cc_n, abe.per " +
                     "FROM fin_acc_bp ab INNER JOIN fin_acc_bp_ety AS abe ON " +
                     "ab.id_acc_bp = abe.id_acc_bp AND ab.id_acc_bp = " + idAccount + " AND ab.b_del = 0 AND abe.id_tp_acc_bp = " + idBizPartnerAccountType + " AND " +
-                    "abe.fid_tp_bkr IN (" + SDataConstantsSys.FINS_TP_BKR_ALL + ", " + (isDebit ? SDataConstantsSys.FINS_TP_BKR_DBT : SDataConstantsSys.FINS_TP_BKR_CDT) + ") " +
+                    "abe.fid_tp_bkr IN (" + SDataConstantsSys.FINS_TP_BKR_ALL + ", " + (isDebit ? SDataConstantsSys.FINS_TP_BKR_DBT : SDataConstantsSys.FINS_TP_BKR_CDT) + ") WHERE " +
+                    (pkTax != null ? ("abe.fid_tax_bas_n = " + pkTax[0] + " AND abe.fid_tax_n = " + pkTax[1] + " " ) : ("abe.fid_tax_bas_n IS NULL AND abe.fid_tax_n IS NULL " )) +
                     "ORDER BY abe.fid_acc, abe.fid_cc_n, abe.per ";
             resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {

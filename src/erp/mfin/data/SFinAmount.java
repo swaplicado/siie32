@@ -20,6 +20,7 @@ public class SFinAmount {
     
     public int[] KeyRefDocument;
     public int[] KeyRefCashAccount;
+    public int[] KeyTax;
 
     public SFinAmount(SFinAmount amount) {
         this(amount.Amount, amount.AmountCy, amount.IsPrepaymentInvoiced, amount.AccountType, amount.MovementType, amount.OmitWhenAmountsChecked);
@@ -45,6 +46,15 @@ public class SFinAmount {
         
         KeyRefDocument = null;
         KeyRefCashAccount = null;
+        KeyTax = null;
+    }
+
+    public int[] getKeyTax() {
+        return KeyTax;
+    }
+
+    public void setKeyTax(int[] keyTax) {
+        this.KeyTax = keyTax;
     }
     
     public void addAmount(SFinAmount amount) {

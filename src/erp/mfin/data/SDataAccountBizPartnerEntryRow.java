@@ -26,6 +26,8 @@ public class SDataAccountBizPartnerEntryRow extends erp.lib.table.STableRow {
         mvValues.add(entry.getDbmsAccount());
         mvValues.add(entry.getFkCostCenterId_n());
         mvValues.add(entry.getDbmsCostCenter_n());
+        mvValues.add(entry.getDbmsTaxBase_n());
+        mvValues.add(entry.getDbmsTax_n());
         mvValues.add(entry.getDbmsBookkeepingRegistryType());
         mvValues.add(entry.getPercentage());
     }
