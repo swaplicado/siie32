@@ -2667,6 +2667,11 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                 }
 
                 if (!validation.getIsError()) {
+                    validation = moPanelBizPartnerBranchAddress.formValidate();
+                    validation.setTabbedPaneIndex(1);
+                }
+
+                if (!validation.getIsError()) {
                     // Validate information of employeee's relatives:
 
                     ArrayList<JLabel> relatives = new ArrayList<>();

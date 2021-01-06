@@ -1,4 +1,14 @@
 ================================================================================
+SIIE 3.2 176.3*/ 2021-01-06
+Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Regeneración de archivos XML y PDF de CFDI facturas, recepción de pagos y recibos de nómina.
+2) Implementación de validación de domicilio en forma de captura de empleados, puesto que increíblemente no se hacía.
+3) Ajuste por cambios en la respuesta de validación de estatus de CFDI:
+    a) si el CFDI es cancelable y no hay transacciones pendientes de cancelación, el campo CancelStatus es vacío;
+    b) si la solicitud de cancelación es colocada con éxito, ahora se recibe el mensaje "Petición de cancelación realizada exitosamente".
+
+================================================================================
 SIIE 3.2 176.2*/ 2020-12-08
 Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

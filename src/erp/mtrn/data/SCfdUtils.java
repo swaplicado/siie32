@@ -1436,37 +1436,41 @@ public abstract class SCfdUtils implements Serializable {
                                         throw new Exception("El CFDI es no cancelable.\n " + ackQuery.composeCfdiRelated());
                                         */
                                         throw new Exception("El CFDI es no cancelable.");
+                                        
+                                    default:
                                 }
 
                                 // check cancellation status:
-                                switch (ackQuery.CancelStatus) {
-                                    case DCfdi33Consts.ESTATUS_CANCEL_PROC: // CFDI cancellation is in process
-                                        cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_PROC_CODE);
-                                        client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
-                                        throw new Exception("La solicitud de cancelación del CFDI está pendiente de ser aceptada o rechazada por el receptor.");
+                                if (!ackQuery.CancelStatus.isEmpty()) { // since december 2020, cancel status is empty for all cancellable CFDI types!, awkward!
+                                    switch (ackQuery.CancelStatus) {
+                                        case DCfdi33Consts.ESTATUS_CANCEL_PROC: // CFDI cancellation is in process
+                                            cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_PROC_CODE);
+                                            client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
+                                            throw new Exception("La solicitud de cancelación del CFDI está pendiente de ser aceptada o rechazada por el receptor.");
 
-                                    case DCfdi33Consts.ESTATUS_CANCEL_RECH: // CFDI cancellation was rejected by receptor
-                                        updateProcessCfd(client, cfd, false);
+                                        case DCfdi33Consts.ESTATUS_CANCEL_RECH: // CFDI cancellation was rejected by receptor
+                                            updateProcessCfd(client, cfd, false);
 
-                                        // Sign & Cancel Log step #6
-                                        createSignCancelLog(client, "", SCfdConsts.ACTION_CODE_PRC_ANNUL, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR, cfd, pac.getPkPacId());
-                                        
-                                        cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_RECH_CODE);
-                                        client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
-                                        throw new Exception("La solicitud de cancelación del CFDI fue rechazada por el receptor.");
-                                        
-                                    case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
-                                    case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
-                                    case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:       // it is not clear which expression is the good one
-                                    case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_EXT:   // it is not clear which expression is the good one
-                                        throw new Exception("El estatus de cancelación del CFDI es inconsistente.");
-                                        
-                                    case DCfdi33Consts.ESTATUS_CANCEL_NINGUNO:
-                                        // CFD about to be cancelled for the first time or maybe a cancellation is still in process (in pending buffer)!
-                                        break;
-                                        
-                                    default:
-                                        throw new Exception("El estatus de cancelación del CFDI es desconocido.");
+                                            // Sign & Cancel Log step #6
+                                            createSignCancelLog(client, "", SCfdConsts.ACTION_CODE_PRC_ANNUL, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR, cfd, pac.getPkPacId());
+
+                                            cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_RECH_CODE);
+                                            client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
+                                            throw new Exception("La solicitud de cancelación del CFDI fue rechazada por el receptor.");
+
+                                        case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
+                                        case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
+                                        case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:       // it is not clear which expression is the good one
+                                        case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_EXT:   // it is not clear which expression is the good one
+                                            throw new Exception("El estatus de cancelación del CFDI es inconsistente.");
+
+                                        case DCfdi33Consts.ESTATUS_CANCEL_NINGUNO:
+                                            // CFD about to be cancelled for the first time or maybe a cancellation is still in process (in pending buffer)!
+                                            break;
+
+                                        default:
+                                            throw new Exception("El estatus de cancelación del CFDI es desconocido: [" + ackQuery.CancelStatus + "]");
+                                    }
                                 }
                                 break;
 
@@ -1585,12 +1589,14 @@ public abstract class SCfdUtils implements Serializable {
                             }
                             else {
                                 String estatusUuid = elementFolios.getValue().getFolio().get(0).getEstatusUUID().getValue();
+                                
                                 switch (estatusUuid) {
                                     case SCfdConsts.UUID_CANCEL_OK:
                                     case SCfdConsts.UUID_CANCEL_ALREADY:
                                         // CFDI is cancelled, or a cancellation request is in process:
 
                                         String estatusCancelacion = elementFolios.getValue().getFolio().get(0).getEstatusCancelacion().getValue();
+                                        
                                         switch (estatusCancelacion) {
                                             case DCfdi33Consts.ESTATUS_CANCEL_PROC:
                                                 // CFDI cancellation is in process:
@@ -1612,6 +1618,7 @@ public abstract class SCfdUtils implements Serializable {
                                                 String cancelStatusCode = "";
                                                 switch (estatusCancelacion) {
                                                     case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
+                                                    case DCfdi33Consts.RESPONSE_CANCEL: // unexpected message in a succesful cancelation, treated as if cancelled out of acceptance
                                                         cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT_CODE;
                                                         break;
                                                     case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:

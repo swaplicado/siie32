@@ -1,0 +1,15 @@
+================================================================================
+Configuración del reporteador de SIIE
+Fecha: 2020-12-21
+================================================================================
+
+Programa/script:
+	"C:\Program Files\Java\jre1.8.0_202\bin\javaw.exe"
+Argumento:
+	-classpath dist/siie32.jar erp.cli.SCliMailer 2852 i s today-1 today-1 gortiz@aeth.mx sflores@swaplicado.com.mx
+Iniciar en:
+	C:\swap\siie
+Ejecución:
+	Diariamente, 02:00 am
+
+================================================================================

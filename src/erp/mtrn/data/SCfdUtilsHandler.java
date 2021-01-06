@@ -132,16 +132,20 @@ public class SCfdUtilsHandler {
             for (DElement element : comprobante.getEltOpcComplemento().getElements()) {
                 if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
                     tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
+                    break;
                 }
             }
         }
+        
         if (tfd != null) {
             float ver = comprobante.getVersion();
             String rfcEmisor = comprobante.getEltEmisor().getAttRfc().getString();
             String rfcReceptor = comprobante.getEltReceptor().getAttRfc().getString();
             double total = comprobante.getAttTotal().getDouble();
+            
             return getCfdiSatStatus(ver, rfcEmisor, rfcReceptor, tfd.getAttUUID().getString(), total);
         }
+        
         return null;
     }
     
@@ -162,8 +166,9 @@ public class SCfdUtilsHandler {
         miClient.getFrame().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         
         String data = "";
-            DecimalFormat decimalFormat32 = new DecimalFormat("0000000000.000000");
+        
         if (ver == DCfdConsts.CFDI_VER_32){
+            DecimalFormat decimalFormat32 = new DecimalFormat("0000000000.000000");
             
             data += "?re=" + rfcEmisor;
             data += "&rr=" + rfcReceptor;

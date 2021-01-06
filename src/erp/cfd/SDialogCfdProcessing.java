@@ -450,7 +450,7 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
                             default:
                         }
                     }
-                    catch(Exception e) {
+                    catch (Exception e) {
                         detailMessage += STrnUtils.formatDocNumber(series, "" + number) + ": " + e.getMessage() + "\n";
                         cfdProcessedWrong++;
                     }
