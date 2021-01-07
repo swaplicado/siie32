@@ -3839,7 +3839,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                         }
                     }
                     
-                    //Warn user about manual accounting required for payments without associated bank account:
+                    // warn user about manual accounting required for payments without associated bank account:
                     
                     if (paymentEntry.AccountDestKey == null) {
                         SCfdXmlCatalogs xmlCatalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
@@ -3875,6 +3875,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         
         // process journal voucher movements:
+        
         if (!validation.getIsError()) {
             int index = 0;
             SDataCfdPayment dummyPayment = new SDataCfdPayment();
@@ -3891,7 +3892,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             catch (Exception e) {
                 SLibUtils.printException(this, e);
                 
-                validation.setMessage(e.getMessage());
+                validation.setMessage(e.getMessage() != null ? e.getMessage() : e.toString());
                 validation.setComponent(moPaneGridPayments.getTable());
                 moPaneGridPayments.setTableRowSelection(index);
             }
