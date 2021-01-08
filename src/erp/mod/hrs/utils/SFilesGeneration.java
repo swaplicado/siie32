@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sa.lib.SLibConsts;
 import sa.lib.gui.SGuiClient;
 
 /**
@@ -53,19 +54,33 @@ public class SFilesGeneration {
             while (resulReceipts.next()) {
                 SDataCfd cfdForPrinting = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) client, SDataConstants.TRN_CFD, new int[]{resulReceipts.getInt("id_cfd")}, SLibConstants.EXEC_MODE_SILENT);
                 
+                int cfdiVersion = 0;
+                
+                switch (cfdForPrinting.getFkXmlTypeId()) {
+                    case SDataConstantsSys.TRNS_TP_XML_CFD:
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_32:
+                        cfdiVersion = SCfdConsts.CFDI_PAYROLL_VER_OLD;
+                        break;
+                    case SDataConstantsSys.TRNS_TP_XML_CFDI_33://
+                        cfdiVersion = SCfdConsts.CFDI_PAYROLL_VER_CUR;
+                        break;
+                    default:
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+                }
+                
                 switch (cfdForPrinting.getFkCfdTypeId()) {
                     case SDataConstantsSys.TRNS_TP_CFD_INV:
                     case SDataConstantsSys.TRNS_TP_CFD_PAY_REC:
                         this.writeXml(cfdForPrinting.getDocXmlName(), cfdForPrinting.getDocXml(), (SClientInterface) client);
                         if (cfdForPrinting.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED || cfdForPrinting.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
-                            SCfdUtils.printCfd((SClientInterface) client, cfdForPrinting, SCfdConsts.CFDI_PAYROLL_VER_CUR, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, false);
+                            SCfdUtils.printCfd((SClientInterface) client, cfdForPrinting, cfdiVersion, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, false);
                         }
                         break;
                         
                     case SDataConstantsSys.TRNS_TP_CFD_PAYROLL:
                         if (cfdForPrinting.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_ANNULED || cfdForPrinting.getFkXmlStatusId() == SDataConstantsSys.TRNS_ST_DPS_EMITED) {
                             this.writeXml(cfdForPrinting.getDocXmlName(), cfdForPrinting.getDocXml(), (SClientInterface) client);
-                            SCfdUtils.printCfd((SClientInterface) client, cfdForPrinting, SCfdConsts.CFDI_PAYROLL_VER_CUR, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, false);
+                            SCfdUtils.printCfd((SClientInterface) client, cfdForPrinting, cfdiVersion, SDataConstantsPrint.PRINT_MODE_PDF_FILE, 1, false);
                         }
                         break;
                 }
