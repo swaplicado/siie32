@@ -28,6 +28,8 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
+import erp.mfin.utils.SBalanceTax;
+import erp.mfin.utils.SMfinUtils;
 import erp.mod.SModConsts;
 import erp.mod.bps.db.SDbBizPartner;
 import erp.mod.fin.db.SFinConsts;
@@ -39,12 +41,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import sa.lib.SLibConsts;
+import sa.lib.SLibUtils;
 
 /**
  *
@@ -1107,57 +1111,92 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
     @Override
     public erp.lib.data.SDataRegistry getRegistry() {
         int idBranch = SLibConsts.UNDEFINED;
-        SDataDsmEntry oDsmEntry = new SDataDsmEntry();
+        ArrayList<SDataDsmEntry> entries = new ArrayList();
+        
         SDataDsm oDsm = new SDataDsm();
         SDataRecord oRecord = null;
         SDataBizPartnerBranch branch = null;
-
-        oDsmEntry.setPkYearId(miClient.getSessionXXX().getWorkingYear());
-        oDsmEntry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
-        oDsmEntry.setUserNewTs(miClient.getSessionXXX().getSystemDate());
-
-        // Settings of account cash (emulated, because is not needed):
-
-        oDsmEntry.setSourceReference("");
-        oDsmEntry.setFkSourceCurrencyId(moDps.getFkCurrencyId());
-        oDsmEntry.setSourceValueCy(moFieldDpsValueCy.getDouble());
-        oDsmEntry.setSourceValue(moFieldDpsValue.getDouble());
-        oDsmEntry.setSourceExchangeRateSystem(moFieldAccExchangeRateSys.getDouble());
-        oDsmEntry.setSourceExchangeRate(moFieldAccExchangeRate.getDouble());
-
-        // Settings of document:
-
-        oDsmEntry.setFkDestinyDpsYearId_n(moDps.getPkYearId());
-        oDsmEntry.setFkDestinyDpsDocId_n(moDps.getPkDocId());
-        oDsmEntry.setFkDestinyCurrencyId(moDps.getFkCurrencyId());
-        oDsmEntry.setDestinyValueCy(moFieldDpsValueCy.getDouble());
-        oDsmEntry.setDestinyValue(moFieldDpsValue.getDouble());
-        oDsmEntry.setDestinyExchangeRateSystem(moFieldDpsExchangeRateSys.getDouble() != 0 ? moFieldDpsExchangeRateSys.getDouble() : moFieldDpsExchangeRate.getDouble());
-        oDsmEntry.setDestinyExchangeRate(moFieldDpsExchangeRate.getDouble());
-        oDsmEntry.setDbmsFkDpsCategoryId(moDps.getFkDpsCategoryId());
-        oDsmEntry.setDbmsDestinyDps(moDps.getDpsNumber());
-        oDsmEntry.setDbmsSubclassMove(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP));
-        oDsmEntry.setDbmsBizPartner(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
-        oDsmEntry.setDbmsDestinyTpDps(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId(), moDps.getFkDpsTypeId() }, SLibConstants.DESCRIPTION_CODE));
-
-        oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);
-        oDsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[1]);
-        oDsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[2]);
-        oDsmEntry.setDbmsCtSysMovId(mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]);
-        oDsmEntry.setDbmsTpSysMovId(mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
-        oDsm.setDbmsSubsystemTypeBiz(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSS_CT_BP, new int[] { mnBizPartnerCategoryId }, SLibConstants.DESCRIPTION_CODE));
-        oDsmEntry.setFkBizPartnerId(moDps.getFkBizPartnerId_r());
-        oDsmEntry.setDbmsFkBizPartnerBranchId_n(moDps.getFkBizPartnerBranchId());
-
-        try {
-            Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategoryId,
-                    moParamRecord.getPkBookkeepingCenterId(), moParamRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, null);
-            if (config.size() > 0) {
-                oDsmEntry.setDbmsAccountOp(config.get(0).getAccountId());
+        ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), moDps.getPkDocId(), moDps.getPkYearId(), 
+                                                    SLibUtils.DbmsDateFormatDate.format(miClient.getSession().getCurrentDate()), 
+                                                    mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], 
+                                                    mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
+        
+        double dValueCy = moFieldDpsValueCy.getDouble();
+        double dValue = moFieldDpsValue.getDouble();
+        double dAmount = dValue;
+        double dAmountCy = dValueCy;
+        
+        for (SBalanceTax balance : balances) {
+            if (dAmount <= 0d) {
+                break;
             }
-        }
-        catch (Exception e) {
-            SLibUtilities.renderException(this, e);
+            
+            SDataDsmEntry oDsmEntry = new SDataDsmEntry();
+            
+            if (dAmount <= balance.getBalance()) {
+                oDsmEntry.setSourceValue(dAmount);
+                oDsmEntry.setSourceValueCy(dAmountCy);
+                oDsmEntry.setDestinyValue(dAmount);
+                oDsmEntry.setDestinyValueCy(dAmountCy);
+            }
+            else {
+                oDsmEntry.setSourceValue(balance.getBalance());
+                oDsmEntry.setSourceValueCy(balance.getBalanceCurrency());
+                oDsmEntry.setDestinyValue(balance.getBalance());
+                oDsmEntry.setDestinyValueCy(balance.getBalanceCurrency());
+            }
+            
+            dAmount -= balance.getBalance();
+            dAmountCy -= balance.getBalanceCurrency();
+            
+            oDsmEntry.setFkTaxBasId_n(balance.getTaxBasId());
+            oDsmEntry.setFkTaxId_n(balance.getTaxId());
+            
+            oDsmEntry.setPkYearId(miClient.getSessionXXX().getWorkingYear());
+            oDsmEntry.setFkUserNewId(miClient.getSession().getUser().getPkUserId());
+            oDsmEntry.setUserNewTs(miClient.getSessionXXX().getSystemDate());
+
+            // Settings of account cash (emulated, because is not needed):
+
+            oDsmEntry.setSourceReference("");
+            oDsmEntry.setFkSourceCurrencyId(moDps.getFkCurrencyId());
+            oDsmEntry.setSourceExchangeRateSystem(moFieldAccExchangeRateSys.getDouble());
+            oDsmEntry.setSourceExchangeRate(moFieldAccExchangeRate.getDouble());
+
+            // Settings of document:
+
+            oDsmEntry.setFkDestinyDpsYearId_n(moDps.getPkYearId());
+            oDsmEntry.setFkDestinyDpsDocId_n(moDps.getPkDocId());
+            oDsmEntry.setFkDestinyCurrencyId(moDps.getFkCurrencyId());
+            oDsmEntry.setDestinyExchangeRateSystem(moFieldDpsExchangeRateSys.getDouble() != 0 ? moFieldDpsExchangeRateSys.getDouble() : moFieldDpsExchangeRate.getDouble());
+            oDsmEntry.setDestinyExchangeRate(moFieldDpsExchangeRate.getDouble());
+            oDsmEntry.setDbmsFkDpsCategoryId(moDps.getFkDpsCategoryId());
+            oDsmEntry.setDbmsDestinyDps(moDps.getDpsNumber());
+            oDsmEntry.setDbmsSubclassMove(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP));
+            oDsmEntry.setDbmsBizPartner(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSU_BP, new int[] { moDps.getFkBizPartnerId_r() }));
+            oDsmEntry.setDbmsDestinyTpDps(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.TRNU_TP_DPS, new int[] { moDps.getFkDpsCategoryId(), moDps.getFkDpsClassId(), moDps.getFkDpsTypeId() }, SLibConstants.DESCRIPTION_CODE));
+
+            oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);
+            oDsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[1]);
+            oDsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[2]);
+            oDsmEntry.setDbmsCtSysMovId(mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]);
+            oDsmEntry.setDbmsTpSysMovId(mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
+            oDsm.setDbmsSubsystemTypeBiz(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSS_CT_BP, new int[] { mnBizPartnerCategoryId }, SLibConstants.DESCRIPTION_CODE));
+            oDsmEntry.setFkBizPartnerId(moDps.getFkBizPartnerId_r());
+            oDsmEntry.setDbmsFkBizPartnerBranchId_n(moDps.getFkBizPartnerBranchId());
+
+            try {
+                Vector<SFinAccountConfigEntry> config = SFinAccountUtilities.obtainBizPartnerAccountConfigs(miClient, moDps.getFkBizPartnerId_r(), mnBizPartnerCategoryId,
+                        moParamRecord.getPkBookkeepingCenterId(), moParamRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, moDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, balance.getTaxPk());
+                if (config.size() > 0) {
+                    oDsmEntry.setDbmsAccountOp(config.get(0).getAccountId());
+                }
+                
+                entries.add(oDsmEntry);
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(this, e);
+            }
         }
 
         switch (mnBizPartnerCategoryId) {
@@ -1181,7 +1220,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         oDsm.setDbmsCompanyBranchCode(branch.getCode());
         oDsm.setDbmsErpDecimalsValue(miClient.getSessionXXX().getParamsErp().getDecimalsValue());
         oDsm.setDbmsIsRecordSaved(false);
-        oDsm.getDbmsEntries().add(oDsmEntry);
+        oDsm.getDbmsEntries().addAll(entries);
 
         try {
             oDsm = (SDataDsm) miClient.getGuiModule(SDataConstants.MOD_FIN).processRegistry(oDsm);

@@ -163,6 +163,7 @@ public abstract class SFinAccountUtilities {
      * @param dateStart Starting date.
      * @param idBizPartnerAccountType Account type. Constants defined in SDataConstantsSys class.
      * @param isDebit Is debit movement.
+     * @param taxPk
      * @return Account and cost center configurations, if any, for parameters supplied.
      */
     @SuppressWarnings("unchecked")
@@ -249,7 +250,7 @@ public abstract class SFinAccountUtilities {
                     "FROM fin_acc_bp ab INNER JOIN fin_acc_bp_ety AS abe ON " +
                     "ab.id_acc_bp = abe.id_acc_bp AND ab.id_acc_bp = " + idAccount + " AND ab.b_del = 0 AND abe.id_tp_acc_bp = " + idBizPartnerAccountType + " AND " +
                     "abe.fid_tp_bkr IN (" + SDataConstantsSys.FINS_TP_BKR_ALL + ", " + (isDebit ? SDataConstantsSys.FINS_TP_BKR_DBT : SDataConstantsSys.FINS_TP_BKR_CDT) + ") WHERE " +
-                    (pkTax != null ? ("abe.fid_tax_bas_n = " + pkTax[0] + " AND abe.fid_tax_n = " + pkTax[1] + " " ) : ("abe.fid_tax_bas_n IS NULL AND abe.fid_tax_n IS NULL " )) +
+                    (pkTax != null && pkTax[0] > 0 ? ("abe.fid_tax_bas_n = " + pkTax[0] + " AND abe.fid_tax_n = " + pkTax[1] + " " ) : ("abe.fid_tax_bas_n IS NULL AND abe.fid_tax_n IS NULL " )) +
                     "ORDER BY abe.fid_acc, abe.fid_cc_n, abe.per ";
             resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {
@@ -261,8 +262,12 @@ public abstract class SFinAccountUtilities {
                 }
             }
 
-            if (accountConfigs.isEmpty()) {
+            if (accountConfigs.isEmpty() && pkTax == null) {
                 throw new Exception(SLibConstants.MSG_ERR_REG_FOUND_NOT + " (Account for business partner for BP: " + idBizPartner + ")");
+            }
+            
+            if (accountConfigs.isEmpty() && pkTax != null) {
+                return null;
             }
         }
 
