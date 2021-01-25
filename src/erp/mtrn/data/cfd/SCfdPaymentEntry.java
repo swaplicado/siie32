@@ -585,7 +585,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             oDsmEntry.setDbmsFkBizPartnerBranchId_n(paymentEntryDoc.DataDps.getFkBizPartnerBranchId());
 
             Vector<SFinAccountConfigEntry> accountConfigEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs((SClientInterface) session.getClient(), paymentEntryDoc.DataDps.getFkBizPartnerId_r(), SDataConstantsSys.BPSS_CT_BP_CUS,
-                    DataRecord.getPkBookkeepingCenterId(), DataRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, paymentEntryDoc.DataDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, null);
+                    DataRecord.getPkBookkeepingCenterId(), DataRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, paymentEntryDoc.DataDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL);
             
             if (!accountConfigEntries.isEmpty()) {
                 oDsmEntry.setDbmsAccountOp(accountConfigEntries.get(0).getAccountId());
@@ -601,10 +601,10 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             oDsm.setDate(session.getCurrentDate());
             oDsm.setDbmsErpTaxModel(((SDataParamsErp) session.getConfigSystem()).getTaxModel());
             oDsm.setFkSubsystemCategoryId(SDataConstantsSys.BPSS_CT_BP_CUS);
-            oDsm.setFkCompanyBranchId(DataRecord.getFkCompanyBranchId_n());
+            oDsm.setFkCompanyBranchId(DataRecord.getFkCompanyBranchId());
             oDsm.setFkUserNewId(session.getUser().getPkUserId());
             oDsm.setDbmsFkCompanyBranch(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getPkBizPartnerBranchId());
-            oDsm.setDbmsCompanyBranchCode(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { DataRecord.getFkCompanyBranchId_n() }).getCode());
+            oDsm.setDbmsCompanyBranchCode(((SClientInterface) session.getClient()).getSessionXXX().getCompany().getDbmsDataCompany().getDbmsBizPartnerBranch(new int[] { DataRecord.getFkCompanyBranchId() }).getCode());
             oDsm.setDbmsErpDecimalsValue(((SDataParamsErp) session.getConfigSystem()).getDecimalsValue());
             oDsm.setDbmsIsRecordSaved(false);
 
