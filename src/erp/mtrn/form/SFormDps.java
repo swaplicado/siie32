@@ -2964,6 +2964,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moFieldCfdiRelationType = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbCfdiRelationType, jlCfdiCfdiUsage);
         moFieldCfdiRelationType.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldCfdiCfdiRelated = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfCfdiCfdiRelated, jlCfdiCfdiRelated);
+        moFieldCfdiCfdiRelated.setLengthMax(1024);
         moFieldCfdiCfdiRelated.setPickerButton(jbCfdiCfdiRelated);
         moFieldCfdiCfdiRelated.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         

@@ -678,7 +678,6 @@ public class SDialogFiscalXmlFile extends SBeanFormDialog implements ItemListene
     protected void windowActivated() {
         if (mbFirstActivation) {
             mbFirstActivation = false;
-            //((JSpinner.NumberEditor) jsYear.getEditor()).getTextField().requestFocus();
             moRadMonth01.requestFocus();
         }
     }

@@ -196,7 +196,7 @@ public abstract class SHrsCfdUtils {
             sqlDeductionsTaxWithheld += (sqlDeductionsTaxWithheld.isEmpty() ? "" : ", ") + resultSet.getInt("id_ded");
         }
 
-        // Obtain payroll header (this is always an one-row query):
+        // Obtain payroll header and receipt main info (this is always a one-row query):
 
         sql = "SELECT pri.dt_iss, p.dt_sta, p.dt_end, p.per_year, p.num, p.fk_tp_pay, p.fk_tp_pay_sht, "
                 + "pr.ear_r, pr.ded_r, "
@@ -229,7 +229,7 @@ public abstract class SHrsCfdUtils {
             
             nPaymentType = resultSet.getInt("p.fk_tp_pay");
 
-            // Obtain employee payroll receipt (this is always an one-row query):
+            // Obtain employee payroll receipt (this is always a one-row query):
 
             sql = "SELECT emp.num AS f_emp_num, bp.alt_id AS f_emp_curp, emp.ssn AS f_emp_nss, " +
                     "tsch.code AS f_emp_reg_tp, pr.day_pad AS f_emp_dias_pag, dep.name AS f_emp_dep, " +
