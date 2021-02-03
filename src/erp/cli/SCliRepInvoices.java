@@ -84,6 +84,7 @@ public class SCliRepInvoices {
     
     /**
      * Create report of summary invoices of items and business partners.
+     * When period start and end dates are from the same month, a monthly accumulated summary is appended.
      * @param args Expected arguments:
      * index 0: mailer option ('I');
      * index 1: category: sales ('S') or purchases ('P');
