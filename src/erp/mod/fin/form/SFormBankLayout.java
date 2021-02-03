@@ -1281,12 +1281,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
             // Show beneficiaries that have bank accounts whose currency equals the requested one:
-            
+           
             String sql = "SELECT b.id_bp, b.bp, b.fiscal_id, bct.bp_key, bpb.id_bpb, bpb_con.email_01, " +
                     "'" + (mnDpsCurrencyId == 0 ? "" : miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { mnDpsCurrencyId })) + "' AS _cur " +
                     "FROM erp.bpsu_bp AS b " +
                     "INNER JOIN erp.bpsu_bp_ct AS bct ON  bct.id_bp = b.id_bp AND bct.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_SUP + " " +
-                    "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = b.id_bp AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " +
+                    "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = b.id_bp " + //AND bpb.fid_tp_bpb = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " " + /* Se comentó esta línea ya que limitaba la consulta únicamente a las sucursales matriz 26/01/2021 */
                     "LEFT OUTER JOIN erp.bpsu_bpb_con AS bpb_con ON bpb.id_bpb = bpb_con.id_bpb AND bpb_con.id_con = " + SDataConstantsSys.BPSS_TP_CON_ADM + " " +
                     "WHERE EXISTS (SELECT * FROM erp.bpsu_bank_acc AS ac WHERE bpb.id_bpb = ac.id_bpb AND ac.fid_cur = " + mnDpsCurrencyId + " AND ac.fid_bank " + 
                     (SLibUtils.belongsTo(mnBankPaymentTypeId, new int[] { SDataConstantsSys.FINS_TP_PAY_BANK_THIRD, SDataConstantsSys.FINS_TP_PAY_BANK_AGREE }) ? "= " : "<> ") + mnBizPartnerBankId + ") " +
