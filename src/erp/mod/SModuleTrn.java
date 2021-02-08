@@ -14,6 +14,7 @@ import erp.mod.trn.db.SDbFunctionalAreaBudget;
 import erp.mod.trn.db.SDbFunctionalAreaBudgets;
 import erp.mod.trn.db.SDbInventoryMfgCost;
 import erp.mod.trn.db.SDbInventoryValuation;
+import erp.mod.trn.db.SDbItemCost;
 import erp.mod.trn.db.SDbItemRequiredDpsConfig;
 import erp.mod.trn.db.SDbMaintArea;
 import erp.mod.trn.db.SDbMaintConfig;
@@ -24,6 +25,7 @@ import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.form.SFormDelivery;
 import erp.mod.trn.form.SFormFunctionalAreaBudgets;
 import erp.mod.trn.form.SFormInventoryValuation;
+import erp.mod.trn.form.SFormItemCost;
 import erp.mod.trn.form.SFormItemRequiredDpsConfig;
 import erp.mod.trn.form.SFormMaintArea;
 import erp.mod.trn.form.SFormMaintUser;
@@ -40,6 +42,7 @@ import erp.mod.trn.view.SViewFunctionalAreaExpenses;
 import erp.mod.trn.view.SViewInventoryCost;
 import erp.mod.trn.view.SViewInventoryMfgCost;
 import erp.mod.trn.view.SViewInventoryValuation;
+import erp.mod.trn.view.SViewItemCost;
 import erp.mod.trn.view.SViewItemRequiredDpsConfig;
 import erp.mod.trn.view.SViewMaintArea;
 import erp.mod.trn.view.SViewMaintUser;
@@ -65,7 +68,7 @@ import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Gil De Jesús, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Cesar Orozco, Gil De Jesús, Sergio Flores, Isabel Servín
  */
 public class SModuleTrn extends SGuiModule {
 
@@ -74,6 +77,7 @@ public class SModuleTrn extends SGuiModule {
     private SFormMmsConfig moFormMmsConfiguration;
     private SFormDelivery moFormDelivery;
     private SFormMaintArea moFormMaintArea;
+    private SFormItemCost moFormItemCost;
     private SFormMaintUser moFormMaintUserEmployee;
     private SFormMaintUser moFormMaintUserContractor;
     private SFormMaintUser moFormMaintUserToolMaintProv;
@@ -127,6 +131,9 @@ public class SModuleTrn extends SGuiModule {
                 break;
             case SModConsts.TRN_INV_MFG_CST:
                 registry = new SDbInventoryMfgCost();
+                break;
+            case SModConsts.TRN_ITEM_COST:
+                registry = new SDbItemCost();
                 break;
             case SModConsts.TRN_MMS_CFG:
                 registry = new SDbMmsConfig();
@@ -328,6 +335,9 @@ public class SModuleTrn extends SGuiModule {
             case SModConsts.TRN_MAINT_USER_SUPV:
                 view = new SViewMaintUserSupervisor(miClient, "Mantto. - Residentes contratistas");
                 break;
+            case SModConsts.TRN_ITEM_COST:
+                view = new SViewItemCost(miClient, "Costos de ítems");
+                break;
             case SModConsts.TRNX_BP_BAL_CUR:
                 title = (subtype == SDataConstantsSys.TRNS_CT_DPS_SAL ? "CXC" : "CXP") + " x moneda";
                 if (params == null) {
@@ -405,6 +415,10 @@ public class SModuleTrn extends SGuiModule {
                 if (moFormMaintUserSupv == null) moFormMaintUserSupv = new SFormMaintUserSupervisor(miClient, "Residente de contratista");
                 form = moFormMaintUserSupv;
                 break;
+            case SModConsts.TRN_ITEM_COST:
+                if (moFormItemCost == null) moFormItemCost = new SFormItemCost(miClient, "Costos de ítems");
+                form = moFormItemCost;
+                break;
             case SModConsts.TRNX_FUNC_BUDGETS:
                 if (moFormFunctionalAreaBudgets == null) moFormFunctionalAreaBudgets = new SFormFunctionalAreaBudgets(miClient, "Presupuestos mensuales de gastos");
                 form = moFormFunctionalAreaBudgets;
@@ -423,6 +437,9 @@ public class SModuleTrn extends SGuiModule {
         switch (type) {
             case SModConsts.TRN_DVY:
                 guiReport = new SGuiReport("reps/trn_dvy.jasper", "Entrega de ventas");
+                break;
+            case SModConsts.TRN_ITEM_COST:
+                guiReport = new SGuiReport("reps/trn_cont_marg.jasper", "Reporte margen de contribución");
                 break;
             case SModConsts.TRNR_CON_STA:
                 guiReport = new SGuiReport("reps/trn_con_sta.jasper", "Reporte de estatus de contratos");

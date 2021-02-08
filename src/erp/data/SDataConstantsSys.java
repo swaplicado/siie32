@@ -924,8 +924,11 @@ public abstract class SDataConstantsSys {
     public static final int [] FINU_CLS_ACC_USR_ORD_DEB = { 4, 1, 1 };
     public static final int [] FINU_CLS_ACC_USR_ORD_CRE = { 4, 2, 1 };
 
+    public static final int FINU_TP_ACC_LEDGER_CASH = 2;
+    public static final int FINU_TP_ACC_LEDGER_BANK = 3;
     public static final int FINU_TP_ACC_LEDGER_CUS = 6;
     public static final int FINU_TP_ACC_LEDGER_DBR = 7;
+    public static final int FINU_TP_ACC_LEDGER_INV = 8;
     public static final int FINU_TP_ACC_LEDGER_VAT_CREDITABLE = 9;
     public static final int FINU_TP_ACC_LEDGER_VAT_CREDITABLE_PEND = 10;
     public static final int FINU_TP_ACC_LEDGER_SUP = 33;

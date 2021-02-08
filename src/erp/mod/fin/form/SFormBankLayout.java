@@ -131,6 +131,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private ArrayList<SLayoutBankRecord> maLayoutBankRecords;
     
     private int mnSelectedRows;
+    private int[] moBankAccPk;
     private String msAccountCredit;
     private String msAgreement;
     private String msAgreementReference;
@@ -1312,6 +1313,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     layoutBankRow.setCurrencyId(mnDpsCurrencyId);
                     
                     loadBankAccountCredits(layoutBankRow, resulSet.getInt("id_bpb"), mnBizPartnerBankId);
+                    layoutBankRow.setBankAccPk(moBankAccPk);
                     
                     layoutBankRow.setAgreement(msAgreement);
                     layoutBankRow.setAgreementReference(msAgreementReference);
@@ -1465,6 +1467,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             for (String account : beneficiaryAccoountsMap) {
                 maBeneficiaryAccountGuiItems.add(new SGuiItem(new int[] { bpbId, bpbBankAccountId }, account));
             }
+            
+            moBankAccPk = new int[] { bpbId, bpbBankAccountId };
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
@@ -1517,6 +1521,15 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private void updateAllLayoutBankRowsFromGridRows() {
         for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
             SLayoutBankRow layoutBankRow = (SLayoutBankRow) gridRow;
+            
+            ArrayList<SDataBizPartnerBranchBankAccount> accounts = layoutBankRow.getBranchBankAccountCredits();
+            for (SDataBizPartnerBranchBankAccount account : accounts) {
+                if (!layoutBankRow.getBeneficiaryAccountNumber().isEmpty() && (
+                        layoutBankRow.getBeneficiaryAccountNumber().equals(account.getBankAccountNumber()) || 
+                        layoutBankRow.getBeneficiaryAccountNumber().equals(account.getBankAccountNumberStd()))) {
+                    layoutBankRow.setBankAccPk(new int[] {account.getPkBizPartnerBranchId(), account.getPkBizPartnerBranchId()});
+                }
+            }
             
             for (SLayoutBankRow layoutBankRowToUpdate : maAllLayoutBankRows) {
                 if (SLibUtils.compareKeys(layoutBankRow.getRowPrimaryKey(), layoutBankRowToUpdate.getRowPrimaryKey())) {
@@ -1618,7 +1631,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private void validateTransfers() throws Exception {
         int visibleRows = 0;
         ArrayList<SLayoutBankRow> layoutBankRows = new ArrayList<>();
-
+        
         updateAllLayoutBankRowsFromGridRows();
 
         for (SGridRow gridRow : moGridPayments.getModel().getGridRows()) {
