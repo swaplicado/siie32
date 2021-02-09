@@ -1,3 +1,26 @@
+SIIE 3.2 176.8*/ 2021-02-08
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se crearon las clases "SDbItemCost", "SViewItemCost" y "SFormItemCost" en los paquetes erp.mod.trn que corresponden
+    al nuevo catálogo de "Costos de ítems", que se convocan desde el Módulo de Finanzas.
+2) Se creó el nuevo reporte de "Margen de contribución" y con ello el dialogo erp.mod.trn.form.SDialogRepContributionMargin,
+    el cual muestra la diferencia de la venta y el costo neto.
+3) Se creó el nuevo reporte de "Situación general" y con ello el dialogo erp.mfin.form.SDialogRepGlobalTemplate,
+    el cual muestra la situación de la empresa hasta la fecha de corte. 
+4) Se corrigió un error que generaba duplicidad al generar los XML de layouts de anticipos.
+
+================================================================================
+SIIE 3.2 176.7*/ 2021-02-03
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al agrupador en la consulta EBITDA del estado de resultados.
+
+================================================================================
+SIIE 3.2 176.6*/ 2021-01-26
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la consulta que muestra las cuentas asociadas en los layouts bancarios.
+
 ================================================================================
 SIIE 3.2 176.5*/ 2021-01-13
 Sergio Abraham FLORES GUTIÉRREZ

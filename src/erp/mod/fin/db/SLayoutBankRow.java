@@ -78,6 +78,7 @@ public class SLayoutBankRow implements SGridRow {
     protected int mnApply;
     protected int mnBankKey;
     protected int mnCurrencyId;
+    protected int[] moBankAccPk;
     protected String msReferenceRecord;
     protected String msObservations;
     protected SLayoutBankRecord moLayoutBankRecord;
@@ -153,6 +154,7 @@ public class SLayoutBankRow implements SGridRow {
         mnApply = 0;
         mnBankKey = 0;
         mnCurrencyId = 0;
+        moBankAccPk = null;
         msReferenceRecord = "";
         msObservations = "";
         moLayoutBankRecord = null;
@@ -217,6 +219,7 @@ public class SLayoutBankRow implements SGridRow {
     public void setApply(int n) { mnApply = n; }
     public void setBankKey(int n) { mnBankKey = n; }
     public void setCurrencyId(int n) { mnCurrencyId = n; }
+    public void setBankAccPk(int[] n) { moBankAccPk = n; }
     public void setReferenceRecord(String s) { msReferenceRecord = s; }
     public void setObservations(String s) { msObservations = s; }
     public void setLayoutBankRecord(SLayoutBankRecord o) { moLayoutBankRecord = o; }
@@ -281,6 +284,7 @@ public class SLayoutBankRow implements SGridRow {
     public int getApply() { return mnApply; }
     public int getBankKey() { return mnBankKey; }
     public int getCurrencyId() { return mnCurrencyId; }
+    public int[] getBankAccPk() { return moBankAccPk; }
     public String getReferenceRecord() { return msReferenceRecord; }
     public String getObservations() { return msObservations; }
     public SLayoutBankRecord getLayoutBankRecord() { return moLayoutBankRecord; }
@@ -334,7 +338,8 @@ public class SLayoutBankRow implements SGridRow {
                 key = new int[] { mnDpsYearId, mnDpsDocId };
                 break;
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
-                key = new int[] { mnBizPartnerId };
+                //key = new int[] { mnBizPartnerId };
+                key = moBankAccPk;
                 break;
             default:
         }

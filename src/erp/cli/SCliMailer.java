@@ -29,7 +29,9 @@ public class SCliMailer {
      */
     public static void main(String[] args) {
         //======================================================================
-        // discomment for testing purpouses:
+        // KEEP THIS SECTION COMMENTED WHEN CODE RELEASED!, they all are only for testing purpouses.
+        // company ID, report type, 's'ales/'p'urchases, start, end, TO, [BCC]
+        // Company ID: 1211 = Operadora Tron; 2852 = Aceites Especiales TH
         //args = new String[] { "2852", "i", "s", "today", "today", "sflores@swaplicado.com.mx" };
         //args = new String[] { "2852", "i", "s", "today-1", "today-1", "sflores@swaplicado.com.mx" };
         //args = new String[] { "2852", "i", "s", "2020-08-01", "2020-08-31", "sflores@swaplicado.com.mx" };
@@ -38,6 +40,9 @@ public class SCliMailer {
         //args = new String[] { "2852", "i", "s", "today-1", "today-1", "gortiz@aeth.mx", "sflores@swaplicado.com.mx" };
         //args = new String[] { "2852", "i", "s", "today-1", "today-1", "gortiz@aeth.mx;sflores@swaplicado.com.mx", "floresgtz@hotmail.com;cesar.orozco@swaplicado.com.mx" };
         //args = new String[] { "1211", "i", "s", "2020-01-01", "2020-12-31", "sflores@swaplicado.com.mx;sflores@aeth.mx", "floresgtz@hotmail.com" };
+        //args = new String[] { "2852", "i", "s", "today-1", "today-1", "sflores@swaplicado.com.mx" };
+        //args = new String[] { "2852", "i", "s", "2021-01-31", "2021-01-31", "sflores@swaplicado.com.mx" };
+        //args = new String[] { "2852", "i", "s", "today-1", "today-1", "sflores@swaplicado.com.mx;sflores@aeth.mx", "floresgtz@hotmail.com" };
         //======================================================================
         
         SParamsApp paramsApp = null;
