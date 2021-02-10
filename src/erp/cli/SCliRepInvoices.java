@@ -298,6 +298,43 @@ public class SCliRepInvoices {
         return sql;
     }
     
+    private String composeSalesBackorderSql() {
+        return "SELECT de.id_year, de.id_doc, de.id_ety, d.dt, d.dt_doc_delivery_n, d.dt_doc_lapsing_n, d.num_ref, d.b_link, d.ts_link, " +
+                "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_cob, d.fid_bpb, d.fid_bp_r, d.fid_usr_link, " +
+                "dt.code AS f_dt_code, dn.code AS f_dn_code, cob.code AS f_cob_code, bb.bpb, b.bp, bc.bp_key, c.cur_key, ul.usr, de.fid_item, " +
+                "de.fid_unit, de.fid_orig_unit, de.surplus_per, de.qty AS f_qty, " +
+                "de.orig_qty AS f_orig_qty, CASE WHEN de.qty = 0 THEN 0 ELSE de.stot_cur_r / de.qty END AS f_price_u, CASE WHEN de.orig_qty = 0 THEN 0 ELSE de.stot_cur_r / de.orig_qty END AS f_orig_price_u, " +
+                "de.sales_price_u_cur, de.sales_freight_u_cur, i.item_key, i.item, ig.igen, u.symbol AS f_unit, uo.symbol AS f_orig_unit, " +
+                "COALESCE((SELECT SUM(ds.qty) FROM trn_dps_dps_supply AS ds, trn_dps_ety AS xde, trn_dps AS xd " +
+                "WHERE ds.id_src_year = de.id_year AND ds.id_src_doc = de.id_doc AND ds.id_src_ety = de.id_ety AND ds.id_des_year = xde.id_year " +
+                "AND ds.id_des_doc = xde.id_doc AND ds.id_des_ety = xde.id_ety AND xde.id_year = xd.id_year AND xde.id_doc = xd.id_doc " +
+                "AND xde.b_del = 0 AND xd.b_del = 0 AND xd.fid_st_dps = 2), 0) AS f_link_qty, " +
+                "COALESCE((SELECT SUM(ds.orig_qty) FROM trn_dps_dps_supply AS ds, trn_dps_ety AS xde, trn_dps AS xd " +
+                "WHERE ds.id_src_year = de.id_year AND ds.id_src_doc = de.id_doc AND ds.id_src_ety = de.id_ety AND ds.id_des_year = xde.id_year " +
+                "AND ds.id_des_doc = xde.id_doc AND ds.id_des_ety = xde.id_ety AND xde.id_year = xd.id_year AND xde.id_doc = xd.id_doc AND xde.b_del = 0 " +
+                "AND xd.b_del = 0 AND xd.fid_st_dps = 2), 0) AS f_link_orig_qty " +
+                "FROM trn_dps AS d " +
+                "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps = 2 " +
+                "AND d.fid_ct_dps = 2 AND d.fid_cl_dps = 2 AND d.fid_tp_dps = 1 AND d.fid_cob = 2890 " +
+                "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
+                "INNER JOIN erp.trnu_dps_nat AS dn ON d.fid_dps_nat = dn.id_dps_nat " +
+                "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
+                "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
+                "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
+                "INNER JOIN erp.bpsu_bp_ct AS bc ON d.fid_bp_r = bc.id_bp AND bc.id_ct_bp = 3 " +
+                "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
+                "INNER JOIN erp.usru_usr AS ul ON d.fid_usr_link = ul.id_usr " +
+                "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
+                "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
+                "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
+                "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit " +
+                "GROUP BY de.id_year, de.id_doc, de.id_ety, d.dt, d.dt_doc_delivery_n, d.dt_doc_lapsing_n, d.num_ref, d.b_link, d.ts_link, d.num_ser, d.num, " +
+                "d.fid_cob, d.fid_bpb, d.fid_bp_r, d.fid_usr_link, dt.code, dn.code, cob.code, bb.bpb, b.bp, bc.bp_key, c.cur_key, ul.usr, de.fid_item, " +
+                "de.fid_unit, de.fid_orig_unit, de.surplus_per, de.qty, de.orig_qty, de.stot_cur_r, i.item_key, i.item, ig.igen, u.symbol, uo.symbol " +
+                "HAVING f_link_orig_qty < de.orig_qty AND d.b_link = 0 ORDER BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, " +
+                "de.id_year, de.id_doc, b.bp, bc.bp_key, d.fid_bp_r, bb.bpb, d.fid_bpb, i.item_key, i.item, de.fid_item, uo.symbol, de.fid_orig_unit";
+    }
+    
     private String composeMailSubject() throws Exception {
         String subject = "[" + SClient.APP_NAME + "] " + msDpsCategoryName + " " + SLibUtils.DateFormatDate.format(mtPeriodStart);
         
@@ -560,6 +597,47 @@ public class SCliRepInvoices {
                 + "</tr>\n";
         html += "</table>\n";
         
+        html += "<br>\n";
+        
+        return html;
+    }
+    
+    private String composeHtmlSalesBackorder() throws Exception {
+        String sql = composeSalesBackorderSql();
+        String html = "<br>\n";
+        
+        html += "<h2>Backorder de pedidos de ventas " + composeTextPeriod(mtPeriodStart, mtPeriodEnd) + "</h2>\n";
+        
+        html += "<table>\n";
+        html += "<tr>"
+                + "<th>Pedido</th>"
+                + "<th>Fecha</th>"
+                + "<th>Cliente</th>"
+                + "<th>Concepto</th>"
+                + "<th>Cant. pedida</th>"
+                + "<th>Cant. procesada</th>"
+                + "<th>Cant. pendiente</th>"
+                + "<th>Unidad</th>"
+                + "</tr>\n";
+        
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                double origQty = resultSet.getDouble("f_orig_qty");
+                double linkQty = resultSet.getDouble("f_link_orig_qty");
+                double toLinkQty = origQty - linkQty;
+                html += "<tr>"
+                        + "<td>" + SLibUtils.textToHtml(resultSet.getString("f_num")) + "</td>"
+                        + "<td class=\"center\">" + SLibUtils.DateFormatDate.format(resultSet.getDate("d.dt")) + "</td>"
+                        + "<td>" + SLibUtils.textToHtml(resultSet.getString("b.bp")) + "</td>"
+                        + "<td>" + SLibUtils.textToHtml(resultSet.getString("i.item_key") + " - " + resultSet.getString("i.item")) + "</td>"
+                        + "<td class=\"number\">" + formatQuantity(origQty) + "</td>"
+                        + "<td class=\"number\">" + formatQuantity(linkQty) + "</td>"
+                        + "<td class=\"number\">" + formatQuantity(toLinkQty) + "</td>"
+                        + "<td>" + SLibUtils.textToHtml(resultSet.getString("f_orig_unit")) + "</td>"
+                        + "</tr>\n"; 
+            }
+        }
+        html += "</table>\n";
         html += "<br>\n";
         
         return html;
@@ -929,6 +1007,7 @@ public class SCliRepInvoices {
         
         body += composeHtmlMailBodyReport();
         body += composeHtmlMailBodyAccum();
+        body += composeHtmlSalesBackorder();
         
         body += STrnUtilities.composeMailFooter("warning");
         
