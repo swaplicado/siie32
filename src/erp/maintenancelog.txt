@@ -2,6 +2,7 @@ SIIE 3.2 177.1*/ 2021-02-08
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se agregó la tabla de "Backorder de pedidos de ventas" en el informe de ventas por mail.
+2) Se agregó la fila "TOTALES" para las vistas de pedidos y contratos.
 
 ================================================================================
 SIIE 3.2 177.0*/ 2021-02-08
