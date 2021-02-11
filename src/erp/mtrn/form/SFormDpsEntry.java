@@ -2727,7 +2727,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
                 }
             }
             
-            if (moParamDps.isEstimate()) {
+            if (SLibUtils.belongsTo(moParamDps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_PUR_CON, SDataConstantsSys.TRNU_TP_DPS_SAL_CON })) { // only contracts
                 moFieldIsDpsPriceVariable.setBoolean(true);
                 enablePriceContractFields(true);
                 

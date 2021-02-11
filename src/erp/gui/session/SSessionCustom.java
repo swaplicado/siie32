@@ -5,10 +5,13 @@
 package erp.gui.session;
 
 import erp.cfd.SCfdXmlCatalogs;
+import erp.data.SDataConstantsSys;
 import erp.gui.account.SAccount;
 import erp.gui.account.SAccountConsts;
 import erp.gui.account.SAccountLedger;
 import erp.gui.account.SAccountUtils;
+import erp.mcfg.data.SCfgParamValues;
+import erp.mcfg.data.SCfgUtils;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -628,9 +631,14 @@ public class SSessionCustom implements SGuiSessionCustom {
             }
             
             // read all CFD XML catalogs:
+            
             moCfdXmlCatalogs = new SCfdXmlCatalogs(moSession);
             
             // read CFD type's XML types:
+            
+            String cfdTypes = SCfgUtils.getParamValue(statementAux, SDataConstantsSys.CFG_PARAM_CFD_TYPES);
+            SCfgParamValues paramValues = new SCfgParamValues(cfdTypes); // check optional configuration of CFD types for this company
+            
             mhmCfdTypeXmlTypes = new HashMap<>();
             sql = "SELECT id_tp_cfd, fid_tp_xml "
                     + "FROM " + SModConsts.TablesMap.get(SModConsts.TRNS_TP_CFD) + " "
@@ -638,7 +646,9 @@ public class SSessionCustom implements SGuiSessionCustom {
                     + "ORDER BY id_tp_cfd ";
             resultSetAux = statementAux.executeQuery(sql);
             while (resultSetAux.next()) {
-                mhmCfdTypeXmlTypes.put(resultSetAux.getInt("id_tp_cfd"), resultSetAux.getInt("fid_tp_xml"));
+                int typeCfd = resultSetAux.getInt("id_tp_cfd"); // convenience variable
+                String typeXml = paramValues.getKeyValue("" + typeCfd); // check if CFD type is overloaded for this company
+                mhmCfdTypeXmlTypes.put(typeCfd, typeXml != null ? SLibUtils.parseInt(typeXml) : resultSetAux.getInt("fid_tp_xml"));
             }
         }
         catch (SQLException e) {
