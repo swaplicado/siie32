@@ -92,6 +92,30 @@ public final class STrnDpsType implements java.io.Serializable {
         return SLibUtilities.compareKeys(getDpsClassKey(), SDataConstantsSys.TRNS_CL_DPS_SAL_EST);
     }
 
+    public boolean isDpsTypeEstimate() {
+        return isDpsTypeEstimatePur()|| isDpsTypeEstimateSal();
+    }
+
+    public boolean isDpsTypeEstimatePur() {
+        return SLibUtilities.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_EST);
+    }
+
+    public boolean isDpsTypeEstimateSal() {
+        return SLibUtilities.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_EST);
+    }
+
+    public boolean isDpsTypeContract() {
+        return isDpsTypeContractPur()|| isDpsTypeContractSal();
+    }
+
+    public boolean isDpsTypeContractPur() {
+        return SLibUtilities.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_CON);
+    }
+
+    public boolean isDpsTypeContractSal() {
+        return SLibUtilities.compareKeys(getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON);
+    }
+
     public int[] getDpsCategoryKey() { return new int[] { mnDpsCategoryId }; }
     public int[] getDpsClassKey() { return new int[] { mnDpsCategoryId, mnDpsClassId }; }
     public int[] getDpsTypeKey() { return new int[] { mnDpsCategoryId, mnDpsClassId, mnDpsTypeId }; }

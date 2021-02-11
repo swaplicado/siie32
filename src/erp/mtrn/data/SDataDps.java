@@ -392,7 +392,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         SDataUserConfigurationTransaction userConfigTxn = new SDataUserConfigurationTransaction();
 
         if (userConfigTxn.read(new int[] { mnFkUserNewId }, statement) != SLibConstants.DB_ACTION_READ_OK) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + " No se encontró la configuración de usuarios para transacciones del usuario ID=" + mnFkUserNewId + ".");
         }
         else {
             if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
@@ -1677,6 +1677,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
     public boolean isEstimateSal() {
         return moXtaDpsType.isEstimateSal();
+    }
+
+    public boolean isDpsTypeContract() {
+        return moXtaDpsType.isDpsTypeContract();
+    }
+
+    public boolean isDpsTypeContractPur() {
+        return moXtaDpsType.isDpsTypeContractPur();
+    }
+
+    public boolean isDpsTypeContractSal() {
+        return moXtaDpsType.isDpsTypeContractSal();
     }
 
     public int[] getDpsCategoryKey() { return new int[] { mnFkDpsCategoryId }; }
