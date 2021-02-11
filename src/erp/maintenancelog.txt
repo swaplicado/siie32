@@ -1,8 +1,15 @@
-SIIE 3.2 176.8*/ 2021-02-08
+SIIE 3.2 177.1*/ 2021-02-08
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregó la tabla de "Backorder de pedidos de ventas" en el informe de ventas por mail.
+2) Se agregó la fila "TOTALES" para las vistas de pedidos y contratos.
+
+================================================================================
+SIIE 3.2 177.0*/ 2021-02-08
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se crearon las clases "SDbItemCost", "SViewItemCost" y "SFormItemCost" en los paquetes erp.mod.trn que corresponden
-    al nuevo catálogo de "Costos de ítems", que se convocan desde el Módulo de Finanzas.
+    al nuevo catálogo de "Costos de ítems", que se convocan desde el módulo de finanzas.
 2) Se creó el nuevo reporte de "Margen de contribución" y con ello el dialogo erp.mod.trn.form.SDialogRepContributionMargin,
     el cual muestra la diferencia de la venta y el costo neto.
 3) Se creó el nuevo reporte de "Situación general" y con ello el dialogo erp.mfin.form.SDialogRepGlobalTemplate,

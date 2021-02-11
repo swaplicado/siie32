@@ -250,9 +250,11 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         }
 
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_orig_qty", "Cantidad", STableConstants.WIDTH_QUANTITY_2X);
-        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        aoTableColumns[i++].setSumApplying(true);
         aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "f_link_orig_qty", "Cant. procesada", STableConstants.WIDTH_QUANTITY_2X);
-        aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
+        aoTableColumns[i++].setSumApplying(true);
 
         if (isViewForDocEntries()) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_orig_unit", "Unidad", STableConstants.WIDTH_UNIT_SYMBOL);
@@ -267,6 +269,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_qty", SLibRpnArgumentType.OPERAND));
         aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_link_orig_qty", SLibRpnArgumentType.OPERAND));
+        aoTableColumns[i].setSumApplying(true);
         aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
 
         if (isViewForDocEntries()) {
@@ -280,6 +283,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
             aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
             aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_link_orig_qty", SLibRpnArgumentType.OPERAND));
             aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_price_u", SLibRpnArgumentType.OPERAND));
+            aoTableColumns[i].setSumApplying(true);
             aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.MULTIPLICATION, SLibRpnArgumentType.OPERATOR));
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "", "Monto pendiente $", STableConstants.WIDTH_VALUE_2X);
             aoTableColumns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValue());
@@ -287,6 +291,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
             aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_link_orig_qty", SLibRpnArgumentType.OPERAND));
             aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
             aoTableColumns[i].getRpnArguments().add(new SLibRpnArgument("f_orig_price_u", SLibRpnArgumentType.OPERAND));
+            aoTableColumns[i].setSumApplying(true);
             aoTableColumns[i++].getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.MULTIPLICATION, SLibRpnArgumentType.OPERATOR));
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "sales_price_u_cur", "Precio u. (s/flete) mon $", STableConstants.WIDTH_VALUE_2X);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererValueUnitary());
@@ -302,7 +307,9 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         for (i = 0; i < aoTableColumns.length; i++) {
             moTablePane.addTableColumn(aoTableColumns[i]);
         }
-
+        
+        setIsSummaryApplying(true);
+        
         mvSuscriptors.add(mnTabTypeAux01);
         mvSuscriptors.add(SDataConstants.BPSU_BP);
         mvSuscriptors.add(SDataConstants.BPSU_BP_CT);
