@@ -1615,6 +1615,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_PS_COMP_PPY = 207014;
     public static final int REP_TRN_PUR_UNIT_COST = 207015;
     public static final int REP_TRN_DPS = 207016;
+    public static final int REP_TRN_DPS_US = 207036;
     public static final int REP_TRN_DPS_ADJ = 207017;
     public static final int REP_TRN_DPS_LIST = 207018;
     public static final int REP_TRN_DPS_ORDER = 207019;
