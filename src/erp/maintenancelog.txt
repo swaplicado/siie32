@@ -1,3 +1,9 @@
+SIIE 3.2 177.3*/ 2021-02-11
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se creó la vista de CFDI recepción de pagos extendida donde se muestra el usuario que lo creó, editó y eliminó, ademas del total.
+
+================================================================================
 SIIE 3.2 177.2*/ 2021-02-10
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

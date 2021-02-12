@@ -216,6 +216,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiFinLayoutBankDoneAdvances;
     private javax.swing.JMenuItem jmiFinItemCost;
     private javax.swing.JMenuItem jmiFinCfdPayment;
+    private javax.swing.JMenuItem jmiFinCfdPaymentExtended;
     private javax.swing.JMenuItem jmiFinMassDownloadCfdi;
     private javax.swing.JMenuItem jmiFinImportPayments;
 
@@ -559,6 +560,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankDoneAdvances = new JMenuItem("Layouts de anticipos pagados");
         jmiFinItemCost = new JMenuItem("Costos de ítems");
         jmiFinCfdPayment = new JMenuItem("CFDI recepción de pagos");
+        jmiFinCfdPaymentExtended = new JMenuItem("CFDI recepción de pagos extendida");
         jmiFinMassDownloadCfdi = new JMenuItem("Descarga masiva de CFDI...");
         jmiFinImportPayments = new JMenuItem("Importación de pagos BBVA");
 
@@ -582,6 +584,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmFin.addSeparator();
         jmFin.add(jmiFinCfdPayment);
         jmiFinCfdPayment.setEnabled(false);
+        jmFin.add(jmiFinCfdPaymentExtended);
+        jmiFinCfdPaymentExtended.setEnabled(false);
         jmFin.addSeparator();
         jmFin.add(jmiFinMassDownloadCfdi);
         jmiFinMassDownloadCfdi.setEnabled(false);
@@ -870,6 +874,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankDoneAdvances.addActionListener(this);
         jmiFinItemCost.addActionListener(this);
         jmiFinCfdPayment.addActionListener(this);
+        jmiFinCfdPaymentExtended.addActionListener(this);
         jmiFinMassDownloadCfdi.addActionListener(this);
         jmiFinImportPayments.addActionListener(this);
 
@@ -1070,6 +1075,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankDoneAdvances.setEnabled(hasRightMoveAccCash);
         jmiFinItemCost.setEnabled(hasRightMoveAccCash);
         jmiFinCfdPayment.setEnabled(hasRightMoveAccCash);
+        jmiFinCfdPaymentExtended.setEnabled(hasRightMoveAccCash);
         jmiFinMassDownloadCfdi.setEnabled(hasRightMoveAccCash);
         jmiFinImportPayments.setEnabled(hasRightMoveAccCash);
 
@@ -2041,7 +2047,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                 miClient.getSession().showView(SModConsts.TRN_ITEM_COST, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiFinCfdPayment) {
-                miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY_REC);
+                miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY_REC, SDataConstants.TRNX_CFD_PAY_REC);
+            }
+            else if (item == jmiFinCfdPaymentExtended) {
+                miClient.getGuiModule(SDataConstants.MOD_SAL).showView(SDataConstants.TRNX_CFD_PAY_REC, SDataConstants.TRNX_CFD_PAY_REC_EXT);
             }
             else if (item == jmiFinMassDownloadCfdi) {
                 new SDialogMassDownloadCfdi((SGuiClient) miClient).setVisible(true);
