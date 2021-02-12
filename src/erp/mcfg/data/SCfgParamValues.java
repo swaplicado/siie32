@@ -22,10 +22,12 @@ public class SCfgParamValues {
         msParamValue = paramValue;
         moKeyValuesMap = new HashMap<>();
         
-        String[] keyValues = SLibUtils.textExplode(msParamValue, ";");
-        for (String keyValue : keyValues) {
-            String[] keyAndValue = SLibUtils.textExplode(keyValue, "=");
-            moKeyValuesMap.put(keyAndValue[0], keyAndValue[1]);
+        if (msParamValue != null && !msParamValue.isEmpty()) {
+            String[] keyValues = SLibUtils.textExplode(msParamValue, ";");
+            for (String keyValue : keyValues) {
+                String[] keyAndValue = SLibUtils.textExplode(keyValue, "=");
+                moKeyValuesMap.put(keyAndValue[0], keyAndValue[1]);
+            }
         }
     }
     
