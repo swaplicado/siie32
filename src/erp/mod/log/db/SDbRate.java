@@ -18,7 +18,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Isabel Servín
  */
 public class SDbRate extends SDbRegistryUser {
 
@@ -93,7 +93,7 @@ public class SDbRate extends SDbRegistryUser {
         Statement statement = null;
 
         msSql = "SELECT * " + getSqlTable() + " WHERE b_del = 0 AND fk_src_spot =  " + params[0] + " AND fk_des_spot = " + params[1] + " AND " +
-                "fk_car = " + params[2] + " AND fk_tp_veh = " + params[3] + " ";
+                "fk_car_n = " + params[2] + " AND fk_tp_veh_n = " + params[3] + " ";
         statement = session.getDatabase().getConnection().createStatement();
         resultSet = statement.executeQuery(msSql);
         while (resultSet.next()) {
@@ -193,8 +193,8 @@ public class SDbRate extends SDbRegistryUser {
             mnFkSourceSpotId = resultSet.getInt("fk_src_spot");
             mnFkDestinySpotTypeId = resultSet.getInt("fk_des_tp_spot");
             mnFkDestinySpotId = resultSet.getInt("fk_des_spot");
-            mnFkCarrierId = resultSet.getInt("fk_car");
-            mnFkVehicleTypeId = resultSet.getInt("fk_tp_veh");
+            mnFkCarrierId = resultSet.getInt("fk_car_n");
+            mnFkVehicleTypeId = resultSet.getInt("fk_tp_veh_n");
             mnFkUserInsertId = resultSet.getInt("fk_usr_ins");
             mnFkUserUpdateId = resultSet.getInt("fk_usr_upd");
             mtTsUserInsert = resultSet.getTimestamp("ts_usr_ins");
@@ -234,8 +234,8 @@ public class SDbRate extends SDbRegistryUser {
                 mnFkSourceSpotId + ", " +
                 mnFkDestinySpotTypeId + ", " +
                 mnFkDestinySpotId + ", " +
-                mnFkCarrierId + ", " +
-                mnFkVehicleTypeId + ", " +
+                (mnFkCarrierId > 0 ? mnFkCarrierId : "NULL") + ", " +
+                (mnFkVehicleTypeId > 0 ? mnFkVehicleTypeId : "NULL") + ", " +
                 mnFkUserInsertId + ", " +
                 mnFkUserUpdateId + ", " +
                 "NOW()" + ", " +
@@ -255,8 +255,8 @@ public class SDbRate extends SDbRegistryUser {
                 "fk_src_spot = " + mnFkSourceSpotId + ", " +
                 "fk_des_tp_spot = " + mnFkDestinySpotTypeId + ", " +
                 "fk_des_spot = " + mnFkDestinySpotId + ", " +
-                "fk_car = " + mnFkCarrierId + ", " +
-                "fk_tp_veh = " + mnFkVehicleTypeId + ", " +
+                "fk_car_n = " + (mnFkCarrierId > 0 ? mnFkCarrierId : "NULL") + ", " +
+                "fk_tp_veh_n = " + (mnFkVehicleTypeId > 0 ? mnFkVehicleTypeId : "NULL") + ", " +
                 //"fk_usr_ins = " + mnFkUserInsertId + ", " +
                 "fk_usr_upd = " + mnFkUserUpdateId + ", " +
                 //"ts_usr_ins = " + "NOW()" + ", " +

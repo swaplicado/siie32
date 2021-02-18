@@ -10,6 +10,8 @@ import erp.mod.log.db.SDbRate;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -21,7 +23,7 @@ import sa.lib.gui.SGuiValidation;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Isabel Servín
  */
 public class SFormRate extends sa.lib.gui.bean.SBeanForm implements ItemListener {
 
@@ -31,6 +33,8 @@ public class SFormRate extends sa.lib.gui.bean.SBeanForm implements ItemListener
 
     /**
      * Creates new form SFormRate
+     * @param client
+     * @param title
      */
     public SFormRate(SGuiClient client, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.LOGU_SPOT, SLibConstants.UNDEFINED, title);
@@ -89,7 +93,7 @@ public class SFormRate extends sa.lib.gui.bean.SBeanForm implements ItemListener
         jlSourceSpotType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel21.add(jlSourceSpotType);
 
-        moKeySourceSpotType.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeySourceSpotType.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel21.add(moKeySourceSpotType);
 
         jPanel23.add(jPanel21);
@@ -100,7 +104,7 @@ public class SFormRate extends sa.lib.gui.bean.SBeanForm implements ItemListener
         jlSourceSpot.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel25.add(jlSourceSpot);
 
-        moKeySourceSpot.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeySourceSpot.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel25.add(moKeySourceSpot);
 
         jPanel23.add(jPanel25);
@@ -111,7 +115,7 @@ public class SFormRate extends sa.lib.gui.bean.SBeanForm implements ItemListener
         jlDestinySpotType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel26.add(jlDestinySpotType);
 
-        moKeyDestinySpotType.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyDestinySpotType.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel26.add(moKeyDestinySpotType);
 
         jPanel23.add(jPanel26);
@@ -122,29 +126,30 @@ public class SFormRate extends sa.lib.gui.bean.SBeanForm implements ItemListener
         jlDestinySpot.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel27.add(jlDestinySpot);
 
-        moKeyDestinySpot.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyDestinySpot.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel27.add(moKeyDestinySpot);
 
         jPanel23.add(jPanel27);
 
         jPanel28.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlCarrier.setText("Transportista:*");
+        jlCarrier.setText("Transportista:");
         jlCarrier.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel28.add(jlCarrier);
+        jlCarrier.getAccessibleContext().setAccessibleName("Transportista:");
 
-        moKeyCarrier.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyCarrier.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel28.add(moKeyCarrier);
 
         jPanel23.add(jPanel28);
 
         jPanel29.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlVehicleType.setText("Tipo vehículo:*");
+        jlVehicleType.setText("Tipo vehículo:");
         jlVehicleType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel29.add(jlVehicleType);
 
-        moKeyVehicleType.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyVehicleType.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel29.add(moKeyVehicleType);
 
         jPanel23.add(jPanel29);
@@ -155,7 +160,7 @@ public class SFormRate extends sa.lib.gui.bean.SBeanForm implements ItemListener
         jlCurrency.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel30.add(jlCurrency);
 
-        moKeyCurrency.setPreferredSize(new java.awt.Dimension(200, 23));
+        moKeyCurrency.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel30.add(moKeyCurrency);
 
         jPanel23.add(jPanel30);
@@ -235,8 +240,6 @@ public class SFormRate extends sa.lib.gui.bean.SBeanForm implements ItemListener
         moFields.addField(moKeySourceSpot);
         moFields.addField(moKeyDestinySpotType);
         moFields.addField(moKeyDestinySpot);
-        moFields.addField(moKeyCarrier);
-        moFields.addField(moKeyVehicleType);
         moFields.addField(moKeyCurrency);
         moFields.addField(moCurRate.getField());
         moFields.addField(moBoolConsolidated);
@@ -330,8 +333,8 @@ public class SFormRate extends sa.lib.gui.bean.SBeanForm implements ItemListener
         moRegistry.setFkSourceSpotId(moKeySourceSpot.getValue()[0]);
         moRegistry.setFkDestinySpotTypeId(moKeyDestinySpotType.getValue()[0]);
         moRegistry.setFkDestinySpotId(moKeyDestinySpot.getValue()[0]);
-        moRegistry.setFkCarrierId(moKeyCarrier.getValue()[0]);
-        moRegistry.setFkVehicleTypeId(moKeyVehicleType.getValue()[0]);
+        moRegistry.setFkCarrierId(moKeyCarrier.getSelectedIndex() == 0 ? 0 : moKeyCarrier.getValue()[0]);
+        moRegistry.setFkVehicleTypeId(moKeyVehicleType.getSelectedIndex() == 0 ? 0 : moKeyVehicleType.getValue()[0]);
         moRegistry.setFkCurrencyId(moKeyCurrency.getValue()[0]);
         moRegistry.setRate(moCurRate.getField().getValue());
         moRegistry.setConsolidated(moBoolConsolidated.getValue());
@@ -342,6 +345,28 @@ public class SFormRate extends sa.lib.gui.bean.SBeanForm implements ItemListener
     @Override
     public SGuiValidation validateForm() {
         SGuiValidation validation = moFields.validateFields();
+        
+        if (validation.isValid()) {
+            boolean showConfirmBox = false;
+            String message = "No selecciono ninguna opción en los siguientes campos:\n";
+            JComponent component = null;
+            if (moKeyCarrier.getSelectedIndex() == 0) {
+                showConfirmBox = true;
+                message += SGuiUtils.getLabelName(jlCarrier) + "\n";
+                component = component == null ? moKeyCarrier : component;
+            }
+            if (moKeyVehicleType.getSelectedIndex() == 0) {
+                showConfirmBox = true;
+                message += SGuiUtils.getLabelName(jlVehicleType) + "\n";
+                component = component == null ? moKeyVehicleType : component;
+            }
+            if (showConfirmBox) {
+                if (miClient.showMsgBoxConfirm(message + SGuiConsts.MSG_CNF_CONT) != JOptionPane.OK_OPTION){
+                    validation.setMessage("Favor de llenar los campos faltantes.");
+                    validation.setComponent(component);
+                }
+            }
+        }
 
         return validation;
     }
