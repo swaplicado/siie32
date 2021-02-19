@@ -294,6 +294,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_MKT_REP = 106901;
 
     public static final int PRV_LOG_MISC = 107001;
+    public static final int PRV_LOG_RATE = 107002;
     public static final int PRV_LOG_REP = 107901;
 
     public static final int PRV_MFG_MISC = 108001;

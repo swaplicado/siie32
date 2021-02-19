@@ -25,11 +25,18 @@ public class SViewSpot extends SGridPaneView {
 
     public SViewSpot(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOGU_SPOT, SLibConstants.UNDEFINED, title);
-        setButtonsEnabled();
+        setButtonsEnabledByPrivilege();
     }
     
-    private void setButtonsEnabled() {
-        int level = miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_LOG_MISC);
+    private void setButtonsEnabledByPrivilege() {
+        if (miClient.getSession().getUser().hasPrivilege(SDataConstantsSys.PRV_LOG_RATE)){
+            setButtonsEnabled(miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_LOG_RATE));
+        }
+        else if (miClient.getSession().getUser().hasPrivilege(SDataConstantsSys.PRV_LOG_MISC)){
+            setButtonsEnabled(miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_LOG_MISC));
+        }
+    }
+    private void setButtonsEnabled (int level) {
         switch (level) {
             case SUtilConsts.LEV_READ:
                 setRowButtonsEnabled(false);

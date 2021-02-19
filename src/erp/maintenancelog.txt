@@ -1,3 +1,12 @@
+SIIE 3.2 179.0*/ 2021-02-19
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se quitó la obligatoriedad en los campos de transportista y tipo vehículo en la forma de captura de tarifas en el módulo de embarques.
+2) Se creó un reporte en el módulo de embarques que muestra un listado de las tarifas.
+3) Se mejoró la granularidad de los permisos en el módulo de embarques, se creó un nuevo permiso de tarifas para que sólo las personas 
+    autorizadas puedan ver, agregar y editar tarifas.
+
+================================================================================
 SIIE 3.2 177.4*/ 2021-02-12
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------

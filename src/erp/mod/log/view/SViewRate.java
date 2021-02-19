@@ -4,10 +4,12 @@
  */
 package erp.mod.log.view;
 
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import java.util.Arrays;
+import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -23,7 +25,26 @@ public class SViewRate extends SGridPaneView {
 
     public SViewRate(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_RATE, SLibConstants.UNDEFINED, title);
-        setRowButtonsEnabled(true, true, true, false, true);        
+        setButtonsEnabled();      
+    }
+    
+    private void setButtonsEnabled () {
+        switch (miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_LOG_RATE)) {
+            case SUtilConsts.LEV_READ:
+                setRowButtonsEnabled(false);
+                break;
+            case SUtilConsts.LEV_CAPTURE:
+            case SUtilConsts.LEV_AUTHOR:
+                setRowButtonsEnabled(true, true, false, false, false);
+                break;
+            case SUtilConsts.LEV_EDITOR:
+                setRowButtonsEnabled(true, true, true, false, false);
+                break;
+            case SUtilConsts.LEV_MANAGER:
+                setRowButtonsEnabled(true, true, true, false, true);
+                break;
+            default:
+        }
     }
 
     @Override

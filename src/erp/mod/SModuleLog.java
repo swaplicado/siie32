@@ -53,7 +53,7 @@ import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Isabel Servín
  */
 public class SModuleLog extends SGuiModule {
 
