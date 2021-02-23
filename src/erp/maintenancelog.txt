@@ -1,3 +1,13 @@
+SIIE 3.2 179.1*/ 2021-02-23
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se corrigió un error en la captura de asociados de negocios que hacia que jamas se agregara uno nuevo como "compañia".
+2) Se mejoró el campo y la descarga de CFD's en las partidas de pólizas contables, pudiendo ver el total y descargar todos los CFD's 
+    relacionados de manera directa o indirecta.
+3) Se mejoró el campo y la descarga de CFD's en la vista de pólizas contables, pudiendo ver el total y descargar todos los CFD's 
+    relacionados de manera directa o indirecta.
+
+================================================================================
 SIIE 3.2 179.0*/ 2021-02-19
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

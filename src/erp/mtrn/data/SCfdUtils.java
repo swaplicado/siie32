@@ -83,6 +83,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import javax.mail.MessagingException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -4694,8 +4695,8 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
     
-    public static void getXmlCfds(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
-        ArrayList<SDataCfd> cfdsAux = new ArrayList<>();
+    public static void getXmlCfds(final SClientInterface client, final HashSet<SDataCfd> cfds) throws Exception {
+        HashSet<SDataCfd> cfdsAux = new HashSet<>();
 
         for(SDataCfd cfd : cfds) {
             if (cfd != null || !cfd.getDocXml().isEmpty() || !cfd.getDocXmlName().isEmpty()) {
@@ -5020,28 +5021,56 @@ public abstract class SCfdUtils implements Serializable {
     }
     
     /**
-     * Devuelve los cfds de una póliza contable a través del primary key de la póliza.
+     * Devuelve los cfds de una póliza contable.
      * @param client
      * @param cfdKey
      * @return SDataCfd.
      * @throws java.lang.Exception
      */
-    public static ArrayList<SDataCfd> getCfdRecord(final SClientInterface client, final Object[] cfdKey) throws java.lang.Exception {
-        ArrayList<SDataCfd> cfds = new ArrayList<>();
-
+    public static HashSet<SDataCfd> getCfdRecord(final SClientInterface client, final Object[] cfdKey) throws java.lang.Exception {
+        HashSet<SDataCfd> cfds = new HashSet<>();
+        
+        // CFD de manera directa:
+        
         String sql = "SELECT id_cfd FROM trn_cfd "
                 + "WHERE fid_rec_year_n = " + cfdKey[0] + " " 
                 + "AND fid_rec_per_n = " + cfdKey[1] + " " 
                 + "AND fid_rec_bkc_n = " + cfdKey[2] + " " 
                 + "AND fid_rec_tp_rec_n = '" + cfdKey[3] + "' " 
                 + "AND fid_rec_num_n = " + cfdKey[4] + ";" ;
-
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
                 cfds.add((SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT));
             }
         }
+        
+        // CFD de documentos de clientes y proveedores:
 
+        String aux = "SELECT DISTINCT c.id_cfd FROM fin_rec_ety AS re1, trn_cfd AS c "
+                + "WHERE NOT re1.b_del "
+                + "AND re1.id_year = " + cfdKey[0] + " "
+                + "AND re1.id_per = " + cfdKey[1] + " "
+                + "AND re1.id_bkc = " + cfdKey[2] + " " 
+                + "AND re1.id_tp_rec = '" + cfdKey[3] + "' "
+                + "AND re1.id_num = " + cfdKey[4] + " ";
+        sql = aux + "AND re1.fid_dps_year_n = c.fid_dps_year_n " +
+                "AND re1.fid_dps_doc_n = c.fid_dps_doc_n;";
+                
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                cfds.add((SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT));
+            }
+        }
+        
+        // CFD de recepción de pagos:
+        
+        sql = aux + "AND re1.fid_cfd_n = c.id_cfd;";
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                cfds.add((SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT));
+            }
+        }
+        
         return cfds;
     }
 
