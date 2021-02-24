@@ -33,7 +33,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -1407,7 +1407,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             }
             else {
                 try {
-                    ArrayList<SDataCfd> cfds = ((SDataRecordEntryRow)moPaneGridEntries.getSelectedTableRow()).getCfds();
+                    HashSet<SDataCfd> cfds = ((SDataRecordEntryRow)moPaneGridEntries.getSelectedTableRow()).getCfds();
                     SCfdUtils.getXmlCfds(miClient, cfds);
                 }
                 catch (Exception e) {

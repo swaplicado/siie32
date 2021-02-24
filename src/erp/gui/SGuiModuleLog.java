@@ -13,13 +13,14 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mod.log.form.SDialogRepRate;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -61,14 +62,15 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiShipmentDiogPendingDetail;
 
     private javax.swing.JMenu jmCatalogue;
-    private javax.swing.JMenuItem jmiCatalogueVehicleType;
     private javax.swing.JMenuItem jmiCatalogueSpot;
     private javax.swing.JMenuItem jmiCatalogueSpotCompanyBranch;
     private javax.swing.JMenuItem jmiCatalogueSpotCompanyBranchEntity;
-    private javax.swing.JMenuItem jmiCatalogueRate;
+    private javax.swing.JMenuItem jmiCatalogueVehicleType;
     private javax.swing.JMenuItem jmiCatalogueVehicle;
+    private javax.swing.JMenuItem jmiCatalogueRate;
 
     private javax.swing.JMenu jmReports;
+    private javax.swing.JMenuItem jmiRepRate;
 
     private erp.form.SFormOptionPicker moPickerModeOfTransportationType;
     private erp.form.SFormOptionPicker moPickerCarrierType;
@@ -82,7 +84,9 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
     }
 
     private void initComponents() {
-        boolean hasRightReports = false;
+        boolean hasRightMisc;
+        boolean hasRightReports;
+        boolean hasRightRate;
 
         jmShipment = new JMenu("Embarques");
         jmiShipment = new JMenuItem("Embarques");
@@ -130,6 +134,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatalogueRate = new JMenuItem("Tarifas");
 
         jmReports = new JMenu("Reportes");
+        jmiRepRate = new JMenuItem("Listado de tarifas...");
 
         jmShipment.add(jmiShipment);
         jmShipment.add(jmiShipmentDetail);
@@ -181,6 +186,8 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCatalogue.add(jmiCatalogueVehicleType);
         jmCatalogue.add(jmiCatalogueVehicle);
         jmCatalogue.add(jmiCatalogueRate);
+        
+        jmReports.add(jmiRepRate);
 
         jmiShipment.addActionListener(this);
         jmiShipmentDetail.addActionListener(this);
@@ -211,22 +218,40 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiShipmentDpsSalesPending.addActionListener(this);
         jmiShipmentDpsSales.addActionListener(this);
 
-        jmiCatalogueVehicleType.addActionListener(this);
         jmiCatalogueSpot.addActionListener(this);
         jmiCatalogueSpotCompanyBranch.addActionListener(this);
         jmiCatalogueSpotCompanyBranchEntity.addActionListener(this);
-        jmiCatalogueRate.addActionListener(this);
+        jmiCatalogueVehicleType.addActionListener(this);
         jmiCatalogueVehicle.addActionListener(this);
+        jmiCatalogueRate.addActionListener(this);
 
+        jmiRepRate.addActionListener(this);
+        
         moPickerModeOfTransportationType = null;
         moPickerCarrierType = null;
         moPickerIncoterm = null;
         moPickerVehicle = null;
         moPickerVehicleType = null;
 
+        hasRightMisc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_LOG_MISC).HasRight;
+        hasRightRate = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_LOG_RATE).HasRight;
         hasRightReports = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_LOG_REP).HasRight;
 
+        jmCatalogue.setEnabled(hasRightMisc || hasRightRate);
+        jmShipment.setEnabled(hasRightMisc);
+        jmShipmentSales.setEnabled(hasRightMisc);
+        jmShipmentAdjustment.setEnabled(hasRightMisc);
+        jmShipmentDiog.setEnabled(hasRightMisc);
         jmReports.setEnabled(hasRightReports);
+        
+        jmiCatalogueSpot.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogueSpotCompanyBranch.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogueSpotCompanyBranchEntity.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogueVehicleType.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogueVehicle.setEnabled(hasRightMisc || hasRightRate);
+        jmiCatalogueRate.setEnabled(hasRightRate);
+        
+        jmiRepRate.setEnabled(hasRightRate);
     }
 
     private int showForm(int formType, int auxType, java.lang.Object pk, boolean isCopy) {
@@ -320,10 +345,7 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
         if (e.getSource() instanceof javax.swing.JMenuItem) {
             javax.swing.JMenuItem item = (javax.swing.JMenuItem) e.getSource();
 
-            if (item == jmiCatalogueVehicleType) {
-                miClient.getSession().showView(SModConsts.LOGU_TP_VEH, SLibConstants.UNDEFINED, null);
-            }
-            else if (item == jmiCatalogueSpot) {
+            if (item == jmiCatalogueSpot) {
                 miClient.getSession().showView(SModConsts.LOGU_SPOT, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiCatalogueSpotCompanyBranch) {
@@ -332,11 +354,14 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiCatalogueSpotCompanyBranchEntity) {
                 miClient.getSession().showView(SModConsts.LOGU_SPOT_COB_ENT, SLibConstants.UNDEFINED, null);
             }
-            else if (item == jmiCatalogueRate) {
-                miClient.getSession().showView(SModConsts.LOG_RATE, SLibConstants.UNDEFINED, null);
+            else if (item == jmiCatalogueVehicleType) {
+                miClient.getSession().showView(SModConsts.LOGU_TP_VEH, SLibConstants.UNDEFINED, null);
             }
             else if (item == jmiCatalogueVehicle) {
                 miClient.getSession().showView(SModConsts.LOG_VEH, SLibConstants.UNDEFINED, null);
+            }
+            else if (item == jmiCatalogueRate) {
+                miClient.getSession().showView(SModConsts.LOG_RATE, SLibConstants.UNDEFINED, null);
             }
 
             else if (item == jmiShipment) {
@@ -422,6 +447,10 @@ public class SGuiModuleLog extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiShipmentDpsSales) {
                 miClient.getSession().showView(SModConsts.LOGX_SHIP_DPS_SAL, SModConsts.VIEW_ST_DONE, new SGuiParams(SModConsts.VIEW_SC_SUM));
+            }
+            
+            else if (item == jmiRepRate) {
+                new SDialogRepRate(miClient.getSession().getClient(), "Listado de tarifas").setVisible(true);
             }
         }
     }

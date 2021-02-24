@@ -6,7 +6,7 @@
 package erp.mfin.data;
 
 import erp.mtrn.data.SDataCfd;
-import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  *
@@ -21,9 +21,9 @@ public final class SDataRecordEntryRow extends erp.lib.table.STableRow {
     
     /**
      * Devuelve una lista con los CFDs del registro.
-     * @return ArrayList.
+     * @return HashSet.
      */
-    public ArrayList<SDataCfd> getCfds() {
+    public HashSet<SDataCfd> getCfds() {
         return ((SDataRecordEntry) moData).getDbmsDataCfds();
     }
     

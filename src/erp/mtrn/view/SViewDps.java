@@ -5,6 +5,7 @@
 
 package erp.mtrn.view;
 
+import cfd.DCfdConsts;
 import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
@@ -1139,30 +1140,33 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else {
                     SDataBizPartnerBranch comBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-                    SDataBizPartnerBranch bpBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-                    SDataBizPartnerBranchAddress bpBranchAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, new int [] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
-                    SDataBizPartnerBranchContact bpBranchContact = null;
+                    SDataBizPartnerBranch bprBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+                    SDataBizPartnerBranchAddress bprBranchAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, new int [] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
+                    SDataBizPartnerBranchContact comBranchContact = null;
+                    SDataBizPartnerBranchContact bprBranchContact = null;
                     SDataCurrency currency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
 
                     int addressFormatType = 0;
                     boolean addCountry = false;
                     
-                    if (bpBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
-                        addressFormatType = bpBranch.getFkAddressFormatTypeId_n();
+                    if (bprBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+                        addressFormatType = bprBranch.getFkAddressFormatTypeId_n();
                     }
                     else {
                         addressFormatType = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
                     }
                     
-                    if (bpBranchAddress.getFkCountryId_n() == comBranch.getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n()) {
+                    if (bprBranchAddress.getFkCountryId_n() == comBranch.getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n()) {
                         addCountry = false;
                     }
                     else {
                         addCountry = true;
                     }
 
-                    String[] hqAddressTexts = bpBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
-                    String[] dvyAddressTexts = bpBranchAddress.obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                    SDataBizPartner company = miClient.getSessionXXX().getCompany().getDbmsDataCompany();
+                    String[] comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                    String[] bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                    String[] dvyAddressTexts = bprBranchAddress.obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
 
                     Cursor cursor = getCursor();
                     Map<String, Object> map = null;
@@ -1195,33 +1199,96 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         try {
                             setCursor(new Cursor(Cursor.WAIT_CURSOR));
                             
-                            bpBranchContact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
-                                    miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+                            if (company.getFiscalId().equals(DCfdConsts.RFC_GEN_INT)) {
+                                // international company:
+                                
+                                comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
+                                bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
+                                dvyAddressTexts = bprBranchAddress.obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
+                                
+                                SDataBizPartnerBranchContact bprBranchContactForPhone = company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0);
+                                bprBranchContact = bprBranch.getDbmsBizPartnerBranchContacts().size() <= 1 ? null : bprBranch.getDbmsBizPartnerBranchContacts().get(1);
 
-                            map = miClient.createReportParams();
-                            map.put("nIdYear", dps.getPkYearId());
-                            map.put("nIdDoc", dps.getPkDocId());
-                            map.put("sAddressLine1", hqAddressTexts[0]);
-                            map.put("sAddressLine2", hqAddressTexts[1]);
-                            map.put("sAddressLine3", hqAddressTexts[2]);
-                            map.put("sAddressLine4", hqAddressTexts.length > 3 ? hqAddressTexts[3] : "");
-                            map.put("sAddressDelivery1", dvyAddressTexts[0].compareTo(hqAddressTexts[0]) == 0 ? "": dvyAddressTexts[0]);
-                            map.put("sAddressDelivery2", dvyAddressTexts[1].compareTo(hqAddressTexts[1]) == 0 ? "DOMICILIO DEL CLIENTE": dvyAddressTexts[1]);
-                            map.put("sAddressDelivery3", dvyAddressTexts[2].compareTo(hqAddressTexts[2]) == 0 ? "": dvyAddressTexts[2]);
-                            map.put("sAddressDelivery4", dvyAddressTexts.length > 3 && hqAddressTexts.length > 3 ?
-                                dvyAddressTexts[3].compareTo(hqAddressTexts[3]) == 0 ? "" : dvyAddressTexts[3] : "");
-                            map.put("nBizPartnerCategory", SDataConstantsSys.BPSS_CT_BP_CUS);
-                            map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
-                                dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
-                                SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
-                            map.put("sErpCurrencyKey", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
-                            map.put("bShowBackground", false);
-                            map.put("sManagerFinance", bpBranchContact == null ? "" : SLibUtilities.textTrim(bpBranchContact.getContactPrefix() + " " + bpBranchContact.getFirstname() + " " + bpBranchContact.getLastname()));
+                                map = miClient.createReportParams();
+                                map.put("nDpsYearId", dps.getPkYearId());
+                                map.put("nDpsDocId", dps.getPkDocId());
+                                map.put("sDpsNumber", dps.getDpsNumber());
+                                map.put("tDpsDate", dps.getDate());
+                                map.put("nDpsDueDays", dps.getDaysOfCredit());
+                                
+                                map.put("sDpsNote1", "If any fees are not received by Saporis International by the due date, those fees may accrue late interest at a rate of 1.5% of the outstanding balance per month or the maximum rate permitted by the law, whichever is lower.");
+                                map.put("sDpsNote2", "<p><b>PLEASE WIRE TRANSFER TO THE FOLLOWING BANK ACCOUNT NUMBER</b></p>"
+                                        + "<p>BANK OF AMERICA</p>"
+                                        + "<p>ACCOUNT NAME: SAPORIS INTERNATIONAL INC</p>"
+                                        + "<p>ACCOUNT NUMBER: 325143301493</p>"
+                                        + "<p>ROUTING NUMBER: 121000358</p>"
+                                        + "<p>WIRE: 026009593</p>"
+                                        + "<br>"
+                                        + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
+                                        + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>");
+                                
+                                map.put("sPONumber", dps.getNumberReference());
+                                map.put("sONumber", "");
+                                
+                                map.put("sIssName", company.getBizPartner());
+                                map.put("sIssAddress1", comAddressTexts[0]);
+                                map.put("sIssAddress2", comAddressTexts[1]);
+                                
+                                SDataBizPartner customer = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+                                map.put("sCusNumber", customer.getDbmsCategorySettingsCus().getKey());
+                                map.put("sCusName", customer.getBizPartner());
+                                map.put("sCusAddress1", bprAddressTexts[0]);
+                                map.put("sCusAddress2", bprAddressTexts[1]);
+                                
+                                map.put("sDvyName", customer.getBizPartner());
+                                map.put("sDvyAddress1", dvyAddressTexts[0]);
+                                map.put("sDvyAddress2", dvyAddressTexts[1]);
+                                
+                                map.put("sDvyPhone", bprBranchContactForPhone.getAuxTelephoneNumbers());
+                                map.put("sDvyContact", bprBranchContact == null ? "" : bprBranchContact.getContact());
+                                
+                                map.put("sCurCode", miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { dps.getFkCurrencyId() }));
+                                
+                                map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
+                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
 
-                            jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS, map);
-                            jasperViewer = new JasperViewer(jasperPrint, false);
-                            jasperViewer.setTitle("Impresión de factura");
-                            jasperViewer.setVisible(true);
+                                jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_US, map);
+                                jasperViewer = new JasperViewer(jasperPrint, false);
+                                jasperViewer.setTitle("Invoice printing");
+                                jasperViewer.setVisible(true);
+                            }
+                            else {
+                                // national company:
+                                
+                                comBranchContact = company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
+                                        company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+
+                                map = miClient.createReportParams();
+                                map.put("nIdYear", dps.getPkYearId());
+                                map.put("nIdDoc", dps.getPkDocId());
+                                map.put("sAddressLine1", bprAddressTexts[0]);
+                                map.put("sAddressLine2", bprAddressTexts[1]);
+                                map.put("sAddressLine3", bprAddressTexts[2]);
+                                map.put("sAddressLine4", bprAddressTexts.length > 3 ? bprAddressTexts[3] : "");
+                                map.put("sAddressDelivery1", dvyAddressTexts[0].compareTo(bprAddressTexts[0]) == 0 ? "": dvyAddressTexts[0]);
+                                map.put("sAddressDelivery2", dvyAddressTexts[1].compareTo(bprAddressTexts[1]) == 0 ? "DOMICILIO DEL CLIENTE": dvyAddressTexts[1]);
+                                map.put("sAddressDelivery3", dvyAddressTexts[2].compareTo(bprAddressTexts[2]) == 0 ? "": dvyAddressTexts[2]);
+                                map.put("sAddressDelivery4", dvyAddressTexts.length > 3 && bprAddressTexts.length > 3 ?
+                                    dvyAddressTexts[3].compareTo(bprAddressTexts[3]) == 0 ? "" : dvyAddressTexts[3] : "");
+                                map.put("nBizPartnerCategory", SDataConstantsSys.BPSS_CT_BP_CUS);
+                                map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
+                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+                                map.put("sErpCurrencyKey", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
+                                map.put("bShowBackground", false);
+                                map.put("sManagerFinance", comBranchContact == null ? "" : SLibUtilities.textTrim(comBranchContact.getContactPrefix() + " " + comBranchContact.getFirstname() + " " + comBranchContact.getLastname()));
+
+                                jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS, map);
+                                jasperViewer = new JasperViewer(jasperPrint, false);
+                                jasperViewer.setTitle("Impresión de factura");
+                                jasperViewer.setVisible(true);
+                            }
                         }
                         catch (Exception e) {
                             SLibUtilities.renderException(this, e);
@@ -1235,23 +1302,24 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                         try {
                             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                            bpBranchContact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
-                                    miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+                            
+                            comBranchContact = company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
+                                    company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
 
                             map = miClient.createReportParams();
                             map.put("nIdYear", dps.getPkYearId());
                             map.put("nIdDoc", dps.getPkDocId());
-                            map.put("sAddressLine1", hqAddressTexts[0]);
-                            map.put("sAddressLine2", hqAddressTexts[1]);
-                            map.put("sAddressLine3", hqAddressTexts[2]);
-                            map.put("sAddressLine4", hqAddressTexts.length > 3 ? hqAddressTexts[3] : "");
+                            map.put("sAddressLine1", bprAddressTexts[0]);
+                            map.put("sAddressLine2", bprAddressTexts[1]);
+                            map.put("sAddressLine3", bprAddressTexts[2]);
+                            map.put("sAddressLine4", bprAddressTexts.length > 3 ? bprAddressTexts[3] : "");
                             map.put("nBizPartnerCategory", SDataConstantsSys.BPSS_CT_BP_CUS);
                             map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
                                 dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                 SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
                             map.put("sErpCurrencyKey", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
                             map.put("bShowBackground", false);
-                            map.put("sManagerFinance", bpBranchContact == null ? "" : SLibUtilities.textTrim(bpBranchContact.getContactPrefix() + " " + bpBranchContact.getFirstname() + " " + bpBranchContact.getLastname()));
+                            map.put("sManagerFinance", comBranchContact == null ? "" : SLibUtilities.textTrim(comBranchContact.getContactPrefix() + " " + comBranchContact.getFirstname() + " " + comBranchContact.getLastname()));
 
                             jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_ADJ, map);
                             jasperViewer = new JasperViewer(jasperPrint, false);
@@ -1282,17 +1350,17 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map.put("nIdDoc", dps.getPkDocId());
                             
                             if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
-                                map.put("sAddressLine1", hqAddressTexts[0]);
-                                map.put("sAddressLine2", hqAddressTexts[1]);
-                                map.put("sAddressLine3", hqAddressTexts[2]);
-                                map.put("sAddressLine4", hqAddressTexts.length > 3 ? hqAddressTexts[3] : "");
+                                map.put("sAddressLine1", bprAddressTexts[0]);
+                                map.put("sAddressLine2", bprAddressTexts[1]);
+                                map.put("sAddressLine3", bprAddressTexts[2]);
+                                map.put("sAddressLine4", bprAddressTexts.length > 3 ? bprAddressTexts[3] : "");
                             }
                             else {
-                                String[] comAddressTexts = miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
-                                map.put("sAddressLine1", comAddressTexts[0] == null || comAddressTexts[0].isEmpty() ? "": comAddressTexts[0]);
-                                map.put("sAddressLine2", comAddressTexts[1] == null || comAddressTexts[1].isEmpty() ? "": comAddressTexts[1]);
-                                map.put("sAddressLine3", comAddressTexts[2] == null || comAddressTexts[2].isEmpty() ? "": comAddressTexts[2]);
-                                map.put("sAddressLine4", comAddressTexts.length > 3 ? comAddressTexts[3] : "");
+                                String[] comBranchAddressTexts = miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                                map.put("sAddressLine1", comBranchAddressTexts[0] == null || comBranchAddressTexts[0].isEmpty() ? "": comBranchAddressTexts[0]);
+                                map.put("sAddressLine2", comBranchAddressTexts[1] == null || comBranchAddressTexts[1].isEmpty() ? "": comBranchAddressTexts[1]);
+                                map.put("sAddressLine3", comBranchAddressTexts[2] == null || comBranchAddressTexts[2].isEmpty() ? "": comBranchAddressTexts[2]);
+                                map.put("sAddressLine4", comBranchAddressTexts.length > 3 ? comBranchAddressTexts[3] : "");
                             }
 
                             textsPrices.add("");
@@ -1353,18 +1421,19 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             
                             map.put("oVectorTextUnit", textsUnits);
                             
-                            bpBranchContact = bpBranch.getDbmsBizPartnerBranchContact(new int[] { dps.getFkContactBizPartnerBranchId_n(), dps.getFkContactContactId_n() });
-                            if (bpBranchContact == null) {
-                                for (int i = 0; i < bpBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
-                                    if (bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_PUR && !bpBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
-                                        textContact = bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
-                                                (bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
-                                                bpBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
+                            bprBranchContact = bprBranch.getDbmsBizPartnerBranchContact(new int[] { dps.getFkContactBizPartnerBranchId_n(), dps.getFkContactContactId_n() });
+                            
+                            if (bprBranchContact == null) {
+                                for (int i = 0; i < bprBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
+                                    if (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_PUR && !bprBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
+                                        textContact = bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
+                                                (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
+                                                bprBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
                                     }
-                                    else if (bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !bpBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
-                                        textContact = bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
-                                                (bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
-                                                bpBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
+                                    else if (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !bprBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
+                                        textContact = bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
+                                                (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
+                                                bprBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
                                     }
 
                                     if (!textContact.isEmpty()) {
@@ -1373,10 +1442,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 }
                             }
                             else {
-                                textContact = bpBranchContact.getFirstname() + (bpBranchContact.getFirstname().length() > 0 ? " " : "") + bpBranchContact.getLastname();
+                                textContact = bprBranchContact.getFirstname() + (bprBranchContact.getFirstname().length() > 0 ? " " : "") + bprBranchContact.getLastname();
                             }
 
-                            map.put("sContact", textContact.isEmpty() ? bpBranch.getDbmsBizPartner() : textContact);
+                            map.put("sContact", textContact.isEmpty() ? bprBranch.getDbmsBizPartner() : textContact);
                             map.put("ctBpCus", SDataConstantsSys.BPSS_CT_BP_CUS);
                             map.put("ctBpSup", SDataConstantsSys.BPSS_CT_BP_SUP);
                             map.put("nFidCtBp", SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON) ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP);
@@ -1409,24 +1478,21 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         try {
                             setCursor(new Cursor(Cursor.WAIT_CURSOR)); 
                             
-                            SDataBizPartner bizPartner = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { miClient.getSessionXXX().getCurrentCompany().getDbmsDataCompany().getPkBizPartnerId()}, SLibConstants.EXEC_MODE_SILENT);
-                            bizPartner.getDbmsBizPartnerBranches().get(0).getFkBizPartnerId();
-                            dps.getFkCompanyBranchId();
-                                                        
                             map = miClient.createReportParams();
                             map.put("nIdYear", dps.getPkYearId());
                             map.put("nIdDoc", dps.getPkDocId());
                             miClient.getSessionXXX().getCurrentCompany().getDbmsDataCompany().getDbmsBizPartnerBranches();
                             
-                            for (int i = 0; i < bizPartner.getDbmsBizPartnerBranches().size(); i++ ) {
-                                if (bizPartner.getDbmsBizPartnerBranches().get(i).getPkBizPartnerBranchId() == dps.getFkCompanyBranchId()) {
-                                    String[] comAddressTexts = bizPartner.getDbmsBizPartnerBranches().get(i).getDbmsBizPartnerBranchAddresses().get(0).obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                            for (int i = 0; i < company.getDbmsBizPartnerBranches().size(); i++ ) {
+                                if (company.getDbmsBizPartnerBranches().get(i).getPkBizPartnerBranchId() == dps.getFkCompanyBranchId()) {
+                                    comAddressTexts = company.getDbmsBizPartnerBranches().get(i).getDbmsBizPartnerBranchAddresses().get(0).obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
                                     map.put("sAddressLine1", comAddressTexts[0] == null || comAddressTexts[0].isEmpty() ? "": comAddressTexts[0]);
                                     map.put("sAddressLine2", comAddressTexts[1] == null || comAddressTexts[1].isEmpty() ? "": comAddressTexts[1]);
                                     map.put("sAddressLine3", comAddressTexts[2].toUpperCase() == null || comAddressTexts[2].isEmpty() ? "": comAddressTexts[2].toUpperCase());
                                     map.put("sAddressLine4", comAddressTexts.length > 3 ? comAddressTexts[3] : "");
                                     map.put("sFiscalIdBp", miClient.getSessionXXX().getCurrentCompany().getDbmsDataCompany().getFiscalId());
-                                    map.put("sTelephone", bizPartner.getDbmsBizPartnerBranches().get(i).getDbmsBizPartnerBranchContacts().get(0).getAuxTelephoneNumbers());
+                                    map.put("sTelephone", company.getDbmsBizPartnerBranches().get(i).getDbmsBizPartnerBranchContacts().get(0).getAuxTelephoneNumbers());
+                                    break;
                                 }
                             }
 
@@ -1475,13 +1541,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                             map.put("oVectorTextUnit", textsUnits);
 
-                            bpBranchContact = bpBranch.getDbmsBizPartnerBranchContact(new int[] { dps.getFkContactBizPartnerBranchId_n(), dps.getFkContactContactId_n() });
-                            if (bpBranchContact == null) {
-                                for (int i = 0; i < bpBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
-                                    if (bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !bpBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
-                                        textContact = bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
-                                                (bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
-                                                bpBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
+                            bprBranchContact = bprBranch.getDbmsBizPartnerBranchContact(new int[] { dps.getFkContactBizPartnerBranchId_n(), dps.getFkContactContactId_n() });
+                            
+                            if (bprBranchContact == null) {
+                                for (int i = 0; i < bprBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
+                                    if (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !bprBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
+                                        textContact = bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
+                                                (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
+                                                bprBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
                                     }
 
                                     if (!textContact.isEmpty()) {
@@ -1490,10 +1557,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 }
                             }
                             else {
-                                textContact = bpBranchContact.getFirstname() + (bpBranchContact.getFirstname().length() > 0 ? " " : "") + bpBranchContact.getLastname();
+                                textContact = bprBranchContact.getFirstname() + (bprBranchContact.getFirstname().length() > 0 ? " " : "") + bprBranchContact.getLastname();
                             }
 
-                            map.put("sContact", textContact.isEmpty() ? bpBranch.getDbmsBizPartner() : textContact);
+                            map.put("sContact", textContact.isEmpty() ? bprBranch.getDbmsBizPartner() : textContact);
                             map.put("ctBpCus", SDataConstantsSys.BPSS_CT_BP_CUS);
                             map.put("ctBpSup", SDataConstantsSys.BPSS_CT_BP_SUP);
                             map.put("nFidCtBp", SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON) ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP);

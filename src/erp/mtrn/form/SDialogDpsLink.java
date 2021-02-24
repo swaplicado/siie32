@@ -56,7 +56,6 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
-    private boolean isOrder;
     private erp.lib.table.STablePane moTablePane;
 
     private int[] manParamDpsDestinyPk;
@@ -563,7 +562,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
 
                 rows++;
 
-                // The source is order and has supplied quantities
+                // The source is order and has supplied quantities:
                 
                 if (!validation.getIsError() && moParamDpsSource.isOrder()){
                     try {
@@ -582,7 +581,7 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                 
                 // Need monthly delivery:
 
-                if (!validation.getIsError() && isOrder) {
+                if (!validation.getIsError() && moParamDpsSource.isDpsTypeContract()) {
                     if (moGuiDpsLink.pickGuiDpsSourceEntry((int[]) moParamDpsSource.getPrimaryKey(), (int[]) entry.getDpsEntryKey()).getGuiDpsSourceEntryPrices().size() > 0) {
                         if (entry.getAuxSGuiDpsEntryPrice() == null) {
                             validation.setMessage("Para el ítem '" + entry.getConcept() + " (" + entry.getConceptKey() + ")' en la partida # " + entry.getSortingPosition() + "\n" +
@@ -604,7 +603,6 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                 }
 
                 if (entry.getSurplusPercentage() == 0) {
-                    
                     // No surplus allowed:
                     
                     if (!validation.getIsError()) {
@@ -742,20 +740,8 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
             case SDataConstants.TRNX_DPS_SRC:
                 moParamDpsSource = (SDataDps) value;
                 moPanelDps.setDps(moParamDpsSource, null);
-                break;
 
-            case SDataConstants.TRNX_DPS_DES:
-                manParamDpsDestinyPk = (int[]) value;
-                renderDpsSourceEntries();
-                break;
-                
-            case SDataConstants.TRN_DPS_ETY_PRC:
-                moGuiDpsLink = (SGuiDpsLink) value;
-                break;
-            case SDataConstants.TRNS_CL_DPS:
-                isOrder = (Boolean) value;
-                
-                if (isOrder) {
+                if (moParamDpsSource.isDpsTypeContract()) {
                     jlEntryPrice.setEnabled(true);
                     jcbDpsEntryPrices.setEnabled(true);
                     jcbDpsEntryPrices.setFocusable(true);
@@ -767,6 +753,15 @@ public class SDialogDpsLink extends javax.swing.JDialog implements erp.lib.form.
                     jcbDpsEntryPrices.setFocusable(false);
                     jbSetEverything.setEnabled(true);
                 }
+                break;
+
+            case SDataConstants.TRNX_DPS_DES:
+                manParamDpsDestinyPk = (int[]) value;
+                renderDpsSourceEntries();
+                break;
+                
+            case SDataConstants.TRN_DPS_ETY_PRC:
+                moGuiDpsLink = (SGuiDpsLink) value;
                 break;
                 
             default:

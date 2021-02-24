@@ -15,7 +15,7 @@ import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataCfd;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
+import java.util.HashSet;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
@@ -135,7 +135,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     protected java.lang.String msDbmsUserEdit;
     protected java.lang.String msDbmsUserDelete;
     protected erp.mfin.data.SDataCheck moDbmsCheck;
-    protected ArrayList<erp.mtrn.data.SDataCfd> maDbmsDataCfd;
+    protected HashSet<erp.mtrn.data.SDataCfd> maDbmsDataCfd;
 
     protected int mnAuxCheckNumber;
     protected java.util.Date mtAuxDateCfd;
@@ -325,7 +325,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public void setDbmsUserEdit(java.lang.String s) { msDbmsUserEdit = s; }
     public void setDbmsUserDelete(java.lang.String s) { msDbmsUserDelete = s; }
     public void setDbmsCheck(erp.mfin.data.SDataCheck o) { moDbmsCheck = o; }
-    public void setDbmsDataCfd(ArrayList<erp.mtrn.data.SDataCfd> a) { maDbmsDataCfd = a; }
+    public void setDbmsDataCfd(HashSet<erp.mtrn.data.SDataCfd> a) { maDbmsDataCfd = a; }
 
     public java.lang.String getDbmsAccount() { return msDbmsAccount; }
     public java.lang.String getDbmsAccountComplement() { return msDbmsAccountComplement; }
@@ -351,7 +351,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
     public erp.mfin.data.SDataCheck getDbmsCheck() { return moDbmsCheck; }
-    public ArrayList<erp.mtrn.data.SDataCfd> getDbmsDataCfds() { return maDbmsDataCfd; }
+    public HashSet<erp.mtrn.data.SDataCfd> getDbmsDataCfds() { return maDbmsDataCfd; }
 
     public void setAuxCheckNumber(int n) { mnAuxCheckNumber = n; }
     public void setAuxDateCfd(java.util.Date t) { mtAuxDateCfd = t; }
@@ -512,7 +512,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         msDbmsDps = "";
         mnDbmsXmlFilesNumber = 0;
         moDbmsCheck = null;
-        maDbmsDataCfd = new ArrayList<SDataCfd>();
+        maDbmsDataCfd = new HashSet<>();
 
         mnAuxCheckNumber = 0;
         mtAuxDateCfd = null;
@@ -527,9 +527,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         String compItem = "";
         String compTax = "";
         ResultSet resultSet = null;
-        Statement statementAux = null;
         SDataCheck check = null;
-        SDataCfd cfd = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
@@ -782,21 +780,23 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                     }
                 }
 
-                // Read XML:
-                statementAux = statement.getConnection().createStatement();
+                // CFD de manera directa: 
+                
                 sql = "SELECT id_cfd FROM trn_cfd WHERE fid_rec_year_n = " + key[0] + " AND fid_rec_per_n = " + key[1] + " AND " +
                     "fid_rec_bkc_n = " + key[2] + " AND fid_rec_tp_rec_n = '" + key[3] + "' AND " +
                     "fid_rec_num_n = " + key[4] + " AND fid_rec_ety_n = " + key[5] + " ";
-                resultSet = statement.executeQuery(sql);
-                while (resultSet.next()) {
-                    cfd = new SDataCfd();
-                    if (cfd.read(new int[] { resultSet.getInt("id_cfd") }, statementAux)!= SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                    }
-                    
-                    if (!cfd.getDocXmlName().isEmpty()) {
-                        maDbmsDataCfd.add(cfd);
-                    }
+                readXml(statement, sql);
+                
+                // CFD de documentos de clientes y proveedores:
+                
+                sql = "SELECT id_cfd FROM trn_cfd WHERE fid_dps_year_n = " + mnFkDpsYearId_n + " AND fid_dps_doc_n = " + mnFkDpsDocId_n + " ";
+                readXml(statement, sql);
+                
+                // CFD de recepción de pagos:
+                
+                if (mnFkCfdId_n != 0) {
+                    sql = "SELECT " + mnFkCfdId_n + " AS id_cfd;";
+                    readXml(statement, sql);
                 }
                 
                 mnDbmsXmlFilesNumber = maDbmsDataCfd.size();
@@ -815,6 +815,23 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         }
 
         return mnLastDbActionResult;
+    }
+    
+    private void readXml(Statement statement, String sql) throws Exception {
+        SDataCfd cfd;
+        Statement statementAux = statement.getConnection().createStatement();
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                cfd = new SDataCfd();
+                if (cfd.read(new int[] { resultSet.getInt("id_cfd") }, statementAux)!= SLibConstants.DB_ACTION_READ_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                }
+                
+                if (!cfd.getDocXmlName().isEmpty()) {
+                    maDbmsDataCfd.add(cfd);
+                }
+            }
+        }
     }
 
     @Override

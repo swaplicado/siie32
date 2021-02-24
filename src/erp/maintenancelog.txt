@@ -1,8 +1,52 @@
-SIIE 3.2 176.8*/ 2021-02-08
+SIIE 3.2 179.1*/ 2021-02-23
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se corrigió un error en la captura de asociados de negocios que hacia que jamas se agregara uno nuevo como "compañia".
+2) Se mejoró el campo y la descarga de CFD's en las partidas de pólizas contables, pudiendo ver el total y descargar todos los CFD's 
+    relacionados de manera directa o indirecta.
+3) Se mejoró el campo y la descarga de CFD's en la vista de pólizas contables, pudiendo ver el total y descargar todos los CFD's 
+    relacionados de manera directa o indirecta.
+
+================================================================================
+SIIE 3.2 179.0*/ 2021-02-19
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se quitó la obligatoriedad en los campos de transportista y tipo vehículo en la forma de captura de tarifas en el módulo de embarques.
+2) Se creó un reporte en el módulo de embarques que muestra un listado de las tarifas.
+3) Se mejoró la granularidad de los permisos en el módulo de embarques, se creó un nuevo permiso de tarifas para que sólo las personas 
+    autorizadas puedan ver, agregar y editar tarifas.
+
+================================================================================
+SIIE 3.2 177.4*/ 2021-02-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de emisión de facturas convencionales y formato de impresión de facturas para empresas extranjeras.
+
+================================================================================
+SIIE 3.2 177.3*/ 2021-02-11
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se creó la vista de CFDI recepción de pagos extendida donde se muestra el usuario que lo creó, editó y eliminó, ademas del total.
+
+================================================================================
+SIIE 3.2 177.2*/ 2021-02-10
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Se habilitó la captura de cotizaciones de compras y su procesamiento en pedidos de compras.
+
+================================================================================
+SIIE 3.2 177.1*/ 2021-02-08
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregó la tabla de "Backorder de pedidos de ventas" en el informe de ventas por mail.
+2) Se agregó la fila "TOTALES" para las vistas de pedidos y contratos.
+
+================================================================================
+SIIE 3.2 177.0*/ 2021-02-08
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se crearon las clases "SDbItemCost", "SViewItemCost" y "SFormItemCost" en los paquetes erp.mod.trn que corresponden
-    al nuevo catálogo de "Costos de ítems", que se convocan desde el Módulo de Finanzas.
+    al nuevo catálogo de "Costos de ítems", que se convocan desde el módulo de finanzas.
 2) Se creó el nuevo reporte de "Margen de contribución" y con ello el dialogo erp.mod.trn.form.SDialogRepContributionMargin,
     el cual muestra la diferencia de la venta y el costo neto.
 3) Se creó el nuevo reporte de "Situación general" y con ello el dialogo erp.mfin.form.SDialogRepGlobalTemplate,

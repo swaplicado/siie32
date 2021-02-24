@@ -1514,7 +1514,14 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     
                 case SDataConstants.TRNX_CFD_PAY_REC:
                     oViewClass = erp.mtrn.view.SViewCfdPayment.class;
-                    sViewTitle = "CFDI pagos";
+                    switch(auxType01) {
+                        case SDataConstants.TRNX_CFD_PAY_REC:
+                            sViewTitle = "CFDI pagos";
+                            break;
+                        case SDataConstants.TRNX_CFD_PAY_REC_EXT:
+                            sViewTitle = "CFDI pagos ext";
+                            break;
+                    }
                     break;
 
                 default:

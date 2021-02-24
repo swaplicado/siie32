@@ -3143,7 +3143,7 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         //moBizPartner.setCodeBankSantander();
         //moBizPartner.setCodeBankBanBajio();
         moBizPartner.setWeb(moFieldWeb.getString());
-
+        
         if (moFieldFkBizPartnerIdentityTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.BPSS_TP_BP_IDY_PER) {
             moBizPartner.setAlternativeId(moFieldAlternativeId.getString().toUpperCase());
         }
@@ -3155,6 +3155,9 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
         moBizPartner.setFkBizAreaId(moFieldFkBizArea.getKeyAsIntArray()[0]);
 
         switch (mnParamBizPartnerTypeX) {
+            case SDataConstants.BPSX_BP_CO:
+                moBizPartner.setIsCompany(true);
+                break;
             case SDataConstants.BPSX_BP_SUP:
                 moBizPartner.setIsSupplier(true);
                 break;

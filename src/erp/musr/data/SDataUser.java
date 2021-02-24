@@ -34,7 +34,7 @@ import sa.lib.gui.SGuiUser;
  * @author Sergio Flores, Alfonso Flores
  */
 public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
-
+    
     protected int mnPkUserId;
     protected java.lang.String msUser;
     protected java.lang.String msUserPassword;
@@ -642,7 +642,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                     statement = connection.createStatement();
                     statementAux = statement.getConnection().createStatement();
 
-                    sql = "SELECT bd FROM erp.cfgu_co WHERE b_del = 0 AND id_co <> " + mnAuxCompanyId;
+                    sql = "SELECT bd FROM erp.cfgu_co WHERE NOT b_del AND id_co <> " + mnAuxCompanyId;
                     resultSet = statement.executeQuery(sql);
 
                     while (resultSet.next()) {
@@ -1112,12 +1112,8 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         boolean has = false;
 
         for (Integer privilege : privileges) {
-            for (Integer privilegeUser : moPrivilegeUser.keySet()) {
-                if (privilege.intValue() == privilegeUser.intValue()) {
-                    has = true;
-                    break;
-                }
-            }
+            has = getPrivilegeLevel(privilege) != SUtilConsts.LEV_NONE;
+            break;
         }
 
         return has;
@@ -1125,13 +1121,9 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
     @Override
     public int getPrivilegeLevel(int privilege) {
-        int level = 0;
+        Integer level = moPrivilegeUser.get(privilege);
 
-        if (hasPrivilege(privilege)) {
-            level = moPrivilegeUser.get(privilege);
-        }
-
-        return level;
+        return level == null ? SUtilConsts.LEV_NONE : level;
     }
 
     @Override

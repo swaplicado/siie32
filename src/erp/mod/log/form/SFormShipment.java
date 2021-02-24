@@ -83,6 +83,9 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
 
     /**
      * Creates new form SFormShipment
+     * @param client
+     * @param client_xxx
+     * @param title
      */
     public SFormShipment(SGuiClient client, SClientInterface client_xxx, String title) {
         setFormSettings(client, SGuiConsts.BEAN_FORM_EDIT, SModConsts.LOG_SHIP, SLibConstants.UNDEFINED, title);
@@ -1911,10 +1914,10 @@ public class SFormShipment extends sa.lib.gui.bean.SBeanForm implements SGridPan
                 moKeySpotDestiny.getSelectedIndex() > 0 &&
                 moKeyCarrier.getSelectedIndex() > 0 &&
                 moKeyVehicleType.getSelectedIndex() > 0) {
-
+            
             miClient.getSession().populateCatalogue(moKeyRateSystem, SModConsts.LOGX_RATE, SLibConsts.UNDEFINED, new SGuiParams(
                     new int[] { moKeySpotSource.getValue()[0], moKeySpotDestiny.getValue()[0], moKeyCarrier.getValue()[0], moKeyVehicleType.getValue()[0] } ));
-
+            
             moKeyRateSystem.setEditable(true);
             if (moKeyRateSystem.getItemCount() > 1) {
 

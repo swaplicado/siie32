@@ -90,6 +90,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_EMPLOYEES_CRUD = "HRS_EMPLOYEES_CRUD";
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
+    public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     
     public static final int CFGX_IVM_FIFO = 1;
     
@@ -293,6 +294,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_MKT_REP = 106901;
 
     public static final int PRV_LOG_MISC = 107001;
+    public static final int PRV_LOG_RATE = 107002;
     public static final int PRV_LOG_REP = 107901;
 
     public static final int PRV_MFG_MISC = 108001;
@@ -1614,6 +1616,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_PS_COMP_PPY = 207014;
     public static final int REP_TRN_PUR_UNIT_COST = 207015;
     public static final int REP_TRN_DPS = 207016;
+    public static final int REP_TRN_DPS_US = 207036;
     public static final int REP_TRN_DPS_ADJ = 207017;
     public static final int REP_TRN_DPS_LIST = 207018;
     public static final int REP_TRN_DPS_ORDER = 207019;

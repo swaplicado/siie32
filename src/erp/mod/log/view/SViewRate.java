@@ -4,10 +4,12 @@
  */
 package erp.mod.log.view;
 
+import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import java.util.ArrayList;
 import java.util.Arrays;
+import sa.gui.util.SUtilConsts;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -17,19 +19,38 @@ import sa.lib.gui.SGuiClient;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Isabel Servín
  */
 public class SViewRate extends SGridPaneView {
 
     public SViewRate(SGuiClient client, String title) {
         super(client, SGridConsts.GRID_PANE_VIEW, SModConsts.LOG_RATE, SLibConstants.UNDEFINED, title);
-        setRowButtonsEnabled(true, true, true, false, true);        
+        setButtonsEnabled();      
+    }
+    
+    private void setButtonsEnabled () {
+        switch (miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_LOG_RATE)) {
+            case SUtilConsts.LEV_READ:
+                setRowButtonsEnabled(false);
+                break;
+            case SUtilConsts.LEV_CAPTURE:
+            case SUtilConsts.LEV_AUTHOR:
+                setRowButtonsEnabled(true, true, false, false, false);
+                break;
+            case SUtilConsts.LEV_EDITOR:
+                setRowButtonsEnabled(true, true, true, false, false);
+                break;
+            case SUtilConsts.LEV_MANAGER:
+                setRowButtonsEnabled(true, true, true, false, true);
+                break;
+            default:
+        }
     }
 
     @Override
     public void prepareSqlQuery() {
         String sql = "";
-        Object filter = null;
+        Object filter;
         
         moPaneSettings = new SGridPaneSettings(1);
         moPaneSettings.setUserInsertApplying(true);
@@ -62,8 +83,8 @@ public class SViewRate extends SGridPaneView {
             + "v.fk_src_spot, "
             + "v.fk_des_tp_spot, "
             + "v.fk_des_spot, "
-            + "v.fk_car, "
-            + "v.fk_tp_veh, "
+            + "v.fk_car_n, "
+            + "v.fk_tp_veh_n, "
             + "v.fk_usr_ins AS " + SDbConsts.FIELD_USER_INS_ID + ", "
             + "v.fk_usr_upd AS " + SDbConsts.FIELD_USER_UPD_ID + ", "
             + "v.ts_usr_ins AS " + SDbConsts.FIELD_USER_INS_TS + ", "
@@ -75,11 +96,11 @@ public class SViewRate extends SGridPaneView {
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_SPOT) + " AS sps ON v.fk_src_spot = sps.id_spot "
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGS_TP_SPOT) + " AS tpd ON v.fk_des_tp_spot = tpd.id_tp_spot "
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_SPOT) + " AS spd ON v.fk_des_spot = spd.id_spot "    
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON v.fk_car = bp.id_bp "        
-            + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_TP_VEH) + " AS tpv ON v.fk_tp_veh = tpv.id_tp_veh "        
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cu ON v.fk_cur = cu.id_cur "            
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ui ON v.fk_usr_ins = ui.id_usr "
             + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS uu ON v.fk_usr_upd = uu.id_usr "
+            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS bp ON v.fk_car_n = bp.id_bp "        
+            + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_TP_VEH) + " AS tpv ON v.fk_tp_veh_n = tpv.id_tp_veh "        
             + (sql.isEmpty() ? "" : "WHERE " + sql)
             + "ORDER BY tps.name, sps.name, tpd.name, spd.name, bp.bp ";        
     }

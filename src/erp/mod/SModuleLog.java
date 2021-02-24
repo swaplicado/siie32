@@ -36,6 +36,7 @@ import erp.mod.log.view.SViewSpotCompanyBranch;
 import erp.mod.log.view.SViewSpotCompanyBranchEntity;
 import erp.mod.log.view.SViewVehicle;
 import erp.mod.log.view.SViewVehicleType;
+import java.sql.ResultSet;
 import javax.swing.JMenu;
 import sa.lib.SLibConsts;
 import sa.lib.db.SDbConsts;
@@ -52,7 +53,7 @@ import sa.lib.gui.SGuiReport;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Isabel Servín
  */
 public class SModuleLog extends SGuiModule {
 
@@ -239,12 +240,12 @@ public class SModuleLog extends SGuiModule {
                 sql = "SELECT tp.id_tp_veh AS " + SDbConsts.FIELD_ID + "1, CONCAT(tp.name, ' (', tp.code, ')', IF(r.b_con = 1, ' - CONSOLIDADO', '')) AS " + SDbConsts.FIELD_ITEM + ", "
                         + "r.id_rate AS " + SDbConsts.FIELD_FK + "1, r.b_con AS " + SDbConsts.FIELD_COMP + " "
                         + "FROM " + SModConsts.TablesMap.get(SModConsts.LOGU_TP_VEH) + " AS tp "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOG_RATE) + " AS r ON tp.id_tp_veh = r.fk_tp_veh "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_SPOT) + " AS src ON r.fk_src_spot = src.id_spot "
                         + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_SPOT) + " AS des ON r.fk_src_spot = des.id_spot "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS car ON r.fk_car = car.id_bp "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOG_RATE) + " AS r ON tp.id_tp_veh = r.fk_tp_veh_n "
+                        + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS car ON r.fk_car_n = car.id_bp "
                         + "WHERE r.b_del = 0 " + (params == null ? "" : "AND r.fk_src_spot = " + params.getKey()[0] + " AND r.fk_des_spot = " + params.getKey()[1] + " AND "
-                        + "r.fk_car = " + params.getKey()[2]) + " "
+                        + "r.fk_car_n = " + params.getKey()[2]) + " "
                         + "GROUP BY tp.id_tp_veh, r.b_con "
                         + "ORDER BY tp.name ";
                 break;
@@ -253,23 +254,41 @@ public class SModuleLog extends SGuiModule {
                  * params.getKey(): If is different of null will contain:
                  *      params.getKey()[0] = fk_src_spot
                  *      params.getKey()[1] = fk_des_spot
-                 *      params.getKey()[2] = fk_car
-                 *      params.getKey()[3] = fk_tp_veh
+                 *      params.getKey()[2] = fk_car_n
+                 *      params.getKey()[3] = fk_tp_veh_n
                  */
-
-                settings = new SGuiCatalogueSettings("Tarifa", 1, 1, SLibConsts.DATA_TYPE_BOOL);
-                sql = "SELECT r.id_rate AS " + SDbConsts.FIELD_ID + "1, CONCAT(r.rate, ' ', cur.cur_key, ' ', IF(r.b_con = 1, '(CONS.)', '')) AS " + SDbConsts.FIELD_ITEM
-                        + ", r.fk_cur AS " + SDbConsts.FIELD_FK + "1, r.b_con AS " + SDbConsts.FIELD_COMP + " "
-                        + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_RATE) + " AS r "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cur ON r.fk_cur = cur.id_cur "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_SPOT) + " AS src ON r.fk_src_spot = src.id_spot "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_SPOT) + " AS des ON r.fk_src_spot = des.id_spot "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS car ON r.fk_car = car.id_bp "
-                        + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_TP_VEH) + " AS tp ON r.fk_tp_veh = tp.id_tp_veh "
-                        + "WHERE r.b_del = 0 " + (params == null ? "" : " AND r.fk_src_spot = " + params.getKey()[0] + " AND r.fk_des_spot = " + params.getKey()[1] + " AND "
-                        + "r.fk_car = " + params.getKey()[2] + " AND r.fk_tp_veh = " + params.getKey()[3]) + " "  //+ AND r.b_con = " + (params.getKey()[4] > 0 ? "1" : "0" )) + " "
-                        + "GROUP BY r.id_rate, r.fk_cur "
-                        + "ORDER BY r.rate ";
+                try {
+                    settings = new SGuiCatalogueSettings("Tarifa", 1, 1, SLibConsts.DATA_TYPE_BOOL);
+                    String [] wheres = 
+                    { 
+                        (params == null ? "" : "r.fk_car_n = " + params.getKey()[2] + " AND r.fk_tp_veh_n = " + params.getKey()[3] + " "),
+                        (params == null ? "" : "r.fk_car_n = " + params.getKey()[2] + " AND r.fk_tp_veh_n IS NULL "),
+                        (params == null ? "" : "r.fk_car_n IS NULL AND r.fk_tp_veh_n = " + params.getKey()[3] + " "),
+                        (params == null ? "" : "r.fk_car_n IS NULL AND r.fk_tp_veh_n IS NULL ")
+                    };
+                    
+                    for (String where : wheres) {
+                        sql = "SELECT r.id_rate AS " + SDbConsts.FIELD_ID + "1, CONCAT(r.rate, ' ', cur.cur_key, ' ', IF(r.b_con = 1, '(CONS.)', '')) AS " + SDbConsts.FIELD_ITEM
+                                + ", r.fk_cur AS " + SDbConsts.FIELD_FK + "1, r.b_con AS " + SDbConsts.FIELD_COMP + " "
+                                + "FROM " + SModConsts.TablesMap.get(SModConsts.LOG_RATE) + " AS r "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS cur ON r.fk_cur = cur.id_cur "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_SPOT) + " AS src ON r.fk_src_spot = src.id_spot "
+                                + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_SPOT) + " AS des ON r.fk_src_spot = des.id_spot "
+                                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP) + " AS car ON r.fk_car_n = car.id_bp "
+                                + "LEFT OUTER JOIN " + SModConsts.TablesMap.get(SModConsts.LOGU_TP_VEH) + " AS tp ON r.fk_tp_veh_n = tp.id_tp_veh "
+                                + "WHERE r.b_del = 0 "
+                                + (params == null ? "" : " AND r.fk_src_spot = " + params.getKey()[0] + " AND r.fk_des_spot = " + params.getKey()[1] + " AND ")
+                                + where + "GROUP BY r.id_rate, r.fk_cur " + "ORDER BY r.rate ";
+                        ResultSet resultSet =  miClient.getSession().getStatement().executeQuery(sql);
+                        if (resultSet.next()) {
+                            break;
+                        }
+                    }
+                }
+                catch (Exception e){
+                    miClient.showMsgBoxError(e.getMessage());
+                }
+                
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
@@ -526,6 +545,8 @@ public class SModuleLog extends SGuiModule {
             case SModConsts.LOGR_SHIP:
                 guiReport = new SGuiReport("reps/log_ship.jasper", "Reporte embarque");
                 break;
+            case SModConsts.LOG_RATE:
+                guiReport = new SGuiReport("reps/log_rate.jasper", "Listado de tarifas");
             default:
         }
 
