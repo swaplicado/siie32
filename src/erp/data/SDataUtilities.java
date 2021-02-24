@@ -4,6 +4,7 @@
  */
 package erp.data;
 
+import erp.SClientUtils;
 import erp.client.SClientInterface;
 import erp.lib.SLibConstants;
 import erp.lib.SLibTimeUtilities;
@@ -218,7 +219,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Sergio Flores, Isabel Servín
  */
 public abstract class SDataUtilities {
 
@@ -3026,6 +3027,9 @@ public abstract class SDataUtilities {
             case SDataConstantsSys.REP_TRN_DPS:
                 name = "reps/trn_dps.jasper";
                 break;
+            case SDataConstantsSys.REP_TRN_DPS_US:
+                name = "reps/trn_dps_us.jasper";
+                break;
             case SDataConstantsSys.REP_TRN_DPS_ADJ:
                 name = "reps/trn_dps_adj.jasper";
                 break;
@@ -3049,6 +3053,9 @@ public abstract class SDataUtilities {
                 break;
             case SDataConstantsSys.REP_TRN_ORD_GDS:
                 name = "reps/trn_dps_order_goods.jasper";
+                break;
+            case SDataConstantsSys.REP_TRN_EST:
+                name = "reps/trn_est.jasper";
                 break;
             case SDataConstantsSys.REP_TRN_PS_ITEM_UNIT_PRICE:
                 name = "reps/trn_ps_item_price.jasper";
@@ -3122,6 +3129,8 @@ public abstract class SDataUtilities {
      * @param client ERP Client Interface.
      * @param reportType Constant defined in erp.data.SDataConstantsSys.
      * @param map Report parameters.
+     * @return 
+     * @throws java.lang.Exception
      */
     public static net.sf.jasperreports.engine.JasperPrint fillReport(erp.client.SClientInterface client, int reportType, java.util.Map<java.lang.String, java.lang.Object> map) throws java.lang.Exception {
         SServerRequest request = null;
@@ -3451,9 +3460,10 @@ public abstract class SDataUtilities {
         newLine = System.getProperty("line.separator");     // for MS Windows try "\r\n"
         osw = new OutputStreamWriter(new FileOutputStream(poFile), "UTF-8");
 
-        sql = "SELECT d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, d.num_ser, d.num, d.fid_st_dps, c.doc_xml " +
+        sql = "SELECT d.fid_ct_dps, d.fid_cl_dps, d.fid_tp_dps, d.num_ser, d.num, d.fid_st_dps, xc.doc_xml " +
                 "FROM trn_dps AS d INNER JOIN trn_cfd AS c ON " +
                 "d.id_year = c.fid_dps_year_n AND d.id_doc = c.fid_dps_doc_n " +
+                "LEFT OUTER JOIN " + SClientUtils.getComplementaryDdName(client) + ".trn_cfd AS xc ON c.id_cfd = xc.id_cfd " +
                 "WHERE YEAR(d.dt) = " + pnYear + " AND MONTH(d.dt) = " + pnPeriod + " AND d.b_del = 0 AND " +
                 "c.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " AND " +
                 "d.fid_st_dps IN (" + SDataConstantsSys.TRNS_ST_DPS_EMITED + ", " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ") AND " +
@@ -3463,7 +3473,7 @@ public abstract class SDataUtilities {
         resultSet = client.getSession().getStatement().executeQuery(sql);
         while (resultSet.next()) {
             docs++;
-            document = docBuilder.parse(new ByteArrayInputStream(resultSet.getString("c.doc_xml").trim().getBytes("UTF-8")));
+            document = docBuilder.parse(new ByteArrayInputStream(resultSet.getString("xc.doc_xml").trim().getBytes("UTF-8")));
 
             node = SXmlUtils.extractElements(document, "Comprobante").item(0);
             namedNodeMap = node.getAttributes();

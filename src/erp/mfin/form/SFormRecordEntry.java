@@ -38,6 +38,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -56,7 +57,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener {
     
@@ -74,6 +75,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private erp.mfin.data.SDataRecordEntry moRecordEntry;
     private erp.mfin.data.SDataRecord moRecord;
     private erp.mitm.data.SDataItem moItem;
+    private erp.mitm.data.SDataItem moItemAux;
     private erp.lib.form.SFormField moFieldConcept;
     private erp.lib.form.SFormField moFieldFkBizPartnerId_nr;
     private erp.lib.form.SFormField moFieldOccasionalFiscalId;
@@ -192,6 +194,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbFileXmlRemove = new javax.swing.JButton();
         jtfXmlFilesNumber = new javax.swing.JTextField();
         jbFileXmlAdd = new javax.swing.JButton();
+        jbGetXml = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         jlFkYearId_n = new javax.swing.JLabel();
         jtfFkYearId_n = new javax.swing.JTextField();
@@ -514,6 +517,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbFileXmlAdd.setFocusable(false);
         jbFileXmlAdd.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jbFileXmlAdd);
+
+        jbGetXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"))); // NOI18N
+        jbGetXml.setToolTipText("Agregar archivos XML");
+        jbGetXml.setFocusable(false);
+        jbGetXml.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel11.add(jbGetXml);
 
         jpSettings.add(jPanel11);
 
@@ -838,6 +847,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jbFkDpsRemove.addActionListener(this);
         jbFileXmlRemove.addActionListener(this);
         jbFileXmlAdd.addActionListener(this);
+        jbGetXml.addActionListener(this);
         jbFkDpsAdj.addActionListener(this);
         jbFkDpsAdjRemove.addActionListener(this);
         jbFkCurrencyId.addActionListener(this);
@@ -852,6 +862,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
 
         jcbFkEntityId_n.addItemListener(this);
         jcbFkItemId_n.addItemListener(this);
+        jcbFkItemAuxId_n.addItemListener(this);
         jcbFkCurrencyId.addItemListener(this);
         jckIsCheckApplying.addItemListener(this);
         jckIsExchangeDifference.addItemListener(this);
@@ -995,6 +1006,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             jbFileXml.setEnabled(false);
             jbFileXmlRemove.setEnabled(false);
             jbFileXmlAdd.setEnabled(false);
+            jbGetXml.setEnabled(true); 
             jlFkDpsAdj.setEnabled(false);
             jtfFkDpsAdj.setEnabled(false);
             jbFkDpsAdj.setEnabled(false);
@@ -1719,6 +1731,15 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         }
     }
 
+    private void itemStateFkItemAuxId_n() {
+        if (!jcbFkItemAuxId_n.isEnabled() || jcbFkItemAuxId_n.getSelectedIndex() <= 0) {
+            moItemAux = null;
+        }
+        else {
+            moItemAux = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, moFieldFkItemAuxId_n.getKeyAsIntArray(), SLibConstants.EXEC_MODE_SILENT);
+        }
+    }
+    
     private void itemStateIsCheckApplying() {
         if (!jckIsCheckApplying.isSelected()) {
             jcbFkCheckId_n.setEnabled(false);
@@ -1894,6 +1915,19 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             maCfdRecordRows = recordEntryDps.getGridRows();
         }
         updateFilesXmlInfo();
+    }
+    
+    private void actionGetXml() {
+        try {
+            HashSet<SDataCfd> cfds = new HashSet<>();
+            maCfdRecordRows.stream().map((cfdRecordRow) -> (SDataCfd) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_CFD, new int[] { cfdRecordRow.getCfdId() }, SLibConstants.EXEC_MODE_SILENT)).forEach((cfd) -> {
+                cfds.add(cfd);
+            });
+            SCfdUtils.getXmlCfds(miClient, cfds);
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
     }
 
     private void actionFkDpsAdj() {
@@ -2220,6 +2254,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     private javax.swing.JButton jbFkItemAuxId_n;
     private javax.swing.JButton jbFkItemId_n;
     private javax.swing.JButton jbFkTaxId_n;
+    private javax.swing.JButton jbGetXml;
     private javax.swing.JButton jbOk;
     private javax.swing.JButton jbReference;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkBizPartnerId_nr;
@@ -2757,10 +2792,14 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         if (jcbFkBizPartnerId_nr.isEnabled() && jcbFkBizPartnerId_nr.getSelectedIndex() > 0) {
             moRecordEntry.setFkBizPartnerId_nr(moFieldFkBizPartnerId_nr.getKeyAsIntArray()[0]);
             moRecordEntry.setFkBizPartnerBranchId_n(((SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, moFieldFkBizPartnerId_nr.getKey(), SLibConstants.EXEC_MODE_VERBOSE)).getDbmsHqBranch().getPkBizPartnerBranchId());
+            moRecordEntry.setDbmsBizPartnerCode(moFieldFkBizPartnerId_nr.getKey().toString());
+            moRecordEntry.setDbmsBizPartner(moFieldFkBizPartnerId_nr.getString());
         }
         else {
             moRecordEntry.setFkBizPartnerId_nr(0);
             moRecordEntry.setFkBizPartnerBranchId_n(0);
+            moRecordEntry.setDbmsBizPartnerCode("");
+            moRecordEntry.setDbmsBizPartner("");
         }
         
         if (jcbOccasionalFiscalId.isEnabled() && !moFieldOccasionalFiscalId.getString().isEmpty()) {
@@ -2782,33 +2821,45 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         if (jcbFkTaxId_n.isEnabled() && jcbFkTaxId_n.getSelectedIndex() > 0) {
             moRecordEntry.setFkTaxBasicId_n(moFieldFkTaxId_n.getKeyAsIntArray()[0]);
             moRecordEntry.setFkTaxId_n(moFieldFkTaxId_n.getKeyAsIntArray()[1]);
+            moRecordEntry.setDbmsTax(moFieldFkTaxId_n.getString());
         }
         else {
             moRecordEntry.setFkTaxBasicId_n(0);
             moRecordEntry.setFkTaxId_n(0);
+            moRecordEntry.setDbmsTax("");
         }
 
         if (jcbFkEntityId_n.isEnabled() && jcbFkEntityId_n.getSelectedIndex() > 0) {
             moRecordEntry.setFkCompanyBranchId_n(moFieldFkEntityId_n.getKeyAsIntArray()[0]);
             moRecordEntry.setFkEntityId_n(moFieldFkEntityId_n.getKeyAsIntArray()[1]);
+            moRecordEntry.setDbmsEntityCode(moFieldFkEntityId_n.getKey().toString());
+            moRecordEntry.setDbmsEntity(moFieldFkEntityId_n.getString());
         }
         else {
             moRecordEntry.setFkCompanyBranchId_n(0);
             moRecordEntry.setFkEntityId_n(0);
+            moRecordEntry.setDbmsEntityCode("");
+            moRecordEntry.setDbmsEntity("");
         }
 
         if (jcbFkItemId_n.isEnabled() && jcbFkItemId_n.getSelectedIndex() > 0) {
+            moRecordEntry.setFkItemId_n(moItem.getPkItemId());
+            moRecordEntry.setDbmsItemCode(moItem.getCode());
+            moRecordEntry.setDbmsItem(moItem.getItem());
+            
             if (jcbFkItemAuxId_n.isEnabled() && jcbFkItemAuxId_n.getSelectedIndex() > 0) {
                 moRecordEntry.setUnits(0);
-                moRecordEntry.setFkItemId_n(moItem.getPkItemId());
                 moRecordEntry.setFkUnitId_n(SModSysConsts.ITMU_UNIT_NA);
                 moRecordEntry.setFkItemAuxId_n(moFieldFkItemAuxId_n.getKeyAsIntArray()[0]);
+                moRecordEntry.setDbmsItemAuxCode(moItemAux.getCode());
+                moRecordEntry.setDbmsItemAux(moItemAux.getItem());
             }
             else {
                 moRecordEntry.setUnits(moFieldUnits.getDouble());
-                moRecordEntry.setFkItemId_n(moItem.getPkItemId());
                 moRecordEntry.setFkUnitId_n(moItem.getFkUnitId());
                 moRecordEntry.setFkItemAuxId_n(SLibConstants.UNDEFINED);
+                moRecordEntry.setDbmsItemAuxCode("");
+                moRecordEntry.setDbmsItemAux("");
             }
 
             moRecordEntry.setDbmsAccountComplement(moItem.getItem());
@@ -2818,7 +2869,11 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             moRecordEntry.setFkItemId_n(0);
             moRecordEntry.setFkUnitId_n(0);
             moRecordEntry.setFkItemAuxId_n(0);
-
+            moRecordEntry.setDbmsItemCode("");
+            moRecordEntry.setDbmsItem("");
+            moRecordEntry.setDbmsItemAuxCode("");
+            moRecordEntry.setDbmsItemAux("");
+            
             moRecordEntry.setDbmsAccountComplement("");
         }
 
@@ -2843,10 +2898,12 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         if (jbFkDps.isEnabled() && moEntryDps != null) {
             moRecordEntry.setFkDpsYearId_n(moEntryDps.getPkYearId());
             moRecordEntry.setFkDpsDocId_n(moEntryDps.getPkDocId());
+            moRecordEntry.setDbmsDps(moEntryDps.getDpsNumber());
         }
         else {
             moRecordEntry.setFkDpsYearId_n(0);
             moRecordEntry.setFkDpsDocId_n(0);
+            moRecordEntry.setDbmsDps("");
         }
 
         if (jbFkDpsAdj.isEnabled() && moEntryDpsAdj != null) {
@@ -2923,6 +2980,8 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         if (cfds.size() > 0) {
             moRecordEntry.getDbmsDataCfds().addAll(cfds);
         }
+        
+        moRecordEntry.setDbmsXmlFilesNumber(Integer.parseInt(jtfXmlFilesNumber.getText()));
 
         return moRecordEntry;
     }
@@ -3032,6 +3091,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
             else if (button == jbFileXmlAdd) {
                 actionFileXmlAdd();
             }
+            else if (button == jbGetXml) {
+                actionGetXml();
+            }
             else if (button == jbFkDpsAdj) {
                 actionFkDpsAdj();
             }
@@ -3140,6 +3202,9 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
                 }
                 else if (comboBox == jcbFkItemId_n) {
                     itemStateFkItemId_n();
+                }
+                else if (comboBox == jcbFkItemAuxId_n) {
+                    itemStateFkItemAuxId_n();
                 }
                 else if (comboBox == jcbFkCurrencyId) {
                     renderCurrencySettings();

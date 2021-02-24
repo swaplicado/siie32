@@ -5,6 +5,7 @@
 package erp.mod.trn.db;
 
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import java.io.ByteArrayInputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +13,8 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.db.SDbRegistryUser;
 import sa.lib.gui.SGuiSession;
@@ -37,6 +40,39 @@ public class SDbMaintUser extends SDbRegistryUser {
     */
     
     protected byte[] maAuxFingerprintBytes;
+    
+    private boolean testDelete(SGuiSession session) throws Exception {
+        ResultSet resultSet = null;
+        boolean canDelete = false;
+        int mnYear = session.getCurrentYear();
+        String date = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.getEndOfYear(session.getSystemDate()));
+        
+        msSql = "SELECT count(*), " +
+                "SUM(s.mov_in) AS f_mov_i, " +
+                "SUM(s.mov_out) AS f_mov_o, " +
+                "SUM(s.mov_in - s.mov_out) AS f_stk " +
+                "FROM trn_stk AS s " +
+                "INNER JOIN erp.itmu_item AS i ON i.id_item = s.id_item " +
+                "INNER JOIN erp.itmu_unit AS u ON u.id_unit = s.id_unit " +
+                "INNER JOIN trn_stk_cfg AS sc ON sc.id_item = s.id_item AND sc.id_unit = s.id_unit AND sc.id_cob = s.id_cob AND sc.id_wh = s.id_wh " +
+                "INNER JOIN trn_diog AS d ON d.id_year = s.fid_diog_year AND d.id_doc = s.fid_diog_doc " + // xxx1
+                "INNER JOIN trn_maint_user_supv AS supv ON d.fid_maint_user_supv = supv.id_maint_user_supv " +
+                "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = d.fid_maint_user_n " +
+                "WHERE NOT s.b_del AND s.id_year = " + mnYear + " AND s.dt <= '" + date + "' " +
+                "AND s.id_wh BETWEEN " + SModSysConsts.TRNX_MAINT_TOOL_AVL + " AND " + SModSysConsts.TRNX_MAINT_TOOL_MAINT + " " +
+                "AND b.id_bp = " + getPkMaintUserId() + " " +
+                "GROUP BY s.id_item, s.id_unit, i.item_key, i.item, u.symbol, sc.qty_min, sc.rop, sc.qty_max, b.id_bp, b.bp" + " " +
+                "HAVING f_stk <> 0 " +
+                "ORDER BY i.item_key, i.item, s.id_item, u.symbol, s.id_unit, b.bp, b.id_bp" + " ";
+                
+                resultSet = session.getStatement().executeQuery(msSql);
+
+        if (!resultSet.next()) {
+            canDelete = true;
+        }
+        
+        return canDelete;
+    }
 
     public SDbMaintUser() {
         super(SModConsts.TRN_MAINT_USER);
@@ -230,5 +266,18 @@ public class SDbMaintUser extends SDbRegistryUser {
 
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
+    }
+    
+    @Override
+    public boolean canDelete(SGuiSession session) throws SQLException, Exception {
+        boolean canDelete = super.canDelete(session);
+
+        if (canDelete) {
+            if (!testDelete(session)) {
+                canDelete = false;
+                msQueryResult = "¡No es posible eliminar el usuario, tiene documentos de invetarios vigentes!";
+            }
+        }
+        return canDelete;
     }
 }

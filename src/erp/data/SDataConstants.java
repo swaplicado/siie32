@@ -425,7 +425,7 @@ public abstract class SDataConstants {
     public static final int TRN_DPS_RISS = 207052;
     public static final int TRN_DPS_REPL = 207053;
     public static final int TRN_DPS_DPS_SUPPLY = 207054;
-    public static final int TRN_DPS_DPS_ADJ = 207055;
+    public static final int TRN_DPS_DPS_ADJ = 207055; 
     public static final int TRN_DPS_IOG_CHG = 207056;
     public static final int TRN_DPS_IOG_WAR = 207057;
     public static final int TRN_DPS_REC = 207058;
@@ -469,6 +469,7 @@ public abstract class SDataConstants {
 
     public static final int TRNX_DPS_RO = 207505;
     public static final int TRNX_DPS_QRY = 207506;
+    public static final int TRNX_DPS_EDIT = 207507;
 
     public static final int TRNX_DPS_BAL = 207511;
     public static final int TRNX_DPS_FILL = 207512;
@@ -540,6 +541,7 @@ public abstract class SDataConstants {
     public static final int TRNX_DIOG_AUDIT_PEND = 207599;
     public static final int TRNX_DIOG_AUDITED = 207600;
     public static final int TRNX_CFD_PAY_REC = 207611;
+    public static final int TRNX_CFD_PAY_REC_EXT = 207612;
     public static final int TRNX_DPS_ACT_VIEW_LINKS = 207614;
     public static final int TRNX_MAINT_DIOG = 207651;
     public static final int TRNX_MAINT_STK = 207652;

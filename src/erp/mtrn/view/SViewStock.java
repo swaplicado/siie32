@@ -105,7 +105,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields = new STableField[2];
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
-                aoTableColumns = new STableColumn[8];
+                aoTableColumns = new STableColumn[9];
                 break;
 
             case SDataConstants.TRNX_STK_STK_WH:
@@ -116,7 +116,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_cob");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_wh");
 
-                aoTableColumns = new STableColumn[14];
+                aoTableColumns = new STableColumn[15];
                 break;
                                 
             case SDataConstants.TRNX_STK_LOT:
@@ -126,7 +126,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_lot");
 
-                aoTableColumns = new STableColumn[9];
+                aoTableColumns = new STableColumn[10];
                 break;
 
             case SDataConstants.TRNX_STK_LOT_WH:
@@ -138,7 +138,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_cob");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_wh");
 
-                aoTableColumns = new STableColumn[11];
+                aoTableColumns = new STableColumn[12];
                 break;
                 
             default:
@@ -158,6 +158,8 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
         }
+        
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Número parte", 75);
 
         if (showWarehouses()) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "bpb.code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
@@ -344,7 +346,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 "WHERE fid_year = " + year + "  AND fid_item = i.id_item AND fid_unit = u.id_unit " + sqlSegWhere + ")";
         
         msSql = "SELECT s.id_item, s.id_unit, " +
-                "i.item_key, i.item, u.symbol, " +
+                "i.item_key, i.item, u.symbol,  i.part_num, " +
                 (!showLots() ? "" : "s.id_lot, l.lot, l.dt_exp_n, l.b_block, ") +
                 (!showWarehouses() ? "" : "s.id_cob, s.id_wh, bpb.code, ent.code, sc.qty_min, sc.qty_max, sc.rop, " +
                  "IF((SUM(s.mov_in - s.mov_out) - " + segregationQuery + ") <= sc.qty_min, " + STableConstants.ICON_VIEW_LIG_RED + ", "
@@ -370,7 +372,7 @@ public class SViewStock extends erp.lib.table.STableTab implements java.awt.even
                 "i.item_key, i.item, u.symbol " +
                 sqlHaving +
                 "ORDER BY " + (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") +
-                "s.id_item, u.symbol, s.id_unit " +
+                "s.id_item, u.symbol, i.part_num, s.id_unit " +
                 (!showWarehouses() ? "" : ", bpb.code, ent.code, s.id_cob, s.id_wh ") +
                 (!showLots() ? "" : ", l.lot, l.dt_exp_n, l.b_block, s.id_lot ");
     }

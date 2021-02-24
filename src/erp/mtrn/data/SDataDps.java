@@ -270,6 +270,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected boolean mbAuxKeepExchangeRate;
     protected String msAuxFileXmlAbsolutePath;
     protected String msAuxFileXmlName;
+    protected sa.lib.srv.SSrvLock moAuxUserLock;
     
     protected double mdTempCfdIvaPorcentaje;
 
@@ -391,7 +392,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         SDataUserConfigurationTransaction userConfigTxn = new SDataUserConfigurationTransaction();
 
         if (userConfigTxn.read(new int[] { mnFkUserNewId }, statement) != SLibConstants.DB_ACTION_READ_OK) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + " No se encontró la configuración de usuarios para transacciones del usuario ID=" + mnFkUserNewId + ".");
         }
         else {
             if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
@@ -1086,7 +1087,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                 "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_year_n = " + mnPkYearId + " AND re.fid_dps_doc_n = " + mnPkDocId + " AND " +
                                 "r.id_tp_rec IN ('" + SDataConstantsSys.FINU_TP_REC_FY_OPEN + "', '" + SDataConstantsSys.FINU_TP_REC_FY_END + "') ";
-                        sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento!";
+                        sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento!\nSe debe eliminar las pólizas contables de cierre o apertura de ejercicio, antes de eliminar el documento.";
                         break;
                     case 220:
                         sSql = "SELECT count(*) AS f_count " +
@@ -1094,7 +1095,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND " +
                                 "r.b_del = 0 AND re.b_del = 0 AND re.fid_dps_adj_year_n = " + mnPkYearId + " AND re.fid_dps_adj_doc_n = " + mnPkDocId + " AND " +
                                 "r.id_tp_rec IN ('" + SDataConstantsSys.FINU_TP_REC_FY_OPEN + "', '" + SDataConstantsSys.FINU_TP_REC_FY_END + "') ";
-                        sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento de ajuste!";
+                        sMsgAux = "¡El documento está en uso por pólizas contables de cierre o apertura de ejercicio como documento de ajuste!\nSe debe eliminar las pólizas contables de cierre o apertura de ejercicio, antes de eliminar el documento.";
                         break;
                     case 221:
                         if (isDocument() || isAdjustment()) {
@@ -1678,6 +1679,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return moXtaDpsType.isEstimateSal();
     }
 
+    public boolean isDpsTypeContract() {
+        return moXtaDpsType.isDpsTypeContract();
+    }
+
+    public boolean isDpsTypeContractPur() {
+        return moXtaDpsType.isDpsTypeContractPur();
+    }
+
+    public boolean isDpsTypeContractSal() {
+        return moXtaDpsType.isDpsTypeContractSal();
+    }
+
     public int[] getDpsCategoryKey() { return new int[] { mnFkDpsCategoryId }; }
     public int[] getDpsClassKey() { return new int[] { mnFkDpsCategoryId, mnFkDpsClassId }; }
     public int[] getDpsTypeKey() { return new int[] { mnFkDpsCategoryId, mnFkDpsClassId, mnFkDpsTypeId }; }
@@ -1946,6 +1959,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setAuxKeepExchangeRate(boolean b) { mbAuxKeepExchangeRate = b; }
     public void setAuxFileXmlAbsolutePath(String s) { msAuxFileXmlAbsolutePath = s; }
     public void setAuxFileXmlName(String s) { msAuxFileXmlName = s; }
+    public void setAuxUserLock(sa.lib.srv.SSrvLock o) { moAuxUserLock = o; }
 
     public void setDbmsDataBookkeepingNumber(erp.mfin.data.SDataBookkeepingNumber o) { moDbmsDataBookkeepingNumber = o; }
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
@@ -1969,6 +1983,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public boolean getAuxKeepExchangeRate() { return mbAuxKeepExchangeRate; }
     public String getAuxFileXmlAbsolutePath() { return msAuxFileXmlAbsolutePath; }
     public String getAuxFileXmlName() { return msAuxFileXmlName; }
+    public sa.lib.srv.SSrvLock getAuxUserLock() { return moAuxUserLock; }
 
     public erp.mfin.data.SDataBookkeepingNumber getDbmsDataBookkeepingNumber() { return moDbmsDataBookkeepingNumber; }
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
@@ -2158,6 +2173,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         mbAuxKeepExchangeRate = false;
         msAuxFileXmlAbsolutePath = "";
         msAuxFileXmlName = "";
+        moAuxUserLock = null;
         
         mdTempCfdIvaPorcentaje = 0;
 
@@ -3987,6 +4003,27 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
     }
     
+    /**
+     * Obtener el uso de CDFI para la configuración de ítem vs. asociado de negocios.
+     * @param client
+     * @param itemId
+     * @param bizPartnerId
+     * @return
+     * @throws SQLException 
+     */
+    public static String getUseCfdi(final SClientInterface client, final int itemId, final int bizPartnerId) throws SQLException {
+        String useCfdi = "";
+
+        String sql = "SELECT cfd_use FROM erp.itmu_cfg_item_bp WHERE id_item = '" + itemId + "' AND id_bp = '" + bizPartnerId + "' " ;
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            if (resultSet.next()) {
+                useCfdi = resultSet.getString("cfd_use");
+            }
+        }
+        
+        return useCfdi;
+    }
+    
     /*
      * CFD and CFDI methods:
      */
@@ -5320,7 +5357,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
                 
                 double price;
-                if (dpsEntry.getSubtotalProvisionalCy_r() == SLibUtils.round(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity(), SLibUtils.getDecimalFormatAmount().getMaximumFractionDigits())) {
+                if (requireComplementoComercioExterior() || SLibUtils.compareAmount(dpsEntry.getSubtotalProvisionalCy_r(), SLibUtils.roundAmount(dpsEntry.getOriginalPriceUnitaryCy() * dpsEntry.getOriginalQuantity()))) {
                     price = dpsEntry.getOriginalPriceUnitaryCy();
                 }
                 else {

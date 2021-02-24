@@ -15,6 +15,7 @@ import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.gui.session.SSessionCustom;
 import erp.lib.SLibConstants;
+import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormOptionPickerInterface;
@@ -73,7 +74,7 @@ import sa.lib.srv.SSrvUtils;
 
 /**
  * User form for input of database registry of CFDI of Payments.
- * @author  Sergio Flores
+ * @author  Sergio Flores, Isabel Servín
  */
 public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener, javax.swing.event.ListSelectionListener {
     
@@ -1720,7 +1721,16 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             jtfPayRecordDateRo.setCaretPosition(0);
             jtfPayRecordBranchCodeRo.setCaretPosition(0);
             jtfPayRecordNumberRo.setCaretPosition(0);
+            
+            selectPayAccountDest();
         }
+    }
+    
+    private void selectPayAccountDest() {
+        SDataAccountCash account = moDataPayRecord.getDbmsDataAccountCash();
+        if (account != null && SLibUtilities.compareKeys(moFieldPayAccountDest.getKey(), new int[] { 0, 0 })) {
+            moFieldPayAccountDest.setKey(account.getPrimaryKey());    // will throw an item-state-changed event
+        }        
     }
 
     private void renderPayPaymentEntry() {
@@ -3829,7 +3839,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
                         }
                     }
                     
-                    //Warn user about manual accounting required for payments without associated bank account:
+                    // warn user about manual accounting required for payments without associated bank account:
                     
                     if (paymentEntry.AccountDestKey == null) {
                         SCfdXmlCatalogs xmlCatalogs = ((SSessionCustom) miClient.getSession().getSessionCustom()).getCfdXmlCatalogs();
@@ -3865,6 +3875,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
         }
         
         // process journal voucher movements:
+        
         if (!validation.getIsError()) {
             int index = 0;
             SDataCfdPayment dummyPayment = new SDataCfdPayment();
@@ -3881,7 +3892,7 @@ public class SFormCfdPayment extends javax.swing.JDialog implements erp.lib.form
             catch (Exception e) {
                 SLibUtils.printException(this, e);
                 
-                validation.setMessage(e.getMessage());
+                validation.setMessage(e.getMessage() != null ? e.getMessage() : e.toString());
                 validation.setComponent(moPaneGridPayments.getTable());
                 moPaneGridPayments.setTableRowSelection(index);
             }

@@ -13,47 +13,41 @@ import erp.lib.SLibUtilities;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Vector;
+import sa.lib.SLibUtils;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Claudio Peña
  */
 public class SDataStockClosing extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
     protected int mnPkYearId;
     protected int mnPkDocId;
-    protected Vector<SDataDiog> mvDbmsDiog;
+    protected Vector<SDataDiog> mvDbmsDiogs;
     
-    protected java.text.SimpleDateFormat moAuxSimpleDateFormat;
-
     public SDataStockClosing() {
         super(SDataConstants.TRN_DIOG);
-        mvDbmsDiog = new Vector<>();
+        mvDbmsDiogs = new Vector<>();
         reset();
     }
+    
+    public void setPkYearId(int n) { mnPkYearId = n; }
+    public void setPkDocId(int n) { mnPkDocId = n; }
+    
+    public int getPkYearId() { return mnPkYearId; }
+    public int getPkDocId() { return mnPkDocId; }
+    public Vector<SDataDiog> getDbmsDiogs() { return mvDbmsDiogs; }
     
     @Override
     public void setPrimaryKey(Object pk) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
-    public void setPkYearId(int n) { mnPkYearId = n; }
-    public void setPkDocId(int n) { mnPkDocId = n; }
-    public void setDbmsDiog(Vector<SDataDiog> o) { mvDbmsDiog = o; }
-    
-    public void setAuxSimpleDateFormat(java.text.SimpleDateFormat o) { moAuxSimpleDateFormat = o; }
-    
     @Override
     public Object getPrimaryKey() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
-    public int getPkYearId() { return mnPkYearId; }
-    public int getPkDocId() { return mnPkDocId; }
-    public Vector<SDataDiog> getDbmsDiog() { return mvDbmsDiog; }
-    
-    public java.text.SimpleDateFormat getAuxSimpleDateFormat() { return moAuxSimpleDateFormat; }
-
     @Override
     public void reset() {
         super.resetRegistry();
@@ -72,11 +66,11 @@ public class SDataStockClosing extends erp.lib.data.SDataRegistry implements jav
 
     @Override
     public int save(java.sql.Connection connection) {
-        String sSql = "";
+        String sql = "";
         ResultSet rs = null;
         Statement stQry = null;
         Statement stUpd = null;
-        Vector<SDataDiog> vDiog = new Vector<>();
+        Vector<SDataDiog> diogs = new Vector<>();
         
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
@@ -84,13 +78,13 @@ public class SDataStockClosing extends erp.lib.data.SDataRegistry implements jav
             stQry = connection.createStatement();
             stUpd = connection.createStatement();
             
-            sSql = "SELECT id_doc FROM trn_diog WHERE " +
+            sql = "SELECT id_doc FROM trn_diog WHERE " +
                     "id_year = " + mnPkYearId + " AND b_sys = 1 AND b_del = 0 AND " + 
                     "fid_ct_iog = " + SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV [0] + " AND " +
                     "fid_cl_iog = " + SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV [1] + " AND " +
                     "fid_tp_iog = " + SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV [2] + " AND " +
-                    "dt = '" + moAuxSimpleDateFormat.format(SLibTimeUtilities.createDate(mnPkYearId, 1, 1)) + "' ";
-            rs = stQry.executeQuery(sSql);
+                    "dt = '" + SLibUtils.DbmsDateFormatDate.format(SLibTimeUtilities.createDate(mnPkYearId, 1, 1)) + "' ";
+            rs = stQry.executeQuery(sql);
             
             while (rs.next()) {
                 SDataDiog diog = new SDataDiog();
@@ -98,11 +92,11 @@ public class SDataStockClosing extends erp.lib.data.SDataRegistry implements jav
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                 }
                 else {
-                    vDiog.add(diog);
+                    diogs.add(diog);
                 }
             }
             
-            for (SDataDiog diog : vDiog) {
+            for (SDataDiog diog : diogs) {
                 diog.setIsDeleted(true);
                 if (diog.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
@@ -112,7 +106,7 @@ public class SDataStockClosing extends erp.lib.data.SDataRegistry implements jav
                 }
             }
             
-            for (SDataDiog diog : mvDbmsDiog) {
+            for (SDataDiog diog : mvDbmsDiogs) {
                 if (diog.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                 }

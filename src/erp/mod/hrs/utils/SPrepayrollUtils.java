@@ -130,6 +130,12 @@ public class SPrepayrollUtils {
         Calendar calDate = Calendar.getInstance();
         calDate.setTime(sinceDate);
         int weekday = calDate.get(Calendar.DAY_OF_WEEK);
+        
+        if (weekday == day) {
+            calDate.add(Calendar.DATE, -1);
+            weekday = calDate.get(Calendar.DAY_OF_WEEK);
+        }
+        
         /**
          * se realiza el recorrido día a día hacia atrás hasta que se 
          * encuentre el día que coincida con el recibido
@@ -140,7 +146,7 @@ public class SPrepayrollUtils {
         }
         
         Date tEnd = (Date) calDate.getTime().clone();
-        calDate.add(Calendar.DATE, -6);
+        calDate.add(Calendar.DATE, (-6 * weekLag));
         Date tStart = calDate.getTime();
         
         return new Date[] {tStart, tEnd};

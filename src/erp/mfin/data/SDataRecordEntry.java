@@ -11,10 +11,11 @@ import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModSysConsts;
+import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SDataCfd;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
+import java.util.HashSet;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 
@@ -31,7 +32,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java.io.Serializable, sa.lib.grid.SGridRow {
     
@@ -117,20 +118,24 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     protected java.lang.String msDbmsAccountingMoveType;
     protected java.lang.String msDbmsAccountingMoveClass;
     protected java.lang.String msDbmsAccountingMoveSubclass;
+    protected java.lang.String msDbmsSystemMoveClass;
+    protected java.lang.String msDbmsSystemMoveType;
+    protected java.lang.String msDbmsEntityCode;
+    protected java.lang.String msDbmsEntity;
+    protected java.lang.String msDbmsBizPartnerCode;
+    protected java.lang.String msDbmsBizPartner;
+    protected java.lang.String msDbmsItemCode;
+    protected java.lang.String msDbmsItem;
+    protected java.lang.String msDbmsItemAuxCode;
+    protected java.lang.String msDbmsItemAux;
+    protected java.lang.String msDbmsTax;
+    protected java.lang.String msDbmsDps;
+    protected int mnDbmsXmlFilesNumber;
     protected java.lang.String msDbmsUserNew;
     protected java.lang.String msDbmsUserEdit;
     protected java.lang.String msDbmsUserDelete;
     protected erp.mfin.data.SDataCheck moDbmsCheck;
-    protected ArrayList<erp.mtrn.data.SDataCfd> maDbmsDataCfd;
-
-    protected java.lang.String msXtaEntityCode;
-    protected java.lang.String msXtaEntity;
-    protected java.lang.String msXtaBizPartnerCode;
-    protected java.lang.String msXtaBizPartner;
-    protected java.lang.String msXtaItemCode;
-    protected java.lang.String msXtaItem;
-    protected java.lang.String msXtaSystemMoveClass;
-    protected java.lang.String msXtaSystemMoveType;
+    protected HashSet<erp.mtrn.data.SDataCfd> maDbmsDataCfd;
 
     protected int mnAuxCheckNumber;
     protected java.util.Date mtAuxDateCfd;
@@ -303,11 +308,24 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public void setDbmsAccountingMoveType(java.lang.String s) { msDbmsAccountingMoveType = s; }
     public void setDbmsAccountingMoveClass(java.lang.String s) { msDbmsAccountingMoveClass = s; }
     public void setDbmsAccountingMoveSubclass(java.lang.String s) { msDbmsAccountingMoveSubclass = s; }
+    public void setDbmsSystemMoveClass(java.lang.String s) { msDbmsSystemMoveClass = s; }
+    public void setDbmsSystemMoveType(java.lang.String s) { msDbmsSystemMoveType = s; }
+    public void setDbmsEntityCode(java.lang.String s) { msDbmsEntityCode = s; }
+    public void setDbmsEntity(java.lang.String s) { msDbmsEntity = s; }
+    public void setDbmsBizPartnerCode(java.lang.String s) { msDbmsBizPartnerCode = s; }
+    public void setDbmsBizPartner(java.lang.String s) { msDbmsBizPartner = s; }
+    public void setDbmsItemCode(java.lang.String s) { msDbmsItemCode = s; }
+    public void setDbmsItem(java.lang.String s) { msDbmsItem = s; }
+    public void setDbmsItemAuxCode(java.lang.String s) { msDbmsItemAuxCode = s; }
+    public void setDbmsItemAux(java.lang.String s) { msDbmsItemAux = s; }
+    public void setDbmsTax(java.lang.String s) { msDbmsTax = s; }
+    public void setDbmsDps(java.lang.String s) { msDbmsDps = s; }
+    public void setDbmsXmlFilesNumber(int i) { mnDbmsXmlFilesNumber = i; }
     public void setDbmsUserNew(java.lang.String s) { msDbmsUserNew = s; }
     public void setDbmsUserEdit(java.lang.String s) { msDbmsUserEdit = s; }
     public void setDbmsUserDelete(java.lang.String s) { msDbmsUserDelete = s; }
     public void setDbmsCheck(erp.mfin.data.SDataCheck o) { moDbmsCheck = o; }
-    public void setDbmsDataCfd(ArrayList<erp.mtrn.data.SDataCfd> a) { maDbmsDataCfd = a; }
+    public void setDbmsDataCfd(HashSet<erp.mtrn.data.SDataCfd> a) { maDbmsDataCfd = a; }
 
     public java.lang.String getDbmsAccount() { return msDbmsAccount; }
     public java.lang.String getDbmsAccountComplement() { return msDbmsAccountComplement; }
@@ -316,35 +334,30 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
     public java.lang.String getDbmsAccountingMoveType() { return msDbmsAccountingMoveType; }
     public java.lang.String getDbmsAccountingMoveClass() { return msDbmsAccountingMoveClass; }
     public java.lang.String getDbmsAccountingMoveSubclass() { return msDbmsAccountingMoveSubclass; }
+    public java.lang.String getDbmsSystemMoveClass() { return msDbmsSystemMoveClass; }
+    public java.lang.String getDbmsSystemMoveType() { return msDbmsSystemMoveType; }
+    public java.lang.String getDbmsEntityCode() { return msDbmsEntityCode; }
+    public java.lang.String getDbmsEntity() { return msDbmsEntity; }
+    public java.lang.String getDbmsBizPartnerCode() { return msDbmsBizPartnerCode; }
+    public java.lang.String getDbmsBizPartner() { return msDbmsBizPartner; }
+    public java.lang.String getDmbsItemCode() { return msDbmsItemCode; }
+    public java.lang.String getDbmsItem() { return msDbmsItem; }
+    public java.lang.String getDmbsItemAuxCode() { return msDbmsItemAuxCode; }
+    public java.lang.String getDbmsItemAux() { return msDbmsItemAux; }
+    public java.lang.String getDbmsTax() { return msDbmsTax; }
+    public java.lang.String getDbmsDps() { return msDbmsDps; }
+    public int getDbmsXmlFilesNumber() { return mnDbmsXmlFilesNumber; }
     public java.lang.String getDbmsUserNew() { return msDbmsUserNew; }
     public java.lang.String getDbmsUserEdit() { return msDbmsUserEdit; }
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
     public erp.mfin.data.SDataCheck getDbmsCheck() { return moDbmsCheck; }
-    public ArrayList<erp.mtrn.data.SDataCfd> getDbmsDataCfds() { return maDbmsDataCfd; }
+    public HashSet<erp.mtrn.data.SDataCfd> getDbmsDataCfds() { return maDbmsDataCfd; }
 
     public void setAuxCheckNumber(int n) { mnAuxCheckNumber = n; }
     public void setAuxDateCfd(java.util.Date t) { mtAuxDateCfd = t; }
 
     public int getAuxCheckNumber() { return mnAuxCheckNumber; }
     public java.util.Date getAuxDateCfd() { return mtAuxDateCfd; }
-
-    public void setXtaEntityCode(java.lang.String s) { msXtaEntityCode = s; }
-    public void setXtaEntity(java.lang.String s) { msXtaEntity = s; }
-    public void setXtaBizPartnerCode(java.lang.String s) { msXtaBizPartnerCode = s; }
-    public void setXtaBizPartner(java.lang.String s) { msXtaBizPartner = s; }
-    public void setXtaItemCode(java.lang.String s) { msXtaItemCode = s; }
-    public void setXtaItem(java.lang.String s) { msXtaItem = s; }
-    public void setXtaSystemMoveClass(java.lang.String s) { msXtaSystemMoveClass = s; }
-    public void setXtaSystemMoveType(java.lang.String s) { msXtaSystemMoveType = s; }
-
-    public java.lang.String getXtaEntityCode() { return msXtaEntityCode; }
-    public java.lang.String getXtaEntity() { return msXtaEntity; }
-    public java.lang.String getXtaBizPartnerCode() { return msXtaBizPartnerCode; }
-    public java.lang.String getXtaBizPartner() { return msXtaBizPartner; }
-    public java.lang.String getXtaItemCode() { return msXtaItemCode; }
-    public java.lang.String getXtaItem() { return msXtaItem; }
-    public java.lang.String getXtaSystemMoveClass() { return msXtaSystemMoveClass; }
-    public java.lang.String getXtaSystemMoveType() { return msXtaSystemMoveType; }
 
     public int[] getKeyCompanyBranch() { return new int[] { mnFkCompanyBranchId_n }; }
     public int[] getKeyCompanyBranchEntity() { return new int[] { mnFkCompanyBranchId_n, mnFkEntityId_n }; }
@@ -485,18 +498,24 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         msDbmsAccountingMoveType = "";
         msDbmsAccountingMoveClass = "";
         msDbmsAccountingMoveSubclass = "";
+        msDbmsSystemMoveClass = "";
+        msDbmsSystemMoveType = "";
+        msDbmsEntityCode = "";
+        msDbmsEntity = "";
+        msDbmsBizPartnerCode = "";
+        msDbmsBizPartner = "";
+        msDbmsItemCode = "";
+        msDbmsItem = "";
+        msDbmsItemAuxCode = "";
+        msDbmsItemAux = "";
+        msDbmsTax = "";
+        msDbmsDps = "";
+        mnDbmsXmlFilesNumber = 0;
         moDbmsCheck = null;
-        maDbmsDataCfd = new ArrayList<SDataCfd>();
+        maDbmsDataCfd = new HashSet<>();
 
         mnAuxCheckNumber = 0;
         mtAuxDateCfd = null;
-
-        msXtaBizPartnerCode = "";
-        msXtaBizPartner = "";
-        msXtaItemCode = "";
-        msXtaItem = "";
-        msXtaSystemMoveClass = "";
-        msXtaSystemMoveType = "";
     }
 
     @Override
@@ -508,16 +527,14 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         String compItem = "";
         String compTax = "";
         ResultSet resultSet = null;
-        Statement statementAux = null;
         SDataCheck check = null;
-        SDataCfd cfd = null;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
 
         try {
-            sql = "SELECT re.*, a.acc, a.fid_tp_acc_sys, cu.cur_key, mtp.tp_acc_mov, mcl.cl_acc_mov, mcls.cls_acc_mov, " +
-                    "smcl.name, smtp.name, un.usr, ue.usr, ud.usr, c.cc, e.code, e.ent, b.bp, bcls.bp_key, bclc.bp_key, i.item_key, i.item, t.tax " +
+            sql = "SELECT re.*, a.acc, a.fid_tp_acc_sys, cu.cur_key, mtp.tp_acc_mov, mcl.cl_acc_mov, mcls.cls_acc_mov, d.num, d.num_ser, " +
+                    "smcl.name, smtp.name, un.usr, ue.usr, ud.usr, c.cc, e.code, e.ent, b.bp, bcls.bp_key, bclc.bp_key, i.item_key, i.item, ia.item_key, ia.item, t.tax " +
                     "FROM fin_rec_ety AS re " +
                     "INNER JOIN fin_acc AS a ON re.fid_acc = a.id_acc " +
                     "INNER JOIN erp.cfgu_cur AS cu ON re.fid_cur = cu.id_cur " +
@@ -530,11 +547,13 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                     "INNER JOIN erp.usru_usr AS ue ON re.fid_usr_edit = ue.id_usr " +
                     "INNER JOIN erp.usru_usr AS ud ON re.fid_usr_del = ud.id_usr " +
                     "LEFT OUTER JOIN fin_cc AS c ON re.fid_cc_n = c.id_cc " +
+                    "LEFT OUTER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc " +
                     "LEFT OUTER JOIN erp.cfgu_cob_ent AS e ON re.fid_cob_n = e.id_cob AND re.fid_ent_n = e.id_ent " +
                     "LEFT OUTER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +
                     "LEFT OUTER JOIN erp.bpsu_bp_ct AS bcls ON re.fid_bp_nr = bcls.id_bp AND bcls.id_ct_bp = " + SModSysConsts.BPSS_CT_BP_SUP + " " +
                     "LEFT OUTER JOIN erp.bpsu_bp_ct AS bclc ON re.fid_bp_nr = bclc.id_bp AND bclc.id_ct_bp = " + SModSysConsts.BPSS_CT_BP_CUS + " " +
                     "LEFT OUTER JOIN erp.itmu_item AS i ON re.fid_item_n = i.id_item " +
+                    "LEFT OUTER JOIN erp.itmu_item AS ia ON re.fid_item_aux_n = ia.id_item " +
                     "LEFT OUTER JOIN erp.finu_tax AS t ON re.fid_tax_bas_n = t.id_tax_bas AND re.fid_tax_n = t.id_tax " +
                     "WHERE re.id_year = " + key[0] + " AND re.id_per = " + key[1] + " AND " +
                     "re.id_bkc = " + key[2] + " AND re.id_tp_rec = '" + key[3] + "' AND " +
@@ -627,44 +646,72 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 msDbmsAccountingMoveType = resultSet.getString("mtp.tp_acc_mov");
                 msDbmsAccountingMoveClass = resultSet.getString("mcl.cl_acc_mov");
                 msDbmsAccountingMoveSubclass = resultSet.getString("mcls.cls_acc_mov");
+                msDbmsSystemMoveClass = resultSet.getString("smcl.name");
+                msDbmsSystemMoveType = resultSet.getString("smtp.name");
                 msDbmsUserNew = resultSet.getString("un.usr");
                 msDbmsUserEdit = resultSet.getString("ue.usr");
                 msDbmsUserDelete = resultSet.getString("ud.usr");
 
-                msXtaEntityCode = resultSet.getString("e.code");
+                msDbmsEntityCode = resultSet.getString("e.code");
                 if (resultSet.wasNull()) {
-                    msXtaEntityCode = "";
+                    msDbmsEntityCode = "";
                 }
 
-                msXtaEntity = resultSet.getString("e.ent");
+                msDbmsEntity = resultSet.getString("e.ent");
                 if (resultSet.wasNull()) {
-                    msXtaEntity = "";
+                    msDbmsEntity = "";
                 }
 
                 switch (mnFkSystemAccountClassId) {
                     case SModSysConsts.FINS_CL_SYS_ACC_BPR_SUP:
-                        msXtaBizPartnerCode = resultSet.getString("bcls.bp_key");
-                        msXtaBizPartner = resultSet.getString("b.bp");
+                        msDbmsBizPartnerCode = resultSet.getString("bcls.bp_key");
+                        msDbmsBizPartner = resultSet.getString("b.bp");
                         break;
                     case SModSysConsts.FINS_CL_SYS_ACC_BPR_CUS:
-                        msXtaBizPartnerCode = resultSet.getString("bclc.bp_key");
-                        msXtaBizPartner = resultSet.getString("b.bp");
+                        msDbmsBizPartnerCode = resultSet.getString("bclc.bp_key");
+                        msDbmsBizPartner = resultSet.getString("b.bp");
                         break;
                     default:
+                        msDbmsBizPartnerCode = "";
+                        msDbmsBizPartner = resultSet.getString("b.bp");
+                        if (resultSet.wasNull()) {
+                            msDbmsBizPartner = "";
+                        }
                 }
 
-                msXtaItemCode = resultSet.getString("i.item_key");
+                msDbmsItemCode = resultSet.getString("i.item_key");
                 if (resultSet.wasNull()) {
-                    msXtaItemCode = "";
+                    msDbmsItemCode = "";
                 }
 
-                msXtaItem = resultSet.getString("i.item");
+                msDbmsItem = resultSet.getString("i.item");
                 if (resultSet.wasNull()) {
-                    msXtaItem = "";
+                    msDbmsItem = "";
+                }
+                
+                msDbmsItemAuxCode = resultSet.getString("ia.item_key");
+                if (resultSet.wasNull()) {
+                    msDbmsItemAuxCode = "";
                 }
 
-                msXtaSystemMoveClass = resultSet.getString("smcl.name");
-                msXtaSystemMoveType = resultSet.getString("smtp.name");
+                msDbmsItemAux = resultSet.getString("ia.item");
+                if (resultSet.wasNull()) {
+                    msDbmsItemAux = "";
+                }
+
+                msDbmsTax = resultSet.getString("t.tax");
+                if (resultSet.wasNull()) {
+                    msDbmsTax = "";
+                }
+
+                String dpsSeries = resultSet.getString("d.num_ser");
+                String dpsNumber = resultSet.getString("d.num");
+                if (dpsSeries != null && dpsNumber != null) {
+                    msDbmsDps = STrnUtils.formatDocNumber(dpsSeries, dpsNumber);
+                }
+                else {
+                    msDbmsDps = "";
+                }
 
                 compBizPartner = resultSet.getString("b.bp");
                 if (resultSet.wasNull()) {
@@ -733,22 +780,26 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                     }
                 }
 
-                // Read XML:
-                statementAux = statement.getConnection().createStatement();
+                // CFD de manera directa: 
+                
                 sql = "SELECT id_cfd FROM trn_cfd WHERE fid_rec_year_n = " + key[0] + " AND fid_rec_per_n = " + key[1] + " AND " +
                     "fid_rec_bkc_n = " + key[2] + " AND fid_rec_tp_rec_n = '" + key[3] + "' AND " +
                     "fid_rec_num_n = " + key[4] + " AND fid_rec_ety_n = " + key[5] + " ";
-                resultSet = statement.executeQuery(sql);
-                while (resultSet.next()) {
-                    cfd = new SDataCfd();
-                    if (cfd.read(new int[] { resultSet.getInt("id_cfd") }, statementAux)!= SLibConstants.DB_ACTION_READ_OK) {
-                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
-                    }
-                    
-                    if (!cfd.getDocXmlName().isEmpty()) {
-                        maDbmsDataCfd.add(cfd);
-                    }
+                readXml(statement, sql);
+                
+                // CFD de documentos de clientes y proveedores:
+                
+                sql = "SELECT id_cfd FROM trn_cfd WHERE fid_dps_year_n = " + mnFkDpsYearId_n + " AND fid_dps_doc_n = " + mnFkDpsDocId_n + " ";
+                readXml(statement, sql);
+                
+                // CFD de recepción de pagos:
+                
+                if (mnFkCfdId_n != 0) {
+                    sql = "SELECT " + mnFkCfdId_n + " AS id_cfd;";
+                    readXml(statement, sql);
                 }
+                
+                mnDbmsXmlFilesNumber = maDbmsDataCfd.size();
 
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_READ_OK;
@@ -764,6 +815,23 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
         }
 
         return mnLastDbActionResult;
+    }
+    
+    private void readXml(Statement statement, String sql) throws Exception {
+        SDataCfd cfd;
+        Statement statementAux = statement.getConnection().createStatement();
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                cfd = new SDataCfd();
+                if (cfd.read(new int[] { resultSet.getInt("id_cfd") }, statementAux)!= SLibConstants.DB_ACTION_READ_OK) {
+                    throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                }
+                
+                if (!cfd.getDocXmlName().isEmpty()) {
+                    maDbmsDataCfd.add(cfd);
+                }
+            }
+        }
     }
 
     @Override
@@ -790,6 +858,18 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                     mnFkCheckId_n = moDbmsCheck.getPkCheckId();
                 }
             }
+            
+            // sanitize data:
+            
+            if (msConcept.length() > LEN_CONCEPT) {
+                msConcept = SLibUtils.textLeft(msConcept, LEN_CONCEPT);
+            }
+            
+            if (msReference.length() > LEN_REFERENCE) {
+                msReference = SLibUtils.textLeft(msReference, LEN_REFERENCE);
+            }
+            
+            // proceed saving data:
             
             callableStatement = connection.prepareCall(
                     "{ CALL fin_rec_ety_save(" +
@@ -1041,7 +1121,7 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 value = mnSortingPosition;
                 break;
             case 1:
-                value = msXtaSystemMoveType;
+                value = msDbmsSystemMoveType;
                 break;
             case 2:
                 value = msConcept;
@@ -1077,19 +1157,19 @@ public class SDataRecordEntry extends erp.lib.data.SDataRegistry implements java
                 value = msDbmsCostCenter_n;
                 break;
             case 13:
-                value = msXtaItemCode;
+                value = msDbmsItemCode;
                 break;
             case 14:
-                value = msXtaItem;
+                value = msDbmsItem;
                 break;
             case 15:
-                value = msXtaEntityCode;
+                value = msDbmsEntityCode;
                 break;
             case 16:
-                value = msXtaEntity;
+                value = msDbmsEntity;
                 break;
             case 17:
-                value = msXtaBizPartner;
+                value = msDbmsBizPartner;
                 break;
             case 18:
                 value = msReference;

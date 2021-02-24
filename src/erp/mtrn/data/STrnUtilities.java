@@ -184,35 +184,40 @@ public abstract class STrnUtilities {
      */
     @SuppressWarnings("unchecked")
     public static Vector<STrnStockMove> obtainStockWarehouse(final SClientInterface client, final int year, final Date dateCutOff_n, final int[] warehouseKey) throws Exception {
-        String sql = "";
-        ResultSet resulSet = null;
         STrnStockMove stockMove = null;
-        Vector<STrnStockMove> stockMoves = new Vector<STrnStockMove>();
+        Vector<STrnStockMove> stockMoves = new Vector<>();
 
-        sql = "SELECT s.id_year, s.id_item, s.id_unit, s.id_lot, s.id_wh, i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, " +
-                "l.b_block, SUM(s.mov_in - s.mov_out) AS f_stk, " +
+        String sql = "SELECT s.id_item, s.id_unit, s.id_lot, " +
+                "i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, l.b_block, " +
+                "s.fid_maint_user_n, s.fid_maint_user_supv, " +
+                "SUM(s.mov_in - s.mov_out) AS f_stk, " +
                 "SUM(s.debit - s.credit) AS f_bal " +
                 "FROM trn_stk AS s " +
                 "INNER JOIN erp.itmu_item AS i ON s.id_item = i.id_item " +
                 "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +
                 "INNER JOIN trn_lot AS l ON s.id_item = l.id_item AND s.id_unit = l.id_unit AND s.id_lot = l.id_lot " +
-                "WHERE s.b_del = 0 AND s.id_year = " + year + " AND s.dt <= '" + client.getSessionXXX().getFormatters().getDbmsDateFormat().format(dateCutOff_n) + "' AND s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " " +
-                "GROUP BY s.id_year, s.id_item, s.id_unit, s.id_lot, s.id_wh, l.lot, l.dt_exp_n, l.b_block, i.item_key, i.item, u.symbol " +
+                "WHERE s.b_del = 0 AND s.id_year = " + year + " AND " +
+                "s.dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateCutOff_n) + "' AND " +
+                "s.id_cob = " + warehouseKey[0] + " AND s.id_wh = " + warehouseKey[1] + " " +
+                "GROUP BY s.id_item, s.id_unit, s.id_lot, " +
+                "i.item_key, i.item, u.symbol, l.lot, l.dt_exp_n, l.b_block, " +
+                "s.fid_maint_user_n, s.fid_maint_user_supv " +
                 "HAVING f_stk <> 0 OR f_bal <> 0 " +
                 "ORDER BY " + (client.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ? "i.item_key, i.item, " : "i.item, i.item_key, ") +
-                "s.id_item, u.symbol, s.id_unit, l.lot, l.dt_exp_n, l.b_block, s.id_lot ";
+                "s.id_item, u.symbol, s.id_unit, l.lot, l.dt_exp_n, l.b_block, s.id_lot, " +
+                "s.fid_maint_user_n, s.fid_maint_user_supv;";
 
-        resulSet = client.getSession().getStatement().executeQuery(sql);
-        while (resulSet.next()) {
-            stockMove = new STrnStockMove(new int[] { year, resulSet.getInt("s.id_item"), resulSet.getInt("s.id_unit"), resulSet.getInt("s.id_lot"),
-                warehouseKey[0], warehouseKey[1] }, resulSet.getDouble("f_stk"));
-
-            stockMove.setAuxLot(resulSet.getString("l.lot"));
-            stockMove.setAuxLotDateExpiration(resulSet.getDate("l.dt_exp_n"));
-            stockMove.setAuxIsLotBlocked(resulSet.getBoolean("l.b_block"));
-            stockMove.setValue(resulSet.getDouble("f_bal"));
-
-            stockMoves.add(stockMove);
+         try (ResultSet resulSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resulSet.next()) {
+                stockMove = new STrnStockMove(new int[] { year, resulSet.getInt("s.id_item"), resulSet.getInt("s.id_unit"), resulSet.getInt("s.id_lot"),
+                warehouseKey[0], warehouseKey[1] }, resulSet.getDouble("f_stk"), resulSet.getDouble("f_bal"), resulSet.getInt("s.fid_maint_user_n"),  resulSet.getInt("s.fid_maint_user_supv"));
+                
+                stockMove.setAuxLot(resulSet.getString("l.lot"));
+                stockMove.setAuxLotDateExpiration(resulSet.getDate("l.dt_exp_n"));
+                stockMove.setAuxIsLotBlocked(resulSet.getBoolean("l.b_block"));
+                
+                stockMoves.add(stockMove);
+            }
         }
 
         return stockMoves;
@@ -1015,50 +1020,49 @@ public abstract class STrnUtilities {
             for (int tp_link = SDataConstantsSys.TRNS_TP_LINK_ITEM; tp_link >= SDataConstantsSys.TRNS_TP_LINK_ALL; tp_link--) {
                 switch(tp_link) {
                     case SDataConstantsSys.TRNS_TP_LINK_ITEM:
-
                         sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
                         "FROM trn_stk_cfg_item AS stk_it " +
                         "INNER JOIN erp.itmu_item AS i ON i.id_item = stk_it.id_ref " +
                         "WHERE stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_ITEM +  " AND stk_it.id_ref = " + itemId + " AND stk_it.id_cob = " + warehouseKey[0] + " AND stk_it.id_wh = " + warehouseKey[1] + " ";
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_LINK_MFR:
-
                         sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
                         "FROM erp.itmu_mfr AS mfr " +
                         "INNER JOIN erp.itmu_item AS i ON mfr.id_mfr = i.fid_mfr AND i.id_item = " + itemId + " " +
                         "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_MFR +  " AND stk_it.id_ref = i.fid_mfr AND stk_it.id_cob = " + warehouseKey[0] + " AND stk_it.id_wh = " + warehouseKey[1] + " ";
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_LINK_BRD:
-
                         sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
                         "FROM erp.itmu_brd AS brd " +
                         "INNER JOIN erp.itmu_item AS i ON brd.id_brd = i.fid_brd AND i.id_item = " + itemId + " " +
                         "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_BRD +  " AND stk_it.id_ref = i.fid_brd AND stk_it.id_cob = " + warehouseKey[0] + " AND stk_it.id_wh = " + warehouseKey[1] + " ";
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_LINK_LINE:
-
                         sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
                         "FROM erp.itmu_line AS line " +
                         "INNER JOIN erp.itmu_item AS i ON line.id_line = i.fid_line_n AND i.id_item = " + itemId + " " +
                         "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_LINE +  " AND stk_it.id_ref = i.fid_line_n AND stk_it.id_cob = " + warehouseKey[0] + " AND stk_it.id_wh = " + warehouseKey[1] + " ";
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_LINK_IGEN:
-
                         sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
                         "FROM erp.itmu_igen AS gen " +
                         "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
                         "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_IGEN +  " AND stk_it.id_ref = i.fid_igen AND stk_it.id_cob = " + warehouseKey[0] + " AND stk_it.id_wh = " + warehouseKey[1] + " ";
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_LINK_IGRP:
-
                         sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
                         "FROM erp.itmu_igrp AS grp " +
                         "INNER JOIN erp.itmu_igen AS gen ON grp.id_igrp = gen.fid_igrp " +
                         "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
                         "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_IGRP +  " AND stk_it.id_ref = grp.id_igrp AND stk_it.id_cob = " + warehouseKey[0] + " AND stk_it.id_wh = " + warehouseKey[1] + " ";
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_LINK_IFAM:
-
                         sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
                         "FROM erp.itmu_ifam AS fam " +
                         "INNER JOIN erp.itmu_igrp AS grp ON fam.id_ifam = grp.fid_ifam " +
@@ -1066,8 +1070,8 @@ public abstract class STrnUtilities {
                         "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
                         "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_IFAM +  " AND stk_it.id_ref = fam.id_ifam AND stk_it.id_cob = " + warehouseKey[0] + " AND stk_it.id_wh = " + warehouseKey[1] + " ";
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_LINK_TP_ITEM:
-
                         sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
                         "FROM erp.itms_ct_item AS ct " +
                         "INNER JOIN erp.itms_cl_item AS cl ON ct.id_ct_item = cl.id_ct_item " +
@@ -1076,8 +1080,8 @@ public abstract class STrnUtilities {
                         "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
                         "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_TP_ITEM +  " AND stk_it.id_ref = tp.id_tp_item AND stk_it.id_cob = " + warehouseKey[0] + " AND stk_it.id_wh = " + warehouseKey[1] + " ";
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_LINK_CL_ITEM:
-
                         sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
                         "FROM erp.itms_ct_item AS ct " +
                         "INNER JOIN erp.itms_cl_item AS cl ON ct.id_ct_item = cl.id_ct_item " +
@@ -1085,20 +1089,21 @@ public abstract class STrnUtilities {
                         "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
                         "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_CL_ITEM +  " AND stk_it.id_ref = cl.id_cl_item AND stk_it.id_cob = " + warehouseKey[0] + " AND stk_it.id_wh = " + warehouseKey[1] + " ";
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_LINK_CT_ITEM:
-
                         sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
                         "FROM erp.itms_ct_item AS ct " +
                         "INNER JOIN erp.itmu_igen AS gen ON gen.fid_ct_item = ct.id_ct_item " +
                         "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen AND i.id_item = " + itemId + " " +
                         "INNER JOIN trn_stk_cfg_item AS stk_it ON stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_CT_ITEM +  " AND stk_it.id_ref = ct.id_ct_item AND stk_it.id_cob = " + warehouseKey[0] + " AND stk_it.id_wh = " + warehouseKey[1] + " ";
                         break;
+                        
                     case SDataConstantsSys.TRNS_TP_LINK_ALL:
-
                         sql = "SELECT stk_it.id_tp_link, stk_it.id_ref, stk_it.id_cob, stk_it.id_wh " +
                         "FROM trn_stk_cfg_item AS stk_it " +
                         "WHERE stk_it.b_del = 0 AND stk_it.id_tp_link = " + SDataConstantsSys.TRNS_TP_LINK_ALL +  " AND stk_it.id_ref = 0 AND stk_it.id_cob = " + warehouseKey[0] + " AND stk_it.id_wh = " + warehouseKey[1] + " ";
                         break;
+                        
                     default:
                 }
 
@@ -1119,9 +1124,9 @@ public abstract class STrnUtilities {
     /**
      * Validates appropriate warehouse dns for provided parameter.
      * @param client
-     * @param itemId
+     * @param numberSeries
+     * @param dpsType
      * @param warehouseKey
-     * @param dnsId
      * @return
      * @throws Exception
      */
@@ -1945,6 +1950,12 @@ public abstract class STrnUtilities {
         return send;
     }
     
+    /**
+     * Enviar CFDI al web service de Soriana.
+     * @param client
+     * @param dpsKey
+     * @throws Exception 
+     */
     public static void sendDocumentSoriana(final SClientInterface client, final int[] dpsKey) throws Exception {
         Cursor cursor = client.getFrame().getCursor();
         SDataDps dps = (SDataDps) SDataUtilities.readRegistry(client, SDataConstants.TRN_DPS, dpsKey, SLibConstants.EXEC_MODE_SILENT);
@@ -2655,6 +2666,7 @@ public abstract class STrnUtilities {
                 }
             }
         }
+        
         return dpsOrder;
     }
     
@@ -2709,14 +2721,12 @@ public abstract class STrnUtilities {
                             + "INNER JOIN erp.itmu_item AS i ON c.fk_ref = i.id_item "
                             + "WHERE c.b_del = 0 AND i.id_item = " + itemId + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
-
                 case SDataConstantsSys.TRNS_TP_LINK_MFR:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c, erp.itmu_mfr AS mfr "
                             + "INNER JOIN erp.itmu_item AS i ON mfr.id_mfr = i.fid_mfr "
                             + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND i.fid_mfr = " + linkType[1] + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
-
                 case SDataConstantsSys.TRNS_TP_LINK_BRD:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c, erp.itmu_brd AS brd "
@@ -2771,13 +2781,11 @@ public abstract class STrnUtilities {
                             + "INNER JOIN erp.itmu_item AS i ON gen.id_igen = i.fid_igen "
                             + "WHERE c.b_del = 0 AND c.fk_tp_link = " + linkType[0] + " AND c.fk_ref = " + linkType[1] + " AND  i.id_item = " + itemId + " AND gen.fid_ct_item = " + linkType[1] + " AND c.id_tp_mms = " + mmsType + "; ";
                     break;
-
                 case SDataConstantsSys.TRNS_TP_LINK_ALL:
                     sql = "SELECT c.id_tp_mms, c.id_cfg, c.fk_tp_link, c.fk_ref "
                             + "FROM trn_mms_cfg AS c  "
                             + "WHERE c.b_del = 0 AND c.fk_ref = 0; ";
                     break;
-                    
                 default:
             }
 
@@ -3224,9 +3232,7 @@ public abstract class STrnUtilities {
      */
     private static SDataDiogEntry processStockEntries(final SClientInterface client, STrnStockMove stockMove) throws java.lang.Exception {
         SDataDiogEntry diogEntry = null;
-        SDataItem item = null;
-
-        item = (SDataItem) SDataUtilities.readRegistry(client, SDataConstants.ITMU_ITEM, new int[] { stockMove.getPkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
+        SDataItem item = (SDataItem) SDataUtilities.readRegistry(client, SDataConstants.ITMU_ITEM, new int[] { stockMove.getPkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
 
         diogEntry = new SDataDiogEntry();
         diogEntry.setPkYearId(SLibConstants.UNDEFINED);
@@ -3242,7 +3248,7 @@ public abstract class STrnUtilities {
         diogEntry.setIsDeleted(false);
         diogEntry.setFkItemId(item.getPkItemId());
         diogEntry.setFkUnitId(item.getFkUnitId());
-        diogEntry.setFkOriginalUnitId(item.getFkUnitId());
+        diogEntry.setFkOriginalUnitId(item.getFkUnitId());      
 
         diogEntry.setFkDpsYearId_n(SLibConstants.UNDEFINED);
         diogEntry.setFkDpsDocId_n(SLibConstants.UNDEFINED);
@@ -3253,7 +3259,6 @@ public abstract class STrnUtilities {
         diogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
         diogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
         diogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
-        diogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
 
         diogEntry.setFkUserNewId(client.getSession().getUser().getPkUserId());
         diogEntry.setFkUserEditId(client.getSession().getUser().getPkUserId());
@@ -3279,12 +3284,12 @@ public abstract class STrnUtilities {
      * @param companyBranch company branch for Diog
      * @param warehouse warehouse for Diog
      * @param diogtype Diog type SModSysConsts.TRNS_TP_IOG_IN_ ...
-     * @param numberSerie number serie for Diog
+     * @param numberSeries number serie for Diog
      * @param stockMoves array list stock moves to process
      * @return object SDataDiog type
      * @throws java.lang.Exception 
      */
-    public static SDataDiog createDataDiogSystem(final SClientInterface client, final int year, final Date date, final int companyBranch, final int warehouse, final int[] diogtype, final String numberSerie, final Vector<STrnStockMove> stockMoves) throws java.lang.Exception {
+    public static SDataDiog createDataDiogSystem(final SClientInterface client, final int year, final Date date, final int companyBranch, final int warehouse, final int[] diogtype, final String numberSeries, final Vector<STrnStockMove> stockMoves) throws java.lang.Exception {
         Vector<SDataDiogEntry> iogEntries = new Vector<>();
         SDataDiog iog = null;
         
@@ -3298,7 +3303,7 @@ public abstract class STrnUtilities {
         iog.setPkYearId(year);
         iog.setPkDocId(0);
         iog.setDate(date);
-        iog.setNumberSeries(numberSerie);
+        iog.setNumberSeries(numberSeries);
         iog.setNumber("");
         iog.setValue_r(0d);
         iog.setCostAsigned(0);

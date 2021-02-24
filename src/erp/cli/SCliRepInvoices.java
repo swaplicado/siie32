@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbDatabase;
@@ -44,11 +45,19 @@ public class SCliRepInvoices {
     private static final String DPS_CATEGORY_PUR = "P";
     private static final String PERIOD_TODAY = "TODAY";
     private static final String ZERO = "&nbsp;&nbsp;-&nbsp;&nbsp;";
-    private static final int ROW_GRP_HDR = 1;
-    private static final int ROW_GRP_FTR = 2;
-    private static final int ROW_ROW = 3;
-    private static final int ROW_TOT_CUR = 4;
-    private static final int ROW_TOT_LOC_CUR = 5;
+    private static final String TXT_TOT_LOC_CUR = "TOTAL MONEDA LOCAL";
+    private static final String TXT_MONTH = "Acumulado mensual";
+    private static final String TXT_YEAR = "Acumulado anual";
+    private static final int ROW_GRP_HDR = 11;
+    private static final int ROW_GRP_FTR = 12;
+    private static final int ROW_ROW_REP = 21; // row for report section
+    private static final int ROW_ROW_ACC = 22; // for for accumulated section (monthly or yearly)
+    private static final int ROW_SUB_TOT = 31;
+    private static final int ROW_TOT = 32;
+    /** Query for detail: by item, unit, busienss partner, currency & price. */
+    private static final int QUERY_DETAIL = 1;
+    /** Query for summary: by currency, item & unit. */
+    private static final int QUERY_SUMMARY = 2;
     private static final DecimalFormat FormatInteger = new DecimalFormat("#,##0;(#,##0)");
     private static final DecimalFormat FormatAmount = new DecimalFormat("#,##0.00;(#,##0.00)");
     private static final DecimalFormat FormatAmountUnit = new DecimalFormat("#,##0.0000;(#,##0.0000)");
@@ -80,10 +89,12 @@ public class SCliRepInvoices {
     private String msCompanyName;
     private int mnLocalCurrencyId;
     private String msLocalCurrencyCode;
+    private String msLocalCurrencyName;
     private Statement miStatement;
     
     /**
      * Create report of summary invoices of items and business partners.
+     * When period start and end dates are from the same month, a monthly accumulated summary is appended.
      * @param args Expected arguments:
      * index 0: mailer option ('I');
      * index 1: category: sales ('S') or purchases ('P');
@@ -200,7 +211,7 @@ public class SCliRepInvoices {
             
             // local currency info
                     
-            sql = "SELECT cur.id_cur, cur.cur_key "
+            sql = "SELECT cur.id_cur, cur.cur, cur.cur_key "
                     + "FROM erp.cfg_param_erp AS cfg "
                     + "INNER JOIN erp.cfgu_cur AS cur ON cfg.fid_cur = cur.id_cur;";
             
@@ -208,6 +219,7 @@ public class SCliRepInvoices {
                 if (resultSet.next()) {
                     mnLocalCurrencyId = resultSet.getInt("id_cur");
                     msLocalCurrencyCode = resultSet.getString("cur_key");
+                    msLocalCurrencyName = resultSet.getString("cur");
                 }
             }
         }
@@ -215,16 +227,31 @@ public class SCliRepInvoices {
     
     /**
      * Compose SQL sentence for report.
-     * @param manDpsClassKeyInv Key of class of invoices.
-     * @param manDpsClassKeyCn Key of class of credit notes.
-     * @param mtPeriodStart Period start.
-     * @param mtPeriodEnd Period end.
+     * @param start Period start.
+     * @param end Period end.
+     * @param queryLevel Query level: detail (QUERY_DETAIL; by item, unit, busienss partner, currency & price); or summary (QUERY_SUMMARY; by currency, item & unit).
      * @return 
      */
-    private String composeSql() {
+    private String composeSql(final Date start, final Date end, final int queryLevel) throws Exception {
+        String orderBy = "";
+        switch (queryLevel) {
+            case QUERY_DETAIL: // by item, unit, busienss partner, currency & price
+                orderBy = "item_key, item, id_item, _unit_symbol, id_unit, "
+                        + "bp, bp_comm, id_bp, "
+                        + "id_cur, cur, cur_key, " // currency by ID, name and code
+                        + "_price";
+                break;
+            case QUERY_SUMMARY: // by currency, item & unit
+                orderBy = "id_cur, cur, cur_key, " // currency by ID, name and code
+                        + "item_key, item, id_item, _unit_symbol, id_unit";
+                break;
+            default:
+                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);
+        }
+        
         String sql = "SELECT "
-                + "item_key, item, id_item, unit_symbol, id_unit, "
-                + "bp, bp_comm, id_bp, cur_key, id_cur, _price, "
+                + "item_key, item, id_item, _unit_symbol, id_unit, "
+                + "id_cur, cur, cur_key" + (queryLevel == QUERY_DETAIL ? ", bp, bp_comm, id_bp, _price" : "") + ", "
                 + "SUM(CASE WHEN fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_NA + " THEN _qty ELSE 0.00 END) AS _qty_inv, "
                 + "SUM(CASE WHEN fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_NA + " THEN _stot_cur_r ELSE 0.00 END) AS _stot_cur_r_inv, "
                 + "SUM(CASE WHEN fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_NA + " THEN _stot_r ELSE 0.00 END) AS _stot_r_inv, "
@@ -234,13 +261,16 @@ public class SCliRepInvoices {
                 + "SUM(CASE WHEN fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC + " THEN _qty ELSE 0.00 END) AS _qty_cn_disc, "
                 + "SUM(CASE WHEN fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC + " THEN _stot_cur_r ELSE 0.00 END) AS _stot_cur_r_cn_disc, "
                 + "SUM(CASE WHEN fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC + " THEN _stot_r ELSE 0.00 END) AS _stot_r_cn_disc, "
-                + "SUM(_qty) AS _qty_net, SUM(_stot_cur_r) AS _stot_cur_r_net, SUM(_stot_r) AS _stot_r_net "
+                + "SUM(_qty) AS _qty_net, "
+                + "SUM(_stot_cur_r) AS _stot_cur_r_net, "
+                + "SUM(_stot_r) AS _stot_r_net "
                 + "FROM ("
                 + "SELECT "
-                + "i.item_key, i.item, i.id_item, u.symbol AS unit_symbol, u.id_unit, "
-                + "bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj, de.price_u_cur AS _price, "
-                + "SUM(de.qty) AS _qty, "
-                + "SUM(de.stot_cur_r) AS _stot_cur_r, SUM(de.stot_r) AS _stot_r "
+                + "i.item_key, i.item, i.id_item, u.symbol AS _unit_symbol, u.id_unit, "
+                + "bp.bp, bp.bp_comm, bp.id_bp, c.id_cur, c.cur, c.cur_key, de.price_u_cur AS _price, de.fid_tp_dps_adj, "
+                + "SUM(CASE WHEN d.fid_cl_dps = " + manDpsClassKeyCn[1] + " THEN (CASE WHEN de.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " THEN -de.qty ELSE 0.0 END) ELSE de.qty END) AS _qty, "
+                + "SUM(CASE WHEN d.fid_cl_dps = " + manDpsClassKeyCn[1] + " THEN -de.stot_cur_r ELSE de.stot_cur_r END) AS _stot_cur_r, "
+                + "SUM(CASE WHEN d.fid_cl_dps = " + manDpsClassKeyCn[1] + " THEN -de.stot_r ELSE de.stot_r END) AS _stot_r "
                 + "FROM "
                 + "trn_dps AS d "
                 + "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
@@ -249,44 +279,60 @@ public class SCliRepInvoices {
                 + "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item "
                 + "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit "
                 + "WHERE NOT d.b_del AND NOT de.b_del AND "
-                + "d.fid_ct_dps = " + manDpsClassKeyInv[0] + " AND d.fid_cl_dps = " + manDpsClassKeyInv[1] + " AND "
-                + "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
+                + "d.fid_ct_dps = " + manDpsClassKeyInv[0] + " AND d.fid_cl_dps IN (" + manDpsClassKeyInv[1] + ", " + manDpsClassKeyCn[1] + ") AND "
+                + "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(start) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(end) + "' AND "
                 + "d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND de.fid_tp_dps_ety <> " + SDataConstantsSys.TRNS_TP_DPS_ETY_VIRT + " "
                 + "GROUP BY "
                 + "i.item_key, i.item, i.id_item, u.symbol, u.id_unit, "
-                + "bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj, de.price_u_cur "
-                + "UNION ALL "
-                + "SELECT "
-                + "i.item_key, i.item, i.id_item, u.symbol AS unit_symbol, u.id_unit, "
-                + "bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj, de.price_u_cur AS _price, "
-                + "SUM(CASE WHEN de.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " THEN -de.qty ELSE 0.0 END) AS _qty, "
-                + "SUM(-de.stot_cur_r) AS _stot_cur_r, SUM(-de.stot_r) AS _stot_r "
-                + "FROM "
-                + "trn_dps AS d "
-                + "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc "
-                + "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur "
-                + "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp "
-                + "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item "
-                + "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit "
-                + "WHERE "
-                + "NOT d.b_del AND NOT de.b_del AND d.fid_ct_dps = " + manDpsClassKeyCn[0] + " AND d.fid_cl_dps = " + manDpsClassKeyCn[1] + " AND "
-                + "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' AND "
-                + "d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND de.fid_tp_dps_ety <> " + SDataConstantsSys.TRNS_TP_DPS_ETY_VIRT + " "
-                + "GROUP BY "
-                + "i.item_key, i.item, i.id_item, u.symbol, u.id_unit, "
-                + "bp.bp, bp.bp_comm, bp.id_bp, c.cur_key, c.id_cur, de.fid_tp_dps_adj, de.price_u_cur "
+                + "bp.bp, bp.bp_comm, bp.id_bp, c.id_cur, c.cur, c.cur_key, de.price_u_cur, de.fid_tp_dps_adj "
                 + "ORDER BY "
-                + "item_key, item, id_item, unit_symbol, id_unit, "
-                + "bp, bp_comm, id_bp, cur_key, id_cur, fid_tp_dps_adj, _price "
+                + "i.item_key, i.item, i.id_item, u.symbol, u.id_unit, "
+                + "bp.bp, bp.bp_comm, bp.id_bp, c.id_cur, c.cur, c.cur_key, de.price_u_cur, de.fid_tp_dps_adj "
                 + ") AS t "
                 + "GROUP BY "
-                + "item_key, item, id_item, unit_symbol, id_unit, "
-                + "bp, bp_comm, id_bp, cur_key, id_cur, _price "
+                + "item_key, item, id_item, _unit_symbol, id_unit, "
+                + "id_cur, cur, cur_key" + (queryLevel == QUERY_DETAIL ? ", bp, bp_comm, id_bp, _price" : "") + " "
                 + "ORDER BY "
-                + "item_key, item, id_item, unit_symbol, id_unit, "
-                + "bp, bp_comm, id_bp, cur_key, id_cur, _price;";
+                + orderBy + ";";
         
         return sql;
+    }
+    
+    private String composeSalesBackorderSql() {
+        return "SELECT de.id_year, de.id_doc, de.id_ety, d.dt, d.dt_doc_delivery_n, d.dt_doc_lapsing_n, d.num_ref, d.b_link, d.ts_link, " +
+                "CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, d.fid_cob, d.fid_bpb, d.fid_bp_r, d.fid_usr_link, " +
+                "dt.code AS f_dt_code, dn.code AS f_dn_code, cob.code AS f_cob_code, bb.bpb, b.bp, bc.bp_key, c.cur_key, ul.usr, de.fid_item, " +
+                "de.fid_unit, de.fid_orig_unit, de.surplus_per, de.qty AS f_qty, " +
+                "de.orig_qty AS f_orig_qty, CASE WHEN de.qty = 0 THEN 0 ELSE de.stot_cur_r / de.qty END AS f_price_u, CASE WHEN de.orig_qty = 0 THEN 0 ELSE de.stot_cur_r / de.orig_qty END AS f_orig_price_u, " +
+                "de.sales_price_u_cur, de.sales_freight_u_cur, i.item_key, i.item, ig.igen, u.symbol AS f_unit, uo.symbol AS f_orig_unit, " +
+                "COALESCE((SELECT SUM(ds.qty) FROM trn_dps_dps_supply AS ds, trn_dps_ety AS xde, trn_dps AS xd " +
+                "WHERE ds.id_src_year = de.id_year AND ds.id_src_doc = de.id_doc AND ds.id_src_ety = de.id_ety AND ds.id_des_year = xde.id_year " +
+                "AND ds.id_des_doc = xde.id_doc AND ds.id_des_ety = xde.id_ety AND xde.id_year = xd.id_year AND xde.id_doc = xd.id_doc " +
+                "AND xde.b_del = 0 AND xd.b_del = 0 AND xd.fid_st_dps = 2), 0) AS f_link_qty, " +
+                "COALESCE((SELECT SUM(ds.orig_qty) FROM trn_dps_dps_supply AS ds, trn_dps_ety AS xde, trn_dps AS xd " +
+                "WHERE ds.id_src_year = de.id_year AND ds.id_src_doc = de.id_doc AND ds.id_src_ety = de.id_ety AND ds.id_des_year = xde.id_year " +
+                "AND ds.id_des_doc = xde.id_doc AND ds.id_des_ety = xde.id_ety AND xde.id_year = xd.id_year AND xde.id_doc = xd.id_doc AND xde.b_del = 0 " +
+                "AND xd.b_del = 0 AND xd.fid_st_dps = 2), 0) AS f_link_orig_qty " +
+                "FROM trn_dps AS d " +
+                "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps = 2 " +
+                "AND d.fid_ct_dps = 2 AND d.fid_cl_dps = 2 AND d.fid_tp_dps = 1 AND d.fid_cob = 2890 " +
+                "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
+                "INNER JOIN erp.trnu_dps_nat AS dn ON d.fid_dps_nat = dn.id_dps_nat " +
+                "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
+                "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
+                "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
+                "INNER JOIN erp.bpsu_bp_ct AS bc ON d.fid_bp_r = bc.id_bp AND bc.id_ct_bp = 3 " +
+                "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
+                "INNER JOIN erp.usru_usr AS ul ON d.fid_usr_link = ul.id_usr " +
+                "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
+                "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
+                "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
+                "INNER JOIN erp.itmu_unit AS uo ON de.fid_orig_unit = uo.id_unit " +
+                "GROUP BY de.id_year, de.id_doc, de.id_ety, d.dt, d.dt_doc_delivery_n, d.dt_doc_lapsing_n, d.num_ref, d.b_link, d.ts_link, d.num_ser, d.num, " +
+                "d.fid_cob, d.fid_bpb, d.fid_bp_r, d.fid_usr_link, dt.code, dn.code, cob.code, bb.bpb, b.bp, bc.bp_key, c.cur_key, ul.usr, de.fid_item, " +
+                "de.fid_unit, de.fid_orig_unit, de.surplus_per, de.qty, de.orig_qty, de.stot_cur_r, i.item_key, i.item, ig.igen, u.symbol, uo.symbol " +
+                "HAVING f_link_orig_qty < de.orig_qty AND d.b_link = 0 ORDER BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, " +
+                "de.id_year, de.id_doc, b.bp, bc.bp_key, d.fid_bp_r, bb.bpb, d.fid_bpb, i.item_key, i.item, de.fid_item, uo.symbol, de.fid_orig_unit";
     }
     
     private String composeMailSubject() throws Exception {
@@ -315,7 +361,23 @@ public class SCliRepInvoices {
         return quantity == 0d ? ZERO : FormatQuantity.format(quantity);
     }
     
-    private String composeMailBodyHtmlHead() throws Exception {
+    /**
+     * Compose text for given period. When start and end are the same, only one date appears. Otherwise both dates appear spaced by a hyphen.
+     * @param start
+     * @param end
+     * @return 
+     */
+    private String composeTextPeriod(final Date start, final Date end) {
+        String period = SLibUtils.DateFormatDate.format(start);
+        
+        if (!start.equals(end)) {
+            period += " - " + SLibUtils.DateFormatDate.format(end);
+        }
+        
+        return period;
+    }
+    
+    private String composeHtmlMailHead() throws Exception {
         // start of head
         String head = "<head>\n";
         
@@ -377,26 +439,25 @@ public class SCliRepInvoices {
                 + "} "
                 + "td.grpftrnumber {"
                 + " padding-top: 5px;"
-                + " padding-bottom: 5px;"
+                + " padding-bottom: 10px;"
                 + " font-weight: bold;"
                 + " text-align: right;"
                 + " white-space: nowrap;"
                 + "} "
-                + "td.totcur {"
-                + " padding-top: 10px;"
+                + "td.subtot {"
                 + " font-weight: bold;"
                 + "} "
-                + "td.totcurnumber {"
-                + " padding-top: 10px;"
+                + "td.subtotnumber {"
                 + " font-weight: bold;"
                 + " text-align: right;"
                 + " white-space: nowrap;"
                 + "} "
-                + "td.totloccur {"
+                + "td.tot {"
+                + " font-size: 1.0em;"
                 + " padding-top: 10px;"
                 + " font-weight: bold;"
                 + "} "
-                + "td.totloccurnumber {"
+                + "td.totnumber {"
                 + " padding-top: 10px;"
                 + " font-weight: bold;"
                 + " text-align: right;"
@@ -416,21 +477,24 @@ public class SCliRepInvoices {
         String ccsClass = "";
         
         switch (rowLevel) {
+            case ROW_GRP_HDR:
+                ccsClass = "grphdr";
+                break;
             case ROW_GRP_FTR:
                 ccsClass = "grpftr";
                 break;
-            case ROW_TOT_CUR:
-                ccsClass = "totcur";
+            case ROW_SUB_TOT:
+                ccsClass = "subtot";
                 break;
-            case ROW_TOT_LOC_CUR:
-                ccsClass = "totloccur";
+            case ROW_TOT:
+                ccsClass = "tot";
                 break;
             default:
         }
         
         html += "<tr>";
         
-        if (rowLevel == ROW_ROW) {
+        if (rowLevel == ROW_ROW_REP || rowLevel == ROW_ROW_ACC) {
             html += "<td class=\"" + ccsClass + "\">&nbsp;&nbsp;&nbsp;</td>";
             html += "<td class=\"" + ccsClass + "\">" + SLibUtils.textToHtml(row.Concept) + "</td>";
         }
@@ -447,14 +511,14 @@ public class SCliRepInvoices {
         html += "<td class=\"" + ccsClass + "number\">" + formatQuantity(row.QtyReturns) + "</td>";
         html += "<td class=\"" + ccsClass + "number\">" + formatQuantity(row.getQtyNet()) + "</td>";
         html += "<td class=\"" + ccsClass + "\">" + SLibUtils.textToHtml(row.Unit) + "</td>";
-        html += "<td class=\"" + ccsClass + "number\">" + (row.UnitId == 0 ? ZERO : formatAmountUnit(rowLevel == ROW_ROW ? row.Price : row.getAvgPrice())) + "</td>";
+        html += "<td class=\"" + ccsClass + "number\">" + (row.UnitId == 0 ? ZERO : formatAmountUnit(rowLevel == ROW_ROW_REP ? row.Price : row.getAvgPrice())) + "</td>"; // specific price available only in rows of report section
         
         html += "</tr>\n";
         
         return html;
     }
     
-    private String composeHtmlDocsInfo() throws Exception {
+    private String composeHtmlDocsInfoReport(final Date start, final Date end) throws Exception {
         DocClass docClassInv = new DocClass(DOC_CLASS_INV_ID);
         DocClass docClassCn = new DocClass(DOC_CLASS_CN_ID);
         
@@ -465,7 +529,7 @@ public class SCliRepInvoices {
                 + "INNER JOIN erp.trns_st_dps AS dst ON dst.id_st_dps = d.fid_st_dps "
                 + "INNER JOIN erp.trns_st_dps AS cst ON cst.id_st_dps = c.fid_st_xml "
                 + "WHERE NOT d.b_del AND d.fid_ct_dps = " + manDpsClassKeyInv[0] + " AND "
-                + "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtPeriodEnd) + "' "
+                + "d.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(start) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(end) + "' "
                 + "GROUP BY d.fid_cl_dps, d.fid_st_dps, c.fid_st_xml "
                 + "ORDER BY d.fid_cl_dps, d.fid_st_dps, c.fid_st_xml;";
         
@@ -510,7 +574,7 @@ public class SCliRepInvoices {
         
         String html = "<br>\n";
         
-        html += "<h3>Comprobantes</h3>\n";
+        html += "<h3>Comprobantes " + composeTextPeriod(start, end) + "</h3>\n";
         
         html += "<table>\n";
         html += "<tr>"
@@ -533,165 +597,420 @@ public class SCliRepInvoices {
                 + "</tr>\n";
         html += "</table>\n";
         
+        html += "<br>\n";
+        
         return html;
     }
     
-    private String composeMailBodyHtmlBody() throws Exception {
-        // start of body
-        String body = "<body>\n";
+    private String composeHtmlSalesBackorder() throws Exception {
+        String sql = composeSalesBackorderSql();
+        String html = "<br>\n";
         
-        // title
+        html += "<h2>Backorder de pedidos de ventas " + composeTextPeriod(mtPeriodStart, mtPeriodEnd) + "</h2>\n";
         
-        body += "<h1>" + SLibUtils.textToHtml(msCompanyName) + "</h1>\n";
-        body += "<h2>" + msDpsCategoryName + " " + SLibUtils.DateFormatDate.format(mtPeriodStart);
-        if (!mtPeriodStart.equals(mtPeriodEnd)) {
-            body += " - " + SLibUtils.DateFormatDate.format(mtPeriodEnd);
+        html += "<table>\n";
+        html += "<tr>"
+                + "<th>Pedido</th>"
+                + "<th>Fecha</th>"
+                + "<th>Cliente</th>"
+                + "<th>Concepto</th>"
+                + "<th>Cant. pedida</th>"
+                + "<th>Cant. procesada</th>"
+                + "<th>Cant. pendiente</th>"
+                + "<th>Unidad</th>"
+                + "</tr>\n";
+        
+        try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                double origQty = resultSet.getDouble("f_orig_qty");
+                double linkQty = resultSet.getDouble("f_link_orig_qty");
+                double toLinkQty = origQty - linkQty;
+                html += "<tr>"
+                        + "<td>" + SLibUtils.textToHtml(resultSet.getString("f_num")) + "</td>"
+                        + "<td class=\"center\">" + SLibUtils.DateFormatDate.format(resultSet.getDate("d.dt")) + "</td>"
+                        + "<td>" + SLibUtils.textToHtml(resultSet.getString("b.bp")) + "</td>"
+                        + "<td>" + SLibUtils.textToHtml(resultSet.getString("i.item_key") + " - " + resultSet.getString("i.item")) + "</td>"
+                        + "<td class=\"number\">" + formatQuantity(origQty) + "</td>"
+                        + "<td class=\"number\">" + formatQuantity(linkQty) + "</td>"
+                        + "<td class=\"number\">" + formatQuantity(toLinkQty) + "</td>"
+                        + "<td>" + SLibUtils.textToHtml(resultSet.getString("f_orig_unit")) + "</td>"
+                        + "</tr>\n"; 
+            }
         }
-        body += "</h2>\n";
+        html += "</table>\n";
+        html += "<br>\n";
+        
+        return html;
+    }
+    
+    private String composeHtmlMailBodyReport() throws Exception {
+        String html = "";
+        
+        // subtitle
+        
+        html += "<h2>" + msDpsCategoryName + " " + composeTextPeriod(mtPeriodStart, mtPeriodEnd) + "</h2>\n";
         
         // table
         
         // header of table
         
-        body += "<table>\n";
-        body += "<tr>";
-        body += "<th colspan=\"2\">Asociado negocios</th>";
-        body += "<th>Total $</th>";
-        body += "<th>Devs. $</th>";
-        body += "<th>Descs. $</th>";
-        body += "<th>Total neto $</th>";
-        body += "<th>Moneda</th>";
-        body += "<th>Cant.</th>";
-        body += "<th>Cant. devs.</th>";
-        body += "<th>Cant. neta</th>";
-        body += "<th>Unidad</th>";
-        body += "<th>Precio $</th>";
-        body += "</tr>\n";
+        html += "<table>\n";
+        html += "<tr>";
+        html += "<th colspan=\"2\">Asociado negocios</th>";
+        html += "<th>Total $</th>";
+        html += "<th>Devs. $</th>";
+        html += "<th>Descs. $</th>";
+        html += "<th>Total neto $</th>";
+        html += "<th>Moneda</th>";
+        html += "<th>Cant.</th>";
+        html += "<th>Cant. devs.</th>";
+        html += "<th>Cant. neta</th>";
+        html += "<th>Unidad</th>";
+        html += "<th>Precio $</th>";
+        html += "</tr>\n";
         
         // rows of table
         
         int curItemId = 0;
-        String curItemText = "";
-        int curCurrencyId = 0;
         int curUnitId = 0;
+        int curCurrencyId = 0;
+        String curItemText = "";
         boolean dataFound = false;
-        HashMap<Integer, String> mapCurrencies = new HashMap<>();
-        HashMap<Integer, String> mapUnits = new HashMap<>();
-        HashMap<Integer, Row> mapRowSubtotals = new HashMap<>(); // key is currency ID
-        HashMap<Integer, Row> mapRowTotals = new HashMap<>(); // key is currency ID
-        HashSet<Integer> setItemUnits = new HashSet<>(); // element is unit ID
-        Row rowLocalTotal = new Row("TOTAL MONEDA LOCAL", mnLocalCurrencyId, msLocalCurrencyCode, 0, "", 0);
+        HashMap<Integer, String> mapCurrencyCodes = new HashMap<>(); // key: ID; value: code
+        HashMap<Integer, String> mapCurrencyNames = new HashMap<>(); // key: ID; value: name
+        HashMap<Integer, String> mapUnitSymbols = new HashMap<>(); // key: ID; value: symbol
+        HashMap<Integer, Row> mapCurItemSubtotalRows = new HashMap<>(); // key is currency ID
+        HashMap<Integer, Row> mapReportTotalRows = new HashMap<>(); // key is currency ID
+        HashSet<Integer> setCurItemUnits = new HashSet<>(); // element is unit ID
+        HashSet<Integer> setReportUnits = new HashSet<>(); // element is unit ID
+        Row rowLocalCurrencyTotal = new Row(TXT_TOT_LOC_CUR, mnLocalCurrencyId, msLocalCurrencyCode, 0, "", 0);
         
-        mapCurrencies.put(mnLocalCurrencyId, msLocalCurrencyCode);
+        mapCurrencyCodes.put(mnLocalCurrencyId, msLocalCurrencyCode);
+        mapCurrencyNames.put(mnLocalCurrencyId, msLocalCurrencyName);
         
-        String sql = composeSql();
+        // BODY
+        
+        // query sorted by item for requested period (may be a single day):
+        String sql = composeSql(mtPeriodStart, mtPeriodEnd, QUERY_DETAIL);
         
         try (ResultSet resultSet = miStatement.executeQuery(sql)) {
             while (resultSet.next()) {
                 dataFound = true;
-                if (curItemId != resultSet.getInt("id_item")) {
+                
+                if (curItemId != resultSet.getInt("id_item")) { // another item?
                     if (curItemId != 0) {
                         // render subtotals of last item
                         
-                        for (Row row : mapRowSubtotals.values()) {
-                            if (setItemUnits.size() == 1) { // check if there is only one unit for current item
-                                row.UnitId = (Integer) setItemUnits.toArray()[0];
-                                row.Unit = mapUnits.get(row.UnitId);
+                        for (Row row : mapCurItemSubtotalRows.values()) {
+                            if (setCurItemUnits.size() == 1) { // check if there is only one unit for current item
+                                row.UnitId = (Integer) setCurItemUnits.toArray()[0];
+                                row.Unit = mapUnitSymbols.get(row.UnitId);
                             }
                             
-                            body += composeHtmlTableRow(row, ROW_GRP_FTR);
+                            html += composeHtmlTableRow(row, ROW_GRP_FTR);
                         }
                     }
                     
                     curItemId = resultSet.getInt("id_item");
                     curItemText = resultSet.getString("item_key") + " - " + resultSet.getString("item");
-                    mapRowSubtotals.clear();
-                    setItemUnits.clear();
+                    mapCurItemSubtotalRows.clear();
+                    setCurItemUnits.clear();
                     
-                    body += "<tr><td class=\"grphdr\" colspan=\"12\">" + SLibUtils.textToHtml(curItemText) + "</td></tr>\n";
+                    html += "<tr><td class=\"grphdr\" colspan=\"12\">" + SLibUtils.textToHtml(curItemText) + "</td></tr>\n";
                 }
                 
                 curCurrencyId = resultSet.getInt("id_cur");
-                if (mapCurrencies.get(curCurrencyId) == null) {
-                    mapCurrencies.put(curCurrencyId, resultSet.getString("cur_key"));
+                if (mapCurrencyCodes.get(curCurrencyId) == null) {
+                    mapCurrencyCodes.put(curCurrencyId, resultSet.getString("cur_key")); // preserve currency codes
+                }
+                if (mapCurrencyNames.get(curCurrencyId) == null) {
+                    mapCurrencyNames.put(curCurrencyId, resultSet.getString("cur")); // preserve currency names
                 }
                 
                 curUnitId = resultSet.getInt("id_unit");
-                if (mapUnits.get(curUnitId) == null) {
-                    mapUnits.put(curUnitId, resultSet.getString("unit_symbol"));
+                if (mapUnitSymbols.get(curUnitId) == null) {
+                    mapUnitSymbols.put(curUnitId, resultSet.getString("_unit_symbol")); // preserve unit codes
                 }
                 
-                setItemUnits.add(curUnitId);
+                setCurItemUnits.add(curUnitId); // update set of units for current item
+                setReportUnits.add(curUnitId); // update set of units for this report
                 
-                Row row = new Row(resultSet.getString("bp"), curCurrencyId, mapCurrencies.get(curCurrencyId), curUnitId, mapUnits.get(curUnitId), resultSet.getDouble("_price"));
+                Row row = new Row(resultSet.getString("bp"), curCurrencyId, mapCurrencyCodes.get(curCurrencyId), curUnitId, mapUnitSymbols.get(curUnitId), resultSet.getDouble("_price"));
                 row.TotGross = resultSet.getDouble("_stot_cur_r_inv");
                 row.TotReturns = resultSet.getDouble("_stot_cur_r_cn_ret");
                 row.TotDiscounts = resultSet.getDouble("_stot_cur_r_cn_disc");
                 row.QtyGross = resultSet.getDouble("_qty_inv");
                 row.QtyReturns = resultSet.getDouble("_qty_cn_ret");
                 
-                body += composeHtmlTableRow(row, ROW_ROW);
+                html += composeHtmlTableRow(row, ROW_ROW_REP); // append current row
                 
-                Row rowSubtotal = mapRowSubtotals.get(curCurrencyId);
-                if (rowSubtotal == null) {
-                    rowSubtotal = new Row(curItemText + " " + mapCurrencies.get(curCurrencyId), curCurrencyId, mapCurrencies.get(curCurrencyId), 0, "", 0);
-                    mapRowSubtotals.put(curCurrencyId, rowSubtotal);
+                // update current item subtotal
+                Row rowCurItemSubtotal = mapCurItemSubtotalRows.get(curCurrencyId);
+                if (rowCurItemSubtotal == null) {
+                    rowCurItemSubtotal = new Row(curItemText + " " + mapCurrencyCodes.get(curCurrencyId), curCurrencyId, mapCurrencyCodes.get(curCurrencyId), 0, "", 0);
+                    mapCurItemSubtotalRows.put(curCurrencyId, rowCurItemSubtotal);
                 }
-                rowSubtotal.add(resultSet.getDouble("_stot_cur_r_inv"), resultSet.getDouble("_stot_cur_r_cn_ret"), resultSet.getDouble("_stot_cur_r_cn_disc"), 
+                rowCurItemSubtotal.add(resultSet.getDouble("_stot_cur_r_inv"), resultSet.getDouble("_stot_cur_r_cn_ret"), resultSet.getDouble("_stot_cur_r_cn_disc"), 
                         resultSet.getDouble("_qty_inv"), resultSet.getDouble("_qty_cn_ret"));
                 
-                Row rowTotal = mapRowTotals.get(curCurrencyId);
-                if (rowTotal == null) {
-                    rowTotal = new Row("TOTAL " + mapCurrencies.get(curCurrencyId), curCurrencyId, mapCurrencies.get(curCurrencyId), 0, "", 0);
-                    mapRowTotals.put(curCurrencyId, rowTotal);
+                // update currency total
+                Row rowReportTotal = mapReportTotalRows.get(curCurrencyId);
+                if (rowReportTotal == null) {
+                    rowReportTotal = new Row(mapCurrencyNames.get(curCurrencyId), curCurrencyId, mapCurrencyCodes.get(curCurrencyId), 0, "", 0);
+                    mapReportTotalRows.put(curCurrencyId, rowReportTotal);
                 }
-                rowTotal.add(resultSet.getDouble("_stot_cur_r_inv"), resultSet.getDouble("_stot_cur_r_cn_ret"), resultSet.getDouble("_stot_cur_r_cn_disc"), 
+                rowReportTotal.add(resultSet.getDouble("_stot_cur_r_inv"), resultSet.getDouble("_stot_cur_r_cn_ret"), resultSet.getDouble("_stot_cur_r_cn_disc"), 
                         resultSet.getDouble("_qty_inv"), resultSet.getDouble("_qty_cn_ret"));
                 
-                rowLocalTotal.add(resultSet.getDouble("_stot_r_inv"), resultSet.getDouble("_stot_r_cn_ret"), resultSet.getDouble("_stot_r_cn_disc"), 
+                // update local currency
+                rowLocalCurrencyTotal.add(resultSet.getDouble("_stot_r_inv"), resultSet.getDouble("_stot_r_cn_ret"), resultSet.getDouble("_stot_r_cn_disc"), 
                         resultSet.getDouble("_qty_inv"), resultSet.getDouble("_qty_cn_ret"));
-            }
-            
-            // render subtotals of last item
-            
-            for (Row row : mapRowSubtotals.values()) {
-                if (setItemUnits.size() == 1) { // check if there is only one unit for current item
-                    row.UnitId = (Integer) setItemUnits.toArray()[0];
-                    row.Unit = mapUnits.get(row.UnitId);
-                }
-                
-                body += composeHtmlTableRow(row, ROW_GRP_FTR);
             }
             
             if (dataFound) {
-                // render totals
+                // render subtotals of last item
 
-                body += "<tr><td class=\"grphdr\" colspan=\"12\">" + SLibUtils.textToHtml("TOTALES") + "</td></tr>\n";
+                for (Row row : mapCurItemSubtotalRows.values()) {
+                    if (setCurItemUnits.size() == 1) { // check if there is one single unit for current item
+                        row.UnitId = (Integer) setCurItemUnits.toArray()[0];
+                        row.Unit = mapUnitSymbols.get(row.UnitId);
+                    }
 
-                for (Row row : mapRowTotals.values()) {
-                    body += composeHtmlTableRow(row, ROW_TOT_CUR);
+                    html += composeHtmlTableRow(row, ROW_GRP_FTR);
                 }
 
-                if (mapRowTotals.size() > 1 || !mapRowTotals.containsKey(mnLocalCurrencyId)) {
-                    body += composeHtmlTableRow(rowLocalTotal, ROW_TOT_LOC_CUR);
+                // render totals
+
+                html += "<tr><td class=\"grphdr\" colspan=\"12\">" + SLibUtils.textToHtml("TOTALES POR MONEDA") + "</td></tr>\n";
+
+                for (Row row : mapReportTotalRows.values()) {
+                    if (setReportUnits.size() == 1) { // check if there is one single unit for whole report
+                        row.UnitId = (Integer) setReportUnits.toArray()[0];
+                        row.Unit = mapUnitSymbols.get(row.UnitId);
+                    }
+
+                    html += composeHtmlTableRow(row, mapReportTotalRows.size() == 1 ? ROW_TOT : ROW_SUB_TOT);
+                }
+
+                if (mapReportTotalRows.size() > 1 || !mapReportTotalRows.containsKey(mnLocalCurrencyId)) {
+                    html += composeHtmlTableRow(rowLocalCurrencyTotal, ROW_TOT);
                 }
             }
         }
 
         // end of table
-        body += "</table>";
+        html += "</table>";
         
         if (dataFound) {
-            body += composeHtmlDocsInfo();
+            html += composeHtmlDocsInfoReport(mtPeriodStart, mtPeriodEnd);
         }
         else {
-            body += "<p><strong>" + SLibUtils.textToHtml("¡No se encontró información para " + (mtPeriodStart.equals(mtPeriodEnd) ? "la fecha solicitada" : "el período solicitado") + "!") + "</strong></p>\n";
+            html += "<p><strong>" + SLibUtils.textToHtml("¡No se encontró información para " +
+                    (mtPeriodStart.equals(mtPeriodEnd) ? "la fecha solicitada" : "el período solicitado") + " " + composeTextPeriod(mtPeriodStart, mtPeriodEnd) + "!") +
+                    "</strong></p>\n";
         }
         
-        body += "<br>";
+        return html;
+    }
+    
+    private String composeHtmlMailBodyAccum() throws Exception {
+        String html = "";
+        String subtitle = "";
+        Date accumStart = null;
+        Date accumEnd = null;
+        int[] anStart = SLibTimeUtils.digestDate(mtPeriodStart);
+        int[] anEnd = SLibTimeUtils.digestDate(mtPeriodEnd);
+        
+        // subtitle
+        
+        if (anStart[0] == anEnd[0]) { // same year?
+            if (anStart[1] == anEnd[1]) { // same month?
+                subtitle = TXT_MONTH + " ";
+                accumStart = SLibTimeUtils.getBeginOfMonth(mtPeriodStart);
+            }
+            else {
+                subtitle = TXT_YEAR + " ";
+                accumStart = SLibTimeUtils.getBeginOfYear(mtPeriodStart);
+            }
+            accumEnd = mtPeriodEnd;
+            
+            subtitle += msDpsCategoryName.toLowerCase() + " " + composeTextPeriod(accumStart, accumEnd);
+            
+            html += "<h2>" + subtitle + "</h2>\n";
+
+            // table
+
+            // header of table
+
+            html += "<table>\n";
+            html += "<tr>";
+            html += "<th colspan=\"2\">Concepto</th>";
+            html += "<th>Total $</th>";
+            html += "<th>Devs. $</th>";
+            html += "<th>Descs. $</th>";
+            html += "<th>Total neto $</th>";
+            html += "<th>Moneda</th>";
+            html += "<th>Cant.</th>";
+            html += "<th>Cant. devs.</th>";
+            html += "<th>Cant. neta</th>";
+            html += "<th>Unidad</th>";
+            html += "<th>Precio prom. $</th>";
+            html += "</tr>\n";
+
+            // rows of table
+
+            int curUnitId = 0;
+            int curCurrencyId = 0;
+            String curCurrencyText = "";
+            boolean dataFound = false;
+            boolean localCurrencyFound = false;
+            HashMap<Integer, String> mapCurrencyCodes = new HashMap<>(); // key: ID; value: code
+            HashMap<Integer, String> mapCurrencyNames = new HashMap<>(); // key: ID; value: name
+            HashMap<Integer, String> mapUnitSymbols = new HashMap<>(); // key: ID; value: symbol
+            HashMap<String, Row> mapReportTotalRows = new HashMap<>(); // key is item ID + "-" + unit ID
+            HashSet<Integer> setCurCurrencyUnits = new HashSet<>(); // element is unit ID
+            HashSet<Integer> setReportUnits = new HashSet<>(); // element is unit ID
+            Row rowCurCurrencySubtotal = null;
+            Row rowLocalCurrencyTotal = new Row(TXT_TOT_LOC_CUR, mnLocalCurrencyId, msLocalCurrencyCode, 0, "", 0);
+
+            mapCurrencyCodes.put(mnLocalCurrencyId, msLocalCurrencyCode);
+            mapCurrencyNames.put(mnLocalCurrencyId, msLocalCurrencyName);
+
+            // BODY
+
+            // query sorted by currency for requested period (may be only one day):
+            String sql = composeSql(accumStart, accumEnd, QUERY_SUMMARY);
+
+            try (ResultSet resultSet = miStatement.executeQuery(sql)) {
+                while (resultSet.next()) {
+                    dataFound = true;
+
+                    if (curCurrencyId != resultSet.getInt("id_cur")) { // another currency?
+                        if (curCurrencyId != 0) {
+                            // render subtotal of last currency
+
+                            if (setCurCurrencyUnits.size() == 1) { // check if there is only one unit for current currency
+                                rowCurCurrencySubtotal.UnitId = (Integer) setCurCurrencyUnits.toArray()[0];
+                                rowCurCurrencySubtotal.Unit = mapUnitSymbols.get(rowCurCurrencySubtotal.UnitId);
+                            }
+
+                            html += composeHtmlTableRow(rowCurCurrencySubtotal, ROW_GRP_FTR);
+                        }
+
+                        curCurrencyId = resultSet.getInt("id_cur");
+                        curCurrencyText = resultSet.getString("cur");
+                        setCurCurrencyUnits.clear();
+                        rowCurCurrencySubtotal = null;
+
+                        html += "<tr><td class=\"grphdr\" colspan=\"12\">" + SLibUtils.textToHtml(curCurrencyText) + "</td></tr>\n";
+                        
+                        if (!localCurrencyFound && curCurrencyId == mnLocalCurrencyId) {
+                            localCurrencyFound = true;
+                        }
+                    }
+
+                    curCurrencyId = resultSet.getInt("id_cur");
+                    if (mapCurrencyCodes.get(curCurrencyId) == null) {
+                        mapCurrencyCodes.put(curCurrencyId, resultSet.getString("cur_key")); // preserve currency codes
+                    }
+                    if (mapCurrencyNames.get(curCurrencyId) == null) {
+                        mapCurrencyNames.put(curCurrencyId, resultSet.getString("cur")); // preserve currency names
+                    }
+
+                    curUnitId = resultSet.getInt("id_unit");
+                    if (mapUnitSymbols.get(curUnitId) == null) {
+                        mapUnitSymbols.put(curUnitId, resultSet.getString("_unit_symbol")); // preserve unit codes
+                    }
+
+                    setCurCurrencyUnits.add(curUnitId); // update set of units for current currency
+                    setReportUnits.add(curUnitId); // update set of units for this report
+
+                    Row row = new Row(resultSet.getString("item_key") + " - " + resultSet.getString("item"), curCurrencyId, mapCurrencyCodes.get(curCurrencyId), curUnitId, mapUnitSymbols.get(curUnitId), 0);
+                    row.TotGross = resultSet.getDouble("_stot_cur_r_inv");
+                    row.TotReturns = resultSet.getDouble("_stot_cur_r_cn_ret");
+                    row.TotDiscounts = resultSet.getDouble("_stot_cur_r_cn_disc");
+                    row.QtyGross = resultSet.getDouble("_qty_inv");
+                    row.QtyReturns = resultSet.getDouble("_qty_cn_ret");
+
+                    html += composeHtmlTableRow(row, ROW_ROW_ACC); // append current row
+
+                    // update current currency subtotal
+                    
+                    if (rowCurCurrencySubtotal == null) {
+                        rowCurCurrencySubtotal = new Row(curCurrencyText, curCurrencyId, mapCurrencyCodes.get(curCurrencyId), 0, "", 0);
+                    }
+                    rowCurCurrencySubtotal.add(resultSet.getDouble("_stot_cur_r_inv"), resultSet.getDouble("_stot_cur_r_cn_ret"), resultSet.getDouble("_stot_cur_r_cn_disc"), 
+                            resultSet.getDouble("_qty_inv"), resultSet.getDouble("_qty_cn_ret"));
+
+                    // update item-unit total
+                    Row rowReportTotal = mapReportTotalRows.get(resultSet.getInt("id_item") + "-" + curUnitId);
+                    if (rowReportTotal == null) {
+                        rowReportTotal = new Row(resultSet.getString("item_key") + " - " + resultSet.getString("item"), mnLocalCurrencyId, msLocalCurrencyCode, curUnitId, mapUnitSymbols.get(curUnitId), 0);
+                        mapReportTotalRows.put(resultSet.getInt("id_item") + "-" + curUnitId, rowReportTotal);
+                    }
+                    rowReportTotal.add(resultSet.getDouble("_stot_r_inv"), resultSet.getDouble("_stot_r_cn_ret"), resultSet.getDouble("_stot_r_cn_disc"), 
+                            resultSet.getDouble("_qty_inv"), resultSet.getDouble("_qty_cn_ret"));
+
+                    // update local currency total
+                    rowLocalCurrencyTotal.add(resultSet.getDouble("_stot_r_inv"), resultSet.getDouble("_stot_r_cn_ret"), resultSet.getDouble("_stot_r_cn_disc"), 
+                            resultSet.getDouble("_qty_inv"), resultSet.getDouble("_qty_cn_ret"));
+                }
+
+                if (dataFound) {
+                    // render subtotal of last item
+
+                    if (setCurCurrencyUnits.size() == 1) { // check if there is one single unit for current currency
+                        rowCurCurrencySubtotal.UnitId = (Integer) setCurCurrencyUnits.toArray()[0];
+                        rowCurCurrencySubtotal.Unit = mapUnitSymbols.get(rowCurCurrencySubtotal.UnitId);
+                    }
+
+                    html += composeHtmlTableRow(rowCurCurrencySubtotal, ROW_GRP_FTR);
+                    // render totals
+
+                    html += "<tr><td class=\"grphdr\" colspan=\"12\">" + SLibUtils.textToHtml("TOTALES POR CONCEPTO") + "</td></tr>\n";
+
+                    for (Row row : mapReportTotalRows.values()) {
+                        if (setReportUnits.size() == 1) { // check if there is one single unit for whole report
+                            row.UnitId = (Integer) setReportUnits.toArray()[0];
+                            row.Unit = mapUnitSymbols.get(row.UnitId);
+                        }
+
+                        html += composeHtmlTableRow(row, mapReportTotalRows.size() == 1 ? ROW_TOT : ROW_ROW_ACC);
+                    }
+
+                    if (mapReportTotalRows.size() > 1 || !localCurrencyFound) {
+                        html += composeHtmlTableRow(rowLocalCurrencyTotal, ROW_TOT);
+                    }
+                }
+            }
+
+            // end of table
+            html += "</table>";
+
+            if (dataFound) {
+                html += composeHtmlDocsInfoReport(accumStart, accumEnd);
+            }
+            else {
+                html += "<p><strong>" + SLibUtils.textToHtml("¡No se encontró información para " +
+                        (accumStart.equals(accumEnd) ? "la fecha solicitada" : "el período solicitado") + " " + composeTextPeriod(accumStart, accumEnd) + "!") +
+                        "</strong></p>\n";
+            }
+        }
+        
+        return html;
+    }
+    
+    private String composeHtmlMailBody() throws Exception {
+        String body = "<body>\n";
+        
+        body += "<h1>" + SLibUtils.textToHtml(msCompanyName) + "</h1>\n";
+        
+        body += composeHtmlMailBodyReport();
+        body += composeHtmlMailBodyAccum();
+        body += composeHtmlSalesBackorder();
+        
         body += STrnUtilities.composeMailFooter("warning");
         
-        // end of body
         body += "</body>\n";
         
         return body;
@@ -703,8 +1022,8 @@ public class SCliRepInvoices {
      */
     public void sendMail() throws Exception {
         String html = "<html>\n";
-        html += composeMailBodyHtmlHead();
-        html += composeMailBodyHtmlBody();
+        html += composeHtmlMailHead();
+        html += composeHtmlMailBody();
         html += "</html>";
         
         String subject = composeMailSubject();
@@ -760,12 +1079,12 @@ public class SCliRepInvoices {
         }
         
         public double getTotNet() {
-            // returns and discounts are negative values:
+            // consider that returns and discounts are both already negative!:
             return SLibUtils.roundAmount(TotGross + TotReturns + TotDiscounts);
         }
         
         public double getQtyNet() {
-            // returns are negative values:
+            // consider that returns are already negative!:
             return QtyGross + QtyReturns;
         }
         

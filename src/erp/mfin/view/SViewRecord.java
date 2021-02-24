@@ -20,6 +20,7 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mfin.data.SDataRecord;
+import erp.mtrn.data.SCfdUtils;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
@@ -32,7 +33,7 @@ import sa.gui.util.SUtilConsts;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona
+ * @author Sergio Flores, Edwin Carmona, Isabel Servín
  */
 public class SViewRecord extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -41,6 +42,7 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
     private javax.swing.JButton mjbPrintRecordCy;
     private javax.swing.JButton mjbAudit;
     private javax.swing.JButton mjbAuditRevoke;
+    private javax.swing.JButton jbGetXml;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.mfin.view.SPanelFilterRecordType moPanelFilterRecordType;
@@ -82,7 +84,12 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         mjbAuditRevoke.setPreferredSize(new Dimension(23, 23));
         mjbAuditRevoke.setToolTipText("Desmarcar como auditado");
         mjbAuditRevoke.addActionListener(this);
-
+        
+        jbGetXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML));
+        jbGetXml.setPreferredSize(new Dimension(23, 23));
+        jbGetXml.setToolTipText("Obtener CFDI del comprobante");
+        jbGetXml.addActionListener(this);
+        
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moPanelFilterRecordType = new SPanelFilterRecordType(miClient, this);
@@ -101,9 +108,11 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbAudit);
         addTaskBarUpperComponent(mjbAuditRevoke);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(jbGetXml);
 
         STableField[] aoKeyFields = new STableField[5];
-        STableColumn[] aoTableColumns = new STableColumn[26];
+        STableColumn[] aoTableColumns = new STableColumn[27];
 
         col = 0;
         aoKeyFields[col++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "r.id_year");
@@ -132,6 +141,7 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "e.ent", "Cuenta efectivo", 100);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_adj_year", "Cierre", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_adj_audit", "Auditoría", STableConstants.WIDTH_BOOLEAN);
+        aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "cfd", "CFDI", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "r.b_audit", "Auditada", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uaud.usr", "Usr. auditoría", STableConstants.WIDTH_USER);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "r.ts_audit", "Auditoría", STableConstants.WIDTH_DATE_TIME);
@@ -337,6 +347,22 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
             }
         }
     }
+    
+    private void actionGetXml() {
+        if (jbGetXml.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                try {
+                    SCfdUtils.getXmlCfds(miClient, SCfdUtils.getCfdRecord(miClient, (Object[])moTablePane.getSelectedTableRow().getPrimaryKey()));
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+        }
+    }
 
     @Override
     public void createSqlQuery() {
@@ -374,7 +400,12 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
                 "bkc.code, cob.code, e.ent, uaud.usr, uaut.usr, un.usr, ue.usr, ud.usr, " +
                 "CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_per, " +
                 "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_num, " +
-                "SUM(re.debit) AS f_debit, SUM(re.credit) AS f_credit, SUM(re.debit) - SUM(re.credit) AS f_balance " +
+                "SUM(re.debit) AS f_debit, SUM(re.credit) AS f_credit, SUM(re.debit) - SUM(re.credit) AS f_balance, " +
+                "((SELECT COUNT(*) FROM trn_cfd AS c WHERE r.id_year = c.fid_rec_year_n AND r.id_per = c.fid_rec_per_n AND r.id_bkc = c.fid_rec_bkc_n AND r.id_tp_rec = c.fid_rec_tp_rec_n AND r.id_num = c.fid_rec_num_n) + " +
+                "(SELECT COUNT(DISTINCT re1.fid_dps_year_n, re1.fid_dps_doc_n) FROM fin_rec_ety AS re1, trn_cfd AS c WHERE NOT re1.b_del AND r.id_year = re1.id_year AND r.id_per = re1.id_per AND r.id_bkc = re1.id_bkc AND r.id_tp_rec = re1.id_tp_rec AND r.id_num = re1.id_num AND " +
+                " re1.fid_dps_year_n = c.fid_dps_year_n AND re1.fid_dps_doc_n = c.fid_dps_doc_n) + " +
+                "(SELECT COUNT(DISTINCT re1.fid_cfd_n) FROM fin_rec_ety AS re1, trn_cfd AS c WHERE NOT re1.b_del AND r.id_year = re1.id_year AND r.id_per = re1.id_per AND r.id_bkc = re1.id_bkc AND r.id_tp_rec = re1.id_tp_rec AND r.id_num = re1.id_num " +
+                "AND re1.fid_cfd_n = c.id_cfd )) AS cfd " +
                 "FROM fin_rec AS r " +
                 "INNER JOIN fin_bkc AS bkc ON " +
                 "r.id_bkc = bkc.id_bkc " +
@@ -424,6 +455,9 @@ public class SViewRecord extends erp.lib.table.STableTab implements java.awt.eve
             }
             else if (button == mjbAuditRevoke) {
                 actionAudit(false);
+            }
+            else if (button == jbGetXml) {
+                actionGetXml();
             }
         }
     }

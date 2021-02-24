@@ -5,6 +5,8 @@
 
 package erp.mtrn.view;
 
+import cfd.DCfdConsts;
+import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
@@ -33,6 +35,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SCfdUtils;
 import erp.mtrn.data.SCfdUtilsHandler;
+import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.STrnUtilities;
@@ -54,6 +57,7 @@ import erp.table.STabFilterUsers;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.ImageIcon;
@@ -65,12 +69,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.gui.util.SUtilConsts;
+import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
 /**
- *
- * @author Sergio Flores, Edwin Carmona, Alfredo Pérez, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Edwin Carmona, Alfredo Pérez, Sergio Flores, Isabel Servín, Claudio Peña
  *
  * BUSINESS PARTNER BLOCKING NOTES:
  * Business Partner Blocking applies only to order and document for purchases and sales,
@@ -101,6 +105,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbPrintOrderGoods;
     private javax.swing.JButton jbGetXml;
     private javax.swing.JButton jbGetAcknowledgmentCancellation;
+    private javax.swing.JButton jbShowCfdi;
     private javax.swing.JButton jbSignXml;
     private javax.swing.JButton jbValidateCfdi;
     private javax.swing.JButton jbGetCfdiStatus;
@@ -108,6 +113,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbResetPacFlags;
     private javax.swing.JButton jbImportCfdiWithOutPurchaseOrder;
     private javax.swing.JButton jbImportCfdiWithPurchaseOrder;
+    private javax.swing.JButton jbChangeDpsEntryItem;
     private javax.swing.JButton jbRestoreSignXml;
     private javax.swing.JButton jbRestoreAckCancellation;
     private erp.table.STabFilterUsers moTabFilterUser;
@@ -236,6 +242,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbImportCfdiWithPurchaseOrder.setPreferredSize(new Dimension(23, 23));
         jbImportCfdiWithPurchaseOrder.addActionListener(this);
         jbImportCfdiWithPurchaseOrder.setToolTipText("Importar CFDI con orden de compra");
+        
+        jbChangeDpsEntryItem = new JButton(miClient.getImageIcon(SLibConstants.ICON_EDIT));
+        jbChangeDpsEntryItem.setPreferredSize(new Dimension(23, 23));
+        jbChangeDpsEntryItem.addActionListener(this);
+        jbChangeDpsEntryItem.setToolTipText("Cambiar ítems de documentos");
 
         jbChangeDeliveryAddress = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_loc.gif")));
         jbChangeDeliveryAddress.setPreferredSize(new Dimension(23, 23));
@@ -326,12 +337,17 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetXml.setPreferredSize(new Dimension(23, 23));
         jbGetXml.addActionListener(this);
         jbGetXml.setToolTipText("Obtener XML del comprobante");
-
+        
         jbGetAcknowledgmentCancellation = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_CANCEL));
         jbGetAcknowledgmentCancellation.setPreferredSize(new Dimension(23, 23));
         jbGetAcknowledgmentCancellation.addActionListener(this);
         jbGetAcknowledgmentCancellation.setToolTipText("Obtener XML del acuse de cancelación del CFDI");
 
+        jbShowCfdi = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
+        jbShowCfdi.setPreferredSize(new Dimension(23, 23)); 
+        jbShowCfdi.addActionListener(this);
+        jbShowCfdi.setToolTipText("Mostrar CFDI del comprobante");
+        
         jbSignXml = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_SIGN));
         jbSignXml.setPreferredSize(new Dimension(23, 23));
         jbSignXml.addActionListener(this);
@@ -342,7 +358,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbValidateCfdi.addActionListener(this);
         jbValidateCfdi.setToolTipText("Validar timbrado o cancelación del CFDI");
 
-        jbGetCfdiStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_look.gif")));
+        jbGetCfdiStatus = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_query.gif")));
         jbGetCfdiStatus.setPreferredSize(new Dimension(23, 23));
         jbGetCfdiStatus.addActionListener(this);
         jbGetCfdiStatus.setToolTipText("Checar estatus cancelación del CFDI");
@@ -403,6 +419,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarUpperComponent(jbImportCfdiWithOutPurchaseOrder);
         addTaskBarUpperComponent(jbImportCfdiWithPurchaseOrder);
         addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(jbChangeDpsEntryItem);
+        addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);
@@ -429,6 +447,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbPrintOrderGoods);
         addTaskBarLowerComponent(jbGetXml);
         addTaskBarLowerComponent(jbGetAcknowledgmentCancellation);
+        addTaskBarLowerComponent(jbShowCfdi);
         addTaskBarLowerComponent(jbSignXml);
         addTaskBarLowerComponent(jbValidateCfdi);
         addTaskBarLowerComponent(jbGetCfdiStatus);
@@ -450,6 +469,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbImport.setEnabled(mbHasRightNew && createImportFinder);
         jbImportCfdiWithOutPurchaseOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
         jbImportCfdiWithPurchaseOrder.setEnabled(mbIsCategoryPur && mbIsDoc);
+        jbChangeDpsEntryItem.setEnabled(true);
         jbChangeDeliveryAddress.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
         jbChangeAgentSupervisor.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
         jbSetDeliveryDate.setEnabled(mbIsCategorySal && mbIsDoc && mbHasRightLogistics);
@@ -468,10 +488,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbPrintContractMoves.setEnabled(mbIsCategorySal && mbIsEstCon);
         jbPrintOrderGoods.setEnabled(mbIsCategorySal && mbIsOrd);
         jbGetXml.setEnabled((mbIsDoc || mbIsDocAdj));
+        jbShowCfdi.setEnabled(mbIsDoc || mbIsDocAdj);
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbGetCfdiStatus.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbGetCfdiStatus.setEnabled((mbIsDoc || mbIsDocAdj));
         jbSendCfdi.setEnabled((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj)));
         jbRestoreSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbRestoreAckCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
@@ -699,6 +720,22 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         return key;
     }
 
+    private File getRouteImgReport() {
+        JFileChooser save = new JFileChooser();
+        save.setCurrentDirectory(new java.io.File("C:\\"));
+        save.setDialogTitle("Seleccionar imagen");
+        save.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        FileNameExtensionFilter filtro = new FileNameExtensionFilter("JPG y PNG","jpg","png");
+        save.setFileFilter(filtro);
+        save.setAcceptAllFileFilterUsed(false);
+
+        if (save.showDialog(null, "Subir") == JFileChooser.APPROVE_OPTION) {
+            System.out.println("getSelectedFile() : " + save.getSelectedFile());
+
+        }
+        return save.getSelectedFile();
+    }
+    
     @Override
     public void actionNew() {
         if (jbNew.isEnabled()) {
@@ -897,6 +934,20 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
     
+    private void actionChangeDpsEntryItem() {
+        if (jbChangeDpsEntryItem.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                int gui = mbIsCategoryPur ? SDataConstants.MOD_PUR : SDataConstants.MOD_SAL;
+                if (miClient.getGuiModule(gui).showForm(SDataConstants.TRNX_DPS_EDIT, moTablePane.getSelectedTableRow().getPrimaryKey()) == SLibConstants.DB_ACTION_SAVE_OK) {
+                    miClient.getGuiModule(gui).refreshCatalogues(mnTabType);
+                }
+            }
+        }
+    }
+    
     private void actionChangeDeliveryAddress() {
         if (jbChangeDeliveryAddress.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
@@ -1089,30 +1140,33 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else {
                     SDataBizPartnerBranch comBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-                    SDataBizPartnerBranch bpBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-                    SDataBizPartnerBranchAddress bpBranchAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, new int [] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
-                    SDataBizPartnerBranchContact bpBranchContact = null;
+                    SDataBizPartnerBranch bprBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+                    SDataBizPartnerBranchAddress bprBranchAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, new int [] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
+                    SDataBizPartnerBranchContact comBranchContact = null;
+                    SDataBizPartnerBranchContact bprBranchContact = null;
                     SDataCurrency currency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
 
                     int addressFormatType = 0;
                     boolean addCountry = false;
                     
-                    if (bpBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
-                        addressFormatType = bpBranch.getFkAddressFormatTypeId_n();
+                    if (bprBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
+                        addressFormatType = bprBranch.getFkAddressFormatTypeId_n();
                     }
                     else {
                         addressFormatType = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
                     }
                     
-                    if (bpBranchAddress.getFkCountryId_n() == comBranch.getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n()) {
+                    if (bprBranchAddress.getFkCountryId_n() == comBranch.getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n()) {
                         addCountry = false;
                     }
                     else {
                         addCountry = true;
                     }
 
-                    String[] hqAddressTexts = bpBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
-                    String[] dvyAddressTexts = bpBranchAddress.obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                    SDataBizPartner company = miClient.getSessionXXX().getCompany().getDbmsDataCompany();
+                    String[] comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                    String[] bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                    String[] dvyAddressTexts = bprBranchAddress.obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
 
                     Cursor cursor = getCursor();
                     Map<String, Object> map = null;
@@ -1145,33 +1199,96 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                         try {
                             setCursor(new Cursor(Cursor.WAIT_CURSOR));
                             
-                            bpBranchContact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
-                                    miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+                            if (company.getFiscalId().equals(DCfdConsts.RFC_GEN_INT)) {
+                                // international company:
+                                
+                                comAddressTexts = comBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
+                                bprAddressTexts = bprBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
+                                dvyAddressTexts = bprBranchAddress.obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_2ROWS, addCountry);
+                                
+                                SDataBizPartnerBranchContact bprBranchContactForPhone = company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(0);
+                                bprBranchContact = bprBranch.getDbmsBizPartnerBranchContacts().size() <= 1 ? null : bprBranch.getDbmsBizPartnerBranchContacts().get(1);
 
-                            map = miClient.createReportParams();
-                            map.put("nIdYear", dps.getPkYearId());
-                            map.put("nIdDoc", dps.getPkDocId());
-                            map.put("sAddressLine1", hqAddressTexts[0]);
-                            map.put("sAddressLine2", hqAddressTexts[1]);
-                            map.put("sAddressLine3", hqAddressTexts[2]);
-                            map.put("sAddressLine4", hqAddressTexts.length > 3 ? hqAddressTexts[3] : "");
-                            map.put("sAddressDelivery1", dvyAddressTexts[0].compareTo(hqAddressTexts[0]) == 0 ? "": dvyAddressTexts[0]);
-                            map.put("sAddressDelivery2", dvyAddressTexts[1].compareTo(hqAddressTexts[1]) == 0 ? "DOMICILIO DEL CLIENTE": dvyAddressTexts[1]);
-                            map.put("sAddressDelivery3", dvyAddressTexts[2].compareTo(hqAddressTexts[2]) == 0 ? "": dvyAddressTexts[2]);
-                            map.put("sAddressDelivery4", dvyAddressTexts.length > 3 && hqAddressTexts.length > 3 ?
-                                dvyAddressTexts[3].compareTo(hqAddressTexts[3]) == 0 ? "" : dvyAddressTexts[3] : "");
-                            map.put("nBizPartnerCategory", SDataConstantsSys.BPSS_CT_BP_CUS);
-                            map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
-                                dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
-                                SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
-                            map.put("sErpCurrencyKey", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
-                            map.put("bShowBackground", false);
-                            map.put("sManagerFinance", bpBranchContact == null ? "" : SLibUtilities.textTrim(bpBranchContact.getContactPrefix() + " " + bpBranchContact.getFirstname() + " " + bpBranchContact.getLastname()));
+                                map = miClient.createReportParams();
+                                map.put("nDpsYearId", dps.getPkYearId());
+                                map.put("nDpsDocId", dps.getPkDocId());
+                                map.put("sDpsNumber", dps.getDpsNumber());
+                                map.put("tDpsDate", dps.getDate());
+                                map.put("nDpsDueDays", dps.getDaysOfCredit());
+                                
+                                map.put("sDpsNote1", "If any fees are not received by Saporis International by the due date, those fees may accrue late interest at a rate of 1.5% of the outstanding balance per month or the maximum rate permitted by the law, whichever is lower.");
+                                map.put("sDpsNote2", "<p><b>PLEASE WIRE TRANSFER TO THE FOLLOWING BANK ACCOUNT NUMBER</b></p>"
+                                        + "<p>BANK OF AMERICA</p>"
+                                        + "<p>ACCOUNT NAME: SAPORIS INTERNATIONAL INC</p>"
+                                        + "<p>ACCOUNT NUMBER: 325143301493</p>"
+                                        + "<p>ROUTING NUMBER: 121000358</p>"
+                                        + "<p>WIRE: 026009593</p>"
+                                        + "<br>"
+                                        + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
+                                        + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>");
+                                
+                                map.put("sPONumber", dps.getNumberReference());
+                                map.put("sONumber", "");
+                                
+                                map.put("sIssName", company.getBizPartner());
+                                map.put("sIssAddress1", comAddressTexts[0]);
+                                map.put("sIssAddress2", comAddressTexts[1]);
+                                
+                                SDataBizPartner customer = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+                                map.put("sCusNumber", customer.getDbmsCategorySettingsCus().getKey());
+                                map.put("sCusName", customer.getBizPartner());
+                                map.put("sCusAddress1", bprAddressTexts[0]);
+                                map.put("sCusAddress2", bprAddressTexts[1]);
+                                
+                                map.put("sDvyName", customer.getBizPartner());
+                                map.put("sDvyAddress1", dvyAddressTexts[0]);
+                                map.put("sDvyAddress2", dvyAddressTexts[1]);
+                                
+                                map.put("sDvyPhone", bprBranchContactForPhone.getAuxTelephoneNumbers());
+                                map.put("sDvyContact", bprBranchContact == null ? "" : bprBranchContact.getContact());
+                                
+                                map.put("sCurCode", miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { dps.getFkCurrencyId() }));
+                                
+                                map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
+                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
 
-                            jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS, map);
-                            jasperViewer = new JasperViewer(jasperPrint, false);
-                            jasperViewer.setTitle("Impresión de factura");
-                            jasperViewer.setVisible(true);
+                                jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_US, map);
+                                jasperViewer = new JasperViewer(jasperPrint, false);
+                                jasperViewer.setTitle("Invoice printing");
+                                jasperViewer.setVisible(true);
+                            }
+                            else {
+                                // national company:
+                                
+                                comBranchContact = company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
+                                        company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+
+                                map = miClient.createReportParams();
+                                map.put("nIdYear", dps.getPkYearId());
+                                map.put("nIdDoc", dps.getPkDocId());
+                                map.put("sAddressLine1", bprAddressTexts[0]);
+                                map.put("sAddressLine2", bprAddressTexts[1]);
+                                map.put("sAddressLine3", bprAddressTexts[2]);
+                                map.put("sAddressLine4", bprAddressTexts.length > 3 ? bprAddressTexts[3] : "");
+                                map.put("sAddressDelivery1", dvyAddressTexts[0].compareTo(bprAddressTexts[0]) == 0 ? "": dvyAddressTexts[0]);
+                                map.put("sAddressDelivery2", dvyAddressTexts[1].compareTo(bprAddressTexts[1]) == 0 ? "DOMICILIO DEL CLIENTE": dvyAddressTexts[1]);
+                                map.put("sAddressDelivery3", dvyAddressTexts[2].compareTo(bprAddressTexts[2]) == 0 ? "": dvyAddressTexts[2]);
+                                map.put("sAddressDelivery4", dvyAddressTexts.length > 3 && bprAddressTexts.length > 3 ?
+                                    dvyAddressTexts[3].compareTo(bprAddressTexts[3]) == 0 ? "" : dvyAddressTexts[3] : "");
+                                map.put("nBizPartnerCategory", SDataConstantsSys.BPSS_CT_BP_CUS);
+                                map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
+                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+                                map.put("sErpCurrencyKey", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
+                                map.put("bShowBackground", false);
+                                map.put("sManagerFinance", comBranchContact == null ? "" : SLibUtilities.textTrim(comBranchContact.getContactPrefix() + " " + comBranchContact.getFirstname() + " " + comBranchContact.getLastname()));
+
+                                jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS, map);
+                                jasperViewer = new JasperViewer(jasperPrint, false);
+                                jasperViewer.setTitle("Impresión de factura");
+                                jasperViewer.setVisible(true);
+                            }
                         }
                         catch (Exception e) {
                             SLibUtilities.renderException(this, e);
@@ -1185,23 +1302,24 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                         try {
                             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-                            bpBranchContact = miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
-                                    miClient.getSessionXXX().getCompany().getDbmsDataCompany().getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
+                            
+                            comBranchContact = company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().size() <= 1 ? null :
+                                    company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
 
                             map = miClient.createReportParams();
                             map.put("nIdYear", dps.getPkYearId());
                             map.put("nIdDoc", dps.getPkDocId());
-                            map.put("sAddressLine1", hqAddressTexts[0]);
-                            map.put("sAddressLine2", hqAddressTexts[1]);
-                            map.put("sAddressLine3", hqAddressTexts[2]);
-                            map.put("sAddressLine4", hqAddressTexts.length > 3 ? hqAddressTexts[3] : "");
+                            map.put("sAddressLine1", bprAddressTexts[0]);
+                            map.put("sAddressLine2", bprAddressTexts[1]);
+                            map.put("sAddressLine3", bprAddressTexts[2]);
+                            map.put("sAddressLine4", bprAddressTexts.length > 3 ? bprAddressTexts[3] : "");
                             map.put("nBizPartnerCategory", SDataConstantsSys.BPSS_CT_BP_CUS);
                             map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
                                 dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                 SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
                             map.put("sErpCurrencyKey", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
                             map.put("bShowBackground", false);
-                            map.put("sManagerFinance", bpBranchContact == null ? "" : SLibUtilities.textTrim(bpBranchContact.getContactPrefix() + " " + bpBranchContact.getFirstname() + " " + bpBranchContact.getLastname()));
+                            map.put("sManagerFinance", comBranchContact == null ? "" : SLibUtilities.textTrim(comBranchContact.getContactPrefix() + " " + comBranchContact.getFirstname() + " " + comBranchContact.getLastname()));
 
                             jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_ADJ, map);
                             jasperViewer = new JasperViewer(jasperPrint, false);
@@ -1232,17 +1350,17 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map.put("nIdDoc", dps.getPkDocId());
                             
                             if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
-                                map.put("sAddressLine1", hqAddressTexts[0]);
-                                map.put("sAddressLine2", hqAddressTexts[1]);
-                                map.put("sAddressLine3", hqAddressTexts[2]);
-                                map.put("sAddressLine4", hqAddressTexts.length > 3 ? hqAddressTexts[3] : "");
+                                map.put("sAddressLine1", bprAddressTexts[0]);
+                                map.put("sAddressLine2", bprAddressTexts[1]);
+                                map.put("sAddressLine3", bprAddressTexts[2]);
+                                map.put("sAddressLine4", bprAddressTexts.length > 3 ? bprAddressTexts[3] : "");
                             }
                             else {
-                                String[] comAddressTexts = miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
-                                map.put("sAddressLine1", comAddressTexts[0] == null || comAddressTexts[0].isEmpty() ? "": comAddressTexts[0]);
-                                map.put("sAddressLine2", comAddressTexts[1] == null || comAddressTexts[1].isEmpty() ? "": comAddressTexts[1]);
-                                map.put("sAddressLine3", comAddressTexts[2] == null || comAddressTexts[2].isEmpty() ? "": comAddressTexts[2]);
-                                map.put("sAddressLine4", comAddressTexts.length > 3 ? comAddressTexts[3] : "");
+                                String[] comBranchAddressTexts = miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                                map.put("sAddressLine1", comBranchAddressTexts[0] == null || comBranchAddressTexts[0].isEmpty() ? "": comBranchAddressTexts[0]);
+                                map.put("sAddressLine2", comBranchAddressTexts[1] == null || comBranchAddressTexts[1].isEmpty() ? "": comBranchAddressTexts[1]);
+                                map.put("sAddressLine3", comBranchAddressTexts[2] == null || comBranchAddressTexts[2].isEmpty() ? "": comBranchAddressTexts[2]);
+                                map.put("sAddressLine4", comBranchAddressTexts.length > 3 ? comBranchAddressTexts[3] : "");
                             }
 
                             textsPrices.add("");
@@ -1303,18 +1421,19 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             
                             map.put("oVectorTextUnit", textsUnits);
                             
-                            bpBranchContact = bpBranch.getDbmsBizPartnerBranchContact(new int[] { dps.getFkContactBizPartnerBranchId_n(), dps.getFkContactContactId_n() });
-                            if (bpBranchContact == null) {
-                                for (int i = 0; i < bpBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
-                                    if (bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_PUR && !bpBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
-                                        textContact = bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
-                                                (bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
-                                                bpBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
+                            bprBranchContact = bprBranch.getDbmsBizPartnerBranchContact(new int[] { dps.getFkContactBizPartnerBranchId_n(), dps.getFkContactContactId_n() });
+                            
+                            if (bprBranchContact == null) {
+                                for (int i = 0; i < bprBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
+                                    if (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_PUR && !bprBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
+                                        textContact = bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
+                                                (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
+                                                bprBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
                                     }
-                                    else if (bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !bpBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
-                                        textContact = bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
-                                                (bpBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
-                                                bpBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
+                                    else if (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !bprBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
+                                        textContact = bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
+                                                (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
+                                                bprBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
                                     }
 
                                     if (!textContact.isEmpty()) {
@@ -1323,10 +1442,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 }
                             }
                             else {
-                                textContact = bpBranchContact.getFirstname() + (bpBranchContact.getFirstname().length() > 0 ? " " : "") + bpBranchContact.getLastname();
+                                textContact = bprBranchContact.getFirstname() + (bprBranchContact.getFirstname().length() > 0 ? " " : "") + bprBranchContact.getLastname();
                             }
 
-                            map.put("sContact", textContact.isEmpty() ? bpBranch.getDbmsBizPartner() : textContact);
+                            map.put("sContact", textContact.isEmpty() ? bprBranch.getDbmsBizPartner() : textContact);
                             map.put("ctBpCus", SDataConstantsSys.BPSS_CT_BP_CUS);
                             map.put("ctBpSup", SDataConstantsSys.BPSS_CT_BP_SUP);
                             map.put("nFidCtBp", SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON) ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP);
@@ -1349,187 +1468,129 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             setCursor(cursor);
                         }
                     }
-                }
-            }
-        }
-    }
+                    else if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_EST)) {
+                        String textContact = "";
+                        Vector<String> textsPrices = new Vector<>();
+                        Vector<String> textsSalesPrices = new Vector<>();
+                        Vector<String> textsSalesFreights = new Vector<>();
+                        Vector<String> textsUnits = new Vector<>();
 
-    /* XXX 2020-06-12 Sergio Flores: Remove if no longer needed. Preserved only if new code fails.
-    private void actionPrintContract() {
-        if (jbPrintContractKgAsTon.isEnabled()) {
-            int i;
-            int nFkRecAddressFormatTypeId_n = 0;
-            boolean bincludeCountry = false;
-            double dQty = 0;
-            String[] addressOficial = null;
-            String[] addressContract = null;
-            String[] addressDelivery = null;
-            Cursor cursor = getCursor();
-            Map<String, Object> map = null;
-            JasperPrint jasperPrint = null;
-            JasperViewer jasperViewer = null;
-            SDataDps oDps = null;
-            SDataBizPartnerBranch oCompanyBranch = null;
-            SDataBizPartnerBranch oBizPartnerBranch = null;
-            SDataBizPartnerBranchContact oContact = null;
-            SDataBizPartnerBranchAddress oAddress = null;
-            SDataCurrency oCurrency = null;
-            SDataUnit oUnit = null;
-            Vector<String> vPrice = null;
-            Vector<String> vUnit = null;
-            String sContact = "";
-
-            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
-                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
-            }
-            else {
-                oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                
-                oCompanyBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { oDps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-                oBizPartnerBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { oDps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-                oAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, new int [] { oDps.getFkBizPartnerBranchId(),
-                    oDps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
-                oCurrency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { oDps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
-                
-                if (oBizPartnerBranch.getFkAddressFormatTypeId_n() != SLibConstants.UNDEFINED) {
-                    nFkRecAddressFormatTypeId_n = oBizPartnerBranch.getFkAddressFormatTypeId_n();
-                }
-                else {
-                    nFkRecAddressFormatTypeId_n = miClient.getSessionXXX().getParamsCompany().getFkDefaultAddressFormatTypeId_n();
-                }
-
-                if (oAddress.getFkCountryId_n() == oCompanyBranch.getDbmsBizPartnerBranchAddressOfficial().getFkCountryId_n()) {
-                    bincludeCountry = false;
-                }
-                else {
-                    bincludeCountry = true;
-                }
-
-                addressOficial = oBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkRecAddressFormatTypeId_n,
-                    SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
-                addressContract = oBizPartnerBranch.getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkRecAddressFormatTypeId_n,
-                    SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
-                addressDelivery = oAddress.obtainAddress(nFkRecAddressFormatTypeId_n,
-                    SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
-
-                if (SLibUtilities.belongsTo(oDps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_SAL_CON, SDataConstantsSys.TRNU_TP_DPS_PUR_CON })) {
-                    // contract:
-
-                    vPrice = new Vector<>();
-                    vUnit = new Vector<>();
-                    
-                    try {
-                        setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-                        map = miClient.createReportParams();
-                        map.put("nIdYear", oDps.getPkYearId());
-                        map.put("nIdDoc", oDps.getPkDocId());
-                        
-                        if (SLibUtilities.compareKeys(oDps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
-                                map.put("sAddressLine1", addressContract[0]);
-                                map.put("sAddressLine2", addressContract[1]);
-                                map.put("sAddressLine3", addressContract[2]);
-                                map.put("sAddressLine4", addressContract.length > 3 ? addressContract[3] : "");
-                            }
-                            else {
-                                addressOficial = miClient.getSessionXXX().getCurrentCompanyBranch().getDbmsBizPartnerBranchAddressOfficial().obtainAddress(nFkRecAddressFormatTypeId_n,
-                                    SDataBizPartnerBranchAddress.ADDRESS_4ROWS, bincludeCountry);
-                                map.put("sAddressLine1", addressOficial[0] == null || addressOficial[0].isEmpty() ? "": addressOficial[0]);
-                                map.put("sAddressLine2", addressOficial[1] == null || addressOficial[1].isEmpty() ? "": addressOficial[1]);
-                                map.put("sAddressLine3", addressOficial[2] == null || addressOficial[2].isEmpty() ? "": addressOficial[2]);
-                                map.put("sAddressLine4", addressOficial.length > 3 ? addressOficial[3] : "");
-                            }
-
-                        vPrice.add("");
-                        for (i = 0; i < oDps.getDbmsDpsEntries().size(); i++) {
-                            if (!oDps.getDbmsDpsEntries().get(i).getIsDeleted()) {
-                                if (oDps.getDbmsDpsEntries().get(i).getFkOriginalUnitId() == SModSysConsts.ITMU_UNIT_KG) {
-                                    vPrice.add(SLibUtilities.translateValueToText(oDps.getDbmsDpsEntries().get(i).getOriginalPriceUnitaryCy() * 1000, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
-                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
-                                    SLibConstants.LAN_ENGLISH, oCurrency.getTextSingular(), oCurrency.getTextPlural(), oCurrency.getTextPrefix(), oCurrency.getTextSuffix()));
-                                }
-                                else {
-                                    vPrice.add(SLibUtilities.translateValueToText(oDps.getDbmsDpsEntries().get(i).getOriginalPriceUnitaryCy(), miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
-                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
-                                    SLibConstants.LAN_ENGLISH, oCurrency.getTextSingular(), oCurrency.getTextPlural(), oCurrency.getTextPrefix(), oCurrency.getTextSuffix()));
-                                }
-                            }
-                        }
-                        
-                        map.put("oVectorTextPrice", vPrice);
-
-                        vUnit.add("");
-                        for (i = 0; i < oDps.getDbmsDpsEntries().size(); i++) {
-                            if (!oDps.getDbmsDpsEntries().get(i).getIsDeleted()) {
-                                if (oDps.getDbmsDpsEntries().get(i).getFkOriginalUnitId() == SModSysConsts.ITMU_UNIT_KG) {
-                                    dQty = oDps.getDbmsDpsEntries().get(i).getOriginalQuantity() / 1000;
-                                    oUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT,
-                                        new int[] { SModSysConsts.ITMU_UNIT_MT_TON }, SLibConstants.EXEC_MODE_SILENT);
-                                }
-                                else {
-                                    dQty = oDps.getDbmsDpsEntries().get(i).getOriginalQuantity();
-                                    oUnit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT,
-                                        new int[] { oDps.getDbmsDpsEntries().get(i).getFkOriginalUnitId() }, SLibConstants.EXEC_MODE_SILENT);
-                                }
-
-                                vUnit.add(SLibUtilities.translateUnitsToText(dQty, miClient.getSessionXXX().getParamsErp().getDecimalsQuantity(),
-                                oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
-                                SLibConstants.LAN_ENGLISH, oUnit.getUnit(), oUnit.getUnit()));
-                            }
-                        }
-
-                        map.put("oVectorTextUnit", vUnit);
-                        oContact = oBizPartnerBranch.getDbmsBizPartnerBranchContact(new int[] { oDps.getFkContactBizPartnerBranchId_n(), oDps.getFkContactContactId_n() });
-
-                        if (oContact == null) {
-                            for (i = 0; i < oBizPartnerBranch.getDbmsBizPartnerBranchContact().size(); i++) {
-                                if (oBizPartnerBranch.getDbmsBizPartnerBranchContact().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_PUR && !oBizPartnerBranch.getDbmsBizPartnerBranchContact().get(i).getIsDeleted()) {
-                                    sContact = oBizPartnerBranch.getDbmsBizPartnerBranchContact().get(i).getFirstname() +
-                                            (oBizPartnerBranch.getDbmsBizPartnerBranchContact().get(i).getFirstname().length() > 0 ? " " : "") +
-                                            oBizPartnerBranch.getDbmsBizPartnerBranchContact().get(i).getLastname();
-                                }
-                                else if (oBizPartnerBranch.getDbmsBizPartnerBranchContact().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !oBizPartnerBranch.getDbmsBizPartnerBranchContact().get(i).getIsDeleted()) {
-                                    sContact = oBizPartnerBranch.getDbmsBizPartnerBranchContact().get(i).getFirstname() +
-                                            (oBizPartnerBranch.getDbmsBizPartnerBranchContact().get(i).getFirstname().length() > 0 ? " " : "") +
-                                            oBizPartnerBranch.getDbmsBizPartnerBranchContact().get(i).getLastname();
-                                }
-
-                                if (sContact.length() > 0) {
+                        try {
+                            setCursor(new Cursor(Cursor.WAIT_CURSOR)); 
+                            
+                            map = miClient.createReportParams();
+                            map.put("nIdYear", dps.getPkYearId());
+                            map.put("nIdDoc", dps.getPkDocId());
+                            miClient.getSessionXXX().getCurrentCompany().getDbmsDataCompany().getDbmsBizPartnerBranches();
+                            
+                            for (int i = 0; i < company.getDbmsBizPartnerBranches().size(); i++ ) {
+                                if (company.getDbmsBizPartnerBranches().get(i).getPkBizPartnerBranchId() == dps.getFkCompanyBranchId()) {
+                                    comAddressTexts = company.getDbmsBizPartnerBranches().get(i).getDbmsBizPartnerBranchAddresses().get(0).obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
+                                    map.put("sAddressLine1", comAddressTexts[0] == null || comAddressTexts[0].isEmpty() ? "": comAddressTexts[0]);
+                                    map.put("sAddressLine2", comAddressTexts[1] == null || comAddressTexts[1].isEmpty() ? "": comAddressTexts[1]);
+                                    map.put("sAddressLine3", comAddressTexts[2].toUpperCase() == null || comAddressTexts[2].isEmpty() ? "": comAddressTexts[2].toUpperCase());
+                                    map.put("sAddressLine4", comAddressTexts.length > 3 ? comAddressTexts[3] : "");
+                                    map.put("sFiscalIdBp", miClient.getSessionXXX().getCurrentCompany().getDbmsDataCompany().getFiscalId());
+                                    map.put("sTelephone", company.getDbmsBizPartnerBranches().get(i).getDbmsBizPartnerBranchContacts().get(0).getAuxTelephoneNumbers());
                                     break;
                                 }
                             }
-                        }
-                        else {
-                            sContact = oContact.getFirstname() + (oContact.getFirstname().length() > 0 ? " " : "") + oContact.getLastname();
-                        }
 
-                        map.put("sContact", sContact.length() == 0 ? oBizPartnerBranch.getDbmsBizPartner() : sContact);
-                        map.put("ctBpCus", SDataConstantsSys.BPSS_CT_BP_CUS);
-                        map.put("ctBpSup", SDataConstantsSys.BPSS_CT_BP_SUP);
-                        map.put("nFidCtBp", SLibUtilities.compareKeys(oDps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON) ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP);
-                        map.put("oDecimalFormat", miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormatFixed4());
-                        map.put("oQuantityFormat", miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
-                        map.put("oDateTextFormat", miClient.getSessionXXX().getFormatters().getDateTextFormat());
-                        map.put("nFidTpCarBp", SModSysConsts.LOGS_TP_CAR_CAR);
-                        map.put("nLogIncotermExw", SModSysConsts.LOGS_INC_EXW);
-                        map.put("bPrintTon", true);
+                            textsPrices.add("");
+                            textsSalesPrices.add("");
+                            textsSalesFreights.add("");
 
-                        jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_CON, map);
-                        jasperViewer = new JasperViewer(jasperPrint, false);
-                        jasperViewer.setTitle("Impresión de contrato");
-                        jasperViewer.setVisible(true);
-                    }
-                    catch (Exception e) {
-                        SLibUtilities.renderException(this, e);
-                    }
-                    finally {
-                        setCursor(cursor);
+                            for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+                                if (!entry.getIsDeleted()) {
+                                    double price = entry.getOriginalPriceUnitaryCy();
+                                    double salesPrice = entry.getSalesPriceUnitaryCy();
+                                    double salesFreight = entry.getSalesFreightUnitaryCy();
+
+                                    textsPrices.add(SLibUtilities.translateValueToText(price, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
+                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+
+                                    textsSalesPrices.add(SLibUtilities.translateValueToText(salesPrice, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
+                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+
+                                    textsSalesFreights.add(SLibUtilities.translateValueToText(salesFreight, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
+                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
+                                }
+                            }
+
+                            map.put("oVectorTextPrice", textsPrices);
+                            map.put("oVectorTextSalesPrice", textsSalesPrices);
+                            map.put("oVectorTextSalesFreight", textsSalesFreights);
+
+                            textsUnits.add("");
+
+                            for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+                                if (!entry.getIsDeleted()) {
+                                    double quantity = 0;
+                                    SDataUnit unit = null;
+                                    quantity = entry.getOriginalQuantity();
+                                    unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { entry.getFkOriginalUnitId() }, SLibConstants.EXEC_MODE_SILENT);
+                                    
+                                    textsUnits.add(SLibUtilities.translateUnitsToText(quantity, miClient.getSessionXXX().getParamsErp().getDecimalsQuantity(),
+                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH : SLibConstants.LAN_ENGLISH, 
+                                    unit.getUnit(), unit.getUnit()));
+                                }
+                            }
+
+                            map.put("oVectorTextUnit", textsUnits);
+
+                            bprBranchContact = bprBranch.getDbmsBizPartnerBranchContact(new int[] { dps.getFkContactBizPartnerBranchId_n(), dps.getFkContactContactId_n() });
+                            
+                            if (bprBranchContact == null) {
+                                for (int i = 0; i < bprBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
+                                    if (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFkContactTypeId() == SDataConstantsSys.BPSS_TP_CON_ADM && !bprBranch.getDbmsBizPartnerBranchContacts().get(i).getIsDeleted()) {
+                                        textContact = bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname() +
+                                                (bprBranch.getDbmsBizPartnerBranchContacts().get(i).getFirstname().length() > 0 ? " " : "") +
+                                                bprBranch.getDbmsBizPartnerBranchContacts().get(i).getLastname();
+                                    }
+
+                                    if (!textContact.isEmpty()) {
+                                        break;
+                                    }
+                                }
+                            }
+                            else {
+                                textContact = bprBranchContact.getFirstname() + (bprBranchContact.getFirstname().length() > 0 ? " " : "") + bprBranchContact.getLastname();
+                            }
+
+                            map.put("sContact", textContact.isEmpty() ? bprBranch.getDbmsBizPartner() : textContact);
+                            map.put("ctBpCus", SDataConstantsSys.BPSS_CT_BP_CUS);
+                            map.put("ctBpSup", SDataConstantsSys.BPSS_CT_BP_SUP);
+                            map.put("nFidCtBp", SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON) ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP);
+                            map.put("oDecimalFormat", miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormatFixed4());
+                            map.put("oQuantityFormat", miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
+                            map.put("oDateTextFormat", miClient.getSessionXXX().getFormatters().getDateTextFormat());
+                            map.put("nFidTpCarBp", SModSysConsts.LOGS_TP_CAR_CAR);
+                            map.put("nLogIncotermExw", SModSysConsts.LOGS_INC_EXW);
+                            if (JOptionPane.showConfirmDialog(this, "Desea incluir una imagen en el reporte", "Cargar imagen", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                                map.put("imgItem", "" + getRouteImgReport());
+                            }
+                            
+                            map.put("bPrintTon", contractKgAsTon);
+
+                            jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_EST, map);
+                            jasperViewer = new JasperViewer(jasperPrint, false);
+                            jasperViewer.setTitle("Impresión de cotización");
+                            jasperViewer.setVisible(true);
+                        }
+                        catch (Exception e) {
+                            SLibUtilities.renderException(this, e);
+                        }
+                        finally {
+                            setCursor(cursor);
+                        }
                     }
                 }
             }
         }
     }
-    */
 
     private void actionPrintContractMoves() {
         if (jbPrintContractMoves.isEnabled()) {
@@ -1727,7 +1788,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
         }
     }
-
+    
     private void actionPrintAcknowledgmentCancellation() {
         if (jbPrintAcknowledgmentCancellation.isEnabled()) {
             if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
@@ -1736,6 +1797,29 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             else {
                 try {
                     SCfdUtils.printAcknowledgmentCancellationCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SLibConstants.UNDEFINED);
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+        }
+    }
+    
+    private void actionShowCfdi() {
+        if(jbShowCfdi.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                try {
+                    SDataCfd cfd = SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
+                    if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+                    }
+                    else {
+                        SCfdRenderer renderer = new SCfdRenderer(miClient);
+                        renderer.showCfdi(cfd.getDocXml());
+                    }
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -1885,7 +1969,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el registro CFD del documento '" + dps.getDpsNumber() + "'.");
                 }
                 else {
-                    miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(dps.getDbmsDataCfd()).composeMessage());
+                    miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(dps.getDbmsDataCfd()).getDetailedStatus());
                 }
             }
         }
@@ -2015,7 +2099,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
             }
         }
-
+        
         msSql = "SELECT d.id_year, d.id_doc, d.dt, d.dt_doc_delivery_n, d.num_ref, d.comms_ref, d.exc_rate, " +
                 "d.stot_r, d.tax_charged_r, d.tax_retained_r, d.tot_r, " +
                 "d.stot_cur_r, d.tax_charged_cur_r, d.tax_retained_cur_r, d.tot_cur_r, " +
@@ -2032,9 +2116,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "IF(x.ts IS NULL OR doc_xml = '', " + STableConstants.ICON_NULL  + ", " + // not is CFD nor CFDI
                 "IF(x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + // is CFD
                 "IF(x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + // CFDI pending sign
-                "IF(LENGTH(x.ack_can_xml) = 0 AND x.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + // CFDI signed, canceled only SIIE
-                "IF(LENGTH(x.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " +  // CFDI canceled with cancellation acknowledgment in XML format
-                "IF(x.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + // CFDI canceled with cancellation acknowledgment in PDF format
+                "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + // CFDI signed, canceled only SIIE
+                "IF(LENGTH(xc.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " +  // CFDI canceled with cancellation acknowledgment in XML format
+                "IF(xc.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + // CFDI canceled with cancellation acknowledgment in PDF format
                 STableConstants.ICON_XML_SIGN + " " + // CFDI signed, canceled only SIIE
                 ")))))) AS f_ico_xml, " +
                 "x.can_st, " + // cancellation status
@@ -2095,13 +2179,23 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             default:
         }
 
+        String complementaryDbName = "";
+        
+        try {
+            complementaryDbName = SClientUtils.getComplementaryDdName((SClientInterface) miClient);
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+            
         msSql +=
                 "INNER JOIN erp.usru_usr AS ul ON d.fid_usr_link = ul.id_usr " +
                 "INNER JOIN erp.usru_usr AS uc ON d.fid_usr_close = uc.id_usr " +
                 "INNER JOIN erp.usru_usr AS un ON d.fid_usr_new = un.id_usr " + (mbHasRightAuthor ? " AND d.fid_usr_new = " + miClient.getSession().getUser().getPkUserId() + " " : "") +
                 "INNER JOIN erp.usru_usr AS ue ON d.fid_usr_edit = ue.id_usr " +
                 "INNER JOIN erp.usru_usr AS ud ON d.fid_usr_del = ud.id_usr " +
-                "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n ";
+                "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " + 
+                "LEFT OUTER JOIN " + complementaryDbName + ".trn_cfd AS xc ON x.id_cfd = xc.id_cfd ";
 
         if (mbIsDoc || mbIsDocAdj) {
             msSql +=
@@ -2162,6 +2256,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbImportCfdiWithPurchaseOrder){
                     actionImportCfdi(true);
                 }
+                else if (button == jbChangeDpsEntryItem) {
+                    actionChangeDpsEntryItem();
+                }
                 else if (button == jbChangeDeliveryAddress) {
                     actionChangeDeliveryAddress();
                 }
@@ -2215,6 +2312,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbPrintAcknowledgmentCancellation) {
                     actionPrintAcknowledgmentCancellation();
+                }
+                else if (button == jbShowCfdi) {
+                    actionShowCfdi();
                 }
                 else if (button == jbGetAcknowledgmentCancellation) {
                     actionGetAcknowledgmentCancellation();

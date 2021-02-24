@@ -22,7 +22,7 @@ import sa.lib.gui.SGuiItem;
  * Editing bank layouts and aplicating payments in SFormBankLayout.
  * Showing bank layouts in SDialogBankLayoutCardex.
  * 
- * @author Juan Barajas, Alfredo Pérez, Sergio Flores
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín
  */
 public class SLayoutBankRow implements SGridRow {
     
@@ -78,6 +78,7 @@ public class SLayoutBankRow implements SGridRow {
     protected int mnApply;
     protected int mnBankKey;
     protected int mnCurrencyId;
+    protected int[] moBankAccPk;
     protected String msReferenceRecord;
     protected String msObservations;
     protected SLayoutBankRecord moLayoutBankRecord;
@@ -87,6 +88,14 @@ public class SLayoutBankRow implements SGridRow {
     protected ArrayList<SGuiItem> maAgreementReferences;
     protected HashMap<String, String> moCodeBankAccountCredits;
     protected HashMap<String, String> moAliasBankAccountCredits;
+    
+    protected boolean mbIsXml;
+    protected String msXml;
+    protected String msXmlUuid;
+    protected String msXmlRfcEmi;
+    protected String msXmlRfcRec;
+    protected double mdXmlTotal;
+    protected int mnXmlType;
     
     /**
      * Create a new bank layout row.
@@ -145,6 +154,7 @@ public class SLayoutBankRow implements SGridRow {
         mnApply = 0;
         mnBankKey = 0;
         mnCurrencyId = 0;
+        moBankAccPk = null;
         msReferenceRecord = "";
         msObservations = "";
         moLayoutBankRecord = null;
@@ -154,6 +164,14 @@ public class SLayoutBankRow implements SGridRow {
         maAgreementReferences = new ArrayList<>();
         moCodeBankAccountCredits = new HashMap<>();
         moAliasBankAccountCredits = new HashMap<>();
+        
+        mbIsXml = false;
+        msXml = "";
+        msXmlUuid = "";
+        msXmlRfcEmi = "";
+        msXmlRfcRec = "";
+        mdXmlTotal = 0;
+        mnXmlType = 0;
     }
 
     public void setTransactionType(int n) { mnTransactionType = n; }
@@ -201,6 +219,7 @@ public class SLayoutBankRow implements SGridRow {
     public void setApply(int n) { mnApply = n; }
     public void setBankKey(int n) { mnBankKey = n; }
     public void setCurrencyId(int n) { mnCurrencyId = n; }
+    public void setBankAccPk(int[] n) { moBankAccPk = n; }
     public void setReferenceRecord(String s) { msReferenceRecord = s; }
     public void setObservations(String s) { msObservations = s; }
     public void setLayoutBankRecord(SLayoutBankRecord o) { moLayoutBankRecord = o; }
@@ -210,6 +229,14 @@ public class SLayoutBankRow implements SGridRow {
     public void setBranchBankAccountCreditArray(ArrayList<SDataBizPartnerBranchBankAccount> a) { maBranchBankAccountCredits = a; }
     
     public void setExchangeRate(double exchangeRate) { moMoneyPayment.setExchangeRate(exchangeRate); }
+    
+    public void setIsXml(boolean b) { mbIsXml = b; }
+    public void setXml(String s) { msXml = s; }
+    public void setXmlUuid(String s) { msXmlUuid = s; }
+    public void setXmlRfcEmi(String s) { msXmlRfcEmi = s; }
+    public void setXmlRfcRec(String s) { msXmlRfcRec = s; }
+    public void setXmlTotal(double d) { mdXmlTotal = d; }
+    public void setXmlType(int i) { mnXmlType = i; }
     
     public int getRowMode() { return mnRowMode; }
     public int getTransactionType() { return mnTransactionType; }
@@ -257,6 +284,7 @@ public class SLayoutBankRow implements SGridRow {
     public int getApply() { return mnApply; }
     public int getBankKey() { return mnBankKey; }
     public int getCurrencyId() { return mnCurrencyId; }
+    public int[] getBankAccPk() { return moBankAccPk; }
     public String getReferenceRecord() { return msReferenceRecord; }
     public String getObservations() { return msObservations; }
     public SLayoutBankRecord getLayoutBankRecord() { return moLayoutBankRecord; }
@@ -266,6 +294,14 @@ public class SLayoutBankRow implements SGridRow {
     public ArrayList<SGuiItem> getAgreementsReferences() { return maAgreementReferences; }
     public HashMap<String, String> getCodeBankAccountCredits() { return moCodeBankAccountCredits; }
     public HashMap<String, String> getAliasBankAccountCredits() { return moAliasBankAccountCredits; }
+    
+    public boolean isXml() { return mbIsXml; }
+    public String getXml() { return msXml; }
+    public String getXmlUuid() { return msXmlUuid; }
+    public String getXmlRfcEmi() { return msXmlRfcEmi; }
+    public String getXmlRfcRec() { return msXmlRfcRec; }
+    public double getXmlTotal() { return mdXmlTotal; }
+    public int getXmlType() { return mnXmlType; }
 
     public String getBranchBankAccountCreditNumber(int[] pk, int typeLayout) {
         String account = "";
@@ -302,7 +338,8 @@ public class SLayoutBankRow implements SGridRow {
                 key = new int[] { mnDpsYearId, mnDpsDocId };
                 break;
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
-                key = new int[] { mnBizPartnerId };
+                //key = new int[] { mnBizPartnerId };
+                key = moBankAccPk;
                 break;
             default:
         }
@@ -534,7 +571,7 @@ public class SLayoutBankRow implements SGridRow {
                         }
                         break;
                     case 12:
-                        value = moLayoutBankRecord.getLayoutBankRecordKey().getRecordPeriod();
+                        value = moLayoutBankRecord.getLayoutBankRecordKey() == null ? "" : moLayoutBankRecord.getLayoutBankRecordKey().getRecordPeriod();
                         break;
                     case 13:
                         value = moLayoutBankRecord.getBookkeepingCenterCode();
@@ -543,7 +580,7 @@ public class SLayoutBankRow implements SGridRow {
                         value = moLayoutBankRecord.getCompanyBranchCode();
                         break;
                     case 15:
-                        value = moLayoutBankRecord.getLayoutBankRecordKey().getRecordNumber();
+                        value = moLayoutBankRecord.getLayoutBankRecordKey() == null ? "" : moLayoutBankRecord.getLayoutBankRecordKey().getRecordNumber();
                         break;
                     case 16:
                         value = moLayoutBankRecord.getDate();

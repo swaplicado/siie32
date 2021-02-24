@@ -49,7 +49,8 @@ import sa.lib.gui.SGuiSession;
 import sa.lib.srv.SSrvConsts;
 
 /**
- *
+ * Esta clase es para usarse una sola vez.
+ * Objetivo: corregir la información relacionada con Subsidio para el empleo indebidamente registrado en CFDI previos.
  * @author Edwin Carmona
  */
 public class SReceiptsR {

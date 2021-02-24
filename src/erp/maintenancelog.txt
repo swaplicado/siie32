@@ -1,10 +1,186 @@
+SIIE 3.2 179.1*/ 2021-02-23
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se corrigió un error en la captura de asociados de negocios que hacia que jamas se agregara uno nuevo como "compañia".
+2) Se mejoró el campo y la descarga de CFD's en las partidas de pólizas contables, pudiendo ver el total y descargar todos los CFD's 
+    relacionados de manera directa o indirecta.
+3) Se mejoró el campo y la descarga de CFD's en la vista de pólizas contables, pudiendo ver el total y descargar todos los CFD's 
+    relacionados de manera directa o indirecta.
+
+================================================================================
+SIIE 3.2 179.0*/ 2021-02-19
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se quitó la obligatoriedad en los campos de transportista y tipo vehículo en la forma de captura de tarifas en el módulo de embarques.
+2) Se creó un reporte en el módulo de embarques que muestra un listado de las tarifas.
+3) Se mejoró la granularidad de los permisos en el módulo de embarques, se creó un nuevo permiso de tarifas para que sólo las personas 
+    autorizadas puedan ver, agregar y editar tarifas.
+
+================================================================================
+SIIE 3.2 177.4*/ 2021-02-12
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de emisión de facturas convencionales y formato de impresión de facturas para empresas extranjeras.
+
+================================================================================
+SIIE 3.2 177.3*/ 2021-02-11
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se creó la vista de CFDI recepción de pagos extendida donde se muestra el usuario que lo creó, editó y eliminó, ademas del total.
+
+================================================================================
+SIIE 3.2 177.2*/ 2021-02-10
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Se habilitó la captura de cotizaciones de compras y su procesamiento en pedidos de compras.
+
+================================================================================
+SIIE 3.2 177.1*/ 2021-02-08
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregó la tabla de "Backorder de pedidos de ventas" en el informe de ventas por mail.
+2) Se agregó la fila "TOTALES" para las vistas de pedidos y contratos.
+
+================================================================================
+SIIE 3.2 177.0*/ 2021-02-08
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se crearon las clases "SDbItemCost", "SViewItemCost" y "SFormItemCost" en los paquetes erp.mod.trn que corresponden
+    al nuevo catálogo de "Costos de ítems", que se convocan desde el módulo de finanzas.
+2) Se creó el nuevo reporte de "Margen de contribución" y con ello el dialogo erp.mod.trn.form.SDialogRepContributionMargin,
+    el cual muestra la diferencia de la venta y el costo neto.
+3) Se creó el nuevo reporte de "Situación general" y con ello el dialogo erp.mfin.form.SDialogRepGlobalTemplate,
+    el cual muestra la situación de la empresa hasta la fecha de corte. 
+4) Se corrigió un error que generaba duplicidad al generar los XML de layouts de anticipos.
+
+================================================================================
+SIIE 3.2 176.7*/ 2021-02-03
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al agrupador en la consulta EBITDA del estado de resultados.
+
+================================================================================
+SIIE 3.2 176.6*/ 2021-01-26
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la consulta que muestra las cuentas asociadas en los layouts bancarios.
+
+================================================================================
+SIIE 3.2 176.5*/ 2021-01-13
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al largo máximo permitido en la lista de UUID relacionados en la forma de captura de documentos (erp.mtrn.form.SFormDps).
+
+================================================================================
+SIIE 3.2 176.4*/ 2021-01-07
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la contabilización de CFDI de recepción pagos en pólizas de diario, las cuales no tienen cuenta bancaria asociada.
+
+================================================================================
+SIIE 3.2 176.3*/ 2021-01-06
+Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Regeneración de archivos XML y PDF de CFDI facturas, recepción de pagos y recibos de nómina.
+2) Implementación de validación de domicilio en forma de captura de empleados, puesto que increíblemente no se hacía.
+3) Ajuste por cambios en la respuesta de validación de estatus de CFDI:
+    a) si el CFDI es cancelable y no hay transacciones pendientes de cancelación, el campo CancelStatus es vacío;
+    b) si la solicitud de cancelación es colocada con éxito, ahora se recibe el mensaje "Petición de cancelación realizada exitosamente".
+
+================================================================================
+SIIE 3.2 176.2*/ 2020-12-08
+Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección a la generación de nóminas respecto a tiempos extra.
+2) Preparación de release 3.2 176.2* (parcial) porque la implementación del impuesto en la configuración de cuentas contables para asociados de negocios.
+
+================================================================================
+SIIE 3.2 176.1*/ 2020-11-19
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) En la forma de recepción de pagos se agregó una función para que se asigne la cuenta de banco beneficiaria
+    de manera automática de ser necesario.
+2) Se agregó un botón en la vista erp.mod.trn.view.SViewDpsSendWebService para que cuando el estado de la factura sea "rechazada" o "aceptada",
+    se pueda regresar al estado anterior, o sea, "pendiente por enviar".
+
+================================================================================
+SIIE 3.2 176.0*/ 2020-11-18
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se habilitó el botón de "Ver detalle" para layouts bancarios de anticipos.
+2) Se modificó la forma en que se validan los CFD's para que se pueda realizar con cualquier certificador 
+    mediante la incorporación del WebService del SAT.
+
+================================================================================
+SIIE 3.2 175.3/ 2020-11-12
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Se corrigieron los errores en la importación de datos del reloj checador para generación de nóminas.
+
+================================================================================
+SIIE 3.2 175.2/ 2020-10-29
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se agregó a la vista de pólizas contables la columna "CFDI" que muestra la cantidad de CFD's en cada póliza.
+2) Se agregó a la forma de la póliza contable la columna "CFDI" que muestra la cantidad de CFD's que contiene cada renglón de la póliza.
+3) Se agregó a la vista de pólizas contables el botón "Descargar CFDI" que descarga todos los CFD's que contiene la póliza.
+4) Se agregó a la forma de la póliza contable el botón "Descargar CFDI" que descarga todos los CFD's que contiene el renglón seleccionado de la póliza.
+5) Se agregó a la forma de renglones de pólizas contables el botón "Descargar CFDI" que descarga todos los CFD's que contiene.
+6) Se implementó que en el reporte de pólizas contables, en la modalidad individual, se guarden las pólizas directamente en un directorio seleccionado.
+
+================================================================================
+SIIE 3.2 175.1/ 2020-10-27
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Recordatorio de aplicación de anticipos facturados en captura de documentos.
+2) Corrección de recordatorio cuando la factura no tiene UUID al crearse notas de crédito.
+3) Corrección en eliminación de facturas sin timbrar en años previos.
+4) Mejora en configuración de 'Uso de CFDI' para clientes vs. productos.
+5) Correción al traspaso de inventarios con infomación de almacén y usuarios de mantenimiento.
+6) Implementación de descarga masiva de CFDI.
+7) Implementación de número de parte en el catálogo de ítems y en el archivo de texto de existencias para MP Software.
+8) Implementación del cálculo y actualización masivos del SBC.
+9) Implementación del reporte de cotizaciones de productos.
+
+================================================================================
+SIIE 3.2 175.0/ 2020-10-20
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección de valores relacionados con el emisor y receptor en el proceso de importacón de un XML con orden de compra y sin orden de compra.
+2) Se agregó una validación en el proceso de importación de facturas para que solo se puedan procesar las que tienen un estatus "vigente" en el SAT.
+3) Adición de un botón en la vista de facturas para visualizar el el XML del CFDI en un formato genérico en caso de que la factura cuente con él.
+4) Creación de la clase erp.mtrn.form.SFormCfdiMassiveValidation para la validación masiva del estatus de CFDI,
+    se accede en el Módulo de Egresos y CXP, en el menú de facturas.
+5) Adición de las columnas "Asociado de negocios", "RFC ocasional", "Repositorio contable", "Entidad", "Ítem", "Ítem auxiliar", "Impuesto", "Documento" y "Ejercicio contable" 
+    en la forma de captura de pólizas contables.
+6) Se agregó una opción para validar el estatus del SAT de las facturas asociadas a un layout bancario.
+7) Para disminuir el tamaño de las bases de datos de las empresas, se creó una base de datos complementaria cuyo nombre tiene como base el nombre de la base de datos principal,
+    con una terminacion "_cfd" en la cual se guardarán los XML de los CFDI y, si aplica, los acuses de cancelación respectivos.
+7.1) Adaptación del código fuente para su funcionamiento con la base de datos complementaria.
+8) Permitir modificar el ítem y el centro de costo de facturas y órdenes vinculadas entre sí mediante un nuevo botón en la vista de documentos,
+    p. ej., órdenes de compra y otras facturas del mismo proveedor vinculadas a las mismas partidas afectadas.
+9) Validación y corrección de la generación masiva de diferencias cambiarias de documentos liquidados en moneda extranjera.
+10) Validación y corrección de la generación masiva de diferencias cambiarias de revaluación de saldos de documentos en moneda extranjera y cuentas de dinero en moneda extranjera.
+
+================================================================================
+SIIE 3.2 174.3*/ 2020-09-28
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Mejoramiento a la generación de CFDI con Complemento Comercio Exterior para preservar el precio unitario del concepto tal como fue definido originalmente.
+
+================================================================================
+SIIE 3.2 174.2*/ 2020-09-18
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Trabajo en proceso de implementación de cálculo de ISR retenido por salarios de manera diferenciada por categoría de esquema de reclutamiento.
+
 ================================================================================
 SIIE 3.2 174.1/ 2020-09-02
-Edwin CARMONA
+Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Se agrega vista para opción de percepciones quincenales importadas y se agrega filtro de solo perpeciones relacionadas a un bono.
 2) Se quitan de la prenómina únicamente los empleados que tengan faltas, no todos.
-3) Se agrega id de BD principal en el JSON de configuración proveniente de CAP Link.
+3) Se agrega ID de BD principal en el JSON de configuración proveniente de CAP Link.
 4) Se guarda y abre automáticamente la nómina al dar click en el botón "cargar prenómina"
 
 ================================================================================

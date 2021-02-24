@@ -27,10 +27,13 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SDataRecordEntryRow;
 import erp.mod.fin.db.SFinConsts;
+import erp.mtrn.data.SCfdUtils;
+import erp.mtrn.data.SDataCfd;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -44,7 +47,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author  Sergio Flores
+ * @author  Sergio Flores, Isabel Servín
  */
 public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, javax.swing.event.ListSelectionListener {
 
@@ -53,13 +56,13 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private final int CONCEPT_POLICY_CURR_ENTRY = 3;
     private final int CONCEPT_POLICY_LAST_ENTRY = 4;
 
-    private int mnFormType;
+    private final int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
     private boolean mbResetingForm;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
 
     private erp.mfin.data.SDataRecord moRecord;
     private erp.mfin.data.SDataAccountCash moAccountCash;
@@ -85,7 +88,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private boolean mbOriginalIsDeleted;
     private java.lang.String msAuxLastEntryConcept;
 
-    /** Creates new form SFormRecord */
+    /** Creates new form SFormRecord
+     * @param client */
     public SFormRecord(erp.client.SClientInterface client) {
         super(client.getFrame(), true);
         miClient = client;
@@ -162,6 +166,8 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbEntryMoveUp = new javax.swing.JButton();
         jsEntry2 = new javax.swing.JSeparator();
         jbEntryViewSum = new javax.swing.JButton();
+        jsEntry4 = new javax.swing.JSeparator();
+        jbGetXml = new javax.swing.JButton();
         jsEntry3 = new javax.swing.JSeparator();
         jtbEntryDeletedFilter = new javax.swing.JToggleButton();
         jpCommands12 = new javax.swing.JPanel();
@@ -505,6 +511,15 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbEntryViewSum.setPreferredSize(new java.awt.Dimension(23, 23));
         jpCommands11.add(jbEntryViewSum);
 
+        jsEntry4.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jsEntry4.setPreferredSize(new java.awt.Dimension(3, 23));
+        jpCommands11.add(jsEntry4);
+
+        jbGetXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"))); // NOI18N
+        jbGetXml.setToolTipText("Obtener CFDI del renglón");
+        jbGetXml.setPreferredSize(new java.awt.Dimension(23, 23));
+        jpCommands11.add(jbGetXml);
+
         jsEntry3.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jsEntry3.setPreferredSize(new java.awt.Dimension(3, 23));
         jpCommands11.add(jsEntry3);
@@ -839,7 +854,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         moPaneGridEntries.setDoubleClickAction(this, "publicActionEntryEdit");
         jpEntries.add(moPaneGridEntries, BorderLayout.CENTER);
 
-        aoTableColumns = new STableColumnForm[24];
+        aoTableColumns = new STableColumnForm[34];
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "#", STableConstants.WIDTH_NUM_TINYINT);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cuenta contable", STableConstants.WIDTH_ACCOUNT_ID);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta contable", STableConstants.WIDTH_ACCOUNT);
@@ -856,6 +871,16 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Subclase movimiento", 200);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. centro costo", STableConstants.WIDTH_ACCOUNT_ID);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo", STableConstants.WIDTH_ACCOUNT);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Asociado negocios", 175);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "RFC ocasional", 75);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Repositorio contable", 75);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Impuesto", 100);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Entidad", 100);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", STableConstants.WIDTH_ITEM_2X);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem auxiliar", STableConstants.WIDTH_ITEM);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Docto. (factura)", STableConstants.WIDTH_DOC_NUM);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "CFDI", STableConstants.WIDTH_NUM_SMALLINT);
+        aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_INTEGER, "Ejercicio contable", STableConstants.WIDTH_YEAR_PERIOD);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cheque", STableConstants.WIDTH_NUM_SMALLINT);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_BOOLEAN, "Eliminado", STableConstants.WIDTH_BOOLEAN);
         aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usr. creación", STableConstants.WIDTH_USER);
@@ -894,6 +919,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
         jbEntryMoveDown.addActionListener(this);
         jbEntryMoveUp.addActionListener(this);
         jbEntryViewSum.addActionListener(this);
+        jbGetXml.addActionListener(this); 
         jtbEntryDeletedFilter.addActionListener(this);
         
         jbMoneyIn.addActionListener(this);
@@ -1253,7 +1279,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                 form.setFormVisible(true);
 
                 if (form.getFormResult() == SLibConstants.FORM_RESULT_OK) {
-                    moPaneGridEntries.setTableRow(new SDataRecordEntryRow(form.getRegistry()), index);
+                    moPaneGridEntries.setTableRow(new SDataRecordEntryRow((SDataRecordEntry) form.getRegistry()), index);
                     renderEntries(true);
                     calculateBalance();
                     moPaneGridEntries.setTableRowSelection(index);
@@ -1371,6 +1397,23 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
                     "Total cargos: $ " + SLibUtils.getDecimalFormatAmount().format(debit) + ".\n" +
                     "Total abonos: $ " + SLibUtils.getDecimalFormatAmount().format(credit) + "." +
                     (debit == 0 || credit == 0 ? "" : "\nDiferencia (cargos - abonos): $ " + SLibUtils.getDecimalFormatAmount().format(debit - credit) + "."));
+        }
+    }
+    
+    private void actionPerformedGetXml() {
+        if (jbGetXml.isEnabled()) {
+            if (moPaneGridEntries.getSelectedTableRow() == null || moPaneGridEntries.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                try {
+                    HashSet<SDataCfd> cfds = ((SDataRecordEntryRow)moPaneGridEntries.getSelectedTableRow()).getCfds();
+                    SCfdUtils.getXmlCfds(miClient, cfds);
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
         }
     }
 
@@ -1750,6 +1793,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JButton jbEntryNewCopy;
     private javax.swing.JButton jbEntryNewInsert;
     private javax.swing.JButton jbEntryViewSum;
+    private javax.swing.JButton jbGetXml;
     private javax.swing.JButton jbMiAdvanceCus;
     private javax.swing.JButton jbMiAdvanceSupDev;
     private javax.swing.JButton jbMiCreditCdr;
@@ -1813,6 +1857,7 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
     private javax.swing.JSeparator jsEntry01;
     private javax.swing.JSeparator jsEntry2;
     private javax.swing.JSeparator jsEntry3;
+    private javax.swing.JSeparator jsEntry4;
     private javax.swing.JToggleButton jtbEntryDeletedFilter;
     private javax.swing.JTextField jtfAccountCashCurrencyKey;
     private javax.swing.JTextField jtfBalance;
@@ -2215,6 +2260,9 @@ public class SFormRecord extends javax.swing.JDialog implements erp.lib.form.SFo
             }
             else if (button == jbEntryViewSum) {
                 actionPerformedEntryViewSum();
+            }
+            else if (button == jbGetXml) {
+                actionPerformedGetXml();
             }
             
             else if (button == jbMoneyIn) {

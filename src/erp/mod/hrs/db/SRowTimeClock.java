@@ -17,7 +17,7 @@ public class SRowTimeClock implements SGridRow {
     protected String msNumEmployee;
     protected String msEmployee;
     protected int mnAbsences;
-    protected double mdExtraTime;
+    protected double mdOvertime;
     protected int mnSundays;
     protected int mnHolidays;
     protected int mnDaysOff;
@@ -27,7 +27,7 @@ public class SRowTimeClock implements SGridRow {
         msNumEmployee = "";
         msEmployee = "";
         mnAbsences = 0;
-        mdExtraTime = 0;
+        mdOvertime = 0;
         mnSundays = 0;
         mnHolidays = 0;
         mnDaysOff = 0;
@@ -65,12 +65,12 @@ public class SRowTimeClock implements SGridRow {
         this.mnAbsences = mnAbsences;
     }
 
-    public double getExtraTime() {
-        return mdExtraTime;
+    public double getOvertime() {
+        return mdOvertime;
     }
 
-    public void setExtraTime(double extraTime) {
-        this.mdExtraTime = extraTime;
+    public void setOvertime(double extraTime) {
+        this.mdOvertime = extraTime;
     }
 
     public int getSundays() {
@@ -147,7 +147,7 @@ public class SRowTimeClock implements SGridRow {
                 value = mnAbsences;
                 break;
             case 3:
-                value = mdExtraTime;
+                value = mdOvertime;
                 break;
             case 4:
                 value = mnSundays;

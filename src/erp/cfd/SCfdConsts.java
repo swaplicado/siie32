@@ -121,4 +121,7 @@ public abstract class SCfdConsts {
     public static final int STEP_CODE_CFD_SAVED = 5;
     public static final int STEP_CODE_PAC_FLAG_CLEAR = 6;
     public static final int STEP_CODE_CONSUME_STAMP = 7;
+    
+    public static final String STATUS_VALID = "Vigente";
+    public static final String STATUS_CANCEL_PROCESSING = "En proceso";
 }

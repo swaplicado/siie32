@@ -76,7 +76,7 @@
                 <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeySourceSpotType">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[200, 23]"/>
+                      <Dimension value="[250, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -100,7 +100,7 @@
                 <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeySourceSpot">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[200, 23]"/>
+                      <Dimension value="[250, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -124,7 +124,7 @@
                 <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyDestinySpotType">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[200, 23]"/>
+                      <Dimension value="[250, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -148,7 +148,7 @@
                 <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyDestinySpot">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[200, 23]"/>
+                      <Dimension value="[250, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -163,7 +163,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlCarrier">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Transportista:*"/>
+                    <Property name="text" type="java.lang.String" value="Transportista:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
                     </Property>
@@ -172,7 +172,7 @@
                 <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyCarrier">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[200, 23]"/>
+                      <Dimension value="[250, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -187,7 +187,7 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="jlVehicleType">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Tipo veh&#xed;culo:*"/>
+                    <Property name="text" type="java.lang.String" value="Tipo veh&#xed;culo:"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[100, 23]"/>
                     </Property>
@@ -196,7 +196,7 @@
                 <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyVehicleType">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[200, 23]"/>
+                      <Dimension value="[250, 23]"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -220,7 +220,7 @@
                 <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyCurrency">
                   <Properties>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[200, 23]"/>
+                      <Dimension value="[250, 23]"/>
                     </Property>
                   </Properties>
                 </Component>

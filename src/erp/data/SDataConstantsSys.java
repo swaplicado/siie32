@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Sergio Flores, Claudio Peña, Sergio Flores
+ * @author Sergio Flores, Claudio Peña, Sergio Flores, Isabel Servín
  * 
  */
 public abstract class SDataConstantsSys {
@@ -90,6 +90,7 @@ public abstract class SDataConstantsSys {
     public static final String CFG_PARAM_HRS_EMPLOYEES_CRUD = "HRS_EMPLOYEES_CRUD";
     public static final String CFG_PARAM_HRS_SIBLING_COMPANIES = "HRS_SIBLING_COMPANIES";
     public static final String CFG_PARAM_HRS_CAP = "HRS_CAP";
+    public static final String CFG_PARAM_CFD_TYPES = "CFD_TYPES";
     
     public static final int CFGX_IVM_FIFO = 1;
     
@@ -293,6 +294,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_MKT_REP = 106901;
 
     public static final int PRV_LOG_MISC = 107001;
+    public static final int PRV_LOG_RATE = 107002;
     public static final int PRV_LOG_REP = 107901;
 
     public static final int PRV_MFG_MISC = 108001;
@@ -924,8 +926,11 @@ public abstract class SDataConstantsSys {
     public static final int [] FINU_CLS_ACC_USR_ORD_DEB = { 4, 1, 1 };
     public static final int [] FINU_CLS_ACC_USR_ORD_CRE = { 4, 2, 1 };
 
+    public static final int FINU_TP_ACC_LEDGER_CASH = 2;
+    public static final int FINU_TP_ACC_LEDGER_BANK = 3;
     public static final int FINU_TP_ACC_LEDGER_CUS = 6;
     public static final int FINU_TP_ACC_LEDGER_DBR = 7;
+    public static final int FINU_TP_ACC_LEDGER_INV = 8;
     public static final int FINU_TP_ACC_LEDGER_VAT_CREDITABLE = 9;
     public static final int FINU_TP_ACC_LEDGER_VAT_CREDITABLE_PEND = 10;
     public static final int FINU_TP_ACC_LEDGER_SUP = 33;
@@ -946,6 +951,11 @@ public abstract class SDataConstantsSys {
     
     public static final int TRNS_CT_DPS_PUR = 1;
     public static final int TRNS_CT_DPS_SAL = 2;
+    
+    public static final int TRNS_CL_DPS_EST = 1;
+    public static final int TRNS_CL_DPS_ORD = 2;
+    public static final int TRNS_CL_DPS_DOC = 3;
+    public static final int TRNS_CL_DPS_ADJ = 5;
 
     public static final int[] TRNS_CL_DPS_PUR_EST = { 1, 1 };
     public static final int[] TRNS_CL_DPS_PUR_ORD = { 1, 2 };
@@ -1148,7 +1158,7 @@ public abstract class SDataConstantsSys {
     public static final int[] TRNU_TP_DPS_SAL_EST = { 2, 1, 1 };
     public static final int[] TRNU_TP_DPS_SAL_CON = { 2, 1, 2 };
     public static final int[] TRNU_TP_DPS_SAL_ORD = { 2, 2, 1 };
-    public static final int[] TRNU_TP_DPS_SAL_INV = { 2, 3, 1 };
+     public static final int[] TRNU_TP_DPS_SAL_INV = { 2, 3, 1 };
     public static final int[] TRNU_TP_DPS_SAL_REM = { 2, 3, 2 };
     public static final int[] TRNU_TP_DPS_SAL_REC = { 2, 3, 3 };
     public static final int[] TRNU_TP_DPS_SAL_TIC = { 2, 3, 4 };
@@ -1606,6 +1616,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_PS_COMP_PPY = 207014;
     public static final int REP_TRN_PUR_UNIT_COST = 207015;
     public static final int REP_TRN_DPS = 207016;
+    public static final int REP_TRN_DPS_US = 207036;
     public static final int REP_TRN_DPS_ADJ = 207017;
     public static final int REP_TRN_DPS_LIST = 207018;
     public static final int REP_TRN_DPS_ORDER = 207019;
@@ -1614,6 +1625,7 @@ public abstract class SDataConstantsSys {
     public static final int REP_TRN_BAL_AGI = 207022;
     public static final int REP_TRN_BPS_MOV_DPS = 207023;
     public static final int REP_TRN_ORD_GDS = 207024;
+    public static final int REP_TRN_EST = 207025;
     public static final int REP_TRN_PS_ITEM_UNIT_PRICE = 207026;
     public static final int REP_TRN_DPS_BPS_DETAIL = 207027;
     public static final int REP_TRN_DPS_MOV = 207028;

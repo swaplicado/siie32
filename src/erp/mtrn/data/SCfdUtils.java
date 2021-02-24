@@ -21,6 +21,7 @@ import com.finkok.stamp.Incidencia;
 import com.finkok.stamp.IncidenciaArray;
 import com.finkok.stamp.StampSOAP;
 import erp.SClient;
+import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataBizPartner;
 import erp.cfd.SCfdDataConcepto;
@@ -82,6 +83,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import javax.mail.MessagingException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -395,7 +397,7 @@ public abstract class SCfdUtils implements Serializable {
         byte[] buffer =null;
         int read = -1;
 
-        sql = "UPDATE trn_cfd SET ack_can_pdf_n = ? " +
+        sql = "UPDATE " + SClientUtils.getComplementaryDdName(client) + ".trn_cfd SET ack_can_pdf_n = ? " +
                 "WHERE id_cfd = " + cfd.getPkCfdId() + " ";
 
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
@@ -1091,7 +1093,6 @@ public abstract class SCfdUtils implements Serializable {
                         
                     default:
                 }
-
             }
             else {
                 // CFDI signing testing environment:
@@ -1436,37 +1437,41 @@ public abstract class SCfdUtils implements Serializable {
                                         throw new Exception("El CFDI es no cancelable.\n " + ackQuery.composeCfdiRelated());
                                         */
                                         throw new Exception("El CFDI es no cancelable.");
+                                        
+                                    default:
                                 }
 
                                 // check cancellation status:
-                                switch (ackQuery.CancelStatus) {
-                                    case DCfdi33Consts.ESTATUS_CANCEL_PROC: // CFDI cancellation is in process
-                                        cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_PROC_CODE);
-                                        client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
-                                        throw new Exception("La solicitud de cancelación del CFDI está pendiente de ser aceptada o rechazada por el receptor.");
+                                if (!ackQuery.CancelStatus.isEmpty()) { // since december 2020, cancel status is empty for all cancellable CFDI types!, awkward!
+                                    switch (ackQuery.CancelStatus) {
+                                        case DCfdi33Consts.ESTATUS_CANCEL_PROC: // CFDI cancellation is in process
+                                            cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_PROC_CODE);
+                                            client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
+                                            throw new Exception("La solicitud de cancelación del CFDI está pendiente de ser aceptada o rechazada por el receptor.");
 
-                                    case DCfdi33Consts.ESTATUS_CANCEL_RECH: // CFDI cancellation was rejected by receptor
-                                        updateProcessCfd(client, cfd, false);
+                                        case DCfdi33Consts.ESTATUS_CANCEL_RECH: // CFDI cancellation was rejected by receptor
+                                            updateProcessCfd(client, cfd, false);
 
-                                        // Sign & Cancel Log step #6
-                                        createSignCancelLog(client, "", SCfdConsts.ACTION_CODE_PRC_ANNUL, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR, cfd, pac.getPkPacId());
-                                        
-                                        cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_RECH_CODE);
-                                        client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
-                                        throw new Exception("La solicitud de cancelación del CFDI fue rechazada por el receptor.");
-                                        
-                                    case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
-                                    case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
-                                    case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:       // it is not clear which expression is the good one
-                                    case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_EXT:   // it is not clear which expression is the good one
-                                        throw new Exception("El estatus de cancelación del CFDI es inconsistente.");
-                                        
-                                    case DCfdi33Consts.ESTATUS_CANCEL_NINGUNO:
-                                        // CFD about to be cancelled for the first time or maybe a cancellation is still in process (in pending buffer)!
-                                        break;
-                                        
-                                    default:
-                                        throw new Exception("El estatus de cancelación del CFDI es desconocido.");
+                                            // Sign & Cancel Log step #6
+                                            createSignCancelLog(client, "", SCfdConsts.ACTION_CODE_PRC_ANNUL, SCfdConsts.STEP_CODE_PAC_FLAG_CLEAR, cfd, pac.getPkPacId());
+
+                                            cfd.saveField(client.getSession().getDatabase().getConnection(), SDataCfd.FIELD_CAN_ST, DCfdi33Consts.ESTATUS_CANCEL_RECH_CODE);
+                                            client.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(SDataConstants.TRN_CFD);
+                                            throw new Exception("La solicitud de cancelación del CFDI fue rechazada por el receptor.");
+
+                                        case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
+                                        case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
+                                        case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC:       // it is not clear which expression is the good one
+                                        case DCfdi33Consts.ESTATUS_CANCEL_PLAZO_VENC_EXT:   // it is not clear which expression is the good one
+                                            throw new Exception("El estatus de cancelación del CFDI es inconsistente.");
+
+                                        case DCfdi33Consts.ESTATUS_CANCEL_NINGUNO:
+                                            // CFD about to be cancelled for the first time or maybe a cancellation is still in process (in pending buffer)!
+                                            break;
+
+                                        default:
+                                            throw new Exception("El estatus de cancelación del CFDI es desconocido: [" + ackQuery.CancelStatus + "]");
+                                    }
                                 }
                                 break;
 
@@ -1585,12 +1590,14 @@ public abstract class SCfdUtils implements Serializable {
                             }
                             else {
                                 String estatusUuid = elementFolios.getValue().getFolio().get(0).getEstatusUUID().getValue();
+                                
                                 switch (estatusUuid) {
                                     case SCfdConsts.UUID_CANCEL_OK:
                                     case SCfdConsts.UUID_CANCEL_ALREADY:
                                         // CFDI is cancelled, or a cancellation request is in process:
 
                                         String estatusCancelacion = elementFolios.getValue().getFolio().get(0).getEstatusCancelacion().getValue();
+                                        
                                         switch (estatusCancelacion) {
                                             case DCfdi33Consts.ESTATUS_CANCEL_PROC:
                                                 // CFDI cancellation is in process:
@@ -1612,6 +1619,7 @@ public abstract class SCfdUtils implements Serializable {
                                                 String cancelStatusCode = "";
                                                 switch (estatusCancelacion) {
                                                     case DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT:
+                                                    case DCfdi33Consts.RESPONSE_CANCEL: // unexpected message in a succesful cancelation, treated as if cancelled out of acceptance
                                                         cancelStatusCode = DCfdi33Consts.ESTATUS_CANCEL_SIN_ACEPT_CODE;
                                                         break;
                                                     case DCfdi33Consts.ESTATUS_CANCEL_CON_ACEPT:
@@ -4213,13 +4221,13 @@ public abstract class SCfdUtils implements Serializable {
         for (int i = 0; i < comprobante.getEltConceptos().getEltHijosConcepto().size(); i++) {
             oConcepto = comprobante.getEltConceptos().getEltHijosConcepto().get(i);
             
-            dSubtotalImporte = SLibUtils.round(oConcepto.getAttCantidad().getDouble() * oConcepto.getAttValorUnitario().getDouble(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+            dSubtotalImporte = SLibUtils.roundAmount(oConcepto.getAttCantidad().getDouble() * oConcepto.getAttValorUnitario().getDouble());
             
             if (Math.abs(oConcepto.getAttImporte().getDouble() - dSubtotalImporte) >= SLibConstants.RES_VAL_DECS) {
-                throw new Exception("El monto del cálculo del importe del concepto '" + oConcepto.getAttDescripcion().getString() + "' es incorrecto.");
+                throw new Exception("El monto del importe del concepto '" + oConcepto.getAttDescripcion().getString() + "' es incorrecto.");
             }
             
-            dSubtotalConceptos = SLibUtils.round((dSubtotalConceptos + dSubtotalImporte), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+            dSubtotalConceptos = SLibUtils.roundAmount(dSubtotalConceptos + dSubtotalImporte);
         }
         
         // validate taxes charged:
@@ -4228,7 +4236,7 @@ public abstract class SCfdUtils implements Serializable {
             for (int i = 0; i < comprobante.getEltImpuestos().getEltOpcImpuestosTrasladados().getEltHijosImpuestoTrasladado().size(); i++) {
                 oTraslado = comprobante.getEltImpuestos().getEltOpcImpuestosTrasladados().getEltHijosImpuestoTrasladado().get(i);
 
-                dTotalImptoTrasladados = SLibUtils.round((dTotalImptoTrasladados + oTraslado.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                dTotalImptoTrasladados = SLibUtils.roundAmount(dTotalImptoTrasladados + oTraslado.getAttImporte().getDouble());
             }
 
             if (Math.abs(comprobante.getEltImpuestos().getAttTotalImpuestosTrasladados().getDouble() - dTotalImptoTrasladados) >= SLibConstants.RES_VAL_DECS) {
@@ -4242,7 +4250,7 @@ public abstract class SCfdUtils implements Serializable {
             for (int i = 0; i < comprobante.getEltImpuestos().getEltOpcImpuestosRetenidos().getEltHijosImpuestoRetenido().size(); i++) {
                 oRetencion = comprobante.getEltImpuestos().getEltOpcImpuestosRetenidos().getEltHijosImpuestoRetenido().get(i);
 
-                dTotalImptoRetenidos = SLibUtils.round((dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                dTotalImptoRetenidos = SLibUtils.roundAmount(dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble());
             }
 
             if (Math.abs(comprobante.getEltImpuestos().getAttTotalImpuestosRetenidos().getDouble() - dTotalImptoRetenidos) >= SLibConstants.RES_VAL_DECS) {
@@ -4258,7 +4266,7 @@ public abstract class SCfdUtils implements Serializable {
         
         // validate total:
         
-        dTotal = SLibUtils.round((dSubtotalConceptos + dTotalImptoTrasladados - dTotalImptoRetenidos - comprobante.getAttDescuento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+        dTotal = SLibUtils.roundAmount(dSubtotalConceptos + dTotalImptoTrasladados - dTotalImptoRetenidos - comprobante.getAttDescuento().getDouble());
         
         if (Math.abs(comprobante.getAttTotal().getDouble() - dTotal) >= SLibConstants.RES_VAL_DECS) {
             throw new Exception("El monto del cálculo del total es incorrecto.");
@@ -4287,13 +4295,13 @@ public abstract class SCfdUtils implements Serializable {
         for (int i = 0; i < comprobante.getEltConceptos().getEltConceptos().size(); i++) {
             oConcepto = comprobante.getEltConceptos().getEltConceptos().get(i);
             
-            dSubtotalImporte = SLibUtils.round(oConcepto.getAttCantidad().getDouble() * oConcepto.getAttValorUnitario().getDouble(), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+            dSubtotalImporte = SLibUtils.roundAmount(oConcepto.getAttCantidad().getDouble() * oConcepto.getAttValorUnitario().getDouble());
             
-            if (Math.abs(oConcepto.getAttImporte().getDouble() - dSubtotalImporte) >= SLibConstants.RES_VAL_DECS) {
-                throw new Exception("El monto del cálculo del importe del concepto '" + oConcepto.getAttDescripcion().getString() + "' es incorrecto.");
+            if (Math.abs(SLibUtils.roundAmount(oConcepto.getAttImporte().getDouble() - dSubtotalImporte)) >= SLibConstants.RES_VAL_DECS) {
+                throw new Exception("El monto del importe del concepto '" + oConcepto.getAttDescripcion().getString() + "' es incorrecto.");
             }
             
-            dSubtotalConceptos = SLibUtils.round((dSubtotalConceptos + dSubtotalImporte), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+            dSubtotalConceptos = SLibUtils.roundAmount(dSubtotalConceptos + dSubtotalImporte);
         }
         
         if (comprobante.getEltOpcImpuestos() != null) {
@@ -4302,10 +4310,10 @@ public abstract class SCfdUtils implements Serializable {
                 for (int i = 0; i < comprobante.getEltOpcImpuestos().getEltOpcImpuestosTraslados().getEltImpuestoTrasladados().size(); i++) {
                     oTraslado = comprobante.getEltOpcImpuestos().getEltOpcImpuestosTraslados().getEltImpuestoTrasladados().get(i);
 
-                    dTotalImptoTrasladados = SLibUtils.round((dTotalImptoTrasladados + oTraslado.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                    dTotalImptoTrasladados = SLibUtils.roundAmount(dTotalImptoTrasladados + oTraslado.getAttImporte().getDouble());
                 }
 
-                if (Math.abs(comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble() - dTotalImptoTrasladados) >= SLibConstants.RES_VAL_DECS) {
+                if (Math.abs(SLibUtils.roundAmount(comprobante.getEltOpcImpuestos().getAttTotalImpuestosTraslados().getDouble() - dTotalImptoTrasladados)) >= SLibConstants.RES_VAL_DECS) {
                     throw new Exception("La suma de los impuestos trasladados es incorrecta.");
                 }
             }
@@ -4315,23 +4323,23 @@ public abstract class SCfdUtils implements Serializable {
                 for (int i = 0; i < comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones().size(); i++) {
                     oRetencion = comprobante.getEltOpcImpuestos().getEltOpcImpuestosRetenciones().getEltImpuestoRetenciones().get(i);
 
-                    dTotalImptoRetenidos = SLibUtils.round((dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
+                    dTotalImptoRetenidos = SLibUtils.roundAmount(dTotalImptoRetenidos + oRetencion.getAttImporte().getDouble());
                 }
 
-                if (Math.abs(comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble() - dTotalImptoRetenidos) >= SLibConstants.RES_VAL_DECS) {
+                if (Math.abs(SLibUtils.roundAmount(comprobante.getEltOpcImpuestos().getAttTotalImpuestosRetenidos().getDouble() - dTotalImptoRetenidos)) >= SLibConstants.RES_VAL_DECS) {
                     throw new Exception("La suma de los impuestos retenidos es incorrecta.");
                 }
             }
         }
         
         // validate subtotal vs. subtotal concepts:
-        if (Math.abs(comprobante.getAttSubTotal().getDouble() - dSubtotalConceptos) >= SLibConstants.RES_VAL_DECS) {
+        if (Math.abs(SLibUtils.roundAmount(comprobante.getAttSubTotal().getDouble() - dSubtotalConceptos)) >= SLibConstants.RES_VAL_DECS) {
             throw new Exception("La suma de importes de los conceptos es incorrecta.");
         }
         
         // validate total:
-        dTotal = SLibUtils.round((dSubtotalConceptos + dTotalImptoTrasladados - dTotalImptoRetenidos - comprobante.getAttDescuento().getDouble()), SLibUtils.DecimalFormatValue2D.getMaximumFractionDigits());
-        if (Math.abs(comprobante.getAttTotal().getDouble() - dTotal) >= SLibConstants.RES_VAL_DECS) {
+        dTotal = SLibUtils.roundAmount(dSubtotalConceptos + dTotalImptoTrasladados - dTotalImptoRetenidos - comprobante.getAttDescuento().getDouble());
+        if (Math.abs(SLibUtils.roundAmount(comprobante.getAttTotal().getDouble() - dTotal)) >= SLibConstants.RES_VAL_DECS) {
             throw new Exception("El monto del cálculo del total es incorrecto.");
         }
         
@@ -4687,8 +4695,8 @@ public abstract class SCfdUtils implements Serializable {
         }
     }
     
-    public static void getXmlCfds(final SClientInterface client, final ArrayList<SDataCfd> cfds) throws Exception {
-        ArrayList<SDataCfd> cfdsAux = new ArrayList<>();
+    public static void getXmlCfds(final SClientInterface client, final HashSet<SDataCfd> cfds) throws Exception {
+        HashSet<SDataCfd> cfdsAux = new HashSet<>();
 
         for(SDataCfd cfd : cfds) {
             if (cfd != null || !cfd.getDocXml().isEmpty() || !cfd.getDocXmlName().isEmpty()) {
@@ -4927,10 +4935,27 @@ public abstract class SCfdUtils implements Serializable {
         return cfd;
     }
     
+    /**
+     * Devuelve un cfd a través del tipo de cfd y el primary key del documento.
+     * @param client
+     * @param typeCfd
+     * @param cfdKey
+     * @return SDataCfd.
+     * @throws java.lang.Exception
+     */
     public static SDataCfd getCfd(final SClientInterface client, final int typeCfd, final int[] cfdKey) throws java.lang.Exception {
         return getCfd(client, typeCfd, SLibConsts.UNDEFINED, cfdKey);
     }
     
+    /**
+     * Devuelve un cfd a través del tipo de cfd, el subtipo y el primary key del documento.
+     * @param client
+     * @param typeCfd
+     * @param subtypeCfd
+     * @param cfdKey
+     * @return SDataCfd.
+     * @throws java.lang.Exception
+     */
     public static SDataCfd getCfd(final SClientInterface client, final int typeCfd, final int subtypeCfd, final int[] cfdKey) throws java.lang.Exception {
         String sql = "";
         String sqlWhere = "";
@@ -4974,6 +4999,15 @@ public abstract class SCfdUtils implements Serializable {
         return cfd;
     }
     
+    /**
+     * Devuelve una lista de cfds a través del tipo de cfd, el subtipo y el primary key de los documentos.
+     * @param client
+     * @param typeCfd
+     * @param subtypeCfd
+     * @param keysDps
+     * @return ArrayList.
+     * @throws java.lang.Exception
+     */
     public static ArrayList<SDataCfd> getCfds(final SClientInterface client, final int typeCfd, final int subtypeCfd, ArrayList<int[]> keysDps) throws java.lang.Exception {
         ArrayList<SDataCfd> cfds ;
         
@@ -4985,14 +5019,68 @@ public abstract class SCfdUtils implements Serializable {
         }
         return cfds;
     }
+    
+    /**
+     * Devuelve los cfds de una póliza contable.
+     * @param client
+     * @param cfdKey
+     * @return SDataCfd.
+     * @throws java.lang.Exception
+     */
+    public static HashSet<SDataCfd> getCfdRecord(final SClientInterface client, final Object[] cfdKey) throws java.lang.Exception {
+        HashSet<SDataCfd> cfds = new HashSet<>();
+        
+        // CFD de manera directa:
+        
+        String sql = "SELECT id_cfd FROM trn_cfd "
+                + "WHERE fid_rec_year_n = " + cfdKey[0] + " " 
+                + "AND fid_rec_per_n = " + cfdKey[1] + " " 
+                + "AND fid_rec_bkc_n = " + cfdKey[2] + " " 
+                + "AND fid_rec_tp_rec_n = '" + cfdKey[3] + "' " 
+                + "AND fid_rec_num_n = " + cfdKey[4] + ";" ;
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                cfds.add((SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT));
+            }
+        }
+        
+        // CFD de documentos de clientes y proveedores:
 
-    public static InputStream getAcknowledgmentCancellationPdf(final SClientInterface client, final SDataCfd cfd) {
+        String aux = "SELECT DISTINCT c.id_cfd FROM fin_rec_ety AS re1, trn_cfd AS c "
+                + "WHERE NOT re1.b_del "
+                + "AND re1.id_year = " + cfdKey[0] + " "
+                + "AND re1.id_per = " + cfdKey[1] + " "
+                + "AND re1.id_bkc = " + cfdKey[2] + " " 
+                + "AND re1.id_tp_rec = '" + cfdKey[3] + "' "
+                + "AND re1.id_num = " + cfdKey[4] + " ";
+        sql = aux + "AND re1.fid_dps_year_n = c.fid_dps_year_n " +
+                "AND re1.fid_dps_doc_n = c.fid_dps_doc_n;";
+                
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                cfds.add((SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT));
+            }
+        }
+        
+        // CFD de recepción de pagos:
+        
+        sql = aux + "AND re1.fid_cfd_n = c.id_cfd;";
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                cfds.add((SDataCfd) SDataUtilities.readRegistry(client, SDataConstants.TRN_CFD, new int[] { resultSet.getInt("id_cfd") }, SLibConstants.EXEC_MODE_SILENT));
+            }
+        }
+        
+        return cfds;
+    }
+
+    public static InputStream getAcknowledgmentCancellationPdf(final SClientInterface client, final SDataCfd cfd) throws Exception {
         String sql = "";
         ResultSet resultSet = null;
         InputStream ackCancellation = null;
 
         try {
-            sql = "SELECT ack_can_pdf_n FROM trn_cfd WHERE id_cfd = " + cfd.getPkCfdId() + " AND ack_can_pdf_n IS NOT NULL ";
+            sql = "SELECT ack_can_pdf_n FROM " + SClientUtils.getComplementaryDdName(client) + ".trn_cfd WHERE id_cfd = " + cfd.getPkCfdId() + " AND ack_can_pdf_n IS NOT NULL ";
             resultSet = client.getSession().getStatement().executeQuery(sql);
 
             if (resultSet.next()) {

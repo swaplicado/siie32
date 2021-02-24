@@ -12,10 +12,7 @@ import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
-import erp.mitm.data.SDataItem;
-import erp.mod.SModSysConsts;
 import erp.mtrn.data.SDataDiog;
-import erp.mtrn.data.SDataDiogEntry;
 import erp.mtrn.data.SDataStockClosing;
 import erp.mtrn.data.STrnStockMove;
 import erp.mtrn.data.STrnUtilities;
@@ -27,7 +24,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Claudio Peña
  */
 public class SDialogUtilStockClosing extends javax.swing.JDialog {
 
@@ -43,7 +40,7 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
     private erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldYear;
 
-    private Vector<SDataDiog> mvDbmsDiog;
+    private Vector<SDataDiog> mvDbmsDiogs;
 
     /** Creates new form SDialogUtilStockClosing */
     public SDialogUtilStockClosing(erp.client.SClientInterface client) {
@@ -191,122 +188,28 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
         }
     }
 
-     private SDataDiogEntry processStockEntries(STrnStockMove stockMove) throws java.lang.Exception {
-        SDataDiogEntry diogEntry = null;
-        SDataItem item = null;
-
-        item = (SDataItem) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_ITEM, new int[] { stockMove.getPkItemId() }, SLibConstants.EXEC_MODE_VERBOSE);
-
-        diogEntry = new SDataDiogEntry();
-        diogEntry.setPkYearId(SLibConstants.UNDEFINED);
-        diogEntry.setPkDocId(SLibConstants.UNDEFINED);
-        diogEntry.setPkEntryId(SLibConstants.UNDEFINED);
-        diogEntry.setQuantity(stockMove.getQuantity());
-        diogEntry.setValueUnitary(0);
-        diogEntry.setValue(0);
-        diogEntry.setOriginalQuantity(stockMove.getQuantity());
-        diogEntry.setOriginalValueUnitary(0);
-        diogEntry.setSortingPosition(0);
-        diogEntry.setIsInventoriable(true);
-        diogEntry.setIsDeleted(false);
-        diogEntry.setFkItemId(item.getPkItemId());
-        diogEntry.setFkUnitId(item.getFkUnitId());
-        diogEntry.setFkOriginalUnitId(item.getFkUnitId());
-
-        diogEntry.setFkDpsYearId_n(SLibConstants.UNDEFINED);
-        diogEntry.setFkDpsDocId_n(SLibConstants.UNDEFINED);
-        diogEntry.setFkDpsEntryId_n(SLibConstants.UNDEFINED);
-        diogEntry.setFkDpsAdjustmentYearId_n(SLibConstants.UNDEFINED);
-        diogEntry.setFkDpsAdjustmentDocId_n(SLibConstants.UNDEFINED);
-        diogEntry.setFkDpsAdjustmentEntryId_n(SLibConstants.UNDEFINED);
-        diogEntry.setFkMfgYearId_n(SLibConstants.UNDEFINED);
-        diogEntry.setFkMfgOrderId_n(SLibConstants.UNDEFINED);
-        diogEntry.setFkMfgChargeId_n(SLibConstants.UNDEFINED);
-        diogEntry.setFkMaintAreaId(SModSysConsts.TRN_MAINT_AREA_NA);
-
-        diogEntry.setFkUserNewId(mnFkUserId);
-        diogEntry.setFkUserEditId(mnFkUserId);
-        diogEntry.setFkUserDeleteId(mnFkUserId);
-
-        diogEntry.setDbmsItem(item.getItem());
-        diogEntry.setDbmsItemKey(item.getKey());
-        diogEntry.setDbmsUnit(item.getDbmsDataUnit().getUnit());
-        diogEntry.setDbmsUnitSymbol(item.getDbmsDataUnit().getSymbol());
-        diogEntry.setDbmsOriginalUnit(item.getDbmsDataUnit().getUnit());
-        diogEntry.setDbmsOriginalUnitSymbol(item.getDbmsDataUnit().getSymbol());
-
-        diogEntry.getAuxStockMoves().add(stockMove);
-
-        return diogEntry;
-    }
-
-     public Vector<SDataDiog> processStock() {
+    public Vector<SDataDiog> createDiogs() {
         String sql = "";
         Statement statement = null;
         ResultSet resulSet = null;
-        Vector<SDataDiogEntry> iogEntries = new Vector<>();
         Vector<STrnStockMove> stockMoves = null;
         SDataDiog iog = null;
 
         try {
             statement = miClient.getSession().getStatement().getConnection().createStatement();
 
-            sql = "SELECT id_cob, id_wh " +
+            sql = "SELECT DISTINCT id_cob, id_wh " +
                     "FROM trn_stk " +
                     "WHERE b_del = 0 AND id_year = " + (mnPkYearId - 1) + " " +
-                    "GROUP BY id_cob, id_wh " +
                     "ORDER BY id_cob, id_wh ";
 
             resulSet = statement.executeQuery(sql);
             while (resulSet.next()) {
                 mnFkCompanyBranchId = resulSet.getInt("id_cob");
                 mnFkWarehouseId = resulSet.getInt("id_wh");
-
-                stockMoves = STrnUtilities.obtainStockWarehouse(miClient, (mnPkYearId - 1), SLibTimeUtilities.createDate(mnPkYearId - 1, 12, 31), new int[] { mnFkCompanyBranchId, mnFkWarehouseId });
-
-                iog = STrnUtilities.createDataDiogSystem(miClient, mnPkYearId, SLibTimeUtilities.createDate(mnPkYearId, 1, 1), mnFkCompanyBranchId, mnFkWarehouseId, SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV, "EA", stockMoves);
-                
-                mvDbmsDiog.add(iog);
-                
-                /*
-                iogEntries.clear();
-                for (STrnStockMove stockMove : stockMoves) {
-                    iogEntries.add(processStockEntries(stockMove));
-                }
-
-                iog = new SDataDiog();
-
-                iog.setPkYearId(mnPkYearId);
-                iog.setPkDocId(0);
-                iog.setDate(SLibTimeUtilities.createDate(mnPkYearId, 1, 1));
-                iog.setNumberSeries("EA");
-                iog.setNumber("");
-                iog.setReference("");
-                iog.setValue_r(0d);
-                iog.setCostAsigned(0);
-                iog.setCostTransferred(0);
-                iog.setIsShipmentRequired(false);
-                iog.setIsShipped(false);
-                iog.setIsAudited(false);
-                iog.setIsAuthorized(false);
-                iog.setIsRecordAutomatic(false);
-                iog.setIsSystem(true);
-                iog.setIsDeleted(false);
-                iog.setFkDiogCategoryId(SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV[0]);
-                iog.setFkDiogClassId(SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV[1]);
-                iog.setFkDiogTypeId(SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV[2]);
-                iog.setFkDiogAdjustmentTypeId(1);
-                iog.setFkCompanyBranchId(mnFkCompanyBranchId);
-                iog.setFkWarehouseId(mnFkWarehouseId);
-                iog.setFkUserShippedId(SUtilConsts.USR_NA_ID);
-                iog.setFkUserAuditedId(SUtilConsts.USR_NA_ID);
-                iog.setFkUserAuthorizedId(SUtilConsts.USR_NA_ID);
-                iog.setFkUserNewId(mnFkUserId);
-                iog.getDbmsEntries().clear();
-                iog.getDbmsEntries().addAll(iogEntries);
-
-                mvDbmsDiog.add(iog);
-                */
+                    stockMoves = STrnUtilities.obtainStockWarehouse(miClient, (mnPkYearId - 1), SLibTimeUtilities.createDate(mnPkYearId - 1, 12, 31), new int[] { mnFkCompanyBranchId, mnFkWarehouseId });
+                    iog = STrnUtilities.createDataDiogSystem(miClient, mnPkYearId, SLibTimeUtilities.createDate(mnPkYearId, 1, 1), mnFkCompanyBranchId, mnFkWarehouseId, SDataConstantsSys.TRNS_TP_IOG_IN_ADJ_INV, "EA", stockMoves);
+                    mvDbmsDiogs.add(iog);                                
             }
         }
         catch (java.sql.SQLException e) {
@@ -316,7 +219,7 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
             SLibUtilities.renderException(this, e);
         }
 
-        return mvDbmsDiog;
+        return mvDbmsDiogs;
     }
 
     public void actionOk() {
@@ -332,14 +235,12 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
                 try {
                     cursor = getCursor();
                     setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
-                    mvDbmsDiog = new Vector<>();
+                    mvDbmsDiogs = new Vector<>();
                     mnPkYearId = moFieldYear.getInteger();
 
                     syc = new SDataStockClosing();
                     syc.setPkYearId(moFieldYear.getInteger());
-                    syc.setAuxSimpleDateFormat(miClient.getSessionXXX().getFormatters().getDbmsDateFormat());
-                    syc.setDbmsDiog(processStock());
+                    syc.getDbmsDiogs().addAll(createDiogs());
 
                     SDataUtilities.saveRegistry(miClient, syc);
                     miClient.getGuiModule(SDataConstants.MOD_INV).refreshCatalogues(SDataConstants.TRN_DIOG);
@@ -387,7 +288,7 @@ public class SDialogUtilStockClosing extends javax.swing.JDialog {
         mnPkDocId = 0;
         mnFkCompanyBranchId = 0;
         mnFkWarehouseId = 0;
-        mvDbmsDiog = null;
+        mvDbmsDiogs = null;
         mnFkUserId = miClient.getSession().getUser().getPkUserId();
 
         moFieldYear.setFieldValue(date[0]);

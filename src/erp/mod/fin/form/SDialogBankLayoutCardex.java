@@ -316,10 +316,12 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
             
             SDataDps dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, new int[] {xmlRow.getDpsYearId(), xmlRow.getDpsDocId() }, SLibConstants.EXEC_MODE_SILENT);
             
-            layoutBankRow.setDpsCompanyBranchCode(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.DESCRIPTION_CODE));
-            layoutBankRow.setDpsType(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.TRNU_TP_DPS, dps.getDpsTypeKey(), SLibConstants.DESCRIPTION_CODE));
-            layoutBankRow.setDpsNumber(dps.getDpsNumber());
-            layoutBankRow.setDpsDate(dps.getDate());
+            if (dps != null) {
+                layoutBankRow.setDpsCompanyBranchCode(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.DESCRIPTION_CODE));
+                layoutBankRow.setDpsType(SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SDataConstants.TRNU_TP_DPS, dps.getDpsTypeKey(), SLibConstants.DESCRIPTION_CODE));
+                layoutBankRow.setDpsNumber(dps.getDpsNumber());
+                layoutBankRow.setDpsDate(dps.getDate());
+            }
             layoutBankRow.setMoneyPayment(new SMoney(miClient.getSession(), xmlRow.getAmountPayed(), xmlRow.getCurrencyId(), xmlRow.getExchangeRate()));
             layoutBankRow.setObservations(xmlRow.getObservations());
             

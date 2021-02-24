@@ -60,9 +60,11 @@ import erp.mtrn.form.SDialogRepSalesPurchasesNet;
 import erp.mtrn.form.SDialogRepSalesPurchasesPriceUnitary;
 import erp.mtrn.form.SFormBizPartnerBlocking;
 import erp.mtrn.form.SFormCfdPayment;
+import erp.mtrn.form.SFormCfdiMassiveValidation;
 import erp.mtrn.form.SFormDncDocumentNumberSeries;
 import erp.mtrn.form.SFormDps;
 import erp.mtrn.form.SFormDpsDeliveryAck;
+import erp.mtrn.form.SFormDpsEdit;
 import erp.mtrn.form.SFormStamp;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -80,7 +82,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores
+ * @author Sergio Flores, Uriel Castañeda, Claudio Peña, Daniel López, Sergio Flores, Isabel Servín
  */
 public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -149,6 +151,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
     private javax.swing.JMenu jmDpsDelAck;
     private javax.swing.JMenuItem jmiDpsDelAckPend;
     private javax.swing.JMenuItem jmiDpsDelAckOk;
+    private javax.swing.JMenuItem jmiCfdiMassiveValidation;
     private javax.swing.JMenu jmDpsAdj;
     private javax.swing.JMenuItem jmiDpsAdjDoc;
     private javax.swing.JMenuItem jmiDpsAdjDocAnn;
@@ -241,6 +244,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
 
     private erp.mtrn.form.SFormDps moFormDps;
     private erp.mtrn.form.SFormDps moFormDpsRo;
+    private erp.mtrn.form.SFormDpsEdit moFormDpsEdit;
     private erp.mtrn.form.SFormBizPartnerBlocking moFormBizPartnerBlocking;
     private erp.mtrn.form.SFormDncDocumentNumberSeries moFormDncDocumentNumberSeriesDps;
     private erp.mtrn.form.SFormDncDocumentNumberSeries moFormDncDocumentNumberSeriesDiog;
@@ -409,6 +413,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDpsDelAck = new JMenu("Acuses de entrega de facturas");
         jmiDpsDelAckPend = new JMenuItem("Acuses de entrega de facturas pendientes");
         jmiDpsDelAckOk = new JMenuItem("Acuses de entrega de facturas listos");
+        jmiCfdiMassiveValidation = new JMenuItem("Validación masiva de estatus de CFDI...");
         
         jmDpsDelAck.add(jmiDpsDelAckPend);
         jmDpsDelAck.add(jmiDpsDelAckOk);
@@ -442,6 +447,8 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmDps.add(jmiDpsDocRemission);
         jmDps.addSeparator();
         jmDps.add(jmDpsDelAck);
+        jmDps.addSeparator();
+        jmDps.add(jmiCfdiMassiveValidation);
 
         jmDpsAdj = new JMenu("Notas crédito");
         jmiDpsAdjDoc = new JMenuItem("Notas de crédito de ventas");
@@ -718,6 +725,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsDocRemission.addActionListener(this);
         jmiDpsDelAckPend.addActionListener(this);
         jmiDpsDelAckOk.addActionListener(this);
+        jmiCfdiMassiveValidation.addActionListener(this);
         jmiDpsAdjDoc.addActionListener(this);
         jmiDpsAdjDocAnn.addActionListener(this);
         jmiDpsAdjMailPending.addActionListener(this);
@@ -848,6 +856,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
         jmiDpsWsReject.setEnabled(hasRightDocTransaction && levelRightDocTransaction >= SUtilConsts.LEV_AUTHOR);
         jmiDpsDocRemission.setEnabled(hasRightDocTransaction);
         jmDpsDelAck.setEnabled(hasRightDocTransaction);
+        jmiCfdiMassiveValidation.setEnabled(true);
 
         jmDpsAdj.setEnabled(hasRightDocTransactionAdjust);
         jmiDpsAdjDoc.setEnabled(hasRightDocTransactionAdjust);
@@ -1082,6 +1091,15 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                         moRegistry = new SDataDps();
                     }
                     break;
+                case SDataConstants.TRNX_DPS_EDIT:
+                    if (moFormDpsEdit == null) {
+                        moFormDpsEdit = new SFormDpsEdit(miClient);
+                    }
+                    miForm = moFormDpsEdit;
+                    if (pk != null) {
+                        moRegistry = new SDataDps();
+                    }
+                    break;
                 case SDataConstants.FIN_CC_ITEM:
                     if (moFormCostCenterItem == null) {
                         moFormCostCenterItem = new SFormCostCenterItem(miClient);
@@ -1171,7 +1189,7 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     miForm.setValue(SLibConstants.VALUE_TYPE, moFormComplement); // int[] document type
                     miForm.setValue(SLibConstants.VALUE_STATUS, true); // editable status
                     break;
-
+                
                 default:
             }
 
@@ -1496,7 +1514,14 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
                     
                 case SDataConstants.TRNX_CFD_PAY_REC:
                     oViewClass = erp.mtrn.view.SViewCfdPayment.class;
-                    sViewTitle = "CFDI pagos";
+                    switch(auxType01) {
+                        case SDataConstants.TRNX_CFD_PAY_REC:
+                            sViewTitle = "CFDI pagos";
+                            break;
+                        case SDataConstants.TRNX_CFD_PAY_REC_EXT:
+                            sViewTitle = "CFDI pagos ext";
+                            break;
+                    }
                     break;
 
                 default:
@@ -1865,6 +1890,9 @@ public class SGuiModuleTrnSal extends erp.lib.gui.SGuiModule implements java.awt
             }
             else if(item == jmiDpsDelAckOk){
                 showView(SDataConstants.TRN_DPS_ACK, SDataConstantsSys.TRNS_CT_DPS_SAL, SUtilConsts.PROC);
+            }
+            else if(item == jmiCfdiMassiveValidation){
+                new SFormCfdiMassiveValidation(miClient, SDataConstantsSys.TRNS_CT_DPS_SAL).setVisible(true);
             }
             else if (item == jmiDpsAdjDoc) {
                 showView(SDataConstants.TRN_DPS, SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNX_TP_DPS_ADJ);

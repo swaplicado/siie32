@@ -5,6 +5,7 @@
 
 package erp.mtrn.view;
 
+import erp.SClientUtils;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -38,7 +39,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  * User view for management of database registries of CFDI of Payments.
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -57,14 +58,17 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
+    private final int mnAuxType;
 
     /**
      * Creates user view for management of database registries of CFDI of Payments.
      * @param client GUI client interface.
      * @param tabTitle View tab title.
+     * @param auxType01
      */
-    public SViewCfdPayment(erp.client.SClientInterface client, java.lang.String tabTitle) {
-        super(client, tabTitle, SDataConstants.TRNX_CFD_PAY_REC);
+    public SViewCfdPayment(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
+        super(client, tabTitle, SDataConstants.TRNX_CFD_PAY_REC, auxType01);
+        mnAuxType = auxType01;
         initComponents();
     }
 
@@ -170,8 +174,13 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         moTablePane.getPrimaryKeyFields().add(aoKeyFields[0]);
 
         int col = 0;
-        STableColumn[] aoTableColumns = new STableColumn[11];
-        
+        STableColumn[] aoTableColumns;
+        if (mnAuxType == SDataConstants.TRNX_CFD_PAY_REC_EXT) {
+            aoTableColumns = new STableColumn[15];
+        }
+        else {
+            aoTableColumns = new STableColumn[11];
+        }
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_num", "Folio CFDI", STableConstants.WIDTH_DOC_NUM);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DATE_TIME, "c.ts", "Fecha-hora CFDI", STableConstants.WIDTH_DATE_TIME);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cob_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
@@ -185,6 +194,12 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "b.fiscal_id", "RFC receptor original", 100);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fb.bp", "Banco factoraje", 250);
         aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "fb.fiscal_id", "RFC banco factoraje", 100);
+        if (mnAuxType == SDataConstants.TRNX_CFD_PAY_REC_EXT) {
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "re._tot", "Total $", 100);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_usr_new", "Usr. creación", 100);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_usr_edit", "Usr. modificación", 100);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_usr_del", "Usr. eliminación", 100);
+        }
         
         for (col = 0; col < aoTableColumns.length; col++) {
             moTablePane.addTableColumn(aoTableColumns[col]);
@@ -403,7 +418,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfd).composeMessage());
+                    miClient.showMsgBoxInformation(new SCfdUtilsHandler(miClient).getCfdiSatStatus(cfd).getDetailedStatus());
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -497,6 +512,10 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
     public void createSqlQuery() {
         String where = "";      // for main from
         String whereRe = "";    // for from in derived table 're'
+        String sqlSelect = "";
+        String sqlSubSelect = "";
+        String sqlGroupBy = "";
+        String sqlJoins = "";
         STableSetting setting = null;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
@@ -507,28 +526,50 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                 whereRe += (whereRe.isEmpty() ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter(new int[] { period[0] }, "r.dt");
             }
         }
-
+        
+        if (mnAuxType == SDataConstants.TRNX_CFD_PAY_REC_EXT){
+            sqlSelect = ", usr_new.usr AS _usr_new, usr_edit.usr AS _usr_edit, usr_del.usr AS _usr_del, re._tot ";
+            sqlSubSelect = ", re.fid_usr_new, re.fid_usr_edit, re.fid_usr_del, SUM(re.credit - re.debit) AS _tot ";
+            sqlGroupBy = "GROUP BY re.fid_cfd_n, re.fid_bp_nr, re.fid_usr_new, re.fid_usr_edit, re.fid_usr_del";
+            sqlJoins = "LEFT OUTER JOIN erp.usru_usr AS usr_new ON re.fid_usr_new = usr_new.id_usr " +
+                "LEFT OUTER JOIN erp.usru_usr AS usr_edit ON re.fid_usr_edit = usr_edit.id_usr " +
+                "LEFT OUTER JOIN erp.usru_usr AS usr_del ON re.fid_usr_del = usr_del.id_usr ";
+        }
+        
+        String complementaryDbName = "";
+        
+        try {
+            complementaryDbName = SClientUtils.getComplementaryDdName((SClientInterface) miClient);
+        }
+        catch (Exception e) {
+            SLibUtils.printException(this, e);
+        }
+         
         msSql = "SELECT c.id_cfd, c.ts, CONCAT(c.ser, IF(length(c.ser) = 0, '', '-'), c.num) AS _num, c.uuid, c.xml_rfc_rec, " +
                 "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS _ico, " +
                 "IF(c.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR c.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + /* is CFD */
                 "IF(c.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(c.uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + /* CFDI pending sign */
-                "IF(LENGTH(c.ack_can_xml) = 0 AND c.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + /* CFDI signed, canceled only SIIE */
-                "IF(LENGTH(c.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " + /* CFDI canceled with cancellation acknowledgment in XML format */
-                "IF(c.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + /* CFDI canceled with cancellation acknowledgment in PDF format */
+                "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + /* CFDI signed, canceled only SIIE */
+                "IF(LENGTH(xc.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " + /* CFDI canceled with cancellation acknowledgment in XML format */
+                "IF(xc.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + /* CFDI canceled with cancellation acknowledgment in PDF format */
                 STableConstants.ICON_XML_SIGN + " " + /* CFDI signed, canceled only SIIE */
                 "))))) AS _ico_xml, " +
                 "cob.code AS _cob_code, " +
                 "b.bp, b.fiscal_id, " +
                 "fb.bp, fb.fiscal_id " +
+                sqlSelect + 
                 "FROM trn_cfd AS c " +
+                "INNER JOIN " + complementaryDbName + ".trn_cfd AS xc ON c.id_cfd = xc.id_cfd " +
                 "INNER JOIN erp.bpsu_bpb AS cob ON c.fid_cob_n = cob.id_bpb " +
                 "LEFT OUTER JOIN " +
-                "(SELECT DISTINCT re.fid_cfd_n, re.fid_bp_nr " +
+                "(SELECT DISTINCT re.fid_cfd_n, re.fid_bp_nr " + sqlSubSelect +
                 "FROM fin_rec AS r " +
                 "INNER JOIN fin_rec_ety AS re ON r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num " +
-                "WHERE " + whereRe + " AND NOT r.b_del AND NOT re.b_del AND re.fid_cfd_n IS NOT NULL AND re.fid_bp_nr IS NOT NULL) AS re ON re.fid_cfd_n = c.id_cfd " +
+                "WHERE " + whereRe + " AND NOT r.b_del AND NOT re.b_del AND re.fid_cfd_n IS NOT NULL AND re.fid_bp_nr IS NOT NULL " +
+                sqlGroupBy + ") AS re ON re.fid_cfd_n = c.id_cfd " +
                 "LEFT OUTER JOIN erp.bpsu_bp AS b ON b.id_bp = re.fid_bp_nr " +
                 "LEFT OUTER JOIN erp.bpsu_bp AS fb ON fb.id_bp = c.fid_fact_bank_n " +
+                sqlJoins +
                 (where.isEmpty() ? "" : "WHERE " + where) +
                 "ORDER BY c.ser, CONVERT(c.num, UNSIGNED), c.ts, c.id_cfd ";
     }

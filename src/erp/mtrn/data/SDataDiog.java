@@ -29,7 +29,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Gil De Jesús
+ * @author Sergio Flores, Edwin Carmona, Gil De Jesús, Claudio Peña
  */
 public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -174,6 +174,17 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         stockMove.setFkMfgChargeId_n(iogEntry.getFkMfgChargeId_n());
         stockMove.setFkBookkeepingYearId_n(mnFkBookkeepingYearId_n);
         stockMove.setFkBookkeepingNumberId_n(mnFkBookkeepingNumberId_n);
+        stockMove.setFkMaintMovementTypeId(mnFkMaintMovementTypeId);
+        
+        if (SLibUtils.compareKeys(getDiogTypeKey(), SModSysConsts.TRNS_TP_IOG_IN_ADJ_INV)) {
+            stockMove.setFkMaintUserId_n(move.getMaintUserId_n());
+            stockMove.setFkMaintUserSupervisorId(move.getMaintUserSupervisorId());
+        }
+        else {
+            stockMove.setFkMaintUserId_n(mnFkMaintUserId_n);
+            stockMove.setFkMaintUserSupervisorId(mnFkMaintUserSupervisorId);
+        }
+        
         stockMove.setAuxValue(iogEntry.getValue());
 
         stockMove.computeValue();
@@ -368,7 +379,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
             mnFkDpsDocId_n = nDpsNumberId_n;
             mnFkDpsYearId_n = nDpsYearId_n;
         }
-        
     }
     
     /*
@@ -610,11 +620,11 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         mnFkMfgOrderId_n = 0;
         mnFkBookkeepingYearId_n = 0;
         mnFkBookkeepingNumberId_n = 0;
-        mnFkMaintMovementTypeId = SModSysConsts.TRNS_TP_MAINT_MOV_NA;   // default value set only for preventing bugs
-        mnFkMaintUserId_n = 0;
-        mnFkMaintUserSupervisorId = SModSysConsts.TRN_MAINT_USER_SUPV_NA;   // default value set only for preventing bugs
-        mnFkMaintReturnUserId_n = 0;
-        mnFkMaintReturnUserSupervisorId = SModSysConsts.TRN_MAINT_USER_SUPV_NA;   // default value set only for preventing bugs
+        mnFkMaintMovementTypeId = SModSysConsts.TRNS_TP_MAINT_MOV_NA; // default value set only for preventing bugs
+        mnFkMaintUserId_n = 0; // default value set only for preventing bugs
+        mnFkMaintUserSupervisorId = SModSysConsts.TRN_MAINT_USER_SUPV_NA; // default value set only for preventing bugs
+        mnFkMaintReturnUserId_n = 0; // default value set only for preventing bugs
+        mnFkMaintReturnUserSupervisorId = SModSysConsts.TRN_MAINT_USER_SUPV_NA; // default value set only for preventing bugs
         mnFkUserShippedId = 0;
         mnFkUserAuditedId = 0;
         mnFkUserAuthorizedId = 0;
@@ -811,7 +821,6 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
         CallableStatement callableStatement = null;
         SDataBookkeepingNumber bookkeepingNumber = null;
 
-        //System.out.println("SDataDiog: 0");
         mnLastDbActionResult = SLibConstants.UNDEFINED;
 
         try {
@@ -933,7 +942,7 @@ public class SDataDiog extends erp.lib.data.SDataRegistry implements java.io.Ser
                 // Save aswell document entries:
 
                 //System.out.println("SDataDiog: 3.1");
-                for (SDataDiogEntry entry : mvDbmsDiogEntries) {
+                 for (SDataDiogEntry entry : mvDbmsDiogEntries) {
                     if (entry.getIsRegistryNew() || entry.getIsRegistryEdited()) {
                         entry.setPkYearId(mnPkYearId);
                         entry.setPkDocId(mnPkDocId);

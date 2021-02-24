@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -87,7 +87,7 @@ public class SViewDpsSend extends erp.lib.table.STableTab implements java.awt.ev
 
         mjbSendClose.setToolTipText("Marcar como enviado");
         mjbViewDps.setToolTipText("Ver documento");
-        mjbViewNotes.setToolTipText("Ver notas");
+        mjbViewNotes.setToolTipText("Ver notas del documento");
         mjbViewLinks.setToolTipText("Ver vínculos del documento");
         mjbSend.setToolTipText("Enviar comprobante");
 

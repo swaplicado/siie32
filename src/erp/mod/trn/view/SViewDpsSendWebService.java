@@ -7,17 +7,23 @@ package erp.mod.trn.view;
 import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
+import erp.data.SDataUtilities;
 import erp.gui.SModuleUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mtrn.data.SDataCfd;
+import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnUtilities;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
@@ -33,13 +39,14 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Isabel Servín
  */
 public class SViewDpsSendWebService extends SGridPaneView implements ActionListener {
 
     private JButton mjbViewDps;
     private JButton mjbViewNotes;
     private JButton jbSend;
+    private JButton jbBack;
     private SGridFilterDatePeriod moFilterDatePeriod;
     
     public SViewDpsSendWebService(SGuiClient client, int gridSubtype, String title, SGuiParams params) {
@@ -56,6 +63,7 @@ public class SViewDpsSendWebService extends SGridPaneView implements ActionListe
         mjbViewDps = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_LOOK), "Ver documento", this);
         mjbViewNotes = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NOTES), "Ver notas", this);
         jbSend = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_mail.gif")), "Enviar", this);
+        jbBack = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_move_left.gif")), "Regresar a facturas x enviar x WS", this);
         
         if (mnGridSubtype != SModSysConsts.TRNS_ST_XML_DVY_PENDING) {
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
@@ -63,8 +71,10 @@ public class SViewDpsSendWebService extends SGridPaneView implements ActionListe
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewDps);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjbViewNotes);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbSend);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbBack);
         
         jbSend.setEnabled(mnGridSubtype != SModSysConsts.TRNS_ST_XML_DVY_APPROVED);
+        jbBack.setEnabled(mnGridSubtype != SModSysConsts.TRNS_ST_XML_DVY_PENDING);
     }
 
     private void actionViewDps() {
@@ -127,6 +137,40 @@ public class SViewDpsSendWebService extends SGridPaneView implements ActionListe
             }
         }
     }
+    
+    private void actionBack() {
+        if (jbBack.isEnabled()) {
+            if (jtTable.getSelectedRowCount() != 1) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                try {
+                    SGridRowView gridRow = (SGridRowView) getSelectedGridRow();
+                    if (gridRow.getRowType() != SGridConsts.ROW_TYPE_DATA) {
+                        miClient.showMsgBoxWarning(SGridConsts.ERR_MSG_ROW_TYPE_DATA);
+                    }
+                    else {
+                        SDataDps dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                        Date dateDelivery = dps.getDateDocDelivery_n();
+                        String confirmMessage = "";
+                        if (dateDelivery != null) {
+                            confirmMessage = "La factura fue enviada el día " + SLibUtils.DbmsDateFormatDate.format(dateDelivery) + "\n";
+                        }
+                        confirmMessage += "¿Seguro desea regresarla a facturas x enviar x WS?";
+                        if (miClient.showMsgBoxConfirm(confirmMessage) == JOptionPane.OK_OPTION){
+                            SDataCfd cfd = dps.getDbmsDataCfd();
+                            cfd.saveField(((SClientInterface) miClient).getSession().getStatement().getConnection(), SDataCfd.FIELD_DVY_ST, SModSysConsts.TRNS_ST_XML_DVY_PENDING);
+                            miClient.getSession().notifySuscriptors(mnGridType);
+                        miClient.getSession().notifySuscriptors(mnGridSubtype);
+                        }
+                    }
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+        }
+    }
 
     @Override
     public void prepareSqlQuery() {
@@ -139,8 +183,6 @@ public class SViewDpsSendWebService extends SGridPaneView implements ActionListe
             filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
             sql += (sql.isEmpty() ? "AND " : "") + SGridUtils.getSqlFilterDate("d.dt", (SGuiDate) filter);
         }
-        
-        
         
         msSql = "SELECT "
                 + "v.fid_dps_year_n AS " + SDbConsts.FIELD_ID + "1, "
@@ -246,6 +288,9 @@ public class SViewDpsSendWebService extends SGridPaneView implements ActionListe
             }
             else if (button == jbSend) {
                 actionSend();
+            }
+            else if (button == jbBack) {
+                actionBack();
             }
         }
     }
