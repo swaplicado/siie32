@@ -19,7 +19,7 @@
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
-    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,2,88,0,0,4,16"/>
+    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,2,110,0,0,4,0"/>
   </AuxValues>
 
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
@@ -132,7 +132,7 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Nacimiento:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[95, 23]"/>
+                          <Dimension value="[90, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -222,7 +222,7 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Inicio beneficios:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[95, 23]"/>
+                          <Dimension value="[90, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -280,7 +280,7 @@
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="XAXX010101XXXXXX00"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[150, 23]"/>
+                          <Dimension value="[125, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -314,7 +314,7 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="&#xda;ltima alta:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[95, 23]"/>
+                          <Dimension value="[90, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -404,7 +404,7 @@
                       <Properties>
                         <Property name="text" type="java.lang.String" value="&#xda;ltima baja:"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[95, 23]"/>
+                          <Dimension value="[90, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -453,7 +453,7 @@
                         <Property name="editable" type="boolean" value="false"/>
                         <Property name="text" type="java.lang.String" value="TEXT"/>
                         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                          <Dimension value="[300, 23]"/>
+                          <Dimension value="[275, 23]"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -475,7 +475,7 @@
             <Container class="javax.swing.JPanel" name="jPanel4">
               <Properties>
                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                  <Dimension value="[100, 300]"/>
+                  <Dimension value="[100, 325]"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -511,7 +511,7 @@
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                         <Property name="columns" type="int" value="1"/>
-                        <Property name="rows" type="int" value="4"/>
+                        <Property name="rows" type="int" value="5"/>
                         <Property name="verticalGap" type="int" value="5"/>
                       </Layout>
                       <SubComponents>
@@ -546,7 +546,24 @@
                                 <Property name="text" type="java.lang.String" value="TEXT"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Nombre percepci&#xf3;n"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[225, 23]"/>
+                                  <Dimension value="[300, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                          </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel28">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
+                          <SubComponents>
+                            <Component class="javax.swing.JLabel" name="jlEarningLoan_n1">
+                              <Properties>
+                                <Property name="text" type="java.lang.String" value="Tipo otro pago:*"/>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[100, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -554,7 +571,7 @@
                               <Properties>
                                 <Property name="toolTipText" type="java.lang.String" value="Tipo otro pago"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[225, 23]"/>
+                                  <Dimension value="[450, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -578,7 +595,7 @@
                             <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyEarningLoan_n">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[325, 23]"/>
+                                  <Dimension value="[300, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -604,6 +621,13 @@
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                   <Dimension value="[125, 23]"/>
+                                </Property>
+                              </Properties>
+                            </Component>
+                            <Component class="javax.swing.JLabel" name="jLabel2">
+                              <Properties>
+                                <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                  <Dimension value="[15, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -648,7 +672,7 @@
                                   <Insets value="[2, 0, 2, 0]"/>
                                 </Property>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[65, 23]"/>
                                 </Property>
                               </Properties>
                               <Constraints>
@@ -681,6 +705,18 @@
                                   <Properties>
                                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                                       <Dimension value="[125, 23]"/>
+                                    </Property>
+                                  </Properties>
+                                </Component>
+                                <Component class="javax.swing.JLabel" name="jlEarningAuxValueHint">
+                                  <Properties>
+                                    <Property name="horizontalAlignment" type="int" value="0"/>
+                                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                                      <Image iconType="3" name="/erp/img/icon_view_help.png"/>
+                                    </Property>
+                                    <Property name="toolTipText" type="java.lang.String" value="Monto auxiliar"/>
+                                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                                      <Dimension value="[15, 23]"/>
                                     </Property>
                                   </Properties>
                                 </Component>
@@ -728,7 +764,7 @@
                       </Border>
                     </Property>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                      <Dimension value="[455, 1]"/>
+                      <Dimension value="[425, 1]"/>
                     </Property>
                   </Properties>
                   <Constraints>
@@ -748,7 +784,7 @@
 
                       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
                         <Property name="columns" type="int" value="1"/>
-                        <Property name="rows" type="int" value="4"/>
+                        <Property name="rows" type="int" value="5"/>
                         <Property name="verticalGap" type="int" value="5"/>
                       </Layout>
                       <SubComponents>
@@ -783,11 +819,18 @@
                                 <Property name="text" type="java.lang.String" value="TEXT"/>
                                 <Property name="toolTipText" type="java.lang.String" value="Nombre deducci&#xf3;n"/>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[225, 23]"/>
+                                  <Dimension value="[300, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
                           </SubComponents>
+                        </Container>
+                        <Container class="javax.swing.JPanel" name="jPanel30">
+
+                          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                            <Property name="alignment" type="int" value="0"/>
+                            <Property name="verticalGap" type="int" value="0"/>
+                          </Layout>
                         </Container>
                         <Container class="javax.swing.JPanel" name="jPanel3">
 
@@ -807,7 +850,7 @@
                             <Component class="sa.lib.gui.bean.SBeanFieldKey" name="moKeyDeductionLoan_n">
                               <Properties>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[325, 23]"/>
+                                  <Dimension value="[300, 23]"/>
                                 </Property>
                               </Properties>
                             </Component>
@@ -849,7 +892,7 @@
                                   <Insets value="[2, 0, 2, 0]"/>
                                 </Property>
                                 <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-                                  <Dimension value="[75, 23]"/>
+                                  <Dimension value="[65, 23]"/>
                                 </Property>
                               </Properties>
                               <Constraints>

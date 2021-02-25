@@ -2098,14 +2098,7 @@ public abstract class SHrsUtils {
         ArrayList<Object> aPercepciones = null;
         ArrayList<Object> aDeducciones = null;
 
-        // prevent from reading payroll multiple times because is a really lengthy operation:
-        
-        SDbPayroll payroll = (SDbPayroll) SCfdUtils.DataSet.get(SModConsts.HRS_PAY);
-
-        if (payroll == null) {
-            payroll = (SDbPayroll) client.getSession().readRegistry(SModConsts.HRS_PAY, payrollReceiptKey);
-        }
-        
+        SDbPayroll payroll = SCfdUtils.retrieveDataSetPayroll(client.getSession(), payrollReceiptKey[0]); // streamline payroll retrieval
         SDbPayrollReceipt payrollReceipt = payroll.getChildPayrollReceipt(payrollReceiptKey);
 
         SDataBizPartner bizPartnerCompany = new SDataBizPartner();

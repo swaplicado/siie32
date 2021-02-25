@@ -74,6 +74,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
     private void initComponents() {
 
         jpMain = new javax.swing.JPanel();
+        jpSettings = new javax.swing.JPanel();
         jpDeduction = new javax.swing.JPanel();
         jlDeduction = new javax.swing.JLabel();
         moKeyDeduction = new sa.lib.gui.bean.SBeanFieldKey();
@@ -96,16 +97,20 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
         jpMain.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jpMain.setLayout(new java.awt.BorderLayout());
 
+        jpSettings.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
         jpDeduction.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
         jlDeduction.setText("Deducción:");
         jlDeduction.setPreferredSize(new java.awt.Dimension(100, 23));
         jpDeduction.add(jlDeduction);
 
-        moKeyDeduction.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyDeduction.setPreferredSize(new java.awt.Dimension(400, 23));
         jpDeduction.add(moKeyDeduction);
 
-        jpMain.add(jpDeduction, java.awt.BorderLayout.NORTH);
+        jpSettings.add(jpDeduction);
+
+        jpMain.add(jpSettings, java.awt.BorderLayout.NORTH);
 
         jpEmployee.setLayout(new java.awt.BorderLayout());
 
@@ -154,8 +159,8 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
         moCurTotal.setEditable(false);
         jpTotal.add(moCurTotal);
 
-        jlTotalHelp.setForeground(java.awt.Color.gray);
-        jlTotalHelp.setText("(monto total de la deducción actual en esta nómina)");
+        jlTotalHelp.setForeground(java.awt.SystemColor.textInactiveText);
+        jlTotalHelp.setText("(Monto total de la deducción actual en esta nómina)");
         jlTotalHelp.setPreferredSize(new java.awt.Dimension(300, 23));
         jpTotal.add(jlTotalHelp);
 
@@ -180,6 +185,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
     private javax.swing.JPanel jpDeduction;
     private javax.swing.JPanel jpEmployee;
     private javax.swing.JPanel jpMain;
+    private javax.swing.JPanel jpSettings;
     private javax.swing.JPanel jpTotal;
     private sa.lib.gui.bean.SBeanCompoundField moCompValue;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurTotal;
@@ -187,7 +193,7 @@ public class SDialogPayrollDeductions extends SBeanFormDialog implements SGridPa
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 640, 400);
+        SGuiUtils.setWindowBounds(this, 720, 450);
         
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);

@@ -114,8 +114,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbImportCfdiWithOutPurchaseOrder;
     private javax.swing.JButton jbImportCfdiWithPurchaseOrder;
     private javax.swing.JButton jbChangeDpsEntryItem;
-    private javax.swing.JButton jbRestoreSignXml;
-    private javax.swing.JButton jbRestoreAckCancellation;
+    private javax.swing.JButton jbRestoreCfdStamped;
+    private javax.swing.JButton jbRestoreCfdCancelAck;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
@@ -368,15 +368,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbSendCfdi.addActionListener(this);
         jbSendCfdi.setToolTipText("Enviar comprobante vía mail");
 
-        jbRestoreSignXml = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")));
-        jbRestoreSignXml.setPreferredSize(new Dimension(23, 23));
-        jbRestoreSignXml.addActionListener(this);
-        jbRestoreSignXml.setToolTipText("Insertar XML timbrado del CFDI");
+        jbRestoreCfdStamped = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")));
+        jbRestoreCfdStamped.setPreferredSize(new Dimension(23, 23));
+        jbRestoreCfdStamped.addActionListener(this);
+        jbRestoreCfdStamped.setToolTipText("Insertar XML timbrado del CFDI");
 
-        jbRestoreAckCancellation = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert_annul.gif")));
-        jbRestoreAckCancellation.setPreferredSize(new Dimension(23, 23));
-        jbRestoreAckCancellation.addActionListener(this);
-        jbRestoreAckCancellation.setToolTipText("Insertar PDF del acuse de cancelación del CFDI");
+        jbRestoreCfdCancelAck = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert_annul.gif")));
+        jbRestoreCfdCancelAck.setPreferredSize(new Dimension(23, 23));
+        jbRestoreCfdCancelAck.addActionListener(this);
+        jbRestoreCfdCancelAck.setToolTipText("Insertar PDF del acuse de cancelación del CFDI");
 
         jbResetPacFlags = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")));
         jbResetPacFlags.setPreferredSize(new Dimension(23, 23));
@@ -452,8 +452,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbValidateCfdi);
         addTaskBarLowerComponent(jbGetCfdiStatus);
         addTaskBarLowerComponent(jbSendCfdi);
-        addTaskBarLowerComponent(jbRestoreSignXml);
-        addTaskBarLowerComponent(jbRestoreAckCancellation);
+        addTaskBarLowerComponent(jbRestoreCfdStamped);
+        addTaskBarLowerComponent(jbRestoreCfdCancelAck);
         addTaskBarLowerComponent(jbResetPacFlags);
         addTaskBarLowerSeparator();
         addTaskBarLowerComponent(moTabFilterUser);
@@ -494,8 +494,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbGetCfdiStatus.setEnabled((mbIsDoc || mbIsDocAdj));
         jbSendCfdi.setEnabled((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj)));
-        jbRestoreSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbRestoreAckCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbRestoreCfdStamped.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbRestoreCfdCancelAck.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbResetPacFlags.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
 
         STableField[] aoKeyFields = new STableField[2];
@@ -1128,23 +1128,23 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
-                SDataDps dps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
+                SDataDps oDps = (SDataDps) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_DPS, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
 
-                if (dps.getDbmsDataCfd() != null) {
+                if (oDps.getDbmsDataCfd() != null) {
                     try {
-                        SCfdUtils.printCfd(miClient, dps.getDbmsDataCfd(), SLibConstants.UNDEFINED, SDataConstantsPrint.PRINT_MODE_VIEWER, 1, false);
+                        SCfdUtils.printCfd(miClient, oDps.getDbmsDataCfd(), SLibConstants.UNDEFINED, SDataConstantsPrint.PRINT_MODE_VIEWER, 1, false);
                     }
                     catch (Exception e) {
                         SLibUtilities.renderException(this, e);
                     }
                 }
                 else {
-                    SDataBizPartnerBranch comBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-                    SDataBizPartnerBranch bprBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { dps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
-                    SDataBizPartnerBranchAddress bprBranchAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, new int [] { dps.getFkBizPartnerBranchId(), dps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
+                    SDataBizPartnerBranch comBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { oDps.getFkCompanyBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+                    SDataBizPartnerBranch bprBranch = (SDataBizPartnerBranch) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB, new int[] { oDps.getFkBizPartnerBranchId() }, SLibConstants.EXEC_MODE_SILENT);
+                    SDataBizPartnerBranchAddress bprBranchAddress = (SDataBizPartnerBranchAddress) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BPB_ADD, new int [] { oDps.getFkBizPartnerBranchId(), oDps.getFkBizPartnerBranchAddressId() }, SLibConstants.EXEC_MODE_SILENT);
                     SDataBizPartnerBranchContact comBranchContact = null;
                     SDataBizPartnerBranchContact bprBranchContact = null;
-                    SDataCurrency currency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { dps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
+                    SDataCurrency currency = (SDataCurrency) SDataUtilities.readRegistry(miClient, SDataConstants.CFGU_CUR, new int[] { oDps.getFkCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
 
                     int addressFormatType = 0;
                     boolean addCountry = false;
@@ -1173,17 +1173,17 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     JasperPrint jasperPrint = null;
                     JasperViewer jasperViewer = null;
                     
-                    if (SLibUtilities.belongsTo(dps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD })) {
+                    if (SLibUtilities.belongsTo(oDps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_SAL_ORD, SDataConstantsSys.TRNU_TP_DPS_PUR_ORD })) {
                         // order:
 
-                        if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_ORD) && !dps.getIsAuthorized()) {
+                        if (SLibUtilities.compareKeys(oDps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_PUR_ORD) && !oDps.getIsAuthorized()) {
                             miClient.showMsgBoxWarning("No se puede imprimir el documento porque:\n-No está autorizado.");
                         }
                         else {
                             try {
                                 setCursor(new Cursor(Cursor.WAIT_CURSOR));
                                 
-                                STrnUtilities.createReportOrder(miClient, null, dps, SDataConstantsPrint.PRINT_MODE_VIEWER);
+                                STrnUtilities.createReportOrder(miClient, null, oDps, SDataConstantsPrint.PRINT_MODE_VIEWER);
                             }
                             catch (Exception e) {
                                 SLibUtilities.renderException(this, e);
@@ -1193,7 +1193,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             }
                         }
                     }
-                    else if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_INV)) {
+                    else if (SLibUtilities.compareKeys(oDps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_INV)) {
                         // sales invoice:
 
                         try {
@@ -1210,11 +1210,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 bprBranchContact = bprBranch.getDbmsBizPartnerBranchContacts().size() <= 1 ? null : bprBranch.getDbmsBizPartnerBranchContacts().get(1);
 
                                 map = miClient.createReportParams();
-                                map.put("nDpsYearId", dps.getPkYearId());
-                                map.put("nDpsDocId", dps.getPkDocId());
-                                map.put("sDpsNumber", dps.getDpsNumber());
-                                map.put("tDpsDate", dps.getDate());
-                                map.put("nDpsDueDays", dps.getDaysOfCredit());
+                                map.put("nDpsYearId", oDps.getPkYearId());
+                                map.put("nDpsDocId", oDps.getPkDocId());
+                                map.put("sDpsNumber", oDps.getDpsNumber());
+                                map.put("tDpsDate", oDps.getDate());
+                                map.put("nDpsDueDays", oDps.getDaysOfCredit());
                                 
                                 map.put("sDpsNote1", "If any fees are not received by Saporis International by the due date, those fees may accrue late interest at a rate of 1.5% of the outstanding balance per month or the maximum rate permitted by the law, whichever is lower.");
                                 map.put("sDpsNote2", "<p><b>PLEASE WIRE TRANSFER TO THE FOLLOWING BANK ACCOUNT NUMBER</b></p>"
@@ -1227,14 +1227,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                         + "<p>PLEASE SEND CHECKS TO 1546 CHIA WAY LOS ANGELES CA 90041 USA</p>"
                                         + "<p>If you have any questions about this invoice, please contact: jacinta@simplefoods.mx</p>");
                                 
-                                map.put("sPONumber", dps.getNumberReference());
+                                map.put("sPONumber", oDps.getNumberReference());
                                 map.put("sONumber", "");
                                 
                                 map.put("sIssName", company.getBizPartner());
                                 map.put("sIssAddress1", comAddressTexts[0]);
                                 map.put("sIssAddress2", comAddressTexts[1]);
                                 
-                                SDataBizPartner customer = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { dps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
+                                SDataBizPartner customer = (SDataBizPartner) SDataUtilities.readRegistry(miClient, SDataConstants.BPSU_BP, new int[] { oDps.getFkBizPartnerId_r() }, SLibConstants.EXEC_MODE_SILENT);
                                 map.put("sCusNumber", customer.getDbmsCategorySettingsCus().getKey());
                                 map.put("sCusName", customer.getBizPartner());
                                 map.put("sCusAddress1", bprAddressTexts[0]);
@@ -1247,10 +1247,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 map.put("sDvyPhone", bprBranchContactForPhone.getAuxTelephoneNumbers());
                                 map.put("sDvyContact", bprBranchContact == null ? "" : bprBranchContact.getContact());
                                 
-                                map.put("sCurCode", miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { dps.getFkCurrencyId() }));
+                                map.put("sCurCode", miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { oDps.getFkCurrencyId() }));
                                 
-                                map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                map.put("sValueText", SLibUtilities.translateValueToText(oDps.getTotalCy_r(), 2,
+                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                     SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
 
                                 jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_TRN_DPS_US, map);
@@ -1265,8 +1265,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                         company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
 
                                 map = miClient.createReportParams();
-                                map.put("nIdYear", dps.getPkYearId());
-                                map.put("nIdDoc", dps.getPkDocId());
+                                map.put("nIdYear", oDps.getPkYearId());
+                                map.put("nIdDoc", oDps.getPkDocId());
                                 map.put("sAddressLine1", bprAddressTexts[0]);
                                 map.put("sAddressLine2", bprAddressTexts[1]);
                                 map.put("sAddressLine3", bprAddressTexts[2]);
@@ -1277,8 +1277,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                 map.put("sAddressDelivery4", dvyAddressTexts.length > 3 && bprAddressTexts.length > 3 ?
                                     dvyAddressTexts[3].compareTo(bprAddressTexts[3]) == 0 ? "" : dvyAddressTexts[3] : "");
                                 map.put("nBizPartnerCategory", SDataConstantsSys.BPSS_CT_BP_CUS);
-                                map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                map.put("sValueText", SLibUtilities.translateValueToText(oDps.getTotalCy_r(), 2,
+                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                     SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
                                 map.put("sErpCurrencyKey", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
                                 map.put("bShowBackground", false);
@@ -1297,7 +1297,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             setCursor(cursor);
                         }
                     }
-                    else if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
+                    else if (SLibUtilities.compareKeys(oDps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CN)) {
                         // sales credit note:
 
                         try {
@@ -1307,15 +1307,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                     company.getDbmsHqBranch().getDbmsBizPartnerBranchContacts().get(1);
 
                             map = miClient.createReportParams();
-                            map.put("nIdYear", dps.getPkYearId());
-                            map.put("nIdDoc", dps.getPkDocId());
+                            map.put("nIdYear", oDps.getPkYearId());
+                            map.put("nIdDoc", oDps.getPkDocId());
                             map.put("sAddressLine1", bprAddressTexts[0]);
                             map.put("sAddressLine2", bprAddressTexts[1]);
                             map.put("sAddressLine3", bprAddressTexts[2]);
                             map.put("sAddressLine4", bprAddressTexts.length > 3 ? bprAddressTexts[3] : "");
                             map.put("nBizPartnerCategory", SDataConstantsSys.BPSS_CT_BP_CUS);
-                            map.put("sValueText", SLibUtilities.translateValueToText(dps.getTotalCy_r(), 2,
-                                dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                            map.put("sValueText", SLibUtilities.translateValueToText(oDps.getTotalCy_r(), 2,
+                                oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                 SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
                             map.put("sErpCurrencyKey", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getKey());
                             map.put("bShowBackground", false);
@@ -1333,7 +1333,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             setCursor(cursor);
                         }
                     }
-                    else if (SLibUtilities.belongsTo(dps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_SAL_CON, SDataConstantsSys.TRNU_TP_DPS_PUR_CON })) {
+                    else if (SLibUtilities.belongsTo(oDps.getDpsTypeKey(), new int[][] { SDataConstantsSys.TRNU_TP_DPS_SAL_CON, SDataConstantsSys.TRNU_TP_DPS_PUR_CON })) {
                         // contract:
 
                         String textContact = "";
@@ -1346,10 +1346,10 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
                             map = miClient.createReportParams();
-                            map.put("nIdYear", dps.getPkYearId());
-                            map.put("nIdDoc", dps.getPkDocId());
+                            map.put("nIdYear", oDps.getPkYearId());
+                            map.put("nIdDoc", oDps.getPkDocId());
                             
-                            if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
+                            if (SLibUtilities.compareKeys(oDps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON)) {
                                 map.put("sAddressLine1", bprAddressTexts[0]);
                                 map.put("sAddressLine2", bprAddressTexts[1]);
                                 map.put("sAddressLine3", bprAddressTexts[2]);
@@ -1367,7 +1367,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             textsSalesPrices.add("");
                             textsSalesFreights.add("");
                             
-                            for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+                            for (SDataDpsEntry entry : oDps.getDbmsDpsEntries()) {
                                 if (!entry.getIsDeleted()) {
                                     double price = entry.getOriginalPriceUnitaryCy();
                                     double salesPrice = entry.getSalesPriceUnitaryCy();
@@ -1380,15 +1380,15 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                     }
                                     
                                     textsPrices.add(SLibUtilities.translateValueToText(price, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                     SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
                                     
                                     textsSalesPrices.add(SLibUtilities.translateValueToText(salesPrice, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                     SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
 
                                     textsSalesFreights.add(SLibUtilities.translateValueToText(salesFreight, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                     SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
                                 }
                             }
@@ -1399,7 +1399,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                             textsUnits.add("");
                             
-                            for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+                            for (SDataDpsEntry entry : oDps.getDbmsDpsEntries()) {
                                 if (!entry.getIsDeleted()) {
                                     double quantity = 0;
                                     SDataUnit unit = null;
@@ -1414,14 +1414,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                     }
                                     
                                     textsUnits.add(SLibUtilities.translateUnitsToText(quantity, miClient.getSessionXXX().getParamsErp().getDecimalsQuantity(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH : SLibConstants.LAN_ENGLISH, 
+                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH : SLibConstants.LAN_ENGLISH, 
                                     unit.getUnit(), unit.getUnit()));
                                 }
                             }
                             
                             map.put("oVectorTextUnit", textsUnits);
                             
-                            bprBranchContact = bprBranch.getDbmsBizPartnerBranchContact(new int[] { dps.getFkContactBizPartnerBranchId_n(), dps.getFkContactContactId_n() });
+                            bprBranchContact = bprBranch.getDbmsBizPartnerBranchContact(new int[] { oDps.getFkContactBizPartnerBranchId_n(), oDps.getFkContactContactId_n() });
                             
                             if (bprBranchContact == null) {
                                 for (int i = 0; i < bprBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
@@ -1448,7 +1448,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map.put("sContact", textContact.isEmpty() ? bprBranch.getDbmsBizPartner() : textContact);
                             map.put("ctBpCus", SDataConstantsSys.BPSS_CT_BP_CUS);
                             map.put("ctBpSup", SDataConstantsSys.BPSS_CT_BP_SUP);
-                            map.put("nFidCtBp", SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON) ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP);
+                            map.put("nFidCtBp", SLibUtilities.compareKeys(oDps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON) ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP);
                             map.put("oDecimalFormat", miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormatFixed4());
                             map.put("oQuantityFormat", miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
                             map.put("oDateTextFormat", miClient.getSessionXXX().getFormatters().getDateTextFormat());
@@ -1468,7 +1468,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             setCursor(cursor);
                         }
                     }
-                    else if (SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_EST)) {
+                    else if (SLibUtilities.compareKeys(oDps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_EST)) {
                         String textContact = "";
                         Vector<String> textsPrices = new Vector<>();
                         Vector<String> textsSalesPrices = new Vector<>();
@@ -1479,12 +1479,12 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             setCursor(new Cursor(Cursor.WAIT_CURSOR)); 
                             
                             map = miClient.createReportParams();
-                            map.put("nIdYear", dps.getPkYearId());
-                            map.put("nIdDoc", dps.getPkDocId());
+                            map.put("nIdYear", oDps.getPkYearId());
+                            map.put("nIdDoc", oDps.getPkDocId());
                             miClient.getSessionXXX().getCurrentCompany().getDbmsDataCompany().getDbmsBizPartnerBranches();
                             
                             for (int i = 0; i < company.getDbmsBizPartnerBranches().size(); i++ ) {
-                                if (company.getDbmsBizPartnerBranches().get(i).getPkBizPartnerBranchId() == dps.getFkCompanyBranchId()) {
+                                if (company.getDbmsBizPartnerBranches().get(i).getPkBizPartnerBranchId() == oDps.getFkCompanyBranchId()) {
                                     comAddressTexts = company.getDbmsBizPartnerBranches().get(i).getDbmsBizPartnerBranchAddresses().get(0).obtainAddress(addressFormatType, SDataBizPartnerBranchAddress.ADDRESS_4ROWS, addCountry);
                                     map.put("sAddressLine1", comAddressTexts[0] == null || comAddressTexts[0].isEmpty() ? "": comAddressTexts[0]);
                                     map.put("sAddressLine2", comAddressTexts[1] == null || comAddressTexts[1].isEmpty() ? "": comAddressTexts[1]);
@@ -1500,22 +1500,22 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             textsSalesPrices.add("");
                             textsSalesFreights.add("");
 
-                            for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+                            for (SDataDpsEntry entry : oDps.getDbmsDpsEntries()) {
                                 if (!entry.getIsDeleted()) {
                                     double price = entry.getOriginalPriceUnitaryCy();
                                     double salesPrice = entry.getSalesPriceUnitaryCy();
                                     double salesFreight = entry.getSalesFreightUnitaryCy();
 
                                     textsPrices.add(SLibUtilities.translateValueToText(price, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                     SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
 
                                     textsSalesPrices.add(SLibUtilities.translateValueToText(salesPrice, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                     SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
 
                                     textsSalesFreights.add(SLibUtilities.translateValueToText(salesFreight, miClient.getSessionXXX().getParamsErp().getDecimalsValue(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
+                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH :
                                     SLibConstants.LAN_ENGLISH, currency.getTextSingular(), currency.getTextPlural(), currency.getTextPrefix(), currency.getTextSuffix()));
                                 }
                             }
@@ -1526,7 +1526,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
 
                             textsUnits.add("");
 
-                            for (SDataDpsEntry entry : dps.getDbmsDpsEntries()) {
+                            for (SDataDpsEntry entry : oDps.getDbmsDpsEntries()) {
                                 if (!entry.getIsDeleted()) {
                                     double quantity = 0;
                                     SDataUnit unit = null;
@@ -1534,14 +1534,14 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                                     unit = (SDataUnit) SDataUtilities.readRegistry(miClient, SDataConstants.ITMU_UNIT, new int[] { entry.getFkOriginalUnitId() }, SLibConstants.EXEC_MODE_SILENT);
                                     
                                     textsUnits.add(SLibUtilities.translateUnitsToText(quantity, miClient.getSessionXXX().getParamsErp().getDecimalsQuantity(),
-                                    dps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH : SLibConstants.LAN_ENGLISH, 
+                                    oDps.getFkCurrencyId() == miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getPkCurrencyId() ? SLibConstants.LAN_SPANISH : SLibConstants.LAN_ENGLISH, 
                                     unit.getUnit(), unit.getUnit()));
                                 }
                             }
 
                             map.put("oVectorTextUnit", textsUnits);
 
-                            bprBranchContact = bprBranch.getDbmsBizPartnerBranchContact(new int[] { dps.getFkContactBizPartnerBranchId_n(), dps.getFkContactContactId_n() });
+                            bprBranchContact = bprBranch.getDbmsBizPartnerBranchContact(new int[] { oDps.getFkContactBizPartnerBranchId_n(), oDps.getFkContactContactId_n() });
                             
                             if (bprBranchContact == null) {
                                 for (int i = 0; i < bprBranch.getDbmsBizPartnerBranchContacts().size(); i++) {
@@ -1563,7 +1563,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                             map.put("sContact", textContact.isEmpty() ? bprBranch.getDbmsBizPartner() : textContact);
                             map.put("ctBpCus", SDataConstantsSys.BPSS_CT_BP_CUS);
                             map.put("ctBpSup", SDataConstantsSys.BPSS_CT_BP_SUP);
-                            map.put("nFidCtBp", SLibUtilities.compareKeys(dps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON) ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP);
+                            map.put("nFidCtBp", SLibUtilities.compareKeys(oDps.getDpsTypeKey(), SDataConstantsSys.TRNU_TP_DPS_SAL_CON) ? SDataConstantsSys.BPSS_CT_BP_CUS : SDataConstantsSys.BPSS_CT_BP_SUP);
                             map.put("oDecimalFormat", miClient.getSessionXXX().getFormatters().getDecimalsValueUnitaryFormatFixed4());
                             map.put("oQuantityFormat", miClient.getSessionXXX().getFormatters().getDecimalsQuantityFormat());
                             map.put("oDateTextFormat", miClient.getSessionXXX().getFormatters().getDateTextFormat());
@@ -1796,7 +1796,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
             else {
                 try {
-                    SCfdUtils.printAcknowledgmentCancellationCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SLibConstants.UNDEFINED);
+                    SCfdUtils.printCancelAckForCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SLibConstants.UNDEFINED);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -1845,7 +1845,6 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     }
 
     private void actionSignXml() throws Exception {
-
         if (jbSignXml.isEnabled()) {
            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
@@ -2000,11 +1999,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
 
-    private void actionRestoreSignXml() throws Exception {
+    private void actionRestoreCfdStamped() throws Exception {
         boolean needUpdate = true;
         SDataDps dps = null;
 
-        if (jbRestoreSignXml.isEnabled()) {
+        if (jbRestoreCfdStamped.isEnabled()) {
            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -2015,7 +2014,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
                 }
                 else {
-                    needUpdate = SCfdUtils.restoreSignXml(miClient, dps.getDbmsDataCfd(), true, SLibConstants.UNDEFINED);
+                    needUpdate = SCfdUtils.restoreCfdStamped(miClient, dps.getDbmsDataCfd(), true, SLibConstants.UNDEFINED);
 
                     if (needUpdate) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
@@ -2025,11 +2024,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         }
     }
 
-    private void actionRestoreAckCancellation() throws Exception {
+    private void actionRestoreCfdCancelAck() throws Exception {
         boolean needUpdate = true;
         SDataDps dps = null;
 
-        if (jbRestoreAckCancellation.isEnabled()) {
+        if (jbRestoreCfdCancelAck.isEnabled()) {
            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
@@ -2040,13 +2039,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     miClient.showMsgBoxWarning("El documento '" + dps.getDpsNumber() + "' está eliminado.");
                 }
                 else {
-                    needUpdate = SCfdUtils.restoreAcknowledgmentCancellation(miClient, dps.getDbmsDataCfd(), true, SLibConstants.UNDEFINED);
+                    needUpdate = SCfdUtils.restoreCfdCancelAck(miClient, dps.getDbmsDataCfd(), true, SLibConstants.UNDEFINED);
 
                     if (needUpdate) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
                     }
                 }
-           }
+            }
         }
     }
 
@@ -2331,11 +2330,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 else if (button == jbSendCfdi) {
                     actionSendCfdi();
                 }
-                else if (button == jbRestoreSignXml) {
-                    actionRestoreSignXml();
+                else if (button == jbRestoreCfdStamped) {
+                    actionRestoreCfdStamped();
                 }
-                else if (button == jbRestoreAckCancellation) {
-                    actionRestoreAckCancellation();
+                else if (button == jbRestoreCfdCancelAck) {
+                    actionRestoreCfdCancelAck();
                 }
                 else if (button == jbResetPacFlags) {
                     actionResetPacFlags();
