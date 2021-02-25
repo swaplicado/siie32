@@ -38,6 +38,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -1918,7 +1919,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
     
     private void actionGetXml() {
         try {
-            ArrayList<SDataCfd> cfds = new ArrayList();
+            HashSet<SDataCfd> cfds = new HashSet<>();
             maCfdRecordRows.stream().map((cfdRecordRow) -> (SDataCfd) SDataUtilities.readRegistry(miClient, SDataConstants.TRN_CFD, new int[] { cfdRecordRow.getCfdId() }, SLibConstants.EXEC_MODE_SILENT)).forEach((cfd) -> {
                 cfds.add(cfd);
             });
