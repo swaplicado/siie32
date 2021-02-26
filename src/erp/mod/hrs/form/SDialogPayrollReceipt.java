@@ -1885,12 +1885,12 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         if (moKeyEarningOtherPaymentType.getSelectedIndex() > 0) {
             switch (moKeyEarningOtherPaymentType.getValue()[0]) {
                 case SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB:
-                    jlEarningAuxAmount1.setText(SDbEarning.TAX_SUB_LABEL + ":*");
+                    jlEarningAuxAmount1.setText(SDbEarning.TAX_SUB_LABEL + ":");
                     jlEarningAuxAmount1.setEnabled(true);
                     jlEarningAuxAmount1Hint.setToolTipText(SDbEarning.TAX_SUB_HINT);
                     jlEarningAuxAmount1Hint.setEnabled(true);
                     moCurEarningAuxAmount1.setEnabled(true);
-                    moCurEarningAuxAmount1.getField().setMandatory(true); // mandatory!
+                    moCurEarningAuxAmount1.getField().setMandatory(false); // non-mandatory!
                     break;
                     
                 case SModSysConsts.HRSS_TP_OTH_PAY_TAX_BAL:

@@ -23,7 +23,7 @@ import sa.lib.gui.SGuiSession;
  */
 public class SDbEarning extends SDbRegistryUser {
     
-    public static final String TAX_SUB_LABEL = "Subsidio compensado";
+    public static final String TAX_SUB_LABEL = "Subsidio comp.";
     public static final String TAX_SUB_HINT = "Subsidio compensado + pagado = " + SCfdConsts.CFDI_OTHER_PAY_TAX_SUBSIDY_EFF;
     public static final String OTH_TAX_BAL_LABEL_BAL = "Saldo a favor";
     public static final String OTH_TAX_BAL_LABEL_REM_BAL = "Remanente saldo";

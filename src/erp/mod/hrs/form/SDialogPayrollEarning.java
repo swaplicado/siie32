@@ -372,7 +372,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jlAuxValue.setEnabled(false);
         jlAuxValueHint.setToolTipText(null);
         jlAuxValueHint.setEnabled(false);
-        moCompAuxValue.setEnabled(false); // field rarely used; preferable disabling it when not used
+        moCompAuxValue.setEnabled(false);
         moCompAuxValue.getField().setMandatory(false);
         moCompAuxValue.setCompoundText("");
         moCompAuxValue.getField().setDecimalFormat(SLibUtils.DecimalFormatInteger);
@@ -384,7 +384,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jlAuxAmount1.setEnabled(false);
         jlAuxAmount1Hint.setToolTipText(null);
         jlAuxAmount1Hint.setEnabled(false);
-        moCurAuxAmount1.setEnabled(false); // field rarely used; preferable disabling it when not used
+        moCurAuxAmount1.setEnabled(false);
         moCurAuxAmount1.getField().setMandatory(false);
         moCurAuxAmount1.getField().resetField();
         
@@ -392,7 +392,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jlAuxAmount2.setEnabled(false);
         jlAuxAmount2Hint.setToolTipText(null);
         jlAuxAmount2Hint.setEnabled(false);
-        moCurAuxAmount2.setEnabled(false); // field rarely used; preferable disabling it when not used
+        moCurAuxAmount2.setEnabled(false);
         moCurAuxAmount2.getField().setMandatory(false);
         moCurAuxAmount2.getField().resetField();
     }
@@ -473,12 +473,12 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         if (moKeyOtherPaymentType.getSelectedIndex() > 0) {
             switch (moKeyOtherPaymentType.getValue()[0]) {
                 case SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB:
-                    jlAuxAmount1.setText(SDbEarning.TAX_SUB_LABEL + ":*");
+                    jlAuxAmount1.setText(SDbEarning.TAX_SUB_LABEL + ":");
                     jlAuxAmount1.setEnabled(true);
                     jlAuxAmount1Hint.setToolTipText(SDbEarning.TAX_SUB_HINT);
                     jlAuxAmount1Hint.setEnabled(true);
                     moCurAuxAmount1.setEnabled(true);
-                    moCurAuxAmount1.getField().setMandatory(true); // mandatory!
+                    moCurAuxAmount1.getField().setMandatory(false); // non-mandatory!
                     break;
                     
                 case SModSysConsts.HRSS_TP_OTH_PAY_TAX_BAL:
