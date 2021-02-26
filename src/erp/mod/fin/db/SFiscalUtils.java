@@ -37,6 +37,7 @@ import sa.lib.xml.SXmlElement;
  */
 public abstract class SFiscalUtils {
 
+    private static final int LEN_ACC_NAME = 250;
     private static final int DEBIT = 1;
     private static final int CREDIT = 2;
     public static final DecimalFormat DecimalFormatImporte = new DecimalFormat("#0.00");
@@ -44,7 +45,7 @@ public abstract class SFiscalUtils {
     public static final SimpleDateFormat DateFormatFecha = new SimpleDateFormat("yyyy-MM-dd");
     public static final DecimalFormat DecimalFormatBizPartner = new DecimalFormat("00000");
     public static final DecimalFormat DecimalFormatEntity = new DecimalFormat("000");
-    private static double ALLOWED_AMOUNT_DIFF = 0.05;
+    private static final double ALLOWED_AMOUNT_DIFF = 0.05;
     
     /**
      * Extracts only decimal characters from text.
@@ -64,6 +65,7 @@ public abstract class SFiscalUtils {
 
     /**
      * Creates default text for option of "non applicable" fiscal account.
+     * @return 
      */
     public static String createFiscalAccountNameNotApplicable() {
         return SModSysConsts.FINS_FISCAL_ACC_NA_CODE + " - " + SModSysConsts.FINS_FISCAL_ACC_NA_NAME;
@@ -81,7 +83,7 @@ public abstract class SFiscalUtils {
         fiscalAccountLinkDetail.setFiscalAccount(fiscalAccountCode);
         fiscalAccountLinkDetail.setAccountCode(accountCode);
         fiscalAccountLinkDetail.setAccountCodeParent(accountCodeParent);
-        fiscalAccountLinkDetail.setAccountName(accountName);
+        fiscalAccountLinkDetail.setAccountName(accountName.substring(0, LEN_ACC_NAME));
         fiscalAccountLinkDetail.setNature(accountNature);
         fiscalAccountLinkDetail.setLevel(level);
 
@@ -90,51 +92,48 @@ public abstract class SFiscalUtils {
 
     /**
      * Reads accounts for grid pane rows <code>SFiscalAccount</code>.
+     * @param session
+     * @return 
+     * @throws java.lang.Exception
      */
     public static ArrayList<SFiscalAccount> readAccounts(final SGuiSession session) throws Exception {
-        String sql = "";
-        ResultSet resultSet = null;
-        SFiscalAccount account = null;
+        SFiscalAccount account;
         ArrayList<SFiscalAccount> accounts = new ArrayList<>();
 
-        sql = "SELECT a.pk_acc, F_ACC_USR(" + ((SDataParamsCompany) session.getConfigCompany()).getMaskAccount() + ", a.code) AS f_code, a.acc AS f_name, a.deep, a.lev, "
+        String sql = "SELECT a.pk_acc, F_ACC_USR(" + ((SDataParamsCompany) session.getConfigCompany()).getMaskAccount() + ", a.code) AS f_code, a.acc AS f_name, a.deep, a.lev, "
                 + "fa.id_fiscal_acc, fa.code AS f_fiscal_code, fa.name AS f_fiscal_name "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_ACC) + " AS a "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FINS_FISCAL_ACC) + " AS fa ON a.fid_fiscal_acc = fa.id_fiscal_acc "
                 + "WHERE a.b_del = 0 "
                 + "ORDER BY a.code; ";
 
-        resultSet = session.getStatement().executeQuery(sql);
-        while (resultSet.next()) {
-            account = new SFiscalAccount(resultSet.getInt("pk_acc"), resultSet.getString("f_code"), resultSet.getString("f_name"));
-            account.setFiscalAccount(resultSet.getInt("id_fiscal_acc"), resultSet.getString("f_fiscal_code") + " - " + resultSet.getString("f_fiscal_name"));
-            accounts.add(account);
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                account = new SFiscalAccount(resultSet.getInt("pk_acc"), resultSet.getString("f_code"), resultSet.getString("f_name"));
+                account.setFiscalAccount(resultSet.getInt("id_fiscal_acc"), resultSet.getString("f_fiscal_code") + " - " + resultSet.getString("f_fiscal_name"));
+                accounts.add(account);
+            }
         }
 
         return accounts;
     }
 
     public static String getFiscalAccountNameByCode(final Statement statement, final String code) throws Exception {
-        String sql = "";
         String name = "";
-        ResultSet resultSet = null;
+        String sql = "SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.FINS_FISCAL_ACC) + " WHERE code = '" + code + "' ";
 
-        sql = "SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.FINS_FISCAL_ACC) + " WHERE code = '" + code + "' ";
-
-        resultSet = statement.executeQuery(sql);
-        if (resultSet.next()) {
-            name = resultSet.getString(1);
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                name = resultSet.getString(1);
+            }
         }
-
+        
         return name;
     }
 
     public static boolean hasAccountingMoves(final Statement statement, final int itemId, final int periodYear, final int periodMonth, final int moveType) throws Exception {
         boolean hasMoves = false;
-        String sql = "";
-        ResultSet resultSet = null;
-
-        sql = "SELECT COUNT(*) "
+        String sql = "SELECT COUNT(*) "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_REC) + " AS r "
                 + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.FIN_REC_ETY) + " AS re ON "
                 + "r.id_year = re.id_year AND r.id_per = re.id_per AND r.id_bkc = re.id_bkc AND r.id_tp_rec = re.id_tp_rec AND r.id_num = re.id_num AND "
@@ -144,9 +143,10 @@ public abstract class SFiscalUtils {
                 + "al.fid_tp_acc_r = " + SModSysConsts.FINS_TP_ACC_RES + " "
                 + "WHERE re.fid_item_n = " + itemId + " AND " + (moveType == DEBIT ? "(re.debit <> 0.0 OR (re.debit = 0 AND re.credit = 0))" : "(re.credit <> 0.0)") + "; " ;
 
-        resultSet = statement.executeQuery(sql);
-        if (resultSet.next()) {
-            hasMoves = resultSet.getInt(1) > 0;
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            if (resultSet.next()) {
+                hasMoves = resultSet.getInt(1) > 0;
+            }
         }
 
         return hasMoves;
@@ -157,7 +157,7 @@ public abstract class SFiscalUtils {
      */
 
     public static String createQueryCatalogo11(final SGuiSession session, final int periodYear, final int periodMonth) throws Exception {
-        String sql = "";
+        String sql;
 
         if (periodYear < SFiscalConsts.YEAR_MIN || periodYear > SLibTimeConsts.YEAR_MAX) {
             throw new Exception("El atributo 'Anio' debe ser mínimo " + SFiscalConsts.YEAR_MIN + " y máximo " + SLibTimeConsts.YEAR_MAX + ".");
@@ -319,7 +319,7 @@ public abstract class SFiscalUtils {
     }
 
     public static String createQueryCatalogo13(final SGuiSession session, final int periodYear, final int periodMonth) throws Exception {
-        String sql = "";
+        String sql;
 
         if (periodYear < SFiscalConsts.YEAR_MIN || periodYear > SLibTimeConsts.YEAR_MAX) {
             throw new Exception("El atributo 'Anio' debe ser mínimo " + SFiscalConsts.YEAR_MIN + " y máximo " + SLibTimeConsts.YEAR_MAX + ".");
@@ -532,6 +532,8 @@ public abstract class SFiscalUtils {
      * @param session GUI user session.
      * @param periodYear Requested period's year.
      * @param periodMonth Requested period's month.
+     * @return 
+     * @throws java.lang.Exception
      */
     public static SXmlDocument createDocCatalogo11(final SGuiSession session, final int periodYear, final int periodMonth) throws Exception {
         int i = 0;
@@ -941,6 +943,8 @@ public abstract class SFiscalUtils {
      * @param session GUI user session.
      * @param periodYear Requested period's year.
      * @param periodMonth Requested period's month.
+     * @return 
+     * @throws java.lang.Exception
      */
     public static SXmlDocument createDocCatalogo13(final SGuiSession session, final int periodYear, final int periodMonth) throws Exception {
         boolean useFixedFiscalAccounts = false; // when 'true', treat system accounts (e.g., cash, banks, business partners, etc.) as simple fixed fiscal accounts, those ones provided by SAT, without any individual system subaccount. Otherwise, when 'false', treat each individual system subaccount as a fiscal subaccount
@@ -1365,23 +1369,24 @@ public abstract class SFiscalUtils {
     /**
      * Gets the more recent available chart of accounts.
      * @param session User GUI session.
+     * @return 
+     * @throws java.lang.Exception
      */
     public static int[] getLastChartOfAccounts(final SGuiSession session) throws Exception {
         int[] period = null;
-        String sql = "";
-        ResultSet resultSet = null;
-
-        sql = "SELECT id_year AS f_year, MAX(id_per) AS f_month "
+        
+        String sql = "SELECT id_year AS f_year, MAX(id_per) AS f_month "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK) + " "
                 + "WHERE id_year = (SELECT MAX(id_year) FROM " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK) + ") "
                 + "GROUP BY f_year ";
 
-        resultSet = session.getStatement().executeQuery(sql);
-        if (!resultSet.next()) {
-            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nConfiguración para contabilidad en medios electrónicos.");
-        }
-        else {
-            period = new int[] { resultSet.getInt(1), resultSet.getInt(2) };
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (!resultSet.next()) {
+                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nConfiguración para contabilidad en medios electrónicos.");
+            }
+            else {
+                period = new int[] { resultSet.getInt(1), resultSet.getInt(2) };
+            }
         }
 
         return period;
@@ -1392,25 +1397,26 @@ public abstract class SFiscalUtils {
      * @param session User GUI session.
      * @param reqYear Requested year.
      * @param reqMonth Requested month.
+     * @return 
+     * @throws java.lang.Exception
      */
     public static int[] getSuitableChartOfAccounts(final SGuiSession session, final int reqYear, final int reqMonth) throws Exception {
         int[] period = null;
-        String sql = "";
-        ResultSet resultSet = null;
-
-        sql = "SELECT id_year AS f_year, MAX(id_per) AS f_month "
+        
+        String sql = "SELECT id_year AS f_year, MAX(id_per) AS f_month "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.FIN_FISCAL_ACC_LINK) + " "
                 + "WHERE (id_year = " + reqYear + " AND id_per <= " + reqMonth + ") OR id_year < " + reqYear + " "
                 + "GROUP BY id_year "
                 + "ORDER BY f_year DESC "
                 + "LIMIT 1";
 
-        resultSet = session.getStatement().executeQuery(sql);
-        if (!resultSet.next()) {
-            throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nConfiguración para contabilidad en medios electrónicos.");
-        }
-        else {
-            period = new int[] { resultSet.getInt(1), resultSet.getInt(2) };
+        try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+            if (!resultSet.next()) {
+                throw new Exception(SDbConsts.ERR_MSG_REG_NOT_FOUND + "\nConfiguración para contabilidad en medios electrónicos.");
+            }
+            else {
+                period = new int[] { resultSet.getInt(1), resultSet.getInt(2) };
+            }
         }
 
         return period;
@@ -1441,8 +1447,8 @@ public abstract class SFiscalUtils {
     }
 
     public static String createQueryBalanza11(final SGuiSession session, final int periodYear, final int periodMonth, final int coaYear, final int coaMonth) throws Exception {
-        String sql = "";
-        String balDate = "";
+        String sql;
+        String balDate;
 
         if (periodYear < SFiscalConsts.YEAR_MIN || periodYear > SLibTimeConsts.YEAR_MAX) {
             throw new Exception("El atributo 'Anio' debe ser mínimo " + SFiscalConsts.YEAR_MIN + " y máximo " + SLibTimeConsts.YEAR_MAX + ".");
@@ -1584,8 +1590,8 @@ public abstract class SFiscalUtils {
     
     public static String createQueryBalanza13(final SGuiSession session, final int periodYear, final int periodMonth, final int coaYear, final int coaMonth) throws Exception {
         int month = 0;
-        String sql = "";
-        String balDate = "";
+        String sql;
+        String balDate;
         String whereDec = "";
         
         // adjust calendar month if necesary:
@@ -1781,16 +1787,15 @@ public abstract class SFiscalUtils {
      * @param periodMonth Requested period's month.
      * @param balanceType Trial balance type. Constants defined in <code>SFiscalConsts.BAL_...</code>.
      * @param lastModification Last accounting modification, when trial balance type is "complement", i.e., <code>SFiscalConsts.TRS_CMP</code>). Otherwise <code>null</code> must be provided.
-     */
+     * @return 
+     * @throws java.lang.Exception */
     public static SXmlDocument createDocBalanza11(final SGuiSession session, final int periodYear, final int periodMonth, final String balanceType, final Date lastModification) throws Exception {
         double sign = 0d;
         int[] coaPeriod = null;
         int[] accountClassKey = null;
-        String sql = "";
         String accountCode = "";
         String[] months = null;
         Statement statement = null;
-        ResultSet resultSet = null;
         SDbBizPartner company = null;
         SXmlDocument xmlDoc = null;
         SXmlElement xmlCtas = null;
@@ -1829,51 +1834,52 @@ public abstract class SFiscalUtils {
 
         coaPeriod = getSuitableChartOfAccounts(session, periodYear, periodMonth);
 
-        sql = createQueryBalanza11(session, periodYear, periodMonth, coaPeriod[0], coaPeriod[1]);
+        String sql = createQueryBalanza11(session, periodYear, periodMonth, coaPeriod[0], coaPeriod[1]);
 
         statement = session.getStatement().getConnection().createStatement();
 
-        resultSet = statement.executeQuery(sql);
-        while (resultSet.next()) {
-            accountCode = resultSet.getString("f_acc_code");
-            if (accountCode == null) {
-                months = SLibTimeUtils.createMonthsOfYearStd(Calendar.LONG);
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nNo se ha configurado el código agrupador del SAT para la "
-                        + "cuenta contable " + resultSet.getString("f_acc_id") + ":\n'" + resultSet.getString("f_acc_name") + "'.\n"
-                        + "El catálogo de cuentas más reciente es: " + months[coaPeriod[1] - 1] + " " + coaPeriod[0] + ".");
-            }
-
-            accountClassKey = new int[] { resultSet.getInt("f_acc_tp_id"), resultSet.getInt("f_acc_cl_id") };
-
-            if (SLibUtils.belongsTo(accountClassKey, new int[][] { SModSysConsts.FINS_CL_ACC_ASSET, SModSysConsts.FINS_CL_ACC_ORD_DBT, SModSysConsts.FINS_CL_ACC_RES_DBT })) {
-                if (resultSet.getString("f_acc_nat").compareTo(SFiscalConsts.COA_DBT) != 0) {
-                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nNaturaleza inapropiada ('" + resultSet.getString("f_acc_nat") + "') para la "
+        try (ResultSet resultSet = statement.executeQuery(sql)) {
+            while (resultSet.next()) {
+                accountCode = resultSet.getString("f_acc_code");
+                if (accountCode == null) {
+                    months = SLibTimeUtils.createMonthsOfYearStd(Calendar.LONG);
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nNo se ha configurado el código agrupador del SAT para la "
+                            + "cuenta contable " + resultSet.getString("f_acc_id") + ":\n'" + resultSet.getString("f_acc_name") + "'.\n"
+                            + "El catálogo de cuentas más reciente es: " + months[coaPeriod[1] - 1] + " " + coaPeriod[0] + ".");
+                }
+                
+                accountClassKey = new int[] { resultSet.getInt("f_acc_tp_id"), resultSet.getInt("f_acc_cl_id") };
+                
+                if (SLibUtils.belongsTo(accountClassKey, new int[][] { SModSysConsts.FINS_CL_ACC_ASSET, SModSysConsts.FINS_CL_ACC_ORD_DBT, SModSysConsts.FINS_CL_ACC_RES_DBT })) {
+                    if (resultSet.getString("f_acc_nat").compareTo(SFiscalConsts.COA_DBT) != 0) {
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nNaturaleza inapropiada ('" + resultSet.getString("f_acc_nat") + "') para la "
+                                + "cuenta contable " + resultSet.getString("f_acc_id") + ":\n'" + resultSet.getString("f_acc_name") + "' (" + resultSet.getString("f_acc_code") + ").");
+                    }
+                    
+                    sign = 1d;
+                }
+                else if (SLibUtils.belongsTo(accountClassKey, new int[][] { SModSysConsts.FINS_CL_ACC_LIABTY, SModSysConsts.FINS_CL_ACC_EQUITY, SModSysConsts.FINS_CL_ACC_ORD_CDT, SModSysConsts.FINS_CL_ACC_RES_CDT })) {
+                    if (resultSet.getString("f_acc_nat").compareTo(SFiscalConsts.COA_CDT) != 0) {
+                        throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nNaturaleza inapropiada ('" + resultSet.getString("f_acc_nat") + "') para la "
+                                + "cuenta contable " + resultSet.getString("f_acc_id") + ":\n'" + resultSet.getString("f_acc_name") + "' (" + resultSet.getString("f_acc_code") + ").");
+                    }
+                    
+                    sign = -1d;
+                }
+                else {
+                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nClase de cuenta desconocida para la "
                             + "cuenta contable " + resultSet.getString("f_acc_id") + ":\n'" + resultSet.getString("f_acc_name") + "' (" + resultSet.getString("f_acc_code") + ").");
                 }
-
-                sign = 1d;
+                
+                xmlCtas = createElementBalanza11Ctas(
+                        accountCode,
+                        resultSet.getDouble("f_bal_ope") * sign,
+                        resultSet.getDouble("f_dbt"),
+                        resultSet.getDouble("f_cdt"),
+                        resultSet.getDouble("f_bal_clo") * sign);
+                
+                xmlDoc.getXmlElements().add(xmlCtas);
             }
-            else if (SLibUtils.belongsTo(accountClassKey, new int[][] { SModSysConsts.FINS_CL_ACC_LIABTY, SModSysConsts.FINS_CL_ACC_EQUITY, SModSysConsts.FINS_CL_ACC_ORD_CDT, SModSysConsts.FINS_CL_ACC_RES_CDT })) {
-                if (resultSet.getString("f_acc_nat").compareTo(SFiscalConsts.COA_CDT) != 0) {
-                    throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nNaturaleza inapropiada ('" + resultSet.getString("f_acc_nat") + "') para la "
-                            + "cuenta contable " + resultSet.getString("f_acc_id") + ":\n'" + resultSet.getString("f_acc_name") + "' (" + resultSet.getString("f_acc_code") + ").");
-                }
-
-                sign = -1d;
-            }
-            else {
-                throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN + "\nClase de cuenta desconocida para la "
-                        + "cuenta contable " + resultSet.getString("f_acc_id") + ":\n'" + resultSet.getString("f_acc_name") + "' (" + resultSet.getString("f_acc_code") + ").");
-            }
-
-            xmlCtas = createElementBalanza11Ctas(
-                    accountCode,
-                    resultSet.getDouble("f_bal_ope") * sign,
-                    resultSet.getDouble("f_dbt"),
-                    resultSet.getDouble("f_cdt"),
-                    resultSet.getDouble("f_bal_clo") * sign);
-
-            xmlDoc.getXmlElements().add(xmlCtas);
         }
 
         return xmlDoc;
@@ -1886,17 +1892,17 @@ public abstract class SFiscalUtils {
      * @param periodMonth Requested period's month. Ranging from 1 up to 13.
      * @param balanceType Trial balance type. Constants defined in <code>SFiscalConsts.BAL_...</code>.
      * @param lastModification Last accounting modification, when trial balance type is "complement", i.e., <code>SFiscalConsts.TRS_CMP</code>). Otherwise <code>null</code> must be provided.
+     * @return 
+     * @throws java.lang.Exception
      */
     public static SXmlDocument createDocBalanza13(final SGuiSession session, final int periodYear, final int periodMonth, final String balanceType, final Date lastModification) throws Exception {
         int month = 0;
         double sign = 0d;
         int[] coaPeriod = null;
         int[] accountClassKey = null;
-        String sql = "";
         String accountCode = "";
         String[] months = null;
         Statement statement = null;
-        ResultSet resultSet = null;
         SDbBizPartner company = null;
         SXmlDocument xmlDoc = null;
         SXmlElement xmlCtas = null;
@@ -1946,11 +1952,11 @@ public abstract class SFiscalUtils {
 
         coaPeriod = getSuitableChartOfAccounts(session, periodYear, month);
 
-        sql = createQueryBalanza13(session, periodYear, periodMonth, coaPeriod[0], coaPeriod[1]);
+        String sql = createQueryBalanza13(session, periodYear, periodMonth, coaPeriod[0], coaPeriod[1]);
 
         statement = session.getStatement().getConnection().createStatement();
 
-        resultSet = statement.executeQuery(sql);
+        ResultSet resultSet = statement.executeQuery(sql);
         while (resultSet.next()) {
             accountCode = resultSet.getString("f_acc_code");
             if (accountCode == null) {
@@ -1997,7 +2003,7 @@ public abstract class SFiscalUtils {
             sumCdt = SLibUtils.roundAmount(sumCdt + resultSet.getDouble("f_cdt"));
             sumBalClo = SLibUtils.roundAmount(sumBalClo + resultSet.getDouble("f_bal_clo"));
         }
-
+        
         double realBalOpe = 0;
         double realDbt = 0;
         double realCdt = 0;
@@ -2369,6 +2375,8 @@ public abstract class SFiscalUtils {
      * @param tipoSolicitud Request type.
      * @param numOrden Order number.
      * @param numTramite Processing number.
+     * @return 
+     * @throws java.lang.Exception
      */
     public static SXmlDocument createDocPolizas11(final SGuiSession session, final int periodYear, final int periodMonth, final String tipoSolicitud, final String numOrden, final String numTramite) throws Exception {
         int[] coaPeriod = null;
@@ -2715,6 +2723,8 @@ public abstract class SFiscalUtils {
     * @param tipoSolicitud Request type.
     * @param numOrden Order number.
     * @param numTramite Processing number.
+     * @return 
+     * @throws java.lang.Exception
     */
     public static SXmlDocument createDocPolizas13(final SGuiSession session, final int periodYear, final int periodMonth, final String tipoSolicitud, final String numOrden, final String numTramite) throws Exception {
         int[] coaPeriod = null;
@@ -3121,6 +3131,8 @@ public abstract class SFiscalUtils {
      * @param numTramite Processing number.
      * @param accountStdStart Starting account code on standard-format.
      * @param accountStdEnd Ending account code on standard-format.
+     * @return 
+     * @throws java.lang.Exception
      */
     public static SXmlDocument createDocAuxiliarCtas11(final SGuiSession session, final int periodYear, final int periodMonth, final String tipoSolicitud, final String numOrden, final String numTramite, final String accountStdStart, final String accountStdEnd) throws Exception {
         int[] coaPeriod = null;
@@ -3411,6 +3423,8 @@ public abstract class SFiscalUtils {
      * @param numTramite Processing number.
      * @param accountStdStart Starting account code on standard-format.
      * @param accountStdEnd Ending account code on standard-format.
+     * @return 
+     * @throws java.lang.Exception
      */    
     public static SXmlDocument createDocAuxiliarCtas13(final SGuiSession session, final int periodYear, final int periodMonth, final String tipoSolicitud, final String numOrden, final String numTramite, final String accountStdStart, final String accountStdEnd) throws Exception {
         int[] coaPeriod = null;
