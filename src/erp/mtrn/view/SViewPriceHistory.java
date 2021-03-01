@@ -14,7 +14,10 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mtrn.form.SFormOptionPickerPriceHistory;
+import erp.table.SFilterConstants;
+import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
 
 /**
@@ -25,6 +28,7 @@ public class SViewPriceHistory extends erp.lib.table.STableTab implements java.a
 
     private javax.swing.JButton jbCardex;
     private erp.mtrn.form.SFormOptionPickerPriceHistory moFormOptionPickerPriceHistory;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     public SViewPriceHistory(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_PRICE_HIST, auxType01, 0);
@@ -50,6 +54,10 @@ public class SViewPriceHistory extends erp.lib.table.STableTab implements java.a
         STableColumn[] aoTableColumns = new STableColumn[7];
 
         moFormOptionPickerPriceHistory = new SFormOptionPickerPriceHistory(miClient, SDataConstants.TRNX_PRICE_HIST, mnTabTypeAux01);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
+        
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         i = 0;
         aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "i.id_item");
@@ -136,6 +144,11 @@ public class SViewPriceHistory extends erp.lib.table.STableTab implements java.a
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_DELETED && setting.getStatus() == STableConstants.STATUS_ON) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "item.b_del = FALSE ";
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
         }
 

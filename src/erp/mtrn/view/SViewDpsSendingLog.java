@@ -8,6 +8,7 @@ package erp.mtrn.view;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.lib.SLibConstants;
+import erp.mod.SModConsts;
 import erp.lib.data.SDataSqlUtilities;
 import erp.lib.table.STabFilterDatePeriod;
 import erp.lib.table.STableColumn;
@@ -17,6 +18,7 @@ import erp.lib.table.STableSetting;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterFunctionalArea;
 
 /**
  *
@@ -27,6 +29,7 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     /**
      * View to sending log.
@@ -48,6 +51,7 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
         
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isDpsPurchases() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
         
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -58,6 +62,8 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
         addTaskBarUpperComponent(moTabFilterCompanyBranch);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterBizPartner);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         aoKeyFields = new STableField[2];
         aoTableColumns = new STableColumn[14];
@@ -118,6 +124,7 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
         String sqlDatePeriod = "";
         String sqlCompanyBranch = "";
         String sqlBizPartner = "";
+        String sqlDocFunctArea = "";
         STableSetting setting = null;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
@@ -131,6 +138,11 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
                 sqlBizPartner = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlDocFunctArea += " AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
         }
         
@@ -148,7 +160,7 @@ public class SViewDpsSendingLog extends erp.lib.table.STableTab {
                 "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
                 "INNER JOIN erp.usru_usr AS ua ON d.fid_usr_audit = ua.id_usr " +
                 "INNER JOIN erp.usru_usr AS us ON snd.fid_usr = us.id_usr " +
-                "WHERE d.b_del = 0 AND d.fid_ct_dps = " + mnTabTypeAux01 + " " + sqlDatePeriod + sqlCompanyBranch + sqlBizPartner +
+                "WHERE d.b_del = 0 AND d.fid_ct_dps = " + mnTabTypeAux01 + " " + sqlDatePeriod + sqlCompanyBranch + sqlBizPartner + sqlDocFunctArea +
                 "ORDER BY dt.code, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, ";
         
         if ((isDpsPurchases() && miClient.getSessionXXX().getParamsErp().getFkSortingSupplierTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) ||

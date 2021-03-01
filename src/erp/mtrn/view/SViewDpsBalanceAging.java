@@ -15,9 +15,11 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterFunctionalArea;
 import java.util.Date;
 import javax.swing.JButton;
 
@@ -31,6 +33,7 @@ public class SViewDpsBalanceAging extends erp.lib.table.STableTab implements jav
     private erp.lib.table.STabFilterDateType moTabFilterDateType;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     public SViewDpsBalanceAging(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_BAL_AGING, auxType01);
@@ -44,6 +47,7 @@ public class SViewDpsBalanceAging extends erp.lib.table.STableTab implements jav
         moTabFilterDateType = new STabFilterDateType(this);
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);
@@ -53,6 +57,8 @@ public class SViewDpsBalanceAging extends erp.lib.table.STableTab implements jav
         addTaskBarUpperComponent(moTabFilterCompanyBranch);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterBizPartner);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         STableField[] aoKeyFields = new STableField[2];
         STableColumn[] aoTableColumns = new STableColumn[mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? 28 : 27];
@@ -171,6 +177,7 @@ public class SViewDpsBalanceAging extends erp.lib.table.STableTab implements jav
         String sqlBizPartner = "";
         String sqlCompanyBranch = "";
         String sqlDateType = "";
+        String sqlFunctAreas = "";
 
         String sSqlOrderBy = "";
         STableSetting setting = null;
@@ -201,6 +208,11 @@ public class SViewDpsBalanceAging extends erp.lib.table.STableTab implements jav
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
                 sqlBizPartner += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND re.fid_bp_nr = " + (Integer) setting.getSetting() + " ");
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
         }
 

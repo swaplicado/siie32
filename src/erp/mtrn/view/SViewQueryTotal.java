@@ -12,11 +12,13 @@ import erp.lib.table.STabFilterDatePeriodRange;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mod.trn.db.STrnConsts;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
 import erp.table.STabFilterCurrency;
+import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterRelatedParts;
 import erp.table.STabFilterUnitType;
 
@@ -36,6 +38,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
     private erp.table.STabFilterCurrency moTabFilterCurrency;
     private erp.table.STabFilterRelatedParts moTabFilterRelatedParts;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     public SViewQueryTotal(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_QRY, auxType01);
@@ -52,6 +55,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
         moTabFilterCurrency = new STabFilterCurrency(miClient, this);
         moTabFilterRelatedParts = new STabFilterRelatedParts(miClient, this);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -61,6 +65,8 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
         addTaskBarUpperComponent(moTabCompanyBranch);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterUnitType);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         switch(mnTabTypeAux01) {
             case SDataConstantsSys.TRNX_SAL_TOT_BY_IGEN:
@@ -458,6 +464,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
     public void createSqlQuery() {
         java.util.Date[] range = null;
         String sqlDatePeriod = "";
+        String sqlFunctAreas = "";
         String dateInit = "";
         String dateEnd = "";
         String sqlCompanyBranch = "";
@@ -484,6 +491,11 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 dateInit = miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[0]);
                 dateEnd = miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[1]);
                 sqlDatePeriod += "AND doc.dt BETWEEN '" + dateInit + "' AND '" + dateEnd + "' ";
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlFunctAreas += (sqlFunctAreas.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
                 sqlCompanyBranch += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND doc.fid_cob = " + (Integer) setting.getSetting() + " ");
@@ -608,7 +620,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 "AND doc.fid_tp_dps = " + (isPurchase() ? SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] : SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2]) + " " +
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
                 (withRelatedParts ? "" : " AND bp.b_att_rel_pty = 0 ") +
-                sqlCompanyBranch + sqlDatePeriod +
+                sqlCompanyBranch + sqlDatePeriod + sqlFunctAreas +
                 sqlGroupOrder + ") " +
                 "UNION " +
                 "(SELECT " + sqlColumns + "0 AS f_stot_r, COALESCE(SUM(" + columnStot + "), 0) AS f_adj_r, 0 AS f_adj_d, 0 - COALESCE(SUM(" + columnStot + "), 0) AS f_stot_net " +
@@ -647,7 +659,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
                 (withRelatedParts ? "" : " AND bp.b_att_rel_pty = 0 ") +
                 "AND e.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " " +
-                sqlCompanyBranch + sqlDatePeriod +
+                sqlCompanyBranch + sqlDatePeriod + sqlFunctAreas +
                 sqlGroupOrder + ") " +
                 "UNION " +
                 "(SELECT " + sqlColumns + "0 AS f_stot_r, 0 AS f_adj_r, COALESCE(SUM(" + columnStot + "), 0) AS f_adj_d, 0 - COALESCE(SUM(" + columnStot + "), 0) AS f_stot_net " +
@@ -686,7 +698,7 @@ public class SViewQueryTotal extends erp.lib.table.STableTab {
                 "AND doc.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND doc.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " +
                 (withRelatedParts ? "" : " AND bp.b_att_rel_pty = 0 ") +
                 "AND e.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_DISC + " " +
-                sqlCompanyBranch + sqlDatePeriod +
+                sqlCompanyBranch + sqlDatePeriod + sqlFunctAreas +
                 sqlGroupOrder + ")) " +
                 "AS t " +
                 sqlGroupOrder + " ";

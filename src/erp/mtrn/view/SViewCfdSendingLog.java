@@ -15,9 +15,11 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterFunctionalArea;
 import javax.swing.JButton;
 
 /**
@@ -27,6 +29,7 @@ import javax.swing.JButton;
 public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
 
@@ -47,6 +50,7 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
         STableColumn[] aoTableColumns = null;
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
         
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isCfdiPayroll() ? SDataConstants.BPSX_BP_EMP : SDataConstantsSys.BPSS_CT_BP_CUS);
@@ -56,6 +60,8 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
         removeTaskBarUpperComponent(jbDelete);
         
         addTaskBarUpperComponent(moTabFilterDatePeriod);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
         addTaskBarUpperSeparator();
         if (!isCfdiPayroll()) {
             addTaskBarUpperComponent(moTabFilterCompanyBranch);
@@ -131,6 +137,7 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
     @SuppressWarnings("unchecked")
     public void createSqlQuery() {
         String sqlDatePeriod = "";
+        java.lang.String sqlFunctAreas = "";
         String sqlCompanyBranch = "";
         String sqlBizPartner = "";
         STableSetting setting = null;
@@ -140,6 +147,11 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
 
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 sqlDatePeriod = "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), (isCfdiPayroll() ? "p.dt_end" : "d.dt"));
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {
                 sqlCompanyBranch = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_cob = " + (Integer) setting.getSetting() + " ");
@@ -191,7 +203,7 @@ public class SViewCfdSendingLog extends erp.lib.table.STableTab implements java.
                     "INNER JOIN erp.usru_usr AS ua ON d.fid_usr_audit = ua.id_usr " +
                     "INNER JOIN erp.trns_tp_cfd AS tp ON dx.fid_tp_cfd = tp.id_tp_cfd " +
                     "INNER JOIN erp.usru_usr AS us ON snd.fid_usr = us.id_usr " +
-                    "WHERE d.b_del = 0 AND dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAYROLL : SDataConstantsSys.TRNS_TP_CFD_INV) + " " + sqlDatePeriod + sqlCompanyBranch + sqlBizPartner +
+                    "WHERE d.b_del = 0 AND dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAYROLL : SDataConstantsSys.TRNS_TP_CFD_INV) + " " + sqlDatePeriod + sqlFunctAreas + sqlCompanyBranch + sqlBizPartner +
                     "HAVING id_cfd <> 0 " +
                     "ORDER BY tp.tp_cfd, d.num_ser, CAST(d.num AS UNSIGNED INTEGER), d.num, d.dt, b.bp, bc.bp_key, b.id_bp, bb.bpb, bb.id_bpb, snd.id_snd ";
         }

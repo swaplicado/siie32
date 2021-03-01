@@ -13,6 +13,9 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
 import erp.mcfg.data.SDataParamsCompany;
+import erp.mod.SModConsts;
+import erp.table.SFilterConstants;
+import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -26,6 +29,7 @@ public class SViewRecordDps extends erp.lib.table.STableTab {
 
     private erp.lib.table.STableColumn[] aoTableColumns;
     private erp.lib.table.STabFilterDatePeriodRange moTabFilterDatePeriodRange;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     private JToggleButton jtbRecordAdjYearEnd;
     private JToggleButton jtbRecordAdjAudit;
@@ -46,11 +50,13 @@ public class SViewRecordDps extends erp.lib.table.STableTab {
         mbShowRecordAdjAudit = true;
 
         moTabFilterDatePeriodRange = new STabFilterDatePeriodRange(miClient, this);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
         addTaskBarUpperComponent(moTabFilterDatePeriodRange);
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         jtbRecordAdjYearEnd = new JToggleButton(new ImageIcon(getClass().getResource("/erp/img/switch_adj_year_off.gif")));
         jtbRecordAdjYearEnd.setSelectedIcon(new ImageIcon(getClass().getResource("/erp/img/switch_adj_year_on.gif")));
@@ -163,6 +169,11 @@ public class SViewRecordDps extends erp.lib.table.STableTab {
                 dateInit = miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[0]);
                 dateEnd = miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[1]);
                 sqlDatePeriod += "d.dt BETWEEN '" + dateInit + "' AND '" + dateEnd + "' ";
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
         }
 

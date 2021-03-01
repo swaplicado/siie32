@@ -18,6 +18,8 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
 import erp.mod.SModConsts;
+import erp.table.SFilterConstants;
+import erp.table.STabFilterFunctionalArea;
 import sa.lib.SLibUtils;
 import sa.lib.grid.SGridConsts;
 
@@ -30,6 +32,7 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
     private erp.lib.table.STableColumn[] aoTableColumns;
     private erp.lib.table.STabFilterDatePeriodRange moTabFilterDatePeriodRange;
     private erp.lib.table.STabFilterDateCutOff moTabFilterDateCutOff;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     public SViewCfdXml(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01, int auxType02) {
         super(client, tabTitle, SDataConstants.TRN_CFD, auxType01, auxType02);
@@ -47,11 +50,15 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
             moTabFilterDatePeriodRange = null;
             moTabFilterDateCutOff = new STabFilterDateCutOff(miClient, this, SLibTimeUtilities.getEndOfYear(miClient.getSessionXXX().getWorkingDate()));
         }
+        
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
         addTaskBarUpperComponent(!isCfdiSignPending() ? moTabFilterDatePeriodRange : moTabFilterDateCutOff);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         aoTableColumns = new STableColumn[!isCfdiSignPending() ? 9 : 8];
 
@@ -98,6 +105,7 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
     public void createSqlQuery() {
         java.util.Date[] range = null;
         String sqlDatePeriod = "";
+        java.lang.String sqlFunctAreas = "";
         String sqlDatePeriodPayroll = "";
         String dateInit = "";
         String dateEnd = "";
@@ -116,6 +124,11 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
                 else {
                     sqlDatePeriod = setting.getSetting() == null ? "" : " AND d.dt <= '" + (new java.sql.Date(((java.util.Date) setting.getSetting()).getTime())) + "' ";
                     sqlDatePeriodPayroll = setting.getSetting() == null ? "" : " AND dx.ts <= '" + (new java.sql.Date(((java.util.Date) setting.getSetting()).getTime())) + "' ";
+                }
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlFunctAreas += (sqlFunctAreas.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }
@@ -185,7 +198,7 @@ public class SViewCfdXml extends erp.lib.table.STableTab implements java.awt.eve
                  "r.id_pay = hr.id_pay AND r.id_emp = hr.id_emp AND hr.b_del = 0 AND hr.id_iss = dx.fid_pay_rcp_iss_n ") +
                  "INNER JOIN erp.trns_tp_cfd AS tp ON dx.fid_tp_cfd = tp.id_tp_cfd " +
                  "WHERE dx.fid_tp_cfd = " + (isCfdiPayroll() ? SDataConstantsSys.TRNS_TP_CFD_PAYROLL : SDataConstantsSys.TRNS_TP_CFD_INV)+ " AND dx.fid_tp_xml IN (" + SDataConstantsSys.TRNS_TP_XML_CFDI_32 + ", " + SDataConstantsSys.TRNS_TP_XML_CFDI_33 + ") AND hr.b_del = 0 " + 
-                 "AND NOT (dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND dx.b_con = 0) " + (isCfdiSignPending() ? " AND LENGTH(dx.uuid) = 0 " : " AND LENGTH(dx.uuid) <> 0 ") + sqlDatePeriodPayroll + " " +
+                 "AND NOT (dx.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " AND dx.b_con = 0) " + (isCfdiSignPending() ? " AND LENGTH(dx.uuid) = 0 " : " AND LENGTH(dx.uuid) <> 0 ") + sqlDatePeriodPayroll + " " + sqlFunctAreas +
                  "ORDER BY tp_cfd, f_tp_doc, f_dt, f_num, f_cob, uuid, f_ico, f_ico_xml";
     }
 

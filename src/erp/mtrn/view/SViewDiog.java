@@ -19,12 +19,14 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDiog;
 import erp.mtrn.data.STrnDiogComplement;
 import erp.mtrn.data.STrnUtilities;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCompanyBranchEntity;
 import erp.table.STabFilterDocumentType;
+import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
@@ -50,6 +52,7 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.table.STabFilterCompanyBranchEntity moTabFilterCompanyBranchEntity;
     private erp.table.STabFilterDocumentType moTabFilterTypeDocument;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     public SViewDiog(erp.client.SClientInterface client, java.lang.String tabTitle) {
         this(client, tabTitle, SLibConstants.UNDEFINED, SLibConstants.UNDEFINED);
@@ -69,6 +72,7 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterCompanyBranchEntity = new STabFilterCompanyBranchEntity(miClient, this, SDataConstantsSys.CFGS_CT_ENT_WH);
         moTabFilterTypeDocument = new STabFilterDocumentType(miClient, this, SDataConstants.TRNS_TP_IOG);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         if (mnTabTypeAux01 != SLibConstants.UNDEFINED && mnTabTypeAux02 != SLibConstants.UNDEFINED) {
             moTabFilterTypeDocument.setFixedDocumentType(new int[] { mnTabTypeAux01, mnTabTypeAux02, 1 });
@@ -82,6 +86,8 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
         addTaskBarUpperComponent(moTabFilterCompanyBranchEntity);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterTypeDocument);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         addTaskBarUpperSeparator();
 
@@ -286,6 +292,7 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
         int[] key = null;
         String sqlWhere = "";
         STableSetting setting = null;
+        java.lang.String sqlFunctAreas = "";
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
@@ -310,6 +317,11 @@ public class SViewDiog extends erp.lib.table.STableTab implements java.awt.event
                 key = (int[]) setting.getSetting();
                 if (key != null) {
                     sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "iog.fid_ct_iog = " + key[0] + " AND iog.fid_cl_iog = " + key[1] + " AND iog.fid_tp_iog = " + key[2] + " ";
+                }
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }

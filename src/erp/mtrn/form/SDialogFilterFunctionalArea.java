@@ -249,7 +249,7 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
 
     @Override
     public void formRefreshCatalogues() {
-        SFormUtilities.populateComboBox(miClient, jcbFunctionalArea, mnDataType, null);
+        SFormUtilities.populateComboBox(miClient, jcbFunctionalArea, mnDataType, manDataFilterKey);
     }
 
     @Override

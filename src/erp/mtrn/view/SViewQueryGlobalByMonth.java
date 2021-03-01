@@ -13,9 +13,11 @@ import erp.lib.table.STabFilterYear;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mod.trn.db.STrnConsts;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCurrency;
+import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterRelatedParts;
 import erp.table.STabFilterUnitType;
 import java.util.Calendar;
@@ -51,6 +53,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
     private erp.table.STabFilterUnitType moTabFilterUnitType;
     private erp.table.STabFilterCurrency moTabFilterCurrency;
     private erp.table.STabFilterRelatedParts moTabFilterRelatedParts;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     public SViewQueryGlobalByMonth(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_QRY, auxType01);
@@ -64,6 +67,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         moTabFilterUnitType = new STabFilterUnitType(miClient, this);
         moTabFilterCurrency = new STabFilterCurrency(miClient, this);
         moTabFilterRelatedParts = new STabFilterRelatedParts(miClient, this);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
         
         mnYear = miClient.getSessionXXX().getWorkingYear();
         mnType = 0;
@@ -78,7 +82,9 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterCurrency);
         addTaskBarUpperSeparator();
-        addTaskBarUpperComponent(moTabFilterRelatedParts); 
+        addTaskBarUpperComponent(moTabFilterRelatedParts);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         setIsSummaryApplying(true);
 
@@ -302,14 +308,15 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
         int typeUnitTotal = 0;
         boolean withRelatedParts = false;
         String sqlDatePeriod = "";
+        String sqlFunctAreas = "";
         String dateInit = "";
         String dateEnd = "";
         
         for (int i = 0; i < mvTableSettings.size(); i++) {
-           setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
-           if (setting.getType() == SFilterConstants.SETTING_FILTER_CURRENCY) {
+            setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
+            if (setting.getType() == SFilterConstants.SETTING_FILTER_CURRENCY) {
                 mbIsLocalCurrency = ((Integer)setting.getSetting()) == STabFilterCurrency.TP_SYSTEM_CURRENCY;
-            } 
+            }
         }
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
@@ -321,6 +328,11 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
                 dateInit = miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(SLibTimeUtilities.getBeginOfYear(tDate));
                 dateEnd = miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(SLibTimeUtilities.getEndOfYear(tDate));
                 sqlDatePeriod += " AND d.dt BETWEEN '" + dateInit + "' AND '" + dateEnd + "' ";
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_UNIT_TP) {
                 typeUnitTotal = (Integer)setting.getSetting();
@@ -369,7 +381,7 @@ public class SViewQueryGlobalByMonth extends erp.lib.table.STableTab {
                     "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc " +
                     "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
                     "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
-                    "WHERE d.b_del = 0 AND de.b_del = 0 " + sqlDatePeriod +
+                    "WHERE d.b_del = 0 AND de.b_del = 0 " + sqlDatePeriod + sqlFunctAreas +
                     (withRelatedParts ? "" : " AND bp.b_att_rel_pty = 0 ") +
                     "GROUP BY i.item_key, i.item " +
                     "HAVING f_stot_01 <> 0 OR f_qty_01 <> 0 OR f_stot_02 <> 0 OR f_qty_02 <> 0 OR f_stot_03 <> 0 OR f_qty_03 <> 0 OR f_stot_04 <> 0 OR f_qty_04 <> 0 OR f_stot_05 <> 0 OR f_qty_05 <> 0 OR " +

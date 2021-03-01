@@ -87,7 +87,7 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
 
     private void initComponentsExtra() {
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        moSetting = new STableSetting(SFilterConstants.SETTING_FILTER_FUNC_ARE, mnFunctionalAreaId);
+        moSetting = new STableSetting(SFilterConstants.SETTING_FILTER_FUNC_AREA, mnFunctionalAreaId);
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, mnDataType, manDataFilter);
 
         renderText();
@@ -102,10 +102,10 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
         if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
             renderText();
-
-            moSetting.setSetting(msFunctionalAreasIds);
-            moTab.updateSetting(moSetting);
         }
+        
+        moSetting.setSetting(msFunctionalAreasIds);
+        moTab.updateSetting(moSetting);
     }
 
     private void renderText() {

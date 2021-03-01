@@ -17,11 +17,13 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.form.SDialogUpdateDpsSalesAgentComms;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -45,6 +47,7 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     private erp.mtrn.form.SDialogUpdateDpsSalesAgentComms moDialogUpdateDpsSalesAgentComms;
 
     public SViewDpsSalesAgent(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
@@ -89,6 +92,7 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
         
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, SDataConstantsSys.BPSS_CT_BP_CUS);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
         moDialogUpdateDpsSalesAgentComms = new SDialogUpdateDpsSalesAgentComms(miClient);
 
         removeTaskBarUpperComponent(jbNew);
@@ -103,6 +107,8 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
         addTaskBarUpperComponent(moTabFilterCompanyBranch);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterBizPartner);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbChangeAgentSupervisor);
         addTaskBarUpperSeparator();
@@ -277,6 +283,7 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
         String sqlDatePeriod = "";
         String sqlCompanyBranch = "";
         String sqlBizPartner = "";
+        String sqlFunctAreas = "";
         STableSetting setting = null;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
@@ -290,6 +297,11 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
                 sqlBizPartner = ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlFunctAreas += "AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
         }
 
@@ -349,7 +361,7 @@ public class SViewDpsSalesAgent extends erp.lib.table.STableTab implements java.
                 }
 
                 msSql +=
-                    sqlDatePeriod + sqlCompanyBranch + sqlBizPartner +
+                    sqlDatePeriod + sqlCompanyBranch + sqlBizPartner + sqlFunctAreas +
                     "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                     "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
                     "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " + SDataConstantsSys.BPSS_CT_BP_CUS + " " +
