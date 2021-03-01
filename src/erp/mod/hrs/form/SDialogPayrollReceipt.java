@@ -908,48 +908,52 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             
             @Override
             public void actionRowEdit() {
-                try {
-                    SHrsReceiptEarning hrsReceiptEarning = (SHrsReceiptEarning) moGridReceiptEarnings.getSelectedGridRow();
+                if (jbRowEdit.isEnabled()) {
+                    try {
+                        SHrsReceiptEarning hrsReceiptEarning = (SHrsReceiptEarning) moGridReceiptEarnings.getSelectedGridRow();
 
-                    SDialogPayrollEarning dlgPayrollEarning = new SDialogPayrollEarning(miClient, hrsReceiptEarning.clone(), "Percepción");
-                    dlgPayrollEarning.setVisible(true);
-                    
-                    if (dlgPayrollEarning.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
-                        refreshReceiptMovements();
+                        SDialogPayrollEarning dlgPayrollEarning = new SDialogPayrollEarning(miClient, hrsReceiptEarning.clone(), "Percepción");
+                        dlgPayrollEarning.setVisible(true);
+
+                        if (dlgPayrollEarning.getFormResult() == SGuiConsts.FORM_RESULT_OK) {
+                            refreshReceiptMovements();
+                        }
                     }
-                }
-                catch (Exception e) {
-                    SLibUtils.printException(this, e);
+                    catch (Exception e) {
+                        SLibUtils.printException(this, e);
+                    }
                 }
             }
             
             @Override
             public void actionRowDelete() {
-                if (jtTable.getSelectedRowCount() != 1) {
-                    miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-                }
-                else {
-                    SHrsReceiptEarning hrsReceiptEarning = (SHrsReceiptEarning) moGridReceiptEarnings.getSelectedGridRow();
-                    
-                    if (hrsReceiptEarning.getPayrollReceiptEarning().isSystem()) {
-                        miClient.showMsgBoxInformation(SDbConsts.MSG_REG_ + hrsReceiptEarning.getEarning().getName() + SDbConsts.MSG_REG_IS_SYSTEM + "\n" +
-                        "Se debe eliminar mediante la eliminación del consumo de incidencia respectivo.");
+                if (jbRowDelete.isEnabled()) {
+                    if (jtTable.getSelectedRowCount() != 1) {
+                        miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
                     }
                     else {
                         int moveId = 0;
                         boolean remove = false;
-                        
-                        for (SHrsReceiptEarning hrsReceiptEarningToRemove : moHrsReceipt.getHrsReceiptEarnings()) {
-                            if (SLibUtils.compareKeys(hrsReceiptEarningToRemove.getRowPrimaryKey(), hrsReceiptEarning.getRowPrimaryKey())) {
-                                remove = true;
-                                moveId = hrsReceiptEarningToRemove.getPayrollReceiptEarning().getPkMoveId();
-                                break;
-                            }
-                        }
+                        SHrsReceiptEarning hrsReceiptEarning = (SHrsReceiptEarning) moGridReceiptEarnings.getSelectedGridRow();
 
-                        if (remove) {
-                            moHrsReceipt.removeHrsReceiptEarning(moveId);
-                            refreshReceiptMovements();
+                        if (hrsReceiptEarning.getPayrollReceiptEarning().isSystem()) {
+                            miClient.showMsgBoxInformation(SDbConsts.MSG_REG_ + hrsReceiptEarning.getEarning().getName() + SDbConsts.MSG_REG_IS_SYSTEM + "\n" +
+                            "Se debe eliminar mediante la eliminación del consumo de incidencia respectivo.");
+                        }
+                        else {
+
+                            for (SHrsReceiptEarning hrsReceiptEarningToRemove : moHrsReceipt.getHrsReceiptEarnings()) {
+                                if (SLibUtils.compareKeys(hrsReceiptEarningToRemove.getRowPrimaryKey(), hrsReceiptEarning.getRowPrimaryKey())) {
+                                    remove = true;
+                                    moveId = hrsReceiptEarningToRemove.getPayrollReceiptEarning().getPkMoveId();
+                                    break;
+                                }
+                            }
+
+                            if (remove) {
+                                moHrsReceipt.removeHrsReceiptEarning(moveId);
+                                refreshReceiptMovements();
+                            }
                         }
                     }
                 }
@@ -990,26 +994,27 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             
             @Override
             public void actionRowDelete() {
-                int moveId = 0;
-                boolean remove = false;
-
-                if (jtTable.getSelectedRowCount() != 1) {
-                    miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
-                }
-                else {
-                    SHrsReceiptDeduction hrsReceiptDeduction = (SHrsReceiptDeduction) moGridReceiptDeductions.getSelectedGridRow();
-                    
-                    for (SHrsReceiptDeduction hrsReceiptDeductionToRemove : moHrsReceipt.getHrsReceiptDeductions()) {
-                        if (SLibUtils.compareKeys(hrsReceiptDeductionToRemove.getRowPrimaryKey(), hrsReceiptDeduction.getRowPrimaryKey())) {
-                            remove = true;
-                            moveId = hrsReceiptDeductionToRemove.getPayrollReceiptDeduction().getPkMoveId();
-                            break;
-                        }
+                if (jbRowDelete.isEnabled()) {
+                    if (jtTable.getSelectedRowCount() != 1) {
+                        miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
                     }
-                    
-                    if (remove) {
-                        moHrsReceipt.removeHrsReceiptDeduction(moveId);
-                        refreshReceiptMovements();
+                    else {
+                        int moveId = 0;
+                        boolean remove = false;
+                        SHrsReceiptDeduction hrsReceiptDeduction = (SHrsReceiptDeduction) moGridReceiptDeductions.getSelectedGridRow();
+
+                        for (SHrsReceiptDeduction hrsReceiptDeductionToRemove : moHrsReceipt.getHrsReceiptDeductions()) {
+                            if (SLibUtils.compareKeys(hrsReceiptDeductionToRemove.getRowPrimaryKey(), hrsReceiptDeduction.getRowPrimaryKey())) {
+                                remove = true;
+                                moveId = hrsReceiptDeductionToRemove.getPayrollReceiptDeduction().getPkMoveId();
+                                break;
+                            }
+                        }
+
+                        if (remove) {
+                            moHrsReceipt.removeHrsReceiptDeduction(moveId);
+                            refreshReceiptMovements();
+                        }
                     }
                 }
             }
@@ -1056,28 +1061,30 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
             
             @Override
             public void actionRowDelete() {
-                try {
-                    if (jtTable.getSelectedRowCount() == 0) {
-                        miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROWS);
-                    }
-                    else if (miClient.showMsgBoxConfirm(SGridConsts.MSG_CONFIRM_REG_DEL) == JOptionPane.YES_OPTION) {
-                        SGridRow[] gridRows = getSelectedGridRows();
+                if (jbRowDelete.isEnabled()) {
+                    try {
+                        if (jtTable.getSelectedRowCount() == 0) {
+                            miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROWS);
+                        }
+                        else if (miClient.showMsgBoxConfirm(SGridConsts.MSG_CONFIRM_REG_DEL) == JOptionPane.YES_OPTION) {
+                            SGridRow[] gridRows = getSelectedGridRows();
 
-                        for (int i = 0; i < gridRows.length; i++) {
-                            SGridRow gridRow = gridRows[i];
-                            SDbAbsenceConsumption absenceConsumption = (SDbAbsenceConsumption) gridRow;
-                            
-                            moHrsReceipt.updateHrsReceiptEarningAbsence(absenceConsumption, false);
+                            for (int i = 0; i < gridRows.length; i++) {
+                                SGridRow gridRow = gridRows[i];
+                                SDbAbsenceConsumption absenceConsumption = (SDbAbsenceConsumption) gridRow;
 
-                            moModel.getGridRows().remove(moModel.getGridRows().indexOf(gridRow));
-                            
-                            populateAbsenceConsumption();
-                            refreshReceiptMovements();
+                                moHrsReceipt.updateHrsReceiptEarningAbsence(absenceConsumption, false);
+
+                                moModel.getGridRows().remove(moModel.getGridRows().indexOf(gridRow));
+
+                                populateAbsenceConsumption();
+                                refreshReceiptMovements();
+                            }
                         }
                     }
-                }
-                catch (Exception e) {
-                    SLibUtils.showException(this, e);
+                    catch (Exception e) {
+                        SLibUtils.showException(this, e);
+                    }
                 }
             }
         };
