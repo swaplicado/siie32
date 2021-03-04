@@ -9,7 +9,7 @@ import java.awt.Color;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public abstract class STableConstants {
 
@@ -92,6 +92,8 @@ public abstract class STableConstants {
     public static final int ICON_XML = 1101;
     public static final int ICON_XML_PEND = 1102;
     public static final int ICON_XML_SIGN = 1103;
+    public static final int ICON_PDF = 1104;
+    public static final int ICON_XML_PDF = 1105;
     public static final int ICON_XML_CANC = 1106;
     public static final int ICON_XML_CANC_PDF = 1107;
     public static final int ICON_XML_CANC_XML = 1108;

@@ -350,7 +350,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             }
             else {
                 try {
-                    SCfdUtils.getXmlCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
+                    SCfdUtils.downloadXmlCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);

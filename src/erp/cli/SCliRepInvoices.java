@@ -312,7 +312,7 @@ public class SCliRepInvoices {
                 "COALESCE((SELECT SUM(ds.orig_qty) FROM trn_dps_dps_supply AS ds, trn_dps_ety AS xde, trn_dps AS xd " +
                 "WHERE ds.id_src_year = de.id_year AND ds.id_src_doc = de.id_doc AND ds.id_src_ety = de.id_ety AND ds.id_des_year = xde.id_year " +
                 "AND ds.id_des_doc = xde.id_doc AND ds.id_des_ety = xde.id_ety AND xde.id_year = xd.id_year AND xde.id_doc = xd.id_doc AND xde.b_del = 0 " +
-                "AND xd.b_del = 0 AND xd.fid_st_dps = 2), 0) AS f_link_orig_qty " +
+                "AND xd.b_del = 0 AND xd.fid_st_dps = 2), 0) AS f_link_orig_qty, u_new.usr AS _usr_new " +
                 "FROM trn_dps AS d " +
                 "INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 AND d.fid_st_dps = 2 " +
                 "AND d.fid_ct_dps = 2 AND d.fid_cl_dps = 2 AND d.fid_tp_dps = 1 AND d.fid_cob = 2890 " +
@@ -324,6 +324,7 @@ public class SCliRepInvoices {
                 "INNER JOIN erp.bpsu_bp_ct AS bc ON d.fid_bp_r = bc.id_bp AND bc.id_ct_bp = 3 " +
                 "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                 "INNER JOIN erp.usru_usr AS ul ON d.fid_usr_link = ul.id_usr " +
+                "INNER JOIN erp.usru_usr AS u_new ON d.fid_usr_new = u_new.id_usr " + 
                 "INNER JOIN erp.itmu_item AS i ON de.fid_item = i.id_item " +
                 "INNER JOIN erp.itmu_igen AS ig ON i.fid_igen = ig.id_igen " +
                 "INNER JOIN erp.itmu_unit AS u ON de.fid_unit = u.id_unit " +
@@ -618,6 +619,7 @@ public class SCliRepInvoices {
                 + "<th>Cant. procesada</th>"
                 + "<th>Cant. pendiente</th>"
                 + "<th>Unidad</th>"
+                + "<th>Usuario</th>"
                 + "</tr>\n";
         
         try (ResultSet resultSet = miStatement.executeQuery(sql)) {
@@ -634,6 +636,7 @@ public class SCliRepInvoices {
                         + "<td class=\"number\">" + formatQuantity(linkQty) + "</td>"
                         + "<td class=\"number\">" + formatQuantity(toLinkQty) + "</td>"
                         + "<td>" + SLibUtils.textToHtml(resultSet.getString("f_orig_unit")) + "</td>"
+                        + "<td>" + SLibUtils.textToHtml(resultSet.getString("_usr_new")) + "</td>"
                         + "</tr>\n"; 
             }
         }

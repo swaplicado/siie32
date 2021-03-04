@@ -44,6 +44,7 @@ import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerAddressee;
 import erp.mbps.data.SDataBizPartnerBranch;
 import erp.mcfg.data.SDataCertificate;
+import erp.mcfg.data.SDataParamsCompany;
 import erp.mfin.data.SDataTax;
 import erp.mfin.data.diot.SDiotConsts;
 import erp.mhrs.data.SDataPayrollReceiptIssue;
@@ -75,6 +76,9 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -4796,9 +4800,10 @@ public abstract class SCfdUtils implements Serializable {
         bw.close();
     }
     
-    public static void getXmlCfd(final SClientInterface client, final SDataCfd cfd) throws Exception {
+    public static void downloadXmlCfd(final SClientInterface client, final SDataCfd cfd) throws Exception {
         if (cfd == null || cfd.getDocXml().isEmpty() || cfd.getDocXmlName().isEmpty()) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\nNo se encontró el archivo XML del documento.");
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\n"
+                    + "No se encontró el archivo XML del documento.");
         }
         else {
             if (canObtainXml(cfd)) {
@@ -4808,6 +4813,23 @@ public abstract class SCfdUtils implements Serializable {
                     writeXmlToDisk(file, cfd, SDataConstantsSys.TRNS_ST_DPS_EMITED);
                     client.showMsgBoxInformation(SLibConstants.MSG_INF_FILE_CREATE + file.getAbsolutePath());
                 }
+            }
+        }
+    }
+    
+    public static void downloadXmlPdf(final SClientInterface client, final int[] pk) throws Exception {
+        String name = SDataPdf.composePdfName(pk[0], pk[1]);
+        File origin = new File(SDataPdf.composePdfDirectory(((SDataParamsCompany)client.getSession().getConfigCompany()).getXmlBaseDirectory(), pk[0]) + "/" + name);
+        if (!origin.exists()) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ + "\n"
+                    + "No se encontró el archivo PDF del documento.");
+        }
+        else {
+            client.getFileChooser().setSelectedFile(new File(name));
+            if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+                File destiny = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+                Files.copy(Paths.get(origin.getAbsolutePath()), Paths.get(destiny.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+                client.showMsgBoxInformation(SLibConstants.MSG_INF_FILE_CREATE + destiny.getAbsolutePath());
             }
         }
     }

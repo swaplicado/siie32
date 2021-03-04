@@ -374,7 +374,7 @@ public class SViewPayrollCfdi extends SGridPaneView implements ActionListener {
                 else {
                     try {
                         if (mnGridSubtype == SModConsts.VIEW_SC_DET) {
-                            SCfdUtils.getXmlCfd((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT));
+                            SCfdUtils.downloadXmlCfd((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, gridRow.getRowPrimaryKey(), SLibConstants.EXEC_MODE_SILENT));
                         }
                     }
                     catch (Exception e) {

@@ -457,6 +457,7 @@ public abstract class SDataConstants {
     public static final int TRN_DNC_DPS_DNS = 207087;
     public static final int TRN_DNC_DIOG = 207088;
     public static final int TRN_DNC_DIOG_DNS = 207089;
+    public static final int TRN_PDF = 207094;           // out of place!
     public static final int TRN_CFD = 207095;           // out of place! (sflores, 2014-01-28)
     public static final int TRN_CFD_SND_LOG = 207096;   // out of place! (sflores, 2014-05-12)
     public static final int TRN_PAC = 207097;           // out of place! (sflores, 2014-02-17)
