@@ -68,6 +68,7 @@ import erp.mtrn.data.SDataDpsNotesRow;
 import erp.mtrn.data.SDataDpsType;
 import erp.mtrn.data.SDataEntryDpsDpsAdjustment;
 import erp.mtrn.data.SDataEntryDpsDpsLink;
+import erp.mtrn.data.SDataPdf;
 import erp.mtrn.data.SDataSystemNotes;
 import erp.mtrn.data.SGuiDpsEntryPrice;
 import erp.mtrn.data.SGuiDpsLink;
@@ -86,6 +87,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -213,6 +215,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.lib.form.SFormField moFieldAddAmc71ShipToCity;
     private erp.lib.form.SFormField moFieldAddAmc71ShipToPostalCode;
     private erp.lib.form.SFormField moFieldCfdiXmlFile;
+    private erp.lib.form.SFormField moFieldCfdiPdfFile;
     private erp.lib.form.SFormField moFieldCfdiPaymentWay;
     private erp.lib.form.SFormField moFieldCfdiPaymentMethod;
     private erp.lib.form.SFormField moFieldCfdiTaxRegime;
@@ -278,6 +281,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private boolean mbOrigIsDiscountDocApplying;
     private boolean mbIsLocalCurrency;
     private java.lang.String msFileXmlJustLoaded;
+    private File moFilePdfJustLoaded;
     private erp.mtrn.data.cfd.SAddendaAmc71Manager moAddendaAmc71Manager;
     private java.lang.Object moRecordUserKey;
     private sa.lib.srv.SSrvLock moRecordUserLock;
@@ -727,6 +731,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbLoadFileXml = new javax.swing.JButton();
         jbDeleteFileXml = new javax.swing.JButton();
         jPanel105 = new javax.swing.JPanel();
+        jlFilePdf = new javax.swing.JLabel();
+        jtfFilePdf = new javax.swing.JTextField();
+        jbLoadFilePdf = new javax.swing.JButton();
+        jbDeleteFilePdf = new javax.swing.JButton();
         jPanel95 = new javax.swing.JPanel();
         jlCfdiTaxRegime = new javax.swing.JLabel();
         jcbCfdiTaxRegime = new javax.swing.JComboBox<SFormComponentItem>();
@@ -2602,6 +2610,27 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jPanel74.add(jPanel75);
 
         jPanel105.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlFilePdf.setText("Archivo PDF:");
+        jlFilePdf.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel105.add(jlFilePdf);
+
+        jtfFilePdf.setEditable(false);
+        jtfFilePdf.setText("XML");
+        jtfFilePdf.setOpaque(false);
+        jtfFilePdf.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel105.add(jtfFilePdf);
+
+        jbLoadFilePdf.setText("...");
+        jbLoadFilePdf.setToolTipText("Seleccionar archivo XML...");
+        jbLoadFilePdf.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel105.add(jbLoadFilePdf);
+
+        jbDeleteFilePdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_delete.gif"))); // NOI18N
+        jbDeleteFilePdf.setToolTipText("Eliminar archivo XML");
+        jbDeleteFilePdf.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel105.add(jbDeleteFilePdf);
+
         jPanel74.add(jPanel105);
 
         jPanel95.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
@@ -2953,6 +2982,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         
         moFieldCfdiXmlFile = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFileXml, jlFileXml);
         moFieldCfdiXmlFile.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
+        moFieldCfdiPdfFile = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfFilePdf, jlFilePdf);
+        moFieldCfdiPdfFile.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldCfdiTaxRegime = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdiTaxRegime, jlCfdiTaxRegime);
         moFieldCfdiTaxRegime.setTabbedPaneIndex(TAB_CFD_XML, jTabbedPane);
         moFieldCfdiCfdiUsage = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbCfdiCfdiUsage, jlCfdiCfdiUsage);
@@ -3053,6 +3084,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         mvFields.add(moFieldAddAmc71ShipToPostalCode);
         
         mvFields.add(moFieldCfdiXmlFile);
+        mvFields.add(moFieldCfdiPdfFile);
         mvFields.add(moFieldCfdiTaxRegime);
         mvFields.add(moFieldCfdiCfdiUsage);
         mvFields.add(moFieldCfdiConfirmation);
@@ -3209,6 +3241,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbCfdCceCalcTotalUsd.addActionListener(this);
         jbLoadFileXml.addActionListener(this);
         jbDeleteFileXml.addActionListener(this);
+        jbLoadFilePdf.addActionListener(this);
+        jbDeleteFilePdf.addActionListener(this);
         jbCfdiCfdiRelated.addActionListener(this);
         jtbEntryFilter.addActionListener(this);
         jtbNotesFilter.addActionListener(this);
@@ -3459,6 +3493,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlFileXml.setEnabled(enableXmlFields);
         jbLoadFileXml.setEnabled(enableXmlFields);
         jbDeleteFileXml.setEnabled(enableXmlFields);
+        jlFilePdf.setEnabled(enableXmlFields);
+        jbLoadFilePdf.setEnabled(enableXmlFields);
+        jbDeleteFilePdf.setEnabled(enableXmlFields);
         
         jcbCfdiTaxRegime.setEnabled(enableFields && isCfdiVer33);
         jcbCfdiCfdiUsage.setEnabled(enableFields && isCfdiVer33);
@@ -7319,7 +7356,30 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     }
                 }
                 else {
-                    miClient.showMsgBoxInformation("El archivo solo puede ser XML");
+                    miClient.showMsgBoxInformation("El archivo sólo puede ser XML.");
+                }
+            }
+            miClient.getFileChooser().resetChoosableFileFilters();
+        }
+        catch (Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+    }
+    
+    private void actionLoadFilePdf() {
+        FileFilter filter = new FileNameExtensionFilter("PDF file", "pdf");
+        miClient.getFileChooser().repaint();
+        miClient.getFileChooser().setAcceptAllFileFilterUsed(false);
+        miClient.getFileChooser().setFileFilter(filter);
+       
+        try {
+            if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
+                if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".pdf")) {
+                    moFieldCfdiPdfFile.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
+                    moFilePdfJustLoaded = new File(miClient.getFileChooser().getSelectedFile().getAbsolutePath());
+                }
+                else {
+                    miClient.showMsgBoxInformation("El archivo sólo puede ser PDF.");
                 }
             }
             miClient.getFileChooser().resetChoosableFileFilters();
@@ -7332,6 +7392,11 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void actionDeleteFileXml() {
         moFieldCfdiXmlFile.setFieldValue("");
         msFileXmlJustLoaded = "";
+    }
+    
+    private void actionDeleteFilePdf() {
+        moFieldCfdiPdfFile.setFieldValue("");
+        moFilePdfJustLoaded = null;
     }
     
     private void actionCfdiCfdiRelated() {
@@ -8226,6 +8291,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbDateDocDelivery_n;
     private javax.swing.JButton jbDateDocLapsing_n;
     private javax.swing.JButton jbDateStartCredit;
+    private javax.swing.JButton jbDeleteFilePdf;
     private javax.swing.JButton jbDeleteFileXml;
     private javax.swing.JButton jbEdit;
     private javax.swing.JButton jbEditHelp;
@@ -8243,6 +8309,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbFkModeOfTransportationTypeId;
     private javax.swing.JButton jbFkProductionOrderId_n;
     private javax.swing.JButton jbFkVehicleId_n;
+    private javax.swing.JButton jbLoadFilePdf;
     private javax.swing.JButton jbLoadFileXml;
     private javax.swing.JButton jbNotesDelete;
     private javax.swing.JButton jbNotesEdit;
@@ -8388,6 +8455,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlDriver;
     private javax.swing.JLabel jlExchangeRate;
     private javax.swing.JLabel jlExchangeRateSystem;
+    private javax.swing.JLabel jlFilePdf;
     private javax.swing.JLabel jlFileXml;
     private javax.swing.JLabel jlFkCarrierId_n;
     private javax.swing.JLabel jlFkCarrierTypeId;
@@ -8495,6 +8563,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfDpsTypeRo;
     private javax.swing.JTextField jtfExchangeRate;
     private javax.swing.JTextField jtfExchangeRateSystemRo;
+    private javax.swing.JTextField jtfFilePdf;
     private javax.swing.JTextField jtfFileXml;
     private javax.swing.JTextField jtfFkDpsStatusAuthorizationRo;
     private javax.swing.JTextField jtfFkDpsStatusRo;
@@ -8616,6 +8685,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_SAL_DOC_OMT_DOC_SRC).HasRight :
                 miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_OMT_DOC_SRC).HasRight;
         msFileXmlJustLoaded = "";
+        moFilePdfJustLoaded = null;
         moAddendaAmc71Manager = null;
         
         moPaneGridEntries.createTable();
@@ -8839,13 +8909,13 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         // validate document numbers according to curren number series:
                         int num = SLibUtilities.parseInt(moFieldNumber.getString());
                         int numMin = ((int[]) ((SFormComponentItem) jcbNumberSeries.getSelectedItem()).getComplement())[0];
-                        int numMax = ((int[]) ((SFormComponentItem) jcbNumberSeries.getSelectedItem()).getComplement())[1];
+                        int numMax = ((int[]) ((SFormComponentItem) jcbNumberSeries.getSelectedItem()).getComplement())[1]; // -1 means unlimited
 
                         if (num < numMin) {
                             validation.setMessage("El valor para el campo '" + jlNumber.getText() + "' no puede ser menor a " + numMin + "'.");
                             validation.setComponent(jtfNumber);
                         }
-                        else if (numMax != -1 && num > numMax) {
+                        else if (numMax != -1 && num > numMax) { // -1 means unlimited
                             validation.setMessage("El valor para el campo '" + jlNumber.getText() + "' no puede ser mayor a " + numMax + "'.");
                             validation.setComponent(jtfNumber);
                         }
@@ -8900,19 +8970,19 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_EMPTY + "'" + jckShipments.getText() + "'.");
                     validation.setComponent(jtfShipments);
                 }
-                else if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH && moFieldCfdiPaymentWay.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99) == 0) {
+                else if (isCfdEmissionRequired && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH && moFieldCfdiPaymentWay.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99) == 0) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentWay.getText() + "'.");
                     validation.setComponent(jcbCfdiPaymentWay);
                 }
-                else if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT && moFieldCfdiPaymentWay.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99) != 0) {
+                else if (isCfdEmissionRequired && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT && moFieldCfdiPaymentWay.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99) != 0) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentWay.getText() + "' (" + SDataConstantsSys.TRNS_CFD_CAT_PAY_WAY_99 + ").");
                     validation.setComponent(jcbCfdiPaymentWay);
                 }
-                else if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH && moFieldCfdiPaymentMethod.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE) != 0) {
+                else if (isCfdEmissionRequired && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CASH && moFieldCfdiPaymentMethod.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE) != 0) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentMethod.getText() + "' (" + SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE + ").");
                     validation.setComponent(jcbCfdiPaymentMethod);
                 }
-                else if (mbIsSales && (mbIsDpsInvoice || mbIsDpsAdjustment) && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT && moFieldCfdiPaymentMethod.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE) == 0 &&
+                else if (isCfdEmissionRequired && moFieldFkPaymentTypeId.getKeyAsIntArray()[0] == SDataConstantsSys.TRNS_TP_PAY_CREDIT && moFieldCfdiPaymentMethod.getKey().toString().compareTo(SDataConstantsSys.TRNS_CFD_CAT_PAY_MET_PUE) == 0 &&
                         miClient.showMsgBoxConfirm(SGuiConsts.ERR_MSG_FIELD_VAL_ + "'" + jlCfdiPaymentMethod.getText() + "' \"" + moFieldCfdiPaymentMethod.getFieldValue() + "\", en ventas a crédito, no está permitido según las disposiciones fiscales.\n" + SGuiConsts.MSG_CNF_CONT) != JOptionPane.YES_OPTION) {
                     validation.setMessage(SLibConstants.MSG_ERR_GUI_FIELD_VALUE_DIF + "'" + jlCfdiPaymentMethod.getText() + "'.");
                     validation.setComponent(jcbCfdiPaymentMethod);
@@ -9608,13 +9678,18 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
         
         if (isCfdXmlFilePermitted()) {
-            if (moDps.getDbmsDataCfd() != null) {
+            if (moDps.getDbmsDataCfd() != null) { // Cuando se modifica un DPS existente desde la vista de facturas.
                 moFieldCfdiXmlFile.setFieldValue(moDps.getDbmsDataCfd().getDocXmlName());
                 msFileXmlJustLoaded = "";
             }
-            else if (!moDps.getAuxFileXmlAbsolutePath().isEmpty()) {
+            else if (!moDps.getAuxFileXmlAbsolutePath().isEmpty()) { // Cuando se crea un DPS a partir de un archivo XML.
                 moFieldCfdiXmlFile.setFieldValue(moDps.getAuxFileXmlName());
                 msFileXmlJustLoaded = moDps.getAuxFileXmlAbsolutePath();
+            }
+            
+            if (moDps.getDbmsDataPdf() != null) { // Cuando el DPS posee un archivo PDF asociado.
+                moFieldCfdiPdfFile.setFieldValue(moDps.getDbmsDataPdf().getDocPdfName());
+                moFilePdfJustLoaded = null;
             }
         }
 
@@ -9887,7 +9962,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             try {
                 String xml = SXmlUtils.readXml(msFileXmlJustLoaded);
                 SDataCfd cfd = moDps.getDbmsDataCfd() != null ? moDps.getDbmsDataCfd() : new SDataCfd();
-                
+               
                 cfd.setCertNumber("");
                 cfd.setStringSigned("");
                 cfd.setSignature("");
@@ -9919,7 +9994,25 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
             moDps.setDbmsDataCfd(cfd);
         }
-
+        
+        if ((moFilePdfJustLoaded != null) || (moFieldCfdiPdfFile.getString().isEmpty() && moDps.getDbmsDataPdf() != null)) {
+            SDataPdf pdf;
+            if (moDps.getDbmsDataPdf() != null) {
+                pdf =  moDps.getDbmsDataPdf();
+            }
+            else {
+                pdf = new SDataPdf();
+                moDps.setDbmsDataPdf(pdf);
+            }
+            if (moFilePdfJustLoaded != null) {
+                pdf.setAuxDocPdfFile(moFilePdfJustLoaded);
+            }
+            else {
+                pdf.setAuxToBeDeleted(true);
+            }
+            pdf.setAuxXmlBaseDirectory(((SDataParamsCompany) miClient.getSession().getConfigCompany()).getXmlBaseDirectory());
+        }
+        
         return moDps;
     }
 
@@ -10077,6 +10170,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (button == jbDeleteFileXml) {
                     actionDeleteFileXml();
+                }
+                else if (button == jbLoadFilePdf) {
+                    actionLoadFilePdf();
+                }
+                else if (button == jbDeleteFilePdf) {
+                    actionDeleteFilePdf();
                 }
                 else if (button == jbCfdiCfdiRelated) {
                     actionCfdiCfdiRelated();

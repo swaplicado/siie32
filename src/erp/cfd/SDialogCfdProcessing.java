@@ -651,6 +651,17 @@ public class SDialogCfdProcessing extends SBeanFormDialog {
      * Public methods:
      */
     
+    /**
+     * Set form parameters.
+     * @param client
+     * @param cfds
+     * @param payrollReceiptKeys
+     * @param stampsAvailable
+     * @param annulmentDate
+     * @param validateStamp
+     * @param cfdSubtype Constants defined in SCfdConsts.CFDI_PAYROLL_VER_...
+     * @param dpsAnnulmentType 
+     */
     public void setFormParams(final SClientInterface client, final ArrayList<SDataCfd> cfds, final ArrayList<int[]> payrollReceiptKeys, final int stampsAvailable, Date annulmentDate, final boolean validateStamp, final int cfdSubtype, final int dpsAnnulmentType) {
         mbFirstTime = true;
         

@@ -33,6 +33,7 @@ import cfd.ver3.cce11.DElementDescripcionesEspecificas;
 import cfd.ver3.clf10.DElementLeyenda;
 import cfd.ver3.clf10.DElementLeyendasFiscales;
 import cfd.ver33.DCfdi33Catalogs;
+import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
@@ -278,6 +279,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected erp.mtrn.data.SDataCfd moDbmsDataCfd;
     protected erp.mtrn.data.SDataDpsCfd moDbmsDataDpsCfd;
     protected erp.mtrn.data.SDataDpsAddenda moDbmsDataAddenda;
+    protected erp.mtrn.data.SDataPdf moDbmsDataPdf;
     
     protected java.lang.String msXtaTotalCyAsText; // read-only member
     protected erp.mtrn.data.STrnDpsType moXtaDpsType; // read-only member
@@ -392,7 +394,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         SDataUserConfigurationTransaction userConfigTxn = new SDataUserConfigurationTransaction();
 
         if (userConfigTxn.read(new int[] { mnFkUserNewId }, statement) != SLibConstants.DB_ACTION_READ_OK) {
-            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP + " No se encontró la configuración de usuarios para transacciones del usuario ID=" + mnFkUserNewId + ".");
         }
         else {
             if (mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
@@ -1679,6 +1681,18 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         return moXtaDpsType.isEstimateSal();
     }
 
+    public boolean isDpsTypeContract() {
+        return moXtaDpsType.isDpsTypeContract();
+    }
+
+    public boolean isDpsTypeContractPur() {
+        return moXtaDpsType.isDpsTypeContractPur();
+    }
+
+    public boolean isDpsTypeContractSal() {
+        return moXtaDpsType.isDpsTypeContractSal();
+    }
+
     public int[] getDpsCategoryKey() { return new int[] { mnFkDpsCategoryId }; }
     public int[] getDpsClassKey() { return new int[] { mnFkDpsCategoryId, mnFkDpsClassId }; }
     public int[] getDpsTypeKey() { return new int[] { mnFkDpsCategoryId, mnFkDpsClassId, mnFkDpsTypeId }; }
@@ -1953,6 +1967,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
     public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
     public void setDbmsDataAddenda(erp.mtrn.data.SDataDpsAddenda o) { moDbmsDataAddenda = o; }
+    public void setDbmsDataPdf(erp.mtrn.data.SDataPdf o) { moDbmsDataPdf = o; }
 
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
     public java.util.Date getDbmsRecordDate() { return mtDbmsRecordDate; }
@@ -1977,6 +1992,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
     public erp.mtrn.data.SDataDpsCfd getDbmsDataDpsCfd() { return moDbmsDataDpsCfd; }
     public erp.mtrn.data.SDataDpsAddenda getDbmsDataAddenda() { return moDbmsDataAddenda; }
+    public erp.mtrn.data.SDataPdf getDbmsDataPdf() { return moDbmsDataPdf; }
     
     public java.lang.String getXtaTotalCyAsText() { return msXtaTotalCyAsText; }
     public erp.mtrn.data.STrnDpsType getXtaDpsType() { return moXtaDpsType; }
@@ -2169,6 +2185,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         moDbmsDataCfd = null;
         moDbmsDataDpsCfd = null;
         moDbmsDataAddenda = null;
+        moDbmsDataPdf = null;
         
         msXtaTotalCyAsText = "";
         createXtaDpsType();
@@ -2468,12 +2485,27 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 // Read data for CFD:
 
-                sSql = "SELECT COUNT(*) FROM trn_dps_cfd WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
+                sSql = "SELECT COUNT(*) "
+                        + "FROM trn_dps_cfd "
+                        + "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
                 oResultSet = statement.executeQuery(sSql);
                 if (oResultSet.next()) {
                     if (oResultSet.getInt(1) > 0) {
                         moDbmsDataDpsCfd = new SDataDpsCfd();
                         if (moDbmsDataDpsCfd.read(anKey, oStatementAux)!= SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+                    }
+                }
+                
+                sSql = "SELECT COUNT(*) "
+                        + "FROM " + SClientUtils.getComplementaryDbName(statement.getConnection()) + ".trn_pdf "
+                        + "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
+                oResultSet = statement.executeQuery(sSql);
+                if (oResultSet.next()) {
+                    if (oResultSet.getInt(1) > 0) {
+                        moDbmsDataPdf = new SDataPdf();
+                        if (moDbmsDataPdf.read(anKey, oStatementAux)!= SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                     }
@@ -2872,71 +2904,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         // 4.3 Business partner's asset or liability:
                         
-                        //Determinación de los distintos impuestos en el documento
-                        boolean taxEmpty = false;
-                        ArrayList<int[]> taxes = new ArrayList();
-                        for (SDataDpsEntry entry : mvDbmsDpsEntries) {
-                            if (! entry.getDbmsEntryTaxes().isEmpty()) {
-                                for (SDataDpsEntryTax dbmsEntryTax : entry.getDbmsEntryTaxes()) {
-                                    if (dbmsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                                        int hasCfg = 0;
-                                        int [] tax = new int[] { dbmsEntryTax.getPkTaxBasicId(), dbmsEntryTax.getPkTaxId(), hasCfg };
-                                        boolean exists = false;
-                                        for (int[] taxe : taxes) {
-                                            if (taxe[0] == 0) {
-                                                continue;
-                                            }
-                                            if (taxe[0] == dbmsEntryTax.getPkTaxBasicId() && taxe[1] == dbmsEntryTax.getPkTaxId()) {
-                                                exists = true;
-                                                break;
-                                            }
-                                        }
-                                        if (! exists) {
-                                            taxes.add(tax);
-                                        }
-                                    }
-                                }
-                            }
-                            else {
-                                if (! taxEmpty) {
-                                    taxes.add(new int[] { 0, 0 });
-                                    taxEmpty = true;
-                                }
-                            }
-                            
-                        }
-                        
-                        ArrayList<SFinAccountConfig> aAccCfgOperations = new ArrayList();
-                        SFinAccountConfig oAccCfgOperations = null;
-                        
-                        // lectura de la configuración por default (sin impuesto)
-                        oAccCfgOperations = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
-                                mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                mtDate, SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), null, oStatement));
-                        
-                        oAccCfgOperations.setTax(new int[] { 0, 0 });
-                        aAccCfgOperations.add(oAccCfgOperations);
-                        
-                        // se lee la configuración de los impuestos existentes en el documento
-                        for (int[] tax : taxes) {
-                            if (tax[0] == 0) {
-                                continue;
-                            }
-                            
-                            java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> v = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
-                                mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                mtDate, SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), tax, oStatement);
-                            
-                            SFinAccountConfig aux = null;
-                            if (v != null) {
-                                aux = new SFinAccountConfig(v);
-                                tax[2] = 1;
-                                aux.setTax(tax);
-
-                                aAccCfgOperations.add(aux);
-                            }
-                        }
-                        
                         // Add values:
                         
                         boolean thereArePrepayments = false;            // prepayments invoiced or prepayments to apply
@@ -2947,30 +2914,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         
                         for (SDataDpsEntry entry : mvDbmsDpsEntries) {
                             if (entry.isAccountable()) {
-                                // Determina si ya existe el impuesto en la lista, si no existe se agrega otro monto con el impuesto faltante,
-                                // si existe, se agrega el monto al impuesto existente
-                                int[] taxPk = new int[]{ 0, 0, 0};
-                                for (SDataDpsEntryTax dbmsEntryTax : entry.getDbmsEntryTaxes()) {
-                                    if (dbmsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
-                                        taxPk[0] = dbmsEntryTax.getKeyTax()[0];
-                                        taxPk[1] = dbmsEntryTax.getKeyTax()[1];
-                                        taxPk[2] = 0;
-
-                                        for (int[] taxe : taxes) {
-                                            if (taxe[0] == taxPk[0] && taxe[1] == taxPk[1]) {
-                                                taxPk[2] = taxe[2];
-                                                break;
-                                            }
-                                        }
-                                        break;
-                                    }
-                                }
-                                
-                                // considera el caso de cuando no hay impuestos en la partida
-                                if (entry.getDbmsEntryTaxes().isEmpty()) {
-                                    taxPk[2] = 1;
-                                }
-                                
                                 if (SLibUtils.belongsTo(entry.getOperationsType(),
                                         new int[] {
                                             SDataConstantsSys.TRNX_OPS_TYPE_OPS_PREPAY,
@@ -2979,20 +2922,15 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     // prepayments invoiced:
                                     
                                     thereArePrepayments = true;
-                                    SFinAmount finAmount = null;
                                     
                                     if (entry.getKeyCashAccount_n() != null) {
                                         // prepayment increment (in invoice) or decrement (in credit note) into cash account:
 
-                                        finAmount = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAccountType.ACC_CASH_ACCOUNT, isDocument() ? SFinMovementType.MOVT_INCREMENT : SFinMovementType.MOVT_DECREMENT);
+                                        SFinAmount finAmount = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAccountType.ACC_CASH_ACCOUNT, isDocument() ? SFinMovementType.MOVT_INCREMENT : SFinMovementType.MOVT_DECREMENT);
                                         if (isAdjustment()) {
                                             finAmount.KeyRefDocument = entry.getKeyAuxDps();
                                         }
                                         
-                                        if (taxPk[2] == 1) {
-                                            finAmount.setKeyTax(taxPk);
-                                        }
-
                                         oAmounts.addAmountForCashAccount(entry.getKeyCashAccount_n(), finAmount); // add amounts by cash account
                                     }
                                     else {
@@ -3000,54 +2938,31 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                                         thereArePrepaymentsToInvoice = true;
 
-                                        finAmount = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAccountType.ACC_PREPAY_TO_INVOICE, isDocument() ? SFinMovementType.MOVT_INCREMENT : SFinMovementType.MOVT_DECREMENT);
+                                        SFinAmount finAmount = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), true, SFinAccountType.ACC_PREPAY_TO_INVOICE, isDocument() ? SFinMovementType.MOVT_INCREMENT : SFinMovementType.MOVT_DECREMENT);
                                         if (isAdjustment()) {
                                             finAmount.KeyRefDocument = entry.getKeyAuxDps();
                                         }
                                         
-                                        if (taxPk[2] == 1) {
-                                            finAmount.setKeyTax(taxPk);
-                                        }
-                                        
                                         oAmounts.addAmountForPrepaymentsToInvoice(finAmount); // add all amounts together
                                     }
-                                    
                                 }
                                 else {
                                     // operations and application of prepayments invoiced:
                                     
                                     if (isDocument()) {
                                         // increment business partner's balance:
-                                        
-                                        boolean hasTheTax = false;
-                                        if (taxPk[2] == 1) {
-                                            for (SFinAmount amount : oAmounts.getAmounts()) {
-                                                if (amount.getKeyTax()[0] == taxPk[0] && amount.getKeyTax()[1] == taxPk[1]) {
-                                                    hasTheTax = true;
-                                                    oAmountBizPartnerBalance = amount;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        
-                                        if (oAmountBizPartnerBalance == null || (! hasTheTax && taxPk[2] == 1)) {
+
+                                        if (oAmountBizPartnerBalance == null) {
                                             oAmountBizPartnerBalance = new SFinAmount(0, 0);
                                             oAmounts.getAmounts().add(oAmountBizPartnerBalance);
                                         }
 
                                         oAmountBizPartnerBalance.addAmount(entry.getTotal_r(), entry.getTotalCy_r()); // add all amounts together
-                                        
-                                        if (taxPk[2] == 1) {
-                                            oAmountBizPartnerBalance.setKeyTax(taxPk);
-                                        }
                                     }
                                     else {
                                         // decrement business partner document's balance:
-                                        SFinAmount aux = new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), false, SFinAccountType.ACC_BIZ_PARTNER_DOC, SFinMovementType.MOVT_DECREMENT);
-                                        if (taxPk[2] == 1) {
-                                            aux.setKeyTax(taxPk);
-                                        }
-                                        oAmounts.addAmountForDocument(entry.getKeyAuxDps(), aux);  // add amounts by document
+
+                                        oAmounts.addAmountForDocument(entry.getKeyAuxDps(), new SFinAmount(entry.getTotal_r(), entry.getTotalCy_r(), false, SFinAccountType.ACC_BIZ_PARTNER_DOC, SFinMovementType.MOVT_DECREMENT));  // add amounts by document
                                     }
                                     
                                     if (SLibUtils.belongsTo(entry.getOperationsType(),
@@ -3085,57 +3000,27 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                         // Create journal voucher entries:
                         
                         ArrayList<SFinAmount> aAmountEntries;
-                        ArrayList<SFinAccountConfig> aAccCfgPrepayments = new ArrayList();
+                        SFinAccountConfig oAccCfgOperations = null;
                         SFinAccountConfig oAccCfgPrepayments = null;
-                        ArrayList<SFinAccountConfig> aAccCfgPrepaymentsToInvoice = new ArrayList();
                         SFinAccountConfig oAccCfgPrepaymentsToInvoice = null;
                         SFinAccountConfig oAccCfgItem = null;
+                        
+                        oAccCfgOperations = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
+                                mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
+                                mtDate, SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), oStatement));
 
                         if (thereArePrepayments) { // prevent from reading configuration when not needed!
                             oAccCfgPrepayments = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                     mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), null, oStatement));
-                            
-                            oAccCfgPrepayments.setTax(new int[] { 0, 0 });
-                            
-                            aAccCfgPrepayments.add(oAccCfgPrepayments);
-                            
-                            for (int[] tax : taxes) {
-                                java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> v = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
-                                    mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), tax, oStatement);
-                                
-                                if (v != null) {
-                                    SFinAccountConfig aux = new SFinAccountConfig(v);
-                                    aux.setTax(tax);
-
-                                    aAccCfgPrepayments.add(aux);
-                                }
-                            }
+                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, isDebitForBizPartner(), oStatement));
                         }
                         
                         if (thereArePrepaymentsToInvoice) { // prevent from reading configuration when not needed!
                             oAccCfgPrepaymentsToInvoice = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                                     mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), null, oStatement));
-                            
-                            oAccCfgPrepaymentsToInvoice.setTax(new int[] { 0, 0 });
-                            aAccCfgPrepaymentsToInvoice.add(oAccCfgPrepaymentsToInvoice);
-                            
-                            for (int[] tax : taxes) {
-                                java.util.Vector<erp.mfin.data.SFinAccountConfigEntry> v = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
-                                                mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), oRecord.getPkBookkeepingCenterId(), 
-                                                mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), tax, oStatement);
-                                
-                                if (v != null) {
-                                    SFinAccountConfig aux = new SFinAccountConfig(v);
-                                    aux.setTax(tax);
-
-                                    aAccCfgPrepaymentsToInvoice.add(aux);
-                                }
-                            }
+                                    mtDate, SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL, isDebitForBizPartner(), oStatement));
                         }
-                        
+
                         anSysAccTypeKeyBpr = getSysAccTypeKeyBizPartner();
                         anSysMvtTypeKeyBpr = getSysMvtTypeKeyBizPartner();
                         anSysMvtTypeKeyBprXXX = getSysMvtTypeKeyBizPartnerXXX();
@@ -3170,10 +3055,6 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                                         oRecordEntry.setConcept(sConcept);
                                         oRecordEntry.setSortingPosition(++nSortingPosition);
-                                        if (amount.getKeyTax() != null) {
-                                            oRecordEntry.setFkTaxBasicId_n(amount.getKeyTax()[0]);
-                                            oRecordEntry.setFkTaxId_n(amount.getKeyTax()[1]);
-                                        }
 
                                         oRecord.getDbmsRecordEntries().add(oRecordEntry);
                                         break;
@@ -3181,43 +3062,33 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     case ACC_PREPAY_TO_INVOICE:
                                         // user requested accounting of prepayments into prepayments to invoice:
                                         
-                                        for (SFinAccountConfig oAccPrepayInvoice : aAccCfgPrepaymentsToInvoice) {
-                                            if (amount.getKeyTax()[0] == oAccPrepayInvoice.getTax()[0] && amount.getKeyTax()[1] == oAccPrepayInvoice.getTax()[1]) {
-                                                aAmountEntries = oAccPrepayInvoice.prorateAmount(amount);
-
-                                                for (i = 0; i < oAccPrepayInvoice.getAccountConfigEntries().size(); i++) {
-                                                    oRecordEntry = createAccRecordEntry(
-                                                            oAccPrepayInvoice.getAccountConfigEntries().get(i).getAccountId(),
-                                                            oAccPrepayInvoice.getAccountConfigEntries().get(i).getCostCenterId(),
-                                                            anAccMvtSubclassKey, SModSysConsts.FINS_TP_SYS_ACC_NA_NA, anSysMvtTypeKeyBpr, SDataConstantsSys.FINS_TP_SYS_MOV_NA,
-                                                            isAdjustment() ? amount.KeyRefDocument : null, null);
-
-                                                    if (isDebitForBizPartner()) {
-                                                        oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
-                                                        oRecordEntry.setCredit(0);
-                                                        oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
-                                                        oRecordEntry.setCreditCy(0);
-                                                    }
-                                                    else {
-                                                        oRecordEntry.setDebit(0);
-                                                        oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
-                                                        oRecordEntry.setDebitCy(0);
-                                                        oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
-                                                    }
-
-                                                    oRecordEntry.setConcept(sConcept);
-                                                    oRecordEntry.setSortingPosition(++nSortingPosition);
-
-                                                    if (amount.getKeyTax() != null) {
-                                                        oRecordEntry.setFkTaxBasicId_n(amount.getKeyTax()[0]);
-                                                        oRecordEntry.setFkTaxId_n(amount.getKeyTax()[1]);
-                                                    }
-
-                                                    oRecord.getDbmsRecordEntries().add(oRecordEntry);
-                                                }
-                                            }
-                                        }
+                                        aAmountEntries = oAccCfgPrepaymentsToInvoice.prorateAmount(amount);
                                         
+                                        for (i = 0; i < oAccCfgPrepaymentsToInvoice.getAccountConfigEntries().size(); i++) {
+                                            oRecordEntry = createAccRecordEntry(
+                                                    oAccCfgPrepaymentsToInvoice.getAccountConfigEntries().get(i).getAccountId(),
+                                                    oAccCfgPrepaymentsToInvoice.getAccountConfigEntries().get(i).getCostCenterId(),
+                                                    anAccMvtSubclassKey, SModSysConsts.FINS_TP_SYS_ACC_NA_NA, anSysMvtTypeKeyBpr, SDataConstantsSys.FINS_TP_SYS_MOV_NA,
+                                                    isAdjustment() ? amount.KeyRefDocument : null, null);
+                                            
+                                            if (isDebitForBizPartner()) {
+                                                oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setCredit(0);
+                                                oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                                oRecordEntry.setCreditCy(0);
+                                            }
+                                            else {
+                                                oRecordEntry.setDebit(0);
+                                                oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                                oRecordEntry.setDebitCy(0);
+                                                oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                            }
+
+                                            oRecordEntry.setConcept(sConcept);
+                                            oRecordEntry.setSortingPosition(++nSortingPosition);
+
+                                            oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                                        }
                                         break;
                                         
                                     default:
@@ -3225,98 +3096,46 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                 }
                             }
                             else {
-                                if (amount.getKeyTax() == null || (amount.getKeyTax() != null && amount.getKeyTax()[0] == 0)) {
-                                    SFinAccountConfig accountConfig;
-                                    
-                                    if (amount.IsPrepaymentInvoiced) {
-                                        accountConfig = oAccCfgPrepayments;
-                                    }
-                                    else {
-                                        accountConfig = oAccCfgOperations;
-                                    }
-
-                                    aAmountEntries = accountConfig.prorateAmount(amount);
-
-                                    for (i = 0; i < accountConfig.getAccountConfigEntries().size(); i++) {
-                                        oRecordEntry = createAccRecordEntry(
-                                                accountConfig.getAccountConfigEntries().get(i).getAccountId(),
-                                                accountConfig.getAccountConfigEntries().get(i).getCostCenterId(),
-                                                anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
-                                                isAdjustment() ? amount.KeyRefDocument : null, null);
-
-                                        if (amount.IsPrepaymentInvoiced) {
-                                            oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
-                                            oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
-                                        }
-
-                                        if (isDebitForBizPartner()) {
-                                            oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
-                                            oRecordEntry.setCredit(0);
-                                            oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
-                                            oRecordEntry.setCreditCy(0);
-                                        }
-                                        else {
-                                            oRecordEntry.setDebit(0);
-                                            oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
-                                            oRecordEntry.setDebitCy(0);
-                                            oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
-                                        }
-
-                                        oRecordEntry.setConcept(sConcept);
-                                        oRecordEntry.setSortingPosition(++nSortingPosition);
-
-                                        oRecord.getDbmsRecordEntries().add(oRecordEntry);
-                                    }
+                                SFinAccountConfig accountConfig;
+                                
+                                if (amount.IsPrepaymentInvoiced) {
+                                    accountConfig = oAccCfgPrepayments;
                                 }
                                 else {
-                                    ArrayList<SFinAccountConfig> aAccCfgs;
+                                    accountConfig = oAccCfgOperations;
+                                }
+                                
+                                aAmountEntries = accountConfig.prorateAmount(amount);
+
+                                for (i = 0; i < accountConfig.getAccountConfigEntries().size(); i++) {
+                                    oRecordEntry = createAccRecordEntry(
+                                            accountConfig.getAccountConfigEntries().get(i).getAccountId(),
+                                            accountConfig.getAccountConfigEntries().get(i).getCostCenterId(),
+                                            anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
+                                            isAdjustment() ? amount.KeyRefDocument : null, null);
                                     
                                     if (amount.IsPrepaymentInvoiced) {
-                                        aAccCfgs = aAccCfgPrepayments;
+                                        oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
+                                        oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
+                                    }
+
+                                    if (isDebitForBizPartner()) {
+                                        oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                        oRecordEntry.setCredit(0);
+                                        oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                        oRecordEntry.setCreditCy(0);
                                     }
                                     else {
-                                        aAccCfgs = aAccCfgOperations;
+                                        oRecordEntry.setDebit(0);
+                                        oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                        oRecordEntry.setDebitCy(0);
+                                        oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
                                     }
-                                     
-                                    for (SFinAccountConfig aAccCfg : aAccCfgs) {
-                                        if (aAccCfg.getTax()[0] == amount.getKeyTax()[0] && aAccCfg.getTax()[1] == amount.getKeyTax()[1]) {
-                                            aAmountEntries = aAccCfg.prorateAmount(amount);
 
-                                            for (i = 0; i < aAccCfg.getAccountConfigEntries().size(); i++) {
-                                                oRecordEntry = createAccRecordEntry(
-                                                        aAccCfg.getAccountConfigEntries().get(i).getAccountId(),
-                                                        aAccCfg.getAccountConfigEntries().get(i).getCostCenterId(),
-                                                        anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
-                                                        isAdjustment() ? amount.KeyRefDocument : null, null);
+                                    oRecordEntry.setConcept(sConcept);
+                                    oRecordEntry.setSortingPosition(++nSortingPosition);
 
-                                                if (amount.IsPrepaymentInvoiced) {
-                                                    oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
-                                                    oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
-                                                }
-
-                                                if (isDebitForBizPartner()) {
-                                                    oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
-                                                    oRecordEntry.setCredit(0);
-                                                    oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
-                                                    oRecordEntry.setCreditCy(0);
-                                                }
-                                                else {
-                                                    oRecordEntry.setDebit(0);
-                                                    oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
-                                                    oRecordEntry.setDebitCy(0);
-                                                    oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
-                                                }
-
-                                                oRecordEntry.setConcept(sConcept);
-                                                oRecordEntry.setSortingPosition(++nSortingPosition);
-                                                
-                                                oRecordEntry.setFkTaxBasicId_n(amount.getKeyTax()[0]);
-                                                oRecordEntry.setFkTaxId_n(amount.getKeyTax()[1]);
-
-                                                oRecord.getDbmsRecordEntries().add(oRecordEntry);
-                                            }
-                                        }
-                                    }
+                                    oRecord.getDbmsRecordEntries().add(oRecordEntry);
                                 }
                             }
                         }
@@ -3678,6 +3497,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     }
                 }
                 
+                // Save PDF of purchases when provided:
+                
+                if (moDbmsDataPdf != null && mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                    moDbmsDataPdf.setPkYearId(mnPkYearId);
+                    moDbmsDataPdf.setPkDocId(mnPkDocId);
+                    
+                    if (moDbmsDataPdf.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+                
                 // Save XML auxiliar from CFDI version 3.3 or International Commerce:
                 
                 sSql = "DELETE FROM trn_dps_cfd WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
@@ -3747,7 +3577,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 try {
                     accountConfigs = SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                             mnFkBizPartnerId_r, STrnUtils.getBizPartnerCategoryId(mnFkDpsCategoryId), (Integer) keyRecord[2], mtDate,
-                            SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), null, statement);
+                            SDataConstantsSys.FINS_TP_ACC_BP_OP, isDebitForBizPartner(), statement);
                 }
                 catch (Exception e) {
                     msDbmsError = MSG_ERR_ACC_UNK_ + "asociado de negocios.\n[" + e + "]";

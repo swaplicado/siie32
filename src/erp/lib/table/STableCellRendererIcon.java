@@ -11,7 +11,7 @@ import javax.swing.JLabel;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRenderer {
 
@@ -25,6 +25,8 @@ public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRe
     public static final javax.swing.ImageIcon moIconXml = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_xml.png"));
     public static final javax.swing.ImageIcon moIconXmlPend = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_xml_pend.png"));
     public static final javax.swing.ImageIcon moIconXmlSign = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_xml_sign.png"));
+    public static final javax.swing.ImageIcon moIconPdf = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_xml_pdf.png"));
+    public static final javax.swing.ImageIcon moIconXmlPdf = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_xml_n_pdf.png"));
     public static final javax.swing.ImageIcon moIconXmlCancel = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_xml_canc.png"));
     public static final javax.swing.ImageIcon moIconXmlCancelPdf = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_xml_canc_pdf.png"));
     public static final javax.swing.ImageIcon moIconXmlCancelXml = new javax.swing.ImageIcon(new Object().getClass().getResource("/erp/img/icon_view_xml_canc_xml.png"));
@@ -84,6 +86,12 @@ public class STableCellRendererIcon extends javax.swing.table.DefaultTableCellRe
                 break;
             case STableConstants.ICON_XML_SIGN:
                 moLabel.setIcon(moIconXmlSign);
+                break;
+            case STableConstants.ICON_PDF:
+                moLabel.setIcon(moIconPdf);
+                break;
+            case STableConstants.ICON_XML_PDF:
+                moLabel.setIcon(moIconXmlPdf);
                 break;
             case STableConstants.ICON_XML_CANC:
                 moLabel.setIcon(moIconXmlCancel);
