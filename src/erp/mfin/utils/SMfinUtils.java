@@ -19,70 +19,23 @@ import java.util.logging.Logger;
 public class SMfinUtils {
     
     /**
-     * 
+     * Obtiene el saldo de un documento agrupado por impuesto
      * 
      * @param connection
-     * @param miClient
      * @param idDoc
      * @param idYear
+     * @param recYear
      * @param dt
      * @param cat
      * @param tp
      * 
      * @return ArrayList
      */
-    public static ArrayList<SBalanceTax> getBalanceByTax(java.sql.Connection connection, int idDoc, int idYear, String dt, int cat, int tp) {
+    public static ArrayList<SBalanceTax> getBalanceByTax(java.sql.Connection connection, int idDoc, int idYear, int recYear, String dt, int cat, int tp) {
         
         /* Query 1. Moves without document: */
-        String sql = "SELECT " +
-                    "    b.id_bp," +
-                    "    b.bp," +
-                    "    NULL AS id_year," +
-                    "    NULL AS id_doc," +
-                    "    NULL AS dt," +
-                    "    NULL AS f_doc_code," +
-                    "    NULL AS f_num," +
-                    "    NULL AS tot_r," +
-                    "    NULL AS exc_rate," +
-                    "    NULL AS tot_cur_r," +
-                    "    c.id_cur," +
-                    "    c.cur_key," +
-                    "    NULL AS f_cob_code," +
-                    "    SUM(re.debit - re.credit) AS f_bal," +
-                    "    SUM(re.debit_cur - re.credit_cur) AS f_bal_cur," +
-                    "    btp.id_tp_bp," +
-                    "    btp.tp_bp," +
-                    "    re.fid_tax_bas_n," +
-                    "    re.fid_tax_n " +
-                    "FROM " +
-                    "    fin_rec AS r" +
-                    "        INNER JOIN" +
-                    "    fin_rec_ety AS re ON r.id_year = re.id_year" +
-                    "        AND r.id_per = re.id_per" +
-                    "        AND r.id_bkc = re.id_bkc" +
-                    "        AND r.id_tp_rec = re.id_tp_rec" +
-                    "        AND r.id_num = re.id_num" +
-                    "        AND r.id_year = " + idYear + " " +
-                    "        AND r.dt <= '" + dt + "'" +
-                    "        AND NOT r.b_del" +
-                    "        AND NOT re.b_del" +
-                    "        AND re.fid_ct_sys_mov_xxx = " + cat +
-                    "        AND re.fid_tp_sys_mov_xxx = " + tp +
-                    "        AND re.fid_dps_year_n IS NULL" +
-                    "        AND re.fid_dps_doc_n IS NULL" +
-                    "        LEFT OUTER JOIN" +
-                    "    erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp" +
-                    "        LEFT OUTER JOIN" +
-                    "    erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp" +
-                    "        AND bct.id_ct_bp = re.fid_tp_sys_mov_xxx" +
-                    "        LEFT OUTER JOIN" +
-                    "    erp.bpsu_tp_bp AS btp ON bct.fid_tp_bp = btp.id_tp_bp" +
-                    "        AND btp.id_ct_bp = re.fid_tp_sys_mov_xxx" +
-                    "        LEFT OUTER JOIN" +
-                    "    erp.cfgu_cur AS c ON re.fid_cur = c.id_cur " +
-                    "GROUP BY btp.id_tp_bp , b.id_bp , b.bp , c.id_cur , c.cur_key , re.fid_tax_bas_n , re.fid_tax_n " +
-                    "HAVING f_bal <> 0 OR f_bal_cur <> 0 " +
-                    "UNION SELECT " +
+        String sql = ""
+                + "SELECT " +
                     "    b.id_bp," +
                     "    b.bp," +
                     "    d.id_year," +
@@ -115,7 +68,7 @@ public class SMfinUtils {
                     "        AND r.id_bkc = re.id_bkc" +
                     "        AND r.id_tp_rec = re.id_tp_rec" +
                     "        AND r.id_num = re.id_num" +
-                    "        AND r.id_year = " + idYear + " " +
+                    "        AND r.id_year = " + (recYear > 0 ? recYear : "re.id_year") + " " +
                     (dt.isEmpty() ? "" : "AND r.dt <= '" + dt + "' ") +
                     "        AND NOT r.b_del" +
                     "        AND NOT re.b_del" +

@@ -492,9 +492,9 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
                         break;
 
                     case SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL:
-                        if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_NA) {
-                            message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_NA }) + "'";
-                        }
+//                        if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_NA) {
+//                            message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_NA }) + "'";
+//                        }
                         break;
 
                     default:

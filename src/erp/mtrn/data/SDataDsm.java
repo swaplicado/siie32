@@ -1491,7 +1491,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         // si esto pasa significa que hay una configuración disponible y por ende se obtiene el balance correspondiente al impuesto
         if (taxPk != null) {
-            ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(connection, nDpsDocId, nDpsYearId, "", nTpSysMovId[0], nTpSysMovId[1]);
+            ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(connection, nDpsDocId, nDpsYearId, 0, "", nTpSysMovId[0], nTpSysMovId[1]);
             for (SBalanceTax balance : balances) {
                 if (balance.getTaxPk()[0] == taxPk[0] && balance.getTaxPk()[1] == taxPk[1]) {
                     return new double[] { balance.getBalance(), balance.getBalanceCurrency() };
@@ -1555,7 +1555,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                 }
                 
                 // se obtiene el saldo correspondiente al impuesto
-                ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(connection, nDpsDocId, nDpsYearId, "", nTpSysMovId[0], nTpSysMovId[1]);
+                ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(connection, nDpsDocId, nDpsYearId, 0, "", nTpSysMovId[0], nTpSysMovId[1]);
                 for (SBalanceTax balance : balances) {
                     if (balance.getTaxPk()[0] == nPkTaxBasicId && balance.getTaxPk()[1] == nPkTaxId) {
                         String sql = "SELECT t.id_tax_bas, t.id_tax, t.per, t.val_u, t.val, t.fid_tp_tax, t.fid_tp_tax_cal, t.fid_tp_tax_app, "
