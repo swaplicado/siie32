@@ -15,5 +15,5 @@ public abstract class SDataRepConstants {
     public static final String REP_TAX_PND_PUR = "Reporte de impuestos pendientes de egresos";
     public static final String REP_TAX_PND_SAL = "Reporte de impuestos pendientes de ingresos";
     public static final String REP_XML_FIL = "Archivos de contabilidad electrónica";
-    public static final String REP_XLS = "Estados Financieros Personalizados";
+    public static final String REP_XLS = "Estados financieros personalizados";
 }

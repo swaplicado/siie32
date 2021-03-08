@@ -109,6 +109,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         jlName = new javax.swing.JLabel();
         moTextName = new sa.lib.gui.bean.SBeanFieldText();
         moTextNumber = new sa.lib.gui.bean.SBeanFieldText();
+        moTextId = new sa.lib.gui.bean.SBeanFieldText();
         jPanel17 = new javax.swing.JPanel();
         jlPaymentType = new javax.swing.JLabel();
         moTextPaymentType = new sa.lib.gui.bean.SBeanFieldText();
@@ -231,7 +232,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moTextName.setEditable(false);
         moTextName.setText("TEXT");
         moTextName.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        moTextName.setPreferredSize(new java.awt.Dimension(350, 23));
+        moTextName.setPreferredSize(new java.awt.Dimension(385, 23));
         jPanel16.add(moTextName);
 
         moTextNumber.setEditable(false);
@@ -240,6 +241,14 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         moTextNumber.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         moTextNumber.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel16.add(moTextNumber);
+
+        moTextId.setEditable(false);
+        moTextId.setForeground(java.awt.SystemColor.textInactiveText);
+        moTextId.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+        moTextId.setText("TEXT");
+        moTextId.setToolTipText("ID");
+        moTextId.setPreferredSize(new java.awt.Dimension(50, 23));
+        jPanel16.add(moTextId);
 
         jPanel15.add(jPanel16);
 
@@ -786,6 +795,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
     private sa.lib.gui.bean.SBeanFieldText moTextEarningName;
     private sa.lib.gui.bean.SBeanFieldText moTextEmployeeType;
     private sa.lib.gui.bean.SBeanFieldText moTextFiscalId;
+    private sa.lib.gui.bean.SBeanFieldText moTextId;
     private sa.lib.gui.bean.SBeanFieldText moTextName;
     private sa.lib.gui.bean.SBeanFieldText moTextNumber;
     private sa.lib.gui.bean.SBeanFieldText moTextPaymentType;
@@ -804,6 +814,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
 
         moTextName.setTextSettings(SGuiUtils.getLabelName(jlName), 202);
         moTextNumber.setTextSettings(SGuiUtils.getLabelName(jlName), 10);
+        moTextId.setTextSettings(SGuiUtils.getLabelName(jlName), 10);
         moTextPaymentType.setTextSettings(SGuiUtils.getLabelName(jlName), 50);
         moDecSalary.setDecimalSettings(SGuiUtils.getLabelName(jlSalary), SGuiConsts.GUI_TYPE_DEC_AMT, false);
         moDecWage.setDecimalSettings(SGuiUtils.getLabelName(jlWage), SGuiConsts.GUI_TYPE_DEC_AMT, false);
@@ -1102,6 +1113,7 @@ public class SDialogPayrollReceipt extends SBeanFormDialog implements SGridPaneF
         
         moTextName.setValue(employee.getXtaEmployeeName());
         moTextNumber.setValue(employee.getNumber());
+        moTextId.setValue("" + employee.getPkEmployeeId());
         moTextFiscalId.setValue(employee.getXtaEmployeeRfc());
         moTextAlternativeId.setValue(employee.getXtaEmployeeCurp());
         moTextSocialSecurityNumber.setValue(employee.getSocialSecurityNumber());

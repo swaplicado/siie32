@@ -650,7 +650,15 @@ public abstract class SHrsCfdUtils {
             SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
         }
     }
-    
+
+    /**
+     * Get the number of CFD of receipts in payroll by department.
+     * @param session
+     * @param payrollId
+     * @param departmentId
+     * @return
+     * @throws Exception 
+     */
     public static int getCfdCountByDepartment(final SGuiSession session, final int payrollId, final int departmentId) throws Exception {
         int count = 0;
 
@@ -668,6 +676,32 @@ public abstract class SHrsCfdUtils {
             }
         }
                         
+        return count;
+    }
+    
+    /**
+     * Get the number of receipts in payroll that do not require a CFD.
+     * @param session
+     * @param payrollId
+     * @return Number of receipts in payroll that do not require a CFD.
+     * @throws Exception 
+     */
+    public static int getReceiptCountCfdNotRequired(final SGuiSession session, final int payrollId) throws Exception {
+        int count = 0;
+        
+        if (payrollId != 0) {
+            String sql = "SELECT COUNT(*) "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                    + "WHERE p.id_pay = " + payrollId + " AND p.b_del = 0 AND pr.b_del = 0 AND NOT pr.b_cfd_req;";
+
+            try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+                if (resultSet.next()) {
+                    count = resultSet.getInt(1);
+                }
+            }
+        }
+        
         return count;
     }
 }

@@ -24,6 +24,7 @@ import erp.mod.hrs.db.SDbConfig;
 import erp.mod.hrs.db.SDbPayroll;
 import erp.mod.hrs.db.SDbPayrollReceipt;
 import erp.mod.hrs.db.SDbPayrollReceiptIssue;
+import erp.mod.hrs.db.SHrsCfdUtils;
 import erp.mtrn.data.SDataCfd;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -130,6 +131,9 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
         jlDatePayment = new javax.swing.JLabel();
         jtfDatePayment = new javax.swing.JFormattedTextField();
         jbDatePayment = new javax.swing.JButton();
+        jPanel13 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
+        jlCfdNotRequired = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jbOk = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
@@ -341,6 +345,16 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
 
         getContentPane().add(jpGrid, java.awt.BorderLayout.CENTER);
 
+        jPanel13.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlCfdNotRequired.setText("n");
+        jlCfdNotRequired.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel14.add(jlCfdNotRequired);
+
+        jPanel13.add(jPanel14);
+
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jbOk.setText("Aceptar");
@@ -362,7 +376,9 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
         });
         jPanel2.add(jbCancel);
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_END);
+        jPanel13.add(jPanel2);
+
+        getContentPane().add(jPanel13, java.awt.BorderLayout.SOUTH);
 
         setSize(new java.awt.Dimension(976, 638));
         setLocationRelativeTo(null);
@@ -513,12 +529,14 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
     }
 
     private void computeTotals() {
-        jlTotalAvailables.setText("Recibos disponibles: " + moTablePaneReceiptAvailable.getTableGuiRowCount());
-        jlTotalSelected.setText("Recibos seleccionados: " + moTablePaneReceiptSelected.getTableGuiRowCount());
+        jlTotalAvailables.setText("Recibos disponibles: " + SLibUtils.DecimalFormatInteger.format(moTablePaneReceiptAvailable.getTableGuiRowCount()));
+        jlTotalSelected.setText("Recibos seleccionados: " + SLibUtils.DecimalFormatInteger.format(moTablePaneReceiptSelected.getTableGuiRowCount()));
     }
     
     @SuppressWarnings("unchecked")
     private void populatePayroll() {
+        int cfdNotRequired = 0;
+        
         if (!maHrsPayrollEmployeeReceipts.isEmpty()) {
             SHrsPayrollEmployeeReceipt receiptSample = maHrsPayrollEmployeeReceipts.get(0);
             
@@ -531,7 +549,7 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
             jtfPayrollNumber.setCaretPosition(0);
             jtfPayrollDates.setCaretPosition(0);
             jtfPayrollNotes.setCaretPosition(0);
-
+            
             try {
                 for (SHrsPayrollEmployeeReceipt receipt : maHrsPayrollEmployeeReceipts) {
                     receipt.setPaymentTypeSys((String) SDataReadDescriptions.getField(miClient, SDataConstants.TRNU_TP_PAY_SYS, new int[] { receipt.getPaymentTypeSysId() }, SLibConstants.FIELD_TYPE_TEXT));
@@ -550,6 +568,8 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
 
                 moTablePaneReceiptSelected.renderTableRows();
                 moTablePaneReceiptSelected.setTableRowSelection(0);
+                
+                cfdNotRequired = SHrsCfdUtils.getReceiptCountCfdNotRequired(miClient.getSession(), receiptSample.getPkPayrollId());
             }
             catch (Exception e) {
                 SLibUtilities.renderException(this, e);
@@ -557,6 +577,8 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
         }
         
         computeTotals();
+        
+        jlCfdNotRequired.setText("Recibos que no requieren CFDI: " + SLibUtils.DecimalFormatInteger.format(cfdNotRequired));
     }
     
     @SuppressWarnings("unchecked")
@@ -813,6 +835,8 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -831,6 +855,7 @@ public class SDialogPayrollCfdi extends JDialog implements ActionListener, ListS
     private javax.swing.JButton jbRemove;
     private javax.swing.JButton jbRemoveAll;
     private javax.swing.JComboBox jcbFilterDepartment;
+    private javax.swing.JLabel jlCfdNotRequired;
     private javax.swing.JLabel jlCfdiRelatedHint;
     private javax.swing.JLabel jlCfdiRelatedUuid;
     private javax.swing.JLabel jlDateIssue;
