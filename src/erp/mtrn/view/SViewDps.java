@@ -104,6 +104,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
     private javax.swing.JButton jbPrintContractMoves;
     private javax.swing.JButton jbPrintOrderGoods;
     private javax.swing.JButton jbGetXml;
+    private javax.swing.JButton jbGetPdf;
     private javax.swing.JButton jbGetAcknowledgmentCancellation;
     private javax.swing.JButton jbShowCfdi;
     private javax.swing.JButton jbSignXml;
@@ -338,6 +339,11 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetXml.addActionListener(this);
         jbGetXml.setToolTipText("Obtener XML del comprobante");
         
+        jbGetPdf = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_TYPE));
+        jbGetPdf.setPreferredSize(new Dimension(23, 23));
+        jbGetPdf.addActionListener(this);
+        jbGetPdf.setToolTipText("Obtener PDF del comprobante");
+        
         jbGetAcknowledgmentCancellation = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_XML_CANCEL));
         jbGetAcknowledgmentCancellation.setPreferredSize(new Dimension(23, 23));
         jbGetAcknowledgmentCancellation.addActionListener(this);
@@ -446,6 +452,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         addTaskBarLowerComponent(jbPrintContractMoves);
         addTaskBarLowerComponent(jbPrintOrderGoods);
         addTaskBarLowerComponent(jbGetXml);
+        addTaskBarLowerComponent(jbGetPdf);
         addTaskBarLowerComponent(jbGetAcknowledgmentCancellation);
         addTaskBarLowerComponent(jbShowCfdi);
         addTaskBarLowerComponent(jbSignXml);
@@ -487,7 +494,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbPrintContractKgAsTon.setEnabled((mbIsCategorySal || mbIsCategoryPur) && mbIsEstCon);
         jbPrintContractMoves.setEnabled(mbIsCategorySal && mbIsEstCon);
         jbPrintOrderGoods.setEnabled(mbIsCategorySal && mbIsOrd);
-        jbGetXml.setEnabled((mbIsDoc || mbIsDocAdj));
+        jbGetXml.setEnabled(mbIsDoc || mbIsDocAdj);
+        jbGetPdf.setEnabled(mbIsCategoryPur && (mbIsDoc || mbIsDocAdj));
         jbShowCfdi.setEnabled(mbIsDoc || mbIsDocAdj);
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
         jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
@@ -502,8 +510,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         STableColumn[] aoTableColumns = null;
 
         if (mbIsDoc || mbIsDocAdj) {
-            aoTableColumns = new STableColumn[48];  // extra columns for accounting record and CFD info
-        }
+                aoTableColumns = new STableColumn[48];  // extra columns for accounting record and CFD info
+            }
         else {
             aoTableColumns = new STableColumn[42];
         }
@@ -1780,7 +1788,23 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             }
             else {
                 try {
-                    SCfdUtils.getXmlCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
+                    SCfdUtils.downloadXmlCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_INV, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
+                }
+                catch (Exception e) {
+                    SLibUtilities.renderException(this, e);
+                }
+            }
+        }
+    }
+    
+    private void actionGetPdf() {
+        if (jbGetPdf.isEnabled()) {
+            if (moTablePane.getSelectedTableRow() == null || moTablePane.getSelectedTableRow().getIsSummary()) {
+                miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
+            }
+            else {
+                try {
+                    SCfdUtils.downloadXmlPdf(miClient, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey());
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -2112,14 +2136,16 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "(SELECT de.concept FROM trn_dps_ety AS de WHERE de.id_doc = d.id_doc AND de.id_year = d.id_year AND NOT de.b_del ORDER BY de.id_ety LIMIT 1) AS f_concept, " +
                 "(SELECT CONCAT(mo.id_year, '-', mo.num) FROM mfg_ord AS mo WHERE d.fid_mfg_year_n = mo.id_year AND d.fid_mfg_ord_n = mo.id_ord) AS f_mfg_ord, " +
                 "IF(d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", " + STableConstants.ICON_ST_ANNUL + ", " + STableConstants.ICON_NULL + ") AS f_ico, " +
-                "IF(x.ts IS NULL OR doc_xml = '', " + STableConstants.ICON_NULL  + ", " + // not is CFD nor CFDI
-                "IF(x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ", " + STableConstants.ICON_XML + ", " + // is CFD
+                "IF((x.ts IS NULL OR doc_xml = '') AND p.doc_pdf_name IS NULL, " + STableConstants.ICON_NULL  + ", " + // not is CFD nor CFDI
+                "IF((x.ts IS NULL OR doc_xml = '') AND p.doc_pdf_name IS NOT NULL, " + STableConstants.ICON_PDF + ", " + 
+                "IF((x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ") AND p.doc_pdf_name IS NULL , " + STableConstants.ICON_XML + ", " + // is CFD
+                "IF((x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_CFD + " OR x.fid_tp_xml = " + SDataConstantsSys.TRNS_TP_XML_NA + ") AND p.doc_pdf_name IS NOT NULL , " + STableConstants.ICON_XML_PDF + ", " + // is CFD
                 "IF(x.fid_st_xml = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " OR LENGTH(uuid) = 0, " + STableConstants.ICON_XML_PEND + ", " + // CFDI pending sign
                 "IF(LENGTH(xc.ack_can_xml) = 0 AND xc.ack_can_pdf_n IS NULL, " + STableConstants.ICON_XML_SIGN  + ", " + // CFDI signed, canceled only SIIE
                 "IF(LENGTH(xc.ack_can_xml) != 0, " + STableConstants.ICON_XML_CANC_XML + ", " +  // CFDI canceled with cancellation acknowledgment in XML format
                 "IF(xc.ack_can_pdf_n IS NOT NULL, " + STableConstants.ICON_XML_CANC_PDF + ", " + // CFDI canceled with cancellation acknowledgment in PDF format
                 STableConstants.ICON_XML_SIGN + " " + // CFDI signed, canceled only SIIE
-                ")))))) AS f_ico_xml, " +
+                ")))))))) AS f_ico_xml, " +
                 "x.can_st, " + // cancellation status
                 "bp.id_bp, bp.bp, bpc.bp_key, bpb.id_bpb, bpb.bpb, " +
                 "(SELECT c.cur_key FROM erp.cfgu_cur AS c WHERE d.fid_cur = c.id_cur) AS f_cur_key, " +
@@ -2194,7 +2220,8 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "INNER JOIN erp.usru_usr AS ue ON d.fid_usr_edit = ue.id_usr " +
                 "INNER JOIN erp.usru_usr AS ud ON d.fid_usr_del = ud.id_usr " +
                 "LEFT OUTER JOIN trn_cfd AS x ON d.id_year = x.fid_dps_year_n AND d.id_doc = x.fid_dps_doc_n " + 
-                "LEFT OUTER JOIN " + complementaryDbName + ".trn_cfd AS xc ON x.id_cfd = xc.id_cfd ";
+                "LEFT OUTER JOIN " + complementaryDbName + ".trn_cfd AS xc ON x.id_cfd = xc.id_cfd " +
+                "LEFT OUTER JOIN " + complementaryDbName + ".trn_pdf AS p ON d.id_year = p.id_year AND d.id_doc = p.id_doc ";
 
         if (mbIsDoc || mbIsDocAdj) {
             msSql +=
@@ -2308,6 +2335,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 }
                 else if (button == jbGetXml) {
                     actionGetXml();
+                }
+                else if (button == jbGetPdf) {
+                    actionGetPdf();
                 }
                 else if (button == jbPrintAcknowledgmentCancellation) {
                     actionPrintAcknowledgmentCancellation();

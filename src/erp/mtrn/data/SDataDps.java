@@ -33,6 +33,7 @@ import cfd.ver3.cce11.DElementDescripcionesEspecificas;
 import cfd.ver3.clf10.DElementLeyenda;
 import cfd.ver3.clf10.DElementLeyendasFiscales;
 import cfd.ver33.DCfdi33Catalogs;
+import erp.SClientUtils;
 import erp.cfd.SCfdConsts;
 import erp.cfd.SCfdDataConcepto;
 import erp.cfd.SCfdDataImpuesto;
@@ -278,6 +279,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     protected erp.mtrn.data.SDataCfd moDbmsDataCfd;
     protected erp.mtrn.data.SDataDpsCfd moDbmsDataDpsCfd;
     protected erp.mtrn.data.SDataDpsAddenda moDbmsDataAddenda;
+    protected erp.mtrn.data.SDataPdf moDbmsDataPdf;
     
     protected java.lang.String msXtaTotalCyAsText; // read-only member
     protected erp.mtrn.data.STrnDpsType moXtaDpsType; // read-only member
@@ -1965,6 +1967,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public void setDbmsDataCfd(erp.mtrn.data.SDataCfd o) { moDbmsDataCfd = o; }
     public void setDbmsDataDpsCfd(erp.mtrn.data.SDataDpsCfd o) { moDbmsDataDpsCfd = o; }
     public void setDbmsDataAddenda(erp.mtrn.data.SDataDpsAddenda o) { moDbmsDataAddenda = o; }
+    public void setDbmsDataPdf(erp.mtrn.data.SDataPdf o) { moDbmsDataPdf = o; }
 
     public java.lang.Object getDbmsRecordKey() { return moDbmsRecordKey; }
     public java.util.Date getDbmsRecordDate() { return mtDbmsRecordDate; }
@@ -1989,6 +1992,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
     public erp.mtrn.data.SDataCfd getDbmsDataCfd() { return moDbmsDataCfd; }
     public erp.mtrn.data.SDataDpsCfd getDbmsDataDpsCfd() { return moDbmsDataDpsCfd; }
     public erp.mtrn.data.SDataDpsAddenda getDbmsDataAddenda() { return moDbmsDataAddenda; }
+    public erp.mtrn.data.SDataPdf getDbmsDataPdf() { return moDbmsDataPdf; }
     
     public java.lang.String getXtaTotalCyAsText() { return msXtaTotalCyAsText; }
     public erp.mtrn.data.STrnDpsType getXtaDpsType() { return moXtaDpsType; }
@@ -2181,6 +2185,7 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         moDbmsDataCfd = null;
         moDbmsDataDpsCfd = null;
         moDbmsDataAddenda = null;
+        moDbmsDataPdf = null;
         
         msXtaTotalCyAsText = "";
         createXtaDpsType();
@@ -2480,12 +2485,27 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                 
                 // Read data for CFD:
 
-                sSql = "SELECT COUNT(*) FROM trn_dps_cfd WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
+                sSql = "SELECT COUNT(*) "
+                        + "FROM trn_dps_cfd "
+                        + "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
                 oResultSet = statement.executeQuery(sSql);
                 if (oResultSet.next()) {
                     if (oResultSet.getInt(1) > 0) {
                         moDbmsDataDpsCfd = new SDataDpsCfd();
                         if (moDbmsDataDpsCfd.read(anKey, oStatementAux)!= SLibConstants.DB_ACTION_READ_OK) {
+                            throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
+                        }
+                    }
+                }
+                
+                sSql = "SELECT COUNT(*) "
+                        + "FROM " + SClientUtils.getComplementaryDbName(statement.getConnection()) + ".trn_pdf "
+                        + "WHERE id_year = " + mnPkYearId + " AND id_doc = " + mnPkDocId + " ";
+                oResultSet = statement.executeQuery(sSql);
+                if (oResultSet.next()) {
+                    if (oResultSet.getInt(1) > 0) {
+                        moDbmsDataPdf = new SDataPdf();
+                        if (moDbmsDataPdf.read(anKey, oStatementAux)!= SLibConstants.DB_ACTION_READ_OK) {
                             throw new Exception(SLibConstants.MSG_ERR_DB_REG_READ_DEP);
                         }
                     }
@@ -3473,6 +3493,17 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                     moDbmsDataCfd.setTimestamp(mtDate);
 
                     if (moDbmsDataCfd.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
+                        throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
+                    }
+                }
+                
+                // Save PDF of purchases when provided:
+                
+                if (moDbmsDataPdf != null && mnFkDpsCategoryId == SDataConstantsSys.TRNS_CT_DPS_PUR) {
+                    moDbmsDataPdf.setPkYearId(mnPkYearId);
+                    moDbmsDataPdf.setPkDocId(mnPkDocId);
+                    
+                    if (moDbmsDataPdf.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                         throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
                     }
                 }

@@ -77,7 +77,7 @@ public class SDialogRepGlobalStatement extends javax.swing.JDialog implements ja
     
     private final int[] maDpsCategories = {SDataConstantsSys.TRNS_CT_DPS_SAL, SDataConstantsSys.TRNS_CT_DPS_PUR};
 
-    /** Creates new form SDialogRepGlobalTemplate
+    /** Creates new form SDialogRepGlobalStatement
      * @param client */
     public SDialogRepGlobalStatement(erp.client.SClientInterface client) {
         super(client.getFrame(), false);
