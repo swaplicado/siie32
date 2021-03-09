@@ -374,6 +374,9 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp " 
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_CFD) + " AS c ON c.fid_pay_rcp_pay_n = pri.id_pay AND c.fid_pay_rcp_emp_n = pri.id_emp AND c.fid_pay_rcp_iss_n = pri.id_iss " 
                 + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT pri.b_del AND c.fid_st_xml = " + SModSysConsts.TRNS_ST_DPS_EMITED + ") AS _count_cfds, "
+                + "(SELECT COUNT(*) "
+                + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr " 
+                + " WHERE pr.id_pay = v.id_pay AND NOT pr.b_del AND NOT pr.b_cfd_req) AS _count_cfds_not_req, "
                 + "IF((SELECT COUNT(*) > 0 "
                 + " FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr " 
                 + " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP_ISS) + " AS pri ON pri.id_pay = pr.id_pay AND pri.id_emp = pr.id_emp " 
@@ -414,12 +417,15 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
         gridColumnsViews.add(column);
         
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT, "v.nts", "Notas nómina", 200));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_count_rcps", "Recibos nómina"));
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_count_cfds", "CFDI emitidos"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_count_rcps", "Recibos nómina", 65));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_count_cfds", "CFDI emitidos", 65));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "_count_cfds_not_req", "CFDI no requeridos", 65));
         
-        column = new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "", "CFDI x emitir");
+        column = new SGridColumnView(SGridConsts.COL_TYPE_INT_2B, "", "CFDI x emitir", 65);
         column.getRpnArguments().add(new SLibRpnArgument("_count_rcps", SLibRpnArgumentType.OPERAND));
         column.getRpnArguments().add(new SLibRpnArgument("_count_cfds", SLibRpnArgumentType.OPERAND));
+        column.getRpnArguments().add(new SLibRpnArgument("_count_cfds_not_req", SLibRpnArgumentType.OPERAND));
+        column.getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.ADDITION, SLibRpnArgumentType.OPERATOR));
         column.getRpnArguments().add(new SLibRpnArgument(SLibRpnOperator.SUBTRACTION, SLibRpnArgumentType.OPERATOR));
         gridColumnsViews.add(column);
         

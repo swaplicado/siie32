@@ -605,7 +605,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRepFinStat = new JMenu("Estados financieros");
         jmiRepFinStatBalanceSheet = new JMenuItem("Balance general...");
         jmiRepFinStatProfitLossStat = new JMenuItem("Estado de resultados...");
-        jmiRepFinCustom = new JMenuItem("Estados Financieros Personalizados...");
+        jmiRepFinCustom = new JMenuItem("Estados financieros personalizados...");
 
         jmRepCashAccBal = new JMenu("Saldos de cuentas de dinero");
         jmiRepCashAccBalCash = new JMenuItem("Saldos de cajas...");
