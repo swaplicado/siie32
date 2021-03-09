@@ -1,6 +1,13 @@
 ================================================================================
-SIIE 3.2 180.1*/ 2021-03-08
+SIIE 3.2 180.2*/ 2021-03-09
 Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se añadió la opción de filtrar por centro de costo en los reportes financieros de "Balance general" y "Estado de resultados".
+2) Se agregaron nuevos permisos para poder acceder a las vistas de "CFD de recepción de pagos" asi como para editar y anular los comprobantes.
+
+================================================================================
+SIIE 3.2 180.1*/ 2021-03-08
+Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Adición del despliegue de recibos de nómina que no requieren CFDI en vistas y formas de captura.
 
@@ -11,6 +18,7 @@ Isabel Danae GARCÍA SERVÍN
 1) Se agregó una constante para truncar el nombre de la cuenta en el catálogo de cuentas contables de SIIE a 250. 
 2) Se agregó la funcionalidad de poder agregar un PDF de un CFD para las facturas de compras y notas de crédito, y, así mismo, 
     un botón de descarga del PDF del CFD en las vistas correspondientes. 
+3) Se agregó a la tabla de "Backorder de pedidos de ventas" la columna de "Usuario", en el informe de ventas por mail.
 
 ================================================================================
 SIIE 3.2 179.2*/ 2021-02-25
