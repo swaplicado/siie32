@@ -33,6 +33,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
@@ -153,22 +154,8 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         addTaskBarLowerComponent(jbRestoreCfdCancelAck);
         addTaskBarLowerComponent(jbDeactivateFlags);
 
-        jbNew.setEnabled(true);
-        jbEdit.setEnabled(true);
-        jbDelete.setEnabled(false); // deletion is not allowed
-        jbAnnul.setEnabled(true);
-        jbPrint.setEnabled(true);
-        jbPrintCancelAck.setEnabled(true);
-        jbGetXml.setEnabled(true);
-        jbGetXmlCancelAck.setEnabled(true);
-        jbSignXml.setEnabled(true);
-        jbVerifyCfdi.setEnabled(true);
-        jbGetCfdiStatus.setEnabled(true);
-        jbSendCfdi.setEnabled(true);
-        jbRestoreCfdStamped.setEnabled(true);
-        jbRestoreCfdCancelAck.setEnabled(true);
-        jbDeactivateFlags.setEnabled(true);
-
+        enableButtons();
+        
         STableField[] aoKeyFields = new STableField[1];
         aoKeyFields[0] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "c.id_cfd");
         moTablePane.getPrimaryKeyFields().add(aoKeyFields[0]);
@@ -214,6 +201,67 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         mvSuscriptors.add(SDataConstants.USRU_USR);
 
         populateTable();
+    }
+    
+    private void enableButtons() {
+        jbNew.setEnabled(false);
+        jbEdit.setEnabled(false);
+        jbDelete.setEnabled(false); // deletion is not allowed
+        jbAnnul.setEnabled(false);
+        jbPrint.setEnabled(false);
+        jbPrintCancelAck.setEnabled(false);
+        jbGetXml.setEnabled(false);
+        jbGetXmlCancelAck.setEnabled(false);
+        jbSignXml.setEnabled(false);
+        jbVerifyCfdi.setEnabled(false);
+        jbGetCfdiStatus.setEnabled(false);
+        jbSendCfdi.setEnabled(false);
+        jbRestoreCfdStamped.setEnabled(false);
+        jbRestoreCfdCancelAck.setEnabled(false);
+        jbDeactivateFlags.setEnabled(false);
+        
+        switch (miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_FIN_CFD_PAY)) {
+            case SUtilConsts.LEV_READ:
+                jbPrint.setEnabled(true);
+                jbPrintCancelAck.setEnabled(true);
+                jbGetXml.setEnabled(true);
+                jbGetXmlCancelAck.setEnabled(true);
+                jbGetCfdiStatus.setEnabled(true);
+                break;
+            case SUtilConsts.LEV_CAPTURE:
+            case SUtilConsts.LEV_AUTHOR:
+            case SUtilConsts.LEV_EDITOR:
+                jbNew.setEnabled(true);
+                jbEdit.setEnabled(true);
+                jbPrint.setEnabled(true);
+                jbPrintCancelAck.setEnabled(true);
+                jbGetXml.setEnabled(true);
+                jbGetXmlCancelAck.setEnabled(true);
+                jbSignXml.setEnabled(true);
+                jbVerifyCfdi.setEnabled(true);
+                jbGetCfdiStatus.setEnabled(true);
+                jbSendCfdi.setEnabled(true);
+                jbRestoreCfdStamped.setEnabled(true);
+                jbDeactivateFlags.setEnabled(true);
+                break;
+            case SUtilConsts.LEV_MANAGER:
+                jbNew.setEnabled(true);
+                jbEdit.setEnabled(true);
+                jbAnnul.setEnabled(true);
+                jbPrint.setEnabled(true);
+                jbPrintCancelAck.setEnabled(true);
+                jbGetXml.setEnabled(true);
+                jbGetXmlCancelAck.setEnabled(true);
+                jbSignXml.setEnabled(true);
+                jbVerifyCfdi.setEnabled(true);
+                jbGetCfdiStatus.setEnabled(true);
+                jbSendCfdi.setEnabled(true);
+                jbRestoreCfdStamped.setEnabled(true);
+                jbRestoreCfdCancelAck.setEnabled(true);
+                jbDeactivateFlags.setEnabled(true);
+                break;
+            default:
+        }
     }
 
     @Override

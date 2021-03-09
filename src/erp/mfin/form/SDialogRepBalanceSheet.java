@@ -21,8 +21,10 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
+import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
@@ -31,22 +33,31 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.border.TitledBorder;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
-public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.awt.event.ActionListener, java.awt.event.ItemListener {
+public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldDate;
     private erp.lib.form.SFormField moFieldCurrencyId;
     private erp.lib.form.SFormField moFieldExchangeRate;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
+    
+    private erp.mfin.form.SPanelAccount moPanelCostCenterStartId;
+    private erp.mfin.form.SPanelAccount moPanelCostCenterEndId;
+    
+    private java.lang.String msCostCenterBeginId;
+    private java.lang.String msCostCenterEndId;
 
-    /** Creates new form SDialogRepBalanceSheet */
+    /** Creates new form SDialogRepBalanceSheet
+     * @param client */
     public SDialogRepBalanceSheet(erp.client.SClientInterface client) {
         super(client.getFrame(), false);
         miClient = client;
@@ -81,6 +92,12 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
         jckShowRecordAdjYearEnd = new javax.swing.JCheckBox();
         jPanel11 = new javax.swing.JPanel();
         jckShowRecordAdjAudit = new javax.swing.JCheckBox();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jpFilterBegin = new javax.swing.JPanel();
+        jlFilterBegin = new javax.swing.JLabel();
+        jpFilterEnd = new javax.swing.JPanel();
+        jlFilterEnd = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jpPrint = new javax.swing.JButton();
         jpClose = new javax.swing.JButton();
@@ -173,6 +190,34 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
 
         jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
+        jPanel5.setLayout(new java.awt.BorderLayout());
+
+        jPanel8.setLayout(new java.awt.GridLayout(2, 1));
+
+        jpFilterBegin.setBorder(javax.swing.BorderFactory.createTitledBorder("Centro de costo inicial:"));
+        jpFilterBegin.setLayout(new java.awt.BorderLayout());
+
+        jlFilterBegin.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jlFilterBegin.setText("[Panel centro de costo]");
+        jlFilterBegin.setPreferredSize(new java.awt.Dimension(100, 50));
+        jpFilterBegin.add(jlFilterBegin, java.awt.BorderLayout.PAGE_START);
+
+        jPanel8.add(jpFilterBegin);
+
+        jpFilterEnd.setBorder(javax.swing.BorderFactory.createTitledBorder("Centro de costo final:"));
+        jpFilterEnd.setLayout(new java.awt.BorderLayout());
+
+        jlFilterEnd.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jlFilterEnd.setText("[Panel centro de costo]");
+        jlFilterEnd.setPreferredSize(new java.awt.Dimension(100, 50));
+        jpFilterEnd.add(jlFilterEnd, java.awt.BorderLayout.PAGE_START);
+
+        jPanel8.add(jpFilterEnd);
+
+        jPanel5.add(jPanel8, java.awt.BorderLayout.NORTH);
+
+        jPanel2.add(jPanel5, java.awt.BorderLayout.PAGE_END);
+
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
@@ -199,7 +244,7 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(400, 300));
+        setSize(new java.awt.Dimension(576, 389));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -242,9 +287,41 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
 
         jckShowRecordAdjYearEnd.setSelected(true);
         jckShowRecordAdjAudit.setSelected(true);
+        
+        try {
+            moPanelCostCenterStartId = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
+            moPanelCostCenterEndId = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
+            moPanelCostCenterStartId.getFieldAccount().getComponent().addFocusListener(this);
+        }
+        catch(Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+
+        moPanelCostCenterStartId.resetPanel();
+        moPanelCostCenterEndId.resetPanel();
+        
+        jpFilterBegin.remove(jlFilterBegin);
+        jpFilterEnd.remove(jlFilterEnd);
+
+        ((TitledBorder) jpFilterBegin.getBorder()).setTitle("Centro de costo inicial:");
+        ((TitledBorder) jpFilterEnd.getBorder()).setTitle("Centro de costo final:");
+        jpFilterBegin.add(moPanelCostCenterStartId, BorderLayout.CENTER);
+        jpFilterEnd.add(moPanelCostCenterEndId, BorderLayout.CENTER);
+        
+        msCostCenterBeginId = "";
+        msCostCenterEndId = "";
 
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
+    }
+    
+    private void actionCostCenterIdFocusGained() {
+    }
+
+    private void actionCostCenterIdFocusLost() {
+        if (!moPanelCostCenterStartId.isEmptyAccountId() && moPanelCostCenterEndId.isEmptyAccountId()) {
+            moPanelCostCenterEndId.getFieldAccount().setFieldValue(moPanelCostCenterStartId.getFieldAccount().getFieldValue());
+        }
     }
 
     private java.lang.String createParamSql(int section) {
@@ -296,11 +373,15 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
                 break;
             default:
         }
+        
+        String sqlWhere = msCostCenterBeginId.isEmpty() ? "" : "WHERE re.fid_cc_n >= '" + msCostCenterBeginId + "' "; 
+        sqlWhere += (msCostCenterEndId.isEmpty() ? "" : (msCostCenterBeginId.isEmpty() ? "WHERE " : "AND ") + "re.fid_cc_n <= '" + msCostCenterEndId + "' ");
 
         sql += "INNER JOIN erp.finu_cl_acc_usr AS acl ON " +
                 "am.fid_tp_acc_usr = acl.id_tp_acc_usr AND am.fid_cl_acc_usr = acl.id_cl_acc_usr " +
                 "INNER JOIN erp.finu_cls_acc_usr AS acls ON " +
                 "am.fid_tp_acc_usr = acls.id_tp_acc_usr AND am.fid_cl_acc_usr = acls.id_cl_acc_usr AND am.fid_cls_acc_usr = acls.id_cls_acc_usr " +
+                sqlWhere +
                 "GROUP BY am.fid_cl_acc_usr, am.fid_cls_acc_usr, acl.cl_acc_usr, acls.cls_acc_usr, LEFT(re.fid_acc, " + (levels.get(1) - 1) + "), am.acc ";
 
         // Complimentary query for profit and loss row:
@@ -451,7 +532,12 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
 
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-
+            
+            msCostCenterBeginId = moPanelCostCenterStartId.isEmptyAccountId() ? "" : moPanelCostCenterStartId.getFieldAccount().getString();
+            msCostCenterEndId = moPanelCostCenterStartId.isEmptyAccountId() ? "" : moPanelCostCenterEndId.getFieldAccount().getString();
+            String costCenterBeginName = moPanelCostCenterStartId.getCurrentInputCostCenter() == null ? "" : moPanelCostCenterStartId.getCurrentInputCostCenter().getCostCenter();
+            String costCenterEndName = moPanelCostCenterEndId.getCurrentInputCostCenter() == null ? "" : moPanelCostCenterEndId.getCurrentInputCostCenter().getCostCenter();
+            
             map = miClient.createReportParams();
             map.put("oDateTextFormat", miClient.getSessionXXX().getFormatters().getDateTextFormat());
             map.put("tDate", moFieldDate.getDate());
@@ -466,7 +552,11 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
             map.put("sCurrency", ((SFormComponentItem) jcbCurrencyId.getSelectedItem()).getItem());
             map.put("sCurrencyLocal", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
             map.put("dExchangeRate", moFieldExchangeRate.getDouble());
-
+            map.put("sCostCenterBeginId", msCostCenterBeginId);
+            map.put("sCostCenterEndId", msCostCenterEndId);
+            map.put("sCostCenterBeginName", costCenterBeginName);
+            map.put("sCostCenterEndName", costCenterEndName);
+            
             jasperPrint = SDataUtilities.fillReport(miClient, SDataConstantsSys.REP_FIN_STAT_BAL_SHEET, map);
             jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setTitle(getTitle());
@@ -540,8 +630,10 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JButton jbCurrencyId;
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbExchangeRate;
@@ -552,7 +644,11 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
     private javax.swing.JLabel jlCurrencyId;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlExchangeRate;
+    private javax.swing.JLabel jlFilterBegin;
+    private javax.swing.JLabel jlFilterEnd;
     private javax.swing.JButton jpClose;
+    private javax.swing.JPanel jpFilterBegin;
+    private javax.swing.JPanel jpFilterEnd;
     private javax.swing.JButton jpPrint;
     private javax.swing.JTextField jtfExchangeRate;
     // End of variables declaration//GEN-END:variables
@@ -581,6 +677,28 @@ public class SDialogRepBalanceSheet extends javax.swing.JDialog implements java.
 
             if (comboBox == jcbCurrencyId) {
                 itemStateCurrencyId();
+            }
+        }
+    }
+    
+    @Override
+    public void focusGained(FocusEvent e) {
+        if (e.getSource() instanceof javax.swing.JFormattedTextField) {
+            JFormattedTextField formattedTextField = (JFormattedTextField) e.getSource();
+
+            if (formattedTextField == moPanelCostCenterStartId.getFieldAccount().getComponent()) {
+                actionCostCenterIdFocusGained();
+            }
+        }
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (e.getSource() instanceof javax.swing.JFormattedTextField) {
+            JFormattedTextField formattedTextField = (JFormattedTextField) e.getSource();
+
+            if (formattedTextField == moPanelCostCenterStartId.getFieldAccount().getComponent()) {
+                actionCostCenterIdFocusLost();
             }
         }
     }

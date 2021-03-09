@@ -43,8 +43,8 @@ import net.sf.jasperreports.view.JasperViewer;
 public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.ChangeListener {
 
     private boolean mbFirstTime;
-    private int mnReportType;
-    private erp.client.SClientInterface miClient;
+    private final int mnReportType;
+    private final erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldDateStart;
     private erp.lib.form.SFormField moFieldDateEnd;
     private erp.lib.form.SFormField moFieldItem;
@@ -59,7 +59,7 @@ public class SDialogRepTrialBalanceDual extends javax.swing.JDialog implements j
     private java.lang.String msCostCenterBeginId;
     private java.lang.String msCostCenterEndId;
 
-    private boolean mbIsAuxCostCenter;
+    private final boolean mbIsAuxCostCenter;
 
     /** 
      * Creates new form SDialogRepTrialBalanceAndBalanceCostCenter

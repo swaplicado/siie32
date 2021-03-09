@@ -985,6 +985,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         boolean hasRightGblCatAccCfg = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_FIN_ACC_CFG).HasRight;
         boolean hasRightGblCatAccTax = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_FIN_ACC_TAX).HasRight;
         boolean hasRightGblCatAccMisc = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_FIN_ACC_MISC).HasRight;
+        boolean hasRightCfdPayment = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_CFD_PAY).HasRight;
 
         jmCfg.setEnabled(hasRightGblCatAccCfg || hasRightAutAccBp || hasRightAutAccItem || hasRightGblCatAccTax);
 
@@ -1063,7 +1064,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecDpsBizPartnerCus.setEnabled(hasRightBookkeeping || hasRightRep);
         jmiRecDpsBizPartnerSup.setEnabled(hasRightBookkeeping || hasRightRep);
 
-        jmFin.setEnabled(hasRightExcRate || hasRightMoveAccCash || hasRightCounterRcpt);
+        jmFin.setEnabled(hasRightExcRate || hasRightMoveAccCash || hasRightCounterRcpt || hasRightCfdPayment);
         jmiFinExchangeRate.setEnabled(hasRightExcRate);
         jmiFinCashCheck.setEnabled(hasRightMoveAccCash);
         jmiFinCashCounterReceipt.setEnabled(hasRightCounterRcpt);
@@ -1074,8 +1075,8 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiFinLayoutBankPendingAdvances.setEnabled(hasRightMoveAccCash);
         jmiFinLayoutBankDoneAdvances.setEnabled(hasRightMoveAccCash);
         jmiFinItemCost.setEnabled(hasRightMoveAccCash);
-        jmiFinCfdPayment.setEnabled(hasRightMoveAccCash);
-        jmiFinCfdPaymentExtended.setEnabled(hasRightMoveAccCash);
+        jmiFinCfdPayment.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
+        jmiFinCfdPaymentExtended.setEnabled(hasRightMoveAccCash || hasRightCfdPayment);
         jmiFinMassDownloadCfdi.setEnabled(hasRightMoveAccCash);
         jmiFinImportPayments.setEnabled(hasRightMoveAccCash);
 

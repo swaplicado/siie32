@@ -22,8 +22,10 @@ import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
@@ -32,24 +34,32 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.border.TitledBorder;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.view.JasperViewer;
 import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
-public class SDialogRepProfitLossStatement extends javax.swing.JDialog implements java.awt.event.ActionListener, java.awt.event.ItemListener {
+public class SDialogRepProfitLossStatement extends javax.swing.JDialog implements java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldDateBegin;
     private erp.lib.form.SFormField moFieldDateEnd;
     private erp.lib.form.SFormField moFieldCurrencyId;
     private erp.lib.form.SFormField moFieldExchangeRate;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
+    
+    private erp.mfin.form.SPanelAccount moPanelCostCenterStartId;
+    private erp.mfin.form.SPanelAccount moPanelCostCenterEndId;
+    
+    private java.lang.String msSqlCc;
 
-    /** Creates new form SDialogRepProfitLossStatement */
+    /** Creates new form SDialogRepProfitLossStatement
+     * @param client */
     public SDialogRepProfitLossStatement(erp.client.SClientInterface client) {
         super(client.getFrame(), false);
         miClient = client;
@@ -96,6 +106,12 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
         jckShowRecordAdjYearEnd = new javax.swing.JCheckBox();
         jPanel11 = new javax.swing.JPanel();
         jckShowRecordAdjAudit = new javax.swing.JCheckBox();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        jpFilterBegin = new javax.swing.JPanel();
+        jlFilterBegin = new javax.swing.JLabel();
+        jpFilterEnd = new javax.swing.JPanel();
+        jlFilterEnd = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jpPrint = new javax.swing.JButton();
         jpClose = new javax.swing.JButton();
@@ -240,6 +256,34 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
+        jPanel5.setLayout(new java.awt.BorderLayout());
+
+        jPanel9.setLayout(new java.awt.GridLayout(2, 1));
+
+        jpFilterBegin.setBorder(javax.swing.BorderFactory.createTitledBorder("Centro de costo inicial:"));
+        jpFilterBegin.setLayout(new java.awt.BorderLayout());
+
+        jlFilterBegin.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jlFilterBegin.setText("[Panel centro de costo]");
+        jlFilterBegin.setPreferredSize(new java.awt.Dimension(100, 50));
+        jpFilterBegin.add(jlFilterBegin, java.awt.BorderLayout.PAGE_START);
+
+        jPanel9.add(jpFilterBegin);
+
+        jpFilterEnd.setBorder(javax.swing.BorderFactory.createTitledBorder("Centro de costo final:"));
+        jpFilterEnd.setLayout(new java.awt.BorderLayout());
+
+        jlFilterEnd.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jlFilterEnd.setText("[Panel centro de costo]");
+        jlFilterEnd.setPreferredSize(new java.awt.Dimension(100, 50));
+        jpFilterEnd.add(jlFilterEnd, java.awt.BorderLayout.PAGE_START);
+
+        jPanel9.add(jpFilterEnd);
+
+        jPanel5.add(jPanel9, java.awt.BorderLayout.NORTH);
+
+        jPanel2.add(jPanel5, java.awt.BorderLayout.CENTER);
+
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
@@ -266,7 +310,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(578, 389));
+        setSize(new java.awt.Dimension(816, 539));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -319,9 +363,40 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
         jckShowRecordAdjYearEnd.setSelected(true);
         jckShowRecordAdjAudit.setSelected(true);
         jrbFormatStandard.setSelected(true);
+        
+        try {
+            moPanelCostCenterStartId = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
+            moPanelCostCenterEndId = new SPanelAccount(miClient, SDataConstants.FIN_CC, false, false, false);
+            moPanelCostCenterStartId.getFieldAccount().getComponent().addFocusListener(this);
+        }
+        catch(Exception e) {
+            miClient.showMsgBoxWarning(e.getMessage());
+        }
+
+        moPanelCostCenterStartId.resetPanel();
+        moPanelCostCenterEndId.resetPanel();
+        
+        jpFilterBegin.remove(jlFilterBegin);
+        jpFilterEnd.remove(jlFilterEnd);
+
+        ((TitledBorder) jpFilterBegin.getBorder()).setTitle("Centro de costo inicial:");
+        ((TitledBorder) jpFilterEnd.getBorder()).setTitle("Centro de costo final:");
+        jpFilterBegin.add(moPanelCostCenterStartId, BorderLayout.CENTER);
+        jpFilterEnd.add(moPanelCostCenterEndId, BorderLayout.CENTER);
+        
+        msSqlCc = "";
                 
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
+    }
+    
+    private void actionCostCenterIdFocusGained() {
+    }
+
+    private void actionCostCenterIdFocusLost() {
+        if (!moPanelCostCenterStartId.isEmptyAccountId() && moPanelCostCenterEndId.isEmptyAccountId()) {
+            moPanelCostCenterEndId.getFieldAccount().setFieldValue(moPanelCostCenterStartId.getFieldAccount().getFieldValue());
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -361,7 +436,8 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
                     "(am.fid_tp_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_SAL_ADJ[0] + " AND " +
                     "am.fid_cl_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_SAL_ADJ[1] + " AND " +
                     "am.fid_cls_acc_r = " + SDataConstantsSys.FINS_CLS_ACC_SAL_ADJ[2] + ")) " +
-                    "WHERE NOT r.b_del AND NOT re.b_del AND r.id_year = " + year[0] + " " + sqlFilter + sqlPeriod;
+                    "WHERE NOT r.b_del AND NOT re.b_del AND r.id_year = " + year[0] + " " + sqlFilter + sqlPeriod +
+                    msSqlCc;
 
             resulSet = miClient.getSession().getStatement().executeQuery(sql);
             while (resulSet.next()) {
@@ -401,6 +477,15 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            
+            String costCenterBeginId = moPanelCostCenterStartId.isEmptyAccountId() ? "" : moPanelCostCenterStartId.getFieldAccount().getString();
+            String costCenterEndId = moPanelCostCenterStartId.isEmptyAccountId() ? "" : moPanelCostCenterEndId.getFieldAccount().getString();
+            String costCenterBeginName = moPanelCostCenterStartId.getCurrentInputCostCenter() == null ? "" : moPanelCostCenterStartId.getCurrentInputCostCenter().getCostCenter();
+            String costCenterEndName = moPanelCostCenterEndId.getCurrentInputCostCenter() == null ? "" : moPanelCostCenterEndId.getCurrentInputCostCenter().getCostCenter();
+            
+            msSqlCc = costCenterBeginId.isEmpty() ? "" : "AND re.fid_cc_n >= '" + costCenterBeginId + "' "; 
+            msSqlCc += (costCenterEndId.isEmpty() ? "" : "AND re.fid_cc_n <= '" + costCenterEndId + "' ");
+            
             map = miClient.createReportParams();
             map.put("nYear", year[0]);
             map.put("tDateStart", moFieldDateBegin.getDate());
@@ -415,6 +500,11 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
             map.put("dExchangeRate", moFieldExchangeRate.getDouble());
             map.put("sSqlFilter", sqlFilter);
             map.put("sSqlDate", sqlPeriod);
+            map.put("sSqlCc", msSqlCc);
+            map.put("sCostCenterBeginId", costCenterBeginId);
+            map.put("sCostCenterEndId", costCenterEndId);
+            map.put("sCostCenterBeginName", costCenterBeginName);
+            map.put("sCostCenterEndName", costCenterEndName);
             map.put("bEbitda", jckShowEbitda.isSelected());
             map.put("bStandard", jrbFormatStandard.isSelected());
 
@@ -514,9 +604,11 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCurrencyId;
     private javax.swing.JButton jbDateBegin;
     private javax.swing.JButton jbDateEnd;
@@ -531,7 +623,11 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
     private javax.swing.JLabel jlDateBegin;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlExchangeRate;
+    private javax.swing.JLabel jlFilterBegin;
+    private javax.swing.JLabel jlFilterEnd;
     private javax.swing.JButton jpClose;
+    private javax.swing.JPanel jpFilterBegin;
+    private javax.swing.JPanel jpFilterEnd;
     private javax.swing.JButton jpPrint;
     private javax.swing.JRadioButton jrbFormatPeriodAnnual;
     private javax.swing.JRadioButton jrbFormatStandard;
@@ -565,6 +661,28 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
 
             if (comboBox == jcbCurrencyId) {
                 itemStateCurrencyId();
+            }
+        }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+        if (e.getSource() instanceof javax.swing.JFormattedTextField) {
+            JFormattedTextField formattedTextField = (JFormattedTextField) e.getSource();
+
+            if (formattedTextField == moPanelCostCenterStartId.getFieldAccount().getComponent()) {
+                actionCostCenterIdFocusGained();
+            }
+        }
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        if (e.getSource() instanceof javax.swing.JFormattedTextField) {
+            JFormattedTextField formattedTextField = (JFormattedTextField) e.getSource();
+
+            if (formattedTextField == moPanelCostCenterStartId.getFieldAccount().getComponent()) {
+                actionCostCenterIdFocusLost();
             }
         }
     }
