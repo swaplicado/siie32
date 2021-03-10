@@ -47,7 +47,7 @@ public class SViewRecordEntriesWithoutXml extends erp.lib.table.STableTab {
         jbEdit.setEnabled(false);
         jbDelete.setEnabled(false);
         
-        STableColumn[] aoTableColumns = new STableColumn[21];
+        STableColumn[] aoTableColumns = new STableColumn[22];
 
         i = 0;
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_per", "Período póliza", STableConstants.WIDTH_YEAR_PERIOD);
@@ -55,6 +55,7 @@ public class SViewRecordEntriesWithoutXml extends erp.lib.table.STableTab {
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_cob_code", "Sucursal empresa", STableConstants.WIDTH_CODE_COB);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "_num", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_DATE, "dt", "Fecha póliza", STableConstants.WIDTH_DATE);
+        aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_INTEGER, "re.sort_pos", "Renglón", 35);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "id_acc", "No. cuenta contable", STableConstants.WIDTH_ACCOUNT_ID);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "acc", "Cuenta contable", STableConstants.WIDTH_ACCOUNT);
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "concept", "Concepto póliza", 175);
@@ -130,7 +131,7 @@ public class SViewRecordEntriesWithoutXml extends erp.lib.table.STableTab {
             }
         }
         
-        msSql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety, r.dt, re.concept, bkc.code AS _bkc_code, cob.code AS _cob_code, am.id_acc, am.acc, " +
+        msSql = "SELECT re.id_year, re.id_per, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety, re.sort_pos, r.dt, re.concept, bkc.code AS _bkc_code, cob.code AS _cob_code, am.id_acc, am.acc, " +
                 "re.debit, re.credit, re.exc_rate, re.debit_cur, re.credit_cur, cur.cur_key, CONCAT(re.id_year, '-', erp.lib_fix_int(re.id_per, 2)) AS _per, " +
                 "CONCAT(re.id_tp_rec, '-', erp.lib_fix_int(re.id_num, 6)) AS _num, re.b_del, un.usr AS _usr_new, ue.usr AS _usr_edit, ud.usr AS _usr_del, re.ts_new, re.ts_edit, re.ts_del " +
                 "FROM fin_rec_ety AS re " +
@@ -148,6 +149,6 @@ public class SViewRecordEntriesWithoutXml extends erp.lib.table.STableTab {
                 "(SELECT CONCAT(c.fid_dps_year_n, '_', c.fid_dps_doc_n) FROM trn_cfd AS c WHERE c.fid_dps_year_n = re.fid_dps_year_n AND c.fid_dps_doc_n = re.fid_dps_doc_n))) " +
                 "AND re.fid_cfd_n IS NULL AND cfd.fid_rec_year_n IS NULL AND cfd.fid_rec_per_n IS NULL AND cfd.fid_rec_bkc_n IS NULL AND cfd.fid_rec_tp_rec_n IS NULL AND cfd.fid_rec_num_n IS NULL AND cfd.fid_rec_ety_n IS NULL " +
                 "AND NOT r.b_del AND NOT a.b_del AND NOT am.b_del " + sqlWhere + " " + 
-                "ORDER BY re.id_year, re.id_per, _bkc_code, re.id_bkc, re.id_tp_rec, re.id_num, re.id_ety, r.dt;";
+                "ORDER BY re.id_year, re.id_per, _bkc_code, re.id_bkc, re.id_tp_rec, re.id_num, re.sort_pos, re.id_ety;";
     }
 }

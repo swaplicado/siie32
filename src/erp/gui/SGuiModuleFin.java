@@ -1629,7 +1629,7 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     break;
                 case SDataConstants.FINX_REC_W_XML:
                     oViewClass = erp.mfin.view.SViewRecordEntriesWithoutXml.class;
-                    sViewTitle = "Renglones de pólizas contab. sin XML egresos";
+                    sViewTitle = "Renglones pólizas contab. sin XML egresos";
                     break;
                 case SDataConstants.FINX_ACCOUNTING:
                     oViewClass = erp.mfin.view.SPanelAccounting.class;
