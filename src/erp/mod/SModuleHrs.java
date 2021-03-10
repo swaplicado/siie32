@@ -133,6 +133,7 @@ import erp.mod.hrs.view.SViewPayrollReceiptImportedEarnings;
 import erp.mod.hrs.view.SViewPaysheetCustomType;
 import erp.mod.hrs.view.SViewPosition;
 import erp.mod.hrs.view.SViewPrePayrollCutoffCalendar;
+import erp.mod.hrs.view.SViewPtu;
 import erp.mod.hrs.view.SViewShift;
 import erp.mod.hrs.view.SViewSsContributionTable;
 import erp.mod.hrs.view.SViewSsContributionTableRow;
@@ -1054,6 +1055,9 @@ public class SModuleHrs extends SGuiModule {
                     title = "CFDI recibos nóminas" + (params != null && params.getType() == SCfdConsts.CFDI_PAYROLL_VER_OLD ? " imp." : "");
                 }
                 view = new SViewPayrollCfdi(miClient, subtype, title, params);
+                break;
+            case SModConsts.HRSX_PTU:
+                view = new SViewPtu(miClient, "Consulta para PTU");
                 break;
             default:
                 miClient.showMsgBoxError(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

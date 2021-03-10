@@ -85,6 +85,8 @@ public class SViewEmployeeWageLog extends SGridPaneView {
                 + "v.wage, "
                 + "v.b_del AS " + SDbConsts.FIELD_IS_DEL + ", "
                 + "bp.bp, "
+                + "emp.num, "
+                + "emp.b_act, "
                 + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_PAY) + " WHERE id_tp_pay = v.fk_tp_pay) AS f_pay_name, "
                 + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSS_TP_SAL) + " WHERE id_tp_sal = v.fk_tp_sal) AS f_sal_name, "
                 + "(SELECT name FROM " + SModConsts.TablesMap.get(SModConsts.HRSU_TP_EMP) + " WHERE id_tp_emp = v.fk_tp_emp) AS f_tp_emp_name, "
@@ -122,7 +124,9 @@ public class SViewEmployeeWageLog extends SGridPaneView {
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
             
-        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.bp", "Empleado"));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_BPR_L, "bp.bp", "Empleado", 250));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_RAW, "emp.num", "Clave", 50));
+        gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_BOOL_M, "emp.b_act", "Activo"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DATE, SDbConsts.FIELD_DATE, SGridConsts.COL_TITLE_DATE));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.sal", "Salario diario $"));
         gridColumnsViews.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_2D, "v.wage", "Sueldo mensual $"));
