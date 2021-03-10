@@ -35,7 +35,7 @@ public class STabFilterSwitch extends javax.swing.JPanel {
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         jtbFilter.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_std_off.gif"))); // NOI18N
-        jtbFilter.setToolTipText("Mostrar todos los renglones/ Mostrar solo renglones con CFDI");
+        jtbFilter.setToolTipText("Mostrar todos los renglones/ Mostrar solo renglones con asociados de negocio");
         jtbFilter.setPreferredSize(new java.awt.Dimension(23, 23));
         jtbFilter.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/switch_std_on.gif"))); // NOI18N
         jtbFilter.addActionListener(new java.awt.event.ActionListener() {
