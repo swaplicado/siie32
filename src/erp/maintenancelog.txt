@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 180.3*/ 2021-03-10
+Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de consulta para cálculo de PT en Módulo Recursos Humanos.
+2) Adición de número de empleados listados en reporte de empleados activos por período.
+
+================================================================================
 SIIE 3.2 180.2*/ 2021-03-09
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

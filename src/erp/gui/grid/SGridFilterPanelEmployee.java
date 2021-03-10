@@ -30,24 +30,45 @@ import sa.lib.gui.SGuiUtils;
  */
 public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, ActionListener, ItemListener {
 
-    public static int EMP_STATUS = 200;
-    public static int EMP_STATUS_ACT = 2;
-    public static int EMP_STATUS_INA = 3;
-    public static int EMP_STATUS_ALL = 4;
+    public static final int EMP_STATUS = 200;
+    public static final int EMP_STATUS_ACT = 2;
+    public static final int EMP_STATUS_INA = 3;
+    public static final int EMP_STATUS_ALL = 4;
     
-    private SGuiClient miClient;
-    private SGridPaneView moPaneView;
-    private int mnFilterType1;
-    private int mnFilterType2;
+    private final SGuiClient miClient;
+    private final SGridPaneView moPaneView;
+    private final int mnFilterType1;
+    private final int mnFilterType2;
+    private final int mnStatusDefault;
     
     /**
      * Creates new form SGridFilterPanelEmployee
+     * 
+     * @param client
+     * @param paneView
+     * @param type1
+     * @param type2
      */
     public SGridFilterPanelEmployee(SGuiClient client, SGridPaneView paneView, int type1, int type2) {
+        this(client, paneView, type1, type2, EMP_STATUS_ACT);
+    }
+
+    /**
+     * Creates new form SGridFilterPanelEmployee
+     * 
+     * @param client
+     * @param paneView
+     * @param type1
+     * @param type2
+     * @param statusDefault Constants available in this class: EMP_STATUS_ACT, EMP_STATUS_INA, EMP_STATUS_ALL
+
+     */
+    public SGridFilterPanelEmployee(SGuiClient client, SGridPaneView paneView, int type1, int type2, int statusDefault) {
         miClient = client;
         moPaneView = paneView;
         mnFilterType1 = type1;
         mnFilterType2 = type2;
+        mnStatusDefault = statusDefault;
         initComponents();
         initComponentsCustom();
     }
@@ -225,8 +246,22 @@ public class SGridFilterPanelEmployee extends JPanel implements SGridFilter, Act
         jbClearFilter2.setEnabled(moKeyFilter2.getSelectedIndex() > 0);
         moPaneView.getFiltersMap().put(mnFilterType2, new SGridFilterValue(mnFilterType2, SGridConsts.FILTER_DATA_TYPE_INT_ARRAY, moKeyFilter2.getSelectedIndex() <= 0 ? null : key));
         
-        jtbActive.setSelected(true); // by default, allways show first active registries
-        moPaneView.getFiltersMap().put(EMP_STATUS, new SGridFilterValue(EMP_STATUS, SGridConsts.FILTER_DATA_TYPE_INT, EMP_STATUS_ACT));
+        int statusDefault = mnStatusDefault;
+        switch (statusDefault) {
+            case EMP_STATUS_ACT:
+                jtbActive.setSelected(true);
+                break;
+            case EMP_STATUS_INA:
+                jtbInactive.setSelected(true);
+                break;
+            case EMP_STATUS_ALL:
+                jtbAll.setSelected(true);
+                break;
+            default:
+                statusDefault = EMP_STATUS_ACT;
+                jtbActive.setSelected(true); // by default, allways show first active registries
+        }
+        moPaneView.getFiltersMap().put(EMP_STATUS, new SGridFilterValue(EMP_STATUS, SGridConsts.FILTER_DATA_TYPE_INT, statusDefault));
         
         moKeyFilter1.addItemListener(this);
         moKeyFilter2.addItemListener(this);
