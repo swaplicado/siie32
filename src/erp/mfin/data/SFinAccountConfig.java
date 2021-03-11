@@ -14,6 +14,7 @@ public class SFinAccountConfig {
     
     private ArrayList<SFinAccountConfigEntry> maAccountConfigEntries;
     private double[] madPercentages;
+    private int[] tax;
     
     public SFinAccountConfig(Collection<SFinAccountConfigEntry> configEntries) {
         maAccountConfigEntries = new ArrayList(configEntries);
@@ -40,5 +41,13 @@ public class SFinAccountConfig {
         }
         
         return amounts;
+    }
+
+    public int[] getTax() {
+        return tax;
+    }
+
+    public void setTax(int[] tax) {
+        this.tax = tax;
     }
 }

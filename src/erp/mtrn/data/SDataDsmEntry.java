@@ -34,6 +34,8 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
     protected int mnFkAccountingMoveTypeId;
     protected int mnFkAccountingMoveClassId;
     protected int mnFkAccountingMoveSubclassId;
+    protected int mnFkTaxBas_n;
+    protected int mnFkTax_n;
     protected int mnFkBizPartnerId;
     protected int mnFkSourceCurrencyId;
     protected java.lang.String msFkSourceAccountId_n;
@@ -99,6 +101,8 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
     public void setFkAccountingMoveTypeId(int n) { mnFkAccountingMoveTypeId = n; }
     public void setFkAccountingMoveClassId(int n) { mnFkAccountingMoveClassId = n; }
     public void setFkAccountingMoveSubclassId(int n) { mnFkAccountingMoveSubclassId = n; }
+    public void setFkTaxBasId_n(int n) { mnFkTaxBas_n = n; }
+    public void setFkTaxId_n(int n) { mnFkTax_n = n; }
     public void setFkBizPartnerId(int n) { mnFkBizPartnerId = n; }
     public void setFkSourceCurrencyId(int n) { mnFkSourceCurrencyId = n; }
     public void setFkSourceAccountId_n(java.lang.String s) { msFkSourceAccountId_n = s; }
@@ -132,6 +136,8 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
     public int getFkAccountingMoveTypeId() { return mnFkAccountingMoveTypeId; }
     public int getFkAccountingMoveClassId() { return mnFkAccountingMoveClassId; }
     public int getFkAccountingMoveSubclassId() { return mnFkAccountingMoveSubclassId; }
+    public int getFkTaxBasId_n() { return mnFkTaxBas_n; }
+    public int getFkTaxId_n() { return mnFkTax_n; }
     public int getFkBizPartnerId() { return mnFkBizPartnerId; }
     public int getFkSourceCurrencyId() { return mnFkSourceCurrencyId; }
     public java.lang.String getFkSourceAccountId_n() { return msFkSourceAccountId_n; }
@@ -193,6 +199,14 @@ public class SDataDsmEntry extends erp.lib.data.SDataRegistry implements java.io
     public java.lang.String getDbmsUserDelete() { return msDbmsUserDelete; }
 
     public java.util.Vector<SDataDsmEntryNotes> getDbmsNotes() { return mvDbmsDsmEntryNotes; }
+    
+    public int[] getTaxPk() {
+        if (mnFkTaxBas_n > 0) {
+            return new int[] { mnFkTaxBas_n , mnFkTax_n };
+        }
+        
+        return null;
+    }
 
     @Override
     public void reset() {

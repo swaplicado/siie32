@@ -241,59 +241,88 @@ public class SHrsReceipt {
 
         return total;
     }
-    
+
     /**
-     * Compute, adding ore removing, earning (as other payment) of $0.01 if tax subsidy was totally offset by tax.
+     * Compute, adding ore removing, earning (as other payment) of $0.01 if payroll-tax subsidy was completely offset by payroll tax.
      * Otherwise this earning (as other payment) is removed when existing.
-     * @param isSubsidyOffsetTotally
-     * @param dbEarningOther
-     * earningOther Exception 
+     * @param addInformativeSubsidy
+     * @param taxAssesed
+     * @param subsidyAssesed
+     * @param earningOtherPayment
+     * @param hrsEmployeeDays
+     * @return If available, user-defined effective tax subsidy, only if informative subsidy needs to be added to receipt, otherwise zero.
+     * @throws Exception 
      */
-    private void computeReceiptTaxSubsidyAsOtherPayment(final boolean isSubsidyOffsetTotally, final SDbEarning earningOtherPayment, final SHrsEmployeeDays hrsEmployeeDays) throws Exception {
+    private double computeReceiptTaxSubsidyAsOtherPayment(final boolean addInformativeSubsidy, final double taxAssesed, final double subsidyAssesed, final SDbEarning earningOtherPayment, final SHrsEmployeeDays hrsEmployeeDays) throws Exception {
         int countSubsidy = 0;
-        SHrsReceiptEarning hrsReceiptEarningPrevious = null;
+        boolean isUserSubsidy = false;
+        double userSubsidyEffective = 0; // when available, is set in auxiliar amount No. 1
+        SHrsReceiptEarning hrsReceiptEarningOld = null;
+        
+        // identify receipt earning for subsidy as other payment:
         
         for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
-            SDbPayrollReceiptEarning payrollReceiptEarning = hrsReceiptEarning.getPayrollReceiptEarning();
+            SDbPayrollReceiptEarning payrollReceiptEarning = hrsReceiptEarning.getPayrollReceiptEarning(); // convenience variable
             
-            if (payrollReceiptEarning.getFkEarningTypeId() == SModSysConsts.HRSS_TP_EAR_OTH && payrollReceiptEarning.isAutomatic()) {
+            if (payrollReceiptEarning.getFkEarningTypeId() == SModSysConsts.HRSS_TP_EAR_OTH && payrollReceiptEarning.getFkOtherPaymentTypeId() == SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB) {
                 if (++countSubsidy > 1) {
                     throw new Exception("¡No puede haber más de una percepcion 'Subsidio para el empleo' en el recibo!");
                 }
                 
                 // prepare for update or removal of existing subsidy earning:
-                hrsReceiptEarningPrevious = hrsReceiptEarning;
-                break;
+                hrsReceiptEarningOld = hrsReceiptEarning;
+                
+                if (payrollReceiptEarning.isUserEdited() || !payrollReceiptEarning.isAutomatic()) { // consider that this earning is allways automatic!, just for consistence!
+                    // user edited subsidy:
+                    isUserSubsidy = true;
+                    userSubsidyEffective = payrollReceiptEarning.getAuxiliarAmount1();
+                }
             }
         }
         
-        if (hrsReceiptEarningPrevious != null) {
-            maHrsReceiptEarnings.remove(hrsReceiptEarningPrevious);
+        // remove found receipt earning for subsidy:
+        
+        if (hrsReceiptEarningOld != null) {
+            maHrsReceiptEarnings.remove(hrsReceiptEarningOld);
         }
         
-        if (isSubsidyOffsetTotally) {
+        if (addInformativeSubsidy) {
             // subsidy compensated:
             
             double amountRequired = 0.01;
-            SDbPayrollReceiptEarning payrollReceiptEarningOther = moHrsPayroll.createPayrollReceiptEarning(
+            SDbPayrollReceiptEarning payrollReceiptEarning = moHrsPayroll.createPayrollReceiptEarning(
                     this, earningOtherPayment, hrsEmployeeDays, null, 
                     1, amountRequired, true, 
                     0, 0, maHrsReceiptEarnings.size() + 1);
             
-            payrollReceiptEarningOther.setAmountExempt(amountRequired); // subsidy is exempt
-            payrollReceiptEarningOther.setAmountTaxable(0);
+            payrollReceiptEarning.setAmountExempt(amountRequired); // subsidy is exempt
+            payrollReceiptEarning.setAmountTaxable(0);
+            
+            if (!isUserSubsidy) {
+                payrollReceiptEarning.setAuxiliarAmount1(subsidyAssesed);
+            }
+            else {
+                if (userSubsidyEffective > taxAssesed) {
+                    userSubsidyEffective = taxAssesed; // prevent subsidy to be greater than tax
+                }
+                
+                payrollReceiptEarning.setUserEdited(true);
+                payrollReceiptEarning.setAuxiliarAmount1(userSubsidyEffective);
+            }
             
             SHrsReceiptEarning hrsReceiptEarningNew = new SHrsReceiptEarning();
             hrsReceiptEarningNew.setHrsReceipt(this);
             hrsReceiptEarningNew.setEarning(earningOtherPayment);
-            hrsReceiptEarningNew.setPayrollReceiptEarning(payrollReceiptEarningOther);
+            hrsReceiptEarningNew.setPayrollReceiptEarning(payrollReceiptEarning);
 
             maHrsReceiptEarnings.add(hrsReceiptEarningNew);
         }
         
-        if (hrsReceiptEarningPrevious != null || isSubsidyOffsetTotally) {
+        if (hrsReceiptEarningOld != null || addInformativeSubsidy) {
             renumberHrsReceiptEarnings();
         }
+        
+        return !addInformativeSubsidy ? 0 : userSubsidyEffective;
     }
 
     /**
@@ -488,6 +517,8 @@ public class SHrsReceipt {
                 double taxAssessedAlt = SHrsUtils.computeTaxAlt(taxTable, earningsTaxableArt174, moPayrollReceipt.getMonthlyPayment(), tableFactor);
                 taxAssessed = SLibUtils.roundAmount(taxAssessed + taxAssessedAlt); // update assessed tax
             }
+            
+            // Compute tax:
 
             payrollTaxAssessed = SLibUtils.roundAmount(taxAssessed - (annualTaxCompensated + annualTaxPayed));
 
@@ -522,11 +553,9 @@ public class SHrsReceipt {
                     subsidyAssessed = SLibUtils.roundAmount(subsidyAssessed + subsidyComputedAlt); // update assessed subsidy
                 }
                 
-                // Set maximum tax subsidy in one single receipt according to new regulations as of January 2020:
-                
-                double maxSubsidyAssessed = subsidyTable.getChildRows().get(0).getTaxSubsidy();
-                
                 // Compute subsidy:
+                
+                double maxSubsidyAssessed = subsidyTable.getChildRows().get(0).getTaxSubsidy(); // set maximum subsidy in one single receipt according to new regulations as of January 2020
                 
                 payrollSubsidyAssessedGross = SLibUtils.roundAmount(subsidyAssessed - (annualSubsidyCompensated + annualSubsidyPayed));
                 payrollSubsidyAssessed = payrollSubsidyAssessedGross <= maxSubsidyAssessed ? payrollSubsidyAssessedGross : maxSubsidyAssessed; // applay maximum value for subsidy when needed
@@ -567,7 +596,7 @@ public class SHrsReceipt {
         
         // Prepare net tax: if positive = tax; if negative = subsidy:
         
-        boolean isTaxNet = moHrsPayroll.getConfig().isTaxNet();
+        boolean isTaxNet = moHrsPayroll.getConfig().isTaxNet(); // convenience variable
         double taxNet = isTaxNet ? SLibUtils.roundAmount(payrollTaxAssessed - payrollSubsidyAssessed) : 0;
         
         // Prepare removal or update of previous tax receipt deduction, if any:
@@ -605,19 +634,21 @@ public class SHrsReceipt {
         }
         else {
             double payrollTaxCompensated = SLibUtils.roundAmount(payrollTaxAssessed - (payrollSubsidyAssessed > 0 ? payrollSubsidyAssessed : 0));
-            payrollTax = payrollTaxCompensated > 0 ? payrollTaxCompensated : 0;
+            payrollTax = payrollTaxCompensated > 0 ? payrollTaxCompensated : 0; // XXX 2021-02-25 Sergio Flores: Validar si en efecto aquí es necesario compensar el impuesto contra el subsidio, puesto que se trata del caso de impuesto no "neteado".
         }
         
         if (hrsReceiptDeductionTaxOld != null || hrsReceiptDeductionTaxNew != null) {
             if (isUserTax) {
                 // preserve computed tax by system (and implicitly tax by user as well):
-                SDbPayrollReceiptDeduction payrollReceiptDeduction = hrsReceiptDeductionTaxOld.getPayrollReceiptDeduction();
+                SDbPayrollReceiptDeduction payrollReceiptDeduction = hrsReceiptDeductionTaxOld.getPayrollReceiptDeduction(); // convenience variable
+                payrollReceiptDeduction.setAmountUnitary(userTax); // already set with tax by user!, just for consistence!
                 payrollReceiptDeduction.setAmountSystem_r(payrollTax);
+                payrollReceiptDeduction.setAmount_r(userTax); // already set with tax by user!, just for consistence!
             }
             else if (hrsReceiptDeductionTaxOld != null) {
                 if (payrollTax > 0) {
                     // update former deduction:
-                    SDbPayrollReceiptDeduction payrollReceiptDeduction = hrsReceiptDeductionTaxOld.getPayrollReceiptDeduction();
+                    SDbPayrollReceiptDeduction payrollReceiptDeduction = hrsReceiptDeductionTaxOld.getPayrollReceiptDeduction(); // convenience variable
                     payrollReceiptDeduction.setAmountUnitary(payrollTax);
                     payrollReceiptDeduction.setAmountSystem_r(payrollTax);
                     payrollReceiptDeduction.setAmount_r(payrollTax);
@@ -633,7 +664,7 @@ public class SHrsReceipt {
                 
                 if (isTaxNet) {
                     // reasign tax; when created new deduction was asigned with assesed tax to pay:
-                    SDbPayrollReceiptDeduction payrollReceiptDeduction = hrsReceiptDeductionTaxNew.getPayrollReceiptDeduction();
+                    SDbPayrollReceiptDeduction payrollReceiptDeduction = hrsReceiptDeductionTaxNew.getPayrollReceiptDeduction(); // convenience variable
                     payrollReceiptDeduction.setAmountUnitary(payrollTax);
                     payrollReceiptDeduction.setAmountSystem_r(payrollTax);
                     payrollReceiptDeduction.setAmount_r(payrollTax);
@@ -649,6 +680,7 @@ public class SHrsReceipt {
         int countSubsidy = 0; // receipt earning entries for subsidy should be one at the most
         boolean isUserSubsidy = false;
         double userSubsidy = 0;
+        double userSubsidyEffective = 0;
         SHrsReceiptEarning hrsReceiptEarningSubsidyOld = null;
         
         for (SHrsReceiptEarning hrsReceiptEarning : maHrsReceiptEarnings) {
@@ -666,6 +698,7 @@ public class SHrsReceipt {
                     // user edited subsidy:
                     isUserSubsidy = true;
                     userSubsidy = payrollReceiptEarning.getAmount_r();
+                    userSubsidyEffective = payrollReceiptEarning.getAuxiliarAmount1();
                 }
             }
         }
@@ -684,8 +717,10 @@ public class SHrsReceipt {
         if (hrsReceiptEarningSubsidyOld != null || hrsReceiptEarningSubsidyNew != null) {
             if (isUserSubsidy) {
                 // preserve computed subsidy by system (and implicitly subsidy by user as well):
-                SDbPayrollReceiptEarning payrollReceiptEarning = hrsReceiptEarningSubsidyOld.getPayrollReceiptEarning();
+                SDbPayrollReceiptEarning payrollReceiptEarning = hrsReceiptEarningSubsidyOld.getPayrollReceiptEarning(); // convenience variable
+                payrollReceiptEarning.setAmountUnitary(userSubsidy); // already set with subsidy by user!, just for consistence!
                 payrollReceiptEarning.setAmountSystem_r(payrollSubsidy);
+                payrollReceiptEarning.setAmount_r(userSubsidy); // already set with subsidy by user!, just for consistence!
                 
                 payrollReceiptEarning.setAmountExempt(userSubsidy); // subsidy is exempt
                 payrollReceiptEarning.setAmountTaxable(0);
@@ -693,7 +728,7 @@ public class SHrsReceipt {
             else if (hrsReceiptEarningSubsidyOld != null) {
                 if (payrollSubsidy > 0) {
                     // update former earning:
-                    SDbPayrollReceiptEarning payrollReceiptEarning = hrsReceiptEarningSubsidyOld.getPayrollReceiptEarning();
+                    SDbPayrollReceiptEarning payrollReceiptEarning = hrsReceiptEarningSubsidyOld.getPayrollReceiptEarning(); // convenience variable
                     payrollReceiptEarning.setAmountUnitary(payrollSubsidy);
                     payrollReceiptEarning.setAmountSystem_r(payrollSubsidy);
                     payrollReceiptEarning.setAmount_r(payrollSubsidy);
@@ -712,7 +747,7 @@ public class SHrsReceipt {
                 
                 if (isTaxNet) {
                     // reasign subsidy; when created new earning was asigned with assessed subsidy to pay:
-                    SDbPayrollReceiptEarning payrollReceiptEarning = hrsReceiptEarningSubsidyNew.getPayrollReceiptEarning();
+                    SDbPayrollReceiptEarning payrollReceiptEarning = hrsReceiptEarningSubsidyNew.getPayrollReceiptEarning(); // convenience variable
                     payrollReceiptEarning.setAmountUnitary(payrollSubsidy);
                     payrollReceiptEarning.setAmountSystem_r(payrollSubsidy);
                     payrollReceiptEarning.setAmount_r(payrollSubsidy);
@@ -727,8 +762,8 @@ public class SHrsReceipt {
         }
         
         // create other earning to inform subsidy assessed in receipt, if needed:
-        boolean isSubOffsetTotally = isTaxNet && payrollSubsidyAssessed > 0 && payrollTaxAssessed >= payrollSubsidyAssessed; // convenience variable
-        computeReceiptTaxSubsidyAsOtherPayment(isSubOffsetTotally, earningSubsidyOtherPayment, moHrsEmployee.createEmployeeDays());
+        boolean addInformativeSubsidy = hrsReceiptEarningSubsidyOld == null && isTaxNet && payrollSubsidyAssessed > 0 && payrollTaxAssessed >= payrollSubsidyAssessed; // convenience variable
+        double userInformativeSubsidyEffective = computeReceiptTaxSubsidyAsOtherPayment(addInformativeSubsidy, payrollTaxAssessed, payrollSubsidyAssessed, earningSubsidyOtherPayment, moHrsEmployee.createEmployeeDays());
         
         // Set tax and subsidy current calculations:
         
@@ -738,17 +773,26 @@ public class SHrsReceipt {
 
             if (isTaxNet) {
                 // compensate tax and subsidy between each other:
-                
+
                 if (payrollTaxAssessed >= payrollSubsidyAssessed) {
                     payrollTaxCompensated = payrollSubsidyAssessed;
-                    payrollSubsidyCompensated = payrollSubsidyAssessed;
+                    
+                    if (userSubsidyEffective != 0) {
+                        payrollSubsidyCompensated = userSubsidyEffective;
+                    }
+                    else if (userInformativeSubsidyEffective != 0) {
+                        payrollSubsidyCompensated = userInformativeSubsidyEffective;
+                    }
+                    else {
+                        payrollSubsidyCompensated = payrollSubsidyAssessed;
+                    }
                 }
                 else {
                     payrollTaxCompensated = payrollTaxAssessed;
                     payrollSubsidyCompensated = payrollTaxAssessed;
                 }
             }
-
+            
             moPayrollReceipt.setPayrollTaxAssessed(payrollTaxAssessed);
             moPayrollReceipt.setPayrollTaxCompensated(payrollTaxCompensated);
             moPayrollReceipt.setPayrollTaxPending_r(payrollTax);
@@ -1320,7 +1364,7 @@ public class SHrsReceipt {
         
         // validate absence consumption:
         
-        SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays();
+        SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays(); // convenience variable
         double receiptCalendarDays = hrsEmployeeDays.getReceiptDays();
         double employeeWorkableCalendarDays = hrsEmployeeDays.getReceiptDays() - hrsEmployeeDays.getDaysNotWorked_r();
         double employeeWorkableBusinessDays = hrsEmployeeDays.getBusinessDays() - hrsEmployeeDays.getDaysNotWorked_r();
@@ -1436,7 +1480,7 @@ public class SHrsReceipt {
         
         // create a fresh Employee Days instance:
         
-        SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays();
+        SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays(); // convenience variable
         
         // remove all absence earnings added by system:
         
@@ -1609,7 +1653,7 @@ public class SHrsReceipt {
     public void computePayrollReceiptDays() throws Exception {
         // Compute moPayrollReceipt values related to days:
         
-        SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays();
+        SHrsEmployeeDays hrsEmployeeDays = moHrsEmployee.createEmployeeDays(); // convenience variable
         
         moPayrollReceipt.setFactorCalendar(hrsEmployeeDays.getFactorCalendar()); // just an informative datum
         moPayrollReceipt.setFactorDaysPaid(hrsEmployeeDays.getFactorDaysPaid()); // just an informative datum

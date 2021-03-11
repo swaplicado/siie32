@@ -997,7 +997,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
      */
     
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 1024, 640);
+        SGuiUtils.setWindowBounds(this, 1024, 672); // aspect ratio: 0.65625 instead of standard 0.625
 
         jtfPaymentType.setText((String) miClient.getSession().readField(SModConsts.HRSS_TP_PAY, new int[] { mnFormSubtype }, SDbRegistry.FIELD_NAME));
         jtfPaymentType.setCaretPosition(0);

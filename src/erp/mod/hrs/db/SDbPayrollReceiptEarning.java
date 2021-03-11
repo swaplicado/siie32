@@ -431,6 +431,7 @@ public class SDbPayrollReceiptEarning extends SDbRegistryUser {
         registry.setBenefitAnniversary(this.getBenefitAnniversary());
         registry.setAlternativeTaxCalculation(this.isAlternativeTaxCalculation());
         registry.setTimeClockSourced(this.isTimeClockSourced());
+        registry.setUserEdited(this.isUserEdited());
         registry.setAutomatic(this.isAutomatic());
         registry.setDeleted(this.isDeleted());
         registry.setSystem(this.isSystem());

@@ -327,7 +327,7 @@ public abstract class SHrsCfdUtils {
 
                     boolean bTaxSubFound = false;
                     boolean bHasEarningTaxSubComp = false;
-                    double dTaxSubPayrollComp = SLibUtils.roundAmount(resultSet.getDouble("pr.pay_tax_sub_comp") + resultSet.getDouble("pr.pay_tax_sub_payd"));
+                    double dTaxSubEffective = SLibUtils.roundAmount(resultSet.getDouble("pr.pay_tax_sub_comp") + resultSet.getDouble("pr.pay_tax_sub_payd"));
 
                     // Obtain perceptions:
 
@@ -406,10 +406,10 @@ public abstract class SHrsCfdUtils {
                                     if (resultSetAux.getDouble("pre.aux_amt1") > 0) {
                                         hrsFormerReceiptConcept.setXtaSubsidioEmpleo(resultSetAux.getDouble("pre.aux_amt1"));
                                     }
-                                    else if (dTaxSubPayrollComp > 0) {
-                                        hrsFormerReceiptConcept.setXtaSubsidioEmpleo(dTaxSubPayrollComp);
+                                    else if (dTaxSubEffective > 0) {
+                                        hrsFormerReceiptConcept.setXtaSubsidioEmpleo(dTaxSubEffective);
                                     }
-                                    hrsFormerReceiptConcept.setXtaTipoOtroPagoClave(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo);// code of type of other payment when earning is tax subsidy!
+                                    hrsFormerReceiptConcept.setXtaTipoOtroPagoClave(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo); // code of type of other payment when earning is tax subsidy!
                                     break;
 
                                 case SModSysConsts.HRSS_TP_EAR_OTH:
@@ -433,7 +433,7 @@ public abstract class SHrsCfdUtils {
 
                     // Add a dummy earning only for acomplishing CFDI requirements, if it is needed:
 
-                    if (!bTaxSubFound && dTaxSubPayrollComp > 0) {
+                    if (!bTaxSubFound && dTaxSubEffective > 0) {
                         if (!bHasEarningTaxSubComp) {
                             throw new Exception("El recibo no tiene el nodo otro pago para informar del Subsidio para el empleo totalmente compensado.");
                         }
@@ -448,8 +448,8 @@ public abstract class SHrsCfdUtils {
                         hrsFormerReceiptConcept.setTotalExento(0.01); // fixed value when tax subsidy is not actually paid
                         hrsFormerReceiptConcept.setPkTipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_TAX_SUBSIDY[0]);
                         hrsFormerReceiptConcept.setPkSubtipoConcepto(SCfdConsts.CFDI_PAYROLL_PERCEPTION_TAX_SUBSIDY[1]);
-                        hrsFormerReceiptConcept.setXtaSubsidioEmpleo(dTaxSubPayrollComp);
-                        hrsFormerReceiptConcept.setXtaTipoOtroPagoClave(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo);// code of type of other payment when earning is tax subsidy!
+                        hrsFormerReceiptConcept.setXtaSubsidioEmpleo(dTaxSubEffective);
+                        hrsFormerReceiptConcept.setXtaTipoOtroPagoClave(DCfdi33Catalogs.ClaveTipoOtroPagoSubsidioEmpleo); // code of type of other payment when earning is tax subsidy!
 
                         hrsFormerReceipt.getChildConcepts().add(hrsFormerReceiptConcept);
 
@@ -650,7 +650,15 @@ public abstract class SHrsCfdUtils {
             SCfdUtils.signCfdi((SClientInterface) session.getClient(), cfd, SCfdConsts.CFDI_PAYROLL_VER_CUR, false, false);
         }
     }
-    
+
+    /**
+     * Get the number of CFD of receipts in payroll by department.
+     * @param session
+     * @param payrollId
+     * @param departmentId
+     * @return
+     * @throws Exception 
+     */
     public static int getCfdCountByDepartment(final SGuiSession session, final int payrollId, final int departmentId) throws Exception {
         int count = 0;
 
@@ -668,6 +676,32 @@ public abstract class SHrsCfdUtils {
             }
         }
                         
+        return count;
+    }
+    
+    /**
+     * Get the number of receipts in payroll that do not require a CFD.
+     * @param session
+     * @param payrollId
+     * @return Number of receipts in payroll that do not require a CFD.
+     * @throws Exception 
+     */
+    public static int getReceiptCountCfdNotRequired(final SGuiSession session, final int payrollId) throws Exception {
+        int count = 0;
+        
+        if (payrollId != 0) {
+            String sql = "SELECT COUNT(*) "
+                    + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_PAY) + " AS p "
+                    + "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.HRS_PAY_RCP) + " AS pr ON pr.id_pay = p.id_pay "
+                    + "WHERE p.id_pay = " + payrollId + " AND p.b_del = 0 AND pr.b_del = 0 AND NOT pr.b_cfd_req;";
+
+            try (ResultSet resultSet = session.getStatement().executeQuery(sql)) {
+                if (resultSet.next()) {
+                    count = resultSet.getInt(1);
+                }
+            }
+        }
+        
         return count;
     }
 }

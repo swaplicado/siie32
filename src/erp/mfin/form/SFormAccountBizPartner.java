@@ -28,6 +28,7 @@ import erp.mfin.data.SDataAccountBizPartnerEntryRow;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -275,12 +276,14 @@ public class SFormAccountBizPartner extends javax.swing.JDialog implements erp.l
         moPaneEntries.setDoubleClickAction(this, "publicActionEntryEdit");
         jpEntries.add(moPaneEntries, BorderLayout.CENTER);
         i = 0;
-        columns = new STableColumnForm[7];
+        columns = new STableColumnForm[9];
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo cuentas contables", 150);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. cuenta contable", STableConstants.WIDTH_ACCOUNT_ID);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Cuenta contable", STableConstants.WIDTH_ACCOUNT);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. centro costo", 100);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Centro costo", 150);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Base impuesto", 150);
+        columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "impuesto", 150);
         columns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Tipo asiento contable", 75);
         columns[i] = new STableColumnForm(SLibConstants.DATA_TYPE_DOUBLE, "Porcentaje", STableConstants.WIDTH_PERCENTAGE);
         columns[i].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererPercentage());
@@ -362,7 +365,7 @@ public class SFormAccountBizPartner extends javax.swing.JDialog implements erp.l
     }
 
     private erp.mfin.data.SDataAccountBizPartnerEntry createEntry(int type, double percentage) {
-        SDataAccountBizPartnerEntry entry = new SDataAccountBizPartnerEntry();
+       SDataAccountBizPartnerEntry entry = new SDataAccountBizPartnerEntry();
 
         entry.setPkAccountBizPartnerTypeId(type);
         entry.setDbmsAccountBizPartnerType(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[]{type}));
@@ -673,7 +676,7 @@ public class SFormAccountBizPartner extends javax.swing.JDialog implements erp.l
     @Override
     public erp.lib.form.SFormValidation formValidate() {
         int i;
-        double[][] percentages = new double[manAccountTypes.length][3]; // secundary index for bookkeeping registry type: 0 = ALL; 1 = DBT; 2 = CDT
+        double[][][][] percentages = new double[manAccountTypes.length][3][100][100]; // secundary index for bookkeeping registry type: 0 = ALL; 1 = DBT; 2 = CDT
         SFormValidation validation = new SFormValidation();
         SDataAccountBizPartnerEntry entry = null;
 
@@ -701,20 +704,24 @@ public class SFormAccountBizPartner extends javax.swing.JDialog implements erp.l
                 }
             }
 
-            if (!validation.getIsError()) {
+            if (! validation.getIsError()) {
                 // Validate account type percentages:
-
+                boolean[] c3 = new boolean[] {false, false, false};
+                ArrayList<int[]> taxes = new ArrayList();
                 for (i = 0; i < moPaneEntries.getTableGuiRowCount() && !validation.getIsError(); i++) {
                     entry = (SDataAccountBizPartnerEntry) ((SDataAccountBizPartnerEntryRow) moPaneEntries.getTableRow(i)).getData();
                     switch (entry.getFkBookkeepingRegistryTypeId()) {
                         case SDataConstantsSys.FINS_TP_BKR_ALL:
-                            percentages[entry.getPkAccountBizPartnerTypeId() - 1][ALL] += entry.getPercentage();
+                            percentages[entry.getPkAccountBizPartnerTypeId() - 1][ALL][entry.getFkTaxBasicId_n()][entry.getFkTaxId_n()] += entry.getPercentage();
+                            c3[0] = true; 
                             break;
                         case SDataConstantsSys.FINS_TP_BKR_DBT:
-                            percentages[entry.getPkAccountBizPartnerTypeId() - 1][DBT] += entry.getPercentage();
+                            percentages[entry.getPkAccountBizPartnerTypeId() - 1][DBT][entry.getFkTaxBasicId_n()][entry.getFkTaxId_n()] += entry.getPercentage();
+                            c3[1] = true;
                             break;
                         case SDataConstantsSys.FINS_TP_BKR_CDT:
-                            percentages[entry.getPkAccountBizPartnerTypeId() - 1][CDT] += entry.getPercentage();
+                            percentages[entry.getPkAccountBizPartnerTypeId() - 1][CDT][entry.getFkTaxBasicId_n()][entry.getFkTaxId_n()] += entry.getPercentage();
+                            c3[2] = true;
                             break;
                         default:
                             validation.setMessage("El tipo de asiento contable del tipo de cuenta '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[] { i + 1 }) + "'\n" +
@@ -722,60 +729,84 @@ public class SFormAccountBizPartner extends javax.swing.JDialog implements erp.l
                             validation.setComponent(moPaneEntries.getTable());
                             validation.setTabbedPaneIndex(0);
                     }
+                    
+                    if (! taxes.contains(new int[] { entry.getFkTaxBasicId_n(), entry.getFkTaxId_n() })) {
+                        taxes.add(new int[] { entry.getFkTaxBasicId_n(), entry.getFkTaxId_n() });
+                    }
                 }
-
+                
                 if (!validation.getIsError()) {
+                    boolean breakable = false;
+                    
                     for (i = 0; i < percentages.length; i++) {
-                        if (percentages[i][ALL] != 0d) {
-                            // Only bookkeeping registry type "ALL" must be provided:
+                        for (int[] tax : taxes) {
+                            if (percentages[i][ALL][tax[0]][tax[1]] != 0d) {
+                                // Only bookkeeping registry type "ALL" must be provided:
 
-                            if (percentages[i][ALL] != 1d) {
-                                validation.setMessage("La suma total de los porcentajes del tipo de asiento contable '" + msTextAll + "'\n" +
-                                        "para el tipo de cuenta '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[] { i + 1 }) + "' " +
-                                        "(" + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(percentages[i][ALL]) + ")\n" +
-                                        "debe ser igual a " + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(1d) + ".");
-                                validation.setComponent(moPaneEntries.getTable());
-                                validation.setTabbedPaneIndex(0);
-                                break;
+                                if (percentages[i][ALL][tax[0]][tax[1]] != 1d) {
+                                    validation.setMessage("La suma total de los porcentajes del tipo de asiento contable '" + msTextAll + "'\n" +
+                                            "para el tipo de cuenta '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[] { i + 1 }) + "' " +
+                                            (tax[0] == 0 ? " sin impuesto " : (" e impuesto: '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX, new int[] { tax[0], tax[1] } ) + "' ")) +
+                                            "(" + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(percentages[i][ALL][tax[0]][tax[1]]) + ")\n" +
+                                            "debe ser igual a " + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(1d) + ".");
+                                    validation.setComponent(moPaneEntries.getTable());
+                                    validation.setTabbedPaneIndex(0);
+                                    breakable = true;
+                                    break;
+                                }
+                                else if (percentages[i][DBT][tax[0]][tax[1]] != 0d || percentages[i][CDT][tax[0]][tax[1]] != 0d) {
+                                    validation.setMessage("Si se configuran asientos contables del tipo '" + msTextAll + "'\n" +
+                                            "para el tipo de cuenta '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[] { i + 1 }) + "'" +
+                                            (tax[0] == 0 ? " sin impuesto " : (" e impuesto: '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX, new int[] { tax[0], tax[1] } ) + "' ")) +
+                                             "\n no se pueden configurar asientos contables del tipo '" + msTextDbt + "' o '" + msTextCdt + "'"
+                                                    
+                                                    + ".");
+                                    validation.setComponent(moPaneEntries.getTable());
+                                    validation.setTabbedPaneIndex(0);
+                                    breakable = true;
+                                    break;
+                                }
                             }
-                            else if (percentages[i][DBT] != 0d || percentages[i][CDT] != 0d) {
-                                validation.setMessage("Si se configuran asientos contables del tipo '" + msTextAll + "'\n" +
-                                        "para el tipo de cuenta '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[] { i + 1 }) + "'\n" +
-                                        "no se pueden configurar asientos contables del tipo '" + msTextDbt + "' o '" + msTextCdt + "'.");
-                                validation.setComponent(moPaneEntries.getTable());
-                                validation.setTabbedPaneIndex(0);
-                                break;
+                            else {
+                                // Both bookkeeping registry types "DEBIT" and "CREDIT" must be provided:
+
+                                if (percentages[i][DBT][tax[0]][tax[1]] != 1d) {
+                                    validation.setMessage("La suma total de los porcentajes del tipo de asiento contable '" + msTextDbt + "'\n" +
+                                            "para el tipo de cuenta '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[] { i + 1 }) + "' " +
+                                            (tax[0] == 0 ? " sin impuesto " : (" e impuesto: '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX, new int[] { tax[0], tax[1] } ) + "' ")) +
+                                            "(" + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(percentages[i][DBT][tax[0]][tax[1]]) + ")\n" +
+                                            "debe ser igual a " + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(1d) + ".");
+                                    validation.setComponent(moPaneEntries.getTable());
+                                    validation.setTabbedPaneIndex(0);
+                                    breakable = true;
+                                    break;
+                                }
+                                else if (percentages[i][CDT][tax[0]][tax[1]] != 1d) {
+                                    validation.setMessage("La suma total de los porcentajes del tipo de asiento contable '" + msTextCdt + "'\n" +
+                                            "para el tipo de cuenta '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[] { i + 1 }) + "' " +
+                                            (tax[0] == 0 ? " sin impuesto " : (" e impuesto: '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX, new int[] { tax[0], tax[1] } ) + "' ")) +
+                                            "(" + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(percentages[i][CDT][tax[0]][tax[1]]) + ")\n" +
+                                            "debe ser igual a " + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(1d) + ".");
+                                    validation.setComponent(moPaneEntries.getTable());
+                                    validation.setTabbedPaneIndex(0);
+                                    breakable = true;
+                                    break;
+                                }
+                                else if (percentages[i][ALL][tax[0]][tax[1]] != 0d) {
+                                    validation.setMessage("Si se configuran asientos contables de los tipos '" + msTextDbt + "' y '" + msTextCdt + "'\n" +
+                                            "para el tipo de cuenta '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[] { i + 1 }) + "'" +
+                                            (tax[0] == 0 ? " sin impuesto " : (" e impuesto: '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX, new int[] { tax[0], tax[1] } ) + "' ")) +
+                                            "\n no se pueden configurar asientos contables del tipo '" + msTextAll + "'.");
+                                    validation.setComponent(moPaneEntries.getTable());
+                                    validation.setTabbedPaneIndex(0);
+                                    breakable = true;
+                                    break;
+                                }
                             }
                         }
-                        else {
-                            // Both bookkeeping registry types "DEBIT" and "CREDIT" must be provided:
-
-                            if (percentages[i][DBT] != 1d) {
-                                validation.setMessage("La suma total de los porcentajes del tipo de asiento contable '" + msTextDbt + "'\n" +
-                                        "para el tipo de cuenta '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[] { i + 1 }) + "' " +
-                                        "(" + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(percentages[i][DBT]) + ")\n" +
-                                        "debe ser igual a " + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(1d) + ".");
-                                validation.setComponent(moPaneEntries.getTable());
-                                validation.setTabbedPaneIndex(0);
-                                break;
-                            }
-                            else if (percentages[i][CDT] != 1d) {
-                                validation.setMessage("La suma total de los porcentajes del tipo de asiento contable '" + msTextCdt + "'\n" +
-                                        "para el tipo de cuenta '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[] { i + 1 }) + "' " +
-                                        "(" + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(percentages[i][CDT]) + ")\n" +
-                                        "debe ser igual a " + miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat().format(1d) + ".");
-                                validation.setComponent(moPaneEntries.getTable());
-                                validation.setTabbedPaneIndex(0);
-                                break;
-                            }
-                            else if (percentages[i][ALL] != 0d) {
-                                validation.setMessage("Si se configuran asientos contables de los tipos '" + msTextDbt + "' y '" + msTextCdt + "'\n" +
-                                        "para el tipo de cuenta '" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_BP, new int[] { i + 1 }) + "'\n" +
-                                        "no se pueden configurar asientos contables del tipo '" + msTextAll + "'.");
-                                validation.setComponent(moPaneEntries.getTable());
-                                validation.setTabbedPaneIndex(0);
-                                break;
-                            }
+                        
+                        if (breakable) {
+                            break;
                         }
                     }
                 }

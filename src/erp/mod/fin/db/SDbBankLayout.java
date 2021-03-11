@@ -672,7 +672,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                         dsmEntry.setDbmsFkBizPartnerBranchId_n(layoutBankDps.getDps().getFkBizPartnerBranchId());
 
                         Vector<SFinAccountConfigEntry> configEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs((SClientInterface) session.getClient(), layoutBankDps.getDps().getFkBizPartnerId_r(), SDataConstantsSys.BPSS_CT_BP_SUP,
-                                record.getPkBookkeepingCenterId(), record.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, layoutBankDps.getDps().getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL);
+                                record.getPkBookkeepingCenterId(), record.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, layoutBankDps.getDps().getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, null);
                         if (configEntries.size() > 0) {
                             dsmEntry.setDbmsAccountOp(configEntries.get(0).getAccountId());
                         }

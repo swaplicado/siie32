@@ -76,9 +76,12 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
     private void initComponents() {
 
         jpMain = new javax.swing.JPanel();
+        jpSettings = new javax.swing.JPanel();
         jpEarning = new javax.swing.JPanel();
         jlEarning = new javax.swing.JLabel();
         moKeyEarning = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel1 = new javax.swing.JPanel();
+        jlOtherPayment = new javax.swing.JLabel();
         moKeyOtherPayment = new sa.lib.gui.bean.SBeanFieldKey();
         jpEmployee = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -99,20 +102,32 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         jpMain.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro:"));
         jpMain.setLayout(new java.awt.BorderLayout());
 
+        jpSettings.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+
         jpEarning.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
 
-        jlEarning.setText("Percepción:");
+        jlEarning.setText("Percepción:*");
         jlEarning.setPreferredSize(new java.awt.Dimension(100, 23));
         jpEarning.add(jlEarning);
 
-        moKeyEarning.setPreferredSize(new java.awt.Dimension(250, 23));
+        moKeyEarning.setPreferredSize(new java.awt.Dimension(400, 23));
         jpEarning.add(moKeyEarning);
 
-        moKeyOtherPayment.setToolTipText("Tipo otro pago");
-        moKeyOtherPayment.setPreferredSize(new java.awt.Dimension(250, 23));
-        jpEarning.add(moKeyOtherPayment);
+        jpSettings.add(jpEarning);
 
-        jpMain.add(jpEarning, java.awt.BorderLayout.NORTH);
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlOtherPayment.setText("Tipo otro pago:*");
+        jlOtherPayment.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel1.add(jlOtherPayment);
+
+        moKeyOtherPayment.setToolTipText("Tipo otro pago");
+        moKeyOtherPayment.setPreferredSize(new java.awt.Dimension(575, 23));
+        jPanel1.add(moKeyOtherPayment);
+
+        jpSettings.add(jPanel1);
+
+        jpMain.add(jpSettings, java.awt.BorderLayout.NORTH);
 
         jpEmployee.setLayout(new java.awt.BorderLayout());
 
@@ -161,8 +176,8 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
         moCurTotal.setEditable(false);
         jpTotal.add(moCurTotal);
 
-        jlTotalHelp.setForeground(java.awt.Color.gray);
-        jlTotalHelp.setText("(monto total de la percepción actual en esta nómina)");
+        jlTotalHelp.setForeground(java.awt.SystemColor.textInactiveText);
+        jlTotalHelp.setText("(Monto total de la percepción actual en esta nómina)");
         jlTotalHelp.setPreferredSize(new java.awt.Dimension(300, 23));
         jpTotal.add(jlTotalHelp);
 
@@ -174,6 +189,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -181,12 +197,14 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
     private javax.swing.JButton jbClearAll;
     private javax.swing.JButton jbSetAll;
     private javax.swing.JLabel jlEarning;
+    private javax.swing.JLabel jlOtherPayment;
     private javax.swing.JLabel jlTotal;
     private javax.swing.JLabel jlTotalHelp;
     private javax.swing.JLabel jlValue;
     private javax.swing.JPanel jpEarning;
     private javax.swing.JPanel jpEmployee;
     private javax.swing.JPanel jpMain;
+    private javax.swing.JPanel jpSettings;
     private javax.swing.JPanel jpTotal;
     private sa.lib.gui.bean.SBeanCompoundField moCompValue;
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurTotal;
@@ -195,7 +213,7 @@ public class SDialogPayrollEarnings extends SBeanFormDialog implements SGridPane
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 640, 400);
+        SGuiUtils.setWindowBounds(this, 720, 450);
         
         jbSave.setText("Cerrar");
         jbCancel.setEnabled(false);

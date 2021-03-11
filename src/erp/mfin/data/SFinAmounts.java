@@ -23,13 +23,15 @@ public class SFinAmounts {
     /**
      * Gets amount that matches the document key provided if any, otherwise null.
      * @param key Document key.
+     * @param keyTax
      * @return Found amount.
      */
-    public SFinAmount getAmountByDocument(final int[] key) {
+    public SFinAmount getAmountByDocument(final int[] key, final int[] keyTax) {
         SFinAmount amount = null;
         
         for (SFinAmount a : maAmounts) {
-            if (a.AccountType == SFinAccountType.ACC_BIZ_PARTNER_DOC && SLibUtils.compareKeys(key, a.KeyRefDocument)) {
+            if (a.AccountType == SFinAccountType.ACC_BIZ_PARTNER_DOC && SLibUtils.compareKeys(key, a.KeyRefDocument)
+                    && keyTax[0] == a.getKeyTax()[0] && keyTax[1] == a.getKeyTax()[1]) {
                 amount = a;
                 break;
             }
@@ -79,12 +81,13 @@ public class SFinAmounts {
      * @param amount Amount to be added.
      */
     public void addAmountForDocument(final int[] key, final SFinAmount amount) {
-        SFinAmount a = getAmountByDocument(key);
+        SFinAmount a = getAmountByDocument(key, amount.getKeyTax());
         
         if (a == null) {
             a = new SFinAmount(amount);
             a.AccountType = SFinAccountType.ACC_BIZ_PARTNER_DOC;
             a.KeyRefDocument = key;
+            a.KeyTax = amount.getKeyTax();
             maAmounts.add(a);
         }
         else {

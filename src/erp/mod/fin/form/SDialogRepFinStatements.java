@@ -29,7 +29,7 @@ import sa.lib.gui.bean.SBeanDialogReport;
 
 /**
  *
- * @author Alfredo Perez
+ * @author Alfredo Pérez
  */
 public class SDialogRepFinStatements extends SBeanDialogReport implements ActionListener {
 

@@ -153,7 +153,7 @@ public class SViewRecordEntriesXml extends erp.lib.table.STableTab implements ja
         if (jbGetXml.isEnabled()) {
             if (moTablePane.getSelectedTableRow() != null && !moTablePane.getSelectedTableRow().getIsSummary()) {
                 try {
-                    SCfdUtils.getXmlCfd((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT));
+                    SCfdUtils.downloadXmlCfd((SClientInterface) miClient, (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT));
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);

@@ -21,12 +21,16 @@ public class SDataAccountBizPartnerEntry extends erp.lib.data.SDataRegistry impl
     protected double mdPercentage;
     protected java.lang.String msFkAccountId;
     protected java.lang.String msFkCostCenterId_n;
+    protected int mnFkTaxBasicId_n;
+    protected int mnFkTaxId_n;
     protected int mnFkBookkeepingRegistryTypeId;
 
     protected java.lang.String msDbmsAccountBizPartner;
     protected java.lang.String msDbmsAccountBizPartnerType;
     protected java.lang.String msDbmsAccount;
     protected java.lang.String msDbmsCostCenter_n;
+    protected java.lang.String msDbmsTaxBase_n;
+    protected java.lang.String msDbmsTax_n;
     protected java.lang.String msDbmsBookkeepingRegistryType;
 
     public SDataAccountBizPartnerEntry() {
@@ -40,6 +44,8 @@ public class SDataAccountBizPartnerEntry extends erp.lib.data.SDataRegistry impl
     public void setPercentage(double d) { mdPercentage = d; }
     public void setFkAccountId(java.lang.String s) { msFkAccountId = s; }
     public void setFkCostCenterId_n(java.lang.String s) { msFkCostCenterId_n = s; }
+    public void setFkTaxBasicId_n(int n) { mnFkTaxBasicId_n = n; }
+    public void setFkTaxId_n(int n) { mnFkTaxId_n = n; }
     public void setFkBookkeepingRegistryTypeId(int n) { mnFkBookkeepingRegistryTypeId = n; }
 
     public int getPkAccountBizPartnerId() { return mnPkAccountBizPartnerId; }
@@ -48,18 +54,24 @@ public class SDataAccountBizPartnerEntry extends erp.lib.data.SDataRegistry impl
     public double getPercentage() { return mdPercentage; }
     public java.lang.String getFkAccountId() { return msFkAccountId; }
     public java.lang.String getFkCostCenterId_n() { return msFkCostCenterId_n; }
+    public int getFkTaxBasicId_n() { return mnFkTaxBasicId_n; }
+    public int getFkTaxId_n() { return mnFkTaxId_n; }
     public int getFkBookkeepingRegistryTypeId() { return mnFkBookkeepingRegistryTypeId; }
 
     public void setDbmsAccountBizPartner(java.lang.String s) { msDbmsAccountBizPartner = s; }
     public void setDbmsAccountBizPartnerType(java.lang.String s) { msDbmsAccountBizPartnerType = s; }
     public void setDbmsAccount(java.lang.String s) { msDbmsAccount = s; }
     public void setDbmsCostCenter_n(java.lang.String s) { msDbmsCostCenter_n = s; }
+    public void setDbmsTaxBase_n(java.lang.String s) { msDbmsTaxBase_n = s; }
+    public void setDbmsTax_n(java.lang.String s) { msDbmsTax_n = s; }
     public void setDbmsBookkeepingRegistryType(java.lang.String s) { msDbmsBookkeepingRegistryType = s; }
 
     public java.lang.String getDbmsAccountBizPartner() { return msDbmsAccountBizPartner; }
     public java.lang.String getDbmsAccountBizPartnerType() { return msDbmsAccountBizPartnerType; }
     public java.lang.String getDbmsAccount() { return msDbmsAccount; }
     public java.lang.String getDbmsCostCenter_n() { return msDbmsCostCenter_n; }
+    public java.lang.String getDbmsTaxBase_n() { return msDbmsTaxBase_n; }
+    public java.lang.String getDbmsTax_n() { return msDbmsTax_n; }
     public java.lang.String getDbmsBookkeepingRegistryType() { return msDbmsBookkeepingRegistryType; }
 
     @Override
@@ -84,12 +96,16 @@ public class SDataAccountBizPartnerEntry extends erp.lib.data.SDataRegistry impl
         mdPercentage = 0;
         msFkAccountId = "";
         msFkCostCenterId_n = "";
+        mnFkTaxBasicId_n = 0;
+        mnFkTaxId_n = 0;
         mnFkBookkeepingRegistryTypeId = 0;
 
         msDbmsAccountBizPartner = "";
         msDbmsAccountBizPartnerType = "";
         msDbmsAccount = "";
         msDbmsCostCenter_n = "";
+        msDbmsTaxBase_n = "";
+        msDbmsTax_n = "";
         msDbmsBookkeepingRegistryType = "";
     }
 
@@ -103,13 +119,15 @@ public class SDataAccountBizPartnerEntry extends erp.lib.data.SDataRegistry impl
         reset();
 
         try {
-            sql = "SELECT e.*, ab.acc_bp, abt.tp_acc_bp, b.tp_bkr, a.acc, c.cc " +
+            sql = "SELECT e.*, ab.acc_bp, abt.tp_acc_bp, b.tp_bkr, a.acc, c.cc, tb.tax_bas, ta.tax " +
                     "FROM fin_acc_bp_ety AS e " +
                     "INNER JOIN fin_acc_bp AS ab ON e.id_acc_bp = ab.id_acc_bp " +
                     "INNER JOIN erp.fins_tp_acc_bp AS abt ON e.id_tp_acc_bp = abt.id_tp_acc_bp " +
                     "INNER JOIN erp.fins_tp_bkr AS b ON e.fid_tp_bkr = b.id_tp_bkr " +
                     "INNER JOIN fin_acc AS a ON e.fid_acc = a.id_acc " +
                     "LEFT OUTER JOIN fin_cc AS c ON e.fid_cc_n = c.id_cc " +
+                    "LEFT OUTER JOIN erp.finu_tax_bas AS tb ON e.fid_tax_bas_n = tb.id_tax_bas " +
+                    "LEFT OUTER JOIN erp.finu_tax AS ta ON e.fid_tax_bas_n = ta.id_tax_bas AND e.fid_tax_n = ta.id_tax " +
                     "WHERE e.id_acc_bp = " + key[0] + " AND e.id_tp_acc_bp = " + key[1] + " AND e.id_ety = " + key[2] + " ";
             resultSet = statement.executeQuery(sql);
             if (!resultSet.next()) {
@@ -125,6 +143,8 @@ public class SDataAccountBizPartnerEntry extends erp.lib.data.SDataRegistry impl
                 if (resultSet.wasNull()) {
                     msFkCostCenterId_n = "";
                 }
+                mnFkTaxBasicId_n = resultSet.getInt("e.fid_tax_bas_n");
+                mnFkTaxId_n = resultSet.getInt("e.fid_tax_n");
                 mnFkBookkeepingRegistryTypeId = resultSet.getInt("fid_tp_bkr");
 
                 msDbmsAccountBizPartner = resultSet.getString("ab.acc_bp");
@@ -133,6 +153,14 @@ public class SDataAccountBizPartnerEntry extends erp.lib.data.SDataRegistry impl
                 msDbmsCostCenter_n = resultSet.getString("c.cc");
                 if (resultSet.wasNull()) {
                     msDbmsCostCenter_n = "";
+                }
+                msDbmsTaxBase_n = resultSet.getString("tb.tax_bas");
+                if (resultSet.wasNull()) {
+                    msDbmsTaxBase_n = "";
+                }
+                msDbmsTax_n = resultSet.getString("ta.tax");
+                if (resultSet.wasNull()) {
+                    msDbmsTax_n = "";
                 }
                 msDbmsBookkeepingRegistryType = resultSet.getString("b.tp_bkr");
 
@@ -162,13 +190,15 @@ public class SDataAccountBizPartnerEntry extends erp.lib.data.SDataRegistry impl
         try {
             callableStatement = connection.prepareCall(
                     "{ CALL fin_acc_bp_ety_save(" +
-                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkAccountBizPartnerId);
             callableStatement.setInt(nParam++, mnPkAccountBizPartnerTypeId);
             callableStatement.setInt(nParam++, mnPkEntryId);
             callableStatement.setDouble(nParam++, mdPercentage);
             callableStatement.setString(nParam++, msFkAccountId);
             if (msFkCostCenterId_n.length() > 0) callableStatement.setString(nParam++, msFkCostCenterId_n); else callableStatement.setNull(nParam++, java.sql.Types.CHAR);
+            if (mnFkTaxBasicId_n > 0) callableStatement.setInt(nParam++, mnFkTaxBasicId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
+            if (mnFkTaxId_n > 0) callableStatement.setInt(nParam++, mnFkTaxId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
             callableStatement.setInt(nParam++, mnFkBookkeepingRegistryTypeId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

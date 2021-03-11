@@ -33,6 +33,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
@@ -52,8 +53,8 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
     private javax.swing.JButton jbVerifyCfdi;
     private javax.swing.JButton jbGetCfdiStatus;
     private javax.swing.JButton jbSendCfdi;
-    private javax.swing.JButton jbRestoreSignedXml;
-    private javax.swing.JButton jbRestoreSignedXmlCancelAck;
+    private javax.swing.JButton jbRestoreCfdStamped;
+    private javax.swing.JButton jbRestoreCfdCancelAck;
     private javax.swing.JButton jbDeactivateFlags;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
@@ -118,15 +119,15 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         jbSendCfdi.addActionListener(this);
         jbSendCfdi.setToolTipText("Enviar comprobante vía mail");
 
-        jbRestoreSignedXml = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")));
-        jbRestoreSignedXml.setPreferredSize(new Dimension(23, 23));
-        jbRestoreSignedXml.addActionListener(this);
-        jbRestoreSignedXml.setToolTipText("Insertar XML timbrado del CFDI");
+        jbRestoreCfdStamped = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert.gif")));
+        jbRestoreCfdStamped.setPreferredSize(new Dimension(23, 23));
+        jbRestoreCfdStamped.addActionListener(this);
+        jbRestoreCfdStamped.setToolTipText("Insertar XML timbrado del CFDI");
 
-        jbRestoreSignedXmlCancelAck = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert_annul.gif")));
-        jbRestoreSignedXmlCancelAck.setPreferredSize(new Dimension(23, 23));
-        jbRestoreSignedXmlCancelAck.addActionListener(this);
-        jbRestoreSignedXmlCancelAck.setToolTipText("Insertar PDF del acuse de cancelación del CFDI");
+        jbRestoreCfdCancelAck = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_insert_annul.gif")));
+        jbRestoreCfdCancelAck.setPreferredSize(new Dimension(23, 23));
+        jbRestoreCfdCancelAck.addActionListener(this);
+        jbRestoreCfdCancelAck.setToolTipText("Insertar PDF del acuse de cancelación del CFDI");
 
         jbDeactivateFlags = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_action.gif")));
         jbDeactivateFlags.setPreferredSize(new Dimension(23, 23));
@@ -149,26 +150,12 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         addTaskBarLowerComponent(jbVerifyCfdi);
         addTaskBarLowerComponent(jbGetCfdiStatus);
         addTaskBarLowerComponent(jbSendCfdi);
-        addTaskBarLowerComponent(jbRestoreSignedXml);
-        addTaskBarLowerComponent(jbRestoreSignedXmlCancelAck);
+        addTaskBarLowerComponent(jbRestoreCfdStamped);
+        addTaskBarLowerComponent(jbRestoreCfdCancelAck);
         addTaskBarLowerComponent(jbDeactivateFlags);
 
-        jbNew.setEnabled(true);
-        jbEdit.setEnabled(true);
-        jbDelete.setEnabled(false); // deletion is not allowed
-        jbAnnul.setEnabled(true);
-        jbPrint.setEnabled(true);
-        jbPrintCancelAck.setEnabled(true);
-        jbGetXml.setEnabled(true);
-        jbGetXmlCancelAck.setEnabled(true);
-        jbSignXml.setEnabled(true);
-        jbVerifyCfdi.setEnabled(true);
-        jbGetCfdiStatus.setEnabled(true);
-        jbSendCfdi.setEnabled(true);
-        jbRestoreSignedXml.setEnabled(true);
-        jbRestoreSignedXmlCancelAck.setEnabled(true);
-        jbDeactivateFlags.setEnabled(true);
-
+        enableButtons();
+        
         STableField[] aoKeyFields = new STableField[1];
         aoKeyFields[0] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "c.id_cfd");
         moTablePane.getPrimaryKeyFields().add(aoKeyFields[0]);
@@ -214,6 +201,67 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         mvSuscriptors.add(SDataConstants.USRU_USR);
 
         populateTable();
+    }
+    
+    private void enableButtons() {
+        jbNew.setEnabled(false);
+        jbEdit.setEnabled(false);
+        jbDelete.setEnabled(false); // deletion is not allowed
+        jbAnnul.setEnabled(false);
+        jbPrint.setEnabled(false);
+        jbPrintCancelAck.setEnabled(false);
+        jbGetXml.setEnabled(false);
+        jbGetXmlCancelAck.setEnabled(false);
+        jbSignXml.setEnabled(false);
+        jbVerifyCfdi.setEnabled(false);
+        jbGetCfdiStatus.setEnabled(false);
+        jbSendCfdi.setEnabled(false);
+        jbRestoreCfdStamped.setEnabled(false);
+        jbRestoreCfdCancelAck.setEnabled(false);
+        jbDeactivateFlags.setEnabled(false);
+        
+        switch (miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_FIN_CFD_PAY)) {
+            case SUtilConsts.LEV_READ:
+                jbPrint.setEnabled(true);
+                jbPrintCancelAck.setEnabled(true);
+                jbGetXml.setEnabled(true);
+                jbGetXmlCancelAck.setEnabled(true);
+                jbGetCfdiStatus.setEnabled(true);
+                break;
+            case SUtilConsts.LEV_CAPTURE:
+            case SUtilConsts.LEV_AUTHOR:
+            case SUtilConsts.LEV_EDITOR:
+                jbNew.setEnabled(true);
+                jbEdit.setEnabled(true);
+                jbPrint.setEnabled(true);
+                jbPrintCancelAck.setEnabled(true);
+                jbGetXml.setEnabled(true);
+                jbGetXmlCancelAck.setEnabled(true);
+                jbSignXml.setEnabled(true);
+                jbVerifyCfdi.setEnabled(true);
+                jbGetCfdiStatus.setEnabled(true);
+                jbSendCfdi.setEnabled(true);
+                jbRestoreCfdStamped.setEnabled(true);
+                jbDeactivateFlags.setEnabled(true);
+                break;
+            case SUtilConsts.LEV_MANAGER:
+                jbNew.setEnabled(true);
+                jbEdit.setEnabled(true);
+                jbAnnul.setEnabled(true);
+                jbPrint.setEnabled(true);
+                jbPrintCancelAck.setEnabled(true);
+                jbGetXml.setEnabled(true);
+                jbGetXmlCancelAck.setEnabled(true);
+                jbSignXml.setEnabled(true);
+                jbVerifyCfdi.setEnabled(true);
+                jbGetCfdiStatus.setEnabled(true);
+                jbSendCfdi.setEnabled(true);
+                jbRestoreCfdStamped.setEnabled(true);
+                jbRestoreCfdCancelAck.setEnabled(true);
+                jbDeactivateFlags.setEnabled(true);
+                break;
+            default:
+        }
     }
 
     @Override
@@ -318,7 +366,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    SCfdUtils.printCfd((SClientInterface) miClient, cfd, 0, SDataConstantsPrint.PRINT_MODE_VIEWER, 1, false);
+                    SCfdUtils.printCfd((SClientInterface) miClient, cfd, SLibConstants.UNDEFINED, SDataConstantsPrint.PRINT_MODE_VIEWER, 1, false);
                 }
                 catch (Exception e) {
                     SLibUtils.showException(this, e);
@@ -334,7 +382,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             }
             else {
                 try {
-                    SCfdUtils.printAcknowledgmentCancellationCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), 0);
+                    SCfdUtils.printCancelAckForCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()), SLibConstants.UNDEFINED);
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -350,7 +398,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
             }
             else {
                 try {
-                    SCfdUtils.getXmlCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
+                    SCfdUtils.downloadXmlCfd(miClient, SCfdUtils.getCfd(miClient, SDataConstantsSys.TRNS_TP_CFD_PAY_REC, (int[]) moTablePane.getSelectedTableRow().getPrimaryKey()));
                 }
                 catch (Exception e) {
                     SLibUtilities.renderException(this, e);
@@ -445,14 +493,14 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
     }
 
     private void actionRestoreSignedXml() throws Exception {
-        if (jbRestoreSignedXml.isEnabled()) {
+        if (jbRestoreCfdStamped.isEnabled()) {
            if (moTablePane.getSelectedTableRow() == null) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    boolean needUpdate = SCfdUtils.restoreSignXml(miClient, cfd, true, 0);
+                    boolean needUpdate = SCfdUtils.restoreCfdStamped(miClient, cfd, true, SLibConstants.UNDEFINED);
 
                     if (needUpdate) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
@@ -466,14 +514,14 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
     }
 
     private void actionRestoreSignedXmlCancelAck() throws Exception {
-        if (jbRestoreSignedXmlCancelAck.isEnabled()) {
+        if (jbRestoreCfdCancelAck.isEnabled()) {
            if (moTablePane.getSelectedTableRow() == null) {
                 miClient.showMsgBoxInformation(SLibConstants.MSG_ERR_GUI_ROW_UNDEF);
             }
             else {
                 try {
                     SDataCfd cfd = (SDataCfd) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_CFD, moTablePane.getSelectedTableRow().getPrimaryKey(), SLibConstants.EXEC_MODE_SILENT);
-                    boolean needUpdate = SCfdUtils.restoreAcknowledgmentCancellation(miClient, cfd, true, 0);
+                    boolean needUpdate = SCfdUtils.restoreCfdCancelAck(miClient, cfd, true, 0);
 
                     if (needUpdate) {
                         miClient.getGuiModule(SDataConstants.MOD_SAL).refreshCatalogues(mnTabType);
@@ -609,10 +657,10 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
                 else if (button == jbSendCfdi) {
                     actionSendCfdi();
                 }
-                else if (button == jbRestoreSignedXml) {
+                else if (button == jbRestoreCfdStamped) {
                     actionRestoreSignedXml();
                 }
-                else if (button == jbRestoreSignedXmlCancelAck) {
+                else if (button == jbRestoreCfdCancelAck) {
                     actionRestoreSignedXmlCancelAck();
                 }
                 else if (button == jbDeactivateFlags) {

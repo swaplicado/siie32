@@ -11,15 +11,20 @@ import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormComboBoxGroup;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mfin.data.SDataAccount;
 import erp.mfin.data.SDataAccountBizPartnerEntry;
+import erp.mfin.data.SValidationUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 
@@ -41,6 +46,9 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
     private erp.lib.form.SFormField moFieldPercentage;
     private erp.lib.form.SFormField moFieldFkBookkeepingRegistryTypeId;
     private erp.mfin.form.SPanelAccount moPanelFkAccountId;
+    private erp.lib.form.SFormComboBoxGroup moComboBoxGroup;
+    private erp.lib.form.SFormField moFieldPkTaxBasicId;
+    private erp.lib.form.SFormField moFieldPkTaxId;
     private erp.mfin.form.SPanelAccount moPanelFkCostCenterId_n;
 
     /** Creates new form DFormAccountBizPartnerEntry */
@@ -73,11 +81,20 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
         jlDummyAccount = new javax.swing.JLabel();
         jlDummyCostCenter_n = new javax.swing.JLabel();
         jpConfig = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jlDummy = new javax.swing.JLabel();
+        jPanel21 = new javax.swing.JPanel();
+        jlPkTaxBasicId = new javax.swing.JLabel();
+        jcbPkTaxBasicId = new javax.swing.JComboBox();
+        jbPkTaxBasicId = new javax.swing.JButton();
+        jPanel22 = new javax.swing.JPanel();
+        jlPkTaxId = new javax.swing.JLabel();
+        jcbPkTaxId = new javax.swing.JComboBox();
+        jbPkTaxId = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
         jlFkBookkeepingRegistryTypeId = new javax.swing.JLabel();
-        jcbFkBookkeepingRegistryTypeId = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbFkBookkeepingRegistryTypeId = new javax.swing.JComboBox<>();
         jPanel8 = new javax.swing.JPanel();
         jlPercentage = new javax.swing.JLabel();
         jtfPercentage = new javax.swing.JTextField();
@@ -140,16 +157,55 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
         jpPanelAccounts.add(jlDummyAccount);
 
         jlDummyCostCenter_n.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jlDummyCostCenter_n.setText("[Panel centro costo]");
+        jlDummyCostCenter_n.setText("[Panel centro costo-beneficio]");
         jlDummyCostCenter_n.setPreferredSize(new java.awt.Dimension(100, 50));
         jpPanelAccounts.add(jlDummyCostCenter_n);
 
         jpAccountsConfig.add(jpPanelAccounts, java.awt.BorderLayout.NORTH);
 
         jpConfig.setLayout(new java.awt.BorderLayout());
+        jpConfig.add(jPanel2, java.awt.BorderLayout.WEST);
 
-        jPanel1.setLayout(new java.awt.GridLayout(3, 1, 0, 1));
+        jPanel1.setLayout(new java.awt.GridLayout(5, 1, 0, 1));
         jPanel1.add(jlDummy);
+
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlPkTaxBasicId.setForeground(java.awt.Color.blue);
+        jlPkTaxBasicId.setText("Impuesto básico:");
+        jlPkTaxBasicId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel21.add(jlPkTaxBasicId);
+
+        jcbPkTaxBasicId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbPkTaxBasicId.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel21.add(jcbPkTaxBasicId);
+
+        jbPkTaxBasicId.setText("jButton3");
+        jbPkTaxBasicId.setToolTipText("Seleccionar impuesto básico");
+        jbPkTaxBasicId.setFocusable(false);
+        jbPkTaxBasicId.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel21.add(jbPkTaxBasicId);
+
+        jPanel1.add(jPanel21);
+
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
+
+        jlPkTaxId.setForeground(java.awt.Color.blue);
+        jlPkTaxId.setText("Impuesto:");
+        jlPkTaxId.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel22.add(jlPkTaxId);
+
+        jcbPkTaxId.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jcbPkTaxId.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel22.add(jcbPkTaxId);
+
+        jbPkTaxId.setText("jButton4");
+        jbPkTaxId.setToolTipText("Seleccionar impuesto");
+        jbPkTaxId.setFocusable(false);
+        jbPkTaxId.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel22.add(jbPkTaxId);
+
+        jPanel1.add(jPanel22);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
@@ -197,8 +253,8 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
 
         getContentPane().add(jpControls, java.awt.BorderLayout.PAGE_END);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-600)/2, (screenSize.height-400)/2, 600, 400);
+        setSize(new java.awt.Dimension(600, 400));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
@@ -218,16 +274,26 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
         jpPanelAccounts.remove(jlDummyCostCenter_n);
         jpPanelAccounts.add(moPanelFkAccountId);
         jpPanelAccounts.add(moPanelFkCostCenterId_n);
+        
+        moComboBoxGroup = new SFormComboBoxGroup(miClient);
 
         moFieldPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_DOUBLE, true, jtfPercentage, jlPercentage);
         moFieldPercentage.setIsPercent(true);
         moFieldPercentage.setDecimalFormat(miClient.getSessionXXX().getFormatters().getDecimalsPercentageFormat());
+        moFieldPkTaxBasicId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbPkTaxBasicId, jlPkTaxBasicId);
+        moFieldPkTaxBasicId.setPickerButton(jbPkTaxBasicId);
+        moFieldPkTaxId = new erp.lib.form.SFormField(miClient, SLibConstants.DATA_TYPE_KEY, false, jcbPkTaxId, jlPkTaxId);
+        moFieldPkTaxId.setPickerButton(jbPkTaxId);
         moFieldFkBookkeepingRegistryTypeId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkBookkeepingRegistryTypeId, jlFkBookkeepingRegistryTypeId);
 
         mvFields = new Vector<SFormField>();
         mvFields.add(moFieldPercentage);
+        mvFields.add(moFieldPkTaxBasicId);
+        mvFields.add(moFieldPkTaxId);
         mvFields.add(moFieldFkBookkeepingRegistryTypeId);
 
+        jbPkTaxBasicId.addActionListener(this);
+        jbPkTaxId.addActionListener(this);
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
 
@@ -260,6 +326,14 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
             }
         }
     }
+    
+    private void actionPkTaxBasicId() {
+        miClient.pickOption(SDataConstants.FINU_TAX_BAS, moFieldPkTaxBasicId, null);
+    }
+
+    private void actionPkTaxId() {
+        miClient.pickOption(SDataConstants.FINU_TAX, moFieldPkTaxId, moFieldPkTaxBasicId.getKeyAsIntArray());
+    }
 
     private void actionEdit(boolean edit) {
 
@@ -289,13 +363,20 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbOk;
+    private javax.swing.JButton jbPkTaxBasicId;
+    private javax.swing.JButton jbPkTaxId;
     private javax.swing.JComboBox<SFormComponentItem> jcbFkBookkeepingRegistryTypeId;
+    private javax.swing.JComboBox jcbPkTaxBasicId;
+    private javax.swing.JComboBox jcbPkTaxId;
     private javax.swing.JLabel jlAccountBizPartner;
     private javax.swing.JLabel jlAccountBizPartnerType;
     private javax.swing.JLabel jlDummy;
@@ -303,6 +384,8 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
     private javax.swing.JLabel jlDummyCostCenter_n;
     private javax.swing.JLabel jlFkBookkeepingRegistryTypeId;
     private javax.swing.JLabel jlPercentage;
+    private javax.swing.JLabel jlPkTaxBasicId;
+    private javax.swing.JLabel jlPkTaxId;
     private javax.swing.JPanel jpAccounts;
     private javax.swing.JPanel jpAccountsConfig;
     private javax.swing.JPanel jpConfig;
@@ -333,14 +416,22 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
 
         jtfAccountBizPartner.setText("");
         jtfAccountBizPartnerType.setText("");
+        
+        jbPkTaxBasicId.setEnabled(true);
+        jbPkTaxId.setEnabled(true);
 
         moPanelFkAccountId.resetPanel();
         moPanelFkCostCenterId_n.resetPanel();
+        moComboBoxGroup.reset();
         moFieldFkBookkeepingRegistryTypeId.setFieldValue(new int[] { SDataConstantsSys.FINS_TP_BKR_ALL });
     }
 
     @Override
     public void formRefreshCatalogues() {
+        moComboBoxGroup.clear();
+        moComboBoxGroup.addComboBox(SDataConstants.FINU_TAX_BAS, jcbPkTaxBasicId, jbPkTaxBasicId);
+        moComboBoxGroup.addComboBox(SDataConstants.FINU_TAX, jcbPkTaxId, jbPkTaxId);
+        
         SFormUtilities.populateComboBox(miClient, jcbFkBookkeepingRegistryTypeId, SDataConstants.FINS_TP_BKR);
     }
 
@@ -401,9 +492,9 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
                         break;
 
                     case SDataConstantsSys.FINS_TP_ACC_BP_ADV_BILL:
-                        if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_NA) {
-                            message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_NA }) + "'";
-                        }
+//                        if (nSystemTypeId != SDataConstantsSys.FINS_TP_ACC_SYS_NA) {
+//                            message = "'" + SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_ACC_SYS, new int[] { SDataConstantsSys.FINS_TP_ACC_SYS_NA }) + "'";
+//                        }
                         break;
 
                     default:
@@ -415,14 +506,30 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
                     validation.setComponent(moPanelFkAccountId.getFieldAccount().getComponent());
                 }
                 else {
-                    if (!moPanelFkCostCenterId_n.isEmptyAccountId()) {
-                        // Cost center has been specified and must be validated:
+                    boolean val = false;
+                    try {
+                        // Validación de cuenta contable impuesto
+                        val = SValidationUtils.validateAccTax(miClient.getSession(),
+                                new int [] { moAccountBizPartnerEntry.getPkAccountBizPartnerTypeId(), moAccountBizPartnerEntry.getPkAccountBizPartnerId(), moAccountBizPartnerEntry.getPkEntryId()} ,
+                                moPanelFkAccountId.getFieldAccount().getString(), new int[] { moAccountBizPartnerEntry.getFkTaxBasicId_n(), moAccountBizPartnerEntry.getFkTaxId_n() });
+                    }
+                    catch (SQLException ex) {
+                        Logger.getLogger(SFormAccountBizPartnerEntry.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
+                    if (! val) {
+                        validation.setMessage("La combinación cuenta contable vs impuesto ya existe.");
+                    }
+                    else {
+                        if (!moPanelFkCostCenterId_n.isEmptyAccountId()) {
+                            // Cost center has been specified and must be validated:
 
-                        message = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), null);
+                            message = SDataUtilities.validateCostCenter(miClient, moPanelFkCostCenterId_n.getCurrentInputCostCenter(), null);
 
-                        if (message.length() > 0) {
-                            validation.setMessage(message);
-                            validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
+                            if (message.length() > 0) {
+                                validation.setMessage(message);
+                                validation.setComponent(moPanelFkCostCenterId_n.getFieldAccount().getComponent());
+                            }
                         }
                     }
                 }
@@ -463,7 +570,13 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
         moFieldFkBookkeepingRegistryTypeId.setFieldValue(new int[] { moAccountBizPartnerEntry.getFkBookkeepingRegistryTypeId() });
         moPanelFkAccountId.getFieldAccount().setFieldValue(moAccountBizPartnerEntry.getFkAccountId());
         moPanelFkCostCenterId_n.getFieldAccount().setFieldValue(moAccountBizPartnerEntry.getFkCostCenterId_n().length() == 0 ? moPanelFkCostCenterId_n.getEmptyAccountId() : moAccountBizPartnerEntry.getFkCostCenterId_n());
+        
+        jbPkTaxBasicId.setEnabled(false);
+        jbPkTaxId.setEnabled(false);
 
+        moFieldPkTaxBasicId.setKey(new int[] { moAccountBizPartnerEntry.getFkTaxBasicId_n() });
+        moFieldPkTaxId.setKey(new int[] { moAccountBizPartnerEntry.getFkTaxBasicId_n(), moAccountBizPartnerEntry.getFkTaxId_n() });
+        
         moPanelFkAccountId.refreshPanel();
         moPanelFkCostCenterId_n.refreshPanel();
     }
@@ -478,9 +591,14 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
             moAccountBizPartnerEntry.setFkAccountId(moPanelFkAccountId.getFieldAccount().getString());
             moAccountBizPartnerEntry.setFkCostCenterId_n(moPanelFkCostCenterId_n.getFieldAccount().getString());
             moAccountBizPartnerEntry.setFkBookkeepingRegistryTypeId(moFieldFkBookkeepingRegistryTypeId.getKeyAsIntArray()[0]);
+            
+            moAccountBizPartnerEntry.setFkTaxBasicId_n(moFieldPkTaxId.getKeyAsIntArray() == null ? 0 : moFieldPkTaxId.getKeyAsIntArray()[0]);
+            moAccountBizPartnerEntry.setFkTaxId_n(moFieldPkTaxId.getKeyAsIntArray() == null ? 0 : moFieldPkTaxId.getKeyAsIntArray()[1]);
 
             moAccountBizPartnerEntry.setDbmsAccount(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FIN_ACC, new Object[] { moAccountBizPartnerEntry.getFkAccountId() }));
             moAccountBizPartnerEntry.setDbmsCostCenter_n(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FIN_CC, new Object[] { moAccountBizPartnerEntry.getFkCostCenterId_n() }));
+            moAccountBizPartnerEntry.setDbmsTaxBase_n(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX_BAS, new int[] { moAccountBizPartnerEntry.getFkTaxBasicId_n() }));
+            moAccountBizPartnerEntry.setDbmsTax_n(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINU_TAX, new int[] { moAccountBizPartnerEntry.getFkTaxBasicId_n(), moAccountBizPartnerEntry.getFkTaxId_n() } ));
             moAccountBizPartnerEntry.setDbmsBookkeepingRegistryType(SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.FINS_TP_BKR, new int[] { moAccountBizPartnerEntry.getFkBookkeepingRegistryTypeId() }));
         }
 
@@ -512,6 +630,12 @@ public class SFormAccountBizPartnerEntry extends javax.swing.JDialog implements 
             }
             else if (button == jbCancel) {
                 actionCancel();
+            }
+            else if (button == jbPkTaxBasicId) {
+                actionPkTaxBasicId();
+            }
+            else if (button == jbPkTaxId) {
+                actionPkTaxId();
             }
         }
     }

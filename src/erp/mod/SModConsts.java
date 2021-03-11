@@ -405,6 +405,7 @@ public abstract class SModConsts {
     public static final int TRN_INV_VAL = 2023048;
     public static final int TRN_INV_MFG_CST = 2023049;
     public static final int TRN_ITEM_COST = 2023050;
+    public static final int TRN_PDF = 2023059;
     public static final int TRN_CFD = 2023051;
     public static final int TRN_CFD_SIGN_LOG = 2023052;
     public static final int TRN_CFD_SIGN_LOG_MSG = 2023053;
@@ -697,6 +698,7 @@ public abstract class SModConsts {
     public static final int HRSX_ABS_MOV = 2064101;
     public static final int HRSX_SSC_UPD = 2064102;
     public static final int HRSX_EAR_SSC = 2064103;
+    public static final int HRSX_PTU = 2064106;
     public static final int HRSX_IMPORT_CAP = 2064110;
     public static final int HRSX_LAYOUT_SUA_HIRE = 1;
     public static final int HRSX_LAYOUT_SUA_SSC = 2;
@@ -1037,6 +1039,7 @@ public abstract class SModConsts {
         TablesMap.put(TRN_INV_VAL, "trn_inv_val");
         TablesMap.put(TRN_INV_MFG_CST, "trn_inv_mfg_cst");
         TablesMap.put(TRN_ITEM_COST, "trn_item_cost");
+        TablesMap.put(TRN_PDF, "trn_pdf");
         TablesMap.put(TRN_CFD, "trn_cfd");
         TablesMap.put(TRN_CFD_SIGN_LOG, "trn_cfd_sign_log");
         TablesMap.put(TRN_CFD_SIGN_LOG_MSG, "trn_cfd_sign_log_msg");

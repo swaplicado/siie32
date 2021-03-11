@@ -39,11 +39,11 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
     private final SHrsReceiptEarning moHrsReceiptEarning;
     private final SHrsEmployeeDays moHrsEmployeeDays;
     private double mdOriginalUnitsAlleged;
-    private double mdOriginalAmount;
-    private double mdOriginalAuxValue;
-    private double mdOriginalAuxAmount1;
-    private double mdOriginalAuxAmount2;
-    private int mnOriginalOtherPaymentType;
+    private double mdOriginalAmount_r;
+    private double mdOriginalAuxiliarValue;
+    private double mdOriginalAuxiliarAmount1;
+    private double mdOriginalAuxiliarAmount2;
+    private int mnOriginalOtherPaymentTypeId;
 
     /**
      * Creates new form SDialogPayrollEarning
@@ -73,8 +73,8 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jPanel2 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jlEarning = new javax.swing.JLabel();
-        moTextEarningCode = new sa.lib.gui.bean.SBeanFieldText();
-        moTextEarningName = new sa.lib.gui.bean.SBeanFieldText();
+        jtfEarningCode = new javax.swing.JTextField();
+        jtfEarningName = new javax.swing.JTextField();
         jPanel16 = new javax.swing.JPanel();
         jlOtherPaymentType = new javax.swing.JLabel();
         moKeyOtherPaymentType = new sa.lib.gui.bean.SBeanFieldKey();
@@ -125,15 +125,15 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jlEarning.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel7.add(jlEarning);
 
-        moTextEarningCode.setEditable(false);
-        moTextEarningCode.setText("TEXT");
-        moTextEarningCode.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel7.add(moTextEarningCode);
+        jtfEarningCode.setEditable(false);
+        jtfEarningCode.setFocusable(false);
+        jtfEarningCode.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel7.add(jtfEarningCode);
 
-        moTextEarningName.setEditable(false);
-        moTextEarningName.setText("TEXT");
-        moTextEarningName.setPreferredSize(new java.awt.Dimension(300, 23));
-        jPanel7.add(moTextEarningName);
+        jtfEarningName.setEditable(false);
+        jtfEarningName.setFocusable(false);
+        jtfEarningName.setPreferredSize(new java.awt.Dimension(400, 23));
+        jPanel7.add(jtfEarningName);
 
         jPanel2.add(jPanel7);
 
@@ -143,7 +143,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jlOtherPaymentType.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel16.add(jlOtherPaymentType);
 
-        moKeyOtherPaymentType.setPreferredSize(new java.awt.Dimension(500, 23));
+        moKeyOtherPaymentType.setPreferredSize(new java.awt.Dimension(575, 23));
         jPanel16.add(moKeyOtherPaymentType);
 
         jPanel2.add(jPanel16);
@@ -217,10 +217,9 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jPanel18.add(jlAuxValue);
         jPanel18.add(moCompAuxValue);
 
-        jlAuxValueHint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlAuxValueHint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
         jlAuxValueHint.setToolTipText("Valor auxiliar");
-        jlAuxValueHint.setPreferredSize(new java.awt.Dimension(20, 23));
+        jlAuxValueHint.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel18.add(jlAuxValueHint);
 
         jPanel2.add(jPanel18);
@@ -232,10 +231,9 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jPanel17.add(jlAuxAmount1);
         jPanel17.add(moCurAuxAmount1);
 
-        jlAuxAmount1Hint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlAuxAmount1Hint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
         jlAuxAmount1Hint.setToolTipText("Monto auxiliar");
-        jlAuxAmount1Hint.setPreferredSize(new java.awt.Dimension(20, 23));
+        jlAuxAmount1Hint.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel17.add(jlAuxAmount1Hint);
 
         jPanel2.add(jPanel17);
@@ -247,10 +245,9 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jPanel19.add(jlAuxAmount2);
         jPanel19.add(moCurAuxAmount2);
 
-        jlAuxAmount2Hint.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlAuxAmount2Hint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_view_help.png"))); // NOI18N
         jlAuxAmount2Hint.setToolTipText("Monto auxiliar");
-        jlAuxAmount2Hint.setPreferredSize(new java.awt.Dimension(20, 23));
+        jlAuxAmount2Hint.setPreferredSize(new java.awt.Dimension(15, 23));
         jPanel19.add(jlAuxAmount2Hint);
 
         jPanel2.add(jPanel19);
@@ -305,6 +302,8 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
     private javax.swing.JLabel jlOtherPaymentType;
     private javax.swing.JLabel jlUnits;
     private javax.swing.JLabel jlUnitsAlleged;
+    private javax.swing.JTextField jtfEarningCode;
+    private javax.swing.JTextField jtfEarningName;
     private sa.lib.gui.bean.SBeanCompoundField moCompAuxValue;
     private sa.lib.gui.bean.SBeanCompoundField moCompUnits;
     private sa.lib.gui.bean.SBeanCompoundField moCompUnitsAlleged;
@@ -315,16 +314,13 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
     private sa.lib.gui.bean.SBeanCompoundFieldCurrency moCurAuxAmount2;
     private sa.lib.gui.bean.SBeanFieldDecimal moDecFactorAmount;
     private sa.lib.gui.bean.SBeanFieldKey moKeyOtherPaymentType;
-    private sa.lib.gui.bean.SBeanFieldText moTextEarningCode;
-    private sa.lib.gui.bean.SBeanFieldText moTextEarningName;
     // End of variables declaration//GEN-END:variables
 
     private void initComponentsCustom() {
-        SGuiUtils.setWindowBounds(this, 640, 400);
+        SGuiUtils.setWindowBounds(this, 720, 450);
 
         jbSave.setText("Aceptar");
 
-        moTextEarningName.setTextSettings(SGuiUtils.getLabelName(jlEarning.getText()), 255, 0);
         moKeyOtherPaymentType.setKeySettings(miClient, SGuiUtils.getLabelName(jlOtherPaymentType), true);
         moCompUnitsAlleged.setCompoundFieldSettings(miClient);
         moCompUnitsAlleged.getField().setDecimalSettings(SGuiUtils.getLabelName(jlUnitsAlleged.getText()), SGuiConsts.GUI_TYPE_DEC_QTY, true);
@@ -376,10 +372,10 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jlAuxValue.setEnabled(false);
         jlAuxValueHint.setToolTipText(null);
         jlAuxValueHint.setEnabled(false);
-        moCompAuxValue.setEnabled(false); // field rarely used; preferable disabling it when not used
+        moCompAuxValue.setEnabled(false);
         moCompAuxValue.getField().setMandatory(false);
         moCompAuxValue.setCompoundText("");
-        moCompAuxValue.getField().setGuiType(SGuiConsts.GUI_TYPE_DEC_AMT);
+        moCompAuxValue.getField().setDecimalFormat(SLibUtils.DecimalFormatInteger);
         moCompAuxValue.getField().setMinDouble(0);
         moCompAuxValue.getField().setMaxDouble(Double.MAX_VALUE);
         moCompAuxValue.getField().resetField();
@@ -388,7 +384,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jlAuxAmount1.setEnabled(false);
         jlAuxAmount1Hint.setToolTipText(null);
         jlAuxAmount1Hint.setEnabled(false);
-        moCurAuxAmount1.setEnabled(false); // field rarely used; preferable disabling it when not used
+        moCurAuxAmount1.setEnabled(false);
         moCurAuxAmount1.getField().setMandatory(false);
         moCurAuxAmount1.getField().resetField();
         
@@ -396,7 +392,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         jlAuxAmount2.setEnabled(false);
         jlAuxAmount2Hint.setToolTipText(null);
         jlAuxAmount2Hint.setEnabled(false);
-        moCurAuxAmount2.setEnabled(false); // field rarely used; preferable disabling it when not used
+        moCurAuxAmount2.setEnabled(false);
         moCurAuxAmount2.getField().setMandatory(false);
         moCurAuxAmount2.getField().resetField();
     }
@@ -408,16 +404,19 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         // preserve original values:
         
         mdOriginalUnitsAlleged = payrollReceiptEarning.getUnitsAlleged();
-        mdOriginalAmount = payrollReceiptEarning.getAmount_r();
-        mdOriginalAuxValue = payrollReceiptEarning.getAuxiliarValue();
-        mdOriginalAuxAmount1 = payrollReceiptEarning.getAuxiliarAmount1();
-        mdOriginalAuxAmount2 = payrollReceiptEarning.getAuxiliarAmount2();
-        mnOriginalOtherPaymentType = payrollReceiptEarning.getFkOtherPaymentTypeId();
+        mdOriginalAmount_r = payrollReceiptEarning.getAmount_r();
+        mdOriginalAuxiliarValue = payrollReceiptEarning.getAuxiliarValue();
+        mdOriginalAuxiliarAmount1 = payrollReceiptEarning.getAuxiliarAmount1();
+        mdOriginalAuxiliarAmount2 = payrollReceiptEarning.getAuxiliarAmount2();
+        mnOriginalOtherPaymentTypeId = payrollReceiptEarning.getFkOtherPaymentTypeId();
         
         // render earning:
         
-        moTextEarningCode.setValue(earning.getCode());
-        moTextEarningName.setValue(earning.getName());
+        jtfEarningCode.setText(earning.getCode());
+        jtfEarningName.setText(earning.getName());
+        
+        jtfEarningCode.setCaretPosition(0);
+        jtfEarningName.setCaretPosition(0);
         
         boolean unitsEditable = moHrsReceiptEarning.getEarning().areUnitsModifiable();
         String earningUnit = moHrsReceiptEarning.getHrsReceipt().getHrsPayroll().getEarningComputationTypesMap().get(earning.getFkEarningComputationTypeId());
@@ -437,30 +436,15 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         moCurAmountOriginal.getField().setValue(payrollReceiptEarning.getAmount_r()); // read only
 
         // resetting of specialized fields:
-        moKeyOtherPaymentType.setEnabled(false);
+        moKeyOtherPaymentType.setEnabled(earning.getFkOtherPaymentTypeId() == SModSysConsts.HRSS_TP_EAR_OTH);
+        moKeyOtherPaymentType.removeItemListener(this);
         moKeyOtherPaymentType.setValue(new int[] { payrollReceiptEarning.getFkOtherPaymentTypeId() }); // may trigger an item-state-changed event
         itemStateChangedKeyOtherPayment(); // force triggering an item-state-changed event
+        moKeyOtherPaymentType.addItemListener(this);
         
-        switch (earning.getFkEarningTypeId()) {
-            case SModSysConsts.HRSS_TP_EAR_TAX_SUB:
-                jlAuxAmount1.setText(SDbEarning.TAX_SUB_LABEL + ":");
-                jlAuxAmount1.setEnabled(true);
-                jlAuxAmount1Hint.setToolTipText(SDbEarning.TAX_SUB_HINT);
-                jlAuxAmount1Hint.setEnabled(true);
-                moCurAuxAmount1.setEnabled(true); // field rarely used; preferable disabling it when used
-                moCurAuxAmount1.getField().setMandatory(false); // yes!, is NOT mandatory!
-                
-                moCurAuxAmount1.getField().setValue(payrollReceiptEarning.getAuxiliarAmount1());
-                break;
-                
-            case SModSysConsts.HRSS_TP_EAR_OTH:
-                moKeyOtherPaymentType.setEnabled(earning.getFkOtherPaymentTypeId() == SModSysConsts.HRSS_TP_EAR_OTH);
-                
-                moCompAuxValue.getField().setValue(payrollReceiptEarning.getAuxiliarValue());
-                moCurAuxAmount1.getField().setValue(payrollReceiptEarning.getAuxiliarAmount1());
-                moCurAuxAmount2.getField().setValue(payrollReceiptEarning.getAuxiliarAmount2());
-                break;
-        }
+        moCompAuxValue.getField().setValue(payrollReceiptEarning.getAuxiliarValue());
+        moCurAuxAmount1.getField().setValue(payrollReceiptEarning.getAuxiliarAmount1());
+        moCurAuxAmount2.getField().setValue(payrollReceiptEarning.getAuxiliarAmount2());
         
         jckUserEdited.setSelected(payrollReceiptEarning.isUserEdited());
         jckAutomatic.setSelected(payrollReceiptEarning.isAutomatic());
@@ -479,7 +463,7 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
     }
     
     private void actionPerformedCopyAmountOriginal() {
-        moCurAmount.getField().setValue(mdOriginalAmount);
+        moCurAmount.getField().setValue(mdOriginalAmount_r);
         moCurAmount.getField().getComponent().requestFocusInWindow();
     }
     
@@ -488,14 +472,23 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
         
         if (moKeyOtherPaymentType.getSelectedIndex() > 0) {
             switch (moKeyOtherPaymentType.getValue()[0]) {
+                case SModSysConsts.HRSS_TP_OTH_PAY_TAX_SUB:
+                    jlAuxAmount1.setText(SDbEarning.TAX_SUB_LABEL + ":");
+                    jlAuxAmount1.setEnabled(true);
+                    jlAuxAmount1Hint.setToolTipText(SDbEarning.TAX_SUB_HINT);
+                    jlAuxAmount1Hint.setEnabled(true);
+                    moCurAuxAmount1.setEnabled(true);
+                    moCurAuxAmount1.getField().setMandatory(false); // non-mandatory!
+                    break;
+                    
                 case SModSysConsts.HRSS_TP_OTH_PAY_TAX_BAL:
                     int year = SLibTimeUtils.digestYear(moHrsReceiptEarning.getHrsReceipt().getHrsPayroll().getPayroll().getDateEnd())[0];
                     jlAuxValue.setText(SDbEarning.OTH_TAX_BAL_LABEL_YEAR + ":*");
                     jlAuxValue.setEnabled(true);
                     jlAuxValueHint.setToolTipText(SDbEarning.OTH_TAX_BAL_HINT_YEAR);
                     jlAuxValueHint.setEnabled(true);
-                    moCompAuxValue.setEnabled(true); // field rarely used; preferable disabling it when used
-                    moCompAuxValue.getField().setMandatory(true); // yes!, is mandatory!
+                    moCompAuxValue.setEnabled(true);
+                    moCompAuxValue.getField().setMandatory(true); // mandatory!
                     moCompAuxValue.setCompoundText("");
                     moCompAuxValue.getField().setDecimalFormat(SLibUtils.DecimalFormatCalendarYear);
                     moCompAuxValue.getField().setMinDouble(year - 1);
@@ -506,15 +499,15 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
                     jlAuxAmount1.setEnabled(true);
                     jlAuxAmount1Hint.setToolTipText(SDbEarning.OTH_TAX_BAL_HINT_BAL);
                     jlAuxAmount1Hint.setEnabled(true);
-                    moCurAuxAmount1.setEnabled(true); // field rarely used; preferable disabling it when used
-                    moCurAuxAmount1.getField().setMandatory(true); // yes!, is mandatory!
+                    moCurAuxAmount1.setEnabled(true);
+                    moCurAuxAmount1.getField().setMandatory(true); // mandatory!
 
                     jlAuxAmount2.setText(SDbEarning.OTH_TAX_BAL_LABEL_REM_BAL + ":");
                     jlAuxAmount2.setEnabled(true);
                     jlAuxAmount2Hint.setToolTipText(SDbEarning.OTH_TAX_BAL_HINT_REM_BAL);
                     jlAuxAmount2Hint.setEnabled(true);
                     moCurAuxAmount2.setEnabled(true); // field rarely used; preferable disabling it when used
-                    moCurAuxAmount2.getField().setMandatory(false); // yes!, is NOT mandatory!
+                    moCurAuxAmount2.getField().setMandatory(false); // non-mandatory!
                     break;
                     
                 default:
@@ -575,17 +568,18 @@ public class SDialogPayrollEarning extends SBeanFormDialog implements ActionList
                 payrollReceiptEarning.setAmount_r(moCurAmount.getField().getValue());
                 
                 payrollReceiptEarning.setFkOtherPaymentTypeId(moKeyOtherPaymentType.getValue()[0]);
-                payrollReceiptEarning.setAuxiliarValue(moCompAuxValue.getField().getValue());
-                payrollReceiptEarning.setAuxiliarAmount1(moCurAuxAmount1.getField().getValue());
-                payrollReceiptEarning.setAuxiliarAmount2(moCurAuxAmount2.getField().getValue());
+                payrollReceiptEarning.setAuxiliarValue(!moCompAuxValue.isEnabled() ? 0 : moCompAuxValue.getField().getValue());
+                payrollReceiptEarning.setAuxiliarAmount1(!moCurAuxAmount1.isEnabled() ? 0 : moCurAuxAmount1.getField().getValue());
+                payrollReceiptEarning.setAuxiliarAmount2(!moCurAuxAmount2.isEnabled() ? 0 : moCurAuxAmount2.getField().getValue());
                 
                 if (!payrollReceiptEarning.isUserEdited()) {
-                    payrollReceiptEarning.setUserEdited(mdOriginalUnitsAlleged != moCompUnitsAlleged.getField().getValue() ||
-                            mdOriginalAmount != moCurAmount.getField().getValue() ||
-                            mdOriginalAuxValue != moCompAuxValue.getField().getValue() ||
-                            mdOriginalAuxAmount1 != moCurAuxAmount1.getField().getValue() ||
-                            mdOriginalAuxAmount2 != moCurAuxAmount2.getField().getValue() ||
-                            mnOriginalOtherPaymentType != moKeyOtherPaymentType.getValue()[0]
+                    payrollReceiptEarning.setUserEdited(
+                            mdOriginalUnitsAlleged != payrollReceiptEarning.getUnitsAlleged() ||
+                            mdOriginalAmount_r != payrollReceiptEarning.getAmount_r() ||
+                            mnOriginalOtherPaymentTypeId != payrollReceiptEarning.getFkOtherPaymentTypeId() ||
+                            mdOriginalAuxiliarValue != payrollReceiptEarning.getAuxiliarValue() ||
+                            mdOriginalAuxiliarAmount1 != payrollReceiptEarning.getAuxiliarAmount1() ||
+                            mdOriginalAuxiliarAmount2 != payrollReceiptEarning.getAuxiliarAmount2()
                     );
                 }
                 

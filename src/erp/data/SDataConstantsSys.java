@@ -188,6 +188,7 @@ public abstract class SDataConstantsSys {
     public static final int PRV_FIN_MOV_CDR = 102020;
     public static final int PRV_FIN_MOV_DBR = 102021;
     public static final int PRV_FIN_COUNTER_RCPT = 102022;
+    public static final int PRV_FIN_CFD_PAY = 102051;
     public static final int PRV_FIN_REP = 102901;
     public static final int PRV_FIN_REP_STATS = 102902;
     public static final int PRV_FIN_REP_INDEX = 102903;
