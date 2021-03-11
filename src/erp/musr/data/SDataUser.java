@@ -63,36 +63,37 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     protected java.util.Vector<SDataAccessCompanyBranchEntity> mvDbmsAccessCompanyBranchEntities;
     protected java.util.Vector<SDataAccessCompanyBranchEntityUniversal> mvDbmsAccessCompanyBranchEntitiesUniversal;
 
-    protected erp.mtrn.data.SDataUserConfigurationTransaction moDbmsUserConfigurationTransaction;
+    private erp.mtrn.data.SDataUserConfigurationTransaction moDbmsUserConfigurationTransaction;
+    
+    private java.util.HashSet<Integer> moModuleAccess;
+    private java.util.HashMap<Integer, Integer> moPrivilegeUser;
+    private java.util.HashMap<Integer, Integer> moRightsUser;
+    private java.util.HashMap<int[], Integer> moRightsCompany;
 
     protected boolean mbExtraIsPasswordUpdateRequired;
     protected boolean mbExtraIsSpecialSuperUser;
     protected boolean mbExtraIsSpecialConfigurator;
     protected boolean mbExtraIsSpecialAdministrator;
 
-    private java.util.HashSet<Integer> moModuleAccess;
-    private java.util.HashMap<Integer, Integer> moPrivilegeUser;
-    private java.util.HashMap<Integer, Integer> moRightsUser;
-    private java.util.HashMap<int[], Integer> moRightsCompany;
-
     protected int mnAuxCompanyId;
 
     public SDataUser() {
         super(SDataConstants.USRU_USR);
 
-        mvDbmsTypeModules = new Vector<SDataTypeModule>();
-        mvDbmsUserPrivilegesUser = new Vector<SDataUserPrivilegeUser>();
-        mvDbmsUserPrivilegesCompany = new Vector<SDataUserPrivilegeCompany>();
-        mvDbmsUserRolesUser = new Vector<SDataUserRoleUser>();
-        mvDbmsUserRolesCompany = new Vector<SDataUserRoleCompany>();
-        mvDbmsAccessCompanies = new Vector<SDataAccessCompany>();
-        mvDbmsAccessCompanyBranches = new Vector<SDataAccessCompanyBranch>();
-        mvDbmsAccessCompanyBranchEntities = new Vector<SDataAccessCompanyBranchEntity>();
-        mvDbmsAccessCompanyBranchEntitiesUniversal = new Vector<SDataAccessCompanyBranchEntityUniversal>();
-        moModuleAccess = new HashSet<Integer>();
-        moPrivilegeUser = new HashMap<Integer, Integer>();
-        moRightsUser = new HashMap<Integer, Integer>();
-        moRightsCompany = new HashMap<int[], Integer>();
+        mvDbmsTypeModules = new Vector<>();
+        mvDbmsUserPrivilegesUser = new Vector<>();
+        mvDbmsUserPrivilegesCompany = new Vector<>();
+        mvDbmsUserRolesUser = new Vector<>();
+        mvDbmsUserRolesCompany = new Vector<>();
+        mvDbmsAccessCompanies = new Vector<>();
+        mvDbmsAccessCompanyBranches = new Vector<>();
+        mvDbmsAccessCompanyBranchEntities = new Vector<>();
+        mvDbmsAccessCompanyBranchEntitiesUniversal = new Vector<>();
+        
+        moModuleAccess = new HashSet<>();
+        moPrivilegeUser = new HashMap<>();
+        moRightsUser = new HashMap<>();
+        moRightsCompany = new HashMap<>();
 
         reset();
     }
@@ -114,7 +115,6 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public void setUserNewTs(java.util.Date t) { mtUserNewTs = t; }
     public void setUserEditTs(java.util.Date t) { mtUserEditTs = t; }
     public void setUserDeleteTs(java.util.Date t) { mtUserDeleteTs = t; }
-    public void setAuxCompanyId(int n) { mnAuxCompanyId = n; }
 
     public int getPkUserId() { return mnPkUserId; }
     public java.lang.String getUser() { return msUser; }
@@ -147,13 +147,10 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     public void setExtraIsPasswordUpdateRequired(boolean b) { mbExtraIsPasswordUpdateRequired = b; }
 
     public boolean getExtraIsPasswordUpdateRequired() { return mbExtraIsPasswordUpdateRequired; }
-    public boolean getExtraIsSpecialSuperUser() { return mbExtraIsSpecialSuperUser; }
-    public boolean getExtraIsSpecialConfigurator() { return mbExtraIsSpecialConfigurator; }
-    public boolean getExtraIsSpecialAdministrator() { return mbExtraIsSpecialAdministrator; }
 
+    public void setAuxCompanyId(int n) { mnAuxCompanyId = n; }
+    
     public int getAuxCompanyId() { return mnAuxCompanyId; }
-
-    public erp.mtrn.data.SDataUserConfigurationTransaction getDbmsUserConfigurationTransaction() { return moDbmsUserConfigurationTransaction; }
 
     @Override
     public void setPrimaryKey(java.lang.Object pk) {
@@ -610,7 +607,6 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 if (moDbmsUserConfigurationTransaction == null) {
                     moDbmsUserConfigurationTransaction = new SDataUserConfigurationTransaction();
-                    moDbmsUserConfigurationTransaction.setPkUserId(mnPkUserId);
                     moDbmsUserConfigurationTransaction.setIsPurchasesItemAllApplying(true);
                     moDbmsUserConfigurationTransaction.setPurchasesOrderLimit_n(-1);
                     moDbmsUserConfigurationTransaction.setPurchasesOrderLimitMonthly_n(-1);
@@ -619,18 +615,12 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                     moDbmsUserConfigurationTransaction.setSalesOrderLimit_n(-1);
                     moDbmsUserConfigurationTransaction.setSalesOrderLimitMonthly_n(-1);
                     moDbmsUserConfigurationTransaction.setSalesDocLimit_n(-1);
-                    moDbmsUserConfigurationTransaction.setCapacityVolumeMinPercentage(0);
-                    moDbmsUserConfigurationTransaction.setCapacityMassMinPercentage(0);
-                    moDbmsUserConfigurationTransaction.setFkUserNewId(mnFkUserNewId);
-                    moDbmsUserConfigurationTransaction.setFkUserEditId(mnFkUserNewId);
-                }
-                else {
-                    moDbmsUserConfigurationTransaction.setPkUserId(mnPkUserId);
-                    moDbmsUserConfigurationTransaction.setFkUserNewId(mnFkUserEditId);
-                    moDbmsUserConfigurationTransaction.setFkUserEditId(mnFkUserNewId);
                 }
 
+                moDbmsUserConfigurationTransaction.setPkUserId(mnPkUserId);
                 moDbmsUserConfigurationTransaction.setIsDeleted(mbIsDeleted);
+                moDbmsUserConfigurationTransaction.setFkUserNewId(mnFkUserEditId);
+                moDbmsUserConfigurationTransaction.setFkUserEditId(mnFkUserNewId);
 
                 if (moDbmsUserConfigurationTransaction.save(connection) != SLibConstants.DB_ACTION_SAVE_OK) {
                     throw new Exception(SLibConstants.MSG_ERR_DB_REG_SAVE_DEP);
@@ -735,6 +725,25 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         }
     }
 
+    private boolean hasSpecialRole(int role) {
+        boolean hasRole = false;
+
+        switch (role) {
+            case SDataConstantsSys.ROL_SPE_SUPER:
+                hasRole = mbExtraIsSpecialSuperUser;
+                break;
+            case SDataConstantsSys.ROL_SPE_CONFIG:
+                hasRole = mbExtraIsSpecialSuperUser || mbExtraIsSpecialConfigurator;
+                break;
+            case SDataConstantsSys.ROL_SPE_ADMOR:
+                hasRole = mbExtraIsSpecialSuperUser || mbExtraIsSpecialAdministrator;
+                break;
+            default:
+        }
+
+        return hasRole;
+    }
+
     /*
      * Class public methods:
      */
@@ -836,31 +845,13 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         return access;
     }
 
-    public boolean hasSpecialRole(int role) {
-        boolean hasRole = false;
-
-        switch (role) {
-            case SDataConstantsSys.ROL_SPE_SUPER:
-                hasRole = mbExtraIsSpecialSuperUser;
-                break;
-            case SDataConstantsSys.ROL_SPE_CONFIG:
-                hasRole = mbExtraIsSpecialSuperUser || mbExtraIsSpecialConfigurator;
-                break;
-            case SDataConstantsSys.ROL_SPE_ADMOR:
-                hasRole = mbExtraIsSpecialSuperUser || mbExtraIsSpecialAdministrator;
-                break;
-            default:
-        }
-
-        return hasRole;
-    }
-
     /**
      * This funtion looks for a specific privilege for the user logged and
      * determines if it has right.
      *
      * @param client ERP Client interface.
      * @param privilege The privilege to look.
+     * @return A instance of <code>erp.musr.data.SDataUser.Right</code>.
      */
     public erp.musr.data.SDataUser.Right hasRight(erp.client.SClientInterface client, int privilege) {
         SDataUser.Right right = new SDataUser.Right(privilege, false, SLibConstants.UNDEFINED);
@@ -923,25 +914,29 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         return right;
     }
 
-    public void readPrivilegeUser(SGuiSession session) {
+    public void readUserPrivileges(SGuiSession session) {
         String sql = "";
         ResultSet resultSet = null;
         ResultSet resultSetAux = null;
         Statement statementAux;
 
         try {
-            // Read role of user:
+            // Read roles by user:
 
             sql = "SELECT id_rol, fid_tp_lev "
-                    + "FROM erp.usru_rol_usr WHERE id_usr = " + session.getUser().getPkUserId() + " ORDER BY id_rol ";
+                    + "FROM erp.usru_rol_usr "
+                    + "WHERE id_usr = " + session.getUser().getPkUserId() + " "
+                    + "ORDER BY id_rol;";
 
             statementAux = session.getStatement().getConnection().createStatement();
 
             resultSet = session.getStatement().executeQuery(sql);
             while (resultSet.next()) {
-                // Read privilege by role:
+                // Read privileges by role by user:
 
-                sql = "SELECT id_prv FROM erp.usrs_rol_prv WHERE id_rol = " + resultSet.getInt("id_rol") + " ";
+                sql = "SELECT id_prv "
+                        + "FROM erp.usrs_rol_prv "
+                        + "WHERE id_rol = " + resultSet.getInt("id_rol") + ";";
 
                 resultSetAux = statementAux.executeQuery(sql);
 
@@ -949,27 +944,34 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                     moPrivilegeUser.put(resultSetAux.getInt("id_prv"), resultSet.getInt("fid_tp_lev"));
                 }
             }
-            // Read privilege of user:
+            
+            // Read privileges by user:
 
             sql = "SELECT id_prv, fid_tp_lev "
-                    + "FROM erp.usru_prv_usr WHERE id_usr = " + session.getUser().getPkUserId() + " ORDER BY id_prv ";
+                    + "FROM erp.usru_prv_usr "
+                    + "WHERE id_usr = " + session.getUser().getPkUserId() + " "
+                    + "ORDER BY id_prv;";
 
             resultSet = session.getStatement().executeQuery(sql);
             while (resultSet.next()) {
                 moPrivilegeUser.put(resultSet.getInt("id_prv"), resultSet.getInt("fid_tp_lev"));
             }
-            // Read role of user by company:
+            
+            // Read roles by company:
 
             sql = "SELECT id_rol, fid_tp_lev "
                     + "FROM erp.usru_rol_co "
                     + "WHERE id_usr = " + session.getUser().getPkUserId() + " AND id_co = " + session.getConfigCompany().getCompanyId() + " "
-                    + "ORDER BY id_rol ";
+                    + "ORDER BY id_rol;";
 
             resultSet = session.getStatement().executeQuery(sql);
             while (resultSet.next()) {
-                // Read privilege by role:
+                // Read privileges by role by company:
 
-                sql = "SELECT id_prv FROM erp.usrs_rol_prv WHERE id_rol = " + resultSet.getInt("id_rol") + " ";
+                sql = "SELECT id_prv "
+                        + "FROM erp.usrs_rol_prv "
+                        + "WHERE id_rol = " + resultSet.getInt("id_rol") + ""
+                        + "ORDER BY id_prv;";
 
                 resultSetAux = statementAux.executeQuery(sql);
 
@@ -977,41 +979,38 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                     moPrivilegeUser.put(resultSetAux.getInt("id_prv"), resultSet.getInt("fid_tp_lev"));
                 }
             }
-            // Read privilege of user by company:
+            
+            // Read privileges by company:
 
             sql = "SELECT id_prv, fid_tp_lev "
-                    + "FROM erp.usru_prv_co WHERE id_usr = " + session.getUser().getPkUserId() + " AND id_co = " + session.getConfigCompany().getCompanyId() + " "
-                    + "ORDER BY id_prv ";
+                    + "FROM erp.usru_prv_co "
+                    + "WHERE id_usr = " + session.getUser().getPkUserId() + " AND id_co = " + session.getConfigCompany().getCompanyId() + " "
+                    + "ORDER BY id_prv;";
 
             resultSet = session.getStatement().executeQuery(sql);
             while (resultSet.next()) {
                 moPrivilegeUser.put(resultSet.getInt("id_prv"), resultSet.getInt("fid_tp_lev"));
             }
-            // Read role type and privilege type of user:
+            
+            // Establish access to modules from type of user's roles and privileges:
 
-            sql = "SELECT DISTINCT(tp_prv) AS tp_prv FROM(";
+            sql = "SELECT DISTINCT(tp_prv) AS tp_prv FROM (";
 
             sql += "SELECT DISTINCT(r_u.fid_tp_rol) AS tp_prv "
                     + "FROM erp.usru_rol_usr AS rol_u "
                     + "INNER JOIN erp.usrs_rol AS r_u ON rol_u.id_rol = r_u.id_rol "
                     + "WHERE rol_u.id_usr = " + session.getUser().getPkUserId() + " ";
-
             sql += "UNION ";
-
             sql += "SELECT DISTINCT(p_u.fid_tp_prv) AS tp_prv "
                     + "FROM erp.usru_prv_usr AS prv_u "
                     + "INNER JOIN erp.usrs_prv AS p_u ON prv_u.id_prv = p_u.id_prv "
                     + "WHERE prv_u.id_usr = " + session.getUser().getPkUserId() + " ";
-
             sql += "UNION ";
-
             sql += "SELECT DISTINCT(r.fid_tp_rol) AS tp_prv "
                     + "FROM erp.usru_rol_co AS rol "
                     + "INNER JOIN erp.usrs_rol AS r ON rol.id_rol = r.id_rol "
                     + "WHERE rol.id_usr = " + session.getUser().getPkUserId() + " AND rol.id_co = " + session.getConfigCompany().getCompanyId() + " ";
-
             sql += "UNION ";
-
             sql += "SELECT DISTINCT(p.fid_tp_prv) AS tp_prv "
                     + "FROM erp.usru_prv_co AS prv "
                     + "INNER JOIN erp.usrs_prv AS p ON prv.id_prv = p.id_prv "

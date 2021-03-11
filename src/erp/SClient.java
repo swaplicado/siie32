@@ -1107,7 +1107,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         // Read privilege and module access by user:
 
-        moSessionXXX.getUser().readPrivilegeUser(moSession);
+        moSessionXXX.getUser().readUserPrivileges(moSession);
 
         if (moSession.getUser().hasModuleAccess(SModConsts.MOD_CFG_N)) {
         }

@@ -2634,7 +2634,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             switch (mnFormSubtype) {
                 case SModSysConsts.FINX_LAY_BANK_ACC:
                     enableFieldsForm(true);
-                    enableFieldsGrid(false);
+                    enableFieldsGrid(false); // disable all grid controls
+                    jbGridRowsCheckAll.setEnabled(true); // but enable this one
+                    jbGridRowsUncheckAll.setEnabled(true); // but enable this one
                     break;
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                     enableFieldsForm(false);
