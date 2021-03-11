@@ -31,7 +31,7 @@ public class SMfinUtils {
      * 
      * @return ArrayList
      */
-    public static ArrayList<SBalanceTax> getBalanceByTax(java.sql.Connection connection, int idDoc, int idYear, int recYear, String dt, int cat, int tp) {
+    public static ArrayList<SBalanceTax> getBalanceByTax(java.sql.Connection connection, int idDoc, int idYear, int recYear, int cat, int tp) {
         
         /* Query 1. Moves without document: */
         String sql = ""
@@ -69,7 +69,7 @@ public class SMfinUtils {
                     "        AND r.id_tp_rec = re.id_tp_rec" +
                     "        AND r.id_num = re.id_num" +
                     "        AND r.id_year = " + (recYear > 0 ? recYear : "re.id_year") + " " +
-                    (dt.isEmpty() ? "" : "AND r.dt <= '" + dt + "' ") +
+                    "        AND r.dt <= CONCAT(r.id_year, '-12-31') " +
                     "        AND NOT r.b_del" +
                     "        AND NOT re.b_del" +
                     "        AND re.fid_ct_sys_mov_xxx = " + cat +
