@@ -5,6 +5,7 @@
 
 package erp.musr.data;
 
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -52,6 +53,8 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     protected java.util.Date mtUserNewTs;
     protected java.util.Date mtUserEditTs;
     protected java.util.Date mtUserDeleteTs;
+    
+    // members for management of data registry:
 
     protected java.util.Vector<SDataTypeModule> mvDbmsTypeModules;
     protected java.util.Vector<SDataUserPrivilegeUser> mvDbmsUserPrivilegesUser;
@@ -65,15 +68,17 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
     private erp.mtrn.data.SDataUserConfigurationTransaction moDbmsUserConfigurationTransaction;
     
+    // members for management of user privileges in user session:
+    
     private java.util.HashSet<Integer> moModuleAccess;
     private java.util.HashMap<Integer, Integer> moPrivilegeUser;
     private java.util.HashMap<Integer, Integer> moRightsUser;
     private java.util.HashMap<int[], Integer> moRightsCompany;
 
     protected boolean mbExtraIsPasswordUpdateRequired;
-    protected boolean mbExtraIsSpecialSuperUser;
-    protected boolean mbExtraIsSpecialConfigurator;
-    protected boolean mbExtraIsSpecialAdministrator;
+    protected boolean mbExtraIsSpecialRoleSuper;
+    protected boolean mbExtraIsSpecialRoleConfig;
+    protected boolean mbExtraIsSpecialRoleAdmor;
 
     protected int mnAuxCompanyId;
 
@@ -193,6 +198,8 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         mvDbmsAccessCompanyBranches.clear();
         mvDbmsAccessCompanyBranchEntities.clear();
         mvDbmsAccessCompanyBranchEntitiesUniversal.clear();
+        
+        moDbmsUserConfigurationTransaction = null;
 
         moModuleAccess.clear();
         moPrivilegeUser.clear();
@@ -200,9 +207,9 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         moRightsCompany.clear();
 
         mbExtraIsPasswordUpdateRequired = false;
-        mbExtraIsSpecialSuperUser = false;
-        mbExtraIsSpecialConfigurator = false;
-        mbExtraIsSpecialAdministrator = false;
+        mbExtraIsSpecialRoleSuper = false;
+        mbExtraIsSpecialRoleConfig = false;
+        mbExtraIsSpecialRoleAdmor = false;
 
         mnAuxCompanyId = 0;
     }
@@ -369,23 +376,20 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Define special roles:
 
-                if (mnPkUserId == SDataConstantsSys.USRX_USER_SUPER) {
-                    mbExtraIsSpecialSuperUser = true;
-                }
-                else {
-                    for (SDataUserRoleUser role : mvDbmsUserRolesUser) {
-                        switch (role.getPkRoleId()) {
-                            case SDataConstantsSys.ROL_SPE_SUPER:
-                                mbExtraIsSpecialSuperUser = true;
-                                break;
-                            case SDataConstantsSys.ROL_SPE_CONFIG:
-                                mbExtraIsSpecialConfigurator = true;
-                                break;
-                            case SDataConstantsSys.ROL_SPE_ADMOR:
-                                mbExtraIsSpecialAdministrator = true;
-                                break;
-                            default:
-                        }
+                for (SDataUserRoleUser role : mvDbmsUserRolesUser) {
+                    switch (role.getPkRoleId()) {
+                        case SDataConstantsSys.ROL_SPE_SUPER:
+                            mbExtraIsSpecialRoleSuper = true;
+                            mbExtraIsSpecialRoleConfig = true;
+                            mbExtraIsSpecialRoleAdmor = true;
+                            break;
+                        case SDataConstantsSys.ROL_SPE_CONFIG:
+                            mbExtraIsSpecialRoleConfig = true;
+                            break;
+                        case SDataConstantsSys.ROL_SPE_ADMOR:
+                            mbExtraIsSpecialRoleAdmor = true;
+                            break;
+                        default:
                     }
                 }
 
@@ -411,7 +415,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
     @Override
     public int save(java.sql.Connection connection) {
-        int nParam = 1;
+        int param = 1;
         java.lang.String sql = "";
         java.sql.ResultSet resultSet = null;
         java.sql.Statement statement = null;
@@ -425,27 +429,27 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
                     "{ CALL erp.usru_usr_save(" +
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
                     "?, ?, ?, ?, ?, ?) }");
-            callableStatement.setInt(nParam++, mnPkUserId);
-            callableStatement.setString(nParam++, msUser);
-            callableStatement.setString(nParam++, msUserPassword);
-            callableStatement.setString(nParam++, msEmail);
-            callableStatement.setBoolean(nParam++, mbIsUniversal);
-            callableStatement.setBoolean(nParam++, mbIsCanEdit);
-            callableStatement.setBoolean(nParam++, mbIsCanDelete);
-            callableStatement.setBoolean(nParam++, mbIsActive);
-            callableStatement.setBoolean(nParam++, mbIsDeleted);
-            callableStatement.setBoolean(nParam++, mbIsRegistryNew ? true : mbExtraIsPasswordUpdateRequired);
-            callableStatement.setInt(nParam++, mnFkUserTypeId);
-            if (mnFkBizPartnerId_n > 0) callableStatement.setInt(nParam++, mnFkBizPartnerId_n); else callableStatement.setNull(nParam++, java.sql.Types.INTEGER);
-            callableStatement.setInt(nParam++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
-            callableStatement.registerOutParameter(nParam++, java.sql.Types.INTEGER);
-            callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-            callableStatement.registerOutParameter(nParam++, java.sql.Types.CHAR);
+            callableStatement.setInt(param++, mnPkUserId);
+            callableStatement.setString(param++, msUser);
+            callableStatement.setString(param++, msUserPassword);
+            callableStatement.setString(param++, msEmail);
+            callableStatement.setBoolean(param++, mbIsUniversal);
+            callableStatement.setBoolean(param++, mbIsCanEdit);
+            callableStatement.setBoolean(param++, mbIsCanDelete);
+            callableStatement.setBoolean(param++, mbIsActive);
+            callableStatement.setBoolean(param++, mbIsDeleted);
+            callableStatement.setBoolean(param++, mbIsRegistryNew ? true : mbExtraIsPasswordUpdateRequired);
+            callableStatement.setInt(param++, mnFkUserTypeId);
+            if (mnFkBizPartnerId_n > 0) callableStatement.setInt(param++, mnFkBizPartnerId_n); else callableStatement.setNull(param++, java.sql.Types.INTEGER);
+            callableStatement.setInt(param++, mbIsRegistryNew ? mnFkUserNewId : mnFkUserEditId);
+            callableStatement.registerOutParameter(param++, java.sql.Types.INTEGER);
+            callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
+            callableStatement.registerOutParameter(param++, java.sql.Types.CHAR);
             callableStatement.execute();
 
-            mnPkUserId = callableStatement.getInt(nParam - 3);
-            mnDbmsErrorId = callableStatement.getInt(nParam - 2);
-            msDbmsError = callableStatement.getString(nParam - 1);
+            mnPkUserId = callableStatement.getInt(param - 3);
+            mnDbmsErrorId = callableStatement.getInt(param - 2);
+            msDbmsError = callableStatement.getString(param - 1);
 
             if (mnDbmsErrorId != 0) {
                 throw new Exception(msDbmsError);
@@ -453,14 +457,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
             else {
                 // Save aswell the access permission to companies:
 
-                nParam = 1;
+                param = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_access_co_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(nParam++, mnPkUserId);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(param++, mnPkUserId);
+                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsAccessCompanies.size(); i++) {
@@ -472,14 +476,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the access permission to company branches:
 
-                nParam = 1;
+                param = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_access_cob_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(nParam++, mnPkUserId);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(param++, mnPkUserId);
+                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsAccessCompanyBranches.size(); i++) {
@@ -491,14 +495,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the access permission to branch entities:
 
-                nParam = 1;
+                param = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_access_cob_ent_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(nParam++, mnPkUserId);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(param++, mnPkUserId);
+                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsAccessCompanyBranchEntities.size(); i++) {
@@ -510,14 +514,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the access permission to branch entities universal:
 
-                nParam = 1;
+                param = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_access_cob_ent_univ_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(nParam++, mnPkUserId);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(param++, mnPkUserId);
+                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsAccessCompanyBranchEntitiesUniversal.size(); i++) {
@@ -529,14 +533,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the privileges at user level:
 
-                nParam = 1;
+                param = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_prv_usr_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(nParam++, mnPkUserId);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(param++, mnPkUserId);
+                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsUserPrivilegesUser.size(); i++) {
@@ -548,14 +552,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the privileges at company level:
 
-                nParam = 1;
+                param = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_prv_co_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(nParam++, mnPkUserId);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(param++, mnPkUserId);
+                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsUserPrivilegesCompany.size(); i++) {
@@ -567,14 +571,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the roles at user level:
 
-                nParam = 1;
+                param = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_rol_usr_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(nParam++, mnPkUserId);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(param++, mnPkUserId);
+                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsUserRolesUser.size(); i++) {
@@ -586,14 +590,14 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
                 // Save aswell the roles at company level:
 
-                nParam = 1;
+                param = 1;
 
                 callableStatement = connection.prepareCall(
                         "{ CALL erp.usru_rol_co_del(" +
                         "?, ?, ?) }");
-                callableStatement.setInt(nParam++, mnPkUserId);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
-                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+                callableStatement.setInt(param++, mnPkUserId);
+                callableStatement.registerOutParameter(param++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(param++, java.sql.Types.VARCHAR);
                 callableStatement.execute();
 
                 for (int i = 0; i < mvDbmsUserRolesCompany.size(); i++) {
@@ -667,12 +671,43 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     /*
      * Other class specific methods:
      */
+    
+    /**
+     * Check if privilege is restricted.
+     * @param privilege Constants defined in SDataConstantsSys.PRV_...
+     * @return <code>true</code> if privilege is restricted, otherwise <code>false</code>.
+     */
+    private boolean isPrivilegeRestricted(final int privilege) {
+        return SLibUtilities.belongsTo(privilege, new int[] { SDataConstantsSys.PRV_CFG_ERP, SDataConstantsSys.PRV_CFG_CO, SDataConstantsSys.PRV_CAT_USR });
+    }
+    
+    /**
+     * Check if privilege is granted by special role.
+     * @param privilege Constants defined in SDataConstantsSys.PRV_...
+     * @return <code>true</code> if privilege is granted by special role, otherwise <code>false</code>.
+     */
+    private boolean isPrivilegeGrantedBySpecialRole(final int privilege) {
+        boolean granted = false;
+        boolean isPrivilegeRestricted = isPrivilegeRestricted(privilege); // convenience variable
+        
+        if (isSupervisor()) {
+            granted = true;
+        }
+        else if (isConfigurator() && isPrivilegeRestricted) {
+            granted = true;
+        }
+        else if (isAdministrator() && !isPrivilegeRestricted) {
+            granted = true;
+        }
+        
+        return granted;
+    }
 
-    private void putPrivilegeHashMap(int privilege, int level, HashMap<Integer, Integer> map) {
+    private void putPrivilegeHashMap(final int privilege, final int level, final HashMap<Integer, Integer> map) {
         map.put(privilege, level);
     }
 
-    private void putPrivilegeHashMap(int company, int privilege, int level, HashMap<int[], Integer> map) {
+    private void putPrivilegeHashMap(final int company, final int privilege, final int level, final HashMap<int[], Integer> map) {
         if (map.get(new int[] { company, privilege }) == null) {
             map.put(new int[] { company, privilege }, level);
         }
@@ -681,7 +716,7 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         }
     }
 
-    private void prepareUserRights(java.sql.Statement statement) throws java.lang.Exception {
+    private void prepareUserRights(final Statement statement) throws Exception {
         SDataRole oRole = new SDataRole();
 
         // Prepare user privilegies in user roles:
@@ -725,42 +760,29 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         }
     }
 
-    private boolean hasSpecialRole(int role) {
-        boolean hasRole = false;
-
-        switch (role) {
-            case SDataConstantsSys.ROL_SPE_SUPER:
-                hasRole = mbExtraIsSpecialSuperUser;
-                break;
-            case SDataConstantsSys.ROL_SPE_CONFIG:
-                hasRole = mbExtraIsSpecialSuperUser || mbExtraIsSpecialConfigurator;
-                break;
-            case SDataConstantsSys.ROL_SPE_ADMOR:
-                hasRole = mbExtraIsSpecialSuperUser || mbExtraIsSpecialAdministrator;
-                break;
-            default:
-        }
-
-        return hasRole;
-    }
-
     /*
      * Class public methods:
      */
 
-    public boolean hasAccessToModule(int moduleId, int companyId) {
+    /**
+     * Check if user has access to module.
+     * @param moduleId
+     * @param companyId
+     * @return 
+     */
+    public boolean hasAccessToModule(final int moduleId, final int companyId) {
         boolean access = false;
 
-        if (mbExtraIsSpecialSuperUser) {
+        if (isSupervisor()) {
             access = true;
         }
 
         if (!access) {
             if (moduleId == SDataConstants.MOD_CFG) {
-                access = mbExtraIsSpecialConfigurator;
+                access = isConfigurator();
             }
             else {
-                access = mbExtraIsSpecialAdministrator;
+                access = isAdministrator();
             }
         }
 
@@ -846,27 +868,16 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     }
 
     /**
-     * This funtion looks for a specific privilege for the user logged and
-     * determines if it has right.
+     * Look for a specific privilege for the user of current session.
      *
      * @param client ERP Client interface.
      * @param privilege The privilege to look.
      * @return A instance of <code>erp.musr.data.SDataUser.Right</code>.
      */
-    public erp.musr.data.SDataUser.Right hasRight(erp.client.SClientInterface client, int privilege) {
+    public erp.musr.data.SDataUser.Right hasRight(final SClientInterface client, final int privilege) {
         SDataUser.Right right = new SDataUser.Right(privilege, false, SLibConstants.UNDEFINED);
-
-        if (hasSpecialRole(SDataConstantsSys.ROL_SPE_SUPER)) {
-            right.HasRight = true;
-            right.Level = SUtilConsts.LEV_MANAGER;
-        }
-        else if (hasSpecialRole(SDataConstantsSys.ROL_SPE_CONFIG) &&
-                SLibUtilities.belongsTo(privilege, new int[] { SDataConstantsSys.PRV_CFG_ERP, SDataConstantsSys.PRV_CFG_CO, SDataConstantsSys.PRV_CAT_USR })) {
-            right.HasRight = true;
-            right.Level = SUtilConsts.LEV_MANAGER;
-        }
-        else if (hasSpecialRole(SDataConstantsSys.ROL_SPE_ADMOR) &&
-                !SLibUtilities.belongsTo(privilege, new int[] { SDataConstantsSys.PRV_CFG_ERP, SDataConstantsSys.PRV_CFG_CO })) {
+        
+        if (isPrivilegeGrantedBySpecialRole(privilege)) {
             right.HasRight = true;
             right.Level = SUtilConsts.LEV_MANAGER;
         }
@@ -1069,28 +1080,35 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
     @Override
     public boolean isAdministrator() {
-        return isSupervisor() || mnFkUserTypeId == SModSysConsts.USRS_TP_USR_ADM;
+        return isSupervisor() || mnFkUserTypeId == SModSysConsts.USRS_TP_USR_ADM || mbExtraIsSpecialRoleAdmor;
+    }
+
+    public boolean isConfigurator() {
+        return isSupervisor() || mbExtraIsSpecialRoleConfig;
     }
 
     @Override
     public boolean isSupervisor() {
-        return mnFkUserTypeId == SModSysConsts.USRS_TP_USR_SUP;
+        return mnFkUserTypeId == SModSysConsts.USRS_TP_USR_SUP || mnPkUserId == SDataConstantsSys.USRX_USER_SUPER || mbExtraIsSpecialRoleSuper;
     }
 
     @Override
-    public boolean hasModuleAccess(int module) {
+    public boolean hasModuleAccess(final int module) {
+        throw new UnsupportedOperationException("Not supported yet.");
+        
+        /* 2021-03-11 Sergio Flores: Not implemented yet. Keep code for further maintenance!
         boolean access = false;
 
-        if (mbExtraIsSpecialSuperUser) {
+        if (isSupervisor()) {
             access = true;
         }
 
         if (!access) {
             if (module == SModConsts.MOD_CFG_N) {
-                access = mbExtraIsSpecialConfigurator;
+                access = isConfigurator();
             }
             else {
-                access = mbExtraIsSpecialAdministrator;
+                access = isAdministrator();
             }
         }
 
@@ -1099,15 +1117,16 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
         }
 
         return access;
+        */
     }
 
     @Override
-    public boolean hasPrivilege(int privilege) {
+    public boolean hasPrivilege(final int privilege) {
         return hasPrivilege(new int[] { privilege });
     }
 
     @Override
-    public boolean hasPrivilege(int[] privileges) {
+    public boolean hasPrivilege(final int[] privileges) {
         boolean has = false;
 
         for (Integer privilege : privileges) {
@@ -1119,10 +1138,15 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
     }
 
     @Override
-    public int getPrivilegeLevel(int privilege) {
-        Integer level = moPrivilegeUser.get(privilege);
+    public int getPrivilegeLevel(final int privilege) {
+        if (isPrivilegeGrantedBySpecialRole(privilege)) {
+            return SUtilConsts.LEV_MANAGER;
+        }
+        else {
+            Integer level = moPrivilegeUser.get(privilege);
 
-        return level == null ? SUtilConsts.LEV_NONE : level;
+            return level == null ? SUtilConsts.LEV_NONE : level;
+        }
     }
 
     @Override
@@ -1142,16 +1166,16 @@ public class SDataUser extends SDataRegistry implements Serializable, SGuiUser {
 
     @Override
     public SGuiSessionCustom createSessionCustom(SGuiClient client) {
+        return createSessionCustom(client, 0);
+    }
+
+    @Override
+    public SGuiSessionCustom createSessionCustom(SGuiClient client, int terminal) {
         SSessionCustom sessionCustom = new SSessionCustom(client.getSession());
 
         sessionCustom.updateSessionSettings();
 
         return sessionCustom;
-    }
-
-    @Override
-    public SGuiSessionCustom createSessionCustom(SGuiClient client, int terminal) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

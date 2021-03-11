@@ -107,7 +107,7 @@ import sa.lib.xml.SXmlUtils;
 public class SClient extends JFrame implements ActionListener, SClientInterface, SGuiClient {
 
     public static final String APP_NAME = "SIIE 3.2";
-    public static final String APP_RELEASE = "3.2 180.3*"; // fecha release: 2021-03-10
+    public static final String APP_RELEASE = "3.2 180.4"; // fecha release: 2021-03-11
     public static final String APP_COPYRIGHT = "2007-2021";
     public static final String APP_PROVIDER = "Software Aplicado SA de CV";
 
@@ -1109,6 +1109,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         moSessionXXX.getUser().readUserPrivileges(moSession);
 
+        /* Functionality not yet implemented (sflores, 2015-09-28). Keep code for further maintenance!
         if (moSession.getUser().hasModuleAccess(SModConsts.MOD_CFG_N)) {
         }
         if (moSession.getUser().hasModuleAccess(SModConsts.MOD_USR_N)) {
@@ -1130,16 +1131,13 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         if (moSession.getUser().hasModuleAccess(SModConsts.MOD_HRS_N)) {    
         }
         if (moSession.getUser().hasModuleAccess(SModConsts.MOD_QLT_N)) {
-            /* Functionality not yet implemented (sflores, 2015-09-28)
             modulesAccessed++;
             jtbModuleSomRm.setEnabled(true);
             if (defaultToggleButton == null) {
                 defaultToggleButton = jtbModuleSomRm;
             }
-            */
         }
 
-        /* Functionality not yet implemented (sflores, 2015-09-28)
         if (defaultToggleButton != null) {
             defaultToggleButton.requestFocus();
         }
