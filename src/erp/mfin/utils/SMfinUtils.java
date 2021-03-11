@@ -31,7 +31,7 @@ public class SMfinUtils {
      * 
      * @return ArrayList
      */
-    public static ArrayList<SBalanceTax> getBalanceByTax(java.sql.Connection connection, int idDoc, int idYear, int recYear, int cat, int tp) {
+    public static ArrayList<SBalanceTax> getBalanceByTax(java.sql.Connection connection, int idDoc, int idYear, int cat, int tp) {
         
         /* Query 1. Moves without document: */
         String sql = ""
@@ -68,8 +68,6 @@ public class SMfinUtils {
                     "        AND r.id_bkc = re.id_bkc" +
                     "        AND r.id_tp_rec = re.id_tp_rec" +
                     "        AND r.id_num = re.id_num" +
-                    "        AND r.id_year = " + (recYear > 0 ? recYear : "re.id_year") + " " +
-                    "        AND r.dt <= CONCAT(r.id_year, '-12-31') " +
                     "        AND NOT r.b_del" +
                     "        AND NOT re.b_del" +
                     "        AND re.fid_ct_sys_mov_xxx = " + cat +
@@ -86,7 +84,7 @@ public class SMfinUtils {
                     "    trn_dps AS d ON re.fid_dps_year_n = d.id_year" +
                     "        AND re.fid_dps_doc_n = d.id_doc" +
                     "        AND d.b_del = 0" +
-                    "        AND d.fid_st_dps = 2" +
+                    "        AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED +
                     "        AND re.fid_dps_year_n = " + idYear + " " +
                     "        AND re.fid_dps_doc_n = " + idDoc + " " +
                     "        INNER JOIN" +
