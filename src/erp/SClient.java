@@ -1109,6 +1109,7 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
 
         moSessionXXX.getUser().readUserPrivileges(moSession);
 
+        /* Functionality not yet implemented (sflores, 2015-09-28). Keep code for further maintenance!
         if (moSession.getUser().hasModuleAccess(SModConsts.MOD_CFG_N)) {
         }
         if (moSession.getUser().hasModuleAccess(SModConsts.MOD_USR_N)) {
@@ -1130,16 +1131,13 @@ public class SClient extends JFrame implements ActionListener, SClientInterface,
         if (moSession.getUser().hasModuleAccess(SModConsts.MOD_HRS_N)) {    
         }
         if (moSession.getUser().hasModuleAccess(SModConsts.MOD_QLT_N)) {
-            /* Functionality not yet implemented (sflores, 2015-09-28)
             modulesAccessed++;
             jtbModuleSomRm.setEnabled(true);
             if (defaultToggleButton == null) {
                 defaultToggleButton = jtbModuleSomRm;
             }
-            */
         }
 
-        /* Functionality not yet implemented (sflores, 2015-09-28)
         if (defaultToggleButton != null) {
             defaultToggleButton.requestFocus();
         }
