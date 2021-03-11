@@ -6,6 +6,7 @@ package erp.mfin.form;
 
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
+import erp.lib.form.SFormUtilities;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STablePane;
 import erp.mfin.data.SDataCfdRecordRow;
@@ -13,7 +14,9 @@ import erp.mtrn.data.SCfdUtils;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -131,6 +134,13 @@ public class SDialogRecordEntryXml extends javax.swing.JDialog implements Action
         jbRowRemove.addActionListener(this);
         jbOk.addActionListener(this);
         jbCancel.addActionListener(this);
+        
+        AbstractAction actionCancel = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) { actionCancel(); }
+        };
+        
+        SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
         
         populateGridRows();
     }

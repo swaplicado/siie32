@@ -1,5 +1,13 @@
 ================================================================================
 SIIE 3.2 180.3*/ 2021-03-10
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se creó una nueva vista que muestra los renglones de pólizas contables que no tienen un XML de egresos, en el menú de Pólizas contables en el módulo de Contabilidad.
+2) Se corrigió el toolTipText del botón del filtro de pólizas contables.
+3) Se reestructuró el reporte de "Estado de resultados" recorriendo las columnas a la derecha y agregando los porcentajes y la ultilidad en la columna de perdiodo para la modalidad periodo.
+
+================================================================================
+SIIE 3.2 180.3*/ 2021-03-10
 Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de consulta para cálculo de PT en Módulo Recursos Humanos.

@@ -519,7 +519,7 @@ public class SFormRecordEntry extends javax.swing.JDialog implements erp.lib.for
         jPanel11.add(jbFileXmlAdd);
 
         jbGetXml.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/icon_std_doc_xml.gif"))); // NOI18N
-        jbGetXml.setToolTipText("Agregar archivos XML");
+        jbGetXml.setToolTipText("Descargar archivos XML");
         jbGetXml.setFocusable(false);
         jbGetXml.setPreferredSize(new java.awt.Dimension(23, 23));
         jPanel11.add(jbGetXml);
