@@ -5,7 +5,9 @@
 package erp.mod.trn.view;
 
 import erp.data.SDataConstantsSys;
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.mod.SModConsts;
+import erp.table.SFilterConstants;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibUtils;
@@ -15,6 +17,7 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
 /**
@@ -27,6 +30,8 @@ public class SViewInvoicePending extends SGridPaneView {
     private Date mtDateFinal;
     private int mnYearId;
     private int mnBizPartberId;
+    
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
     
     public SViewInvoicePending(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, gridType, gridSubtype, title, params);
@@ -42,6 +47,9 @@ public class SViewInvoicePending extends SGridPaneView {
         mtDateStart = null;
         mnBizPartberId = 0;
         createGridColumns();
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
 
     private void setParamsView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
@@ -72,6 +80,14 @@ public class SViewInvoicePending extends SGridPaneView {
     
     @Override
     public void prepareSqlQuery() {
+        String sql = "";
+        Object filter = null;
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null) {
+            sql += "AND d.fid_func IN ( " + filter + ") ";
+        }
+        
         moPaneSettings = new SGridPaneSettings(2);
         msSql= "SELECT d.id_year " + SDbConsts.FIELD_ID + "1, " +
                 "d.id_doc " + SDbConsts.FIELD_ID + "2, " + 
@@ -79,8 +95,9 @@ public class SViewInvoicePending extends SGridPaneView {
                 "'' AS " + SDbConsts.FIELD_NAME + ", " + 
                 "d.dt, d.dt_doc_delivery_n, d.num_ref, d.b_close, d.b_del, d.ts_close, CONCAT(d.num_ser, IF(length(d.num_ser) = 0, '', '-'), d.num) AS f_num, " +
                 "IF(d.aut_authorn_rej = " + SDataConstantsSys.TRNS_ST_DPS_NEW + ", 'Tope evento usuario', IF(d.aut_authorn_rej = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + ", 'Tope mensual usuario', IF(d.aut_authorn_rej = " + SDataConstantsSys.TRNS_ST_DPS_ANNULED + ", 'Tope mensual área funcional', 'No aplica'))) " +
-                "AS _aut_auth_rej, d.ts_authorn, d.tot_cur_r, dt.code, c.cur_key, b.id_bp, b.bp, bc.bp_key, bb.id_bpb, bb.bpb, cb.code, sa.st_dps_authorn, ua.usr FROM  " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d " +
-                "INNER JOIN  " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS dt ON d.fid_ct_dps = dt.id_ct_dps " ;
+                "AS _aut_auth_rej, d.ts_authorn, d.tot_cur_r, dt.code, c.cur_key, b.id_bp, b.bp, bc.bp_key, bb.id_bpb, bb.bpb, cb.code, sa.st_dps_authorn, ua.usr " +
+                "FROM  " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d " +
+                "INNER JOIN  " + SModConsts.TablesMap.get(SModConsts.TRNU_TP_DPS) + " AS dt ON d.fid_ct_dps = dt.id_ct_dps " + sql ;
                  if (mnGridMode == SDataConstantsSys.BPSS_CT_BP_CUS) {
                     msSql += "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2] + " ";
                 }

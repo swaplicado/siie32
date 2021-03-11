@@ -6,9 +6,11 @@ package erp.mod.trn.view.qi;
 
 import erp.SClientUtils;
 import erp.client.SClientInterface;
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.lib.table.STableConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.table.SFilterConstants;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibUtils;
@@ -17,6 +19,7 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
 /**
@@ -24,6 +27,8 @@ import sa.lib.gui.SGuiParams;
  * @author Claudio Peña, Isabel Servín
  */
 public class SViewCreditNotes extends SGridPaneView {
+    
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
 
     private Date mtDateStart;
     private Date mtDateFinal;
@@ -43,6 +48,10 @@ public class SViewCreditNotes extends SGridPaneView {
         setRowButtonsEnabled(false);
         mnBizPartherId = 0;
         createGridColumns();
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
     
     private void setParamsView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
@@ -73,12 +82,19 @@ public class SViewCreditNotes extends SGridPaneView {
     @Override
     public void prepareSqlQuery() {
         String complementaryDbName = "";
+        String whereFunAreas = "";
+        Object filter = null;
         
         try {
             complementaryDbName = SClientUtils.getComplementaryDdName((SClientInterface) miClient);
         }
         catch (Exception e) {
             SLibUtils.printException(this, e);
+        }
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null) {
+            whereFunAreas = " AND d.fid_func IN ( " + filter + ") ";
         }
             
         moPaneSettings = new SGridPaneSettings(2);
@@ -98,7 +114,8 @@ public class SViewCreditNotes extends SGridPaneView {
         "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code, ul.usr, uc.usr, un.usr, ue.usr, ud.usr , " +
         "(SELECT rbc.code FROM fin_bkc AS rbc WHERE r.id_bkc = rbc.id_bkc) AS f_rbc_code, " +
         "(SELECT rcb.code FROM erp.bpsu_bpb AS rcb WHERE r.fid_cob = rcb.id_bpb) AS f_rcb_code, CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, " + SModSysConsts.FINS_TP_ACC_BAL + ")) as f_rper, " +
-        "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SModSysConsts.ITMU_TP_UNIT_MASS + ")) as f_rnum FROM trn_dps AS d " +
+        "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SModSysConsts.ITMU_TP_UNIT_MASS + ")) as f_rnum " +
+        "FROM trn_dps AS d " +
         "INNER JOIN erp.bpsu_bp AS bp ON d.fid_bp_r = bp.id_bp " +
         "INNER JOIN erp.bpsu_bp_ct AS bpc ON bp.id_bp = bpc.id_bp AND bpc.id_ct_bp = " + SModSysConsts.FINS_TP_ACC_RES + " " +
         "INNER JOIN erp.bpsu_bpb AS bpb ON d.fid_bpb = bpb.id_bpb " +
@@ -113,7 +130,7 @@ public class SViewCreditNotes extends SGridPaneView {
         "LEFT OUTER JOIN " + complementaryDbName + ".trn_cfd AS xc ON x.id_cfd = xc.id_cfd " +
         "LEFT OUTER JOIN trn_dps_rec AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +
         "LEFT OUTER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
-        "WHERE bp.id_bp = " + mnBizPartherId + " AND d.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND YEAR(d.dt) = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "'";
+        "WHERE bp.id_bp = " + mnBizPartherId + " " + whereFunAreas + " AND d.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND YEAR(d.dt) = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "'";
         
     }
           

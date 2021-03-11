@@ -13,6 +13,7 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableRow;
 import erp.mcfg.data.SDataParamsCompany;
 import erp.mod.SModConsts;
+import erp.mod.SModSysConsts;
 import erp.server.SQueryRequest;
 import erp.server.SServerConstants;
 import erp.server.SServerRequest;
@@ -94,6 +95,32 @@ public abstract class SDataReadTableRows {
                         (filterKey == null ? "" : "AND id_cob = " + ((int[]) filterKey)[0] + " AND fid_ct_ent = " + ((int[]) filterKey)[1] + " " +
                         (((int[]) filterKey).length > 2 ? " AND fid_tp_ent = " + ((int[]) filterKey)[2] : "" ) ) + " " +
                         "ORDER BY id_cob, ent, id_ent ";
+                break;
+                
+            case SModConsts.CFGU_FUNC:
+                aoPkFields = new STableField[1];
+                aoPkFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "id_func");
+
+                i = 0;
+                aoQueryFields = new STableField[2];
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "code");
+                aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "name");
+                
+                sSql = "SELECT fa.id_func, fa.name, fa.code "
+                        + "FROM cfgu_func AS fa ";
+                if (filterKey != null) {
+                    sSql += "INNER JOIN usr_usr_func AS fau ON "
+                            + "fau.id_func = fa.id_func AND (fau.id_usr = " + ((int[]) filterKey)[0] + " OR fa.id_func = " + SModSysConsts.CFGU_FUNC_NON + " ) ";
+                }
+                sSql += "WHERE NOT b_del ";
+                if (filterKey != null) {
+                    sSql += "UNION "
+                            + "SELECT fa.id_func, fa.name, fa.code "
+                            + "FROM cfgu_func AS fa "
+                            + "WHERE fa.id_func = " + SModSysConsts.CFGU_FUNC_NON+ " ";
+                }
+                sSql += "ORDER BY name, code, id_func ";
+                
                 break;
 
             case SDataConstants.CFGU_LAN:

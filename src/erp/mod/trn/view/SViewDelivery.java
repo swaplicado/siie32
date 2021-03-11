@@ -4,9 +4,11 @@
  */
 package erp.mod.trn.view;
 
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.trn.db.STrnUtils;
+import erp.table.SFilterConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import sa.lib.gui.SGuiDate;
 public class SViewDelivery extends SGridPaneView implements ActionListener {
 
     private SGridFilterDatePeriod moFilterDatePeriod;
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
     private JButton mjPrint;
     
     /**
@@ -47,6 +50,9 @@ public class SViewDelivery extends SGridPaneView implements ActionListener {
         moFilterDatePeriod = new SGridFilterDatePeriod(miClient, this, SGuiConsts.DATE_PICKER_DATE_PERIOD);
         moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
 
         mjPrint = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_PRINT), SUtilConsts.TXT_PRINT, this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(mjPrint);
@@ -97,6 +103,11 @@ public class SViewDelivery extends SGridPaneView implements ActionListener {
         filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
         if (filter != null) {
             where += (where.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
+        }
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null) {
+            where += (where.isEmpty() ? "" : "AND ") + "d.fid_func IN ( " + filter + ") ";
         }
         
         msSql = "SELECT v.id_dvy AS " + SDbConsts.FIELD_ID + "1, "

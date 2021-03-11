@@ -8,12 +8,14 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataUtilities;
 import erp.gui.SModuleUtilities;
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbDps;
 import erp.mtrn.data.SDataDps;
+import erp.table.SFilterConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -49,6 +51,7 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
     private JButton mjDpsNotes;
     private JButton mjDpsLinks;
     private SGridFilterDatePeriod moFilterDatePeriod;
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
     
     /**
      * @param client GUI client.
@@ -86,6 +89,9 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
             moFilterDatePeriod.initFilter(new SGuiDate(SGuiConsts.GUI_DATE_MONTH, miClient.getSession().getCurrentDate().getTime()));
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDatePeriod);
         }
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
     
     private boolean isProcessed() {
@@ -193,6 +199,11 @@ public class SViewDeliveryQuery extends SGridPaneView implements ActionListener 
             if (filter != null) {
                 where = SGridUtils.getSqlFilterDate("d.dt", (SGuiDate) filter);
             }
+        }
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null) {
+            where += (where.isEmpty() ? "" : "AND ") + "d.fid_func IN ( " + filter + ") ";
         }
         
         switch (mnGridSubtype) {

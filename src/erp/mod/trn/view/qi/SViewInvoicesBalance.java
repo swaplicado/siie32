@@ -5,9 +5,11 @@
 package erp.mod.trn.view.qi;
 
 import erp.data.SDataConstantsSys;
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.lib.table.STableConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.table.SFilterConstants;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibUtils;
@@ -16,6 +18,7 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
 /**
@@ -29,6 +32,7 @@ public class SViewInvoicesBalance extends SGridPaneView {
     private Date mtDateStart;
     private Date mtDateFinal;
     
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
     
     public SViewInvoicesBalance(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, gridType, gridSubtype, title, params);
@@ -45,6 +49,9 @@ public class SViewInvoicesBalance extends SGridPaneView {
         mtDateFinal = null;
         mnBizPartherId = 0;
         createGridColumns();
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
     
      private void setParamsView(final Date dateStart, final Date dateFinal, final int idBizPartner, final int year ) {
@@ -74,6 +81,13 @@ public class SViewInvoicesBalance extends SGridPaneView {
     
     @Override
     public void prepareSqlQuery() {
+        String sql = "";
+        Object filter = null;
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null) {
+            sql += "AND d.fid_func IN ( " + filter + ") ";
+        }
         
         moPaneSettings = new SGridPaneSettings(2);
         /* Query 1. Moves without document: */
@@ -123,7 +137,7 @@ public class SViewInvoicesBalance extends SGridPaneView {
                 "INNER JOIN erp.bpsu_bp AS b ON re.fid_bp_nr = b.id_bp " +
                 "INNER JOIN erp.bpsu_bp_ct AS bct ON re.fid_bp_nr = bct.id_bp AND bct.id_ct_bp = re.fid_tp_sys_mov_xxx " +
                 "INNER JOIN erp.bpsu_tp_bp AS btp ON bct.fid_tp_bp = btp.id_tp_bp AND btp.id_ct_bp = re.fid_tp_sys_mov_xxx " +
-                "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc AND d.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND d.fid_st_dps = 2 " +
+                "INNER JOIN trn_dps AS d ON re.fid_dps_year_n = d.id_year AND re.fid_dps_doc_n = d.id_doc AND d.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND d.fid_st_dps = 2 " + sql +
                 "INNER JOIN erp.trnu_tp_dps AS dt ON d.fid_ct_dps = dt.id_ct_dps AND d.fid_cl_dps = dt.id_cl_dps AND d.fid_tp_dps = dt.id_tp_dps " +
                 "INNER JOIN erp.cfgu_cur AS c ON d.fid_cur = c.id_cur " +
                 "INNER JOIN erp.bpsu_bpb AS cob ON d.fid_cob = cob.id_bpb " +
