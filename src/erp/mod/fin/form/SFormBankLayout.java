@@ -1892,7 +1892,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jbExchangeRateReset.setEnabled(enableFields && !isExchangeRateNotRequired());
         jbExchangeRateRefresh.setEnabled(enableFields && !isExchangeRateNotRequired());
         jbGridRowsCheckAll.setEnabled(enableFields && isModeForTransfersOfPayments());
-        jbGridRowsUncheckAll.setEnabled(enableFields && isModeForTransfers());
+        jbGridRowsUncheckAll.setEnabled(enableFields && isModeForTransfersOfPayments());
         
         jbPickLayoutPath.setEnabled(enableFields && isModeForTransfers());
     }
