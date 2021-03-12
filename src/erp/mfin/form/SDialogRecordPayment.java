@@ -1116,8 +1116,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         SDataDsm oDsm = new SDataDsm();
         SDataRecord oRecord = null;
         SDataBizPartnerBranch branch = null;
-        ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), moDps.getPkDocId(), moDps.getPkYearId(), miClient.getSession().getCurrentYear(),
-                                                    miClient.getSession().getCurrentYear() + "-12-31", 
+        ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), moDps.getPkDocId(), moDps.getPkYearId(), 
                                                     mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], 
                                                     mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
         

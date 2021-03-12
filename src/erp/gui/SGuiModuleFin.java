@@ -179,9 +179,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
     private javax.swing.JMenu jmRec;
     private javax.swing.JMenuItem jmiRecRec;
+    private javax.swing.JMenuItem jmiRecRecCash;
     private javax.swing.JMenuItem jmiRecRecEtyXmlIncome;
     private javax.swing.JMenuItem jmiRecRecEtyXmlExpenses;
-    private javax.swing.JMenuItem jmiRecRecCash;
+    private javax.swing.JMenuItem jmiRecRecEtyWithoutXmlExpenses;
     private javax.swing.JMenuItem jmiRecAudPend;
     private javax.swing.JMenuItem jmiRecAud;
     private javax.swing.JMenuItem jmiRecBal;
@@ -493,9 +494,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmRec = new JMenu("Pólizas contables");
 
         jmiRecRec = new JMenuItem("Pólizas contables");
+        jmiRecRecCash = new JMenuItem("Pólizas contables de cuentas de dinero");
         jmiRecRecEtyXmlIncome = new JMenuItem("Pólizas contables con XML de ingresos");
         jmiRecRecEtyXmlExpenses = new JMenuItem("Pólizas contables con XML de egresos");
-        jmiRecRecCash = new JMenuItem("Pólizas contables de cuentas de dinero");
+        jmiRecRecEtyWithoutXmlExpenses = new JMenuItem("Renglones de pólizas contables sin XML de egresos");
         jmiRecAudPend = new JMenuItem("Pólizas contables por auditar");
         jmiRecAud = new JMenuItem("Pólizas contables auditadas");
         jmiRecBal = new JMenuItem("Balanza de comprobación");
@@ -515,9 +517,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRecDpsBizPartnerSup = new JMenuItem("Consulta pólizas contables de docs. de proveedores");
 
         jmRec.add(jmiRecRec);
+        jmRec.add(jmiRecRecCash);
         jmRec.add(jmiRecRecEtyXmlIncome);
         jmRec.add(jmiRecRecEtyXmlExpenses);
-        jmRec.add(jmiRecRecCash);
+        jmRec.add(jmiRecRecEtyWithoutXmlExpenses);
         jmRec.addSeparator();
         jmRec.add(jmiRecAudPend);
         jmRec.add(jmiRecAud);
@@ -840,9 +843,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiBkkFiscalYearOpeningDel.addActionListener(this);
 
         jmiRecRec.addActionListener(this);
+        jmiRecRecCash.addActionListener(this);
         jmiRecRecEtyXmlIncome.addActionListener(this);
         jmiRecRecEtyXmlExpenses.addActionListener(this);
-        jmiRecRecCash.addActionListener(this);
+        jmiRecRecEtyWithoutXmlExpenses.addActionListener(this);
         jmiRecAud.addActionListener(this);
         jmiRecAudPend.addActionListener(this);
         jmiRecBal.addActionListener(this);
@@ -1043,9 +1047,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
 
         jmRec.setEnabled(hasRightBookkeeping || hasRightRep || hasRightMoveAccCash || hasRightMoveBpCdr || hasRightMoveBpDbr);
         jmiRecRec.setEnabled(hasRightBookkeeping);
+        jmiRecRecCash.setEnabled(hasRightBookkeeping || hasRightMoveAccCash);
         jmiRecRecEtyXmlIncome.setEnabled(hasRightBookkeeping);
         jmiRecRecEtyXmlExpenses.setEnabled(hasRightBookkeeping);
-        jmiRecRecCash.setEnabled(hasRightBookkeeping || hasRightMoveAccCash);
+        jmiRecRecEtyWithoutXmlExpenses.setEnabled(hasRightBookkeeping);
         jmiRecAud.setEnabled(hasRightBookkeeping);
         jmiRecAudPend.setEnabled(hasRightBookkeeping);
         jmiRecBal.setEnabled(hasRightBookkeeping || hasRightRep);
@@ -1606,6 +1611,10 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                     oViewClass = erp.mfin.view.SViewRecord.class;
                     sViewTitle = "Pólizas contab.";
                     break;
+                case SDataConstants.FINX_REC_CASH:
+                    oViewClass = erp.mfin.view.SViewRecordCash.class;
+                    sViewTitle = "Pólizas contab. ctas. dinero";
+                    break;
                 case SDataConstants.FIN_REC_ETY:
                     switch(auxType01){
                         case SDataConstantsSys.TRNS_CT_DPS_PUR:
@@ -1618,9 +1627,9 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
                             break;
                     }
                     break;
-                case SDataConstants.FINX_REC_CASH:
-                    oViewClass = erp.mfin.view.SViewRecordCash.class;
-                    sViewTitle = "Pólizas contab. ctas. dinero";
+                case SDataConstants.FINX_REC_W_XML:
+                    oViewClass = erp.mfin.view.SViewRecordEntriesWithoutXml.class;
+                    sViewTitle = "Renglones pólizas contab. sin XML egresos";
                     break;
                 case SDataConstants.FINX_ACCOUNTING:
                     oViewClass = erp.mfin.view.SPanelAccounting.class;
@@ -1957,14 +1966,17 @@ public class SGuiModuleFin extends erp.lib.gui.SGuiModule implements java.awt.ev
             else if (item == jmiRecAudPend) {
                 showView(SDataConstants.FIN_REC, SUtilConsts.AUD_PEND);
             }
+            else if (item == jmiRecRecCash) {
+                showView(SDataConstants.FINX_REC_CASH);
+            }
             else if (item == jmiRecRecEtyXmlIncome) {
                 showView(SDataConstants.FIN_REC_ETY, SDataConstantsSys.TRNS_CT_DPS_SAL);
             }
             else if (item == jmiRecRecEtyXmlExpenses) {
                 showView(SDataConstants.FIN_REC_ETY, SDataConstantsSys.TRNS_CT_DPS_PUR);
             }
-            else if (item == jmiRecRecCash) {
-                showView(SDataConstants.FINX_REC_CASH);
+            else if (item == jmiRecRecEtyWithoutXmlExpenses) {
+                showView(SDataConstants.FINX_REC_W_XML);
             }
             else if (item == jmiRecBal) {
                 showView(SDataConstants.FINX_ACCOUNTING, SDataConstants.FINX_ACCOUNTING);

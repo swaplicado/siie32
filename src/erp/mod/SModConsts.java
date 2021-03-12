@@ -698,6 +698,7 @@ public abstract class SModConsts {
     public static final int HRSX_ABS_MOV = 2064101;
     public static final int HRSX_SSC_UPD = 2064102;
     public static final int HRSX_EAR_SSC = 2064103;
+    public static final int HRSX_PTU = 2064106;
     public static final int HRSX_IMPORT_CAP = 2064110;
     public static final int HRSX_LAYOUT_SUA_HIRE = 1;
     public static final int HRSX_LAYOUT_SUA_SSC = 2;
