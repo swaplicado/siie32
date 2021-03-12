@@ -61,13 +61,13 @@ public class SBankLayoutCourier extends Thread {
         mailBody += "<body>"
                 + "<div>"
                 + "<p>"
-                + paymentRow.getBizPartner() + ":"
+                + SLibUtils.textToHtml(paymentRow.getBizPartner()) + ":"
                 + "</p>"
                 + "<p>"
-                + "Se programo una transferencia a tu cuenta " + paymentRow.getBeneficiaryAccountBankName() + " con terminacion " + paymentRow.getBeneficiaryAccountNumberShort() + "."
+                + SLibUtils.textToHtml("Se programó una transferencia a tu cuenta " + paymentRow.getBeneficiaryAccountBankName() + " con terminación " + paymentRow.getBeneficiaryAccountNumberShort() + ".")
                 + "</p>"
                 + "<p>"
-                + "Importe: $" + SLibUtils.getDecimalFormatAmount().format(paymentRow.getPayment()) + " " + miClient.getSession().getSessionCustom().getCurrencyCode(new int[] { paymentRow.getCurrencyId() }) + "."
+                + "Importe: $" + SLibUtils.getDecimalFormatAmount().format(paymentRow.getPayment()) + " " + paymentRow.getPayerAccountCurrencyKey() + "."
                 + "</p>";
         
         SLayoutBankPayment payment = paymentRow.getLayoutBankPayment();
@@ -119,13 +119,13 @@ public class SBankLayoutCourier extends Thread {
         
         mailBody += "<p>"
                 + "Atentamente,<br>"
-                + "<strong>" + company.getBizPartner() + "</strong>"
+                + "<strong>" + SLibUtils.textToHtml(company.getBizPartner()) + "</strong>"
                 + "</p>"
                 + "<p>"
                 + "<small>"
                 + "P.D.<br>"
-                + "Veras reflejado el movimiento en tu cuenta en unos minutos mas.<br>"
-                + "Para recibir adecuadamente estas notificaciones, agreganos a tu lista de contactos."
+                + SLibUtils.textToHtml("Verás reflejado el movimiento en tu cuenta en unos minutos más.") + "<br>"
+                + SLibUtils.textToHtml("Para recibir adecuadamente estas notificaciones, agréganos a tu lista de contactos.")
                 + "</small>"
                 + "</p>";
         
