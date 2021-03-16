@@ -1,5 +1,11 @@
 ================================================================================
 SIIE 3.2 180.4/ 2021-03-11
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) correccion en la moneda en el correo de avisos de transferencias.
+
+================================================================================
+SIIE 3.2 180.4/ 2021-03-11
 Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
 1) Implementación de la separación de contabilización de documentos y pagos por tasa de impuesto.
