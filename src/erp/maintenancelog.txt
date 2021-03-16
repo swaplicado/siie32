@@ -1,3 +1,10 @@
+SIIE 3.2 180.4/ 2021-03-16
+Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al procesamiento de pagos al determinar los porcentajes de impuestos.
+2) Corrección al procesamiento de contabilización de documentos para casos de partidas sin impuestos.
+3) Corrección a la consulta de estatus de CFDI para permitir RFC del emisor o receptor con ampersand.
+
 ================================================================================
 SIIE 3.2 180.4/ 2021-03-11
 Isabel Danae GARCÍA SERVÍN
