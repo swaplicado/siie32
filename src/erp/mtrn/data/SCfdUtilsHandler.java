@@ -179,8 +179,8 @@ public class SCfdUtilsHandler {
             DecimalFormat decimalFormat33 = new DecimalFormat("#." + SLibUtils.textRepeat("#", 6));
             
             data += "?id=" + (uuid == null || uuid.isEmpty() ? SLibUtils.textRepeat("0", 40) : uuid);
-            data += "&re=" + (rfcEmisor == null || rfcEmisor.isEmpty() ? SLibUtils.textRepeat("X", 13) : rfcEmisor);
-            data += "&rr=" + (rfcReceptor == null || rfcReceptor.isEmpty() ? SLibUtils.textRepeat("X", 13) : rfcReceptor);
+            data += "&re=" + (rfcEmisor == null || rfcEmisor.isEmpty() ? SLibUtils.textRepeat("X", 13) : rfcEmisor.replaceAll("&", "&amp;"));
+            data += "&rr=" + (rfcReceptor == null || rfcReceptor.isEmpty() ? SLibUtils.textRepeat("X", 13) : rfcReceptor.replaceAll("&", "&amp;"));
             data += "&tt=" + decimalFormat33.format(SLibUtils.roundAmount(total));
         }
         
