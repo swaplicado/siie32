@@ -154,7 +154,12 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         addTaskBarLowerComponent(jbRestoreCfdCancelAck);
         addTaskBarLowerComponent(jbDeactivateFlags);
 
-        enableButtons();
+        if (miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_CFD_PAY).HasRight) {
+            enableButtons(miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_FIN_CFD_PAY));
+        }
+        else if (miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_MOV_ACC_CASH).HasRight){
+            enableButtons(miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_FIN_MOV_ACC_CASH));
+        }
         
         STableField[] aoKeyFields = new STableField[1];
         aoKeyFields[0] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "c.id_cfd");
@@ -203,7 +208,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         populateTable();
     }
     
-    private void enableButtons() {
+    private void enableButtons(int level) {
         jbNew.setEnabled(false);
         jbEdit.setEnabled(false);
         jbDelete.setEnabled(false); // deletion is not allowed
@@ -220,7 +225,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         jbRestoreCfdCancelAck.setEnabled(false);
         jbDeactivateFlags.setEnabled(false);
         
-        switch (miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_FIN_CFD_PAY)) {
+        switch (level) {
             case SUtilConsts.LEV_READ:
                 jbPrint.setEnabled(true);
                 jbPrintCancelAck.setEnabled(true);
