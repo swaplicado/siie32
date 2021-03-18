@@ -52,6 +52,7 @@ public class SLayoutBankRow implements SGridRow {
     protected boolean mbPayed;
     protected SMoney moMoneyDpsBalance;
     protected SMoney moMoneyPayment;
+    protected int mnBankCurrencyId;
     protected double mdBalanceTotByBizPartner;
     protected double mdBalancePayed;
     protected String msPayerAccountCurrencyKey;
@@ -128,6 +129,7 @@ public class SLayoutBankRow implements SGridRow {
         mbPayed = false;
         moMoneyDpsBalance = null;
         moMoneyPayment = null;
+        mnBankCurrencyId = 1;
         mdBalanceTotByBizPartner = 0;
         mdBalancePayed = 0;
         msPayerAccountCurrencyKey = "";
@@ -193,6 +195,7 @@ public class SLayoutBankRow implements SGridRow {
     public void setPayed(boolean b) { mbPayed = b; }
     public void setMoneyDpsBalance(SMoney o) { moMoneyDpsBalance = o; }
     public void setMoneyPayment(SMoney o) { moMoneyPayment = o; }
+    public void setBankCurrencyId(int n) { mnBankCurrencyId = n; } 
     public void setBalanceTotByBizPartner(double d) { mdBalanceTotByBizPartner = d; }
     public void setBalancePayed(double d) { mdBalancePayed = d; }
     public void setPayerAccountCurrencyKey(String s) { msPayerAccountCurrencyKey = s; }
@@ -229,6 +232,7 @@ public class SLayoutBankRow implements SGridRow {
     public void setBranchBankAccountCreditArray(ArrayList<SDataBizPartnerBranchBankAccount> a) { maBranchBankAccountCredits = a; }
     
     public void setExchangeRate(double exchangeRate) { moMoneyPayment.setExchangeRate(exchangeRate); }
+    public void setExchangeRate(double exchangeRate, int currencyId) { moMoneyPayment.setExchangeRate(exchangeRate, currencyId); }
     
     public void setIsXml(boolean b) { mbIsXml = b; }
     public void setXml(String s) { msXml = s; }
@@ -258,6 +262,7 @@ public class SLayoutBankRow implements SGridRow {
     public boolean isPayed() { return mbPayed; }
     public SMoney getMoneyDpsBalance() { return moMoneyDpsBalance; }
     public SMoney getMoneyPayment() { return moMoneyPayment; }
+    public int getBankCurrencyId() { return mnBankCurrencyId; }
     public double getBalanceTotByBizPartner() { return mdBalanceTotByBizPartner; }
     public double getBalancePayed() { return mdBalancePayed; }
     public String getPayerAccountCurrencyKey() { return msPayerAccountCurrencyKey; }
@@ -622,8 +627,8 @@ public class SLayoutBankRow implements SGridRow {
                             case 8:
                                 break;
                             case 9:
-                                if (!moMoneyDpsBalance.isLocalCurrency() || moMoneyDpsBalance.getOriginalCurrencyId() != moMoneyPayment.getOriginalCurrencyId()) {
-                                    setExchangeRate((double) value);
+                                if (!moMoneyDpsBalance.isLocalCurrency() || moMoneyDpsBalance.getOriginalCurrencyId() != mnBankCurrencyId) {
+                                    setExchangeRate((double) value, mnBankCurrencyId);
                                 }   
                                 break;
                             case 10:
