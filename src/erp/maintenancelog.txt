@@ -2,7 +2,8 @@
 SIIE 3.2 180.4/ 2021-03-11
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) correccion en la moneda en el correo de avisos de transferencias.
+1) Correccion en la moneda en el correo de avisos de transferencias.
+2) Correcciones en la vista de layouts bancarios.
 
 ================================================================================
 SIIE 3.2 180.4/ 2021-03-11
