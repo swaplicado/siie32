@@ -4844,7 +4844,7 @@ public abstract class SCfdUtils implements Serializable {
         }
 
         if (cfdsAux.isEmpty()) {
-            client.showMsgBoxInformation("No existen documentos timbrados para obtener XML.");
+            client.showMsgBoxInformation("No se contraron comprobantes  para obtener su correspondiente XML.");
         }
         else {
             client.getFileChooser().setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

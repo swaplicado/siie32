@@ -400,7 +400,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
     }
 
     @SuppressWarnings("unchecked")
-    private double readNetSales() {
+    private double readNetSales(boolean isPeriod) {
         int[] year = SLibTimeUtilities.digestYear(moFieldDateBegin.getDate());
         double netSales = 0;
         String sql = "";
@@ -414,7 +414,7 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
             sqlFilter = (jckShowRecordAdjYearEnd.isSelected() ? "" : "AND NOT r.b_adj_year ");
             sqlFilter += (jckShowRecordAdjAudit.isSelected() ? "" : "AND NOT r.b_adj_audit ");
 
-            if (jrbFormatStandard.isSelected()) {
+            if (isPeriod) {
                 sqlPeriod = "AND r.dt BETWEEN "
                         + "'" + SLibUtils.DbmsDateFormatDate.format(moFieldDateBegin.getDate()) + "' AND "
                         + "'" + SLibUtils.DbmsDateFormatDate.format(moFieldDateEnd.getDate()) + "' ";
@@ -495,7 +495,13 @@ public class SDialogRepProfitLossStatement extends javax.swing.JDialog implement
             map.put("nLenAccount", levels.get(2) - 1);
             map.put("sCompAccountMajor", account.substring(levels.get(1) - 1)); // complement to compose a ledger (level 1) account
             map.put("sCompAccount", account.substring(levels.get(2) - 1));      // complement to compose a level 2 subaccount
-            map.put("dNetSales", readNetSales());
+            if (jrbFormatStandard.isSelected()) {
+                map.put("dNetSales", readNetSales(true));
+            }
+            else {
+                map.put("dNetSales", readNetSales(false));
+                map.put("dNetSalesPer", readNetSales(true));
+            }
             map.put("sCurrency", ((SFormComponentItem) jcbCurrencyId.getSelectedItem()).getItem());
             map.put("dExchangeRate", moFieldExchangeRate.getDouble());
             map.put("sSqlFilter", sqlFilter);

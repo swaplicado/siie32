@@ -1,9 +1,31 @@
+SIIE 3.2 180.4/ 2021-03-16
+Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Corrección al procesamiento de pagos al determinar los porcentajes de impuestos.
+2) Corrección al procesamiento de contabilización de documentos para casos de partidas sin impuestos.
+3) Corrección a la consulta de estatus de CFDI para permitir RFC del emisor o receptor con ampersand.
+
+================================================================================
+SIIE 3.2 180.4/ 2021-03-11
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Correccion en la moneda en el correo de avisos de transferencias.
+2) Correcciones en la vista de layouts bancarios.
+
+================================================================================
+SIIE 3.2 180.4/ 2021-03-11
+Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
+--------------------------------------------------------------------------------
+1) Implementación de la separación de contabilización de documentos y pagos por tasa de impuesto.
+2) Refactorización al procesamiento de permisos de usuario en el registro de datos del usuario.
+
 ================================================================================
 SIIE 3.2 180.3*/ 2021-03-10
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
 1) Se creó una nueva vista que muestra los renglones de pólizas contables que no tienen un XML de egresos, en el menú de Pólizas contables en el módulo de Contabilidad.
 2) Se corrigió el toolTipText del botón del filtro de pólizas contables.
+3) Se reestructuró el reporte de "Estado de resultados" recorriendo las columnas a la derecha y agregando los porcentajes y la ultilidad en la columna de perdiodo para la modalidad periodo.
 
 ================================================================================
 SIIE 3.2 180.3*/ 2021-03-10

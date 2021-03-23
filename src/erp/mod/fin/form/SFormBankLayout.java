@@ -143,6 +143,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private HashMap<String, ArrayList<SGuiItem>> moAgreementReferencesMap;
     private ArrayList<SSrvLock> maLocks;
     
+    private boolean mbShowConfirmCloseDialog;
+    
     /**
      * Creates new form SFormLayoutBank
      * @param client GUI client.
@@ -765,6 +767,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 moGridPayments.getTable().getDefaultEditor(String.class).addCellEditorListener(SFormBankLayout.this);
                 moCellEditorOptions.addCellEditorListener(SFormBankLayout.this);
                 moCellEditorOptionsAgreementReference.addCellEditorListener(SFormBankLayout.this);
+                
+                mbShowConfirmCloseDialog = true;
 
                 return gridColumnsForm;
             }
@@ -830,7 +834,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     }
 
     private boolean isExchangeRateNotRequired() {
-        return miClient.getSession().getSessionCustom().isLocalCurrency(moKeyDpsCurrency.getValue()) || SLibUtils.compareKeys(moKeyDpsCurrency.getValue(), moKeyBankLayoutCurrency.getValue());
+        return !(!miClient.getSession().getSessionCustom().isLocalCurrency(moKeyDpsCurrency.getValue()) || !miClient.getSession().getSessionCustom().isLocalCurrency(moKeyBankLayoutCurrency.getValue()));
     }
 
     private void processLayoutBank() {
@@ -1015,12 +1019,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             moRegistry.parseBankLayoutXml(miClient);
             
             moGridPayments.populateGrid(new Vector<>(moRegistry.getAuxLayoutBankPaymentRows()));
-            moGridPayments.createGridColumns();
-            
-            moGridPayments.getTable().setColumnSelectionAllowed(false);
-            moGridPayments.getTable().getTableHeader().setReorderingAllowed(false);
-            moGridPayments.getTable().getTableHeader().setResizingAllowed(true);
-            moGridPayments.getTable().setRowSorter(new TableRowSorter<>(moGridPayments.getModel()));
+//            moGridPayments.createGridColumns();
+//            
+//            moGridPayments.getTable().setColumnSelectionAllowed(false);
+//            moGridPayments.getTable().getTableHeader().setReorderingAllowed(false);
+//            moGridPayments.getTable().getTableHeader().setResizingAllowed(true);
+//            moGridPayments.getTable().setRowSorter(new TableRowSorter<>(moGridPayments.getModel()));
             moGridPayments.getTable().getTableHeader().setEnabled(false);
             
             if (moGridPayments.getTable().getRowCount() > 0) {
@@ -1103,8 +1107,6 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         mltAgreementsReferences = new ArrayList<>();
         moAgreementReferencesMap = new HashMap<>();
 
-        Cursor cursor = getCursor();
-        
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
@@ -1174,6 +1176,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     layoutBankRow.setDpsCurrencyKey(resulSet.getString("cur_key"));
                     
                     layoutBankRow.setMoneyPayment(new SMoney(miClient.getSession(), 0d, resulSet.getInt("f_id_cur"), mnBankLayoutCurrencyId == mnDpsCurrencyId ? 1d : 0d));
+                    layoutBankRow.setBankCurrencyId(mnBankLayoutCurrencyId); 
                     layoutBankRow.setBalanceTotByBizPartner(0);
                     layoutBankRow.setPayerAccountCurrencyKey(moKeyBankLayoutCurrency.getSelectedIndex() <= 0 ?
                             SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, miClient.getSession().getSessionCustom().getLocalCurrencyKey(), SLibConstants.DESCRIPTION_CODE) : SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, moKeyBankLayoutCurrency.getValue(), SLibConstants.DESCRIPTION_CODE));
@@ -1892,7 +1895,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jbExchangeRateReset.setEnabled(enableFields && !isExchangeRateNotRequired());
         jbExchangeRateRefresh.setEnabled(enableFields && !isExchangeRateNotRequired());
         jbGridRowsCheckAll.setEnabled(enableFields && isModeForTransfersOfPayments());
-        jbGridRowsUncheckAll.setEnabled(enableFields && isModeForTransfers());
+        jbGridRowsUncheckAll.setEnabled(enableFields && isModeForTransfersOfPayments());
         
         jbPickLayoutPath.setEnabled(enableFields && isModeForTransfers());
     }
@@ -2377,6 +2380,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             if (isModeForAccounting() && moRegistry.getLayoutStatus() != SDbBankLayout.STATUS_APPROVED) {
                 if (miClient.showMsgBoxConfirm("El layout bancario no tiene estatus '" + SDbBankLayout.STATUS_APPROVED_TEXT + "'.\n¿Está seguro que desea continuar con la aplicación de sus pagos?") != JOptionPane.YES_OPTION) {
                     mbCanShowForm = false;
+                    mbShowConfirmCloseDialog = false;
                     msCanShowFormMessage = "El layout bancario debería tener estatus '" + SDbBankLayout.STATUS_APPROVED_TEXT + "' para la aplicación de sus pagos.";
                 }
             }
@@ -2634,7 +2638,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             switch (mnFormSubtype) {
                 case SModSysConsts.FINX_LAY_BANK_ACC:
                     enableFieldsForm(true);
-                    enableFieldsGrid(false);
+                    enableFieldsGrid(false); // disable all grid controls
+                    jbGridRowsCheckAll.setEnabled(true); // but enable this one
+                    jbGridRowsUncheckAll.setEnabled(true); // but enable this one
                     break;
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                     enableFieldsForm(false);
@@ -2797,19 +2803,26 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     @Override
     public void actionCancel() {
         if (jbCancel.isEnabled()) {
-            if (miClient.showMsgBoxConfirm(SGuiConsts.MSG_CNF_FORM_CLS) == JOptionPane.YES_OPTION) {
-                try {
-                    for (SSrvLock lock : maLocks) {
-                        SSrvUtils.releaseLock(miClient.getSession(), lock);
-                    }
-                }
-                catch (Exception e) {
-                    SLibUtils.showException(this, e);
-                }
-
-                super.actionCancel();
+            if (!mbShowConfirmCloseDialog) {
+                close();
+            }
+            else if (miClient.showMsgBoxConfirm(SGuiConsts.MSG_CNF_FORM_CLS) == JOptionPane.YES_OPTION){
+                close();
             }
         }
+    }
+    
+    private void close() {
+        try {
+            for (SSrvLock lock : maLocks) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+
+        super.actionCancel();
     }
 
     @Override
