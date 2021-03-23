@@ -19,7 +19,6 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.mfin.form.SDialogAccountingMoveDpsBizPartner;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SCfdPaymentUtils;
@@ -57,7 +56,6 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
     private javax.swing.JButton jbRestoreCfdCancelAck;
     private javax.swing.JButton jbDeactivateFlags;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
-    private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
     private final int mnAuxType;
 
@@ -135,7 +133,6 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         jbDeactivateFlags.setToolTipText("Limpiar inconsistencias de timbrado o cancelación del CFDI");
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
-        moDialogAccountingMoveDpsBizPartner = new SDialogAccountingMoveDpsBizPartner(miClient, mnTabTypeAux01);
         moDialogAnnulCfdi = new SDialogAnnulCfdi(miClient);
 
         addTaskBarUpperComponent(jbAnnul);
@@ -153,7 +150,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         addTaskBarLowerComponent(jbRestoreCfdStamped);
         addTaskBarLowerComponent(jbRestoreCfdCancelAck);
         addTaskBarLowerComponent(jbDeactivateFlags);
-
+        
         if (miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_CFD_PAY).HasRight) {
             enableButtons(miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_FIN_CFD_PAY));
         }
