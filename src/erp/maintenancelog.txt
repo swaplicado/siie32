@@ -1,3 +1,9 @@
+SIIE 3.2 180.5/ 2021-04-06
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Adición de número de parte en vista de documentos de almacén de mantenimiento.
+
+================================================================================
 SIIE 3.2 180.4/ 2021-03-16
 Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
