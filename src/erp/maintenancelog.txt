@@ -1,3 +1,11 @@
+================================================================================
+SIIE 3.2 181.0/ 2021-04-09
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Refactorización general del código para el procesamiento y el pago de layouts de transferencia y de anticipos.
+2) Se agregó un nuevo permiso para poder acceder a consulta de los datos personales de los empleados en el módulo de RH.
+
+================================================================================
 SIIE 3.2 180.5/ 2021-04-06
 Jhonatan Claudio PEÑA HERNÁNDEZ
 --------------------------------------------------------------------------------
