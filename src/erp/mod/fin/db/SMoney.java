@@ -9,7 +9,7 @@ import sa.lib.SLibUtils;
 import sa.lib.gui.SGuiSession;
 /**
  *
- * @author Uriel Castañeda, Alfredo Pérez, Sergio Flores
+ * @author Uriel Castañeda, Alfredo Pérez, Sergio Flores, Isabel Servín
  */
 public final class SMoney {
     
@@ -32,6 +32,7 @@ public final class SMoney {
     public void setOriginalAmount(double d) { mdOriginalAmount = d; }
     public void setOriginalCurrencyId(int n) { mnOriginalCurrencyId = n; }
     public void setExchangeRate(double exchangeRate) { mdExchangeRate = isLocalCurrency() ? 1d : exchangeRate; }
+    public void setExchangeRate(double exchangeRate, int currencyId) { mdExchangeRate = moSession.getSessionCustom().isLocalCurrency(new int[] {currencyId}) && isLocalCurrency() ? 1d : exchangeRate; }
     
     public double getLocalAmount() {
         return SLibUtils.roundAmount(mdOriginalAmount * mdExchangeRate);

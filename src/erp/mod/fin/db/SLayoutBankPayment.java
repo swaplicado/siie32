@@ -13,7 +13,7 @@ import sa.lib.SLibUtils;
 /**
  * Abstraction of a payment of a bank layout.
  * 
- * @author Juan Barajas, Alfredo Pérez, Sergio Flores
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín
  */
 public class SLayoutBankPayment {
     
@@ -25,6 +25,7 @@ public class SLayoutBankPayment {
     protected int mnBizPartnerBranchId;
     protected int mnBizPartnerBranchBankAccountId;
     protected SMoney moMoneyAmount;
+    protected double mdExchangeRateForPayment;
     protected int mnBookkeepingYearId_n;
     protected int mnBookkeepingNumberId_n;
     protected int mnAction;
@@ -40,6 +41,7 @@ public class SLayoutBankPayment {
         mnBizPartnerBranchId = bizPartnerBranchId;
         mnBizPartnerBranchBankAccountId = bizPartnerBranchBankAccountId;
         moMoneyAmount = null;
+        mdExchangeRateForPayment = 1d;
         mnBookkeepingYearId_n = 0;
         mnBookkeepingNumberId_n = 0;
         mnAction = 0;
@@ -55,6 +57,7 @@ public class SLayoutBankPayment {
     public void setBizPartnerBranchId(int n) { mnBizPartnerBranchId = n; }
     public void setBizPartnerBranchBankAccountId(int n) { mnBizPartnerBranchBankAccountId = n; }
     public void setMoneyAmount(SMoney o) { moMoneyAmount = o; }
+    public void setExchangeRateForPayment(double d) { mdExchangeRateForPayment = d; }
     public void setBookkeepingYearId_n(int n) { mnBookkeepingYearId_n = n; }
     public void setBookkeepingNumberId_n(int n) { mnBookkeepingNumberId_n = n; }
     public void setAction(int n) { mnAction = n; }
@@ -67,6 +70,7 @@ public class SLayoutBankPayment {
     public int getBizPartnerBranchId() { return mnBizPartnerBranchId; }
     public int getBizPartnerBranchBankAccountId() { return mnBizPartnerBranchBankAccountId; }
     public SMoney getMoneyAmount() { return moMoneyAmount; }
+    public double getExchangeRateForPayment() { return mdExchangeRateForPayment; }
     public int getBookkeepingYearId_n() { return mnBookkeepingYearId_n; }
     public int getBookkeepingNumberId_n() { return mnBookkeepingNumberId_n; }
     public int getAction() { return mnAction; }
@@ -121,6 +125,7 @@ public class SLayoutBankPayment {
         if (this.getMoneyAmount() != null) {
             clone.setMoneyAmount(this.getMoneyAmount().clone());
         }
+        clone.setExchangeRateForPayment(this.getExchangeRateForPayment());
         clone.setBookkeepingYearId_n(this.getBookkeepingYearId_n());
         clone.setBookkeepingNumberId_n(this.getBookkeepingNumberId_n());
         clone.setAction(this.getAction());

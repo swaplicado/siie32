@@ -12,6 +12,7 @@ import erp.data.SDataReadDescriptions;
 import erp.data.SDataUtilities;
 import erp.lib.SLibConstants;
 import erp.lib.table.STableConstants;
+import erp.mcfg.data.SDataCurrency;
 import erp.mfin.data.SDataAccountCash;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
@@ -23,6 +24,7 @@ import erp.mod.fin.db.SLayoutBankXmlRow;
 import erp.mod.fin.db.SMoney;
 import erp.mtrn.data.SDataDps;
 import java.awt.BorderLayout;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.event.ListSelectionEvent;
@@ -41,7 +43,7 @@ import sa.lib.gui.bean.SBeanFormDialog;
 
 /**
  *
- * @author Uriel Castañeda, Alfredo Pérez, Sergio Flores
+ * @author Uriel Castañeda, Alfredo Pérez, Sergio Flores, Isabel Servín
  */
 public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSelectionListener {
     
@@ -82,6 +84,11 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         jtfLayoutType = new javax.swing.JTextField();
         jlAccountDebit = new javax.swing.JLabel();
         jtfBankAcount = new javax.swing.JTextField();
+        jPanel8 = new javax.swing.JPanel();
+        jlBankLayoutCurrency = new javax.swing.JLabel();
+        jtfBankLayoutCurrency = new javax.swing.JTextField();
+        jlDpsCurrency = new javax.swing.JLabel();
+        jtfDpsCurrency = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jpSettings = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
@@ -102,7 +109,7 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         jpBenefit.setLayout(new java.awt.BorderLayout());
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del registro"));
-        jPanel4.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
+        jPanel4.setLayout(new java.awt.GridLayout(3, 1, 0, 5));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -120,7 +127,7 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         jPanel7.add(jPanel6);
 
         jlDate.setText("Fecha apliación:");
-        jlDate.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlDate.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel7.add(jlDate);
 
         jtfDate.setEditable(false);
@@ -141,13 +148,31 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         jPanel2.add(jtfLayoutType);
 
         jlAccountDebit.setText("Cuenta bancaria: ");
-        jlAccountDebit.setPreferredSize(new java.awt.Dimension(100, 23));
+        jlAccountDebit.setPreferredSize(new java.awt.Dimension(115, 23));
         jPanel2.add(jlAccountDebit);
 
         jtfBankAcount.setPreferredSize(new java.awt.Dimension(200, 23));
         jPanel2.add(jtfBankAcount);
 
         jPanel4.add(jPanel2);
+
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBankLayoutCurrency.setText("Moneda origen: ");
+        jlBankLayoutCurrency.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel8.add(jlBankLayoutCurrency);
+
+        jtfBankLayoutCurrency.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel8.add(jtfBankLayoutCurrency);
+
+        jlDpsCurrency.setText("Moneda documento:");
+        jlDpsCurrency.setPreferredSize(new java.awt.Dimension(115, 23));
+        jPanel8.add(jlDpsCurrency);
+
+        jtfDpsCurrency.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel8.add(jtfDpsCurrency);
+
+        jPanel4.add(jPanel8);
 
         jpBenefit.add(jPanel4, java.awt.BorderLayout.CENTER);
 
@@ -199,16 +224,21 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JLabel jlAccountDebit;
     private javax.swing.JLabel jlBalanceTot;
+    private javax.swing.JLabel jlBankLayoutCurrency;
     private javax.swing.JLabel jlDate;
+    private javax.swing.JLabel jlDpsCurrency;
     private javax.swing.JLabel jlDummy1;
     private javax.swing.JLabel jlFolio;
     private javax.swing.JLabel jlPkBankLayoutTypeId;
     private javax.swing.JPanel jpBenefit;
     private javax.swing.JPanel jpSettings;
     private javax.swing.JTextField jtfBankAcount;
+    private javax.swing.JTextField jtfBankLayoutCurrency;
     private javax.swing.JTextField jtfDate;
+    private javax.swing.JTextField jtfDpsCurrency;
     private javax.swing.JTextField jtfLayoutType;
     private javax.swing.JTextField jtfRegistryKey;
     private javax.swing.JTextField jtfRows;
@@ -230,6 +260,12 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         jtfBankAcount.setText("");
         jtfBankAcount.setEditable(false);
         jtfBankAcount.setFocusable(false);
+        jtfBankLayoutCurrency.setText("");
+        jtfBankLayoutCurrency.setEditable(false);
+        jtfBankLayoutCurrency.setEditable(false);
+        jtfDpsCurrency.setText("");
+        jtfDpsCurrency.setEditable(false);
+        jtfDpsCurrency.setEditable(false);
         
         jtfDate.setText("");
         jtfDate.setEditable(false);
@@ -296,16 +332,27 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
         
         jtfRows.setText("0/0");
         
-        moBankLayout.parseBankLayoutXml(miClient);
+        moBankLayout.parseBankLayoutXml(miClient, false);
+        
+        SDataCurrency bankCur = (SDataCurrency) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.CFGU_CUR, new int[] { moBankLayout.getXtaBankCurrencyId() }, SLibConstants.EXEC_MODE_SILENT);
         
         jtfRegistryKey.setText(SLibUtils.textKey(moBankLayout.getPrimaryKey()));
         jtfDate.setText(SLibUtils.DateFormatDate.format(moBankLayout.getDateLayout()));
         jtfLayoutType.setText(moBankLayout.getXtaBankLayoutType());
+        jtfBankLayoutCurrency.setText(bankCur.getCurrency());
+        jtfDpsCurrency.setText(((SDataCurrency) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.CFGU_CUR, new int[] { moBankLayout.getFkDpsCurrencyId() }, SLibConstants.EXEC_MODE_SILENT)).getCurrency());
         
         renderAccountSettings(new int[] { moBankLayout.getFkBankCompanyBranchId(), moBankLayout.getFkBankAccountCashId() });
        
         for (SLayoutBankXmlRow xmlRow : moBankLayout.getAuxLayoutBankXmlRows()) {
             SLayoutBankRow layoutBankRow = new SLayoutBankRow(miClient, SLayoutBankRow.MODE_DIALOG_CARDEX);
+            
+            String bank_acc = "";
+            String sql = "SELECT acc_num FROM erp.bpsu_bank_acc WHERE id_bpb = " + xmlRow.getBizPartnerBranchId() + " AND id_bank_acc = " + xmlRow.getBizPartnerBranchAccountId() + ";";
+            ResultSet resultSet = miClient.getSession().getStatement().executeQuery(sql);
+            if (resultSet.next()) {
+                bank_acc = resultSet.getString(1);
+            }
             
             layoutBankRow.setBizPartnerId(xmlRow.getBizPartnerId());
             layoutBankRow.setDpsYearId(xmlRow.getDpsYearId());
@@ -313,6 +360,7 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
             layoutBankRow.setAgreement(xmlRow.getAgreement());
             layoutBankRow.setAgreementReference(xmlRow.getAgreementReference());
             layoutBankRow.setConceptCie(xmlRow.getConceptCie());
+            layoutBankRow.setBankCurrencyKey(bankCur.getKey());
             
             SDataDps dps = (SDataDps) SDataUtilities.readRegistry((SClientInterface) miClient, SDataConstants.TRN_DPS, new int[] {xmlRow.getDpsYearId(), xmlRow.getDpsDocId() }, SLibConstants.EXEC_MODE_SILENT);
             
@@ -344,7 +392,7 @@ public class SDialogBankLayoutCardex extends SBeanFormDialog implements ListSele
                     layoutBankRow.setBizPartner(layoutBankPaymentRow.getBizPartner());
                     layoutBankRow.setBizPartnerKey(layoutBankPaymentRow.getBizPartnerKey());
                     layoutBankRow.setPayerAccountCurrencyKey(layoutBankPaymentRow.getPayerAccountCurrencyKey());
-                    layoutBankRow.setBeneficiaryAccountNumber(layoutBankPaymentRow.getBeneficiaryAccountNumber());
+                    layoutBankRow.setBeneficiaryAccountNumber(bank_acc);
                     layoutBankRow.setAgreement(layoutBankPaymentRow.getAgreement());
                     layoutBankRow.setAgreementReference(layoutBankPaymentRow.getAgreementReference());
                     layoutBankRow.setConceptCie(layoutBankPaymentRow.getAgreementConceptCie());

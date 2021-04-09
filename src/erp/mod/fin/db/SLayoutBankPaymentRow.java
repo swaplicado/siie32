@@ -13,7 +13,7 @@ import sa.lib.gui.SGuiClient;
 /**
  * Abstraction of a grid row when paying (doing the accounting of) bank layouts.
  * 
- * @author Juan Barajas, Alfredo Pérez, Sergio Flores
+ * @author Juan Barajas, Alfredo Pérez, Sergio Flores, Isabel Servín
  */
 public class SLayoutBankPaymentRow implements SGridRow {
 
@@ -199,27 +199,30 @@ public class SLayoutBankPaymentRow implements SGridRow {
                 value = msPayerAccountCurrencyKey;
                 break;
             case 5:
-                value = msAgreement == null && !msAgreement.isEmpty() ? msAgreement : msBeneficiaryAccountNumber;
+                value = mdExchangeRate;
                 break;
             case 6:
-                value = msAgreementReference;
+                value = msAgreement == null && !msAgreement.isEmpty() ? msAgreement : msBeneficiaryAccountNumber;
                 break;
             case 7:
-                value = msAgreementConceptCie;
+                value = msAgreementReference;
                 break;
             case 8:
-                value = msRecordPeriod;
+                value = msAgreementConceptCie;
                 break;
             case 9:
-                value = msRecordBkc;
+                value = msRecordPeriod;
                 break;
             case 10:
-                value = msRecordCob;
+                value = msRecordBkc;
                 break;
             case 11:
-                value = msRecordNumber;
+                value = msRecordCob;
                 break;
             case 12:
+                value = msRecordNumber;
+                break;
+            case 13:
                 value = mtRecordDate;
                 break;
             default:

@@ -26,7 +26,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Isabel Servín
  */
 public class SLayoutBankAccountingAdvance {
 
@@ -167,7 +167,7 @@ public class SLayoutBankAccountingAdvance {
         entry.setConcept("");
         entry.setReference(msReferenceRecord);
         entry.setIsReferenceTax(false);
-        entry.setDebit(mdAmount);
+        entry.setDebit(SLibUtils.roundAmount(mdAmount * mdExchangeRate));
         entry.setCredit(0);
         entry.setExchangeRate(mdExchangeRate);
         entry.setExchangeRateSystem(mdExchangeRateSystem);
@@ -262,8 +262,8 @@ public class SLayoutBankAccountingAdvance {
         entry.setDbmsAccountingMoveSubclass(moSession.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_JOURNAL, SDbRegistry.FIELD_NAME) + "");
 
         entry.setDebit(0);
-        entry.setCredit(mdAmount);
-        entry.setExchangeRate(1);
+        entry.setCredit(SLibUtils.roundAmount(mdAmount * mdExchangeRate));
+        entry.setExchangeRate(mdExchangeRate);
         entry.setExchangeRateSystem(1);
         entry.setDebitCy(0);
         entry.setCreditCy(mdAmount);
@@ -326,7 +326,7 @@ public class SLayoutBankAccountingAdvance {
         
         try {
             concept = createConceptRecordEntry();
-            oConfigBizPartnerOps = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(mnBizPartnerId, SModSysConsts.BPSS_CT_BP_SUP, mnBookkeepingCenterId, 
+             oConfigBizPartnerOps = new SFinAccountConfig(SFinAccountUtilities.obtainBizPartnerAccountConfigs(mnBizPartnerId, SModSysConsts.BPSS_CT_BP_SUP, mnBookkeepingCenterId, 
                                                             mtDate, SDataConstantsSys.FINS_TP_ACC_BP_PAY, false, null, moSession.getStatement()));
 
             entry = createRecordEntryAccountCash();

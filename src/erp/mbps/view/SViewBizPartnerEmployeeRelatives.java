@@ -32,7 +32,7 @@ import sa.lib.gui.SGuiItem;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab implements java.awt.event.ActionListener, java.awt.event.ItemListener {
 
@@ -199,9 +199,10 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         }
 
         levelRightEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_CAT_BPS_BP).Level;
+        boolean isPermissionEdit = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PER_EMP_DATA).HasRight;
 
         jbNew.setEnabled(false);
-        jbEdit.setEnabled((levelRightEditCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && employeesCrudEnabled);
+        jbEdit.setEnabled(((levelRightEditCategory >= SUtilConsts.LEV_AUTHOR || levelRightEdit >= SUtilConsts.LEV_AUTHOR) && employeesCrudEnabled) || !isPermissionEdit);
         jbDelete.setEnabled(false);
         mvSuscriptors.add(SDataConstants.USRU_USR);
         mvSuscriptors.add(SDataConstants.BPSX_BP_EMP);

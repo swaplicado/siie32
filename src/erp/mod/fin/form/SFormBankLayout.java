@@ -143,6 +143,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private HashMap<String, ArrayList<SGuiItem>> moAgreementReferencesMap;
     private ArrayList<SSrvLock> maLocks;
     
+    private boolean mbShowConfirmCloseDialog;
+    
     /**
      * Creates new form SFormLayoutBank
      * @param client GUI client.
@@ -628,12 +630,12 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         jckShowOnlyBenefsWithAccounts.setPreferredSize(new Dimension(200, 23));
 
         jbExchangeRateReset = new JButton("TC original");
-        jbExchangeRateReset.setToolTipText("Poner TC original del documento");
+        jbExchangeRateReset.setToolTipText("Poner TC original del documento al renglón");
         jbExchangeRateReset.setMargin(new Insets (2, 2, 2, 2));
         jbExchangeRateReset.setPreferredSize(new java.awt.Dimension(85, 23));
 
         jbExchangeRateRefresh = new JButton("TC actual");
-        jbExchangeRateRefresh.setToolTipText("Poner TC actual");
+        jbExchangeRateRefresh.setToolTipText("Poner TC actual al renglón");
         jbExchangeRateRefresh.setMargin(new Insets (2, 2, 2, 2));
         jbExchangeRateRefresh.setPreferredSize(new java.awt.Dimension(85, 23));
 
@@ -668,6 +670,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                         gridColumnsForm.add(column);
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_2D, "Monto a pagar $"));
                         gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_CUR, "Moneda"));
+                        gridColumnsForm.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_EXC_RATE, "Tipo de cambio"));
                         column = new SGridColumnForm(SGridConsts.COL_TYPE_TEXT, "Cuenta/Convenio", 120);
                         column.setApostropheOnCsvRequired(true);
                         gridColumnsForm.add(column);
@@ -765,6 +768,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                 moGridPayments.getTable().getDefaultEditor(String.class).addCellEditorListener(SFormBankLayout.this);
                 moCellEditorOptions.addCellEditorListener(SFormBankLayout.this);
                 moCellEditorOptionsAgreementReference.addCellEditorListener(SFormBankLayout.this);
+                
+                mbShowConfirmCloseDialog = true;
 
                 return gridColumnsForm;
             }
@@ -830,7 +835,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     }
 
     private boolean isExchangeRateNotRequired() {
-        return miClient.getSession().getSessionCustom().isLocalCurrency(moKeyDpsCurrency.getValue()) || SLibUtils.compareKeys(moKeyDpsCurrency.getValue(), moKeyBankLayoutCurrency.getValue());
+        return !(!miClient.getSession().getSessionCustom().isLocalCurrency(moKeyDpsCurrency.getValue()) || !miClient.getSession().getSessionCustom().isLocalCurrency(moKeyBankLayoutCurrency.getValue()));
     }
 
     private void processLayoutBank() {
@@ -980,6 +985,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         if (moKeyDpsCurrency.getSelectedIndex() <= 0) {
             exr = 0;
         }
+        else if (moRegistry != null && moRegistry.getExchangeRateAcc() != 0) { 
+            exr = moRegistry.getExchangeRateAcc();
+        }
         else {
             if (isExchangeRateNotRequired()) {
                 exr = 1; // document's currency is local or is equal to bank's currency
@@ -1012,15 +1020,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
      */
     private void populateGridWithPaymentsFromXml() {
         try {
-            moRegistry.parseBankLayoutXml(miClient);
+            moRegistry.parseBankLayoutXml(miClient, false);
             
             moGridPayments.populateGrid(new Vector<>(moRegistry.getAuxLayoutBankPaymentRows()));
-            moGridPayments.createGridColumns();
-            
-            moGridPayments.getTable().setColumnSelectionAllowed(false);
-            moGridPayments.getTable().getTableHeader().setReorderingAllowed(false);
-            moGridPayments.getTable().getTableHeader().setResizingAllowed(true);
-            moGridPayments.getTable().setRowSorter(new TableRowSorter<>(moGridPayments.getModel()));
             moGridPayments.getTable().getTableHeader().setEnabled(false);
             
             if (moGridPayments.getTable().getRowCount() > 0) {
@@ -1077,6 +1079,15 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             SLayoutBankPaymentRow layoutBankPaymentRow = (SLayoutBankPaymentRow) gridRow;
             if (layoutBankPaymentRow.isForPayment()) {
                 payments++;
+                if (!isModeForTransfersOfPrepayments()) {
+                    if (!miClient.getSession().getSessionCustom().isLocalCurrency(moKeyBankLayoutCurrency.getValue()) || !miClient.getSession().getSessionCustom().isLocalCurrency(moKeyDpsCurrency.getValue())) {
+                        miClient.showMsgBoxInformation("Puede ser necesario realizar ajustes por diferencia cambiaria por liquidación de saldos" +
+                        (!miClient.getSession().getSessionCustom().isLocalCurrency(moKeyBankLayoutCurrency.getValue()) && miClient.getSession().getSessionCustom().isLocalCurrency(moKeyDpsCurrency.getValue()) ? 
+                                ",\nel tipo de cambio " + SLibUtils.getDecimalFormatExchangeRate().format(moDecExchangeRate.getValue()) + " es diferente, al menos, "
+                                + "a uno de los tipos cambiarios individuales de los pagos." : "."));
+                        break;
+                    }
+                }
             }
         }
 
@@ -1103,8 +1114,6 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
         mltAgreementsReferences = new ArrayList<>();
         moAgreementReferencesMap = new HashMap<>();
 
-        Cursor cursor = getCursor();
-        
         try {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
@@ -1174,6 +1183,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     layoutBankRow.setDpsCurrencyKey(resulSet.getString("cur_key"));
                     
                     layoutBankRow.setMoneyPayment(new SMoney(miClient.getSession(), 0d, resulSet.getInt("f_id_cur"), mnBankLayoutCurrencyId == mnDpsCurrencyId ? 1d : 0d));
+                    layoutBankRow.setBankCurrencyId(mnBankLayoutCurrencyId); 
                     layoutBankRow.setBalanceTotByBizPartner(0);
                     layoutBankRow.setPayerAccountCurrencyKey(moKeyBankLayoutCurrency.getSelectedIndex() <= 0 ?
                             SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, miClient.getSession().getSessionCustom().getLocalCurrencyKey(), SLibConstants.DESCRIPTION_CODE) : SDataReadDescriptions.getCatalogueDescription(((SClientInterface) miClient), SDataConstants.CFGU_CUR, moKeyBankLayoutCurrency.getValue(), SLibConstants.DESCRIPTION_CODE));
@@ -1423,7 +1433,6 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                     msAgreement = agreement;
                     moAgreementReferencesMap.put(agreement, SFinUtilities.getAgreementReferences(miClient, bizPartnerBranchId, agreement));
 
-                    beneficiaryAccount = mnBankPaymentTypeId != SDataConstantsSys.FINS_TP_PAY_BANK_THIRD ? resultSet.getString("b.acc_num_std") : resultSet.getString("b.acc_num");
                     agreementsMap.add(agreement);
                     beneficiaryAccoountsMap.add(agreement);
 
@@ -1599,7 +1608,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
                                         layoutBankRowInArray.setExchangeRate(1);
                                     }
                                     else {
-                                        layoutBankRowInArray.setExchangeRate((double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXR).getValue());
+                                        layoutBankRowInArray.setExchangeRate((double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_EXR).getValue(), mnBankLayoutCurrencyId);
                                     }
                                     layoutBankRowInArray.getMoneyPayment().setOriginalCurrencyId((int) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_CUR).getValue());
                                     layoutBankRowInArray.setBalancePayed((double) xmlBankLayoutPaymentDoc.getAttribute(SXmlBankLayoutPaymentDoc.ATT_LAY_ROW_AMT).getValue());
@@ -1659,7 +1668,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
 
                     for (SLayoutBankRow row : layoutBankRows) {
                         if (SLibUtils.compareKeys(new int[] { row.getBizPartnerId(), }, new int[] { layoutBankRowInArray.getBizPartnerId() }) &&
-                            row.getBeneficiaryAccountNumber().compareTo(layoutBankRowInArray.getBeneficiaryAccountNumber()) == 0) {
+                            row.getBeneficiaryAccountNumber().compareTo(layoutBankRowInArray.getBeneficiaryAccountNumber()) == 0 &&
+                            SLibUtils.compareAmount(row.getExchangeRate() * 100, layoutBankRowInArray.getExchangeRate() * 100)) 
+                        {
                             found = true;
                             row.setBalanceTotByBizPartner(row.getBalanceTotByBizPartner() + layoutBankRowInArray.getBalanceTotByBizPartner());
                             break;
@@ -1889,10 +1900,16 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     private void enableFieldsGrid(final boolean enableFields) {
         jckShowOnlyDocsDateDue.setEnabled(enableFields && isModeForTransfersOfPayments());
         jckShowOnlyBenefsWithAccounts.setEnabled(enableFields && isModeForTransfers());
-        jbExchangeRateReset.setEnabled(enableFields && !isExchangeRateNotRequired());
-        jbExchangeRateRefresh.setEnabled(enableFields && !isExchangeRateNotRequired());
+        if (mnFormSubtype != SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY) { 
+            jbExchangeRateReset.setEnabled(enableFields && !isExchangeRateNotRequired() && 
+                    !(!miClient.getSession().getSessionCustom().isLocalCurrency(moKeyBankLayoutCurrency.getValue()) && 
+                            !miClient.getSession().getSessionCustom().isLocalCurrency(moKeyDpsCurrency.getValue())));
+            jbExchangeRateRefresh.setEnabled(enableFields && !isExchangeRateNotRequired() && 
+                    !(!miClient.getSession().getSessionCustom().isLocalCurrency(moKeyBankLayoutCurrency.getValue()) && 
+                            !miClient.getSession().getSessionCustom().isLocalCurrency(moKeyDpsCurrency.getValue())));
+        }
         jbGridRowsCheckAll.setEnabled(enableFields && isModeForTransfersOfPayments());
-        jbGridRowsUncheckAll.setEnabled(enableFields && isModeForTransfers());
+        jbGridRowsUncheckAll.setEnabled(enableFields && isModeForTransfersOfPayments());
         
         jbPickLayoutPath.setEnabled(enableFields && isModeForTransfers());
     }
@@ -1901,7 +1918,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
      * Set desired exchange rate into current grid row, if any.
      * @param exchangeRate Desired exchange rate.
      */
-    public void setExchangeRate(final double exchangeRate) {
+    private void setExchangeRate(final double exchangeRate) {
         int index = moGridPayments.getTable().getSelectedRow();
         
         if (index != -1) {
@@ -2087,8 +2104,13 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
      * Resets current exchange rate in current grid row.
      */
     private void actionPerformedExchangeRateResetOriginal() {
-        if (moGridPayments.getSelectedGridRow() != null) {
-            setExchangeRate(((SLayoutBankRow) moGridPayments.getSelectedGridRow()).getMoneyDpsBalance().getExchangeRate());
+        if (jbExchangeRateReset.isEnabled()) {
+            if (moGridPayments.getSelectedGridRow() == null) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                setExchangeRate(((SLayoutBankRow) moGridPayments.getSelectedGridRow()).getMoneyDpsBalance().getExchangeRate());
+            }
         }
     }
 
@@ -2096,7 +2118,14 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
      * Set´s the exchange rate specified in the field 'exchange rate' for one DPS/row in the grid
      */
     private void actionPerformedExchangeRateSetCurrent() {
-        setExchangeRate(moDecExchangeRate.getValue());
+        if (jbExchangeRateRefresh.isEnabled()) {
+            if (moGridPayments.getSelectedGridRow() == null) {
+                miClient.showMsgBoxInformation(SGridConsts.MSG_SELECT_ROW);
+            }
+            else {
+                setExchangeRate(moDecExchangeRate.getValue());
+            }
+        }
     }
 
     private void actionPerformedGridRowsCheckAll() {
@@ -2377,6 +2406,7 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             if (isModeForAccounting() && moRegistry.getLayoutStatus() != SDbBankLayout.STATUS_APPROVED) {
                 if (miClient.showMsgBoxConfirm("El layout bancario no tiene estatus '" + SDbBankLayout.STATUS_APPROVED_TEXT + "'.\n¿Está seguro que desea continuar con la aplicación de sus pagos?") != JOptionPane.YES_OPTION) {
                     mbCanShowForm = false;
+                    mbShowConfirmCloseDialog = false;
                     msCanShowFormMessage = "El layout bancario debería tener estatus '" + SDbBankLayout.STATUS_APPROVED_TEXT + "' para la aplicación de sus pagos.";
                 }
             }
@@ -2634,7 +2664,9 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             switch (mnFormSubtype) {
                 case SModSysConsts.FINX_LAY_BANK_ACC:
                     enableFieldsForm(true);
-                    enableFieldsGrid(false);
+                    enableFieldsGrid(false); // disable all grid controls
+                    jbGridRowsCheckAll.setEnabled(true); // but enable this one
+                    jbGridRowsUncheckAll.setEnabled(true); // but enable this one
                     break;
                 case SModSysConsts.FINX_LAY_BANK_TRN_TP_PAY:
                     enableFieldsForm(false);
@@ -2650,8 +2682,10 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             
             if (isModeForAccounting()) {
                 if (!isExchangeRateNotRequired()) {
-                    double exr = SDataUtilities.obtainExchangeRate((SClientInterface) miClient, mnDpsCurrencyId, moDateDateLayout.getValue());
-                    moDecExchangeRate.setValue(exr);
+                    if (moDecExchangeRate.getValue() == 0) {
+                        double exr = SDataUtilities.obtainExchangeRate((SClientInterface) miClient, mnDpsCurrencyId, moDateDateLayout.getValue());
+                        moDecExchangeRate.setValue(exr);
+                    }
                 }
             }
         }
@@ -2718,8 +2752,8 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
             }
 
             registry.setTransfers(moGridPayments.getModel().getGridRows().size());
-            registry.setAuxExchangeRateForAccounting(moDecExchangeRate.isEnabled() ? moDecExchangeRate.getValue() : 1d);
         }
+        registry.setExchangeRateAcc(!isExchangeRateNotRequired() ? moDecExchangeRate.getValue() : 1d);
 
         registry.setExchangeRate(1d);
         registry.setXtaBankPaymentTypeId(mnBankPaymentTypeId);
@@ -2797,19 +2831,26 @@ public class SFormBankLayout extends SBeanForm implements ActionListener, ItemLi
     @Override
     public void actionCancel() {
         if (jbCancel.isEnabled()) {
-            if (miClient.showMsgBoxConfirm(SGuiConsts.MSG_CNF_FORM_CLS) == JOptionPane.YES_OPTION) {
-                try {
-                    for (SSrvLock lock : maLocks) {
-                        SSrvUtils.releaseLock(miClient.getSession(), lock);
-                    }
-                }
-                catch (Exception e) {
-                    SLibUtils.showException(this, e);
-                }
-
-                super.actionCancel();
+            if (!mbShowConfirmCloseDialog) {
+                close();
+            }
+            else if (miClient.showMsgBoxConfirm(SGuiConsts.MSG_CNF_FORM_CLS) == JOptionPane.YES_OPTION){
+                close();
             }
         }
+    }
+    
+    private void close() {
+        try {
+            for (SSrvLock lock : maLocks) {
+                SSrvUtils.releaseLock(miClient.getSession(), lock);
+            }
+        }
+        catch (Exception e) {
+            SLibUtils.showException(this, e);
+        }
+
+        super.actionCancel();
     }
 
     @Override

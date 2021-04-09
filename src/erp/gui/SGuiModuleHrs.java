@@ -41,7 +41,7 @@ import sa.lib.gui.SGuiParams;
 
 /**
  *
- * @author Sergio Flores, Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña, Isabel Servín
  */
 public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.event.ActionListener {
 
@@ -551,34 +551,39 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCfgConfig.setEnabled(true);
         jmCfg.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CFG).HasRight);
         
+        boolean isPermissionCat = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT).HasRight;
+        boolean isPermissionCatEmp = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight;
+        boolean isPermissionCatEmpWage = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight;
+        boolean isPermissionPerEmpData = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PER_EMP_DATA).HasRight;
         jmCat.setEnabled(
-                miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT).HasRight ||
-                miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight ||
-                miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
-        jmiCatEmployee.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight);
-        jmiCatEmployeeRelatives.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight);
-        jmiCatEmployeeIntegral.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight);
-        jmiCatEmployeeContractExp.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP).HasRight);
-        jmiCatEmployeeHireLog.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
-        jmiCatEmployeeWageLog.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
-        jmiCatEmployeeSscBaseLog.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
-        jmiCatEmployeeSscBaseUpdate.setEnabled(miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_CAT_EMP_WAGE).HasRight);
-        jmiCatEarnings.setEnabled(true);
-        jmiCatDeductions.setEnabled(true);
-        jmiCatDeparment.setEnabled(true);
-        jmiCatPosition.setEnabled(true);
-        jmiCatShift.setEnabled(true);
-        jmiCatEmployeeType.setEnabled(true);
-        jmiCatWorkerType.setEnabled(true);
-        jmiCatEmployeeDismissType.setEnabled(true);
-        jmiCatMwzType.setEnabled(true);
-        jmiCatMwzTypeWage.setEnabled(true);
-        jmiCatUma.setEnabled(true);
-        jmiCatUmi.setEnabled(true);
-        jmiCatWorkerTypeSalary.setEnabled(true);
-        jmiCatLoanTypeAdjustment.setEnabled(true);
-        jmiCatAbsenceType.setEnabled(true);
-        jmiCatAbsenceClass.setEnabled(true);
+                isPermissionCat ||
+                isPermissionCatEmp ||
+                isPermissionCatEmpWage ||
+                isPermissionPerEmpData);
+        jmiCatEmployee.setEnabled(isPermissionCatEmp);
+        jmiCatEmployeeRelatives.setEnabled(isPermissionCatEmp || isPermissionPerEmpData);
+        jmiCatEmployeeIntegral.setEnabled(isPermissionCatEmp);
+        jmiCatEmployeeContractExp.setEnabled(isPermissionCatEmp);
+        jmiCatEmployeeHireLog.setEnabled(isPermissionCatEmpWage);
+        jmiCatEmployeeWageLog.setEnabled(isPermissionCatEmpWage);
+        jmiCatEmployeeSscBaseLog.setEnabled(isPermissionCatEmpWage);
+        jmiCatEmployeeSscBaseUpdate.setEnabled(isPermissionCatEmpWage);
+        jmiCatEarnings.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatDeductions.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatDeparment.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatPosition.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatShift.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatEmployeeType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatWorkerType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatEmployeeDismissType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatMwzType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatMwzTypeWage.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatUma.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatUmi.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatWorkerTypeSalary.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatLoanTypeAdjustment.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatAbsenceType.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
+        jmiCatAbsenceClass.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
         
         boolean isPermissionPay = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY).HasRight;
         boolean isPermissionPayWee = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_HRS_PAY_WEE).HasRight;
