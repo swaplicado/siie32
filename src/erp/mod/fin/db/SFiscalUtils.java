@@ -83,7 +83,7 @@ public abstract class SFiscalUtils {
         fiscalAccountLinkDetail.setFiscalAccount(fiscalAccountCode);
         fiscalAccountLinkDetail.setAccountCode(accountCode);
         fiscalAccountLinkDetail.setAccountCodeParent(accountCodeParent);
-        fiscalAccountLinkDetail.setAccountName(accountName.substring(0, LEN_ACC_NAME));
+        fiscalAccountLinkDetail.setAccountName(SLibUtils.textLeft(accountName, LEN_ACC_NAME));
         fiscalAccountLinkDetail.setNature(accountNature);
         fiscalAccountLinkDetail.setLevel(level);
 

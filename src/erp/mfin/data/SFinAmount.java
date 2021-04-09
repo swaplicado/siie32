@@ -50,7 +50,7 @@ public class SFinAmount {
     }
 
     public int[] getKeyTax() {
-        return KeyTax;
+        return KeyTax == null ? new int[] { 0, 0 } : KeyTax;
     }
 
     public void setKeyTax(int[] keyTax) {

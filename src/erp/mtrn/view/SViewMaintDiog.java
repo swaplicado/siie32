@@ -285,7 +285,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 break;
             case SUtilConsts.PER_ITM:
                 aoKeyFields = new STableField[3];
-                aoTableColumns = new STableColumn[29];
+                aoTableColumns = new STableColumn[30];
                 break;
             default:
                 aoKeyFields = null;
@@ -326,6 +326,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
             aoTableColumns[col++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererQuantity());
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave ítem", STableConstants.WIDTH_ITEM);
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.name", "Ítem", 250);
+            aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Número parte", 75);
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "maint.name", "Área mantenimiento", 150);
             aoTableColumns[col++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "unit.symbol", "Unitad", STableConstants.WIDTH_UNIT_SYMBOL);
             aoTableColumns[col] = new STableColumn(SLibConstants.DATA_TYPE_DOUBLE, "_price", "Precio unitario $", STableConstants.WIDTH_VALUE_UNITARY);
@@ -512,7 +513,7 @@ public class SViewMaintDiog extends erp.lib.table.STableTab implements java.awt.
                 "tp_iog.tp_iog, tp_iog.code, bpb.code, ent.code, " +
                 "maint.bp, supv.name, ";
                 if (mnTabTypeAux02 == SUtilConsts.PER_ITM) {
-                   msSql +=  "ioge.qty, ioge.val_u, ioge.fid_item, ioge.fid_unit, ioge.fid_maint_area, i.item_key, i.name, unit.symbol, maint.name, " + 
+                   msSql +=  "ioge.qty, ioge.val_u, ioge.fid_item, ioge.fid_unit, ioge.fid_maint_area, i.item_key, i.name, i.part_num, unit.symbol, maint.name, " + 
                              "IF(iog.fid_ct_iog = " + SDataConstantsSys.TRNS_CT_IOG_IN + " , ioge.val_u, t._avg_prc) AS _price, " +
                              "IF(iog.fid_ct_iog = " + SDataConstantsSys.TRNS_CT_IOG_IN + " , ioge.val_u, t._avg_prc) * ioge.qty AS _value, ";
                 }

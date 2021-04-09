@@ -42,6 +42,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
@@ -1116,38 +1117,66 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         SDataDsm oDsm = new SDataDsm();
         SDataRecord oRecord = null;
         SDataBizPartnerBranch branch = null;
-        ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), moDps.getPkDocId(), moDps.getPkYearId(), miClient.getSession().getCurrentYear(),
-                                                    SLibUtils.DbmsDateFormatDate.format(miClient.getSession().getCurrentDate()), 
+        ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), moDps.getPkDocId(), moDps.getPkYearId(), 
                                                     mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], 
                                                     mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
         
-        double dValueCy = moFieldDpsValueCy.getDouble();
-        double dValue = moFieldDpsValue.getDouble();
-        double dAmount = dValue;
-        double dAmountCy = dValueCy;
+        double dTotalBalance = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalance(), (a, b) -> a + b);
+        double dTotalBalanceCur = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalanceCurrency(), (a, b) -> a + b);
+        
+        HashMap<String, double[]> taxBalances = new HashMap();
+        String tax;
+        double perc;
+        double percCur;
+        double amtToPay = 0;
+        double amtToPayCur = 0;
+        int[] taxMax = new int[]{ 0, 0 };
+        double amtMaj = 0d;
+        for (SBalanceTax balance : balances) {
+            tax = balance.getTaxBasId() + "_" + balance.getTaxId();
+            perc = balance.getBalance() / dTotalBalance;
+            percCur = balance.getBalanceCurrency() / dTotalBalanceCur;
+            
+            taxBalances.put(tax, new double[] { perc, percCur });
+            
+            amtToPay += SLibUtilities.round(moFieldDpsValue.getDouble() * perc, miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate());
+            amtToPayCur += SLibUtilities.round(moFieldDpsValueCy.getDouble() * percCur, miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate());
+            
+            if (balance.getBalanceCurrency() > amtMaj) {
+                amtMaj = balance.getBalanceCurrency();
+                taxMax = new int[] { balance.getTaxBasId(), balance.getTaxId() };
+            }
+        }
+        
+        double diffCur = 0;
+        if (moFieldDpsValueCy.getDouble() != amtToPayCur) {
+            diffCur = SLibUtilities.round(moFieldDpsValueCy.getDouble() - amtToPayCur, miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate());
+        }
+        double diff = 0;
+        if (moFieldDpsValue.getDouble() != amtToPay) {
+            diff = SLibUtilities.round(moFieldDpsValue.getDouble() - amtToPay, miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate());
+        }
         
         for (SBalanceTax balance : balances) {
-            if (dAmount <= 0d) {
+            if (moFieldDpsValueCy.getDouble() <= 0d) {
                 break;
             }
             
             SDataDsmEntry oDsmEntry = new SDataDsmEntry();
             
-            if (dAmount <= balance.getBalance()) {
-                oDsmEntry.setSourceValue(dAmount);
-                oDsmEntry.setSourceValueCy(dAmountCy);
-                oDsmEntry.setDestinyValue(dAmount);
-                oDsmEntry.setDestinyValueCy(dAmountCy);
-            }
-            else {
-                oDsmEntry.setSourceValue(balance.getBalance());
-                oDsmEntry.setSourceValueCy(balance.getBalanceCurrency());
-                oDsmEntry.setDestinyValue(balance.getBalance());
-                oDsmEntry.setDestinyValueCy(balance.getBalanceCurrency());
-            }
+            tax = balance.getTaxBasId() + "_" + balance.getTaxId();
             
-            dAmount -= balance.getBalance();
-            dAmountCy -= balance.getBalanceCurrency();
+            oDsmEntry.setSourceValue(SLibUtilities.round(moFieldDpsValue.getDouble() * taxBalances.get(tax)[0], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+            oDsmEntry.setDestinyValue(SLibUtilities.round(moFieldDpsValue.getDouble() * taxBalances.get(tax)[0], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+            oDsmEntry.setSourceValueCy(SLibUtilities.round(moFieldDpsValueCy.getDouble() * taxBalances.get(tax)[1], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+            oDsmEntry.setDestinyValueCy(SLibUtilities.round(moFieldDpsValueCy.getDouble() * taxBalances.get(tax)[1], miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+            
+            if (balance.getTaxBasId() == taxMax[0] && balance.getTaxId() == taxMax[1]) {
+                oDsmEntry.setSourceValue(SLibUtilities.round(oDsmEntry.getSourceValue() + diff, miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+                oDsmEntry.setDestinyValue(SLibUtilities.round(oDsmEntry.getDestinyValue() + diff, miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+                oDsmEntry.setSourceValueCy(SLibUtilities.round(oDsmEntry.getSourceValueCy() + diffCur, miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+                oDsmEntry.setDestinyValueCy(SLibUtilities.round(oDsmEntry.getDestinyValueCy() + diffCur, miClient.getSessionXXX().getParamsErp().getDecimalsValue()));
+            }
             
             oDsmEntry.setFkTaxBasId_n(balance.getTaxBasId());
             oDsmEntry.setFkTaxId_n(balance.getTaxId());

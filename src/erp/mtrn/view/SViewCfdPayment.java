@@ -19,7 +19,6 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
-import erp.mfin.form.SDialogAccountingMoveDpsBizPartner;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mtrn.data.SCfdPaymentUtils;
@@ -57,7 +56,6 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
     private javax.swing.JButton jbRestoreCfdCancelAck;
     private javax.swing.JButton jbDeactivateFlags;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
-    private erp.mfin.form.SDialogAccountingMoveDpsBizPartner moDialogAccountingMoveDpsBizPartner;
     private erp.mtrn.form.SDialogAnnulCfdi moDialogAnnulCfdi;
     private final int mnAuxType;
 
@@ -135,7 +133,6 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         jbDeactivateFlags.setToolTipText("Limpiar inconsistencias de timbrado o cancelación del CFDI");
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
-        moDialogAccountingMoveDpsBizPartner = new SDialogAccountingMoveDpsBizPartner(miClient, mnTabTypeAux01);
         moDialogAnnulCfdi = new SDialogAnnulCfdi(miClient);
 
         addTaskBarUpperComponent(jbAnnul);
@@ -153,8 +150,13 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         addTaskBarLowerComponent(jbRestoreCfdStamped);
         addTaskBarLowerComponent(jbRestoreCfdCancelAck);
         addTaskBarLowerComponent(jbDeactivateFlags);
-
-        enableButtons();
+        
+        if (miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_CFD_PAY).HasRight) {
+            enableButtons(miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_FIN_CFD_PAY)); // a more specific right has precedence
+        }
+        else if (miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_FIN_MOV_ACC_CASH).HasRight){
+            enableButtons(miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_FIN_MOV_ACC_CASH));
+        }
         
         STableField[] aoKeyFields = new STableField[1];
         aoKeyFields[0] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "c.id_cfd");
@@ -203,7 +205,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         populateTable();
     }
     
-    private void enableButtons() {
+    private void enableButtons(int level) {
         jbNew.setEnabled(false);
         jbEdit.setEnabled(false);
         jbDelete.setEnabled(false); // deletion is not allowed
@@ -220,7 +222,7 @@ public class SViewCfdPayment extends erp.lib.table.STableTab implements java.awt
         jbRestoreCfdCancelAck.setEnabled(false);
         jbDeactivateFlags.setEnabled(false);
         
-        switch (miClient.getSession().getUser().getPrivilegeLevel(SDataConstantsSys.PRV_FIN_CFD_PAY)) {
+        switch (level) {
             case SUtilConsts.LEV_READ:
                 jbPrint.setEnabled(true);
                 jbPrintCancelAck.setEnabled(true);

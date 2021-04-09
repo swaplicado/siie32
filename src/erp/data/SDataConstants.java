@@ -367,7 +367,8 @@ public abstract class SDataConstants {
     public static final int FINX_REC_USER = 206518;
     public static final int FINX_REC_RO = 206519;
     public static final int FINX_REC_DPS = 206520;
-
+    public static final int FINX_REC_W_XML = 206521;
+    
     public static final int TRNS_CT_DPS = 207001;
     public static final int TRNS_CL_DPS = 207002;
     public static final int TRNS_TP_DPS_ADJ = 207003;
