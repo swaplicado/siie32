@@ -1,5 +1,11 @@
 ================================================================================
 SIIE 3.2 181.1/ 2021-04-12
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Incorporación de número de parte en búsqueda de ítems.
+
+================================================================================
+SIIE 3.2 181.1/ 2021-04-12
 Edwin Omar CARMONA FIGUEROA
 --------------------------------------------------------------------------------
 1) Refactorización de rutinas de aplicación de pagos a facturas para su reutilización en la contabilización de CFDI de recepción de pagos y de layouts bancarios,
