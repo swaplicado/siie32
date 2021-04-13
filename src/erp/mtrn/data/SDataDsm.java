@@ -1233,7 +1233,6 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                 "et.b_del = FALSE " +
                 "WHERE tx.id_year = " + nDpsYearId + " AND " +
                 "tx.id_doc = " + nDpsDocId + " " +
-                (oDsmEntry.getFkTaxBasId_n() > 0 ? ("AND tx.id_tax_bas = " + oDsmEntry.getFkTaxBasId_n() + " AND tx.id_tax = " + oDsmEntry.getFkTaxId_n() + " ") : "") +
                 "GROUP BY tx.id_tax_bas, tx.id_tax";
 
             resultSet = statementAux.executeQuery(sSql);
