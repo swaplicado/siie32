@@ -222,13 +222,13 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                     // Record entry for taxes source:
 
                     if (oDsmEntry.getFkSourceDpsYearId_n() > 0 && oDsmEntry.getFkSourceDpsDocId_n() > 0) {
-                        nSortPos = calculateDpsTaxes(connection, oRecord, oDsmEntry, SDataConstants.TRNX_DSM_ETY_SOURCE, nSortPos, 0, oDsmEntry.getFkSourceDpsYearId_n(), oDsmEntry.getFkSourceDpsDocId_n(), sConcept, hasTaxCfg);
+                        nSortPos = calculateDpsTaxes(connection, oRecord, oDsmEntry, SDataConstants.TRNX_DSM_ETY_SOURCE, nSortPos, 0, oDsmEntry.getFkSourceDpsYearId_n(), oDsmEntry.getFkSourceDpsDocId_n(), sConcept);
                     }
 
                     // Record entry for taxes destiny:
 
                     if (oDsmEntry.getFkDestinyDpsYearId_n() > 0 && oDsmEntry.getFkDestinyDpsDocId_n() > 0) {
-                        nSortPos = calculateDpsTaxes(connection, oRecord, oDsmEntry, SDataConstants.TRNX_DSM_ETY_DESTINY, nSortPos, 0, oDsmEntry.getFkDestinyDpsYearId_n(), oDsmEntry.getFkDestinyDpsDocId_n(), sConcept, hasTaxCfg);
+                        nSortPos = calculateDpsTaxes(connection, oRecord, oDsmEntry, SDataConstants.TRNX_DSM_ETY_DESTINY, nSortPos, 0, oDsmEntry.getFkDestinyDpsYearId_n(), oDsmEntry.getFkDestinyDpsDocId_n(), sConcept);
                     }
 
                     mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
@@ -1188,7 +1188,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         return vTpSysMov;
     }
 
-    private int calculateDpsTaxes(java.sql.Connection connection, erp.mfin.data.SDataRecord oRecord, erp.mtrn.data.SDataDsmEntry oDsmEntry, int nTypeSource, int nSortPos, int nPkNumberId, int nDpsYearId, int nDpsDocId, java.lang.String sConcept, boolean hasCfg) {
+    private int calculateDpsTaxes(java.sql.Connection connection, erp.mfin.data.SDataRecord oRecord, erp.mtrn.data.SDataDsmEntry oDsmEntry, int nTypeSource, int nSortPos, int nPkNumberId, int nDpsYearId, int nDpsDocId, java.lang.String sConcept) {
         boolean bRefTax = false;
         double dValueTax = 0;
         double dValueTaxCur = 0;
@@ -1315,7 +1315,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         // Read the balance net of tax:
 
-                         oDpsTaxBalance = calculateDpsTaxBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] { oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId() }, oDsmEntry.getFkBizPartnerId(), nPkTaxType, nPkTaxBasicId, nPkTaxId, false);
+                         oDpsTaxBalance = calculateDpsTaxBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] { oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId() }, oDsmEntry.getFkBizPartnerId(), nPkTaxType, nPkTaxBasicId, nPkTaxId);
 
                         // Read the current balance of tax:
 
@@ -1342,7 +1342,7 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
                             if (dValueTax == 0) {
                                 // Read the balance net of tax:
 
-                                oDpsTaxBalance = calculateDpsTaxBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] { oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId() }, oDsmEntry.getFkBizPartnerId(), nPkTaxType, nPkTaxBasicId, nPkTaxId, false);
+                                oDpsTaxBalance = calculateDpsTaxBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] { oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId() }, oDsmEntry.getFkBizPartnerId(), nPkTaxType, nPkTaxBasicId, nPkTaxId);
 
                                 switch (mnDbmsTaxModel) {
                                     case SDataConstantsSys.CFGS_TAX_MODEL_DPS:
@@ -1375,19 +1375,10 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
 
                         oDpsBalance = calculateDpsBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] {oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId()},
                             oDsmEntry.getFkBizPartnerId(), (oDsmEntry.getDbmsFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_PUR ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS),
-                            hasCfg  ? oDsmEntry.getTaxPk() == null ? (new int [] { 0, 0 }) : oDsmEntry.getTaxPk() : null);
+                            null);
 
                         // Read the balance net of tax:
-                        
-                        if (! hasCfg) {
-                            oDpsTaxBalance = calculateDpsTaxBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] { oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId() }, oDsmEntry.getFkBizPartnerId(), nPkTaxType, nPkTaxBasicId, nPkTaxId, 
-                                                        hasCfg);
-                        }
-                        else {
-                            int [] pk = oDsmEntry.getTaxPk() == null ? (new int [] { 0, 0 }) : oDsmEntry.getTaxPk();
-                            oDpsTaxBalance = calculateDpsTaxBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] { oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId() }, oDsmEntry.getFkBizPartnerId(), nPkTaxType, pk[0], pk[1], 
-                                                        hasCfg);
-                        }
+                        oDpsTaxBalance = calculateDpsTaxBalanceNet(connection, nDpsYearId, nDpsDocId, new int[] { oDsmEntry.getDbmsCtSysMovId(), oDsmEntry.getDbmsTpSysMovId() }, oDsmEntry.getFkBizPartnerId(), nPkTaxType, nPkTaxBasicId, nPkTaxId);
 
                         // Check if apply all balance when quantity cur is equal to balance_cur:
 
@@ -1535,48 +1526,13 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         return new double[] { dDpsBalanceNet, dDpsBalanceCurNet };
     }
 
-    private java.lang.Object calculateDpsTaxBalanceNet(java.sql.Connection connection, int nDpsYearId, int nDpsDocId, int nTpSysMovId[], int nBizPartnerId, int nPkTaxType, int nPkTaxBasicId, int nPkTaxId, boolean withTax) {
+    private java.lang.Object calculateDpsTaxBalanceNet(java.sql.Connection connection, int nDpsYearId, int nDpsDocId, int nTpSysMovId[], int nBizPartnerId, int nPkTaxType, int nPkTaxBasicId, int nPkTaxId) {
         double dTaxBalance = 0.0;
         double dTaxBalanceCur = 0.0;
         String sSql = "";
         String sSqlTax = "";
         
         try {
-            // si existe la configuración de impuesto
-            if (withTax) {
-                /**
-                 * si el impuesto es 0 significa que las demás partidas tienen 
-                 * configuraciones pero esta no tiene impuesto, 
-                 * por ende no tiene configuración y el balance del impuesto es 0
-                 */
-                if (nPkTaxBasicId == 0) {
-                    return new double[] { 0d, 0d };
-                }
-                
-                // se obtiene el saldo correspondiente al impuesto
-                ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(connection, nDpsDocId, nDpsYearId, nTpSysMovId[0], nTpSysMovId[1]);
-                for (SBalanceTax balance : balances) {
-                    if (balance.getTaxPk()[0] == nPkTaxBasicId && balance.getTaxPk()[1] == nPkTaxId) {
-                        String sql = "SELECT t.id_tax_bas, t.id_tax, t.per, t.val_u, t.val, t.fid_tp_tax, t.fid_tp_tax_cal, t.fid_tp_tax_app, "
-                                    + "t.tax "
-                                    + "FROM " + SModConsts.TablesMap.get(SModConsts.FINU_TAX) + " AS t "
-                                    + "WHERE t.id_tax_bas = " + nPkTaxBasicId + " AND t.id_tax = " + nPkTaxId + ";";
-
-                        ResultSet res = connection.createStatement().executeQuery(sql);
-                        
-                        double per = 0d;
-                        if (res.next()) {
-                            per = res.getDouble("t.per");
-                        }
-
-                        // se retorna el impuesto en base al saldo de la partida
-                        return new double[] { SLibUtilities.round((balance.getBalance() * per) / (1 + per), mnDbmsErpDecimalsValue), 
-                                                SLibUtilities.round((balance.getBalanceCurrency() * per) / (1 + per), mnDbmsErpDecimalsValue) 
-                                            };
-                    }
-                }
-            }
-
             String sSumTax = "SELECT " + (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(et1.tax_charged_r) " : "SUM(et1.tax_retained_r) ") + " AS balance_adj ";
             String sSumTaxCur = "SELECT " + (nPkTaxType == SModSysConsts.FINS_TP_TAX_CHARGED ? "SUM(et1.tax_charged_cur_r) " : "SUM(et1.tax_retained_cur_r) ") + " AS balance_cur_adj ";
         
