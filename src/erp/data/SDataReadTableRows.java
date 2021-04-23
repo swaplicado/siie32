@@ -28,7 +28,7 @@ import sa.lib.srv.SSrvConsts;
 
 /**
  *
- * @author Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Isabel Servín, Claudio Peña
  */
 public abstract class SDataReadTableRows {
 
@@ -1090,10 +1090,10 @@ public abstract class SDataReadTableRows {
 
                 i = 0;
                 if (filterKey == null || filterKey instanceof int[]) {
-                    aoQueryFields = new STableField[9];
+                    aoQueryFields = new STableField[10];
                 }
                 else {
-                    aoQueryFields = new STableField[10];
+                    aoQueryFields = new STableField[11];
                 }
                 
                 switch (pnDataType) {
@@ -1112,20 +1112,27 @@ public abstract class SDataReadTableRows {
                     case SDataConstants.ITMX_ITEM_BY_KEY:
                         aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
                         aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.part_num");
                         break;
                     case SDataConstants.ITMX_ITEM_BY_NAME:
                         aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
                         aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
+                        aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.part_num");
+
                         break;
                     case SDataConstants.ITMX_ITEM_BY_BRAND:
                     case SDataConstants.ITMX_ITEM_BY_MANUFACTURER:
                         if (piClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                             aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
                             aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
+                            aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.part_num");
+
                         }
                         else {
                             aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item");
                             aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.item_key");
+                            aoQueryFields[i++] = new STableField(SLibConstants.DATA_TYPE_STRING, "i.part_num");
+
                         }
                         break;
                 }
@@ -1157,8 +1164,7 @@ public abstract class SDataReadTableRows {
                 if (filterKey != null && filterKey instanceof Object[] && ((Object[]) filterKey)[1] != null) {
                     tDate = new java.sql.Date(((java.util.Date) ((Object[]) filterKey)[1]).getTime());
                 }
-                
-                sSql = "SELECT i.id_item, i.item, i.item_key, u.id_unit, u.symbol, b.id_brd, b.brd, m.id_mfr, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item, si.id_st_item, si.name " +
+                sSql = "SELECT i.id_item, i.item, i.item_key, i.part_num, u.id_unit, u.symbol, b.id_brd, b.brd, m.id_mfr, m.mfr, icl.id_ct_item, icl.id_cl_item, icl.cl_item, si.id_st_item, si.name " +
                         (filterKey == null || filterKey instanceof int[] ? "" : ", trn_stk_get(" +
                         (Integer) ((Object[]) filterKey)[0] + ", i.id_item, i.fid_unit, NULL, " + (Integer) ((Object[]) filterKey)[3] + ", " + (Integer) ((Object[]) filterKey)[4] + ", NULL, '" + SLibUtils.DbmsDateFormatDate.format(tDate) + "') AS f_stock ") +
                         "FROM erp.itmu_item AS i " +

@@ -24,12 +24,12 @@ import sa.lib.mail.SMailSender;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SBankLayoutCourier extends Thread {
     
-    private SGuiClient miClient;
-    private SDbBankLayout moBankLayout;
+    private final SGuiClient miClient;
+    private final SDbBankLayout moBankLayout;
     
     public SBankLayoutCourier(SGuiClient client, final SDbBankLayout bankLayout) {
         miClient = client;
@@ -124,7 +124,7 @@ public class SBankLayoutCourier extends Thread {
                 + "<p>"
                 + "<small>"
                 + "P.D.<br>"
-                + SLibUtils.textToHtml("Verás reflejado el movimiento en tu cuenta en unos minutos más.") + "<br>"
+                + SLibUtils.textToHtml("Veras reflejado el movimiento en tu cuenta en unos minutos más.") + "<br>"
                 + SLibUtils.textToHtml("Para recibir adecuadamente estas notificaciones, agréganos a tu lista de contactos.")
                 + "</small>"
                 + "</p>";

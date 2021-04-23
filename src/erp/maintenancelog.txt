@@ -1,3 +1,55 @@
+================================================================================
+SIIE 3.2 181.5/ 2021-04-20
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la iluminación de los íconos de los tipos de asoc. de negocio en la ventana de asociados de negocio.
+2) Se encapsuló la creación de la conexión con la base de datos y la forma de llamar al statement en el servidor, con el fin de que no se cierre la conexión con la BD despúes de un fallo en la red. 
+
+================================================================================
+SIIE 3.2 181.4/ 2021-04-15
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Actualización de los fields en el archivo jasper de los acuses de cancelación.
+
+================================================================================
+SIIE 3.2 181.4/ 2021-04-14
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Corrección de cálculo de montos de impuesto en la aplicación de pagos a proveedores desde pólizas contables.
+
+================================================================================
+SIIE 3.2 181.3/ 2021-04-13
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Corrección de rutina de aplicación de pagos a proveedores desde pólizas contables.
+
+================================================================================
+SIIE 3.2 181.2/ 2021-04-12
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Incorporación de número de parte en búsqueda de ítems.
+
+================================================================================
+SIIE 3.2 181.1/ 2021-04-12
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Refactorización de rutinas de aplicación de pagos a facturas para su reutilización en la contabilización de CFDI de recepción de pagos y de layouts bancarios,
+ además de pólizas contables donde dichas rutinas ya estaban implementadas.
+
+================================================================================
+SIIE 3.2 181.0/ 2021-04-09
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Refactorización general del código para el procesamiento y el pago de layouts de transferencia y de anticipos.
+2) Se agregó un nuevo permiso para poder acceder a consulta de los datos personales de los empleados en el módulo de RH.
+
+================================================================================
+SIIE 3.2 180.5/ 2021-04-06
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Adición de número de parte en vista de documentos de almacén de mantenimiento.
+
+================================================================================
 SIIE 3.2 180.4/ 2021-03-16
 Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
 --------------------------------------------------------------------------------
@@ -9,8 +61,9 @@ Edwin Omar CARMONA FIGUEROA/ Sergio Abraham FLORES GUTIÉRREZ
 SIIE 3.2 180.4/ 2021-03-11
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
-1) Correccion en la moneda en el correo de avisos de transferencias.
+1) Corrección en la moneda en el correo de avisos de transferencias.
 2) Correcciones en la vista de layouts bancarios.
+3) Corrección al truncado del nombre de cuenta contable de la contabiliad electrónica.
 
 ================================================================================
 SIIE 3.2 180.4/ 2021-03-11

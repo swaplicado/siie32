@@ -441,7 +441,7 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
         String[] titles = null;
         HashMap<Integer, Object> params = new HashMap<Integer, Object>();
 
-        aoTableColumns = new STableColumnForm[showStock() ? 10 : 9];
+        aoTableColumns = new STableColumnForm[showStock() ? 11 : 10];
 
         if (jrbFindByItemKey.isSelected() || jrbFindByItemName.isSelected()) {
             dataType = jrbFindByItemKey.isSelected() ? SDataConstants.ITMX_ITEM_BY_KEY : SDataConstants.ITMX_ITEM_BY_NAME;
@@ -449,10 +449,12 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             if (jrbFindByItemKey.isSelected()) {
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. parte", 250);
             }
             else {
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. parte", 250);
             }
             
             if (showStock()) {
@@ -480,9 +482,11 @@ public class SFormOptionPickerItems extends javax.swing.JDialog implements erp.l
             if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. parte", 250);
             }
             else {
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Ítem", 250);
+                aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "No. parte", 250);
                 aoTableColumns[col++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", STableConstants.WIDTH_ITEM_KEY);
             }
             

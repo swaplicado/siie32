@@ -57,6 +57,7 @@ public class SLayoutBankRow implements SGridRow {
     protected double mdBalancePayed;
     protected String msPayerAccountCurrencyKey;
     protected String msDpsCurrencyKey;
+    protected String msBankCurrencyKey;
     protected String msBeneficiaryAccountNumber;
     protected String msBeneficiaryEmail;
     protected String msBeneficiaryFiscalId;
@@ -133,7 +134,8 @@ public class SLayoutBankRow implements SGridRow {
         mdBalanceTotByBizPartner = 0;
         mdBalancePayed = 0;
         msPayerAccountCurrencyKey = "";
-        msDpsCurrencyKey = "";      
+        msDpsCurrencyKey = ""; 
+        msBankCurrencyKey = "";
         msBeneficiaryAccountNumber = "";
         msBeneficiaryEmail = "";
         msBeneficiaryFiscalId = "";
@@ -200,6 +202,7 @@ public class SLayoutBankRow implements SGridRow {
     public void setBalancePayed(double d) { mdBalancePayed = d; }
     public void setPayerAccountCurrencyKey(String s) { msPayerAccountCurrencyKey = s; }
     public void setDpsCurrencyKey(String s) { msDpsCurrencyKey = s; }
+    public void setBankCurrencyKey(String s) { msBankCurrencyKey = s; }
     public void setBeneficiaryAccountNumber(String s) { msBeneficiaryAccountNumber = s; }
     public void setBeneficiaryEmail(String s) { msBeneficiaryEmail = s; }
     public void setBeneficiaryFiscalId(String s) { msBeneficiaryFiscalId = s; }
@@ -267,6 +270,7 @@ public class SLayoutBankRow implements SGridRow {
     public double getBalancePayed() { return mdBalancePayed; }
     public String getPayerAccountCurrencyKey() { return msPayerAccountCurrencyKey; }
     public String getDpsCurrencyKey() { return msDpsCurrencyKey; }
+    public String getBankCurrencyKey() { return msBankCurrencyKey; }
     public String getBeneficiaryAccountNumber() { return msBeneficiaryAccountNumber; }
     public String getBeneficiaryEmail() { return msBeneficiaryEmail; }
     public String getBeneficiaryFiscalId() { return msBeneficiaryFiscalId; }
@@ -299,6 +303,8 @@ public class SLayoutBankRow implements SGridRow {
     public ArrayList<SGuiItem> getAgreementsReferences() { return maAgreementReferences; }
     public HashMap<String, String> getCodeBankAccountCredits() { return moCodeBankAccountCredits; }
     public HashMap<String, String> getAliasBankAccountCredits() { return moAliasBankAccountCredits; }
+    
+    public double getExchangeRate() { return moMoneyPayment.getExchangeRate(); }
     
     public boolean isXml() { return mbIsXml; }
     public String getXml() { return msXml; }
@@ -343,8 +349,7 @@ public class SLayoutBankRow implements SGridRow {
                 key = new int[] { mnDpsYearId, mnDpsDocId };
                 break;
             case SModSysConsts.FINX_LAY_BANK_TRN_TP_PREPAY:
-                //key = new int[] { mnBizPartnerId };
-                key = moBankAccPk;
+                key = new int[] { mnBizPartnerId };
                 break;
             default:
         }
@@ -551,7 +556,7 @@ public class SLayoutBankRow implements SGridRow {
                         value = moMoneyPayment.getOriginalAmount();
                         break;
                     case 7:
-                        value =  msDpsCurrencyKey;
+                        value =  msBankCurrencyKey;
                         break;
                     case 8:
                         value = moMoneyPayment.getExchangeRate();

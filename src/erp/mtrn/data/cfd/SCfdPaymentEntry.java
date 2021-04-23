@@ -20,6 +20,8 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
+import erp.mfin.utils.SBalanceTax;
+import erp.mfin.utils.SMfinUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SDbBizPartner;
@@ -550,50 +552,120 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             
             // generate DSM entry for the accounting of current payment (to process payment and related taxes):
             
-            SDataDsmEntry oDsmEntry = new SDataDsmEntry();
+            ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(session.getDatabase().getConnection(), paymentEntryDoc.DataDps.getPkDocId(), paymentEntryDoc.DataDps.getPkYearId(), 
+                                                SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
+                        
+            double dTotalBalance = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalance(), (a, b) -> a + b);
+            double dTotalBalanceCur = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalanceCurrency(), (a, b) -> a + b);
 
-            oDsmEntry.setPkYearId(session.getCurrentYear());
-            oDsmEntry.setFkUserNewId(session.getUser().getPkUserId());
+            HashMap<String, double[]> taxBalances = new HashMap();
+            String tax;
+            double perc;
+            double percCur;
+            double amtToPay = 0;
+            double amtToPayCur = 0;
+            double amtDesToPay = 0;
+            double amtDesToPayCur = 0;
+            int[] taxMax = new int[] { 0, 0 };
+            double amtMaj = 0d;
+            for (SBalanceTax balance : balances) {
+                tax = balance.getTaxBasId() + "_" + balance.getTaxId();
 
-            oDsmEntry.setSourceReference("");
-            oDsmEntry.setFkSourceCurrencyId(CurrencyId);
-            oDsmEntry.setSourceValueCy(paymentEntryDoc.PayPayment);
-            oDsmEntry.setSourceValue(SLibUtils.roundAmount(paymentEntryDoc.PayPayment * ExchangeRate));
-            oDsmEntry.setSourceExchangeRateSystem(ExchangeRate);
-            oDsmEntry.setSourceExchangeRate(ExchangeRate);
-            
-            oDsmEntry.setFkDestinyDpsYearId_n(paymentEntryDoc.DataDps.getPkYearId());
-            oDsmEntry.setFkDestinyDpsDocId_n(paymentEntryDoc.DataDps.getPkDocId());
-            oDsmEntry.setFkDestinyCurrencyId(paymentEntryDoc.DataDps.getFkCurrencyId());
-            oDsmEntry.setDestinyValueCy(paymentEntryDoc.DocPayment);
-            oDsmEntry.setDestinyValue(paymentEntryDoc.PayPaymentLocal);
-            oDsmEntry.setDestinyExchangeRateSystem(destXrt);
-            oDsmEntry.setDestinyExchangeRate(destXrt);
-            oDsmEntry.setDbmsFkDpsCategoryId(paymentEntryDoc.DataDps.getFkDpsCategoryId());
-            oDsmEntry.setDbmsDestinyDps(paymentEntryDoc.DataDps.getDpsNumber());
-            oDsmEntry.setDbmsSubclassMove(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP, SDbRegistry.FIELD_NAME).toString());
-            oDsmEntry.setDbmsBizPartner(bizPartnerName);
-            oDsmEntry.setDbmsDestinyTpDps(session.readField(SModConsts.TRNU_TP_DPS, paymentEntryDoc.DataDps.getDpsTypeKey(), SDbRegistry.FIELD_CODE).toString());
+                perc = balance.getBalance() / dTotalBalance;
+                percCur = balance.getBalanceCurrency() / dTotalBalanceCur;
 
-            oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);
-            oDsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[1]);
-            oDsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[2]);
-            oDsmEntry.setDbmsCtSysMovId(SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]);
-            oDsmEntry.setDbmsTpSysMovId(SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
-            
-            oDsmEntry.setFkBizPartnerId(paymentEntryDoc.DataDps.getFkBizPartnerId_r());
-            oDsmEntry.setDbmsFkBizPartnerBranchId_n(paymentEntryDoc.DataDps.getFkBizPartnerBranchId());
+                taxBalances.put(tax, new double[] { perc, percCur });
 
-            Vector<SFinAccountConfigEntry> accountConfigEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs((SClientInterface) session.getClient(), paymentEntryDoc.DataDps.getFkBizPartnerId_r(), SDataConstantsSys.BPSS_CT_BP_CUS,
-                    DataRecord.getPkBookkeepingCenterId(), DataRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, paymentEntryDoc.DataDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, null);
-            
-            if (!accountConfigEntries.isEmpty()) {
-                oDsmEntry.setDbmsAccountOp(accountConfigEntries.get(0).getAccountId());
+                amtToPay += SLibUtils.roundAmount((paymentEntryDoc.PayPayment * ExchangeRate) * perc);
+                amtToPayCur += SLibUtils.roundAmount(paymentEntryDoc.PayPayment * percCur);
+
+                amtDesToPay += SLibUtils.roundAmount(paymentEntryDoc.PayPaymentLocal * perc);
+                amtDesToPayCur += SLibUtils.roundAmount(paymentEntryDoc.DocPayment * percCur);
+
+                if (balance.getBalanceCurrency() > amtMaj) {
+                    amtMaj = balance.getBalanceCurrency();
+                    taxMax = new int[] { balance.getTaxBasId(), balance.getTaxId() };
+                }
             }
-            
-            // process payment and related taxes with DSM instance:
-            
-            oDsm.getDbmsEntries().add(oDsmEntry);
+
+            double diff = 0;
+            if ((paymentEntryDoc.PayPayment * ExchangeRate) != amtToPay) {
+                diff = SLibUtils.roundAmount(paymentEntryDoc.PayPayment - amtToPay);
+            }
+            double diffCur = 0;
+            if (paymentEntryDoc.PayPayment != amtToPayCur) {
+                diffCur = SLibUtils.roundAmount(paymentEntryDoc.PayPayment - amtToPayCur);
+            }
+            double diffDes = 0;
+            if (paymentEntryDoc.PayPaymentLocal != amtDesToPay) {
+                diffDes = SLibUtils.roundAmount(paymentEntryDoc.PayPaymentLocal - amtToPay);
+            }
+            double diffDesCur = 0;
+            if (paymentEntryDoc.DocPayment != amtDesToPayCur) {
+                diffDesCur = SLibUtils.roundAmount(paymentEntryDoc.DocPayment - amtToPayCur);
+            }
+
+            for (SBalanceTax balance : balances) {
+                SDataDsmEntry oDsmEntry = new SDataDsmEntry();
+
+                tax = balance.getTaxBasId() + "_" + balance.getTaxId();
+
+                oDsmEntry.setSourceValue(SLibUtils.roundAmount((paymentEntryDoc.PayPayment * ExchangeRate) * taxBalances.get(tax)[0]));
+                oDsmEntry.setSourceValueCy(SLibUtils.roundAmount(paymentEntryDoc.PayPayment * taxBalances.get(tax)[1]));
+
+                oDsmEntry.setDestinyValue(SLibUtils.roundAmount(paymentEntryDoc.PayPaymentLocal * taxBalances.get(tax)[0]));
+                oDsmEntry.setDestinyValueCy(SLibUtils.roundAmount(paymentEntryDoc.DocPayment * taxBalances.get(tax)[1]));
+
+                if (balance.getTaxBasId() == taxMax[0] && balance.getTaxId() == taxMax[1]) {
+                    oDsmEntry.setSourceValue(SLibUtils.roundAmount(oDsmEntry.getSourceValue() + diff));
+                    oDsmEntry.setSourceValueCy(SLibUtils.roundAmount(oDsmEntry.getSourceValueCy() + diffCur));
+
+                    oDsmEntry.setDestinyValue(SLibUtils.roundAmount(oDsmEntry.getDestinyValue() + diffDes));
+                    oDsmEntry.setDestinyValueCy(SLibUtils.roundAmount(oDsmEntry.getDestinyValueCy() + diffDesCur));
+                }
+
+                oDsmEntry.setPkYearId(session.getCurrentYear());
+                oDsmEntry.setFkUserNewId(session.getUser().getPkUserId());
+
+                oDsmEntry.setSourceReference("");
+                oDsmEntry.setFkSourceCurrencyId(CurrencyId);
+                oDsmEntry.setSourceExchangeRateSystem(ExchangeRate);
+                oDsmEntry.setSourceExchangeRate(ExchangeRate);
+                
+                oDsmEntry.setFkTaxBasId_n(balance.getTaxBasId());
+                oDsmEntry.setFkTaxId_n(balance.getTaxId());
+
+                oDsmEntry.setFkDestinyDpsYearId_n(paymentEntryDoc.DataDps.getPkYearId());
+                oDsmEntry.setFkDestinyDpsDocId_n(paymentEntryDoc.DataDps.getPkDocId());
+                oDsmEntry.setFkDestinyCurrencyId(paymentEntryDoc.DataDps.getFkCurrencyId());
+                oDsmEntry.setDestinyExchangeRateSystem(destXrt);
+                oDsmEntry.setDestinyExchangeRate(destXrt);
+                oDsmEntry.setDbmsFkDpsCategoryId(paymentEntryDoc.DataDps.getFkDpsCategoryId());
+                oDsmEntry.setDbmsDestinyDps(paymentEntryDoc.DataDps.getDpsNumber());
+                oDsmEntry.setDbmsSubclassMove(session.readField(SModConsts.FINS_CLS_ACC_MOV, SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP, SDbRegistry.FIELD_NAME).toString());
+                oDsmEntry.setDbmsBizPartner(bizPartnerName);
+                oDsmEntry.setDbmsDestinyTpDps(session.readField(SModConsts.TRNU_TP_DPS, paymentEntryDoc.DataDps.getDpsTypeKey(), SDbRegistry.FIELD_CODE).toString());
+
+                oDsmEntry.setFkAccountingMoveTypeId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[0]);
+                oDsmEntry.setFkAccountingMoveClassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[1]);
+                oDsmEntry.setFkAccountingMoveSubclassId(SDataConstantsSys.FINS_CLS_ACC_MOV_SUBSYS_PAY_APP[2]);
+                oDsmEntry.setDbmsCtSysMovId(SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0]);
+                oDsmEntry.setDbmsTpSysMovId(SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
+
+                oDsmEntry.setFkBizPartnerId(paymentEntryDoc.DataDps.getFkBizPartnerId_r());
+                oDsmEntry.setDbmsFkBizPartnerBranchId_n(paymentEntryDoc.DataDps.getFkBizPartnerBranchId());
+
+                Vector<SFinAccountConfigEntry> accountConfigEntries = SFinAccountUtilities.obtainBizPartnerAccountConfigs((SClientInterface) session.getClient(), paymentEntryDoc.DataDps.getFkBizPartnerId_r(), SDataConstantsSys.BPSS_CT_BP_CUS,
+                        DataRecord.getPkBookkeepingCenterId(), DataRecord.getDate(), SDataConstantsSys.FINS_TP_ACC_BP_OP, paymentEntryDoc.DataDps.getFkDpsCategoryId() == SDataConstantsSys.TRNS_CT_DPS_SAL, oDsmEntry.getTaxPk());
+
+                if (! accountConfigEntries.isEmpty()) {
+                    oDsmEntry.setDbmsAccountOp(accountConfigEntries.get(0).getAccountId());
+                }
+
+                // process payment and related taxes with DSM instance:
+
+                oDsm.getDbmsEntries().add(oDsmEntry);
+            }
 
             oDsm.setDbmsPkRecordTypeId(SDataConstantsSys.FINU_TP_REC_SUBSYS_CUS);
             oDsm.setDbmsSubsystemTypeBiz(session.readField(SModConsts.BPSS_CT_BP, new int[] { SDataConstantsSys.BPSS_CT_BP_CUS }, SDbRegistry.FIELD_CODE) + "");
