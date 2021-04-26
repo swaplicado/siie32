@@ -11,7 +11,6 @@
 
 package erp.gui.grid;
 
-import erp.data.SDataConstants;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComboBoxGroup;

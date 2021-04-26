@@ -93,7 +93,7 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
         renderText();
         
         moSetting.setSetting(msFunctionalAreasIds);
-        moTab.updateSetting(moSetting);
+//        moTab.updateSetting(moSetting);
     }
 
     private void actionTypeFunctionalArea() {
@@ -156,15 +156,5 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
     public void setDataFilter(final int[] filter) {
         manDataFilter = filter;
         moDialogFilterFunctionalArea.setDataFilterKey(manDataFilter);
-    }
-
-    public void setFixedFunctionalAreaType(final int type) {
-        mnFunctionalAreaId = type;
-        renderText();
-
-        moSetting.setSetting(mnFunctionalAreaId);
-        moTab.addSetting(moSetting);
-
-        jbFunctionalArea.setEnabled(false);   // a fixed type was set
     }
 }

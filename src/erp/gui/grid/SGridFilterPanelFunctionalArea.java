@@ -138,9 +138,6 @@ public class SGridFilterPanelFunctionalArea extends JPanel implements SGridFilte
         
         tfFunAreas.setText(text);
         tfFunAreas.setCaretPosition(0);
-        SGridFilterValue val = new SGridFilterValue(SFilterConstants.SETTING_FILTER_FUNC_AREA, SGridConsts.FILTER_DATA_TYPE_TEXT, msAreasIds);
-        //moPaneView.getFiltersMap().clear();
-        moPaneView.getFiltersMap().put(SFilterConstants.SETTING_FILTER_FUNC_AREA, val);
     }
     
     private void actionEditFunArea() {
@@ -149,6 +146,8 @@ public class SGridFilterPanelFunctionalArea extends JPanel implements SGridFilte
         
         if (moDialogFunAreas.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
             this.setTextToField(moDialogFunAreas.getSelectedPrimaryKey() == null ? null : ((int[]) moDialogFunAreas.getSelectedPrimaryKey()));
+            SGridFilterValue val = new SGridFilterValue(SFilterConstants.SETTING_FILTER_FUNC_AREA, SGridConsts.FILTER_DATA_TYPE_TEXT, msAreasIds);
+            moPaneView.putFilter(SFilterConstants.SETTING_FILTER_FUNC_AREA, val);
         }
         
         jbEditFuncArea.setEnabled(true);
