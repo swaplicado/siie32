@@ -86,7 +86,7 @@ public class SViewOrders extends SGridPaneView {
         
         filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
         if (filter != null) {
-            sql += "AND d.fid_func IN ( " + filter + ") ";
+            sql += " AND d.fid_func IN (" + filter + ") ";
         }
         
         moPaneSettings = new SGridPaneSettings(2);
@@ -116,7 +116,7 @@ public class SViewOrders extends SGridPaneView {
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ue ON d.fid_usr_edit = ue.id_usr " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.USRU_USR) + " AS ud ON d.fid_usr_del = ud.id_usr " +
                 "AND d.id_year = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' " +
-                "AND  bp.id_bp = " + mnBizPartherId + sql;
+                "AND bp.id_bp = " + mnBizPartherId + " " + sql;
     }
           
 

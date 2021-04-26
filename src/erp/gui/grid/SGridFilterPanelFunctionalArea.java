@@ -107,25 +107,27 @@ public class SGridFilterPanelFunctionalArea extends JPanel implements SGridFilte
         tfFunAreas.setValue("");
         ArrayList<String> lFunctionalAreasIds = null;
         ArrayList<String> lFunctionalAreasCodes = null;
+        msAreasIds = "";
         
         if (key == null) {
             lFunctionalAreasIds = STrnFunAreasUtils.getFunctionalAreasOfUser((SClientInterface) miClient, miClient.getSession().getUser().getPkUserId(), STrnFunAreasUtils.FUN_AREA_ID, "");
             
             if (lFunctionalAreasIds.isEmpty()) {
-                text = SLibConstants.TXT_ALL;                
+                msAreasIds = "''";
+                text = "";
             }
             else {
                 for (String id : lFunctionalAreasIds) {
                     msAreasIds += id + ", ";
                 }
-                
+
                 msAreasIds = msAreasIds.substring(0, msAreasIds.length() - 2);
-                
+
                 lFunctionalAreasCodes = STrnFunAreasUtils.getFunctionalAreasOfUser((SClientInterface) miClient, miClient.getSession().getUser().getPkUserId(), STrnFunAreasUtils.FUN_AREA_CODE, "");
                 for (String code : lFunctionalAreasCodes) {
                     codes += code + ", ";
                 }
-                
+
                 text = codes.substring(0, codes.length() - 2);
             }
         }

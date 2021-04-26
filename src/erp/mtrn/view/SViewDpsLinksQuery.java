@@ -366,10 +366,10 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (! ((String) setting.getSetting()).isEmpty()) {
                     if (isViewFromSource()) {
-                        sqlFunctAreas = "AND " + " ds.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                        sqlFunctAreas = "AND ds.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                     }
                     else {
-                        sqlFunctAreas = "AND " + " dd.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                        sqlFunctAreas = "AND dd.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                     }
                 }
             }

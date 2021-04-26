@@ -91,6 +91,9 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, mnDataType, manDataFilter);
 
         renderText();
+        
+        moSetting.setSetting(msFunctionalAreasIds);
+        moTab.updateSetting(moSetting);
     }
 
     private void actionTypeFunctionalArea() {
@@ -118,20 +121,21 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
             lFunctionalAreasIds = STrnFunAreasUtils.getFunctionalAreasOfUser(miClient, miClient.getSessionXXX().getUser().getPkUserId(), STrnFunAreasUtils.FUN_AREA_ID, "");
             
             if (lFunctionalAreasIds.isEmpty()) {
-                text = SLibConstants.TXT_ALL;                
+                msFunctionalAreasIds = "''";
+                text = "";
             }
             else {
                 for (String id : lFunctionalAreasIds) {
                     msFunctionalAreasIds += id + ", ";
                 }
-                
+
                 msFunctionalAreasIds = msFunctionalAreasIds.substring(0, msFunctionalAreasIds.length() - 2);
-                
+
                 lFunctionalAreasCodes = STrnFunAreasUtils.getFunctionalAreasOfUser(miClient, miClient.getSessionXXX().getUser().getPkUserId(), STrnFunAreasUtils.FUN_AREA_CODE, "");
                 for (String code : lFunctionalAreasCodes) {
                     codes += code + ", ";
                 }
-                
+
                 text = codes.substring(0, codes.length() - 2);
             }
         }

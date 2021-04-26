@@ -110,15 +110,9 @@ public abstract class SDataReadTableRows {
                         + "FROM cfgu_func AS fa ";
                 if (filterKey != null) {
                     sSql += "INNER JOIN usr_usr_func AS fau ON "
-                            + "fau.id_func = fa.id_func AND (fau.id_usr = " + ((int[]) filterKey)[0] + " OR fa.id_func = " + SModSysConsts.CFGU_FUNC_NON + " ) ";
+                            + "fau.id_func = fa.id_func AND fau.id_usr = " + ((int[]) filterKey)[0] + " ";
                 }
                 sSql += "WHERE NOT b_del ";
-                if (filterKey != null) {
-                    sSql += "UNION "
-                            + "SELECT fa.id_func, fa.name, fa.code "
-                            + "FROM cfgu_func AS fa "
-                            + "WHERE fa.id_func = " + SModSysConsts.CFGU_FUNC_NON+ " ";
-                }
                 sSql += "ORDER BY name, code, id_func ";
                 
                 break;

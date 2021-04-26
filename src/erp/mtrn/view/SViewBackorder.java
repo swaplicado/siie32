@@ -268,7 +268,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
                 if (! ((String) setting.getSetting()).isEmpty()) {
-                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }

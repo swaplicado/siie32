@@ -86,7 +86,7 @@ public class SViewInvoicesToSupply extends SGridPaneView {
         
         filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
         if (filter != null) {
-            sql += "AND da.fid_func IN ( " + filter + ") ";
+            sql += " AND da.fid_func IN ( " + filter + ") ";
         }
         
         moPaneSettings = new SGridPaneSettings(2);

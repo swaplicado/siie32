@@ -211,15 +211,9 @@ public abstract class SDataReadComponentItems {
                         + "FROM cfgu_func AS fa ";
                 if (pk != null) {
                     sql += "INNER JOIN usr_usr_func AS fau ON "
-                            + "fau.id_func = fa.id_func AND (fau.id_usr = " + ((int[]) pk)[0] + " OR fa.id_func = " + SModSysConsts.CFGU_FUNC_NON + " ) ";
+                            + "fau.id_func = fa.id_func AND fau.id_usr = " + ((int[]) pk)[0] + " ";
                 }
                 sql += "WHERE NOT b_del ";
-                if (pk != null) {
-                    sql += "UNION "
-                            + "SELECT fa.id_func AS f_id_1, name AS f_item "
-                            + "FROM cfgu_func AS fa "
-                            + "WHERE fa.id_func = " + SModSysConsts.CFGU_FUNC_NON+ " ";
-                }
                 sql += "ORDER BY f_item, f_id_1 ";
                 
                 text = "área funcional";

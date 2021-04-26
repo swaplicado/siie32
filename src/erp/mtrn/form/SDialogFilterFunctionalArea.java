@@ -17,7 +17,6 @@ import java.util.Vector;
  */
 public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener {
 
-    private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
@@ -101,7 +100,7 @@ public class SDialogFilterFunctionalArea extends javax.swing.JDialog implements 
 
         jPanel3.setLayout(new java.awt.GridLayout(2, 1, 0, 5));
 
-        jckSelectedAll.setText("Todas las áreas funcionales");
+        jckSelectedAll.setText("Áreas funcionales asignadas");
         jckSelectedAll.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 jckSelectedAllItemStateChanged(evt);

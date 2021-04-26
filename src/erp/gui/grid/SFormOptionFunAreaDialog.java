@@ -90,7 +90,7 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 0));
 
-        jlBizPartner1.setText("Todas las áreas funcionales:");
+        jlBizPartner1.setText("Áreas funcionales asignadas:");
         jlBizPartner1.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel3.add(jlBizPartner1);
         jPanel3.add(checkIsAllAreas);
@@ -227,7 +227,7 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
     }
 
     private void actionOk() {
-        if (jcbFunAreas.getSelectedIndex() <= 0) {
+        if (! checkIsAllAreas.isSelected() && jcbFunAreas.getSelectedIndex() <= 0) {
             miClient.showMsgBoxWarning("Se debe seleccionar una opción para el campo '" + jlFunAreas.getText() + "'.");
             jcbFunAreas.requestFocus();
         }
@@ -308,7 +308,7 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
 
     @Override
     public java.lang.Object getSelectedPrimaryKey() {
-        if (((SFormComponentItem) jcbFunAreas.getSelectedItem()) == null) {
+        if (((SFormComponentItem) jcbFunAreas.getSelectedItem()) == null  || checkIsAllAreas.isSelected()) {
             return null;
         }
         
