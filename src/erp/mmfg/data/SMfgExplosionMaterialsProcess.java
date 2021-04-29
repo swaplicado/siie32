@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mmfg.data.explosion;
+package erp.mmfg.data;
 
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  *
  * @author Edwin Carmona
  */
-public class SExplosionMaterialsProcess {
+public class SMfgExplosionMaterialsProcess {
 
     public final int ID_BOOM = 0;
     public final int REF_BOOM = 1;
@@ -53,10 +53,10 @@ public class SExplosionMaterialsProcess {
         String sResult = "";
 
         try {
-            ArrayList<SInputData> lFile = SCsvFileManager.readFile(sFileName);
+            ArrayList<SMfgInputData> lFile = SMfgCsvFileManager.readFile(sFileName);
             HashMap<Integer, SDataExplotionMaterialsEntry> lIngredients = new HashMap();
 
-            for (SInputData oData : lFile) {
+            for (SMfgInputData oData : lFile) {
                 SDataBom oBom = this.getBomByItemKey(miClient, oData.getMsItemKey());
                 if (oBom != null) {
                     lIngredients = this.explode(miClient, oBom, oData.getMnQuantity(), lIngredients, true);
@@ -194,7 +194,7 @@ public class SExplosionMaterialsProcess {
      * @return String with errors ocurred, if the string is empty there were no errors
      */
     private String writeExplosion(HashMap<Integer, SDataExplotionMaterialsEntry> lExplosionList) {
-      String sResult = SCsvFileManager.writeCsvFile(lExplosionList);
+      String sResult = SMfgCsvFileManager.writeCsvFile(lExplosionList);
 
       return sResult;
     }

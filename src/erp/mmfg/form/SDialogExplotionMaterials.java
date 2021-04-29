@@ -16,7 +16,7 @@ import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mmfg.data.SDataExplotionMaterials;
 import erp.mmfg.data.SDataProductionOrder;
-import erp.mmfg.data.explosion.SExplosionMaterialsProcess;
+import erp.mmfg.data.SMfgExplosionMaterialsProcess;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -533,7 +533,7 @@ public class SDialogExplotionMaterials extends javax.swing.JDialog implements er
                         }
                     }
                     
-                    SExplosionMaterialsProcess oExplosion = new SExplosionMaterialsProcess();
+                    SMfgExplosionMaterialsProcess oExplosion = new SMfgExplosionMaterialsProcess();
                     String sResult = oExplosion.explodeFile(miClient, moFileToExplode.getAbsolutePath(), moFieldFkCobId.getKeyAsIntArray()[0], lWhs, moFieldDate.getDate());
                     if (! sResult.isEmpty()) {
                         JOptionPane.showMessageDialog(this, sResult, "Error", JOptionPane.ERROR_MESSAGE);

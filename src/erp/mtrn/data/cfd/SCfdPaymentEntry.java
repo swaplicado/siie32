@@ -20,8 +20,7 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
-import erp.mfin.utils.SBalanceTax;
-import erp.mfin.utils.SFinUtils;
+import erp.mfin.data.SFinBalanceTax;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SDbBizPartner;
@@ -552,12 +551,12 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             
             // generate DSM entry for the accounting of current payment (to process payment and related taxes):
             
-            ArrayList<SBalanceTax> balances = SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), paymentEntryDoc.DataDps.getPkDocId(), paymentEntryDoc.DataDps.getPkYearId(), 
+            ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), paymentEntryDoc.DataDps.getPkDocId(), paymentEntryDoc.DataDps.getPkYearId(), 
                                                 SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
                         
             double dTotalBalance = 0d;
             double dTotalBalanceCur = 0d;
-            for (SBalanceTax balance : balances) {
+            for (SFinBalanceTax balance : balances) {
                 dTotalBalance += balance.getBalance();
                 dTotalBalanceCur += balance.getBalanceCurrency();
             }
@@ -572,7 +571,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             double amtDesToPayCur = 0;
             int[] taxMax = new int[] { 0, 0 };
             double amtMaj = 0d;
-            for (SBalanceTax balance : balances) {
+            for (SFinBalanceTax balance : balances) {
                 tax = balance.getTaxBasId() + "_" + balance.getTaxId();
 
                 perc = balance.getBalance() / dTotalBalance;
@@ -609,7 +608,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                 diffDesCur = SLibUtils.roundAmount(paymentEntryDoc.DocPayment - amtToPayCur);
             }
 
-            for (SBalanceTax balance : balances) {
+            for (SFinBalanceTax balance : balances) {
                 SDataDsmEntry oDsmEntry = new SDataDsmEntry();
 
                 tax = balance.getTaxBasId() + "_" + balance.getTaxId();
