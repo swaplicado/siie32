@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  *
  * @author Edwin Carmona
  */
-public class SMfinUtils {
+public class SFinUtils {
     
     /**
      * Obtiene el saldo de un documento agrupado por impuesto
@@ -128,9 +128,9 @@ public class SMfinUtils {
             return taxBalances;
         }
         catch (SQLException ex) {
-            Logger.getLogger(SMfinUtils.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SFinUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        return new ArrayList();
+        return new ArrayList<>();
     }
 }
