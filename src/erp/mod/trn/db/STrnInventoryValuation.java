@@ -145,7 +145,7 @@ public class STrnInventoryValuation {
      */
     private void validateNewValuation() throws Exception {
         if (!SDataUtilities.isPeriodOpen((SClientInterface) moSession.getClient(), new int[] { mnYear, mnPeriod })) {
-            throw new Exception(SLibConstants.MSG_ERR_GUI_PER_CLOSE + "\nPeríodo cerrado: " + mnYear + "-" + mnPeriod);
+            throw new Exception(SLibConstants.MSG_ERR_GUI_PER_CLOSE + "\nPeríodo cerrado: " + SLibUtils.DecimalFormatCalendarYear.format(mnYear) + "-" + SLibUtils.DecimalFormatCalendarMonth.format(mnPeriod));
         }
         
         validateDefaultWarehouseWip();

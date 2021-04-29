@@ -888,7 +888,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 "INNER JOIN hrs_pay_rcp_ear AS rcp_ear ON rcp_ear.id_pay = rcp.id_pay AND rcp_ear.id_emp = rcp.id_emp " +
                                 "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                 "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ear.b_del AND v.id_tp_acc = ear.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                 "UNION " +
@@ -902,7 +902,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 "INNER JOIN hrs_ear AS ear ON ear.id_ear = rcp_ear.fk_ear " +
                                 "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
                                 "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ear.b_del AND v.id_tp_acc = ear.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                 "UNION " +
@@ -917,7 +917,7 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 "INNER JOIN hrs_acc_ear AS v ON v.id_ear = ear.id_ear " +
                                 "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
                                 "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ear.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ear.b_del AND v.id_tp_acc = ear.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ear.id_ear, rtrim(ear.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                 "ORDER BY f_tp_acc, f_id_concept, f_id_ref; ";
                         conceptType = "percepción";
@@ -938,7 +938,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 "INNER JOIN hrs_pay_rcp_ded AS rcp_ded ON rcp_ded.id_pay = rcp.id_pay AND rcp_ded.id_emp = rcp.id_emp " +
                                 "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                 "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ded.b_del AND v.id_tp_acc = ded.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_GBL + " AND " +
+                                "p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                 "UNION " +
@@ -952,7 +953,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 "INNER JOIN hrs_ded AS ded ON ded.id_ded = rcp_ded.fk_ded " +
                                 "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
                                 "INNER JOIN erp.hrsu_dep AS d ON d.id_dep = rcp.fk_dep AND v.id_ref = d.id_dep " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ded.b_del AND v.id_tp_acc = ded.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_DEP + " AND " +
+                                "p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(d.name), rtrim(d.code), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
 
                                 "UNION " +
@@ -967,7 +969,8 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
                                 "INNER JOIN hrs_acc_ded AS v ON v.id_ded = ded.id_ded " +
                                 "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = rcp.id_emp AND v.id_ref = emp.id_emp " +
                                 "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = emp.id_emp " +
-                                "WHERE v.b_del = 0 AND p.b_del = 0 AND rcp.b_del = 0 AND rcp_ded.b_del = 0 AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
+                                "WHERE NOT v.b_del AND NOT p.b_del AND NOT rcp.b_del AND NOT rcp_ded.b_del AND v.id_tp_acc = ded.fk_tp_acc_cfg AND v.id_tp_acc = " + SModSysConsts.HRSS_TP_ACC_EMP + " AND " +
+                                "p.id_pay = " + moPayroll.getPkPayrollId() + " AND rcp.id_emp IN (" + sEmployees + ") " +
                                 "GROUP BY v.id_tp_acc, ded.id_ded, rtrim(ded.name_abbr), v.id_ref, rtrim(bp.bp), v.fk_acc, v.fk_cc_n, v.fk_item_n, v.fk_bp_n, v.fk_tax_bas_n, v.fk_tax_tax_n " +
                                 "ORDER BY f_tp_acc, f_id_concept, f_id_ref ";
                         conceptType = "deducción";
@@ -1522,12 +1525,12 @@ public class SDialogPayrollAccounting extends JDialog implements ActionListener 
         String msg = "";
         Boolean compute = true;
 
-        if (moTablePaneEmpAvailable.getTableGuiRowCount() > 0) {
-            miClient.showMsgBoxWarning("Todavía quedan empleados disponibles sin ser seleccionados.");
+        if (moTablePaneEmpSelected.getTableGuiRowCount() == 0) {
+            miClient.showMsgBoxWarning("No hay empleados seleccionados.");
             moTablePaneEmpAvailable.requestFocus();
         }
-        else if (moTablePaneEmpSelected.getTableGuiRowCount() == 0) {
-            miClient.showMsgBoxWarning("No hay empleados seleccionados.");
+        else if (moTablePaneEmpAvailable.getTableGuiRowCount() > 0) {
+            miClient.showMsgBoxWarning("Todavía quedan empleados disponibles sin ser seleccionados.");
             moTablePaneEmpAvailable.requestFocus();
         }
         else {

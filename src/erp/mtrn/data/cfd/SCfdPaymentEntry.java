@@ -21,7 +21,7 @@ import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mfin.utils.SBalanceTax;
-import erp.mfin.utils.SMfinUtils;
+import erp.mfin.utils.SFinUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SDbBizPartner;
@@ -552,13 +552,17 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             
             // generate DSM entry for the accounting of current payment (to process payment and related taxes):
             
-            ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(session.getDatabase().getConnection(), paymentEntryDoc.DataDps.getPkDocId(), paymentEntryDoc.DataDps.getPkYearId(), 
+            ArrayList<SBalanceTax> balances = SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), paymentEntryDoc.DataDps.getPkDocId(), paymentEntryDoc.DataDps.getPkYearId(), 
                                                 SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
                         
-            double dTotalBalance = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalance(), (a, b) -> a + b);
-            double dTotalBalanceCur = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalanceCurrency(), (a, b) -> a + b);
+            double dTotalBalance = 0d;
+            double dTotalBalanceCur = 0d;
+            for (SBalanceTax balance : balances) {
+                dTotalBalance += balance.getBalance();
+                dTotalBalanceCur += balance.getBalanceCurrency();
+            }
 
-            HashMap<String, double[]> taxBalances = new HashMap();
+            HashMap<String, double[]> taxBalances = new HashMap<>();
             String tax;
             double perc;
             double percCur;

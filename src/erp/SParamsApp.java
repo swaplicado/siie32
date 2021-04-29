@@ -5,6 +5,7 @@
 
 package erp;
 
+import erp.lib.SLibUtilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -93,8 +94,10 @@ public class SParamsApp implements java.io.Serializable {
             file = new File(FILE_NAME);
             if (!file.exists()) {
                 error = true;
-                System.err.println("WARNING: Cofiguration file does not exist!");
-                JOptionPane.showMessageDialog(null, "Cofiguration file does not exist!", "Warning!", JOptionPane.WARNING_MESSAGE);
+                String warning = "warning";
+                String message = SClient.APP_NAME + " cofiguration file '" + FILE_NAME + "' could not be found in system's base folder!";
+                System.err.println(warning.toUpperCase() + ": " + message);
+                JOptionPane.showMessageDialog(null, message, SLibUtilities.textProperCase(warning) + "!", JOptionPane.WARNING_MESSAGE);
             }
             else {
                 fis = new FileInputStream(file);

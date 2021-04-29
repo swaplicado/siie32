@@ -29,7 +29,7 @@ import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
 import erp.mfin.utils.SBalanceTax;
-import erp.mfin.utils.SMfinUtils;
+import erp.mfin.utils.SFinUtils;
 import erp.mod.SModConsts;
 import erp.mod.bps.db.SDbBizPartner;
 import erp.mod.fin.db.SFinConsts;
@@ -1117,14 +1117,18 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         SDataDsm oDsm = new SDataDsm();
         SDataRecord oRecord = null;
         SDataBizPartnerBranch branch = null;
-        ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), moDps.getPkDocId(), moDps.getPkYearId(), 
+        ArrayList<SBalanceTax> balances = SFinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), moDps.getPkDocId(), moDps.getPkYearId(), 
                                                     mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], 
                                                     mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
         
-        double dTotalBalance = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalance(), (a, b) -> a + b);
-        double dTotalBalanceCur = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalanceCurrency(), (a, b) -> a + b);
+        double dTotalBalance = 0d;
+        double dTotalBalanceCur = 0d;
+        for (SBalanceTax balance : balances) {
+            dTotalBalance += balance.getBalance();
+            dTotalBalanceCur += balance.getBalanceCurrency();
+        }
         
-        HashMap<String, double[]> taxBalances = new HashMap();
+        HashMap<String, double[]> taxBalances = new HashMap<>();
         String tax;
         double perc;
         double percCur;
