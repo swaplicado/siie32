@@ -60,7 +60,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Alfonso Flores, Sergio Flores
+ * @author Alfonso Flores, Sergio Flores, Isabel Servín
  */
 public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form.SFormExtendedInterface, java.awt.event.ActionListener {
     
@@ -3105,6 +3105,8 @@ public class SFormBizPartner extends javax.swing.JDialog implements erp.lib.form
 
         jckIsDeleted.setEnabled(true);
         jckIsCategoryDeleted.setEnabled(moBizPartner.getDbmsDataEmployee() == null || (moBizPartner.getDbmsDataEmployee() != null && (mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_SUP || mnParamBizPartnerCategory == SDataConstantsSys.BPSS_CT_BP_CUS)));
+        
+        renderBizPartnerCategory();
     }
 
     @Override

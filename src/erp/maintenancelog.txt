@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 181.5/ 2021-04-20
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Corrección en la iluminación de los íconos de los tipos de asoc. de negocio en la ventana de asociados de negocio.
+2) Se encapsuló la creación de la conexión con la base de datos y la forma de llamar al statement en el servidor, con el fin de que no se cierre la conexión con la BD despúes de un fallo en la red. 
+
+================================================================================
 SIIE 3.2 181.4/ 2021-04-15
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

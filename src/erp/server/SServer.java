@@ -32,7 +32,7 @@ import sa.lib.srv.SSrvConsts;
  *
  * @author Sergio Flores
  * To generate stub:
- * ...[siie_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath: .;"[sa-lib-10_path]\build\classes" erp.server.SServer
+ * ...[siie_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SServer
  * 
  * Generate stubs for:
  * erp.server.SServer

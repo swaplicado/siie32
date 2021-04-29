@@ -66,9 +66,9 @@ import sa.lib.srv.SSrvResponse;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  * To generate stub:
- * ...[siie_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath: .;"[sa-lib-10_path]\build\classes" erp.server.SSessionServer
+ * ...[siie_path]\build\classes>"C:\Program Files\Java\jdk1.8.0_XX\bin\rmic" -classpath .;"[sa-lib-10_path]\build\classes" erp.server.SSessionServer
  */
 public class SSessionServer implements SSessionServerRemote, Serializable {
 
@@ -101,19 +101,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
         try {
             msSessionServer = "[SessionServer " + mnSessionId + "]: ";
-            moCompanyDatabase = new SDataDatabase(SLibConstants.DBMS_MY_SQL);
-            moCompanyDatabase.setUserSettings(SDataConstantsSys.DB_SETTINGS);
-            if (moCompanyDatabase.connect(moServer.getParamsApp().getDatabaseHostSrv(), moServer.getParamsApp().getDatabasePortSrv(),
-                    msCompanyDatabaseName, moServer.getParamsApp().getDatabaseUser(), moServer.getParamsApp().getDatabasePswd()) != SLibConstants.DB_CONNECTION_OK) {
-                throw new Exception(SLibConstants.MSG_ERR_DB_CON);
-            }
-            else {
-                moConnectionMonitor = new SDataConnectionMonitor(moCompanyDatabase);
-                moConnectionMonitor.startMonitor();
-
-                moStatement = moCompanyDatabase.getConnection().createStatement();
-                createCfd();
-            }
+            createCompanyDatabase();
         }
         catch (SQLException e) {
             moServer.renderMessageLn(msSessionServer + e);
@@ -128,7 +116,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
      */
     private void createCfd() throws SQLException, NoSuchAlgorithmException, Exception {
         String sql = "SELECT xml_base_dir FROM cfg_param_co WHERE id_co = " + mnPkCompanyId + " ";
-        ResultSet resultSet = moStatement.executeQuery(sql);
+        ResultSet resultSet = getStatement().executeQuery(sql);
 
         if (!resultSet.next()) {
             throw new Exception("Company's configuration could not be read.");
@@ -281,7 +269,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         // Execute local variable declarations, if any:
 
         for (i = 0; i < paQuerySentences.length - 1; i++) {
-            moStatement.execute(paQuerySentences[i]);
+            getStatement().execute(paQuerySentences[i]);
         }
 
         // Get query data:
@@ -290,8 +278,8 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
         bExistsFieldIsEditable = sSql.contains(STableConstants.FIELD_IS_EDITABLE);
         bExistsFieldStyle = sSql.contains(STableConstants.FIELD_STYLE);
-
-        oResultSet = moStatement.executeQuery(sSql);
+        
+        oResultSet = getStatement().executeQuery(sSql);
 
         while (oResultSet.next()) {
             STableRowCustom tableRowCustom = new STableRowCustom();
@@ -448,7 +436,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         int i = 0;
         int cols = 0;
         Vector<Vector<Object>> vectors = new Vector<Vector<Object>>();
-        ResultSet oResultSet = moStatement.executeQuery(sql);
+        ResultSet oResultSet = getStatement().executeQuery(sql);
 
         cols = oResultSet.getMetaData().getColumnCount();
         while (oResultSet.next()) {
@@ -470,7 +458,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
     private String requestReadCatalogueDescription(Object packet) throws Exception {
         String sql = (String) packet;
         String descrip = "";
-        ResultSet resultSet = moStatement.executeQuery(sql);
+        ResultSet resultSet = getStatement().executeQuery(sql);
 
         if (resultSet.next()) {
             descrip = resultSet.getString(1);
@@ -625,19 +613,35 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
 
     private void startTransac() throws SQLException, Exception {
         mbIsTransactionClosed = false;
-        moStatement.execute("START TRANSACTION; ");
+        getStatement().execute("START TRANSACTION; ");
     }
 
     private void commitTransac() throws SQLException, Exception {
-        moStatement.execute("COMMIT; ");
+        getStatement().execute("COMMIT; ");
         mbIsTransactionClosed = true;
     }
 
     private void rollbackTransac() throws SQLException, Exception {
-        moStatement.execute("ROLLBACK; ");
+        getStatement().execute("ROLLBACK; ");
         mbIsTransactionClosed = true;
     }
+    
+    private void createCompanyDatabase() throws Exception {
+        moCompanyDatabase = new SDataDatabase(SLibConstants.DBMS_MY_SQL);
+        moCompanyDatabase.setUserSettings(SDataConstantsSys.DB_SETTINGS);
+        if (moCompanyDatabase.connect(moServer.getParamsApp().getDatabaseHostSrv(), moServer.getParamsApp().getDatabasePortSrv(),
+                msCompanyDatabaseName, moServer.getParamsApp().getDatabaseUser(), moServer.getParamsApp().getDatabasePswd()) != SLibConstants.DB_CONNECTION_OK) {
+            throw new Exception(SLibConstants.MSG_ERR_DB_CON); 
+        }
+        else {
+            moConnectionMonitor = new SDataConnectionMonitor(moCompanyDatabase);
+            moConnectionMonitor.startMonitor();
 
+            moStatement = moCompanyDatabase.getConnection().createStatement();
+            createCfd();
+        }
+    }
+  
     /*
      * Public functions
      */
@@ -648,7 +652,14 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
     public int getPkCompanyId() { return mnPkCompanyId; }
     public String getCompanyDatabaseName() { return msCompanyDatabaseName; }
     public Date getTimestamp() { return mtTimestamp; }
-    public Statement getStatement() { return moStatement; }
+    public Statement getStatement() throws Exception { 
+        if (moStatement.isClosed()) {
+            createCompanyDatabase();
+            moStatement = moCompanyDatabase.getConnection().createStatement();
+        }
+        
+        return moStatement; 
+    }
     public DCfd getCfd() { return moCfd; }
 
     public void closeSession() {
@@ -725,14 +736,14 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
         try {
             switch (poRequest.getRequestType()) {
                 case SServerConstants.REQ_COMP_ITEMS_COMBO_BOX:
-                    oResponse.setPacket(SDataReadComponentItems.getComponentItemsForComboBox(poRequest.getRegistryType(), moStatement, moServer.getParamsErp(), poRequest.getPrimaryKey()));
+                    oResponse.setPacket(SDataReadComponentItems.getComponentItemsForComboBox(poRequest.getRegistryType(), getStatement(), moServer.getParamsErp(), poRequest.getPrimaryKey()));
                     break;
 
                 case SServerConstants.REQ_COMP_ITEMS_LIST:
-                    oResponse.setPacket(SDataReadComponentItems.getComponentItemsForList(poRequest.getRegistryType(), moStatement, moServer.getParamsErp(), poRequest.getPrimaryKey()));
+                    oResponse.setPacket(SDataReadComponentItems.getComponentItemsForList(poRequest.getRegistryType(), getStatement(), moServer.getParamsErp(), poRequest.getPrimaryKey()));
                     break;
                 case SServerConstants.REQ_REGS:
-                    oResponse.setPacket(SDataReadRegistries.readRegistries(moStatement, poRequest.getRegistryType(), poRequest.getPrimaryKey()));
+                    oResponse.setPacket(SDataReadRegistries.readRegistries(getStatement(), poRequest.getRegistryType(), poRequest.getPrimaryKey()));
                     break;
 
                 case SServerConstants.REQ_REPS:
@@ -760,7 +771,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     break;
 
                 case SServerConstants.REQ_DB_ACTION_READ:
-                    nResult = ((SDataRegistry) poRequest.getPacket()).read(poRequest.getPrimaryKey(), moStatement);
+                    nResult = ((SDataRegistry) poRequest.getPacket()).read(poRequest.getPrimaryKey(), getStatement());
                     break;
 
                 case SServerConstants.REQ_DB_ACTION_SAVE:
@@ -848,7 +859,7 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     oParams = (Object[]) poRequest.getPacket();
                     oResponse.setPacket(SFinAccountUtilities.obtainTaxAccountId(
                             (int[]) oParams[0], (Integer) oParams[1], (java.util.Date) oParams[2],
-                            (Integer) oParams[3], moStatement));
+                            (Integer) oParams[3], getStatement()));
                     break;
 
                 case SServerConstants.REQ_OBJ_FIN_ACC_BP:
@@ -856,14 +867,14 @@ public class SSessionServer implements SSessionServerRemote, Serializable {
                     oResponse.setPacket(SFinAccountUtilities.obtainBizPartnerAccountConfigs(
                             (Integer) oParams[0], (Integer) oParams[1], (Integer) oParams[2],
                             (java.util.Date) oParams[3], (Integer) oParams[4], (Boolean) oParams[5], 
-                            oParams[6] == null ? null : (int[]) oParams[6], moStatement));
+                            oParams[6] == null ? null : (int[]) oParams[6], getStatement()));
                     break;
 
                 case SServerConstants.REQ_OBJ_FIN_ACC_ITEM:
                     oParams = (Object[]) poRequest.getPacket();
                     oResponse.setPacket(SFinAccountUtilities.obtainItemAccountConfigs(
                             (Integer) oParams[0], (Integer) oParams[1], (java.util.Date) oParams[2],
-                            (Integer) oParams[3], (Boolean) oParams[4], moStatement));
+                            (Integer) oParams[3], (Boolean) oParams[4], getStatement()));
                     break;
 
                 case SServerConstants.REQ_CFD:

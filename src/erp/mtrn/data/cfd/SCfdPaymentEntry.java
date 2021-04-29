@@ -555,8 +555,12 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(session.getDatabase().getConnection(), paymentEntryDoc.DataDps.getPkDocId(), paymentEntryDoc.DataDps.getPkYearId(), 
                                                 SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
                         
-            double dTotalBalance = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalance(), (a, b) -> a + b);
-            double dTotalBalanceCur = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalanceCurrency(), (a, b) -> a + b);
+            double dTotalBalance = 0d;
+            double dTotalBalanceCur = 0d;
+            for (SBalanceTax balance : balances) {
+                dTotalBalance += balance.getBalance();
+                dTotalBalanceCur += balance.getBalanceCurrency();
+            }
 
             HashMap<String, double[]> taxBalances = new HashMap();
             String tax;
