@@ -562,7 +562,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
                 dTotalBalanceCur += balance.getBalanceCurrency();
             }
 
-            HashMap<String, double[]> taxBalances = new HashMap();
+            HashMap<String, double[]> taxBalances = new HashMap<>();
             String tax;
             double perc;
             double percCur;

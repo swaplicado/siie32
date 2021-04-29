@@ -105,7 +105,7 @@ public class SMfinUtils {
         
         try {
             resultSet = connection.createStatement().executeQuery(sql);
-            ArrayList<SBalanceTax> taxBalances = new ArrayList();
+            ArrayList<SBalanceTax> taxBalances = new ArrayList<>();
             SBalanceTax tax;
             
             while(resultSet.next()) {
