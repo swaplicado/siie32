@@ -68,10 +68,11 @@ public class SDbPayroll extends SDbRegistryUser {
     protected Date mtTsUserUpdate;
     */
 
-    protected String msAuxPaymentType;
+    protected boolean mbAuxIsDummy;
+    protected int mnAuxFkUserCloseId;
     protected double mdAuxTotalEarnings;
     protected double mdAuxTotalDeductions;
-    protected boolean mbAuxIsDummy;
+    protected String msAuxPaymentType;
 
     protected ArrayList<SDbPayrollReceipt> maChildPayrollReceipts;
     protected ArrayList<SDbPayrollReceipt> maChildPayrollReceiptsToDelete;
@@ -202,15 +203,18 @@ public class SDbPayroll extends SDbRegistryUser {
     public Date getTsUserInsert() { return mtTsUserInsert; }
     public Date getTsUserUpdate() { return mtTsUserUpdate; }
 
-    public void setAuxPaymentType(String s) { msAuxPaymentType = s; }
+    public void setAuxIsDummy(boolean b) { mbAuxIsDummy = b; }
+    public void setAuxFkUserCloseId(int n) { mnAuxFkUserCloseId = n; }
     public void setAuxTotalEarnings(double d) { mdAuxTotalEarnings = d; }
     public void setAuxTotalDeductions(double d) { mdAuxTotalDeductions = d; }
-    public void setAuxIsDummy(boolean b) { mbAuxIsDummy = b; }
+    public void setAuxPaymentType(String s) { msAuxPaymentType = s; }
 
-    public String getAuxPaymentType() { return msAuxPaymentType; }
+    public boolean isAuxIsDummy() { return mbAuxIsDummy; }
+    public int getAuxFkUserCloseId() { return mnAuxFkUserCloseId; }
     public double getAuxTotalEarnings() { return mdAuxTotalEarnings; }
     public double getAuxTotalDeductions() { return mdAuxTotalDeductions; }
     public double getAuxTotalNet() { return mdAuxTotalEarnings - mdAuxTotalDeductions; }
+    public String getAuxPaymentType() { return msAuxPaymentType; }
     
     public boolean isPayrollNormal() { return mnFkPaysheetTypeId == SModSysConsts.HRSS_TP_PAY_SHT_NOR; }
     public boolean isPayrollFortnightStandard() { return mnFkPaymentTypeId == SModSysConsts.HRSS_TP_PAY_FOR && mbFortnightStandard; }
@@ -348,10 +352,11 @@ public class SDbPayroll extends SDbRegistryUser {
         mtTsUserInsert = null;
         mtTsUserUpdate = null;
 
-        msAuxPaymentType = "";
+        mbAuxIsDummy = false;
+        mnAuxFkUserCloseId = 0;
         mdAuxTotalEarnings = 0;
         mdAuxTotalDeductions = 0;
-        mbAuxIsDummy = false;
+        msAuxPaymentType = "";
 
         maChildPayrollReceipts = new ArrayList<>();
         maChildPayrollReceiptsToDelete = new ArrayList<>();
@@ -712,8 +717,9 @@ public class SDbPayroll extends SDbRegistryUser {
         msSql = "UPDATE " + getSqlTable() + " SET ";
         switch (field) {
             case FIELD_CLOSE:
-                msSql += "b_clo = " + (Boolean) value + " ";
-
+                msSql += "b_clo = " + (Boolean) value + ", ";
+                msSql += "fk_usr_clo = " + (mnAuxFkUserCloseId == 0 ? SUtilConsts.USR_NA_ID : mnAuxFkUserCloseId) + ", ";
+                msSql += "ts_usr_clo = NOW() ";
                 break;
             default:
                 throw new Exception(SLibConsts.ERR_MSG_OPTION_UNKNOWN);

@@ -153,7 +153,8 @@ public class SViewPayroll extends SGridPaneView implements ActionListener {
                         }
                         
                         if (canClose) {
-                            payroll.saveField(miClient.getSession().getStatement(), gridRow.getRowPrimaryKey(), SDbPayroll.FIELD_CLOSE, close); // Close payroll
+                            payroll.setAuxFkUserCloseId(miClient.getSession().getUser().getPkUserId());
+                            payroll.saveField(miClient.getSession().getStatement(), gridRow.getRowPrimaryKey(), SDbPayroll.FIELD_CLOSE, close); // close payroll
                         }
 
                         miClient.getSession().notifySuscriptors(mnGridType);

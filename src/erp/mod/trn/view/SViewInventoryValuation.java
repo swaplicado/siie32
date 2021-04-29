@@ -84,7 +84,7 @@ public class SViewInventoryValuation extends SGridPaneView {
 
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
-        ArrayList<SGridColumnView> columns = new ArrayList<SGridColumnView>();
+        ArrayList<SGridColumnView> columns = new ArrayList<>();
 
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_YEAR, "v.fk_year_year", "Año"));
         columns.add(new SGridColumnView(SGridConsts.COL_TYPE_INT_CAL_MONTH, "v.fk_year_per", "Mes"));
