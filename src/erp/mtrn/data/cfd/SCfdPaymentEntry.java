@@ -552,7 +552,7 @@ public final class SCfdPaymentEntry extends erp.lib.table.STableRow {
             // generate DSM entry for the accounting of current payment (to process payment and related taxes):
             
             ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), paymentEntryDoc.DataDps.getPkDocId(), paymentEntryDoc.DataDps.getPkYearId(), 
-                                                SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
+                                                SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1], paymentEntryDoc.ParentPaymentEntry.DataRecord);
                         
             double dTotalBalance = 0d;
             double dTotalBalanceCur = 0d;
