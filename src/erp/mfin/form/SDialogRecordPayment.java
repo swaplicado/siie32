@@ -28,8 +28,7 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
-import erp.mfin.utils.SBalanceTax;
-import erp.mfin.utils.SFinUtils;
+import erp.mfin.data.SFinBalanceTax;
 import erp.mod.SModConsts;
 import erp.mod.bps.db.SDbBizPartner;
 import erp.mod.fin.db.SFinConsts;
@@ -49,7 +48,6 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import sa.lib.SLibConsts;
-import sa.lib.SLibUtils;
 
 /**
  *
@@ -1117,13 +1115,13 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         SDataDsm oDsm = new SDataDsm();
         SDataRecord oRecord = null;
         SDataBizPartnerBranch branch = null;
-        ArrayList<SBalanceTax> balances = SFinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), moDps.getPkDocId(), moDps.getPkYearId(), 
+        ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(miClient.getSession().getDatabase().getConnection(), moDps.getPkDocId(), moDps.getPkYearId(), 
                                                     mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[0], 
-                                                    mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1]);
+                                                    mnBizPartnerCategoryId == SDataConstantsSys.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1] : SDataConstantsSys.FINS_TP_SYS_MOV_BPS_CUS[1], null);
         
         double dTotalBalance = 0d;
         double dTotalBalanceCur = 0d;
-        for (SBalanceTax balance : balances) {
+        for (SFinBalanceTax balance : balances) {
             dTotalBalance += balance.getBalance();
             dTotalBalanceCur += balance.getBalanceCurrency();
         }
@@ -1136,7 +1134,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
         double amtToPayCur = 0;
         int[] taxMax = new int[]{ 0, 0 };
         double amtMaj = 0d;
-        for (SBalanceTax balance : balances) {
+        for (SFinBalanceTax balance : balances) {
             tax = balance.getTaxBasId() + "_" + balance.getTaxId();
             perc = balance.getBalance() / dTotalBalance;
             percCur = balance.getBalanceCurrency() / dTotalBalanceCur;
@@ -1161,7 +1159,7 @@ public class SDialogRecordPayment extends javax.swing.JDialog implements erp.lib
             diff = SLibUtilities.round(moFieldDpsValue.getDouble() - amtToPay, miClient.getSessionXXX().getParamsErp().getDecimalsExchangeRate());
         }
         
-        for (SBalanceTax balance : balances) {
+        for (SFinBalanceTax balance : balances) {
             if (moFieldDpsValueCy.getDouble() <= 0d) {
                 break;
             }

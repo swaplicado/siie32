@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mmfg.data.explosion;
+package erp.mmfg.data;
 
 import erp.mmfg.data.SDataExplotionMaterialsEntry;
 import java.io.BufferedReader;
@@ -26,7 +26,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  * @author Edwin Carmona
  */
-public class SCsvFileManager {
+public class SMfgCsvFileManager {
     //Delimiter used in CSV file
     private static final String COMMA_DELIMITER = ",";
     private static final String NEW_LINE_SEPARATOR = "\n";
@@ -111,8 +111,8 @@ public class SCsvFileManager {
         return sResult;
     }
     
-    public static ArrayList<SInputData> readFile(String fileName) {
-        ArrayList<SInputData> lRows = new ArrayList();
+    public static ArrayList<SMfgInputData> readFile(String fileName) {
+        ArrayList<SMfgInputData> lRows = new ArrayList();
         BufferedReader fileReader = null;
         
         try {
@@ -127,14 +127,14 @@ public class SCsvFileManager {
                 tokens[QUANTITY] = line.substring(line.indexOf(COMMA_DELIMITER) + 1).replace("\"", "").replace(COMMA_DELIMITER, "");
                 
                 if (tokens[ITEM_KEY].length() > 0 && Double.parseDouble(tokens[QUANTITY]) > 0) {
-                    SInputData row = new SInputData(tokens[ITEM_KEY], Double.parseDouble(tokens[QUANTITY]));
+                    SMfgInputData row = new SMfgInputData(tokens[ITEM_KEY], Double.parseDouble(tokens[QUANTITY]));
                     lRows.add(row);
                 }
             }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(SExplosionMaterialsProcess.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SMfgExplosionMaterialsProcess.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(SExplosionMaterialsProcess.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SMfgExplosionMaterialsProcess.class.getName()).log(Level.SEVERE, null, ex);
         }
     
         return lRows;

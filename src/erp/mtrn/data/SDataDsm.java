@@ -12,9 +12,7 @@ import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
-import erp.mfin.utils.SBalanceTax;
-import erp.mfin.utils.SFinUtils;
-import erp.mod.SModConsts;
+import erp.mfin.data.SFinBalanceTax;
 import erp.mod.SModSysConsts;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
@@ -1481,8 +1479,8 @@ public class SDataDsm extends erp.lib.data.SDataRegistry implements java.io.Seri
         
         // si esto pasa significa que hay una configuración disponible y por ende se obtiene el balance correspondiente al impuesto
         if (taxPk != null) {
-            ArrayList<SBalanceTax> balances = SFinUtils.getBalanceByTax(connection, nDpsDocId, nDpsYearId, nTpSysMovId[0], nTpSysMovId[1]);
-            for (SBalanceTax balance : balances) {
+            ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(connection, nDpsDocId, nDpsYearId, nTpSysMovId[0], nTpSysMovId[1], null);
+            for (SFinBalanceTax balance : balances) {
                 if (balance.getTaxPk()[0] == taxPk[0] && balance.getTaxPk()[1] == taxPk[1]) {
                     return new double[] { balance.getBalance(), balance.getBalanceCurrency() };
                 }

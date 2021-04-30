@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mmfg.data.explosion;
+package erp.mmfg.data;
 
 /**
  *
  * @author Edwin Carmona
  */
-public class SInputData {
+public class SMfgInputData {
     
     protected String msItemKey;
     protected double mnQuantity;
     
-    public SInputData() {}
+    public SMfgInputData() {}
     
-    public SInputData(final String sItemKey, final double dQuantity) {
+    public SMfgInputData(final String sItemKey, final double dQuantity) {
         this.msItemKey = sItemKey;
         this.mnQuantity = dQuantity;
     }

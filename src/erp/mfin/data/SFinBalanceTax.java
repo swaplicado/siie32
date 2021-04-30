@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package erp.mfin.utils;
+package erp.mfin.data;
 
 /**
  * Estructura para la obtención de saldos de documentos
  * 
  * @author Edwin Carmona
  */
-public class SBalanceTax {
+public class SFinBalanceTax {
     private int taxBasId;
     private int taxId;
     private double balance;
