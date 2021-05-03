@@ -1,4 +1,11 @@
 ================================================================================
+SIIE 3.2 181.6/ 2021-05-03
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Implementación de consulta de documentos por área funcional.
+2) Corrección a la contabilización de CFDI de recepción de pagos, especialmente al modificar CFDI aún sin timbrar, p. ej., al cambiar la fecha de emisión.
+
+================================================================================
 SIIE 3.2 181.5/ 2021-04-20
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------
