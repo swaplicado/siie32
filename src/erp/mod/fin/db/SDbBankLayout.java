@@ -23,9 +23,8 @@ import erp.mfin.data.SDataRecord;
 import erp.mfin.data.SDataRecordEntry;
 import erp.mfin.data.SFinAccountConfigEntry;
 import erp.mfin.data.SFinAccountUtilities;
+import erp.mfin.data.SFinBalanceTax;
 import erp.mfin.data.SFinUtilities;
-import erp.mfin.utils.SBalanceTax;
-import erp.mfin.utils.SMfinUtils;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SDbBizPartner;
@@ -695,13 +694,14 @@ public class SDbBankLayout extends SDbRegistryUser {
                             double paymentCy = layoutBankDps.getPaymentCy();
                             double payment = (new SMoney(session, layoutBankDps.getPaymentCy(), layoutBankDps.getDps().getFkCurrencyId(), exchangeRate)).getLocalAmount();
                             
-                            ArrayList<SBalanceTax> balances = SMfinUtils.getBalanceByTax(session.getDatabase().getConnection(), layoutBankDps.getDps().getPkDocId(), layoutBankDps.getDps().getPkYearId(), 
+                            ArrayList<SFinBalanceTax> balances = erp.mod.fin.db.SFinUtils.getBalanceByTax(session.getDatabase().getConnection(), layoutBankDps.getDps().getPkDocId(), layoutBankDps.getDps().getPkYearId(), 
                                                     SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0], 
-                                                    SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1]);
+                                                    SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1],
+                                                    null);
         
 							double dTotalBalance = 0d;
 							double dTotalBalanceCur = 0d;
-							for (SBalanceTax balance : balances) {
+							for (SFinBalanceTax balance : balances) {
 								dTotalBalance += balance.getBalance();
 								dTotalBalanceCur += balance.getBalanceCurrency();
 							}
@@ -714,7 +714,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                             double amtToPayCur = 0;
                             int[] taxMax = new int[] { 0, 0 };
                             double amtMaj = 0d;
-                            for (SBalanceTax balance : balances) {
+                            for (SFinBalanceTax balance : balances) {
                                 tax = balance.getTaxBasId() + "_" + balance.getTaxId();
                                 perc = balance.getBalance() / dTotalBalance;
                                 percCur = balance.getBalanceCurrency() / dTotalBalanceCur;
@@ -739,7 +739,7 @@ public class SDbBankLayout extends SDbRegistryUser {
                                 diff = SLibUtils.roundAmount(payment - amtToPay);
                             }
                             
-                            for (SBalanceTax balance : balances) {
+                            for (SFinBalanceTax balance : balances) {
                                 SDataDsmEntry dsmEntry = new SDataDsmEntry();
                                 
                                 tax = balance.getTaxBasId() + "_" + balance.getTaxId();
