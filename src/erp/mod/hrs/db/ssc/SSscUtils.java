@@ -7,6 +7,7 @@ import erp.mod.hrs.db.SDbEmployee;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.db.SHrsUtils;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -117,7 +118,7 @@ public abstract class SSscUtils {
         2) recorrer el result set para leer el empleado en cuestión y llenar el arreglo
         */
         
-        Date bom = SLibTimeUtils.createDate(year, monthStart);
+        Date cutoffdate = SLibTimeUtils.createDate(year, monthStart);
 
         String sql = "SELECT DISTINCT pr.id_emp, bp.bp "
                 + "FROM hrs_pay AS p "
@@ -128,9 +129,10 @@ public abstract class SSscUtils {
                 + "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp "
                 + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND "
                 + "p.per_year = " + year + " AND p.per BETWEEN " + monthStart + " AND " + monthEnd + " AND "
-                + "e.fk_tp_ear NOT IN (" + getExcludedEarningTypesSqlList() + ") AND "
-                + "emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(bom) + "' AND emp.b_act "
-                + "ORDER BY bp.bp, pr.id_emp;" ; 
+//                + "e.fk_tp_ear NOT IN (" + getExcludedEarningTypesSqlList() + ") AND " // ¿?
+                + "emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act "
+//                + "and pr.id_emp = 3504 " // xxx pruebas
+                + "GROUP BY pr.id_emp ORDER BY bp.bp, pr.id_emp;" ; 
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
@@ -175,15 +177,15 @@ public abstract class SSscUtils {
         Date periodEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(year, monthEnd));
         
         double uma = SHrsUtils.getRecentUma(session, periodEnd);
-        double foodExemptWeekly = SLibUtils.roundAmount(uma * SHrsConsts.WEEK_DAYS * FOOD_EXEMPT_PCT);
-        double foodExemptFortnightly = SLibUtils.roundAmount(uma * SHrsConsts.FORTNIGHT_FIXED_DAYS * FOOD_EXEMPT_PCT);
-        double overtimeExemptWeekly = SLibUtils.roundAmount(uma * SHrsConsts.WEEK_DAYS * OVERTIME_EXEMPT_PCT);
-        double overtimeExemptFortnightly = SLibUtils.roundAmount(uma * SHrsConsts.FORTNIGHT_FIXED_DAYS * OVERTIME_EXEMPT_PCT);
+        double foodExemptWeekly = SLibUtils.roundAmount(uma * (SHrsConsts.WEEK_DAYS) * FOOD_EXEMPT_PCT);
+        double foodExemptFortnightly = SLibUtils.roundAmount(uma * (SHrsConsts.FORTNIGHT_FIXED_DAYS ) * FOOD_EXEMPT_PCT);
+        double overtimeExemptWeekly = SLibUtils.roundAmount(uma * (SHrsConsts.WEEK_DAYS * 4) * OVERTIME_EXEMPT_PCT);
+        double overtimeExemptFortnightly = SLibUtils.roundAmount(uma * (SHrsConsts.FORTNIGHT_FIXED_DAYS * 2) * OVERTIME_EXEMPT_PCT);
         
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             for (SDbEmployee employee : employees) {
                 // crear nuevo renglón para el empleado actual:
-                SRowEmployeeSsc row = new SRowEmployeeSsc(session, employee, periodStart, periodEnd);
+                SRowEmployeeSsc row = new SRowEmployeeSsc(session, employee, periodStart, periodEnd, year , monthStart, monthEnd);
 
                 // prellenar el arreglo de percepciones del nuevo renglón con todas las percepciones pagadas a todos los empleados en un período dado:
                 for (SDbEarning earning : earnings) {
@@ -197,6 +199,9 @@ public abstract class SSscUtils {
                 double totalAmountExempt = 0;
                 double totalAmountTaxed = 0;
 
+                int calendarDaysInPeriod = daysCalendarPeriod(year , monthStart);
+                calendarDaysInPeriod = calendarDaysInPeriod + daysCalendarPeriod(year , monthEnd);
+            
                 String sql = "SELECT e.id_ear, e.fk_tp_ear, pre.id_pay, pre.id_mov, pre.amt_r, pr.pay_hr_r, emp.wrk_hrs_day "
                         + "FROM hrs_pay AS p "
                         + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
@@ -225,73 +230,99 @@ public abstract class SSscUtils {
                         double amountExempt = 0;
                         double amountTaxed = 0;
                         double ssd = 0;
-                        
+
                         switch (resultSet.getInt("e.fk_tp_ear")) {
                             case SModSysConsts.HRSS_TP_EAR_FOOD:
                                 switch (employee.getFkPaymentTypeId()) {
                                     case SModSysConsts.HRSS_TP_PAY_WEE:
-                                        if (resultSet.getDouble("pre.amt_r") <= foodExemptWeekly) {
-                                            amountExempt = resultSet.getDouble("pre.amt_r");
-                                            amountTaxed = 0;
+                                        if ((resultSet.getDouble("pre.amt_r")) >= foodExemptWeekly) {
+                                            amountTaxed = (resultSet.getDouble("pre.amt_r") - foodExemptWeekly);
+                                            amountExempt = 0;
                                         }
                                         else {
-                                            amountExempt = foodExemptWeekly;
-                                            amountTaxed = resultSet.getDouble("pre.amt_r") - amountExempt;
+                                            amountTaxed = 0;
+                                            amountExempt = resultSet.getDouble("pre.amt_r");
                                         }
                                         break;
                                         
                                     case SModSysConsts.HRSS_TP_PAY_FOR:
-                                        if (resultSet.getDouble("pre.amt_r") <= foodExemptFortnightly) {
-                                            amountExempt = resultSet.getDouble("pre.amt_r");
-                                            amountTaxed = 0;
+                                        if ((resultSet.getDouble("pre.amt_r")) >= foodExemptFortnightly) {
+                                            amountTaxed = resultSet.getDouble("pre.amt_r") - foodExemptFortnightly;
+                                            amountExempt = 0;
                                         }
                                         else {
-                                            amountExempt = foodExemptFortnightly;
-                                            amountTaxed = resultSet.getDouble("pre.amt_r") - amountExempt;
+                                            amountTaxed = 0;
+                                            amountExempt = resultSet.getDouble("pre.amt_r");
                                         }
                                         break;
                                         
                                     default:
                                 }
-                                  case SModSysConsts.HRSS_TP_EAR_OVER_TIME: //Tiempo extra
-                                        switch (employee.getFkPaymentTypeId()) {
-                                        case SModSysConsts.HRSS_TP_PAY_WEE:
-                                            if ((((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS ) + ( OVERTIME_EXEMPT_DAYS_WEEK * resultSet.getDouble("pre.amt_r"))) > 
-                                                        ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS )) +  resultSet.getDouble("pre.amt_r"))) {
-                                                    amountExempt = resultSet.getDouble("pre.amt_r");
-                                                    amountTaxed = 0;
-                                            }
-                                            else {
-                                                ssd = ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS ) + ( OVERTIME_EXEMPT_DAYS_WEEK * resultSet.getDouble("pre.amt_r"))) -
-                                                        ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS )) +  resultSet.getDouble("pre.amt_r");
-                                                amountExempt = (ssd - overtimeExemptWeekly);
-                                                amountTaxed = resultSet.getDouble("pre.amt_r") - amountExempt;
-                                            }
-                                            break;
-                                            
-                                        case SModSysConsts.HRSS_TP_PAY_FOR:
-                                            if ((((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS ) + ( OVERTIME_EXEMPT_DAYS_FORT * resultSet.getDouble("pre.amt_r"))) > 
-                                                        ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS )) +  resultSet.getDouble("pre.amt_r"))) {
-                                                    amountExempt = resultSet.getDouble("pre.amt_r");
-                                                    amountTaxed = 0;
-                                            }
-                                            else {
-                                                ssd = ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS ) + ( OVERTIME_EXEMPT_DAYS_FORT * resultSet.getDouble("pre.amt_r"))) -
-                                                        ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS )) +  resultSet.getDouble("pre.amt_r");
-                                                amountExempt = (ssd - overtimeExemptFortnightly);
-                                                amountTaxed = resultSet.getDouble("pre.amt_r") - amountExempt;
-                                            }
-                                            break;
-                                        default:
-                                    }
-                                
                                 break;
-                                
+                            case SModSysConsts.HRSS_TP_EAR_SUN_BONUS:
+                                switch (employee.getFkPaymentTypeId()) {
+                                    case SModSysConsts.HRSS_TP_PAY_WEE:
+                                        if ((resultSet.getDouble("pre.amt_r")) >= foodExemptWeekly) {
+                                            amountTaxed = (resultSet.getDouble("pre.amt_r") - foodExemptWeekly);
+                                            amountExempt = 0;
+                                        }
+                                        else {
+                                            amountTaxed = 0;
+                                            amountExempt = resultSet.getDouble("pre.amt_r");
+                                        }
+                                        break;
+                                        
+                                    case SModSysConsts.HRSS_TP_PAY_FOR:
+                                        if ((resultSet.getDouble("pre.amt_r")) >= foodExemptFortnightly) {
+                                            amountTaxed = resultSet.getDouble("pre.amt_r") - foodExemptFortnightly;
+                                            amountExempt = 0;
+                                        }
+                                        else {
+                                            amountTaxed = 0;
+                                            amountExempt = resultSet.getDouble("pre.amt_r");
+                                        }
+                                        break;
+                                        
+                                    default:
+                                }
+                                break;
+                            case SModSysConsts.HRSS_TP_EAR_OVER_TIME: //Tiempo extra
+                                switch (employee.getFkPaymentTypeId()) {
+                                    case SModSysConsts.HRSS_TP_PAY_WEE:
+                                        if ((((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS ) + ( OVERTIME_EXEMPT_DAYS_WEEK * resultSet.getDouble("pre.amt_r"))) > 
+                                                    ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS )) +  resultSet.getDouble("pre.amt_r"))) {
+                                                amountExempt = resultSet.getDouble("pre.amt_r");
+                                                amountTaxed = 0;
+                                        }
+                                        else {
+                                            ssd = ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS ) + ( OVERTIME_EXEMPT_DAYS_WEEK * resultSet.getDouble("pre.amt_r"))) -
+                                                    ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.WEEK_DAYS )) +  resultSet.getDouble("pre.amt_r");
+                                            amountExempt = (ssd - overtimeExemptWeekly);
+                                            amountTaxed = resultSet.getDouble("pre.amt_r") - amountExempt;
+                                        }
+                                        break;
+
+                                    case SModSysConsts.HRSS_TP_PAY_FOR:
+                                        if ((((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS ) + ( OVERTIME_EXEMPT_DAYS_FORT * resultSet.getDouble("pre.amt_r"))) > 
+                                                    ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS )) +  resultSet.getDouble("pre.amt_r"))) {
+                                                amountExempt = resultSet.getDouble("pre.amt_r");
+                                                amountTaxed = 0;
+                                        }
+                                        else {
+                                            ssd = ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS ) + ( OVERTIME_EXEMPT_DAYS_FORT * resultSet.getDouble("pre.amt_r"))) -
+                                                    ((resultSet.getDouble("pr.pay_hr_r") * (resultSet.getDouble("emp.wrk_hrs_day")) * SHrsConsts.FORTNIGHT_FIXED_DAYS )) +  resultSet.getDouble("pre.amt_r");
+                                            amountExempt = (ssd - overtimeExemptFortnightly);
+                                            amountTaxed = resultSet.getDouble("pre.amt_r") - amountExempt;
+                                        }
+                                    break;
+                                default:
+                                }
+                                break;
                             default:
                                 amountExempt = 0;
                                 amountTaxed = resultSet.getDouble("pre.amt_r");
-                        }                        
-                        
+                        }            
+
                         totalAmountExempt = SLibUtils.roundAmount(totalAmountExempt + amountExempt);
                         totalAmountTaxed = SLibUtils.roundAmount(totalAmountTaxed + amountTaxed);
                     }
@@ -378,8 +409,60 @@ public abstract class SSscUtils {
             }
         }
         
-        return rows; /// xxx
+        return rows;
     }
+    
+    public static double getEmployeeDailyIncome(final SGuiSession session, final int year, final int monthStart, final int monthEnd, final int typePay, final int idEmp) throws SQLException, Exception {
+        ArrayList<Double> rowsS = new ArrayList<>();
+        int mnYearPay = year;
+        int mnMonthStartPay = monthStart;
+        int mnMonthEndPay = monthEnd;
+        int mnTypePaypal = typePay;
+        int mnIdEmp = idEmp;
+        double DailyIncome = 0.0;
+        
+        try (Statement statement = session.getStatement().getConnection().createStatement()) {
+            ArrayList<Integer> payrollReceipts = getEmployeeRecentPayroll(session, mnYearPay, mnMonthStartPay,mnMonthEndPay, mnTypePaypal);
+            for (int i = 0; i < payrollReceipts.size()-1; i++) {
+                String sql = "SELECT pay_day_r FROM HRS_PAY_RCP WHERE id_emp = " + mnIdEmp + " AND id_pay = " + payrollReceipts.get(i) + " ; " ;
+                ResultSet resultSet = statement.executeQuery(sql);
+                while (resultSet.next()) {
+                     rowsS.add(resultSet.getDouble("pay_day_r"));
+                }        
+                ArrayList<Double> rowsSSecond = rowsS;
+                for (int x = 0; x < rowsS.size()- 1; x++) {
+                    if (!rowsS.get(x).equals(rowsSSecond.get(1))) {
+                       DailyIncome = 0.0;
+                       x = rowsS.size()-1;
+                    } 
+                    else {
+                       DailyIncome = rowsS.get(1);
+                    }
+                }
+            }
+        }
+        
+        return DailyIncome;
+    }
+    
+    public static ArrayList<Integer> getEmployeeRecentPayroll(final SGuiSession session, final int year, final int monthStart, final int monthEnd, final int typePay) throws Exception {
+        ArrayList<Integer> rows = new ArrayList<>();
+        
+        String sql = "SELECT id_pay from hrs_pay where fis_year= " + year + " and per_year = " + year + " " +
+                        "AND per >= " + monthStart + " AND per <= " + monthEnd + " " +
+                        "AND fk_tp_pay_sht = 1 " +
+                        "AND fk_tp_pay = " + typePay + " " +
+                        "AND NOT b_del; ";
+                try (Statement statement = session.getStatement().getConnection().createStatement()) {
+                ResultSet resultSet = statement.executeQuery(sql);
+                while (resultSet.next()) {
+                    rows.add(resultSet.getInt("id_pay"));
+                }
+            }
+                
+            return rows;
+    }
+    
     
     public static int daysCalendarPeriod(final int year, final int month) {
         int daysCalendarPeriod = 0;
@@ -423,5 +506,14 @@ public abstract class SSscUtils {
             bLeapYear = true;
         }
         return bLeapYear;
+    }
+    
+     public static int getEmployeeAntiquity(final Date dateBenefits, final Date dateCutoff) {
+       String yearAnti = String.valueOf(SHrsUtils.getEmployeeSeniority(dateBenefits, dateCutoff));
+       String monthAnti = String.valueOf(SHrsUtils.getEmployeeSeniorityAntMonth(dateBenefits, dateCutoff));
+       String antiquityCompleteResult = yearAnti + "." + monthAnti;
+       int antiquityComplete = (int)(Math.round(Math.ceil(Double.parseDouble(antiquityCompleteResult))));
+       
+       return antiquityComplete;
     }
 }

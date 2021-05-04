@@ -106,12 +106,15 @@ import erp.mod.hrs.view.SViewBenefit;
 import erp.mod.hrs.view.SViewBenefitTable;
 import erp.mod.hrs.view.SViewBenefitTableRow;
 import erp.mod.hrs.view.SViewBenefitVacationPending;
+import erp.mod.hrs.view.SViewConditionalEarning;
 import erp.mod.hrs.view.SViewConfig;
 import erp.mod.hrs.view.SViewDeduction;
 import erp.mod.hrs.view.SViewDepartment;
 import erp.mod.hrs.view.SViewEarning;
 import erp.mod.hrs.view.SViewEmployeeDismissalType;
 import erp.mod.hrs.view.SViewEmployeeHireLog;
+import erp.mod.hrs.view.SViewEmployeeIdse;
+import erp.mod.hrs.view.SViewEmployeeSua;
 import erp.mod.hrs.view.SViewEmployeeType;
 import erp.mod.hrs.view.SViewEmployeeWageLog;
 import erp.mod.hrs.view.SViewEmployeeWageSscBaseLog;
@@ -123,13 +126,12 @@ import erp.mod.hrs.view.SViewMwzType;
 import erp.mod.hrs.view.SViewMwzTypeWage;
 import erp.mod.hrs.view.SViewPayroll;
 import erp.mod.hrs.view.SViewPayrollBenefitEarningComplement;
-import erp.mod.hrs.view.SViewConditionalEarning;
 import erp.mod.hrs.view.SViewPayrollCfdi;
 import erp.mod.hrs.view.SViewPayrollLoanDeductionComplement;
 import erp.mod.hrs.view.SViewPayrollLoanEarningComplement;
 import erp.mod.hrs.view.SViewPayrollReceipt;
-import erp.mod.hrs.view.SViewPayrollReceiptRecord;
 import erp.mod.hrs.view.SViewPayrollReceiptImportedEarnings;
+import erp.mod.hrs.view.SViewPayrollReceiptRecord;
 import erp.mod.hrs.view.SViewPaysheetCustomType;
 import erp.mod.hrs.view.SViewPosition;
 import erp.mod.hrs.view.SViewPrePayrollCutoffCalendar;
@@ -760,6 +762,14 @@ public class SModuleHrs extends SGuiModule {
                         + "ORDER BY pr.id_emp) ")
                         + "ORDER BY bp.bp, e.id_emp ";
                 break;
+            case SModConsts.HRSU_EMP_IDSE:
+                settings = new SGuiCatalogueSettings("Alta IDSE", 1);
+                sql = "SELECT id_tp_acc AS " + SDbConsts.FIELD_ID + "1, IF(id_tp_acc = 1, 'ALTA EMPLEADOS', IF(id_tp_acc = 2, 'BAJA EMPLEADOS', IF(id_tp_acc = 3, 'MODIFICACIÓN EMPLEADOS', '') )) " + SDbConsts.FIELD_ITEM + " " 
+                      + "FROM erp.HRSS_TP_ACC;";
+                break;
+            case SModConsts.HRSU_EMP_SUA:
+                //
+                break;
             case SModConsts.HRS_TAX:
                 settings = new SGuiCatalogueSettings("Tabla impuesto", 1);
                 sql = "SELECT id_tax AS " + SDbConsts.FIELD_ID + "1, CONCAT('VIGENCIA: ', dt_sta) AS " + SDbConsts.FIELD_ITEM + " "
@@ -910,6 +920,12 @@ public class SModuleHrs extends SGuiModule {
                 break;
             case SModConsts.HRS_EMP_LOG_HIRE:
                 view = new SViewEmployeeHireLog(miClient, "Bitácora altas y bajas");
+                break;
+            case SModConsts.HRS_EMP_LOG_SUA:
+                view = new SViewEmployeeSua(miClient, "Bitácora empleados SUA");
+                break;
+            case SModConsts.HRS_EMP_LOG_IDSE:
+                view = new SViewEmployeeIdse(miClient, "Bitácora empleados IDSE");
                 break;
             case SModConsts.HRS_EMP_LOG_WAGE:
                 view = new SViewEmployeeWageLog(miClient, "Bitácora sueldos y salarios");

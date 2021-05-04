@@ -64,6 +64,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
     public int mnMonthStart = 0;
     public int mnMonthEnd = 0; 
     public double earningExtra = 0.0; 
+    public Date mtDateStart = null;
     public Date mtDateEnd = null;
     
     protected SGridPaneForm moGridSbcEmployees;
@@ -274,17 +275,18 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "Empleado", 250));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_CODE_UNT, "Clave empleado"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "Inicio beneficios", 75));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "Antigüedad", 50));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Antigüedad final periodo", 50));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_TEXT_NAME_ACC, "Período pago", 60));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días vacaciones", 50));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_PER_2D, "Prima vacacional %", 50));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días aguinaldo", 50));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_4D, "Factor de integración", 75));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_8D, "Factor de integración", 150));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Ingreso diario $", 75));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SBC actual $", 75));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DATE, "SBC últ. cambio", 75));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SBC con factor $", 75));
-                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Ingresos variables $", 75));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Otras percepciones $", 75));
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_1B, "Días bimestre ", 50));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Días no trabajados sugeridos", 75));
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Días no trabajados efectivos", moGridSbcEmployees.getTable().getDefaultEditor(Integer.class));
                 column.setEditable(true);
@@ -296,7 +298,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Seleccionado", moGridSbcEmployees.getTable().getDefaultEditor(Boolean.class));
                 column.setEditable(true);
                 columns.add(column);
-                
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Pagos extras: ", 1));
                 for (SDbEarning earning : maEarnings) {
                     columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, SLibUtils.textProperCase(earning.getName()) + " Exento", 75));
                     columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, SLibUtils.textProperCase(earning.getName()) + " Gravado", 75));
@@ -321,9 +323,10 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         moFieldDateChangeSalary = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateChangeSsc, jlDateCut);
         moFieldDateChangeSalary.setPickerButton(jbDateChangeSscPicker);
 
+        mtDateStart = SLibTimeUtils.getBeginOfMonth(SLibTimeUtils.createDate(mnYear, mnMonthStart));
         mtDateEnd = SLibTimeUtils.getEndOfMonth(SLibTimeUtils.createDate(mnYear, mnMonthEnd));
         
-        dataEmployeeDetail(mtDateEnd, mnYear);
+        dataEmployeeDetail(mtDateStart, mtDateEnd, mnYear);
         jpEmployeeSBC.add(moGridSbcEmployees, BorderLayout.CENTER);
 
         employeeSelectAll(true);
@@ -334,12 +337,13 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         
         AbstractAction actionOk = new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) { try {
+            public void actionPerformed(ActionEvent e) { 
+                try {
                 actionOk();
-                } catch (ParseException ex) {
-                    Logger.getLogger(SFormMassiveUpdateSsc.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(SFormMassiveUpdateSsc.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
-}
         };
 
         SFormUtilities.putActionMap(getRootPane(), actionOk, "ok", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
@@ -383,14 +387,17 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         setVisible(false);
     }
 
-    private void dataEmployeeDetail(Date dateLayoutEnd, int layoutYear) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String dateEnd = formatter.format(dateLayoutEnd ); 
+    private void dataEmployeeDetail(Date dateLayoudStart, Date dateLayoutEnd, int layoutYear) {
+        String dateStart = SLibUtils.DbmsDateFormatDate.format(dateLayoudStart); 
+        String dateEnd = SLibUtils.DbmsDateFormatDate.format(dateLayoutEnd); 
         String pDateBoyCurr = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.getBeginOfYear(dateLayoutEnd));
         String sql = "";
+        String mSsql = "";
         ResultSet resultSet = null;
+        ResultSet resultSetExport = null;
         int auxEmployee = 0;
-        int daysAbs = 0;
+        
+        String dateEndAnt = SLibUtils.DbmsDateFormatDate.format(SLibTimeUtils.addDate(dateLayoutEnd, 0, -2, 0));
 
         try {
             ArrayList<SRowEmployeeSsc> rows = SSscUtils.createEmployeeSbcRows(miClient.getSession(), layoutYear, mnMonthStart, mnMonthEnd);
@@ -399,10 +406,12 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 sql = "SELECT bp.id_bp AS _IdEmp, bp.bp AS _emp_name, e.num AS _emp_num, tp.name AS _pay_tp_name, " +
                 "e.dt_ben AS _emp_dt_ben, " +
                 "va.dt AS SscLastUpdate , va.sal_ssc as SscCurrent, ' " + dateEnd + " ' AS _p_dt_cutoff, " +
-                "@sen_raw:=ROUND(DATEDIFF(' " + dateEnd + " ', e.dt_ben) / " + SHrsConsts.YEAR_DAYS + ", 4) AS _sen_raw, " +
-                "@sen_as_years:=TIMESTAMPDIFF(YEAR, e.dt_ben, ' " + dateEnd + " ') AS _sen_as_years, " +
-                "@sen_as_months:=TIMESTAMPDIFF(MONTH, e.dt_ben, ' " + dateEnd + " ') AS _sen_as_months, " +
-                "@curr_sal_day:=ROUND(IF(e.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + ", e.sal, e.wage * " + SHrsConsts.YEAR_MONTHS + " / " + SHrsConsts.YEAR_DAYS + "), 2) AS DailyIncome, " +
+                "@sen_raw:=CEILING(ROUND(DATEDIFF(' " + dateEnd + " ', e.dt_ben) / " + SHrsConsts.YEAR_DAYS + ", 4)) AS _sen_raw, " + 
+                "@sen_as_years:=TIMESTAMPDIFF(YEAR, e.dt_ben, ' " + dateEndAnt + " ') AS _sen_as_years, " +
+                "@sen_as_months:=TIMESTAMPDIFF(MONTH, e.dt_ben, ' " + dateEndAnt + " ') AS _sen_as_months, " +
+                "@curr_sal_wage:=(SELECT IF((SELECT COUNT(*) FROM hrs_emp_log_wage WHERE id_emp = " + row.getEmployee().getPkEmployeeId() + " AND dt BETWEEN ' " + dateStart + " ' AND ' " + dateEnd + " ') >= 1, 0, v.wage) AS wage " +
+                "FROM hrs_emp_log_wage AS v INNER JOIN erp.hrsu_emp AS emp ON v.id_emp = emp.id_emp WHERE v.b_del = 0 AND emp.b_act = 1  AND v.id_emp = " + row.getEmployee().getPkEmployeeId() + " AND v.dt <= ' " + dateEndAnt + " ' ORDER BY v.dt DESC LIMIT 1) as WageI, " +
+                "@curr_sal_day:=ROUND(IF(e.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + ", e.sal, @curr_sal_wage * " + SHrsConsts.YEAR_MONTHS + " / " + SHrsConsts.YEAR_DAYS + "), 2) AS DailyIncome, " +
                 "@curr_ben_anniv:=@sen_as_years + 1 AS _curr_ben_anniv, " +
                 "@curr_ben_year:=YEAR(ADDDATE(e.dt_ben, " +
                 "INTERVAL @sen_as_years YEAR)) AS _curr_ben_year, " +
@@ -413,11 +422,11 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 "@curr_dt_base:=IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " = " + SModSysConsts.HRSS_TP_BEN_ANN_BON + ", " +
                 "IF(e.dt_ben < ' " + pDateBoyCurr + " ', ' " + pDateBoyCurr + " ', e.dt_ben), " +
                 "ADDDATE(e.dt_ben, INTERVAL @sen_as_years YEAR)) AS _curr_dt_base, " +
-                "@curr_days_elapsed:=DATEDIFF(' " + dateEnd + " ', @curr_dt_base) AS _curr_days_elapsed, " +
+                "@curr_days_elapsed:=DATEDIFF(' " + dateEndAnt + " ', @curr_dt_base) AS _curr_days_elapsed, " +
                 "@curr_prop:=@curr_days_elapsed / " + SHrsConsts.YEAR_DAYS + " AS _curr_prop, " +
                 "@prev_dt_base:=IF(@sen_as_years = 0, NULL, IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " = " + SModSysConsts.HRSS_TP_BEN_ANN_BON + ", IF(e.dt_ben < ' " + pDateBoyCurr + " ', ' " + pDateBoyCurr + " ', e.dt_ben), ADDDATE(e.dt_ben, INTERVAL @sen_as_years - 1 YEAR))) AS _prev_dt_base, " +
                 "@prev_days_elapsed:=IF(@sen_as_years = 0, NULL, " +
-                "DATEDIFF(' " + dateEnd + " ', @prev_dt_base) - @curr_days_elapsed) AS _prev_days_elapsed, " +
+                "DATEDIFF(' " + dateEndAnt + " ', @prev_dt_base) - @curr_days_elapsed) AS _prev_days_elapsed, " +
                 "@prev_prop:=IF(@sen_as_years = 0, NULL, @prev_days_elapsed / " + SHrsConsts.YEAR_DAYS + ") AS _prev_prop, " +
                 "@id_ben_day_pay:=(SELECT b.id_ben FROM hrs_ben AS b " +
                 "WHERE NOT b.b_del AND b.fk_tp_ben = IF(" + SModSysConsts.HRSS_TP_BEN_VAC + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ") AND b.dt_sta <= ' " + dateEnd + " ' AND b.fk_tp_pay_n = e.fk_tp_pay ORDER BY b.dt_sta DESC , b.id_ben " +
@@ -435,25 +444,25 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 "@id_ben_bon:=COALESCE(@id_ben_bon_pay, @id_ben_bon_all) AS _id_ben_bon, " +
                 "@ben_bon_name:=(SELECT b.name FROM hrs_ben AS b WHERE b.id_ben = @id_ben_bon) AS _ben_bon_name, " +
                 "@curr_ben_days:=COALESCE((SELECT br.ben_day " +
-                "FROM hrs_ben_row AS br WHERE br.id_ben = @id_ben_day AND @sen_raw <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS _DiasAguinaldo, " +
+                "FROM hrs_ben_row AS br WHERE br.id_ben = @id_ben_day AND (SELECT CEILING(@sen_raw)) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS _DiasAguinaldo, " +
                 "@curr_ben_days_prop:=@curr_ben_days * @curr_prop AS _curr_ben_days_prop, " +
                 "@curr_ben_amt_prop:=ROUND(@curr_sal_day * @curr_ben_days_prop, 2) AS _curr_ben_amt_prop, " +
                 "@curr_ben_bon_perc:=COALESCE((SELECT  " +
                 "br.ben_bon_per " +
-                "FROM hrs_ben_row AS br WHERE br.id_ben = @id_ben_bon AND @sen_raw <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") " +
+                "FROM hrs_ben_row AS br WHERE br.id_ben = @id_ben_bon AND (SELECT FLOOR(@sen_raw)) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") " +
                 "ORDER BY br.id_row " +
                 "LIMIT 1), 0) AS _curr_ben_bon_perc, " +
                 "@curr_ben_bon_amt_prop:=ROUND(@curr_ben_amt_prop * @curr_ben_bon_perc, 2) AS _curr_ben_bon_amt_prop, " +
                 "@prev_ben_days:=IF(@sen_as_years < 1, 0, " +
                 "COALESCE((SELECT br.ben_day " +
                 "FROM hrs_ben_row AS br " +
-                "WHERE br.id_ben = @id_ben_day AND (@sen_raw - 1) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0)) AS _prev_ben_days, " +
+                "WHERE br.id_ben = @id_ben_day AND ((SELECT FLOOR(@sen_raw))- 1) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0)) AS _prev_ben_days, " +
                 "@prev_ben_days_prop:=@prev_ben_days * @prev_prop AS _prev_ben_days_prop, " +
                 "@prev_ben_amt_prop:=ROUND(@curr_sal_day * @prev_ben_days_prop, 2) AS _prev_ben_amt_prop, " +
                 "@prev_ben_bon_perc:=IF(@sen_as_years < 1, 0, " +
                 "COALESCE((SELECT br.ben_bon_per " +
                 "FROM hrs_ben_row AS br " +
-                "WHERE br.id_ben = @id_ben_bon AND (@sen_raw - 1) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") " +
+                "WHERE br.id_ben = @id_ben_bon AND ((SELECT FLOOR(@sen_raw)) - 1) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") " +
                 "ORDER BY br.id_row " +
                 "LIMIT 1), 0)) AS _prev_ben_bon_perc, " +
                 "@prev_ben_bon_amt_prop:=ROUND(@prev_ben_amt_prop * @prev_ben_bon_perc, 2) AS _prev_ben_bon_amt_prop, " +
@@ -476,11 +485,11 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 "ORDER BY b.dt_sta DESC , b.id_ben LIMIT 1)) AS _id_ben_bon_pay, " +
                 "@id_ben_bon:=COALESCE(@id_ben_bon_pay, @id_ben_bon_all) AS _id_ben_bon, " +
                 "@curr_ben_bon_perc:=COALESCE((SELECT br.ben_bon_per " +
-                "FROM hrs_ben_row AS br WHERE br.id_ben = @id_ben_bon AND @sen_raw <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS VacationsBonus, " +
+                "FROM hrs_ben_row AS br WHERE br.id_ben = @id_ben_bon AND (SELECT FLOOR(@sen_raw)) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS VacationsBonus, " +
                 "@id_ben_day:=COALESCE(@id_ben_day_pay, @id_ben_day_all) AS _id_ben_day, " +
-                "@curr_ben_days:=COALESCE((SELECT br.ben_day " +
+                "@curr_ben_days:=COALESCE((SELECT br.ben_day " + 
                 "FROM hrs_ben_row AS br " +
-                "WHERE br.id_ben = @id_ben_day AND @sen_raw <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS VacationsDays, " +
+                "WHERE br.id_ben = @id_ben_day AND (SELECT FLOOR(@sen_raw)) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS VacationsDays, " +
                 "@id_ben_day_pay1:=(SELECT b.id_ben " +
                 "FROM hrs_ben AS b " +
                 "WHERE NOT b.b_del AND b.fk_tp_ben = IF(" + SModSysConsts.HRSS_TP_BEN_ANN_BON + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ", " + SModSysConsts.HRSS_TP_BEN_ANN_BON + ") AND b.dt_sta <= ' " + dateEnd + " ' AND b.fk_tp_pay_n = e.fk_tp_pay " +
@@ -489,14 +498,10 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 "FROM hrs_ben AS b " +
                 "WHERE NOT b.b_del AND b.fk_tp_ben = IF(" + SModSysConsts.HRSS_TP_BEN_ANN_BON + " = " + SModSysConsts.HRSS_TP_BEN_VAC_BON + ", " + SModSysConsts.HRSS_TP_BEN_VAC + ", " + SModSysConsts.HRSS_TP_BEN_ANN_BON + ") AND b.dt_sta <= ' " + dateEnd + " ' AND b.fk_tp_pay_n IS NULL ORDER BY b.dt_sta DESC , b.id_ben LIMIT 1) AS _id_ben_day_all, " +
                 "@id_ben_day1:=COALESCE(@id_ben_day_pay1, @id_ben_day_all1) AS _id_ben_day, " +
-                "@curr_ben_days:=COALESCE((SELECT br.ben_day " +
+                "@curr_ben_days_bon:=COALESCE((SELECT br.ben_day " +
                 "FROM hrs_ben_row AS br " +
-                "WHERE br.id_ben = @id_ben_day1 " +
-                "AND @sen_raw <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS AnnualBonusDays, " +
-                "@curr_ben_days_anual:=COALESCE((SELECT br.ben_day " +
-                "FROM hrs_ben_row AS br " +
-                "WHERE br.id_ben = @id_ben_day AND @sen_raw <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS VacationsDays, " +
-                "@factorI:=(((@curr_ben_days / " + SHrsConsts.YEAR_DAYS + ") + ((@curr_ben_bon_perc * @curr_ben_days_anual ) / " + SHrsConsts.YEAR_DAYS + ")) + 1 ) AS SscFactor, " +
+                "WHERE br.id_ben = @id_ben_day1 AND (SELECT FLOOR(@sen_raw)) <= (br.mon / " + SHrsConsts.YEAR_MONTHS + ") ORDER BY br.id_row LIMIT 1), 0) AS AnnualBonusDays, " +
+                "@factorI:=(((@curr_ben_days_bon / " + SHrsConsts.YEAR_DAYS + ") + ((@curr_ben_bon_perc * @curr_ben_days ) / " + SHrsConsts.YEAR_DAYS + ")) + 1 ) AS SscFactor, " +
                 "@SbcFac:=(@curr_sal_day * @factorI) AS SbcFac, " +
                 "(@Factori * @curr_sal_day) AS SscRaw " +
                 "FROM erp.bpsu_bp AS bp " +
@@ -552,7 +557,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 "ORDER BY id_emp , ben_year , ben_ann) AS t " +
                 "GROUP BY id_emp , ben_year , ben_ann " +
                 "ORDER BY id_emp , ben_year , ben_ann) AS tprev ON tprev.id_emp = bp.id_bp " +
-                "INNER JOIN hrs_emp_log_sal_ssc AS va ON va.id_emp = e.id_emp AND va.dt = (SELECT dt FROM hrs_emp_log_sal_ssc WHERE id_emp = e.id_emp ORDER BY dt DESC LIMIT 1) " +
+                "INNER JOIN hrs_emp_log_sal_ssc AS va ON va.id_emp = e.id_emp AND va.dt = (SELECT dt FROM hrs_emp_log_sal_ssc WHERE id_emp = e.id_emp AND dt < ' " + dateStart + " ' ORDER BY dt DESC LIMIT 1) " +
                 "INNER JOIN erp.hrsu_emp AS emp ON va.id_emp = emp.id_emp " +
                 "WHERE e.b_act AND NOT e.b_del AND e.b_act " +
                 "AND bp.id_bp = " + row.getEmployee().getPkEmployeeId() + "  " +
@@ -567,11 +572,10 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
             calendarDaysInPeriod = calendarDaysInPeriod + daysCalendarPeriod(layoutYear , mnMonthEnd);
 
             if (resultSet.next()) {
-                daysAbs = rows.get(auxEmployee).getAbsenceEffectiveDaysFinal();
-
                 for( auxEarning = 0; auxEarning <= rows.get(auxEmployee).getSbcEarnings().size()-1; auxEarning++) {
-                    earningExtra = earningExtra + rows.get(auxEmployee).getSbcEarnings().get(auxEarning).AmountTaxed;
+                earningExtra = earningExtra + rows.get(auxEmployee).getSbcEarnings().get(auxEarning).AmountTaxed;
                 }
+
                 auxEmployee++;
                 auxEarning++;
 
@@ -585,9 +589,10 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 row.setAnnualBonusDays(resultSet.getDouble("AnnualBonusDays"));
                 row.setSscFactor(resultSet.getDouble("SscFactor"));
                 row.setDailyIncome(resultSet.getDouble("DailyIncome"));
-                row.setSscCurrent(resultSet.getDouble("SscCurrent"));
+                row.setSscCurrent(resultSet.getDouble("SscCurrent")); 
                 row.setSscLastUpdate(resultSet.getDate("SscLastUpdate"));
                 row.setSscRaw(resultSet.getDouble("SscRaw"));
+                row.setPeriodDays(SLibTimeUtils.countPeriodDays(dateLayoudStart, dateLayoutEnd));
                 row.setVariableIncome(earningExtra);
                 row.computeSbc();
             }
@@ -596,12 +601,12 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         moGridSbcEmployees.populateGrid(new Vector<>(rows));
         moGridSbcEmployees.setSelectedGridRow(0);
         refreshSbcEmployeesLabel();
-
+        
         }
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
-    }   
+    }
     
     private void reset() {        
         for (SGridRow row : moGridSbcEmployees.getModel().getGridRows()) {
@@ -658,8 +663,8 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
     
     public void save(String Date) throws ParseException {
         SDbMassiveSalarySscBase massiveSalarySscBase = new SDbMassiveSalarySscBase();
-        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-        Date fechaDate = formato.parse(jftDateChangeSsc.getText());
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        Date fechaDate = format.parse(jftDateChangeSsc.getText());
         
         for (SGridRow row : moGridSbcEmployees.getModel().getGridRows()) {
             SRowEmployeeSsc rowEmployeeSbc = (SRowEmployeeSsc) row;
@@ -726,24 +731,26 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
             for (SGridRow rowAux : moGridSbcEmployees.getModel().getGridRows()) {
                 row = (SRowEmployeeSsc) rowAux;
                 if (row.isRowSelected()) {
-                    if (row.getSscFinal()<= 0) {
+                    if (row.getSscFinal() <= 0) {
                         miClient.showMsgBoxWarning("El valor del SBC debe ser mayor a 0.");
                         validation.setIsError(true);
                         save = false;
                         break;
-                    } else if (row.getSscFinal() < SLibUtils.roundAmount(row.getSscRaw())) {
+                    } 
+                    else if (row.getSscFinal() < SLibUtils.roundAmount(row.getSscRaw())) {
                         miClient.showMsgBoxWarning("El SBC nuevo no puede ser menor que el SSC con factor.");
                         validation.setIsError(true);
                         save = false;
                         break;
-                    } else {
+                    } 
+                    else {
                         row.setSscLastUpdate(miClient.getSession().getSystemDate());
                         SRowEmployeeSbc.add(row);
                     }
                 }
             }
             if (validation.getIsError() == false ) {
-                if (SRowEmployeeSbc.isEmpty()){
+                if (SRowEmployeeSbc.isEmpty()) {
                     miClient.showMsgBoxWarning("No se ha seleccionado ningún empleado para actualizar.");
                     validation.setIsError(true);
 
