@@ -699,8 +699,12 @@ public class SDbBankLayout extends SDbRegistryUser {
                                                     SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[0], 
                                                     SDataConstantsSys.FINS_TP_SYS_MOV_BPS_SUP[1]);
         
-                            double dTotalBalance = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalance(), (a, b) -> a + b);
-                            double dTotalBalanceCur = balances.parallelStream().reduce(0d, (output, ob) -> output + ob.getBalanceCurrency(), (a, b) -> a + b);
+							double dTotalBalance = 0d;
+							double dTotalBalanceCur = 0d;
+							for (SBalanceTax balance : balances) {
+								dTotalBalance += balance.getBalance();
+								dTotalBalanceCur += balance.getBalanceCurrency();
+							}
 
                             HashMap<String, double[]> taxBalances = new HashMap();
                             String tax;
