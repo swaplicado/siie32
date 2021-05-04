@@ -24,6 +24,7 @@ public class SFinAmount {
 
     public SFinAmount(SFinAmount amount) {
         this(amount.Amount, amount.AmountCy, amount.IsPrepaymentInvoiced, amount.AccountType, amount.MovementType, amount.OmitWhenAmountsChecked);
+        this.KeyTax = amount.getKeyTax();
         KeyRefDocument = amount.KeyRefDocument;
         KeyRefCashAccount = amount.KeyRefCashAccount;
     }

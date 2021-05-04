@@ -3428,36 +3428,88 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
                                     case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_PREPAY:        // adjustment of prepayments invoiced
                                     case SDataConstantsSys.TRNX_OPS_TYPE_ADJ_APP_PREPAY:    // application of prepayments invoiced
                                         
-                                        aAmountEntries = oAccCfgPrepayments.prorateAmount(new SFinAmount(entry.getSubtotal_r(), entry.getSubtotalCy_r()));
-
-                                        for (i = 0; i < oAccCfgPrepayments.getAccountConfigEntries().size(); i++) {
-                                            oRecordEntry = createAccRecordEntry(
-                                                    oAccCfgPrepayments.getAccountConfigEntries().get(i).getAccountId(),
-                                                    oAccCfgPrepayments.getAccountConfigEntries().get(i).getCostCenterId(),
-                                                    anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
-                                                    isAdjustment() ? entry.getKeyAuxDps() : null, null);
-
-                                            oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
-                                            oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
-
-                                            if (isDebitForOperations()) {
-                                                oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
-                                                oRecordEntry.setCredit(0);
-                                                oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
-                                                oRecordEntry.setCreditCy(0);
+                                        boolean hasConfig = false;
+                                        for (SFinAccountConfig oAccCfgPrpymnt : aAccCfgPrepayments) {
+                                            int [] entryKeyTax = new int[] { 0, 0 };
+                                            if (! entry.getDbmsEntryTaxes().isEmpty()) {
+                                                for (SDataDpsEntryTax dbmsEntryTax : entry.getDbmsEntryTaxes()) {
+                                                    if (dbmsEntryTax.getFkTaxTypeId() == SModSysConsts.FINS_TP_TAX_CHARGED) {
+                                                        entryKeyTax[0] = dbmsEntryTax.getPkTaxBasicId();
+                                                        entryKeyTax[1] = dbmsEntryTax.getPkTaxId();
+                                                        break;
+                                                    }
+                                                }
                                             }
-                                            else {
-                                                oRecordEntry.setDebit(0);
-                                                oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
-                                                oRecordEntry.setDebitCy(0);
-                                                oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                            
+                                            if (oAccCfgPrpymnt.getTax()[0] == entryKeyTax[0] && oAccCfgPrpymnt.getTax()[1] == entryKeyTax[1]) {
+                                                aAmountEntries = oAccCfgPrpymnt.prorateAmount(new SFinAmount(entry.getSubtotal_r(), entry.getSubtotalCy_r()));
+
+                                                for (i = 0; i < oAccCfgPrpymnt.getAccountConfigEntries().size(); i++) {
+                                                    oRecordEntry = createAccRecordEntry(
+                                                            oAccCfgPrpymnt.getAccountConfigEntries().get(i).getAccountId(),
+                                                            oAccCfgPrpymnt.getAccountConfigEntries().get(i).getCostCenterId(),
+                                                            anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
+                                                            isAdjustment() ? entry.getKeyAuxDps() : null, null);
+
+                                                    oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
+                                                    oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
+
+                                                    if (isDebitForOperations()) {
+                                                        oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                                        oRecordEntry.setCredit(0);
+                                                        oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                                        oRecordEntry.setCreditCy(0);
+                                                    }
+                                                    else {
+                                                        oRecordEntry.setDebit(0);
+                                                        oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                                        oRecordEntry.setDebitCy(0);
+                                                        oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                                    }
+
+                                                    oRecordEntry.setConcept(sConcept);
+                                                    oRecordEntry.setSortingPosition(++nSortingPosition);
+
+                                                    oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                                                }
+                                                
+                                                hasConfig = true;
                                             }
-
-                                            oRecordEntry.setConcept(sConcept);
-                                            oRecordEntry.setSortingPosition(++nSortingPosition);
-
-                                            oRecord.getDbmsRecordEntries().add(oRecordEntry);
                                         }
+                                        
+                                        if (! hasConfig) {
+                                            aAmountEntries = oAccCfgPrepayments.prorateAmount(new SFinAmount(entry.getSubtotal_r(), entry.getSubtotalCy_r()));
+
+                                                for (i = 0; i < oAccCfgPrepayments.getAccountConfigEntries().size(); i++) {
+                                                    oRecordEntry = createAccRecordEntry(
+                                                            oAccCfgPrepayments.getAccountConfigEntries().get(i).getAccountId(),
+                                                            oAccCfgPrepayments.getAccountConfigEntries().get(i).getCostCenterId(),
+                                                            anAccMvtSubclassKey, anSysAccTypeKeyBpr, anSysMvtTypeKeyBpr, anSysMvtTypeKeyBprXXX,
+                                                            isAdjustment() ? entry.getKeyAuxDps() : null, null);
+
+                                                    oRecordEntry.setFkDpsYearId_n(SLibConsts.UNDEFINED);
+                                                    oRecordEntry.setFkDpsDocId_n(SLibConsts.UNDEFINED);
+
+                                                    if (isDebitForOperations()) {
+                                                        oRecordEntry.setDebit(aAmountEntries.get(i).Amount);
+                                                        oRecordEntry.setCredit(0);
+                                                        oRecordEntry.setDebitCy(aAmountEntries.get(i).AmountCy);
+                                                        oRecordEntry.setCreditCy(0);
+                                                    }
+                                                    else {
+                                                        oRecordEntry.setDebit(0);
+                                                        oRecordEntry.setCredit(aAmountEntries.get(i).Amount);
+                                                        oRecordEntry.setDebitCy(0);
+                                                        oRecordEntry.setCreditCy(aAmountEntries.get(i).AmountCy);
+                                                    }
+
+                                                    oRecordEntry.setConcept(sConcept);
+                                                    oRecordEntry.setSortingPosition(++nSortingPosition);
+
+                                                    oRecord.getDbmsRecordEntries().add(oRecordEntry);
+                                                }
+                                        }
+                                        
                                         break;
                                         
                                     default:
