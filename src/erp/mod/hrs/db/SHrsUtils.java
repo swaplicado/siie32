@@ -815,7 +815,7 @@ public abstract class SHrsUtils {
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " " 
                 + "WHERE dt >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
                 + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' " 
-                + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del GROUP BY id_emp;";
+                + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del AND id_log > 1 GROUP BY id_emp;";
 
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {

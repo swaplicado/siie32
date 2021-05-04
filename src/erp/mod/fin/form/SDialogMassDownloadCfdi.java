@@ -896,7 +896,7 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
     public void actionSave() {
         boolean canClose = true;
         if(moDateStart.getValue() == null && moDateEnd.getValue() == null) {
-            if (JOptionPane.showConfirmDialog(this, "Al no elegir fechas, la cantidad de XML, puede ser masiva. ¿Desea continuar?", "Confirm", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+            if (JOptionPane.showConfirmDialog(this, "Al no elegir fechas, la cantidad de XML, puede ser masiva. ¿Desea continuar?", "Confirmar", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
                  canClose = true;
             }
             else {

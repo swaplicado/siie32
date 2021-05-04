@@ -33,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
@@ -110,7 +111,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         jPanel3 = new javax.swing.JPanel();
         jlSbcEmployeesLabel = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
-        jbOk = new javax.swing.JButton();
+        jbSave = new javax.swing.JButton();
         jbCancel = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jpEmployeeSBC = new javax.swing.JPanel();
@@ -151,10 +152,10 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         jPanel4.setPreferredSize(new java.awt.Dimension(500, 33));
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 1, 0));
 
-        jbOk.setText("Aceptar");
-        jbOk.setToolTipText("[Ctrl + Enter]");
-        jbOk.setPreferredSize(new java.awt.Dimension(75, 23));
-        jPanel4.add(jbOk);
+        jbSave.setText("Guardar");
+        jbSave.setToolTipText("[Ctrl + Enter]");
+        jbSave.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel4.add(jbSave);
 
         jbCancel.setText("Cancelar");
         jbCancel.setToolTipText("[Escape]");
@@ -291,6 +292,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Días no trabajados efectivos", moGridSbcEmployees.getTable().getDefaultEditor(Integer.class));
                 column.setEditable(true);
                 columns.add(column);
+//                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Diferencia SBS $"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SBC sugerido $"));
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SBC nuevo $", moGridSbcEmployees.getTable().getDefaultEditor(Double.class));
                 column.setEditable(true);
@@ -331,7 +333,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
 
         employeeSelectAll(true);
 
-        jbOk.addActionListener(this);
+        jbSave.addActionListener(this);
         jbCancel.addActionListener(this);
         jbDateChangeSscPicker.addActionListener(this);
         
@@ -339,7 +341,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
             @Override
             public void actionPerformed(ActionEvent e) { 
                 try {
-                actionOk();
+                actionSave();
                     } catch (ParseException ex) {
                         Logger.getLogger(SFormMassiveUpdateSsc.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -363,7 +365,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         }
     }
 
-    private void actionOk() throws ParseException {
+    private void actionSave() throws ParseException {
         SFormValidation validation = formValidate();
 
         if (validation.getIsError()) {
@@ -375,10 +377,16 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
             }
         }
         else {
-            save(jftDateChangeSsc.getText());
+            boolean canClose = true;
+            if (JOptionPane.showConfirmDialog(this, "Esta seguro que desea actualizar los SBC", "Confirmar", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+                 canClose = true;
+            } 
+            else {
+                save(jftDateChangeSsc.getText());
 
-            mnFormResult = SLibConstants.FORM_RESULT_OK;
-            setVisible(false);
+                mnFormResult = SLibConstants.FORM_RESULT_OK;
+                setVisible(false);
+            }
         }
     }
     
@@ -504,6 +512,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 "@factorI:=(((@curr_ben_days_bon / " + SHrsConsts.YEAR_DAYS + ") + ((@curr_ben_bon_perc * @curr_ben_days ) / " + SHrsConsts.YEAR_DAYS + ")) + 1 ) AS SscFactor, " +
                 "@SbcFac:=(@curr_sal_day * @factorI) AS SbcFac, " +
                 "(@Factori * @curr_sal_day) AS SscRaw " +
+                        
                 "FROM erp.bpsu_bp AS bp " +
                 "INNER JOIN erp.hrsu_emp AS e ON e.id_emp = bp.id_bp " +
                 "INNER JOIN erp.hrss_tp_pay AS tp ON e.fk_tp_pay = tp.id_tp_pay " +
@@ -591,6 +600,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 row.setDailyIncome(resultSet.getDouble("DailyIncome"));
                 row.setSscCurrent(resultSet.getDouble("SscCurrent")); 
                 row.setSscLastUpdate(resultSet.getDate("SscLastUpdate"));
+                row.setSscRaw(resultSet.getDouble("SscRaw"));
                 row.setSscRaw(resultSet.getDouble("SscRaw"));
                 row.setPeriodDays(SLibTimeUtils.countPeriodDays(dateLayoudStart, dateLayoutEnd));
                 row.setVariableIncome(earningExtra);
@@ -685,7 +695,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
     private javax.swing.JPanel jPanel4;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbDateChangeSscPicker;
-    private javax.swing.JButton jbOk;
+    private javax.swing.JButton jbSave;
     private javax.swing.JFormattedTextField jftDateChangeSsc;
     private javax.swing.JFormattedTextField jftDateCut;
     private javax.swing.JLabel jlBimestre;
@@ -822,9 +832,9 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
         if (e.getSource() instanceof javax.swing.JButton) {
             javax.swing.JButton button = (javax.swing.JButton) e.getSource();
 
-            if (button == jbOk) {
+            if (button == jbSave) {
                 try {
-                    actionOk();
+                    actionSave();
                 } catch (ParseException ex) {
                     Logger.getLogger(SFormMassiveUpdateSsc.class.getName()).log(Level.SEVERE, null, ex);
                 }

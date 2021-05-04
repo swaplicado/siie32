@@ -130,7 +130,8 @@ public abstract class SSscUtils {
                 + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND "
                 + "p.per_year = " + year + " AND p.per BETWEEN " + monthStart + " AND " + monthEnd + " AND "
 //                + "e.fk_tp_ear NOT IN (" + getExcludedEarningTypesSqlList() + ") AND " // ¿?
-                + "emp.dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act "
+                + "emp.dt_hire < '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act AND "
+                + "emp.dt_sal_ssc < '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' "
 //                + "and pr.id_emp = 3504 " // xxx pruebas
                 + "GROUP BY pr.id_emp ORDER BY bp.bp, pr.id_emp;" ; 
         

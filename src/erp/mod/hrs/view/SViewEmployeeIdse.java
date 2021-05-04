@@ -167,7 +167,7 @@ public class SViewEmployeeIdse extends SGridPaneView implements ActionListener{
                         "INNER JOIN HRS_EMP_LOG_SAL_SSC AS ssc ON ssc.id_emp = emp.id_emp " +
                         "INNER JOIN cfg_param_co AS par " +
                         "INNER JOIN hrs_cfg AS cfg " +
-                        "WHERE ssc.dt >= " + start + " AND ssc.dt <= " + end + " AND NOT ssc.b_del GROUP BY bp.id_bp ORDER BY bp.id_bp; ";
+                        "WHERE ssc.dt >= " + start + " AND ssc.dt <= " + end + " AND NOT ssc.b_del AND ssc.id_log > 1 GROUP BY bp.id_bp ORDER BY bp.id_bp; ";
             }
         }
        
