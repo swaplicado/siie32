@@ -21,6 +21,7 @@ import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.hrs.db.SHrsConsts;
 import erp.mod.hrs.form.SDialogCalculateIncomeTax;
+import erp.mod.hrs.form.SDialogLayoutEmployee;
 import erp.mod.hrs.form.SDialogPayrollReceiptSsc;
 import erp.mod.hrs.form.SDialogRepHrsActiveEmployees;
 import erp.mod.hrs.form.SDialogRepHrsAuxPayroll;
@@ -78,6 +79,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiCatEmployeeWageLog;
     private javax.swing.JMenuItem jmiCatEmployeeSscBaseLog;
     private javax.swing.JMenuItem jmiCatEmployeeSscBaseUpdate;
+    private javax.swing.JMenuItem jmiCatEmployeeSua;
+    private javax.swing.JMenuItem jmiCatEmployeeIdse;
     private javax.swing.JMenuItem jmiCatEarnings;
     private javax.swing.JMenuItem jmiCatDeductions;
     private javax.swing.JMenuItem jmiCatDeparment;
@@ -160,6 +163,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
     private javax.swing.JMenuItem jmiRepEmployeeActiveByPeriod;
     private javax.swing.JMenuItem jmiRepPtu;
 
+    private SDialogLayoutEmployee moDialogLayoutEmployee;
+
     private erp.mhrs.form.SDialogFormerPayrollImport moDialogFormerPayrollImport;
 
     public SGuiModuleHrs(erp.client.SClientInterface client) {
@@ -230,6 +235,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeWageLog = new JMenuItem("Bitácora de sueldos y salarios");
         jmiCatEmployeeSscBaseLog = new JMenuItem("Bitácora de salarios base de cotización");
         jmiCatEmployeeSscBaseUpdate = new JMenuItem("Actualización de salarios base de cotización");
+        jmiCatEmployeeSua = new JMenuItem("Empleados para SUA");
+        jmiCatEmployeeIdse = new JMenuItem("Empleados para IDSE");
         jmiCatEarnings = new JMenuItem("Percepciones");
         jmiCatDeductions = new JMenuItem("Deducciones");
         jmiCatDeparment = new JMenuItem("Departamentos");
@@ -255,6 +262,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmCat.add(jmiCatEmployeeHireLog);
         jmCat.add(jmiCatEmployeeWageLog);
         jmCat.add(jmiCatEmployeeSscBaseLog);
+        jmCat.add(jmiCatEmployeeSua);
+        jmCat.add(jmiCatEmployeeIdse);
         //jmCat.add(jmiCatEmployeeSscBaseUpdate); // 2020-10-09 Sergio Flores: this menu option is obsolete!
         jmCat.addSeparator();
         jmCat.add(jmiCatEarnings);
@@ -452,6 +461,8 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeHireLog.addActionListener(this);
         jmiCatEmployeeWageLog.addActionListener(this);
         jmiCatEmployeeSscBaseLog.addActionListener(this);
+        jmiCatEmployeeSua.addActionListener(this);
+        jmiCatEmployeeIdse.addActionListener(this);
         jmiCatEmployeeSscBaseUpdate.addActionListener(this);
         jmiCatEarnings.addActionListener(this);
         jmiCatDeductions.addActionListener(this);
@@ -526,7 +537,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiRepVacationsFileCsv.addActionListener(this);
         jmiRepEmployeeActiveByPeriod.addActionListener(this);
         jmiRepPtu.addActionListener(this);
-
+        
         jmiCfgTaxTable.setEnabled(true);
         jmiCfgTaxTableRow.setEnabled(true);
         jmiCfgTaxSubsidyTable.setEnabled(true);
@@ -567,6 +578,9 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
         jmiCatEmployeeHireLog.setEnabled(isPermissionCatEmpWage);
         jmiCatEmployeeWageLog.setEnabled(isPermissionCatEmpWage);
         jmiCatEmployeeSscBaseLog.setEnabled(isPermissionCatEmpWage);
+        jmiCatEmployeeSua.setEnabled(false);
+//        jmiCatEmployeeSua.setEnabled(isPermissionCatEmpWage);
+        jmiCatEmployeeIdse.setEnabled(isPermissionCatEmpWage);
         jmiCatEmployeeSscBaseUpdate.setEnabled(isPermissionCatEmpWage);
         jmiCatEarnings.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
         jmiCatDeductions.setEnabled(isPermissionCat || isPermissionCatEmp || isPermissionCatEmpWage);
@@ -773,7 +787,7 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
                         default:
                             throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
                     }
-                    break;
+                    break;                  
                 default:
                     throw new Exception(SLibConstants.MSG_ERR_UTIL_UNKNOWN_VIEW);
             }
@@ -913,6 +927,12 @@ public class SGuiModuleHrs extends erp.lib.gui.SGuiModule implements java.awt.ev
             }
             else if (item == jmiCatEmployeeSscBaseLog) {
                 miClient.getSession().showView(SModConsts.HRS_EMP_LOG_SAL_SSC, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCatEmployeeSua) {
+                miClient.getSession().showView(SModConsts.HRS_EMP_LOG_SUA, SLibConsts.UNDEFINED, null);
+            }
+            else if (item == jmiCatEmployeeIdse) {
+                miClient.getSession().showView(SModConsts.HRS_EMP_LOG_IDSE, SLibConsts.UNDEFINED, null);
             }
             else if (item == jmiCatEmployeeSscBaseUpdate) {
                new SDialogPayrollReceiptSsc((SGuiClient) miClient, "Actualización de salario base cotización").setVisible(true);

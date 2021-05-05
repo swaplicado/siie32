@@ -4,6 +4,7 @@
  */
 package erp.mod.fin.form;
 
+import erp.SClientUtils;
 import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import java.awt.event.ActionEvent;
@@ -16,9 +17,12 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -496,7 +500,21 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
        return validation;
     }
     
-    public void createParamsXML() {
+    public String routeXml() throws SQLException {
+        String mySql = "";
+        ResultSet resultSet = null;
+        
+        mySql = "SELECT xml_base_dir FROM cfg_param_co";
+        Statement statementD = miClient.getSession().getStatement().getConnection().createStatement();
+        resultSet = statementD.executeQuery(mySql);
+            while (resultSet.next()) {
+                msRoute = resultSet.getString("cfg.xml_base_dir");
+            }
+            
+        return  msRoute;
+    }
+    
+    public void createParamsXML() throws SQLException {
         String mySql = "";
         int countXml = 0;
         int countPdf = 0;
@@ -507,15 +525,22 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
         File routeSaveXML = routeSaveXML();
         SimpleDateFormat dateFileYear = new SimpleDateFormat("yyyy");
         SimpleDateFormat dateFileMounth = new SimpleDateFormat("MM");
-               
+        
         try {
             
+            String complementaryDbName = "";
+            try {
+                complementaryDbName = SClientUtils.getComplementaryDdName((SClientInterface) miClient);
+            }
+            catch (Exception e) {
+                SLibUtils.printException(this, e);
+            }
             if (typeCfdi() == mnInvoices || typeCfdi() == mnCreditNotes) {
-                mySql = "SELECT cfd.id_cfd, cfd.doc_xml_name, cfd.doc_xml, cfd.xml_sign_n, cfd.fid_tp_cfd, cfd.fid_st_xml, cfg.xml_base_dir, "
+                mySql = "SELECT cfd.id_cfd, com.doc_xml_name, com.doc_xml, cfd.xml_sign_n, cfd.fid_tp_cfd, cfd.fid_st_xml, "
                         + "CONCAT_WS(dps.num_ser, dps.num) AS _folios "
                         + "FROM trn_dps AS dps "
                         + "INNER JOIN trn_cfd AS cfd ON cfd.fid_dps_year_n = dps.id_year AND cfd.fid_dps_doc_n = dps.id_doc "
-                        + "INNER JOIN cfg_param_co as cfg "
+                        + "INNER JOIN " + complementaryDbName + ".trn_cfd AS com ON com.id_cfd = cfd.id_cfd "
                         + "WHERE dps.b_del = 0 AND "
                         + "dps.fid_ct_dps = " + getDpsCategory() + " AND dps.fid_cl_dps = " + getDpsClass() + " AND dps.fid_st_dps = " + statusCfdi() + " " ;
                 if (moDateStart.getValue() != null) {
@@ -543,13 +568,13 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
                 }
             }
             else if (typeCfdi() == mnCfdPayrollReceipts ) {
-                mySql = "SELECT cfd.id_cfd, cfd.doc_xml_name, cfd.doc_xml, cfd.xml_sign_n, cfd.fid_tp_cfd, cfd.fid_st_xml, cfg.xml_base_dir, "
+                mySql = "SELECT cfd.id_cfd, com.doc_xml_name, com.doc_xml, cfd.xml_sign_n, cfd.fid_tp_cfd, cfd.fid_st_xml, "
                         + "CONCAT_WS(cfd.ser, cfd.num) AS _folios "
                         + "FROM hrs_pay_rcp AS rcp "
                         + "INNER JOIN hrs_pay_rcp_iss AS iss ON iss.id_pay = rcp.id_pay AND iss.id_emp = rcp.id_emp "
                         + "INNER JOIN trn_cfd AS cfd ON cfd.fid_pay_rcp_pay_n = iss.id_pay AND cfd.fid_pay_rcp_emp_n = iss.id_emp AND cfd.fid_pay_rcp_iss_n = iss.id_iss "
                         + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = iss.id_emp "
-                        + "INNER JOIN cfg_param_co as cfg "
+                        + "INNER JOIN " + complementaryDbName + ".trn_cfd AS com ON com.id_cfd = cfd.id_cfd "
                         + "WHERE cfd.fid_st_xml = " + statusCfdi() + " " ;
                 if (moDateStart.getValue() != null) {
                     mySql += " AND cfd.xml_sign_n >= "+ "'" +  SLibUtils.DbmsDateFormatDate.format(moDateStart.getValue()) + " 00:00:00'";
@@ -576,11 +601,11 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
                 }
             }
             else if (typeCfdi() == mnCfdPaymentReceipts ) {
-                mySql = "SELECT cfd.id_cfd, cfd.doc_xml_name, cfd.doc_xml, cfd.xml_sign_n, cfd.fid_tp_cfd, cfd.fid_st_xml, cfg.xml_base_dir, "
+                mySql = "SELECT cfd.id_cfd, com.doc_xml_name, com.doc_xml, cfd.xml_sign_n, cfd.fid_tp_cfd, cfd.fid_st_xml, "
                         + "CONCAT_WS(cfd.ser, cfd.num) AS _folios "
                         + "FROM trn_cfd AS cfd "
                         + "INNER JOIN fin_rec_ety AS ety.fid_cfd_n = cfd.id_cfd "
-                        + "INNER JOIN cfg_param_co as cfg "
+                        + "INNER JOIN " + complementaryDbName + ".trn_cfd AS com ON com.id_cfd = cfd.id_cfd "
                         + "WHERE cfd.fid_st_xml = " + statusCfdi() + " " ;
                 if (moDateStart.getValue() != null) {
                     mySql += " AND cfd.xml_sign_n >= "+ "'" +  SLibUtils.DbmsDateFormatDate.format(moDateStart.getValue()) + " 00:00:00'";
@@ -610,22 +635,25 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
             resultSet = statement.executeQuery(mySql);
             while (resultSet.next()) {
                 countXml = countXml + 1;
-                mdDateSign =  resultSet.getDate("cfd.xml_sign_n");
-                msNameXML = resultSet.getString("cfd.doc_xml_name");
-                msXml = resultSet.getString("cfd.doc_xml");
-                msRoute = resultSet.getString("cfg.xml_base_dir");
-                
-                writeXml(routeSaveXML, msNameXML, msXml);
-                if(routeSaveXML!=null){
+                mdDateSign = resultSet.getDate("cfd.xml_sign_n");
+                msNameXML = resultSet.getString("com.doc_xml_name");
+                msXml = resultSet.getString("com.doc_xml");
+//                msRoute = resultSet.getString("reps/img/aeth/");
+//                msRoute = resultSet.getString("cfg.xml_base_dir");
+
+                writeXml(routeSaveXML, (msNameXML.isEmpty() ?  String.valueOf(countXml) : msNameXML), msXml);
+                if(routeSaveXML != null) {
                     if (getTypeDownload() == DOWNLOAD_XML_PDF) {
-                        if(mdDateSign != null ) {
+                        if(mdDateSign != null  ) {
                             String mnYearR = dateFileYear.format(mdDateSign);
                             String mnMounthR = dateFileMounth.format(mdDateSign);
                             String namePdf = msNameXML.substring(0,26) + "pdf";
                             String sCarpAct = System.getProperty("user.dir");
-                            File routeFindPdf = new File(sCarpAct + "/" + msRoute + mnYearR + "/" + mnMounthR + "/");
+//                            File routeFindPdf = new File(sCarpAct + "/" + msRoute + mnYearR + "/" + mnMounthR + "/");
+                            File routeFindPdf = new File(sCarpAct + "/" + routeXml() + mnYearR + "/" + mnMounthR + "/");
+
                             File archiveFindPdf = new File(routeFindPdf + "/" + namePdf );
-                            if(archiveFindPdf.exists()){
+                            if(archiveFindPdf.exists()) {
                                 fileMovePdf(routeFindPdf, routeSaveXML, namePdf);
                                  countPdf = countPdf + 1;
                             }
@@ -657,16 +685,16 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
                 }
             }
         }
-        
+
         catch (Exception e) {
             SLibUtils.showException(this, e);
         }
     }
     
     public static void fileMovePdf(File sourceFile, File destinationFile, String namePdf) {
-    File dataInputFile = new File (sourceFile +"/"+ namePdf);
-    File fileSendPath = new File(destinationFile, namePdf);
-    dataInputFile.renameTo(fileSendPath);
+        File dataInputFile = new File (sourceFile +"/"+ namePdf);
+        File fileSendPath = new File(destinationFile, namePdf);
+        dataInputFile.renameTo(fileSendPath);
     
     }
 
@@ -868,18 +896,26 @@ public class SDialogMassDownloadCfdi extends SBeanFormDialog implements ItemList
     public void actionSave() {
         boolean canClose = true;
         if(moDateStart.getValue() == null && moDateEnd.getValue() == null) {
-            if (JOptionPane.showConfirmDialog(this, "Al no elegir fechas, la cantidad de XML, puede ser masiva. ¿Desea continuar?", "Confirm", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+            if (JOptionPane.showConfirmDialog(this, "Al no elegir fechas, la cantidad de XML, puede ser masiva. ¿Desea continuar?", "Confirmar", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
                  canClose = true;
             }
             else {
                 if (jbSave.isEnabled()) {
-                           createParamsXML();
+                    try {
+                        createParamsXML();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(SDialogMassDownloadCfdi.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                            dispose();
                        }            
             }
         }
         else if (jbSave.isEnabled()) {
-            createParamsXML();
+            try {
+                createParamsXML();
+            } catch (SQLException ex) {
+                Logger.getLogger(SDialogMassDownloadCfdi.class.getName()).log(Level.SEVERE, null, ex);
+            }
             dispose();
         } 
     }

@@ -465,6 +465,8 @@ public abstract class SDataConstants {
     public static final int TRN_TP_CFD_PAC = 207098;    // out of place! (sflores, 2014-02-17)
     public static final int TRN_MMS_LOG = 207099;       // out of place! (sflores, 2014-01-28)
     public static final int TRN_CFD_SIGN_LOG = 207100;  // out of place! (sflores, 2014-09-01)
+    public static final int TRN_DNC_DPS_SUA = 207101;
+    public static final int TRN_DNC_DPS_IDSE = 207102;
     public static final int TRN_CFD_FIN_REC = 207104;
     public static final int TRN_DVY = 207111;
     public static final int TRN_DVY_ETY = 207112;

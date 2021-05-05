@@ -7,8 +7,13 @@ package erp.mod.hrs.db.ssc;
 
 import erp.mod.SModConsts;
 import erp.mod.hrs.db.SDbEmployee;
+import erp.mod.hrs.db.SHrsUtils;
+import static erp.mod.hrs.db.ssc.SSscUtils.getEmployeeAntiquity;
+import static erp.mod.hrs.db.ssc.SSscUtils.getEmployeeDailyIncome;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import sa.lib.SLibTimeUtils;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbRegistry;
@@ -21,14 +26,18 @@ import sa.lib.gui.SGuiSession;
  */
 public class SRowEmployeeSsc implements SGridRow {
     
-    public static final int COL_SELECTED = 18;
-    public static final int COLS_FIXED = 20;
-
+    public static final int COL_SELECTED = 19;
+    public static final int COLS_FIXED = 21;
+    
+    protected int mnLimitUmasSsc = 25;
     protected SGuiSession moSession;
     protected SDbEmployee moEmployee;
     protected Date mtPeriodStart;
     protected Date mtPeriodEnd;
     protected int mnPeriodDays;
+    protected int mnYearPay;
+    protected int mnMonthStartPay;
+    protected int mnMonthEndPay;
     
     protected int mnVacationsDays;
     protected double mdVacationsBonus;
@@ -39,22 +48,27 @@ public class SRowEmployeeSsc implements SGridRow {
     protected Date mtSscLastUpdate;
     protected double mdSscRaw;
     protected double mdVariableIncome;
+    protected double mdMaximumSalary;
     protected int mnAbsenceEffectiveDaysSuggested;
     protected int mnAbsenceEffectiveDaysFinal;
     protected double mdSscSuggested;
     protected double mdSscFinal;
     protected boolean mbRowSelected;
     
-    /** Lista de las percepciones del período (bimestre) a procesar. */
+    /* Lista de las percepciones del período (bimestre) a procesar. */
     protected ArrayList<SSscEarning> maSbcEarnings;
     
-    public SRowEmployeeSsc(final SGuiSession session, final SDbEmployee employee, final Date periodStart, final Date periodEnd) {
+    public SRowEmployeeSsc(final SGuiSession session, final SDbEmployee employee, final Date periodStart, final Date periodEnd, final int year, final int monthStart, final int monthEnd) throws Exception {
         moSession = session;
         moEmployee = employee;
         mtPeriodStart = periodStart;
         mtPeriodEnd = periodEnd;
         mnPeriodDays = SLibTimeUtils.countPeriodDays(mtPeriodStart, mtPeriodEnd);
-
+        mnYearPay = year;
+        mnMonthStartPay = monthStart;
+        mnMonthEndPay = monthEnd;
+        mdMaximumSalary = (SHrsUtils.getRecentUma(session, periodEnd) * mnLimitUmasSsc );
+        
         mnVacationsDays = 0;
         mdVacationsBonus = 0.0;
         mdAnnualBonusDays = 0.0;
@@ -66,7 +80,7 @@ public class SRowEmployeeSsc implements SGridRow {
         mdVariableIncome = 0.0;
         mnAbsenceEffectiveDaysSuggested = 0;
         mnAbsenceEffectiveDaysFinal = 0;
-        mdSscSuggested = 0.0;
+        mdSscSuggested = 0.0f;
         mdSscFinal = 0.0;
         mbRowSelected = false;
         
@@ -76,6 +90,7 @@ public class SRowEmployeeSsc implements SGridRow {
     public SDbEmployee getEmployee() { return moEmployee; }
     public Date getPeriodStart() { return mtPeriodStart; }
     public Date getPeriodEnd() { return mtPeriodEnd; }
+    public void setPeriodDays(int n) { mnPeriodDays = n; }
     public int getPeriodDays() { return mnPeriodDays; }
     
     public void setVacationsDays(int n) { mnVacationsDays = n; }
@@ -90,9 +105,9 @@ public class SRowEmployeeSsc implements SGridRow {
     public void setAbsenceEffectiveDaysSuggested(int days) { mnAbsenceEffectiveDaysSuggested = days; setAbsenceEffectiveDaysFinal(mnAbsenceEffectiveDaysSuggested); setSscSuggested(computeSbc(mnAbsenceEffectiveDaysSuggested)); }
     public void setAbsenceEffectiveDaysFinal(int days) { mnAbsenceEffectiveDaysFinal = days; setSscFinal(computeSbc(mnAbsenceEffectiveDaysFinal)); }
     public void setSscSuggested(double sbc) { SLibUtils.roundAmount(mdSscSuggested) ;mdSscSuggested = sbc; setSscFinal(mdSscSuggested); }
-    public void setSscFinal(double sbc) { mdSscFinal = sbc; }
+    public void setSscFinal(double sbc) { mdSscFinal = (sbc >= mdMaximumSalary ? mdMaximumSalary : sbc ); }
     public void setRowSelected(boolean d) { mbRowSelected = d; }
-    
+     
     public int getVacationsDays() { return mnVacationsDays; }
     public double getVacationsBonus() { return mdVacationsBonus; }
     public double getAnnualBonusDays() { return mdAnnualBonusDays; }
@@ -122,7 +137,7 @@ public class SRowEmployeeSsc implements SGridRow {
         
         return sbcEarning;
     }
-    
+
     private double computeSbc(final int absenceDays) {
         int workedDays = mnPeriodDays - absenceDays; // convenience variable
         return mdSscRaw + (workedDays == 0 ? 0 : (mdVariableIncome / workedDays));
@@ -187,7 +202,7 @@ public class SRowEmployeeSsc implements SGridRow {
                     value = moEmployee.getDateBenefits();
                     break;
                 case 3:
-                    value = SLibTimeUtils.formatAge(moEmployee.getDateBenefits(), mtPeriodEnd);
+                    value = getEmployeeAntiquity(moEmployee.getDateBenefits(), mtPeriodEnd);
                     break;
                 case 4:
                     value = moSession.readField(SModConsts.HRSS_TP_PAY, new int[] { moEmployee.getFkPaymentTypeId() }, SDbRegistry.FIELD_NAME);
@@ -205,7 +220,13 @@ public class SRowEmployeeSsc implements SGridRow {
                     value = mdSscFactor;
                     break;
                 case 9:
-                    value = mdDailyIncome;
+                     {
+                        try {
+                            value = getEmployeeDailyIncome(moSession, mnYearPay, mnMonthStartPay, mnMonthEndPay, moEmployee.getFkPaymentTypeId(), moEmployee.getPkEmployeeId());//
+                        } catch (Exception ex) {
+                            Logger.getLogger(SRowEmployeeSsc.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                     break;
                 case 10:
                     value = mdSscCurrent;
@@ -220,16 +241,19 @@ public class SRowEmployeeSsc implements SGridRow {
                     value = mdVariableIncome;
                     break;
                 case 14:
-                    value = mnAbsenceEffectiveDaysSuggested;
+                    value = mnPeriodDays;//
                     break;
                 case 15:
-                    value = mnAbsenceEffectiveDaysFinal;
+                    value = mnAbsenceEffectiveDaysSuggested;
                     break;
                 case 16:
-                    value = mdSscSuggested;
+                   value = mnAbsenceEffectiveDaysFinal;
                     break;
                 case 17:
-                    value = SLibUtils.roundAmount(mdSscFinal);
+                    value = mdSscSuggested;
+                    break;
+                case 18:
+                   value = SLibUtils.roundAmount(mdSscFinal);
                     break;
                 case COL_SELECTED:
                     value = mbRowSelected;
@@ -273,13 +297,14 @@ public class SRowEmployeeSsc implements SGridRow {
             case 12:
             case 13:
             case 14:
-                break;
             case 15:
-                setAbsenceEffectiveDaysFinal((int) value);
                 break;
             case 16:
+                setAbsenceEffectiveDaysFinal((int) value);
                 break;
             case 17:
+                break;
+            case 18:
                 setSscFinal((double) value);
                 break;
             case COL_SELECTED:
