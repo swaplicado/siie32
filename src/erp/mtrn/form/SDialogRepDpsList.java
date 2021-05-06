@@ -228,7 +228,7 @@ public class SDialogRepDpsList extends javax.swing.JDialog implements erp.lib.fo
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(400, 300));
+        setSize(new java.awt.Dimension(496, 339));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
