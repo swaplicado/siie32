@@ -498,13 +498,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetPdf.setEnabled(mbIsCategoryPur && (mbIsDoc || mbIsDocAdj));
         jbShowCfdi.setEnabled(mbIsDoc || mbIsDocAdj);
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbGetCfdiStatus.setEnabled((mbIsDoc || mbIsDocAdj));
-        jbSendCfdi.setEnabled((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj)));
-        jbRestoreCfdStamped.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbRestoreCfdCancelAck.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbResetPacFlags.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbGetCfdiStatus.setEnabled((mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbSendCfdi.setEnabled(((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj))) && mbHasRightEdit);
+        jbRestoreCfdStamped.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbRestoreCfdCancelAck.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbResetPacFlags.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
 
         STableField[] aoKeyFields = new STableField[2];
         STableColumn[] aoTableColumns = null;

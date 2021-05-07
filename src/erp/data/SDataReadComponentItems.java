@@ -340,6 +340,7 @@ public abstract class SDataReadComponentItems {
         boolean isFkOnlyInts = true;
         boolean isComplementApplying = false;
         boolean onlyInternational = false;
+        boolean fiscalId = false;
         java.lang.String sql = "";
         java.lang.String text = "";
         java.lang.String field = "";
@@ -409,8 +410,10 @@ public abstract class SDataReadComponentItems {
                 break;
             case SDataConstants.BPSX_BP_CO:
             case SDataConstants.BPSX_BP_SUP:
+            case SDataConstants.BPSX_BP_SUP_FI:
             case SDataConstants.BPSX_BP_INT_SUP:
             case SDataConstants.BPSX_BP_CUS:
+            case SDataConstants.BPSX_BP_CUS_FI:
             case SDataConstants.BPSX_BP_INT_CUS:
             case SDataConstants.BPSX_BP_CDR:
             case SDataConstants.BPSX_BP_DBR:
@@ -425,22 +428,30 @@ public abstract class SDataReadComponentItems {
                         isKeyApplying = paramsErp.getIsKeySupplierApplying();
                         break;
                     case SDataConstants.BPSX_BP_SUP:
+                    case SDataConstants.BPSX_BP_SUP_FI:
                     case SDataConstants.BPSX_BP_INT_SUP:
                         text = "proveedor";
                         category = SDataConstantsSys.BPSS_CT_BP_SUP;
                         sortingType = paramsErp.getFkSortingSupplierTypeId();
                         isKeyApplying = paramsErp.getIsKeySupplierApplying();
-                        if (catalogue == SDataConstants.BPSX_BP_INT_SUP) {
+                        if (catalogue == SDataConstants.BPSX_BP_SUP_FI) {
+                            fiscalId = true;
+                        }
+                        else if (catalogue == SDataConstants.BPSX_BP_INT_SUP) {
                             onlyInternational = true;
                         }
                         break;
                     case SDataConstants.BPSX_BP_CUS:
+                    case SDataConstants.BPSX_BP_CUS_FI:
                     case SDataConstants.BPSX_BP_INT_CUS:
                         text = "cliente";
                         category = SDataConstantsSys.BPSS_CT_BP_CUS;
                         sortingType = paramsErp.getFkSortingCustomerTypeId();
                         isKeyApplying = paramsErp.getIsKeyCustomerApplying();
-                        if (catalogue == SDataConstants.BPSX_BP_INT_CUS) {
+                        if (catalogue == SDataConstants.BPSX_BP_CUS_FI) {
+                            fiscalId = true;
+                        }
+                        else if (catalogue == SDataConstants.BPSX_BP_INT_CUS) {
                             onlyInternational = true;
                         }
                         break;
@@ -464,7 +475,7 @@ public abstract class SDataReadComponentItems {
                     default:
                 }
 
-                sql = "SELECT DISTINCT bp.id_bp AS f_id_1, " + (!isKeyApplying ? "bp.bp " :
+                sql = "SELECT DISTINCT bp.id_bp AS f_id_1, " + (!isKeyApplying ? !fiscalId ? "bp.bp " : "CONCAT(bp.bp, ' (', bp.fiscal_id, ')')" :
                         (sortingType == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME ||sortingType == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME_COMM ? "CONCAT(ct.bp_key, ' - ', bp.bp) " : "CONCAT(bp.bp, ' - ', ct.bp_key) ")) + "AS f_item " +
                         "FROM erp.bpsu_bp AS bp " +
                         (catalogue == SDataConstants.BPSX_BP_EMP ? "WHERE bp.b_del = 0 AND bp.b_att_emp = 1 " :
