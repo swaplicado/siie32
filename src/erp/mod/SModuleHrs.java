@@ -114,7 +114,7 @@ import erp.mod.hrs.view.SViewEarning;
 import erp.mod.hrs.view.SViewEmployeeDismissalType;
 import erp.mod.hrs.view.SViewEmployeeHireLog;
 import erp.mod.hrs.view.SViewEmployeeIdse;
-import erp.mod.hrs.view.SViewEmployeeSua;
+//import erp.mod.hrs.view.SViewEmployeeSua;
 import erp.mod.hrs.view.SViewEmployeeType;
 import erp.mod.hrs.view.SViewEmployeeWageLog;
 import erp.mod.hrs.view.SViewEmployeeWageSscBaseLog;
@@ -922,7 +922,7 @@ public class SModuleHrs extends SGuiModule {
                 view = new SViewEmployeeHireLog(miClient, "Bitácora altas y bajas");
                 break;
             case SModConsts.HRS_EMP_LOG_SUA:
-                view = new SViewEmployeeSua(miClient, "Bitácora empleados SUA");
+//                view = new SViewEmployeeSua(miClient, "Bitácora empleados SUA");
                 break;
             case SModConsts.HRS_EMP_LOG_IDSE:
                 view = new SViewEmployeeIdse(miClient, "Bitácora empleados IDSE");

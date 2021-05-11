@@ -6,16 +6,12 @@
 package erp.gui.grid;
 
 import erp.client.SClientInterface;
-import erp.data.SDataReadDescriptions;
-import erp.lib.SLibConstants;
-import erp.mod.SModConsts;
 import erp.mtrn.utils.STrnFunAreasUtils;
 import erp.table.SFilterConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -102,41 +98,18 @@ public class SGridFilterPanelFunctionalArea extends JPanel implements SGridFilte
     }
     
     private void setTextToField(int[] key) {
-        String text = "";
-        String codes = "";
         tfFunAreas.setValue("");
-        ArrayList<String> lFunctionalAreasIds = null;
-        ArrayList<String> lFunctionalAreasCodes = null;
         msAreasIds = "";
+        int nFunArea = 0;
         
-        if (key == null) {
-            lFunctionalAreasIds = STrnFunAreasUtils.getFunctionalAreasOfUser((SClientInterface) miClient, miClient.getSession().getUser().getPkUserId(), STrnFunAreasUtils.FUN_AREA_ID, "");
-            
-            if (lFunctionalAreasIds.isEmpty()) {
-                msAreasIds = "''";
-                text = "";
-            }
-            else {
-                for (String id : lFunctionalAreasIds) {
-                    msAreasIds += id + ", ";
-                }
-
-                msAreasIds = msAreasIds.substring(0, msAreasIds.length() - 2);
-
-                lFunctionalAreasCodes = STrnFunAreasUtils.getFunctionalAreasOfUser((SClientInterface) miClient, miClient.getSession().getUser().getPkUserId(), STrnFunAreasUtils.FUN_AREA_CODE, "");
-                for (String code : lFunctionalAreasCodes) {
-                    codes += code + ", ";
-                }
-
-                text = codes.substring(0, codes.length() - 2);
-            }
-        }
-        else {
-            text = SDataReadDescriptions.getCatalogueDescription((SClientInterface) miClient, SModConsts.CFGU_FUNC, key, SLibConstants.DESCRIPTION_CODE);
-            msAreasIds = "" + key[0];
+        if (key != null) {
+            nFunArea = key[0];
         }
         
-        tfFunAreas.setText(text);
+        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter((SClientInterface) miClient, nFunArea);
+        msAreasIds = texts[0];
+        
+        tfFunAreas.setText(texts[1]);
         tfFunAreas.setCaretPosition(0);
     }
     

@@ -22,6 +22,8 @@ import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mitm.data.SDataUnitType;
+import erp.mod.SModConsts;
+import erp.mtrn.utils.STrnFunAreasUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -36,7 +38,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Alfonso Flores, Edwin Carmona, Uriel Castañeda
+ * @author Alfonso Flores, Uriel Castañeda, Edwin Carmona
  */
 public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener {
     
@@ -45,7 +47,6 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     private static final int BY_OPTION_GEN = 2;
     private static final int BY_OPTION_ITM = 3;
 
-    private int mnFormType;
     private int mnFormResult;
     private int mnFormStatus;
     private boolean mbFirstTime;
@@ -60,6 +61,12 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     private erp.lib.form.SFormField moFieldCrossWith;
     private erp.lib.form.SFormField moFieldItemCategory;
     private erp.lib.form.SFormField moFieldUnitType;
+    
+    private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
+    private int mnDataType;
+    private int mnFunctionalAreaId;
+    private int[] manDataFilter;
+    private String msFunctionalAreasIds;
 
     private boolean mbParamIsSupplier;
 
@@ -105,7 +112,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jPanel19 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
-        jcbCompanyBranch = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCompanyBranch = new javax.swing.JComboBox<>();
         jrbByBizPartner = new javax.swing.JRadioButton();
         jrbBySalesAgent = new javax.swing.JRadioButton();
         jrbByItemGeneric = new javax.swing.JRadioButton();
@@ -113,19 +120,23 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jPanel8 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jlCrossWith = new javax.swing.JLabel();
-        jcbCrossWith = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCrossWith = new javax.swing.JComboBox<>();
         jPanel14 = new javax.swing.JPanel();
         jlItemCategory = new javax.swing.JLabel();
-        jcbItemCategory = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbItemCategory = new javax.swing.JComboBox<>();
         jPanel12 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jckIsWithUnits = new javax.swing.JCheckBox();
         jPanel13 = new javax.swing.JPanel();
         jlUnitType = new javax.swing.JLabel();
-        jcbUnitType = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbUnitType = new javax.swing.JComboBox<>();
         jPanel17 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jckWithoutRelatedParty = new javax.swing.JCheckBox();
+        jPanel7 = new javax.swing.JPanel();
+        jlBizPartner1 = new javax.swing.JLabel();
+        jtfFunctionalArea = new javax.swing.JTextField();
+        jbFunctionalArea = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jbPrint = new javax.swing.JButton();
         jbExit = new javax.swing.JButton();
@@ -275,7 +286,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jPanel9.add(jPanel19, java.awt.BorderLayout.NORTH);
 
         jPanel8.setPreferredSize(new java.awt.Dimension(376, 100));
-        jPanel8.setLayout(new java.awt.GridLayout(5, 1, 0, 1));
+        jPanel8.setLayout(new java.awt.GridLayout(6, 1, 0, 1));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -336,6 +347,24 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         jPanel8.add(jPanel17);
 
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizPartner1.setText("Área funcional:");
+        jlBizPartner1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel7.add(jlBizPartner1);
+
+        jtfFunctionalArea.setEditable(false);
+        jtfFunctionalArea.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel7.add(jtfFunctionalArea);
+
+        jbFunctionalArea.setText("...");
+        jbFunctionalArea.setToolTipText("Seleccionar asociado de negocios:");
+        jbFunctionalArea.setFocusable(false);
+        jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel7.add(jbFunctionalArea);
+
+        jPanel8.add(jPanel7);
+
         jPanel9.add(jPanel8, java.awt.BorderLayout.CENTER);
 
         jPanel2.add(jPanel9, java.awt.BorderLayout.CENTER);
@@ -357,7 +386,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setSize(new java.awt.Dimension(816, 539));
+        setSize(new java.awt.Dimension(976, 639));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -418,6 +447,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         jbExit.addActionListener(this);
         jbDateStart.addActionListener(this);
         jbDateEnd.addActionListener(this);
+        jbFunctionalArea.addActionListener(this);
         jrbCurrencyLoc.addItemListener(this);
         jrbCurrencyDoc.addItemListener(this);
         jcbCurrency.addItemListener(this);
@@ -437,6 +467,13 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         SFormUtilities.putActionMap(getRootPane(), action, "exit", KeyEvent.VK_ESCAPE, 0);
 
         setModalityType(ModalityType.MODELESS);
+        
+        //Áreas funcionales
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, SModConsts.CFGU_FUNC, manDataFilter);
+
+        renderText();
     }
 
     private void windowActivated() {
@@ -521,6 +558,8 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
                 map.put("sSqlWhereCur", sqlCurrency);
                 map.put("sSqlGroupBy", (String) createQuerySentenceValues()[0]);
                 map.put("sSqlOrderBy", (String) createQuerySentenceValues()[1]);
+                map.put("sFuncText", jtfFunctionalArea.getText());
+                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
                 map.put("sDetailConcept", (String) createQuerySentenceValues()[2]);
                 map.put("sFilter", (String) createQuerySentenceValues()[3]);
                 map.put("nTpDetail", (Integer) createQuerySentenceValues()[4]);
@@ -627,6 +666,26 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
         else {
             jcbUnitType.setEnabled(false);
         }
+    }
+    
+    private void actionFunctionalArea() {
+        moDialogFilterFunctionalArea.formRefreshCatalogues();
+        moDialogFilterFunctionalArea.formReset();
+        moDialogFilterFunctionalArea.setFunctionalAreaId(mnFunctionalAreaId);
+        moDialogFilterFunctionalArea.setFormVisible(true);
+
+        if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+            mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            renderText();
+        }
+    }
+    
+    private void renderText() {
+        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter(miClient, mnFunctionalAreaId);
+        msFunctionalAreasIds = texts[0];
+        
+        jtfFunctionalArea.setText(texts[1]);
+        jtfFunctionalArea.setCaretPosition(0);
     }
 
     private java.lang.Object[] createQuerySentenceValues() {
@@ -982,11 +1041,13 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbDateEnd;
     private javax.swing.JButton jbDateStart;
     private javax.swing.JButton jbExit;
+    private javax.swing.JButton jbFunctionalArea;
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox<SFormComponentItem> jcbCompanyBranch;
     private javax.swing.JComboBox<SFormComponentItem> jcbCrossWith;
@@ -997,6 +1058,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     private javax.swing.JCheckBox jckWithoutRelatedParty;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateStart;
+    private javax.swing.JLabel jlBizPartner1;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlCrossWith;
     private javax.swing.JLabel jlCurrency;
@@ -1011,6 +1073,7 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
     private javax.swing.JRadioButton jrbBySalesAgent;
     private javax.swing.JRadioButton jrbCurrencyDoc;
     private javax.swing.JRadioButton jrbCurrencyLoc;
+    private javax.swing.JTextField jtfFunctionalArea;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -1128,6 +1191,9 @@ public class SDialogRepSalesPurchases extends javax.swing.JDialog implements erp
             }
             else if (button == jbExit) {
                 actionClose();
+            }
+            else if (button == jbFunctionalArea) {
+                actionFunctionalArea();
             }
         }
     }

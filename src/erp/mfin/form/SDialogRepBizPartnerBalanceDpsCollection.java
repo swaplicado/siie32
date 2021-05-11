@@ -18,6 +18,9 @@ import erp.lib.SLibTimeUtilities;
 import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
+import erp.mod.SModConsts;
+import erp.mtrn.form.SDialogFilterFunctionalArea;
+import erp.mtrn.utils.STrnFunAreasUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -30,7 +33,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
- * @author Néstor Ávalos
+ * @author Néstor Ávalos, Edwin Carmona
  */
 public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialog implements java.awt.event.ActionListener {
 
@@ -47,6 +50,11 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
     int[] manSysMoveTypeKey;
     private java.lang.String msBizPartnerCat;
     private java.lang.String msBizPartnerCatPlural;
+    
+    private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
+    private int mnFunctionalAreaId;
+    private int[] manDataFilter;
+    private String msFunctionalAreasIds;
 
     /** Creates new form SDialogRepBizPartnerBalanceDps */
     public SDialogRepBizPartnerBalanceDpsCollection(erp.client.SClientInterface client, int idBizPartnerCategory, int idReport) {
@@ -79,6 +87,10 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
         jlDateEnd = new javax.swing.JLabel();
         jftDateEnd = new javax.swing.JFormattedTextField();
         jbDateEnd = new javax.swing.JButton();
+        jPanel11 = new javax.swing.JPanel();
+        jlBizPartner1 = new javax.swing.JLabel();
+        jtfFunctionalArea = new javax.swing.JTextField();
+        jbFunctionalArea = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jpPrint = new javax.swing.JButton();
         jpClose = new javax.swing.JButton();
@@ -97,7 +109,7 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
 
         jPanel5.setLayout(new java.awt.BorderLayout(0, 5));
 
-        jPanel6.setLayout(new java.awt.GridLayout(1, 1, 0, 1));
+        jPanel6.setLayout(new java.awt.GridLayout(2, 1, 0, 1));
 
         jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Período:"));
         jPanel10.setPreferredSize(new java.awt.Dimension(100, 77));
@@ -141,6 +153,24 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
 
         jPanel6.add(jPanel10);
 
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizPartner1.setText("Área funcional:");
+        jlBizPartner1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel11.add(jlBizPartner1);
+
+        jtfFunctionalArea.setEditable(false);
+        jtfFunctionalArea.setPreferredSize(new java.awt.Dimension(200, 23));
+        jPanel11.add(jtfFunctionalArea);
+
+        jbFunctionalArea.setText("...");
+        jbFunctionalArea.setToolTipText("Seleccionar asociado de negocios:");
+        jbFunctionalArea.setFocusable(false);
+        jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel11.add(jbFunctionalArea);
+
+        jPanel6.add(jPanel11);
+
         jPanel5.add(jPanel6, java.awt.BorderLayout.NORTH);
 
         jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
@@ -171,8 +201,8 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-500)/2, (screenSize.height-300)/2, 500, 300);
+        setSize(new java.awt.Dimension(500, 300));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jpPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jpPrintActionPerformed
@@ -203,12 +233,20 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
 
         jbDateInitial.addActionListener(this);
         jbDateEnd.addActionListener(this);
+        jbFunctionalArea.addActionListener(this);
 
         resetForm();
 
         setModalityType(ModalityType.MODELESS);
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
+        
+        //Áreas funcionales
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, SModConsts.CFGU_FUNC, manDataFilter);
+        
+        renderText();
     }
 
     private void windowActivated() {
@@ -246,6 +284,8 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
                 map.put("nYear", year);
                 map.put("tDateInitial", moFieldDateInitial.getDate());
                 map.put("tDateEnd", moFieldDateEnd.getDate());
+                map.put("sFuncText", jtfFunctionalArea.getText());
+                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
 
                 jasperPrint = SDataUtilities.fillReport(miClient, mnReportId, map);
                 jasperViewer = new JasperViewer(jasperPrint, false);
@@ -267,6 +307,26 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
 
     private void actionDateEnd() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateEnd.getDate(), moFieldDateEnd);
+    }
+    
+    private void actionFunctionalArea() {
+        moDialogFilterFunctionalArea.formRefreshCatalogues();
+        moDialogFilterFunctionalArea.formReset();
+        moDialogFilterFunctionalArea.setFunctionalAreaId(mnFunctionalAreaId);
+        moDialogFilterFunctionalArea.setFormVisible(true);
+
+        if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+            mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            renderText();
+        }
+    }
+    
+    private void renderText() {
+        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter(miClient, mnFunctionalAreaId);
+        msFunctionalAreasIds = texts[0];
+        
+        jtfFunctionalArea.setText(texts[1]);
+        jtfFunctionalArea.setCaretPosition(0);
     }
 
     public void actionPrint() {
@@ -297,6 +357,7 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -304,12 +365,15 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbDateEnd;
     private javax.swing.JButton jbDateInitial;
+    private javax.swing.JButton jbFunctionalArea;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JFormattedTextField jftDateInitial;
+    private javax.swing.JLabel jlBizPartner1;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDateInitial;
     private javax.swing.JButton jpClose;
     private javax.swing.JButton jpPrint;
+    private javax.swing.JTextField jtfFunctionalArea;
     // End of variables declaration//GEN-END:variables
 
     public void resetForm() {
@@ -328,6 +392,9 @@ public class SDialogRepBizPartnerBalanceDpsCollection extends javax.swing.JDialo
             }
             else if (button == jbDateEnd) {
                 actionDateEnd();
+            }
+            else if (button == jbFunctionalArea) {
+                actionFunctionalArea();
             }
         }
     }
