@@ -12,6 +12,9 @@ import erp.lib.data.SDataSqlUtilities;
 import erp.lib.table.STabFilterDatePeriod;
 import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
+import erp.mod.SModConsts;
+import erp.table.SFilterConstants;
+import erp.table.STabFilterFunctionalArea;
 
 /**
  *
@@ -20,6 +23,7 @@ import erp.lib.table.STableConstants;
 public class SViewBol extends erp.lib.table.STableTab {
     
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     public SViewBol(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_DOC_REMISSION, auxType01);
@@ -30,9 +34,12 @@ public class SViewBol extends erp.lib.table.STableTab {
         int i;
        
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_DATE);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
         
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
       
         erp.lib.table.STableColumn[] aoTableColumns = new STableColumn[11];
 
@@ -86,12 +93,18 @@ public class SViewBol extends erp.lib.table.STableTab {
     @Override
     public void createSqlQuery() {
         java.lang.String sqlWhere = "";
+        java.lang.String sqlFunctAreas = "";
         erp.lib.table.STableSetting setting = null;
         
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
         }
 
@@ -110,7 +123,7 @@ public class SViewBol extends erp.lib.table.STableTab {
                 + "AND d.fid_cl_dps = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.TRNU_TP_DPS_SAL_INV[1] : SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1]) + " "
                 + "AND d.fid_tp_dps = " + (mnTabTypeAux01 == SDataConstantsSys.TRNS_CT_DPS_SAL ? SDataConstantsSys.TRNU_TP_DPS_SAL_INV[2] : SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2]) + " "
                 + "AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " "
-                + "AND NOT d.b_del AND " + sqlWhere +" "
+                + "AND NOT d.b_del AND " + sqlWhere + " " + sqlFunctAreas
                 + "ORDER BY f_num";
     }
 }

@@ -19,12 +19,14 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnDiogComplement;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
 import erp.table.STabFilterDocumentType;
+import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
 import java.util.Date;
 import java.util.Vector;
@@ -53,6 +55,7 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
     private erp.table.STabFilterDocumentType moTabFilterDocumentType;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     /**
      * @param client Client interface.
@@ -132,6 +135,7 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moTabFilterDocumentType = new STabFilterDocumentType(miClient, this, SDataConstants.TRNU_TP_DPS, new int[] { mnTabTypeAux01, mnTabTypeAux02 });
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isViewForPurchases() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         if (isViewForPurchases()) {
             levelRightAllDocs = miClient.getSessionXXX().getUser().hasRight(miClient, SDataConstantsSys.PRV_PUR_DOC_TRN).Level;
@@ -157,6 +161,8 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
         addTaskBarUpperComponent(moTabFilterDocumentType);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterBizPartner);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mjbViewDps);
         addTaskBarUpperComponent(mjbViewNotes);
@@ -416,6 +422,11 @@ public class SViewDpsStockReturn extends erp.lib.table.STableTab implements java
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_BP) {
                 sqlFilter += ((Integer) setting.getSetting() == SLibConstants.UNDEFINED ? "" : "AND d.fid_bp_r = " + (Integer) setting.getSetting() + " ");
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlFilter += (sqlFilter.length() == 0 ? "" : "AND ") + " d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
         }
 

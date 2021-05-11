@@ -115,7 +115,7 @@ import sa.lib.xml.SXmlUtils;
 
 /**
  *
- * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores, Claudio Peña
+ * @author Sergio Flores, Edwin Carmona, Uriel Castañeda, Juan Barajas, Sergio Flores, Claudio Peña, Isabel Servín
  */
 public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, erp.lib.form.SFormExtendedInterface {
     
@@ -339,20 +339,20 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jlBizPartner = new javax.swing.JLabel();
         jtfBizPartnerRo = new javax.swing.JTextField();
         jPanel8 = new javax.swing.JPanel();
+        jlFiscalId = new javax.swing.JLabel();
+        jtfFiscalId = new javax.swing.JTextField();
+        jPanel9 = new javax.swing.JPanel();
         jlBizPartnerBranch = new javax.swing.JLabel();
         jtfBizPartnerBranchRo = new javax.swing.JTextField();
-        jPanel9 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
         jlBizPartnerBranchAddressMain01 = new javax.swing.JLabel();
         jtfBizPartnerBranchAddressMain01Ro = new javax.swing.JTextField();
-        jPanel10 = new javax.swing.JPanel();
+        jPanel65 = new javax.swing.JPanel();
         jlBizPartnerBranchAddressMain02 = new javax.swing.JLabel();
         jtfBizPartnerBranchAddressMain02Ro = new javax.swing.JTextField();
-        jPanel65 = new javax.swing.JPanel();
+        jPanel17 = new javax.swing.JPanel();
         jlBizPartnerBranchAddress01 = new javax.swing.JLabel();
         jtfBizPartnerBranchAddress01Ro = new javax.swing.JTextField();
-        jPanel17 = new javax.swing.JPanel();
-        jlBizPartnerBranchAddress02 = new javax.swing.JLabel();
-        jtfBizPartnerBranchAddress02Ro = new javax.swing.JTextField();
         jPanel11 = new javax.swing.JPanel();
         jlDate = new javax.swing.JLabel();
         jftDate = new javax.swing.JFormattedTextField();
@@ -844,69 +844,70 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartnerBranch.setText("Sucursal asociado:");
-        jlBizPartnerBranch.setPreferredSize(new java.awt.Dimension(105, 23));
-        jPanel8.add(jlBizPartnerBranch);
+        jlFiscalId.setText("RFC:");
+        jlFiscalId.setPreferredSize(new java.awt.Dimension(105, 23));
+        jPanel8.add(jlFiscalId);
 
-        jtfBizPartnerBranchRo.setEditable(false);
-        jtfBizPartnerBranchRo.setText("BRANCH");
-        jtfBizPartnerBranchRo.setFocusable(false);
-        jtfBizPartnerBranchRo.setPreferredSize(new java.awt.Dimension(270, 23));
-        jPanel8.add(jtfBizPartnerBranchRo);
+        jtfFiscalId.setEditable(false);
+        jtfFiscalId.setText("FISCAL ID");
+        jtfFiscalId.setFocusable(false);
+        jtfFiscalId.setPreferredSize(new java.awt.Dimension(270, 23));
+        jPanel8.add(jtfFiscalId);
 
         jPanel57.add(jPanel8);
 
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartnerBranchAddressMain01.setText("Domicilio sucursal:");
-        jlBizPartnerBranchAddressMain01.setPreferredSize(new java.awt.Dimension(105, 23));
-        jPanel9.add(jlBizPartnerBranchAddressMain01);
+        jlBizPartnerBranch.setText("Sucursal asociado:");
+        jlBizPartnerBranch.setPreferredSize(new java.awt.Dimension(105, 23));
+        jPanel9.add(jlBizPartnerBranch);
 
-        jtfBizPartnerBranchAddressMain01Ro.setEditable(false);
-        jtfBizPartnerBranchAddressMain01Ro.setText("ADDRESS 01");
-        jtfBizPartnerBranchAddressMain01Ro.setFocusable(false);
-        jtfBizPartnerBranchAddressMain01Ro.setPreferredSize(new java.awt.Dimension(270, 23));
-        jPanel9.add(jtfBizPartnerBranchAddressMain01Ro);
+        jtfBizPartnerBranchRo.setEditable(false);
+        jtfBizPartnerBranchRo.setText("BRANCH");
+        jtfBizPartnerBranchRo.setFocusable(false);
+        jtfBizPartnerBranchRo.setPreferredSize(new java.awt.Dimension(270, 23));
+        jPanel9.add(jtfBizPartnerBranchRo);
 
         jPanel57.add(jPanel9);
 
         jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartnerBranchAddressMain02.setPreferredSize(new java.awt.Dimension(105, 23));
-        jPanel10.add(jlBizPartnerBranchAddressMain02);
+        jlBizPartnerBranchAddressMain01.setText("Domicilio sucursal:");
+        jlBizPartnerBranchAddressMain01.setPreferredSize(new java.awt.Dimension(105, 23));
+        jPanel10.add(jlBizPartnerBranchAddressMain01);
 
-        jtfBizPartnerBranchAddressMain02Ro.setEditable(false);
-        jtfBizPartnerBranchAddressMain02Ro.setText("ADDRESS 02");
-        jtfBizPartnerBranchAddressMain02Ro.setFocusable(false);
-        jtfBizPartnerBranchAddressMain02Ro.setPreferredSize(new java.awt.Dimension(270, 23));
-        jPanel10.add(jtfBizPartnerBranchAddressMain02Ro);
+        jtfBizPartnerBranchAddressMain01Ro.setEditable(false);
+        jtfBizPartnerBranchAddressMain01Ro.setText("ADDRESS 01");
+        jtfBizPartnerBranchAddressMain01Ro.setFocusable(false);
+        jtfBizPartnerBranchAddressMain01Ro.setPreferredSize(new java.awt.Dimension(270, 23));
+        jPanel10.add(jtfBizPartnerBranchAddressMain01Ro);
 
         jPanel57.add(jPanel10);
 
         jPanel65.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartnerBranchAddress01.setText("Domicilio operación:");
-        jlBizPartnerBranchAddress01.setPreferredSize(new java.awt.Dimension(105, 23));
-        jPanel65.add(jlBizPartnerBranchAddress01);
+        jlBizPartnerBranchAddressMain02.setPreferredSize(new java.awt.Dimension(105, 23));
+        jPanel65.add(jlBizPartnerBranchAddressMain02);
 
-        jtfBizPartnerBranchAddress01Ro.setEditable(false);
-        jtfBizPartnerBranchAddress01Ro.setText("ADDRESS 01");
-        jtfBizPartnerBranchAddress01Ro.setFocusable(false);
-        jtfBizPartnerBranchAddress01Ro.setPreferredSize(new java.awt.Dimension(270, 23));
-        jPanel65.add(jtfBizPartnerBranchAddress01Ro);
+        jtfBizPartnerBranchAddressMain02Ro.setEditable(false);
+        jtfBizPartnerBranchAddressMain02Ro.setText("ADDRESS 02");
+        jtfBizPartnerBranchAddressMain02Ro.setFocusable(false);
+        jtfBizPartnerBranchAddressMain02Ro.setPreferredSize(new java.awt.Dimension(270, 23));
+        jPanel65.add(jtfBizPartnerBranchAddressMain02Ro);
 
         jPanel57.add(jPanel65);
 
         jPanel17.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
-        jlBizPartnerBranchAddress02.setPreferredSize(new java.awt.Dimension(105, 23));
-        jPanel17.add(jlBizPartnerBranchAddress02);
+        jlBizPartnerBranchAddress01.setText("Domicilio operación:");
+        jlBizPartnerBranchAddress01.setPreferredSize(new java.awt.Dimension(105, 23));
+        jPanel17.add(jlBizPartnerBranchAddress01);
 
-        jtfBizPartnerBranchAddress02Ro.setEditable(false);
-        jtfBizPartnerBranchAddress02Ro.setText("ADDRESS 02");
-        jtfBizPartnerBranchAddress02Ro.setFocusable(false);
-        jtfBizPartnerBranchAddress02Ro.setPreferredSize(new java.awt.Dimension(270, 23));
-        jPanel17.add(jtfBizPartnerBranchAddress02Ro);
+        jtfBizPartnerBranchAddress01Ro.setEditable(false);
+        jtfBizPartnerBranchAddress01Ro.setText("ADDRESS 01");
+        jtfBizPartnerBranchAddress01Ro.setFocusable(false);
+        jtfBizPartnerBranchAddress01Ro.setPreferredSize(new java.awt.Dimension(270, 23));
+        jPanel17.add(jtfBizPartnerBranchAddress01Ro);
 
         jPanel57.add(jPanel17);
 
@@ -3094,10 +3095,10 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         moComboBoxGroupCfdCceGroupAddressee = new SFormComboBoxGroup(miClient);
         
         if (mnFormType == SDataConstantsSys.TRNS_CT_DPS_PUR) {
-            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_SUP);
+            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_SUP_FI);
         }
         else {
-            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_CUS);
+            moPickerBizPartner = new SFormOptionPickerBizPartner(miClient, SDataConstants.BPSX_BP_CUS_FI);
         }
 
         // Pane of document entries:
@@ -3307,7 +3308,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         boolean goAhead = true;
         
         mbDocBeingImported = false;
-
+        
         if (mbFirstTime) {
             mbFirstTime = false;
 
@@ -4667,27 +4668,31 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private void renderBizPartner() {
         String[] address = null;
         int nFkRecAddressFormatTypeId_n = 0;
-
+        
         jtfBizPartnerRo.setText("");
+        jtfFiscalId.setText("");
         jtfBizPartnerBranchRo.setText("");
         jtfBizPartnerBranchAddressMain01Ro.setText("");
         jtfBizPartnerBranchAddressMain02Ro.setText("");
         jtfBizPartnerBranchAddress01Ro.setText("");
-        jtfBizPartnerBranchAddress02Ro.setText("");
-
+        
         jtfBizPartnerRo.setToolTipText(null);
+        jtfFiscalId.setToolTipText(null);
         jtfBizPartnerBranchRo.setToolTipText(null);
         jtfBizPartnerBranchAddressMain01Ro.setToolTipText(null);
         jtfBizPartnerBranchAddressMain02Ro.setToolTipText(null);
         jtfBizPartnerBranchAddress01Ro.setToolTipText(null);
-        jtfBizPartnerBranchAddress02Ro.setToolTipText(null);
-
+        
         SFormUtilities.locateComboBoxItem(jcbTaxRegionId, new int[] { 0 });
 
         if (moBizPartner != null) {
             jtfBizPartnerRo.setText(moBizPartner.getBizPartner());
             jtfBizPartnerRo.setToolTipText(jtfBizPartnerRo.getText());
             jtfBizPartnerRo.setCaretPosition(0);
+            
+            jtfFiscalId.setText(moBizPartner.getFiscalId());
+            jtfFiscalId.setToolTipText(jtfFiscalId.getText());
+            jtfFiscalId.setCaretPosition(0);
 
             SFormUtilities.locateComboBoxItem(jcbTaxRegionId, new int[] { moBizPartnerBranch.getFkTaxRegionId_n() != 0 ? moBizPartnerBranch.getFkTaxRegionId_n() : miClient.getSessionXXX().getParamsCompany().getFkDefaultTaxRegionId_n() });
         }
@@ -4717,13 +4722,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 address = moBizPartnerBranchAddress.obtainAddress(nFkRecAddressFormatTypeId_n, SDataBizPartnerBranchAddress.ADDRESS_2ROWS,
                         moBizPartnerBranchAddress.getFkCountryId_n() != miClient.getSessionXXX().getParamsErp().getFkCountryId());
 
-                jtfBizPartnerBranchAddress01Ro.setText(address[0]);
+                jtfBizPartnerBranchAddress01Ro.setText(address[0] + " " + address[1]);
                 jtfBizPartnerBranchAddress01Ro.setToolTipText(jtfBizPartnerBranchAddressMain01Ro.getText());
                 jtfBizPartnerBranchAddress01Ro.setCaretPosition(0);
-
-                jtfBizPartnerBranchAddress02Ro.setText(address[1]);
-                jtfBizPartnerBranchAddress02Ro.setToolTipText(jtfBizPartnerBranchAddressMain02Ro.getText());
-                jtfBizPartnerBranchAddress02Ro.setCaretPosition(0);
             }
         }
         
@@ -8417,7 +8418,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlBizPartner;
     private javax.swing.JLabel jlBizPartnerBranch;
     private javax.swing.JLabel jlBizPartnerBranchAddress01;
-    private javax.swing.JLabel jlBizPartnerBranchAddress02;
     private javax.swing.JLabel jlBizPartnerBranchAddressMain01;
     private javax.swing.JLabel jlBizPartnerBranchAddressMain02;
     private javax.swing.JLabel jlCfdCceAddresseeBizPartner;
@@ -8457,6 +8457,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JLabel jlExchangeRateSystem;
     private javax.swing.JLabel jlFilePdf;
     private javax.swing.JLabel jlFileXml;
+    private javax.swing.JLabel jlFiscalId;
     private javax.swing.JLabel jlFkCarrierId_n;
     private javax.swing.JLabel jlFkCarrierTypeId;
     private javax.swing.JLabel jlFkContactId_n;
@@ -8540,7 +8541,6 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfAddSorianaRemisiónFolio;
     private javax.swing.JTextField jtfAddSorianaTienda;
     private javax.swing.JTextField jtfBizPartnerBranchAddress01Ro;
-    private javax.swing.JTextField jtfBizPartnerBranchAddress02Ro;
     private javax.swing.JTextField jtfBizPartnerBranchAddressMain01Ro;
     private javax.swing.JTextField jtfBizPartnerBranchAddressMain02Ro;
     private javax.swing.JTextField jtfBizPartnerBranchRo;
@@ -8565,6 +8565,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JTextField jtfExchangeRateSystemRo;
     private javax.swing.JTextField jtfFilePdf;
     private javax.swing.JTextField jtfFileXml;
+    private javax.swing.JTextField jtfFiscalId;
     private javax.swing.JTextField jtfFkDpsStatusAuthorizationRo;
     private javax.swing.JTextField jtfFkDpsStatusRo;
     private javax.swing.JTextField jtfFkDpsStatusValidityRo;

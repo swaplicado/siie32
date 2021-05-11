@@ -2319,7 +2319,7 @@ public class SFormPayroll extends SBeanForm implements ActionListener, ItemListe
             for (Integer bonusId : bonusIds) {
                 if (maBonusPayed.contains(bonusId)) {
                     miClient.showMsgBoxError("Este bono ya está contemplado en la nómina.\n"
-                            + "Si desea calcularlo de nuevo pase todos los recibos al lado izquierdo e inténtelo de otra vez.");
+                            + "Si desea calcularlo de nuevo pase todos los recibos al lado izquierdo e inténtelo de nuevo.");
                     return;
                 }
             }

@@ -1,4 +1,19 @@
 ================================================================================
+SIIE 3.2 182.0/ 2021-05-07
+Isabel Danae GARCÍA SERVÍN
+--------------------------------------------------------------------------------
+1) Se restringireron los permisos relacionados con CFDI para usuarios con permiso de lectura de facturas de ventas. 
+2) Se agregó un campo en la seleccion de asociados de negocio para permitir la búsqueda de mediante RFC y mostrarlo en la forma de captura.
+3) Se agregó a la base de datos los campos de "ítem de referencia" y "centro de costo" en la tabla de match de ítems para la importacion de facturas XML.
+
+================================================================================
+SIIE 3.2 181.6/ 2021-05-03
+Edwin Omar CARMONA FIGUEROA
+--------------------------------------------------------------------------------
+1) Implementación de consulta de documentos por área funcional.
+2) Corrección a la contabilización de CFDI de recepción de pagos, especialmente al modificar CFDI aún sin timbrar, p. ej., al cambiar la fecha de emisión.
+
+================================================================================
 SIIE 3.2 181.5/ 2021-04-20
 Isabel Danae GARCÍA SERVÍN
 --------------------------------------------------------------------------------

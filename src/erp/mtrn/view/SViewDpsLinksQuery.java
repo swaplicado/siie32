@@ -16,9 +16,12 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsEntry;
 import erp.mtrn.data.STrnUtilities;
+import erp.table.SFilterConstants;
+import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -30,6 +33,7 @@ import javax.swing.JOptionPane;
 public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     private javax.swing.JButton jbDeleteLinks;
 
@@ -49,6 +53,7 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
         int i;
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         jbDeleteLinks = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_LINK_NO));
         jbDeleteLinks.setPreferredSize(new Dimension(23, 23));
@@ -59,6 +64,8 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
         addTaskBarUpperComponent(moTabFilterDatePeriod);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbDeleteLinks);
 
@@ -341,6 +348,7 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
         int[] dpsTypeKey = getDpsTypeKey();
         String sqlDpsType = "";
         String sqlDatePeriod = "";
+        String sqlFunctAreas = "";
         String sqlInnerJoinDps = "";
         String sqlOrderBy = "";
         STableSetting setting = null;
@@ -353,6 +361,16 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
                 }
                 else {
                     sqlDatePeriod = "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "dd.dt");
+                }
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    if (isViewFromSource()) {
+                        sqlFunctAreas = "AND ds.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    }
+                    else {
+                        sqlFunctAreas = "AND dd.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                    }
                 }
             }
         }
@@ -443,7 +461,7 @@ public class SViewDpsLinksQuery extends erp.lib.table.STableTab implements java.
                 "ds.dt, ds.num_ser, ds.num, ds.num_ref, dst.code, dscob.code, " +
                 "dd.dt, dd.num_ser, dd.num, dd.num_ref, ddt.code, ddcob.code, " +
                 "b.id_bp, b.bp, bc.bp_key " +
-                sqlInnerJoinDps + sqlDpsType + sqlDatePeriod +
+                sqlInnerJoinDps + sqlDpsType + sqlDatePeriod + sqlFunctAreas +
                 "AND ds.b_del = 0 AND ds.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
                 "AND dd.b_del = 0 AND dd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " +
                 "INNER JOIN erp.bpsu_bp AS b ON " +

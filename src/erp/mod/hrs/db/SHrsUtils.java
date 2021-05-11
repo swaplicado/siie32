@@ -97,7 +97,24 @@ public abstract class SHrsUtils {
         }
         
         return output;
-    }        
+    }
+    
+     /**
+     * Replaces special characters \ñÑ\.
+     * @param input Original text.
+     * @return Text without special characters.
+     */
+    private static String removeSpecialCharsSua(String input) {
+        String specialCharacters = "ñÑ";
+        String replaceCharacters = "//";
+        String output = input;
+        
+        for (int i = 0; i < specialCharacters.length(); i++) {
+            output = output.replace(specialCharacters.charAt(i), replaceCharacters.charAt(i));
+        }
+        
+        return output;
+    }      
 
     /**
      * Shows total of payroll bank-layout.
@@ -730,23 +747,23 @@ public abstract class SHrsUtils {
             }
         }
     }
-	
+
     /**
      * 
      * @param client
-     * @param dateApplicationIni
+     * @param dateApplicationSta
      * @param dateApplicationEnd
      * @return
      * @throws SQLException 
      */
-    private static ArrayList<Integer> prepareSqlQueryHigh(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    public static ArrayList<Integer> prepareSqlQueryHigh(SGuiClient client, Date dateApplicationSta, Date dateApplicationEnd) throws SQLException {
         ArrayList<Integer> employeeIds = new ArrayList<>();
 
         String sql = "SELECT id_emp "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " 
-                + "WHERE dt_hire >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationIni) + "' AND "
+                + "WHERE dt_hire >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
                 + "dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
-                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_ACTIVE + ";";
+                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_ACTIVE + " AND id_log = 1;";
 
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
@@ -760,19 +777,45 @@ public abstract class SHrsUtils {
     /**
      * 
      * @param client
-     * @param dateApplicationIni
+     * @param dateApplicationSta
      * @param dateApplicationEnd
      * @return
      * @throws SQLException 
      */
-    private static ArrayList<Integer> prepareSqlQueryMod(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    private static ArrayList<Integer> prepareSqlQueryReEntry(SGuiClient client, Date dateApplicationSta, Date dateApplicationEnd) throws SQLException {
+        ArrayList<Integer> employeeIds = new ArrayList<>();
+
+        String sql = "SELECT id_emp "
+                + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " " 
+                + "WHERE dt_hire >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
+                + "dt_hire <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
+                + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_ACTIVE + " AND id_log != 1;";
+
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                employeeIds.add(resultSet.getInt("id_emp"));                  
+            }
+        }
+        
+        return employeeIds;
+    }
+    
+    /**
+     * 
+     * @param client
+     * @param dateApplicationSta
+     * @param dateApplicationEnd
+     * @return
+     * @throws SQLException 
+     */
+    private static ArrayList<Integer> prepareSqlQueryMod(SGuiClient client, Date dateApplicationSta, Date dateApplicationEnd) throws SQLException {
         ArrayList<Integer> employeeIds = new ArrayList<>();
 
         String sql = "SELECT id_emp "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_SAL_SSC) + " " 
-                + "WHERE dt >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationIni) + "' AND "
+                + "WHERE dt >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
                 + "dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' " 
-                + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del;";
+                + "AND sal_ssc != " + SModConsts.HRSX_HIRE_DISMISSED + " AND NOT b_del AND id_log > 1 GROUP BY id_emp;";
 
         try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
             while (resultSet.next()) {
@@ -786,17 +829,17 @@ public abstract class SHrsUtils {
     /**
      * 
      * @param client
-     * @param dateApplicationIni
+     * @param dateApplicationSta
      * @param dateApplicationEnd
      * @return
      * @throws SQLException 
      */
-    private static ArrayList<Integer> prepareSqlQueryLow(SGuiClient client, Date dateApplicationIni, Date dateApplicationEnd) throws SQLException {
+    private static ArrayList<Integer> prepareSqlQueryLow(SGuiClient client, Date dateApplicationSta, Date dateApplicationEnd) throws SQLException {
         ArrayList<Integer> employeeIds = new ArrayList<>();
 
         String sql = "SELECT id_emp "
                 + "FROM " + SModConsts.TablesMap.get(SModConsts.HRS_EMP_LOG_HIRE) + " "
-                + "WHERE dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationIni) + "' AND "
+                + "WHERE dt_dis_n >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND "
                 + "dt_dis_n <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + "' "
                 + "AND NOT b_del AND b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + ";"; 
 
@@ -808,7 +851,898 @@ public abstract class SHrsUtils {
         
         return employeeIds;
     }
-     
+    
+    /**
+     *  
+     * Employees who have an incident
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateApplicationSta Date start layout
+     * @param dateApplicationEnd Date final layout
+     * @return
+     * @throws SQLException 
+     */
+    private static ArrayList<Integer> prepareSqlQueryInability(SGuiClient client, int layoutSuaType, Date dateApplicationSta ,Date dateApplicationEnd) throws SQLException {
+        ArrayList<Integer> employeeIds = new ArrayList<>();
+
+        String sql = "SELECT id_emp " +
+                "FROM hrs_abs WHERE dt >= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationSta) + "' AND dt <= '" + SLibUtils.DbmsDateFormatDate.format(dateApplicationEnd) + 
+                "' AND NOT b_del AND fk_cl_abs = " + (layoutSuaType == SModConsts.HRSX_LAYOUT_SUA_INABILITY || layoutSuaType == SModConsts.HRSX_LAYOUT_SUA_INABILITY_IMP ? SModConsts.HRSX_LAYOUT_SUA_ABS_INABILITY : SModConsts.HRSX_LAYOUT_SUA_ABS_TRUANCY) + ";"; 
+
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                employeeIds.add(resultSet.getInt("id_emp"));
+            }
+        }
+        
+        return employeeIds;
+    }
+    
+    /**
+     *  
+     * Employees who have a credit
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateApplicationSta Date start layout
+     * @param dateApplicationEnd Date final layout
+     * @return
+     * @throws SQLException 
+     */
+    private static ArrayList<Integer> prepareSqlQueryCred(SGuiClient client, int layoutSuaType, Date dateApplicationSta ,Date dateApplicationEnd) throws SQLException {
+        ArrayList<Integer> employeeIds = new ArrayList<>();
+
+        String sql = "SELECT v.id_emp AS id_emp, v.fk_tp_loan, v.b_clo, v.b_del AS b_del " +
+                "FROM hrs_loan AS v " +
+                "INNER JOIN erp.hrss_tp_loan AS vt ON v.fk_tp_loan = vt.id_tp_loan " +
+                "INNER JOIN erp.hrss_tp_loan_pay AS vtp ON v.fk_tp_loan_pay = vtp.id_tp_loan_pay " +
+                "INNER JOIN erp.bpsu_bp AS bp ON v.id_emp = bp.id_bp " +
+                "INNER JOIN erp.hrsu_emp AS emp ON v.id_emp = emp.id_emp " +
+                "WHERE v.b_del = 0 AND emp.b_act = 1 AND v.fk_tp_loan = 11 " +
+                "HAVING (v.b_clo = 0 AND v.fk_tp_loan NOT IN (11 , 12)) " +
+                "OR (v.b_clo = 0 AND v.fk_tp_loan IN (11 , 12)) " +
+                "ORDER BY bp.bp , v.id_emp ;"; 
+
+        try (ResultSet resultSet = client.getSession().getStatement().executeQuery(sql)) {
+            while (resultSet.next()) {
+                employeeIds.add(resultSet.getInt("id_emp"));
+            }
+        }
+        
+        return employeeIds;
+    }
+    
+    /**
+     * Worker registration - insured
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd Date final layout
+     */
+    public static void createLayoutEmployeeRegisterAseg(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateSta = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);
+        java.lang.String buffer = "";
+        String sql = "";
+        String fileName = "";
+        String param = "";
+        String ssn = "";
+        String rfc = "";
+        String name = "";
+        String fullName = "";
+        String fatherName = "";
+        String motherName = "";
+        String curp = "";
+        String workerKey = "";
+        double baseSalary = 0;
+        Date dateApplication = null;
+
+        fileName = ("aseg.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
+                ArrayList<Integer> pkPrimaryKUSer = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
+    
+                for (int i = 0; i <= pkPrimaryKUSer.size()-1; i++){
+                int pkUser = pkPrimaryKUSer.get(i);
+                    
+                    sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, bp.fiscal_id as RFC , emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM, "
+                            + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, "
+                            + "sal.id_tp_sal AS TpSalario, wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.dt_hire AS DateApplication, par.reg_ss AS Param "
+                            + "FROM erp.HRSU_EMP AS emp "
+                            + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                            + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                            + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                            + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                            + "INNER JOIN hrs_emp_log_hire AS hire ON hire.id_emp = emp.id_emp "
+                            + "INNER JOIN cfg_param_co AS par "
+                            + "INNER JOIN hrs_cfg AS cfg "
+                            + "WHERE hire.b_hire = " + (layoutSuaType == SModConsts.HRSX_HIRE_ACTIVE ? SModConsts.HRSX_HIRE_ACTIVE : SModConsts.HRSX_HIRE_DISMISSED) + " AND not hire.b_del "
+                            + "AND hire.dt_hire >= '" + dateSta + "' AND hire.dt_hire <= '" + dateEnd + "' "
+                            + "AND emp.id_emp = " + pkUser;
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        dateApplication = resultSetHeader.getDate("DateApplication");
+                        ssn = resultSetHeader.getString("SSN");
+                        rfc = resultSetHeader.getString("RFC");
+                        baseSalary = resultSetHeader.getDouble("Salario");
+                        workerKey = resultSetHeader.getString("ClaveTrab");
+                        name = resultSetHeader.getString("Nombre");
+                        fatherName = resultSetHeader.getString("ApellidoP");
+                        motherName = resultSetHeader.getString("ApellidoM");
+                        curp = resultSetHeader.getString("CURP");
+                        
+                    }
+
+                    buffer += param.substring(0, 10); // (Registro patronal)
+                    buffer += param.substring(10); // (Digito del registro patronal R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += rfc.substring(0, 13); // (Reg. Fed. de contribuyentes)
+                    buffer += curp; // (CURP)
+                    fullName = fatherName + "$" + motherName + "$" + name;
+                    buffer += removeSpecialCharsSua(fullName.concat(fullName.length() > 50 ? fullName.substring(0, 50) : (SLibUtilities.textRepeat(" ",(fullName.length() == 50 ? 0 : 50 - fullName.length() ))))); // (Nombre del trabajador)
+                    buffer += "1"; // (Tipo de trabajador)
+                    buffer += "0"; //(Jornada semana reducida)
+                    buffer += formatDateData.format(dateApplication); // (Fecha dealta)
+                    String baseSalaryS = String.valueOf(baseSalary);
+                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                    buffer += (baseSalaryS.length() > 7 ? baseSalaryS.substring(0, 7) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
+                    buffer += (workerKey.length() > 17 ? workerKey.substring(0, 17) : (SLibUtilities.textRepeat("0", (workerKey.length() == 17 ? 0 : 17 - workerKey.length())))).concat(workerKey); // (Clave de ubicación, clñave del trabajador)
+                    buffer += "          "; // (Número de crédito infonavit)
+                    buffer += "00000000"; // (Fecha de inicio)
+                    buffer += "0"; // (Tipo de descuento)
+                    buffer += "00000000"; // (Valor de descuento)
+                    buffer += "0"; // (Tipo de pensión)
+                    buffer += param.substring(0, 3); // Clave del municipio
+                    buffer += "\r\n";
+
+                }
+                    
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
+     /**
+     * Worker affiliation
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeAffiliateData(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateSta = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);        
+        java.lang.String buffer = "";
+        String sql = "";
+        String fileName = "";
+        String param = "";
+        String ssn = "";
+        String salaryType = "";
+        String dateBirth = "";
+        String placeBirth = "";
+        String umf = "";
+        String sex = "";
+        String hrsW = "";
+        String cp = "";
+        String ocupacion = "";
+        String placeBirthCode = "";
+        Date dateBirthN = null;
+
+        fileName = ("afil.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
+                ArrayList<Integer> pkPrimaryKUSer = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
+    
+                for (int i = 0; i <= pkPrimaryKUSer.size()-1; i++){
+                int pkUser = pkPrimaryKUSer.get(i);
+                    
+                    sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, bp.fiscal_id as RFC , emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM, "
+                        + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, emp.dt_bir AS Birth, cat.code AS Sex, emp.wrk_hrs_day AS HrsWork, "
+                        + "sal.id_tp_sal AS TpSalario, wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.dt_hire AS DateApplication, par.reg_ss AS Param, emp.place_bir, emp.umf, a.zip_code, pos.name "
+                        + "FROM erp.HRSU_EMP AS emp "
+                        + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                        + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                        + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                        + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                        + "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = bp.id_bp " 
+                        + "INNER JOIN erp.bpsu_bpb_add AS a ON a.id_bpb = bpb.fid_bp "
+                        + "INNER JOIN erp.HRSU_POS AS pos ON pos.id_pos = emp.fk_pos "
+                        + "INNER JOIN hrs_emp_log_hire AS hire ON hire.id_emp = emp.id_emp "
+                        + "INNER JOIN cfg_param_co AS par "
+                        + "INNER JOIN hrs_cfg AS cfg "
+                        + "INNER JOIN erp.HRSS_TP_HRS_CAT AS cat on emp.fk_cl_cat_sex = cat.id_cl_hrs_cat AND emp.fk_tp_cat_sex = cat.id_tp_hrs_cat "
+                        + "WHERE hire.b_hire = " + (layoutSuaType == SModConsts.HRSX_HIRE_ACTIVE ? SModConsts.HRSX_HIRE_ACTIVE : SModConsts.HRSX_HIRE_DISMISSED) + " AND not hire.b_del "
+                        + "AND hire.dt_hire >= '" + dateSta + "' AND hire.dt_hire <= '" + dateEnd + "' "
+                        + "AND emp.id_emp = " + pkUser;
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        ssn = resultSetHeader.getString("SSN");
+                        dateBirthN = resultSetHeader.getDate("Birth");
+                        dateBirth = formatDateData.format(dateBirthN);
+                        sex = resultSetHeader.getString("Sex");
+                        hrsW = resultSetHeader.getString("HrsWork");
+                        placeBirth = resultSetHeader.getString("emp.place_bir");
+                        placeBirthCode = resultSetHeader.getString("CURP");
+                        umf = resultSetHeader.getString("emp.umf");
+                        cp = resultSetHeader.getString("a.zip_code");
+                        ocupacion = resultSetHeader.getString("pos.name");
+
+                     }
+
+                    buffer += param.substring(0, 10); // (Registro patronal)
+                    buffer += param.substring(10); // (Digito del registro patronal R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += (cp.length() > 5 ? cp.substring(0, 4) : cp.concat((SLibUtilities.textRepeat("0", (cp.length() == 5 ? 0 : 5 - cp.length())))));; // (CP)
+                    buffer += dateBirth; // (Fecha de nacimiento)
+                    buffer += (placeBirth.length() > 25 ? placeBirth.substring(0, 24) : placeBirth.concat((SLibUtilities.textRepeat(" ", (placeBirth.length() == 25 ? 0 : 25 - placeBirth.length()))))); // (Lugar de nacimiento)
+                    buffer += (placeBirthCode.length() != 18 ? "NE" :  placeBirthCode.substring(11, 13)); // (Clave de lugar de nacimiento)
+                    buffer += (umf.length() > 3 ? umf.substring(0, 2) : umf.concat((SLibUtilities.textRepeat("0", (umf.length() == 3 ? 0 : 3 - umf.length()))))); // (Unidad de medicina familiar )
+                    buffer += (ocupacion.length() > 12 ? ocupacion.substring(0, 11) : ocupacion.concat((SLibUtilities.textRepeat(" ", (ocupacion.length() == 12 ? 0 : 12 - ocupacion.length()))))); // (Ocupacion)
+                    buffer += sex; // (Sexo)
+                    buffer += (salaryType.equals("1") ? "0" : salaryType.equals("2") ? "1" : salaryType.equals("3") ? "2" : "0"); //(Type of salary)
+                    buffer += hrsW; // (Hora)
+                    buffer += "\r\n";
+
+                }
+                    
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
+    /**
+     * Low of the worker
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeImportMovLow(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateSta = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);        
+        java.lang.String buffer = "";
+        String sql = "";
+        String fileName = "";
+        String param = "";
+        String ssn = "";
+        String inabilityNull = "  000000";
+        String daysIncidence = "00";
+        String inputV = "00";
+        int typeMov = layoutSuaType;
+        double baseSalary = 0;
+        Date dateApplication = null;
+    
+        fileName = ("movtBaja.txt");
+    
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
+
+                ArrayList<Integer> pkPrimaryKUSer = prepareSqlQueryLow(client, dateLayoutStart, dateLayoutEnd);
+
+                for (int i = 0; i <= pkPrimaryKUSer.size()-1; i++){
+                int pkUser = pkPrimaryKUSer.get(i);
+                    
+                    sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, bp.fiscal_id as RFC , emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM, "
+                            + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, "
+                            + "sal.id_tp_sal AS TpSalario, wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.dt_hire AS DateApplication, par.reg_ss AS Param "
+                            + "FROM erp.HRSU_EMP AS emp "
+                            + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                            + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                            + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                            + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                            + "INNER JOIN hrs_emp_log_hire AS hire ON hire.id_emp = emp.id_emp "
+                            + "INNER JOIN cfg_param_co AS par "
+                            + "INNER JOIN hrs_cfg AS cfg "
+                            + "WHERE hire.b_hire = " + (layoutSuaType == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? SModConsts.HRSX_HIRE_DISMISSED : SModConsts.HRSX_HIRE_ACTIVE ) + " AND not hire.b_del "
+                            + "AND hire.dt_hire >= '" + dateSta + "' AND hire.dt_hire <= '" + dateEnd + "' "
+                            + "AND emp.id_emp = " + pkUser;
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        dateApplication = resultSetHeader.getDate("DateApplication");
+                        ssn = resultSetHeader.getString("SSN");
+                        baseSalary = resultSetHeader.getDouble("Salario");
+                        
+                    }
+
+                    buffer += param.substring(0, 10); // (Registro patronal)
+                    buffer += param.substring(10); // (Digito del registro patronal R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += (String.valueOf(typeMov).length() > 2 ?  String.valueOf(typeMov).substring(0, 1) :  String.valueOf(typeMov).concat((SLibUtilities.textRepeat(" ", ( String.valueOf(typeMov).length() == 2 ? 0 : 2 -  String.valueOf(typeMov).length())))));  // (Tipo de movimiento)
+                    buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
+                    buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inabilityNull : inabilityNull); // (Folio de incapacidad)
+                    buffer += daysIncidence; // (Días de incidencia)
+                    String baseSalaryS = String.valueOf(baseSalary);
+                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                    buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 5 ? 0 : 5 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
+                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inputV : inputV);
+                    buffer += "\r\n";
+
+                }
+                    
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            
+            catch (Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
+    /**
+     * Low of the worker
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeImportMovEntry(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateSta = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);        
+        java.lang.String buffer = "";
+        String sql = "";
+        String fileName = "";
+        String param = "";
+        String ssn = "";
+        String inabilityNull = "  000000";
+        String daysIncidence = "00";
+        String inputV = "00";
+        int typeMov = layoutSuaType;
+        double baseSalary = 0;
+        Date dateApplication = null;
+    
+        fileName = ("movtReingreso.txt");
+    
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
+
+                ArrayList<Integer> pkPrimaryKUSer = prepareSqlQueryReEntry(client, dateLayoutStart, dateLayoutEnd);
+
+                for (int i = 0; i <= pkPrimaryKUSer.size()-1; i++){
+                int pkUser = pkPrimaryKUSer.get(i);
+                    
+                    sql = "SELECT bp.firstname AS Nombre, bp.alt_id AS CURP, bp.fiscal_id as RFC , emp.lastname1 AS ApellidoP, emp.lastname2 AS ApellidoM, "
+                            + "emp.num AS ClaveTrab, emp.ssn AS SSN, emp.sal_ssc AS Salario, e.id_tp_emp AS TpTrabajador, "
+                            + "sal.id_tp_sal AS TpSalario, wrktp.id_tp_work_day AS Jornada, cfg.ss_subbra AS Guia, hire.dt_hire AS DateApplication, par.reg_ss AS Param "
+                            + "FROM erp.HRSU_EMP AS emp "
+                            + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                            + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                            + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                            + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                            + "INNER JOIN hrs_emp_log_hire AS hire ON hire.id_emp = emp.id_emp "
+                            + "INNER JOIN cfg_param_co AS par "
+                            + "INNER JOIN hrs_cfg AS cfg "
+                            + "WHERE hire.b_hire = " + (layoutSuaType == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? SModConsts.HRSX_HIRE_DISMISSED : SModConsts.HRSX_HIRE_ACTIVE ) + " AND not hire.b_del "
+                            + "AND hire.dt_hire >= '" + dateSta + "' AND hire.dt_hire <= '" + dateEnd + "' "
+                            + "AND emp.id_emp = " + pkUser;
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        dateApplication = resultSetHeader.getDate("DateApplication");
+                        ssn = resultSetHeader.getString("SSN");
+                        baseSalary = resultSetHeader.getDouble("Salario");
+                        
+                    }
+
+                    buffer += param.substring(0, 10); // (Registro patronal)
+                    buffer += param.substring(10); // (Digito del registro patronal R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += (String.valueOf(typeMov).length() > 2 ?  String.valueOf(typeMov).substring(0, 1) :  String.valueOf(typeMov).concat((SLibUtilities.textRepeat(" ", ( String.valueOf(typeMov).length() == 2 ? 0 : 2 -  String.valueOf(typeMov).length())))));  // (Tipo de movimiento)
+                    buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
+                    buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inabilityNull : inabilityNull); // (Folio de incapacidad)
+                    buffer += daysIncidence; // (Días de incidencia)
+                    String baseSalaryS = String.valueOf(baseSalary);
+                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                    buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 5 ? 0 : 5 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
+                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inputV : inputV);
+                    buffer += "\r\n";
+
+                }
+                    
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            
+            catch (Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
+    /**
+     * Worker disability and absenteeism
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeImportMovInc(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateSta = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);        
+        java.lang.String buffer = "";
+        String sql = "";
+        String fileName = "";
+        String param = "";
+        String ssn = "";
+        String invoice = "";
+        String daysSubsidized = "";
+        int typeMov = layoutSuaType;
+        double baseSalary = 0;
+        Date dateApplication = null;
+        
+        switch (layoutSuaType) {
+            case SModConsts.HRSX_LAYOUT_SUA_TRUANCY: // Ausentismo
+                fileName = ("movtAusentismo.txt");
+                break;
+            case SModConsts.HRSX_LAYOUT_SUA_INABILITY: //incapacidad
+                fileName = ("movtIncapacidad.txt");
+                break;
+            default:
+        }
+                
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
+
+                ArrayList<Integer> pkPrimaryKUSer = prepareSqlQueryInability(client, typeMov, dateLayoutStart, dateLayoutEnd);
+
+                for (int i = 0; i <= pkPrimaryKUSer.size()-1; i++){
+                int pkUser = pkPrimaryKUSer.get(i);
+                    
+                   sql = "SELECT emp.ssn AS SSN, " +
+                            "v.num, v.dt, v.dt_sta, v.dt_end, v.eff_day, par.reg_ss AS Param, tabs.id_tp_abs, " +
+                            "(SELECT COALESCE(SUM(ac.eff_day), 0.0) " +
+                            "FROM hrs_abs AS a " +
+                            "INNER JOIN hrs_abs_cns AS ac ON ac.id_emp = a.id_emp AND ac.id_abs = a.id_abs " +
+                            "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = ac.fk_rcp_pay AND pr.id_emp = ac.fk_rcp_emp " +
+                            "INNER JOIN hrs_pay AS p ON p.id_pay = pr.id_pay " +
+                            "WHERE NOT a.b_del AND NOT ac.b_del AND NOT pr.b_del AND NOT p.b_del " +
+                            "AND ac.id_emp = v.id_emp AND ac.id_abs = v.id_abs) AS f_app_days, v.ben_ann, v.ben_year " +
+                            "FROM hrs_abs AS v " +
+                            "INNER JOIN erp.bpsu_bp AS bp ON v.id_emp = bp.id_bp " +
+                            "INNER JOIN erp.hrsu_emp AS emp ON v.id_emp = emp.id_emp " +
+                            "INNER JOIN erp.hrsu_cl_abs AS cabs ON v.fk_cl_abs = cabs.id_cl_abs " +
+                            "INNER JOIN erp.hrsu_tp_abs AS tabs ON v.fk_cl_abs = tabs.id_cl_abs AND v.fk_tp_abs = tabs.id_tp_abs " +
+                            "INNER JOIN erp.usru_usr AS uc ON v.fk_usr_clo = uc.id_usr " +
+                            "INNER JOIN erp.usru_usr AS ui ON v.fk_usr_ins = ui.id_usr " +
+                            "INNER JOIN erp.usru_usr AS uu ON v.fk_usr_upd = uu.id_usr " +
+                            "INNER JOIN cfg_param_co AS par " +
+                            "WHERE v.b_del = 0 AND v.dt >= '" + dateSta + "' AND v.dt <= '" + dateEnd + "' AND emp.b_act = " + SModConsts.HRSX_HIRE_ACTIVE + " AND v.id_emp = " + pkUser + " " +
+                            "ORDER BY bp.bp , v.id_emp , v.dt , cabs.name , tabs.name , v.id_abs;";
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        ssn = resultSetHeader.getString("SSN");
+                        invoice =  resultSetHeader.getString("num");
+                        daysSubsidized = resultSetHeader.getString("eff_day");
+                        dateApplication = resultSetHeader.getDate("dt");
+
+                    }
+
+                    buffer += param.substring(0, 10); // (Registro patronal)
+                    buffer += param.substring(10); // (Digito del registro patronal R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (NSS)
+                    buffer += (String.valueOf(typeMov).length() > 2 ?  String.valueOf(typeMov).substring(0, 1) :  String.valueOf(typeMov).concat((SLibUtilities.textRepeat(" ", ( String.valueOf(typeMov).length() == 2 ? 0 : 2 -  String.valueOf(typeMov).length())))));  // (Tipo de movimiento)
+                    buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
+                    buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? invoice : invoice); // (Folio de incapacidad)
+                    buffer += daysSubsidized; // (Días de incidencia)
+                    String baseSalaryS = String.valueOf(baseSalary);
+                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                    buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 5 ? 0 : 5 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
+                    buffer += "\r\n";
+
+                }
+                    
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            
+            catch (Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
+     /**
+     * Worker disability FALTAN DATOS SIIE
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeImportInc(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateSta = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);        
+        java.lang.String buffer = "";
+        String sql = "";
+        String fileName = "";
+        String param = "";
+        String ssn = "";
+        String invoice = "";
+        String daysSubsidized = "";
+        String disabilityBranch = "";
+        String riskCode = "";
+        String sequelCode= "";
+        String controlCode = "";
+        int typeMov = layoutSuaType;
+        Date dateSt = null;
+        Date dateEn = null;
+        
+        fileName = ("incap.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
+                ArrayList<Integer> pkPrimaryKUSer =  prepareSqlQueryInability(client, typeMov, dateLayoutStart, dateLayoutEnd);
+
+                for (int i = 0; i <= pkPrimaryKUSer.size()-1; i++){
+                int pkUser = pkPrimaryKUSer.get(i);
+                    
+                    sql = "SELECT emp.ssn AS SSN, " +
+                            "v.num, v.dt, v.dt_sta, v.dt_end, v.eff_day, par.reg_ss AS Param, tabs.id_tp_abs, v.dis_risk, v.dis_sequel, v.dis_control, " +
+                            "(SELECT COALESCE(SUM(ac.eff_day), 0.0) " +
+                            "FROM hrs_abs AS a " +
+                            "INNER JOIN hrs_abs_cns AS ac ON ac.id_emp = a.id_emp AND ac.id_abs = a.id_abs " +
+                            "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = ac.fk_rcp_pay AND pr.id_emp = ac.fk_rcp_emp " +
+                            "INNER JOIN hrs_pay AS p ON p.id_pay = pr.id_pay " +
+                            "WHERE NOT a.b_del AND NOT ac.b_del AND NOT pr.b_del AND NOT p.b_del " +
+                            "AND ac.id_emp = v.id_emp AND ac.id_abs = v.id_abs) AS f_app_days, v.ben_ann, v.ben_year " +
+                            "FROM hrs_abs AS v " +
+                            "INNER JOIN erp.bpsu_bp AS bp ON v.id_emp = bp.id_bp " +
+                            "INNER JOIN erp.hrsu_emp AS emp ON v.id_emp = emp.id_emp " +
+                            "INNER JOIN erp.hrsu_cl_abs AS cabs ON v.fk_cl_abs = cabs.id_cl_abs " +
+                            "INNER JOIN erp.hrsu_tp_abs AS tabs ON v.fk_cl_abs = tabs.id_cl_abs AND v.fk_tp_abs = tabs.id_tp_abs " +
+                            "INNER JOIN erp.usru_usr AS uc ON v.fk_usr_clo = uc.id_usr " +
+                            "INNER JOIN erp.usru_usr AS ui ON v.fk_usr_ins = ui.id_usr " +
+                            "INNER JOIN erp.usru_usr AS uu ON v.fk_usr_upd = uu.id_usr " +
+                            "INNER JOIN cfg_param_co AS par " +
+                            "WHERE v.b_del = 0 AND v.dt >= '" + dateSta + "' AND v.dt <= '" + dateEnd + "' AND emp.b_act = " + SModConsts.HRSX_HIRE_ACTIVE + " AND v.id_emp = " + pkUser + " " +
+                            "ORDER BY bp.bp , v.id_emp , v.dt , cabs.name , tabs.name , v.id_abs;";
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        ssn = resultSetHeader.getString("SSN");
+                        dateSt = resultSetHeader.getDate("dt_sta");
+                        dateEn = resultSetHeader.getDate("dt_end");
+                        invoice =  resultSetHeader.getString("num");
+                        disabilityBranch =  resultSetHeader.getString("id_tp_abs");
+                        daysSubsidized = resultSetHeader.getString("eff_day"); 
+                        riskCode = resultSetHeader.getString("v.dis_risk"); 
+                        sequelCode = resultSetHeader.getString("v.dis_sequel"); 
+                        controlCode = resultSetHeader.getString("v.dis_control"); 
+                    }
+
+                    buffer += param.substring(0, 10); // (Registro patronal)
+                    buffer += param.substring(10); // (Digito del registro patronal R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += "1";
+                    buffer +=  formatDateData.format(dateSt);
+                    buffer += (invoice.length() > 8 ? invoice.substring(0, 7) : (SLibUtilities.textRepeat("0", (invoice.length() == 8 ? 0 : 8 - invoice.length())))).concat(invoice); // (Folio)
+                    buffer += (daysSubsidized.length() > 2 ? daysSubsidized.substring(0, 2) : (SLibUtilities.textRepeat("0", (daysSubsidized.length() == 3 ? 0 : 3 - daysSubsidized.length())))).concat(daysSubsidized);;
+                    buffer += (Integer.valueOf(disabilityBranch) == SModSysConsts.HRSS_TP_DIS_RSK || Integer.valueOf(disabilityBranch) == SModSysConsts.HRSS_TP_DIS_MAT ? "100" : "060"); // (Porcentaje de incapacidad) disabilityBranch
+                    buffer += disabilityBranch; // (rama de incapacidad)
+                    buffer += riskCode; // (Riesgo)NO SIIE
+                    buffer += sequelCode; // (Secuela) no SIIE
+                    buffer += controlCode; // (Control de incapacidad) no SIIE
+                    buffer += formatDateData.format(dateEn);
+                    buffer += "\r\n";
+
+                }
+
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
+    /**
+     * Report change of wages in the worker
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeImportMovSsc(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateSta = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);        
+        java.lang.String buffer = "";
+        String sql = "";
+        String fileName = "";
+        String param = "";
+        String ssn = "";
+        String inabilityNull = "  000000";
+        String daysIncidence = "00";
+        String inputV = "00";
+        int typeMov = layoutSuaType;
+        double baseSalary = 0;
+        Date dateApplication = null;
+
+        fileName = ("movtSbc.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
+                ArrayList<Integer> pkPrimaryKUSer =  prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
+    
+                for (int i = 0; i <= pkPrimaryKUSer.size()-1; i++){
+                int pkUser = pkPrimaryKUSer.get(i);
+                    
+                    sql = "SELECT bp.firstname AS Nombre, "
+                            + "emp.ssn AS SSN, emp.sal_ssc AS Salario, ssc.dt AS DateApplication, par.reg_ss AS Param "
+                            + "FROM erp.HRSU_EMP AS emp "
+                            + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                            + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                            + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                            + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                            + "INNER JOIN HRS_EMP_LOG_SAL_SSC AS ssc ON ssc.id_emp = emp.id_emp "
+                            + "INNER JOIN cfg_param_co AS par "
+                            + "INNER JOIN hrs_cfg AS cfg "
+                            + "WHERE ssc.dt >= '" + dateSta + "' AND ssc.dt <= '" + dateEnd + "' AND NOT ssc.b_del "
+                            + "AND emp.id_emp = " + pkUser ; 
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        dateApplication = resultSetHeader.getDate("DateApplication");
+                        ssn = resultSetHeader.getString("SSN");
+                        baseSalary = resultSetHeader.getDouble("Salario");
+                        
+                    }
+
+                    buffer += param.substring(0, 10); // (Registro patronal)
+                    buffer += param.substring(10); // (Digito del registro patronal R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += "0" + typeMov; // (Tipo de movimiento)
+                    buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
+                    buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_SSC ? inabilityNull : inabilityNull); // (Folio de incapacidad)
+                    buffer += daysIncidence; // (Días de incidencia)
+                    String baseSalaryS = String.valueOf(baseSalary);
+                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                    buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 5 ? 0 : 5 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
+                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_SSC ? inputV : inputV);
+                    buffer += "\r\n";
+
+                }
+                    
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    /**
+     * Report worker credit
+     * @param client
+     * @param layoutSuaType Type Layout
+     * @param dateLayoutStart Date start layout
+     * @param dateLayoutEnd  Date final layout
+     */
+    public static void createLayoutEmployeeCred(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+        ResultSet resultSetHeader = null;
+        BufferedWriter bw = null;
+        Statement statement = null;
+        SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateSta = formatter.format(dateLayoutStart);
+        String dateEnd = formatter.format(dateLayoutEnd);        
+        java.lang.String buffer = "";
+        String sql = "";
+        String fileName = "";
+        String param = "";
+        String ssn = "";
+        String inabilityNull = "  000000";
+        String daysIncidence = "00";
+        String inputV = "00";
+        int typeMov = layoutSuaType;
+        double baseSalary = 0;
+        Date dateApplication = null;
+
+        fileName = ("cred.txt");
+        
+        client.getFileChooser().setSelectedFile(new File(fileName));
+        if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(client.getFileChooser().getSelectedFile().getAbsolutePath());
+
+            try {
+                statement = client.getSession().getStatement();
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
+                ArrayList<Integer> pkPrimaryKUSer =  prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
+    
+                for (int i = 0; i <= pkPrimaryKUSer.size()-1; i++){
+                int pkUser = pkPrimaryKUSer.get(i);
+                    
+                    sql = "SELECT bp.firstname AS Nombre, "
+                            + "emp.ssn AS SSN, emp.sal_ssc AS Salario, ssc.dt AS DateApplication, par.reg_ss AS Param "
+                            + "FROM erp.HRSU_EMP AS emp "
+                            + "INNER JOIN erp.BPSU_BP AS bp ON bp.id_bp = emp.id_emp "
+                            + "INNER JOIN erp.HRSU_TP_EMP AS e ON e.id_tp_emp = emp.fk_tp_emp "
+                            + "INNER JOIN erp.hrss_tp_sal AS sal ON sal.id_tp_sal = emp.fk_tp_sal "
+                            + "INNER JOIN erp.hrss_tp_work_day AS wrktp ON emp.fk_tp_work_day = wrktp.id_tp_work_day "
+                            + "INNER JOIN HRS_EMP_LOG_SAL_SSC AS ssc ON ssc.id_emp = emp.id_emp "
+                            + "INNER JOIN cfg_param_co AS par "
+                            + "INNER JOIN hrs_cfg AS cfg "
+                            + "WHERE ssc.dt >= '" + dateSta + "' AND ssc.dt <= '" + dateEnd + "' AND NOT ssc.b_del "
+                            + "AND emp.id_emp = " + pkUser ; 
+
+                    resultSetHeader = client.getSession().getStatement().executeQuery(sql);
+
+                    while (resultSetHeader.next()) {
+                        param = resultSetHeader.getString("Param");
+                        dateApplication = resultSetHeader.getDate("DateApplication");
+                        ssn = resultSetHeader.getString("SSN");
+                        baseSalary = resultSetHeader.getDouble("Salario");
+                        
+                    }
+
+                    buffer += param.substring(0, 10); // (Registro patronal)
+                    buffer += param.substring(10); // (Digito del registro patronal R.P)
+                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                    buffer += "0" + typeMov; // (Tipo de movimiento)
+                    buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
+                    buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_SSC ? inabilityNull : inabilityNull); // (Folio de incapacidad)
+                    buffer += daysIncidence; // (Días de incidencia)
+                    String baseSalaryS = String.valueOf(baseSalary);
+                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                    buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 5 ? 0 : 5 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
+                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_SSC ? inputV : inputV);
+                    buffer += "\r\n";
+
+                }
+                    
+                bw.write(buffer);
+                bw.flush();
+                bw.close();
+
+                if (client.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
+                    SLibUtilities.launchFile(file.getPath());
+                }
+            }
+            catch (Exception e) {
+                SLibUtilities.renderException(STableUtilities.class.getName(), e);
+            }
+        }
+    }
+    
     /**
      * 
      * @param client
@@ -816,14 +1750,13 @@ public abstract class SHrsUtils {
      * @param dateLayoutStart Date start layout
      * @param dateLayoutEnd  Date final layout
      */
-    public static void createLayoutEmployeeRegister(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
+    public static void createLayoutEmployeeRegister(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) { // xx123
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
         Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
-        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyyyMMdd HHmm");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String dateIni = formatter.format(dateLayoutStart);
+        String dateSta = formatter.format(dateLayoutStart);
         String dateEnd = formatter.format(dateLayoutEnd);        
         java.lang.String buffer = "";
         String sql = "";
@@ -840,7 +1773,7 @@ public abstract class SHrsUtils {
         double baseSalary = 0;
         Date dateApplication = null;
 
-        fileName = formatDateTitle.format(new Date()).concat(" Altas.txt");
+        fileName = "Altas IDSE.txt";
         
         client.getFileChooser().setSelectedFile(new File(fileName));
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
@@ -848,7 +1781,7 @@ public abstract class SHrsUtils {
 
             try {
                 statement = client.getSession().getStatement();
-                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8")); // utf-8
                 ArrayList<Integer> pkPrimaryK = prepareSqlQueryHigh(client, dateLayoutStart, dateLayoutEnd);
     
                 for (int i = 0; i <= pkPrimaryK.size()-1; i++){
@@ -865,8 +1798,8 @@ public abstract class SHrsUtils {
                             + "INNER JOIN hrs_emp_log_hire AS hire ON hire.id_emp = emp.id_emp "
                             + "INNER JOIN cfg_param_co AS par "
                             + "INNER JOIN hrs_cfg AS cfg "
-                            + "WHERE hire.b_hire = " + (layoutSuaType == SModConsts.HRSX_HIRE_ACTIVE ? SModConsts.HRSX_HIRE_ACTIVE : SModConsts.HRSX_HIRE_DISMISSED) + " AND not hire.b_del "
-                            + "AND hire.dt_hire >= '" + dateIni + "' AND hire.dt_hire <= '" + dateEnd + "' "
+                            + "WHERE hire.b_hire = " + (layoutSuaType == SModConsts.HRSX_HIRE_DISMISSED ? SModConsts.HRSX_HIRE_DISMISSED : SModConsts.HRSX_HIRE_ACTIVE) + " AND not hire.b_del "
+                            + "AND hire.dt_hire >= '" + dateSta + "' AND hire.dt_hire <= '" + dateEnd + "' "
                             + "AND emp.id_emp = " + pkUser;
 
                     resultSetHeader = client.getSession().getStatement().executeQuery(sql);
@@ -898,18 +1831,18 @@ public abstract class SHrsUtils {
                     buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
                     buffer += String.valueOf(SLibUtilities.textRepeat(" ", 6));
                     buffer += "1"; // (Type of worker)
-                    buffer += (salaryType.equals(1) ? "0" : salaryType.equals(2) ? "1" : "2"); //(Type of salary)
+                    buffer += (salaryType.equals("1") ? "0" : salaryType.equals("2") ? "1" : salaryType.equals("3") ? "2" : "0"); //(Type of salary)
                     buffer += "0"; //(Week or reduced working day)
                     buffer += formatDateData.format(dateApplication); // (Movement date)
-                    buffer += "000"; //(Family medicine unit)
+                    buffer += "123"; //(Family medicine unit)
                     buffer += String.valueOf(SLibUtilities.textRepeat(" ", 2));
                     buffer += "08"; // (Movement type)
-                    buffer += (guia + "400"); // (Guide)
+                    buffer += (guia + "406"); // (Guide)
                     buffer += (workerKey.length() > 10 ? workerKey.substring(0, 10) : (SLibUtilities.textRepeat("0", (workerKey.length() == 10 ? 0 : 10 - workerKey.length())))).concat(workerKey); // (Worker's code)
                     buffer += SLibUtilities.textRepeat(" ", 1);
                     buffer += curp; // CURP
                     buffer += "9"; // (Format Identifier)
-                    buffer += "\n";
+                    buffer += "\r\n";
                 }
                     
                 bw.write(buffer);
@@ -931,16 +1864,15 @@ public abstract class SHrsUtils {
      * @param client
      * @param layoutSuaType Type Layout
      * @param dateLayoutStart Date start layout
-     * @param dateLayoutEnd  Date final layout
+     * @param dateLayoutEnd Date final layout
      */
     public static void createLayoutEmployeeModification(SGuiClient client, int layoutSuaType, Date dateLayoutStart, Date dateLayoutEnd) {
         ResultSet resultSetHeader = null;
         BufferedWriter bw = null;
         Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
-        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyyyMMdd HHmm");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String dateIni = formatter.format(dateLayoutStart);
+        String dateSta = formatter.format(dateLayoutStart);
         String dateEnd = formatter.format(dateLayoutEnd); 
         java.lang.String buffer = "";
         String sql = "";
@@ -957,7 +1889,7 @@ public abstract class SHrsUtils {
         double baseSalary = 0;
         Date dateApplication = null;
         
-        fileName = formatDateTitle.format(new Date()).concat(" SBC.txt");
+        fileName = "SBC IDSE.txt";
         
         client.getFileChooser().setSelectedFile(new File(fileName));
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
@@ -965,7 +1897,7 @@ public abstract class SHrsUtils {
 
             try {
                 statement = client.getSession().getStatement();
-                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
                 ArrayList<Integer> pkPrimaryK = prepareSqlQueryMod(client, dateLayoutStart, dateLayoutEnd);
     
                 for (int i = 0; i <= pkPrimaryK.size()-1; i++){
@@ -982,7 +1914,7 @@ public abstract class SHrsUtils {
                             + "INNER JOIN HRS_EMP_LOG_SAL_SSC AS ssc ON ssc.id_emp = emp.id_emp "
                             + "INNER JOIN cfg_param_co AS par "
                             + "INNER JOIN hrs_cfg AS cfg "
-                            + "WHERE ssc.dt >= '" + dateIni + "' AND ssc.dt <= '" + dateEnd + "' AND NOT ssc.b_del "
+                            + "WHERE ssc.dt >= '" + dateSta + "' AND ssc.dt <= '" + dateEnd + "' AND NOT ssc.b_del "
                             + "AND emp.id_emp = " + pkUser ; 
 
                     resultSetHeader = client.getSession().getStatement().executeQuery(sql);
@@ -1014,17 +1946,17 @@ public abstract class SHrsUtils {
                     buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
                     buffer += String.valueOf(SLibUtilities.textRepeat(" ", 6));
                     buffer += String.valueOf(SLibUtilities.textRepeat(" ", 1));
-                    buffer += (salaryType.equals(1) ? "0" : salaryType.equals(2) ? "1" : "2"); //(Type of salary)
+                    buffer += (salaryType.equals("1") ? "0" : salaryType.equals("2") ? "1" : salaryType.equals("3") ? "2" : "0"); //(Type of salary)
                     buffer += "0"; //(Week or reduced working day)
                     buffer += formatDateData.format(dateApplication); // (Movement date)
                     buffer += String.valueOf(SLibUtilities.textRepeat(" ", 5));
                     buffer += "07"; // (Movement type)
-                    buffer += (guia + "400"); // (Guide)
+                    buffer += (guia + "406"); // (Guide)
                     buffer += (workerKey.length() > 10 ? workerKey.substring(0, 10) : (SLibUtilities.textRepeat("0", (workerKey.length() == 10 ? 0 : 10 - workerKey.length())))).concat(workerKey); // (Worker's code)
                     buffer += SLibUtilities.textRepeat(" ", 1);
                     buffer += curp; // CURP
                     buffer += "9"; // (Format Identifier)
-                    buffer += "\n";                                  
+                    buffer += "\r\n";                                  
                 }
                 
                 bw.write(buffer);
@@ -1053,9 +1985,8 @@ public abstract class SHrsUtils {
         BufferedWriter bw = null;
         Statement statement = null;
         SimpleDateFormat formatDateData = new SimpleDateFormat("ddMMyyyy");
-        SimpleDateFormat formatDateTitle = new SimpleDateFormat("yyyyMMdd HHmm");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String dateIni = formatter.format(dateLayoutStart);
+        String dateSta = formatter.format(dateLayoutStart);
         String dateEnd = formatter.format(dateLayoutEnd);
         java.lang.String buffer = "";
         String sql = "";
@@ -1070,7 +2001,7 @@ public abstract class SHrsUtils {
         String type = "";
         Date dateApplication = null;
         
-        fileName = formatDateTitle.format(new Date()).concat(" Bajas.txt");
+        fileName = "Bajas IDSE.txt";
         
         client.getFileChooser().setSelectedFile(new File(fileName));
         if (client.getFileChooser().showSaveDialog(client.getFrame()) == JFileChooser.APPROVE_OPTION) {
@@ -1078,7 +2009,7 @@ public abstract class SHrsUtils {
 
             try {
                 statement = client.getSession().getStatement();
-                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
+                bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
                 ArrayList<Integer> pkPrimaryK = prepareSqlQueryLow(client, dateLayoutStart, dateLayoutEnd);
     
                 for (int i = 0; i <= pkPrimaryK.size()-1; i++){
@@ -1096,7 +2027,7 @@ public abstract class SHrsUtils {
                           + "INNER JOIN cfg_param_co AS par "
                           + "INNER JOIN hrs_cfg AS cfg "
                           + "WHERE hire.b_hire = " + SModConsts.HRSX_HIRE_DISMISSED + " AND not hire.b_del "
-                          + "AND hire.dt_dis_n >= '" + dateIni + "' AND hire.dt_dis_n <= '" + dateEnd + "' "
+                          + "AND hire.dt_dis_n >= '" + dateSta + "' AND hire.dt_dis_n <= '" + dateEnd + "' "
                           + "AND emp.id_emp = " + pkUser;
 
                     resultSetHeader = client.getSession().getStatement().executeQuery(sql);
@@ -1123,12 +2054,12 @@ public abstract class SHrsUtils {
                     buffer += formatDateData.format(dateApplication); // (Movement date)
                     buffer += String.valueOf(SLibUtilities.textRepeat(" ", 5));
                     buffer += "02"; // (Movement type)
-                    buffer += (guia + "400"); // (Guide)
+                    buffer += (guia + "406"); // (Guide)
                     buffer += (workerKey.length() > 10 ? workerKey.substring(0, 10) : (SLibUtilities.textRepeat("0", (workerKey.length() == 10 ? 0 : 10 - workerKey.length())))).concat(workerKey); // (Worker's code)
-                    buffer += (type.equals(1) ? "6" : type.equals(2) ? "2" : type.equals(3) ? "1" : type.equals(4) ? "3" : "6" );
+                    buffer += (type.equals("1") ? "6" : type.equals("2") ? "2" : type.equals("3") ? "1" : type.equals("4") ? "3" : "6" );
                     buffer += SLibUtilities.textRepeat(" ", 18);
                     buffer += "9"; // (Format Identifier)
-                    buffer += "\n";
+                    buffer += "\r\n";
                 }
                 
                 bw.write(buffer);
@@ -1144,7 +2075,7 @@ public abstract class SHrsUtils {
             }
         }
     }
-
+    
     /**
      * Checks if period is anniversary of provided date.
      * @param anniversary
@@ -2380,6 +3311,20 @@ public abstract class SHrsUtils {
         Period period = new Period(start, end);
         
         return period.getYears();
+    }
+    
+    /**
+     * Get employee's seniority in years. Uses Joda-Time.
+     * @param dateBenefits
+     * @param dateCutoff
+     * @return Seniority antiquity in years.
+     */
+    public static int getEmployeeSeniorityAntMonth(final Date dateBenefits, final Date dateCutoff) {
+        DateTime start = new DateTime(dateBenefits);
+        DateTime end = new DateTime(dateCutoff);
+        Period period = new Period(start, end);
+        
+        return period.getMonths();
     }
     
     public static int getPaymentVacationsByEmployee(final SGuiSession session, final int employeeId, final int benefitAnniversary, final int benefitYear) throws Exception {
@@ -3693,4 +4638,19 @@ public abstract class SHrsUtils {
             }
         }
     }
+
+    public static ArrayList<String> companyWithRh(final Statement statement) throws SQLException {
+        String sql;
+        ArrayList<String> companyName = new ArrayList<String>();
+        
+        sql = "SELECT bd FROM erp.cfgu_co WHERE b_mod_hrs = 1;";
+        ResultSet resultSet = statement.executeQuery(sql);
+        
+        while (resultSet.next()) {
+            String cn = resultSet.getString("bd");
+            companyName.add(cn);
+        }
+        return companyName;
+
+    }    
 }

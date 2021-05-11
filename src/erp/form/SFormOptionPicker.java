@@ -187,7 +187,14 @@ public class SFormOptionPicker extends javax.swing.JDialog implements erp.lib.fo
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Clave", 100);
                 setTitle("Seleccionar lenguaje");
                 break;
-
+                
+            case SModConsts.CFGU_FUNC:
+                aoTableColumns = new STableColumnForm[2];
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Código", 100);
+                aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Área", 300);
+                setTitle("Seleccionar área funcional");
+                break;
+                
             case SDataConstants.USRU_USR:
                 aoTableColumns = new STableColumnForm[1];
                 aoTableColumns[i++] = new STableColumnForm(SLibConstants.DATA_TYPE_STRING, "Usuario", 300);

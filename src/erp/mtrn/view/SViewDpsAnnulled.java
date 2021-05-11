@@ -18,8 +18,10 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterDocumentNature;
+import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterUsers;
 import java.awt.event.KeyEvent;
 import sa.gui.util.SUtilConsts;
@@ -36,6 +38,7 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     
     private boolean mbHasRightAuthor = false;
 
@@ -65,6 +68,7 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperSeparator();
@@ -73,6 +77,8 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
         addTaskBarUpperComponent(moTabFilterUser);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDocumentNature);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         STableField[] aoKeyFields = new STableField[2];
         STableColumn[] aoTableColumns = null;
@@ -225,6 +231,11 @@ public class SViewDpsAnnulled extends erp.lib.table.STableTab implements java.aw
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_NAT) {
                 if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
                     sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_dps_nat = " + ((Integer) setting.getSetting()) + " ";
+                }
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((Integer) setting.getSetting()) + ") ";
                 }
             }
         }

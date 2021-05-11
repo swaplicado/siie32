@@ -396,7 +396,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, mbIsEstCon ? SLibConstants.GUI_DATE_AS_YEAR : SLibConstants.GUI_DATE_AS_YEAR_MONTH);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
-        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
         moDialogUpdateDpsDlvryAddrss = new SDialogUpdateDpsDeliveryAddress(miClient);
         moDialogUpdateDpsSalesAgentComms = new SDialogUpdateDpsSalesAgentComms(miClient);
         moDialogUpdateDpsLogistics = new SDialogUpdateDpsLogistics(miClient);
@@ -498,13 +498,13 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         jbGetPdf.setEnabled(mbIsCategoryPur && (mbIsDoc || mbIsDocAdj));
         jbShowCfdi.setEnabled(mbIsDoc || mbIsDocAdj);
         jbGetAcknowledgmentCancellation.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbGetCfdiStatus.setEnabled((mbIsDoc || mbIsDocAdj));
-        jbSendCfdi.setEnabled((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj)));
-        jbRestoreCfdStamped.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbRestoreCfdCancelAck.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
-        jbResetPacFlags.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj));
+        jbSignXml.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbValidateCfdi.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbGetCfdiStatus.setEnabled((mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbSendCfdi.setEnabled(((mbIsCategoryPur && mbIsOrd) || (mbIsCategorySal && (mbIsDoc || mbIsDocAdj))) && mbHasRightEdit);
+        jbRestoreCfdStamped.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbRestoreCfdCancelAck.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
+        jbResetPacFlags.setEnabled(mbIsCategorySal && (mbIsDoc || mbIsDocAdj) && mbHasRightEdit);
 
         STableField[] aoKeyFields = new STableField[2];
         STableColumn[] aoTableColumns = null;
@@ -2116,9 +2116,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                     sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_dps_nat = " + ((Integer) setting.getSetting()) + " ";
                 }
             }
-            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_ARE) {
-                if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
-                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func = " + ((Integer) setting.getSetting()) + " ";
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }

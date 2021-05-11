@@ -4,8 +4,10 @@
  */
 package erp.mod.log.view;
 
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.table.SFilterConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ public class SViewShipmentDpsCost extends SGridPaneView implements ActionListene
 
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterDateCutOff moFilterDateCutOff;
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
 
     public SViewShipmentDpsCost(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, gridType, gridSubtype, title, params);
@@ -53,6 +56,9 @@ public class SViewShipmentDpsCost extends SGridPaneView implements ActionListene
             moFilterDateCutOff.initFilter(null);
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
         }
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
 
     @Override
@@ -78,6 +84,11 @@ public class SViewShipmentDpsCost extends SGridPaneView implements ActionListene
         else if (mnGridSubtype == SModConsts.VIEW_ST_DONE) {
             filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
             sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("v.dt", (SGuiDate) filter);
+        }
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null) {
+            sql += (sql.isEmpty() ? "" : "AND ") + " d.fid_func IN ( " + filter + ") ";
         }
 
         sqlTotalWeightGross = "(SELECT SUM(sde.weight_gross) FROM " + SModConsts.TablesMap.get(SModConsts.LOG_SHIP) + " AS s "

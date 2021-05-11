@@ -128,6 +128,9 @@ public class SDialogLayoutEmployee extends SBeanFormDialog implements FocusListe
 
     private void initComponentsCustom() {
          switch (mnLayoutSua) {
+            case SModConsts.HRSX_LAYOUT_IDSE_HIRE:
+                jtfMode.setText("Layout alta de empleados IDSE");
+                break;
             case SModConsts.HRSX_LAYOUT_SUA_HIRE:
                 jtfMode.setText("Layout alta de empleados");
                 break;
@@ -136,6 +139,27 @@ public class SDialogLayoutEmployee extends SBeanFormDialog implements FocusListe
                 break;
             case SModConsts.HRSX_LAYOUT_SUA_DISMISS:
                 jtfMode.setText("Layout baja de empleados");
+                break;
+            case SModConsts.HRSX_LAYOUT_SUA_INABILITY:
+                jtfMode.setText("Layout incapacidad de empleados");
+                break;
+            case SModConsts.HRSX_LAYOUT_SUA_TRUANCY:
+                jtfMode.setText("Layout inasistencia de empleados");
+                break;
+            case SModConsts.HRSX_LAYOUT_SUA_ENTRY:
+                jtfMode.setText("Layout re-ingreso de empleados");
+                break;
+            case SModConsts.HRSX_LAYOUT_SUA_INABILITY_IMP:
+                jtfMode.setText("Datos de incapacidades empleados");
+                break;
+            case SModConsts.HRSX_LAYOUT_IDSE_SSC:
+                jtfMode.setText("Layout de modificación SBC de empleados IDSE");
+                break;
+            case SModConsts.HRSX_LAYOUT_IDSE_DISMISS:
+                jtfMode.setText("Layout baja de empleados IDSE");
+                break;
+            case SModConsts.HRSX_LAYOUT_SUA_AFI:
+                jtfMode.setText("Layout datos afiliatorios");
                 break;
             default:
         }
@@ -173,8 +197,15 @@ public class SDialogLayoutEmployee extends SBeanFormDialog implements FocusListe
 
         items.add(new SGuiItem(new int[] { SLibConsts.UNDEFINED }, "(" + SUtilConsts.TXT_SELECT + " tipo de layout)"));
         items.add(new SGuiItem(new int[] { SModConsts.HRSX_LAYOUT_SUA_HIRE}, "Layout alta usuario"));
+        items.add(new SGuiItem(new int[] { SModConsts.HRSX_LAYOUT_IDSE_HIRE}, "Layout alta usuario IDSE"));
         items.add(new SGuiItem(new int[] { SModConsts.HRSX_LAYOUT_SUA_SSC }, "Layout modificación usuario"));
-        items.add(new SGuiItem(new int[] { SModConsts.HRSX_LAYOUT_SUA_DISMISS }, "Layout eliminar usuario"));
+        items.add(new SGuiItem(new int[] { SModConsts.HRSX_LAYOUT_SUA_DISMISS }, "Layout baja usuario"));
+        items.add(new SGuiItem(new int[] { SModConsts.HRSX_LAYOUT_SUA_INABILITY }, "Layout incapacidad de empleado (Mov)"));
+        items.add(new SGuiItem(new int[] { SModConsts.HRSX_LAYOUT_SUA_TRUANCY }, "Layout inasistencia de empleado (Mov)"));
+        items.add(new SGuiItem(new int[] { SModConsts.HRSX_LAYOUT_SUA_ENTRY }, "Layout re-ingreso de empleado"));
+        items.add(new SGuiItem(new int[] { SModConsts.HRSX_LAYOUT_IDSE_SSC }, "Layout modificación usuario IDSE"));
+        items.add(new SGuiItem(new int[] { SModConsts.HRSX_LAYOUT_IDSE_DISMISS }, "Layout baja empleado IDE"));
+        items.add(new SGuiItem(new int[] { SModConsts.HRSX_LAYOUT_SUA_AFI }, "Layout datos afiliatorios"));
     }
 
     @Override
@@ -211,16 +242,40 @@ public class SDialogLayoutEmployee extends SBeanFormDialog implements FocusListe
        if (jbSave.isEnabled()) {
             if (SGuiUtils.computeValidation(miClient, validateForm())) {
                 switch (mnLayoutSua) {
-                    case SModConsts.HRSX_LAYOUT_SUA_HIRE:
-                        SHrsUtils.createLayoutEmployeeRegister(miClient ,mnLayoutSua ,moDateStart.getValue() ,moDateEnd.getValue());
+                    case SModConsts.HRSX_LAYOUT_IDSE_HIRE:
+                        SHrsUtils.createLayoutEmployeeRegister(miClient, mnLayoutSua, moDateStart.getValue(), moDateEnd.getValue());
                         break;
-                    case SModConsts.HRSX_LAYOUT_SUA_SSC:
-                        SHrsUtils.createLayoutEmployeeModification(miClient ,mnLayoutSua ,moDateStart.getValue() ,moDateEnd.getValue());
+                    case SModConsts.HRSX_LAYOUT_IDSE_SSC: // dification of worker's salary worker
+                        SHrsUtils.createLayoutEmployeeModification(miClient, mnLayoutSua, moDateStart.getValue(), moDateEnd.getValue());
                         break;
-                    case SModConsts.HRSX_LAYOUT_SUA_DISMISS:
-                        SHrsUtils.createLayoutEmployeeDeletion(miClient ,mnLayoutSua ,moDateStart.getValue() ,moDateEnd.getValue());
+                    case SModConsts.HRSX_LAYOUT_IDSE_DISMISS: // Low worker
+                        SHrsUtils.createLayoutEmployeeDeletion(miClient, mnLayoutSua, moDateStart.getValue(), moDateEnd.getValue());
                         break;
-                    default :
+                    case SModConsts.HRSX_LAYOUT_SUA_HIRE: // High worker
+                        SHrsUtils.createLayoutEmployeeRegisterAseg(miClient, mnLayoutSua, moDateStart.getValue(), moDateEnd.getValue());
+                        break;
+                    case SModConsts.HRSX_LAYOUT_SUA_AFI: // Affiliate data
+                        SHrsUtils.createLayoutEmployeeAffiliateData(miClient, mnLayoutSua, moDateStart.getValue(), moDateEnd.getValue());
+                        break;
+                    case SModConsts.HRSX_LAYOUT_SUA_DISMISS: // Low worker
+                        SHrsUtils.createLayoutEmployeeImportMovLow(miClient, mnLayoutSua, moDateStart.getValue(), moDateEnd.getValue());
+                        break;
+                    case SModConsts.HRSX_LAYOUT_SUA_SSC: // Modification of worker's salary
+                        SHrsUtils.createLayoutEmployeeImportMovSsc(miClient, mnLayoutSua, moDateStart.getValue(), moDateEnd.getValue());
+                        break;
+                    case SModConsts.HRSX_LAYOUT_SUA_INABILITY_IMP: // Disability the worker
+                        SHrsUtils.createLayoutEmployeeImportInc(miClient, mnLayoutSua, moDateStart.getValue(), moDateEnd.getValue());
+                        break;
+                    case SModConsts.HRSX_LAYOUT_SUA_TRUANCY: // Absense of the worker  mov
+                        SHrsUtils.createLayoutEmployeeImportMovInc(miClient, mnLayoutSua, moDateStart.getValue(), moDateEnd.getValue());
+                        break;
+                    case SModConsts.HRSX_LAYOUT_SUA_INABILITY: // Disability the worker mov
+                        SHrsUtils.createLayoutEmployeeImportMovInc(miClient, mnLayoutSua, moDateStart.getValue(), moDateEnd.getValue());
+                        break;
+                    case SModConsts.HRSX_LAYOUT_SUA_ENTRY: // Disability the worker mov
+                        SHrsUtils.createLayoutEmployeeImportMovEntry(miClient, mnLayoutSua, moDateStart.getValue(), moDateEnd.getValue());
+                        break;
+                    default:
                 }
                 mnFormResult = SGuiConsts.FORM_RESULT_OK;
                 dispose();

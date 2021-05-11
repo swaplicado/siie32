@@ -50,7 +50,7 @@ public class SViewConditionalEarning extends SGridPaneView implements ActionList
                 + "v.amt, "
                 + "v.pct, "
                 + "IF (v.fk_scope = " + 2 + ", (SELECT name FROM erp.hrsu_dep WHERE id_dep = v.fk_ref), "
-                + "IF (v.fk_scope = " + 3 + ", (SELECT CONCAT(lastname1, ' ', lastname2) FROM erp.hrsu_emp WHERE id_emp = v.fk_ref), "
+                + "IF (v.fk_scope = " + 3 + ", (SELECT bp FROM erp.bpsu_bp WHERE id_bp = v.fk_ref), "
                 + "'GLOBAL')) AS ref_name, "
                 + "v.fk_ref, "
                 + "ve.code AS ear_code, "

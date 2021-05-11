@@ -5,9 +5,11 @@
 package erp.mod.trn.view.qi;
 
 import erp.data.SDataConstantsSys;
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.lib.table.STableConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.table.SFilterConstants;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibUtils;
@@ -17,6 +19,7 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
 /**
@@ -29,6 +32,8 @@ public class SViewInvoicesToSupply extends SGridPaneView {
     private Date mtDateFinal;
     private int mnYearId;
     private int mnBizPartherId;
+    
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
     
     public SViewInvoicesToSupply(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, gridType, gridSubtype, title, params);
@@ -44,6 +49,9 @@ public class SViewInvoicesToSupply extends SGridPaneView {
         mtDateStart = null;
         mnBizPartherId = 0;
         createGridColumns();
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
 
     private void setParamsView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
@@ -73,6 +81,13 @@ public class SViewInvoicesToSupply extends SGridPaneView {
     
     @Override
     public void prepareSqlQuery() {
+        String sql = "";
+        Object filter = null;
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null) {
+            sql += " AND da.fid_func IN ( " + filter + ") ";
+        }
         
         moPaneSettings = new SGridPaneSettings(2);
         msSql= "SELECT id_year " + SDbConsts.FIELD_ID + "1, " +
@@ -91,12 +106,12 @@ public class SViewInvoicesToSupply extends SGridPaneView {
                 "AND ddd.id_dps_doc = de.id_doc AND ddd.id_dps_ety = de.id_ety AND ddd.id_adj_year = dae.id_year AND ddd.id_adj_doc = dae.id_doc AND ddd.id_adj_ety = dae.id_ety " +
                 "AND dae.id_year = da.id_year AND dae.id_doc = da.id_doc AND dae.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " " +
                 "AND dae.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " AND da.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND " +
-                "da.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), " + SModSysConsts.FINS_CFD_TAX_NA + ") AS f_adj_qty, " +
+                "da.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + sql + "), " + SModSysConsts.FINS_CFD_TAX_NA + ") AS f_adj_qty, " +
                 "COALESCE((SELECT SUM(ddd.orig_qty) FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_DPS_ADJ) + " AS ddd, trn_dps_ety AS dae, trn_dps " +
                 "AS da WHERE ddd.id_dps_year = de.id_year AND ddd.id_dps_doc = de.id_doc " +
                 "AND ddd.id_dps_ety = de.id_ety AND ddd.id_adj_year = dae.id_year AND ddd.id_adj_doc = dae.id_doc AND ddd.id_adj_ety = dae.id_ety AND dae.id_year = da.id_year " +
                 "AND dae.id_doc = da.id_doc AND dae.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND dae.fid_tp_dps_adj = " + SDataConstantsSys.TRNS_TP_DPS_ADJ_RET + " " +
-                "AND da.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND da.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), 0) AS f_adj_orig_qty, " +
+                "AND da.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND da.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + sql + "), 0) AS f_adj_orig_qty, " +
                 "COALESCE((SELECT SUM(ge.qty * CASE WHEN ge.fid_dps_adj_year_n IS NULL THEN " + SModSysConsts.FINS_TP_ACC_NA + " ELSE -1 END) " +
                 "FROM trn_diog_ety AS ge, trn_diog AS g WHERE ge.fid_dps_year_n = de.id_year " +
                 "AND ge.fid_dps_doc_n = de.id_doc AND ge.fid_dps_ety_n = de.id_ety AND ge.id_year = g.id_year AND ge.id_doc = g.id_doc " +

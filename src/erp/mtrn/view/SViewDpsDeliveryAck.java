@@ -20,12 +20,14 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
 import erp.mtrn.data.STrnDeliveryAckUtilities;
 import erp.mtrn.form.SDialogDpsDeliveryAckReasign;
 import erp.mtrn.form.SDialogDpsDeliveryAckSend;
 import erp.mtrn.form.SDialogDpsDeliveryAckViewer;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCompanyBranch;
+import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
 import java.util.Vector;
 import javax.swing.JButton;
@@ -49,6 +51,7 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
     private erp.lib.table.STabFilterDateCutOff moTabFilterDateCutOff;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     private erp.mtrn.form.SDialogDpsDeliveryAckReasign moDialogDpsDeliveryAckReasign;
     private erp.mtrn.form.SDialogDpsDeliveryAckViewer moDialogDpsDeliveryViewer;
@@ -88,6 +91,8 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
                 break;
             default:
         }
+        
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         mjbDeliveryAckClose = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_CLOSE));
         mjbDeliveryAckOpen = new JButton(miClient.getImageIcon(SLibConstants.ICON_DOC_OPEN));
@@ -134,6 +139,8 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
         addTaskBarUpperComponent(mjbDeliveryAckOpen);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(mbIsPending ? moTabFilterDateCutOff : moTabFilterDatePeriod);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterCompanyBranch);
         addTaskBarUpperSeparator();
@@ -336,6 +343,7 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
     public void createSqlQuery() {
         int[] keyDpsType = null;
         String sqlWhere = "";
+        String sqlFunctAreas = "";
         STableSetting setting = null;
 
         switch (mnTabTypeAux01) {
@@ -359,6 +367,11 @@ public class SViewDpsDeliveryAck extends erp.lib.table.STableTab implements java
                 }
                 else {
                     sqlWhere += "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "dps.dt") + " ";
+                }
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlFunctAreas += (sqlFunctAreas.isEmpty() ? "" : "AND ") + " dps.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_COB) {

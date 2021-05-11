@@ -5,9 +5,11 @@
 package erp.mod.trn.view.qi;
 
 import erp.data.SDataConstantsSys;
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.lib.table.STableConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.table.SFilterConstants;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibUtils;
@@ -17,6 +19,7 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
 /**
@@ -29,6 +32,8 @@ public class SViewInvoicesToSend extends SGridPaneView {
     private Date mtDateFinal;
     private int mnYearId;
     private int mnBizPartherId;
+    
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
     
     public SViewInvoicesToSend(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, gridType, gridSubtype, title, params);
@@ -44,6 +49,9 @@ public class SViewInvoicesToSend extends SGridPaneView {
         mtDateStart = null;
         mnBizPartherId = 0;
         createGridColumns();
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
 
      private void setParamsView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
@@ -74,6 +82,13 @@ public class SViewInvoicesToSend extends SGridPaneView {
     
     @Override
     public void prepareSqlQuery() {
+        String sql = "";
+        Object filter = null;
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null) {
+            sql += " AND d.fid_func IN ( " + filter + ") ";
+        }
         
         moPaneSettings = new SGridPaneSettings(2);
         msSql= "SELECT id_year " + SDbConsts.FIELD_ID + "1, " +
@@ -95,7 +110,8 @@ public class SViewInvoicesToSend extends SGridPaneView {
                     msSql += "AND d.fid_ct_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[0] + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[1] + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNU_TP_DPS_PUR_INV[2] + " ";
                 }
                 
-                msSql += "AND d.id_year = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' AND d.fid_cob = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND d.fid_bp_r = " + mnBizPartherId +  
+                msSql += "AND d.id_year = " + mnYearId + " AND d.dt >= '" + SLibUtils.DbmsDateFormatDate.format(mtDateStart) + "' AND d.dt <= '" + SLibUtils.DbmsDateFormatDate.format(mtDateFinal) + "' " +
+                "AND d.fid_cob = " + SDataConstantsSys.BPSS_TP_BPB_HQ + " AND d.fid_bp_r = " + mnBizPartherId + sql +
                 " INNER JOIN " + SModConsts.TablesMap.get(SModConsts.CFGU_CUR) + " AS c ON d.fid_cur = c.id_cur INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BP_CT) + " AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " + mnGridMode + " " +
                 "INNER JOIN " + SModConsts.TablesMap.get(SModConsts.BPSU_BPB) + " AS cb ON d.fid_cob = cb.id_bpb " +

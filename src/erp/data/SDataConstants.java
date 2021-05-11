@@ -180,6 +180,8 @@ public abstract class SDataConstants {
     public static final int BPSX_BP_CDR = 204510;
     public static final int BPSX_BP_DBR = 204511;
     public static final int BPSX_BP_EMP = 204512;
+    public static final int BPSX_BP_SUP_FI = 204519;
+    public static final int BPSX_BP_CUS_FI = 204520;
     public static final int BPSX_BP_EMP_CON_EXP = 204561; // employee contract expiration
     public static final int BPSX_BP_EMP_REL = 204571; // employee relatives
     public static final int BPSX_BP_INT_SUP = 204608; //international suppliers
@@ -465,6 +467,8 @@ public abstract class SDataConstants {
     public static final int TRN_TP_CFD_PAC = 207098;    // out of place! (sflores, 2014-02-17)
     public static final int TRN_MMS_LOG = 207099;       // out of place! (sflores, 2014-01-28)
     public static final int TRN_CFD_SIGN_LOG = 207100;  // out of place! (sflores, 2014-09-01)
+    public static final int TRN_DNC_DPS_SUA = 207101;
+    public static final int TRN_DNC_DPS_IDSE = 207102;
     public static final int TRN_CFD_FIN_REC = 207104;
     public static final int TRN_DVY = 207111;
     public static final int TRN_DVY_ETY = 207112;

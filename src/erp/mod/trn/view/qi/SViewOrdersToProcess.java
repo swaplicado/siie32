@@ -5,9 +5,11 @@
 package erp.mod.trn.view.qi;
 
 import erp.data.SDataConstantsSys;
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.lib.table.STableConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.table.SFilterConstants;
 import java.util.ArrayList;
 import java.util.Date;
 import sa.lib.SLibRpnArgument;
@@ -20,6 +22,7 @@ import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
 import sa.lib.gui.SGuiClient;
+import sa.lib.gui.SGuiConsts;
 import sa.lib.gui.SGuiParams;
 
 /**
@@ -32,6 +35,8 @@ public class SViewOrdersToProcess extends SGridPaneView {
     private Date mtDateFinal;
     private int mnYearId;
     private int mnBizPartherId;
+    
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
     
     public SViewOrdersToProcess(SGuiClient client, int gridType, int gridSubtype, String title, SGuiParams params) {
         super(client, SGridConsts.GRID_PANE_VIEW, gridType, gridSubtype, title, params);
@@ -47,6 +52,9 @@ public class SViewOrdersToProcess extends SGridPaneView {
         mtDateStart = null;
         mnBizPartherId = 0;
         createGridColumns();
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
     }
 
     private void setParamsView(final Date dateStart, final Date dateFinal, final int year, final int idBizPartner ) {
@@ -77,6 +85,13 @@ public class SViewOrdersToProcess extends SGridPaneView {
     
     @Override
     public void prepareSqlQuery() {
+        String sql = "";
+        Object filter = null;
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null) {
+            sql += "AND d.fid_func IN ( " + filter + ") ";
+        }
         
         moPaneSettings = new SGridPaneSettings(2);
         msSql = "SELECT id_year " + SDbConsts.FIELD_ID + "1, " +
@@ -96,7 +111,7 @@ public class SViewOrdersToProcess extends SGridPaneView {
                 "AND xde.id_doc = xd.id_doc AND xde."
                 + "b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND xd.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND xd.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + "), " + SModSysConsts.FINS_CFD_TAX_NA + ") AS f_link_orig_qty " +
                 "FROM " + SModConsts.TablesMap.get(SModConsts.TRN_DPS) + " AS d INNER JOIN " + SModConsts.TablesMap.get(SModConsts.TRN_DPS_ETY) + " AS de ON d.id_year = de.id_year " +
-                "AND d.id_doc = de.id_doc AND d.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND de.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " ; 
+                "AND d.id_doc = de.id_doc AND d.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND de.b_del = " + SModSysConsts.FINS_CFD_TAX_NA + " AND d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " " + sql; 
                 if (mnGridMode == SDataConstantsSys.BPSS_CT_BP_CUS) {
                     msSql += "AND d.fid_ct_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_cl_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_tp_dps = " + SDataConstantsSys.TRNS_ST_DPS_NEW + " ";
                 }

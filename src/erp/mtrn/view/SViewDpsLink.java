@@ -21,6 +21,7 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mitm.form.SPanelFilterItemGeneric;
+import erp.mod.SModConsts;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.STrnUtilities;
 import erp.mtrn.form.SDialogContractAnalysis;
@@ -28,6 +29,7 @@ import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
 import erp.table.STabFilterCompanyBranch;
 import erp.table.STabFilterDocumentNature;
+import erp.table.STabFilterFunctionalArea;
 import erp.table.STabFilterUsers;
 import java.awt.Dimension;
 import java.util.Vector;
@@ -60,6 +62,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
     private erp.mtrn.form.SDialogContractAnalysis moDialogContractAnalysis;
     private erp.table.STabFilterUsers moTabFilterUser;
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     private boolean mbHasRightAuthor = false;
 
@@ -167,6 +170,7 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         moTabFilterUser.removeButtonUser();
         moTabFilterUser.setUserId(mbHasRightAuthor ? miClient.getSession().getUser().getPkUserId() : SDataConstantsSys.UNDEFINED);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -189,6 +193,8 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
         addTaskBarLowerComponent(moTabFilterUser);
         addTaskBarLowerSeparator();
         addTaskBarLowerComponent(moTabFilterDocumentNature);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         mjbClose.setEnabled(hasRightToClose && !isViewForDocLinked());
         mjbOpen.setEnabled(hasRightToOpen && isViewForDocLinked());
@@ -525,6 +531,11 @@ public class SViewDpsLink extends erp.lib.table.STableTab implements java.awt.ev
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_NAT) {
                 if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
                     sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + "d.fid_dps_nat = " + ((Integer) setting.getSetting()) + " ";
+                }
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + " d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }

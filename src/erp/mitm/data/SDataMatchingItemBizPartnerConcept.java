@@ -30,6 +30,8 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
     protected int mnFkBizPartnerId;
     protected int mnFkItemId;
     protected int mnFkUnitId;
+    protected int mnFkItemIdRef;
+    protected String mnFkCostCenter;
     protected int mnFkTaxRegionId;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
@@ -55,6 +57,8 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
     public void setFkBizPartnerId(int n) { mnFkBizPartnerId = n; }
     public void setFkItemId(int n) { mnFkItemId = n; }
     public void setFkUnitId(int n) { mnFkUnitId = n; }
+    public void setFkItemIdRef(int n) { mnFkItemIdRef = n; }
+    public void setFkCostCenter(String s) { mnFkCostCenter = s; }
     public void setFkTaxRegionId(int n) { mnFkTaxRegionId = n; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
@@ -73,6 +77,8 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
     public int getFkBizPartnerId() { return mnFkBizPartnerId; }
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
+    public int getFkItemIdRef() { return mnFkItemIdRef; }
+    public String getFkCostCenter() { return mnFkCostCenter; }
     public int getFkTaxRegionId() { return mnFkTaxRegionId; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
@@ -106,6 +112,8 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
         mnFkBizPartnerId = 0;
         mnFkItemId = 0;
         mnFkUnitId = 0;
+        mnFkItemIdRef = 0;
+        mnFkCostCenter = "";
         mnFkTaxRegionId = 0;
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
@@ -143,6 +151,8 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
                 mnFkBizPartnerId = resultSet.getInt("fid_bp");
                 mnFkItemId = resultSet.getInt("fid_item");
                 mnFkUnitId = resultSet.getInt("fid_unit");
+                mnFkItemIdRef = resultSet.getInt("fid_item_ref_n");
+                mnFkCostCenter = resultSet.getString("fid_cc");
                 mnFkTaxRegionId = resultSet.getInt("fid_tax_reg");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
@@ -180,7 +190,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
             callableStatement = connection.prepareCall(
                     "{ CALL erp.itmu_match_item_cpt_bp_save(" +  
                     "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-                    "?, ?, ?, ?, ?) }");
+                    "?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkMatchId);
             callableStatement.setString(nParam++, msConceptKey);
             callableStatement.setDouble(nParam++, mdFactorConversion);
@@ -191,6 +201,8 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
             callableStatement.setInt(nParam++, mnFkBizPartnerId);
             callableStatement.setInt(nParam++, mnFkItemId);
             callableStatement.setInt(nParam++, mnFkUnitId);
+            callableStatement.setInt(nParam++, mnFkItemIdRef);
+            callableStatement.setString(nParam++, mnFkCostCenter);
             callableStatement.setInt(nParam++, mnFkTaxRegionId);
             callableStatement.setInt(nParam++, mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);

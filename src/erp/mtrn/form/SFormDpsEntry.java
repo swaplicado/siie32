@@ -80,6 +80,8 @@ import sa.lib.gui.SGuiConsts;
  */
 public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.FocusListener, java.awt.event.ItemListener, javax.swing.event.CellEditorListener {
     
+    public static final int CONCEPT_LENGTH_MAX = 130;
+    
     private static final int TAB_TAX = 0;
     private static final int TAB_SAL_CMS = 1; // sales comissions
     private static final int TAB_PRC = 2;
@@ -2259,7 +2261,7 @@ public class SFormDpsEntry extends javax.swing.JDialog implements erp.lib.form.S
         moFieldConceptKey = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtConceptfKey, jlConceptKey);
         moFieldConceptKey.setLengthMax(35);
         moFieldConcept = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, true, jtfConcept, jlConcept);
-        moFieldConcept.setLengthMax(130);
+        moFieldConcept.setLengthMax(CONCEPT_LENGTH_MAX);
         moFieldFkOriginalUnitId = new SFormField(miClient, SLibConstants.DATA_TYPE_KEY, true, jcbFkOriginalUnitId, jlFkOriginalUnitId);
         moFieldFkOriginalUnitId.setPickerButton(jbFkOriginalUnitId);
         moFieldIsDiscountUnitaryPercentage = new SFormField(miClient, SLibConstants.DATA_TYPE_BOOLEAN, true, jckIsDiscountUnitaryPercentage);

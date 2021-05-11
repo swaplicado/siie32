@@ -161,7 +161,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
 
-                aoTableColumns = new STableColumn[10];
+                aoTableColumns = new STableColumn[11];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL:
@@ -171,7 +171,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
 
-                aoTableColumns = new STableColumn[6];
+                aoTableColumns = new STableColumn[7];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL_LENT:
@@ -180,7 +180,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[10];
+                aoTableColumns = new STableColumn[11];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL_MAINT:
@@ -189,7 +189,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[10];
+                aoTableColumns = new STableColumn[11];
                 break;
 
             case SModSysConsts.TRNX_MAINT_TOOL_LOST:           
@@ -198,7 +198,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_item");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "s.id_unit");
                 aoKeyFields[i++] = new STableField(SLibConstants.DATA_TYPE_INTEGER, "_id_bp");
-                aoTableColumns = new STableColumn[10];
+                aoTableColumns = new STableColumn[11];
                 break;
 
             default:
@@ -213,9 +213,11 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "No. parte", 250);
         }
         else {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "No. parte", 250);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
         }
 
@@ -391,7 +393,7 @@ public class SViewMaintStock extends erp.lib.table.STableTab implements java.awt
             }
         }
         
-        msSql = "SELECT s.id_item, s.id_unit, i.item_key, i.item, u.symbol, sc.qty_min, sc.rop, sc.qty_max, " +
+        msSql = "SELECT s.id_item, s.id_unit, i.item_key, i.item, i.part_num, u.symbol, sc.qty_min, sc.rop, sc.qty_max, " +
                 (!isMaintUserNeeded() ? "" : "COALESCE(b.id_bp, 0) AS _id_bp, COALESCE(b.bp, 'N/D') AS _bp, supv.name, MIN(s.dt) AS _diog_dt, ") +
                 "IF(SUM(s.mov_in - s.mov_out) <= sc.qty_min, " + STableConstants.ICON_VIEW_LIG_RED + ", " +
                 "IF(sc.qty_min < SUM(s.mov_in - s.mov_out) AND SUM(s.mov_in - s.mov_out) <= sc.rop, "  + STableConstants.ICON_VIEW_LIG_YEL + ", " +

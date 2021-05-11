@@ -21,8 +21,11 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsUtils;
+import erp.mtrn.form.SDialogFilterFunctionalArea;
+import erp.mtrn.utils.STrnFunAreasUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -57,6 +60,11 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
     int[] manSysMoveTypeKey;
     private java.lang.String msBizPartnerCatSng;
     private java.lang.String msBizPartnerCatPlr;
+    
+    private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
+    private int mnFunctionalAreaId;
+    private int[] manDataFilter;
+    private String msFunctionalAreasIds;
 
     /** Creates new form SDialogRepBizPartnerBalanceDps */
     public SDialogRepBizPartnerBalanceDps(erp.client.SClientInterface client, int idBizPartnerCategory) {
@@ -98,6 +106,10 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
         jlBizPartner = new javax.swing.JLabel();
         jcbBizPartner = new javax.swing.JComboBox();
         jbPickBizPartner = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jlBizPartner1 = new javax.swing.JLabel();
+        jtfFunctionalArea = new javax.swing.JTextField();
+        jbFunctionalArea = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jpPrint = new javax.swing.JButton();
         jpClose = new javax.swing.JButton();
@@ -203,6 +215,24 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
 
         jPanel6.add(jPanel4);
 
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizPartner1.setText("Área funcional:");
+        jlBizPartner1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel5.add(jlBizPartner1);
+
+        jtfFunctionalArea.setEditable(false);
+        jtfFunctionalArea.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel5.add(jtfFunctionalArea);
+
+        jbFunctionalArea.setText("...");
+        jbFunctionalArea.setToolTipText("Seleccionar asociado de negocios:");
+        jbFunctionalArea.setFocusable(false);
+        jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel5.add(jbFunctionalArea);
+
+        jPanel6.add(jPanel5);
+
         jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
@@ -289,6 +319,7 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
         jcbCurrency.addItemListener(this);
         jbPickExRate.addActionListener(this);
         jbPickBizPartner.addActionListener(this);
+        jbFunctionalArea.addActionListener(this);
 
         resetForm();
 
@@ -299,6 +330,13 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
         jrbCurrencyLoc.setSelected(true);
+        
+        //Áreas funcionales
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, SModConsts.CFGU_FUNC, manDataFilter);
+
+        renderText();
     }
 
     private void windowActivated() {
@@ -379,6 +417,8 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
             map.put("tDate", moFieldDate.getDate());
             map.put("sBizPartner", (jcbBizPartner.getSelectedIndex() <= 0 ? "(TODOS)" : moFieldBizPartner.getString()));
             map.put("sFilterBizPartner", filterBp);
+            map.put("sFuncText", jtfFunctionalArea.getText());
+            map.put("sFilterFunctionalArea", "AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
             map.put("nCurrencyId", moFieldCurrency.getKeyAsIntArray()[0]);
             map.put("sCurrencyCode", SDataReadDescriptions.getCatalogueDescription((miClient), SDataConstants.CFGU_CUR, moFieldCurrency.getKeyAsIntArray(), SLibConstants.DESCRIPTION_CODE));
             map.put("sCurrency", jcbCurrency.getSelectedItem().toString());
@@ -433,6 +473,26 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
             print();
         }
     }
+    
+    private void actionFunctionalArea() {
+        moDialogFilterFunctionalArea.formRefreshCatalogues();
+        moDialogFilterFunctionalArea.formReset();
+        moDialogFilterFunctionalArea.setFunctionalAreaId(mnFunctionalAreaId);
+        moDialogFilterFunctionalArea.setFormVisible(true);
+
+        if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+            mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            renderText();
+        }
+    }
+    
+    private void renderText() {
+        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter(miClient, mnFunctionalAreaId);
+        msFunctionalAreasIds = texts[0];
+        
+        jtfFunctionalArea.setText(texts[1]);
+        jtfFunctionalArea.setCaretPosition(0);
+    }
 
     public void actionClose() {
         setVisible(false);
@@ -447,7 +507,9 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JButton jbFunctionalArea;
     private javax.swing.JButton jbPickBizPartner;
     private javax.swing.JButton jbPickDate;
     private javax.swing.JButton jbPickExRate;
@@ -455,6 +517,7 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
     private javax.swing.JComboBox jcbCurrency;
     private javax.swing.JFormattedTextField jftDate;
     private javax.swing.JLabel jlBizPartner;
+    private javax.swing.JLabel jlBizPartner1;
     private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlCurrencyDocWarning;
     private javax.swing.JLabel jlDate;
@@ -464,6 +527,7 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
     private javax.swing.JRadioButton jrbCurrencyDoc;
     private javax.swing.JRadioButton jrbCurrencyLoc;
     private javax.swing.JTextField jtfExRate;
+    private javax.swing.JTextField jtfFunctionalArea;
     // End of variables declaration//GEN-END:variables
 
     public void resetForm() {
@@ -498,6 +562,9 @@ public class SDialogRepBizPartnerBalanceDps extends javax.swing.JDialog implemen
             }
             else if (button == jbPickBizPartner) {
                 actionPickBizPartner();
+            }
+            else if (button == jbFunctionalArea) {
+                actionFunctionalArea();
             }
         }
     }

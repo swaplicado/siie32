@@ -8,11 +8,13 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
 import erp.data.SProcConstants;
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.log.db.SParamsShipment;
 import erp.mtrn.data.SDataDps;
+import erp.table.SFilterConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -49,6 +51,7 @@ public class SViewShipmentDpsAdjustment extends SGridPaneView implements ActionL
 
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterDateCutOff moFilterDateCutOff;
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
 
     private JButton moButtonShipmentNational;
     private JButton moButtonShipmentInternational;
@@ -90,6 +93,9 @@ public class SViewShipmentDpsAdjustment extends SGridPaneView implements ActionL
 
         moButtonShipmentOpen = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_doc_open.gif")), "Abrir para embarque", this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moButtonShipmentOpen);
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
 
         switch (mnGridMode) {
             case  SModConsts.VIEW_SC_SUM:
@@ -246,6 +252,11 @@ public class SViewShipmentDpsAdjustment extends SGridPaneView implements ActionL
         else if (mnGridSubtype == SModConsts.VIEW_ST_DONE) {
             filter = (SGuiDate) moFiltersMap.get(SGridConsts.FILTER_DATE_PERIOD).getValue();
             sql += (sql.isEmpty() ? "" : "AND ") + SGridUtils.getSqlFilterDate("d.dt", (SGuiDate) filter);
+        }
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null) {
+            sql += (sql.isEmpty() ? "" : "AND ") + " d.fid_func IN ( " + filter + ") ";
         }
 
         sqlOrderByDoc += "num_ser, CAST(num AS UNSIGNED INTEGER), num, f_dt_code, dt, bp_key, bp, id_bp ";

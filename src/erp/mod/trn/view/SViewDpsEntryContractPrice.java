@@ -8,12 +8,14 @@ import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.gui.SModuleUtilities;
+import erp.gui.grid.SGridFilterPanelFunctionalArea;
 import erp.lib.SLibConstants;
 import erp.lib.SLibUtilities;
 import erp.mcfg.data.SDataParamsErp;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.form.SDialogContractPriceCardex;
+import erp.table.SFilterConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ public class SViewDpsEntryContractPrice extends SGridPaneView implements ActionL
     private JButton jbCardex;
     private SGridFilterDatePeriod moFilterDatePeriod;
     private SGridFilterDateCutOff moFilterDateCutOff;
+    private SGridFilterPanelFunctionalArea moFilterFunctionalArea;
     private SDialogContractPriceCardex moDialogContractPriceCardex;
     
     public SViewDpsEntryContractPrice(SGuiClient client, int gridSubtype, String title, SGuiParams params) {
@@ -68,6 +71,9 @@ public class SViewDpsEntryContractPrice extends SGridPaneView implements ActionL
             moFilterDateCutOff.initFilter(null);
             getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterDateCutOff);
         }
+        
+        moFilterFunctionalArea = new SGridFilterPanelFunctionalArea(miClient, this, SFilterConstants.SETTING_FILTER_FUNC_AREA);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterFunctionalArea);
         
         mjbViewDps = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_LOOK), "Ver documento", this);
         mjbViewNotes = SGridUtils.createButton(miClient.getImageIcon(SLibConstants.ICON_NOTES), "Ver notas", this);
@@ -165,6 +171,11 @@ public class SViewDpsEntryContractPrice extends SGridPaneView implements ActionL
             if (filter != null) {
                 sql += (sql.isEmpty() ? "" : "AND ") + "d.dt <= '" + SLibUtils.DbmsDateFormatDate.format((SGuiDate) filter) + "' ";
             }
+        }
+        
+        filter = (String) (moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA) == null ? null : moFiltersMap.get(SFilterConstants.SETTING_FILTER_FUNC_AREA).getValue());
+        if (filter != null) {
+            sql += (sql.isEmpty() ? "" : "AND ") + "d.fid_func IN ( " + filter + ") ";
         }
         
         msSql = "SELECT "

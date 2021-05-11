@@ -15,9 +15,11 @@ import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mitm.form.SPanelFilterItemGeneric;
+import erp.mod.SModConsts;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterCompanyBranch;
 import erp.table.STabFilterDocumentNature;
+import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
 import javax.swing.JButton;
 import sa.lib.SLibUtils;
@@ -38,6 +40,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
     private erp.table.STabFilterCompanyBranch moTabFilterCompanyBranch;
     private erp.mitm.form.SPanelFilterItemGeneric moPanelFilterItemGeneric;
     private erp.table.STabFilterDocumentNature moTabFilterDocumentNature;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     public SViewBackorder(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01, int auxType02) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_BACKORDER, auxType01, auxType02);
@@ -86,6 +89,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
         moTabFilterCompanyBranch = new STabFilterCompanyBranch(miClient, this);
         moPanelFilterItemGeneric = new SPanelFilterItemGeneric(miClient, this);
         moTabFilterDocumentNature = new STabFilterDocumentNature(miClient, this, SDataConstants.TRNU_DPS_NAT);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
@@ -100,6 +104,8 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
         addTaskBarUpperComponent(mjbViewLinks);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDocumentNature);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         mjbViewNotes.setEnabled(true);
         mjbViewLinks.setEnabled(true);
@@ -235,6 +241,7 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
         String sqlWhereDateSubquery = "";
         String sqlCompanyBranch = "";
         String sqlItemGeneric = "";
+        String sqlFunctAreas = "";
         String sqlWhere = "";
         java.util.Date date = null;
         STableSetting setting = null;
@@ -257,6 +264,11 @@ public class SViewBackorder extends erp.lib.table.STableTab implements java.awt.
             else if (setting.getType() == SFilterConstants.SETTING_FILTER_DOC_NAT) {
                 if (((Integer) setting.getSetting()) != SLibConstants.UNDEFINED) {
                     sqlWhere += (sqlWhere.isEmpty() ? "AND " : "") + "d.fid_dps_nat = " + ((Integer) setting.getSetting()) + " ";
+                }
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + "d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
                 }
             }
         }

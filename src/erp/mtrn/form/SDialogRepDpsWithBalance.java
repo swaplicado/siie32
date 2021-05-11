@@ -20,6 +20,8 @@ import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mod.SModConsts;
+import erp.mtrn.utils.STrnFunAreasUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -51,6 +53,11 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
     private erp.lib.form.SFormField moFieldRoute;
 
     private boolean mbParamIsSupplier;
+    
+    private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
+    private int mnFunctionalAreaId;
+    private int[] manDataFilter;
+    private String msFunctionalAreasIds;
 
     /** Creates new form SDialogRepDpsWithBalance */
     public SDialogRepDpsWithBalance(erp.client.SClientInterface client) {
@@ -79,19 +86,23 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jbDate = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
-        jcbCompanyBranch = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCompanyBranch = new javax.swing.JComboBox<>();
         jPanel5 = new javax.swing.JPanel();
         jlBizArea = new javax.swing.JLabel();
-        jcbBizArea = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbBizArea = new javax.swing.JComboBox<>();
         jPanel7 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
-        jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbBizPartner = new javax.swing.JComboBox<>();
         jPanel8 = new javax.swing.JPanel();
         jlAgent = new javax.swing.JLabel();
-        jcbAgent = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbAgent = new javax.swing.JComboBox<>();
         jPanel9 = new javax.swing.JPanel();
         jlRoute = new javax.swing.JLabel();
-        jcbRoute = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbRoute = new javax.swing.JComboBox<>();
+        jPanel13 = new javax.swing.JPanel();
+        jlBizPartner1 = new javax.swing.JLabel();
+        jtfFunctionalArea = new javax.swing.JTextField();
+        jbFunctionalArea = new javax.swing.JButton();
         jPanel11 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
         jrbByLocalCurrency = new javax.swing.JRadioButton();
@@ -113,7 +124,7 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jPanel2.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Filtros del reporte:"));
-        jPanel3.setLayout(new java.awt.GridLayout(6, 1, 5, 5));
+        jPanel3.setLayout(new java.awt.GridLayout(7, 1, 5, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -193,6 +204,24 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
 
         jPanel3.add(jPanel9);
 
+        jPanel13.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizPartner1.setText("Área funcional:");
+        jlBizPartner1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel13.add(jlBizPartner1);
+
+        jtfFunctionalArea.setEditable(false);
+        jtfFunctionalArea.setPreferredSize(new java.awt.Dimension(266, 23));
+        jPanel13.add(jtfFunctionalArea);
+
+        jbFunctionalArea.setText("...");
+        jbFunctionalArea.setToolTipText("Seleccionar asociado de negocios:");
+        jbFunctionalArea.setFocusable(false);
+        jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel13.add(jbFunctionalArea);
+
+        jPanel3.add(jPanel13);
+
         jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
 
         jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Moneda del reporte:"));
@@ -258,6 +287,7 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         jbPrint.addActionListener(this);
         jbExit.addActionListener(this);
         jbDate.addActionListener(this);
+        jbFunctionalArea.addActionListener(this);
 
         AbstractAction actionOk = new AbstractAction() {
             @Override
@@ -274,6 +304,13 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
         SFormUtilities.putActionMap(getRootPane(), action, "exit", KeyEvent.VK_ESCAPE, 0);
 
         setModalityType(ModalityType.MODELESS);
+        
+        //Áreas funcionales
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, SModConsts.CFGU_FUNC, manDataFilter);
+        
+        renderText();
     }
 
     private void windowActivated() {
@@ -325,6 +362,8 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
                 map.put("sSqlWhereBizPartner", moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "" : " AND re.fid_bp_nr = " + moFieldBizPartner.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereSalesAgent", moFieldAgent.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_sal_agt_n = " + moFieldAgent.getKeyAsIntArray()[0]);
                 map.put("sSqlWhereSalesRoute", moFieldRoute.getKeyAsIntArray()[0] == 0 ? "" : " AND rou.fid_sal_route = " + moFieldRoute.getKeyAsIntArray()[0]);
+                map.put("sFuncText", jtfFunctionalArea.getText());
+                map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
                 map.put("sTitle", mbParamIsSupplier ? " DE PROVEEDORES" : " DE CLIENTES");
                 map.put("sLocalCurrency", miClient.getSessionXXX().getParamsErp().getDbmsDataCurrency().getCurrency());
                 map.put("sBizPartner", moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "(TODOS)" : jcbBizPartner.getSelectedItem().toString());
@@ -363,12 +402,33 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
             jftDate.requestFocus();
         }
     }
+    
+    private void actionFunctionalArea() {
+        moDialogFilterFunctionalArea.formRefreshCatalogues();
+        moDialogFilterFunctionalArea.formReset();
+        moDialogFilterFunctionalArea.setFunctionalAreaId(mnFunctionalAreaId);
+        moDialogFilterFunctionalArea.setFormVisible(true);
+
+        if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+            mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            renderText();
+        }
+    }
+    
+    private void renderText() {
+        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter(miClient, mnFunctionalAreaId);
+        msFunctionalAreasIds = texts[0];
+        
+        jtfFunctionalArea.setText(texts[1]);
+        jtfFunctionalArea.setCaretPosition(0);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -379,6 +439,7 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbDate;
     private javax.swing.JButton jbExit;
+    private javax.swing.JButton jbFunctionalArea;
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox<SFormComponentItem> jcbAgent;
     private javax.swing.JComboBox<SFormComponentItem> jcbBizArea;
@@ -389,11 +450,13 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
     private javax.swing.JLabel jlAgent;
     private javax.swing.JLabel jlBizArea;
     private javax.swing.JLabel jlBizPartner;
+    private javax.swing.JLabel jlBizPartner1;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlDate;
     private javax.swing.JLabel jlRoute;
     private javax.swing.JRadioButton jrbByDpsCurrency;
     private javax.swing.JRadioButton jrbByLocalCurrency;
+    private javax.swing.JTextField jtfFunctionalArea;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -497,6 +560,9 @@ public class SDialogRepDpsWithBalance extends javax.swing.JDialog implements erp
             }
             else if (button == jbDate) {
                 actionDate();
+            }
+            else if (button == jbFunctionalArea) {
+                actionFunctionalArea();
             }
         }
     }

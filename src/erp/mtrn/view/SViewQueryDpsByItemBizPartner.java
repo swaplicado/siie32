@@ -16,9 +16,11 @@ import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
 import erp.mfin.data.SFinUtilities;
 import erp.mitm.form.SPanelFilterItem;
+import erp.mod.SModConsts;
 import erp.mtrn.form.SDialogUpdateDpsAccountCenterCost;
 import erp.table.SFilterConstants;
 import erp.table.STabFilterBizPartner;
+import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -36,6 +38,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
     private erp.mitm.form.SPanelFilterItem moPanelFilterItem;
     private erp.table.STabFilterBizPartner moTabFilterBizPartner;
     private erp.mtrn.form.SDialogUpdateDpsAccountCenterCost moDialogUpdateDpsAccountCostCenter;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
     
     private javax.swing.JButton jbAccountCostCenter;
 
@@ -54,6 +57,7 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
         moPanelFilterItem = new SPanelFilterItem(miClient, this, true);
         moTabFilterBizPartner = new STabFilterBizPartner(miClient, this, isPurchase() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS);
         moDialogUpdateDpsAccountCostCenter = new SDialogUpdateDpsAccountCenterCost(miClient);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         jbAccountCostCenter = new JButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_bkk_csh.gif")));
         jbAccountCostCenter.setPreferredSize(new Dimension(23, 23));
@@ -83,6 +87,9 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
             addTaskBarUpperSeparator();
             addTaskBarUpperComponent(moTabFilterBizPartner);
         }
+        
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         renderTableColumns();
         setIsSummaryApplying(true);
@@ -214,6 +221,11 @@ public class SViewQueryDpsByItemBizPartner extends erp.lib.table.STableTab imple
                 sqlDatePeriod += " AND d.dt BETWEEN " +
                         "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[0]) + "' AND " +
                         "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[1]) + "' ";
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlWhere += " AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
             
            if (SLibUtils.belongsTo(mnTabTypeAux01, new int[] { SDataConstantsSys.TRNX_PUR_DPS_BY_ITEM_BP_FIL, SDataConstantsSys.TRNX_SAL_DPS_BY_ITEM_BP_FIL })) {

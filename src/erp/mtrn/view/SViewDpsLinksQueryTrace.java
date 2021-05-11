@@ -14,6 +14,9 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
+import erp.table.SFilterConstants;
+import erp.table.STabFilterFunctionalArea;
 import javax.swing.JButton;
 
 /**
@@ -23,6 +26,7 @@ import javax.swing.JButton;
 public class SViewDpsLinksQueryTrace extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     public SViewDpsLinksQueryTrace(erp.client.SClientInterface client, java.lang.String tabTitle, int auxType01) {
         super(client, tabTitle, SDataConstants.TRNX_DPS_LINKS_TRACE, auxType01);
@@ -33,11 +37,14 @@ public class SViewDpsLinksQueryTrace extends erp.lib.table.STableTab implements 
         int i;
 
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, SLibConstants.GUI_DATE_AS_YEAR_MONTH);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         removeTaskBarUpperComponent(jbNew);
         removeTaskBarUpperComponent(jbEdit);
         removeTaskBarUpperComponent(jbDelete);
         addTaskBarUpperComponent(moTabFilterDatePeriod);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
 
         STableField[] aoKeyFields = new STableField[2];
         STableColumn[] aoTableColumns = new STableColumn[19];
@@ -123,12 +130,18 @@ public class SViewDpsLinksQueryTrace extends erp.lib.table.STableTab implements 
     public void createSqlQuery() {
         String sqlDatePeriod = "";
         String sqlDocType = "";
+        String sqlFunctAreas = "";
         STableSetting setting = null;
 
         for (int i = 0; i < mvTableSettings.size(); i++) {
             setting = (erp.lib.table.STableSetting) mvTableSettings.get(i);
             if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 sqlDatePeriod += "AND " + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlFunctAreas += "AND d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
         }
 
@@ -147,7 +160,7 @@ public class SViewDpsLinksQueryTrace extends erp.lib.table.STableTab implements 
                 "oe.id_year, oe.id_doc, oe.id_ety, o.dt, ot.code, IF(LENGTH(o.num_ser) = 0, o.num, CONCAT(o.num_ser, '-', o.num)) AS f_o_num, ocb.code, " +
                 "ce.id_year, ce.id_doc, ce.id_ety, c.dt, ct.code, IF(LENGTH(c.num_ser) = 0, c.num, CONCAT(c.num_ser, '-', c.num)) AS f_c_num, ccb.code " +
                 "FROM trn_dps AS d INNER JOIN trn_dps_ety AS de ON d.id_year = de.id_year AND d.id_doc = de.id_doc AND d.b_del = 0 AND de.b_del = 0 AND " +
-                "d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " + sqlDocType + sqlDatePeriod +
+                "d.fid_st_dps = " + SDataConstantsSys.TRNS_ST_DPS_EMITED + " AND d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " " + sqlDocType + sqlDatePeriod + sqlFunctAreas +
                 "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " +
                 "INNER JOIN erp.bpsu_bp_ct AS bc ON b.id_bp = bc.id_bp AND bc.id_ct_bp = " +
                 (isViewForCategoryPur() ? SDataConstantsSys.BPSS_CT_BP_SUP : SDataConstantsSys.BPSS_CT_BP_CUS) + " " +

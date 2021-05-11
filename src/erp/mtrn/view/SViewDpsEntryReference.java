@@ -17,6 +17,9 @@ import erp.lib.table.STableColumn;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STableField;
 import erp.lib.table.STableSetting;
+import erp.mod.SModConsts;
+import erp.table.SFilterConstants;
+import erp.table.STabFilterFunctionalArea;
 import java.awt.Dimension;
 import javax.swing.JButton;
 import sa.gui.util.SUtilConsts;
@@ -31,6 +34,7 @@ public class SViewDpsEntryReference extends erp.lib.table.STableTab implements j
     private javax.swing.JButton jbViewLinks;
     private erp.lib.table.STabFilterDeleted moTabFilterDeleted;
     private erp.lib.table.STabFilterDatePeriod moTabFilterDatePeriod;
+    private erp.table.STabFilterFunctionalArea moTabFilterFunctionalArea;
 
     private boolean mbIsCategoryPur = false;
     private boolean mbIsCategorySal = false;
@@ -105,11 +109,14 @@ public class SViewDpsEntryReference extends erp.lib.table.STableTab implements j
 
         moTabFilterDeleted = new STabFilterDeleted(this);
         moTabFilterDatePeriod = new STabFilterDatePeriod(miClient, this, mbIsEstCon ? SLibConstants.GUI_DATE_AS_YEAR : SLibConstants.GUI_DATE_AS_YEAR_MONTH);
+        moTabFilterFunctionalArea = new STabFilterFunctionalArea(miClient, this, SModConsts.CFGU_FUNC, new int[] { miClient.getSession().getUser().getPkUserId() });
 
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDeleted);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(moTabFilterDatePeriod);
+        addTaskBarUpperSeparator();
+        addTaskBarUpperComponent(moTabFilterFunctionalArea);
         addTaskBarUpperSeparator();
         addTaskBarUpperComponent(jbViewNotes);
         addTaskBarUpperComponent(jbViewLinks);
@@ -323,6 +330,11 @@ public class SViewDpsEntryReference extends erp.lib.table.STableTab implements j
             }
             else if (setting.getType() == STableConstants.SETTING_FILTER_PERIOD) {
                 sqlWhere += (sqlWhere.length() == 0 ? "" : "AND ") + SDataSqlUtilities.composePeriodFilter((int[]) setting.getSetting(), "d.dt");
+            }
+            else if (setting.getType() == SFilterConstants.SETTING_FILTER_FUNC_AREA) {
+                if (! ((String) setting.getSetting()).isEmpty()) {
+                    sqlWhere += (sqlWhere.isEmpty() ? "" : "AND ") + " d.fid_func IN (" + ((String) setting.getSetting()) + ") ";
+                }
             }
         }
 
