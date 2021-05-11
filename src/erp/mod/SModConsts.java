@@ -595,6 +595,7 @@ public abstract class SModConsts {
     public static final int HRSS_TP_PAY = 2061011;
     public static final int HRSS_TP_PAY_SHT = 2061012;
     public static final int HRSS_TP_SAL = 2061013;
+    public static final int HRSS_TP_ENT = 2061014;
     public static final int HRSS_TP_ACC = 2061016;
     public static final int HRSS_TP_TAX_COMP = 2061021;
     public static final int HRSS_TP_EAR_COMP = 2061031;
@@ -628,6 +629,9 @@ public abstract class SModConsts {
     public static final int HRSU_SHT = 2062033;
     public static final int HRSU_EMP = 2062051;
     public static final int HRSU_EMP_REL = 2062052;
+    public static final int HRSU_EMP_SUA = 2062053;
+    public static final int HRSU_EMP_IDSE = 2062054;
+    public static final int HRSU_TP_COD = 2062055;
 
     public static final int HRS_SIE_PAY = 2063001;
     public static final int HRS_SIE_PAY_EMP = 2063002;
@@ -655,6 +659,8 @@ public abstract class SModConsts {
     public static final int HRS_EMP_LOG_HIRE = 2063081;
     public static final int HRS_EMP_LOG_WAGE = 2063082;
     public static final int HRS_EMP_LOG_SAL_SSC = 2063083;
+    public static final int HRS_EMP_LOG_SUA = 2063084;
+    public static final int HRS_EMP_LOG_IDSE = 2063085;
     public static final int HRS_LOAN = 2063091;
     public static final int HRS_ABS = 2063101;
     public static final int HRS_ABS_CNS = 2063102;
@@ -700,10 +706,20 @@ public abstract class SModConsts {
     public static final int HRSX_EAR_SSC = 2064103;
     public static final int HRSX_PTU = 2064106;
     public static final int HRSX_IMPORT_CAP = 2064110;
-    public static final int HRSX_LAYOUT_SUA_HIRE = 1;
-    public static final int HRSX_LAYOUT_SUA_SSC = 2;
-    public static final int HRSX_LAYOUT_SUA_DISMISS = 3;
-    public static final int HRSX_LAYOUT_UPDATE_SSC = 4;
+    public static final int HRSX_LAYOUT_SUA_HIRE = 1; // High worker
+    public static final int HRSX_LAYOUT_SUA_DISMISS = 2; // Low worker
+    public static final int HRSX_LAYOUT_IDSE_HIRE = 3; // High worker IDSE
+    public static final int HRSX_LAYOUT_IDSE_DISMISS = 4; //Low worker IDSE
+    public static final int HRSX_LAYOUT_IDSE_SSC = 5; // Modification of worker's salary IDSE
+    public static final int HRSX_LAYOUT_SUA_SSC = 7; // Modification of worker's salary
+    public static final int HRSX_LAYOUT_SUA_ENTRY = 8; // Reentry worker
+    public static final int HRSX_LAYOUT_SUA_VOLUNT = 9; // Voluntary contribution
+    public static final int HRSX_LAYOUT_SUA_TRUANCY = 11; // Absense of the worker
+    public static final int HRSX_LAYOUT_SUA_INABILITY = 12; // Worker disability docs mov 
+    public static final int HRSX_LAYOUT_SUA_INABILITY_IMP = 13; // Worker disability
+    public static final int HRSX_LAYOUT_SUA_ABS_TRUANCY = 1; // Absense of the worker variable
+    public static final int HRSX_LAYOUT_SUA_ABS_INABILITY = 2; // Disability the worker variable
+    public static final int HRSX_LAYOUT_SUA_AFI = 14; // Affiliate data
     
     public static final int HRSX_HIRE_DISMISSED = 0; // Employee hire log dismissed
     public static final int HRSX_HIRE_ACTIVE = 1;    // Employee hire log active
@@ -1186,11 +1202,12 @@ public abstract class SModConsts {
         TablesMap.put(HRSS_TP_CON, "erp.hrss_tp_con");
         TablesMap.put(HRSS_TP_REC_SCHE, "erp.hrss_tp_rec_sche");
         TablesMap.put(HRSS_TP_POS_RISK, "erp.hrss_tp_pos_risk");
+        TablesMap.put(HRSU_TP_COD, "erp.locu_sta");
         TablesMap.put(HRSS_TP_WORK_DAY, "erp.hrss_tp_work_day");
         TablesMap.put(HRSS_TP_DIS, "erp.hrss_tp_dis");
         TablesMap.put(HRSS_TP_DAY, "erp.hrss_tp_day");
         TablesMap.put(HRSS_BANK, "erp.hrss_bank");
-		TablesMap.put(HRSS_BONUS, "erp.hrss_bonus");
+	TablesMap.put(HRSS_BONUS, "erp.hrss_bonus");
         TablesMap.put(HRSS_GROCERY_SRV, "erp.hrss_grocery_srv");
 
         TablesMap.put(HRSU_CL_ABS, "erp.hrsu_cl_abs");

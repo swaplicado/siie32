@@ -4,6 +4,7 @@
  */
 package erp.mtrn.form;
 
+import erp.client.SClientInterface;
 import erp.data.SDataConstants;
 import erp.data.SDataConstantsSys;
 import erp.data.SDataUtilities;
@@ -15,6 +16,8 @@ import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
 import erp.mitm.data.SDataUnitType;
+import erp.mod.SModConsts;
+import erp.mtrn.utils.STrnFunAreasUtils;
 import java.awt.Cursor;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
@@ -55,6 +58,11 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
     private erp.lib.form.SFormField moFieldUnitType;
     private erp.lib.form.SFormField moFieldDocClass;
     private erp.lib.form.SFormField moFieldBizPartner;
+    
+    private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
+    private int mnFunctionalAreaId;
+    private int[] manDataFilter;
+    private String msFunctionalAreasIds;
 
     /** Creates new form SDialogRepSalesPurchasesComparative
      * @param client ERP Client interface.
@@ -102,8 +110,12 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         jcbDocClass = new javax.swing.JComboBox();
         jPanel10 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
-        jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbBizPartner = new javax.swing.JComboBox<>();
         jbBizPartner = new javax.swing.JButton();
+        jPanel14 = new javax.swing.JPanel();
+        jlBizPartner1 = new javax.swing.JLabel();
+        jtfFunctionalArea = new javax.swing.JTextField();
+        jbFunctionalArea = new javax.swing.JButton();
         jPanel11 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jckWithoutRelatedParty = new javax.swing.JCheckBox();
@@ -181,7 +193,7 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Opciones del reporte:"));
         jPanel9.setLayout(new java.awt.BorderLayout(0, 1));
 
-        jPanel6.setLayout(new java.awt.GridLayout(4, 1, 0, 2));
+        jPanel6.setLayout(new java.awt.GridLayout(5, 1, 0, 2));
 
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -223,6 +235,24 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         jPanel10.add(jbBizPartner);
 
         jPanel6.add(jPanel10);
+
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizPartner1.setText("Área funcional:");
+        jlBizPartner1.setPreferredSize(new java.awt.Dimension(125, 23));
+        jPanel14.add(jlBizPartner1);
+
+        jtfFunctionalArea.setEditable(false);
+        jtfFunctionalArea.setPreferredSize(new java.awt.Dimension(266, 23));
+        jPanel14.add(jtfFunctionalArea);
+
+        jbFunctionalArea.setText("...");
+        jbFunctionalArea.setToolTipText("Seleccionar asociado de negocios:");
+        jbFunctionalArea.setFocusable(false);
+        jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel14.add(jbFunctionalArea);
+
+        jPanel6.add(jPanel14);
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -271,6 +301,7 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         jbDateBegin.addActionListener(this);
         jbDateEnd.addActionListener(this);
         jbBizPartner.addActionListener(this);
+        jbFunctionalArea.addActionListener(this);
 
         switch (mnFormType) {
             case SDataConstantsSys.TRNS_CT_DPS_PUR:
@@ -308,6 +339,13 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
         SFormUtilities.putActionMap(getRootPane(), action, "exit", KeyEvent.VK_ESCAPE, 0);
 
         setModalityType(ModalityType.MODELESS);
+        
+        //Áreas funcionales
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient, SModConsts.CFGU_FUNC, manDataFilter);
+        
+        renderText();
     }
 
     private void windowActivated() {
@@ -319,6 +357,26 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
     
     private String replaceQuotes(final String string) {
         return string.replace("\"", "'");
+    }
+    
+    private void actionFunctionalArea() {
+        moDialogFilterFunctionalArea.formRefreshCatalogues();
+        moDialogFilterFunctionalArea.formReset();
+        moDialogFilterFunctionalArea.setFunctionalAreaId(mnFunctionalAreaId);
+        moDialogFilterFunctionalArea.setFormVisible(true);
+
+        if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+            mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            renderText();
+        }
+    }
+    
+    private void renderText() {
+        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter((SClientInterface) miClient, mnFunctionalAreaId);
+        msFunctionalAreasIds = texts[0];
+        
+        jtfFunctionalArea.setText(texts[1]);
+        jtfFunctionalArea.setCaretPosition(0);
     }
 
     @SuppressWarnings("unchecked")
@@ -428,7 +486,8 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
                             "d.fid_st_dps_val = " + SDataConstantsSys.TRNS_ST_DPS_VAL_EFF + " AND " +
                             "d.fid_ct_dps = " + mnFormType + " AND d.fid_cl_dps IN (" + docClass + ") AND " +
                             "d.dt BETWEEN '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateBegin.getDate()) + "' AND " +
-                            "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateEnd.getDate()) + "' " +
+                            "'" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(moFieldDateEnd.getDate()) + "' AND " +
+                            "d.fid_func IN ( " + msFunctionalAreasIds + " ) " + 
                             "INNER JOIN erp.bpsu_bp AS b ON d.fid_bp_r = b.id_bp " + ( moFieldBizPartner.getKeyAsIntArray()[0] == 0 ? "" : " AND d.fid_bp_r = " + moFieldBizPartner.getKeyAsIntArray()[0]) + " " + (jckWithoutRelatedParty.isSelected() ? " AND b.b_att_rel_pty = 0 " : "") +
                             "INNER JOIN erp.bpsu_bpb AS bb ON d.fid_bpb = bb.id_bpb " +
                             "INNER JOIN erp.bpsu_bpb_add AS bba ON d.fid_bpb = bba.id_bpb AND d.fid_add = bba.id_add " +
@@ -568,6 +627,7 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -580,6 +640,7 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
     private javax.swing.JButton jbClose;
     private javax.swing.JButton jbDateBegin;
     private javax.swing.JButton jbDateEnd;
+    private javax.swing.JButton jbFunctionalArea;
     private javax.swing.JButton jbPrint;
     private javax.swing.JComboBox<SFormComponentItem> jcbBizPartner;
     private javax.swing.JComboBox jcbDocClass;
@@ -588,10 +649,12 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
     private javax.swing.JFormattedTextField jftDateBegin;
     private javax.swing.JFormattedTextField jftDateEnd;
     private javax.swing.JLabel jlBizPartner;
+    private javax.swing.JLabel jlBizPartner1;
     private javax.swing.JLabel jlDateBegin;
     private javax.swing.JLabel jlDateEnd;
     private javax.swing.JLabel jlDocClass;
     private javax.swing.JLabel jlUnitType;
+    private javax.swing.JTextField jtfFunctionalArea;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -712,6 +775,9 @@ public class SDialogRepSalesPurchasesFileCsv extends javax.swing.JDialog impleme
             }
             else if (button == jbBizPartner) {
                 actionBizPartner();
+            }
+            else if (button == jbFunctionalArea) {
+                actionFunctionalArea();
             }
         }
     }

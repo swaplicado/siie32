@@ -16,9 +16,11 @@ import erp.lib.SLibUtilities;
 import erp.lib.form.SFormComponentItem;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.bps.db.SBpsConsts;
 import erp.mod.bps.db.SBpsUtils;
+import erp.mtrn.utils.STrnFunAreasUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -59,6 +61,11 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private erp.lib.form.SFormField moFieldSalesAgent;
     private erp.lib.form.SFormField moFieldUserAnalyst;
     private erp.lib.form.SFormField moFieldCurrency;
+    
+    private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
+    private int mnFunctionalAreaId;
+    private int[] manDataFilter;
+    private String msFunctionalAreasIds;
 
 
     /** Creates new form SDialogRepBizPartnerBalanceAging */
@@ -94,7 +101,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jbPickDateCutoff = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jlCoBranch = new javax.swing.JLabel();
-        jcbCoBranch = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCoBranch = new javax.swing.JComboBox<>();
         jbPickCoBranch = new javax.swing.JButton();
         jPanel101 = new javax.swing.JPanel();
         jlRepType = new javax.swing.JLabel();
@@ -114,24 +121,28 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jrbDocSortNumber = new javax.swing.JRadioButton();
         jPanel102 = new javax.swing.JPanel();
         jlBizPartner = new javax.swing.JLabel();
-        jcbBizPartner = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbBizPartner = new javax.swing.JComboBox<>();
         jbPickBizPartner = new javax.swing.JButton();
         jPanel104 = new javax.swing.JPanel();
         jlSalesAgent = new javax.swing.JLabel();
-        jcbSalesAgent = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbSalesAgent = new javax.swing.JComboBox<>();
         jbPickSalesAgent = new javax.swing.JButton();
         jPanel106 = new javax.swing.JPanel();
         jlAnalyst = new javax.swing.JLabel();
-        jcbUserAnalyst = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbUserAnalyst = new javax.swing.JComboBox<>();
         jbPickUserAnalyst = new javax.swing.JButton();
         jPanel98 = new javax.swing.JPanel();
         jlCurrency = new javax.swing.JLabel();
-        jcbCurrency = new javax.swing.JComboBox<SFormComponentItem>();
+        jcbCurrency = new javax.swing.JComboBox<>();
         jbPickCurrency = new javax.swing.JButton();
         jlCurrencyWarning = new javax.swing.JLabel();
         jPanel105 = new javax.swing.JPanel();
         jlShowAmounts = new javax.swing.JLabel();
         moBoolShowAmounts = new sa.lib.gui.bean.SBeanFieldBoolean();
+        jPanel8 = new javax.swing.JPanel();
+        jlBizPartner1 = new javax.swing.JLabel();
+        jtfFunctionalArea = new javax.swing.JTextField();
+        jbFunctionalArea = new javax.swing.JButton();
         jpControls = new javax.swing.JPanel();
         jbPrint = new javax.swing.JButton();
         jbClose = new javax.swing.JButton();
@@ -147,7 +158,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jpParams.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jpParams.setLayout(new java.awt.BorderLayout());
 
-        jPanel7.setLayout(new java.awt.GridLayout(11, 1, 0, 5));
+        jPanel7.setLayout(new java.awt.GridLayout(12, 1, 0, 5));
 
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -342,6 +353,24 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         jPanel7.add(jPanel105);
 
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizPartner1.setText("Área funcional:");
+        jlBizPartner1.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel8.add(jlBizPartner1);
+
+        jtfFunctionalArea.setEditable(false);
+        jtfFunctionalArea.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel8.add(jtfFunctionalArea);
+
+        jbFunctionalArea.setText("...");
+        jbFunctionalArea.setToolTipText("Seleccionar asociado de negocios:");
+        jbFunctionalArea.setFocusable(false);
+        jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel8.add(jbFunctionalArea);
+
+        jPanel7.add(jPanel8);
+
         jpParams.add(jPanel7, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jpParams, java.awt.BorderLayout.CENTER);
@@ -400,6 +429,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         jbPickSalesAgent.addActionListener(this);
         jbPickUserAnalyst.addActionListener(this);
         jbPickCurrency.addActionListener(this);
+        jbFunctionalArea.addActionListener(this);
         jrbRepTypeDetail.addItemListener(this);
         jrbRepTypeSummary.addItemListener(this);
         jrbDueType30_60_90d.addItemListener(this);
@@ -438,6 +468,13 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
 
         SFormUtilities.putActionMap(getRootPane(), actionPrint, "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.putActionMap(getRootPane(), actionCancel, "cancel", KeyEvent.VK_ESCAPE, 0);
+        
+        //Áreas funcionales
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, SModConsts.CFGU_FUNC, manDataFilter);
+
+        renderText();
     }
 
     private void windowActivated() {
@@ -553,6 +590,8 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             map.put("sSqlFilterAnalyst", sqlFilterUserAnalyst);
             map.put("sSqlFilterCurrency", sqlFilterCurrency);
             map.put("sSqlSortBy", sqlSortBy);
+            map.put("sFuncText", jtfFunctionalArea.getText());
+            map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
             map.put("bShowGarntInsur", bShowGarntInsur);
 
             // Report view:
@@ -659,6 +698,8 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             oMap.put("sSqlFkBpId", sqlBizPartner);
             oMap.put("sSqlCob", sqlCoBranch);
             oMap.put("sSqlFilterAnalyst", sqlFilterUserAnalyst);
+            oMap.put("sFuncText", jtfFunctionalArea.getText());
+            oMap.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
             oMap.put("sSqlOrderBy", sqlOrderBy);
             oMap.put("nTP_ACC", mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_CL_ACC_ASSET[0] : SDataConstantsSys.FINS_CL_ACC_LIABTY[0]);
             oMap.put("nCL_ACC", mnBizPartnerCategory == SModSysConsts.BPSS_CT_BP_SUP ? SDataConstantsSys.FINS_CL_ACC_ASSET[1] : SDataConstantsSys.FINS_CL_ACC_LIABTY[1]);
@@ -744,6 +785,26 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
         }
     }
     
+    private void actionFunctionalArea() {
+        moDialogFilterFunctionalArea.formRefreshCatalogues();
+        moDialogFilterFunctionalArea.formReset();
+        moDialogFilterFunctionalArea.setFunctionalAreaId(mnFunctionalAreaId);
+        moDialogFilterFunctionalArea.setFormVisible(true);
+
+        if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+            mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            renderText();
+        }
+    }
+    
+    private void renderText() {
+        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter(miClient, mnFunctionalAreaId);
+        msFunctionalAreasIds = texts[0];
+        
+        jtfFunctionalArea.setText(texts[1]);
+        jtfFunctionalArea.setCaretPosition(0);
+    }
+    
     private void actionPickDateCutoff() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateCutoff.getDate(), moFieldDateCutoff);
     }
@@ -805,9 +866,11 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel98;
     private javax.swing.JPanel jPanel99;
     private javax.swing.JButton jbClose;
+    private javax.swing.JButton jbFunctionalArea;
     private javax.swing.JButton jbPickBizPartner;
     private javax.swing.JButton jbPickCoBranch;
     private javax.swing.JButton jbPickCurrency;
@@ -822,6 +885,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private javax.swing.JComboBox<SFormComponentItem> jcbUserAnalyst;
     private javax.swing.JLabel jlAnalyst;
     private javax.swing.JLabel jlBizPartner;
+    private javax.swing.JLabel jlBizPartner1;
     private javax.swing.JLabel jlCoBranch;
     private javax.swing.JLabel jlCurrency;
     private javax.swing.JLabel jlCurrencyWarning;
@@ -843,6 +907,7 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
     private javax.swing.JRadioButton jrbRepTypeDetail;
     private javax.swing.JRadioButton jrbRepTypeSummary;
     private javax.swing.JFormattedTextField jtfDateCutoff;
+    private javax.swing.JTextField jtfFunctionalArea;
     private sa.lib.gui.bean.SBeanFieldBoolean moBoolShowAmounts;
     // End of variables declaration//GEN-END:variables
 
@@ -973,6 +1038,9 @@ public class SDialogRepBizPartnerBalanceAging extends javax.swing.JDialog implem
             }
             else if (button == jbPickCurrency) {
                 actionPickCurrency();
+            }
+            else if (button == jbFunctionalArea) {
+                actionFunctionalArea();
             }
         }
     }

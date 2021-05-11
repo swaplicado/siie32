@@ -22,7 +22,10 @@ import erp.lib.form.SFormField;
 import erp.lib.form.SFormUtilities;
 import erp.mbps.data.SDataBizPartner;
 import erp.mbps.data.SDataBizPartnerCategory;
+import erp.mod.SModConsts;
 import erp.mod.bps.db.SBpsUtils;
+import erp.mtrn.form.SDialogFilterFunctionalArea;
+import erp.mtrn.utils.STrnFunAreasUtils;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -64,6 +67,11 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
     int[] manSysMoveTypeKey;
     private java.lang.String msBizPartnerCatSng;
     private java.lang.String msBizPartnerCatPlr;
+    
+    private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
+    private int mnFunctionalAreaId;
+    private int[] manDataFilter;
+    private String msFunctionalAreasIds;
 
     /** Creates new form SDialogRepBizPartnerAccountingMoves */
     public SDialogRepBizPartnerAccountingMoves(erp.client.SClientInterface client, int idBizPartnerCategory) {
@@ -102,6 +110,11 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         jlDateRef = new javax.swing.JLabel();
         jftDateRef = new javax.swing.JFormattedTextField();
         jbPickDateRef = new javax.swing.JButton();
+        jPanel11 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
+        jlBizPartner1 = new javax.swing.JLabel();
+        jtfFunctionalArea = new javax.swing.JTextField();
+        jbFunctionalArea = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jbPrint = new javax.swing.JButton();
         jbClose = new javax.swing.JButton();
@@ -117,7 +130,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setLayout(new java.awt.GridLayout(5, 1, 0, 5));
+        jPanel6.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -175,6 +188,27 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         jPanel3.add(jbPickDateRef);
 
         jPanel6.add(jPanel3);
+
+        jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+        jPanel6.add(jPanel11);
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizPartner1.setText("Área funcional:");
+        jlBizPartner1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel10.add(jlBizPartner1);
+
+        jtfFunctionalArea.setEditable(false);
+        jtfFunctionalArea.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel10.add(jtfFunctionalArea);
+
+        jbFunctionalArea.setText("...");
+        jbFunctionalArea.setToolTipText("Seleccionar asociado de negocios:");
+        jbFunctionalArea.setFocusable(false);
+        jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel10.add(jbFunctionalArea);
+
+        jPanel6.add(jPanel10);
 
         jPanel2.add(jPanel6, java.awt.BorderLayout.NORTH);
 
@@ -243,12 +277,20 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
         jbPickDateRef.addActionListener(this);
         jbPrint.addActionListener(this);
         jbClose.addActionListener(this);
+        jbFunctionalArea.addActionListener(this);
         jckShowPayDays.addItemListener(this);
         jtfYear.addFocusListener(this);
         jftDateRef.addFocusListener(this);
 
         SFormUtilities.createActionMap(rootPane, this, "actionPrint", "print", KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK);
         SFormUtilities.createActionMap(rootPane, this, "actionClose", "close", KeyEvent.VK_ESCAPE, 0);
+        
+        //Áreas funcionales
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, SModConsts.CFGU_FUNC, manDataFilter);
+
+        renderText();
     }
 
     private void windowActivated() {
@@ -304,6 +346,8 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
             map.put("nDaysCredit", bizPartnerCategory.getEffectiveDaysOfCredit());
             map.put("nDaysGrace", bizPartnerCategory.getEffectiveDaysOfGrace());
             map.put("sCreditType", SDataReadDescriptions.getCatalogueDescription(miClient, SDataConstants.BPSS_TP_CRED, new int[] { bizPartnerCategory.getEffectiveCreditTypeId() }));
+            map.put("sFuncText", jtfFunctionalArea.getText());
+            map.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
 
             jasperPrint = SDataUtilities.fillReport(miClient, jckShowPayDays.isSelected() ? SDataConstantsSys.REP_FIN_BPS_ACC_MOV_DAY : SDataConstantsSys.REP_FIN_BPS_ACC_MOV, map);
             jasperViewer = new JasperViewer(jasperPrint, false);
@@ -348,6 +392,26 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
     public void focusLostDate() {
         moFieldYear.setFieldValue(SLibTimeUtilities.digestYear(moFieldDateRef.getDate())[0]);
     }
+    
+    private void actionFunctionalArea() {
+        moDialogFilterFunctionalArea.formRefreshCatalogues();
+        moDialogFilterFunctionalArea.formReset();
+        moDialogFilterFunctionalArea.setFunctionalAreaId(mnFunctionalAreaId);
+        moDialogFilterFunctionalArea.setFormVisible(true);
+
+        if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+            mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            renderText();
+        }
+    }
+    
+    private void renderText() {
+        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter(miClient, mnFunctionalAreaId);
+        msFunctionalAreasIds = texts[0];
+        
+        jtfFunctionalArea.setText(texts[1]);
+        jtfFunctionalArea.setCaretPosition(0);
+    }
 
     private void actionPickDate() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateRef.getDate(), moFieldDateRef);
@@ -384,6 +448,8 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -392,6 +458,7 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JButton jbClose;
+    private javax.swing.JButton jbFunctionalArea;
     private javax.swing.JButton jbPickBizPartner;
     private javax.swing.JButton jbPickDateRef;
     private javax.swing.JButton jbPrint;
@@ -399,8 +466,10 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
     private javax.swing.JCheckBox jckShowPayDays;
     private javax.swing.JFormattedTextField jftDateRef;
     private javax.swing.JLabel jlBizPartner;
+    private javax.swing.JLabel jlBizPartner1;
     private javax.swing.JLabel jlDateRef;
     private javax.swing.JLabel jlYear;
+    private javax.swing.JTextField jtfFunctionalArea;
     private javax.swing.JTextField jtfYear;
     // End of variables declaration//GEN-END:variables
 
@@ -443,6 +512,9 @@ public class SDialogRepBizPartnerAccountingMoves extends javax.swing.JDialog imp
             }
             else if (button == jbClose) {
                 actionClose();
+            }
+            else if (button == jbFunctionalArea) {
+                actionFunctionalArea();
             }
         }
     }

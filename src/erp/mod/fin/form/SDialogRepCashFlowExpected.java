@@ -4,9 +4,15 @@
  */
 package erp.mod.fin.form;
 
+import erp.client.SClientInterface;
 import erp.data.SDataConstantsSys;
+import erp.lib.SLibConstants;
 import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
+import erp.mtrn.form.SDialogFilterFunctionalArea;
+import erp.mtrn.utils.STrnFunAreasUtils;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import sa.lib.SLibTimeUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiUtils;
@@ -17,7 +23,12 @@ import sa.lib.gui.bean.SBeanDialogReport;
  *
  * @author Juan Barajas
  */
-public class SDialogRepCashFlowExpected extends SBeanDialogReport {
+public class SDialogRepCashFlowExpected extends SBeanDialogReport implements ActionListener {
+    
+    private erp.mtrn.form.SDialogFilterFunctionalArea moDialogFilterFunctionalArea;
+    private int mnFunctionalAreaId;
+    private int[] manDataFilter;
+    private String msFunctionalAreasIds;
     
     /**
      * Creates new form SDialogRepContractByBizPartner
@@ -47,6 +58,10 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport {
         jPanel13 = new javax.swing.JPanel();
         jlCompanyBranch = new javax.swing.JLabel();
         moKeyCompanyBranch = new sa.lib.gui.bean.SBeanFieldKey();
+        jPanel14 = new javax.swing.JPanel();
+        jlBizPartner1 = new javax.swing.JLabel();
+        jtfFunctionalArea = new javax.swing.JTextField();
+        jbFunctionalArea = new javax.swing.JButton();
         moRadioSummary = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadioDetailBp = new sa.lib.gui.bean.SBeanFieldRadio();
         moRadioDetailBpDps = new sa.lib.gui.bean.SBeanFieldRadio();
@@ -54,7 +69,7 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Parámetros del reporte:"));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jPanel2.setLayout(new java.awt.GridLayout(6, 1, 0, 5));
+        jPanel2.setLayout(new java.awt.GridLayout(7, 1, 0, 5));
 
         jPanel11.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
@@ -76,6 +91,24 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport {
         jPanel13.add(moKeyCompanyBranch);
 
         jPanel2.add(jPanel13);
+
+        jPanel14.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jlBizPartner1.setText("Área funcional:");
+        jlBizPartner1.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel14.add(jlBizPartner1);
+
+        jtfFunctionalArea.setEditable(false);
+        jtfFunctionalArea.setPreferredSize(new java.awt.Dimension(300, 23));
+        jPanel14.add(jtfFunctionalArea);
+
+        jbFunctionalArea.setText("...");
+        jbFunctionalArea.setToolTipText("Seleccionar asociado de negocios:");
+        jbFunctionalArea.setFocusable(false);
+        jbFunctionalArea.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel14.add(jbFunctionalArea);
+
+        jPanel2.add(jPanel14);
 
         buttonGroup1.add(moRadioSummary);
         moRadioSummary.setText("Resumen");
@@ -99,10 +132,14 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JButton jbFunctionalArea;
+    private javax.swing.JLabel jlBizPartner1;
     private javax.swing.JLabel jlCompanyBranch;
     private javax.swing.JLabel jlDateStart;
+    private javax.swing.JTextField jtfFunctionalArea;
     private sa.lib.gui.bean.SBeanFieldDate moBaseDate;
     private sa.lib.gui.bean.SBeanFieldKey moKeyCompanyBranch;
     private sa.lib.gui.bean.SBeanFieldRadio moRadioDetailBp;
@@ -126,7 +163,36 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport {
         moBaseDate.setValue(SLibTimeUtils.getBeginOfMonth(miClient.getSession().getCurrentDate()));
         moRadioSummary.setSelected(true);
         
+        jbFunctionalArea.addActionListener(this);
+        
+        //Áreas funcionales
+        mnFunctionalAreaId = SLibConstants.UNDEFINED;
+        manDataFilter = new int[] { miClient.getSession().getUser().getPkUserId() };
+        moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea((SClientInterface) miClient, SModConsts.CFGU_FUNC, manDataFilter);
+        
+        renderText();
+        
         reloadCatalogues();
+    }
+    
+    private void actionFunctionalArea() {
+        moDialogFilterFunctionalArea.formRefreshCatalogues();
+        moDialogFilterFunctionalArea.formReset();
+        moDialogFilterFunctionalArea.setFunctionalAreaId(mnFunctionalAreaId);
+        moDialogFilterFunctionalArea.setFormVisible(true);
+
+        if (moDialogFilterFunctionalArea.getFormResult() == erp.lib.SLibConstants.FORM_RESULT_OK) {
+            mnFunctionalAreaId = moDialogFilterFunctionalArea.getFunctionalAreaId();
+            renderText();
+        }
+    }
+    
+    private void renderText() {
+        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter((SClientInterface) miClient, mnFunctionalAreaId);
+        msFunctionalAreasIds = texts[0];
+        
+        jtfFunctionalArea.setText(texts[1]);
+        jtfFunctionalArea.setCaretPosition(0);
     }
 
     public void reloadCatalogues() {
@@ -159,7 +225,20 @@ public class SDialogRepCashFlowExpected extends SBeanDialogReport {
         moParamsMap.put("tBaseDate", moBaseDate.getValue());
         moParamsMap.put("sCompanyBranch", moKeyCompanyBranch.getSelectedIndex() > 0 ? moKeyCompanyBranch.getSelectedItem().getItem() : "(TODAS)");
         moParamsMap.put("sSqlWhereCompanyBranch", moKeyCompanyBranch.getSelectedIndex() > 0 ? " AND r.fid_cob = " + moKeyCompanyBranch.getValue()[0] : "");
+        moParamsMap.put("sFuncText", jtfFunctionalArea.getText());
+        moParamsMap.put("sFilterFunctionalArea", " AND d.fid_func IN ( " + msFunctionalAreasIds + " ) ");
         moParamsMap.put("bShowDetailBp", moRadioDetailBp.isSelected());
         moParamsMap.put("bShowDetailBpDps", moRadioDetailBpDps.isSelected());
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof javax.swing.JButton) {
+            javax.swing.JButton button = (javax.swing.JButton) e.getSource();
+
+            if (button == jbFunctionalArea) {
+                actionFunctionalArea();
+            }
+        }
     }
 }

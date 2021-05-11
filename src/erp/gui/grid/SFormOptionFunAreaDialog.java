@@ -169,7 +169,7 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
 
     private void jcbFunAreasKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jcbFunAreasKeyPressed
         if (evt.getKeyCode() == KeyEvent.VK_F5) {
-            actionBizPartner();
+            actionFunArea();
         }
     }//GEN-LAST:event_jcbFunAreasKeyPressed
 
@@ -211,7 +211,7 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
         }
     }
 
-    private void actionBizPartner() {
+    private void actionFunArea() {
         SFormOptionPickerInterface picker = miClient.getOptionPicker(SModConsts.CFGU_FUNC);
 
         picker.formReset();
@@ -329,7 +329,7 @@ public class SFormOptionFunAreaDialog extends javax.swing.JDialog implements erp
             JButton button = (JButton) e.getSource();
 
             if (button == jbFunAreas) {
-                actionBizPartner();
+                actionFunArea();
             }
         }
     }

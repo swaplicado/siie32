@@ -9,16 +9,14 @@
 
 package erp.table;
 
-import erp.data.SDataReadDescriptions;
 import erp.lib.SLibConstants;
 import erp.lib.table.STableSetting;
 import erp.mtrn.form.SDialogFilterFunctionalArea;
 import erp.mtrn.utils.STrnFunAreasUtils;
-import java.util.ArrayList;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Edwin Carmona
  */
 public class STabFilterFunctionalArea extends javax.swing.JPanel {
 
@@ -82,21 +80,21 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbFunctionalAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbFunctionalAreaActionPerformed
-        actionTypeFunctionalArea();
+        actionFunctionalArea();
     }//GEN-LAST:event_jbFunctionalAreaActionPerformed
 
     private void initComponentsExtra() {
         mnFunctionalAreaId = SLibConstants.UNDEFINED;
-        moSetting = new STableSetting(SFilterConstants.SETTING_FILTER_FUNC_AREA, mnFunctionalAreaId);
         moDialogFilterFunctionalArea = new SDialogFilterFunctionalArea(miClient, mnDataType, manDataFilter);
-
         renderText();
         
+        moSetting = new STableSetting(SFilterConstants.SETTING_FILTER_FUNC_AREA, msFunctionalAreasIds);
+        
         moSetting.setSetting(msFunctionalAreasIds);
-//        moTab.updateSetting(moSetting);
+        moTab.updateSetting(moSetting);
     }
 
-    private void actionTypeFunctionalArea() {
+    private void actionFunctionalArea() {
         moDialogFilterFunctionalArea.formRefreshCatalogues();
         moDialogFilterFunctionalArea.formReset();
         moDialogFilterFunctionalArea.setFunctionalAreaId(mnFunctionalAreaId);
@@ -112,39 +110,10 @@ public class STabFilterFunctionalArea extends javax.swing.JPanel {
     }
 
     private void renderText() {
-        String text = "";
-        String codes = "";
-        msFunctionalAreasIds = "";
-        ArrayList<String> lFunctionalAreasIds = null;
-        ArrayList<String> lFunctionalAreasCodes = null;
-        if (mnFunctionalAreaId == SLibConstants.UNDEFINED) {
-            lFunctionalAreasIds = STrnFunAreasUtils.getFunctionalAreasOfUser(miClient, miClient.getSessionXXX().getUser().getPkUserId(), STrnFunAreasUtils.FUN_AREA_ID, "");
-            
-            if (lFunctionalAreasIds.isEmpty()) {
-                msFunctionalAreasIds = "''";
-                text = "";
-            }
-            else {
-                for (String id : lFunctionalAreasIds) {
-                    msFunctionalAreasIds += id + ", ";
-                }
-
-                msFunctionalAreasIds = msFunctionalAreasIds.substring(0, msFunctionalAreasIds.length() - 2);
-
-                lFunctionalAreasCodes = STrnFunAreasUtils.getFunctionalAreasOfUser(miClient, miClient.getSessionXXX().getUser().getPkUserId(), STrnFunAreasUtils.FUN_AREA_CODE, "");
-                for (String code : lFunctionalAreasCodes) {
-                    codes += code + ", ";
-                }
-
-                text = codes.substring(0, codes.length() - 2);
-            }
-        }
-        else {
-            text = SDataReadDescriptions.getCatalogueDescription(miClient, mnDataType, new int[] { mnFunctionalAreaId }, SLibConstants.DESCRIPTION_CODE);
-            msFunctionalAreasIds = "" + mnFunctionalAreaId;
-        }
+        String texts[] = STrnFunAreasUtils.getFunAreasTextFilter(miClient, mnFunctionalAreaId);
+        msFunctionalAreasIds = texts[0];
         
-        jtfFunctionalArea.setText(text);
+        jtfFunctionalArea.setText(texts[1]);
         jtfFunctionalArea.setCaretPosition(0);
     }
 
