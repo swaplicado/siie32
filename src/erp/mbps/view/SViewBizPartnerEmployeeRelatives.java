@@ -147,16 +147,16 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "pos.name", "Puesto", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "emp.name", "Tipo empleado", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "wrk.name", "Tipo obrero", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "add.county", "País", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "add.state", "Estado", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "add.locality", "Municipio", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "add.locality", "Localidad", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "add.neighborhood", "Colonia", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "add.street", "Calle", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "add.street_num_ext", "No. exterior", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "add.street_num_int", "No. interior", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "add.zip_code", "CP", 100);
-        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "add.reference", "Telefono", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.county", "País", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.state", "Estado", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.locality", "Municipio", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.locality", "Localidad", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.neighborhood", "Colonia", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street", "Calle", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_ext", "No. exterior", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.street_num_int", "No. interior", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.zip_code", "CP", 100);
+        aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "addr.reference", "Telefono", 100);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_mfg_ope", "Operador", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "e.b_uni", "Sindicalizado", STableConstants.WIDTH_BOOLEAN_2X);
         aoTableColumns[column++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "bp.b_att_par_shh", "Socio/accionista", STableConstants.WIDTH_BOOLEAN_2X);
@@ -364,7 +364,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
 
         msSql = "SELECT bp.id_bp, bp.bp, bp.fiscal_id, bp.alt_id, bp.b_att_par_shh, bp.b_att_rel_pty, bp.b_del, " +
                 "CAST(e.num AS UNSIGNED INTEGER) AS _emp_num, e.ssn, e.dt_bir, e.dt_ben, e.dt_hire, e.dt_dis_n, e.b_act, e.b_mfg_ope, e.b_uni, e.place_bir, e.umf, " +
-                "add.street, add.street_num_ext, add.street_num_int, add.neighborhood, add.locality, add.county, add.state, add.zip_code, add.reference, " + 
+                "addr.street, addr.street_num_ext, addr.street_num_int, addr.neighborhood, addr.locality, addr.county, addr.state, addr.zip_code, addr.reference, " + 
                 "img_pho_n IS NOT NULL AS _with_img_pho, img_sig_n IS NOT NULL AS _with_img_sig, " +
                 "bp.fid_usr_new, bp.fid_usr_edit, bp.fid_usr_del, bp.ts_new, bp.ts_edit, bp.ts_del, un.usr, ue.usr, ud.usr, " +
                 "pay.name, emp.name, wrk.name, dep.name, pos.name, csex.name, cblo.name, " +
@@ -389,7 +389,7 @@ public class SViewBizPartnerEmployeeRelatives extends erp.lib.table.STableTab im
                 "INNER JOIN erp.usru_usr AS ue ON bp.fid_usr_edit = ue.id_usr " +
                 "INNER JOIN erp.usru_usr AS ud ON bp.fid_usr_del = ud.id_usr " +
                 "INNER JOIN erp.bpsu_bpb AS bpb ON bpb.fid_bp = bp.id_bp " +
-                "INNER JOIN erp.bpsu_bpb_add AS add ON bpb.id_bpb = add.id_bpb AND add.id_add = 1 " +
+                "INNER JOIN erp.bpsu_bpb_add AS addr ON bpb.id_bpb = addr.id_bpb AND addr.id_add = 1 " +
                 "LEFT OUTER JOIN erp.hrsu_emp AS e ON bp.id_bp = e.id_emp " +
                 "LEFT OUTER JOIN erp.hrss_tp_pay AS pay ON e.fk_tp_pay = pay.id_tp_pay " +
                 "LEFT OUTER JOIN erp.hrsu_tp_emp AS emp ON e.fk_tp_emp = emp.id_tp_emp " +
