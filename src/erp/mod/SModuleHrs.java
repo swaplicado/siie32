@@ -170,7 +170,7 @@ import sa.lib.gui.bean.SBeanOptionPicker;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SModuleHrs extends SGuiModule {
 
@@ -768,7 +768,16 @@ public class SModuleHrs extends SGuiModule {
                       + "FROM erp.HRSS_TP_ACC;";
                 break;
             case SModConsts.HRSU_EMP_SUA:
-                //
+                settings = new SGuiCatalogueSettings("Alta", 1);
+                sql = "SELECT id_tp_con AS " + SDbConsts.FIELD_ID + "1, "
+                       + "IF(id_tp_con = 1, 'ALTA', " 
+                       + "IF(id_tp_con = 2, 'REINGRESO', "
+                       + "IF(id_tp_con = 3, 'BAJA', "
+                       + "IF(id_tp_con = 4, 'MOVIMIENTOS AFILIATORIOS', "
+                       + "IF(id_tp_con = 5, 'INCAPACIDAD', "
+                       + "IF(id_tp_con = 6, 'AUSEBTISMO', '')))))) " + SDbConsts.FIELD_ITEM + " " 
+                       + "FROM erp.hrss_tp_con " 
+                       + "WHERE id_tp_con <= 6;";
                 break;
             case SModConsts.HRS_TAX:
                 settings = new SGuiCatalogueSettings("Tabla impuesto", 1);

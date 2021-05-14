@@ -5,24 +5,32 @@
 package erp.mod.hrs.view;
 
 import erp.mod.SModConsts;
+import erp.mod.hrs.form.SFormCopyHolidays;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import sa.lib.SLibConsts;
 import sa.lib.SLibTimeUtils;
+import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
 import sa.lib.grid.SGridColumnView;
 import sa.lib.grid.SGridConsts;
 import sa.lib.grid.SGridFilterYear;
 import sa.lib.grid.SGridPaneSettings;
 import sa.lib.grid.SGridPaneView;
+import sa.lib.grid.SGridUtils;
 import sa.lib.gui.SGuiClient;
 import sa.lib.gui.SGuiConsts;
 
 /**
  *
- * @author Juan Barajas
+ * @author Juan Barajas, Claudio Peña
  */
-public class SViewHoliday extends SGridPaneView {
-
+public class SViewHoliday extends SGridPaneView implements ActionListener {
+    private JButton jbCopyHolidays;
+    private SFormCopyHolidays moFormCopyHolidays;
     private SGridFilterYear moFilterYear;
     
     public SViewHoliday(SGuiClient client, String title) {
@@ -35,6 +43,9 @@ public class SViewHoliday extends SGridPaneView {
         moFilterYear = new SGridFilterYear(miClient, this);
         moFilterYear.initFilter(new int[] { SLibTimeUtils.digestYear(miClient.getSession().getCurrentDate())[0] });
         
+        jbCopyHolidays = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_dps_link_rev.gif")), "Copiar días feriados de años anteriores", this);
+
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbCopyHolidays);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(moFilterYear);
     }
 
@@ -78,6 +89,21 @@ public class SViewHoliday extends SGridPaneView {
                 + "ORDER BY v.id_hdy, v.dt, v.name, v.id_hol ";
     }
 
+    private void actionCopyHolidays() {
+       if (jbCopyHolidays.isEnabled()) {
+            try {
+                moFormCopyHolidays = new SFormCopyHolidays(miClient, "Copia de días feriados");
+                moFormCopyHolidays.setVisible(true);
+                prepareSqlQuery();
+                readGridData();
+                
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }    
+    }
+    
     @Override
     public ArrayList<SGridColumnView> createGridColumns() {
         ArrayList<SGridColumnView> gridColumnsViews = new ArrayList<>();
@@ -99,5 +125,16 @@ public class SViewHoliday extends SGridPaneView {
     public void defineSuscriptions() {
         moSuscriptionsSet.add(mnGridType);
         moSuscriptionsSet.add(SModConsts.USRU_USR);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof JButton) {
+            JButton button = (JButton) e.getSource();
+
+            if (button == jbCopyHolidays) {
+                actionCopyHolidays();
+            }
+        }
     }
 }

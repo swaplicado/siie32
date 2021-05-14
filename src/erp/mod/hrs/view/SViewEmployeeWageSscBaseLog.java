@@ -32,7 +32,8 @@ import sa.lib.gui.SGuiConsts;
 public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements ActionListener{
 
     private SGridFilterPanelEmployee moFilterEmployee;
-    private JButton jbLayoutEmployeeSBC;
+    private JButton jbLayoutEmployeeSbc;
+    private JButton jbLayoutEmployeeSbcIdse;
     private JButton jbEmployeesSscPeriod;
     private SDialogLayoutEmployee moDialogLayoutEmployee;
     private SDialogMassiveUpdateSscPeriod moDialogMassiveUpdateSscPeriod;
@@ -49,18 +50,34 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
         moFilterEmployee.initFilter(null);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
         
-        jbLayoutEmployeeSBC = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout modificación SBC de empleados", this);
-        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeSBC);
+        jbLayoutEmployeeSbc = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout modificación SBC de empleados", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeSbc);
+        
+        jbLayoutEmployeeSbcIdse = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout modificación SBC de empleados IDSE", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeSbcIdse);
         
         jbEmployeesSscPeriod = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_wizard.gif")), "Actualización de SBC de empleados", this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbEmployeesSscPeriod);
 
     }
 
-    private void actionLayoutEmployeeSBC() {
-        if (jbLayoutEmployeeSBC.isEnabled()) {
+    private void actionLayoutEmployeeSbc() {
+        if (jbLayoutEmployeeSbc.isEnabled()) {
             try {
                 moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_SSC);
+                moDialogLayoutEmployee.resetForm();
+                moDialogLayoutEmployee.setVisible(true);
+            }
+            catch (Exception e) {
+                SLibUtils.showException(this, e);
+            }
+        }
+    }
+    
+    private void actionLayoutEmployeeSbcIdse() {
+        if (jbLayoutEmployeeSbcIdse.isEnabled()) {
+            try {
+                moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_IDSE_SSC);
                 moDialogLayoutEmployee.resetForm();
                 moDialogLayoutEmployee.setVisible(true);
             }
@@ -182,8 +199,12 @@ public class SViewEmployeeWageSscBaseLog extends SGridPaneView implements Action
         if (e.getSource() instanceof JButton) {
             JButton button = (JButton) e.getSource();
 
-            if (button == jbLayoutEmployeeSBC) {
-                actionLayoutEmployeeSBC();
+            
+            if (button == jbLayoutEmployeeSbc) {
+                actionLayoutEmployeeSbc();
+            }            
+            else if (button == jbLayoutEmployeeSbcIdse) {
+                actionLayoutEmployeeSbcIdse();
             }            
             else if (button == jbEmployeesSscPeriod) {
                 actionEmployeesSscPeriod();

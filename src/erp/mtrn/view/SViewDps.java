@@ -641,6 +641,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
             aoTableColumns[i] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "f_rnum", "Folio póliza", STableConstants.WIDTH_RECORD_NUM);
             aoTableColumns[i++].setCellRenderer(miClient.getSessionXXX().getFormatters().getTableCellRendererDefaultColorBlueDark());
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "uu.usr", "Usr. timbrado", STableConstants.WIDTH_USER);
         }
 
         aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_BOOLEAN, "d.b_del", "Eliminado", STableConstants.WIDTH_BOOLEAN);
@@ -2153,7 +2154,7 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
                 "(SELECT cob.code FROM erp.bpsu_bpb AS cob WHERE d.fid_cob = cob.id_bpb) AS f_cob_code, ul.usr, uc.usr, un.usr, ue.usr, ud.usr ";
 
         if (mbIsDoc || mbIsDocAdj) {
-            msSql += ", (SELECT rbc.code FROM fin_bkc AS rbc WHERE r.id_bkc = rbc.id_bkc) AS f_rbc_code, (SELECT rcb.code FROM erp.bpsu_bpb AS rcb WHERE r.fid_cob = rcb.id_bpb) AS f_rcb_code, CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_rper, " +
+            msSql += " ,uu.usr , (SELECT rbc.code FROM fin_bkc AS rbc WHERE r.id_bkc = rbc.id_bkc) AS f_rbc_code, (SELECT rcb.code FROM erp.bpsu_bpb AS rcb WHERE r.fid_cob = rcb.id_bpb) AS f_rcb_code, CONCAT(r.id_year, '-', erp.lib_fix_int(r.id_per, 2)) as f_rper, " +
                     "CONCAT(r.id_tp_rec, '-', erp.lib_fix_int(r.id_num, " + SDataConstantsSys.NUM_LEN_FIN_REC + ")) as f_rnum ";
         }
 
@@ -2226,7 +2227,9 @@ public class SViewDps extends erp.lib.table.STableTab implements java.awt.event.
         if (mbIsDoc || mbIsDocAdj) {
             msSql +=
                     "LEFT OUTER JOIN trn_dps_rec AS dr ON d.id_year = dr.id_dps_year AND d.id_doc = dr.id_dps_doc " +
-                    "LEFT OUTER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num ";
+                    "LEFT OUTER JOIN fin_rec AS r ON dr.fid_rec_year = r.id_year AND dr.fid_rec_per = r.id_per AND dr.fid_rec_bkc = r.id_bkc AND dr.fid_rec_tp_rec = r.id_tp_rec AND dr.fid_rec_num = r.id_num " +
+                    "LEFT OUTER JOIN trn_cfd_sign_log AS sign ON sign.fid_cfd = x.id_cfd " +
+                    "LEFT OUTER JOIN erp.usru_usr AS uu ON sign.fid_usr = uu.id_usr ";
         }
 
         msSql += (sqlWhere.length() == 0 ? "" : "WHERE " + sqlWhere);

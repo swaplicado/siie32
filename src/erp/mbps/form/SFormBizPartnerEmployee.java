@@ -60,7 +60,7 @@ import sa.lib.gui.SGuiUtils;
 
 /**
  *
- * @author Juan Barajas, Edwin Carmona, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.lib.form.SFormInterface, java.awt.event.ActionListener, java.awt.event.ItemListener, java.awt.event.FocusListener {
 
@@ -97,6 +97,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private erp.lib.form.SFormField moFieldGroceryServiceAccount;
     private erp.lib.form.SFormField moFieldIsActive;
     private erp.lib.form.SFormField moFieldDateBirth;
+    private erp.lib.form.SFormField moFieldEntityEmployee;
+    private erp.lib.form.SFormField moFieldUmf;
     private erp.lib.form.SFormField moFieldDateBenefits;
     private erp.lib.form.SFormField moFieldDateLastHire;
     private erp.lib.form.SFormField moFieldDateLastDismissal_n;
@@ -336,6 +338,12 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         jftDateBirth = new javax.swing.JFormattedTextField();
         jbDateBirth = new javax.swing.JButton();
         jtfAge = new javax.swing.JTextField();
+        jPanel61 = new javax.swing.JPanel();
+        jlBirthPlace = new javax.swing.JLabel();
+        jtfBirthPlace = new javax.swing.JTextField();
+        jPanel62 = new javax.swing.JPanel();
+        jlUmf = new javax.swing.JLabel();
+        jtfUmf = new javax.swing.JTextField();
         jPanel36 = new javax.swing.JPanel();
         jlFkCatalogueSexTypeId = new javax.swing.JLabel();
         jcbFkCatalogueSexTypeId = new javax.swing.JComboBox<SFormComponentItem>();
@@ -1085,6 +1093,29 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
 
         jPanel43.add(jPanel34);
 
+        jPanel61.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        jlBirthPlace.setText("Lugar nacimiento: *");
+        jlBirthPlace.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel61.add(jlBirthPlace);
+
+        jtfBirthPlace.setPreferredSize(new java.awt.Dimension(150, 23));
+        jPanel61.add(jtfBirthPlace);
+
+        jPanel43.add(jPanel61);
+
+        jPanel62.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEADING, 5, 0));
+
+        jlUmf.setText("UMF: *");
+        jlUmf.setPreferredSize(new java.awt.Dimension(100, 23));
+        jPanel62.add(jlUmf);
+        jlUmf.getAccessibleContext().setAccessibleDescription("");
+
+        jtfUmf.setPreferredSize(new java.awt.Dimension(40, 23));
+        jPanel62.add(jtfUmf);
+
+        jPanel43.add(jPanel62);
+
         jPanel36.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
 
         jlFkCatalogueSexTypeId.setText("Sexo:*");
@@ -1542,6 +1573,14 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         moFieldDateBirth = new SFormField(miClient, SLibConstants.DATA_TYPE_DATE, true, jftDateBirth, jlDateBirth);
         moFieldDateBirth.setPickerButton(jbDateBirth);
         moFieldDateBirth.setTabbedPaneIndex(1, jTabbedPane);
+        
+        moFieldEntityEmployee = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfBirthPlace, jlBirthPlace);
+        moFieldEntityEmployee.setLengthMax(50);
+        moFieldEntityEmployee.setTabbedPaneIndex(1, jTabbedPane);
+        moFieldUmf =  new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfUmf, jlUmf);
+        moFieldUmf.setLengthMax(3);
+        moFieldUmf.setTabbedPaneIndex(1, jTabbedPane);
+        
         moFieldFileImagePhoto = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfImagePhoto, jlImagePhoto);
         moFieldFileImagePhoto.setTabbedPaneIndex(1, jTabbedPane);
         moFieldFileImageSignature = new SFormField(miClient, SLibConstants.DATA_TYPE_STRING, false, jtfImageSignature, jlImageSignature);
@@ -1658,6 +1697,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         mvFields.add(moFieldFkRecruitmentSchemeType);
         mvFields.add(moFieldFkPositionRiskType);
         mvFields.add(moFieldDateBirth);
+        mvFields.add(moFieldEntityEmployee);
+        mvFields.add(moFieldUmf);
         mvFields.add(moFieldFileImagePhoto);
         mvFields.add(moFieldFileImageSignature);
         mvFields.add(moFieldFkCatalogueSexType);
@@ -2211,7 +2252,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private void focusLostDateBirth() {
         jtfAge.setText(SLibTimeUtils.formatAge(moFieldDateBirth.getDate(), miClient.getSession().getSystemDate()));
     }
-    
+     
     private void focusLostMateDateBirth() {
         jtfMateAge.setText(SLibTimeUtils.formatAge(moFieldMateDateBirth.getDate(), miClient.getSession().getSystemDate()));
     }
@@ -2296,6 +2337,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JPanel jPanel59;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel60;
+    private javax.swing.JPanel jPanel61;
+    private javax.swing.JPanel jPanel62;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
@@ -2377,6 +2420,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JFormattedTextField jftSonDateBirth5;
     private javax.swing.JLabel jlAlternativeId;
     private javax.swing.JLabel jlBankAccount;
+    private javax.swing.JLabel jlBirthPlace;
     private javax.swing.JLabel jlContractExpiration;
     private javax.swing.JLabel jlContractExpirationHint;
     private javax.swing.JLabel jlDateBenefits;
@@ -2426,6 +2470,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JLabel jlSon3;
     private javax.swing.JLabel jlSon4;
     private javax.swing.JLabel jlSon5;
+    private javax.swing.JLabel jlUmf;
     private javax.swing.JLabel jlWage;
     private javax.swing.JLabel jlWorkingHoursDay;
     private javax.swing.JPanel jpBranchAddress;
@@ -2435,6 +2480,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JRadioButton jradOvertimeSometimes;
     private javax.swing.JTextField jtfAge;
     private javax.swing.JTextField jtfBankAccount;
+    private javax.swing.JTextField jtfBirthPlace;
     private javax.swing.JTextField jtfBizPartner_Ro;
     private javax.swing.JTextField jtfEmail;
     private javax.swing.JTextField jtfFirstname;
@@ -2461,6 +2507,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
     private javax.swing.JTextField jtfSonName3;
     private javax.swing.JTextField jtfSonName4;
     private javax.swing.JTextField jtfSonName5;
+    private javax.swing.JTextField jtfUmf;
     private javax.swing.JTextField jtfWage;
     private javax.swing.JTextField jtfWorkingHoursDay;
     // End of variables declaration//GEN-END:variables
@@ -2682,6 +2729,10 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
                     relatives.add(jlSon4);
                     relatives.add(jlSon5);
 
+                    ArrayList<SFormField> entitiesEmployee = new ArrayList<>();
+                    entitiesEmployee.add(moFieldEntityEmployee);
+                    entitiesEmployee.add(moFieldUmf);
+                    
                     ArrayList<SFormField> names = new ArrayList<>();
                     names.add(moFieldMateName);
                     names.add(moFieldSonName1);
@@ -2825,6 +2876,8 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldFileImagePhoto.setFieldValue("");
             moFieldFileImageSignature.setFieldValue("");
             moFieldFkCatalogueSexType.setFieldValue(new int[] { moEmployee.getFkCatalogueSexClassId(), moEmployee.getFkCatalogueSexTypeId() });
+            moFieldEntityEmployee.setFieldValue(moEmployee.getPlaceBir());
+            moFieldUmf.setFieldValue(moEmployee.getUmf());
             moFieldFkCatalogueBloodTypeType.setFieldValue(new int[] { moEmployee.getFkCatalogueBloodTypeClassId(), moEmployee.getFkCatalogueBloodTypeTypeId() });
             moFieldFkCatalogueEducationType.setFieldValue(new int[] { moEmployee.getFkCatalogueEducationClassId(), moEmployee.getFkCatalogueEducationTypeId() });
             moFieldFkCatalogueMaritalStatusType.setFieldValue(new int[] { moEmployee.getFkCatalogueMaritalStatusClassId(), moEmployee.getFkCatalogueMaritalStatusTypeId() });
@@ -3152,7 +3205,9 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         //moEmployee.setFkSourceCompanyId(...); // source company set above in this method!
         moEmployee.setFkBankId_n(moFieldFkBank_n.getKeyAsIntArray()[0]);
         moEmployee.setFkGroceryServiceId(moFieldFkGroceryService.getKeyAsIntArray()[0]);
-
+        moEmployee.setPlaceBir(moFieldEntityEmployee.getString());
+        moEmployee.setUmf(moFieldUmf.getString());
+        
         if (jckChangeSalary.isSelected()) {
             moEmployee.setAuxSalary(moFieldSalary.getDouble());
             moEmployee.setAuxDateSalary(moFieldDateChangeSalary.getDate());

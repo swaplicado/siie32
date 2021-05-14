@@ -26,8 +26,8 @@ import sa.lib.gui.SGuiSession;
  */
 public class SRowEmployeeSsc implements SGridRow {
     
-    public static final int COL_SELECTED = 19;
-    public static final int COLS_FIXED = 21;
+    public static final int COL_SELECTED = 20;
+    public static final int COLS_FIXED = 22;
     
     protected int mnLimitUmasSsc = 25;
     protected SGuiSession moSession;
@@ -53,6 +53,7 @@ public class SRowEmployeeSsc implements SGridRow {
     protected int mnAbsenceEffectiveDaysFinal;
     protected double mdSscSuggested;
     protected double mdSscFinal;
+    protected double mdSalaryDifferent;
     protected boolean mbRowSelected;
     
     /* Lista de las percepciones del período (bimestre) a procesar. */
@@ -82,6 +83,7 @@ public class SRowEmployeeSsc implements SGridRow {
         mnAbsenceEffectiveDaysFinal = 0;
         mdSscSuggested = 0.0f;
         mdSscFinal = 0.0;
+        mdSalaryDifferent = 0.0;
         mbRowSelected = false;
         
         maSbcEarnings = new ArrayList<>();
@@ -100,12 +102,13 @@ public class SRowEmployeeSsc implements SGridRow {
     public void setDailyIncome(double d) { mdDailyIncome = d; }
     public void setSscCurrent(double d) { mdSscCurrent = d; }
     public void setSscLastUpdate(Date t) { mtSscLastUpdate = t; }
-    public void setSscRaw(double d) { mdSscRaw = d; }
+    public void setSscRaw(double d) { mdSscRaw = d; setSalaryDifferent(mdSscRaw); }
     public void setVariableIncome(double d) { mdVariableIncome = d; }
     public void setAbsenceEffectiveDaysSuggested(int days) { mnAbsenceEffectiveDaysSuggested = days; setAbsenceEffectiveDaysFinal(mnAbsenceEffectiveDaysSuggested); setSscSuggested(computeSbc(mnAbsenceEffectiveDaysSuggested)); }
     public void setAbsenceEffectiveDaysFinal(int days) { mnAbsenceEffectiveDaysFinal = days; setSscFinal(computeSbc(mnAbsenceEffectiveDaysFinal)); }
     public void setSscSuggested(double sbc) { SLibUtils.roundAmount(mdSscSuggested) ;mdSscSuggested = sbc; setSscFinal(mdSscSuggested); }
-    public void setSscFinal(double sbc) { mdSscFinal = (sbc >= mdMaximumSalary ? mdMaximumSalary : sbc ); }
+    public void setSscFinal(double sbc) { mdSscFinal = (sbc >= mdMaximumSalary ? mdMaximumSalary : sbc ); setSalaryDifferent(mdSscFinal); }
+    public void setSalaryDifferent(double d) { mdSalaryDifferent =  (mdSscFinal - mdSscRaw); }
     public void setRowSelected(boolean d) { mbRowSelected = d; }
      
     public int getVacationsDays() { return mnVacationsDays; }
@@ -121,6 +124,7 @@ public class SRowEmployeeSsc implements SGridRow {
     public int getAbsenceEffectiveDaysFinal() { return mnAbsenceEffectiveDaysFinal; }
     public double getSscSuggested() { return mdSscSuggested; }
     public double getSscFinal() { return mdSscFinal; }
+    public double getSalaryDifferent() { return mdSalaryDifferent; }
     public boolean isRowSelected() { return mbRowSelected; }
     
     public ArrayList<SSscEarning> getSbcEarnings() { return maSbcEarnings; }
@@ -142,7 +146,7 @@ public class SRowEmployeeSsc implements SGridRow {
         int workedDays = mnPeriodDays - absenceDays; // convenience variable
         return mdSscRaw + (workedDays == 0 ? 0 : (mdVariableIncome / workedDays));
     }
-    
+
     public void computeSbc() {
         setSscSuggested(computeSbc(mnAbsenceEffectiveDaysSuggested));
     }
@@ -255,6 +259,9 @@ public class SRowEmployeeSsc implements SGridRow {
                 case 18:
                    value = SLibUtils.roundAmount(mdSscFinal);
                     break;
+                case 19:
+                    value = mdSalaryDifferent;
+                    break;
                 case COL_SELECTED:
                     value = mbRowSelected;
                     break;
@@ -306,6 +313,8 @@ public class SRowEmployeeSsc implements SGridRow {
                 break;
             case 18:
                 setSscFinal((double) value);
+                break;
+            case 19:
                 break;
             case COL_SELECTED:
                 setRowSelected((boolean) value);

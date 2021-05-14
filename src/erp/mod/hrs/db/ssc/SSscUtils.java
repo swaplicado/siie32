@@ -121,20 +121,21 @@ public abstract class SSscUtils {
         Date cutoffdate = SLibTimeUtils.createDate(year, monthStart);
 
         String sql = "SELECT DISTINCT pr.id_emp, bp.bp "
-                + "FROM hrs_pay AS p "
-                + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
-                + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
-                + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
-                + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = pr.id_emp "
-                + "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp "
-                + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND "
-                + "p.per_year = " + year + " AND p.per BETWEEN " + monthStart + " AND " + monthEnd + " AND "
-//                + "e.fk_tp_ear NOT IN (" + getExcludedEarningTypesSqlList() + ") AND " // ¿?
-                + "emp.dt_hire < '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act AND "
-                + "emp.dt_sal_ssc < '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' "
-//                + "and pr.id_emp = 3504 " // xxx pruebas
-                + "GROUP BY pr.id_emp ORDER BY bp.bp, pr.id_emp;" ; 
-        
+                    + "FROM hrs_pay AS p "
+                    + "INNER JOIN hrs_pay_rcp AS pr ON pr.id_pay = p.id_pay "
+                    + "INNER JOIN hrs_pay_rcp_ear AS pre ON pre.id_pay = pr.id_pay AND pre.id_emp = pr.id_emp "
+                    + "INNER JOIN hrs_ear AS e ON e.id_ear = pre.fk_ear "
+                    + "INNER JOIN erp.bpsu_bp AS bp ON bp.id_bp = pr.id_emp "
+                    + "INNER JOIN erp.hrsu_emp AS emp ON emp.id_emp = pr.id_emp "
+                    + "INNER JOIN hrs_emp_member AS men ON men.id_emp = emp.id_emp "
+                    + "INNER JOIN hrs_emp_log_sal_ssc AS va ON va.id_emp = emp.id_emp "
+                    + "WHERE NOT p.b_del AND NOT pr.b_del AND NOT pre.b_del AND "
+                    + "p.per_year = " + year + " AND p.per BETWEEN " + monthStart + " AND " + monthEnd + " AND "
+                    + "emp.dt_hire < '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' AND emp.b_act AND "
+                    + "emp.dt_sal_ssc < '" + SLibUtils.DbmsDateFormatDate.format(cutoffdate) + "' "
+    //                + "and pr.id_emp = 3680 " // xxx Para pruebas de empleados
+                    + "GROUP BY pr.id_emp ORDER BY bp.bp, pr.id_emp;" ; 
+
         try (Statement statement = session.getStatement().getConnection().createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
             while (resultSet.next()) {

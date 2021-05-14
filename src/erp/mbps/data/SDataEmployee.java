@@ -38,7 +38,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  * Used mainly in CRUD operations on employees.
- * @author Juan Barajas, Edwin Carmona, Sergio Flores
+ * @author Juan Barajas, Edwin Carmona, Sergio Flores, Claudio Peña
  */
 public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io.Serializable {
 
@@ -62,6 +62,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     protected int mnOvertimePolicy;
     protected String msBankAccount;
     protected String msGroceryServiceAccount;
+    protected String msPlaceBir;
+    protected String msUmf;
     protected java.sql.Blob moImagePhoto_n;
     protected java.sql.Blob moImageSignature_n;
     protected boolean mbUnionized;
@@ -205,6 +207,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public void setOvertimePolicy(int n) { mnOvertimePolicy = n; }
     public void setBankAccount(String s) { msBankAccount = s; }
     public void setGroceryServiceAccount(String s) { msGroceryServiceAccount = s; }
+    public void setPlaceBir(String s) { msPlaceBir = s; }
+    public void setUmf(String s) { msUmf = s; }
     public void setImagePhoto_n(java.sql.Blob o) { moImagePhoto_n = o; }
     public void setImageSignature_n(java.sql.Blob o) { moImageSignature_n = o; }
     public void setUnionized(boolean b) { mbUnionized = b; }
@@ -272,6 +276,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
     public int getOvertimePolicy() { return mnOvertimePolicy; }
     public String getBankAccount() { return msBankAccount; }
     public String getGroceryServiceAccount() { return msGroceryServiceAccount; }
+    public String getPlaceBir() { return msPlaceBir; }
+    public String getUmf() { return msUmf; }
     public java.sql.Blob getImagePhoto_n() { return moImagePhoto_n; }
     public java.sql.Blob getImageSignature_n() { return moImageSignature_n; }
     public boolean isUnionized() { return mbUnionized; }
@@ -400,6 +406,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
         mnOvertimePolicy = 0;
         msBankAccount = "";
         msGroceryServiceAccount = "";
+        msPlaceBir = "";
+        msUmf = "";
         moImagePhoto_n = null;
         moImageSignature_n = null;
         mbUnionized = false;
@@ -486,6 +494,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                 mnOvertimePolicy = resultSet.getInt("overtime");
                 msBankAccount = resultSet.getString("bank_acc");
                 msGroceryServiceAccount = resultSet.getString("grocery_srv_acc");
+                msPlaceBir= resultSet.getString("place_bir");
+                msUmf = resultSet.getString("umf");
                 /*
                 moImagePhoto_n = resultSet.getBlob("img_pho_n");
                 moImageSignature_n = resultSet.getBlob("img_sig_n");
@@ -632,6 +642,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         mnOvertimePolicy + ", " + 
                         "'" + msBankAccount + "', " + 
                         "'" + msGroceryServiceAccount + "', " +
+                        "'" + msPlaceBir + "', " +
+                        "'" + msUmf + "', " +
                         "NULL, " +
                         "NULL, " +
                         (mbUnionized ? 1 : 0) + ", " + 
@@ -690,6 +702,8 @@ public class SDataEmployee extends erp.lib.data.SDataRegistry implements java.io
                         "overtime = " + mnOvertimePolicy + ", " +
                         "bank_acc = '" + msBankAccount + "', " +
                         "grocery_srv_acc = '" + msGroceryServiceAccount + "', " +
+                        "place_bir = '" + msPlaceBir + "', " +
+                        "umf = '" + msUmf + "', " +
                         /*
                         "img_pho_n = " + (moImagePhoto_n == null ? null : moImagePhoto_n) + ", " +
                         "img_sig_n = " + (moImageSignature_n == null ? null : moImageSignature_n) + ", " +

@@ -32,7 +32,9 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
     
     private SGridFilterPanelEmployee moFilterEmployee;
     private JButton jbLayoutEmployeeHire;
+    private JButton jbLayoutEmployeeEntry;
     private JButton jbLayoutEmployeeDismiss;
+    private JButton jbLayoutEmployeeAfi;
     
     private SDialogLayoutEmployee moDialogLayoutEmployee;
 
@@ -47,25 +49,44 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
         moFilterEmployee = new SGridFilterPanelEmployee(miClient, this, SModConsts.HRSS_TP_PAY, SModConsts.HRSU_DEP);
         moFilterEmployee.initFilter(null);
         getPanelCommandsCustom(SGuiConsts.PANEL_LEFT).add(moFilterEmployee);
-        
         jbLayoutEmployeeHire = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout alta empleados", this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeHire);
+        jbLayoutEmployeeEntry = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout re-ingreso empleados", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeEntry);
         jbLayoutEmployeeDismiss = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout baja empleados", this);
         getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeDismiss);
+        jbLayoutEmployeeAfi = SGridUtils.createButton(new ImageIcon(getClass().getResource("/erp/img/icon_std_save.gif")), "Layout movimientos afiliatorios empleados", this);
+        getPanelCommandsSys(SGuiConsts.PANEL_CENTER).add(jbLayoutEmployeeAfi);
         
     }
-
+    
     private void actionLayoutEmployeeHire() {
-        if (jbLayoutEmployeeHire.isEnabled()) {     
+        if (jbLayoutEmployeeHire.isEnabled()) {
             moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_HIRE);
             moDialogLayoutEmployee.resetForm();
-            moDialogLayoutEmployee.setVisible(true);  
+            moDialogLayoutEmployee.setVisible(true);
+        }
+    }
+    
+    private void actionLayoutEmployeeEntry() {
+        if (jbLayoutEmployeeEntry.isEnabled()) {
+            moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_ENTRY);
+            moDialogLayoutEmployee.resetForm();
+            moDialogLayoutEmployee.setVisible(true);
         }
     }
     
     private void actionLayoutEmployeeDismiss(){
         if (jbLayoutEmployeeDismiss.isEnabled()) {
             moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_DISMISS);
+            moDialogLayoutEmployee.resetForm();
+            moDialogLayoutEmployee.setVisible(true);  
+        }
+    }
+    
+    private void actionLayoutEmployeeAfil(){
+        if (jbLayoutEmployeeAfi.isEnabled()) {
+            moDialogLayoutEmployee = new SDialogLayoutEmployee(miClient, "Layout empleados", SModConsts.HRSX_LAYOUT_SUA_AFI);
             moDialogLayoutEmployee.resetForm();
             moDialogLayoutEmployee.setVisible(true);  
         }
@@ -181,8 +202,14 @@ public class SViewEmployeeHireLog extends SGridPaneView implements ActionListene
             if (button == jbLayoutEmployeeHire) {
                 actionLayoutEmployeeHire();
             }
+            else if (button == jbLayoutEmployeeEntry) {
+                actionLayoutEmployeeEntry();
+            }
             else if (button == jbLayoutEmployeeDismiss) {
                 actionLayoutEmployeeDismiss();
+            }
+            else if (button == jbLayoutEmployeeAfi) {
+                actionLayoutEmployeeAfil();
             }
         }
     }

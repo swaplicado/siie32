@@ -717,7 +717,7 @@ public abstract class SModConsts {
     public static final int HRSX_LAYOUT_SUA_TRUANCY = 11; // Absense of the worker
     public static final int HRSX_LAYOUT_SUA_INABILITY = 12; // Worker disability docs mov 
     public static final int HRSX_LAYOUT_SUA_INABILITY_IMP = 13; // Worker disability
-    public static final int HRSX_LAYOUT_SUA_ABS_TRUANCY = 1; // Absense of the worker variable
+    public static final int HRSX_LAYOUT_SUA_ABS_TRUANCY = 1; // Absence of the worker variable
     public static final int HRSX_LAYOUT_SUA_ABS_INABILITY = 2; // Disability the worker variable
     public static final int HRSX_LAYOUT_SUA_AFI = 14; // Affiliate data
     

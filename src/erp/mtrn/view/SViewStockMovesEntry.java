@@ -28,7 +28,7 @@ import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Claudio Peña
  */
 public class SViewStockMovesEntry extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -81,11 +81,12 @@ public class SViewStockMovesEntry extends erp.lib.table.STableTab implements jav
         jtbDecimals.addActionListener(this);
         addTaskBarUpperComponent(jtbDecimals);
 
-        aoTableColumns = new STableColumn[39];
+        aoTableColumns = new STableColumn[40];
 
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Num. parte", 250);
         }
         else {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
@@ -229,7 +230,7 @@ public class SViewStockMovesEntry extends erp.lib.table.STableTab implements jav
 
         msSql = "SELECT s.id_year, s.id_item, s.id_unit, s.id_lot, s.id_cob, s.id_wh, s.id_mov, s.b_del, " +   // 06
                     "s.dt, st.code, st.tp_iog, tpa.tp_iog_adj, l.lot, l.dt_exp_n, l.b_block, cob.code, ent.code, " +    // 15
-                    "i.item_key, i.item, s.mov_in, s.mov_out, u.symbol, s.debit, s.credit, " +                              // 20
+                    "i.item_key, i.item, s.mov_in, i.part_num, s.mov_out, u.symbol, s.debit, s.credit, " +                              // 20
                     "iog.dt, iogt.code, CONCAT(iog.num_ser, IF(length(iog.num_ser) = 0, '', '-'), erp.lib_fix_int(iog.num, " + SDataConstantsSys.NUM_LEN_IOG + ")) AS f_iog_num, iog_cob.code, iog_ent.code, " +    // 25
                     "un.usr, iog.ts_new, ue.usr, iog.ts_edit, " +                                       // 29
                     "dpst.code, CONCAT(dps.num_ser, IF(length(dps.num_ser) = 0, '', '-'), dps.num) AS f_dps_num, dps.dt, dps_cob.code, " +  // 33
