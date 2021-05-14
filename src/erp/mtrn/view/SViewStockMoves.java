@@ -24,7 +24,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Claudio Peña
  */
 public class SViewStockMoves extends erp.lib.table.STableTab implements java.awt.event.ActionListener {
 
@@ -73,11 +73,12 @@ public class SViewStockMoves extends erp.lib.table.STableTab implements java.awt
         jtbDecimals.addActionListener(this);
         addTaskBarUpperComponent(jtbDecimals);
 
-        aoTableColumns = new STableColumn[9];
+        aoTableColumns = new STableColumn[10];
 
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num,", "Num. parte", 250);
         }
         else {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
@@ -180,7 +181,7 @@ public class SViewStockMoves extends erp.lib.table.STableTab implements java.awt
             }
         }
 
-        msSql = "SELECT i.item_key, i.item, SUM(s.mov_in) AS f_mov_i, SUM(s.mov_out) AS f_mov_o, u.symbol, bpb.code, wh.code, tp.tp_iog, tpa.tp_iog_adj " +
+        msSql = "SELECT i.item_key, i.item, i.part_num, SUM(s.mov_in) AS f_mov_i, SUM(s.mov_out) AS f_mov_o, u.symbol, bpb.code, wh.code, tp.tp_iog, tpa.tp_iog_adj " +
                 "FROM trn_stk AS s " +
                 "INNER JOIN erp.itmu_item AS i ON s.id_item = i.id_item AND i.b_inv = TRUE " +
                 "INNER JOIN erp.itmu_unit AS u ON s.id_unit = u.id_unit " +

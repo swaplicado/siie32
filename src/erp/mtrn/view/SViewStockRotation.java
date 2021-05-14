@@ -27,7 +27,7 @@ import sa.lib.SLibRpnOperator;
 
 /**
  *
- * @author Juan Barajas, Sergio Flores
+ * @author Juan Barajas, Sergio Flores, Claudio Peña
  */
 public class SViewStockRotation extends erp.lib.table.STableTab {
 
@@ -75,16 +75,18 @@ public class SViewStockRotation extends erp.lib.table.STableTab {
         jtbDecimals.addActionListener(this);
         addTaskBarUpperComponent(jtbDecimals);
 
-        col = (showLots() ? 11 : 8 );
+        col = (showLots() ? 12 : 9 );
 
         aoTableColumns = new STableColumn[col];
 
         if (miClient.getSessionXXX().getParamsErp().getFkSortingItemTypeId() == SDataConstantsSys.CFGS_TP_SORT_KEY_NAME) {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Num. parte", 250);
         }
         else {
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item", "Ítem", 250);
+            aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.part_num", "Num. parte", 250);
             aoTableColumns[i++] = new STableColumn(SLibConstants.DATA_TYPE_STRING, "i.item_key", "Clave", STableConstants.WIDTH_ITEM_KEY);
         }
 
@@ -202,8 +204,8 @@ public class SViewStockRotation extends erp.lib.table.STableTab {
         }
 
         msSql = "SELECT s.id_item, s.id_unit, " +
-                "i.item_key, i.item, u.symbol, 1 AS f_const, " +
-                (!showLots() ? "" : "l.lot, l.dt_exp_n, l.b_block, ") +
+                "i.item_key, i.item, i.part_num, u.symbol, 1 AS f_const, " +
+                (!showLots() ? "" : "l.lot, l.dt_exp_n, l.b_block, i.part_num, ") +
                 "COALESCE(SUM(CASE WHEN s.dt < '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[0]) + "' THEN s.mov_in - s.mov_out ELSE 0 END), 0) AS f_inv_i, " +
                 "COALESCE(SUM(CASE WHEN s.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[0]) + "' AND s.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[1]) + "' THEN s.mov_in ELSE 0 END), 0) AS f_mov_i, " +
                 "COALESCE(SUM(CASE WHEN s.dt >= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[0]) + "' AND s.dt <= '" + miClient.getSessionXXX().getFormatters().getDbmsDateFormat().format(range[1]) + "' THEN s.mov_out ELSE 0 END), 0) AS f_mov_o, " +

@@ -62,6 +62,7 @@ import erp.mfin.data.SFinAmount;
 import erp.mfin.data.SFinAmounts;
 import erp.mfin.data.SFinDpsTaxes;
 import erp.mfin.data.SFinMovementType;
+import erp.mod.SModConsts;
 import erp.mod.SModSysConsts;
 import erp.mod.trn.db.SDbMmsConfig;
 import erp.mod.trn.db.STrnUtils;
@@ -84,6 +85,7 @@ import java.util.Vector;
 import sa.lib.SLibConsts;
 import sa.lib.SLibUtils;
 import sa.lib.db.SDbConsts;
+import sa.lib.gui.SGuiSession;
 
 /* IMPORTANT:
  * Every single change made to the definition of this class' table must be updated also in the following classes:
@@ -93,7 +95,7 @@ import sa.lib.db.SDbConsts;
 
 /**
  * WARNING: Every change that affects the structure of this registry must be reflected in SIIE/ETL Avista classes and methods!
- * @author Sergio Flores, Juan Barajas, Daniel López, Sergio Flores, Isabel Servín
+ * @author Sergio Flores, Juan Barajas, Daniel López, Sergio Flores, Isabel Servín, Claudio Peña
  */
 public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Serializable, erp.cfd.SCfdXmlCfdi32, erp.cfd.SCfdXmlCfdi33 {
 
@@ -5337,6 +5339,57 @@ public class SDataDps extends erp.lib.data.SDataRegistry implements java.io.Seri
         }
         
         return impuestos;
+    }
+    
+        public static boolean getAreaFunctional(SGuiSession session, int mnPkUserId, int mnIdArea) throws SQLException {
+        ResultSet resultSet = null;
+        Statement statement = session.getStatement().getConnection().createStatement();
+        boolean Functional = false;
+        
+        String sql = "SELECT id_func " +
+            "FROM " + SModConsts.TablesMap.get(SModConsts.USR_USR_FUNC) + " " +
+            "WHERE id_usr = " + mnPkUserId + " " +
+            "ORDER BY id_func ";
+
+        resultSet = statement.executeQuery(sql);
+        while (resultSet.next()) {
+            if (resultSet.getInt("id_func") != mnIdArea ){
+                Functional = false;
+            }
+            else {
+                Functional = true;
+            }
+        }
+        return Functional;
+    }
+
+    /**
+    * 
+    * @param session
+    * @param pkCfd
+    * @return
+    */
+    public static ArrayList<Object[]> getUsePolicy(SGuiSession session, int pkCfd) throws SQLException, Exception {
+        ResultSet resultSet = null;
+        Statement statement = session.getStatement().getConnection().createStatement();
+        java.lang.Object[] pk = new Object[5];
+        ArrayList<Object[]> keyPolicy = null;
+        keyPolicy = new ArrayList<>();
+        
+        String sql = "SELECT * FROM fin_rec_ety WHERE not b_del AND fid_cfd_n = " + pkCfd + " GROUP BY id_tp_rec, id_num; ";
+        resultSet = statement.executeQuery(sql);
+        
+        while (resultSet.next()) {
+            pk[0] = resultSet.getInt("id_year");
+            pk[1] = resultSet.getInt("id_per");
+            pk[2] = resultSet.getInt("id_bkc");
+            pk[3] = resultSet.getString("id_tp_rec");
+            pk[4] = resultSet.getInt("id_num");
+            keyPolicy.add(pk);
+            
+        }
+        
+        return keyPolicy;
     }
     
     /*

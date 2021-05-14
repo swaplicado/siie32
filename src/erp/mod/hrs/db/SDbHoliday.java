@@ -7,6 +7,10 @@ package erp.mod.hrs.db;
 import erp.mod.SModConsts;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import sa.gui.util.SUtilConsts;
 import sa.lib.SLibUtils;
@@ -16,7 +20,7 @@ import sa.lib.gui.SGuiSession;
 
 /**
  *
- * @author Néstor Ávalos, Sergio Flores
+ * @author Néstor Ávalos, Sergio Flores, Claudio Peña
  */
 public class SDbHoliday extends SDbRegistryUser {
 
@@ -214,4 +218,76 @@ public class SDbHoliday extends SDbRegistryUser {
         registry.setRegistryNew(this.isRegistryNew());
         return registry;
     }
+   
+    public static boolean finYearExists(SGuiSession session, int pkYearId) throws SQLException {
+        boolean notYearExists = false;
+        String mySql = "SELECT * FROM fin_year WHERE id_year = " + pkYearId + " AND NOT b_closed AND NOT b_del;";
+        Statement statement = session.getStatement().getConnection().createStatement();
+        ResultSet resultSet = statement.executeQuery(mySql);
+        if (resultSet.next()) {
+            return notYearExists = true;
+        } 
+        else {
+            return notYearExists;
+        }
+    }
+    
+    public static boolean existHolidaysInCurrentYear(SGuiSession session, int pkYearId) throws SQLException {
+        boolean notHolidaysExists = false;
+        String mySql = "SELECT * FROM hrs_hol WHERE id_hdy = " + pkYearId + " AND NOT b_del;";
+        Statement statement = session.getStatement().getConnection().createStatement();
+        ResultSet resultSet = statement.executeQuery(mySql);
+        if (resultSet.next()) {
+            return notHolidaysExists = true;
+        } 
+        else {
+            return notHolidaysExists;
+        }
+    }
+    
+    public static boolean existHolidaysToCopy(SGuiSession session, int pkYearCopy) throws SQLException {
+        boolean notHolidaysExistsCopy = false;
+        String mySql = "SELECT * FROM hrs_hol WHERE id_hdy = " + pkYearCopy + " AND NOT b_del;";
+        Statement statement = session.getStatement().getConnection().createStatement();
+        ResultSet resultSet = statement.executeQuery(mySql);
+        if (resultSet.next()) {
+            return notHolidaysExistsCopy = true;
+        }
+        else {
+            return notHolidaysExistsCopy;
+        }
+    }
+    
+    public static Date validateDate(int currentYear, Date dt) throws ParseException {
+        SimpleDateFormat dtS = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dt);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        int year = currentYear;
+        
+        if ((year % 4 == 0 && year % 100 != 0) || (year % 100 == 0 && year % 400 == 0)) {
+            String dtFinal = year + "-" + (Integer.toString(month).length() <=1 ? ("0" + month ) : month) + "-" + (Integer.toString(day).length() <=1 ? ("0" + day ) : day) ;
+            Date dtFinalDate = dtS.parse(dtFinal);
+            
+            return dtFinalDate;
+        } else {
+            if (month == 2 && day > 28) {
+                day = 28;
+                String dtFinal = year + "-" + (Integer.toString(month).length() <=1 ? ("0" + month ) : month) + "-" + (Integer.toString(day).length() <=1 ? ("0" + day ) : day) ;
+                Date dtFinalDate = dtS.parse(dtFinal);
+            
+            return dtFinalDate;
+            
+            }
+            else {
+                String dtFinal = year + "-" + (Integer.toString(month).length() <=1 ? ("0" + month ) : month) + "-" + (Integer.toString(day).length() <=1 ? ("0" + day ) : day) ;
+                Date dtFinalDate = dtS.parse(dtFinal);
+            
+            return dtFinalDate;
+            
+            }
+        }
+    }
 }
+

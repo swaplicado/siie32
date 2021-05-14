@@ -292,11 +292,11 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_INT_2B, "Días no trabajados efectivos", moGridSbcEmployees.getTable().getDefaultEditor(Integer.class));
                 column.setEditable(true);
                 columns.add(column);
-//                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Diferencia SBS $"));
                 columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SBC sugerido $"));
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "SBC nuevo $", moGridSbcEmployees.getTable().getDefaultEditor(Double.class));
                 column.setEditable(true);
                 columns.add(column);
+                columns.add(new SGridColumnForm(SGridConsts.COL_TYPE_DEC_AMT, "Diferencia SBS $"));
                 column = new SGridColumnForm(SGridConsts.COL_TYPE_BOOL_S, "Seleccionado", moGridSbcEmployees.getTable().getDefaultEditor(Boolean.class));
                 column.setEditable(true);
                 columns.add(column);
@@ -419,7 +419,7 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 "@sen_as_months:=TIMESTAMPDIFF(MONTH, e.dt_ben, ' " + dateEndAnt + " ') AS _sen_as_months, " +
                 "@curr_sal_wage:=(SELECT IF((SELECT COUNT(*) FROM hrs_emp_log_wage WHERE id_emp = " + row.getEmployee().getPkEmployeeId() + " AND dt BETWEEN ' " + dateStart + " ' AND ' " + dateEnd + " ') >= 1, 0, v.wage) AS wage " +
                 "FROM hrs_emp_log_wage AS v INNER JOIN erp.hrsu_emp AS emp ON v.id_emp = emp.id_emp WHERE v.b_del = 0 AND emp.b_act = 1  AND v.id_emp = " + row.getEmployee().getPkEmployeeId() + " AND v.dt <= ' " + dateEndAnt + " ' ORDER BY v.dt DESC LIMIT 1) as WageI, " +
-                "@curr_sal_day:=ROUND(IF(e.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + ", e.sal, @curr_sal_wage * " + SHrsConsts.YEAR_MONTHS + " / " + SHrsConsts.YEAR_DAYS + "), 2) AS DailyIncome, " +
+                "@curr_sal_day:=ROUND(IF(e.fk_tp_pay = " + SModSysConsts.HRSS_TP_PAY_WEE + ", e.sal, @curr_sal_wage * " + SHrsConsts.YEAR_MONTHS + " / " + SHrsConsts.YEAR_DAYS + "), 2) AS DailyIncome, e.sal AS DailyIncome2, " +
                 "@curr_ben_anniv:=@sen_as_years + 1 AS _curr_ben_anniv, " +
                 "@curr_ben_year:=YEAR(ADDDATE(e.dt_ben, " +
                 "INTERVAL @sen_as_years YEAR)) AS _curr_ben_year, " +
@@ -597,11 +597,12 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                 row.setVacationsBonus(resultSet.getDouble("VacationsBonus"));
                 row.setAnnualBonusDays(resultSet.getDouble("AnnualBonusDays"));
                 row.setSscFactor(resultSet.getDouble("SscFactor"));
-                row.setDailyIncome(resultSet.getDouble("DailyIncome"));
+                row.setDailyIncome(resultSet.getDouble("DailyIncome2"));
                 row.setSscCurrent(resultSet.getDouble("SscCurrent")); 
                 row.setSscLastUpdate(resultSet.getDate("SscLastUpdate"));
                 row.setSscRaw(resultSet.getDouble("SscRaw"));
                 row.setSscRaw(resultSet.getDouble("SscRaw"));
+                row.setSalaryDifferent(resultSet.getDouble("SscRaw")-resultSet.getDouble("SscCurrent"));
                 row.setPeriodDays(SLibTimeUtils.countPeriodDays(dateLayoudStart, dateLayoutEnd));
                 row.setVariableIncome(earningExtra);
                 row.computeSbc();
@@ -747,12 +748,12 @@ public class SFormMassiveUpdateSsc extends javax.swing.JDialog implements erp.li
                         save = false;
                         break;
                     } 
-                    else if (row.getSscFinal() < SLibUtils.roundAmount(row.getSscRaw())) {
-                        miClient.showMsgBoxWarning("El SBC nuevo no puede ser menor que el SSC con factor.");
-                        validation.setIsError(true);
-                        save = false;
-                        break;
-                    } 
+//                    else if (row.getSscFinal() < SLibUtils.roundAmount(row.getSscRaw())) {
+//                        miClient.showMsgBoxWarning("El SBC nuevo no puede ser menor que el SSC con factor.");
+//                        validation.setIsError(true);
+//                        save = false;
+//                        break;
+//                    } 
                     else {
                         row.setSscLastUpdate(miClient.getSession().getSystemDate());
                         SRowEmployeeSbc.add(row);

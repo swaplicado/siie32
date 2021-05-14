@@ -26,7 +26,7 @@ import sa.lib.gui.SGuiDate;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Claudio Peña
  */
 public class SViewInventoryCost extends SGridPaneView {
 
@@ -107,6 +107,7 @@ public class SViewInventoryCost extends SGridPaneView {
                         + "s.id_unit AS " + SDbConsts.FIELD_ID + "2, "
                         + "i.item_key AS " + SDbConsts.FIELD_CODE + ", "
                         + "i.item AS " + SDbConsts.FIELD_NAME + ", "
+                        + "i.part_num, "
                         + "u.symbol, "
                         + "u.unit, "
                         + "t._price_u, "
@@ -165,11 +166,14 @@ public class SViewInventoryCost extends SGridPaneView {
             case SModConsts.ITMU_ITEM:
                 if (((SDataParamsErp) miClient.getSession().getConfigSystem()).getFkSortingItemTypeId() == SModSysConsts.CFGS_TP_SORT_NAME_KEY) {
                     columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " ítem"));
+                    columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "i.part_num", SGridConsts.COL_TITLE_NAME + " Num. parte"));
                     columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " ítem"));
                 }
                 else {
                     columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_CODE_ITM, SDbConsts.FIELD_CODE, SGridConsts.COL_TITLE_CODE + " ítem"));
                     columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, SDbConsts.FIELD_NAME, SGridConsts.COL_TITLE_NAME + " ítem"));
+                    columns.add(new SGridColumnView(SGridConsts.COL_TYPE_TEXT_NAME_ITM_L, "i.part_num", SGridConsts.COL_TITLE_NAME + " Num. parte"));
+
                 }
 
                 columns.add(new SGridColumnView(SGridConsts.COL_TYPE_DEC_QTY, "_mov_in", "Entradas"));

@@ -879,7 +879,7 @@ public abstract class SHrsUtils {
     }
     
     /**
-     *  
+     * No se utiliza XXX
      * Employees who have a credit
      * @param client
      * @param layoutSuaType Type Layout
@@ -984,31 +984,35 @@ public abstract class SHrsUtils {
                         motherName = resultSetHeader.getString("ApellidoM");
                         curp = resultSetHeader.getString("CURP");
                         
+                        buffer += param.substring(0, 10); // (Registro patronal)
+                        buffer += param.substring(10); // (Digito del registro patronal R.P)
+                        buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                        buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                        buffer += rfc.substring(0, 13); // (Reg. Fed. de contribuyentes)
+                        buffer += curp; // (CURP)
+                        fullName = fatherName + "$" + motherName + "$" + name;
+                        buffer += removeSpecialCharsSua(fullName.concat(fullName.length() > 50 ? fullName.substring(0, 50) : (SLibUtilities.textRepeat(" ",(fullName.length() == 50 ? 0 : 50 - fullName.length() ))))); // (Nombre del trabajador)
+                        buffer += "1"; // (Tipo de trabajador)
+                        buffer += "0"; //(Jornada semana reducida)
+                        buffer += formatDateData.format(dateApplication); // (Fecha dealta)
+                        String baseSalaryS = String.valueOf(String.format("%.2f", baseSalary));
+                        baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                        if (baseSalaryS.length() == 7) {
+                            buffer += (baseSalaryS.length() > 7 ? baseSalaryS.substring(0, 7) : baseSalaryS.concat((SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length()))))); // (Salary base quote)
+                        }
+                        else {
+                            buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                        }
+                        buffer += (workerKey.length() > 17 ? workerKey.substring(0, 17) : (SLibUtilities.textRepeat("0", (workerKey.length() == 17 ? 0 : 17 - workerKey.length())))).concat(workerKey); // (Clave de ubicación, clñave del trabajador)
+                        buffer += "          "; // (Número de crédito infonavit)
+                        buffer += "00000000"; // (Fecha de inicio)
+                        buffer += "0"; // (Tipo de descuento)
+                        buffer += "00000000"; // (Valor de descuento)
+                        buffer += "0"; // (Tipo de pensión)
+                        buffer += param.substring(0, 3); // Clave del municipio
+                        buffer += "\r\n";
+                    
                     }
-
-                    buffer += param.substring(0, 10); // (Registro patronal)
-                    buffer += param.substring(10); // (Digito del registro patronal R.P)
-                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
-                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
-                    buffer += rfc.substring(0, 13); // (Reg. Fed. de contribuyentes)
-                    buffer += curp; // (CURP)
-                    fullName = fatherName + "$" + motherName + "$" + name;
-                    buffer += removeSpecialCharsSua(fullName.concat(fullName.length() > 50 ? fullName.substring(0, 50) : (SLibUtilities.textRepeat(" ",(fullName.length() == 50 ? 0 : 50 - fullName.length() ))))); // (Nombre del trabajador)
-                    buffer += "1"; // (Tipo de trabajador)
-                    buffer += "0"; //(Jornada semana reducida)
-                    buffer += formatDateData.format(dateApplication); // (Fecha dealta)
-                    String baseSalaryS = String.valueOf(baseSalary);
-                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
-                    buffer += (baseSalaryS.length() > 7 ? baseSalaryS.substring(0, 7) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
-                    buffer += (workerKey.length() > 17 ? workerKey.substring(0, 17) : (SLibUtilities.textRepeat("0", (workerKey.length() == 17 ? 0 : 17 - workerKey.length())))).concat(workerKey); // (Clave de ubicación, clñave del trabajador)
-                    buffer += "          "; // (Número de crédito infonavit)
-                    buffer += "00000000"; // (Fecha de inicio)
-                    buffer += "0"; // (Tipo de descuento)
-                    buffer += "00000000"; // (Valor de descuento)
-                    buffer += "0"; // (Tipo de pensión)
-                    buffer += param.substring(0, 3); // Clave del municipio
-                    buffer += "\r\n";
-
                 }
                     
                 bw.write(buffer);
@@ -1104,23 +1108,22 @@ public abstract class SHrsUtils {
                         cp = resultSetHeader.getString("a.zip_code");
                         ocupacion = resultSetHeader.getString("pos.name");
 
+                        buffer += param.substring(0, 10); // (Registro patronal)
+                        buffer += param.substring(10); // (Digito del registro patronal R.P)
+                        buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                        buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                        buffer += (cp.length() > 5 ? cp.substring(0, 4) : cp.concat((SLibUtilities.textRepeat("0", (cp.length() == 5 ? 0 : 5 - cp.length())))));; // (CP)
+                        buffer += dateBirth; // (Fecha de nacimiento)
+                        buffer += (placeBirth.length() > 25 ? placeBirth.substring(0, 24) : placeBirth.concat((SLibUtilities.textRepeat(" ", (placeBirth.length() == 25 ? 0 : 25 - placeBirth.length()))))); // (Lugar de nacimiento)
+                        buffer += (placeBirthCode.length() != 18 ? "NE" :  placeBirthCode.substring(11, 13)); // (Clave de lugar de nacimiento)
+                        buffer += (umf.length() > 3 ? umf.substring(0, 2) : umf.concat((SLibUtilities.textRepeat("0", (umf.length() == 3 ? 0 : 3 - umf.length()))))); // (Unidad de medicina familiar )
+                        buffer += (ocupacion.length() > 12 ? ocupacion.substring(0, 11) : ocupacion.concat((SLibUtilities.textRepeat(" ", (ocupacion.length() == 12 ? 0 : 12 - ocupacion.length()))))); // (Ocupacion)
+                        buffer += sex; // (Sexo)
+                        buffer += (salaryType.equals("1") ? "0" : salaryType.equals("2") ? "1" : salaryType.equals("3") ? "2" : "0"); //(Type of salary)
+                        buffer += hrsW; // (Hora)
+                        buffer += "\r\n";
+                        
                      }
-
-                    buffer += param.substring(0, 10); // (Registro patronal)
-                    buffer += param.substring(10); // (Digito del registro patronal R.P)
-                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
-                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
-                    buffer += (cp.length() > 5 ? cp.substring(0, 4) : cp.concat((SLibUtilities.textRepeat("0", (cp.length() == 5 ? 0 : 5 - cp.length())))));; // (CP)
-                    buffer += dateBirth; // (Fecha de nacimiento)
-                    buffer += (placeBirth.length() > 25 ? placeBirth.substring(0, 24) : placeBirth.concat((SLibUtilities.textRepeat(" ", (placeBirth.length() == 25 ? 0 : 25 - placeBirth.length()))))); // (Lugar de nacimiento)
-                    buffer += (placeBirthCode.length() != 18 ? "NE" :  placeBirthCode.substring(11, 13)); // (Clave de lugar de nacimiento)
-                    buffer += (umf.length() > 3 ? umf.substring(0, 2) : umf.concat((SLibUtilities.textRepeat("0", (umf.length() == 3 ? 0 : 3 - umf.length()))))); // (Unidad de medicina familiar )
-                    buffer += (ocupacion.length() > 12 ? ocupacion.substring(0, 11) : ocupacion.concat((SLibUtilities.textRepeat(" ", (ocupacion.length() == 12 ? 0 : 12 - ocupacion.length()))))); // (Ocupacion)
-                    buffer += sex; // (Sexo)
-                    buffer += (salaryType.equals("1") ? "0" : salaryType.equals("2") ? "1" : salaryType.equals("3") ? "2" : "0"); //(Type of salary)
-                    buffer += hrsW; // (Hora)
-                    buffer += "\r\n";
-
                 }
                     
                 bw.write(buffer);
@@ -1191,7 +1194,7 @@ public abstract class SHrsUtils {
                             + "INNER JOIN cfg_param_co AS par "
                             + "INNER JOIN hrs_cfg AS cfg "
                             + "WHERE hire.b_hire = " + (layoutSuaType == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? SModConsts.HRSX_HIRE_DISMISSED : SModConsts.HRSX_HIRE_ACTIVE ) + " AND not hire.b_del "
-                            + "AND hire.dt_hire >= '" + dateSta + "' AND hire.dt_hire <= '" + dateEnd + "' "
+                            + "AND hire.dt_dis_n >= '" + dateSta + "' AND hire.dt_dis_n <= '" + dateEnd + "' "
                             + "AND emp.id_emp = " + pkUser;
 
                     resultSetHeader = client.getSession().getStatement().executeQuery(sql);
@@ -1202,22 +1205,26 @@ public abstract class SHrsUtils {
                         ssn = resultSetHeader.getString("SSN");
                         baseSalary = resultSetHeader.getDouble("Salario");
                         
+                        buffer += param.substring(0, 10); // (Registro patronal)
+                        buffer += param.substring(10); // (Digito del registro patronal R.P)
+                        buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                        buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                        buffer += (String.valueOf(typeMov).length() > 2 ?  String.valueOf(typeMov).substring(0, 1) :  String.valueOf(typeMov).concat((SLibUtilities.textRepeat(" ", ( String.valueOf(typeMov).length() == 2 ? 0 : 2 -  String.valueOf(typeMov).length())))));  // (Tipo de movimiento)
+                        buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
+                        buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inabilityNull : inabilityNull); // (Folio de incapacidad)
+                        buffer += daysIncidence; // (Días de incidencia)
+                        String baseSalaryS = String.valueOf(String.format("%.2f", baseSalary));
+                        baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                        if (baseSalaryS.length() == 7) {
+                            buffer += (baseSalaryS.length() > 7 ? baseSalaryS.substring(0, 7) : baseSalaryS.concat((SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length()))))); // (Salary base quote)
+                        }
+                        else {
+                            buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                        }
+    //                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inputV : inputV);
+                        buffer += "\r\n";
+                        
                     }
-
-                    buffer += param.substring(0, 10); // (Registro patronal)
-                    buffer += param.substring(10); // (Digito del registro patronal R.P)
-                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
-                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
-                    buffer += (String.valueOf(typeMov).length() > 2 ?  String.valueOf(typeMov).substring(0, 1) :  String.valueOf(typeMov).concat((SLibUtilities.textRepeat(" ", ( String.valueOf(typeMov).length() == 2 ? 0 : 2 -  String.valueOf(typeMov).length())))));  // (Tipo de movimiento)
-                    buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
-                    buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inabilityNull : inabilityNull); // (Folio de incapacidad)
-                    buffer += daysIncidence; // (Días de incidencia)
-                    String baseSalaryS = String.valueOf(baseSalary);
-                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
-                    buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 5 ? 0 : 5 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
-                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inputV : inputV);
-                    buffer += "\r\n";
-
                 }
                     
                 bw.write(buffer);
@@ -1300,22 +1307,26 @@ public abstract class SHrsUtils {
                         ssn = resultSetHeader.getString("SSN");
                         baseSalary = resultSetHeader.getDouble("Salario");
                         
+                        buffer += param.substring(0, 10); // (Registro patronal)
+                        buffer += param.substring(10); // (Digito del registro patronal R.P)
+                        buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                        buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                        buffer += (String.valueOf(typeMov).length() > 2 ?  String.valueOf(typeMov).substring(0, 1) :  String.valueOf(typeMov).concat((SLibUtilities.textRepeat(" ", ( String.valueOf(typeMov).length() == 2 ? 0 : 2 -  String.valueOf(typeMov).length())))));  // (Tipo de movimiento)
+                        buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
+                        buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inabilityNull : inabilityNull); // (Folio de incapacidad)
+                        buffer += daysIncidence; // (Días de incidencia)     
+                        String baseSalaryS = String.valueOf(String.format("%.2f", baseSalary));
+                        baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                        if (baseSalaryS.length() == 7) {
+                            buffer += (baseSalaryS.length() > 7 ? baseSalaryS.substring(0, 7) : baseSalaryS.concat((SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length()))))); // (Salary base quote)
+                        }
+                        else {
+                            buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                        }
+    //                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inputV : inputV);
+                        buffer += "\r\n";
+                        
                     }
-
-                    buffer += param.substring(0, 10); // (Registro patronal)
-                    buffer += param.substring(10); // (Digito del registro patronal R.P)
-                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
-                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
-                    buffer += (String.valueOf(typeMov).length() > 2 ?  String.valueOf(typeMov).substring(0, 1) :  String.valueOf(typeMov).concat((SLibUtilities.textRepeat(" ", ( String.valueOf(typeMov).length() == 2 ? 0 : 2 -  String.valueOf(typeMov).length())))));  // (Tipo de movimiento)
-                    buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
-                    buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inabilityNull : inabilityNull); // (Folio de incapacidad)
-                    buffer += daysIncidence; // (Días de incidencia)
-                    String baseSalaryS = String.valueOf(baseSalary);
-                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
-                    buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 5 ? 0 : 5 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
-                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_DISMISS ? inputV : inputV);
-                    buffer += "\r\n";
-
                 }
                     
                 bw.write(buffer);
@@ -1412,21 +1423,25 @@ public abstract class SHrsUtils {
                         daysSubsidized = resultSetHeader.getString("eff_day");
                         dateApplication = resultSetHeader.getDate("dt");
 
+                        buffer += param.substring(0, 10); // (Registro patronal)
+                        buffer += param.substring(10); // (Digito del registro patronal R.P)
+                        buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                        buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (NSS)
+                        buffer += (String.valueOf(typeMov).length() > 2 ?  String.valueOf(typeMov).substring(0, 1) :  String.valueOf(typeMov).concat((SLibUtilities.textRepeat(" ", ( String.valueOf(typeMov).length() == 2 ? 0 : 2 -  String.valueOf(typeMov).length())))));  // (Tipo de movimiento)
+                        buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
+                        buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? invoice : invoice); // (Folio de incapacidad)
+                        buffer += daysSubsidized; // (Días de incidencia)                    
+                        String baseSalaryS = String.valueOf(String.format("%.2f", baseSalary));
+                        baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                        if (baseSalaryS.length() == 7) {
+                            buffer += (baseSalaryS.length() > 7 ? baseSalaryS.substring(0, 7) : baseSalaryS.concat((SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length()))))); // (Salary base quote)
+                        }
+                        else {
+                            buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                        }
+                        buffer += "\r\n";
+                        
                     }
-
-                    buffer += param.substring(0, 10); // (Registro patronal)
-                    buffer += param.substring(10); // (Digito del registro patronal R.P)
-                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
-                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (NSS)
-                    buffer += (String.valueOf(typeMov).length() > 2 ?  String.valueOf(typeMov).substring(0, 1) :  String.valueOf(typeMov).concat((SLibUtilities.textRepeat(" ", ( String.valueOf(typeMov).length() == 2 ? 0 : 2 -  String.valueOf(typeMov).length())))));  // (Tipo de movimiento)
-                    buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
-                    buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_DISMISS ? invoice : invoice); // (Folio de incapacidad)
-                    buffer += daysSubsidized; // (Días de incidencia)
-                    String baseSalaryS = String.valueOf(baseSalary);
-                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
-                    buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 5 ? 0 : 5 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
-                    buffer += "\r\n";
-
                 }
                     
                 bw.write(buffer);
@@ -1522,24 +1537,24 @@ public abstract class SHrsUtils {
                         riskCode = resultSetHeader.getString("v.dis_risk"); 
                         sequelCode = resultSetHeader.getString("v.dis_sequel"); 
                         controlCode = resultSetHeader.getString("v.dis_control"); 
+                        
+                        buffer += param.substring(0, 10); // (Registro patronal)
+                        buffer += param.substring(10); // (Digito del registro patronal R.P)
+                        buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                        buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                        buffer += "1";
+                        buffer +=  formatDateData.format(dateSt);
+                        buffer += (invoice.length() > 8 ? invoice.substring(0, 7) : (SLibUtilities.textRepeat("0", (invoice.length() == 8 ? 0 : 8 - invoice.length())))).concat(invoice); // (Folio)
+                        buffer += (daysSubsidized.length() > 2 ? daysSubsidized.substring(0, 2) : (SLibUtilities.textRepeat("0", (daysSubsidized.length() == 3 ? 0 : 3 - daysSubsidized.length())))).concat(daysSubsidized);;
+                        buffer += (Integer.valueOf(disabilityBranch) == SModSysConsts.HRSS_TP_DIS_RSK || Integer.valueOf(disabilityBranch) == SModSysConsts.HRSS_TP_DIS_MAT ? "100" : "060"); // (Porcentaje de incapacidad) disabilityBranch
+                        buffer += disabilityBranch; // (rama de incapacidad)
+                        buffer += riskCode; // (Riesgo)NO SIIE
+                        buffer += sequelCode; // (Secuela) no SIIE
+                        buffer += controlCode; // (Control de incapacidad) no SIIE
+                        buffer += formatDateData.format(dateEn);
+                        buffer += "\r\n";
+                        
                     }
-
-                    buffer += param.substring(0, 10); // (Registro patronal)
-                    buffer += param.substring(10); // (Digito del registro patronal R.P)
-                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
-                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
-                    buffer += "1";
-                    buffer +=  formatDateData.format(dateSt);
-                    buffer += (invoice.length() > 8 ? invoice.substring(0, 7) : (SLibUtilities.textRepeat("0", (invoice.length() == 8 ? 0 : 8 - invoice.length())))).concat(invoice); // (Folio)
-                    buffer += (daysSubsidized.length() > 2 ? daysSubsidized.substring(0, 2) : (SLibUtilities.textRepeat("0", (daysSubsidized.length() == 3 ? 0 : 3 - daysSubsidized.length())))).concat(daysSubsidized);;
-                    buffer += (Integer.valueOf(disabilityBranch) == SModSysConsts.HRSS_TP_DIS_RSK || Integer.valueOf(disabilityBranch) == SModSysConsts.HRSS_TP_DIS_MAT ? "100" : "060"); // (Porcentaje de incapacidad) disabilityBranch
-                    buffer += disabilityBranch; // (rama de incapacidad)
-                    buffer += riskCode; // (Riesgo)NO SIIE
-                    buffer += sequelCode; // (Secuela) no SIIE
-                    buffer += controlCode; // (Control de incapacidad) no SIIE
-                    buffer += formatDateData.format(dateEn);
-                    buffer += "\r\n";
-
                 }
 
                 bw.write(buffer);
@@ -1618,22 +1633,26 @@ public abstract class SHrsUtils {
                         ssn = resultSetHeader.getString("SSN");
                         baseSalary = resultSetHeader.getDouble("Salario");
                         
+                        buffer += param.substring(0, 10); // (Registro patronal)
+                        buffer += param.substring(10); // (Digito del registro patronal R.P)
+                        buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                        buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                        buffer += "0" + typeMov; // (Tipo de movimiento)
+                        buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
+                        buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_SSC ? "        " : inabilityNull); // (Folio de incapacidad)
+                        buffer += "  "; // (Días de incidencia)
+                        String baseSalaryS = String.valueOf(String.format("%.2f", baseSalary));
+                        baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                        if (baseSalaryS.length() == 7) {
+                            buffer += (baseSalaryS.length() > 7 ? baseSalaryS.substring(0, 7) : baseSalaryS.concat((SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length()))))); // (Salary base quote)
+                        }
+                        else {
+                            buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 7 ? 0 : 7 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                        }
+    //                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_SSC ? inputV : inputV);
+                        buffer += "\r\n";
+                        
                     }
-
-                    buffer += param.substring(0, 10); // (Registro patronal)
-                    buffer += param.substring(10); // (Digito del registro patronal R.P)
-                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
-                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
-                    buffer += "0" + typeMov; // (Tipo de movimiento)
-                    buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
-                    buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_SSC ? inabilityNull : inabilityNull); // (Folio de incapacidad)
-                    buffer += daysIncidence; // (Días de incidencia)
-                    String baseSalaryS = String.valueOf(baseSalary);
-                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
-                    buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 5 ? 0 : 5 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
-                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_SSC ? inputV : inputV);
-                    buffer += "\r\n";
-
                 }
                     
                 bw.write(buffer);
@@ -1711,22 +1730,21 @@ public abstract class SHrsUtils {
                         ssn = resultSetHeader.getString("SSN");
                         baseSalary = resultSetHeader.getDouble("Salario");
                         
+                        buffer += param.substring(0, 10); // (Registro patronal)
+                        buffer += param.substring(10); // (Digito del registro patronal R.P)
+                        buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
+                        buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
+                        buffer += "0" + typeMov; // (Tipo de movimiento)
+                        buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
+                        buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_SSC ? inabilityNull : inabilityNull); // (Folio de incapacidad)
+                        buffer += daysIncidence; // (Días de incidencia)
+                        String baseSalaryS = String.valueOf(baseSalary);
+                        baseSalaryS = baseSalaryS.replaceAll("\\.","");
+                        buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 5 ? 0 : 5 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
+                        buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_SSC ? inputV : inputV);
+                        buffer += "\r\n";
+                    
                     }
-
-                    buffer += param.substring(0, 10); // (Registro patronal)
-                    buffer += param.substring(10); // (Digito del registro patronal R.P)
-                    buffer += (ssn.length() > 10 ? ssn.substring(0, 9) : ssn.concat((SLibUtilities.textRepeat(" ", (ssn.length() == 10 ? 0 : 10 - ssn.length()))))); // (Numero de seguridad social)
-                    buffer += (ssn.length() > 10 ? ssn.substring(9) : " " ); // (Check digit of the NSS)
-                    buffer += "0" + typeMov; // (Tipo de movimiento)
-                    buffer += formatDateData.format(dateApplication); // (Fecha mov)                    
-                    buffer += (typeMov == SModConsts.HRSX_LAYOUT_SUA_SSC ? inabilityNull : inabilityNull); // (Folio de incapacidad)
-                    buffer += daysIncidence; // (Días de incidencia)
-                    String baseSalaryS = String.valueOf(baseSalary);
-                    baseSalaryS = baseSalaryS.replaceAll("\\.","");
-                    buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 5 ? 0 : 5 - baseSalaryS.length())))).concat(baseSalaryS); // (Salario base contización)
-                    buffer += (typeMov ==  SModConsts.HRSX_LAYOUT_SUA_SSC ? inputV : inputV);
-                    buffer += "\r\n";
-
                 }
                     
                 bw.write(buffer);
@@ -1825,10 +1843,14 @@ public abstract class SHrsUtils {
                     buffer += removeSpecialChars(fatherName).concat(fatherName.length() > 27 ? fatherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (fatherName.length() == 27 ? 0 : 27 - fatherName.length())))); // (Last name)
                     buffer += removeSpecialChars(motherName).concat(motherName.length() > 27 ? motherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (motherName.length() == 27 ? 0 : 27 - motherName.length())))); // (Mother's last name)
                     buffer += removeSpecialChars(name).concat(name.length() > 27 ? name.substring(0, 27) : (SLibUtilities.textRepeat(" ", (name.length() == 27 ? 0 : 27 - name.length())))); // (name)
-                    String.format("%.2f", baseSalary);
-                    String baseSalaryS = String.valueOf(baseSalary);
+                    String baseSalaryS = String.valueOf(String.format("%.2f", baseSalary));
                     baseSalaryS = baseSalaryS.replaceAll("\\.","");
-                    buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                    if (baseSalaryS.length() == 6) {
+                        buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : baseSalaryS.concat((SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length()))))); // (Salary base quote)
+                    }
+                    else {
+                        buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                    }
                     buffer += String.valueOf(SLibUtilities.textRepeat(" ", 6));
                     buffer += "1"; // (Type of worker)
                     buffer += (salaryType.equals("1") ? "0" : salaryType.equals("2") ? "1" : salaryType.equals("3") ? "2" : "0"); //(Type of salary)
@@ -1940,10 +1962,14 @@ public abstract class SHrsUtils {
                     buffer += removeSpecialChars(fatherName).concat(fatherName.length() > 27 ? fatherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (fatherName.length() == 27 ? 0 : 27 - fatherName.length())))); // (Last name)
                     buffer += removeSpecialChars(motherName).concat(motherName.length() > 27 ? motherName.substring(0, 27) : (SLibUtilities.textRepeat(" ", (motherName.length() == 27 ? 0 : 27 - motherName.length())))); // (Mother's last name)
                     buffer += removeSpecialChars(name).concat(name.length() > 27 ? name.substring(0, 27) : (SLibUtilities.textRepeat(" ", (name.length() == 27 ? 0 : 27 - name.length())))); // (name)
-                    String.format("%.2f", baseSalary);
-                    String baseSalaryS = String.valueOf(baseSalary);
+                    String baseSalaryS = String.valueOf(String.format("%.2f", baseSalary));
                     baseSalaryS = baseSalaryS.replaceAll("\\.","");
-                    buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                    if (baseSalaryS.length() == 6) {
+                        buffer += (baseSalaryS.length() > 6 ? baseSalaryS.substring(0, 6) : baseSalaryS.concat((SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length()))))); // (Salary base quote)
+                    }
+                    else {
+                        buffer += (baseSalaryS.length() > 5 ? baseSalaryS.substring(0, 5) : (SLibUtilities.textRepeat("0", (baseSalaryS.length() == 6 ? 0 : 6 - baseSalaryS.length())))).concat(baseSalaryS); // (Salary base quote)
+                    }
                     buffer += String.valueOf(SLibUtilities.textRepeat(" ", 6));
                     buffer += String.valueOf(SLibUtilities.textRepeat(" ", 1));
                     buffer += (salaryType.equals("1") ? "0" : salaryType.equals("2") ? "1" : salaryType.equals("3") ? "2" : "0"); //(Type of salary)
