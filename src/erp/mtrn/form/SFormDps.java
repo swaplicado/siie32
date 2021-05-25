@@ -6,6 +6,7 @@
 package erp.mtrn.form;
 
 import cfd.DCfdUtils;
+import cfd.DElement;
 import cfd.ver3.DCfdVer3Consts;
 import cfd.ver33.DCfdi33Catalogs;
 import erp.cfd.SCfdConsts;
@@ -29,6 +30,7 @@ import erp.lib.form.SFormField;
 import erp.lib.form.SFormOptionPickerInterface;
 import erp.lib.form.SFormUtilities;
 import erp.lib.form.SFormValidation;
+import erp.lib.gui.SGuiDate;
 import erp.lib.table.STableColumnForm;
 import erp.lib.table.STableConstants;
 import erp.lib.table.STablePaneGrid;
@@ -52,6 +54,7 @@ import erp.mod.SModSysConsts;
 import erp.mod.trn.db.STrnUtils;
 import erp.mtrn.data.SCfdParams;
 import erp.mtrn.data.SCfdUtils;
+import erp.mtrn.data.SCfdUtilsHandler;
 import erp.mtrn.data.SDataCfd;
 import erp.mtrn.data.SDataDps;
 import erp.mtrn.data.SDataDpsCfd;
@@ -127,6 +130,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private static final int TAB_CFD_XML = 5; // CFD XML file
     
     private static final int LEN_SERIES = 15; // maximum length of number series
+    private static final int UUID_FIRST_SECC_LENGHT = 8;
 
     private int mnFormType;
     private int mnFormResult;
@@ -301,6 +305,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private erp.mfin.form.SDialogRecordPicker moDialogRecordPicker;
     private erp.mtrn.form.SDialogShowDocumentLinks moDialogShowDocumentLinks;
     private erp.mfin.form.SPanelRecord moPanelRecord;
+    private cfd.ver33.DElementComprobante moComprobante;
+    private java.lang.String msXmlUuid;
 
     /**
      * Creates new form DFormDps
@@ -370,6 +376,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDateDoc = new javax.swing.JButton();
         jlDaysOfCredit = new javax.swing.JLabel();
         jtfDaysOfCredit = new javax.swing.JTextField();
+        jbDateMaturity = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jckDateStartCredit = new javax.swing.JCheckBox();
         jftDateStartCredit = new javax.swing.JFormattedTextField();
@@ -986,6 +993,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jtfDaysOfCredit.setText("0");
         jtfDaysOfCredit.setPreferredSize(new java.awt.Dimension(35, 23));
         jPanel18.add(jtfDaysOfCredit);
+
+        jbDateMaturity.setIcon(new javax.swing.ImageIcon(getClass().getResource("/erp/img/cal_cal.gif"))); // NOI18N
+        jbDateMaturity.setToolTipText("Seleccionar fecha de vencimiento");
+        jbDateMaturity.setFocusable(false);
+        jbDateMaturity.setPreferredSize(new java.awt.Dimension(23, 23));
+        jPanel18.add(jbDateMaturity);
 
         jPanel57.add(jPanel18);
 
@@ -3211,6 +3224,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         jbDate.addActionListener(this);
         jbDateDoc.addActionListener(this);
         jbDateStartCredit.addActionListener(this);
+        jbDateMaturity.addActionListener(this);
         jbBizPartnerBalance.addActionListener(this);
         jbRecordManualSelect.addActionListener(this);
         jbRecordManualView.addActionListener(this);
@@ -4986,6 +5000,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDateStartCredit.setEditable(false);
             jftDateStartCredit.setFocusable(false);
             jbDateStartCredit.setEnabled(false);
+            jbDateMaturity.setEnabled(false);
             //jcbFkLanguageId.setEnabled(...); // language is not editable
             jcbFkDpsNatureId.setEnabled(false);
             jcbFkFunctionalArea.setEnabled(false);
@@ -6088,6 +6103,12 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
 
     private void actionDateStartCredit() {
         miClient.getGuiDatePickerXXX().pickDate(moFieldDateStartCredit.getDate(), moFieldDateStartCredit);
+    }
+    
+    private void actionDateMaturity() {
+        SGuiDate date = miClient.getGuiDatePickerXXX().pickDate(moFieldDateStartCredit.getDate());
+        jtfDaysOfCredit.setText(SLibTimeUtilities.getDaysDiff(date, moFieldDateStartCredit.getDate())+ "");
+        renderDateMaturity();
     }
 
     private void actionBizPartnerBalance() {
@@ -7351,9 +7372,31 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         try {
             if (miClient.getFileChooser().showOpenDialog(miClient.getFrame()) == JFileChooser.APPROVE_OPTION ) {
                 if (miClient.getFileChooser().getSelectedFile().getName().toLowerCase().contains(".xml")) {
-                    if (SCfdUtils.validateCfdiReceptor(miClient, miClient.getFileChooser().getSelectedFile().getAbsolutePath())) {
+                    String absolutePath = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+                    if (SCfdUtils.validateCfdiReceptor(miClient, absolutePath)) {
+                        String cfdi = SXmlUtils.readXml(absolutePath);
+                        msXmlUuid = "";
+                        moComprobante = DCfdUtils.getCfdi33(cfdi);
+                        if (moComprobante.getEltOpcComplemento() != null) {
+                            for (DElement element : moComprobante.getEltOpcComplemento().getElements()) {
+                                if (element.getName().compareTo("tfd:TimbreFiscalDigital") == 0) {
+                                    cfd.ver33.DElementTimbreFiscalDigital tfd = (cfd.ver33.DElementTimbreFiscalDigital) element;
+                                    msXmlUuid = tfd.getAttUUID().getString();
+                                }
+                            }
+                        }
+                        if (!moComprobante.getAttSerie().getString().isEmpty() && jcbNumberSeries.getSelectedItem().toString().isEmpty()) {
+                            jcbNumberSeries.setSelectedItem(moComprobante.getAttSerie().getString());
+                        }
+                        if (!moComprobante.getAttFolio().getString().isEmpty() && jtfNumber.getText().isEmpty()) {
+                            jtfNumber.setText(moComprobante.getAttFolio().getString());
+                        }
+                        else if (moComprobante.getAttFolio().getString().isEmpty() && jtfNumber.getText().isEmpty()) {
+                            jtfNumber.setText(SLibUtils.textLeft(msXmlUuid, UUID_FIRST_SECC_LENGHT));
+                        }
+                        
                         moFieldCfdiXmlFile.setFieldValue(miClient.getFileChooser().getSelectedFile().getName());
-                        msFileXmlJustLoaded = miClient.getFileChooser().getSelectedFile().getAbsolutePath();
+                        msFileXmlJustLoaded = absolutePath;
                     }
                 }
                 else {
@@ -7392,7 +7435,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     
     private void actionDeleteFileXml() {
         moFieldCfdiXmlFile.setFieldValue("");
+        moComprobante = null;
         msFileXmlJustLoaded = "";
+        msXmlUuid = "";
     }
     
     private void actionDeleteFilePdf() {
@@ -7542,12 +7587,14 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
             jftDateStartCredit.setEditable(true);
             jftDateStartCredit.setFocusable(true);
             jbDateStartCredit.setEnabled(true);
+            jbDateMaturity.setEnabled(true);
             jftDateStartCredit.requestFocus();
         }
         else {
             jftDateStartCredit.setEditable(false);
             jftDateStartCredit.setFocusable(false);
             jbDateStartCredit.setEnabled(false);
+            jbDateMaturity.setEnabled(false);
             moFieldDateStartCredit.setFieldValue(moFieldDate.getDate());
             renderDateMaturity();
         }
@@ -8056,6 +8103,47 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         }
     }
     
+    private SFormValidation validateCfdi() {
+        SFormValidation validation = new SFormValidation();
+        try {
+            String message = "No se puede guardar el CFDI ";
+            String cfdiStatus = new SCfdUtilsHandler(miClient).getCfdiSatStatus(moComprobante).getCfdiStatus(); 
+            if (!cfdiStatus.equals(SCfdConsts.STATUS_VALID)) {
+                validation.setMessage(message + "ya que su estatus es : " + cfdiStatus + ".");
+            }
+            if (!validation.getIsError()) {
+                if (!moBizPartner.getFiscalId().equals(moComprobante.getEltEmisor().getAttRfc().getString())) {
+                    validation.setMessage(message + "porque el emisor no corresponde al asociado de negocios seleccionado.");
+                }
+            }
+            if (!validation.getIsError()) {
+                if (SCfdUtils.getCfdIdByUuid(miClient, msXmlUuid) != 0){
+                    validation.setMessage(message + "el UUID del CFDI ya existe en la base de datos.");
+                }
+            }
+            if (!validation.getIsError()) {
+                if (!jcbNumberSeries.getSelectedItem().toString().equals(moComprobante.getAttSerie().getString())) {
+                    validation.setMessage(message + "porque el numero de serie no coincide con la serie capturada.");
+                }    
+            }
+            if (!validation.getIsError()) {
+                if (!moComprobante.getAttFolio().getString().isEmpty()) {
+                    if (!jtfNumber.getText().equals(moComprobante.getAttFolio().getString())) {
+                        validation.setMessage(message + "porque el numero de folio no coincide con el folio capturado.");
+                    }
+                }
+            }
+            if (validation.getIsError()) {
+                validation.setComponent(jbLoadFileXml);
+            }
+        } 
+        catch(Exception e) {
+            SLibUtilities.renderException(this, e);
+        }
+        
+        return validation;
+    }
+    
     /**
      * Verify if shipment data is needed
      * @return 
@@ -8291,6 +8379,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
     private javax.swing.JButton jbDateDoc;
     private javax.swing.JButton jbDateDocDelivery_n;
     private javax.swing.JButton jbDateDocLapsing_n;
+    private javax.swing.JButton jbDateMaturity;
     private javax.swing.JButton jbDateStartCredit;
     private javax.swing.JButton jbDeleteFilePdf;
     private javax.swing.JButton jbDeleteFileXml;
@@ -8688,6 +8777,8 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
         msFileXmlJustLoaded = "";
         moFilePdfJustLoaded = null;
         moAddendaAmc71Manager = null;
+        moComprobante = null;
+        msXmlUuid = "";
         
         moPaneGridEntries.createTable();
         moPaneGridEntries.clearTableRows();
@@ -9426,6 +9517,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                         }
                     }
 
+                    if (!validation.getIsError() && moComprobante != null) {
+                        validation = validateCfdi();
+                    }
                     if (!validation.getIsError()) {
                         // credit status of business partner:
    
@@ -9466,7 +9560,7 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
          */
         return validation;
     }
-
+       
     @Override
     public void setFormStatus(int status) {
         mnFormStatus = status;
@@ -10078,6 +10172,9 @@ public class SFormDps extends javax.swing.JDialog implements erp.lib.form.SFormI
                 }
                 else if (button == jbDateStartCredit) {
                     actionDateStartCredit();
+                }
+                else if (button == jbDateMaturity) {
+                    actionDateMaturity();
                 }
                 else if (button == jbBizPartnerBalance) {
                     actionBizPartnerBalance();

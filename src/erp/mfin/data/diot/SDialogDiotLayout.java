@@ -4,7 +4,7 @@
  */
 
 /*
- * SDialogRepProfitLossStatement.java
+ * SDialogDiotLayout.java
  *
  * Created on 29/06/2010, 05:02:26 PM
  */
@@ -35,11 +35,11 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.event.ActionListener {
 
-    private erp.client.SClientInterface miClient;
+    private final erp.client.SClientInterface miClient;
     private erp.lib.form.SFormField moFieldDateStart;
     private erp.lib.form.SFormField moFieldDateEnd;
     private java.util.Vector<erp.lib.form.SFormField> mvFields;
@@ -253,9 +253,9 @@ public class SDialogDiotLayout extends javax.swing.JDialog implements java.awt.e
 
                 File file = new File(fileName.endsWith(fileExt) ? fileName : fileName + fileExt);
 
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"));
-                bw.write(layout);
-                bw.close();
+                try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "ASCII"))) {
+                    bw.write(layout);
+                }
                 
                 if (miClient.showMsgBoxConfirm(SLibConstants.MSG_INF_FILE_CREATE + file.getPath() + "\n" + SLibConstants.MSG_CNF_FILE_OPEN) == JOptionPane.YES_OPTION) {
                     SLibUtilities.launchFile(file.getPath());

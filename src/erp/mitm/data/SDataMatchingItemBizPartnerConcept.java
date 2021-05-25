@@ -19,6 +19,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
     
     protected int mnPkMatchId;
     protected java.lang.String msConceptKey;
+    protected java.lang.String msConceptProductService;
     protected double mdFactorConversion;
     protected int mnUses;
     
@@ -30,9 +31,9 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
     protected int mnFkBizPartnerId;
     protected int mnFkItemId;
     protected int mnFkUnitId;
-    protected int mnFkItemIdRef;
-    protected String mnFkCostCenter;
     protected int mnFkTaxRegionId;
+    protected int mnFkItemRefId_n;
+    protected java.lang.String msFkCostCenterId_n;
     protected int mnFkUserNewId;
     protected int mnFkUserEditId;
     protected int mnFkUserDeleteId;
@@ -49,6 +50,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
 
     public void setPkMatchId(int n) { mnPkMatchId = n; }
     public void setConceptKey(java.lang.String s) { msConceptKey = s; }
+    public void setConceptProductService(java.lang.String s) { msConceptProductService = s; }
     public void setFactorConversion(double d) { mdFactorConversion = d; }
     public void setUses(int n) { mnUses = n; }
     public void setUseFirst(java.util.Date t) { mtUseFirst = t; }
@@ -57,9 +59,9 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
     public void setFkBizPartnerId(int n) { mnFkBizPartnerId = n; }
     public void setFkItemId(int n) { mnFkItemId = n; }
     public void setFkUnitId(int n) { mnFkUnitId = n; }
-    public void setFkItemIdRef(int n) { mnFkItemIdRef = n; }
-    public void setFkCostCenter(String s) { mnFkCostCenter = s; }
     public void setFkTaxRegionId(int n) { mnFkTaxRegionId = n; }
+    public void setFkItemRefId_n(int n) { mnFkItemRefId_n = n; }
+    public void setFkCostCenterId_n(java.lang.String s) { msFkCostCenterId_n = s; }
     public void setFkUserNewId(int n) { mnFkUserNewId = n; }
     public void setFkUserEditId(int n) { mnFkUserEditId = n; }
     public void setFkUserDeleteId(int n) { mnFkUserDeleteId = n; }
@@ -69,6 +71,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
     
     public int getPkMatchId() { return mnPkMatchId; }
     public java.lang.String getConceptKey() { return msConceptKey; }
+    public java.lang.String getConceptProductService() { return msConceptProductService; }
     public double getFactorConversion() { return mdFactorConversion; }
     public int getUses() { return mnUses; }
     public java.util.Date getUseFirst() { return mtUseFirst; }
@@ -77,9 +80,9 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
     public int getFkBizPartnerId() { return mnFkBizPartnerId; }
     public int getFkItemId() { return mnFkItemId; }
     public int getFkUnitId() { return mnFkUnitId; }
-    public int getFkItemIdRef() { return mnFkItemIdRef; }
-    public String getFkCostCenter() { return mnFkCostCenter; }
     public int getFkTaxRegionId() { return mnFkTaxRegionId; }
+    public int getFkItemRefId_n() { return mnFkItemRefId_n; }
+    public java.lang.String getFkCostCenterId_n() { return msFkCostCenterId_n; }
     public int getFkUserNewId() { return mnFkUserNewId; }
     public int getFkUserEditId() { return mnFkUserEditId; }
     public int getFkUserDeleteId() { return mnFkUserDeleteId; }
@@ -104,6 +107,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
         super.resetRegistry();
         mnPkMatchId = 0;
         msConceptKey = "";
+        msConceptProductService = "";
         mdFactorConversion = 0;
         mnUses = 0;
         mtUseFirst = null;
@@ -112,9 +116,9 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
         mnFkBizPartnerId = 0;
         mnFkItemId = 0;
         mnFkUnitId = 0;
-        mnFkItemIdRef = 0;
-        mnFkCostCenter = "";
         mnFkTaxRegionId = 0;
+        mnFkItemRefId_n = 0;
+        msFkCostCenterId_n = "";
         mnFkUserNewId = 0;
         mnFkUserEditId = 0;
         mnFkUserDeleteId = 0;
@@ -128,6 +132,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
         int key = (int) pk;
         String sql;
         ResultSet resultSet;
+        ResultSet compResultSet;
 
         mnLastDbActionResult = SLibConstants.UNDEFINED;
         reset();
@@ -143,6 +148,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
             else {
                 mnPkMatchId = resultSet.getInt("id_match");
                 msConceptKey = resultSet.getString("cpt_key");
+                msConceptProductService = resultSet.getString("cpt_prod_serv");
                 mdFactorConversion = resultSet.getDouble("fact_conv");
                 mnUses = resultSet.getInt("uses");
                 mtUseFirst = resultSet.getDate("use_first");
@@ -151,15 +157,23 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
                 mnFkBizPartnerId = resultSet.getInt("fid_bp");
                 mnFkItemId = resultSet.getInt("fid_item");
                 mnFkUnitId = resultSet.getInt("fid_unit");
-                mnFkItemIdRef = resultSet.getInt("fid_item_ref_n");
-                mnFkCostCenter = resultSet.getString("fid_cc");
                 mnFkTaxRegionId = resultSet.getInt("fid_tax_reg");
+                mnFkItemRefId_n = resultSet.getInt("fid_item_ref_n");
                 mnFkUserNewId = resultSet.getInt("fid_usr_new");
                 mnFkUserEditId = resultSet.getInt("fid_usr_edit");
                 mnFkUserDeleteId = resultSet.getInt("fid_usr_del");
                 mtUserNewTs = resultSet.getTimestamp("ts_new");
                 mtUserEditTs = resultSet.getTimestamp("ts_edit");
                 mtUserDeleteTs = resultSet.getTimestamp("ts_del");
+                
+                // Complementary DB
+                sql = "SELECT mt.* FROM " +
+                    "itmu_match_item_cpt_bp_comp AS mt " +
+                    "WHERE mt.id_match_comp = " + key + " ";
+                compResultSet = statement.executeQuery(sql);
+                if (compResultSet.next()) {
+                    msFkCostCenterId_n = compResultSet.getString("fid_cc_n");
+                }
 
                 // Read aswell unit object:
 
@@ -193,6 +207,7 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
                     "?, ?, ?, ?, ?, ?, ?) }");
             callableStatement.setInt(nParam++, mnPkMatchId);
             callableStatement.setString(nParam++, msConceptKey);
+            callableStatement.setString(nParam++, msConceptProductService);
             callableStatement.setDouble(nParam++, mdFactorConversion);
             callableStatement.setInt(nParam++, mnUses);
             callableStatement.setDate(nParam++, new java.sql.Date(mtUseFirst.getTime()));
@@ -201,9 +216,8 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
             callableStatement.setInt(nParam++, mnFkBizPartnerId);
             callableStatement.setInt(nParam++, mnFkItemId);
             callableStatement.setInt(nParam++, mnFkUnitId);
-            callableStatement.setInt(nParam++, mnFkItemIdRef);
-            callableStatement.setString(nParam++, mnFkCostCenter);
             callableStatement.setInt(nParam++, mnFkTaxRegionId);
+            callableStatement.setInt(nParam++, mnFkItemRefId_n);
             callableStatement.setInt(nParam++, mnFkUserEditId);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
             callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
@@ -221,6 +235,24 @@ public class SDataMatchingItemBizPartnerConcept extends erp.lib.data.SDataRegist
                 mbIsRegistryNew = false;
                 mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_OK;
             }
+            
+            // Complementary DB
+            if (mnLastDbActionResult == SLibConstants.DB_ACTION_SAVE_OK) {
+                nParam = 1;
+                callableStatement = connection.prepareCall(
+                    "{ CALL itmu_match_item_cpt_bp_comp_save(" +  
+                    "?, ?, ?, ?, ?, ? ) }");
+                
+                callableStatement.setInt(nParam++, mnPkMatchId);
+                callableStatement.setBoolean(nParam++, mbIsDeleted);
+                callableStatement.setString(nParam++, msFkCostCenterId_n);
+                callableStatement.setInt(nParam++, mnFkUserEditId);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.SMALLINT);
+                callableStatement.registerOutParameter(nParam++, java.sql.Types.VARCHAR);
+            
+                callableStatement.execute();
+            }
+
         }
         catch (java.lang.Exception e) {
             mnLastDbActionResult = SLibConstants.DB_ACTION_SAVE_ERROR;

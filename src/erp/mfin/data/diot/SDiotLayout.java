@@ -20,7 +20,7 @@ import sa.lib.SLibUtils;
 
 /**
  *
- * @author Sergio Flores
+ * @author Sergio Flores, Isabel Servín
  */
 public class SDiotLayout {
     
@@ -35,6 +35,7 @@ public class SDiotLayout {
     protected HashMap<String, SDataAccount> moMajorAccountsMap; // key: number of major account
     protected HashMap<String, SDataTax> moVatsMap; // key: 'basic tax ID' + "-" + 'tax ID'
     protected HashMap<Integer, SDataBizPartner> moBizPartnersMap; // key: ID of business partner
+    protected HashSet<String> moRepeatedFiscalId;
     protected String[] masDiotAccountCodes;
     
     public SDiotLayout(erp.client.SClientInterface client, Date start, Date end) throws Exception {
@@ -162,6 +163,10 @@ public class SDiotLayout {
         moMajorAccountsMap.clear();
         moVatsMap.clear();
         moBizPartnersMap.clear();
+        
+        // Obtener los RFC que aparecen en los ocasionales agregados a las pólizas y los que tienen movimientos de IVA acreditable
+        
+        obtainRepeatedFiscalId();
         
         // add default VAT to map of taxes:
         
@@ -711,6 +716,40 @@ public class SDiotLayout {
         SDiotTercero terceroTotal = null;
         SDiotTercero terceroCompany = null;
         
+        // Contendrá los registros de terceros cuyo RFC no esta repetido.
+        HashSet<SDiotTercero> terceros = new HashSet<>();
+        
+        // Contendrá los registros te terceros cuyo RFC esta repetido, es decir que aparecen en los ocasionales agregados a las pólizas y los que tienen movimientos de IVA acreditable
+        HashMap<String, SDiotTercero> tercerosRepetidos = new HashMap<>();
+        
+        tercerosMap.values().stream().forEach((map) -> {
+            if (moRepeatedFiscalId.contains(map.Rfc)){
+                if(tercerosRepetidos.containsKey(map.Rfc)) {
+                    SDiotTercero aux = tercerosRepetidos.get(map.Rfc);
+                    aux.ValorPagosImpIva1011 += map.ValorPagosImpIva1011;
+                    aux.ValorPagosImpIva1516 += map.ValorPagosImpIva1516;
+                    aux.ValorPagosImpIvaExento += map.ValorPagosImpIvaExento;
+                    aux.ValorPagosNacIva0 += map.ValorPagosNacIva0;
+                    aux.ValorPagosNacIva10 += map.ValorPagosNacIva10;
+                    aux.ValorPagosNacIva1011 += map.ValorPagosNacIva1011;
+                    aux.ValorPagosNacIva15 += map.ValorPagosNacIva15;
+                    aux.ValorPagosNacIva1516 += map.ValorPagosNacIva1516;
+                    aux.ValorPagosNacIvaEstFront += map.ValorPagosNacIvaEstFront;
+                    aux.ValorPagosNacIvaExento += map.ValorPagosNacIvaExento;
+                }
+                else {
+                    tercerosRepetidos.put(map.Rfc, map);
+                }
+            }
+            else {
+                terceros.add(map);
+            }
+        });
+        // Se agregan los repetidos con los demas registros para procesarse.
+        tercerosRepetidos.values().stream().forEach((terceroRepetido) -> {
+            terceros.add(terceroRepetido);
+        });
+        
         if (format == FORMAT_CSV) {
             terceroTotal = new SDiotTercero();
             
@@ -722,7 +761,7 @@ public class SDiotLayout {
         
         // suppliers:
         
-        for (SDiotTercero tercero : tercerosMap.values()) {
+        for (SDiotTercero tercero : terceros) {
             if (format == FORMAT_CSV) {
                 terceroTotal.addTercero(tercero);
             }
@@ -813,6 +852,47 @@ public class SDiotLayout {
         }
         
         return SLibUtils.textToAscii(layout);
+    }
+
+    private void obtainRepeatedFiscalId() throws Exception {
+        moRepeatedFiscalId = new HashSet<>();
+        HashSet<String> occFiscalIds = new HashSet<>();
+        HashSet<String> taxFiscalIds = new HashSet<>();
+        ResultSet resultSet;
+        
+        String sql = "SELECT DISTINCT re.occ_fiscal_id " +
+            "FROM " +
+            "fin_rec AS r " +
+            "INNER JOIN fin_rec_ety AS re ON re.id_year=r.id_year AND re.id_per=r.id_per AND re.id_bkc=r.id_bkc AND re.id_tp_rec=r.id_tp_rec AND re.id_num=r.id_num " +
+            "WHERE " +
+            "NOT r.b_del AND NOT re.b_del AND " +
+            "r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' AND " +
+            "re.occ_fiscal_id <> '' " +
+            "ORDER BY re.occ_fiscal_id;";
+        resultSet = miClient.getSession().getStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            occFiscalIds.add(resultSet.getString(1));
+        }
+        
+        sql = "SELECT DISTINCT b.fiscal_id " +
+            "FROM " +
+            "fin_rec AS r " +
+            "INNER JOIN fin_rec_ety AS re ON re.id_year=r.id_year AND re.id_per=r.id_per AND re.id_bkc=r.id_bkc AND re.id_tp_rec=r.id_tp_rec AND re.id_num=r.id_num " +
+            "INNER JOIN trn_dps AS d ON d.id_year=re.fid_dps_year_n AND d.id_doc=re.fid_dps_doc_n " +
+            "INNER JOIN erp.bpsu_bp AS b ON b.id_bp=d.fid_bp_r " +
+            "WHERE " +
+            "NOT r.b_del AND NOT re.b_del AND " +
+            "r.dt BETWEEN '" + SLibUtils.DbmsDateFormatDate.format(mtStart) + "' AND '" + SLibUtils.DbmsDateFormatDate.format(mtEnd) + "' AND " +
+            "d.fid_ct_dps=1 AND re.fid_acc = '1160-0002-0000' " +
+            "ORDER BY b.fiscal_id;";
+        resultSet = miClient.getSession().getStatement().executeQuery(sql);
+        while (resultSet.next()) {
+            taxFiscalIds.add(resultSet.getString(1));
+        }
+        
+        occFiscalIds.stream().filter((occFiscalId) -> (taxFiscalIds.contains(occFiscalId))).forEach((occFiscalId) -> {
+            moRepeatedFiscalId.add(occFiscalId);
+        });
     }
     
     public class JournalEntry {
