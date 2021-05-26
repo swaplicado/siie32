@@ -56,7 +56,7 @@ public class SDbEmployee extends SDbRegistryUser {
     protected int mnOvertimePolicy;
     protected String msBankAccount;
     protected String msGroceryServiceAccount;
-    protected String msPlaceBir;
+    protected String msPlaceOfBirth;
     protected String msUmf;
     protected java.sql.Blob moImagePhoto_n;
     protected java.sql.Blob moImageSignature_n;
@@ -134,7 +134,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public void setOvertimePolicy(int n) { mnOvertimePolicy = n; }
     public void setBankAccount(String s) { msBankAccount = s; }
     public void setGroceryServiceAccount(String s) { msGroceryServiceAccount = s; }
-    public void setPlaceBir (String s) { msPlaceBir = s; }
+    public void setPlaceOfBirth (String s) { msPlaceOfBirth = s; }
     public void setUmf(String s) { msUmf= s; }
     public void setImagePhoto_n(java.sql.Blob o) { moImagePhoto_n = o; }
     public void setImageSignature_n(java.sql.Blob o) { moImageSignature_n = o; }
@@ -191,7 +191,7 @@ public class SDbEmployee extends SDbRegistryUser {
     public int getOvertimePolicy() { return mnOvertimePolicy; }
     public String getBankAccount() { return msBankAccount; }
     public String getGroceryServiceAccount() { return msGroceryServiceAccount; }
-    public String getPlaceBir() { return msPlaceBir; }
+    public String getPlaceOfBirth() { return msPlaceOfBirth; }
     public String getUmf() { return msUmf; }
     public java.sql.Blob getImagePhoto_n() { return moImagePhoto_n; }
     public java.sql.Blob getImageSignature_n() { return moImageSignature_n; }
@@ -343,7 +343,7 @@ public class SDbEmployee extends SDbRegistryUser {
         mnOvertimePolicy = 0;
         msBankAccount = "";
         msGroceryServiceAccount = "";
-        msPlaceBir = "";
+        msPlaceOfBirth = "";
         msUmf = "";
         moImagePhoto_n = null;
         moImageSignature_n = null;
@@ -450,7 +450,7 @@ public class SDbEmployee extends SDbRegistryUser {
             mnOvertimePolicy = resultSet.getInt("overtime");
             msBankAccount = resultSet.getString("bank_acc");
             msGroceryServiceAccount = resultSet.getString("grocery_srv_acc");
-            msPlaceBir = resultSet.getString("place_bir");
+            msPlaceOfBirth = resultSet.getString("place_bir");
             msUmf = resultSet.getString("umf");
             /*
             moImagePhoto_n = resultSet.getBlob("img_pho_n");
@@ -557,7 +557,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     mnOvertimePolicy + ", " + 
                     "'" + msBankAccount + "', " + 
                     "'" + msGroceryServiceAccount + "', " + 
-                    "'" + msPlaceBir + "', " + 
+                    "'" + msPlaceOfBirth + "', " + 
                     "'" + msUmf + "', " + 
                     "NULL, " +
                     "NULL, " +
@@ -621,7 +621,7 @@ public class SDbEmployee extends SDbRegistryUser {
                     "overtime = " + mnOvertimePolicy + ", " +
                     "bank_acc = '" + msBankAccount + "', " +
                     "grocery_srv_acc = '" + msGroceryServiceAccount + "', " +
-                    "place_bir = '" + msPlaceBir + "', " +
+                    "place_bir = '" + msPlaceOfBirth + "', " +
                     "umf = '" + msUmf + "', " +
                     /*
                     "img_pho_n = " + moImagePhoto_n + ", " +
@@ -730,7 +730,7 @@ public class SDbEmployee extends SDbRegistryUser {
         registry.setOvertimePolicy(this.getOvertimePolicy());
         registry.setBankAccount(this.getBankAccount());
         registry.setGroceryServiceAccount(this.getGroceryServiceAccount());
-        registry.setPlaceBir(this.getPlaceBir());
+        registry.setPlaceOfBirth(this.getPlaceOfBirth());
         registry.setUmf(this.getUmf());
         registry.setImagePhoto_n(this.getImagePhoto_n());
         registry.setImageSignature_n(this.getImageSignature_n());

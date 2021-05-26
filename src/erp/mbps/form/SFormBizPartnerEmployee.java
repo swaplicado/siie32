@@ -2876,7 +2876,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
             moFieldFileImagePhoto.setFieldValue("");
             moFieldFileImageSignature.setFieldValue("");
             moFieldFkCatalogueSexType.setFieldValue(new int[] { moEmployee.getFkCatalogueSexClassId(), moEmployee.getFkCatalogueSexTypeId() });
-            moFieldEntityEmployee.setFieldValue(moEmployee.getPlaceBir());
+            moFieldEntityEmployee.setFieldValue(moEmployee.getPlaceOfBirth());
             moFieldUmf.setFieldValue(moEmployee.getUmf());
             moFieldFkCatalogueBloodTypeType.setFieldValue(new int[] { moEmployee.getFkCatalogueBloodTypeClassId(), moEmployee.getFkCatalogueBloodTypeTypeId() });
             moFieldFkCatalogueEducationType.setFieldValue(new int[] { moEmployee.getFkCatalogueEducationClassId(), moEmployee.getFkCatalogueEducationTypeId() });
@@ -3205,7 +3205,7 @@ public class SFormBizPartnerEmployee extends javax.swing.JDialog implements erp.
         //moEmployee.setFkSourceCompanyId(...); // source company set above in this method!
         moEmployee.setFkBankId_n(moFieldFkBank_n.getKeyAsIntArray()[0]);
         moEmployee.setFkGroceryServiceId(moFieldFkGroceryService.getKeyAsIntArray()[0]);
-        moEmployee.setPlaceBir(moFieldEntityEmployee.getString());
+        moEmployee.setPlaceOfBirth(moFieldEntityEmployee.getString());
         moEmployee.setUmf(moFieldUmf.getString());
         
         if (jckChangeSalary.isSelected()) {
