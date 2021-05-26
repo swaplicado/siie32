@@ -7,6 +7,15 @@ Isabel Danae GARCÍA SERVÍN
 3) Se modificó en la base de datos los campos de "ítem de referencia" y "centro de costo" para hacer el match de ítems para la importación de facturas XML.
 4) Se agregó un botón en la forma de DPS para ingresar la fecha de vencimiento y en base a ella calcular los días de crédito deseados.
 
+Jhonatan Claudio PEÑA HERNÁNDEZ
+--------------------------------------------------------------------------------
+1) Implementación de centro de costo asignado a departamentos de empleados por empresa.
+2) Adición del centro de costos del departamento al reporte de impuestos sobre nómina.
+3) Correcciones a generación de layouts SUA e IDSE.
+4) Adición de lugar de nacimiento y UMF al catálogo de empleados.
+5) Adición de variables de control de incidencias a la clase registro de incidencias.
+6) Adición de RFC, CURP y NSS al reporte de empleados activos por período.
+
 ================================================================================
 SIIE 3.2 182.0/ 2021-05-07
 Isabel Danae GARCÍA SERVÍN
